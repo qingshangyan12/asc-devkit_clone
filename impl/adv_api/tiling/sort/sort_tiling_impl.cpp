@@ -49,7 +49,7 @@ void GetSortMaxMinTmpSize(
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
         npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-            npuArch == NpuArch::DAV_5162,
+            npuArch == NpuArch::DAV_5102,
         return, "Unsupported NpuArch for Sort API.");
     std::set<AscendC::TensorDataType> supportValueType = {ge::DT_INT8,   ge::DT_UINT8,  ge::DT_FLOAT, ge::DT_FLOAT16,
                                                           ge::DT_BF16,   ge::DT_INT16,  ge::DT_INT32, ge::DT_UINT16,

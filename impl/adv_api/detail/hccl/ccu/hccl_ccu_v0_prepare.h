@@ -24,6 +24,8 @@ using namespace HcclKfcProtocol;
 static_assert(KFC_CONCURRENT_AG_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent AllGather parameters exceed XN capacity");
 static_assert(
     KFC_RS_SOLE_NHR_PARAM_NUM <= CCU_USED_XN_NUM, "Sole NHR MultiLink ReduceScatter parameters exceed XN capacity");
+static_assert(
+    KFC_RS_SOLE_MESH_A5_PARAM_NUM <= CCU_USED_XN_NUM, "Sole Mesh A5 ReduceScatter parameters exceed XN capacity");
 static_assert(KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent AllToAll parameters exceed XN capacity");
 static_assert(KFC_CONCURRENT_RS_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent ReduceScatter parameters exceed XN capacity");
 static_assert(KFC_PARALLEL_AG_STORAGE_NUM <= CCU_USED_XN_NUM, "Parallel AllGather parameters exceed XN capacity");
@@ -522,6 +524,90 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     KERNEL_LOG(
         KERNEL_INFO, "RS sole-NHR prepare: slice=0x%llx, stride=0x%llx, lastJetty=0x%llx\n", sliceSize, sliceStride,
         sliceLastJettySize);
+}
+
+// SoleMesh A5（CcuSchedReduceScatterSoleMeshA5）的 AIV prepare：
+// 自 hccl CcuTempReduceScatterMesh1DA5Mem2Mem::KernelRun 的 host 侧双缓冲流水线切分搬到设备侧。
+// 布局见 KfcReduceScatterSoleMeshA5ParamIndex，与 KFC dispatch、kernel 形参逐槽一致。
+// expansionNum 在此 inline 复刻 GetReduceExpansionNum（低精度 SUM 默认升 fp32），避免 AIV 侧依赖 ccu 库。
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatterSoleMeshA5M2M(
+    __gm__ CommonPrepareParamCcu* commParam)
+{
+    // 双缓冲流水线 chunk 策略（与 hccl A5 template 对齐）：
+    // - slice < MIN_PIPELINE 时不切分（K=1 直通）；bufStride = min(align4K(slice/2), CHUNK_TARGET)；
+    // - scratch 占用恒为 2*rankSize*bufStride，不随消息增大。
+    constexpr uint64_t A5_RS_MIN_PIPELINE_SIZE = 128U * 1024U;
+    constexpr uint64_t A5_RS_CHUNK_TARGET_SIZE = 256U * 1024U;
+    constexpr uint64_t A5_RS_BUF_ALIGN = CCU_MEMSLICE_SIZE;
+    constexpr uint64_t NUM_TWO = 2U;
+
+    const uint64_t dataSize = GetHcclDataTypeSize(commParam->dataType);
+    const uint64_t sliceTotal = commParam->count * dataSize;
+    const uint64_t repeatOffset = commParam->count * ccuParam_.repeatIndex * dataSize;
+    const uint64_t inputBase = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
+    const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
+    const uint64_t sliceStride = commParam->strideCount == 0U ? sliceTotal : commParam->strideCount * dataSize;
+
+    // expansionNum inline（复刻 GetReduceExpansionNum 语义）
+    HcclDataType outDt = commParam->dstDataType;
+    if (commParam->op == HcclReduceOp::HCCL_REDUCE_SUM && outDt == HcclDataType::HCCL_DATA_TYPE_RESERVED) {
+        outDt = commParam->dataType;
+        if (commParam->dataType == HcclDataType::HCCL_DATA_TYPE_HIF8 ||
+            commParam->dataType == HcclDataType::HCCL_DATA_TYPE_FP8E4M3 ||
+            commParam->dataType == HcclDataType::HCCL_DATA_TYPE_FP8E5M2 ||
+            commParam->dataType == HcclDataType::HCCL_DATA_TYPE_INT8) {
+            outDt = HcclDataType::HCCL_DATA_TYPE_FP32;
+        }
+    }
+    const uint64_t expansionNum = GetHcclDataTypeSize(outDt) / dataSize;
+
+    uint64_t chunk;
+    uint64_t lastChunk;
+    uint64_t bufStride;
+    uint64_t chunkNum;
+    if (sliceTotal < A5_RS_MIN_PIPELINE_SIZE) {
+        chunkNum = 1U;
+        chunk = sliceTotal;
+        lastChunk = sliceTotal;
+        bufStride = sliceTotal;
+    } else {
+        uint64_t halfAligned = (sliceTotal / NUM_TWO) / A5_RS_BUF_ALIGN * A5_RS_BUF_ALIGN;
+        bufStride = halfAligned < A5_RS_CHUNK_TARGET_SIZE ? halfAligned : A5_RS_CHUNK_TARGET_SIZE;
+        chunk = bufStride;
+        chunkNum = (sliceTotal + chunk - 1U) / chunk;
+        lastChunk = sliceTotal - (chunkNum - 1U) * chunk;
+    }
+
+    const uint64_t inputRepeatStride = chunk;
+    const uint64_t outputRepeatStride = chunk * expansionNum;
+    const uint64_t scratchRepeatStride = ccuParam_.rankNum * bufStride; // buffer A -> buffer B
+    const uint64_t scratchSlotStride = bufStride;
+    const uint64_t repeatNum = UINT64_MAX - chunkNum;
+    const uint64_t currentRankSliceInputOffset = sliceStride * ccuParam_.rankId;
+    // 与 asc-devkit SoleMesh 约定一致：recvBuf 已为本 rank 输出基址，输出片内偏移取 0。
+    const uint64_t currentRankSliceOutputOffset = 0U;
+
+    xnData_[KFC_RS_SOLE_MESH_A5_OP_ID] = GetOpId(commParam);
+    xnData_[KFC_RS_SOLE_MESH_A5_INPUT] = inputBase;
+    xnData_[KFC_RS_SOLE_MESH_A5_OUTPUT] = outputBase;
+    xnData_[KFC_RS_SOLE_MESH_A5_SCRATCH] = ccuParam_.scratchAddr;
+    xnData_[KFC_RS_SOLE_MESH_A5_RANK_SLICE_INPUT_OFFSET] = currentRankSliceInputOffset;
+    xnData_[KFC_RS_SOLE_MESH_A5_RANK_SLICE_OUTPUT_OFFSET] = currentRankSliceOutputOffset;
+    xnData_[KFC_RS_SOLE_MESH_A5_INPUT_REPEAT_STRIDE] = inputRepeatStride;
+    xnData_[KFC_RS_SOLE_MESH_A5_OUTPUT_REPEAT_STRIDE] = outputRepeatStride;
+    xnData_[KFC_RS_SOLE_MESH_A5_NORMAL_SLICE_SIZE] = chunk;
+    xnData_[KFC_RS_SOLE_MESH_A5_LAST_SLICE_SIZE] = lastChunk;
+    xnData_[KFC_RS_SOLE_MESH_A5_SCRATCH_REPEAT_STRIDE] = scratchRepeatStride;
+    xnData_[KFC_RS_SOLE_MESH_A5_REPEAT_NUM] = repeatNum;
+    CalcGoSize(chunk, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, &xnData_[KFC_RS_SOLE_MESH_A5_GO_ADDR_OFFSET]);
+    CalcGoSize(lastChunk, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, &xnData_[KFC_RS_SOLE_MESH_A5_GO_B_ADDR_OFFSET]);
+    xnData_[KFC_RS_SOLE_MESH_A5_SCRATCH_SLOT_STRIDE] = scratchSlotStride;
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "RS sole-A5 prepare: slice=0x%llx, chunk=0x%llx, lastChunk=0x%llx, chunkNum=%llu, bufStride=0x%llx, "
+        "exp=%llu\n",
+        sliceTotal, chunk, lastChunk, chunkNum, bufStride, expansionNum);
 }
 
 template <const auto& config>
