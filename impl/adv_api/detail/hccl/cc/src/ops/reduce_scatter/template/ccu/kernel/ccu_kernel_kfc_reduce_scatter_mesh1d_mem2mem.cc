@@ -446,7 +446,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ctx.moConfig.loopCount = CCU_LOOP_COUNT_M2M_RE;
     ctx.moConfig.memSlice = CCU_MS_SIZE;
 
-    HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem run");
+    HCCL_INFO("[KFC CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem run");
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(LoadArgs(
         ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, chunkSize, chunkLoopNum, tailSize,
@@ -455,7 +455,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     CCU_CHK_RET(PreSync(ctx));
     CCU_CHK_RET(DoRepeatReduceScatter(ctx));
     CCU_CHK_RET(PostSync(ctx));
-    HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem end");
+    HCCL_INFO("[KFC CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem end");
 
     return CCU_SUCCESS;
 }
