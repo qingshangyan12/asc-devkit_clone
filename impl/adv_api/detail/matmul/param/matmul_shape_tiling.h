@@ -333,7 +333,7 @@ private:
             });
         }
 #endif
-#if __CCE_AICORE__ != 220 && !defined(__DAV_C310__) && !defined(__DAV_310R6__) && (__NPU_ARCH__ != 5102)
+#if (__NPU_ARCH__ != 2201) && (__NPU_ARCH__ != 3101) && (__NPU_ARCH__ != 5102)
         if constexpr (ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT) {
             ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR,
                 "ScheduleType is OUTER_PRODUCT only supported on A2/A3/A5."); });
