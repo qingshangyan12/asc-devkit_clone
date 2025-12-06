@@ -174,8 +174,8 @@
     <file_info copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)/ascendc_kernel_cmake" install_path="$(TARGET_ENV)/tikcpp/ascendc_kernel_cmake">
         <file value="fwk_modules"/>
         <file value="legacy_modules"/>
-        <file value="ASC_CMake"/>
-        <file value="AICPU_CMake"/>
+        <file value="asc_modules"/>
+        <file value="aicpu_modules"/>
         <file value="ascendc.cmake"/>
     </file_info>
 

@@ -16,6 +16,6 @@ include($ENV{ASCEND_HOME_PATH}/compiler/tikcpp/ascendc_kernel_cmake/fwk_modules/
 include($ENV{ASCEND_HOME_PATH}/compiler/tikcpp/ascendc_kernel_cmake/fwk_modules/intf.cmake)
 
 # plugin support ASC language
-list(APPEND CMAKE_MODULE_PATH "$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/ascendc_kernel_cmake/ASC_CMake")
-include($ENV{ASCEND_HOME_PATH}/compiler/tikcpp/ascendc_kernel_cmake/ASC_CMake/FindASC.cmake)
+list(APPEND CMAKE_MODULE_PATH "$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/ascendc_kernel_cmake/asc_modules")
+include($ENV{ASCEND_HOME_PATH}/compiler/tikcpp/ascendc_kernel_cmake/asc_modules/FindASC.cmake)
 set(_ASC_MODULE_LOADED TRUE)
