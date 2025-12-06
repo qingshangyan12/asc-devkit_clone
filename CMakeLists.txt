@@ -78,3 +78,5 @@ if(PACKAGE_OPEN_PROJECT)
   include(cmake/package.cmake)
   include(cmake/version_info.cmake)
 endif()
+
+add_subdirectory(cmake)
