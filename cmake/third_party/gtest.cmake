@@ -8,6 +8,7 @@
 # BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE. See LICENSE in the root of
 # the software repository for the full text of the License.
 # ----------------------------------------------------------------------------
+
 unset(gtest_FOUND CACHE)
 unset(GTEST_INCLUDE CACHE)
 unset(GTEST_STATIC_LIBRARY CACHE)
@@ -106,5 +107,3 @@ set_target_properties(gtest PROPERTIES
 set_target_properties(gtest_main PROPERTIES
         IMPORTED_LOCATION ${GTEST_INSTALL_PATH}/lib/libgtest_main.a
         INTERFACE_INCLUDE_DIRECTORIES ${GTEST_INSTALL_PATH}/include)
-
-
