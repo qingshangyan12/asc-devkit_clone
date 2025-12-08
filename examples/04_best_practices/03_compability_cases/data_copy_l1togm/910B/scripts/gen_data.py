@@ -16,15 +16,12 @@ import numpy as np
 
 def gen_golden_data_simple():
     input_shape_x = [64, 128]
-    input_shape_y = [128, 128]
     dtype = np.half
     input_x = np.ones(input_shape_x).astype(dtype)
-    input_y = np.eye(input_shape_y[0]).astype(dtype)
-    golden = np.matmul(input_x.astype(np.float32), input_y.astype(np.float32)).astype(np.float32)
+    golden = input_x
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
-    input_y.tofile("./input/input_y.bin")
     golden.tofile("./output/golden.bin")
 
 

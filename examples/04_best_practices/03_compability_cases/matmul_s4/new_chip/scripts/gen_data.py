@@ -94,6 +94,8 @@ def gen_golden_data_simple():
 
     x1_gm.fill(0)
     x2_gm.fill(0)
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     x1_gm.tofile("./input/input_x.bin")
     x2_gm.tofile("./input/input_y.bin")
     tiling.tofile("./input/input_tiling.bin")

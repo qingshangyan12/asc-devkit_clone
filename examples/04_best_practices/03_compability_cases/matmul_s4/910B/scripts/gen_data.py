@@ -96,7 +96,8 @@ def gen_golden_data_simple():
     workspace = np.zeros(workspace_shape).astype(np.int32)
     bias = np.random.randint(1, 10, bias_shape).astype(np.int32)
     golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(y_gm_type)
-
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     new_x1_gm.tofile("./input/input_x.bin")
     new_x2_gm.tofile("./input/input_y.bin")
     tiling.tofile("./input/input_tiling.bin")

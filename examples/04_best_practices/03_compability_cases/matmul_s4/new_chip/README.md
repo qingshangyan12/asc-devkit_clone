@@ -1,11 +1,11 @@
-# InitConstValue兼容性样例
+# int4b_t数据类型下Matmul兼容性样例
 ## 概述
-L0A Buffer和L0B Buffer初始化值的端到端用例。
+int4b_t矩阵乘计算的端到端兼容性用例。
 ## 支持的AI处理器
-- Ascend 910D
+该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
 ## 目录结构介绍
 ```
-├── inits_const_value
+├── matmul_s4
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
@@ -19,17 +19,26 @@ L0A Buffer和L0B Buffer初始化值的端到端用例。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
-  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">128 * 128</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">128 * 64</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="7" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">256 * 256</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">256 * 256</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  </tr>
+  <tr><td align="center">x4</td><td align="center">256 * 128</td><td align="center">int4b_t</td><td align="center">ND</td></tr>
+  </tr>
+    <tr><td align="center">y4</td><td align="center">128 * 64</td><td align="center">int4b_t</td><td align="center">ND</td></tr>
+  </tr>
+    <tr><td align="center">tiling</td><td align="center">64</td><td align="center">int32_t</td><td align="center">ND</td></tr>
+  </tr>
+    </tr>
+    <tr><td align="center">workspace</td><td align="center">131072</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">128 * 64</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">256 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">demo</td></tr>
   </table>
 - 算子实现：  
-  351x架构版本删除L0A Buffer/L0B Buffer初始化的相关硬件指令。用户可以通过先初始化L1 Buffer，再通过LoadData接口将L1 Buffer上的数据搬运到L0A Buffer/L0B Buffer。
+    Cube计算单元删除int4b_t数据类型。用户可以在算子侧通过MIX模式在Vector Core进行int4b_t到int8_t的Cast转换，再通过UB搬运到L1后进行Mmad计算。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
