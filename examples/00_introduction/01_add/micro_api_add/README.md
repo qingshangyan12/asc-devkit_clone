@@ -1,11 +1,11 @@
-# Microadd算子直调样例
+# MicroApiAdd算子直调样例
 ## 概述
-本样例介绍Add算子的核函数直调方法，通过微指令API直接对芯片中涉及Vector计算的寄存器进行操作，算子支持单核运行。
+本样例介绍基于微指令API实现Add样例，展示了通过微指令API直接对芯片中涉及Vector计算的寄存器进行操作，算子支持单核运行。
 ## 支持的AI处理器
 - Ascend 910D
 ## 目录结构介绍
 ```
-├── micro_add
+├── micro_api_add
 │   ├── scripts
 │   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py     // 验证输出数据和真值数据是否一致的验证脚本
