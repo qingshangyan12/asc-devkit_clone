@@ -19,7 +19,7 @@ bfloat16 = tf.bfloat16.as_numpy_dtype
 RELATIVE_TOL = 1e-3
 ABSOLUTE_TOL = 1e-5
 ERROR_TOL = 1e-3
-data_type = bfloat16
+data_type = np.float16
 
 def verify_result(output, golden):
     output = np.fromfile(output, dtype=data_type).reshape(-1)
