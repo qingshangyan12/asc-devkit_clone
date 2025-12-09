@@ -44,6 +44,7 @@ constexpr uint32_t POW_TENSOR_SCALAR_FLOAT_CALC_PROC_V200 = 6;
 
 constexpr uint32_t POW_HALF_CALC_PROC = 2;
 constexpr uint32_t POW_DOUBLE = 2;
+constexpr uint32_t POW_TRIPLE = 3;
 constexpr uint32_t FLOAT_SIZE = 4;
 
 struct PowTiling {
@@ -109,7 +110,7 @@ inline uint32_t GetPowerMaxTmpSizeC310(const ge::Shape& srcShape1, const ge::Sha
             }
         }
 
-        maxTmpSize = FLOAT_SIZE * inputSize * POW_DOUBLE;
+        maxTmpSize = FLOAT_SIZE * inputSize * POW_TRIPLE;
     }
 
     return maxTmpSize;
@@ -224,9 +225,9 @@ void GetPowerTmpBufferFactorSizeC310(const bool typeIsInt, const uint32_t typeSi
     if (typeIsInt) {
         maxLiveNodeCount = 0u;
     } else if (typeSize == sizeof(float)) {
-        maxLiveNodeCount = POW_DOUBLE;
+        maxLiveNodeCount = POW_TRIPLE;
     } else {
-        maxLiveNodeCount = POW_DOUBLE * POW_DOUBLE;
+        maxLiveNodeCount = POW_DOUBLE * POW_TRIPLE;
     }
 }
 } // namespace
