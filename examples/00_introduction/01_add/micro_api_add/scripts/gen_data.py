@@ -15,8 +15,8 @@ import numpy as np
 
 
 def gen_golden_data_simple():
-    input_shape_x = [1, 16]
-    input_shape_y = [1, 16]
+    input_shape_x = [1, 512]
+    input_shape_y = [1, 512]
     dtype = np.float16
     input_x = np.random.uniform(-50, 50, input_shape_x).astype(dtype)
     input_y = np.random.uniform(-50, 50, input_shape_y).astype(dtype)
