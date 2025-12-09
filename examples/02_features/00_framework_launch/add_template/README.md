@@ -7,7 +7,7 @@
 - Ascend 910B
 ## 目录结构介绍
 ```
-└── 00_add_template
+└── add_template
     ├── custom_op           // 算子编译工程目录
     │   ├── op_host             // host侧编译实现文件目录
     │   │   └── CMakeLists.txt      // host侧CMake文件
