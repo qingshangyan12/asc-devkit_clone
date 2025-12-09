@@ -1,17 +1,17 @@
-# VectorAdd算子直调样例
+# MicroAdd样例
 ## 概述
 样例基于微指令API实现Add样例，展示了当源操作数和目的操作数指向同一块内存地址时，存在读写依赖的情况，需插入同步指令以确保数据的一致性。
 ## 支持的AI处理器
-- Ascend 910D
+该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
 ## 目录结构介绍
 ```
-├── 04_add_simd
+├── 03_micro_api
 │   ├── scripts
 │   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py     // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── data_utils.h             // 数据读入写出函数
-│   └── vector_add_custom.asc    // Ascend C算子实现 & 调用样例
+│   └── micro_add_custom.asc     // Ascend C算子实现 & 调用样例
 ```
 ## 算子描述
 - 算子功能：  

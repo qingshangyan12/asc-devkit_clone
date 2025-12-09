@@ -1,11 +1,11 @@
-# Microadd算子直调样例
+# MicroApiAdd样例
 ## 概述
-本样例介绍Add算子的核函数直调方法，通过微指令API直接对芯片中涉及Vector计算的寄存器进行操作，算子支持单核运行。
+本样例介绍基于微指令API实现Add样例，展示了通过微指令API直接对芯片中涉及Vector计算的寄存器进行操作，算子支持单核运行。
 ## 支持的AI处理器
-- Ascend 910D
+该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
 ## 目录结构介绍
 ```
-├── micro_add
+├── micro_api_add
 │   ├── scripts
 │   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py     // 验证输出数据和真值数据是否一致的验证脚本
@@ -24,11 +24,11 @@
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">1 * 16</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">1 * 16</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">1 * 512</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">1 * 512</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">1 * 16</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">1 * 512</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
   </table>

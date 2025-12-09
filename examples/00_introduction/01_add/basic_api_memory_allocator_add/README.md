@@ -60,7 +60,7 @@
   
     Add算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm和yGm搬运到Local Memory，分别存储在xLocal、yLocal，Compute任务负责对xLocal、yLocal执行加法操作，计算结果存储在zLocal中，CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
   
-    优化add_custom_v2中反向同步，替换为MTE2等待MTE3执行结束。减少分支判断的同时，算子性能因为double buffer的原因不受影响。另外使用LocalMemAllocator进行线性内存分配，Bank冲突不敏感场景可以使用这种方式简化分配。
+    优化add_custom中反向同步，替换为MTE2等待MTE3执行结束。减少分支判断的同时，算子性能因为double buffer的原因不受影响。另外使用LocalMemAllocator进行线性内存分配，Bank冲突不敏感场景可以使用这种方式简化分配。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
