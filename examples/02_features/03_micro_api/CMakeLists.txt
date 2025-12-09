@@ -15,7 +15,7 @@ find_package(ASC REQUIRED HINTS $ENV{ASCEND_HOME_PATH}/lib64/cmake)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    vector_add_custom.asc
+    micro_add_custom.asc
 )
 
 target_link_libraries(demo PRIVATE
