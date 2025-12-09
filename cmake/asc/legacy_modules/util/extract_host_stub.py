@@ -1114,22 +1114,34 @@ def generate_func_impl_code_cpu(func_sign: FuncSign,
                                 func_params_str: str,
                                 new_func_sign: FuncSign,
                                 kernel_name: str) -> str:
-    if (has_mode_func(CodeMode.AIV) or
-        has_mode_func(CodeMode.KERNEL_TYPE_AIV_ONLY) or
-        has_mode_func(CodeMode.KERNEL_TYPE_MIX_AIV_1_0)):
+    aiv_conditions = [
+        CodeMode.AIV,
+        CodeMode.KERNEL_TYPE_AIV_ONLY, 
+        CodeMode.KERNEL_TYPE_MIX_AIV_1_0
+    ]
+    aic_conditions = [
+        CodeMode.AIC,
+        CodeMode.KERNEL_TYPE_AIC_ONLY,
+        CodeMode.KERNEL_TYPE_MIX_AIC_1_0
+    ]
+    mix_mode_conditions = [
+        CodeMode.MIX,
+        CodeMode.KERNEL_TYPE_MIX_AIC_1_2,
+        CodeMode.NORMAL,
+        CodeMode.MIX_VECTOR_CORE
+    ]
+
+    if any(has_mode_func(mode) for mode in aiv_conditions):
         kernelType = "AIV_MODE"
-    elif (has_mode_func(CodeMode.AIC) or
-        has_mode_func(CodeMode.KERNEL_TYPE_AIC_ONLY) or
-        has_mode_func(CodeMode.KERNEL_TYPE_MIX_AIC_1_0)):
+    elif any(has_mode_func(mode) for mode in aic_conditions):
         kernelType = "AIC_MODE"
     elif has_mode_func(CodeMode.KERNEL_TYPE_MIX_AIC_1_1):
         kernelType = "MIX_MODE_1_1"
-    elif (has_mode_func(CodeMode.MIX) or
-        has_mode_func(CodeMode.KERNEL_TYPE_MIX_AIC_1_2) or
-        has_mode_func(CodeMode.KERNEL_TYPE_CORE)):
+    elif any(has_mode_func(mode) for mode in mix_mode_conditions):
         kernelType = "MIX_MODE"
     else:
-        raise (f"[ERROR]: KernelMode does not support!")
+        raise ValueError(f"[ERROR]: KernelMode does not support!")
+
     param_names = tuple(get_param_names_by_func_sign(func_sign))
     block_dim_name = param_names[0]
     stream_name = param_names[1]
