@@ -683,10 +683,7 @@ __aicore__ inline uint32_t GetPrintFifoTlvLen(uint32_t& argsNum, __gm__ const ch
 
 __aicore__ __gm__ inline BlockPrintFiFoInfo* GetPrintFiFoHead()
 {
-    uint32_t blockIdx = GetDumpBlockIdx();
-    if (blockIdx >= DUMP_CORE_COUNT) {
-        return nullptr;
-    }
+    uint32_t blockIdx = get_coreid() % DUMP_CORE_COUNT;
     uint32_t blockLength = reinterpret_cast<__gm__ BlockPrintFiFoInfo*>(g_sysPrintFifoSpace)->length;
     __gm__ BlockPrintFiFoInfo* fifoHead =
         reinterpret_cast<__gm__ BlockPrintFiFoInfo*>(g_sysPrintFifoSpace + blockLength * blockIdx);
