@@ -1924,26 +1924,26 @@ TEST_F(TestTiling, TestPowerTiling)
     uint32_t minVal;
 
     GetPowerMaxMinTmpSize(powerShape, powerShape, false, 4, false, maxVal, minVal);
-    EXPECT_EQ(maxVal, 512 * 4 * 2);
-    EXPECT_EQ(maxVal, 512 * 4 * 2);
+    EXPECT_EQ(maxVal, 512 * 4 * 3);
+    EXPECT_EQ(maxVal, 512 * 4 * 3);
     GetPowerMaxMinTmpSize(powerShape, powerShape, true, 4, false, maxVal, minVal);
     EXPECT_EQ(maxVal, 0);
     EXPECT_EQ(minVal, 0);
     GetPowerMaxMinTmpSize(powerShape, powerShape, false, 2, false, maxVal, minVal);
-    EXPECT_EQ(maxVal, 512 * 4 * 2);
-    EXPECT_EQ(minVal, 512 * 4 * 2);
+    EXPECT_EQ(maxVal, 512 * 4 * 3);
+    EXPECT_EQ(minVal, 512 * 4 * 3);
 
     std::vector<int64_t> scalar_shape = { 1 };
     auto scalarShape = ge::Shape(scalar_shape);
     GetPowerMaxMinTmpSize(powerShape, scalarShape, false, 2, false, maxVal, minVal);
-    EXPECT_EQ(maxVal, 512 * 4 * 2);
-    EXPECT_EQ(maxVal, 512 * 4 * 2);
+    EXPECT_EQ(maxVal, 512 * 4 * 3);
+    EXPECT_EQ(maxVal, 512 * 4 * 3);
     GetPowerMaxMinTmpSize(powerShape, scalarShape, true, 4, false, maxVal, minVal);
     EXPECT_EQ(maxVal, 0);
     EXPECT_EQ(minVal, 0);
     GetPowerMaxMinTmpSize(scalarShape, powerShape, false, 4, false, maxVal, minVal);
-    EXPECT_EQ(maxVal, 512 * 4 * 2);
-    EXPECT_EQ(minVal, 512 * 4 * 2);
+    EXPECT_EQ(maxVal, 512 * 4 * 3);
+    EXPECT_EQ(minVal, 512 * 4 * 3);
 }
 
 TEST_F(TestTiling, TestPowerTilingFactorSize)
@@ -1952,11 +1952,11 @@ TEST_F(TestTiling, TestPowerTilingFactorSize)
     uint32_t extraBuf = 0xffff;
 
     GetPowerTmpBufferFactorSize(false, true, false, 4, maxLiveNodeCnt, extraBuf);
-    EXPECT_EQ(maxLiveNodeCnt, 2);
+    EXPECT_EQ(maxLiveNodeCnt, 3);
     EXPECT_EQ(extraBuf, 0);
 
     GetPowerTmpBufferFactorSize(false, true, false, 2, maxLiveNodeCnt, extraBuf);
-    EXPECT_EQ(maxLiveNodeCnt, 4);
+    EXPECT_EQ(maxLiveNodeCnt, 6);
     EXPECT_EQ(extraBuf, 0);
 
     GetPowerTmpBufferFactorSize(false, true, true, 2, maxLiveNodeCnt, extraBuf);
