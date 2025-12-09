@@ -93,7 +93,7 @@ def build_config(**kwargs):
         The build configuration
     """
     _check_kwargs(kwargs)
-    config_dict = cce_default_static_build_config.copy()
+    config_dict = _build_cfg.get().copy()
     _update_config_dict(kwargs, config_dict)
     return BuildConfigWrapper(config_dict)
 
