@@ -1,4 +1,4 @@
-# MicroApiAdd算子直调样例
+# MicroApiAdd样例
 ## 概述
 本样例介绍基于微指令API实现Add样例，展示了通过微指令API直接对芯片中涉及Vector计算的寄存器进行操作，算子支持单核运行。
 ## 支持的AI处理器
