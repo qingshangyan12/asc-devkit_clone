@@ -20,7 +20,7 @@ def gen_golden_data_simple():
     dtype = np.half
     input_x = np.eye(32).astype(dtype)
     mid = 32 // 2 # 找到中间列
-    input_x[:mid, :mid] = input_x[:mid, :mid]
+    input_x[mid:, :mid] = input_x[:mid, :mid]
     input_x[mid:, mid:] = input_x[:mid, :mid]
     input_x[:mid, mid:] = input_x[:mid, :mid]
     input_y = np.arange(32 * 32).reshape([32, 32]).astype(dtype)

@@ -2,7 +2,7 @@
 ## 概述
 兼容实现L1 Buffer设置边界值。
 ## 支持的AI处理器
-- Ascend 910D
+该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息）
 ## 目录结构介绍
 ```
 ├── set_loaddata_boundary
@@ -29,7 +29,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">demo</td></tr>
   </table>
 - 算子实现：  
-    351x架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置Load3D时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始夺取。设置为0表示无边界，可使用整个L1 Buffer。
+    新架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置Load3D时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始夺取。设置为0表示无边界，可使用整个L1 Buffer。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

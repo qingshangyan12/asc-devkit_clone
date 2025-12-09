@@ -4,8 +4,7 @@
 本样例以实现gather和adds功能的算子为例，展示了SIMT和SIMD混合编程的算子开发方式。算子中使用SIMT编程方式实现离散内存访问操作gather，使用SIMD编程方式实现连续内存访问操作adds。
 
 ## 支持的AI处理器
-- Ascend 910D
-
+该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
 ## 目录结构
 ```
 ├── 01_simt_gather_and_simd_adds
