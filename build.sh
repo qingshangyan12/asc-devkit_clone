@@ -386,7 +386,6 @@ set_env() {
     exit 1
   fi
 
-  source $ASCEND_CANN_PACKAGE_PATH/bin/setenv.bash || echo "0"
 }
 
 function clean()
