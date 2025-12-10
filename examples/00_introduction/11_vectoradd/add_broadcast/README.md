@@ -2,7 +2,7 @@
 ## 概述
 本样例介绍Add算子的核函数直调方法，多核&tiling场景下增加输入Broadcast。
 ## 支持的AI处理器
-该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
+- Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```
 ├── add_broadcast

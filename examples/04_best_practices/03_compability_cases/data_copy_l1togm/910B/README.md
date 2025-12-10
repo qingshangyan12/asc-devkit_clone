@@ -38,16 +38,21 @@ L1数据搬运到GM的端到端用例。
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
-    source /usr/local/Ascend/cann/set_env.sh
+    export ASCEND_INSTALL_PATH=/usr/local/Ascend/latest
     ```
   - 默认路径，非root用户安装CANN软件包
     ```bash
-    source $HOME/Ascend/cann/set_env.sh
+    export ASCEND_INSTALL_PATH=$HOME/Ascend/latest
     ```
   - 指定路径install_path，安装CANN软件包
     ```bash
-    source ${install_path}/cann/set_env.sh
+    export ASCEND_INSTALL_PATH=${install_path}/latest
     ```
+  配置安装路径后，执行以下命令统一配置环境变量。
+  ```bash
+  # 配置CANN环境变量
+  source ${ASCEND_INSTALL_PATH}/bin/setenv.bash
+  ```
 - 样例执行
   ```bash
   mkdir -p build && cd build;                                              # 创建并进入build目录
