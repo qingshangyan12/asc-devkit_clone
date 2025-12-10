@@ -25,5 +25,13 @@ __simt_callee__ inline long long int llrintf(float x);
 
 __simt_callee__ inline float truncf(float x);
 
+__simt_callee__ inline float roundf(float x);
+
+__simt_callee__ inline float rintf(float x);
+
+__simt_callee__ inline float floorf(float x);
+
+__simt_callee__ inline float ceilf(float x);
+
 #include "impl/simt_api/simt_cast_intf_impl.h"
 #endif  // ASCENDC_MODULE_SIMT_C_CAST_INTERFACE_H

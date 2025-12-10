@@ -20,6 +20,7 @@
 #include "simt_common_intf.h"
 #include "simt_atomic_intf.h"
 #include "simt_cast_inf.h"
+#include "simt_cmp_inf.h"
 #include "simt_math_intf.h"
 #include "simt_transcendental_intf.h"
 #include "simt_warp_level_intf.h"

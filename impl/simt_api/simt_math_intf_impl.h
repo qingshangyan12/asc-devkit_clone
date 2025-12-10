@@ -67,4 +67,19 @@ __simt_callee__ inline float scalblnf(float x, int64_t n)
     return AscendC::Simt::ScaLbnImpl(x, n);
 }
 
+__simt_callee__ inline float fabsf(float x)
+{
+    return AscendC::Simt::AbsImpl(x);
+}
+
+__simt_callee__ inline float fmaxf(float x, float y)
+{
+    return AscendC::Simt::MaxImpl(x, y);
+}
+
+__simt_callee__ inline float fminf(float x, float y)
+{
+    return AscendC::Simt::MinImpl(x, y);
+}
+
 #endif  // ASCENDC_MODULE_SIMT_C_MATH_INTERFACE_IMPL_H

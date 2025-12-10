@@ -503,6 +503,7 @@ __aicore__ inline float ScaLbnImpl(float x, int n)
 
     float two = 2.0;
     float fp32ExponentMidVal = 127;
+#if defined(ASCENDC_CPU_DEBUG)
     if (n < 0) {
         n = -n;
         if (n > fp32ExponentMidVal) {
@@ -518,6 +519,23 @@ __aicore__ inline float ScaLbnImpl(float x, int n)
         x = x * powf(two, static_cast<float>(mulValExp));
     }
     return x * powf(two, static_cast<float>(n));
+#else
+    if (n < 0) {
+        n = -n;
+        if (n > fp32ExponentMidVal) {
+            int mulValExp = n - fp32ExponentMidVal;
+            n = fp32ExponentMidVal;
+            x = x / __powf(two, static_cast<float>(mulValExp));
+        }
+        return x / __powf(two, n);
+    }
+    if (n > fp32ExponentMidVal) {
+        int mulValExp = n - fp32ExponentMidVal;
+        n = fp32ExponentMidVal;
+        x = x * __powf(two, static_cast<float>(mulValExp));
+    }
+    return x * __powf(two, static_cast<float>(n));
+#endif
 }
 
 __aicore__ inline float ScaLbnImpl(float x, long int n)

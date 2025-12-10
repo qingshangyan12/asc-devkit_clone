@@ -38,7 +38,7 @@ __aicore__ inline T ExpImpl(T x)
 template <typename T>
 __aicore__ inline T ExpImpl(T x)
 {
-    return expf(x);
+    return __expf(x);
 }
 
 __aicore__ inline half2 ExpImpl(half2 x)
@@ -526,10 +526,10 @@ template <typename T>
 __aicore__ inline T LogImpl(T x)
 {
     if (x > 0.0f && x < 1.17549435e-38f) { // 1.17549435e-38f: subnormal floating-point number boundary
-        return logf(ExpImpl(23.0f) * x) - 23.0f;
+        return __logf(ExpImpl(23.0f) * x) - 23.0f;
     }
 
-    return logf(x);
+    return __logf(x);
 }
 
 __aicore__ inline half2 LogImpl(half2 x)
@@ -567,7 +567,7 @@ __aicore__ inline T SqrtImpl(T x)
 #if defined(ASCENDC_CPU_DEBUG)
     return sqrt(x);
 #else
-    return sqrtf(x);
+    return __sqrtf(x);
 #endif
 }
 
@@ -1159,7 +1159,7 @@ __aicore__ inline T PowImpl(T x, T y)
 
     return pow(x, y);
 #else
-    return powf(x, y);
+    return __powf(x, y);
 #endif
 }
 
