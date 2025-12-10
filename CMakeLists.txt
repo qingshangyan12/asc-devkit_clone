@@ -50,6 +50,7 @@ if(BUILD_OPEN_PROJECT)
 endif()
 
 add_subdirectory(tools)
+add_subdirectory(cmake)
 
 if(PACKAGE_OPEN_PROJECT)
   cmake_minimum_required(VERSION 3.16)
