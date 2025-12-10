@@ -28,61 +28,10 @@ message(STATUS "CMAKE_ASC_COMPILER: " ${CMAKE_ASC_COMPILER})
 set(CMAKE_ASC_SOURCE_FILE_EXTENSIONS asc)    # Specify .asc as the supported file extension
 set(CMAKE_ASC_COMPILER_ENV_VAR "ASC")        # Name the language ASC
 
-# 2. Check SOC_VERSION (if exists) is valid soc version.
-#    Need to store value of CCE_AICORE_ARCH
-set(ascend910b_list Ascend910B1 Ascend910B2 Ascend910B2C Ascend910B3 Ascend910B4 Ascend910B4-1 Ascend910_9391
-                    Ascend910_9381 Ascend910_9372 Ascend910_9392 Ascend910_9382 Ascend910_9362)
-set(ascend310p_list Ascend310P1 Ascend310P3 Ascend310P5 Ascend310P7
-                    Ascend310P3Vir01 Ascend310P3Vir02 Ascend310P3Vir04 Ascend310P3Vir08)
-set(ascend910_95_list Ascend910_957b Ascend910_950z Ascend910_958b Ascend910_958a
-                      Ascend910_9599 Ascend910_957d Ascend910_9581 Ascend910_9589 Ascend910_957c
-                      Ascend910_95A1 Ascend910_95A2 Ascend910_9591 Ascend910_9592 Ascend910_9595
-                      Ascend910_9596 Ascend910_9581 Ascend910_9582 Ascend910_9583 Ascend910_9584
-                      Ascend910_9585 Ascend910_9586 Ascend910_9587 Ascend910_9588 Ascend910_9571
-                      Ascend910_9572 Ascend910_9573 Ascend910_9574 Ascend910_9575 Ascend910_9576
-                      Ascend910_9577 Ascend910_9578)
-if(DEFINED SOC_VERSION)
-    if(NOT ((SOC_VERSION IN_LIST ascend910b_list) OR (SOC_VERSION IN_LIST ascend310p_list) OR (SOC_VERSION IN_LIST ascend910_95_list)))
-        message(FATAL_ERROR "SOC_VERSION ${SOC_VERSION} is unsupported, support list is ${ascend910b_list} ${ascend310p_list} ${ascend910_95_list}")
-    endif()
-endif()
-
-if(SOC_VERSION IN_LIST ascend910b_list)
-    set(CCE_AICORE_ARCH "dav-2201" CACHE STRING "Value for --npu-arch")
-elseif(SOC_VERSION IN_LIST ascend310p_list)
-    set(CCE_AICORE_ARCH "dav-2002" CACHE STRING "Value for --npu-arch")
-elseif(SOC_VERSION IN_LIST ascend910_95_list)
-    set(CCE_AICORE_ARCH "dav-3101" CACHE STRING "Value for --npu-arch")
-endif()
-
-# 3. CMAKE_BUILD_TYPE: only support Release / Debug
-set(build_type_list Release Debug)
-if(NOT CMAKE_BUILD_TYPE)
-    message(WARNING "CMAKE_BUILD_TYPE is not set. Set to default value Release.")
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type Release/Debug (default Release)" FORCE)
-elseif(NOT CMAKE_BUILD_TYPE IN_LIST build_type_list)
-    message(FATAL_ERROR "CMAKE_BUILD_TYPE only support Release / Debug, current value is ${CMAKE_BUILD_TYPE}")
-else()
-    set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Build type Release/Debug (default Release)" FORCE)
-endif()
-
-# 4. CMAKE_INSTALL_PREFIX: the default output directory is the current working directory.
-if(NOT CMAKE_INSTALL_PREFIX)
-    message(WARNING "CMAKE_INSTALL_PREFIX is not set. Set to default value ${CMAKE_CURRENT_SOURCE_DIR}/out.")
-    set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/out CACHE PATH "path for install" FORCE)
-else()
-    set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "CMake output path" FORCE)
-endif()
-
 # Sequence for the first compilation: CMakeDetermineASCCompiler.cmake -> CMakeASCInformation.cmake
 # Incremental compilation: CMakeASCInformation.cmake
 find_program(CMAKE_ASC_LLD_LINKER NAMES "ld.lld" PATHS "${ASCEND_CANN_PACKAGE_LINUX_PATH}/ccec_compiler/bin/" DOC "ASC ld.lld Linker" NO_DEFAULT_PATH)
 
-if(DEFINED SOC_VERSION)
-    message(STATUS "SOC_VERSION: " ${SOC_VERSION})
-endif()
-message(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
-message(STATUS "CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
 message(STATUS "ASCEND_CANN_PACKAGE_LINUX_PATH: " ${ASCEND_CANN_PACKAGE_LINUX_PATH})
 message(STATUS "CMAKE_ASC_LLD_LINKER: ${CMAKE_ASC_LLD_LINKER}")
 
