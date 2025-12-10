@@ -57,9 +57,6 @@ set(BIN_FILES
     ${CMAKE_SOURCE_DIR}/scripts/package/scripts/prereq_check.bash
     ${CMAKE_SOURCE_DIR}/scripts/package/scripts/prereq_check.csh
     ${CMAKE_SOURCE_DIR}/scripts/package/scripts/prereq_check.fish
-    ${CMAKE_SOURCE_DIR}/scripts/package/scripts/setenv.bash
-    ${CMAKE_SOURCE_DIR}/scripts/package/scripts/setenv.csh
-    ${CMAKE_SOURCE_DIR}/scripts/package/scripts/setenv.fish
 )
 
 install(FILES ${BIN_FILES}
