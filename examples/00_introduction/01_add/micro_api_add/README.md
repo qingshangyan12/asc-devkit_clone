@@ -2,16 +2,16 @@
 ## 概述
 本样例介绍基于微指令API实现Add样例，展示了通过微指令API直接对芯片中涉及Vector计算的寄存器进行操作，算子支持单核运行。
 ## 支持的AI处理器
-该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
+- Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```
 ├── micro_api_add
 │   ├── scripts
-│   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py     // 验证输出数据和真值数据是否一致的验证脚本
-│   ├── CMakeLists.txt           // 编译工程文件
-│   ├── data_utils.h             // 数据读入写出函数
-│   └── micro_add_custom.asc     // Ascend C算子实现 & 调用样例
+│   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt              // 编译工程文件
+│   ├── data_utils.h                // 数据读入写出函数
+│   └── micro_api_add_custom.asc    // Ascend C算子实现 & 调用样例
 ```
 ## 算子描述
 - 算子功能：  
@@ -51,16 +51,21 @@
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
-    source /usr/local/Ascend/cann/set_env.sh
+    export ASCEND_INSTALL_PATH=/usr/local/Ascend/latest
     ```
   - 默认路径，非root用户安装CANN软件包
     ```bash
-    source $HOME/Ascend/cann/set_env.sh
+    export ASCEND_INSTALL_PATH=$HOME/Ascend/latest
     ```
   - 指定路径install_path，安装CANN软件包
     ```bash
-    source ${install_path}/cann/set_env.sh
+    export ASCEND_INSTALL_PATH=${install_path}/latest
     ```
+  配置安装路径后，执行以下命令统一配置环境变量。
+  ```bash
+  # 配置CANN环境变量
+  source ${ASCEND_INSTALL_PATH}/bin/setenv.bash
+  ```
 - 样例执行
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录

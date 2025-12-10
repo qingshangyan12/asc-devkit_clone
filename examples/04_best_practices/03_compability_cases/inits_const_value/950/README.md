@@ -1,11 +1,11 @@
-# SetLoadDataBoundary兼容性样例
+# InitConstValue兼容性样例
 ## 概述
-兼容实现L1 Buffer设置边界值。
+L0A Buffer和L0B Buffer初始化值的端到端用例。
 ## 支持的AI处理器
-该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息）
+- Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```
-├── set_loaddata_boundary
+├── inits_const_value
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
@@ -14,41 +14,46 @@
 ```
 ## 算子描述
 - 算子功能：  
-    兼容实现L1 Buffer设置边界值的端到端用例
+  实现L0A Buffer和L0B Buffer初始化值的端到端用例
 - 算子规格：
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">32 * 32</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">32 * 32</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">128 * 128</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">128 * 64</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">32 * 32</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">128 * 64</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">demo</td></tr>
   </table>
 - 算子实现：  
-    新架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置Load3D时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始夺取。设置为0表示无边界，可使用整个L1 Buffer。
+  新架构版本删除L0A Buffer/L0B Buffer初始化的相关硬件指令。用户可以通过先初始化L1 Buffer，再通过LoadData接口将L1 Buffer上的数据搬运到L0A Buffer/L0B Buffer。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
-    请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
-    source /usr/local/Ascend/cann/set_env.sh
+    export ASCEND_INSTALL_PATH=/usr/local/Ascend/latest
     ```
   - 默认路径，非root用户安装CANN软件包
     ```bash
-    source $HOME/Ascend/cann/set_env.sh
+    export ASCEND_INSTALL_PATH=$HOME/Ascend/latest
     ```
   - 指定路径install_path，安装CANN软件包
     ```bash
-    source ${install_path}/cann/set_env.sh
+    export ASCEND_INSTALL_PATH=${install_path}/latest
     ```
+  配置安装路径后，执行以下命令统一配置环境变量。
+  ```bash
+  # 配置CANN环境变量
+  source ${ASCEND_INSTALL_PATH}/bin/setenv.bash
+  ```
 - 样例执行
   ```bash
   mkdir -p build && cd build;                                              # 创建并进入build目录
