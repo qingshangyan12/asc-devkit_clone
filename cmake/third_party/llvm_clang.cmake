@@ -21,6 +21,7 @@ set(LLVM_CLANG_NAME "llvm-15")
 set(LLVM_CLANG_DOWNLOAD_PATH ${CANN_3RD_LIB_PATH}/pkg)
 set(LLVM_CLANG_INSTALL_PATH ${CANN_3RD_LIB_PATH}/llvm_clang)
 set(LLVM_CLANG_SOURCE_PATH ${CANN_3RD_LIB_PATH}/${LLVM_CLANG_NAME})
+set(LLVM_PATCH_SOURCE_PATH ${CANN_3RD_LIB_PATH}/patch_llvm)
 
 find_path(LLVM_CLANG_INCLUDE
         NAMES clang-c/Index.h
@@ -230,24 +231,12 @@ else()
         SOURCE_DIR ${LLVM_CLANG_SOURCE_PATH}
         )
         FetchContent_MakeAvailable(${LLVM_CLANG_NAME})
-
-        # file(DOWNLOAD
-        #     ${LLVM_CLANG_URL}
-        #     ${LLVM_CLANG_SOURCE_PATH}/${LLVM_FILE}
-        # #     URL_HASH SHA256=e24b4d3bf7821dcb1c901d1e09096c1f88fb00095c5a6ef893baab4836975e52
-        #     SHOW_PROGRESS
-        # )
-        # execute_process(
-        #     COMMAND mkdir -p ${LLVM_CLANG_SOURCE_PATH}
-        #     COMMAND chmod 755 -R ${LLVM_CLANG_SOURCE_PATH}
-        #     COMMAND tar -xf ${LLVM_CLANG_SOURCE_PATH}/${LLVM_FILE} --overwrite --strip-components=1 -C ${LLVM_CLANG_SOURCE_PATH}
-        # )
     else ()
         message(info, "use llvm cache,do not need download llvm code.")
     endif()
 
     set(LLVM_C_COMPILE_FLAGS "-D_GLIBCXX_USE_CXX11_ABI=0 -D_FORTIFY_SOURCE=2 -fvisibility=hidden -fstack-protector-all -fPIE")
-    set(LLVM_CXX_COMPILE_FLAGS "-D_GLIBCXX_USE_CXX11_ABI=0 -std=c++11 -D_FORTIFY_SOURCE=2 -fvisibility=hidden -fstack-protector-all -fPIE")
+    set(LLVM_CXX_COMPILE_FLAGS "-D_GLIBCXX_USE_CXX11_ABI=0 -std=c++11 -D_FORTIFY_SOURCE=2 -fvisibility=hidden -fstack-protector-all -fPIE -DENABLE_ASC_PLUGIN")
     set(LLVM_EXE_SAFE_LINK_FLAGS "-Wl,-z,relro,-z,now,-z,noexecstack -pie")
     set(LLVM_SHARED_SAFE_LINK_FLAGS "-Wl,-z,relro,-z,now,-z,noexecstack")
 
@@ -257,7 +246,9 @@ else()
 
     include(ExternalProject)
     ExternalProject_Add(llvm_clang
-                        SOURCE_DIR ${LLVM_CLANG_SOURCE_PATH}
+                        SOURCE_DIR ${LLVM_PATCH_SOURCE_PATH}
+                        DOWNLOAD_COMMAND bash -c "cp -rf ${LLVM_CLANG_SOURCE_PATH}/* ${LLVM_PATCH_SOURCE_PATH}/"
+                        PATCH_COMMAND cd ${LLVM_PATCH_SOURCE_PATH} && patch -p1 < ${CMAKE_CURRENT_LIST_DIR}/parsedecl_change.patch
                         CONFIGURE_COMMAND ${CMAKE_COMMAND}
                             -G ${CMAKE_GENERATOR}
                             -DLLVM_ENABLE_PROJECTS=clang
