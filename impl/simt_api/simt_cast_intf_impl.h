@@ -46,4 +46,24 @@ __simt_callee__ inline float truncf(float x)
     return AscendC::Simt::TruncImpl(x);
 }
 
+__simt_callee__ inline float roundf(float x)
+{
+    return AscendC::Simt::RoundImpl(x);
+}
+
+__simt_callee__ inline float rintf(float x)
+{
+    return AscendC::Simt::RintImpl(x);
+}
+
+__simt_callee__ inline float floorf(float x)
+{
+    return AscendC::Simt::FloorImpl(x);
+}
+
+__simt_callee__ inline float ceilf(float x)
+{
+    return AscendC::Simt::CeilImpl(x);
+}
+
 #endif  // ASCENDC_MODULE_SIMT_C_CAST_INTERFACE_IMPL_H

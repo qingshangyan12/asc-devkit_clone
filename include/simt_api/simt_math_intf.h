@@ -35,5 +35,11 @@ __simt_callee__ inline float scalbnf(float x, int32_t n);
 
 __simt_callee__ inline float scalblnf(float x, int64_t n);
 
+__simt_callee__ inline float fabsf(float x);
+
+__simt_callee__ inline float fmaxf(float x);
+
+__simt_callee__ inline float fminf(float x);
+
 #include "impl/simt_api/simt_math_intf_impl.h"
 #endif  // ASCENDC_MODULE_SIMT_C_MATH_INTERFACE_H
