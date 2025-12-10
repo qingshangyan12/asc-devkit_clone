@@ -23,7 +23,7 @@ namespace AscendC {
 namespace Internal {
 template <typename T>
 __simd_callee__ inline void LoadDataWithT(__ubuf__ T* src, MicroAPI::RegTensor<float>& dstReg,
-                                          MicroAPI::MaskReg& dstPreg, uint16_t srcOffset)
+                                          MicroAPI::MaskReg& dstPreg, uint32_t srcOffset)
 {
     if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
         MicroAPI::RegTensor<T> srcOrigin;
@@ -36,7 +36,7 @@ __simd_callee__ inline void LoadDataWithT(__ubuf__ T* src, MicroAPI::RegTensor<f
 
 template <typename T>
 __simd_callee__ inline void SaveDataWithT(__ubuf__ T* dst, MicroAPI::RegTensor<float>& srcReg,
-                                          MicroAPI::MaskReg& dstPreg, uint16_t dstOffset)
+                                          MicroAPI::MaskReg& dstPreg, uint32_t dstOffset)
 {
     if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
         MicroAPI::RegTensor<T> regT;
