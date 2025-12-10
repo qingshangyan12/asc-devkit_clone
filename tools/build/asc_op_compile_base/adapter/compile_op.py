@@ -1844,9 +1844,6 @@ def _compile_ascendc_cce_v220(compile_info: CompileInfo, compile_option_tuple, t
         task_ration_str = f"1:{tiling_info.task_ration}"
         _gen_mix_json_from_seperate_json(compile_info.kernel_name, task_ration_str, CORE_TYPE_CUBE, True)
         set_soc_spec("AiCore")
-        if not tiling_info.static_shape_flag:
-            _dynamic_kernel_list_to_json(compile_info.kernel_name, tiling_key_list, \
-                compile_info.enable_deterministic, compile_info.tiling_key_deterministic)
     elif compile_info.hard_sync and compile_info.code_channel in [CORE_TYPE_VEC, CORE_TYPE_CUBE]:
         dst_file = compile_info.dst_file
         single_side_compile_info = _get_sub_compile_info(compile_info, compile_info.code_channel)
@@ -1860,27 +1857,31 @@ def _compile_ascendc_cce_v220(compile_info: CompileInfo, compile_option_tuple, t
         task_ration_str = f"1:0" if compile_info.code_channel == CORE_TYPE_CUBE else f"0:1"
         _gen_mix_json_from_seperate_json(compile_info.kernel_name, task_ration_str, compile_info.code_channel, True)
         set_soc_spec("AiCore")
-        if not tiling_info.static_shape_flag:
-            _dynamic_kernel_list_to_json(compile_info.kernel_name, tiling_key_list, \
-                compile_info.enable_deterministic, compile_info.tiling_key_deterministic)
     else:
-        if compile_info.code_channel == CORE_TYPE_CUBE:
-            arch = f"dav-{chip_version}-cube"
-            sub_core_type = "AIC"
-            optional_core = "AiCore"
-        elif compile_info.code_channel == CORE_TYPE_VEC:
-            arch = f"dav-{chip_version}-vec"
-            sub_core_type = "AIV"
-            optional_core = "VectorCore"  # do the same work with SetOptionalCoreType in cpp
-        else:
-            raise Exception(f"invalid code_channel = {compile_info.code_channel}")
+        arch, sub_core_type, optional_core = get_core_info(compile_info)
         set_soc_spec(optional_core)
         tiling_key_list = call_bisheng_v220(compile_info, compile_option_tuple, tiling_info, arch, \
             compile_info.code_channel)
         _gen_non_mix_sub_json(compile_info, tiling_info, sub_core_type)
-        if not tiling_info.static_shape_flag:
-            _dynamic_kernel_list_to_json(compile_info.kernel_name, tiling_key_list, \
-                compile_info.enable_deterministic, compile_info.tiling_key_deterministic)
+    if not tiling_info.static_shape_flag:
+        _dynamic_kernel_list_to_json(compile_info.kernel_name, tiling_key_list, \
+            compile_info.enable_deterministic, compile_info.tiling_key_deterministic)
+
+
+def get_core_info(compile_info: CompileInfo):
+    chip_version = CommonUtility.get_chip_version()
+    if compile_info.code_channel == CORE_TYPE_CUBE:
+        arch = f"dav-{chip_version}-cube"
+        sub_core_type = "AIC"
+        optional_core = "AiCore"
+        return arch, sub_core_type, optional_core
+    elif compile_info.code_channel == CORE_TYPE_VEC:
+        arch = f"dav-{chip_version}-vec"
+        sub_core_type = "AIV"
+        optional_core = "VectorCore"  # do the same work with SetOptionalCoreType in cpp
+        return arch, sub_core_type, optional_core
+    else:
+        raise Exception(f"invalid code_channel = {compile_info.code_channel}")
 
 
 def _compile_ascendc_cce_m510(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):

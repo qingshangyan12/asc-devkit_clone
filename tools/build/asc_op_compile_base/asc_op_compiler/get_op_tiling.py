@@ -1029,7 +1029,7 @@ def _get_tiling_data_with_time_stamp(class_name):
     return class_body
 
 
-def get_tiling_copy_func_and_micro(class_name):
+def get_tiling_data_func_head():
     class_body = "#if defined(ASCENDC_CPU_DEBUG)\n"
     class_body += "template <class T>\n"
     class_body += "inline __aicore__ void InitTilingData(const __gm__ uint8_t *p_tilingdata, T *tilingdata)\n"
@@ -1038,10 +1038,14 @@ def get_tiling_copy_func_and_micro(class_name):
     class_body += "__inline__ __attribute__((always_inline)) __aicore__ void InitTilingData(const __gm__ uint8_t \
 *p_tilingdata, T *tilingdata)\n"
     class_body += "#endif\n"
-    class_body += "{\n"
+    return class_body
+
+
+def get_tiling_data_func():
+    class_body = "{\n"
     class_body += "    constexpr uint64_t all_bytes = sizeof(T);\n"
-    class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201) || (defined(__DAV_CUBE__) && __NPU_ARCH__ == 3101) || \
-defined(__DAV_310R6_CUBE__) || defined(__GET_CODE_CHANNEL__)\n"
+    class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201) || (defined \
+    (__DAV_CUBE__) && __NPU_ARCH__ == 3101) || defined(__DAV_310R6_CUBE__) || defined(__GET_CODE_CHANNEL__)\n"
     class_body += "#if defined(__DAV_C100__) || defined(ASCENDC_CPU_DEBUG)\n"
     class_body += get_dynamic_assign_tiling_data_by_size("all_bytes", "const __gm__", "(const __gm__ uint8_t *)\
 p_tilingdata")
@@ -1068,7 +1072,7 @@ len_burst, 0, 0);\n"
     class_body += "    set_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);\n"
     class_body += "    wait_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);\n"
     class_body += "#if defined __DAV_C100__\n"
-    class_body += get_dynamic_assign_tiling_data_by_size("all_bytes", "__ubuf__", \
+    class_body += get_dynamic_assign_tiling_data_by_size("all_bytes", "__ubuf__",\
         "(__ubuf__ uint8_t *)tilingdata_in_ub")
     class_body += "#else\n"
     class_body += "    copy_data_align64((uint8_t*)tilingdata, (__ubuf__ uint8_t *)tilingdata_in_ub, all_bytes);\n"
@@ -1079,6 +1083,12 @@ len_burst, 0, 0);\n"
     class_body += "    pipe_barrier(PIPE_ALL);\n"
     class_body += "#endif\n"
     class_body += "}\n\n"
+    return class_body
+
+
+def get_tiling_copy_func_and_micro(class_name):
+    class_body = get_tiling_data_func_head()
+    class_body += get_tiling_data_func()
 
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
     if short_soc_version in ["Ascend910_95", "Ascend910_55", "mc62cm12a"]:
