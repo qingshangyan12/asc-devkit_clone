@@ -29,6 +29,8 @@
         <path value="tools/ascendc_tools" install_mod="750"/>
         <path value="share"/>
         <path value="share/info" install_mod="750"/>
+        <path value="$(TARGET_ENV)/ascc" install_softlink="compiler/ascc"/>
+        <path value="$(TARGET_ENV)/ascc/lib64"/>
         <path value="$(TARGET_ENV)/tikcpp" install_softlink="compiler/tikcpp;tools/tikcpp"/>
         <path value="$(TARGET_ENV)/tikcpp/tikcfw"/>
         <path value="$(TARGET_ENV)/tikcpp/tikcfw/include"/>
@@ -65,8 +67,6 @@
         <path value="$(TARGET_ENV)/asc/impl/adv_api"/>
         <path value="$(TARGET_ENV)/lib64"/>
         <path value="$(TARGET_ENV)/lib64/cmake"/>
-        <path value="$(TARGET_ENV)/lib64/plugin"/>
-        <path value="$(TARGET_ENV)/lib64/plugin/asc"/>
         <path value="$(TARGET_ENV)/lib64/device"/>
         <path value="$(TARGET_ENV)/lib64/device/lib64"/>
     </dir_info>
@@ -144,8 +144,8 @@
         <file value="ascendc_pack_kernel" install_mod="550"/>
     </file_info>
 
-    <file_info value="asc_plugin" copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)" install_path="$(TARGET_ENV)/lib64/plugin/asc" install_type="all" install_mod="440">
-        <file value="libasc_plugin.so" file_type="shared"/>
+    <file_info value="asc_plugin" copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)" install_path="$(TARGET_ENV)/ascc/lib64" install_type="all" install_mod="440">
+        <file value="libasc_plugin.so" file_type="shared" install_softlink="$(TARGET_ENV)/lib64/libasc_plugin.so"/>
     </file_info>
 
     <file_info copy_type="delivery" src_path="lib/device" dst_path="$(TARGET_ENV)" install_path="$(TARGET_ENV)/lib64/device/lib64" pkg_feature="filter_florence">

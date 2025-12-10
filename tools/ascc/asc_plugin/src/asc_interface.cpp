@@ -31,13 +31,18 @@
 namespace AscPlugin {
 
 namespace {
-// pluginPath Example: /cann version/x86_64-linux/lib64/plugin/asc/libasc_plugin.so
+// pluginPath Example: /cann version/x86_64-linux/ascc/lib64/libasc_plugin.so
+//                     /cann version/compiler/ascc/lib64/libasc_plugin.so
+//                     /cann version/tools/ascc/lib64/libasc_plugin.so
+//                     /latest/x86_64-linux/ascc/lib64/libasc_plugin.so
 // cannPath: directory cann version or directory latest
 std::string ExtractCannPath(const std::string& pluginPath)
 {
     const std::vector<std::string> potentialPath = {
-        "/x86_64-linux/lib64/plugin/asc/libasc_plugin.so",
-        "/aarch64-linux/lib64/plugin/asc/libasc_plugin.so",
+        "/x86_64-linux/ascc/lib64/libasc_plugin.so",
+        "/aarch64-linux/ascc/lib64/libasc_plugin.so",
+        "/compiler/ascc/lib64/libasc_plugin.so",
+        "/tools/ascc/lib64/libasc_plugin.so",
     };
 
     for (const std::string& expectedPath : potentialPath) {
@@ -254,7 +259,7 @@ int32_t PluginGenKernel(const char** result, const char* info)
 {
     ASC_CHECK_NULLPTR(result, "PluginGenKernel");
     ASC_CHECK_NULLPTR(info, "PluginGenKernel");
-
+    
     KernelInfo kernelInfo;
     int32_t fromJsonRes = FromJson(kernelInfo, info);
     if (fromJsonRes != ASC_SUCCESS) {
