@@ -5,6 +5,15 @@ target_link_libraries(ascendc_pack_kernel PRIVATE
     c_sec_static
 )
 
+target_compile_options(ascendc_pack_kernel PRIVATE
+    -fpie
+    -fstack-protector-all
+)
+
+target_link_options(ascendc_pack_kernel PRIVATE
+    $<$<CONFIG:Release>:-s>
+)
+
 if(BUILD_OPEN_PROJECT)
   target_include_directories(ascendc_pack_kernel PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../elf_tool
