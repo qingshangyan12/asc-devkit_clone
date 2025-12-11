@@ -346,7 +346,7 @@ def call_bisheng_v220(compile_info: CompileInfo, compile_option_tuple, tiling_in
             compile_option_tuple, sub_arch, tiling_info.tiling_data_file_path)
         # tbe-pass add "__kernel0" in tbe-codegen and json, we use -D to change function name
         current_kernel_name = gen_current_kernel_name(compile_info, sub_arch, code_channel)
-        compile_cmd += get_compile_cmd_for_kernel_name(compile_info, current_kernel_name)
+        compile_cmd += get_compile_cmd_for_kernel_name(compile_info, current_kernel_name, code_channel, tiling_info)
         new_sources += DFXSectionGenerator().generate_dfx_section(str(tiling_info.tiling_key),\
                                             tiling_info, current_kernel_name, compile_info, True)
         if compile_info.code_channel == CORE_TYPE_MIX :
