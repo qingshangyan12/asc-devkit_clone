@@ -30,7 +30,9 @@
 | [asc_mul_scalar](vector_compute/asc_mul_scalar.md) | 矢量内每个元素与标量求积。 |
 | [asc_div](vector_compute/asc_div.md) | 按元素求商。 |
 | [asc_exp](vector_compute/asc_exp.md) | 按元素取自然指数。 |
+| [asc_relu](vector_compute/asc_relu.md) | 按元素做线性整流Relu。 |
 | [asc_max](vector_compute/asc_max.md) | 按元素求最大值。 |
+| [asc_max_scalar](vector_compute/asc_max_scalar.md) | 矢量内每个元素与标量求最大值。 |
 | [asc_min](vector_compute/asc_min.md) | 按元素求最小值。 |
 | [asc_datablock_reduce_sum](vector_compute/asc_datablock_reduce_sum.md) | 对每个DataBlock内所有元素求和。 |
 | [asc_datablock_reduce_max](vector_compute/asc_datablock_reduce_max.md) | 对每个DataBlock内所有元素求最大值。 |
@@ -48,10 +50,10 @@
 | [asc_float2half](vector_compute/asc_float2half.md) | 数据类型转换。将float类型的数据转换为half类型。 |
 | [asc_half2float](vector_compute/asc_half2float.md) | 数据类型转换。将half类型的数据转换为float类型。 |
 | [asc_half2int4](vector_compute/asc_half2int4.md) | 数据类型转换。将half类型的数据转换为int4b_t类型。 |
+| [asc_half2int8](vector_compute/asc_half2int8.md) | 数据类型转换。将half类型的数据转换为int8_t类型。 |
 | [asc_half2int16](vector_compute/asc_half2int16.md) | 数据类型转换。将half类型的数据转换为int16_t类型。 |
 | [asc_half2int32](vector_compute/asc_half2int32.md) | 数据类型转换。将half类型的数据转换为int32_t类型。 |
-
-## 数据搬运
+| [asc_set_deq_scale](vector_compute/asc_set_deq_scale.md) | 设置DEQSCALAR寄存器的值。 |
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -77,7 +79,7 @@
 | [asc_get_block_idx](sys_var/asc_get_block_idx.md) | 获取当前运行核的索引。 |
 | [asc_get_core_id](sys_var/asc_get_core_id.md) | 获取当前核的编号。 |
 | [asc_get_sub_block_id](sys_var/asc_get_sub_block_id.md) | 获取AI Core上Vector核的ID。 |
-| [asc_get_sub_block_dim](sys_var/asc_get_sub_block_dim.md) | 分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。 |
+| [asc_get_sub_block_num](sys_var/asc_get_sub_block_num.md) | 分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。 |
 | [asc_set_ctrl](sys_var/asc_set_ctrl.md) | 设置CTRL寄存器（控制寄存器）的值。 |
 | [asc_get_ctrl](sys_var/asc_get_ctrl.md) | 读取CTRL寄存器（控制寄存器）的值。 |
 | [asc_get_phy_buf_addr](sys_var/asc_get_phy_buf_addr.md) | 基于偏移量获取片上实际物理地址。 |
