@@ -43,17 +43,52 @@ if [[ ! -d $dir_to_delete ]]; then
     exit 1
 else
     log "[INFO] Starting to delete $vendor_name ..."
-    chmod u+x -R $dir_to_delete
+    chmod -R +w $dir_to_delete
     rm -rf $dir_to_delete
     if [ $? -ne 0 ]; then
-        log "[INFO] Failed to delete $vendor_name."
+        log "[ERROR] Failed to delete $vendor_name."
         exit 1
     fi
 fi
 
 config_file=${targetdir}/vendors/config.ini
-found_vendors=$(printf '%s\n' "$vendor_name" | sed 's/[[\.*^$()+?{|]/\\&/g; s/]/\\]/g')
-sed -i "/load_priority=$found_vendors/d" "$config_file"
+if [ ! -f "$config_file" ]; then
+    log "[ERROR] File '$config_file' does not exist."
+    exit 1
+fi
+
+line=$(grep -E '^\s*load_priority\s*=' "$config_file" | head -n1)
+if [ -z "$line" ]; then
+    log "[INFO] No 'load_priority=' found in '$config_file'."
+    exit 0
+fi
+
+value=$(echo "$line" | sed -E 's/^[^=]*=\s*(.*)/\1/' | tr -d ' \t')
+IFS=',' read -r -a items <<< "$value"
+new_items=()
+for item in "${items[@]}"; do
+    if [ "$item" != "$vendor_name" ]; then
+        new_items+=("$item")
+    fi
+done
+
+chmod +w "$config_file"
+
+if [ ${#new_items[@]} -eq 0 ]; then
+    rm -f "$config_file"
+    if [ $? -ne 0 ]; then
+        log "[ERROR] Failed to delete $config_file."
+        exit 1
+    fi
+else
+    new_value=$(IFS=,; echo "${new_items[*]}")
+    new_line="load_priority=$new_value"
+    sed -i "s|^\s*load_priority\s*=.*|$new_line|" "$config_file"
+    if [ $? -ne 0 ]; then
+        log "[ERROR] Failed to update $config_file."
+        exit 1
+    fi
+fi
 
 log "[INFO] Successfully deteled $vendor_name."
 exit 0
