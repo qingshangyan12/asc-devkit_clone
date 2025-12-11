@@ -11,3 +11,4 @@ project(ascendc_tests)
 cmake_minimum_required(VERSION 3.16.0)
 
 add_subdirectory(unit)
+add_subdirectory(testcases_python)

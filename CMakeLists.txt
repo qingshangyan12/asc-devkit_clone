@@ -40,9 +40,6 @@ if(CCACHE_PROGRAM)
 endif()
 
 add_subdirectory(impl)
-if(ENABLE_TEST)
-  add_subdirectory(tests)
-endif()
 
 if(BUILD_OPEN_PROJECT)
   include(cmake/intf_pub_linux.cmake)
@@ -51,6 +48,10 @@ endif()
 
 add_subdirectory(tools)
 add_subdirectory(cmake)
+
+if(ENABLE_TEST)
+  add_subdirectory(tests)
+endif()
 
 if(PACKAGE_OPEN_PROJECT)
   cmake_minimum_required(VERSION 3.16)

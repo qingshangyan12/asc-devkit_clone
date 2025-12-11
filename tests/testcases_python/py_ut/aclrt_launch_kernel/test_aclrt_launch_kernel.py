@@ -11,7 +11,7 @@ from unittest import mock
 THIS_FILE_NAME = __file__
 FILE_PATH = os.path.dirname(os.path.realpath(THIS_FILE_NAME))
 TOP_PATH = os.path.join(FILE_PATH, "../../../../")
-FRAMEWORK_PATH = os.path.join(TOP_PATH, "cmake/util")
+FRAMEWORK_PATH = os.path.join(TOP_PATH, "cmake/asc/legacy_modules/util")
 sys.path.append(FRAMEWORK_PATH)
 
 from extract_host_stub import *
@@ -225,7 +225,7 @@ struct AddCustomTilingData {{
         host_stub_code = re.sub(_file_len_str, str(obj_size), host_stub_code)
         host_stub_code = re.sub(_file_str, str(file_size), host_stub_code)
 
-        with open(os.path.join(TOP_PATH, "llt/atc/tikcpp/testcases_python/py_ut/aclrt_launch_kernel/stub_files/test_gen_host_stup_code.cpp"), 'r') as f:
+        with open(os.path.join(TOP_PATH, "tests/testcases_python/py_ut/aclrt_launch_kernel/stub_files/test_gen_host_stup_code.cpp"), 'r') as f:
             golden_code = f.read()
             f.close()
         self.assertEqual(host_stub_code, golden_code)
@@ -296,7 +296,7 @@ struct AddCustomTilingData {{
         print("-------host_stub_code\n")
         print(host_stub_code)
 
-        with open(os.path.join(TOP_PATH, "llt/atc/tikcpp/testcases_python/py_ut/aclrt_launch_kernel/stub_files/test_gen_host_stub_code_template.cpp"), 'r') as f:
+        with open(os.path.join(TOP_PATH, "tests/testcases_python/py_ut/aclrt_launch_kernel/stub_files/test_gen_host_stub_code_template.cpp"), 'r') as f:
             golden_code = f.read()
             f.close()
 
@@ -758,10 +758,11 @@ struct AddCustomTilingData {{
             'aic/add_custom.cpp5.o':'add_custom5.cpp',
             'aiv/add_custom.cpp5.o':'add_custom5.cpp'
         }
-        dst_dir = TOP_PATH + 'llt/atc/tikcpp/testcases_python/py_ut/aclrt_launch_kernel/stub_files/'
+        dst_dir = FILE_PATH + '/stub_files/'
         mock_shutil.return_value = 'add_custom.cpp'
         extract_host_stub.IS_V220_MODE = True
-        generate_definition = True        
+        extract_host_stub.RUN_MODE = "npu"
+        generate_definition = True
         with mock.patch('builtins.open', new_callable=mock.mock_open, read_data="") as mock_open:
             mock_open.side_effect=RuntimeError()
             self.assertRaises(Exception, save_device_kernel_function, func_groups_template, source_mapping, dst_dir, generate_definition)
@@ -773,7 +774,7 @@ struct AddCustomTilingData {{
         cpp_path_assert_only = os.path.join(dst_dir, 'auto_gen_add_custom.cpp')
         assert os.path.exists(cpp_path_assert_only)
         with open(cpp_path_assert_only, 'r', encoding='utf-8') as file:
-            content = file.read()      
+            content = file.read()
         assert 'StoreArgsOfInitDump' in content
         save_aic_aiv_config_cmake(func_groups, source_mapping, dst_dir, generate_definition)
         extract_host_stub.IS_V220_MODE = False
@@ -1231,7 +1232,7 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
             'aiv/add_custom.cpp.o': True,
         }
         
-        dst_dir = TOP_PATH + 'llt/atc/tikcpp/testcases_python/py_ut/aclrt_launch_kernel/stub_files/'
+        dst_dir = FILE_PATH + '/stub_files/'
         mock_shutil.return_value = 'add_custom.cpp'
         mock_getmode.return_value = CodeMode.KERNEL_TYPE_AIV_ONLY
         compile_dir = dst_dir + 'compile_commands.json'
@@ -1304,7 +1305,7 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
             'aiv/add_custom.cpp.o': True,
         }
         
-        dst_dir = TOP_PATH + 'llt/atc/tikcpp/testcases_python/py_ut/aclrt_launch_kernel/stub_files/'
+        dst_dir = FILE_PATH + '/stub_files/'
         mock_shutil.return_value = 'add_custom.cpp'
         mock_getmode.return_value = CodeMode.KERNEL_TYPE_AIV_ONLY
         compile_dir = dst_dir + 'compile_commands.json'
