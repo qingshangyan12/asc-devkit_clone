@@ -27,7 +27,7 @@ namespace {                                                                     
 void cce_name##_##data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_Stub(__ubuf__ data_type *dst,   \
                 __ubuf__ data_type *src0, __ubuf__ data_type *src1, uint8_t repeat,                                   \
                 uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride,                       \
-                uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)                    \  
+                uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)                    \
 {                                                                                               \
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type *>(11));                                 \
     EXPECT_EQ(src0, reinterpret_cast<__ubuf__ data_type *>(22));                                \
@@ -78,7 +78,7 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_Bin
                 __ubuf__ data_type *, uint8_t, uint8_t, uint8_t, uint8_t,                       \
                 uint8_t, uint8_t, uint8_t))                                                     \
             .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_Stub));   \
+            .will(invoke(cce_name##_##data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_Stub));\
                                                                                                 \
     c_api_name(dst, src0, src1, config);                                                        \
     GlobalMockObject::verify();                                                                 \
@@ -121,7 +121,7 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_half_half_hal
             .will(invoke(cce_name##_##data_type##_##data_type##_##data_type##_uint64_t_Stub));  \
     c_api_name##_sync(dst, src0, src1, count);                                                  \
     GlobalMockObject::verify();                                                                 \
-}                                                                                               \
+}
 
 // ==========asc_add(half/float/int16_t/int32_t)==========
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Add, asc_add, vadd, half);
@@ -156,3 +156,4 @@ TEST_VECTOR_COMPUTE_BINARY_INSTR(Min, asc_min, vmin, half);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Min, asc_min, vmin, float);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Min, asc_min, vmin, int16_t);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Min, asc_min, vmin, int32_t);
+
