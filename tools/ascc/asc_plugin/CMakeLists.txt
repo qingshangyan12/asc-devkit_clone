@@ -87,6 +87,7 @@ target_link_options(asc_plugin PRIVATE
     -Wl,-Bsymbolic
     -Wl,--exclude-libs=ALL
     -Wl,--gc-sections
+    $<$<CONFIG:Release>:-s>
 )
 
 install(TARGETS asc_plugin

@@ -56,6 +56,7 @@ target_link_options(acl_rtc PRIVATE
     -Wl,-z,relro,-z,now,-z,noexecstack
     -Wl,-Bsymbolic
     -Wl,--gc-sections
+    $<$<CONFIG:Release>:-s>
 )
 
 install(TARGETS acl_rtc
