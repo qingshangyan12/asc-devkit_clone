@@ -7,6 +7,9 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+
+#include "acl_rt_compile.h"
+
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <limits.h>
@@ -15,11 +18,12 @@
 #include <thread>
 #include <vector>
 #include <string>
+#include <iostream>
 #include <string_view>
 #include <unistd.h>
 
 #include "acl_base.h"
-#include "acl_rt_compile.h"
+#include "securec.h"
 
 #if !defined(UT_TEST) && !defined(ST_TEST)
 namespace {
@@ -37,15 +41,10 @@ const int ACL_ERROR_RTC_OUT_OF_MEMORY = 276001;                         // 内�
 const int ACL_ERROR_RTC_FAILURE = 576000;                               // ACLRTC内部错误
 // ACL_SUCCESS  0
 
-enum class AclrtcType {
-    ACL_RTC_TYPE_AICORE = 0,
-    ACL_RTC_TYPE_AICPU
-};
-
-enum class CompileType : uint32_t {
-    ASC = 0,
-    AICPU,
-    CCE,
+enum class AclrtcType : uint32_t {
+    ACL_RTC_TYPE_ASC = 0,
+    ACL_RTC_TYPE_AICPU,
+    ACL_RTC_TYPE_CCE
 };
 
 class AclrtcProgram {
@@ -53,13 +52,31 @@ public:
     AclrtcProgram() = default;
     AclrtcProgram(void *program) : program_(program) {}
     AclrtcProgram(void *program, AclrtcType type) : program_(program), type_(type) {}
-    void* GetProgram() const { return program_; }
-    void SetProgram(void *program) { program_ = program; }
-    AclrtcType GetType() const { return type_; }
-    void SetType(AclrtcType type) { type_ = type; }
+    aclrtcProg GetProgram()
+    {
+        return program_;
+    }
+    void SetProgram(aclrtcProg program)
+    {
+        program_ = program;
+    }
+    AclrtcType GetType() const
+    {
+        return type_;
+    }
+    void SetType(AclrtcType type)
+    {
+        type_ = type;
+    }
+    std::string& GetLog()
+    {
+        return log_;
+    }
+
 private:
-    void *program_ = nullptr;
-    AclrtcType type_ = AclrtcType::ACL_RTC_TYPE_AICORE;
+    aclrtcProg program_ = nullptr;
+    AclrtcType type_ = AclrtcType::ACL_RTC_TYPE_ASC;
+    std::string log_;
 };
 
 // bisheng rtc
@@ -117,33 +134,35 @@ bool PathCheck(const char* path) {
     return (access(path, W_OK) == 0 || access(path, R_OK) == 0 || access(path, F_OK) == 0);
 }
 
-// set compile type
-inline CompileType& GetCompileType()
+inline AclrtcType GetAclrtcTypeWithSuffix(const char* name)
 {
-    static thread_local CompileType type = CompileType::ASC;
-    return type;
-}
-
-inline void SetCompileTypeWithSuffix(const char* name)
-{
-    auto checkAndSetType = [name](CompileType type) {
+    AclrtcType aclrtcType = AclrtcType::ACL_RTC_TYPE_ASC;
+    auto checkAndSetType = [name, &aclrtcType](AclrtcType type) {
         constexpr const char* compile_suffix_list[] = {
             ".asc",
             ".aicpu",
             ".cce"
         };
         if (EndsWith(name, compile_suffix_list[static_cast<uint32_t>(type)])) {
-            GetCompileType() = type;
+            aclrtcType = type;
         }
     };
     // check .cce suffix
-    checkAndSetType(CompileType::CCE);
+    checkAndSetType(AclrtcType::ACL_RTC_TYPE_CCE);
+    checkAndSetType(AclrtcType::ACL_RTC_TYPE_AICPU);
+    return aclrtcType;
+}
+
+inline AclrtcProgram* CreatAclrtcProgram(const char* name)
+{
+    AclrtcType aclrtcType = GetAclrtcTypeWithSuffix(name);
+    return new AclrtcProgram(nullptr, aclrtcType);
 }
 
 // 1. define function pointer
-using asrtcCreateProgramFuncPtr = 
-    asrtcResult (*)(asrtcProgram, const char*, const char*, int, const char* const*, const char* const*);
-using asrtcDestroyProgramFuncPtr = asrtcResult (*)(asrtcProgram);
+using asrtcCreateProgramFuncPtr =
+    asrtcResult (*)(asrtcProgram*, const char*, const char*, int, const char* const*, const char* const*);
+using asrtcDestroyProgramFuncPtr = asrtcResult (*)(asrtcProgram*);
 using asrtcCompileProgramFuncPtr = asrtcResult (*)(asrtcProgram, int, const char* const*);
 using asrtcGetDeviceELFSizeFuncPtr = asrtcResult (*)(asrtcProgram, size_t*);
 using asrtcGetDeviceELFFuncPtr = asrtcResult (*)(asrtcProgram, char*);
@@ -230,14 +249,33 @@ aclError aclrtcGetLoweredName(aclrtcProg prog, const char *nameExpr, const char 
 
 aclError aclrtcCreateProg(aclrtcProg *prog, const char *src, const char *name, int numHeaders, const char **headers,
     const char **includeNames) {
-    SetCompileTypeWithSuffix(name);
-    return ErrorCodeProcess(asrtcCreateProgramPtr(prog, src, name, numHeaders, headers, includeNames));
+    if (prog == nullptr || src == nullptr || name == nullptr) {
+        return ACL_ERROR_RTC_INVALID_INPUT;
+    }
+    AclrtcProgram* ascProg = CreatAclrtcProgram(name);
+    aclrtcProg program = nullptr;
+    aclError ret = ErrorCodeProcess(asrtcCreateProgramPtr(&program, src, name, numHeaders, headers, includeNames));
+    if (ret == ACL_SUCCESS) {
+        ascProg->SetProgram(program);
+        *prog = static_cast<aclrtcProg>(ascProg);
+    } else {
+        delete ascProg;
+    }
+    return ret;
 }
 
 aclError aclrtcCompileProg(aclrtcProg prog, int numOptions, const char **options) {
+    if (prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_INPUT;
+    }
+    AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
+    AclrtcType compileType = ascProg->GetType();
     std::vector<const char*> optionsPlugin;
-    if (GetCompileType() == CompileType::ASC) {
+    if (compileType == AclrtcType::ACL_RTC_TYPE_ASC) {
         optionsPlugin.emplace_back("-xasc");
+    } else if (compileType == AclrtcType::ACL_RTC_TYPE_AICPU) {
+        ascProg->GetLog() += "[ERROR] aicpu compile is not supported yet\n";
+        return ACL_ERROR_RTC_COMPILATION;
     }
     optionsPlugin.emplace_back("-std=c++17");
     std::string cannPath = GetCannPath();
@@ -258,32 +296,65 @@ aclError aclrtcCompileProg(aclrtcProg prog, int numOptions, const char **options
     optionsPlugin.emplace_back(interfacePath.c_str());
     optionsPlugin.emplace_back(implPath.c_str());
     for (int i = 0; i < numOptions; ++i) {
+        if (strcmp(options[i], "-xaicpu") == 0) {
+            ascProg->GetLog() += "[ERROR] aicpu compile is not supported yet\n";
+            return ACL_ERROR_RTC_COMPILATION;
+        }
         optionsPlugin.emplace_back(options[i]);
     }
-    AclrtcProgram ascProg(prog);
-    return ErrorCodeProcess(asrtcCompileProgramPtr(prog, optionsPlugin.size(), optionsPlugin.data()));
+    return ErrorCodeProcess(asrtcCompileProgramPtr(ascProg->GetProgram(), optionsPlugin.size(), optionsPlugin.data()));
 }
 
 aclError aclrtcDestroyProg(aclrtcProg *prog) {
-    return ErrorCodeProcess(asrtcDestroyProgramPtr(prog));
+    if (prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_INPUT;
+    }
+    AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(*prog);
+    aclrtcProg program = ascProg->GetProgram();
+    aclError ret = ErrorCodeProcess(asrtcDestroyProgramPtr(&program));
+    delete ascProg;
+    return ret;
 }
 
 aclError aclrtcGetBinData(aclrtcProg prog, char *binData) {
-    AclrtcProgram ascProg(prog);
-    return ErrorCodeProcess(asrtcGetDeviceELFPtr(prog, binData));
+    if (prog == nullptr || binData == nullptr) {
+        return ACL_ERROR_RTC_INVALID_INPUT;
+    }
+    AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
+    return ErrorCodeProcess(asrtcGetDeviceELFPtr(ascProg->GetProgram(), binData));
 }
 
 aclError aclrtcGetBinDataSize(aclrtcProg prog, size_t *binDataSizeRet) {
-    AclrtcProgram ascProg(prog);
-    return ErrorCodeProcess(asrtcGetDeviceELFSizePtr(prog, binDataSizeRet));
+    if (prog == nullptr || binDataSizeRet == nullptr) {
+        return ACL_ERROR_RTC_INVALID_INPUT;
+    }
+    AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
+    return ErrorCodeProcess(asrtcGetDeviceELFSizePtr(ascProg->GetProgram(), binDataSizeRet));
 }
 
 aclError aclrtcGetCompileLogSize(aclrtcProg prog, size_t *logSizeRet) {
-    AclrtcProgram ascProg(prog);
-    return ErrorCodeProcess(asrtcGetProgramLogSizePtr(prog, logSizeRet));
+    if (prog == nullptr || logSizeRet == nullptr) {
+        return ACL_ERROR_RTC_INVALID_INPUT;
+    }
+    AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
+    aclError ret = ErrorCodeProcess(asrtcGetProgramLogSizePtr(ascProg->GetProgram(), logSizeRet));
+    *logSizeRet += ascProg->GetLog().size();
+    return ret;
 }
 
 aclError aclrtcGetCompileLog(aclrtcProg prog, char *log) {
-    AclrtcProgram ascProg(prog);
-    return ErrorCodeProcess(asrtcGetProgramLogPtr(prog, log));
+    if (prog == nullptr || log == nullptr) {
+        return ACL_ERROR_RTC_INVALID_INPUT;
+    }
+    AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
+    char* originLogBegin = log;
+    if (!ascProg->GetLog().empty()) {
+        size_t prefixSize = ascProg->GetLog().size();
+        auto ret = memcpy_s(log, prefixSize, ascProg->GetLog().data(), prefixSize);
+        if (ret != EOK) {
+            return ACL_ERROR_RTC_FAILURE;
+        }
+        originLogBegin += prefixSize;
+    }
+    return ErrorCodeProcess(asrtcGetProgramLogPtr(ascProg->GetProgram(), originLogBegin));
 }
