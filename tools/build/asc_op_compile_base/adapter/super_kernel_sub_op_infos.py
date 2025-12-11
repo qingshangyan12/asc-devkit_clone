@@ -459,12 +459,16 @@ GM_ADDR __ac_dynamic_block_dim_{self.index}, GM_ADDR __ac_wait_lock_{self.index}
         if enable_double_stream:
             self.kernel_call_block += indent_code_func(\
                 f"AscendC::SyncAll<false>(); // reason: double stream need syncall to wait switch func\n")
+        aiv_func_addr = self.gen_param_code('aiv_func_addr')
+        aic_func_addr = self.gen_param_code('aic_func_addr')
+        self.kernel_call_block += self.gen_dcci_before_kernel_start_call_block()
+        self.kernel_call_block += \
+            f"call_func_of_{self.kernel_name}({self.param_offset}, {aiv_func_addr}, {aic_func_addr}, dy_blockDim);\n"
+        self.kernel_call_block += self.gen_dcci_after_kernel_end_call_block()
         if self.kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0]:
             self.kernel_call_block += f"if ASCEND_IS_AIV {{\n"
         else:
             self.kernel_call_block += f"if ASCEND_IS_AIC {{\n"
-        aiv_func_addr = self.gen_param_code('aiv_func_addr')
-        aic_func_addr = self.gen_param_code('aic_func_addr')
         wait_lock_offset = self.param_offset + len(self.kernel_params) + \
             self.extra_kernel_params.index(f'__ac_wait_lock_{self.index}')
         self.kernel_call_block += f"""
@@ -475,11 +479,7 @@ GM_ADDR __ac_dynamic_block_dim_{self.index}, GM_ADDR __ac_wait_lock_{self.index}
     }}
 }}
 """
-        self.kernel_call_block += self.gen_dcci_before_kernel_start_call_block()
-        self.kernel_call_block += \
-            f"call_func_of_{self.kernel_name}({self.param_offset}, {aiv_func_addr}, {aic_func_addr}, dy_blockDim);\n"
-        self.kernel_call_block += self.gen_dcci_after_kernel_end_call_block()
-        
+
 
     def gen_dynamic_op_call_func(self, enable_double_stream: bool):
         func_type = f"using FuncType = void (*)(uint64_t args_offset);"
