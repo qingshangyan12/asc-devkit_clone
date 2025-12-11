@@ -114,3 +114,8 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_half_half_hal
 // ==========asc_exp(half/float)==========
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Exp, asc_exp, vexp, half);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Exp, asc_exp, vexp, float);
+
+// ==========asc_relu(half/float/int32_t)==========
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Relu, asc_relu, vrelu, half);
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Relu, asc_relu, vrelu, float);
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Relu, asc_relu, vrelu, int32_t);
