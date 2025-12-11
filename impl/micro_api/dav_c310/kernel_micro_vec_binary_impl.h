@@ -917,6 +917,8 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
 
     NotNumUnion nan;
     nan.i = F32_NAN;
+    NotNumUnion min_denormal;
+    min_denormal.i = 0x1;
 
     NotNumUnion normalizeScaleEnlarge;
     normalizeScaleEnlarge.i = 0x4B000000; // 2^23
@@ -1056,6 +1058,13 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     // overflow (exponent over 255) underflow (exponent under 0) detection // FP32:1S + 8E + 23M
     Duplicate(tmp1, -23, mask);
     // True if underflow/overflow
+    Compare<int32_t, CMPMODE::EQ>(mask0, scale, (RegTensor<int32_t>&)tmp1, mask);
+    MaskAnd(mask0, mask0, maskValid, mask);
+    Duplicate(tmp0, min_denormal.i, mask0);
+    Add((RegTensor<uint32_t>&)z1, (RegTensor<uint32_t>&)dstSign, tmp0, mask0);
+    Select(dst, z1, dst, mask0);
+    MaskNot(mask0, mask0, mask);
+    MaskAnd(maskValid, mask0, maskValid, mask);
     Compare<int32_t, CMPMODE::LT>(mask0, scale, (RegTensor<int32_t>&)tmp1, mask);
     // set overflown/underflown result to infinity
     MaskAnd(mask0, mask0, maskValid, mask);
@@ -1073,6 +1082,8 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     Select(scale, tmp1, scale, mask0);
     Muls(z1, dst, 2, mask0);
     Select(dst, z1, dst, mask0);
+    MaskNot(mask0, mask0, mask);
+    MaskAnd(maskValid, mask0, maskValid, mask);
 
     Compare<int32_t, CMPMODE::GT>(mask0, scale, (RegTensor<int32_t>&)tmp0, mask);
     MaskAnd(mask0, mask0, maskValid, mask);
@@ -1118,6 +1129,8 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
 
     HalfUnion nan;
     nan.i = 0x7E00;
+    HalfUnion min_denormal;
+    min_denormal.i = 0x1;
 
     HalfUnion normalizeScaleEnlarge;
     normalizeScaleEnlarge.i = 0x6400; // 2^10
@@ -1252,6 +1265,13 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
     // ===========================================================
     // overflow (exponent over 31) underflow (exponent under -9) detection // FP16:1S + 5E + 9M
     Duplicate(tmp1, -9, mask);
+    Compare<int16_t, CMPMODE::EQ>(mask0, scale, (RegTensor<int16_t>&)tmp1, mask);
+    MaskAnd(mask0, mask0, maskValid, mask);
+    Duplicate(tmp0, min_denormal.i, mask0);
+    Add((RegTensor<uint16_t>&)z1, (RegTensor<uint16_t>&)dstSign, tmp0, mask0);
+    Select(dst, z1, dst, mask0);
+    MaskNot(mask0, mask0, mask);
+    MaskAnd(maskValid, mask0, maskValid, mask);
     // True if underflow/overflow
     Compare<int16_t, CMPMODE::LT>(mask0, scale, (RegTensor<int16_t>&)tmp1, mask);
     // set overflown/underflown result to infinity
@@ -1270,6 +1290,8 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
     Select(scale, tmp1, scale, mask0);
     Muls(z1, dst, 2, mask0);
     Select(dst, z1, dst, mask0);
+    MaskNot(mask0, mask0, mask);
+    MaskAnd(maskValid, mask0, maskValid, mask);
 
     Compare<int16_t, CMPMODE::GT>(mask0, scale, (RegTensor<int16_t>&)tmp0, mask);
     MaskAnd(mask0, mask0, maskValid, mask);
@@ -1392,7 +1414,7 @@ __simd_callee__ inline void MaxOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskR
             MaskReg selMask;
             Compare<ActualT, CMPMODE::GT>(selMask, traitTwoSrcReg0, traitTwoSrcReg1, maskTrait2);
             Select(traitTwoDstReg, traitTwoSrcReg0, traitTwoSrcReg1, selMask);
-            Duplicate(traitTwoSrcReg0, 0);
+            Duplicate(traitTwoSrcReg0, static_cast<ActualT>(0));
             Select(traitTwoDstReg, traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
             B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
         }
@@ -1400,7 +1422,7 @@ __simd_callee__ inline void MaxOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskR
         MaskReg selMask;
         Compare<ActualT, CMPMODE::GT>(selMask, srcReg0, srcReg1, mask);
         Select(dstReg, srcReg0, srcReg1, selMask);
-        Duplicate(srcReg0, 0);
+        Duplicate(srcReg0, static_cast<ActualT>(0));
         Select(dstReg, dstReg, srcReg0, mask);
     }
 }
@@ -1442,7 +1464,7 @@ __simd_callee__ inline void MinOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskR
             MaskReg selMask;
             Compare<ActualT, CMPMODE::LT>(selMask, traitTwoSrcReg0, traitTwoSrcReg1, maskTrait2);
             Select(traitTwoDstReg, traitTwoSrcReg0, traitTwoSrcReg1, selMask);
-            Duplicate(traitTwoSrcReg0, 0);
+            Duplicate(traitTwoSrcReg0, static_cast<ActualT>(0));
             Select(traitTwoDstReg, traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
             B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
         }
@@ -1450,7 +1472,7 @@ __simd_callee__ inline void MinOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskR
         MaskReg selMask;
         Compare<ActualT, CMPMODE::LT>(selMask, srcReg0, srcReg1, mask);
         Select(dstReg, srcReg0, srcReg1, selMask);
-        Duplicate(srcReg0, 0);
+        Duplicate(srcReg0, static_cast<ActualT>(0));
         Select(dstReg, dstReg, srcReg0, mask);
     }
 }
