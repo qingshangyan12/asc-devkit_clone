@@ -29,7 +29,7 @@ __aicore__ inline void asc_add(_ubuf__ float* dst, _ubuf__ float* src0, _ubuf__ 
 - 高维切分计算
 
 ```cpp
-_aicore__ inline void asc_add(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, const asc_binary_config& config)
+__aicore__ inline void asc_add(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, const asc_binary_config& config)
 __aicore__ inline void asc_add(_ubuf__ half* dst, _ubuf__ half* src0, _ubuf__ half* src1, const asc_binary_config& config)
 __aicore__ inline void asc_add(_ubuf__ int32_t* dst, _ubuf__ int32_t* src0, _ubuf__ int32_t* src1, const asc_binary_config& config)
 __aicore__ inline void asc_add(_ubuf__ float* dst, _ubuf__ float* src0, _ubuf__ float* src1, const asc_binary_config& config) 
