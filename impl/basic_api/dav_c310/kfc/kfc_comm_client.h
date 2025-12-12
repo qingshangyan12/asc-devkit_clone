@@ -93,6 +93,7 @@ __aicore__ inline KfcCommClient::~KfcCommClient()
         ASCENDC_ASSERT((msg != nullptr),
                        { KERNEL_LOG(KERNEL_ERROR, "ret of alloc message can not be nullptr when client quit"); });
         msg->head = KfcMsgMakeFlag(KFC_Enum::SERVICE_QUIT, 0);
+        msg->userCustomData = GetTaskRationImpl(); // vector core nums: 1 & 2
         PostMessage<false>(msg);
     }
 }
