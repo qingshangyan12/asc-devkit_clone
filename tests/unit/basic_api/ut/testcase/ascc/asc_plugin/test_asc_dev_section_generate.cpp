@@ -226,29 +226,7 @@ TEST_F(TEST_ASC_DEV_SECTION_GENERATE, asc_dev_stub_workspace_arg)
     AscPlugin::AscDevStubGenerator devStubGen = AscPlugin::AscDevStubGenerator(
         info, {AscPlugin::KernelMetaType::KERNEL_TYPE_AIV_ONLY}, AscPlugin::KfcScene::Close);
     devStubGen.socVersion_ = AscPlugin::ShortSocVersion::ASCEND910B;
-    manager.hasWorkspace_ = true;
-    manager.hasTiling_ = true;
     EXPECT_EQ(devStubGen.GetWorkspaceArgName(), std::string("workspace"));
-    manager.hasTiling_ = false;
-    EXPECT_EQ(devStubGen.GetWorkspaceArgName(), std::string("workspace_bak"));
-    manager.hasWorkspace_ = false;
-}
-
-TEST_F(TEST_ASC_DEV_SECTION_GENERATE, asc_dev_stub_workspace_arg_failure)
-{
-    auto& manager = AscPlugin::InfoManager::GetInstance();
-    AscPlugin::KernelInfo info;
-    info.kernelName = "add";
-    info.kernelMangledName = "add_mangling";
-    AscPlugin::AscDevStubGenerator devStubGen = AscPlugin::AscDevStubGenerator(
-        info, {AscPlugin::KernelMetaType::KERNEL_TYPE_AIV_ONLY}, AscPlugin::KfcScene::Close);
-    devStubGen.socVersion_ = AscPlugin::ShortSocVersion::ASCEND910B;
-    manager.hasWorkspace_ = true;
-    manager.hasTiling_ = true;
-    EXPECT_TRUE(devStubGen.GetWorkspaceArgName().empty());
-    manager.hasTiling_ = false;
-    EXPECT_TRUE(devStubGen.GetWorkspaceArgName().empty());
-    manager.hasWorkspace_ = false;
 }
 
 #define TEST_DEV_META_GEN(goldenContent, kernelType, isTemplateFunc)                                     \

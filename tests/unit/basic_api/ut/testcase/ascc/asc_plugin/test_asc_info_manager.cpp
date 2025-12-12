@@ -168,8 +168,6 @@ TEST_F(TEST_ASC_INFO_MANAGER, asc_SetCompileArgs_Undef)
     manager.SetCompileArgs(compileArgs);
     EXPECT_EQ(manager.UserDumpRequested(), false);
     EXPECT_EQ(manager.HasTimeStamp(), true);
-    EXPECT_EQ(manager.HasWorkspace(), true);
-    EXPECT_EQ(manager.HasTiling(), true);
     EXPECT_EQ(manager.IsL2CacheEnabled(), false);
 
     compileArgs = { "-UASCENDC_DUMP", "-UHAVE_WORKSPACE", "-UHAVE_TILING",
@@ -177,27 +175,7 @@ TEST_F(TEST_ASC_INFO_MANAGER, asc_SetCompileArgs_Undef)
     manager.SetCompileArgs(compileArgs);
     EXPECT_EQ(manager.UserDumpRequested(), true);
     EXPECT_EQ(manager.HasTimeStamp(), false);
-    EXPECT_EQ(manager.HasWorkspace(), false);
-    EXPECT_EQ(manager.HasTiling(), false);
     EXPECT_EQ(manager.IsL2CacheEnabled(), true);
-}
-
-// for -DHAVE_WORKSPACE and -DHAVE_TILING
-TEST_F(TEST_ASC_INFO_MANAGER, asc_workspace_tiling)
-{
-    AscPlugin::CompileArgs a;
-    auto& manager = AscPlugin::InfoManager::GetInstance();
-    manager.compileArgs_ = a;   // clean up
-    EXPECT_EQ(manager.HasWorkspace(), false);
-    EXPECT_EQ(manager.HasTiling(), false);
-
-    std::vector<std::string> compileArgs = {"-DHAVE_WORKSPACE","-DHAVE_TILING"};
-
-    manager.SetCompileArgs(compileArgs);
-    EXPECT_EQ(manager.HasWorkspace(), true);
-    EXPECT_EQ(manager.HasTiling(), true);
-    manager.hasWorkspace_ = false;
-    manager.hasTiling_ = false;
 }
 
 // for -DASCENDC_TIME_STAMP_ON

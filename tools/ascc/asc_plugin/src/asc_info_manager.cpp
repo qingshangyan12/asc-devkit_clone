@@ -132,10 +132,6 @@ void InfoManager::UpdateDefinitions(bool hasHostStart, std::vector<std::string>:
         if (prefix != "-D") { // when prefix is -U
             if (macroContent == "ASCENDC_DUMP") {
                 userDumpStatus_ = true;
-            } else if (macroContent == "HAVE_WORKSPACE") {
-                hasWorkspace_ = false;
-            } else if (macroContent == "HAVE_TILING") {
-                hasTiling_ = false;
             } else if (macroContent == "ASCENDC_TIME_STAMP_ON") {
                 hasTimeStamp_ = false;
             } else if (macroContent == "ASCENDC_DEBUG") {
@@ -146,10 +142,6 @@ void InfoManager::UpdateDefinitions(bool hasHostStart, std::vector<std::string>:
                 userDumpStatus_ = false;
             } else if (macroContent == "ASCENDC_DUMP=1") {
                 userDumpStatus_ = true;
-            } else if (macroContent == "HAVE_WORKSPACE") {
-                hasWorkspace_ = true;
-            } else if (macroContent == "HAVE_TILING") {
-                hasTiling_ = true;
             } else if (macroContent == "ASCENDC_TIME_STAMP_ON") {
                 hasTimeStamp_ = true;
             } else if (macroContent == "ASCENDC_DEBUG") {
@@ -390,16 +382,6 @@ bool InfoManager::UserDumpRequested() const
 bool InfoManager::HasTimeStamp() const
 {
     return hasTimeStamp_;
-}
-
-bool InfoManager::HasWorkspace() const
-{
-    return hasWorkspace_;
-}
-
-bool InfoManager::HasTiling() const
-{
-    return hasTiling_;
 }
 
 bool InfoManager::HasPrintf() const

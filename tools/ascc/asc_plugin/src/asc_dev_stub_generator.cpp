@@ -96,26 +96,6 @@ AscDevStubGenerator::AscDevStubGenerator(const KernelInfo &kernelInfo, const std
 
 std::string AscDevStubGenerator::GetWorkspaceArgName() const
 {
-    const auto& hasWorkspace = InfoManager::GetInstance().HasWorkspace();
-    const auto& hasTiling = InfoManager::GetInstance().HasTiling();
-    if (hasWorkspace && !hasTiling) {
-        const size_t idx = kernelInfo_.kernelParameters.size() - 1;
-        if (idx >= kernelInfo_.kernelParameters.size()) {
-            ASC_LOGW(
-                "Kernel [%s] : use workspace failure, must have GM_ADDR argument.", kernelInfo_.kernelName.c_str());
-            return "";
-        }
-        return kernelInfo_.kernelParameters[kernelInfo_.kernelParameters.size() - 1].name;
-    } else if (hasWorkspace && hasTiling) {
-        const size_t idx = kernelInfo_.kernelParameters.size() - 2;
-        if (idx >= kernelInfo_.kernelParameters.size()) {
-            ASC_LOGW("Kernel [%s] : use workspace failure, when both 'HAVE_TILING' and 'HAVE_WORKSPACE' macros are "
-                     "specified, the number of function arguments must exceed 2.",
-                kernelInfo_.kernelName.c_str());
-            return "";
-        }
-        return kernelInfo_.kernelParameters[kernelInfo_.kernelParameters.size() - 2].name;
-    }
     for (const auto& param : kernelInfo_.kernelParameters) {
         if (param.attribute.find(std::string("kfc_workspace")) != std::string::npos) {
             ASC_LOGI("Kernel [%s] : the kernel utilizes the workspace.", kernelInfo_.kernelName.c_str());
@@ -313,7 +293,7 @@ std::string AscDevStubGenerator::GetTempArgsList(const TemplateInstance &tempIns
     return JoinStringWithDelimiter(templateArgList, ", ");
 }
 
-void AscDevStubGenerator::GenStubKernelFunc(const bool isMix, const bool isHardSync, const bool hasAnonymous, 
+void AscDevStubGenerator::GenStubKernelFunc(const bool isMix, const bool isHardSync, const bool hasAnonymous,
     const TemplateInstance tempInst)
 {
     if (!kernelInfo_.namespaces.empty()) {
