@@ -401,6 +401,7 @@ public:
     * @param [in] srcDataType: The type of input data for the communication.
     * @return The setting returns true if successful, otherwise it returns false.
     */
+    [[deprecated("It is obsoleted and use Tiling Api instead.")]]
     __aicore__ inline bool SetReduceDataTypeAbility(HcclReduceOp op,
         HcclDataType dstDataType, HcclDataType srcDataType);
 

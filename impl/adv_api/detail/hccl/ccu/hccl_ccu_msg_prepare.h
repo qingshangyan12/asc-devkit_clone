@@ -33,8 +33,15 @@ constexpr uint64_t DATA_TYPE_SHIFT = 8;
 constexpr uint64_t COMM_TYPE_SHIFT = 0;
 
 constexpr int CCU_PARAM_INDEX = 2;
+constexpr int CCU_XNDATA_INDEX_OPID = 0;
+constexpr int CCU_XNDATA_INDEX_SEND_BUFF = 1;
+constexpr int CCU_XNDATA_INDEX_RCVE_BUFF = 2;
+constexpr int CCU_XNDATA_INDEX_THREE = 3;
+constexpr int CCU_XNDATA_INDEX_FOUR = 4;
+constexpr int CCU_XNDATA_INDEX_FIVE = 5;
 constexpr int CCU_XNDATA_INDEX_SIX = 6;
 constexpr int CCU_XNDATA_INDEX_SEVEN = 7;
+constexpr int CCU_XNDATA_INDEX_EIGHT= 8;
 
 constexpr uint64_t REPEAT_NUM_SHIFT = 55;
 constexpr uint64_t REPEAT_LOOP_INDEX_SHIFT = 48;
@@ -122,10 +129,10 @@ __aicore__ inline uint64_t GetParallelParameters(uint64_t repeatNum, uint64_t re
 
 __aicore__ inline void SetupCCUDataPartA(CCUParam &ccuParam, uint64_t *xnData)
 {
-    xnData[0] = GetOpId(ccuParam); // ccu xn0
+    xnData[CCU_XNDATA_INDEX_OPID] = GetOpId(ccuParam); // ccu xn0
     uint64_t offset = ccuParam.commParam.count * ccuParam.repeatIndex * DATA_TYPE_MAP[ccuParam.commParam.dataType];
-    xnData[1] = (uint64_t)ccuParam.commParam.sendBuf + offset; // ccu xn1
-    xnData[2] = (uint64_t)ccuParam.commParam.recvBuf + offset; // ccu xn2
+    xnData[CCU_XNDATA_INDEX_SEND_BUFF] = (uint64_t)ccuParam.commParam.sendBuf + offset; // ccu xn1
+    xnData[CCU_XNDATA_INDEX_RCVE_BUFF] = (uint64_t)ccuParam.commParam.recvBuf + offset; // ccu xn2
 }
 
 __aicore__ inline void SetupCCUDataPartB(CCUParam &ccuParam, uint64_t *xnData, uint64_t m, uint64_t n, uint64_t p)
@@ -151,21 +158,24 @@ __aicore__ inline void SetupCCUDataPartB(CCUParam &ccuParam, uint64_t *xnData, u
 
 __aicore__ inline void CCUPrepare(CCUParam &ccuParam, uint64_t *xnData)
 {
+    auto dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(ccuParam.commParam.dataType)];
     SetupCCUDataPartA(ccuParam, xnData);
     if (ccuParam.commParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        xnData[3] = 0; // 3 is index of xnData
-        xnData[4] = 0; // 4 is index of xnData
+        xnData[CCU_XNDATA_INDEX_THREE] = 0; // 3 is index of xnData
+        xnData[CCU_XNDATA_INDEX_FOUR] = 0; // 4 is index of xnData
         // 按照卡分组，sendSize 、sendOffset、recvSize、recvOffset  以字节为单位 * DataSzie(DataType)
         // ccu xn5
         AssembleHcclMsgExtForCCU(ccuParam);
-        xnData[5] = reinterpret_cast<uint64_t>(ccuParam.ccuMsgExt) + CCU_MSG_EXT_RANK_OFFSET * ccuParam.alltoallvCnt++;
+        xnData[CCU_XNDATA_INDEX_FIVE] = reinterpret_cast<uint64_t>(ccuParam.ccuMsgExt) + CCU_MSG_EXT_RANK_OFFSET * ccuParam.alltoallvCnt++;
         return;
     } else if (ccuParam.commParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
-        uint64_t sliceSizeAlltoall = ccuParam.commParam.count * DATA_TYPE_MAP[ccuParam.commParam.dataType];
-        xnData[3] = sliceSizeAlltoall;
-        xnData[4] = sliceSizeAlltoall;
-        xnData[5] = (uint64_t)ccuParam.commParam.sendBuf;
-        xnData[6] = sliceSizeAlltoall * ccuParam.rankId;
+        uint64_t sliceSizeAlltoall = ccuParam.commParam.count * dataSize;
+        uint64_t strideSize =
+                ccuParam.commParam.strideCount == 0 ? sliceSizeAlltoall : ccuParam.commParam.strideCount * dataSize;
+        xnData[CCU_XNDATA_INDEX_THREE] = sliceSizeAlltoall;
+        xnData[CCU_XNDATA_INDEX_FOUR] = strideSize;
+        xnData[CCU_XNDATA_INDEX_FIVE] = xnData[CCU_XNDATA_INDEX_SEND_BUFF];
+        xnData[CCU_XNDATA_INDEX_SIX] = strideSize * ccuParam.rankId;
         return;
     }
 
@@ -175,9 +185,9 @@ __aicore__ inline void CCUPrepare(CCUParam &ccuParam, uint64_t *xnData)
     uint64_t sliceSize = sliceCount * DATA_TYPE_MAP[ccuParam.commParam.dataType];
 
     if (ccuParam.commParam.commType.prepareType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
-        xnData[1] = reinterpret_cast<uint64_t>(ccuParam.commParam.sendBuf); // 1 is index of xnData
-        xnData[2] = ccuParam.commParam.wParamExt.sendSizes; // 2 is index of xnData
-        xnData[8] = ccuParam.commParam.wParamExt.remoteWinOffset; // 8 is index of xnData
+        xnData[CCU_XNDATA_INDEX_SEND_BUFF] = reinterpret_cast<uint64_t>(ccuParam.commParam.sendBuf); // 1 is index of xnData
+        xnData[CCU_XNDATA_INDEX_RCVE_BUFF] = ccuParam.commParam.wParamExt.sendSizes; // 2 is index of xnData
+        xnData[CCU_XNDATA_INDEX_EIGHT] = ccuParam.commParam.wParamExt.remoteWinOffset; // 8 is index of xnData
         sliceSize = ccuParam.commParam.count;
         loopCount = CCU_LOOP_COUNT_ATAVW;
     }
@@ -188,18 +198,17 @@ __aicore__ inline void CCUPrepare(CCUParam &ccuParam, uint64_t *xnData)
     uint64_t p = sliceSize - m * loopSize - n * CCU_MEMSLICE_SIZE;
     KERNEL_LOG(KERNEL_INFO, "ApiClient CCUPrepare loopSize:%d, m:%d, n:%d, p:%d", loopSize, m, n, p);
 
-    auto dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(ccuParam.commParam.dataType)];
     if (ccuParam.commParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
-        xnData[3] = (ccuParam.commParam.strideCount == 0) ? tmpCount * dataSize * ccuParam.rankId : 
+        xnData[CCU_XNDATA_INDEX_THREE] = (ccuParam.commParam.strideCount == 0) ? tmpCount * dataSize * ccuParam.rankId :
                     (ccuParam.commParam.strideCount * dataSize * ccuParam.rankId); // 3 is index of xnData
     } else if (ccuParam.commParam.commType.prepareType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
-        xnData[3] = ccuParam.commParam.wParamExt.sendOffsets;// 3 is index of xnData
+        xnData[CCU_XNDATA_INDEX_THREE] = ccuParam.commParam.wParamExt.sendOffsets;// 3 is index of xnData
     } else {
-        xnData[3] = (ccuParam.commParam.strideCount == 0) ? sliceSize * ccuParam.rankId : 
+        xnData[CCU_XNDATA_INDEX_THREE] = (ccuParam.commParam.strideCount == 0) ? sliceSize * ccuParam.rankId :
                     (ccuParam.commParam.strideCount * dataSize * ccuParam.rankId);// 3 is index of xnData
     }
-    xnData[4] = loopSize * m; // 4 is index of xnData
-    xnData[5] = m; // 5 is index of xnData
+    xnData[CCU_XNDATA_INDEX_FOUR] = loopSize * m; // 4 is index of xnData
+    xnData[CCU_XNDATA_INDEX_FIVE] = m; // 5 is index of xnData
     SetupCCUDataPartB(ccuParam, xnData, m, n, p);
 }
 }

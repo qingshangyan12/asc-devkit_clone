@@ -264,4 +264,23 @@ TEST_F(HcclSuiteAIC, AllToAllv_prepare)
     EXPECT_EQ(hccl.Wait(handleId), HCCL_SUCCESS);
 }
 
+// alltoall repeat_prepare_commit Repeat = 1 Call the Prepare interface Expected handleId = 0
+TEST_F(HcclSuiteAIC, AllToAll_prepareWithCommitTrue)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024 * 100 * 1024);
+    HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+
+    HcclHandle handleId = hccl.AlltoAll<true>(reinterpret_cast<__gm__ uint8_t *>(0x1234),
+                                              reinterpret_cast<__gm__ uint8_t *>(0x4321),
+                                              10,
+                                              HcclDataType::HCCL_DATA_TYPE_INT8);
+
+    EXPECT_EQ(handleId, 0);
+    EXPECT_EQ(hccl.Wait(handleId), HCCL_SUCCESS);
+}
+
 }
