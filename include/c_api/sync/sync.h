@@ -11,8 +11,8 @@
 #ifndef INCLUDE_C_API_SYNC_H
 #define INCLUDE_C_API_SYNC_H
 
-#include "c_api_instr_impl/sync/sync_impl.h"
-#include "c_api_interf_util.h"
+#include "c_api_instr_impl/sync_c_api_impl/sync_c_api_impl.h"
+#include "c_api_utils_intf.h"
 
 template<typename Pipe, typename TPipe>
 __aicore__ inline void asc_sync_notify(Pipe pipe, TPipe tpipe, int id);

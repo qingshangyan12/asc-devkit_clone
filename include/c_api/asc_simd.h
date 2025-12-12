@@ -11,14 +11,16 @@
 #ifndef INCLUDE_C_API_ASC_SIMD_H
 #define INCLUDE_C_API_ASC_SIMD_H
 
-#include "c_api_interf_util.h"
+#include "c_api_utils_intf.h"
+#include "atomic/atomic.h"
+#include "cache_ctrl/cache_ctrl.h"
 #include "cube_compute/cube_compute.h"
-#include "cube_dmamove/cube_dmamove.h"
-#include "simd_atomic/simd_atomic.h"
+#include "cube_datamove/cube_datamove.h"
+#include "misc/misc.h"
+#include "scalar_compute/scalar_compute.h"
 #include "sync/sync.h"
 #include "sys_var/sys_var.h"
 #include "vector_compute/vector_compute.h"
 #include "vector_datamove/vector_datamove.h"
-#include "misc/misc.h"
 
 #endif

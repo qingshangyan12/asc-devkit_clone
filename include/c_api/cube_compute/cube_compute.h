@@ -11,6 +11,6 @@
 #ifndef INCLUDE_C_API_CUBE_COMPUTE_H
 #define INCLUDE_C_API_CUBE_COMPUTE_H
 
-#include "c_api_instr_impl/cube_compute/cube_compute_impl.h"
+#include "c_api_instr_impl/cube_compute_c_api_impl/cube_compute_c_api_impl.h"
 
 #endif
