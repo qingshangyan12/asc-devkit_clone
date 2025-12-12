@@ -403,7 +403,7 @@ else
 fi
 
 if [ -d ${targetdir}/$vendordir/op_impl/cpu/aicpu_kernel/impl/ ]; then
-    apply_chmod "${targetdir}/$vendordir/op_impl/cpu/aicpu_kernel/impl/*" "440" "${INSTALL_FOR_ALL}"
+    chmod -R 444 ${targetdir}/$vendordir/op_impl/cpu/aicpu_kernel/impl/* >/dev/null 2>&1
 fi
 
 echo "SUCCESS"
