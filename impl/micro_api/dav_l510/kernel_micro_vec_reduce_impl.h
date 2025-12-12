@@ -28,7 +28,7 @@ __aicore__ inline void ReduceSumImpl(DstRegT &dstReg, SrcRegT srcReg, MaskReg ma
     static_assert(std::is_same_v<U, DefaultType> || std::is_same_v<U, ActualSrcRegT>, "U type is not correct!");
     static_assert((SupportType<Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>, Tuple<int32_t, int32_t>,
         Tuple<uint32_t, uint16_t>, Tuple<uint32_t, uint32_t>, Tuple<half, half>, Tuple<float, float>>()),
-        "ReduceSum unsupport this datatype on current device");
+        "Reduce unsupport this datatype on current device");
 
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcadd(dstReg, srcReg, mask, modeValue);
@@ -40,7 +40,7 @@ __aicore__ inline void ReduceMaxImpl(RegT &dstReg, RegT srcReg, MaskReg mask)
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert((SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMax unsupport this datatype on current device");
+        "Reduce unsupport this datatype on current device");
 
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcmax(dstReg, srcReg, mask, modeValue);
@@ -52,7 +52,7 @@ __aicore__ inline void ReduceMinImpl(RegT &dstReg, RegT srcReg, MaskReg mask)
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert((SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMin unsupport this datatype on current device");
+        "Reduce unsupport this datatype on current device");
 
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcmin(dstReg, srcReg, mask, modeValue);
@@ -64,7 +64,7 @@ __aicore__ inline void ReduceSumWithDataBlockImpl(RegT &dstReg, RegT srcReg, Mas
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert((SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceSumWithDataBlock unsupport this datatype on current device");
+        "ReduceDataBlock unsupport this datatype on current device");
 
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcgadd(dstReg, srcReg, mask, modeValue);
@@ -76,7 +76,7 @@ __aicore__ inline void ReduceMaxWithDataBlockImpl(RegT &dstReg, RegT srcReg, Mas
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert((SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMaxWithDataBlock unsupport this datatype on current device");
+        "ReduceDataBlock unsupport this datatype on current device");
 
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcgmax(dstReg, srcReg, mask, modeValue);
@@ -88,7 +88,7 @@ __aicore__ inline void ReduceMinWithDataBlockImpl(RegT &dstReg, RegT srcReg, Mas
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert((SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMinWithDataBlock unsupport this datatype on current device");
+        "ReduceDataBlock unsupport this datatype on current device");
 
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcgmin(dstReg, srcReg, mask, modeValue);
@@ -99,7 +99,7 @@ __aicore__ inline void PairReduceSumImpl(RegT &dstReg, RegT srcReg, MaskReg mask
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert((SupportType<ActualT, float, half>()), "PairReduceSum unsupport this datatype on current device");
+    static_assert((SupportType<ActualT, float, half>()), "PairReduceElem unsupport this datatype on current device");
 
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcpadd(dstReg, srcReg, mask, modeValue);

@@ -29,7 +29,7 @@ __aicore__ inline void ReduceSumImpl(DstRegT &dstReg, SrcRegT srcReg, MaskReg ma
     static_assert((SupportType<Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int16_t, int8_t>, Tuple<uint16_t, uint8_t>, Tuple<int32_t, int16_t>,
         Tuple<uint32_t, uint16_t>, Tuple<uint32_t, uint32_t>,  Tuple<int32_t, int32_t>,
         Tuple<half, half>, Tuple<float, float>>()),
-        "ReduceSum unsupport this datatype on current device");
+        "Reduce unsupport this datatype on current device");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcadd(dstReg, srcReg, mask, modeValue);
 }
@@ -40,7 +40,7 @@ __aicore__ inline void ReduceMaxImpl(RegT &dstReg, RegT srcReg, MaskReg mask)
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert((SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float>()),
-        "ReduceMax unsupport this datatype on current device");
+        "Reduce unsupport this datatype on current device");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcmax(dstReg, srcReg, mask, modeValue);
 }
@@ -51,9 +51,9 @@ __aicore__ inline void ReduceMinImpl(RegT &dstReg, RegT srcReg, MaskReg mask)
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert((SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float>()),
-        "ReduceMin unsupport this datatype on current device");
+        "Reduce unsupport this datatype on current device");
     static_assert(SupportEnum<mode, MaskMergeMode::MERGING>(),
-        "current ReduceMin api only supported Mode MERGING on current device!");
+        "current Reduce api only supported Mode MERGING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcmin(dstReg, srcReg, mask, modeValue);
 }
@@ -61,25 +61,25 @@ __aicore__ inline void ReduceMinImpl(RegT &dstReg, RegT srcReg, MaskReg mask)
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __aicore__ inline void ReduceSumWithDataBlockImpl(RegT &dstReg, RegT srcReg, MaskReg mask)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulsCast is not supported on this device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "ReduceDataBlock is not supported on this device!"); });
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __aicore__ inline void ReduceMaxWithDataBlockImpl(RegT &dstReg, RegT srcReg, MaskReg mask)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulsCast is not supported on this device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "ReduceDataBlock is not supported on this device!"); });
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __aicore__ inline void ReduceMinWithDataBlockImpl(RegT &dstReg, RegT srcReg, MaskReg mask)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulsCast is not supported on this device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "ReduceDataBlock is not supported on this device!"); });
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __aicore__ inline void PairReduceSumImpl(RegT &dstReg, RegT srcReg, MaskReg mask)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulsCast is not supported on this device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "ReduceDataBlock is not supported on this device!"); });
 }
 } // namespace MicroAPI
 } // namespace AscendC

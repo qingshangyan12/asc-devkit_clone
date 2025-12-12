@@ -25,7 +25,7 @@ __simd_callee__ inline void CopyImpl(U& dstReg, U& srcReg, MaskReg mask)
     static_assert(SupportType<ActualT, bool, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, 
                   int64_t, half, float, bfloat16_t>(), "current data type is not supported on current device!");
     static_assert(SupportEnum<mode, MaskMergeMode::MERGING>(),
-                  "current Copy api only supported MaskMergeMode MERGING on current device!");
+                  "current Move api only supported MaskMergeMode MERGING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (IsSameType<ActualT, bool>::value) {
         vmov((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, modeValue);

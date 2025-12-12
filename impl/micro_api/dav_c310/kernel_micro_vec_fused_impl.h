@@ -27,7 +27,7 @@ __simd_callee__ inline void FusedMulsCastImpl(T3& dstReg, T4& srcReg, T2 scalarV
     static_assert(SupportType<Tuple<ActualT, ActualU, T2>, Tuple<half, float, float>>(),
                   "current data type is not supported on current device!");
     static_assert(SupportEnum<layout, RegLayout::ZERO, RegLayout::ONE>(),
-                  "current FusedMulsCast api only supported RegLayout ZERO, ONE on current device!");
+                  "current MulsCast api only supported RegLayout ZERO, ONE on current device!");
 
     constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layout)>();
     vmulscvt(dstReg, srcReg, scalarValue, mask, partModeValue);
@@ -41,7 +41,7 @@ __simd_callee__ inline void FusedAbsSubImpl(U& dstReg, U& srcReg0, U& srcReg1, M
     static_assert(SupportType<ActualT, half, float, int64_t>(), 
                   "current data type is not supported on current device!");
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
-                  "current FusedAbsSub api only supported Mode ZEROING on current device!");
+                  "current AbsSub api only supported Mode ZEROING on current device!");
     if constexpr(sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
@@ -80,9 +80,9 @@ __simd_callee__ inline void FusedExpSubImpl(S& dstReg, V& srcReg0, V& srcReg1, M
                   "current data type is not supported on current device!");
 #endif
     static_assert(SupportEnum<layout, RegLayout::ZERO, RegLayout::ONE>(),
-                  "current FusedExpSub api only supported RegLayout ZERO, ONE on current device!");
+                  "current ExpSub api only supported RegLayout ZERO, ONE on current device!");
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
-                  "current FusedExpSub api only supported Mode ZEROING on current device!");
+                  "current ExpSub api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layout)>();
     vexpdif(dstReg, srcReg0, srcReg1, mask, partModeValue);
@@ -95,7 +95,7 @@ __simd_callee__ inline void FusedMulDstAddImpl(U& dstReg, U& srcReg0, U& srcReg1
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportType<ActualT, half, float, bfloat16_t>(),
                   "current data type is not supported on current device!");
-    static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(), "FusedMulDstAdd only support Mode ZEROING");
+    static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(), "MulDstAdd only support Mode ZEROING");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vmadd(dstReg, srcReg0, srcReg1, mask, modeValue);
 }

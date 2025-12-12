@@ -24,7 +24,7 @@ __simd_callee__ inline void CopyImpl(RegT &dstReg, RegT &srcReg, MaskReg mask)
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportEnum<mode, MaskMergeMode::MERGING>(),
-        "current Copy api only supported MaskMergeMode MERGING!");
+        "current Move api only supported MaskMergeMode MERGING!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vmov(dstReg, srcReg, mask, modeValue);
 }

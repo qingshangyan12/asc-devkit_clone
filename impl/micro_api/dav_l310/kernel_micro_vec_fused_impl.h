@@ -23,7 +23,7 @@ namespace MicroAPI {
 template <typename T, typename U, typename ScalarT, RegLayout layout, typename RegT, typename RegU>
 __aicore__ inline void FusedMulsCastImpl(RegT &dstReg, RegU &srcReg, ScalarT scalarValue, MaskReg &mask)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulsCast is not supported on current device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "MulsCast is not supported on current device!"); });
 }
 
 template <typename T, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>

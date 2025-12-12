@@ -26,7 +26,7 @@ __aicore__ inline void CopyImpl(RegT &dstReg, RegT &srcReg, MaskReg mask)
     static_assert(SupportType<ActualT, bool, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t,
         half, float, bfloat16_t>(), "current data type is not supported on current device!");
     static_assert(SupportEnum<mode, MaskMergeMode::MERGING>(),
-        "current Copy api only supported MaskMergeMode MERGING");
+        "current Move api only supported MaskMergeMode MERGING");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vmov(dstReg, srcReg, mask, modeValue);
 }

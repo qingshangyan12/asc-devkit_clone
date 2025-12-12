@@ -22,25 +22,25 @@ namespace MicroAPI {
 template <typename T, typename U, typename ScalarT, RegLayout layout, typename RegT, typename RegU>
 __aicore__ inline void FusedMulsCastImpl(RegT &dstReg, RegU &srcReg, ScalarT scalarValue, MaskReg &mask)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulsCast is not supported on this device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "MulsCast is not supported on this device!"); });
 }
 
 template <typename T, MaskMergeMode mode, typename RegT>
 __aicore__ inline void FusedAbsSubImpl(RegT &dstReg, RegT &srcReg0, RegT &srcReg1, MaskReg &mask)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedAbsSub is not supported on this device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "AbsSub is not supported on this device!"); });
 }
 
 template <typename T, typename U, RegLayout layout, MaskMergeMode mode, typename RegT, typename RegU>
 __aicore__ inline void FusedExpSubImpl(RegT &dstReg, RegU &srcReg0, RegU &srcReg1, MaskReg &mask)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedExpSub is not supported on this device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "ExpSub is not supported on this device!"); });
 }
 
 template <typename T, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __aicore__ inline void FusedMulDstAddImpl(RegT &dstReg, RegT &srcReg0, RegT &srcReg1, MaskReg &mask)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "FusedMulDstAdd is not supported on this device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "MulDstAdd is not supported on this device!"); });
 }
 }
 } // namespace AscendC
