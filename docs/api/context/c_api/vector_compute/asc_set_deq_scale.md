@@ -9,17 +9,17 @@
 
 ## 功能说明
 
-设置DEQSCALE寄存器的值。
+设置DEQSCALE（量化参数）寄存器的值。
 
 ## 函数原型
 
-```cpp
-  // 用于cast_deq类中int32转为half场景
-  __aicore__ inline void asc_set_deq_scale(half scale_value)
+  ```cpp
+    // 用于cast_deq类中int32转为half场景
+    __aicore__ inline void asc_set_deq_scale(half scale_value)
 
-  __aicore__ inline void asc_set_deq_scale(const asc_deq_scale_config& config)
-  __aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* config)
-```
+    __aicore__ inline void asc_set_deq_scale(const asc_deq_scale_config& config)
+    __aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* config)
+  ```
 
 ## 参数说明
 
@@ -27,7 +27,7 @@
 | ------------ | ------------ | ------------ |
 |scale_value|输入|Scale量化参数。|
 |config(asc_deq_scale_config)|输入|量化参数，用于非向量模式的量化。详细说明请参考[asc_deq_scale_config](../struct/asc_deq_scale_config.md)|
-|config(uint64_t*)|输入|量化参数，用于向量模式的量化，需要先按照[asc_deq_scale_config](../struct/asc_deq_scale_config.md)的格式填充量化参数。|
+|config(uint64_t*)|输入|量化参数，用于向量模式的量化。|
 
 ## 返回值说明
 

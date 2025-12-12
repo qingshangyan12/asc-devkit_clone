@@ -23,7 +23,7 @@
 
 ## 返回值说明
 
-执行GatherMask(对应接口为：[asc_reduce](./asc_reduce.md))操作后剩余的元素数量。
+执行[asc_reduce](./asc_reduce.md)操作后剩余的元素数量。
 
 ## 流水类型
 
@@ -38,6 +38,7 @@ PIPE_TYPE_S
 
 ```cpp
 // 初始化dst、src0、src1和total_length(参与计算的数据长度)
+int total_length = 256;
 asc_reduce(dst, src0, src1, total_length)
 asc_sync_notify(PIPE_TYPE_V, PIPE_TYPE_S, 0); // 设置等待和同步信号
 asc_sync_wait(PIPE_TYPE_V, PIPE_TYPE_S, 0);

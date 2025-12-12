@@ -23,59 +23,59 @@
   
   ```cpp
     // 不指定舍入模式
-    __aicore__ inline void asc_half2int8(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     // RINT舍入模式
-    __aicore__ inline void asc_half2int8_r(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_r(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     // ROUND舍入模式
-    __aicore__ inline void asc_half2int8_a(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_a(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     //FLOOR舍入模式
-    __aicore__ inline void asc_half2int8_f(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_f(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     // CEIL舍入模式
-    __aicore__ inline void asc_half2int8_c(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_c(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     // TRUNC舍入模式
-    __aicore__ inline void asc_half2int8_z(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_z(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
   ```
 
 - 高维切分计算
   
   ```cpp
-    //不舍入
-    __aicore__ inline void asc_half2int8(__ubuf__ void* dst, __ubuf__ half* src, const asc_unary_config& config)
+    // 不指定舍入模式
+    __aicore__ inline void asc_half2int8(__ubuf__ int8_t* dst, __ubuf__ half* src, const asc_unary_config& config)
     // RINT舍入模式
-    __aicore__ inline void asc_half2int8_r(__ubuf__ int16_t* dst, __ubuf__ half* src, const asc_unary_config& config)
+    __aicore__ inline void asc_half2int8_r(__ubuf__ int8_t* dst, __ubuf__ half* src, const asc_unary_config& config)
     // ROUND舍入模式
-    __aicore__ inline void asc_half2int8_a(__ubuf__ int16_t* dst, __ubuf__ half* src, const asc_unary_config& config)
+    __aicore__ inline void asc_half2int8_a(__ubuf__ int8_t* dst, __ubuf__ half* src, const asc_unary_config& config)
     //FLOOR舍入模式
-    __aicore__ inline void asc_half2int8_f(__ubuf__ int16_t* dst, __ubuf__ half* src, const asc_unary_config& config)
+    __aicore__ inline void asc_half2int8_f(__ubuf__ int8_t* dst, __ubuf__ half* src, const asc_unary_config& config)
     // CEIL舍入模式
-    __aicore__ inline void asc_half2int8_c(__ubuf__ int16_t* dst, __ubuf__ half* src, const asc_unary_config& config)
+    __aicore__ inline void asc_half2int8_c(__ubuf__ int8_t* dst, __ubuf__ half* src, const asc_unary_config& config)
     // TRUNC舍入模式
-    __aicore__ inline void asc_half2int8_z(__ubuf__ int16_t* dst, __ubuf__ half* src, const asc_unary_config& config)
+    __aicore__ inline void asc_half2int8_z(__ubuf__ int8_t* dst, __ubuf__ half* src, const asc_unary_config& config)
   ```
 
 - 同步计算
   
   ```cpp
-    //不舍入
-    __aicore__ inline void asc_half2int8_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    // 不指定舍入模式
+    __aicore__ inline void asc_half2int8_sync(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     // RINT舍入模式
-    __aicore__ inline void asc_half2int8_r_sync(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_r_sync(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     // ROUND舍入模式
-    __aicore__ inline void asc_half2int8_a_sync(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_a_sync(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     //FLOOR舍入模式
-    __aicore__ inline void asc_half2int8_f_sync(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_f_sync(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     // CEIL舍入模式
-    __aicore__ inline void asc_half2int8_c_sync(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_c_sync(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
     // TRUNC舍入模式
-    __aicore__ inline void asc_half2int8_z_sync(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int8_z_sync(__ubuf__ int8_t* dst, __ubuf__ half* src, uint32_t count)
   ```
 
 ## 参数说明
 
 | 参数名    | 输入/输出 | 描述                |
 | ------ | ----- | ----------------- |
-| dst    | 输出    | 目的操作数(矢量)的起始地址。            |
-| src    | 输入    | 源操作数(矢量)的起始地址。             |
+| dst    | 输出    | 目的操作数（矢量）的起始地址。            |
+| src    | 输入    | 源操作数（矢量）的起始地址。             |
 | count  | 输入    | 参与连续计算的元素个数。      |
 | config | 输入    | 在高维切分计算场景下使用的计算配置参数。<br/>详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。 |
 
@@ -95,7 +95,7 @@ PIPE_TYPE_V
 ## 调用示例
 
 ```cpp
-// total_length指参与计算的数据总长度
+int total_length = 256; // total_length指参与计算的数据总长度
 __ubuf__ half* src[total_length];
 __ubuf__ int16_t* dst[total_length];
 asc_half2int8_r(dst, src, total_length);
