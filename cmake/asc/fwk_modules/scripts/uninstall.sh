@@ -15,7 +15,7 @@ sourcedir=$PWD/packages
 vendordir=vendors/$vendor_name
 
 log() {
-    cur_date=`date +"%Y-%m-%d %H:%M:%S"`
+    cur_date=$(date +"%Y-%m-%d %H:%M:%S")
     echo "[ops_custom] [$cur_date] "$1
 }
 
@@ -44,7 +44,7 @@ if [[ ! -d $dir_to_delete ]]; then
 else
     log "[INFO] Starting to delete $vendor_name ..."
     chmod -R +w $dir_to_delete
-    rm -rf $dir_to_delete
+    [ -d "$dir_to_delete" ] && rm -rf $dir_to_delete
     if [ $? -ne 0 ]; then
         log "[ERROR] Failed to delete $vendor_name."
         exit 1
