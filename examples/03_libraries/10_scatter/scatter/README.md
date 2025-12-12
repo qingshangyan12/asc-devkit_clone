@@ -7,7 +7,7 @@
 - Ascend 910B
 ## 目录结构介绍
 ```
-├── 01_scattercustom
+├── scatter
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
@@ -51,7 +51,7 @@
 ## 编译运行：  
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
