@@ -52,7 +52,7 @@ __simd_callee__ inline void MaskInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg
 template <typename T>
 __simd_callee__ inline void MaskDeInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1);
 
-__simd_callee__ inline void Select(MaskReg &dst, MaskReg &src0, MaskReg& src1, MaskReg& mask);
+__simd_callee__ inline void Select(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask);
 
 template <HighLowPart part = HighLowPart::LOWEST>
 __simd_callee__ inline void Pack(MaskReg& dst, MaskReg& src);

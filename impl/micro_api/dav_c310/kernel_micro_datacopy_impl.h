@@ -61,7 +61,7 @@ __simd_callee__ inline void DataCopyGatherImpl(T3& dstReg, __ubuf__ T1* baseAddr
                   (sizeof(T1) == 2 && sizeof(ActualDstT) == 2 && std::is_same_v<ActualIndexT, uint16_t>) ||
                   (sizeof(T1) == 4 && sizeof(ActualDstT) == 4 && std::is_same_v<ActualIndexT, uint32_t>) ||
                   (sizeof(T1) == 8 && sizeof(ActualDstT) == 8 && SupportType<ActualIndexT, uint32_t, uint64_t>()),
-                  "DataCopyGather only support src data type b8/b16/b32/b64 with dst type is b16/b16/b32/b64 respectively and "
+                  "Gather only support src data type b8/b16/b32/b64 with dst type is b16/b16/b32/b64 respectively and "
                   "each index type is u16/u16/u32/(u32/u64) respectively on current device");
     // when index T4<b64, 1> only 32 element valid not support T3<b64, 2> mode
     static_assert(!(sizeof(T1) == 8 && std::is_same_v<ActualIndexT, uint64_t> &&
@@ -101,7 +101,7 @@ __simd_callee__ inline void DataCopyGatherBImpl(U& dstReg, __ubuf__ T* baseAddr,
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     static_assert(CheckRegTrait<S, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
-                  "DataCopyGatherB only support src & dst datatype b8/b16/b32/b64 on current device");
+                  "GatherB only support src & dst datatype b8/b16/b32/b64 on current device");
     if constexpr (sizeof(ActualT) == 1) {
         vgatherb((vector_s8&)dstReg, (__ubuf__ int8_t*)baseAddr, index, mask);
     } else if constexpr (sizeof(ActualT) == 2) {
@@ -156,7 +156,7 @@ __simd_callee__ inline void DataCopyScatterImpl(__ubuf__ T* baseAddr, S& srcReg,
                   (sizeof(ActualT) == 2 && std::is_same_v<ActualIndexT, uint16_t>) ||
                   (sizeof(ActualT) == 4 && std::is_same_v<ActualIndexT, uint32_t>) ||
                   (sizeof(ActualT) == 8 && SupportType<ActualIndexT, uint32_t, uint64_t>()),
-                  "DataCopyScatter only support data type b8/b16/b32/b64"
+                  "Scatter only support data type b8/b16/b32/b64"
                   "with each index type is u16/u16/u32/(u32/u64) respectively on current device");
     // when index V<b64, 1> only 32 element valid not support S<b64, 2> mode
     static_assert(!(sizeof(ActualT) == 8 && std::is_same_v<ActualIndexT, uint64_t> &&
@@ -185,9 +185,9 @@ __simd_callee__ inline void DataCopyScatterImpl(__ubuf__ T* baseAddr, S& srcReg,
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T* srcAddr, AddrReg offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "DataCopy only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
     static_assert(SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_US, MaskDist::DIST_DS>(),
-                  "DataCopy not support this dist on current device");
+                  "LoadAlign not support this dist on current device");
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     pld(mask, (__ubuf__ uint32_t*)srcAddr, offset, distValue);
 }
@@ -196,9 +196,9 @@ __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T* srcAddr, Add
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T* srcAddr)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "DataCopy only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
     static_assert(SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_US, MaskDist::DIST_DS>(),
-                  "DataCopy not support this dist on current device");
+                  "LoadAlign not support this dist on current device");
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     plds(mask, (__ubuf__ uint32_t*)srcAddr, 0, distValue);
 }
@@ -206,9 +206,9 @@ __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T* srcAddr)
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T*& srcAddr, int32_t offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "DataCopy only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
     static_assert(SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_US, MaskDist::DIST_DS>(),
-                  "DataCopy not support this dist on current device");
+                  "LoadAlign not support this dist on current device");
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
     plds(mask, (__ubuf__ uint32_t*&)srcAddr, offset, distValue, postValue);
@@ -218,9 +218,9 @@ __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T*& srcAddr, in
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, MaskReg& mask, AddrReg offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "DataCopy only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "StoreAlign only support type b8/b16/b32/b64 on current device");
     static_assert(SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_PACK>(),
-                  "DataCopy not support this dist on current device");
+                  "StoreAlign not support this dist on current device");
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     pst(mask, (__ubuf__ uint32_t*)dstAddr, offset, distValue);
 }
@@ -229,9 +229,9 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, MaskReg& mask, Add
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, MaskReg& mask)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "DataCopy only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "StoreAlign only support type b8/b16/b32/b64 on current device");
     static_assert(SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_PACK>(),
-                  "DataCopy not support this dist on current device");
+                  "StoreAlign not support this dist on current device");
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     psts(mask, (__ubuf__ uint32_t*)dstAddr, 0, distValue);
 }
@@ -239,9 +239,9 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, MaskReg& mask)
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, MaskReg& mask, int32_t offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "DataCopy only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "StoreAlign only support type b8/b16/b32/b64 on current device");
     static_assert(SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_PACK>(),
-                  "DataCopy not support this dist on current device");
+                  "StoreAlign not support this dist on current device");
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
     psts(mask, (__ubuf__ uint32_t*&)dstAddr, offset, distValue, postValue);
@@ -250,7 +250,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, MaskReg& mask, in
 template <typename T>
 __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, MaskReg& mask, UnalignReg& ureg)
 {
-    static_assert(SupportBytes<T, 2, 4>(), "DataCopy only support type b16/b32 on current device");
+    static_assert(SupportBytes<T, 2, 4>(), "StoreUnAlign only support type b16/b32 on current device");
     if constexpr (sizeof(T) == 2) {
         pstu(ureg, mask, (__ubuf__ uint16_t*&)dstAddr);
     } else if constexpr (sizeof(T) == 4) {

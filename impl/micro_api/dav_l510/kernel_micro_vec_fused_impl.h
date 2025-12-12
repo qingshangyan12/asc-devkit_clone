@@ -30,7 +30,7 @@ __aicore__ inline void FusedMulsCastImpl(RegT &dstReg, RegU &srcReg, ScalarT sca
     static_assert(SupportType<Tuple<ActualT, ActualU, ScalarT>, Tuple<half, float, float>>(),
         "current data type is not supported on current device!");
     static_assert(SupportEnum<layout, RegLayout::ZERO, RegLayout::ONE>(),
-        "current FusedMulsCast api only supported RegLayout ZERO, ONE on current device!");
+        "current MulsCast api only supported RegLayout ZERO, ONE on current device!");
 
     constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layout)>();
     vmulscvt(dstReg, srcReg, scalar, mask, partModeValue);
@@ -68,7 +68,7 @@ __aicore__ inline void FusedExpSubImpl(RegT &dstReg, RegU &srcReg0, RegU &srcReg
     static_assert(SupportType<Tuple<ActualT, ActualU>, Tuple<float, float>, Tuple<half, half>>(),
         "current data type is not supported on current device!");
     static_assert(SupportEnum<layout, RegLayout::ZERO, RegLayout::ONE>(),
-        "current FusedExpSub api only supported RegLayout ZERO, ONE on current device!");
+        "current ExpSub api only supported RegLayout ZERO, ONE on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layout)>();
     vexpdif(dstReg, srcReg0, srcReg1, mask, partModeValue);

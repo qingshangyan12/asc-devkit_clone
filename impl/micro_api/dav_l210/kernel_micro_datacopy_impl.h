@@ -37,10 +37,10 @@ __aicore__ inline void CheckLoadDist()
                           LoadDist::DIST_UNPACK_B16,
                           LoadDist::DIST_BLK,
                           LoadDist::DIST_E2B_B16>(),
-            "DataCopy not support this dist on this device");
+            "LoadAlign not support this dist on this device");
     } else {
         static_assert(SupportEnum<dist, LoadDist::DIST_BDINTLV, LoadDist::DIST_DINTLV_B8, LoadDist::DIST_DINTLV_B16>(),
-            "DataCopy not support this dist on this device");
+            "LoadAlign not support this dist on this device");
     }
 }
 
@@ -57,10 +57,10 @@ __aicore__ inline void CheckStoreDist()
                           StoreDist::DIST_FIRST_ELEMENT_B32,
                           StoreDist::DIST_PACK_B16,
                           StoreDist::DIST_PACK_B32>(),
-            "DataCopy not support this dist on this device");
+            "StoreAlign not support this dist on this device");
     } else {
         static_assert(SupportEnum<dist, StoreDist::DIST_INTLV_B8, StoreDist::DIST_INTLV_B16>(),
-            "DataCopy not support this dist on this device");
+            "StoreAlign not support this dist on this device");
     }
 }
 
@@ -70,7 +70,7 @@ __aicore__ inline void DataCopyImpl(RegT &dstReg, __ubuf__ T *srcUbAddr)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
     CheckLoadDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     vld(dstReg, srcUbAddr, 0, distValue);
@@ -80,7 +80,7 @@ template <typename T = DefaultType, PostLiteral postMode, LoadDist dist = LoadDi
 __aicore__ inline void DataCopyImpl(RegT &dstReg, __ubuf__ T *&srcUbAddr, int32_t offset)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of LoadAlign is not supported on current device!"); });
 }
 
 template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename RegT>
@@ -88,7 +88,7 @@ __aicore__ inline void DataCopyImpl(RegT &dstReg0, RegT &dstReg1, __ubuf__ T *sr
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
     CheckLoadDist<2, dist>();
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     vld(dstReg0, dstReg1, srcUbAddr, 0, distValue);
@@ -98,14 +98,14 @@ template <typename T = DefaultType, PostLiteral postMode, LoadDist dist = LoadDi
 __aicore__ inline void DataCopyImpl(RegT &dstReg0, RegT &dstReg1, __ubuf__ T *&srcUbAddr, int32_t offset)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of LoadAlign is not supported on current device!"); });
 }
 
 // pstu
 template <typename T>
 __aicore__ inline void DataCopyUnAlignImpl(__ubuf__ T *&dstUbAddr, MaskReg &mask, UnalignReg &ureg)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "DataCopyUnAlign is not supported on current device!"); });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "StoreUnAlign is not supported on current device!"); });
 }
 
 // vld
@@ -114,7 +114,7 @@ __aicore__ inline void DataCopyImpl(RegT &dstReg, __ubuf__ T *srcUbAddr, AddrReg
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
     CheckLoadDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     vld(dstReg, srcUbAddr, offset, distValue);
@@ -125,7 +125,7 @@ __aicore__ inline void DataCopyImpl(RegT &dstReg0, RegT &dstReg1, __ubuf__ T *sr
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
     CheckLoadDist<2, dist>();
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     vld(dstReg0, dstReg1, srcUbAddr, offset, distValue);
@@ -137,7 +137,7 @@ __aicore__ inline void DataCopyImpl(__ubuf__ T *dstUbAddr, RegT &srcReg, MaskReg
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
     CheckStoreDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     vst(srcReg, dstUbAddr, 0, distValue, mask);
@@ -147,7 +147,7 @@ template <typename T = DefaultType, PostLiteral postMode, StoreDist dist = Store
 __aicore__ inline void DataCopyImpl(__ubuf__ T *&dstUbAddr, RegT &srcReg, int32_t offset, MaskReg &mask)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of StoreAlign is not supported on current device!"); });
 }
 
 template <typename T = DefaultType, StoreDist dist = StoreDist::DIST_NORM, typename RegT>
@@ -155,7 +155,7 @@ __aicore__ inline void DataCopyImpl(__ubuf__ T *dstUbAddr, RegT &srcReg0, RegT &
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
     CheckStoreDist<2, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     vst(srcReg0, srcReg1, dstUbAddr, 0, distValue, mask);
@@ -167,7 +167,7 @@ __aicore__ inline void DataCopyImpl(__ubuf__ T *dstUbAddr, RegT &srcReg, AddrReg
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
     CheckStoreDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     vst(srcReg, dstUbAddr, offset, distValue, mask);
@@ -179,7 +179,7 @@ __aicore__ inline void DataCopyImpl(
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
     CheckStoreDist<2, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     vst(srcReg0, srcReg1, dstUbAddr, offset, distValue, mask);
@@ -190,7 +190,7 @@ template <typename T = DefaultType, DataCopyMode dataMode, typename RegT>
 __aicore__ inline void DataCopyImpl(RegT &dstReg, __ubuf__ T *srcUbAddr, uint32_t blockStride, MaskReg &mask)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of LoadAlign is not supported on current device!"); });
 }
 
 template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename RegT>
@@ -198,7 +198,7 @@ __aicore__ inline void DataCopyImpl(
     RegT &dstReg, __ubuf__ T *&srcUbAddr, uint32_t blockStride, uint32_t repeatStride, MaskReg &mask)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of LoadAlign is not supported on current device!"); });
 }
 
 // vsstb
@@ -206,7 +206,7 @@ template <typename T = DefaultType, DataCopyMode dataMode, typename RegT>
 __aicore__ inline void DataCopyImpl(__ubuf__ T *dstUbAddr, RegT &srcReg, uint32_t blockStride, MaskReg &mask)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of StoreAlign is not supported on current device!"); });
 }
 
 template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename RegT>
@@ -214,7 +214,7 @@ __aicore__ inline void DataCopyImpl(
     __ubuf__ T *&dstUbAddr, RegT &srcReg, uint32_t blockStride, uint32_t repeatStride, MaskReg &mask)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of StoreAlign is not supported on current device!"); });
 }
 
 // vldas/vldus
@@ -222,28 +222,28 @@ template <typename T>
 __aicore__ inline void DataCopyUnAlignPreImpl(UnalignReg &ureg, __ubuf__ T *srcUbAddr)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopyUnAlign is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of LoadUnAlign is not supported on current device!"); });
 }
 
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename RegT>
 __aicore__ inline void DataCopyUnAlignImpl(RegT &dstReg, UnalignReg &ureg, __ubuf__ T *&srcUbAddr, uint32_t stride)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopyUnAlign is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of LoadUnAlign is not supported on current device!"); });
 }
 
 template <typename T = DefaultType, typename RegT>
 __aicore__ inline void DataCopyUnAlignImpl(RegT &dstReg, UnalignReg &ureg, __ubuf__ T *srcUbAddr)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopyUnAlign is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of LoadUnAlign is not supported on current device!"); });
 }
 
 // vlda/vldu
 template <typename T>
 __aicore__ inline void DataCopyUnAlignPreImpl(UnalignReg &ureg, __ubuf__ T *srcUbAddr, AddrReg &areg)
 {
-    static_assert(SupportBytes<T, 1, 2, 4>(), "DataCopyUnAlignPre only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "LoadUnAlignPre only support type b8/b16/b32 on current device");
     vlda(ureg, srcUbAddr, areg);
 }
 
@@ -253,7 +253,7 @@ __aicore__ inline void DataCopyUnAlignImpl(
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopyUnAlign only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "LoadUnAlign only support type b8/b16/b32 on current device");
     vldu(dstReg, ureg, areg, srcUbAddr, inc);
 }
 
@@ -262,14 +262,14 @@ template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MOD
 __aicore__ inline void DataCopyUnAlignImpl(__ubuf__ T *&dstUbAddr, RegT &srcReg, UnalignReg &ureg, uint32_t offset)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopyUnAlign is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of StoreUnAlign is not supported on current device!"); });
 }
 
 template <typename T, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE>
 __aicore__ inline void DataCopyUnAlignPostImpl(__ubuf__ T *&dstUbAddr, UnalignReg &ureg, int32_t offset)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopyUnAlign is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of StoreUnAlign is not supported on current device!"); });
 }
 
 // vstu/vsta
@@ -278,7 +278,7 @@ __aicore__ inline void DataCopyUnAlignImpl(__ubuf__ T *&dstUbAddr, RegT &srcReg,
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopyUnAlign only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreUnAlign only support type b8/b16/b32 on current device");
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
     vstu(ureg, areg, srcReg, dstUbAddr, postValue);
 }
@@ -286,7 +286,7 @@ __aicore__ inline void DataCopyUnAlignImpl(__ubuf__ T *&dstUbAddr, RegT &srcReg,
 template <typename T>
 __aicore__ inline void DataCopyUnAlignPostImpl(__ubuf__ T *&dstUbAddr, UnalignReg &ureg, AddrReg &areg)
 {
-    static_assert(SupportBytes<T, 1, 2, 4>(), "DataCopyUnAlignPost only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "StoreUnAlignPost only support type b8/b16/b32 on current device");
     vsta(ureg, dstUbAddr, areg);
 }
 
@@ -295,14 +295,14 @@ template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MOD
 __aicore__ inline void DataCopyUnAlignImpl(__ubuf__ T *dstUbAddr, RegT &srcReg, UnalignReg &ureg)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopyUnAlign is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of StoreUnAlign is not supported on current device!"); });
 }
 
 template <typename T>
 __aicore__ inline void DataCopyUnAlignPostImpl(__ubuf__ T *dstUbAddr, UnalignReg &ureg)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopyUnAlign is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of StoreUnAlign is not supported on current device!"); });
 }
 
 // vgather2
@@ -312,7 +312,7 @@ __aicore__ inline void DataCopyGatherImpl(
     RegDstT &dstReg, __ubuf__ SrcT *baseAddr, RegIndexT &index, MaskReg &mask)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopyGather is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of Gather is not supported on current device!"); });
 }
 
 template <typename DstT, typename SrcT, typename IndexT, typename RegDstT>
@@ -336,7 +336,7 @@ template <typename T = DefaultType, typename RegT, typename RegIndexT>
 __aicore__ inline void DataCopyGatherBImpl(RegT &dstReg, __ubuf__ T *baseAddr, RegIndexT &index, MaskReg &mask)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopyGatherB is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of GatherB is not supported on current device!"); });
 }
 
 // vgatherb
@@ -347,7 +347,7 @@ __aicore__ inline void DataCopyGatherBImpl(RegT &dstReg, __ubuf__ T *baseAddr, _
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportBytes<ActualT, 1, 2, 4>(),
-        "DataCopyGatherB only support type b8/b16/b32 on current device");
+        "GatherB only support type b8/b16/b32 on current device");
     vgatherb(dstReg, index, areg, (uint32_t)baseAddr);
 }
 
@@ -363,7 +363,7 @@ __aicore__ inline void DataCopyScatterImpl(__ubuf__ T *baseAddr, RegT &srcReg, R
     static_assert((sizeof(ActualT) == 1 && std::is_same_v<ActualIndexT, uint16_t>) ||
                       (sizeof(ActualT) == 2 && std::is_same_v<ActualIndexT, uint16_t>) ||
                       (sizeof(ActualT) == 4 && std::is_same_v<ActualIndexT, uint32_t>),
-        "DataCopyScatter only support data type b8/b16/b32 with each index type is u16/u16/u32 respectively in "
+        "Scatter only support data type b8/b16/b32 with each index type is u16/u16/u32 respectively in "
         "Ascend610Lite");
     RegIndexT realOffset;
     vshls(realOffset, index, (int16_t)sizeof(ActualT), mask, MaskMergeMode::MERGING);
@@ -375,14 +375,14 @@ template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __aicore__ inline void DataCopyImpl(MaskReg &mask, __ubuf__ T *srcUbAddr)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of LoadAlign is not supported on current device!"); });
 }
 
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __aicore__ inline void DataCopyImpl(MaskReg &mask, __ubuf__ T *&srcUbAddr, int32_t offset)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of LoadAlign is not supported on current device!"); });
 }
 
 // psts
@@ -390,23 +390,23 @@ template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __aicore__ inline void DataCopyImpl(__ubuf__ T *dstUbAddr, MaskReg &mask)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of StoreAlign is not supported on current device!"); });
 }
 
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __aicore__ inline void DataCopyImpl(__ubuf__ T *&dstUbAddr, MaskReg &mask, int32_t offset)
 {
     ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "this version of DataCopy is not supported on current device!"); });
+        false, { KERNEL_LOG(KERNEL_ERROR, "this version of StoreAlign is not supported on current device!"); });
 }
 
 // pld
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __aicore__ inline void DataCopyImpl(MaskReg &mask, __ubuf__ T *srcUbAddr, AddrReg offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
     static_assert(SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_US, MaskDist::DIST_DS>(),
-        "DataCopy not support this dist on current device");
+        "LoadAlign not support this dist on current device");
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     pld(mask, (__ubuf__ uint32_t *)srcUbAddr, offset, distValue);
 }
@@ -415,9 +415,9 @@ __aicore__ inline void DataCopyImpl(MaskReg &mask, __ubuf__ T *srcUbAddr, AddrRe
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __aicore__ inline void DataCopyImpl(__ubuf__ T *dstUbAddr, MaskReg &mask, AddrReg offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
     static_assert(SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_PACK>(),
-        "DataCopy not support this dist on current device");
+        "StoreAlign not support this dist on current device");
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     pst(mask, (__ubuf__ uint32_t *)dstUbAddr, offset, distValue);
 }

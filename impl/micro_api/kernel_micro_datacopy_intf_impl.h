@@ -273,7 +273,7 @@ __simd_callee__ inline void DataCopyUnAlign(__ubuf__ T*& dstAddr, U& srcReg, Una
 {
     DataCopyUnAlignImpl<T, postMode, U>(dstAddr, srcReg, ureg, postUpdateStride);
 }
-template <typename T, PostLiteral postMode , typename U>
+template <typename T, PostLiteral postMode, typename U>
 __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, U& srcReg, UnalignRegForStore& ureg, uint32_t postUpdateStride)
 {
     DataCopyUnAlignImpl<T, postMode, U>(dstAddr, srcReg, ureg, postUpdateStride);
