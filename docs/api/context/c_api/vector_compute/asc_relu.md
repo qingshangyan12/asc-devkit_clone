@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-按元素做线性整流Relu，计算公式如下。
+按元素做线性整流Relu，计算公式如下：
 $$
 dst_i = relu(src_i)
 $$
@@ -41,8 +41,8 @@ $$
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
-|dst|输出|目的操作数(矢量)的起始地址。|
-|src|输入|源操作数(矢量)的起始地址。|
+|dst|输出|目的操作数（矢量）的起始地址。|
+|src|输入|源操作数（矢量）的起始地址。|
 |count|输入|参与计算的元素个数。|
 |config|输入|在非连续场景下使用的计算配置参数。<br/>详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。|
 
@@ -62,7 +62,7 @@ PIPE_TYPE_V
 ## 调用示例
 
 ```cpp
-// total_length指参与计算的数据总长度
+int total_length = 256; // total_length指参与计算的数据总长度
 __ubuf__ half src[total_length];
 asc_relu(dst, src, total_length);
 ```

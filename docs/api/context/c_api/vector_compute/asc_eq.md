@@ -14,7 +14,7 @@
 ## 函数原型
 
 - 高维切分计算
-```cpp
+  ```cpp
   // 比较结果存入寄存器
   __aicore__ inline void asc_eq(__ubuf__ half* src0, __ubuf__ half* src1, const asc_unary_config& config)
   __aicore__ inline void asc_eq(__ubuf__ float* src0, __ubuf__ float* src1, const asc_unary_config& config)
@@ -22,10 +22,10 @@
   __aicore__ inline void asc_eq(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, const asc_unary_config& config)
   __aicore__ inline void asc_eq(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, const asc_unary_config& config)
   __aicore__ inline void asc_eq(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, const asc_unary_config& config)
-```
+  ```
 
 - 同步计算
-```cpp
+  ```cpp
   // 比较结果存入寄存器
   __aicore__ inline void asc_eq_sync(__ubuf__ half* src0, __ubuf__ half* src1, const asc_unary_config& config)
   __aicore__ inline void asc_eq_sync(__ubuf__ float* src0, __ubuf__ float* src1, const asc_unary_config& config)
@@ -33,14 +33,14 @@
   __aicore__ inline void asc_eq_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, const asc_unary_config& config)
   __aicore__ inline void asc_eq_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, const asc_unary_config& config)
   __aicore__ inline void asc_eq_sync(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, const asc_unary_config& config)
-```
+  ```
 
 ## 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
-|dst|输出|目的操作数(矢量)的起始地址。|
-|src0,src1|输入|源操作数(矢量)的起始地址。|
+|dst|输出|目的操作数（矢量）的起始地址。|
+|src0、src1|输入|源操作数（矢量）的起始地址。|
 |config|输入|在非连续场景下使用的计算配置参数。<br/>详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。|
 
 ## 返回值说明
@@ -60,6 +60,7 @@ PIPE_TYPE_V
 
 ```cpp
 // total_length指参与计算的数据总长度
+int total_length = 256;
 __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 asc_unary_config config;

@@ -19,37 +19,37 @@ $$
 
 - 前n个数据计算
 
-```cpp
-  __aicore__ inline void asc_max_scalar(_ubuf__ int16_t* dst, _ubuf__ int16_t* src, int16_t value, uint32_t count)
-  __aicore__ inline void asc_max_scalar(_ubuf__ half* dst, _ubuf__ half* src, half value, uint32_t count)
-  __aicore__ inline void asc_max_scalar(_ubuf__ int32_t* dst, _ubuf__ int32_t* src, int32_t value, uint32_t count)
-  __aicore__ inline void asc_max_scalar(_ubuf__ float* dst, _ubuf__ float* src, float value, uint32_t count)
-```
+  ```cpp
+    __aicore__ inline void asc_max_scalar(_ubuf__ int16_t* dst, _ubuf__ int16_t* src, int16_t value, uint32_t count)
+    __aicore__ inline void asc_max_scalar(_ubuf__ half* dst, _ubuf__ half* src, half value, uint32_t count)
+    __aicore__ inline void asc_max_scalar(_ubuf__ int32_t* dst, _ubuf__ int32_t* src, int32_t value, uint32_t count)
+    __aicore__ inline void asc_max_scalar(_ubuf__ float* dst, _ubuf__ float* src, float value, uint32_t count)
+  ```
 
 - 高维切分计算
 
-```cpp
-  _aicore__ inline void asc_max_scalar(ubuf__ int16_t* dst, _ubuf__ int16_t* src, int16_t value, const asc_unary_config& config)
-  __aicore__ inline void asc_max_scalar(_ubuf__ half* dst, _ubuf__ half* src, half value, const asc_unary_config& config)
-  __aicore__ inline void asc_max_scalar(_ubuf__ int32_t* dst, _ubuf__ int32_t* src, int32_t value, const asc_unary_config& config)
-  __aicore__ inline void asc_max_scalar(_ubuf__ float* dst, _ubuf__ float* src, float value, const asc_unary_config& config)
-```
+  ```cpp
+    _aicore__ inline void asc_max_scalar(ubuf__ int16_t* dst, _ubuf__ int16_t* src, int16_t value, const asc_unary_config& config)
+    __aicore__ inline void asc_max_scalar(_ubuf__ half* dst, _ubuf__ half* src, half value, const asc_unary_config& config)
+    __aicore__ inline void asc_max_scalar(_ubuf__ int32_t* dst, _ubuf__ int32_t* src, int32_t value, const asc_unary_config& config)
+    __aicore__ inline void asc_max_scalar(_ubuf__ float* dst, _ubuf__ float* src, float value, const asc_unary_config& config)
+  ```
 
 - 同步计算
 
-```cpp
-  __aicore__ inline void asc_max_scalar_sync(_ubuf__ int16_t* dst, _ubuf__ int16_t* src, int16_t value, uint32_t count)
-  __aicore__ inline void asc_max_scalar_sync(_ubuf__ half* dst, _ubuf__ half* src, half value, uint32_t count)
-  __aicore__ inline void asc_max_scalar_sync(_ubuf__ int32_t* dst, _ubuf__ int32_t* src, int32_t value, uint32_t count)
-  __aicore__ inline void asc_max_scalar_sync(_ubuf__ float* dst, _ubuf__ float* src, float value, uint32_t count)
-```
+  ```cpp
+    __aicore__ inline void asc_max_scalar_sync(_ubuf__ int16_t* dst, _ubuf__ int16_t* src, int16_t value, uint32_t count)
+    __aicore__ inline void asc_max_scalar_sync(_ubuf__ half* dst, _ubuf__ half* src, half value, uint32_t count)
+    __aicore__ inline void asc_max_scalar_sync(_ubuf__ int32_t* dst, _ubuf__ int32_t* src, int32_t value, uint32_t count)
+    __aicore__ inline void asc_max_scalar_sync(_ubuf__ float* dst, _ubuf__ float* src, float value, uint32_t count)
+  ```
 
 ## 参数说明
 
 | 参数名       | 输入/输出 | 描述               |
 | --------- | ----- | ---------------- |
-| dst       | 输出    | 目的操作数(矢量)的起始地址。            |
-| src | 输入    | 源操作数(矢量)的起始地址。           |
+| dst       | 输出    | 目的操作数（矢量）的起始地址。            |
+| src | 输入    | 源操作数（矢量）的起始地址。           |
 | value | 输入    | 源操作数（标量）。       |
 | count     | 输入    | 参与连续计算的元素个数。      |
 | config    | 输入    | 在高维切分计算场景下使用的计算配置参数。<br/>详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。 |

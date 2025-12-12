@@ -36,10 +36,10 @@ PIPE_TYPE_S
 ## 调用示例
 
 ```cpp
-// dst为目标数据地址，dst0, dst1为源数据地址，total_length指参与计算的数据长度
-asc_copy_ub2gm(dst, dst0, total_length);
+// dst为目标数据地址，src0, src1为源数据地址，total_length指参与计算的数据长度
+asc_copy_ub2gm(dst, src0, total_length);
 asc_sync(PIPE_TYPE_MTE3);
 asc_set_atomic_min();
-asc_copy_ub2gm(dst, dst1, total_length);
+asc_copy_ub2gm(dst, src1, total_length);
 asc_set_atomic_none();
 ```
