@@ -1,5 +1,5 @@
 
-# 1. asc_mul_scalar
+# asc_mul_scalar
 
 ## AI处理器支持情况
 

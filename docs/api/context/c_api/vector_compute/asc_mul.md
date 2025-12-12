@@ -1,4 +1,4 @@
-# 1. asc_mul
+# asc_mul
 
 ## AI处理器支持情况
 
