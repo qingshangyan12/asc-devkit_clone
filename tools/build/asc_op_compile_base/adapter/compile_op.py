@@ -750,8 +750,11 @@ def gen_kernel_fun_with_tiling_key_slave(compile_info: CompileInfo, tiling_key: 
                             tiling_key_slave)
                         kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {kernel_name_of_tk}("
                         source += kernel_func_dec
-                        source += source_declare
-                        source += f"    {source_declare_pub_fun};\n"
+                        if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+                            source += "uint64_t args_offset) {\n"
+                        else:
+                            source += source_declare
+                        source += f"    {source_declare_pub_fun}\n"
                         source += "}\n"
                         source += "#endif\n"
                         source += f"\n#if {TILING_KEY_MACRO} == {tiling_key}UL && defined({vec_core_type})\n"
@@ -760,8 +763,11 @@ def gen_kernel_fun_with_tiling_key_slave(compile_info: CompileInfo, tiling_key: 
                         kernel_name_of_tk = kernel_name_of_tk[:-1] + "v"
                         kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {kernel_name_of_tk}("
                         source += kernel_func_dec
-                        source += source_declare
-                        source += f"    {source_declare_pub_fun};\n"
+                        if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+                            source += "uint64_t args_offset) {\n"
+                        else:
+                            source += source_declare
+                        source += f"    {source_declare_pub_fun}\n"
                         source += "}\n"
                         source += "#endif\n"
                     else:
