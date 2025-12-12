@@ -140,8 +140,6 @@ public:
     bool SaveTempRequested() const;
     bool UserDumpRequested() const;
     bool HasTimeStamp() const;
-    bool HasWorkspace() const;
-    bool HasTiling() const;
     bool HasPrintf() const;
     bool HasSimtPrintf() const;
     bool HasAssert() const;
@@ -176,8 +174,6 @@ private:
     bool saveTempRequested_ = false;
     bool userDumpStatus_ = true;                // if user passed -DASCENDC_DUMP, then update. True means = 1
     bool hasTimeStamp_ = false;                 // for -DASCENDC_TIME_STAMP_ON
-    bool hasWorkspace_ = false;                 // for -DHAVE_WORKSPACE in KernelLaunch
-    bool hasTiling_ = false;                    // for -DHAVE_TILING in KernelLaunch
     bool hasPrintf_ = false;
     bool hasSimtPrintf_ = false;                // only for 910_95 simt
     bool hasAssert_ = false;
