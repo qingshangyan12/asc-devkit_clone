@@ -11,7 +11,7 @@
 #ifndef INCLUDE_C_API_SYS_VAR_H
 #define INCLUDE_C_API_SYS_VAR_H
 
-#include "c_api_instr_impl/sys_var/sys_var_impl.h"
+#include "c_api_instr_impl/sys_var_c_api_impl/sys_var_c_api_impl.h"
 
 __aicore__ inline void asc_set_ctrl(uint64_t config);
 

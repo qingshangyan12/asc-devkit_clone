@@ -11,8 +11,8 @@
 #ifndef INCLUDE_C_API_VECTOR_COMPUTE_H
 #define INCLUDE_C_API_VECTOR_COMPUTE_H
 
-#include "c_api_instr_impl/vector_compute/vector_compute_impl.h"
-#include "c_api_interf_util.h"
+#include "c_api_instr_impl/vector_compute_c_api_impl/vector_compute_c_api_impl.h"
+#include "c_api_utils_intf.h"
 
 __aicore__ inline void asc_get_cmp_mask(__ubuf__ void* dst);
 

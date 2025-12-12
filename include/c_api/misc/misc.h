@@ -11,7 +11,7 @@
 #ifndef INCLUDE_C_API_MISC_H
 #define INCLUDE_C_API_MISC_H
  
-#include "c_api_instr_impl/misc/misc_impl.h"
+#include "c_api_instr_impl/misc_c_api_impl/misc_c_api_impl.h"
  
 __aicore__ inline void asc_init();
 

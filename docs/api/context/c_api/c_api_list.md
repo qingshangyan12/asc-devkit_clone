@@ -60,6 +60,11 @@
 | [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm.md) | 将UB中的数据搬运到GM中。 |
 | [asc_copy_gm2ub](vector_datamove/asc_copy_gm2ub.md) | 将GM中的数据搬运到UB中。 |
 
+## 标量操作
+
+|   API名称   |   说明   |
+|----------|-----------|
+
 ## 同步控制
 
 |   API名称   |   说明   |
@@ -85,11 +90,16 @@
 | [asc_get_phy_buf_addr](sys_var/asc_get_phy_buf_addr.md) | 基于偏移量获取片上实际物理地址。 |
 | [asc_get_system_cycle](sys_var/asc_get_system_cycle.md) | 获取当前系统cycle数。 |
 
+## 缓存控制
+
+|   API名称   |   说明   |
+|----------|-----------|
+| [asc_data_cache_clean_and_invalid](cache_ctrl/asc_data_cache_clean_and_invalid.md)| 用于刷新Cache， 保证Cache的一致性。 |
+
 ## 原子操作
 
 |   API名称   |   说明   |
 |----------|-----------|
-| [asc_data_cache_clean_and_invalid](simd_atomic/asc_data_cache_clean_and_invalid.md)| 用于刷新Cache， 保证Cache的一致性。 |
 
 ## 其他操作
 
