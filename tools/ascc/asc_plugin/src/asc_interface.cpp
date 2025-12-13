@@ -285,9 +285,10 @@ int32_t PluginEpilogue(const char** result)
     ASC_CHECK_NULLPTR(result, "PluginEpilogue");
 
     KernelTypeResult kernelTypeRes = CheckHasMixKernelFunc();
-    // MIX_1_1 and MIX_1_2 with either one having KFC at same time is not supported
-    if ((kernelTypeRes.hasMixOneToOneWithKfc && kernelTypeRes.hasMixOneToTwo) ||
-        (kernelTypeRes.hasMixOneToTwoWithKfc && kernelTypeRes.hasMixOneToOne)) {
+    // MIX_1_1 and MIX_1_2 with either one having KFC at same time is supported in 71
+    if (((kernelTypeRes.hasMixOneToOneWithKfc && kernelTypeRes.hasMixOneToTwo) ||
+        (kernelTypeRes.hasMixOneToTwoWithKfc && kernelTypeRes.hasMixOneToOne)) &&
+        (InfoManager::GetInstance().GetShortSocVersion() != ShortSocVersion::ASCEND910B)) {
         return ASC_FAILURE;
     }
 
