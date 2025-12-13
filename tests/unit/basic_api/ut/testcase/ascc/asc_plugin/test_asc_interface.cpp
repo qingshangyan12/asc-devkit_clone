@@ -663,7 +663,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_nullptr)
     free(const_cast<char*>(configObjPtr));
 }
 
-// Not support MIX_1_1 and MIX_1_2 at same time, will return erorr
+// Support MIX_1_1 and MIX_1_2 at same time in 71
 TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMix11_Mix12)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
@@ -674,10 +674,10 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMix11_Mix12)
     manager.AddGlobalSymbolInfo("__device_stub__sub_custom", AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2, "b.cpp", 120, 110, AscPlugin::KfcScene::Open);
     const char* a;
     int32_t exec_res = AscPlugin::PluginEpilogue(&a);
-    EXPECT_EQ(exec_res, AscPlugin::ASC_FAILURE);
+    EXPECT_EQ(exec_res, AscPlugin::ASC_SUCCESS);
 }
 
-// MIX_1_2 with MIX_AIV_only is ok. Because has MIX, has -D__MIX_CORE_MACRO__=1, has -DA=A_mix_aiv/aic
+// MIX_1_2 with MIX_AIV_only is ok. Because has MIX, has -DA=A_mix_aiv/aic
 TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIV_Mix12)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
@@ -702,7 +702,6 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIV_Mix12)
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-DL2_CACHE_HINT",
-        "-D__MIX_CORE_MACRO__=1",
         "--cce-auto-sync",
         "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom_mix_aic",
@@ -716,7 +715,6 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIV_Mix12)
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-DL2_CACHE_HINT",
-        "-D__MIX_CORE_MACRO__=1",
         "--cce-auto-sync",
         "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom_mix_aiv",
@@ -733,8 +731,8 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIV_Mix12)
     free(const_cast<char*>(expectedRes));
 }
 
-// MIX_1_2 with MIX_AIC_only is ok. Because has MIX, has -D__MIX_CORE_MACRO__=1.
-// Because has MIX_1_1, has -D__MIX_CORE_AIC_RATION__=1
+// MIX_1_2 with MIX_AIC_only is ok. Because has MIX.
+// Because has MIX_1_1
 TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIC_Mix11)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
@@ -759,7 +757,6 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIC_Mix11)
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-DL2_CACHE_HINT",
-        "-D__MIX_CORE_MACRO__=1", "-D__MIX_CORE_AIC_RATION__=1",
         "--cce-auto-sync",
         "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom_mix_aic",
@@ -773,7 +770,6 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIC_Mix11)
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-DL2_CACHE_HINT",
-        "-D__MIX_CORE_MACRO__=1", "-D__MIX_CORE_AIC_RATION__=1",
         "--cce-auto-sync",
         "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom_mix_aiv",

@@ -48,26 +48,25 @@ KernelTypeResult CheckHasMixKernelFunc()
                 mixOneToTwoWithKfcInfo = {funcInfo.first, fileName, lineNum, colNum};
             }
         }
-
-        if (res.hasMixOneToOneWithKfc && res.hasMixOneToTwo) {
-            ASC_LOGE("Having kernel function %s with KERNEL_TYPE_MIX_AIC_1_1 in file %s line %u col %u with "
-                "REGIST_MATMUL_OBJ and kernel function %s with KERNEL_TYPE_MIX_AIC_1_2 in file %s line %u col %u "
-                "is not supported.", mixOneToOneWithKfcInfo.mangledName.c_str(), mixOneToOneWithKfcInfo.fileName.c_str(),
-                mixOneToOneWithKfcInfo.lineNum, mixOneToOneWithKfcInfo.colNum, mixOneToTwoInfo.mangledName.c_str(),
-                mixOneToTwoInfo.fileName.c_str(), mixOneToTwoInfo.lineNum, mixOneToTwoInfo.colNum);
-            return res;
-        }
-
-        if (res.hasMixOneToTwoWithKfc && res.hasMixOneToOne) {
-            ASC_LOGE("Having kernel function %s with KERNEL_TYPE_MIX_AIC_1_1 in file %s line %u col %u and kernel "
-                "function %s with KERNEL_TYPE_MIX_AIC_1_2 in file %s line %u col %u with REGIST_MATMUL_OBJ "
-                "is not supported.", mixOneToOneInfo.mangledName.c_str(), mixOneToOneInfo.fileName.c_str(),
-                mixOneToOneInfo.lineNum, mixOneToOneInfo.colNum, mixOneToTwoWithKfcInfo.mangledName.c_str(),
-                mixOneToTwoWithKfcInfo.fileName.c_str(), mixOneToTwoWithKfcInfo.lineNum, mixOneToTwoWithKfcInfo.colNum);
-            return res;
+        if (InfoManager::GetInstance().GetShortSocVersion() != ShortSocVersion::ASCEND910B) {
+            if (res.hasMixOneToOneWithKfc && res.hasMixOneToTwo) {
+                ASC_LOGE("Having kernel function %s with KERNEL_TYPE_MIX_AIC_1_1 in file %s line %u col %u with "
+                    "REGIST_MATMUL_OBJ and kernel function %s with KERNEL_TYPE_MIX_AIC_1_2 in file %s line %u col %u "
+                    "is not supported.", mixOneToOneWithKfcInfo.mangledName.c_str(), mixOneToOneWithKfcInfo.fileName.c_str(),
+                    mixOneToOneWithKfcInfo.lineNum, mixOneToOneWithKfcInfo.colNum, mixOneToTwoInfo.mangledName.c_str(),
+                    mixOneToTwoInfo.fileName.c_str(), mixOneToTwoInfo.lineNum, mixOneToTwoInfo.colNum);
+                return res;
+            }
+            if (res.hasMixOneToTwoWithKfc && res.hasMixOneToOne) {
+                ASC_LOGE("Having kernel function %s with KERNEL_TYPE_MIX_AIC_1_1 in file %s line %u col %u and kernel "
+                    "function %s with KERNEL_TYPE_MIX_AIC_1_2 in file %s line %u col %u with REGIST_MATMUL_OBJ "
+                    "is not supported.", mixOneToOneInfo.mangledName.c_str(), mixOneToOneInfo.fileName.c_str(),
+                    mixOneToOneInfo.lineNum, mixOneToOneInfo.colNum, mixOneToTwoWithKfcInfo.mangledName.c_str(),
+                    mixOneToTwoWithKfcInfo.fileName.c_str(), mixOneToTwoWithKfcInfo.lineNum, mixOneToTwoWithKfcInfo.colNum);
+                return res;
+            }
         }
     }
-
     ASC_LOGD("KernelTypeResult result: hasMixOneToOne %d, hasMixOneToTwo %d, hasMixOneToOneWithKfc %d, "
         "hasMixOneToTwoWithKfc %d.", res.hasMixOneToOne, res.hasMixOneToTwo, res.hasMixOneToOneWithKfc,
         res.hasMixOneToTwoWithKfc);
@@ -88,9 +87,10 @@ std::vector<std::string> GetDeviceCommonCompileOptions(const KernelTypeResult& k
     std::vector<std::string> deviceCommonOptions = {"-std=c++17", optLevel, "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0"};
 
     if (socVersion == ShortSocVersion::ASCEND910B || socVersion == ShortSocVersion::ASCEND910_95) {
-        // MIX_1_1 and MIX_1_2 with either one having KFC at same time is not supported
-        if ((kernelTypeRes.hasMixOneToOneWithKfc && kernelTypeRes.hasMixOneToTwo) ||
-            (kernelTypeRes.hasMixOneToTwoWithKfc && kernelTypeRes.hasMixOneToOne)) {
+        // MIX_1_1 and MIX_1_2 with either one having KFC at same time is supported in 71
+        if (((kernelTypeRes.hasMixOneToOneWithKfc && kernelTypeRes.hasMixOneToTwo) ||
+            (kernelTypeRes.hasMixOneToTwoWithKfc && kernelTypeRes.hasMixOneToOne)) && 
+            (socVersion != ShortSocVersion::ASCEND910B)) {
             return deviceCommonOptions;
         }
 
@@ -100,13 +100,15 @@ std::vector<std::string> GetDeviceCommonCompileOptions(const KernelTypeResult& k
         if(manager.IsL2CacheEnabled()) {
             deviceCommonOptions.emplace_back("-DL2_CACHE_HINT");
         }
-        // needs to update -D__MIX_CORE_AIC_RATION__, -D__MIX_CORE_MACRO__ based on kernel type info
-        if (kernelTypeRes.hasMixOneToOne || kernelTypeRes.hasMixOneToTwo) {
-            // used for KFC, thus only when type is 1_1 / 1_2
-            deviceCommonOptions.emplace_back("-D__MIX_CORE_MACRO__=1");
-        }
-        if (kernelTypeRes.hasMixOneToOne) {
-            deviceCommonOptions.emplace_back("-D__MIX_CORE_AIC_RATION__=1");
+        if (socVersion == ShortSocVersion::ASCEND910_95) {
+            // needs to update -D__MIX_CORE_AIC_RATION__, -D__MIX_CORE_MACRO__ based on kernel type info
+            if (kernelTypeRes.hasMixOneToOne || kernelTypeRes.hasMixOneToTwo) {
+                // used for KFC, thus only when type is 1_1 / 1_2
+                deviceCommonOptions.emplace_back("-D__MIX_CORE_MACRO__=1");
+            }
+            if (kernelTypeRes.hasMixOneToOne) {
+                deviceCommonOptions.emplace_back("-D__MIX_CORE_AIC_RATION__=1");
+            }
         }
     } else if (socVersion == ShortSocVersion::ASCEND310P) {
         deviceCommonOptions.insert(deviceCommonOptions.end(), {
