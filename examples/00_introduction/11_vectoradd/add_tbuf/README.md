@@ -2,7 +2,8 @@
 ## 概述
 本样例介绍Add算子的核函数直调方法，算支持的数据类型有：bfloat16_t，算子支持单核运行，算子内部使用TmpBuf。
 ## 支持的AI处理器
-- Ascend 950PR/Ascend 950DT
+- Ascend 910C
+- Ascend 910B
 ## 目录结构介绍
 ```
 ├── add_tbuf
