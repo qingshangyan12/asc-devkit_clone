@@ -231,7 +231,7 @@ struct BlockRingBufInfo {
     uint16_t flag = 0U;          // 0: simd, 1: simt
     uint32_t rsv = 0U;           // reserve
     uint64_t ringBufAddr = 0U;   // start addr of fifo buff
-    uint32_t resv_mem[6];        // reserved
+    uint32_t resvMem[6];        // reserved
 };
 
 struct RingBufWriteInfo {
@@ -256,7 +256,7 @@ struct SkipTlvInfo {
 struct PrintTlvInfoHead {
     uint32_t type = static_cast<uint32_t>(DumpType::DUMP_SCALAR);
     uint32_t length = 0U;
-    uint32_t resv_mem[2];               // reserved
+    uint32_t resvMem[2];               // reserved
     uint64_t fmtOffset = 0U;            // offset of fmt string from the start of fmtOffset addr
 };
 
@@ -292,7 +292,7 @@ struct TimeStampTlvInfo {
     uint64_t cycle = 0U;           // system cycle
     uint64_t pc = 0U;              // get pc
     uint64_t entry = 0U;           // entry system cycle
-    uint32_t resv_mem[2];          // reserved
+    uint32_t resvMem[2];          // reserved
 };
 
 struct DumpMeta {
