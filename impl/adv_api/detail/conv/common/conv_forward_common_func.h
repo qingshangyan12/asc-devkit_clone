@@ -31,26 +31,20 @@ using TypeFalse = struct {
 };
 
 template <class Intf, uint32_t ImplType>
-#ifndef ASCC_STRUCT_SETINPUT
-#define ASCC_STRUCT_SETINPUT
 struct SetInput {
     static __aicore__ inline void call(Intf *self, const AscendC::GlobalTensor<typename Intf::InputT> &input)
     {
         self->ctx.agm.SetGlobalBuffer(input.GetPhyAddr(0), input.GetSize());
     }
 };
-#endif
 
 template <class Intf, uint32_t ImplType>
-#ifndef ASCC_STRUCT_SETWEIGHT
-#define ASCC_STRUCT_SETWEIGHT
 struct SetWeight {
     static __aicore__ inline void call(Intf *self, const AscendC::GlobalTensor<typename Intf::WeightT> &weight)
     {
         self->ctx.bgm.SetGlobalBuffer(weight.GetPhyAddr(0), weight.GetSize());
     }
 };
-#endif
 
 template <class Intf, uint32_t ImplType>
 struct SetBias {
@@ -62,8 +56,6 @@ struct SetBias {
 };
 
 template <class Intf, uint32_t ImplType>
-#ifndef ASCC_STRUCT_END
-#define ASCC_STRUCT_END
 struct End {
     static __aicore__ inline void call(Intf *self)
     {
@@ -84,7 +76,6 @@ struct End {
         self->ctx.queueCL0.FreeAllEvent();
     }
 };
-#endif
 
 }  // namespace ConvApiFunc
 #endif

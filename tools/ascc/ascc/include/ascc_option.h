@@ -331,8 +331,6 @@ public:
 };
 
 template <typename Ty>
-#ifndef ASCC_STRUCT_INIT
-#define ASCC_STRUCT_INIT
 struct Init {
     const Ty &init;
     explicit Init(const Ty &Val) : init(Val) {}
@@ -342,7 +340,6 @@ struct Init {
         opt.SetInitialValue(init);
     }
 };
-#endif
 
 template <class Ty>
 struct ListInitializer {

@@ -128,8 +128,6 @@ __aicore__ inline void InitGroupOptDirectionValue(Intf *self)
 }
 
 template <class Intf, uint32_t ImplType>
-#ifndef ASCC_STRUCT_INIT
-#define ASCC_STRUCT_INIT
 struct Init {
     static __aicore__ inline bool call(Intf *self, const void *__restrict tiling)
     {
@@ -303,7 +301,6 @@ struct Init {
         }
     }
 };
-#endif
 
 }  // namespace Conv3dApiFunc
 
