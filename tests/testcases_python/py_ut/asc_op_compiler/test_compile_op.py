@@ -208,12 +208,15 @@ class TestCompileOp(unittest.TestCase):
     #     decode_tiling_result = {}
 
     #     tiling_key_struct_map = {}
+    #     tiling_key_group_map = {}
+
+    #     customized_config = CustomizedConfig(default_kernel_type, default_tiling_struct, )
 
     #     infer_info_from_ifile = InferChannelParamsFromIFile(tiling_key_list, code_channel, hard_sync, no_kfc_server_flag, \
     #                                        enable_deterministic, tiling_key_kernel_type, no_set_kernel_type,\
     #                                        default_kernel_type, dump_info, decode_tiling_result,
     #                                        default_tiling_struct, tiling_struct_expr_map, tiling_key_struct_map,\
-    #                                        set_task_bar, wait_task_bar, tiling_key_deterministic)
+    #                                        set_task_bar, wait_task_bar, tiling_key_deterministic, tiling_key_group_map)
     #     op_compile_option = '{}'
     #     extend_options = {'customized_tiling_key_list': ['1']}
     #     ascendc_common_utilityop_module = importlib.import_module('asc_op_compile_base.asc_op_compiler.ascendc_common_utility')
@@ -221,8 +224,8 @@ class TestCompileOp(unittest.TestCase):
     #         with buildcfg.build_config():
     #             with mock.patch.object(ascendc_common_utilityop_module, 'is_enable_ascendc_cov', return_value=True):
     #                 with mock.patch.object(compile_op_module, 'set_dump_assert_flag') as mock_compile:
-    #                     compile_op_with_inferinfo(cce_file, origin_func_name, op_info, compile_options, code_channel,
-    #                                 op_compile_option, extend_options, infer_info_from_ifile)
+    #                     compile_op_with_customized_config(cce_file, origin_func_name, op_info, compile_options, code_channel,
+    #                                 op_compile_option, extend_options, customized_config)
     #                     args, kwargs = mock_compile.call_args
     #                     self.assertEqual(args[0].tiling_key_list, ['1'])
 
@@ -279,7 +282,7 @@ class TestCompileOp(unittest.TestCase):
     #                             return MockMatch(string, (string,))
     #                         return original_search(pattern, string, *args, **kwargs)
     #                     mock_search.side_effect = custom_search
-    #                     compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
+    #                     compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option, {})
 
 
     def test_compile_op_dynamic_m510(self):
@@ -343,86 +346,87 @@ class TestCompileOp(unittest.TestCase):
                                                             op_info, compile_options, code_channel, op_compile_option)
 
 
-    # def test_compile_op_dynamic_no_tiling_register(self):
-    #     cce_file = os.path.join(TOP_PATH, "tests/testcases_python/py_ut/asc_op_compiler/stub_kernels/add_custom_unalign.cpp")
-    #     origin_func_name = "add_custom_unalign"
-    #     code_channel = 0
-    #     op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d96',
-    #                      op_type='AddCustomUnalign',
-    #                      inputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'x_in__'},
-    #                              {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
-    #                      outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
-    #                      attrs=[{'name': 'testAttr1', 'dtype': 'float', 'value': 0.0}, {'name': 'testAttr2', 'dtype': 'int', 'value': 0}],
-    #                      impl_mode='high_performance',
-    #                      origin_inputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'x_in__'},
-    #                                     {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
-    #                      origin_outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
-    #                      param_type_dynamic=False, mc2_ctx=[], param_type_list=['required', 'required', 'required'],
-    #                      init_value_list=[None])
-    #     compile_options = ['-DDTYPE_X=float', '-DORIG_DTYPE_X=DT_FLOAT', '-DFORMAT_X=FORMAT_ND',
-    #                        '-DDTYPE_Y=float', '-DORIG_DTYPE_Y=DT_FLOAT', '-DFORMAT_Y=FORMAT_ND',
-    #                        '-DDTYPE_Z=float', '-DORIG_DTYPE_Z=DT_FLOAT', '-DFORMAT_Z=FORMAT_ND', '-x', 'cce',
-    #                        '-I' + API_ROOT_PATH,
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'include'),
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'impl'),
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
-    #                        '-I' + os.path.join(API_ROOT_PATH, 'impl/adv_api'),                      
-    #                        '-I' + os.path.join(TOP_PATH, 'build'),
-    #                        '-include' + os.path.join(TOP_PATH, 'tests/testcases_python/py_ut/asc_op_compiler/stub_kernels/add_custom_unalign_tiling.h'),
-    #                        '-DHIGH_PERFORMANCE=1', '-DDETERMINISTIC_MODE=1']
-    #     op_compile_option = '{}'
+    def test_compile_op_dynamic_no_tiling_register(self):
+        cce_file = os.path.join(TOP_PATH, "tests/testcases_python/py_ut/asc_op_compiler/stub_kernels/add_custom_unalign.cpp")
+        origin_func_name = "add_custom_unalign"
+        code_channel = 0
+        op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d96',
+                         op_type='AddCustomUnalign',
+                         inputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'x_in__'},
+                                 {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
+                         outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
+                         attrs=[{'name': 'testAttr1', 'dtype': 'float', 'value': 0.0}, {'name': 'testAttr2', 'dtype': 'int', 'value': 0}],
+                         impl_mode='high_performance',
+                         origin_inputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'x_in__'},
+                                        {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
+                         origin_outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
+                         param_type_dynamic=False, mc2_ctx=[], param_type_list=['required', 'required', 'required'],
+                         init_value_list=[None])
+        compile_options = ['-DDTYPE_X=float', '-DORIG_DTYPE_X=DT_FLOAT', '-DFORMAT_X=FORMAT_ND',
+                           '-DDTYPE_Y=float', '-DORIG_DTYPE_Y=DT_FLOAT', '-DFORMAT_Y=FORMAT_ND',
+                           '-DDTYPE_Z=float', '-DORIG_DTYPE_Z=DT_FLOAT', '-DFORMAT_Z=FORMAT_ND', '-x', 'cce',
+                           '-I' + API_ROOT_PATH,
+                           '-I' + os.path.join(API_ROOT_PATH, 'include'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/adv_api'),                      
+                           '-I' + os.path.join(TOP_PATH, 'build'),
+                           '-include' + os.path.join(TOP_PATH, 'tests/testcases_python/py_ut/asc_op_compiler/stub_kernels/add_custom_unalign_tiling.h'),
+                           '-DHIGH_PERFORMANCE=1', '-DDETERMINISTIC_MODE=1']
+        op_compile_option = '{}'
 
-    #     tiling_key_list = []
-    #     declare_param_str = ""
-    #     select_param_str = ""
-    #     decode_tiling_result = {}
-    #     code_channel:int = 0
-    #     hard_sync = False
-    #     no_kfc_server_flag = False
-    #     find_kfc_server = False
-    #     default_tiling_struct = ""
-    #     tiling_struct_expr_map = {}
-    #     enable_deterministic = False
-    #     tiling_key_kernel_type = {}
-    #     tiling_key_deterministic = {}
-    #     default_kernel_type = KernelMetaType.KERNEL_TYPE_MAX
-    #     dump_info = {"dump_type" : "", "dump_size" : 1048576}
-    #     func_name_exist = False
-    #     expect_tilingkey_set = set()
-    #     need_find_kernel_type = False
-    #     tiling_no_register_flag = False
-    #     tiling_key_struct_map = {}
-    #     set_task_bar, wait_task_bar = False, False
-    #     no_set_kernel_type = False
-    #     with (
-    #         asc_op_compile_base.common.context.op_context.OpContext(),
-    #         buildcfg.build_config(),
-    #         mock.patch.object(CommonUtility, 'is_c310', return_value=False),
-    #         mock.patch.object(CommonUtility, 'is_m510', return_value=False),
-    #         mock.patch.object(compile_op_module, '_compile_ascendc_cce', return_value=None),
-    #         mock.patch.object(CommonUtility, 'is_v220', return_value=False),
-    #         mock.patch.object(CommonUtility, 'is_310r6', return_value=False),
-    #         mock.patch.object(CommonUtility, 'get_tiling_info_by_tiling', return_value=TilingInfo()),
-    #         mock.patch.object(compile_op_module, '_compile_ascendc_cce_m510', return_value=None),
-    #         mock.patch.object(KernelInfoInfer, 'get_tiling_key_list_and_simple_infer_code_channel', return_value=InferChannelParamsFromIFile(tiling_key_list, code_channel, \
-    #             hard_sync, no_kfc_server_flag, enable_deterministic, tiling_key_kernel_type, no_set_kernel_type, default_kernel_type, dump_info, decode_tiling_result,
-    #             default_tiling_struct, tiling_struct_expr_map, tiling_key_struct_map, set_task_bar, wait_task_bar, tiling_key_deterministic)),
-    #         mock.patch.object(compile_op_module, '_get_tiling_struct_without_register_size', return_value=None),
-    #         mock.patch.object(compile_op_module, 'gen_tiling_struct_size_and_dfx_section_file', return_value=None),
-    #         mock.patch.object(compile_op_module, 'link_relocatable_meta_file', return_value=None),
-    #         mock.patch.object(compile_op_module, 'gen_compile_cmd_for_meta_info', return_value=None),
-    #         mock.patch.object(compile_op_module, '_json_post_process', return_value=None),
-    #         mock.patch.object(CommonUtility, 'run_cmd_inner', return_value=None),
-    #         mock.patch('asc_op_compile_base.asc_op_compiler.global_storage.global_var_storage.global_storage_reset')
-    #     ):
-    #         compile_op_module.global_var_storage.set_variable("ascendc_tiling_no_register", True)
-    #         compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
+        tiling_key_list = []
+        declare_param_str = ""
+        select_param_str = ""
+        decode_tiling_result = {}
+        code_channel:int = 0
+        hard_sync = False
+        no_kfc_server_flag = False
+        find_kfc_server = False
+        default_tiling_struct = ""
+        tiling_struct_expr_map = {}
+        enable_deterministic = False
+        tiling_key_kernel_type = {}
+        tiling_key_deterministic = {}
+        tiling_key_group_map = {}
+        default_kernel_type = KernelMetaType.KERNEL_TYPE_MAX
+        dump_info = {"dump_type" : "", "dump_size" : 1048576}
+        func_name_exist = False
+        expect_tilingkey_set = set()
+        need_find_kernel_type = False
+        tiling_no_register_flag = False
+        tiling_key_struct_map = {}
+        set_task_bar, wait_task_bar = False, False
+        no_set_kernel_type = False
+        with (
+            asc_op_compile_base.common.context.op_context.OpContext(),
+            buildcfg.build_config(),
+            mock.patch.object(CommonUtility, 'is_c310', return_value=False),
+            mock.patch.object(CommonUtility, 'is_m510', return_value=False),
+            mock.patch.object(compile_op_module, '_compile_ascendc_cce', return_value=None),
+            mock.patch.object(CommonUtility, 'is_v220', return_value=False),
+            mock.patch.object(CommonUtility, 'is_310r6', return_value=False),
+            mock.patch.object(CommonUtility, 'get_tiling_info_by_tiling', return_value=TilingInfo()),
+            mock.patch.object(compile_op_module, '_compile_ascendc_cce_m510', return_value=None),
+            mock.patch.object(KernelInfoInfer, 'get_tiling_key_list_and_simple_infer_code_channel', return_value=InferChannelParamsFromIFile(tiling_key_list, code_channel, \
+                hard_sync, no_kfc_server_flag, enable_deterministic, tiling_key_kernel_type, no_set_kernel_type, default_kernel_type, dump_info, decode_tiling_result,
+                default_tiling_struct, tiling_struct_expr_map, tiling_key_struct_map, set_task_bar, wait_task_bar, tiling_key_deterministic, tiling_key_group_map)),
+            mock.patch.object(compile_op_module, '_get_tiling_struct_without_register_size', return_value=None),
+            mock.patch.object(compile_op_module, 'gen_tiling_struct_size_and_dfx_section_file', return_value=None),
+            mock.patch.object(compile_op_module, 'link_relocatable_meta_file', return_value=None),
+            mock.patch.object(compile_op_module, 'gen_compile_cmd_for_meta_info', return_value=None),
+            mock.patch.object(compile_op_module, '_json_post_process', return_value=None),
+            mock.patch.object(CommonUtility, 'run_cmd_inner', return_value=None),
+            mock.patch('asc_op_compile_base.asc_op_compiler.global_storage.global_var_storage.global_storage_reset')
+        ):
+            compile_op_module.global_var_storage.set_variable("ascendc_tiling_no_register", True)
+            compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
 
 
     # def test_compile_op_dynamic_c310_cube(self):
@@ -851,30 +855,30 @@ class TestCompileOp(unittest.TestCase):
                 cfg.current()["tir.op_debug_config"] = ["oom"]
                 _gen_compile_cmd(src_file, dst_file, compile_option_tuple, tiling_file)
 
-    # def test_gen_kernel_func_declare_head(self):
-    #     kernel_func_desc = ""
-    #     op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
-    #                      op_type='AddCustomUnalign',
-    #                      inputs=[None,
-    #                              {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
-    #                      outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND',
-    #                                'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
-    #                      attrs=[{'name': 'testAttr1', 'dtype': 'float', 'value': 0.0},
-    #                             {'name': 'testAttr2', 'dtype': 'int', 'value': 0}],
-    #                      impl_mode='high_performance',
-    #                      origin_inputs=[None,
-    #                                     {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
-    #                      origin_outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND',
-    #                                       'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
-    #                      param_type_dynamic=False, mc2_ctx=['mc2_test'], param_type_list=['required', 'required', 'dynamic'],
-    #                      init_value_list=[None], output_shape_depend_on_compute=[0])
-    #     tiling_info = TilingInfo()
-    #     kernel_func_desc, idx = _gen_kernel_func_declare_head(
-    #         kernel_func_desc, True, True, op_info, tiling_info)
-    #     print(kernel_func_desc)
-    #     self.assertEqual(
-    #         "GM_ADDR ffts_addr, GM_ADDR mc2_test, GM_ADDR y_in__, GM_ADDR z_out_, GM_ADDR __ascendc_output_shape, GM_ADDR workspace) {\n", kernel_func_desc)
-    #     self.assertEqual(idx, 5)
+    def test_gen_kernel_func_declare_head(self):
+        kernel_func_desc = ""
+        op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
+                         op_type='AddCustomUnalign',
+                         inputs=[None,
+                                 {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
+                         outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND',
+                                   'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
+                         attrs=[{'name': 'testAttr1', 'dtype': 'float', 'value': 0.0},
+                                {'name': 'testAttr2', 'dtype': 'int', 'value': 0}],
+                         impl_mode='high_performance',
+                         origin_inputs=[None,
+                                        {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
+                         origin_outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND',
+                                          'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
+                         param_type_dynamic=False, mc2_ctx=['mc2_test'], param_type_list=['required', 'required', 'dynamic'],
+                         init_value_list=[None], output_shape_depend_on_compute=[0])
+        tiling_info = TilingInfo()
+        kernel_func_desc, idx, called_func_params, called_func_params_type = _gen_kernel_func_declare_head(
+            True, True, op_info, tiling_info)
+        print(kernel_func_desc)
+        self.assertEqual(
+            "GM_ADDR ffts_addr, GM_ADDR mc2_test, GM_ADDR y_in__, GM_ADDR z_out_, GM_ADDR __ascendc_output_shape, GM_ADDR workspace) {\n", kernel_func_desc)
+        self.assertEqual(idx, 5)
 
     def test_compile_ascendc_cce(self):
         SetCurrentSocInfo("Ascend310P1")
@@ -2714,55 +2718,28 @@ Contents of section
         from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import is_enable_ascendc_cov
         self.assertTrue(is_enable_ascendc_cov())
 
-    # @mock.patch('os.environ', {'ASCEND_HOME_PATH': ''})
-    # def test_is_enable_sanitizer(self):
-    #     SetCurrentSocInfo("Ascend910B1")
-    #     from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import is_enable_sanitizer
-    #     compile_options = []
-    #     self.assertFalse(is_enable_sanitizer(compile_options))
-    #     compile_options = ["-sanitizer"]
-    #     self.assertFalse(is_enable_sanitizer(compile_options))
-    #     with mock.patch('os.environ', {}):
-    #         compile_options = ["-sanitizer"]
-    #         self.assertFalse(is_enable_sanitizer(compile_options))
-    #     with mock.patch('os.path.exists', return_value=False):
-    #         compile_options = ["-sanitizer"]
-    #         self.assertFalse(is_enable_sanitizer(compile_options))
-
-    #     with mock.patch('os.path.exists') as mock_exists:
-    #         with mock.patch('builtins.open', new_callable=mock.mock_open):
-    #             mock_exists.return_value = True
-    #             with mock.patch('json.load', side_effect=RuntimeError()):
-    #                 compile_options = ["-sanitizer"]
-    #                 self.assertRaises(Exception, is_enable_sanitizer, compile_options)
-    #             js = {'Sanitizer': []}
-    #             with mock.patch('json.load', return_value=js):
-    #                 compile_options = ["-sanitizer"]
-    #                 self.assertFalse(is_enable_sanitizer(compile_options))
-    #             js = {}
-    #             with mock.patch('json.load', return_value=js):
-    #                 compile_options = ["-sanitizer"]
-    #                 self.assertFalse(is_enable_sanitizer(compile_options))
-    #             js = {'Sanitizer': ['test']}
-    #             with mock.patch('json.load', return_value=js):
-    #                 compile_options = ["-sanitizer"]
-    #                 self.assertFalse(is_enable_sanitizer(compile_options))
-    #             js = {'Sanitizer': [{'Ascend910B': 'test'}]}
-    #             with mock.patch('json.load', return_value=js):
-    #                 compile_options = ["-sanitizer"]
-    #                 self.assertTrue(is_enable_sanitizer(compile_options))
-
-    #             def mock_exists_fun(path):
-    #                 ascend_home_path = os.environ.get("ASCEND_HOME_PATH")
-    #                 if path == os.path.join(ascend_home_path, "compiler/conf/compile_options_config.json"):
-    #                     return True
-    #                 else:
-    #                     return False
-    #             mock_exists.side_effect = mock_exists_fun
-    #             js = {'Sanitizer': [{'Ascend910B': 'test'}]}
-    #             with mock.patch('json.load', return_value=js):
-    #                 compile_options = ["-sanitizer"]
-    #                 self.assertRaises(Exception, is_enable_sanitizer, compile_options)
+    @mock.patch('os.environ', {'ASCEND_HOME_PATH': ''})
+    def test_is_enable_sanitizer(self):
+        set_current_compile_soc_info("Ascend910B")
+        from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import is_enable_sanitizer
+        compile_options = []
+        self.assertFalse(is_enable_sanitizer(compile_options))
+        with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': None}):
+            compile_options = ["-sanitizer"]
+            self.assertFalse(is_enable_sanitizer(compile_options))
+        with mock.patch('os.path.exists') as mock_exists:
+            with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': os.environ.get('ASCEND_HOME_PATH')}):
+                mock_exists.return_value = True
+                compile_options = ["-sanitizer"]
+                self.assertTrue(is_enable_sanitizer(compile_options))
+                with mock.patch('asc_op_compile_base.asc_op_compiler.global_storage.global_var_storage.get_variable') as mock_soc:
+                    mock_soc.return_value = "Ascend910_95"
+                    self.assertFalse(is_enable_sanitizer(compile_options))
+        with mock.patch('os.path.exists') as mock_exists:
+            with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': '/usr/local/Ascend/latest'}):
+                mock_exists.return_value = False
+                compile_options = ["-sanitizer"]
+                self.assertRaises(Exception, is_enable_sanitizer, compile_options)
 
     def test_add_op_compile_options_by_customized_json(self):
         SetCurrentSocInfo("Ascend910B1")
@@ -3289,28 +3266,28 @@ Contents of section
                     self.assertRaises(Exception, is_enable_build_log)
             global_var_storage.set_variable("ascendc_short_soc_version", get_soc)
 
-    # def test_check_if_gen_placehoder(self):
-    #     from asc_op_compile_base.asc_op_compiler.compile_op import _check_if_gen_placehoder, GEN_PLACE_HOLDER_STR
-    #     with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
-    #         with buildcfg.build_config():
-    #             op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
-    #                              op_type='AddCustomUnalign',
-    #                              inputs=[])
-    #             result = _check_if_gen_placehoder(op_info, True)
-    #             self.assertFalse(result)
-    #             with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value=GEN_PLACE_HOLDER_STR):
-    #                 result = _check_if_gen_placehoder(op_info, True)
-    #                 self.assertFalse(result)
-    #                 op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
-    #                                  op_type='AddCustomUnalign',
-    #                                  inputs=[{'shape': [-2], 'ori_shape': [-12], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'x_in__'},
-    #                                          {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}])
-    #                 result = _check_if_gen_placehoder(op_info, True)
-    #                 self.assertTrue(result)
-    #                 op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
-    #                                  op_type='AddCustomUnalign',
-    #                                  inputs=[None])
-    #                 self.assertRaises(Exception, _check_if_gen_placehoder, op_info, True)
+    def test_check_if_gen_placehoder(self):
+        from asc_op_compile_base.asc_op_compiler.ascendc_compile_utils import check_if_gen_placehoder, GEN_PLACE_HOLDER_STR
+        with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+            with buildcfg.build_config():
+                op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
+                                 op_type='AddCustomUnalign',
+                                 inputs=[])
+                result = check_if_gen_placehoder(op_info, True)
+                self.assertFalse(result)
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value=GEN_PLACE_HOLDER_STR):
+                    result = check_if_gen_placehoder(op_info, True)
+                    self.assertFalse(result)
+                    op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
+                                     op_type='AddCustomUnalign',
+                                     inputs=[{'shape': [-2], 'ori_shape': [-12], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'x_in__'},
+                                             {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}])
+                    result = check_if_gen_placehoder(op_info, True)
+                    self.assertTrue(result)
+                    op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
+                                     op_type='AddCustomUnalign',
+                                     inputs=[None])
+                    self.assertRaises(Exception, check_if_gen_placehoder, op_info, True)
 
 
     def test_json_post_process(self):
@@ -3726,63 +3703,63 @@ Contents of section
                 flag = is_static_shape(inputs, outputs_dynamic_none)
                 self.assertTrue(flag)
 
-    # def test_get_tiling_info(self):
-    #     SetCurrentSocInfo("Ascend910B1")
-    #     op_info = OpInfo(kernel_name='te_addcustom_c3ddf0b6b7cfcb0fa81511155a4d588722c7b8412920ecfe1b049dec430667c5',
-    #                      op_type='AddCustom',
-    #                      inputs=[{'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND', 'sub_format': 0,
-    #                                  'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0, 'total_shape': [8, 2048],
-    #                                  'slice_offset': (), 'L1_addr_offset': 0, 'L1_fusion_type': -1, 'L1_workspace_size': -1,
-    #                                  'valid_shape': (), 'split_index': 0, 'atomic_type': '', 'input_c_values': -1,
-    #                                  'range': [[8, 8], [2048, 2048]], 'param_name': 'x_in__'},
-    #                              {'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND', 'sub_format': 0,
-    #                              'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0, 'total_shape': [8, 2048],
-    #                                  'slice_offset': (), 'L1_addr_offset': 0, 'L1_fusion_type': -1, 'L1_workspace_size': -1,
-    #                                  'valid_shape': (), 'split_index': 0, 'atomic_type': '', 'input_c_values': -1,
-    #                                  'range': [[8, 8], [2048, 2048]], 'param_name': 'y_in__'}],
-    #                      outputs=[{'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND', 'sub_format': 0,
-    #                                'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0, 'total_shape': [8, 2048],
-    #                                'slice_offset': (), 'L1_addr_offset': 0, 'L1_fusion_type': -1, 'L1_workspace_size': -1,
-    #                                'valid_shape': (), 'split_index': 0, 'atomic_type': '', 'input_c_values': -1,
-    #                                'range': [[8, 8], [2048, 2048]], 'param_name': 'z_out_'}],
-    #                      attrs=[],
-    #                      impl_mode='',
-    #                      origin_inputs=[{'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND',
-    #                                      'sub_format': 0, 'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0,
-    #                                      'total_shape': [8, 2048], 'slice_offset': (), 'L1_addr_offset': 0,
-    #                                      'L1_fusion_type': -1, 'L1_workspace_size': -1, 'valid_shape': (), 'split_index': 0,
-    #                                      'atomic_type': '', 'input_c_values': -1, 'range': [[8, 8], [2048, 2048]],
-    #                                      'param_name': 'x_in__'}, {'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND',
-    #                                                                'sub_format': 0, 'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0,
-    #                                                                'total_shape': [8, 2048], 'slice_offset': (), 'L1_addr_offset': 0,
-    #                                                                'L1_fusion_type': -1, 'L1_workspace_size': -1, 'valid_shape': (), 'split_index': 0,
-    #                                                                'atomic_type': '', 'input_c_values': -1, 'range': [[8, 8], [2048, 2048]],
-    #                                                                'param_name': 'y_in__'}],
-    #                      origin_outputs=[{'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND',
-    #                                       'sub_format': 0, 'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0,
-    #                                       'total_shape': [8, 2048], 'slice_offset': (), 'L1_addr_offset': 0, 'L1_fusion_type': -1,
-    #                                       'L1_workspace_size': -1, 'valid_shape': (), 'split_index': 0, 'atomic_type': '',
-    #                                       'input_c_values': -1, 'range': [[8, 8], [2048, 2048]], 'param_name': 'z_out_'}],
-    #                      param_type_dynamic=False,
-    #                      mc2_ctx=[],
-    #                      param_type_list=['required', 'required', 'required'],
-    #                      init_value_list=['0'],
-    #                      output_shape_depend_on_compute=[])
-    #     from asc_op_compile_base.asc_op_compiler.get_op_tiling import TilingDef
-    #     from asc_op_compile_base.asc_op_compiler.get_op_tiling import get_tiling_info
+    def test_get_tiling_info(self):
+        SetCurrentSocInfo("Ascend910B1")
+        op_info = OpInfo(kernel_name='te_addcustom_c3ddf0b6b7cfcb0fa81511155a4d588722c7b8412920ecfe1b049dec430667c5',
+                         op_type='AddCustom',
+                         inputs=[{'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND', 'sub_format': 0,
+                                     'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0, 'total_shape': [8, 2048],
+                                     'slice_offset': (), 'L1_addr_offset': 0, 'L1_fusion_type': -1, 'L1_workspace_size': -1,
+                                     'valid_shape': (), 'split_index': 0, 'atomic_type': '', 'input_c_values': -1,
+                                     'range': [[8, 8], [2048, 2048]], 'param_name': 'x_in__'},
+                                 {'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND', 'sub_format': 0,
+                                 'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0, 'total_shape': [8, 2048],
+                                     'slice_offset': (), 'L1_addr_offset': 0, 'L1_fusion_type': -1, 'L1_workspace_size': -1,
+                                     'valid_shape': (), 'split_index': 0, 'atomic_type': '', 'input_c_values': -1,
+                                     'range': [[8, 8], [2048, 2048]], 'param_name': 'y_in__'}],
+                         outputs=[{'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND', 'sub_format': 0,
+                                   'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0, 'total_shape': [8, 2048],
+                                   'slice_offset': (), 'L1_addr_offset': 0, 'L1_fusion_type': -1, 'L1_workspace_size': -1,
+                                   'valid_shape': (), 'split_index': 0, 'atomic_type': '', 'input_c_values': -1,
+                                   'range': [[8, 8], [2048, 2048]], 'param_name': 'z_out_'}],
+                         attrs=[],
+                         impl_mode='',
+                         origin_inputs=[{'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND',
+                                         'sub_format': 0, 'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0,
+                                         'total_shape': [8, 2048], 'slice_offset': (), 'L1_addr_offset': 0,
+                                         'L1_fusion_type': -1, 'L1_workspace_size': -1, 'valid_shape': (), 'split_index': 0,
+                                         'atomic_type': '', 'input_c_values': -1, 'range': [[8, 8], [2048, 2048]],
+                                         'param_name': 'x_in__'}, {'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND',
+                                                                   'sub_format': 0, 'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0,
+                                                                   'total_shape': [8, 2048], 'slice_offset': (), 'L1_addr_offset': 0,
+                                                                   'L1_fusion_type': -1, 'L1_workspace_size': -1, 'valid_shape': (), 'split_index': 0,
+                                                                   'atomic_type': '', 'input_c_values': -1, 'range': [[8, 8], [2048, 2048]],
+                                                                   'param_name': 'y_in__'}],
+                         origin_outputs=[{'shape': (8, 2048), 'ori_shape': (8, 2048), 'format': 'ND',
+                                          'sub_format': 0, 'ori_format': 'ND', 'dtype': 'float16', 'addr_type': 0,
+                                          'total_shape': [8, 2048], 'slice_offset': (), 'L1_addr_offset': 0, 'L1_fusion_type': -1,
+                                          'L1_workspace_size': -1, 'valid_shape': (), 'split_index': 0, 'atomic_type': '',
+                                          'input_c_values': -1, 'range': [[8, 8], [2048, 2048]], 'param_name': 'z_out_'}],
+                         param_type_dynamic=False,
+                         mc2_ctx=[],
+                         param_type_list=['required', 'required', 'required'],
+                         init_value_list=['0'],
+                         output_shape_depend_on_compute=[])
+        from asc_op_compile_base.asc_op_compiler.get_op_tiling import TilingDef
+        from asc_op_compile_base.asc_op_compiler.get_op_tiling import get_tiling_info
 
-    #     with (
-    #         asc_op_compile_base.common.context.op_context.OpContext(),
-    #         buildcfg.build_config(),
-    #         mock.patch('asc_op_compile_base.asc_op_compiler.get_op_tiling.get_tiling_def', return_value=TilingDef(\
-    #                 {"class_name": "add_custiom", "data_size": 0, "fields": []})),
-    #         mock.patch('asc_op_compile_base.asc_op_compiler.get_op_tiling.do_op_tiling', return_value={"tiling_data": b'\x00', "tiling_key": '0',\
-    #                 "block_dim": 1, "clear_atomic": 0, "schedule_mode": 0, "workspaces": [], "ret_code": False})
-    #     ):
-    #         tiling_info = get_tiling_info(op_info, ['1'])
-    #         self.assertEqual(tiling_info.block_dim, 1)
-    #         self.assertEqual(tiling_info.clear_atomic, 0)
-    #         self.assertEqual(tiling_info.schedule_mode, 0)
+        with (
+            asc_op_compile_base.common.context.op_context.OpContext(),
+            buildcfg.build_config(),
+            mock.patch('asc_op_compile_base.asc_op_compiler.get_op_tiling.get_tiling_def', return_value=TilingDef(\
+                    {"class_name": "add_custiom", "data_size": 0, "fields": []})),
+            mock.patch('asc_op_compile_base.asc_op_compiler.get_op_tiling.do_op_tiling', return_value={"tiling_data": b'\x00', "tiling_key": '0',\
+                    "block_dim": 1, "clear_atomic": 0, "schedule_mode": 0, "workspaces": [], "ret_code": False})
+        ):
+            tiling_info = get_tiling_info(op_info, ['1'], None, False, {})
+            self.assertEqual(tiling_info.block_dim, 1)
+            self.assertEqual(tiling_info.clear_atomic, 0)
+            self.assertEqual(tiling_info.schedule_mode, 0)
 
     @mock.patch('os.path.exists')
     def test_update_compile_info(self, mock_exist):
@@ -4286,7 +4263,7 @@ Contents of section
 #         get_soc = global_var_storage.get_variable("ascendc_short_soc_version")
 #         global_var_storage.set_variable("ascendc_short_soc_version", "Ascend910B")
 #         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-#             kernel_info = KernelInfoInfer.infer_info_from_ifile(src_file, src_file, src_file, "add_custom")
+#             kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
 #             self.assertEqual(kernel_info.default_tiling_struct, "optiling::TilingData_A")
 
 
@@ -4303,89 +4280,89 @@ Contents of section
 #         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
 #             with buildcfg.build_config() as cfg:
 #                 cfg.current()["tir.enable_vector_core"] = True
-#                 kernel_info = KernelInfoInfer.infer_info_from_ifile(src_file, src_file, src_file, "add_custom")
+#                 kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
 #                 self.assertEqual(kernel_info.default_tiling_struct, "optiling::TilingData_A")
 #         global_var_storage.set_variable("ascendc_short_soc_version", get_soc)
 
-#     def test_infer_info_from_ifile_template_tiling(self):
-#         src_file = os.path.join(TOP_PATH, 'kernel_meta', "add_custom.i")
-#         os.system(f"touch {src_file}")
-#         with open(src_file, "w") as file:
-#             context = """
-# void add_custom();
-# @@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {@@ASCENDC_TPL_DTYPE_DECL_D_T_X@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Y@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Z@@ = {10, 20},@@ASCENDC_TPL_UINT_DECL_TILE_NUM@@ = {8, 2, 2, 0, 2, 3, 5, 10, 12, 13, 9, 8},@@ASCENDC_TPL_BOOL_DECL_IS_SPLIT@@ = {0, 1},};
-# @@ASCENDC_TPL_LISTS@@ = {@@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {7}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {10}, @@ASCENDC_TPL_DETERMINISTIC_SEL@@ = {false}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {10}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {10}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},}, @@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {7}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {20}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},},};
-# """
-#             file.write(context)
+    def test_infer_info_from_ifile_template_tiling(self):
+        src_file = os.path.join(TOP_PATH, 'kernel_meta', "add_custom.i")
+        os.system(f"touch {src_file}")
+        with open(src_file, "w") as file:
+            context = """
+void add_custom();
+@@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {@@ASCENDC_TPL_DTYPE_DECL_D_T_X@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Y@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Z@@ = {10, 20},@@ASCENDC_TPL_UINT_DECL_TILE_NUM@@ = {8, 2, 2, 0, 2, 3, 5, 10, 12, 13, 9, 8},@@ASCENDC_TPL_BOOL_DECL_IS_SPLIT@@ = {0, 1},};
+@@ASCENDC_TPL_LISTS@@ = {@@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {7}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {10}, @@ASCENDC_TPL_DETERMINISTIC_SEL@@ = {false}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {10}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {10}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},}, @@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {7}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {20}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},},};
+"""
+            file.write(context)
 
-#         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-#             kernel_info = KernelInfoInfer.infer_info_from_ifile(src_file, src_file, src_file, "add_custom")
-#             self.assertEqual(kernel_info.tiling_key_kernel_type["17435146"], KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2)
-#             self.assertEqual(kernel_info.no_set_kernel_type, False)
+        with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
+            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+            self.assertEqual(kernel_info.tiling_key_kernel_type["17435146"], KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2)
+            self.assertEqual(kernel_info.no_set_kernel_type, False)
         
-#         with open(src_file, "w") as file:
-#             context = """
-# void add_custom();
-# @@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {@@ASCENDC_TPL_DTYPE_DECL_D_T_X@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Y@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Z@@ = {10, 20},@@ASCENDC_TPL_UINT_DECL_TILE_NUM@@ = {8, 2, 2, 0, 2, 3, 5, 10, 12, 13, 9, 8},@@ASCENDC_TPL_BOOL_DECL_IS_SPLIT@@ = {0, 1},};
-# @@ASCENDC_TPL_LISTS@@ = {@@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {17}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {10}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {10}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {10}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},}, @@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {17}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {20}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},},};
-# """
-#             file.write(context)
+        with open(src_file, "w") as file:
+            context = """
+void add_custom();
+@@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {@@ASCENDC_TPL_DTYPE_DECL_D_T_X@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Y@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Z@@ = {10, 20},@@ASCENDC_TPL_UINT_DECL_TILE_NUM@@ = {8, 2, 2, 0, 2, 3, 5, 10, 12, 13, 9, 8},@@ASCENDC_TPL_BOOL_DECL_IS_SPLIT@@ = {0, 1},};
+@@ASCENDC_TPL_LISTS@@ = {@@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {17}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {10}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {10}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {10}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},}, @@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {17}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {20}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},},};
+"""
+            file.write(context)
 
-#         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-#             kernel_info = KernelInfoInfer.infer_info_from_ifile(src_file, src_file, src_file, "add_custom")
-#             self.assertEqual(kernel_info.no_set_kernel_type, True)
+        with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
+            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+            self.assertEqual(kernel_info.no_set_kernel_type, True)
         
-#         with open(src_file, "w") as file:
-#             context = """
-# void add_custom();
-# @@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {@@ASCENDC_TPL_DTYPE_DECL_D_T_X@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Y@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Z@@ = {10, 20},@@ASCENDC_TPL_UINT_DECL_TILE_NUM@@ = {8, 2, 2, 0, 2, 3, 5, 10, 12, 13, 9, 8},@@ASCENDC_TPL_BOOL_DECL_IS_SPLIT@@ = {0, 1},};
-# @@ASCENDC_TPL_LISTS@@ = {@@{@@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {10}, ASCENDC_TPL_DETERMINISTIC_SEL@@ = {false}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {10}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {10}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},}, @@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {7}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {20}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},},};
-# """
-#             file.write(context)
+        with open(src_file, "w") as file:
+            context = """
+void add_custom();
+@@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {@@ASCENDC_TPL_DTYPE_DECL_D_T_X@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Y@@ = {10, 20},@@ASCENDC_TPL_DTYPE_DECL_D_T_Z@@ = {10, 20},@@ASCENDC_TPL_UINT_DECL_TILE_NUM@@ = {8, 2, 2, 0, 2, 3, 5, 10, 12, 13, 9, 8},@@ASCENDC_TPL_BOOL_DECL_IS_SPLIT@@ = {0, 1},};
+@@ASCENDC_TPL_LISTS@@ = {@@{@@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {10}, ASCENDC_TPL_DETERMINISTIC_SEL@@ = {false}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {10}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {10}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},}, @@{@@ASCENDC_TPL_KERNEL_TYPE_SEL@@ = {7}, @@ASCENDC_TPL_DTYPE_SEL_D_T_X@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Y@@ = {20}, @@ASCENDC_TPL_DTYPE_SEL_D_T_Z@@ = {20}, @@ASCENDC_TPL_UINT_SEL_TILE_NUM@@ = {1, 1, 8}, @@ASCENDC_TPL_BOOL_SEL_IS_SPLIT@@ = {0, 1},},};
+"""
+            file.write(context)
 
-#         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-#             try:
-#                 KernelInfoInfer.infer_info_from_ifile(src_file, src_file, src_file, "add_custom")
-#             except Exception as e:
-#                 assert str(e) == "must provide default kernel type", f"msg is :{e}"
-
-
-#     def test_infer_info_from_ifile_key_none_type_exists(self):
-#         get_soc = global_var_storage.get_variable("ascendc_short_soc_version")
-#         global_var_storage.set_variable("ascendc_short_soc_version", "Ascend910B")
-#         src_file = os.path.join(TOP_PATH, 'kernel_meta', "add_custom.i")
-#         os.system(f"touch {src_file}")
-#         with open(src_file, "w") as file:
-#             context = """
-# auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR >= 1";
-# auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-# auto __enable_custom_tiling optiling::TilingData_A = default;
-# auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-# auto __enable_feature_for_compile_default = KERNEL_TYPE_MIX_AIV_1_0;
-# void add_custom();
-# """
-#             file.write(context)
-
-#         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-#             kernel_info = KernelInfoInfer.infer_info_from_ifile(src_file, src_file, src_file, "add_custom")
-#             self.assertEqual(kernel_info.default_tiling_struct, "optiling::TilingData_A")
-#         global_var_storage.set_variable("ascendc_short_soc_version", get_soc)
+        with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
+            try:
+                KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+            except Exception as e:
+                assert str(e) == "must provide default kernel type", f"msg is :{e}"
 
 
-#     def test_infer_info_from_ifile_no_tiling_register(self):
-#         src_file = os.path.join(TOP_PATH, 'kernel_meta', "add_custom.i")
-#         os.system(f"touch {src_file}")
-#         with open(src_file, "w") as file:
-#             context = """
-# auto __enable_no_register_custom_tiling ascendc_trigger_tiling_struct = default
-# void add_custom();
-# """
-#             file.write(context)
+    def test_infer_info_from_ifile_key_none_type_exists(self):
+        get_soc = global_var_storage.get_variable("ascendc_short_soc_version")
+        global_var_storage.set_variable("ascendc_short_soc_version", "Ascend910B")
+        src_file = os.path.join(TOP_PATH, 'kernel_meta', "add_custom.i")
+        os.system(f"touch {src_file}")
+        with open(src_file, "w") as file:
+            context = """
+auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR >= 1";
+auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
+auto __enable_custom_tiling optiling::TilingData_A = default;
+auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
+auto __enable_feature_for_compile_default = KERNEL_TYPE_MIX_AIV_1_0;
+void add_custom();
+"""
+            file.write(context)
 
-#         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-#             kernel_info = KernelInfoInfer.infer_info_from_ifile(src_file, src_file, src_file, "add_custom")
-#             ascendc_tiling_no_register = global_var_storage.get_variable("ascendc_tiling_no_register")
-#             self.assertEqual(ascendc_tiling_no_register, True)
+        with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
+            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+            self.assertEqual(kernel_info.default_tiling_struct, "optiling::TilingData_A")
+        global_var_storage.set_variable("ascendc_short_soc_version", get_soc)
+
+
+    def test_infer_info_from_ifile_no_tiling_register(self):
+        src_file = os.path.join(TOP_PATH, 'kernel_meta', "add_custom.i")
+        os.system(f"touch {src_file}")
+        with open(src_file, "w") as file:
+            context = """
+auto __enable_no_register_custom_tiling ascendc_trigger_tiling_struct = default
+void add_custom();
+"""
+            file.write(context)
+
+        with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
+            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+            ascendc_tiling_no_register = global_var_storage.get_variable("ascendc_tiling_no_register")
+            self.assertEqual(ascendc_tiling_no_register, True)
 
 
     def test_get_dump_info_from_i_file_null(self):
@@ -4581,19 +4558,6 @@ void add_custom();
         self.assertEqual(dump_info["dump_size"],1)
         os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
 
-    # def test_gen_tiling_strcut_section(self):
-    #     compile_info = CompileInfo()
-    #     tiling_info = TilingInfo()
-    #     compile_info.tiling_key_list = ['1']
-    #     compile_info.tiling_key_struct_map = {'1': "tiling"}
-    #     module_name = 'asc_op_compile_base.asc_op_compiler.ascendc_compile_gen_code'
-    #     compile_op_module = importlib.import_module(module_name)
-    #     with mock.patch.object(compile_op_module, 'gen_global_isolation_macro', return_value=""):
-    #         from asc_op_compile_base.asc_op_compiler.ascendc_compile_gen_code import gen_tiling_strcut_section
-    #         source = gen_tiling_strcut_section(compile_info, tiling_info)
-    #         compare_str = "static const uint64_t __ascendc_tiling_struct_tiling __attribute__((used, section(\".ascendc_tiling.tiling\"))) = sizeof(tiling);\n#endif\n\n"
-    #         self.assertEqual(compare_str, source)
-
     def test_get_tiling_struct_size(self):
         compile_info = CompileInfo()
         compile_info.dst_file = "/tmp/add_custom.o"
@@ -4764,10 +4728,10 @@ void add_custom();
                 res = KernelInfoInfer.get_kernel_type_enum(kernel_type, compile_log_path)
                 self.assertEqual(res, None)
 
-    # def test_find_tilingkey(self):
-    #     tiling_str = "g_tilingKey == (aaa)"
-    #     re = KernelInfoInfer.find_tilingkey(tiling_str)
-    #     self.assertEqual(re, None)
+    def test_find_tilingkey(self):
+        tiling_str = "g_tilingKey == (aaa)"
+        re = KernelInfoInfer.find_tilingkey(tiling_str)
+        self.assertEqual(re, (None, False))
 
     def test_set_dynamic_sub_func_names_of_super_kernel(self):
         from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import set_dynamic_sub_func_names_of_super_kernel
@@ -4815,7 +4779,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
 '''
         with mock.patch('builtins.open', new_callable=mock.mock_open, read_data=data) as mock_open:
             dst_i_file = './a.i'
-            self.assertRaises(Exception, KernelInfoInfer.infer_info_from_ifile, src_file, src_file, src_file, "add_custom")
+            self.assertRaises(Exception, KernelInfoInfer.infer_info_from_ifile, None, src_file, src_file, src_file, "add_custom")
         global_var_storage.global_storage_reset()
 
 
