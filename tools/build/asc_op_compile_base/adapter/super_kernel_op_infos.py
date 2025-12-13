@@ -501,11 +501,9 @@ class SuperOperatorInfos:
                 recv_info: {sub_op.recv_info}", AscendCLogLevel.LOG_DEBUG)
 
     def creat_compile_log(self):
-        op_debug_config_val = get_op_debug_config()
-        if "dump_cce" in op_debug_config_val:
-            kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
-            distinct_tag = CommonUtility.get_distinct_filename_tag()
-            self.compile_log_path = os.path.join(kernel_meta_dir, self.kernel_name + distinct_tag + '.log')
+        kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
+        distinct_tag = CommonUtility.get_distinct_filename_tag()
+        self.compile_log_path = os.path.join(kernel_meta_dir, self.kernel_name + distinct_tag + '.log')
 
 
     def sub_op_connect_set(self, former_op, op):
