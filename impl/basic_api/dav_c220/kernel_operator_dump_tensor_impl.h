@@ -713,11 +713,11 @@ __aicore__ inline void SkipRingBufWithInfo(
 __aicore__ inline bool RingBufferWait(__gm__ RingBufReadInfo* readInfo, __gm__ RingBufWriteInfo* writeInfo,
                                       const uint32_t& tlvLen)
 {
-    const uint64_t& firstTimeStamp = static_cast<uint64_t>(GetSystemCycle());
-    constexpr uint64_t TIMEOUT_CYCLE = 50 * 1000 * 1000 * 5; // 5s
+    const uint64_t firstTimeStamp = static_cast<uint64_t>(GetSystemCycle());
+    constexpr uint64_t timeoutCycle = 50 * 1000 * 1000 * 5; // 5s
     while (writeInfo->bufOffset < readInfo->bufOffset && writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
         uint64_t spendTime = static_cast<uint64_t>(GetSystemCycle()) - firstTimeStamp;
-        if (spendTime > TIMEOUT_CYCLE) {
+        if (spendTime > timeoutCycle) {
             return false;
         }
         dcci(reinterpret_cast<__gm__ uint64_t*>(readInfo), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
@@ -730,8 +730,8 @@ __aicore__ inline void WriteRingBufTlvHead(
 {
     printTlv->type = static_cast<uint32_t>(printType);
     printTlv->length = tlvLen - sizeof(uint32_t[2]);   // exclude type and length
-    printTlv->resv_mem[0] = static_cast<uint32_t>(0U);
-    printTlv->resv_mem[1] = static_cast<uint32_t>(0U);
+    printTlv->resvMem[0] = static_cast<uint32_t>(0U);
+    printTlv->resvMem[1] = static_cast<uint32_t>(0U);
     printTlv->fmtOffset = (argsNum + 1) * sizeof(uint64_t);      // include fmt offset
     dcci(reinterpret_cast<__gm__ uint64_t*>(printTlv), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 }
@@ -784,11 +784,11 @@ __aicore__ __gm__ inline RingBufWriteInfo* GetRingBufWriteInfo(__gm__ BlockRingB
 
 __aicore__ inline bool WaitRingBufBeginRead(__gm__ RingBufReadInfo* readInfo)
 {
-    const uint64_t& firstTimeStamp = static_cast<uint64_t>(GetSystemCycle());
-    constexpr uint64_t TIMEOUT_CYCLE = 50 * 1000 * 1000 * 5; // 5s
+    const uint64_t firstTimeStamp = static_cast<uint64_t>(GetSystemCycle());
+    constexpr uint64_t timeoutCycle = 50 * 1000 * 1000 * 5; // 5s
     while (readInfo->bufOffset == 0) {
         uint64_t spendTime = static_cast<uint64_t>(GetSystemCycle()) - firstTimeStamp;
-        if (spendTime > TIMEOUT_CYCLE) {
+        if (spendTime > timeoutCycle) {
             return false;
         }
         dcci(reinterpret_cast<__gm__ uint64_t*>(readInfo), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
@@ -1119,8 +1119,8 @@ __aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId)
     timeStampTlv->cycle = static_cast<uint64_t>(GetSystemCycle());
     timeStampTlv->pc = static_cast<uint64_t>(get_pc());
     timeStampTlv->entry = static_cast<uint64_t>(0U);
-    timeStampTlv->resv_mem[0] = static_cast<uint32_t>(0U);
-    timeStampTlv->resv_mem[1] = static_cast<uint32_t>(0U);
+    timeStampTlv->resvMem[0] = static_cast<uint32_t>(0U);
+    timeStampTlv->resvMem[1] = static_cast<uint32_t>(0U);
     dcci((__gm__ uint64_t*)timeStampTlv, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 
     __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
