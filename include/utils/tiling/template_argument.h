@@ -211,7 +211,6 @@ ASCENDC_TPL_TYPE_TRANS_DEFINE(DT_FLOAT4_E1M2, fp4x2_e1m2_t);    // fp4_e1m2 type
 #define ASCENDC_TPL_ARGS_SEL(...)
 #define ASCENDC_TPL_SEL(...)
 #else
-constexpr size_t VAL_PAIR = 2;
 struct ParamStruct {
     const char* name;
     uint32_t paramType;
@@ -219,44 +218,9 @@ struct ParamStruct {
     std::vector<uint64_t> vals;
     const char* macroType;
     ParamStruct(const char* inName, uint32_t inParamType, uint8_t inBitWidth, std::vector<uint64_t> inVals,
-        const char* inMacroType): name(inName), paramType(inParamType), bitWidth(inBitWidth), vals(std::move(inVals)),macroType(inMacroType) {
-            #ifndef ASCENDC_TPL_DEBUG
-            if (inParamType == ASCENDC_TPL_UINT && inMacroType == "DECL") {
-                ParseTplUintValue();
-            }
-            #endif
-        };
-
-        void ParseTplUintValue()
-        {
-            uint8_t uiFlag = static_cast<uint8_t>(this->vals[0]);
-            if (uiFlag == ASCENDC_TPL_UI_LIST) {
-                this->vals.erase(this->vals.begin(), this->vals.begin() + 1);
-                return;
-            }
-            size_t rangeNum = this->vals[1];
-            size_t elementNum = 0;
-            constexpr int VAL_START = 2;
-            for (size_t i = 1; i <= rangeNum; i++) {
-                elementNum += this->vals[i * VAL_PAIR + 1] - this->vals[VAL_PAIR * i] + 1;
-            }
-            if (uiFlag == ASCENDC_TPL_UI_MIX) {
-                elementNum += this->vals.size() - (VAL_START + rangeNum * VAL_PAIR);
-            }
-            std::vector<uint64_t> extendVal;
-            extendVal.reserve(elementNum);
-            for (size_t i = 1; i <= rangeNum; i++) {
-                for (size_t j = this->vals[VAL_PAIR * i]; j <= this->vals[i * VAL_PAIR + 1]; j++) {
-                    extendVal.emplace_back(j);
-                }
-            }
-            if (uiFlag == ASCENDC_TPL_UI_MIX) {
-                size_t mixStart = VAL_START + rangeNum * VAL_PAIR;
-                // 使用std::copy，比手动循环更高效
-                std::copy(this->vals.begin() + mixStart, this->vals.end(), std::back_inserter(extendVal));
-            }
-            this->vals = std::move(extendVal);
-        };
+        const char* inMacroType):
+        name(inName), paramType(inParamType), bitWidth(inBitWidth), vals(std::move(inVals)),
+        macroType(inMacroType) {}
 };
 using TilingDeclareParams = std::vector<ParamStruct>;
 using TilingSelectParams = std::vector<std::vector<ParamStruct>>;
@@ -283,8 +247,8 @@ using TilingSelectParams = std::vector<std::vector<ParamStruct>>;
 #define ASCENDC_TPL_SEL(...) static TilingSelectParams g_tilingSelectParams{ __VA_ARGS__ }
 
 namespace AscendC {
-    uint64_t EncodeTilingKey(TilingDeclareParams& declareParams,
-                             TilingSelectParams& selectParamsVec,
+    uint64_t EncodeTilingKey(TilingDeclareParams declareParams,
+                             TilingSelectParams selectParamsVec,
                              std::vector<uint64_t> tilingParams);
 }
 
