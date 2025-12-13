@@ -364,24 +364,24 @@ def gen_sync_and_event_code_for_two_stream(super_operator, pre_sub_operator, sub
             if len(sub_operator.wait_block) != 0:
                 sync_and_event_code += indent_code_func(sub_operator.wait_block)
 
-            # add sync after notify/wait event
-            sync_and_event_code += f'// two stream when has wait event, add sync by current operator kernel type\n'
-            if sub_operator.kernel_type in [KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, \
-                    KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
-                # add sync with sub_operator and sub_operator
-                sync_and_event_code += \
-                    indent_code_func(f"AscendC::SyncAll<false>(); // reason3: for continues notify/wait event \n\n")
-            elif sub_operator.kernel_type in [KernelMetaType.KERNEL_TYPE_AIC_ONLY, \
-                    KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0]:
-                sync_and_event_code += '// reason3: for continues notify/wait event\n'
-                sync_and_event_code += \
-                    "ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n"
-                sync_and_event_code += "wait_flag_dev(AscendC::SYNC_AIC_FLAG);\n\n"
-            else:
-                sync_and_event_code += '// reason3: for continues notify/wait event\n'
-                sync_and_event_code += \
-                    'ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n'
-                sync_and_event_code += 'wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);\n\n'
+                # add sync after notify/wait event
+                sync_and_event_code += f'// two stream when has wait event, add sync by current operator kernel type\n'
+                if sub_operator.kernel_type in [KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, \
+                        KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
+                    # add sync with sub_operator and sub_operator
+                    sync_and_event_code += \
+                        indent_code_func(f"AscendC::SyncAll<false>(); // reason3: for continues notify/wait event \n\n")
+                elif sub_operator.kernel_type in [KernelMetaType.KERNEL_TYPE_AIC_ONLY, \
+                        KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0]:
+                    sync_and_event_code += '// reason3: for continues notify/wait event\n'
+                    sync_and_event_code += \
+                        "ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n"
+                    sync_and_event_code += "wait_flag_dev(AscendC::SYNC_AIC_FLAG);\n\n"
+                else:
+                    sync_and_event_code += '// reason3: for continues notify/wait event\n'
+                    sync_and_event_code += \
+                        'ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n'
+                    sync_and_event_code += 'wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);\n\n'
     else:
         # pre op send inter-core sync, cur op recv inter-core sync
         sync_and_event_code += \
