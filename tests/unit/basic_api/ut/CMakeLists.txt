@@ -702,6 +702,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         -Wl,--as-needed
     )
 
+    target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE ASCENDC_TPL_DEBUG)
+
     run_llt_test(
         TARGET tikcpp_tiling_utest_${product_type}
         TASK_NUM 1

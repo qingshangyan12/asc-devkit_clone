@@ -123,7 +123,7 @@ class TestCompileOp(unittest.TestCase):
         declare_param_str = "@@structFlashAttentionScore@@ =@@ASCENDC_TPL_ARGS_DECL_FlashAttentionScore@@ = {@@ASCENDC_TPL_DTYPE_DECL_X@@ = { 10, 30, 20},@@ASCENDC_TPL_FORMAT_DECL_Y@@ = {15, 25},@@ASCENDC_TPL_UINT_DECL_Z@@ = {1, 2, 2, 0, 2, 3, 4, 5, 6},@@ASCENDC_TPL_BOOL_DECL_S@@ = {0, 1}, };"
         with self.assertRaises(RuntimeError) as e:
             extract_template_tiling_info(declare_param_str, select_param_str)
-        self.assertEqual(e.exception.args, ('Bit width:1 in ASCENDC_TPL_UINT_DECL Z is not enough to represent all values: [0, 1, 2, 3, 4, 5, 6]! Please make sure 2^bitWidth is greater than or equal to the number of values.',))
+        self.assertEqual(e.exception.args, ('Bit width:1 in ASCENDC_TPL_UINT_DECL Z is not enough to represent all values: [0, 1, 2, 3, 4, 5, 6]! Please make sure 2^bitWidth is greater than or equal to the [number of values].',))
         declare_param_str = "@@structFlashAttentionScore@@ =@@ASCENDC_TPL_ARGS_DECL_FlashAttentionScore@@ = {@@ASCENDC_TPL_DTYPE_DECL_X@@ = { 10, 30, 20},@@ASCENDC_TPL_FORMAT_DECL_Y@@ = {15, 25},@@ASCENDC_TPL_UINT_DECL_Z@@ = {0, 2, 2, 0, 2, 3, 4, 5, 6},@@ASCENDC_TPL_BOOL_DECL_S@@ = {0, 1}, };"
         with self.assertRaises(RuntimeError) as e:
             extract_template_tiling_info(declare_param_str, select_param_str)
