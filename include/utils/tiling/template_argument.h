@@ -319,7 +319,7 @@ namespace AscendC {
             totalBits += param.bitWidth;
         }
         if(totalBits > MAX_BITS_NUM){
-            printf("[ERROR] Tiling key bits %u exceed max bits %u, please check it!\n", totalBits, MAX_BITS_NUM);
+            printf("[ERROR] Tiling key bits %hhu exceed max bits %hhu, please check it!\n", totalBits, MAX_BITS_NUM);
             return INVALID_TILING_KEY;
         }
         return tilingKey;
