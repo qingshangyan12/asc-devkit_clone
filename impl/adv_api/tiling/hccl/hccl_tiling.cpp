@@ -108,7 +108,7 @@ uint32_t SetDevType(Mc2InitTilingInner *tilingInner)
     int32_t devId = 0;
     int32_t ret = rtGetDevice(&devId);
     if (ret == 0) {
-        g_isSetDevice = true;
+        g_isSetDevice = false;
     }
     (void)dlclose(handle);
     return EXIT_SUCCESS;
