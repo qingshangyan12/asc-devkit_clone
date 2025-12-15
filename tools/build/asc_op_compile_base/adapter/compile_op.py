@@ -30,7 +30,7 @@ from tbe.common.platform.platform_info import get_soc_spec, set_soc_spec
 from tbe.tvm.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from tbe.tvm import var
 from tbe.common.context import get_context
-from .get_op_tiling import TilingInfo, is_static_shape, OpInfo, get_tiling_info_by_tiling
+from .get_op_tiling import TilingInfo, is_static_shape, OpInfo
 from .log_utils import LogUtil, AscendCLogLevel, CompileStage, COMPILE_STAGE_MSG_INFO
 from .global_storage import global_var_storage
 from .ascendc_constants import InferChannelParamsFromIFile, InferChannelParams, KernelMetaType, \
@@ -936,13 +936,13 @@ def _update_compile_option(kernel_name: str, compile_options: list, extend_optio
     import platform
     archlinux = platform.machine()
     if ascend_home_path is None or ascend_home_path == '':
-        asc_opc_path = shutil.which("asc_opc")
-        if asc_opc_path is not None:
+        asc_opc_path = shutil.which("asc_opc")	
+        if asc_opc_path is not None:	
             asc_opc_path_link = os.path.dirname(asc_opc_path)
             asc_opc_real_path = os.path.realpath(asc_opc_path_link)
-            ascend_home_path = os.path.realpath(
+            ascend_home_path = os.path.realpath(	
                     os.path.join(asc_opc_real_path, "..", ".."))
-        else:
+        else:	
             ascend_home_path = "/usr/local/Ascend/latest"
 
     if 'x86' in archlinux:
@@ -1002,8 +1002,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         COMPILE_STAGE_MSG_INFO["generate_tiling_start"],
         AscendCLogLevel.LOG_INFO
     )
-    tiling_info: TilingInfo = get_tiling_info_by_tiling(
-                                op_info, infered_info_from_ifile, value_depend_dict, origin_func_name)
+    tiling_info: TilingInfo = CommonUtility.get_tiling_info_by_tiling(
+                                op_info, infered_info_from_ifile, value_depend_dict)
 
     CommonUtility.print_compile_log(op_info.kernel_name, "get tiling info success", AscendCLogLevel.LOG_INFO)
 
@@ -1016,7 +1016,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     tiling_key_group_map = infered_info_from_ifile.tiling_key_group_map
     context_tiling_key = get_context().get_addition("tiling_key")
     # override customized tiling key list if the input is passed from
-    customize_tiling_key = "customized_tiling_key_list"
+    customize_tiling_key = "customized_tiling_key_list" 
     if customize_tiling_key in extend_options and isinstance(extend_options[customize_tiling_key], list):
         context_tiling_key = extend_options[customize_tiling_key]
     if context_tiling_key:

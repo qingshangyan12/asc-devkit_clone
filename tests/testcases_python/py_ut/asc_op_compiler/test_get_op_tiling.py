@@ -481,7 +481,7 @@ __aicore__  __inline__ __attribute__ ((always_inline)) add_custiom () { }
 
             mock_do_op_tiling.return_value = {"tiling_data": b'\x00', "tiling_key": '0',\
                     "block_dim": 1, "clear_atomic": 0, "schedule_mode": 0, "workspaces": [1024], "ret_code": False}
-            tiling_info = get_tiling_info(op_info_no_static, ['1'], None, False, {})
+            tiling_info = get_tiling_info(op_info_no_static, ['1'])
             self.assertEqual(tiling_info.block_dim, -1)
             self.assertEqual(tiling_info.clear_atomic, 1)
             self.assertEqual(tiling_info.schedule_mode, 0)
