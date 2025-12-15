@@ -13,6 +13,8 @@
 
 #include "set_atomic_min_impl/asc_2201/asc_set_atomic_min_impl.h"
 #include "set_atomic_s8_impl/npu_arch_2201/set_atomic_s8_impl.h"
+#include "set_atomic_type_c_api_impl/set_atomic_bf16_impl/npu_arch_2201/asc_set_atomic_bf16_impl.h"
+#include "get_st_atomic_cfg_impl/npu_arch_2201/asc_get_store_atomic_config_impl.h"
 
 __aicore__ inline void asc_set_atomic_min()
 {
@@ -23,4 +25,15 @@ __aicore__ inline void asc_set_atomic_s8()
 {
     CApiInternal::asc_set_atomic_s8_impl();
 }
+
+__aicore__ inline void asc_set_atomic_bf16()
+{
+    CApiInternal::asc_set_atomic_bf16_impl();
+}
+
+__aicore__ inline int64_t asc_get_store_atomic_config()
+{
+    return CApiInternal::asc_get_store_atomic_config_impl();
+}
+
 #endif

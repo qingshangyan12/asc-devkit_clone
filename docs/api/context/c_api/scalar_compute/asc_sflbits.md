@@ -18,7 +18,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline int32_t asc_sflbits(int64_t value)
+__aicore__ inline int64_t asc_sflbits(int64_t value)
 ```
 
 ## 参数说明
@@ -29,7 +29,7 @@ __aicore__ inline int32_t asc_sflbits(int64_t value)
 
 ## 返回值说明
 
-返回从最高数值位开始和符号位相同的连续比特位的个数，数据类型为int32_t。
+返回从最高数值位开始和符号位相同的连续比特位的个数，数据类型为int64_t。
 
 ## 流水类型
 
@@ -43,6 +43,6 @@ PIPE_TYPE_S
 
 ```cpp
 int64_t val = 0x000f00ff0ff0ffff;
-int32_t res = 0;
+int64_t res = 0;
 res = asc_sflbits(val);    // 返回11
 ```

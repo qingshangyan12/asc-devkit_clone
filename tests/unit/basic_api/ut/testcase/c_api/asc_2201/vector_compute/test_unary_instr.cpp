@@ -127,3 +127,7 @@ TEST_VECTOR_COMPUTE_UNARY_INSTR(Rsqrt, asc_rsqrt, vrsqrt, float);
 // ==========asc_log(half/float)==========
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Log, asc_log, vln, half);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Log, asc_log, vln, float);
+
+// ==========asc_rcp(half/float)==========
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Rcp, asc_rcp, vrec, half);
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Rcp, asc_rcp, vrec, float);
