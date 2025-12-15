@@ -6,7 +6,7 @@ import sys
 import shutil
 import unittest
 from unittest import mock
-import asc_op_compile_base
+
 import json
 from collections import namedtuple
 
@@ -19,7 +19,7 @@ API_ROOT_PATH = os.path.join(
 FRAMEWORK_PATH = os.path.join(
     TOP_PATH, "tools/build/")
 sys.path.insert(0, FRAMEWORK_PATH)
-
+import asc_op_compile_base
 from asc_op_compile_base.common.platform import set_current_compile_soc_info, get_soc_spec
 from asc_op_compile_base.common import register
 from asc_op_compile_base.common import buildcfg
@@ -409,7 +409,7 @@ class TestCompileOp(unittest.TestCase):
             mock.patch.object(compile_op_module, '_compile_ascendc_cce', return_value=None),
             mock.patch.object(CommonUtility, 'is_v220', return_value=False),
             mock.patch.object(CommonUtility, 'is_310r6', return_value=False),
-            mock.patch.object(CommonUtility, 'get_tiling_info_by_tiling', return_value=TilingInfo()),
+            mock.patch.object(compile_op_module, 'get_tiling_info_by_tiling', return_value=TilingInfo()),
             mock.patch.object(compile_op_module, '_compile_ascendc_cce_m510', return_value=None),
             mock.patch.object(KernelInfoInfer, 'get_tiling_key_list_and_simple_infer_code_channel', return_value=InferChannelParamsFromIFile(tiling_key_list, code_channel, \
                 hard_sync, no_kfc_server_flag, enable_deterministic, tiling_key_kernel_type, no_set_kernel_type, default_kernel_type, dump_info, decode_tiling_result,
@@ -3930,9 +3930,9 @@ Contents of section
         tiling_info.tiling_key_data_size = {}
         tiling_info.default_tiling_size = 0
         tiling_info.clear_atomic = True
-        module_name = 'asc_op_compile_base.asc_op_compiler.ascendc_common_utility'
+        module_name = 'asc_op_compile_base.asc_op_compiler.compile_op'
         compile_op_module = importlib.import_module(module_name)
-        with mock.patch.object(compile_op_module, 'get_tiling_info', return_value=tiling_info):
+        with mock.patch.object(compile_op_module, 'get_tiling_info_by_tiling', return_value=tiling_info):
             with asc_op_compile_base.common.context.op_context.OpContext():
                 with buildcfg.build_config():
                     compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
@@ -3943,7 +3943,7 @@ Contents of section
         os.remove(binary_file)
         os.remove(json_file)
 
-        with mock.patch.object(compile_op_module, 'get_tiling_info', return_value=tiling_info):
+        with mock.patch.object(compile_op_module, 'get_tiling_info_by_tiling', return_value=tiling_info):
             with asc_op_compile_base.common.context.op_context.OpContext():
                 with buildcfg.build_config():
                     with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value=['2']):
@@ -4678,7 +4678,7 @@ void add_custom();
             tiling_key_struct_map = {'1': "tiling"})
         module_name = 'asc_op_compile_base.asc_op_compiler.compile_op'
         compile_op_module = importlib.import_module(module_name)
-        self.assertRaises(Exception, CommonUtility.get_tiling_info_by_tiling, op_info, infered_info_from_ifile)
+        self.assertRaises(Exception, compile_op_module.get_tiling_info_by_tiling, op_info, infered_info_from_ifile, "add_custom")
 
     def test_check_func_name_exist(self):
         line = "extern \"C\" __attribute__((cce_kernel)) [aicore] void add_custom("
