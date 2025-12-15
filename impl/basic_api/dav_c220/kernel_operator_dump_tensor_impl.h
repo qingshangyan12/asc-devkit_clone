@@ -683,7 +683,7 @@ __aicore__ inline uint32_t GetPrintTlvLen(uint32_t& argsNum, __gm__ const char* 
 
 __aicore__ __gm__ inline BlockRingBufInfo* GetBlockRingBufInfo()
 {
-    uint32_t blockIdx = get_coreid() % DUMP_CORE_COUNT;
+    uint32_t blockIdx = (get_coreid() & 0x00FF) % DUMP_CORE_COUNT; // & 0x00FF to fix coreid in 910C
     uint32_t blockLength = reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace)->length;
     __gm__ BlockRingBufInfo* ringBufInfo =
         reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace + blockLength * blockIdx);
