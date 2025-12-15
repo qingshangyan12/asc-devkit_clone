@@ -182,6 +182,10 @@ __simt_vf__ LAUNCH_BOUND(1024) inline __aicore__ void KernelAtomicCompute3(__gm_
             asc_atomic_max(dst, value);
         } else if (mode == 4) {
             asc_atomic_min(dst, value);
+        } else if (mode == 2) {
+            asc_atomic_exch(dst, value);
+        } else if (mode == 7) {
+            asc_atomic_cas(dst, compare, value);
         }
     }
 }
@@ -204,6 +208,10 @@ __simt_vf__ inline void VfCallProcessStub3(__gm__ T *dst, T value, T compare, in
             asc_atomic_max(dst, value);
         } else if (mode == 4) {
             asc_atomic_min(dst, value);
+        } else if (mode == 2) {
+            asc_atomic_exch(dst, value);
+        } else if (mode == 7) {
+            asc_atomic_cas(dst, compare, value);
         }
     }
 }
@@ -680,6 +688,7 @@ protected:
 
 INSTANTIATE_TEST_CASE_P(AtomicOpTestCase_float, AtomicOpTestsuite_float,
                         ::testing::Values(AtomicOpParams_float{.mode = 0}, AtomicOpParams_float{.mode = 1},
+                                          AtomicOpParams_float{.mode = 2}, AtomicOpParams_float{.mode = 7},
                                           AtomicOpParams_float{.mode = 3}, AtomicOpParams_float{.mode = 4}));
 
 TEST_P(AtomicOpTestsuite_float, AtomicOpTestCase_float)
@@ -706,6 +715,10 @@ TEST_P(AtomicOpTestsuite_float, AtomicOpTestCase_float)
             expectValue = expectValue > value ? expectValue : value;
         } else if (mode == 4) {
             expectValue = expectValue < value ? expectValue : value;
+        } else if (mode == 2) {
+            expectValue = value;
+        } else if (mode == 7) {
+            expectValue = expectValue == compare ? value : expectValue;
         }
     }
 
@@ -742,6 +755,10 @@ TEST_P(AtomicOpTestsuite_float, AtomicOpVfCallTestCase_float)
             expectValue = expectValue > value ? expectValue : value;
         } else if (mode == 4) {
             expectValue = expectValue < value ? expectValue : value;
+        } else if (mode == 2) {
+            expectValue = value;
+        } else if (mode == 7) {
+            expectValue = expectValue == compare ? value : expectValue;
         }
     }
 
