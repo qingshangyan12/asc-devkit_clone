@@ -69,6 +69,10 @@
         <path value="$(TARGET_ENV)/lib64/plugin/asc"/>
         <path value="$(TARGET_ENV)/lib64/device"/>
         <path value="$(TARGET_ENV)/lib64/device/lib64"/>
+        <path value="$(TARGET_ENV)/devlib"/>
+        <path value="$(TARGET_ENV)/devlib/linux"/>
+        <path value="$(TARGET_ENV)/devlib/linux/x86_64"/>
+        <path value="$(TARGET_ENV)/devlib/linux/aarch64"/>
     </dir_info>
     <file_info copy_type="delivery" src_path="asc-devkit" dst_path="asc-devkit" install_path="share/info/asc-devkit" install_type="all">
         <file value="script" install_mod="550" entity="true"/>
@@ -126,6 +130,14 @@
 
     <file_info value="tikcpp_tiling_libs" copy_type="delivery" src_path="lib/host/tiling" dst_path="$(TARGET_ENV)/lib64" install_path="$(TARGET_ENV)/lib64" install_type="all" install_mod="440" feature="ascendc">
         <file value="libtiling_api.a" file_type="static" pkg_feature="filter_as31xm1_device"/>
+    </file_info>
+
+    <file_info value="devlib_tiling_libs" copy_type="delivery" src_path="" dst_path="$(TARGET_ENV)/devlib/x86_64" install_path="$(TARGET_ENV)/devlib/linux/x86_64" install_type="all" install_mod="440" feature="ascendc">
+        <file value="libtiling_api.a" file_type="static" pkg_feature="filter_as31xm1_device" optional="true"/>
+    </file_info>
+
+    <file_info value="devlib_tiling_libs" copy_type="delivery" src_path="" dst_path="$(TARGET_ENV)/devlib/aarch64" install_path="$(TARGET_ENV)/devlib/linux/aarch64" install_type="all" install_mod="440" feature="ascendc">
+        <file value="libtiling_api.a" file_type="static" pkg_feature="filter_as31xm1_device" optional="true"/>
     </file_info>
 
     <file_info value="device_tiling" copy_type="delivery" src_path="" dst_path="$(TARGET_ENV)/lib64/device/lib64" install_path="$(TARGET_ENV)/lib64/device/lib64" install_type="all" install_mod="440" feature="ascendc">
