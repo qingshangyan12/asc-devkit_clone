@@ -12,6 +12,7 @@
 set -e
 
 test_one_targets=(
+  tikcpp_utest_compile_trace_log
   tikcpp_utest_ascend910
   tikcpp_utest_ascend610
   tikcpp_utest_ascend310p
