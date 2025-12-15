@@ -24,6 +24,7 @@
 #include "clear_nthbit_impl/asc_2201/clear_nthbit_impl.h"
 #include "vadd_impl/asc_2201/add_impl.h"
 #include "vadds_impl/asc_2201/add_scalar_impl.h"
+#include "vbitsort_impl/npu_arch_2201/bitsort_impl.h"
 #include "vbrcb_impl/asc_2201/brcb_impl.h"
 #include "vcadd_impl/asc_2201/repeat_reduce_sum_impl.h"
 #include "vcgadd_impl/asc_2201/data_block_reduce_sum_impl.h"
@@ -37,6 +38,8 @@
 #include "vconv_c_api_impl/vconv_float2float_impl/asc_2201/float2float_impl.h"
 #include "vconv_c_api_impl/vconv_float2bf16_impl/asc_2201/float2bf16_impl.h"
 #include "vconv_c_api_impl/vconv_float2half_impl/asc_2201/float2half_impl.h"
+#include "vconv_c_api_impl/vconv_float2int32_impl/npu_arch_2201/float2int32_impl.h"
+#include "vconv_c_api_impl/vconv_float2int64_impl/npu_arch_2201/float2int64_impl.h"
 #include "vconv_c_api_impl/vconv_half2float_impl/asc_2201/half2float_impl.h"
 #include "vconv_c_api_impl/vconv_half2int4_impl/asc_2201/half2int4_impl.h"
 #include "vconv_c_api_impl/vconv_half2int8_impl/asc_2201/asc_half2int8_impl.h"
@@ -55,11 +58,15 @@
 #include "vdiv_impl/asc_2201/div_impl.h"
 #include "vector_dup_impl/asc_2201/duplicate_impl.h"
 #include "vexp_impl/asc_2201/exp_impl.h"
+#include "vgt_scalar_impl/npu_arch_2201/gt_scalar_impl.h"
+#include "vlog_impl/npu_arch_2201/log_impl.h"
 #include "vmax_impl/asc_2201/max_impl.h"
 #include "vmaxs_impl/asc_2201/max_scalar_impl.h"
 #include "vmin_impl/asc_2201/min_impl.h"
+#include "vmul_add_dst_impl/npu_arch_2201/mul_add_dst_impl.h"
 #include "vmul_impl/asc_2201/mul_impl.h"
 #include "vmuls_impl/asc_2201/mul_scalar_impl.h"
+#include "vor_impl/npu_arch_2201/or_impl.h"
 #include "vrelu_impl/asc_2201/asc_relu_impl.h"
 #include "vsel_impl/asc_2201/select_impl.h"
 #include "vsub_impl/asc_2201/sub_impl.h"
@@ -246,6 +253,37 @@ __aicore__ inline void asc_add_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* s
 __aicore__ inline void asc_add_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t a, uint32_t count)
 {
     CApiInternal::asc_add_scalar_sync_impl<int32_t>(dst, src, a, count);
+}
+
+// ==========asc_bitsort(half/float)==========
+__aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, uint32_t count)
+{
+    CApiInternal::asc_bitsort_impl<half>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, const asc_binary_config& config)
+{
+    CApiInternal::asc_bitsort_impl<half>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_bitsort_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, const asc_binary_config& config)
+{
+    CApiInternal::asc_bitsort_sync_impl<half>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, uint32_t count)
+{
+    CApiInternal::asc_bitsort_impl<float>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, const asc_binary_config& config)
+{
+    CApiInternal::asc_bitsort_impl<float>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_bitsort_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, const asc_binary_config& config)
+{
+    CApiInternal::asc_bitsort_sync_impl<float>(dst, src0, src1, config);
 }
 
 // ==========asc_brcb(uint16_t/uint32_t)==========
@@ -852,6 +890,158 @@ __aicore__ inline void asc_float2half_o_sync(__ubuf__ half* dst, __ubuf__ float*
     CApiInternal::asc_float2half_o_sync_impl<half, float>(dst, src, count);
 }
 
+// ==========asc_float2int32==========
+__aicore__ inline void asc_float2int32_a(__ubuf__ int32_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int32_a_impl<int32_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int32_a(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_a_impl<int32_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int32_a_sync(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_a_sync_impl<int32_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int32_c(__ubuf__ int32_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int32_c_impl<int32_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int32_c(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_c_impl<int32_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int32_c_sync(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_c_sync_impl<int32_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int32_f(__ubuf__ int32_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int32_f_impl<int32_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int32_f(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_f_impl<int32_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int32_f_sync(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_f_sync_impl<int32_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int32_r(__ubuf__ int32_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int32_r_impl<int32_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int32_r(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_r_impl<int32_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int32_r_sync(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_r_sync_impl<int32_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int32_z(__ubuf__ int32_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int32_z_impl<int32_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int32_z(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_z_impl<int32_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int32_z_sync(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int32_z_sync_impl<int32_t, float>(dst, src, count);
+}
+
+// ==========asc_float2int64==========
+__aicore__ inline void asc_float2int64_a(__ubuf__ int64_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int64_a_impl<int64_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int64_a(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_a_impl<int64_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int64_a_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_a_sync_impl<int64_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int64_c(__ubuf__ int64_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int64_c_impl<int64_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int64_c(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_c_impl<int64_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int64_c_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_c_sync_impl<int64_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int64_f(__ubuf__ int64_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int64_f_impl<int64_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int64_f(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_f_impl<int64_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int64_f_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_f_sync_impl<int64_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int64_r(__ubuf__ int64_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int64_r_impl<int64_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int64_r(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_r_impl<int64_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int64_r_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_r_sync_impl<int64_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int64_z(__ubuf__ int64_t* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_float2int64_z_impl<int64_t, float>(dst, src, config);
+}
+
+__aicore__ inline void asc_float2int64_z(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_z_impl<int64_t, float>(dst, src, count);
+}
+
+__aicore__ inline void asc_float2int64_z_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_float2int64_z_sync_impl<int64_t, float>(dst, src, count);
+}
+
 // ==========asc_half2float==========
 __aicore__ inline void asc_half2float(__ubuf__ float* dst, __ubuf__ half* src, const asc_unary_config& config)
 {
@@ -1370,6 +1560,58 @@ __aicore__ inline void asc_exp_sync(__ubuf__ float* dst, __ubuf__ float* src, ui
     CApiInternal::asc_exp_sync_impl<float>(dst, src, count);
 }
 
+// ==========asc_gt_scalar(dst:uint8_t, src:half/float)==========
+__aicore__ inline void asc_gt_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half src1, const asc_unary_config& config)
+{
+    CApiInternal::asc_gt_scalar_impl<half>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_gt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half src1, const asc_unary_config &config)
+{
+    CApiInternal::asc_gt_scalar_sync_impl<half>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_gt_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float src1, const asc_unary_config& config)
+{
+    CApiInternal::asc_gt_scalar_impl<float>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_gt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float src1, const asc_unary_config &config)
+{
+    CApiInternal::asc_gt_scalar_sync_impl<float>(dst, src0, src1, config);
+}
+
+// ==========asc_log(half/float)==========
+__aicore__ inline void asc_log(__ubuf__ half* dst, __ubuf__ half* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_log_impl<half> (dst, src, config);
+}
+
+__aicore__ inline void asc_log(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+{
+    CApiInternal::asc_log_impl<half> (dst, src, count);
+}
+
+__aicore__ inline void asc_log_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+{
+    CApiInternal::asc_log_sync_impl<half>(dst, src, count);
+}
+
+__aicore__ inline void asc_log(__ubuf__ float* dst, __ubuf__ float* src, const asc_unary_config& config)
+{
+    CApiInternal::asc_log_impl<float> (dst, src, config);
+}
+
+__aicore__ inline void asc_log(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_log_impl<float> (dst, src, count);
+}
+
+__aicore__ inline void asc_log_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
+{
+    CApiInternal::asc_log_sync_impl<float>(dst, src, count);
+}
+
 // ==========asc_relu(half/float/int32_t)==========
 __aicore__ inline void asc_relu(__ubuf__ half* dst, __ubuf__ half* src, const asc_unary_config& config)
 {
@@ -1597,6 +1839,52 @@ __aicore__ inline void asc_min(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __
 __aicore__ inline void asc_min_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count)
 {
     CApiInternal::asc_min_sync_impl<int32_t>(dst, src0, src1, count);
+}
+
+// ==========asc_mul_add_dst(half/float)==========
+__aicore__ inline void asc_mul_add_dst(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+{
+    CApiInternal::asc_mul_add_dst_impl<half, half>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_mul_add_dst(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, const asc_binary_config& config)
+{
+    CApiInternal::asc_mul_add_dst_impl<half, half>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_mul_add_dst_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+{
+    CApiInternal::asc_mul_add_dst_sync_impl<half, half>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_mul_add_dst(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+{
+    CApiInternal::asc_mul_add_dst_impl<float, float>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_mul_add_dst(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, const asc_binary_config& config)
+{
+    CApiInternal::asc_mul_add_dst_impl<float, float>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_mul_add_dst_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+{
+    CApiInternal::asc_mul_add_dst_sync_impl<float, float>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_mul_add_dst(__ubuf__ float* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+{
+    CApiInternal::asc_mul_add_dst_impl<float, half>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_mul_add_dst(__ubuf__ float* dst, __ubuf__ half* src0, __ubuf__ half* src1, const asc_binary_config& config)
+{
+    CApiInternal::asc_mul_add_dst_impl<float, half>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_mul_add_dst_sync(__ubuf__ float* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+{
+    CApiInternal::asc_mul_add_dst_sync_impl<float, half>(dst, src0, src1, count);
 }
 
 // ==========asc_mul(half/float/int16_t/int32_t)==========
@@ -2110,4 +2398,34 @@ __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint1
     CApiInternal::asc_transpose_sync_impl<uint16_t>(dst, src);
 }
 
+// ==========asc_or(int16_t/uint16_t)==========
+__aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    CApiInternal::asc_or_impl<int16_t>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, const asc_binary_config& config)
+{
+    CApiInternal::asc_or_impl<int16_t>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_or_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    CApiInternal::asc_or_sync_impl<int16_t>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_or(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
+{
+    CApiInternal::asc_or_impl<uint16_t>(dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_or(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, const asc_binary_config& config)
+{
+    CApiInternal::asc_or_impl<uint16_t>(dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_or_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
+{
+    CApiInternal::asc_or_sync_impl<uint16_t>(dst, src0, src1, count);
+}
 #endif

@@ -127,6 +127,18 @@ TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Hf, asc_float2half_f, vconv_f322f16f, half,
 TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Hc, asc_float2half_c, vconv_f322f16c, half, float);
 TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Hz, asc_float2half_z, vconv_f322f16z, half, float);
 TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Ho, asc_float2half_o, vconv_f322f16o, half, float);
+// ==========asc_float2int32(a/c/f/r/z)==========
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32a, asc_float2int32_a, vconv_f322s32a, int32_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32c, asc_float2int32_c, vconv_f322s32c, int32_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32f, asc_float2int32_f, vconv_f322s32f, int32_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32r, asc_float2int32_r, vconv_f322s32r, int32_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32z, asc_float2int32_z, vconv_f322s32z, int32_t, float);
+// ==========asc_float2int64(a/c/f/r/z)==========
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64a, asc_float2int64_a, vconv_f322s64a, int64_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64c, asc_float2int64_c, vconv_f322s64c, int64_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64f, asc_float2int64_f, vconv_f322s64f, int64_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64r, asc_float2int64_r, vconv_f322s64r, int64_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64z, asc_float2int64_z, vconv_f322s64z, int64_t, float);
 // ==========asc_half2float(NA)==========
 TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2F, asc_half2float, vconv_f162f32, float, half);
 // ==========asc_half2int4(NA/a/c/f/r/z)==========
