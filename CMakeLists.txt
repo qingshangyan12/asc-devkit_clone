@@ -17,7 +17,7 @@ if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   message(STATUS "compile project asc-devkit with library")
   option(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG "Build asc-devkit with cann pkg" ON)
 else()
-  message(STATUS "compile project asc-devkit with src")
+  message(STATUS "compile project asc-devkit with src") 
   option(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG "Build asc-devkit with cann source" OFF)
 endif()
 
