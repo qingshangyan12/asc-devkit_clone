@@ -119,3 +119,7 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
 // ========== asc_vdeq_int162b8_h==========
 TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8h_int8, asc_vdeq_int162b8_h, vconv_vdeqs162b8h, int8_t, int16_t);
 TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8h_uint8, asc_vdeq_int162b8_h, vconv_vdeqs162b8h, uint8_t, int16_t);
+
+// ========== asc_vdeq_int162b8_l==========
+TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8l_int8, asc_vdeq_int162b8l, vconv_vdeqs162b8l, int8_t, int16_t);
+TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8l_uint8, asc_vdeq_int162b8l, vconv_vdeqs162b8l, uint8_t, int16_t);

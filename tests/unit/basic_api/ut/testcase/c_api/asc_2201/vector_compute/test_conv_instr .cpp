@@ -177,3 +177,9 @@ TEST_VECTOR_COMPUTE_CONV_INSTR(AscI322Ff, asc_int322float_f, vconv_s322f32f, flo
 TEST_VECTOR_COMPUTE_CONV_INSTR(AscI322Fr, asc_int322float_r, vconv_s322f32r, float, int32_t);
 // ==========asc_int322float_z==========
 TEST_VECTOR_COMPUTE_CONV_INSTR(AscI322Fz, asc_int322float_z, vconv_s322f32z, float, int32_t);
+// ==========asc_int642float32(a/c/f/r/z)==========
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Fa, asc_int642float_a, vconv_s642f32a, float, int64_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Fc, asc_int642float_c, vconv_s642f32c, float, int64_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Ff, asc_int642float_f, vconv_s642f32f, float, int64_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Fr, asc_int642float_r, vconv_s642f32r, float, int64_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Fz, asc_int642float_z, vconv_s642f32z, float, int64_t);
