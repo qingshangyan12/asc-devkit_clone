@@ -14,7 +14,7 @@
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -36,5 +36,12 @@
   ```
   执行结果如下，说明执行成功。
   ```bash
-  Hello World!!!
+  [Block (0/8)]: Hello World!!!
+  [Block (1/8)]: Hello World!!!
+  [Block (2/8)]: Hello World!!!
+  [Block (3/8)]: Hello World!!!
+  [Block (4/8)]: Hello World!!!
+  [Block (5/8)]: Hello World!!!
+  [Block (6/8)]: Hello World!!!
+  [Block (7/8)]: Hello World!!!
   ```
