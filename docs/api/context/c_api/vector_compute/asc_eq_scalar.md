@@ -58,9 +58,9 @@ PIPE_TYPE_V
 // total_length指参与计算的数据长度
 uint64_t total_length = 128;
 uint64_t offset = 0;
-half scalar_val = 1;
 __ubuf__ half* src = src[offset];
+half value = 1;
 offset += total_length * sizeof(half);
 __ubuf__ half* dst = dst[offset];
-asc_eq_scalar(dst, src, scalar_val, config);
+asc_eq_scalar(dst, src, value, config);
 ```

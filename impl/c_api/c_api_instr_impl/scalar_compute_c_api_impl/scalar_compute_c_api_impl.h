@@ -14,10 +14,16 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 #include "ffs_impl/npu_arch_2201/ffs_impl.h"
+#include "sflbits_impl/npu_arch_2201/asc_sflbits_impl.h"
 
 __aicore__ inline int64_t asc_ffs(uint64_t in)
 {
     return CApiInternal::asc_ffs_impl(in);
+}
+
+__aicore__ inline int64_t asc_sflbits(int64_t value)
+{
+    return CApiInternal::asc_sflbits_impl(value);
 }
 
 #endif
