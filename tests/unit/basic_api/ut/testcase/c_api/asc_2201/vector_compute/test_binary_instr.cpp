@@ -157,3 +157,6 @@ TEST_VECTOR_COMPUTE_BINARY_INSTR(Min, asc_min, vmin, float);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Min, asc_min, vmin, int16_t);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Min, asc_min, vmin, int32_t);
 
+// ==========asc_or(int16_t/uint16_t)==========
+TEST_VECTOR_COMPUTE_BINARY_INSTR(Or, asc_or, vor, int16_t);
+TEST_VECTOR_COMPUTE_BINARY_INSTR(Or, asc_or, vor, uint16_t);

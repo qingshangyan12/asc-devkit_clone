@@ -13,5 +13,11 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_SCALAR_COMPUTE_C_API_IMPL_SCALAR_COMPUTE_C_API_IMPL_H
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "ffs_impl/npu_arch_2201/ffs_impl.h"
+
+__aicore__ inline int64_t asc_ffs(uint64_t in)
+{
+    return CApiInternal::asc_ffs_impl(in);
+}
 
 #endif

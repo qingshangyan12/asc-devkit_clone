@@ -116,6 +116,8 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIV_CAPI_CASE_SRC_FILES
     ${LOCAL_DIR}/testcase/c_api/asc_2201/sys_var/*.cpp
     ${LOCAL_DIR}/testcase/c_api/asc_2201/vector_compute/*.cpp
     ${LOCAL_DIR}/testcase/c_api/asc_2201/vector_datamove/*.cpp
+    ${LOCAL_DIR}/testcase/c_api/asc_2201/scalar_compute/*.cpp
+    ${LOCAL_DIR}/testcase/c_api/asc_2201/cache_ctrl/*.cpp
 )
 
 # ascend910B1 aiv test cases

@@ -12,9 +12,15 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_ATOMIC_C_API_IMPL_H
 
 #include "set_atomic_min_impl/asc_2201/asc_set_atomic_min_impl.h"
+#include "set_atomic_s8_impl/npu_arch_2201/set_atomic_s8_impl.h"
 
 __aicore__ inline void asc_set_atomic_min()
 {
     CApiInternal::asc_set_atomic_min_impl();
+}
+
+__aicore__ inline void asc_set_atomic_s8()
+{
+    CApiInternal::asc_set_atomic_s8_impl();
 }
 #endif

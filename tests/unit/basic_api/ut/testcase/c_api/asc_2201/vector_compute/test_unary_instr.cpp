@@ -119,3 +119,7 @@ TEST_VECTOR_COMPUTE_UNARY_INSTR(Exp, asc_exp, vexp, float);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Relu, asc_relu, vrelu, half);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Relu, asc_relu, vrelu, float);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Relu, asc_relu, vrelu, int32_t);
+
+// ==========asc_log(half/float)==========
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Log, asc_log, vln, half);
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Log, asc_log, vln, float);
