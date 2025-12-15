@@ -104,17 +104,17 @@ class LogUtil:
     def print_compile_log(kernel_name: str, msg_info: str, log_level: AscendCLogLevel, option: Option = Option.DEFAULT):
         default_log_level = AscendCLogLevel.LOG_WARNING.value
         plog_switch = os.environ.get("ASCEND_SLOG_PRINT_TO_STDOUT")
-        if plog_switch is None and log_level.value < default_log_level:
-            return
-        if plog_switch is not None and int(plog_switch) == 0 and log_level.value < default_log_level:
-            return
         plog_level = os.environ.get("ASCEND_GLOBAL_LOG_LEVEL")
         if plog_level is None and log_level.value < default_log_level:
             return
         if plog_level is not None and log_level.value < int(plog_level):
             return
-        LogUtil.log_print(kernel_name, msg_info, log_level, option)
         LogUtil.plog_print(kernel_name, msg_info, log_level, option)
+        if plog_switch is None and log_level.value < default_log_level:
+            return
+        if plog_switch is not None and int(plog_switch) == 0 and log_level.value < default_log_level:
+            return
+        LogUtil.log_print(kernel_name, msg_info, log_level, option)
         return
 
     # print log without level judge
