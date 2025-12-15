@@ -15,16 +15,16 @@
 #ifndef ASCENDC_MODULE_SIMT_C_COMMON_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_SIMT_C_COMMON_INTERFACE_IMPL_H
 
-#include "simt_api/dav_c310/kernel_simt_impl.h"
+#include "simt_api/dav_c310/simt_common_impl.h"
 
 __simt_callee__ inline int32_t asc_get_block_idx()
 {
-    return AscendC::Simt::GetBlockIdxImpl();
+    return asc_get_block_idx_impl();
 }
 
 __simt_callee__ inline int32_t asc_get_block_num()
 {
-    return AscendC::Simt::GetBlockNumImpl();
+    return asc_get_block_num_impl();
 }
 
 #endif  // ASCENDC_MODULE_SIMT_C_COMMON_INTERFACE_IMPL_H
