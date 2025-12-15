@@ -29,7 +29,7 @@ from asc_op_compile_base.common.buildcfg import get_current_build_config
 from asc_op_compile_base.common.platform.platform_info import get_soc_spec, set_soc_spec
 from asc_op_compile_base.common.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from asc_op_compile_base.common.context import get_context
-from .get_op_tiling import TilingInfo, OpInfo
+from .get_op_tiling import TilingInfo, OpInfo, get_tiling_info_by_tiling
 from asc_op_compile_base.common.utils.log_utils import LogUtil, AscendCLogLevel, CompileStage, COMPILE_STAGE_MSG_INFO
 from .global_storage import global_var_storage
 from .ascendc_constants import InferChannelParamsFromIFile, InferChannelParams, KernelMetaType, \
@@ -980,8 +980,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         COMPILE_STAGE_MSG_INFO["generate_tiling_start"],
         AscendCLogLevel.LOG_INFO
     )
-    tiling_info: TilingInfo = CommonUtility.get_tiling_info_by_tiling(
-                                op_info, infered_info_from_ifile, value_depend_dict)
+    tiling_info: TilingInfo = get_tiling_info_by_tiling(
+        op_info, infered_info_from_ifile, value_depend_dict, origin_func_name)
 
     CommonUtility.print_compile_log(op_info.kernel_name, "get tiling info success", AscendCLogLevel.LOG_INFO)
 
