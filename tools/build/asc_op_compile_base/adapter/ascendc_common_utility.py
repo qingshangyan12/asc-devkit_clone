@@ -24,7 +24,6 @@ from tbe.tvm.contrib.ccec import _build_aicore_compile_cmd, switching_compilatio
 from tbe.common.buildcfg import get_current_build_config
 from tbe.tvm.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from tbe.common.utils.op_tiling import tiling_so_arch_path
-from .get_op_tiling import get_tiling_info, OpInfo, get_tiling_info_v2
 from .log_utils import LogUtil, AscendCLogLevel, CompileStage
 from .global_storage import global_var_storage
 from .ascendc_constants import CORE_TYPE_MIX, KernelMetaType, InferChannelParamsFromIFile,\
@@ -652,20 +651,6 @@ format(str(stage), output))
         hex_num_str_list = list(map(reverser_hex_str, hex_num[::-1]))
         hex_num_str = ''.join(hex_num_str_list)
         return hex_num_str
-
-    @staticmethod
-    def get_tiling_info_by_tiling(op_info: OpInfo, infered_info_from_ifile, value_depends: dict):
-        CommonUtility.print_compile_log(op_info.kernel_name, "get tiling info...", AscendCLogLevel.LOG_INFO)
-        # temp enable avoid
-        enable_vd = CommonUtility.is_c310()
-        if infered_info_from_ifile.default_tiling_struct != "" or global_var_storage.get_variable(\
-            "ascendc_tiling_no_register"):
-            return get_tiling_info_v2(op_info, infered_info_from_ifile.tiling_key_list,
-                                      infered_info_from_ifile.default_tiling_struct,
-                                      infered_info_from_ifile.tiling_key_struct_map, value_depends, enable_vd)
-        else:
-            return get_tiling_info(op_info, infered_info_from_ifile.tiling_key_list, value_depends, \
-                                   enable_vd, infered_info_from_ifile.tiling_key_group_map)
 
 
 def is_enable_sanitizer(compile_options):
