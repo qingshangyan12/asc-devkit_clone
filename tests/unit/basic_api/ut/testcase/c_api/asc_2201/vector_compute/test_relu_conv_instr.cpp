@@ -62,7 +62,7 @@ void cce_name##_set_vector_mask_Stub(uint64_t mask1, uint64_t mask0)            
                                                                                                 \
 TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_half_half_half_BinaryConfig_Succ) \
 {                                                                                               \
-    __ubuf__ dst_data_type *real_dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
+    __ubuf__ dst_data_type *dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
     __ubuf__ src_data_type *src0 = reinterpret_cast<__ubuf__ src_data_type *>(22);                      \
     __ubuf__ src_data_type *src1 = reinterpret_cast<__ubuf__ src_data_type *>(33);                      \
                                                                                                 \
@@ -81,13 +81,13 @@ TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_half_half_half
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_bool_Stub));   \
                                                                                                 \
-    c_api_name(reinterpret_cast<__ubuf__ src_data_type*>(real_dst), src0, src1, config);                                                        \
+    c_api_name(dst, src0, src1, config);                                                        \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
 TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_half_half_half_int32_t_Succ)      \
 {                                                                                               \
-    __ubuf__ dst_data_type *real_dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
+    __ubuf__ dst_data_type *dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
     __ubuf__ src_data_type *src0 = reinterpret_cast<__ubuf__ src_data_type *>(22);                      \
     __ubuf__ src_data_type *src1 = reinterpret_cast<__ubuf__ src_data_type *>(33);                      \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
@@ -101,13 +101,13 @@ TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_half_half_half
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_uint64_t_bool_Stub));  \
                                                                                                 \
-    c_api_name(reinterpret_cast<__ubuf__ src_data_type*>(real_dst), src0, src1, count);                                                         \
+    c_api_name(dst, src0, src1, count);                                                         \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
 TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_sync_half_half_half_int32_t_Succ) \
 {                                                                                               \
-    __ubuf__ dst_data_type *real_dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
+    __ubuf__ dst_data_type *dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
     __ubuf__ src_data_type *src0 = reinterpret_cast<__ubuf__ src_data_type *>(22);                      \
     __ubuf__ src_data_type *src1 = reinterpret_cast<__ubuf__ src_data_type *>(33);                      \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
@@ -120,7 +120,7 @@ TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_sync_half_half
                 uint8_t, uint8_t, uint8_t, bool))                                                     \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_uint64_t_bool_Stub));  \
-    c_api_name##_sync(reinterpret_cast<__ubuf__ src_data_type*>(real_dst), src0, src1, count);                                                  \
+    c_api_name##_sync(dst, src0, src1, count);                                                  \
     GlobalMockObject::verify();                                                                 \
 }
 

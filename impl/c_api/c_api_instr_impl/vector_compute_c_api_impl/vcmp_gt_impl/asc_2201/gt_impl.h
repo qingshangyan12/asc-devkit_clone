@@ -29,16 +29,8 @@ __aicore__ inline void gt_impl(__ubuf__ T* src0, __ubuf__ T* src1, const asc_bin
 }
 
 template <typename T>
-__aicore__ inline void gt_sync_impl(__ubuf__ T* src0, __ubuf__ T* src1, uint32_t count)
+__aicore__ inline void gt_sync_impl(__ubuf__ T* src0, __ubuf__ T* src1, const asc_binary_config& config)
 {
-    asc_binary_config config;
-    config.dst_block_stride = 1;
-    config.src0_block_stride = 1;
-    config.src1_block_stride = 1;
-    config.dst_repeat_stride = 8;
-    config.src0_repeat_stride = 8;
-    config.src1_repeat_stride = 8;
-    config.repeat = 1;
     gt_impl<T>(src0, src1, config);
     pipe_barrier(pipe_t::PIPE_ALL);
 }
@@ -53,16 +45,8 @@ __aicore__ inline void gt_impl(__ubuf__ uint8_t* dst, __ubuf__ T* src0, __ubuf__
 }
 
 template <typename T>
-__aicore__ inline void gt_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ T* src0, __ubuf__ T* src1, uint32_t count)
+__aicore__ inline void gt_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ T* src0, __ubuf__ T* src1, const asc_binary_config& config)
 {
-    asc_binary_config config;
-    config.dst_block_stride = 1;
-    config.src0_block_stride = 1;
-    config.src1_block_stride = 1;
-    config.dst_repeat_stride = 8;
-    config.src0_repeat_stride = 8;
-    config.src1_repeat_stride = 8;
-    config.repeat = 1;
     gt_impl<T>(dst, src0, src1, config);
     pipe_barrier(pipe_t::PIPE_ALL);
 }
