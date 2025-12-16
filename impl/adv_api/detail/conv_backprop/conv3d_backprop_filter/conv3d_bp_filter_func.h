@@ -678,5 +678,6 @@ struct End {
         }
     }
 };
+
 }  // namespace ConvBackpropFilterFunc
 #endif // CONV3D_BP_FILTER_FUNC_H

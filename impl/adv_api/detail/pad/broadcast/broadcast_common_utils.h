@@ -19,6 +19,7 @@
 #include "kernel_operator_intf.h"
 
 namespace AscendC {
+
 constexpr uint32_t ONE_VOR_BLOCK_DIM = 8;
 constexpr uint32_t ELEMENT_NUM_FOR_UINT16 = 16;
 constexpr int32_t FLOAT_ELEMENT_NUM = 2;
