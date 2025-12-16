@@ -18,12 +18,12 @@
 <td align="center">DataCopy接口不支持L1 Buffer到GM的通路。用户在cube only场景下，可以在GM多分配一个单位矩阵，通过Mmad矩阵乘法计算输出到L0C Buffer，再从L0C Buffer通过Fixpipe搬运到GM。</td>
 </tr>
 <tr>
-<td rowspan="2" align="center"><a href="./inits_const_value/">L0A Buffer/L0B Buffer初始化</a></td>
-<td align="center"><a href="./inits_const_value/910B/">910B</a></td>
+<td rowspan="2" align="center"><a href="./init_const_value/">L0A Buffer/L0B Buffer初始化</a></td>
+<td align="center"><a href="./init_const_value/910B/">910B</a></td>
 <td align="center">直接使用基础API InitConstValue对L0A Buffer和L0B Buffer进行初始化</td>
 </tr>
 <tr>
-<td align="center"><a href="./inits_const_value/950/">950</a></td>
+<td align="center"><a href="./init_const_value/950/">950</a></td>
 <td align="center">新架构版本删除L0A Buffer/L0B Buffer初始化的相关硬件指令。用户可以通过先初始化L1 Buffer，再通过LoadData接口将L1 Buffer上的数据搬运到L0A Buffer/L0B Buffer。</td>
 </tr>
 <td rowspan="2" align="center"><a href="./matmul_s4/">int4b_t数据类型的矩阵计算</a></td>

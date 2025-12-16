@@ -5,7 +5,7 @@ L0A Buffer和L0B Buffer初始化值的端到端用例。
 - Ascend 910B
 ## 目录结构介绍
 ```
-├── inits_const_value
+├── init_const_value
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
