@@ -9,7 +9,7 @@
 
 ### 功能说明
 
-src0中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst上的对应比特位为1，否则为0。
+src中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst上的对应比特位为1，否则为0。
 
 ### 函数原型
 
@@ -54,8 +54,12 @@ PIPE_TYPE_V
 ### 调用示例
 
 ```cpp
-__ubuf__ uint8_t dst[256 * sizeof(uint8_t)];
-__ubuf__ half src0[256 * sizeof(half)];
+// total_length指参与计算的数据长度
+uint64_t total_length = 128;
+uint64_t offset = 0;
+__ubuf__ half* src = src[offset];
 half value = 1;
-asc_gt_scalar(dst, src0, value, 256);
+offset += total_length * sizeof(half);
+__ubuf__ half* dst = dst[offset];
+asc_ne_scalar(dst, src, value, config);
 ```

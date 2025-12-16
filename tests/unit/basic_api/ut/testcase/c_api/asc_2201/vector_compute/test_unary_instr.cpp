@@ -135,3 +135,6 @@ TEST_VECTOR_COMPUTE_UNARY_INSTR(Rcp, asc_rcp, vrec, float);
 // ==========asc_not(int16_t/uint16_t)==========
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Not, asc_not, vnot, int16_t);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Not, asc_not, vnot, uint16_t);
+// ==========asc_sqrt(half/float)==========
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Sqrt, asc_sqrt, vsqrt, half);
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Sqrt, asc_sqrt, vsqrt, float);

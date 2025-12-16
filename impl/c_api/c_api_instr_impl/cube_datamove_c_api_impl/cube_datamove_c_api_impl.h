@@ -20,5 +20,17 @@
 #include "set_nd_para_impl/asc_2201/set_nd_para_impl.h"
 #include "set_padding_impl/asc_2201/set_padding_impl.h"
 #include "set_quant_pre_impl/asc_2201/set_quant_pre_impl.h"
- 
+#include "set_mm_layout_transform_impl/asc_2201/set_mm_layout_transform_impl.h"
+#include "set_l3d_rpt_impl/asc_2201/set_l3d_rpt_impl.h"
+
+__aicore__ inline void asc_set_mm_layout_transform(bool mmLayoutMode)
+{
+    CApiInternal::set_mm_layout_transform_impl(mmLayoutMode);
+}
+
+__aicore__ inline void asc_set_l1_3d_rpt(uint64_t value)
+{
+    CApiInternal::set_l1_3d_rpt_impl(value);
+}
+
 #endif
