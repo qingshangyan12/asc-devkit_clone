@@ -24,7 +24,6 @@
 #include "softmax_common/softmax_common_arithmetic.h"
 
 namespace AscendC {
-
 __aicore__ inline void CreateSpecialFormatMask(uint64_t& lowMask, const uint32_t& maskLen, const uint32_t& nzBlockCount,
     const uint32_t& totalLen = SOFTMAX_SHAPE_NZ_BASIC_COUNT)
 {
