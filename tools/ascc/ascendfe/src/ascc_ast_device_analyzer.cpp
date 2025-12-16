@@ -35,6 +35,8 @@ static const std::unordered_map<Ascc::ShortSoCVersion, const char*> FIND_KFC_DAV
     {Ascc::ShortSoCVersion::ASCEND310P, "__DAV_M200__"},
     {Ascc::ShortSoCVersion::ASCEND910, "__DAV_C100__"},
     {Ascc::ShortSoCVersion::ASCEND310B, "__DAV_M300__"},
+    {Ascc::ShortSoCVersion::KIRINX90, "__DAV_L300__"},
+    {Ascc::ShortSoCVersion::KIRIN9030, "__DAV_L311__"},
 };
 
 AsccAstDeviceAnalyzer::AsccAstDeviceAnalyzer(const std::string &source)

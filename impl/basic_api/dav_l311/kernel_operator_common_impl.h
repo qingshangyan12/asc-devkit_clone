@@ -262,43 +262,6 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 #endif
 }
 
-template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
-__aicore__ inline void SetNextTaskStartImpl()
-{
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetNextTaskStart!"); });
-}
-
-template<int8_t earlyStartConfig = -1>
-__aicore__ inline void WaitPreTaskEndImpl()
-{
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported WaitPreTaskEnd!"); });
-}
-
-template<bool isAIVOnly = true>
-__aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__ int32_t* ubWorkspaceAddr,
-    const int usedCores)
-{
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported software syncAll!"); });
-}
-
-template<bool isAIVOnly = true>
-__aicore__ inline void SyncAllImpl()
-{
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported hardware syncAll!"); });
-}
-
-template <uint8_t modeId, pipe_t pipe>
-__aicore__ inline void NotifyEventImpl(uint16_t flagId)
-{
-    ASCENDC_ASSERT((false), "NotifyEvent is not supported!");
-}
-
-template <uint8_t modeId, pipe_t pipe>
-__aicore__ inline void WaitEventImpl(uint16_t flagId)
-{
-    ASCENDC_ASSERT((false), "WaitEvent is not supported!");
-}
-
 template <atomic_type_t type, atomic_op_t op>
 __aicore__ inline void SetStoreAtomicConfigImpl()
 {
@@ -314,11 +277,6 @@ __aicore__ inline int64_t GetStoreAtomicConfigImpl()
 __aicore__ inline void GetStoreAtomicConfigImpl(uint16_t &atomicType, uint16_t &atomicOp)
 {
     ASCENDC_ASSERT((false), "GetStoreAtomicConfig is not supported!");
-}
-
-__aicore__ inline void SetSyncBaseAddrImpl(uint64_t config)
-{
-    ASCENDC_ASSERT((false), "SetSyncBaseAddr is not supported!");
 }
 
 template <typename T>

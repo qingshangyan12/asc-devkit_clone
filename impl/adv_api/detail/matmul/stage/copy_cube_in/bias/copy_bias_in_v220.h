@@ -72,7 +72,7 @@ public:
                     }
                 }
             }
-#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
             uint16_t stride = 4 / sizeof(BiasT);
             Nd2NzParams intriParams {static_cast<uint16_t>(dataLen), 1, 1, 1, 1, 1, 1, stride};
 #else

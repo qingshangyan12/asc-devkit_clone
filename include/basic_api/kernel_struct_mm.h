@@ -615,13 +615,6 @@ struct LoadData2dTransposeParamsV311Gen {
         qmode = 0;
     }
 
-#if __NPU_ARCH__ == 3113
-    __aicore__ LoadData2dTransposeParamsV311Gen(const uint16_t startIndexIn, const uint8_t repeatTimesIn,
-        const uint16_t srcStrideIn, const uint16_t dstGapIn, const uint16_t dstfracGapIn, const uint8_t addrModeIn)
-    {
-    }
-#endif
-
     __aicore__ LoadData2dTransposeParamsV311Gen(const uint32_t mStartPositionIn, const uint32_t kStartPositionIn,
         const uint16_t mStepIn, const uint16_t kStepIn, const uint32_t srcStrideIn, const uint16_t dstStrideIn,
         const bool ifTransposeIn, const uint8_t sidIn, const uint8_t qmodeIn)

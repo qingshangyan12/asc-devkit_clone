@@ -977,7 +977,7 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
     }
 #endif
     ReduceSumImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), count);
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3103) && defined(__DAV_L310__))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     ReduceSumImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), count);
 #else // other version

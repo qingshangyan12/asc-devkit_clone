@@ -88,6 +88,8 @@ enum class ShortSoCVersion : uint32_t {
     ASCEND310P = 1,
     ASCEND910 = 2,
     ASCEND310B = 3,
+    KIRINX90 = 4,
+    KIRIN9030 = 5,
     INVALID_TYPE = 0xffffffff
 };
 
@@ -105,13 +107,17 @@ inline const std::unordered_map<Ascc::ShortSoCVersion, const char*> CCE_AICORE_M
     {Ascc::ShortSoCVersion::ASCEND310P, "__CCE_AICORE__=200"},
     {Ascc::ShortSoCVersion::ASCEND910, "__CCE_AICORE__=100"},
     {Ascc::ShortSoCVersion::ASCEND310B, "__CCE_AICORE__=300"},
+    {Ascc::ShortSoCVersion::KIRINX90, "__CCE_AICORE__=300"},
+    {Ascc::ShortSoCVersion::KIRIN9030, "__CCE_AICORE__=311"},
 };
 
 inline const std::unordered_map<ShortSoCVersion, const char*> NPU_ARCH_MAP = {
     {ShortSoCVersion::ASCEND910B, "__NPU_ARCH__=2201"},
     {ShortSoCVersion::ASCEND310P, "__NPU_ARCH__=2002"},
-    {ShortSoCVersion::ASCEND910, "__NPU_ARCH__=1001"},
+    {ShortSoCVersion::ASCEND910, "__NPU_ARCH__=1001"},	
     {ShortSoCVersion::ASCEND310B, "__NPU_ARCH__=3002"},
+    {ShortSoCVersion::KIRINX90, "__NPU_ARCH__=3003"},
+    {ShortSoCVersion::KIRIN9030, "__NPU_ARCH__=3113"},
 };
 } // Ascc
 #endif // __INCLUDE_ASCC_TYPES_H__
