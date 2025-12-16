@@ -20,16 +20,16 @@
 namespace CApiInternal {
 
 template <typename T>
-__aicore__ void add_relu_cast_f322f16_impl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const asc_binary_config& config)
+__aicore__ void add_relu_cast_f322f16_impl(__ubuf__ half* dst, __ubuf__ T* src0, __ubuf__ T* src1, const asc_binary_config& config)
 {
-    vaddreluconv_f322f16(reinterpret_cast<__ubuf__ half*>(dst), src0, src1, static_cast<uint8_t>(config.repeat), static_cast<uint8_t>(config.dst_block_stride),
+    vaddreluconv_f322f16(dst, src0, src1, static_cast<uint8_t>(config.repeat), static_cast<uint8_t>(config.dst_block_stride),
          static_cast<uint8_t>(config.src0_block_stride), static_cast<uint8_t>(config.src1_block_stride),
          static_cast<uint8_t>(config.dst_repeat_stride), static_cast<uint8_t>(config.src0_repeat_stride),
          static_cast<uint8_t>(config.src1_repeat_stride), false);
 }
 
 template <typename T>
-__aicore__ void add_relu_cast_f322f16_impl(__ubuf__ T* dst,  __ubuf__ T* src0, __ubuf__ T* src1, uint32_t count)
+__aicore__ void add_relu_cast_f322f16_impl(__ubuf__ half* dst,  __ubuf__ T* src0, __ubuf__ T* src1, uint32_t count)
 {
     set_mask_count();
     set_vector_mask(static_cast<uint64_t>(0), static_cast<uint64_t>(count));
@@ -38,7 +38,7 @@ __aicore__ void add_relu_cast_f322f16_impl(__ubuf__ T* dst,  __ubuf__ T* src0, _
 }
 
 template <typename T>
-__aicore__ void add_relu_cast_f322f16_sync_impl(__ubuf__ T* dst,  __ubuf__ T* src0, __ubuf__ T* src1, uint32_t count)
+__aicore__ void add_relu_cast_f322f16_sync_impl(__ubuf__ half* dst,  __ubuf__ T* src0, __ubuf__ T* src1, uint32_t count)
 {
     add_relu_cast_f322f16_impl<T>(dst, src0, src1, count);
     pipe_barrier(pipe_t::PIPE_ALL);

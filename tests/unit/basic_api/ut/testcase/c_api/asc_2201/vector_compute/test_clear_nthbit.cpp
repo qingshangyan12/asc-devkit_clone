@@ -42,7 +42,7 @@ TEST_F(TestVectorComputeClearNthbit, clear_nthbit_Succ)
         .times(1)
         .will(invoke(clear_nthbit_Stub));
     
-    uint64_t result = asc_clear_nthbit_impl(bits, idx);
+    uint64_t result = asc_clear_nthbit(bits, idx);
     
     // EXPECT_EQ(expected, result);
     GlobalMockObject::verify();    

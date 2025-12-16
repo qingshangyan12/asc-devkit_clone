@@ -17,6 +17,8 @@ __aicore__ inline int64_t asc_get_acc_val_impl()
 {
 #if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
     return get_acc_val();
+#else
+    return 0;
 #endif
 }
 

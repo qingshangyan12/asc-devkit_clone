@@ -15,7 +15,11 @@ namespace CApiInternal {
 
 __aicore__ inline uint64_t clear_nthbit_impl(uint64_t bits, int64_t idx)
 {
-    sbitset0(bits, idx);
+#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
+    return sbitset0(bits, idx);
+#else
+    return 0;
+#endif
 }
 
 } // namespace CApiInternal
