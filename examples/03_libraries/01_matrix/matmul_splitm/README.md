@@ -42,9 +42,9 @@
  
   - kernel实现  
     关键步骤：  
-    1、使用Matmul API，关键配置如下：1）A矩阵和B矩阵同时使能IBShare参数，2）使用NORM模板，3）使用SplitM模板策略  
-    2、使用for循环搭配Iterate和GetTensorC接口，将每次Iterate的计算结果在矩阵的M方向一分为二后的数据分别获取到当前AIV核  
-    3、当前AIV核获取数据后进行处理，最后根据GetSubBlockIdx是0/1，将结果搬出到相应的GM
+    1、使用Matmul API，关键配置如下：1）A矩阵和B矩阵MatmulType的IBSHARE同时为true，2）使用NORM模板，3）使用SplitM模板策略。  
+    2、使用for循环搭配Iterate和GetTensorC接口，将每次Iterate的计算结果在矩阵的M方向一分为二后的数据分别获取到当前AIV核。  
+    3、当前AIV核获取数据后进行处理，最后根据GetSubBlockIdx是0/1，将结果搬出到相应的GM。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

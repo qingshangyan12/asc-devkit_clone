@@ -5,4 +5,5 @@
 ## 算子开发样例
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| [matmul_splitm](./matmul_splitm) | 本样例介绍Matmul API使用SplitM模板策略的核函数直调方法 |
+| [matmul_splitm](./matmul_splitm) | 本样例介绍Matmul API使用SplitM模板策略的场景 |
+| [matmul_vecout](./matmul_vecout) | 本样例介绍Matmul API输入矩阵为VECOUT的场景 |
