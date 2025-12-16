@@ -136,3 +136,7 @@ TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(MaxScalar, asc_max_scalar, vmaxs, half);
 TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(MaxScalar, asc_max_scalar, vmaxs, float);
 TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(MaxScalar, asc_max_scalar, vmaxs, int16_t);
 TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(MaxScalar, asc_max_scalar, vmaxs, int32_t);
+
+// ==========asc_axpy(half/float)==========
+TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(Axpy, asc_axpy, vaxpy, half);
+TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(Axpy, asc_axpy, vaxpy, float);

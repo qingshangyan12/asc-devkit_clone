@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 #define TEST_VECTOR_COMPUTE_VCMPVS_INSTR(class_name, c_api_name, cce_name, dst_type, src_type)  \
                                                                                                 \
@@ -93,3 +92,6 @@ TEST_VECTOR_COMPUTE_VCMPVS_INSTR(GtScalar, asc_gt_scalar, vcmpvs_gt, uint8_t, ha
 TEST_VECTOR_COMPUTE_VCMPVS_INSTR(EqScalar, asc_eq_scalar, vcmpvs_eq, uint8_t, half);
 TEST_VECTOR_COMPUTE_VCMPVS_INSTR(EqScalar, asc_eq_scalar, vcmpvs_eq, uint8_t, float);
 TEST_VECTOR_COMPUTE_VCMPVS_INSTR(EqScalar, asc_eq_scalar, vcmpvs_eq, uint8_t, int32_t);
+// ==========asc_ne_scalar(half/float)==========
+TEST_VECTOR_COMPUTE_VCMPVS_INSTR(VCMPVSNE, asc_ne_scalar, vcmpvs_ne, uint8_t, float);
+TEST_VECTOR_COMPUTE_VCMPVS_INSTR(VCMPVSNE, asc_ne_scalar, vcmpvs_ne, uint8_t, half);
