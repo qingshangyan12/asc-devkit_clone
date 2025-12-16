@@ -37,7 +37,7 @@ public:
     uint8_t msgRcvPos;
     uint8_t msgSendPos;  // Index used for circular queues. msgQueueHead = msgQueueStart + msgPos
     uint8_t eventID_;
-    uint8_t enableHardWare;
+    uint8_t enableHardWare; 
 
 public:
     __aicore__ inline KfcCommClient(GM_ADDR workspace, int subBlockID, uint8_t enableHardWare = 0)

@@ -17,7 +17,6 @@
 
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/activation/geglu/geglu_common_impl.h"
-
 namespace AscendC {
 #pragma begin_pipe(V)
 /* !
