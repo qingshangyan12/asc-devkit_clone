@@ -131,3 +131,7 @@ TEST_VECTOR_COMPUTE_UNARY_INSTR(Log, asc_log, vln, float);
 // ==========asc_rcp(half/float)==========
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Rcp, asc_rcp, vrec, half);
 TEST_VECTOR_COMPUTE_UNARY_INSTR(Rcp, asc_rcp, vrec, float);
+
+// ==========asc_not(int16_t/uint16_t)==========
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Not, asc_not, vnot, int16_t);
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Not, asc_not, vnot, uint16_t);

@@ -169,3 +169,11 @@ TEST_VECTOR_COMPUTE_BINARY_INSTR(AddRelu, asc_add_relu, vaddrelu, int16_t);
 // ==========asc_mul_add(half/float)==========
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Madd, asc_mul_add, vmadd, half);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Madd, asc_mul_add, vmadd, float);
+// ==========asc_mul_add_relu(half/float)==========
+TEST_VECTOR_COMPUTE_BINARY_INSTR(MulAddRelu, asc_mul_add_relu, vmaddrelu, half);
+TEST_VECTOR_COMPUTE_BINARY_INSTR(MulAddRelu, asc_mul_add_relu, vmaddrelu, float);
+
+// ==========asc_sub_relu(half/float/int16_t)==========
+TEST_VECTOR_COMPUTE_BINARY_INSTR(SubRelu, asc_sub_relu, vsubrelu, half);
+TEST_VECTOR_COMPUTE_BINARY_INSTR(SubRelu, asc_sub_relu, vsubrelu, float);
+TEST_VECTOR_COMPUTE_BINARY_INSTR(SubRelu, asc_sub_relu, vsubrelu, int16_t);
