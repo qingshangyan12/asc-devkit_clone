@@ -1409,21 +1409,23 @@ __simd_callee__ inline void MaxOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskR
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg1;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
+            RegTensor<ActualT, RegTraitNumTwo> traitTwoTmpReg;
             B64TraitOneToTaitTwo(traitTwoSrcReg0, srcReg0);
             B64TraitOneToTaitTwo(traitTwoSrcReg1, srcReg1);
             MaskReg selMask;
             Compare<ActualT, CMPMODE::GT>(selMask, traitTwoSrcReg0, traitTwoSrcReg1, maskTrait2);
             Select(traitTwoDstReg, traitTwoSrcReg0, traitTwoSrcReg1, selMask);
-            Duplicate(traitTwoSrcReg0, static_cast<ActualT>(0));
-            Select(traitTwoDstReg, traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
+            Duplicate(traitTwoTmpReg, static_cast<ActualT>(0));
+            Select(traitTwoDstReg, traitTwoDstReg, traitTwoTmpReg, maskTrait2);
             B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
         }
     } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
+        U tmpReg;
         MaskReg selMask;
         Compare<ActualT, CMPMODE::GT>(selMask, srcReg0, srcReg1, mask);
         Select(dstReg, srcReg0, srcReg1, selMask);
-        Duplicate(srcReg0, static_cast<ActualT>(0));
-        Select(dstReg, dstReg, srcReg0, mask);
+        Duplicate(tmpReg, static_cast<ActualT>(0));
+        Select(dstReg, dstReg, tmpReg, mask);
     }
 }
 
@@ -1459,21 +1461,23 @@ __simd_callee__ inline void MinOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskR
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg1;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
+            RegTensor<ActualT, RegTraitNumTwo> traitTwoTmpReg;
             B64TraitOneToTaitTwo(traitTwoSrcReg0, srcReg0);
             B64TraitOneToTaitTwo(traitTwoSrcReg1, srcReg1);
             MaskReg selMask;
             Compare<ActualT, CMPMODE::LT>(selMask, traitTwoSrcReg0, traitTwoSrcReg1, maskTrait2);
             Select(traitTwoDstReg, traitTwoSrcReg0, traitTwoSrcReg1, selMask);
-            Duplicate(traitTwoSrcReg0, static_cast<ActualT>(0));
-            Select(traitTwoDstReg, traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
+            Duplicate(traitTwoTmpReg, static_cast<ActualT>(0));
+            Select(traitTwoDstReg, traitTwoDstReg, traitTwoTmpReg, maskTrait2);
             B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
         }
     } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
+        U tmpReg;
         MaskReg selMask;
         Compare<ActualT, CMPMODE::LT>(selMask, srcReg0, srcReg1, mask);
         Select(dstReg, srcReg0, srcReg1, selMask);
-        Duplicate(srcReg0, static_cast<ActualT>(0));
-        Select(dstReg, dstReg, srcReg0, mask);
+        Duplicate(tmpReg, static_cast<ActualT>(0));
+        Select(dstReg, dstReg, tmpReg, mask);
     }
 }
 
