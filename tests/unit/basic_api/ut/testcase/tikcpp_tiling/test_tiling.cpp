@@ -377,6 +377,12 @@ TEST_F(TestTiling, TestTilingContextBuildWithConstValue)
     gert::TilingContext *tilingContext = holder->GetContext<gert::TilingContext>();
     EXPECT_EQ(*tilingContext->GetInputShape(1), weight1_shape);
     EXPECT_EQ(*tilingContext->GetOutputShape(0), output_shape);
+    auto info_input_0 = tilingContext->GetInputDesc(0);
+    EXPECT_NE(info_input_0, nullptr);
+    EXPECT_EQ(info_input_0->GetDataType(), ge::DT_FLOAT16);
+    auto info_output_0 = tilingContext->GetOutputDesc(0);
+    EXPECT_NE(info_output_0, nullptr);
+    EXPECT_EQ(info_output_0->GetDataType(), ge::DT_FLOAT16);
 }
 
 TEST_F(TestTiling, TestTilingContextBuildFailed)
