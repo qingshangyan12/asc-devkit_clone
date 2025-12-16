@@ -112,7 +112,9 @@ private:
         "Ascend910_9372",
         "Ascend910_9392",
         "Ascend910_9382",
-        "Ascend910_9362"
+        "Ascend910_9362",
+        "KirinX90",
+        "Kirin9030"
     };
     const std::unordered_map<std::string, Ascc::ShortSoCVersion> socToCore_ = {
         {"Ascend910B1", Ascc::ShortSoCVersion::ASCEND910B}, // ascend910b_list
@@ -137,7 +139,9 @@ private:
         {"Ascend310B1", Ascc::ShortSoCVersion::ASCEND310B}, // ascend310b_list
         {"Ascend310B2", Ascc::ShortSoCVersion::ASCEND310B},
         {"Ascend310B3", Ascc::ShortSoCVersion::ASCEND310B},
-        {"Ascend310B4", Ascc::ShortSoCVersion::ASCEND310B}
+        {"Ascend310B4", Ascc::ShortSoCVersion::ASCEND310B},
+        {"KirinX90", Ascc::ShortSoCVersion::KIRINX90},
+        {"Kirin9030", Ascc::ShortSoCVersion::KIRIN9030}
     };
 };
 } // Ascc

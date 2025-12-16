@@ -336,8 +336,15 @@ struct FunLevelMixCoreType {
 #endif
 
 #define ENABLE_DETERMINISTIC() ENABLE_FEATURE_FOR_COMPILE(deterministic, 1)
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#define KERNEL_TASK_TYPE(key, value)
+#define KERNEL_TASK_TYPE_DEFAULT(value)
+#else
 #define KERNEL_TASK_TYPE(key, value)  ENABLE_FEATURE_FOR_COMPILE(key, value)
 #define KERNEL_TASK_TYPE_DEFAULT(value)  ENABLE_FEATURE_FOR_COMPILE(default, value)
+#endif
+
 #define REGISTER_TILING_DEFAULT(tiling_struct)  ENABLE_FEATURE_FOR_TILING(default, tiling_struct)
 #define REGISTER_TILING_FOR_TILINGKEY(expression, tiling_struct)  ENABLE_FEATURE_FOR_TILING(expression, tiling_struct)
 

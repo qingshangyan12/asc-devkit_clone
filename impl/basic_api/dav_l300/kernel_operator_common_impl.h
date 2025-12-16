@@ -227,52 +227,6 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 #endif
 }
 
-template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
-__aicore__ inline void SetNextTaskStartImpl()
-{
-    return;
-}
-
-template<int8_t earlyStartConfig = -1>
-__aicore__ inline void WaitPreTaskEndImpl()
-{
-    return;
-}
-
-template<bool isAIVOnly = true>
-__aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__ int32_t* ubWorkspaceAddr, const int usedCores)
-{
-    if constexpr (!isAIVOnly) {
-        PipeBarrier<PIPE_ALL>();
-    }
-}
-
-template <bool isAIVOnly = true>
-__aicore__ inline void SyncAllImpl()
-{
-    if constexpr (!isAIVOnly) {
-        PipeBarrier<PIPE_ALL>();
-    }
-}
-
-template <uint8_t modeId, pipe_t pipe>
-__aicore__ inline void NotifyEventImpl(uint16_t flagId)
-{}
-
-template <pipe_t pipe>
-__aicore__ inline void WaitEventImpl(uint16_t flagId)
-{
-    ASCENDC_ASSERT((false), "WaitEvent is not supported!");
-}
-
-template <uint8_t modeId = 0, pipe_t pipe = PIPE_S>
-__aicore__ inline void WaitEventImpl(uint16_t flagId)
-{
-    if (modeId == 2) {
-        PipeBarrier<PIPE_ALL>();
-    }
-}
-
 template <atomic_type_t type, atomic_op_t op>
 __aicore__ inline void SetStoreAtomicConfigImpl()
 {
@@ -288,11 +242,6 @@ __aicore__ inline int64_t GetStoreAtomicConfigImpl()
 __aicore__ inline void GetStoreAtomicConfigImpl(uint16_t &atomicType, uint16_t &atomicOp)
 {
     ASCENDC_ASSERT((false), "GetStoreAtomicConfig is not supported!");
-}
-
-__aicore__ inline void SetSyncBaseAddrImpl(uint64_t config)
-{
-    ASCENDC_ASSERT((false), "SetSyncBaseAddr is not supported on this device!");
 }
 
 template <typename T>
@@ -1515,6 +1464,15 @@ __simd_callee__ inline void Truncate(RegTensor<T> &dstReg, RegTensor<T> &srcReg,
     constexpr decltype(auto) rnd = RndConverter<roundMode>::value;
     constexpr decltype(auto) md = std::integral_constant<::Mode, static_cast<::Mode>(mode)>();
     vtrc(dstReg, srcReg, rnd, mask, md);
+}
+
+__aicore__ inline void Barrier()
+{
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    __asm__ __volatile__("" ::: "memory");
+#else
+    __asm__ __volatile__("");
+#endif
 }
 
 }  // namespace AscendC
