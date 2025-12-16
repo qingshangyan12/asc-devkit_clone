@@ -30,8 +30,9 @@ KernelRunContextHolder::KernelRunContextHolder(
 {}
 
 KernelRunContextHolder::KernelRunContextHolder(gert::ContextHolder<gert::TilingContext> &&ctxHolder,
-    std::vector<std::unique_ptr<uint8_t[]>> &&inputTensorHolder, gert::KernelContext *kernelContextPtr)
-    : valueHolder(std::make_unique<ValueHolderImpl>(std::move(ctxHolder), std::move(inputTensorHolder))),
+    std::vector<std::unique_ptr<uint8_t[]>> &&inputTensorHolder, std::vector<std::unique_ptr<uint8_t[]>> &&outputTensorHolder,
+    gert::KernelContext *kernelContextPtr)
+    : valueHolder(std::make_unique<ValueHolderImpl>(std::move(ctxHolder), std::move(inputTensorHolder), std::move(outputTensorHolder))),
       kernelContext(kernelContextPtr)
 {}
 namespace {
@@ -104,6 +105,7 @@ std::shared_ptr<KernelRunContextHolder> ContextBuilderImpl::BuildTilingContext()
         return nullptr;
     }
     std::vector<std::unique_ptr<uint8_t[]>> tensorValueVec(inputNum_ + outputNum_);
+    std::vector<std::unique_ptr<uint8_t[]>> tensorValueVecOut(outputNum_);
     std::vector<gert::Tensor *> tensorVec(inputNum_ + outputNum_, nullptr);
     for (size_t i = 0; i < inputNum_; ++i) {
         auto iter = dependTensorsData_.find(static_cast<int32_t>(i));
@@ -120,6 +122,12 @@ std::shared_ptr<KernelRunContextHolder> ContextBuilderImpl::BuildTilingContext()
             tensorVec[inputNum_ + key] = reinterpret_cast<gert::Tensor *>(tensorValueVec[inputNum_ + key].get());
         }
     }
+    for (size_t i = 0; i < outputNum_; ++i) {
+        auto iter = dependOutputTensorsData_.find(static_cast<int32_t>(i));
+        if (iter != dependOutputTensorsData_.end()) {
+            tensorValueVecOut[i] = std::move(iter->second);
+        }
+    }
     tilingCtxBuilder_->InputTensors(tensorVec);
     gert::ContextHolder<gert::TilingContext> ctxHolder = tilingCtxBuilder_->Build();
     if (ctxHolder.GetContext() == nullptr) {
@@ -129,7 +137,7 @@ std::shared_ptr<KernelRunContextHolder> ContextBuilderImpl::BuildTilingContext()
     KernelRunContext *kernelRunCtx = reinterpret_cast<gert::KernelContext *>(tilingCtx)->GetContext();
     gert::KernelContext *kernelCtx = reinterpret_cast<gert::KernelContext *>(kernelRunCtx);
     return std::shared_ptr<KernelRunContextHolder>(
-        new KernelRunContextHolder(std::move(ctxHolder), std::move(tensorValueVec), kernelCtx));
+        new KernelRunContextHolder(std::move(ctxHolder), std::move(tensorValueVec), std::move(tensorValueVecOut), kernelCtx));
 }
 
 void ContextBuilderImpl::AddInputTd(int32_t index, ge::DataType dtype, ge::Format originFormat,
@@ -331,6 +339,8 @@ void ContextBuilderImpl::AddOutputTd(int32_t index, ge::DataType dtype, ge::Form
     tensor->SetStorageFormat(storageFormat);
     tensor->SetOriginFormat(originFormat);
     dependOutputTensorsData_.insert({index, std::move(dataPtr)});
+    std::vector<gert::Tensor*> tensorVector = {tensor};
+    tilingCtxBuilder_->OutputTensors(tensorVector);
 }
 
 void ContextBuilderImpl::CompileInfo(void *compileInfo)
