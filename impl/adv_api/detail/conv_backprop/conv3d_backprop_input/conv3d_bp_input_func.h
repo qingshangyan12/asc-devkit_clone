@@ -372,5 +372,6 @@ struct End {
         }
     }
 };
+
 }  // namespace ConvBackpropInputFunc
 #endif

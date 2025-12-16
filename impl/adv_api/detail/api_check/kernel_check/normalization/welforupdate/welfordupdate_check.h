@@ -33,7 +33,6 @@ __aicore__ inline void CheckFuncWelfordUpdate(__gm__ const char *apiName, const 
     checkFun.VerifyingParameters(outputMean, outputVariance, inputMean, inputVariance, inputX,
         sharedTmpBuffer, para);
 }
-
 }
 }
 #endif // IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_WELFORDUPDATE_WELFORDUPDATE_CHECK_H_
