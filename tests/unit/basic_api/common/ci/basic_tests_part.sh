@@ -25,6 +25,8 @@ test_one_targets=(
   tikcpp_tiling_utest_ascend910_9599_AIV_HIGH_LEVEL
   tikcpp_tiling_utest_ascend910_9599_AIV_MICRO
   tikcpp_tiling_utest_ascend910_9599_AIV_SIMT
+  tikcpp_tpl_tiling_key_utest_debug
+  tikcpp_tpl_tiling_key_utest_release
 )
 
 test_two_targets=(
