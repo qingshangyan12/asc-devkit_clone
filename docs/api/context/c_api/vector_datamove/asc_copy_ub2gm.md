@@ -47,7 +47,7 @@ __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src,
 
 ## 流水类型
 
-PIPE_MTE2
+PIPE_MTE3
 
 ## 约束说明
 
