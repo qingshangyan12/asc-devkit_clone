@@ -23,9 +23,19 @@
 #include "kernel_struct_data_copy.h"
 #include "kernel_struct_fixpipe.h"
 
-
 namespace AscendC {
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
+
+__aicore__ inline void EnablePrintf()
+{
+#if defined(__ENABLE_ASCENDC_PRINTF__)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+    static const struct BinaryMetaAscFeature __asc_feature_print__ __attribute__ ((used, section (".ascend.meta"))) =
+    {4, 4, 1};
+#endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#endif // __ENABLE_ASCENDC_PRINTF__
+}
+
 
 template <typename T>
 __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType();
@@ -261,12 +271,12 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& src, u
     dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 }
 
-
-template <template<typename> class Tensor, typename T>
+template <template <typename> class Tensor, typename T>
 __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize);
 
 template <typename T>
-__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
+__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc,
+                                                                uint32_t dumpSize)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
@@ -838,6 +848,7 @@ template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
 #ifdef ASCENDC_DUMP
+    EnablePrintf();
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
     if (blockRingBufInfo == nullptr) {
         return;
@@ -988,9 +999,11 @@ __aicore__ inline void WriteRingBufTlvData(
     MemCopyGm2Gm(dst, reinterpret_cast<__gm__ const uint8_t*>(src.GetPhyAddr()), dumpSize * sizeof(T));
 }
 
-template <template<typename> class Tensor, typename T>
+template <template <typename> class Tensor, typename T>
 __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
+#ifdef ASCENDC_DUMP
+    EnablePrintf();
     if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
         ASCENDC_ASSERT((false),
                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor not support this data type"); });
@@ -1038,6 +1051,7 @@ __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc
     __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
 
     UpdateWriteInfo(writeInfo, tlvLen);
+#endif // ASCENDC_DUMP
 }
 
 __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
@@ -1098,9 +1112,11 @@ __aicore__ inline void WriteTimeStampInfo(uint32_t descId)
 #endif
 }
 
+
 __aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId)
 {
 #ifdef ASCENDC_TIME_STAMP_ON
+    EnablePrintf();
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
     if (blockRingBufInfo == nullptr) {
         return;
@@ -1126,7 +1142,7 @@ __aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId)
     __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
 
     UpdateWriteInfo(writeInfo, tlvLen);
-#endif
+#endif // ASCENDC_TIME_STAMP_ON
 }
 
 __aicore__ inline void DumpTimeStampImpl(uint32_t descId)

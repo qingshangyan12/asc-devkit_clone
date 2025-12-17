@@ -75,49 +75,6 @@ uint32_t InitCannPath()
     return cannPathInit;
 }
 
-const std::string& GetCceAicoreArch(const CoreType coreType)
-{
-    auto& manager = InfoManager::GetInstance();
-    ShortSocVersion soc = manager.GetShortSocVersion();
-    return CCE_AICORE_MAP.at({soc, coreType});
-}
-
-inline bool IsMixKernelType(const KernelMetaType kType)
-{
-    return (kType == KernelMetaType::KERNEL_TYPE_MIX_AIC_1_0 || kType == KernelMetaType::KERNEL_TYPE_MIX_AIV_1_0 ||
-        kType == KernelMetaType::KERNEL_TYPE_MIX_AIC_1_1 || kType == KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2);
-}
-
-// Assume mangling name is A. If AIC_ONLY / AIV_ONLY => do not need update
-// If MIX_AIC_1_0, MIX_AIV_1_0, MIX_AIC_1_1, MIX_AIC_1_2,
-// then update -D<manglingName>=<manglingName>_mix_aic, -D<manglingName>=<manglingName>_mix_aiv
-void UpdateManglingNameSuffix(std::vector<std::string>& compileOptions, const CoreType coreType)
-{
-    auto& manager = InfoManager::GetInstance();
-    ShortSocVersion shortSoc = manager.GetShortSocVersion();
-    if (shortSoc == ShortSocVersion::ASCEND910B || shortSoc == ShortSocVersion::ASCEND910_95) {
-        for (const auto& funcInfo : InfoManager::GetInstance().GetGlobalSymbolInfo()) {
-            std::string manglingName = funcInfo.first;
-            KernelMetaType kType = std::get<0>(funcInfo.second);
-            bool isMixKernelType = IsMixKernelType(kType);
-            if (coreType == CoreType::CUBE && isMixKernelType) {
-                compileOptions.emplace_back(
-                    "-D" + manglingName + "=" + manglingName.substr(DEVICE_STUB_PREFIX_LEN) + "_mix_aic");
-            } else if (coreType == CoreType::VEC && isMixKernelType) {
-                compileOptions.emplace_back(
-                    "-D" + manglingName + "=" + manglingName.substr(DEVICE_STUB_PREFIX_LEN) + "_mix_aiv");
-            } else {
-                compileOptions.emplace_back("-D" + manglingName + "=" + manglingName.substr(DEVICE_STUB_PREFIX_LEN));
-            }
-        }
-    } else {
-        for (const auto& funcInfo : InfoManager::GetInstance().GetGlobalSymbolInfo()) {
-            std::string manglingName = funcInfo.first;
-            compileOptions.emplace_back("-D" + manglingName + "=" + manglingName.substr(DEVICE_STUB_PREFIX_LEN));
-        }
-    }
-}
-
 void GenerateAclrtHeader(const std::string& headerPath)
 {
     if (PathCheck(headerPath.c_str(), true) == PathStatus::NOT_EXIST) {
@@ -284,29 +241,14 @@ int32_t PluginEpilogue(const char** result)
 {
     ASC_CHECK_NULLPTR(result, "PluginEpilogue");
 
-    KernelTypeResult kernelTypeRes = CheckHasMixKernelFunc();
-    // MIX_1_1 and MIX_1_2 with either one having KFC at same time is supported in 71
-    if (((kernelTypeRes.hasMixOneToOneWithKfc && kernelTypeRes.hasMixOneToTwo) ||
-        (kernelTypeRes.hasMixOneToTwoWithKfc && kernelTypeRes.hasMixOneToOne)) &&
-        (InfoManager::GetInstance().GetShortSocVersion() != ShortSocVersion::ASCEND910B)) {
+    CompileOptionManager mng = CompileOptionManager();
+    auto deviceCubeExtraCompileOptions = mng.GetDeviceCompileOptions(CoreType::CUBE);
+    auto deviceVecExtraCompileOptions = mng.GetDeviceCompileOptions(CoreType::VEC);
+    auto hostExtraCompileOptions = mng.GetHostCompileOptions();
+    auto functionRegisterCode = FunctionRegistryImpl();
+    if (deviceCubeExtraCompileOptions.empty() && deviceVecExtraCompileOptions.empty()) {
         return ASC_FAILURE;
     }
-
-    std::vector<std::string> hostExtraCompileOptions = GetHostCompileOptions();
-    std::vector<std::string> deviceCommonOptions = GetDeviceCommonCompileOptions(kernelTypeRes);
-
-    std::vector<std::string> deviceCubeExtraCompileOptions = deviceCommonOptions;
-    deviceCubeExtraCompileOptions.emplace_back("--cce-aicore-arch=" + GetCceAicoreArch(CoreType::CUBE));
-    UpdateManglingNameSuffix(deviceCubeExtraCompileOptions, CoreType::CUBE);
-
-    std::vector<std::string> deviceVecExtraCompileOptions = deviceCommonOptions;
-    deviceVecExtraCompileOptions.emplace_back("--cce-aicore-arch=" + GetCceAicoreArch(CoreType::VEC));
-    UpdateManglingNameSuffix(deviceVecExtraCompileOptions, CoreType::VEC);
-    if (InfoManager::GetInstance().GetShortSocVersion() == ShortSocVersion::ASCEND310P) {
-        deviceVecExtraCompileOptions.emplace_back("-D__ENABLE_VECTOR_CORE__");
-    }
-
-    std::string functionRegisterCode = FunctionRegistryImpl();
     EpilogueResult res = {functionRegisterCode, hostExtraCompileOptions, deviceCubeExtraCompileOptions,
         deviceVecExtraCompileOptions};
     return DumpResultInfo(res, result);

@@ -202,3 +202,17 @@ TEST_F(TEST_ASC_UTILS, asc_ExecuteCompile_code_not_zero) {
     MOCKER(AscPlugin::ExecuteCommand).stubs().will(returnValue(res));
     EXPECT_EQ(AscPlugin::ExecuteCompile("test cmd"), AscPlugin::ASC_FAILURE);
 }
+
+TEST_F(TEST_ASC_UTILS, asc_GetAscFeatureMetaSection) {
+    using namespace AscPlugin;
+    std::string printMeta = GetAscFeatureMetaSection(FeatureFlag::ASC_PRINT_MASK);
+    EXPECT_EQ(printMeta, std::string("static const struct BinaryMetaAscFeature __ascendc_feature_print__ __attribute__ "
+                                     "((used, section (\".ascend.meta\"))) = {4, 4, 1};\n"));
+    std::string fftsMeta = GetAscFeatureMetaSection(FeatureFlag::ASC_FFTS_MASK);
+    EXPECT_EQ(fftsMeta, std::string("static const struct BinaryMetaAscFeature __ascendc_feature_ffts__5 __attribute__ "
+                                    "((used, section (\".ascend.meta\"))) = {4, 4, 2};\n"));
+    std::string l2cacheMeta = GetAscFeatureMetaSection(FeatureFlag::ASC_L2CACHE_HINT_MASK);
+    EXPECT_EQ(l2cacheMeta,
+              std::string("static const struct BinaryMetaAscFeature __ascendc_feature_l2cache__ __attribute__ "
+                          "((used, section (\".ascend.meta\"))) = {4, 4, 3};\n"));
+}

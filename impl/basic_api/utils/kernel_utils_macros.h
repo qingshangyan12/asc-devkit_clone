@@ -142,6 +142,11 @@ struct BinaryMetaOptionalParam {
     uint16_t optionalOutputMode; // 对于可选输入需要占位发布
 };
 
+struct BinaryMetaAscFeature {
+    BaseTlv head;
+    uint32_t feature; // PRINT = 1, FFTS = 2, L2CACHE = 3
+};
+
 enum FuncMetaType { // 函数级TLV类型
     F_TYPE_KTYPE = 1, // kernel type tlv
     F_TYPE_CROSS_CORE_SYNC = 2, // cross core sync
@@ -182,6 +187,8 @@ struct OpSystemRunCfg {
 #ifdef L2_CACHE_HINT
 #ifdef __NPU_DEVICE__
 inline __gm__ struct OpSystemRunCfg g_opL2CacheHintCfg = {0};
+static const struct BinaryMetaAscFeature __asc_feature_l2cache__ __attribute__ ((used, section (".ascend.meta"))) =
+    {4, 4, 3};
 #else // ifndef __NPU_DEVICE__
 extern __gm__ struct OpSystemRunCfg g_opSystemRunCfg;
 #endif // __NPU_DEVICE__

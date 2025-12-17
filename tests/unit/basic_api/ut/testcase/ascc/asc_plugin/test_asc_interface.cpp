@@ -698,12 +698,12 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIV_Mix12)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube", "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom_mix_aic",
         "-D__device_stub__add_custom=add_custom_mix_aic",
     };
@@ -711,12 +711,12 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIV_Mix12)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-vec", "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom_mix_aiv",
         "-D__device_stub__add_custom=add_custom_mix_aiv"
     };
@@ -753,12 +753,13 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIC_Mix11)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube",
+        "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom_mix_aic",
         "-D__device_stub__add_custom=add_custom_mix_aic"
     };
@@ -766,12 +767,13 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIC_Mix11)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-vec",
+        "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom_mix_aiv",
         "-D__device_stub__add_custom=add_custom_mix_aiv"
     };
@@ -781,7 +783,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIC_Mix11)
     nlohmann::json jsonObj = expectRes;
     const char* expectedRes = strdup(jsonObj.dump().c_str());
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
     free(const_cast<char*>(expectedRes));
 }
@@ -805,23 +807,25 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_no_device_call)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube",
+        "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "--cce-aicore-arch=dav-c220-cube"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-vec",
+        "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "--cce-aicore-arch=dav-c220-vec"
     };
 
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
@@ -829,7 +833,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_no_device_call)
     nlohmann::json jsonObj = expectRes;
     const char* expectedRes = strdup(jsonObj.dump().c_str());
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
     free(const_cast<char*>(expectedRes));
 }
@@ -855,12 +859,13 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube",
+        "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -868,12 +873,13 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-vec",
+        "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -883,7 +889,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue)
     nlohmann::json jsonObj = expectRes;
     const char* expectedRes = strdup(jsonObj.dump().c_str());
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
     free(const_cast<char*>(expectedRes));
 }
@@ -912,14 +918,15 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_no_dump)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=0",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         // include paths
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=0",
-        "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -927,14 +934,15 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_no_dump)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
-        "-mllvm", "-cce-aicore-stack-size=0x8000", "-mllvm", "-cce-aicore-function-stack-size=0x8000",
-
-        "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
-        // include paths
-        "-DL2_CACHE_HINT",
+        "--cce-aicore-arch=dav-c220-vec",
         "--cce-auto-sync",
         "-DASCENDC_DUMP=0",
-        "--cce-aicore-arch=dav-c220-vec",
+        "-mllvm", "-cce-aicore-stack-size=0x8000",
+        "-mllvm", "-cce-aicore-function-stack-size=0x8000",
+        "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
+        // include paths
+        "-DL2_CACHE_HINT",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -979,11 +987,11 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_310P)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O2", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
-        "-mllvm", "-cce-aicore-fp-ceiling=2",
-        "-mllvm", "-cce-aicore-record-overflow=false", "-mllvm", "-cce-aicore-mask-opt=false",
+        "--cce-aicore-arch=dav-m200",
         "--cce-auto-sync",
         "-DASCENDC_DUMP=0",
-        "--cce-aicore-arch=dav-m200",
+        "-mllvm", "-cce-aicore-fp-ceiling=2",
+        "-mllvm", "-cce-aicore-record-overflow=false", "-mllvm", "-cce-aicore-mask-opt=false",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -991,14 +999,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_310P)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O2", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
-        "-mllvm", "-cce-aicore-fp-ceiling=2",
-        "-mllvm", "-cce-aicore-record-overflow=false", "-mllvm", "-cce-aicore-mask-opt=false",
+        "--cce-aicore-arch=dav-m200-vec",
         "--cce-auto-sync",
         "-DASCENDC_DUMP=0",
-        "--cce-aicore-arch=dav-m200-vec",
+        "-mllvm", "-cce-aicore-fp-ceiling=2",
+        "-mllvm", "-cce-aicore-record-overflow=false", "-mllvm", "-cce-aicore-mask-opt=false",
+        "-D__ENABLE_VECTOR_CORE__",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom",
-        "-D__ENABLE_VECTOR_CORE__"
     };
     EXPECT_EQ(exec_res, 0);
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
@@ -1042,13 +1050,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_optimize_lv1)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O2", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=0",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=0",
-        "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1056,13 +1065,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_optimize_lv1)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O2", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-vec",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=0",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=0",
-        "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1071,7 +1081,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_optimize_lv1)
     nlohmann::json jsonObj = expectRes;
     const char* expectedRes = strdup(jsonObj.dump().c_str());
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
     free(const_cast<char*>(expectedRes));
 }
@@ -1106,13 +1116,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_no_dump)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=0",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=0",
-        "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1120,13 +1131,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_no_dump)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-vec",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=0",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=0",
-        "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1135,7 +1147,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_no_dump)
     nlohmann::json jsonObj = expectRes;
     const char* expectedRes = strdup(jsonObj.dump().c_str());
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
     free(const_cast<char*>(expectedRes));
 }
@@ -1159,14 +1171,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=1",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=1",
-        "-DONE_CORE_DUMP_SIZE=1048576",
-        "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1174,14 +1186,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-vec",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=1",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=1",
-        "-DONE_CORE_DUMP_SIZE=1048576",
-        "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1190,7 +1202,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on)
     nlohmann::json jsonObj = expectRes;
     const char* expectedRes = strdup(jsonObj.dump().c_str());
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
     free(const_cast<char*>(expectedRes));
 }
@@ -1216,14 +1228,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on_assert)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=1",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=1",
-        "-DONE_CORE_DUMP_SIZE=1024",
-        "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1231,14 +1243,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on_assert)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-vec",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=1",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=1",
-        "-DONE_CORE_DUMP_SIZE=1024",
-        "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1247,7 +1259,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on_assert)
     nlohmann::json jsonObj = expectRes;
     const char* expectedRes = strdup(jsonObj.dump().c_str());
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
     free(const_cast<char*>(expectedRes));
 }
@@ -1282,14 +1294,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_dump_on)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-cube",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=1",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=1",
-        "-DONE_CORE_DUMP_SIZE=1048576",
-        "--cce-aicore-arch=dav-c220-cube",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1297,14 +1309,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_dump_on)
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "--cce-aicore-arch=dav-c220-vec",
+        "--cce-auto-sync",
+        "-DASCENDC_DUMP=1",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "--cce-auto-sync",
-        "-DASCENDC_DUMP=1",
-        "-DONE_CORE_DUMP_SIZE=1048576",
-        "--cce-aicore-arch=dav-c220-vec",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1313,7 +1325,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_dump_on)
     nlohmann::json jsonObj = expectRes;
     const char* expectedRes = strdup(jsonObj.dump().c_str());
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
     free(const_cast<char*>(expectedRes));
 }
@@ -1380,7 +1392,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginFatbinLink_null_soc)
     const std::string jsonStr = jsonObj.dump();
     const char* expectedRes = jsonStr.c_str();
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
 }
 
@@ -1415,7 +1427,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginFatbinLink_910B4_1)
     const std::string jsonStr = jsonObj.dump();
     const char* expectedRes = jsonStr.c_str();
     EXPECT_EQ(exec_res, 0);
-    EXPECT_EQ(strcmp(expectedRes, a), 0);
+    EXPECT_EQ(std::string(a), std::string(expectedRes));
     free(const_cast<char*>(a));
     manager.saveTempRequested_ = false;
     system("rm -rf /tmp/asc_plugin");
