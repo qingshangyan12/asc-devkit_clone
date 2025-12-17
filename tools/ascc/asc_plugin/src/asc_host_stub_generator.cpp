@@ -106,9 +106,10 @@ std::string AscHostStubGenerator::ManglingNameJudgeCode()
 {
     std::string judgeCode = std::string();
     if (kernelInfo_.templateInstances.empty()) {
-        judgeCode += "    __ascendc_manglingName = \"" + kernelInfo_.kernelMangledName + "\";\n";
+        judgeCode += "    const char* __ascendc_manglingName = \"" + kernelInfo_.kernelMangledName + "\";\n";
         return judgeCode;
     }
+    judgeCode += "    const char* __ascendc_manglingName = nullptr;\n";
     KernelMetaType defaultKtype = ExtractKernelType(kernelType_);
     for (size_t j = 0; j < kernelInfo_.templateInstances.size(); j++) {
         TemplateInstance instFuncInfo = kernelInfo_.templateInstances[j];
@@ -141,6 +142,11 @@ std::string AscHostStubGenerator::ManglingNameJudgeCode()
         judgeCode += "        __ascendc_kType = " + std::string(KTYPE_TO_LAUNCH_PARAMS.at(kType)) + ";\n";
         judgeCode += "    }\n";
     }
+    judgeCode += "    if (__ascendc_manglingName == nullptr) {\n";
+    judgeCode += "        ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "
+                    "\"call kernel function failure!\");\n";
+    judgeCode += "        return;\n";
+    judgeCode += "    }\n";
     return judgeCode;
 }
 
@@ -170,7 +176,6 @@ void AscHostStubGenerator::GenStubFuncImpl()
         funcImplCode << "        alignas(((alignof(" << MapParamTypeToVoid(param.type) << ") + 3) >> 2) << 2) "
                      << MapParamTypeToVoid(param.type) << " " << param.name << ";\n";
     }
-    funcImplCode << "        alignas(((alignof(void*) + 3) >> 2) << 2) void* __ascendc_overflow;\n";
     funcImplCode << "    } __ascendc_args {";
     if (!isSupportFifoDump && infoManager.IsDumpOn()) {
         funcImplCode << "nullptr, ";
@@ -193,20 +198,12 @@ void AscHostStubGenerator::GenStubFuncImpl()
                          << maxCoreNum << ");\n";
         }
     }
-    funcImplCode << "    constexpr uint32_t __ascendc_overflow_status_size = 8;\n";
-    funcImplCode <<
-        "    AllocAscendMemDevice(&(__ascendc_args.__ascendc_overflow), __ascendc_overflow_status_size);\n";
     funcImplCode << "    const char* __ascendc_name = \"" << kernelInfo_.kernelName << "\";\n";
 
-    funcImplCode << "    const char* __ascendc_manglingName = nullptr;\n";
     // when no template, only has 1 kernel type
     funcImplCode << "    uint32_t __ascendc_kType = " << KTYPE_TO_LAUNCH_PARAMS.at(defaultKtype) << ";\n";
     funcImplCode << ManglingNameJudgeCode();
-    funcImplCode << "    if (__ascendc_manglingName == nullptr) {\n";
-    funcImplCode << "        ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "
-                    "\"call kernel function failure!\");\n";
-    funcImplCode << "        return;\n";
-    funcImplCode << "    }\n";
+
     if (!isSupportFifoDump && infoManager.IsDumpOn() && infoManager.HasAssert()) {
         funcImplCode << "    __ascendc_ret = "
                         "AscPluginGenerator::ascendc_set_exception_dump_info(__ascendc_one_core_dump_size);\n";
@@ -248,7 +245,6 @@ void AscHostStubGenerator::GenStubFuncImpl()
     if (!isSupportFifoDump && infoManager.IsDumpOn()) {
         funcImplCode << "    FreeAscendMemDevice(__ascendc_args.__ascendc_dump);\n";
     }
-    funcImplCode << "    FreeAscendMemDevice(__ascendc_args.__ascendc_overflow);\n";
     funcImplCode << "}\n";
     if (hasAnonymous) {
         for (size_t i = 0; i < kernelInfo_.namespaces.size(); ++i) {
