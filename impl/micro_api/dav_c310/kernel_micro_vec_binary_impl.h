@@ -928,16 +928,19 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     MicroAPI::RegTensor<float> maxSubnormal;
     MicroAPI::RegTensor<uint32_t> tmp0;
     MicroAPI::RegTensor<int32_t> tmp1;
+    MicroAPI::RegTensor<uint32_t> tmp2;
 
     MicroAPI::RegTensor<float> src0Abs;
     MicroAPI::RegTensor<float> src0Subnormal;
     MicroAPI::RegTensor<float> src0Norm;
     MicroAPI::RegTensor<float> src0All;
+    MicroAPI::RegTensor<float> src0AbsNorm;
 
     MicroAPI::RegTensor<float> src1Abs;
     MicroAPI::RegTensor<float> src1Subnormal;
     MicroAPI::RegTensor<float> src1Norm;
     MicroAPI::RegTensor<float> src1All;
+    MicroAPI::RegTensor<float> src1AbsNorm;
 
     MaskReg mask0;
     MaskReg maskSrc0Normal;
@@ -950,11 +953,13 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     MaskReg maskSrc0Zero; // dividend 0
     MaskReg maskSrc1Zero; // divisor 0
     MaskReg maskValid;
+    MaskReg maskNorm;
 
     RegTensor<uint32_t> src0Exponent;
     RegTensor<uint32_t> src1Exponent;
 
     RegTensor<float> z1;
+    RegTensor<float> z2;
     RegTensor<int32_t> scale;
     RegTensor<uint32_t> dstExponent;
     RegTensor<uint32_t> dstSign;
@@ -1011,6 +1016,9 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     Add((RegTensor<uint32_t>&)src1Norm, (RegTensor<uint32_t>&)src1Norm, tmp0, maskValid);
     Select(src0Norm, src0Norm, src0All, maskValid);
     Select(src1Norm, src1Norm, src1All, maskValid);
+    Abs(src0AbsNorm, src0Norm, maskValid);
+    Abs(src1AbsNorm, src1Norm, maskValid);
+    Compare<float, CMPMODE::LE>(maskNorm, src0AbsNorm, src1AbsNorm, maskValid);
 
     if constexpr (is0ULP) {
         DivPrecisionImpl<float, mode, U>(dst, src0Norm, src1Norm, mask);
@@ -1062,6 +1070,9 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     MaskAnd(mask0, mask0, maskValid, mask);
     Duplicate(tmp0, min_denormal.i, mask0);
     Add((RegTensor<uint32_t>&)z1, (RegTensor<uint32_t>&)dstSign, tmp0, mask0);
+    Duplicate(tmp2, static_cast<uint32_t>(0), mask0);
+    Add((RegTensor<uint32_t>&)z2, (RegTensor<uint32_t>&)dstSign, tmp2, mask0);
+    Select(z1, z2, z1, maskNorm);
     Select(dst, z1, dst, mask0);
     MaskNot(mask0, mask0, mask);
     MaskAnd(maskValid, mask0, maskValid, mask);
@@ -1140,16 +1151,19 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
     MicroAPI::RegTensor<half> maxSubnormal;
     MicroAPI::RegTensor<uint16_t> tmp0;
     MicroAPI::RegTensor<int16_t> tmp1;
+    MicroAPI::RegTensor<uint16_t> tmp2;
 
     MicroAPI::RegTensor<half> src0Abs;
     MicroAPI::RegTensor<half> src0Subnormal;
     MicroAPI::RegTensor<half> src0Norm;
     MicroAPI::RegTensor<half> src0All;
+    MicroAPI::RegTensor<half> src0AbsNorm;
 
     MicroAPI::RegTensor<half> src1Abs;
     MicroAPI::RegTensor<half> src1Subnormal;
     MicroAPI::RegTensor<half> src1Norm;
     MicroAPI::RegTensor<half> src1All;
+    MicroAPI::RegTensor<half> src1AbsNorm;
 
     MaskReg mask0;
     MaskReg maskSrc0Normal;
@@ -1162,11 +1176,13 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
     MaskReg maskSrc0Zero; // dividend 0
     MaskReg maskSrc1Zero; // divisor 0
     MaskReg maskValid;
+    MaskReg maskNorm;
 
     RegTensor<uint16_t> src0Exponent;
     RegTensor<uint16_t> src1Exponent;
 
     RegTensor<half> z1;
+    RegTensor<half> z2;
     RegTensor<int16_t> scale;
     RegTensor<uint16_t> dstExponent;
     RegTensor<uint16_t> dstSign;
@@ -1223,6 +1239,9 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
     Add((RegTensor<uint16_t>&)src1Norm, (RegTensor<uint16_t>&)src1Norm, tmp0, maskValid);
     Select(src0Norm, src0Norm, src0All, maskValid);
     Select(src1Norm, src1Norm, src1All, maskValid);
+    Abs(src0AbsNorm, src0Norm, maskValid);
+    Abs(src1AbsNorm, src1Norm, maskValid);
+    Compare<half, CMPMODE::LE>(maskNorm, src0AbsNorm, src1AbsNorm, maskValid);
 
     constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(MaskMergeMode::ZEROING);
     constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
@@ -1269,6 +1288,9 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
     MaskAnd(mask0, mask0, maskValid, mask);
     Duplicate(tmp0, min_denormal.i, mask0);
     Add((RegTensor<uint16_t>&)z1, (RegTensor<uint16_t>&)dstSign, tmp0, mask0);
+    Duplicate(tmp2, static_cast<uint16_t>(0), mask0);
+    Add((RegTensor<uint16_t>&)z2, (RegTensor<uint16_t>&)dstSign, tmp2, mask0);
+    Select(z1, z2, z1, maskNorm);
     Select(dst, z1, dst, mask0);
     MaskNot(mask0, mask0, mask);
     MaskAnd(maskValid, mask0, maskValid, mask);
