@@ -28,5 +28,26 @@ KernelTypeResult CheckHasMixKernelFunc();
 std::vector<std::string> GetHostCompileOptions();
 std::vector<std::string> GetDeviceCommonCompileOptions(const KernelTypeResult& kernelTypeRes);
 
+class CompileOptionManager {
+public:
+    CompileOptionManager();
+    std::vector<std::string> GetHostCompileOptions() const;
+    std::vector<std::string> GetDeviceCompileOptions(CoreType type);
+
+private:
+    template<ShortSocVersion soc>
+    std::vector<std::string> GetDeviceCompileOptionsWithSoc(CoreType coreType);
+    void SetOldPrintOptions(std::vector<std::string>& devSocOpts);
+private:
+    std::vector<std::string> deviceCompileOpt_;
+    std::string optiLevel_;
+    std::string cannVersionHeader_;
+    ShortSocVersion socVersion_;
+    bool isAutoSyncOn_ = true;
+    bool userDumpStatus_ = true;
+    bool isDumpOn_ = true;
+    bool l2CacheOn_ = true;
+    uint32_t oneCoreDumpSize_ = 0;
+};
 } // namespace AscPlugin
 #endif // __INCLUDE_INTERNAL_ASC_COMPILE_OPTIONS_H__

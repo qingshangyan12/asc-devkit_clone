@@ -47,24 +47,10 @@ uint32_t ascendc_set_exception_dump_info(uint32_t dumpSize);
         stream,                                                                             \
         blockDim,                                                                           \
         ##__VA_ARGS__)
-
-namespace {
-struct AscendCBinaryVersion {
-    uint16_t type = 0;
-    uint16_t len = 4;
-    uint32_t version = 0;
-};
-
-struct AscendCFeatureFlag {
-    uint16_t type = 4;
-    uint16_t len = 4;
-    uint32_t flag = 0;
-};
-}
 )";
 
 constexpr const char *KERNEL_BINARY_VERSION_SECTION = R"(
-static const struct AscendCBinaryVersion __ascendc_binary_version__ __attribute__ ((used, section (".ascend.meta"))) =
+static const struct BinaryMetaVersion __ascendc_binary_version__ __attribute__ ((used, section (".ascend.meta"))) =
     {0, 4, 1};
 )";
 
@@ -94,12 +80,6 @@ std::string FunctionRegistryImpl()
                   "AscPluginGenerator::BindKernelRegisterFunc(AscFunctionRegister);";
     if (infoManager.HasKernelFunc()) {
         codeSource << KERNEL_BINARY_VERSION_SECTION;
-        if (infoManager.IsFifoDumpOn()) {
-            codeSource << GetAscFeatureMetaSection(FeatureFlag::ASC_PRINT_MASK);
-        }
-        if (infoManager.IsL2CacheEnabled()) {
-            codeSource << GetAscFeatureMetaSection(FeatureFlag::ASC_L2CACHE_HINT_MASK);
-        }
     }
     ASC_LOGD("call device stub registry function is: %s", codeSource.str().c_str());
     return codeSource.str();

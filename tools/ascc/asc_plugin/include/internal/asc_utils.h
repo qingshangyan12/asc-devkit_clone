@@ -88,7 +88,8 @@ enum class ShortSocVersion : uint32_t {
 // for split architecture, cube / vec; otherwise means aicore(use cube) + vec
 enum class CoreType: uint32_t {
     CUBE = 0,
-    VEC
+    VEC,
+    NO_SPLIT
 };
 
 enum class FeatureFlag: uint32_t {
