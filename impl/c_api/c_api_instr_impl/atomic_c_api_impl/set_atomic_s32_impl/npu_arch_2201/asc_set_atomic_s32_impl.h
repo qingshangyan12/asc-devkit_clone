@@ -8,14 +8,14 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
  
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_SIMD_ATOMIC_C_API_IMPL_DCCI_IMPL_ASC_2201_DCCI_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_SIMD_ATOMIC_C_API_IMPL_DCCI_IMPL_ASC_2201_DCCI_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_SET_ATOMIC_S32_IMPL_NPU_ARCH_2201_ASC_SET_ATOMIC_S32_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_SET_ATOMIC_S32_IMPL_NPU_ARCH_2201_ASC_SET_ATOMIC_S32_IMPL_H
  
 namespace CApiInternal {
  
-__aicore__ inline void asc_data_cache_clean_and_invalid_impl(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_set_atomic_s32_impl()
 {
-    dcci(dst, entire);
+    set_atomic_s32();
 }
  
 } // namespace CApiInternal

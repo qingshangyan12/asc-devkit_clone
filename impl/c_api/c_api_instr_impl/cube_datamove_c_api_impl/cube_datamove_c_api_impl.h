@@ -22,6 +22,7 @@
 #include "set_quant_pre_impl/asc_2201/set_quant_pre_impl.h"
 #include "set_mm_layout_transform_impl/asc_2201/set_mm_layout_transform_impl.h"
 #include "set_l3d_rpt_impl/asc_2201/set_l3d_rpt_impl.h"
+#include "set_l0c_copy_params_impl/npu_arch_2201/asc_set_l0c_copy_params_impl.h"
 
 __aicore__ inline void asc_set_mm_layout_transform(bool mmLayoutMode)
 {
@@ -33,4 +34,9 @@ __aicore__ inline void asc_set_l1_3d_rpt(uint64_t value)
     CApiInternal::set_l1_3d_rpt_impl(value);
 }
 
+// ==========asc_l0c_copy_params()==========
+__aicore__ inline void asc_set_l0c_copy_params(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
+{
+    CApiInternal::set_l0c_copy_params_impl(ndNum, srcNdStride, dstNdStride);
+}
 #endif

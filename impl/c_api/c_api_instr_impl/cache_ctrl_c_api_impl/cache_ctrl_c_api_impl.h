@@ -13,11 +13,16 @@
 
 #include "get_icache_preload_status_impl/npu_arch_2201/get_icache_preload_status_impl.h"
 #include "dc_preload_impl/asc_2201/asc_data_cache_preload_impl.h"
-#include "dcci_impl/asc_2201/dcci_impl.h"
+#include "dcci_impl/npu_arch_2201/asc_dcci_impl.h"
 
-__aicore__ inline void asc_data_cache_clean_and_invalid(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire)
 {
-    CApiInternal::asc_data_cache_clean_and_invalid_impl(dst, entire);
+    CApiInternal::asc_dcci_impl(dst, entire);
+}
+
+__aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire, uint64_t type)
+{
+    CApiInternal::asc_dcci_impl(dst, entire, type);
 }
 
 __aicore__ inline void asc_data_cache_preload(uint64_t* address, int16_t offset)
