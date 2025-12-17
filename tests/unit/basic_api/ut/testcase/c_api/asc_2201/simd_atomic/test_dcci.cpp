@@ -36,6 +36,32 @@ TEST_F(TestSimdAtomicDcci, dcci_gm_void_ptr_uint64_t_Succ)
         .times(1)
         .will(invoke(dcci_Stub));
     
-    asc_data_cache_clean_and_invalid(dst, entire);
+    asc_dcci(dst, entire);
+    GlobalMockObject::verify();
+}
+
+class TestSimdAtomicDcci3 : public testing::Test { 
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
+
+void dcci_3Stub(__gm__ void* dst, uint64_t entire, uint64_t type)
+{
+    EXPECT_EQ((__gm__ void*)0, dst);
+    EXPECT_EQ(0, entire);
+    EXPECT_EQ(0, type);
+}
+
+TEST_F(TestSimdAtomicDcci3, dcci_gm_void_ptr_uint64_t_uint64_t_Succ)
+{
+    __gm__ void* dst = (__gm__ void*)0;
+    uint64_t entire = 0;
+    uint64_t type = 0;
+    MOCKER(dcci, void(__gm__ void*, uint64_t, uint64_t))
+        .times(1)
+        .will(invoke(dcci_3Stub));
+    
+    asc_dcci(dst, entire, type);
     GlobalMockObject::verify();
 }
