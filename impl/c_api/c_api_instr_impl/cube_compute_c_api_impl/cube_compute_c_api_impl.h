@@ -15,10 +15,16 @@
 #include "set_l0b_2d_impl/asc_2201/set_l0b_2d_impl.h"
 #include "set_l0c_copy_prequant_impl/npu_arch_2201/set_l0c_copy_prequant_impl.h"
 #include "set_l1_2d_impl/asc_2201/set_l1_2d_impl.h"
+#include "set_hf32_trans_mode_impl/asc_2201/asc_set_hf32_trans_mode_impl.h"
 
 __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config)
 {
     CApiInternal::asc_set_l0c_copy_prequant_impl(config);
 }
 
+__aicore__ inline void asc_set_hf32_trans_mode(bool hf32_transmode)
+{
+    CApiInternal::asc_set_hf32_trans_mode_impl(hf32_transmode);
+}
+ 
 #endif

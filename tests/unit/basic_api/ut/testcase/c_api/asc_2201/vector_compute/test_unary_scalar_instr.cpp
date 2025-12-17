@@ -144,3 +144,8 @@ TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(Axpy, asc_axpy, vaxpy, float);
 // ==========asc_leakyrelu(half/float)==========
 TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(LeakyRelu, asc_leakyrelu, vlrelu, half);
 TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(LeakyRelu, asc_leakyrelu, vlrelu, float);
+// ==========asc_min_scalar(half/float/int16_t/int32_t)==========
+TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(MinScalar, asc_min_scalar, vmins, half);
+TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(MinScalar, asc_min_scalar, vmins, float);
+TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(MinScalar, asc_min_scalar, vmins, int16_t);
+TEST_VECTOR_COMPUTE_UNARY_SCALAR_INSTR(MinScalar, asc_min_scalar, vmins, int32_t);

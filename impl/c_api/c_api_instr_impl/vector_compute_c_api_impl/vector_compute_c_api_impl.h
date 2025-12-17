@@ -92,6 +92,7 @@
 #include "vcmp_gt_impl/asc_2201/gt_impl.h"
 #include "vrsqrt_impl/asc_2201/rsqrt_impl.h"
 #include "vtranspose_impl/asc_2201/asc_transpose_impl.h"
+#include "vmins_impl/asc_2201/asc_min_scalar_impl.h"
 #include "vrec_impl/npu_arch_2201/asc_rcp_impl.h"
 #include "vshr_impl/npu_arch_2201/asc_shift_right_impl.h"
 #include "vmadd_impl/npu_arch_2201/asc_mul_add_impl.h"
@@ -3264,6 +3265,67 @@ __aicore__ inline void asc_vdeq_int162b8l(__ubuf__ uint8_t* dst, __ubuf__ int16_
 __aicore__ inline void asc_vdeq_int162b8l_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count)
 {
     CApiInternal::vdeq_int162b8l_sync_impl<uint8_t, int16_t>(dst, src, count);
+}
+
+// ==========asc_min_scalar(half/float/int16_t/int32_t)==========
+__aicore__ inline void asc_min_scalar(__ubuf__ half* dst, __ubuf__ half* src0, half src1, uint32_t count)
+{
+    CApiInternal::asc_min_scalar_impl<half> (dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_min_scalar(__ubuf__ half* dst, __ubuf__ half* src0, half src1, const asc_unary_config& config)
+{
+    CApiInternal::asc_min_scalar_impl<half> (dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_min_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src0, half src1, uint32_t count)
+{
+    CApiInternal::asc_min_scalar_sync_impl<half> (dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_min_scalar(__ubuf__ float* dst, __ubuf__ float* src0, float src1, uint32_t count)
+{
+    CApiInternal::asc_min_scalar_impl<float> (dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_min_scalar(__ubuf__ float* dst, __ubuf__ float* src0, float src1, const asc_unary_config& config)
+{
+    CApiInternal::asc_min_scalar_impl<float> (dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_min_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src0, float src1, uint32_t count)
+{
+    CApiInternal::asc_min_scalar_sync_impl<float> (dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_min_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, int16_t src1, uint32_t count)
+{
+    CApiInternal::asc_min_scalar_impl<int16_t> (dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_min_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, int16_t src1, const asc_unary_config& config)
+{
+    CApiInternal::asc_min_scalar_impl<int16_t> (dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_min_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, int16_t src1, uint32_t count)
+{
+    CApiInternal::asc_min_scalar_sync_impl<int16_t> (dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_min_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, int32_t src1, uint32_t count)
+{
+    CApiInternal::asc_min_scalar_impl<int32_t> (dst, src0, src1, count);
+}
+
+__aicore__ inline void asc_min_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, int32_t src1, const asc_unary_config& config)
+{
+    CApiInternal::asc_min_scalar_impl<int32_t> (dst, src0, src1, config);
+}
+
+__aicore__ inline void asc_min_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, int32_t src1, uint32_t count)
+{
+    CApiInternal::asc_min_scalar_sync_impl<int32_t> (dst, src0, src1, count);
 }
 
 // ==========asc_rcp(half/float)==========
