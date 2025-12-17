@@ -322,6 +322,7 @@ function(ascendc_library target_name target_type)
                                 -DBUILD_CFG=${${device_target}_auto_gen_dir}/host_config.cmake
                                 -DCMAKE_C_COMPILER_LAUNCHER=${CMAKE_C_COMPILER_LAUNCHER}
                                 -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
+                                -DBUILD_MODE=${BUILD_MODE}
                                 <SOURCE_DIR>
                             LIST_SEPARATOR ::
                             BUILD_ALWAYS TRUE
