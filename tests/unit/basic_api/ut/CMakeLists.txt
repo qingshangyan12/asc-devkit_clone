@@ -266,7 +266,6 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         ${LOCAL_DIR}/stub/
         ${ASCENDC_TEST_HEADER_FILES}
         ${ASCENDC_SYS_DIR}/include/base/
-        ${ASCENDC_SYS_DIR}/include/experiment/metadef/
         mmpa_headers
         slog_headers
     )
@@ -427,8 +426,6 @@ set(ASCEND_KERNEL_TEST_HEADERS_FILES
     ${ASCENDC_DIR}/tools/build/asc_pack_kernel/
     ${ASCENDC_SYS_DIR}/include
     ${ASCENDC_SYS_DIR}/include/base/
-    ${ASCENDC_SYS_DIR}/include/experiment/metadef/
-    ${ASCENDC_SYS_DIR}/include/experiment/
     ${ASCENDC_SYS_DIR}/include/metadef/
     ${ASCENDC_DIR}/tikcpulib/inc/
     ${ASCENDC_DIR}/tikcpulib/cpulib/api_check
@@ -463,12 +460,6 @@ target_compile_definitions(ascendc_utest_kernel PRIVATE ASCENDC_CPU_DEBUG=1)
 target_include_directories(ascendc_utest_kernel PRIVATE
     ${ASCEND_KERNEL_TEST_HEADERS_FILES}
     ${ASCENDC_SYS_DIR}/include/base/
-    ${ASCENDC_SYS_DIR}/include/experiment/metadef/
-    ${ASCENDC_SYS_DIR}/include/experiment/
-    ${ASCENDC_SYS_DIR}/include/experiment/runtime/
-    ${ASCENDC_SYS_DIR}/include/experiment/runtime/runtime/
-    ${ASCENDC_SYS_DIR}/include/experiment/msprof/
-    ${ASCENDC_SYS_DIR}/include/experiment/msprof/toolchain
     ${ASCENDC_SYS_DIR}/include
     ${ASCENDC_SYS_DIR}/include/acl/
     ${ASCENDC_SYS_DIR}/pkg_inc/
@@ -534,7 +525,6 @@ target_include_directories(ascendc_utest_asc_plugin PRIVATE
     ${ASC_PLUGIN_TEST_HEADERS_FILES}
     ${JSON_PATH}/include/
     ${ASCENDC_SYS_DIR}/include
-    ${ASCENDC_SYS_DIR}/include/experiment/
 )
 target_compile_options(ascendc_utest_asc_plugin PRIVATE
     -g
