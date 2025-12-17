@@ -14,14 +14,11 @@
 #include "c_api_instr_impl/sync_c_api_impl/sync_c_api_impl.h"
 #include "c_api_utils_intf.h"
 
-template<typename Pipe, typename TPipe>
-__aicore__ inline void asc_sync_notify(Pipe pipe, TPipe tpipe, int id);
+#define asc_sync_notify(pipe, tpipe, id) asc_sync_notify_impl(pipe, tpipe, id)
 
-template<typename Pipe, typename TPipe>
-__aicore__ inline void asc_sync_wait(Pipe pipe, TPipe tpipe, int id);
+#define asc_sync_wait(pipe, tpipe, id) asc_sync_wait_impl(pipe, tpipe, id)
 
-template<typename Pipe>
-__aicore__ inline void asc_sync(Pipe pipe);
+#define asc_sync_pipe(pipe) asc_sync_pipe_impl(pipe)
 
 __aicore__ inline void asc_sync_vec();
 

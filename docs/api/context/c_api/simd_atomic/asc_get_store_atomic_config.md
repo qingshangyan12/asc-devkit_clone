@@ -55,7 +55,7 @@ __aicore__ inline int64_t asc_get_store_atomic_config()
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

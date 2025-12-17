@@ -8,17 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_WAIT_FLAG_IMPL_ASC_2201_WAIT_FLAG_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_WAIT_FLAG_IMPL_ASC_2201_WAIT_FLAG_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_CTRL_IMPL_ASC_2201_ASC_GET_CTRL_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_CTRL_IMPL_ASC_2201_ASC_GET_CTRL_IMPL_H
 
-namespace CApiInternal {
-
-template<pipe_t pipe, pipe_t tpipe>
-__aicore__ inline void asc_sync_wait_impl(int id)
+__aicore__ inline int64_t asc_get_ctrl_impl()
 {
-    wait_flag(pipe, tpipe, static_cast<uint64_t>(id));
+    return get_ctrl();
 }
-
-} // namespace CApiInternal
 
 #endif

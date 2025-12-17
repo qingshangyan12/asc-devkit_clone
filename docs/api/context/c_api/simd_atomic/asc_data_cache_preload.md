@@ -33,7 +33,7 @@ __aicore__ inline void asc_data_cache_preload(uint64_t* address, int64_t offset)
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

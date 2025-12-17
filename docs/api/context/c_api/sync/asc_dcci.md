@@ -41,7 +41,7 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 
 ## 约束说明

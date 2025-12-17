@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-针对PIPE_TYPE_MTE2流水线执行同步操作。
+针对PIPE_MTE2流水线执行同步操作。
 
 ## 函数原型
 
@@ -29,7 +29,7 @@ __aicore__ inline void asc_sync_mte2(int id)
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

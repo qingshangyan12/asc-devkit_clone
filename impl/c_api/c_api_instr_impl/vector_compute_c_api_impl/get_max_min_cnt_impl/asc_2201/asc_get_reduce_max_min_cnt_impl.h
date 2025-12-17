@@ -8,16 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_MAX_MIN_CNT_IMPL_ASC_2201_GET_MAX_MIN_CNT_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_MAX_MIN_CNT_IMPL_ASC_2201_GET_MAX_MIN_CNT_IMPL_H
-
-namespace CApiInternal {
-
-constexpr uint8_t offset = 32;
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_MAX_MIN_CNT_IMPL_ASC_2201_ASC_GET_REDUCE_MAX_MIN_CNT_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_MAX_MIN_CNT_IMPL_ASC_2201_ASC_GET_REDUCE_MAX_MIN_CNT_IMPL_H
 
 __aicore__ inline void asc_get_reduce_max_min_cnt_impl(half& val, uint32_t& index)
 {
 #if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
+    constexpr uint8_t offset = 32;
     int64_t max_min_cnt = get_max_min_cnt();
     union {
         half h;
@@ -31,6 +28,7 @@ __aicore__ inline void asc_get_reduce_max_min_cnt_impl(half& val, uint32_t& inde
 __aicore__ inline void asc_get_reduce_max_min_cnt_impl(float& val, uint32_t& index)
 {
 #if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
+    constexpr uint8_t offset = 32;
     int64_t max_min_cnt = get_max_min_cnt();
     union {
         float f;
@@ -40,7 +38,5 @@ __aicore__ inline void asc_get_reduce_max_min_cnt_impl(float& val, uint32_t& ind
     index = 0xffffffff & (max_min_cnt >> offset);
 #endif
 }
-
-} // namespace CApiInternal
 
 #endif

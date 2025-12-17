@@ -31,18 +31,6 @@
 */
 using order_t = Order_t;
 
-template<pipe_t PIPE>
-using PipeType = std::integral_constant<pipe_t, PIPE>;
-
-#define PIPE_TYPE_S PipeType<PIPE_S>{}
-#define PIPE_TYPE_V PipeType<PIPE_V>{}
-#define PIPE_TYPE_M PipeType<PIPE_M>{}
-#define PIPE_TYPE_MTE1 PipeType<PIPE_MTE1>{}
-#define PIPE_TYPE_MTE2 PipeType<PIPE_MTE2>{}
-#define PIPE_TYPE_MTE3 PipeType<PIPE_MTE3>{}
-#define PIPE_TYPE_ALL PipeType<PIPE_ALL>{}
-#define PIPE_TYPE_FIX PipeType<PIPE_FIX>{}
-
 constexpr uint16_t CAPI_DATABLOCK_NUM = 8;
 constexpr uint16_t CAPI_ONE_DATABLOCK_SIZE = 32;
 

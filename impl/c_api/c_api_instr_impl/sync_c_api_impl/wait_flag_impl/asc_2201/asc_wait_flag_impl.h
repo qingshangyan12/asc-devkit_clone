@@ -8,16 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_SYS_CNT_IMPL_ASC_2201_GET_SYS_CNT_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_SYS_CNT_IMPL_ASC_2201_GET_SYS_CNT_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_WAIT_FLAG_IMPL_ASC_2201_ASC_WAIT_FLAG_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_WAIT_FLAG_IMPL_ASC_2201_ASC_WAIT_FLAG_IMPL_H
 
-namespace CApiInternal {
-
-__aicore__ inline int64_t asc_get_system_cycle_impl()
-{
-    return get_sys_cnt();
-}
-
-} // namespace CApiInternal
+#define asc_sync_wait_impl(pipe, tpipe, id) wait_flag(pipe, tpipe, static_cast<uint64_t>(id))
 
 #endif

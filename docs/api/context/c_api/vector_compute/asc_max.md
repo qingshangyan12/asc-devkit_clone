@@ -60,7 +60,7 @@ __aicore__ inline void asc_max_sync(__ubuf__ float* dst, __ubuf__ float* src0, _
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 

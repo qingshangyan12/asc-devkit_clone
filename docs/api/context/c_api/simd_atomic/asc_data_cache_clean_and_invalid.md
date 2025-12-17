@@ -32,7 +32,7 @@ __aicore__ inline void asc_data_cache_clean_and_invalid(__gm__ void* dst, uint64
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

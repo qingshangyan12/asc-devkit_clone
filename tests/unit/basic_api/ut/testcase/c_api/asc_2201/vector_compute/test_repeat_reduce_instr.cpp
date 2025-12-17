@@ -14,7 +14,7 @@
 #include "c_api/asc_simd.h"
 #include "c_api/c_api_utils_intf.h"
 
-#define TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(class_name, c_api_name, cce_name, data_type)    \
+#define TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(class_name, c_api_name, cce_name, data_type, in_order)    \
                                                                                                 \
 class TestVectorCompute##class_name##data_type : public testing::Test {                         \
 protected:                                                                                      \
@@ -24,7 +24,7 @@ protected:                                                                      
                                                                                                 \
 namespace {                                                                                     \
                                                                                                 \
-void cce_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_Stub(__ubuf__ data_type *dst,  \
+void cce_name##_##data_type##_##in_order##_uint8_t_uint16_t_uint16_t_uint16_t_Stub(__ubuf__ data_type *dst,  \
                 __ubuf__ data_type *src, uint8_t repeat, uint16_t dst_repeat_stride,            \
                 uint16_t src0_stride, uint16_t src1_stride, order_t order)                      \
 {                                                                                               \
@@ -34,20 +34,20 @@ void cce_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_Stub(__ubuf__ d
     EXPECT_EQ(dst_repeat_stride, static_cast<uint16_t>(8));                                     \
     EXPECT_EQ(src0_stride, static_cast<uint16_t>(1));                                           \
     EXPECT_EQ(src1_stride, static_cast<uint16_t>(8));                                           \
-    EXPECT_EQ(order, order_t::ONLY_VALUE);                                                      \
+    EXPECT_EQ(order, order_t::in_order);                                                        \
 }                                                                                               \
                                                                                                 \
-void cce_name##_##data_type##_##data_type##_uint64_t_Stub(__ubuf__ data_type *dst,              \
+void cce_name##_##data_type##_##in_order##_uint64_t_Stub(__ubuf__ data_type *dst,               \
                 __ubuf__ data_type *src, uint8_t repeat,                                        \
                 uint16_t dst_repeat_stride, uint16_t src0_stride, uint16_t src1_stride,         \
                 order_t order)                                                                  \
 {                                                                                               \
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type *>(11));                                 \
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ data_type *>(22));                                 \
-    EXPECT_EQ(order, order_t::ONLY_VALUE);                                                      \
+    EXPECT_EQ(order, order_t::in_order);                                                        \
 }                                                                                               \
                                                                                                 \
-void cce_name##_##data_type##_set_vector_mask_Stub(uint64_t mask1, uint64_t mask0)              \
+void cce_name##_##data_type##_##in_order##_set_vector_mask_Stub(uint64_t mask1, uint64_t mask0)              \
 {                                                                                               \
     EXPECT_EQ(mask1, static_cast<uint64_t>(0));                                                 \
     EXPECT_EQ(mask0, static_cast<uint64_t>(44));                                                \
@@ -65,14 +65,13 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_Red
     config.src_block_stride = static_cast<uint64_t>(1);                                         \
     config.src_repeat_stride = static_cast<uint64_t>(8);                                        \
     config.repeat = static_cast<uint64_t>(1);                                                   \
-    order_t order = order_t::ONLY_VALUE;                                                        \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, __ubuf__ data_type *,                       \
                 uint8_t, uint16_t, uint16_t, uint16_t, order_t))                                \
             .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_Stub));    \
+            .will(invoke(cce_name##_##data_type##_##in_order##_uint8_t_uint16_t_uint16_t_uint16_t_Stub));    \
                                                                                                 \
-    c_api_name(dst, src, config, order);                                                        \
+    c_api_name(dst, src, config);                                                               \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -81,17 +80,16 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_int
     __ubuf__ data_type *dst =  reinterpret_cast<__ubuf__ data_type *>(11);                      \
     __ubuf__ data_type *src =  reinterpret_cast<__ubuf__ data_type *>(22);                      \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
-    order_t order = order_t::ONLY_VALUE;                                                        \
     MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                       \
                 .times(1)                                                                       \
-                .will(invoke(cce_name##_##data_type##_set_vector_mask_Stub));                   \
+                .will(invoke(cce_name##_##data_type##_##in_order##_set_vector_mask_Stub));                   \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, __ubuf__ data_type *,                       \
                 uint8_t, uint16_t, uint16_t, uint16_t, order_t))                                \
             .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_##data_type##_uint64_t_Stub));                \
+            .will(invoke(cce_name##_##data_type##_##in_order##_uint64_t_Stub));                 \
                                                                                                 \
-    c_api_name(dst, src, count, order);                                                         \
+    c_api_name(dst, src, count);                                                                \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -100,22 +98,35 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_half_half_hal
     __ubuf__ data_type *dst =  reinterpret_cast<__ubuf__ data_type *>(11);                      \
     __ubuf__ data_type *src =  reinterpret_cast<__ubuf__ data_type *>(22);                      \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
-    order_t order = order_t::ONLY_VALUE;                                                        \
     MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                       \
                 .times(1)                                                                       \
-                .will(invoke(cce_name##_##data_type##_set_vector_mask_Stub));                   \
+                .will(invoke(cce_name##_##data_type##_##in_order##_set_vector_mask_Stub));                   \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, __ubuf__ data_type *,                       \
                 uint8_t, uint16_t, uint16_t, uint16_t, order_t))                                \
             .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_##data_type##_uint64_t_Stub));                \
-    c_api_name##_sync(dst, src, count, order);                                                  \
+            .will(invoke(cce_name##_##data_type##_##in_order##_uint64_t_Stub));                \
+    c_api_name##_sync(dst, src, count);                                                         \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
 // ==========asc_repeat_reduce(half/float)==========
-TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax, asc_repeat_reduce_max, vcmax, half);
-TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax, asc_repeat_reduce_max, vcmax, float);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax_INDEX_VALUE, asc_repeat_reduce_max_index_value, vcmax, half, INDEX_VALUE);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax_INDEX_VALUE, asc_repeat_reduce_max_index_value, vcmax, float, INDEX_VALUE);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin_INDEX_VALUE, asc_repeat_reduce_min_index_value, vcmin, half, INDEX_VALUE);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin_INDEX_VALUE, asc_repeat_reduce_min_index_value, vcmin, float, INDEX_VALUE);
 
-TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin, asc_repeat_reduce_min, vcmin, half);
-TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin, asc_repeat_reduce_min, vcmin, float);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax_VALUE_INDEX, asc_repeat_reduce_max_value_index, vcmax, half, VALUE_INDEX);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax_VALUE_INDEX, asc_repeat_reduce_max_value_index, vcmax, float, VALUE_INDEX);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin_VALUE_INDEX, asc_repeat_reduce_min_value_index, vcmin, half, VALUE_INDEX);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin_VALUE_INDEX, asc_repeat_reduce_min_value_index, vcmin, float, VALUE_INDEX);
+
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax_ONLY_VALUE, asc_repeat_reduce_max_only_value, vcmax, half, ONLY_VALUE);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax_ONLY_VALUE, asc_repeat_reduce_max_only_value, vcmax, float, ONLY_VALUE);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin_ONLY_VALUE, asc_repeat_reduce_min_only_value, vcmin, half, ONLY_VALUE);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin_ONLY_VALUE, asc_repeat_reduce_min_only_value, vcmin, float, ONLY_VALUE);
+
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax_ONLY_INDEX, asc_repeat_reduce_max_only_index, vcmax, half, ONLY_INDEX);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMax_ONLY_INDEX, asc_repeat_reduce_max_only_index, vcmax, float, ONLY_INDEX);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin_ONLY_INDEX, asc_repeat_reduce_min_only_index, vcmin, half, ONLY_INDEX);
+TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(RepeatBlockReduceMin_ONLY_INDEX, asc_repeat_reduce_min_only_index, vcmin, float, ONLY_INDEX);

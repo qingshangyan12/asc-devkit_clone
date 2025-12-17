@@ -8,16 +8,16 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_SET_CTRL_IMPL_ASC_2201_SET_CTRL_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_SET_CTRL_IMPL_ASC_2201_SET_CTRL_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_ACC_VAL_IMPL_ASC_2201_ASC_GET_ACC_VAL_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_ACC_VAL_IMPL_ASC_2201_ASC_GET_ACC_VAL_IMPL_H
 
-namespace CApiInternal {
-
-__aicore__ inline void asc_set_ctrl_impl(uint64_t config)
+__aicore__ inline int64_t asc_get_acc_val_impl()
 {
-    set_ctrl(config);
+#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
+    return get_acc_val();
+#else
+    return 0;
+#endif
 }
-
-} // namespace CApiInternal
 
 #endif

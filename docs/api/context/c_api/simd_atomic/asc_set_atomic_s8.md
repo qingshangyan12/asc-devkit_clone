@@ -27,7 +27,7 @@ __aicore__ inline int64_t asc_set_atomic_s8()
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

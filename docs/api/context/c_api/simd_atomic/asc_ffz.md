@@ -30,7 +30,7 @@ int64_t类型的数，valueIn中第一个0出现的位置。
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

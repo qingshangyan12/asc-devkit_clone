@@ -36,7 +36,7 @@ __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

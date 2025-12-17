@@ -11,13 +11,9 @@
 #ifndef IMPL_C_API_INSTR_SYS_VAR_GET_SUB_BLOCK_NUM_ASC_2201_ASC_GET_SUBBLOCK_NUM_IMPL_H
 #define IMPL_C_API_INSTR_SYS_VAR_GET_SUB_BLOCK_NUM_ASC_2201_ASC_GET_SUBBLOCK_NUM_IMPL_H
 
-namespace CApiInternal {
-
 __aicore__ inline int64_t asc_get_sub_block_num_impl()
 {
     return get_subblockdim();
 }
-
-} // namespace CApiInternal
 
 #endif

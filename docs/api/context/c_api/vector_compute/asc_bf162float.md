@@ -41,7 +41,7 @@ __aicore__ inline void asc_bf162float_sync(__ubuf__ float* dst, __ubuf__ bfloat1
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 
