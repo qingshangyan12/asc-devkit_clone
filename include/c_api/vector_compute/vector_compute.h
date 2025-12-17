@@ -141,29 +141,101 @@ __aicore__ inline void asc_repeat_reduce_sum(__ubuf__ float* dst, __ubuf__ float
 
 __aicore__ inline void asc_repeat_reduce_sum_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
-__aicore__ inline void asc_repeat_reduce_max(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config);
 
-__aicore__ inline void asc_repeat_reduce_max(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_repeat_reduce_max_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_index_value_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_repeat_reduce_max(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config);
 
-__aicore__ inline void asc_repeat_reduce_max(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
-__aicore__ inline void asc_repeat_reduce_max_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_index_value_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
-__aicore__ inline void asc_repeat_reduce_min(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config);
 
-__aicore__ inline void asc_repeat_reduce_min(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_repeat_reduce_min_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_value_index_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_repeat_reduce_min(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config);
 
-__aicore__ inline void asc_repeat_reduce_min(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
-__aicore__ inline void asc_repeat_reduce_min_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count, order_t order);
+__aicore__ inline void asc_repeat_reduce_max_value_index_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_max_only_value_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_max_only_value_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_max_only_index_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_max_only_index_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_index_value(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_min_index_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_index_value_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_index_value(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_min_index_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_index_value_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_value_index(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_min_value_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_value_index_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_value_index(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_min_value_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_value_index_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_only_value(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_min_only_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_only_value_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_only_value(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_min_only_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_only_value_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_only_index(__ubuf__ half* dst, __ubuf__ half* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_min_only_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_only_index_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_only_index(__ubuf__ float* dst, __ubuf__ float* src, const asc_repeat_reduce_config& config);
+
+__aicore__ inline void asc_repeat_reduce_min_only_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_repeat_reduce_min_only_index_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
 // ==========asc_bf162float==========
 __aicore__ inline void asc_bf162float(__ubuf__ float* dst, __ubuf__ bfloat16_t* src, const asc_unary_config& config);

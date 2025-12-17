@@ -32,7 +32,7 @@ __aicore__ inline void asc_icache_preload(uint64_t *address, int16_t offset);
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

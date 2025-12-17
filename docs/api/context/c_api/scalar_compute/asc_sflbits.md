@@ -33,7 +33,7 @@ __aicore__ inline int64_t asc_sflbits(int64_t value)
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

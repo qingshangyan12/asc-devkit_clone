@@ -42,7 +42,7 @@
 
 ### 流水类型
 
-PIPE_TYPE_MTE2
+PIPE_MTE2
 
 ### 约束说明
 

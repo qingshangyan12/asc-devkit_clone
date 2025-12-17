@@ -48,7 +48,7 @@ Score和Index分别存储在src0和src1中，按Score进行排序（Score大的�
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 

@@ -63,7 +63,7 @@ __aicore__ inline void asc_add_scalar_sync(_ubuf__ float* dst, _ubuf__ float* sr
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 

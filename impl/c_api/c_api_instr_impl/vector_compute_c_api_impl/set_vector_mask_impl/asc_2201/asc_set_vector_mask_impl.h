@@ -8,23 +8,14 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_VMS4_SR_IMPL_ASC_2201_GET_VMS4_SR_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_VMS4_SR_IMPL_ASC_2201_GET_VMS4_SR_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_VECTOR_MASK_IMPL_ASC_2201_ASC_SET_VECTOR_MASK_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_VECTOR_MASK_IMPL_ASC_2201_ASC_SET_VECTOR_MASK_IMPL_H
 
-namespace CApiInternal {
-
-__aicore__ inline void asc_get_vms4_sr_impl(uint16_t sorted_num[4])
+__aicore__ inline void asc_set_vector_mask_impl(uint64_t mask1, uint64_t mask0)
 {
 #if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    uint8_t offset_step = 16;
-    uint64_t vms4_sr = (uint64_t)get_vms4_sr();
-    sorted_num[0] = 0xffff & vms4_sr;
-    sorted_num[1] = 0xffff & (vms4_sr >> offset_step); // >> 16
-    sorted_num[2] = 0xffff & (vms4_sr >> (offset_step * 2)); // >> 32
-    sorted_num[3] = 0xffff & (vms4_sr >> (offset_step * 3)); // >> 48
+    set_vector_mask(mask1, mask0);
 #endif
 }
-
-} // namespace CApiInternal
 
 #endif

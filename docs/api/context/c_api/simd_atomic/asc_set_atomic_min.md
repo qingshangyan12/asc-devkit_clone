@@ -27,7 +27,7 @@ __aicore__ inline void asc_set_atomic_min()
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 
@@ -38,7 +38,7 @@ PIPE_TYPE_S
 ```cpp
 // dst为目标数据地址，src0, src1为源数据地址，total_length指参与计算的数据长度
 asc_copy_ub2gm(dst, src0, total_length);
-asc_sync(PIPE_TYPE_MTE3);
+asc_sync_pipe(PIPE_MTE3);
 asc_set_atomic_min();
 asc_copy_ub2gm(dst, src1, total_length);
 asc_set_atomic_none();

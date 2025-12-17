@@ -11,37 +11,37 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_DATAMOVE_C_API_IMPL_VECTOR_DATAMOVE_C_API_IMPL_VECTOR_DATAMOVE_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_DATAMOVE_C_API_IMPL_VECTOR_DATAMOVE_C_API_IMPL_VECTOR_DATAMOVE_C_API_IMPL_H
 
-#include "copy_gm_to_ubuf_impl/asc_2201/copy_gm_to_ubuf_impl.h"
-#include "copy_ubuf_to_gm_impl/asc_2201/copy_ubuf_to_gm_impl.h"
+#include "copy_gm_to_ubuf_impl/asc_2201/asc_copy_gm_to_ubuf_impl.h"
+#include "copy_ubuf_to_gm_impl/asc_2201/asc_copy_ubuf_to_gm_impl.h"
 
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
 {
-    CApiInternal::asc_copy_gm2ub_impl(dst, src, size);
+    asc_copy_gm2ub_impl(dst, src, size);
 }
 
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, const asc_copy_config& config)
 {
-    CApiInternal::asc_copy_gm2ub_impl(dst, src, config);
+    asc_copy_gm2ub_impl(dst, src, config);
 }
 
 __aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
 {
-    CApiInternal::asc_copy_gm2ub_sync_impl(dst, src, size);
+    asc_copy_gm2ub_sync_impl(dst, src, size);
 }
 
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
 {
-    CApiInternal::asc_copy_ub2gm_impl(dst, src, size);
+    asc_copy_ub2gm_impl(dst, src, size);
 }
 
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, const asc_copy_config& config)
 {
-    CApiInternal::asc_copy_ub2gm_impl(dst, src, config);
+    asc_copy_ub2gm_impl(dst, src, config);
 }
 
 __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
 {
-    CApiInternal::asc_copy_ub2gm_sync_impl(dst, src, size);
+    asc_copy_ub2gm_sync_impl(dst, src, size);
 }
 
 #endif

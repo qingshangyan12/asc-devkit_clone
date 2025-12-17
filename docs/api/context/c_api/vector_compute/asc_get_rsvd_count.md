@@ -27,7 +27,7 @@
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 
@@ -40,7 +40,7 @@ PIPE_TYPE_S
 // 初始化dst、src0、src1和total_length(参与计算的数据长度)
 int total_length = 256;
 asc_reduce(dst, src0, src1, total_length)
-asc_sync_notify(PIPE_TYPE_V, PIPE_TYPE_S, 0); // 设置等待和同步信号
-asc_sync_wait(PIPE_TYPE_V, PIPE_TYPE_S, 0);
+asc_sync_notify(PIPE_V, PIPE_S, 0); // 设置等待和同步信号
+asc_sync_wait(PIPE_V, PIPE_S, 0);
 int64_t result = asc_get_rsvd_count();  // 获取结果
 ```

@@ -8,16 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_IMM_IMPL_ASC_2201_GET_IMM_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_IMM_IMPL_ASC_2201_GET_IMM_IMPL_H
-
-namespace CApiInternal {
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_IMM_IMPL_ASC_2201_ASC_GET_PHY_BUF_ADDR_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_IMM_IMPL_ASC_2201_ASC_GET_PHY_BUF_ADDR_IMPL_H
 
 __aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset)
 {
     return get_imm(offset);
 }
-
-} // namespace CApiInternal
 
 #endif

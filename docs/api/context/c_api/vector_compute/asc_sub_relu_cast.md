@@ -57,7 +57,7 @@ __aicore__ inline void asc_sub_relu_cast_sync(_ubuf__ int8_t* dst, _ubuf__ int16
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 

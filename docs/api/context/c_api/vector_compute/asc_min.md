@@ -55,7 +55,7 @@ __aicore__ inline void asc_min(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 

@@ -13,46 +13,28 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_SYNC_C_API_IMPL_H
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
-#include "set_flag_impl/asc_2201/set_flag_impl.h"
-#include "wait_flag_impl/asc_2201/wait_flag_impl.h"
-#include "pipe_barrier_impl/asc_2201/pipe_barrier_impl.h"
-
-template<typename Pipe, typename TPipe>
-__aicore__ inline void asc_sync_notify(Pipe pipe, TPipe tpipe, int id)
-{
-    CApiInternal::asc_sync_notify_impl<Pipe::value, TPipe::value>(id);
-}
-
-template<typename Pipe, typename TPipe>
-__aicore__ inline void asc_sync_wait(Pipe pipe, TPipe tpipe, int id)
-{
-    CApiInternal::asc_sync_wait_impl<Pipe::value, TPipe::value>(id);
-}
-
-template<typename Pipe>
-__aicore__ inline void asc_sync(Pipe pipe)
-{
-    CApiInternal::asc_sync_impl<Pipe::value>();
-}
+#include "set_flag_impl/asc_2201/asc_set_flag_impl.h"
+#include "wait_flag_impl/asc_2201/asc_wait_flag_impl.h"
+#include "pipe_barrier_impl/asc_2201/asc_pipe_barrier_impl.h"
 
 __aicore__ inline void asc_sync_vec()
 {
-    CApiInternal::asc_sync_vec_impl();
+    asc_sync_vec_impl();
 }
 
 __aicore__ inline void asc_sync_mte3(int id)
 {
-    CApiInternal::asc_sync_mte3_impl(id);
+    asc_sync_mte3_impl(id);
 }
 
 __aicore__ inline void asc_sync_mte2(int id)
 {
-    CApiInternal::asc_sync_mte2_impl(id);
+    asc_sync_mte2_impl(id);
 }
 
 __aicore__ inline void asc_sync()
 {
-    CApiInternal::asc_sync_impl();
+    asc_sync_impl();
 }
 
 #endif

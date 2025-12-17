@@ -7,16 +7,12 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_BLOCK_NUM_IMPL_ASC_2201_GET_BLOCK_NUM_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_BLOCK_NUM_IMPL_ASC_2201_GET_BLOCK_NUM_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_SUB_BLOCK_ID_IMPL_ASC_2201_ASC_GET_SUB_BLOCK_ID_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_SUB_BLOCK_ID_IMPL_ASC_2201_ASC_GET_SUB_BLOCK_ID_IMPL_H
 
-namespace CApiInternal {
-
-__aicore__ inline int64_t asc_get_block_num_impl()
+__aicore__ inline int64_t asc_get_sub_block_id_impl()
 {
-    return get_block_num();
-}
-    
+    return get_subblockid();
 }
 
 #endif

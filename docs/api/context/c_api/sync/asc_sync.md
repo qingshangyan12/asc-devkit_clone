@@ -15,7 +15,7 @@
 
 ```cpp
 template<typename Pipe>
-__aicore__ inline void asc_sync(Pipe pipe);
+__aicore__ inline void asc_sync_pipe(Pipe pipe);
 __aicore__ inline void asc_sync()
 ```
 
@@ -31,7 +31,7 @@ __aicore__ inline void asc_sync()
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 
