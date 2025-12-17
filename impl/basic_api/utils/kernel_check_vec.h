@@ -181,7 +181,7 @@ bool CheckMmadParams(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
 #endif
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 9201))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 template <typename T, typename U, typename S, typename V>
 bool CheckMmadParams(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const LocalTensor<V>& bias, const uint64_t& mmadParams,

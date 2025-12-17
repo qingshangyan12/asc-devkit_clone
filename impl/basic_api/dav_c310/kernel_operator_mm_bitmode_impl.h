@@ -33,36 +33,28 @@ struct Load2DBitModeConfig0 {
         mStep = loadData2DParams_.mStep;
         kStep = loadData2DParams_.kStep;
     }
-    __aicore__ inline void SetMStartPosition(uint32_t mStartPosition_)
-    {
+    __aicore__ inline void SetMStartPosition(uint32_t mStartPosition_) {
         mStartPosition = mStartPosition_;
     };
-    __aicore__ inline void SetKStartPosition(uint32_t kStartPosition_)
-    {
+    __aicore__ inline void SetKStartPosition(uint32_t kStartPosition_) {
         kStartPosition = kStartPosition_;
     };
-    __aicore__ inline void SetMStep(uint16_t mStep_)
-    {
+    __aicore__ inline void SetMStep(uint16_t mStep_) {
         mStep = mStep_;
     };
-    __aicore__ inline void SetKStep(uint16_t kStep_)
-    {
+    __aicore__ inline void SetKStep(uint16_t kStep_) {
         kStep = kStep_;
     };
-    __aicore__ inline uint32_t GetMStartPosition() const
-    {
+    __aicore__ inline uint32_t GetMStartPosition() const {
         return mStartPosition;
     };
-    __aicore__ inline uint32_t GetKStartPosition() const
-    {
+    __aicore__ inline uint32_t GetKStartPosition() const {
         return kStartPosition;
     };
-    __aicore__ inline uint16_t GetMStep() const
-    {
+    __aicore__ inline uint16_t GetMStep() const {
         return mStep;
     };
-    __aicore__ inline uint16_t GetKStep() const
-    {
+    __aicore__ inline uint16_t GetKStep() const {
         return kStep;
     };
 };
@@ -74,21 +66,16 @@ struct Load2DBitModeConfig1 {
         srcStride = loadData2DParams_.srcStride;
         dstStride = loadData2DParams_.dstStride;
     }
-
-    __aicore__ inline void SetSrcStride(int32_t srcStride_)
-    {
+    __aicore__ inline void SetSrcStride(int32_t srcStride_) {
         srcStride = srcStride_;
     };
-    __aicore__ inline void SetDstStride(uint16_t dstStride_)
-    {
+    __aicore__ inline void SetDstStride(uint16_t dstStride_) {
         dstStride = dstStride_;
     };
-    __aicore__ inline int32_t GetSrcStride() const
-    {
+    __aicore__ inline int32_t GetSrcStride() const {
         return srcStride;
     };
-    __aicore__ inline uint16_t GetDstStride() const
-    {
+    __aicore__ inline uint16_t GetDstStride() const {
         return dstStride;
     };
 };
@@ -106,36 +93,28 @@ struct Load3DBitModeConfig0 {
         kPos = loadData3DParams_.kStartPt;
         mPos = loadData3DParams_.mStartPt;
     }
-    __aicore__ inline void SetKExtension(uint16_t kExtension)
-    {
+    __aicore__ inline void SetKExtension(uint16_t kExtension) {
         kStep = kExtension;
     };
-    __aicore__ inline void SetMExtension(uint16_t mExtension)
-    {
+    __aicore__ inline void SetMExtension(uint16_t mExtension) {
         mStep = mExtension;
     };
-    __aicore__ inline void SetKStartPt(uint16_t kStartPt)
-    {
+    __aicore__ inline void SetKStartPt(uint16_t kStartPt) {
         kPos = kStartPt;
     };
-    __aicore__ inline void SetMStartPt(uint16_t mStartPt)
-    {
+    __aicore__ inline void SetMStartPt(uint16_t mStartPt) {
         mPos = mStartPt;
     };
-    __aicore__ inline uint16_t GetKExtension() const
-    {
+    __aicore__ inline uint16_t GetKExtension() const {
         return kStep;
     };
-    __aicore__ inline uint16_t GetMExtension() const
-    {
+    __aicore__ inline uint16_t GetMExtension() const {
         return mStep;
     };
-    __aicore__ inline uint16_t GetKStartPt() const
-    {
+    __aicore__ inline uint16_t GetKStartPt() const {
         return kPos;
     };
-    __aicore__ inline uint16_t GetMStartPt() const
-    {
+    __aicore__ inline uint16_t GetMStartPt() const {
         return mPos;
     };
 };
@@ -168,92 +147,70 @@ struct Load3DBitModeConfig1 {
         sizeChannel = loadData3DParams_.channelSize;
     }
 
-    __aicore__ inline void SetStrideW(uint8_t strideW_)
-    {
+    __aicore__ inline void SetStrideW(uint8_t strideW_) {
         strideW = strideW_;
     };
-    __aicore__ inline void SetStrideH(uint8_t strideH_)
-    {
+    __aicore__ inline void SetStrideH(uint8_t strideH_) {
         strideH = strideH_;
     };
-    __aicore__ inline void SetFilterW(uint8_t filterW_)
-    {
+    __aicore__ inline void SetFilterW(uint8_t filterW_) {
         Wk = filterW_;
     };
-    __aicore__ inline void SetFilterH(uint8_t filterH_)
-    {
+    __aicore__ inline void SetFilterH(uint8_t filterH_) {
         Hk = filterH_;
     };
-    __aicore__ inline void SetDilationFilterW(uint8_t dilationFilterW_)
-    {
+    __aicore__ inline void SetDilationFilterW(uint8_t dilationFilterW_) {
         dilationW = dilationFilterW_;
     };
-    __aicore__ inline void SetDilationFilterH(uint8_t dilationFilterH_)
-    {
+    __aicore__ inline void SetDilationFilterH(uint8_t dilationFilterH_) {
         dilationH = dilationFilterH_;
     };
-    __aicore__ inline void SetFilterSizeW(bool filterSizeW_)
-    {
+    __aicore__ inline void SetFilterSizeW(bool filterSizeW_) {
         filterW = filterSizeW_;
     };
-    __aicore__ inline void SetFilterSizeH(bool filterSizeH_)
-    {
+    __aicore__ inline void SetFilterSizeH(bool filterSizeH_) {
         filterH = filterSizeH_;
     };
-    __aicore__ inline void SetTranspose(bool transpose_)
-    {
+    __aicore__ inline void SetTranspose(bool transpose_) {
         transpose = transpose_;
     };
-    __aicore__ inline void SetFMatrixCtrl(bool fMatrixCtrl_)
-    {
+    __aicore__ inline void SetFMatrixCtrl(bool fMatrixCtrl_) {
         fMatrixCtrl = fMatrixCtrl_;
     };
-    __aicore__ inline void SetChannelSize(uint16_t channelSize_)
-    {
+    __aicore__ inline void SetChannelSize(uint16_t channelSize_) {
         sizeChannel = channelSize_;
     };
-    __aicore__ inline uint8_t GetStrideW() const
-    {
+    __aicore__ inline uint8_t GetStrideW() const {
         return strideW;
     };
-    __aicore__ inline uint8_t GetStrideH() const
-    {
+    __aicore__ inline uint8_t GetStrideH() const {
         return strideH;
     };
-    __aicore__ inline uint8_t GetFilterW() const
-    {
+    __aicore__ inline uint8_t GetFilterW() const {
         return Wk;
     };
-    __aicore__ inline uint8_t GetFilterH() const
-    {
+    __aicore__ inline uint8_t GetFilterH() const {
         return Hk;
     };
-    __aicore__ inline uint8_t GetDilationFilterW() const
-    {
+    __aicore__ inline uint8_t GetDilationFilterW() const {
         return dilationW;
     };
-    __aicore__ inline uint8_t GetDilationFilterH() const
-    {
+    __aicore__ inline uint8_t GetDilationFilterH() const {
         return dilationH;
     };
-    __aicore__ inline bool GetFilterSizeW() const
-    {
+    __aicore__ inline bool GetFilterSizeW() const {
         return filterW;
     };
-    __aicore__ inline bool GetFilterSizeH() const
-    {
+    __aicore__ inline bool GetFilterSizeH() const {
         return filterH;
     };
-    __aicore__ inline bool GetTranspose() const
-    {
+    __aicore__ inline bool GetTranspose() const {
         return transpose;
     };
-    __aicore__ inline bool GetFMatrixCtrl() const
-    {
+    __aicore__ inline bool GetFMatrixCtrl() const {
         return fMatrixCtrl;
     };
-    __aicore__ inline uint16_t GetChannelSize() const
-    {
+    __aicore__ inline uint16_t GetChannelSize() const {
         return sizeChannel;
     };
 };
@@ -271,24 +228,20 @@ struct SetFMatrixBitModeConfig0 {
         l1H = loadData3DParams_.l1H;
         l1W = loadData3DParams_.l1W;
     }
-    __aicore__ inline void SetL1H(uint16_t l1H_)
-    {
+    __aicore__ inline void SetL1H(uint16_t l1H_) {
         l1H = l1H_;
     };
-    __aicore__ inline void SetL1W(uint16_t l1W_)
-    {
+    __aicore__ inline void SetL1W(uint16_t l1W_) {
         l1W = l1W_;
     };
-    __aicore__ inline void SetPadList(const uint8_t padList_[4])
-    {
+    __aicore__ inline void SetPadList(const uint8_t padList_[4]) {
         padList0 = padList_[0];
-        padList0 = padList_[1];
-        padList0 = padList_[PADLIST2];
-        padList0 = padList_[PADLIST3];
+        padList1 = padList_[1];
+        padList2 = padList_[PADLIST2];
+        padList3 = padList_[PADLIST3];
     };
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
 struct MmadBitModeConfig0 {
     uint64_t m:12;
     uint64_t k:12;
@@ -309,66 +262,49 @@ struct MmadBitModeConfig0 {
         cmatrixSource = mmadParams_.cmatrixSource;
         cmatrixInitVal = mmadParams_.cmatrixInitVal;
     }
-
-    __aicore__ inline void SetM(uint16_t m_)
-    {
+    __aicore__ inline void SetM(uint16_t m_) {
         m = m_;
     };
-    __aicore__ inline void SetK(uint16_t k_)
-    {
+    __aicore__ inline void SetK(uint16_t k_) {
         k = k_;
     };
-    __aicore__ inline void SetN(uint16_t n_)
-    {
+    __aicore__ inline void SetN(uint16_t n_) {
         n = n_;
     };
-    __aicore__ inline void SetUnitFlag(uint8_t unitFlag_)
-    {
+    __aicore__ inline void SetUnitFlag(uint8_t unitFlag_) {
         unitFlag = unitFlag_;
     };
-    __aicore__ inline void SetDisableGemv(bool disableGemv_)
-    {
+    __aicore__ inline void SetDisableGemv(bool disableGemv_) {
         disableGemv = disableGemv_;
     };
-    __aicore__ inline void SetCmatrixSource(bool cmatrixSource_)
-    {
+    __aicore__ inline void SetCmatrixSource(bool cmatrixSource_) {
         cmatrixSource = cmatrixSource_;
     };
-    __aicore__ inline void SetCmatrixInitVal(bool cmatrixInitVal_)
-    {
+    __aicore__ inline void SetCmatrixInitVal(bool cmatrixInitVal_) {
         cmatrixInitVal = cmatrixInitVal_;
     };
-
-    __aicore__ inline uint16_t GetM() const
-    {
+    __aicore__ inline uint16_t GetM() const {
         return m;
     };
-    __aicore__ inline uint16_t GetK() const
-    {
+    __aicore__ inline uint16_t GetK() const {
         return k;
     };
-    __aicore__ inline uint16_t GetN() const
-    {
+    __aicore__ inline uint16_t GetN() const {
         return n;
     };
-    __aicore__ inline uint8_t GetUnitFlag() const
-    {
+    __aicore__ inline uint8_t GetUnitFlag() const {
         return unitFlag;
     };
-    __aicore__ inline bool GetDisableGemv() const
-    {
+    __aicore__ inline bool GetDisableGemv() const {
         return disableGemv;
     };
-    __aicore__ inline bool GetCmatrixSource() const
-    {
+    __aicore__ inline bool GetCmatrixSource() const {
         return cmatrixSource;
     };
-    __aicore__ inline bool GetCmatrixInitVal() const
-    {
+    __aicore__ inline bool GetCmatrixInitVal() const {
         return cmatrixInitVal;
     };
 };
-#endif
 }  // namespace AscendC
 
 #endif  // ASCENDC_MODULE_OPERATOR_MM_BITMODE_IMPL_H

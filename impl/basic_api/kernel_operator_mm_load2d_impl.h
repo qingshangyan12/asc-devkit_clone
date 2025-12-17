@@ -88,6 +88,7 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(const LocalTensor<T>& d
     }
 }
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const Load2DBitModeParam& loadDataParams)
@@ -112,6 +113,7 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
             ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
     }
 }
+#endif
 /* **************************************************************************************************
  * LoadData 2d with transpose                                             *
  * ************************************************************************************************* */

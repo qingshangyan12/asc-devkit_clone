@@ -17,7 +17,6 @@
 #define ASCENDC_MODULE_OPERATOR_MM_BITMODE_INTERFACE_H
 #include "kernel_struct_mm.h"
 #include "../../impl/basic_api/kernel_operator_mm_bitmode_struct.h"
-#include "../../impl/basic_api/dav_c310/kernel_operator_mm_bitmode_impl.h"
 
 namespace AscendC {
 class Load2DBitModeParam {
@@ -31,13 +30,10 @@ public:
     __aicore__ inline void SetSrcStride(int32_t srcStride_);
     __aicore__ inline void SetDstStride(uint16_t dstStride_);
     __aicore__ inline void SetIfTranspose(bool ifTranspose_);
-
-    __aicore__ inline void SetConfig0(uint64_t config0_)
-    {
+    __aicore__ inline void SetConfig0(uint64_t config0_) {
         config0 = config0_;
     };
-    __aicore__ inline void SetConfig1(uint64_t config1_)
-    {
+    __aicore__ inline void SetConfig1(uint64_t config1_) {
         config1 = config1_;
     };
 
@@ -47,17 +43,13 @@ public:
     __aicore__ inline uint16_t GetKStep() const;
     __aicore__ inline int32_t GetSrcStride() const;
     __aicore__ inline uint16_t GetDstStride() const;
-
-    __aicore__ inline uint64_t GetIfTranspose() const
-    {
+    __aicore__ inline uint64_t GetIfTranspose() const {
         return ifTranspose;
     };
-    __aicore__ inline uint64_t GetConfig0() const
-    {
+    __aicore__ inline uint64_t GetConfig0() const {
         return config0;
     };
-    __aicore__ inline uint64_t GetConfig1() const
-    {
+    __aicore__ inline uint64_t GetConfig1() const {
         return config1;
     };
 
@@ -93,13 +85,10 @@ public:
     __aicore__ inline void SetTranspose(bool transpose_);
     __aicore__ inline void SetFMatrixCtrl(bool fmatrixCtrl_);
     __aicore__ inline void SetChannelSize(uint16_t sizeChannel_);
-
-    __aicore__ inline void SetConfig0(uint64_t config0_)
-    {
+    __aicore__ inline void SetConfig0(uint64_t config0_) {
         config0 = config0_;
     };
-    __aicore__ inline void SetConfig1(uint64_t config1_)
-    {
+    __aicore__ inline void SetConfig1(uint64_t config1_) {
         config1 = config1_;
     };
 
@@ -118,13 +107,10 @@ public:
     __aicore__ inline bool GetTranspose() const;
     __aicore__ inline bool GetFMatrixCtrl() const;
     __aicore__ inline uint16_t GetChannelSize() const;
-
-    __aicore__ inline uint64_t GetConfig0() const
-    {
+    __aicore__ inline uint64_t GetConfig0() const {
         return config0;
     };
-    __aicore__ inline uint64_t GetConfig1() const
-    {
+    __aicore__ inline uint64_t GetConfig1() const {
         return config1;
     };
 
@@ -147,13 +133,10 @@ public:
     __aicore__ inline void SetL1H(uint16_t l1H_);
     __aicore__ inline void SetL1W(uint16_t l1W_);
     __aicore__ inline void SetPadList(const uint8_t padList_[4]);
-
-    __aicore__ inline void SetConfig0(uint64_t config0_)
-    {
+    __aicore__ inline void SetConfig0(uint64_t config0_) {
         config0 = config0_;
     };
-    __aicore__ inline uint64_t GetConfig0() const
-    {
+    __aicore__ inline uint64_t GetConfig0() const {
         return config0;
     };
 
@@ -176,16 +159,10 @@ public:
     __aicore__ inline void SetDisableGemv(bool disableGemv_);
     __aicore__ inline void SetCmatrixSource(bool cmatrixSource_);
     __aicore__ inline void SetCmatrixInitVal(bool cmatrixInitVal_);
-
-    __aicore__ inline void SetConfig0(uint64_t config0_)
-    {
+    __aicore__ inline void SetConfig0(uint64_t config0_) {
         config0 = config0_;
     };
-    __aicore__ inline uint64_t GetConfig0() const
-    {
-        return config0;
-    };
-
+    
     __aicore__ inline uint16_t GetM() const;
     __aicore__ inline uint16_t GetK() const;
     __aicore__ inline uint16_t GetN() const;
@@ -193,6 +170,9 @@ public:
     __aicore__ inline bool GetDisableGemv() const;
     __aicore__ inline bool GetCmatrixSource() const;
     __aicore__ inline bool GetCmatrixInitVal() const;
+    __aicore__ inline uint64_t GetConfig0() const {
+        return config0;
+    };
 
 private:
     union {
