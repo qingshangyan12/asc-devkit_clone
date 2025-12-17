@@ -28,111 +28,161 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
  * LoadData 2dv2                                             *
  * ************************************************************************************************* */
 template <typename T>
-__aicore__ inline void LoadData2DL12L0ACal(__ca__ T *dst, __cbuf__ T *src, const LoadData2DParamsV2 &loadDataParam)
+__aicore__ inline void LoadData2DL12L0ACal(__ca__ T *dst, __cbuf__ T *src, const Load2DBitModeParam &loadDataParam)
 {
     static_assert(SupportType<T, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t, int16_t,
                 float, int32_t, uint32_t, int4b_t>(),
         "LoadData 2dv2 only support uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, int16_t, float, int32_t, uint32_t, int4b_t on current device!");
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if constexpr (IsSameType<T, int4b_t>::value) {
-        if (loadDataParam.ifTranspose) {
-            load_cbuf_to_ca_s4((__ca__ void *)dst,
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_ca_s4((__ca__ void *)dst,	
                 (__cbuf__ void *)src,
-                loadDataParam.mStartPosition,
-                loadDataParam.kStartPosition,
-                loadDataParam.mStep,
-                loadDataParam.kStep,
-                loadDataParam.srcStride,
-                loadDataParam.dstStride,
+                loadDataParam.GetMStartPosition(),
+                loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(),
+                loadDataParam.GetKStep(),
+                loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(),
                 1);
         } else {
-            load_cbuf_to_ca_s4((__ca__ void *)dst,
+            load_cbuf_to_ca_s4((__ca__ void *)dst,	
                 (__cbuf__ void *)src,
-                loadDataParam.mStartPosition,
-                loadDataParam.kStartPosition,
-                loadDataParam.mStep,
-                loadDataParam.kStep,
-                loadDataParam.srcStride,
-                loadDataParam.dstStride,
+                loadDataParam.GetMStartPosition(),
+                loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(),
+                loadDataParam.GetKStep(),
+                loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(),
                 0);
         }
     } else {
-        if (loadDataParam.ifTranspose) {
+        if (loadDataParam.GetIfTranspose()) {
             load_cbuf_to_ca(dst,
                 src,
-                loadDataParam.mStartPosition,
-                loadDataParam.kStartPosition,
-                loadDataParam.mStep,
-                loadDataParam.kStep,
-                loadDataParam.srcStride,
-                loadDataParam.dstStride,
+                loadDataParam.GetMStartPosition(),
+                loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(),
+                loadDataParam.GetKStep(),
+                loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(),
                 1);
         } else {
             load_cbuf_to_ca(dst,
                 src,
-                loadDataParam.mStartPosition,
-                loadDataParam.kStartPosition,
-                loadDataParam.mStep,
-                loadDataParam.kStep,
-                loadDataParam.srcStride,
-                loadDataParam.dstStride,
+                loadDataParam.GetMStartPosition(),
+                loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(),
+                loadDataParam.GetKStep(),
+                loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(),
                 0);
         }
     }
+#else
+    if constexpr (IsSameType<T, int4b_t>::value) {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_ca_s4((__ca__ T *)dst, (__cbuf__ T *)src,
+                loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_ca_s4((__ca__ T *)dst, (__cbuf__ T *)src,
+                loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    } else {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    }
+#endif
 }
 
 template <typename T>
-__aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const LoadData2DParamsV2 &loadDataParam)
+__aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const Load2DBitModeParam &loadDataParam)
 {
     static_assert(SupportType<T, int4b_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t,
         int16_t, float, int32_t, uint32_t>(),
         "LoadData 2dv2 only support int4b_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, int16_t, float, int32_t, uint32_t on current device!");
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if constexpr (IsSameType<T, int4b_t>::value) {
-        if (loadDataParam.ifTranspose) {
-            load_cbuf_to_cb_s4((__cb__ void *)dst,
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb_s4((__cb__ void *)dst,	
                 (__cbuf__ void *)src,
-                loadDataParam.mStartPosition,
-                loadDataParam.kStartPosition,
-                loadDataParam.mStep,
-                loadDataParam.kStep,
-                loadDataParam.srcStride,
-                loadDataParam.dstStride,
+                loadDataParam.GetMStartPosition(),
+                loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(),
+                loadDataParam.GetKStep(),
+                loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(),
                 1);
         } else {
-            load_cbuf_to_cb_s4((__cb__ void *)dst,
+            load_cbuf_to_cb_s4((__cb__ void *)dst,	
                 (__cbuf__ void *)src,
-                loadDataParam.mStartPosition,
-                loadDataParam.kStartPosition,
-                loadDataParam.mStep,
-                loadDataParam.kStep,
-                loadDataParam.srcStride,
-                loadDataParam.dstStride,
+                loadDataParam.GetMStartPosition(),
+                loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(),
+                loadDataParam.GetKStep(),
+                loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(),
                 0);
         }
     } else {
-        if (loadDataParam.ifTranspose) {
+        if (loadDataParam.GetIfTranspose()) {
             load_cbuf_to_cb(dst,
                 src,
-                loadDataParam.mStartPosition,
-                loadDataParam.kStartPosition,
-                loadDataParam.mStep,
-                loadDataParam.kStep,
-                loadDataParam.srcStride,
-                loadDataParam.dstStride,
+                loadDataParam.GetMStartPosition(),
+                loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(),
+                loadDataParam.GetKStep(),
+                loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(),
                 1);
         } else {
             load_cbuf_to_cb(dst,
                 src,
-                loadDataParam.mStartPosition,
-                loadDataParam.kStartPosition,
-                loadDataParam.mStep,
-                loadDataParam.kStep,
-                loadDataParam.srcStride,
-                loadDataParam.dstStride,
+                loadDataParam.GetMStartPosition(),
+                loadDataParam.GetKStartPosition(),
+                loadDataParam.GetMStep(),
+                loadDataParam.GetKStep(),
+                loadDataParam.GetSrcStride(),
+                loadDataParam.GetDstStride(),
                 0);
         }
     }
+#else
+    if constexpr (IsSameType<T, int4b_t>::value) {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb_s4((__cb__ T *)dst, (__cbuf__ T *)src,
+                loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_cb_s4((__cb__ T *)dst, (__cbuf__ T *)src,
+                loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    } else {
+        if (loadDataParam.GetIfTranspose()) {
+            load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+        } else {
+            load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+        }
+    }
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0ACal(__ca__ T *dst, __cbuf__ T *src, const LoadData2DParamsV2 &loadDataParam)
+{
+    Load2DBitModeParam param(loadDataParam);
+    LoadData2DL12L0ACal(dst, src, param);
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const LoadData2DParamsV2 &loadDataParam)
+{
+    Load2DBitModeParam param(loadDataParam);
+    LoadData2DL12L0BCal(dst, src, param);
 }
 
 template <typename T, typename U>
@@ -429,6 +479,11 @@ __aicore__ inline void Load3DSetFMatrixCal(uint16_t l1H, uint16_t l1W, const uin
     set_fmatrix(regFMatrix);
 }
 
+__aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix)
+{
+    set_fmatrix(regFMatrix);
+}
+
 __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const uint8_t padList[4])
 {
     uint64_t regFMatrix = 0;
@@ -443,6 +498,11 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
     for (uint32_t i = 0; i < padNumber; i++) {
         regFMatrix |= uint64_t(padList[i] & 0xFF) << (padListShiftBase + i * padListShiftBit);
     }
+    set_fmatrix_b(regFMatrix);
+}
+
+__aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
+{
     set_fmatrix_b(regFMatrix);
 }
 
@@ -534,6 +594,49 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ half* dst, __cbuf__ half* sr
 template <typename T>
 __aicore__ inline void LoadData3DV2L12UBCal(__ubuf__ T* dst, __cbuf__ T* src,
     const LoadData3DParamsV2<T>& loadDataParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12UB is not supported on current device"); });
+}
+
+template <typename T>
+__aicore__ inline void LoadData3DV2L12L0ACal(__ca__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams)
+{
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    img2colv2_cbuf_to_ca(dst, src, loadDataParams.GetKExtension(), loadDataParams.GetMExtension(), loadDataParams.GetKStartPt(),
+        loadDataParams.GetMStartPt(), loadDataParams.GetStrideW(), loadDataParams.GetStrideH(), loadDataParams.GetFilterW(),
+        loadDataParams.GetFilterH(), loadDataParams.GetDilationFilterW(), loadDataParams.GetDilationFilterH(),
+        loadDataParams.GetFilterSizeW(), loadDataParams.GetFilterSizeH(), loadDataParams.GetTranspose(),
+        loadDataParams.GetFMatrixCtrl(), loadDataParams.GetChannelSize());
+#else
+    if constexpr (std::is_same<T, bfloat16_t>::value) {
+        img2colv2_cbuf_to_ca((__ca__ half *)dst, (__cbuf__ half *)src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
+    } else {
+        img2colv2_cbuf_to_ca(dst, src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
+    }
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData3DV2L12L0BCal(__cb__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams)
+{
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    img2colv2_cbuf_to_cb(dst, src, loadDataParams.GetKExtension(), loadDataParams.GetMExtension(), loadDataParams.GetKStartPt(),
+        loadDataParams.GetMStartPt(), loadDataParams.GetStrideW(), loadDataParams.GetStrideH(), loadDataParams.GetFilterW(),
+        loadDataParams.GetFilterH(), loadDataParams.GetDilationFilterW(), loadDataParams.GetDilationFilterH(),
+        loadDataParams.GetFilterSizeW(), loadDataParams.GetFilterSizeH(), loadDataParams.GetTranspose(),
+        loadDataParams.GetFMatrixCtrl(), loadDataParams.GetChannelSize());
+#else
+    if constexpr (std::is_same<T, bfloat16_t>::value) {
+        img2colv2_cbuf_to_cb((__cb__ half *)dst, (__cbuf__ half *)src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
+    } else {
+        img2colv2_cbuf_to_cb(dst, src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
+    }
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData3DV2L12UBCal(__ubuf__ T* dst, __cbuf__ T* src,
+    const Load3DBitModeParam& loadDataParams)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12UB is not supported on current device"); });
 }

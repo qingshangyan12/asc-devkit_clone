@@ -16,6 +16,7 @@
 #define ASCENDC_MODULE_OPERATOR_MM_BITMODE_INTF_IMPL_H
 
 namespace AscendC {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 __aicore__ inline Load2DBitModeParam::Load2DBitModeParam()
 {
     config0 = 0;
@@ -94,6 +95,7 @@ __aicore__ inline Load3DBitModeParam::Load3DBitModeParam(const LoadData3DParamsV
     config0BitMode.Init(loadData3DParams_);
     config1BitMode.Init(loadData3DParams_);
 };
+
 __aicore__ inline void Load3DBitModeParam::SetKExtension(uint16_t kStep_)
 {
     config0BitMode.SetKExtension(kStep_);
@@ -225,6 +227,7 @@ __aicore__ inline SetFMatrixBitModeParams::SetFMatrixBitModeParams(const LoadDat
 {
     config0BitMode.Init(loadData3DParams_);
 };
+
 __aicore__ inline void SetFMatrixBitModeParams::SetL1H(uint16_t l1H_)
 {
     config0BitMode.SetL1H(l1H_);
@@ -237,6 +240,7 @@ __aicore__ inline void SetFMatrixBitModeParams::SetPadList(const uint8_t padList
 {
     config0BitMode.SetPadList(padList_);
 };
+#endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
 __aicore__ inline MmadBitModeParams::MmadBitModeParams()
@@ -247,6 +251,7 @@ __aicore__ inline MmadBitModeParams::MmadBitModeParams(const MmadParams &mmadPar
 {
     config0BitMode.Init(mmadParams_);
 };
+
 __aicore__ inline void MmadBitModeParams::SetM(uint16_t m_)
 {
     config0BitMode.SetM(m_);
