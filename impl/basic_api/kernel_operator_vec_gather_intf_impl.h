@@ -151,7 +151,7 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
     }
     const uint32_t elementCountTail = count % elementCountSingleRepeat;
     const uint8_t repeatTime = count / elementCountSingleRepeat;
-if (repeatTime > 0) {
+    if (repeatTime > 0) {
         Gather(dst, src, srcOffset, srcBaseAddr, static_cast<uint64_t>(elementCountSingleRepeat), repeatTime,
             DEFAULT_REPEAT_STRIDE);
     }

@@ -8,12 +8,11 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 project(ascendc_devkit_ut)
-cmake_minimum_required(VERSION 3.16.0)
+cmake_minimum_required(VERSION 3.14.1)
 
 set(PRODUCT_TYPE_LIST
     ascend910 ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend310B1 ascend610Lite)
 
-#set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910 ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend310B1 ascend610Lite)
 set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910 ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend310B1 ascend610Lite)
 # set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910)
 
@@ -52,9 +51,7 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_DIR}/include/
     ${ASCENDC_DIR}/include/basic_api/
     ${ASCENDC_DIR}/include/utils/
-    ${ASCENDC_DIR}/include/c_api/
     ${ASCENDC_DIR}/impl/
-    ${ASCENDC_DIR}/impl/c_api/
     ${ASCENDC_DIR}/impl/basic_api/
     ${ASCENDC_SYS_DIR}/tikcpp/tikcfw
     ${ASCENDC_SYS_DIR}/tikcpp/tikcfw/interface
@@ -98,16 +95,19 @@ file(GLOB ASCENDC_TEST_ascend310p_CASE_SRC_FILES
 # ascend910B1 aic c api test cases
 file(GLOB ASCENDC_TEST_ascend910B1_AIC_CAPI_CASE_SRC_FILES
     ${LOCAL_DIR}/testcase/c_api/asc_2201/cube_compute/*.cpp
-    ${LOCAL_DIR}/testcase/c_api/asc_2201/cube_dmamove/*.cpp
+    ${LOCAL_DIR}/testcase/c_api/asc_2201/cube_datamove/*.cpp
 )
 
 # ascend910B1 aiv c api test cases
 file(GLOB ASCENDC_TEST_ascend910B1_AIV_CAPI_CASE_SRC_FILES
-    ${LOCAL_DIR}/testcase/c_api/asc_2201/simd_atomic/*.cpp
+    ${LOCAL_DIR}/testcase/c_api/asc_2201/atomic/*.cpp
+    ${LOCAL_DIR}/testcase/c_api/asc_2201/cache_ctrl/*.cpp
     ${LOCAL_DIR}/testcase/c_api/asc_2201/sync/*.cpp
     ${LOCAL_DIR}/testcase/c_api/asc_2201/sys_var/*.cpp
     ${LOCAL_DIR}/testcase/c_api/asc_2201/vector_compute/*.cpp
     ${LOCAL_DIR}/testcase/c_api/asc_2201/vector_datamove/*.cpp
+    ${LOCAL_DIR}/testcase/c_api/asc_2201/scalar_compute/*.cpp
+    ${LOCAL_DIR}/testcase/c_api/asc_2201/cache_ctrl/*.cpp
 )
 
 # ascend910B1 aiv test cases
@@ -266,7 +266,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         ${LOCAL_DIR}/stub/
         ${ASCENDC_TEST_HEADER_FILES}
         ${ASCENDC_SYS_DIR}/include/base/
-        ${ASCENDC_SYS_DIR}/include/metadef/
+        ${ASCENDC_SYS_DIR}/include/experiment/metadef/
         mmpa_headers
         slog_headers
     )
@@ -427,6 +427,8 @@ set(ASCEND_KERNEL_TEST_HEADERS_FILES
     ${ASCENDC_DIR}/tools/build/asc_pack_kernel/
     ${ASCENDC_SYS_DIR}/include
     ${ASCENDC_SYS_DIR}/include/base/
+    ${ASCENDC_SYS_DIR}/include/experiment/metadef/
+    ${ASCENDC_SYS_DIR}/include/experiment/
     ${ASCENDC_SYS_DIR}/include/metadef/
     ${ASCENDC_DIR}/tikcpulib/inc/
     ${ASCENDC_DIR}/tikcpulib/cpulib/api_check
@@ -461,6 +463,12 @@ target_compile_definitions(ascendc_utest_kernel PRIVATE ASCENDC_CPU_DEBUG=1)
 target_include_directories(ascendc_utest_kernel PRIVATE
     ${ASCEND_KERNEL_TEST_HEADERS_FILES}
     ${ASCENDC_SYS_DIR}/include/base/
+    ${ASCENDC_SYS_DIR}/include/experiment/metadef/
+    ${ASCENDC_SYS_DIR}/include/experiment/
+    ${ASCENDC_SYS_DIR}/include/experiment/runtime/
+    ${ASCENDC_SYS_DIR}/include/experiment/runtime/runtime/
+    ${ASCENDC_SYS_DIR}/include/experiment/msprof/
+    ${ASCENDC_SYS_DIR}/include/experiment/msprof/toolchain
     ${ASCENDC_SYS_DIR}/include
     ${ASCENDC_SYS_DIR}/include/acl/
     ${ASCENDC_SYS_DIR}/pkg_inc/
@@ -491,6 +499,60 @@ target_link_libraries(ascendc_utest_kernel PRIVATE
 
 run_llt_test(
     TARGET ascendc_utest_kernel
+    TASK_NUM 1
+)
+
+# ############################################ ascc ut ############################################
+# # libasc_plugin: 独立流程
+set(ASC_PLUGIN_TEST_HEADERS_FILES
+    ${LOCAL_DIR}/../common/
+    ${ASCENDC_DIR}/tools/ascc/asc_plugin/include/internal
+    ${ASCENDC_DIR}/tools/ascc/asc_plugin/include/external
+    ${LOCAL_DIR}/testcase/ascc/
+)
+
+file(GLOB ASC_PLUGIN_SRC_FILES
+    ${ASCENDC_DIR}/tools/ascc/asc_plugin/src/*.cpp
+)
+
+file(GLOB TEST_ASC_PLUGIN_SRC_FILES
+    ${LOCAL_DIR}/main.cpp
+    ${LOCAL_DIR}/testcase/ascc/llvm/Support/*.cpp
+    ${LOCAL_DIR}/testcase/ascc/asc_plugin/*.cpp
+)
+
+add_executable(ascendc_utest_asc_plugin
+    ${ASC_PLUGIN_SRC_FILES}
+    ${TEST_ASC_PLUGIN_SRC_FILES}
+)
+add_dependencies(ascendc_utest_asc_plugin  gen_ut_kernel_tiling)
+target_compile_definitions(ascendc_utest_asc_plugin PRIVATE
+    UT_TEST
+)
+target_compile_definitions(ascendc_utest_asc_plugin PRIVATE ASCENDC_CPU_DEBUG=1)
+target_include_directories(ascendc_utest_asc_plugin PRIVATE
+    ${ASC_PLUGIN_TEST_HEADERS_FILES}
+    ${JSON_PATH}/include/
+    ${ASCENDC_SYS_DIR}/include
+    ${ASCENDC_SYS_DIR}/include/experiment/
+)
+target_compile_options(ascendc_utest_asc_plugin PRIVATE
+    -g
+    -Werror
+)
+target_link_directories(ascendc_utest_asc_plugin PRIVATE
+    ${ASCEND_DEP_LIB_DIR}
+)
+target_link_libraries(ascendc_utest_asc_plugin PRIVATE
+    $<BUILD_INTERFACE:intf_llt_pub_basic>
+    -Wl,--no-as-needed
+    c_sec
+    dl
+    -Wl,--as-needed
+)
+
+run_llt_test(
+    TARGET ascendc_utest_asc_plugin
     TASK_NUM 1
 )
 
