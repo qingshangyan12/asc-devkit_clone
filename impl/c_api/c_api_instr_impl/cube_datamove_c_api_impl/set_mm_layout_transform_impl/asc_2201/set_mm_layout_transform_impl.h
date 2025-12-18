@@ -15,7 +15,7 @@
 
 #ifndef IMPL_C_API_INSTR_CUBE_DMAMOVE_SET_MM_LAYOUT_TRANSFORM_ASC_2201_SET_MM_LAYOUT_TRANSFORM_IMPL_H
 #define IMPL_C_API_INSTR_CUBE_DMAMOVE_SET_MM_LAYOUT_TRANSFORM_ASC_2201_SET_MM_LAYOUT_TRANSFORM_IMPL_H
-#include "c_api_utils_intf.h"
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 namespace CApiInternal {
 

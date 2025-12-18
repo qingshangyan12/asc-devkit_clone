@@ -583,6 +583,8 @@ float abs(float in);
 } // namespace cce
 } // namespace bisheng
 
+inline uint32_t g_c_api_core_type = 2;
+
 int64_t bcnt0(uint64_t in);
 int64_t bcnt1(uint64_t in);
 void vcbmax(vector_s16& dst, vector_bool& dst1, vector_s16 src, vector_bool pg, int32_t mode);

@@ -9,7 +9,7 @@
 */
 #ifndef IMPL_C_API_INSTR_SYS_VAR_GET_DATABLOCK_SIZE_ASC_2201_GET_DATABLOCK_SIZE_IMPL_H
 #define IMPL_C_API_INSTR_SYS_VAR_GET_DATABLOCK_SIZE_ASC_2201_GET_DATABLOCK_SIZE_IMPL_H
-#include "c_api_utils_intf.h"
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 namespace CApiInternal {
 
