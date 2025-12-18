@@ -702,7 +702,6 @@ install_run() {
             log "INFO" "AscDevkit package installed successfully! The new version takes effect immediately."
             log_operation "${operation}" "succeeded"
             chmod_end
-            prompt_set_env "${install_path_param}"
         else
             chmod_end
             log "ERROR" "AscDevkit package install failed, please retry after uninstall!"
@@ -744,7 +743,6 @@ upgrade_run() {
             log "INFO" "AscDevkit package upgraded successfully! The new version takes effect immediately."
             log_operation "${operation}" "succeeded"
             chmod_end
-            prompt_set_env "${install_path_param}"
         else
             chmod_end
             log "ERROR" "AscDevkit package upgrade failed, please retry after uninstall!"

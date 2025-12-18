@@ -18,10 +18,10 @@ target_compile_options(aicpu_api PRIVATE
     -O2
     -std=c++17
     -D_FORTIFY_SOURCE=2
-    $<$<STREQUAL:${PRODUCT_SIDE},device>:-fPIC>
+    -fPIC
+    -fstack-protector-strong
     $<$<STREQUAL:${PRODUCT_SIDE},device>:-fvisibility=hidden>
     $<$<STREQUAL:${PRODUCT_SIDE},device>:-fvisibility-inlines-hidden>
-    $<$<STREQUAL:${PRODUCT_SIDE},device>:-fstack-protector-strong>
     $<$<STREQUAL:${PRODUCT_SIDE},device>:-ftrapv>
 )
 
