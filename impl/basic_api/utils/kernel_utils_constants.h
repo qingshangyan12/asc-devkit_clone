@@ -77,6 +77,7 @@ constexpr uint32_t INT4_BIT_NUM = 4;
 #if (__NPU_ARCH__ == 5102)
 // int2b_t param
 constexpr uint32_t INT2_FOUR = 4;
+constexpr uint32_t INT1_EIGHT = 8;
 constexpr uint32_t INT2_BIT_NUM = 2;
 constexpr uint32_t INT1_BIT_NUM = 1;
 #endif
@@ -332,6 +333,7 @@ const uint32_t ONE_BLK_FLOAT_NUM = ONE_BLK_SIZE / B32_BYTE_SIZE;
 namespace ConstantsInternal {
 const uint32_t ONE_BLK_FP4_NUM = 64;
 const uint32_t ONE_BLK_B2_NUM = 128;
+const uint32_t ONE_BLK_B1_NUM = 256;
 } // namespace ConstantsInternal
 #endif
 const uint32_t BRCB_BROADCAST_NUMBER = 8;
@@ -662,6 +664,11 @@ struct SizeOfBits<int4b_t> {
 template <>
 struct SizeOfBits<int2b_t> {
     static constexpr uint32_t value = INT2_BIT_NUM;
+};
+
+template <>
+struct SizeOfBits<uint1b_t> {
+    static constexpr uint32_t value = INT1_BIT_NUM;
 };
 #endif
 

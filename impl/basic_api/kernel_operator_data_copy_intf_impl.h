@@ -688,6 +688,11 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
             { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
                     In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_B2_NUM;
+    } else if constexpr(Std::is_same<PrimType, uint1b_t>::value) {
+        ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_B1_NUM == 0),
+            { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
+                    In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
+        repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_B1_NUM;
     } else if constexpr (Std::is_same<PrimType, fp4x2_e2m1_t>::value || Std::is_same<PrimType, fp4x2_e1m2_t>::value || Std::is_same<PrimType, int4b_t>::value) {
         ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0),
             { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
@@ -732,6 +737,11 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst,
             { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
                     In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_B2_NUM;
+    } else if constexpr(Std::is_same<PrimType, uint1b_t>::value) {
+        ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_B1_NUM == 0),
+            { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
+                    In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
+        repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_B1_NUM;
     } else if constexpr (Std::is_same<PrimType, fp4x2_e2m1_t>::value || Std::is_same<PrimType, fp4x2_e1m2_t>::value || Std::is_same<PrimType, int4b_t>::value) {
         ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0),
             { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
