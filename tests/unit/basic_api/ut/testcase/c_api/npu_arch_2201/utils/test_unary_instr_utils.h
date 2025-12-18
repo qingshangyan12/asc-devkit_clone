@@ -8,11 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#ifndef TESTS_UNIT_BASIC_API_UT_TESTCASE_C_API_NPU_ARCH_2201_UTILS_TEST_UNARY_INSTR_UTILS_H
+#define TESTS_UNIT_BASIC_API_UT_TESTCASE_C_API_NPU_ARCH_2201_UTILS_TEST_UNARY_INSTR_UTILS_H
+
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 #define TEST_VECTOR_COMPUTE_UNARY_INSTR(class_name, c_api_name, cce_name, data_type)            \
                                                                                                 \
@@ -109,3 +111,5 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_half_half_hal
     c_api_name##_sync(dst, src, count);                                                         \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
+
+#endif

@@ -8,11 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#ifndef TESTS_UNIT_BASIC_API_UT_TESTCASE_C_API_NPU_ARCH_2201_UTILS_TEST_CONV_INSTR_UTILS_H
+#define TESTS_UNIT_BASIC_API_UT_TESTCASE_C_API_NPU_ARCH_2201_UTILS_TEST_CONV_INSTR_UTILS_H
+
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 #define TEST_VECTOR_COMPUTE_CONV_INSTR(class_name, c_api_name, cce_name, dst_data_type, src_data_type)       \
                                                                                                 \
@@ -60,19 +62,18 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
     __ubuf__ dst_data_type *dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);               \
     __ubuf__ src_data_type *src = reinterpret_cast<__ubuf__ src_data_type *>(22);               \
                                                                                                 \
-    asc_unary_config config;                                                                    \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src_block_stride = static_cast<uint64_t>(1);                                         \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint16_t dst_block_stride = 1;                                                              \
+    uint16_t src_block_stride = 1;                                                              \
+    uint16_t dst_repeat_stride = 8;                                                             \
+    uint16_t src_repeat_stride = 8;                                                             \
+    uint8_t repeat = 1;                                                                         \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ dst_data_type *, __ubuf__ src_data_type *,               \
                 uint8_t, uint16_t, uint16_t, uint16_t, uint16_t))                               \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_UnaryCfg_Stub));        \
                                                                                                 \
-    c_api_name(dst, src, config);                                                               \
+    c_api_name(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride); \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -111,110 +112,4 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-// ==========asc_bf162float==========
-// ==========asc_bf162int32(a/c/f/r/z)==========
-// ==========asc_float2bf16(r/a/f/c/z)==========
-// ==========asc_float2float(r/f/c/a/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Fr, asc_float2float_r, vconv_f322f32r, float, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Ff, asc_float2float_f, vconv_f322f32f, float, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Fc, asc_float2float_c, vconv_f322f32c, float, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Fa, asc_float2float_a, vconv_f322f32a, float, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Fz, asc_float2float_z, vconv_f322f32z, float, float);
-// ==========asc_float2half(NA/r/a/f/c/z/o)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2H, asc_float2half, vconv_f322f16, half, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Hr, asc_float2half_r, vconv_f322f16r, half, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Hf, asc_float2half_f, vconv_f322f16f, half, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Hc, asc_float2half_c, vconv_f322f16c, half, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Hz, asc_float2half_z, vconv_f322f16z, half, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Ho, asc_float2half_o, vconv_f322f16o, half, float);
-// ==========asc_float2int32(a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32a, asc_float2int32_a, vconv_f322s32a, int32_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32c, asc_float2int32_c, vconv_f322s32c, int32_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32f, asc_float2int32_f, vconv_f322s32f, int32_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32r, asc_float2int32_r, vconv_f322s32r, int32_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I32z, asc_float2int32_z, vconv_f322s32z, int32_t, float);
-// ==========asc_float2int64(a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64a, asc_float2int64_a, vconv_f322s64a, int64_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64c, asc_float2int64_c, vconv_f322s64c, int64_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64f, asc_float2int64_f, vconv_f322s64f, int64_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64r, asc_float2int64_r, vconv_f322s64r, int64_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I64z, asc_float2int64_z, vconv_f322s64z, int64_t, float);
-// ==========asc_half2float(NA)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2F, asc_half2float, vconv_f162f32, float, half);
-// ==========asc_half2int4(NA/a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I4, asc_half2int4, vconv_f162s4, void, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I4a, asc_half2int4_a, vconv_f162s4a, void, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I4c, asc_half2int4_c, vconv_f162s4c, void, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I4f, asc_half2int4_f, vconv_f162s4f, void, half);
-// ==========asc_half2int8(NA/a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I8, asc_half2int8, vconv_f162s8, int8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I8a, asc_half2int8_a, vconv_f162s8a, int8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I8c, asc_half2int8_c, vconv_f162s8c, int8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I8f, asc_half2int8_f, vconv_f162s8f, int8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I8r, asc_half2int8_r, vconv_f162s8r, int8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I8z, asc_half2int8_z, vconv_f162s8z, int8_t, half);
-// ==========asc_half2int16(a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16a, asc_half2int16_a, vconv_f162s16a, int16_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16c, asc_half2int16_c, vconv_f162s16c, int16_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16f, asc_half2int16_f, vconv_f162s16f, int16_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16r, asc_half2int16_r, vconv_f162s16r, int16_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16z, asc_half2int16_z, vconv_f162s16z, int16_t, half);
-// ==========asc_half2int32(a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I32a, asc_half2int32_a, vconv_f162s32a, int32_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I32c, asc_half2int32_c, vconv_f162s32c, int32_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I32f, asc_half2int32_f, vconv_f162s32f, int32_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I32r, asc_half2int32_r, vconv_f162s32r, int32_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I32z, asc_half2int32_z, vconv_f162s32z, int32_t, half);
-// ==========asc_int322float==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(AscI322F, asc_int322float, vconv_s322f32, float, int32_t);
-// ==========asc_int322float_a==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(AscI322Fa, asc_int322float_a, vconv_s322f32a, float, int32_t);
-// ==========asc_int322float_c=========
-TEST_VECTOR_COMPUTE_CONV_INSTR(AscI322Fc, asc_int322float_c, vconv_s322f32c, float, int32_t);
-// ==========asc_int322float_f==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(AscI322Ff, asc_int322float_f, vconv_s322f32f, float, int32_t);
-// ==========asc_int322float_r==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(AscI322Fr, asc_int322float_r, vconv_s322f32r, float, int32_t);
-// ==========asc_int322float_z==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(AscI322Fz, asc_int322float_z, vconv_s322f32z, float, int32_t);
-
-// ==========asc_int642float32(a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Fa, asc_int642float_a, vconv_s642f32a, float, int64_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Fc, asc_int642float_c, vconv_s642f32c, float, int64_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Ff, asc_int642float_f, vconv_s642f32f, float, int64_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Fr, asc_int642float_r, vconv_s642f32r, float, int64_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642Fz, asc_int642float_z, vconv_s642f32z, float, int64_t);
-// ==========asc_int82half==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI82H, asc_int82half, vconv_s82f16, half, int8_t);
-// ==========asc_uint82half==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvU82H, asc_uint82half, vconv_u82f16, half, uint8_t);
-// ==========asc_int162float==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI162F, asc_int162float, vconv_s162f32, float, int16_t);
-// ==========asc_int322int16==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI322I16, asc_int322int16, vconv_s322s16, int16_t, int32_t);
-// ==========asc_int322int64==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI322I64, asc_int322int64, vconv_s322s64, int64_t, int32_t);
-// ==========asc_int642int32==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvI642I32, asc_int642int32, vconv_s642s32, int32_t, int64_t);
-// ==========asc_half2uint8(NA/a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8, asc_half2uint8, vconv_f162u8, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8a, asc_half2uint8_a, vconv_f162u8a, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8c, asc_half2uint8_c, vconv_f162u8c, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8f, asc_half2uint8_f, vconv_f162u8f, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8r, asc_half2uint8_r, vconv_f162u8r, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8z, asc_half2uint8_z, vconv_f162u8z, uint8_t, half);
-// ==========asc_int162half(NA/a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16, asc_int162half, vconv_s162f16, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16a, asc_int162half_a, vconv_s162f16a, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16c, asc_int162half_c, vconv_s162f16c, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16f, asc_int162half_f, vconv_s162f16f, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16r, asc_int162half_r, vconv_s162f16r, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16z, asc_int162half_z, vconv_s162f16z, half, int16_t);
-
-// ==========asc_float2int16(a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16a, asc_float2int16_a, vconv_f322s16a, int16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16c, asc_float2int16_c, vconv_f322s16c, int16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16f, asc_float2int16_f, vconv_f322s16f, int16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16r, asc_float2int16_r, vconv_f322s16r, int16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16z, asc_float2int16_z, vconv_f322s16z, int16_t, float);
-
+#endif

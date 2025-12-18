@@ -8,6 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#ifndef TESTS_UNIT_BASIC_API_UT_TESTCASE_C_API_NPU_ARCH_2201_UTILS_TEST_VCMPVS_INSTR_UTILS_H
+#define TESTS_UNIT_BASIC_API_UT_TESTCASE_C_API_NPU_ARCH_2201_UTILS_TEST_VCMPVS_INSTR_UTILS_H
+
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
@@ -37,16 +40,7 @@ void cce_name##_##dst_type##_##src_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_
     EXPECT_EQ(src_block_stride, static_cast<uint16_t>(1));                                      \
     EXPECT_EQ(dst_repeat_stride, static_cast<uint16_t>(8));                                     \
     EXPECT_EQ(src_repeat_stride, static_cast<uint16_t>(8));                                     \
-}                                                                                               \
-                                                                                                \
-void cce_name##_##dst_type##_##src_type##_InitVcmpvsUnaryConfig(asc_unary_config &config)       \
-{                                                                                               \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src_block_stride = static_cast<uint64_t>(1);                                         \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
-}                                                                                               \
+}                                                                                               \                                                                                     \
                                                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -56,15 +50,18 @@ TEST_F(TestVectorCompute##class_name##dst_type##_##src_type, c_api_name##_half_h
     __ubuf__ src_type *src = reinterpret_cast<__ubuf__ src_type *>(22);                        \
     src_type value = 3.3;                                                                        \
                                                                                                 \
-    asc_unary_config config;                                                                    \
-    cce_name##_##dst_type##_##src_type##_InitVcmpvsUnaryConfig(config);                         \
+    uint16_t dst_block_stride = 1;                                                              \
+    uint16_t src_block_stride = 1;                                                              \
+    uint16_t dst_repeat_stride = 8;                                                             \
+    uint16_t src_repeat_stride = 8;                                                             \
+    uint8_t repeat = 1;                                                                         \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ dst_type *,__ubuf__ src_type *, src_type,                \
                 uint8_t, uint16_t, uint16_t, uint16_t, uint16_t))                               \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_type##_##src_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_Stub));   \
                                                                                                 \
-    c_api_name(dst, src, value, config);                                                        \
+    c_api_name(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);  \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -74,24 +71,18 @@ TEST_F(TestVectorCompute##class_name##dst_type##_##src_type, c_api_name##_sync_h
     __ubuf__ dst_type *dst = reinterpret_cast<__ubuf__ dst_type *>(11);                         \
     __ubuf__ src_type *src = reinterpret_cast<__ubuf__ src_type *>(22);                        \
     src_type value = 3.3;                                                                        \
-    asc_unary_config config;                                                                    \
-    cce_name##_##dst_type##_##src_type##_InitVcmpvsUnaryConfig(config);                         \
+    uint16_t dst_block_stride = 1;                                                              \
+    uint16_t src_block_stride = 1;                                                              \
+    uint16_t dst_repeat_stride = 8;                                                             \
+    uint16_t src_repeat_stride = 8;                                                             \
+    uint8_t repeat = 1;                                                                         \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ dst_type *,__ubuf__ src_type *,                          \
                 src_type, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t))                     \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_type##_##src_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_Stub));  \
-    c_api_name##_sync(dst, src, value, config);                                                 \
+    c_api_name##_sync(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);  \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-// ==========asc_gt_scalar(dst:uint8_t, src:half/float)==========
-TEST_VECTOR_COMPUTE_VCMPVS_INSTR(GtScalar, asc_gt_scalar, vcmpvs_gt, uint8_t, float);
-TEST_VECTOR_COMPUTE_VCMPVS_INSTR(GtScalar, asc_gt_scalar, vcmpvs_gt, uint8_t, half);
-// ==========asc_eq_scalar(half/float/int32_t)==========
-TEST_VECTOR_COMPUTE_VCMPVS_INSTR(EqScalar, asc_eq_scalar, vcmpvs_eq, uint8_t, half);
-TEST_VECTOR_COMPUTE_VCMPVS_INSTR(EqScalar, asc_eq_scalar, vcmpvs_eq, uint8_t, float);
-TEST_VECTOR_COMPUTE_VCMPVS_INSTR(EqScalar, asc_eq_scalar, vcmpvs_eq, uint8_t, int32_t);
-// ==========asc_ne_scalar(half/float)==========
-TEST_VECTOR_COMPUTE_VCMPVS_INSTR(VCMPVSNE, asc_ne_scalar, vcmpvs_ne, uint8_t, float);
-TEST_VECTOR_COMPUTE_VCMPVS_INSTR(VCMPVSNE, asc_ne_scalar, vcmpvs_ne, uint8_t, half);
+#endif
