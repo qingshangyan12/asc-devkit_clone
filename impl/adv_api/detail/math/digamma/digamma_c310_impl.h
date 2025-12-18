@@ -272,8 +272,8 @@ __simd_vf__ inline void DigammaImpl(__ubuf__ float *dstUb, __ubuf__ float *srcUb
 } // namespace DigammaInternel
 
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void DigammaCompute(const LocalTensor<T> &dst, const LocalTensor<T> &src, 
-    const LocalTensor<uint8_t> &tmp, const uint32_t calCount)
+__aicore__ inline void DigammaCompute(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& tmp, const uint32_t calCount)
 {
     CHECK_FUNC_HIGHLEVEL_API(Digamma, (T, isReuseSource), (dst, src, tmp, calCount));
     CheckTensorPosition(dst, "dstTensor", "VECIN, VECOUT, VECCALC");

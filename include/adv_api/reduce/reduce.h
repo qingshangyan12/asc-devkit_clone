@@ -53,9 +53,8 @@ namespace AscendC {
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceMean(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-                                  const LocalTensor<uint8_t> &sharedTmpBuffer,
-                                  const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceMean(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -78,8 +77,8 @@ __aicore__ inline void ReduceMean(const LocalTensor<T> &dstTensor, const LocalTe
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceMean(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-                                  const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceMean(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
 {
     if ASCEND_IS_AIC {
         return;
@@ -105,9 +104,8 @@ __aicore__ inline void ReduceMean(const LocalTensor<T> &dstTensor, const LocalTe
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceMax(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-                                  const LocalTensor<uint8_t> &sharedTmpBuffer,
-                                  const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -130,8 +128,8 @@ __aicore__ inline void ReduceMax(const LocalTensor<T> &dstTensor, const LocalTen
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceMax(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-                                  const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceMax(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
 {
     if ASCEND_IS_AIC {
         return;
@@ -157,9 +155,8 @@ __aicore__ inline void ReduceMax(const LocalTensor<T> &dstTensor, const LocalTen
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceMin(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-                                  const LocalTensor<uint8_t> &sharedTmpBuffer,
-                                  const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceMin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -182,8 +179,8 @@ __aicore__ inline void ReduceMin(const LocalTensor<T> &dstTensor, const LocalTen
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceMin(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-                                  const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceMin(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
 {
     if ASCEND_IS_AIC {
         return;
@@ -210,9 +207,8 @@ __aicore__ inline void ReduceMin(const LocalTensor<T> &dstTensor, const LocalTen
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceSum(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-                                  const LocalTensor<uint8_t> &sharedTmpBuffer,
-                                  const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceSum(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -235,8 +231,8 @@ __aicore__ inline void ReduceSum(const LocalTensor<T> &dstTensor, const LocalTen
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceSum(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-                                  const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceSum(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
 {
     if ASCEND_IS_AIC {
         return;
@@ -262,8 +258,8 @@ __aicore__ inline void ReduceSum(const LocalTensor<T> &dstTensor, const LocalTen
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceProd(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceProd(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -286,8 +282,8 @@ __aicore__ inline void ReduceProd(const LocalTensor<T> &dstTensor, const LocalTe
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceProd(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceProd(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
 {
     if ASCEND_IS_AIC {
         return;
@@ -313,8 +309,8 @@ __aicore__ inline void ReduceProd(const LocalTensor<T> &dstTensor, const LocalTe
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceAny(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceAny(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -337,8 +333,8 @@ __aicore__ inline void ReduceAny(const LocalTensor<T> &dstTensor, const LocalTen
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceAny(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceAny(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
 {
     if ASCEND_IS_AIC {
         return;
@@ -364,8 +360,8 @@ __aicore__ inline void ReduceAny(const LocalTensor<T> &dstTensor, const LocalTen
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceAll(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceAll(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -388,8 +384,8 @@ __aicore__ inline void ReduceAll(const LocalTensor<T> &dstTensor, const LocalTen
  * \param [out] dstTensor, output LocalTensor
  */
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceAll(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceAll(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
 {
     if ASCEND_IS_AIC {
         return;

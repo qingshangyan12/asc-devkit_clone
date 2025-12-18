@@ -382,9 +382,9 @@ __simd_vf__ inline void FmodComputeVF(__ubuf__ T* dstTensor, __ubuf__ T* src0Ten
         FmodInternal::SaveDataWithT(dstTensor, dstReg, maskReg, i * FmodInternal::oneRepSize);
     }
 }
- 
-__aicore__ inline void FmodCompute(const LocalTensor<float> &dstTensor, const LocalTensor<float> &src0Tensor,
-    const LocalTensor<float> &src1Tensor, const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t count)
+
+__aicore__ inline void FmodCompute(const LocalTensor<float>& dstTensor, const LocalTensor<float>& src0Tensor,
+    const LocalTensor<float>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
 {
     __ubuf__ float *src0 = (__ubuf__ float *)src0Tensor.GetPhyAddr();
     __ubuf__ float *src1 = (__ubuf__ float *)src1Tensor.GetPhyAddr();
@@ -393,9 +393,9 @@ __aicore__ inline void FmodCompute(const LocalTensor<float> &dstTensor, const Lo
  
     FmodComputeVF<float>(dst, src0, src1, repeatTimes, count);
 }
- 
-__aicore__ inline void FmodCompute(const LocalTensor<half> &dstTensor, const LocalTensor<half> &src0Tensor,
-    const LocalTensor<half> &src1Tensor, const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t count)
+
+__aicore__ inline void FmodCompute(const LocalTensor<half>& dstTensor, const LocalTensor<half>& src0Tensor,
+    const LocalTensor<half>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
 {
     __ubuf__ half *src0 = (__ubuf__ half *)src0Tensor.GetPhyAddr();
     __ubuf__ half *src1 = (__ubuf__ half *)src1Tensor.GetPhyAddr();
@@ -404,10 +404,10 @@ __aicore__ inline void FmodCompute(const LocalTensor<half> &dstTensor, const Loc
  
     FmodComputeVF<half>(dst, src0, src1, repeatTimes, count);
 }
- 
+
 template <typename T, bool isReuseSource = false, const FmodConfig& config = DEFAULT_FMOD_CONFIG>
-__aicore__ inline void FmodImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &src0Tensor,
-    const LocalTensor<T> &src1Tensor, const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t calCount)
+__aicore__ inline void FmodImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
+    const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
     if ASCEND_IS_AIC {
         return;

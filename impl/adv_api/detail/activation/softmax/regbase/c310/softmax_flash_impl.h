@@ -203,11 +203,11 @@ __simd_vf__ inline void SoftmaxFlashNDWithTailImpl(__ubuf__ T1* dstUb, __ubuf__ 
 } // namespace Internal
 
 template <typename T1, typename T2, bool isBasicBlock = false>
-__aicore__ inline void SoftmaxFlashPostProcess(const LocalTensor<T1> &dstTensor, const LocalTensor<T2> &sumTensor,
-    const LocalTensor<T2> &maxTensor, const LocalTensor<T1> &srcTensor, const LocalTensor<T1> &expMaxTensor,
-    const LocalTensor<T2> &inSumTensor, const LocalTensor<T2> &inMaxTensor, const LocalTensor<float> &workLocal,
-    const LastAxisShapeND &originalSrcShape, const SoftMaxTiling &tiling, bool isUpdate = false,
-    const SoftMaxShapeInfo &softmaxShapeInfo = {})
+__aicore__ inline void SoftmaxFlashPostProcess(const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& sumTensor,
+    const LocalTensor<T2>& maxTensor, const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor,
+    const LocalTensor<T2>& inSumTensor, const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal,
+    const LastAxisShapeND& originalSrcShape, const SoftMaxTiling& tiling, bool isUpdate = false,
+    const SoftMaxShapeInfo& softmaxShapeInfo = {})
 {
     static_assert((SupportType<Tuple<T1, T2>, Tuple<half, float>, Tuple<half, half>,
                 Tuple<float, float>>()), "Failed to check dtype in SoftmaxFlash, current api "
@@ -249,10 +249,10 @@ __aicore__ inline void SoftmaxFlashPostProcess(const LocalTensor<T1> &dstTensor,
 }
 
 template <typename T1, typename T2, bool isReuseSource = false, bool isBasicBlock = false>
-__aicore__ inline void SoftmaxFlashCommonImpl(const LocalTensor<T1> &dstTensor, const LocalTensor<T2> &sumTensor,
-    const LocalTensor<T2> &maxTensor, const LocalTensor<T1> &srcTensor, const LocalTensor<T1> &expMaxTensor,
-    const LocalTensor<T2> &inSumTensor, const LocalTensor<T2> &inMaxTensor, const SoftMaxTiling &tiling,
-    bool isUpdate, const SoftMaxShapeInfo &softmaxShapeInfo)
+__aicore__ inline void SoftmaxFlashCommonImpl(const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& sumTensor,
+    const LocalTensor<T2>& maxTensor, const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor,
+    const LocalTensor<T2>& inSumTensor, const LocalTensor<T2>& inMaxTensor, const SoftMaxTiling& tiling, bool isUpdate,
+    const SoftMaxShapeInfo& softmaxShapeInfo)
 {
     LocalTensor<float> workLocal;
     PopStackBuffer<float, TPosition::LCM>(workLocal);
@@ -293,10 +293,10 @@ __aicore__ inline void SoftmaxFlashCommonImpl(const LocalTensor<T1> &dstTensor, 
 }
 
 template <typename T1, typename T2, bool isReuseSource = false, bool isBasicBlock = false>
-__aicore__ inline void SoftmaxFlashTmpBufCommonImpl(const LocalTensor<T1> &dstTensor, const LocalTensor<T2> &sumTensor,
-    const LocalTensor<T2> &maxTensor, const LocalTensor<T1> &srcTensor, const LocalTensor<T1> &expMaxTensor,
-    const LocalTensor<T2> &inSumTensor, const LocalTensor<T2> &inMaxTensor, const LocalTensor<uint8_t> &sharedTmpBuffer,
-    const SoftMaxTiling &tiling, bool isUpdate, const SoftMaxShapeInfo &softmaxShapeInfo)
+__aicore__ inline void SoftmaxFlashTmpBufCommonImpl(const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& sumTensor,
+    const LocalTensor<T2>& maxTensor, const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor,
+    const LocalTensor<T2>& inSumTensor, const LocalTensor<T2>& inMaxTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const SoftMaxTiling& tiling, bool isUpdate, const SoftMaxShapeInfo& softmaxShapeInfo)
 {
     auto tempBuffer = sharedTmpBuffer.ReinterpretCast<float>();
     uint32_t workLocalSize = tempBuffer.GetSize();

@@ -40,10 +40,8 @@ namespace AscendC {
  * \param [in] calCount, amount of data to be calculated
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Atanh(const LocalTensor<T> &dstTensor,
-    const LocalTensor<T> &srcTensor,
-    const LocalTensor<uint8_t> &sharedTmpBuffer,
-    const uint32_t calCount)
+__aicore__ inline void Atanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -77,9 +75,8 @@ __aicore__ inline void Atanh(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [in] sharedTmpBuffer, input local temporary Tensor
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Atanh(const LocalTensor<T> &dstTensor,
-    const LocalTensor<T> &srcTensor,
-    const LocalTensor<uint8_t> &sharedTmpBuffer)
+__aicore__ inline void Atanh(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     Atanh<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcTensor.GetSize());
 }
@@ -92,7 +89,7 @@ __aicore__ inline void Atanh(const LocalTensor<T> &dstTensor,
  * \param [in] calCount, amount of data to be calculated
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Atanh(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor, const uint32_t calCount)
+__aicore__ inline void Atanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ret = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);

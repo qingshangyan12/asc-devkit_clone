@@ -40,7 +40,7 @@ template <> struct ExtractTypeBySize<sizeof(uint64_t)> {
 namespace MicroAPI {
 namespace Internal {
 template <typename T, typename U>
-__simd_callee__ inline void TwiddleIn(RegTensor<U> &dst, RegTensor<U> &src, MaskReg& maskReg)
+__simd_callee__ inline void TwiddleIn(RegTensor<U>& dst, RegTensor<U>& src, MaskReg& maskReg)
 {
     RegTensor<U> highBit;
     Duplicate(highBit, 1ul << (sizeof(T) * 8 - 1), maskReg);
@@ -57,7 +57,7 @@ __simd_callee__ inline void TwiddleIn(RegTensor<U> &dst, RegTensor<U> &src, Mask
 }
 
 template <typename T, typename U>
-__simd_callee__ inline void TwiddleOut(RegTensor<U> &dst, RegTensor<U> &src, MaskReg& maskReg)
+__simd_callee__ inline void TwiddleOut(RegTensor<U>& dst, RegTensor<U>& src, MaskReg& maskReg)
 {
     RegTensor<U> highBit;
     Duplicate(highBit, 1ul << (sizeof(T) * 8 - 1), maskReg);

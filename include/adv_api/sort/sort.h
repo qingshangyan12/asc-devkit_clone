@@ -33,8 +33,8 @@
  * @param [in] repeatTimes repeat times
  * 
  * template <typename T, bool isFullSort>
- * __aicore__ inline void Sort(const LocalTensor<T> &dstLocal, const LocalTensor<T> &concatLocal,
- *     const LocalTensor<uint32_t> &indexLocal, LocalTensor<T> &tmpLocal, const int32_t repeatTimes);
+ * __aicore__ inline void Sort(const LocalTensor<T>& dstLocal, const LocalTensor<T>& concatLocal,
+ *     const LocalTensor<uint32_t>& indexLocal, LocalTensor<T>& tmpLocal, const int32_t repeatTimes);
 */
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
@@ -61,10 +61,9 @@ namespace AscendC {
  * that the shared space will be cleared after usage, the data could be anything.
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
-template <typename T, typename U, bool isReuseSource = false, const SortConfig &config = internal::defaultSortConfig>
-__aicore__ inline void Sort(LocalTensor<T> &dstTensor, LocalTensor<U> &dstIndexTensor,
-    const LocalTensor<T> &srcTensor, const LocalTensor<U> &srcIndexTensor, const LocalTensor<uint8_t> &sharedTmpBuffer,
-    const uint32_t calCount)
+template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+__aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<U>& srcIndexTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
     MicroAPI::internal::SortImpl<T, U, isReuseSource, config>(
         dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, sharedTmpBuffer, calCount);
@@ -85,9 +84,9 @@ __aicore__ inline void Sort(LocalTensor<T> &dstTensor, LocalTensor<U> &dstIndexT
  * \param [in] calCount: the number of elements to be processed.
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
-template <typename T, typename U, bool isReuseSource = false, const SortConfig &config = internal::defaultSortConfig>
-__aicore__ inline void Sort(const LocalTensor<T> &dstTensor, const LocalTensor<U> &dstIndexTensor,
-    const LocalTensor<T> &srcTensor, const LocalTensor<U> &srcIndexTensor, const uint32_t calCount)
+template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+__aicore__ inline void Sort(const LocalTensor<T>& dstTensor, const LocalTensor<U>& dstIndexTensor,
+    const LocalTensor<T>& srcTensor, const LocalTensor<U>& srcIndexTensor, const uint32_t calCount)
 {
     MicroAPI::internal::SortImpl<T, U, isReuseSource, config>(
         dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, calCount);
@@ -110,9 +109,9 @@ __aicore__ inline void Sort(const LocalTensor<T> &dstTensor, const LocalTensor<U
  * that the shared space will be cleared after usage, the data could be anything.
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
-template <typename T, bool isReuseSource = false, const SortConfig &config = internal::defaultSortConfig>
-__aicore__ inline void Sort(LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+__aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
     MicroAPI::internal::SortImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
@@ -129,8 +128,8 @@ __aicore__ inline void Sort(LocalTensor<T> &dstTensor, const LocalTensor<T> &src
  * \param [in] calCount: the number of elements to be processed.
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
-template <typename T, bool isReuseSource = false, const SortConfig &config = internal::defaultSortConfig>
-__aicore__ inline void Sort(LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor, const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+__aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     MicroAPI::internal::SortImpl<T, isReuseSource, config>(dstTensor, srcTensor, calCount);
 }
@@ -153,9 +152,9 @@ __aicore__ inline void Sort(LocalTensor<T> &dstTensor, const LocalTensor<T> &src
  * that the shared space will be cleared after usage, the data could be anything.
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
-template <typename T, bool isReuseSource = false, const SortConfig &config = internal::defaultSortConfig>
-__aicore__ inline void Sort(LocalTensor<T> &dstTensor, LocalTensor<uint32_t> &dstIndexTensor,
-    const LocalTensor<T> &srcTensor, const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+__aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor,
+    const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
     MicroAPI::internal::SortImpl<T, isReuseSource, config>(
         dstTensor, dstIndexTensor, srcTensor, sharedTmpBuffer, calCount);
@@ -174,9 +173,9 @@ __aicore__ inline void Sort(LocalTensor<T> &dstTensor, LocalTensor<uint32_t> &ds
  * \param [in] calCount: the number of elements to be processed.
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
-template <typename T, bool isReuseSource = false, const SortConfig &config = internal::defaultSortConfig>
-__aicore__ inline void Sort(LocalTensor<T> &dstTensor, LocalTensor<uint32_t> &dstIndexTensor,
-    const LocalTensor<T> &srcTensor, const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+__aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor,
+    const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     MicroAPI::internal::SortImpl<T, isReuseSource, config>(dstTensor, dstIndexTensor, srcTensor, calCount);
 }

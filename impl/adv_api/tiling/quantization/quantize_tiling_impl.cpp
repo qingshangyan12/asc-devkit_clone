@@ -38,7 +38,7 @@ inline uint32_t GetQuantizeMinTmpSize()
 }
 } // namespace
 
-void GetQuantizeTmpBufferFactorSize(uint32_t &maxLiveNodeCount, uint32_t &extraBuf)
+void GetQuantizeTmpBufferFactorSize(uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 {
     extraBuf = 0u;
     maxLiveNodeCount = QUANTIZE_TWO_TIMES;

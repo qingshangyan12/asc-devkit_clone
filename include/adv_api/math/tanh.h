@@ -47,9 +47,9 @@ namespace AscendC {
  * that the shared space will be cleared after usage, the data could be anything.
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
-template <typename T, bool isReuseSource = false, const TanhConfig &config = DEFAULT_TANH_CONFIG>
-__aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer)
+template <typename T, bool isReuseSource = false, const TanhConfig& config = DEFAULT_TANH_CONFIG>
+__aicore__ inline void Tanh(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     Tanh<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, srcTensor.GetSize());
 }
@@ -70,7 +70,7 @@ __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * \param [in] calCount: the number of elements to be processed.
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
-template <typename T, bool isReuseSource = false, const TanhConfig &config = DEFAULT_TANH_CONFIG>
+template <typename T, bool isReuseSource = false, const TanhConfig& config = DEFAULT_TANH_CONFIG>
 __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
@@ -87,7 +87,7 @@ __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * \param [in] srcTensor: input LocalTensor
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
-template <typename T, bool isReuseSource = false, const TanhConfig &config = DEFAULT_TANH_CONFIG>
+template <typename T, bool isReuseSource = false, const TanhConfig& config = DEFAULT_TANH_CONFIG>
 __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Tanh<T, isReuseSource, config>(dstTensor, srcTensor, srcTensor.GetSize());
@@ -104,9 +104,8 @@ __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * \param [in] calCount: the number of elements to be processed.
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
-template <typename T, bool isReuseSource = false, const TanhConfig &config = DEFAULT_TANH_CONFIG>
-__aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const TanhConfig& config = DEFAULT_TANH_CONFIG>
+__aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     TanhImpl<T, isReuseSource, config>(dstTensor, srcTensor, calCount);
 }
@@ -127,8 +126,8 @@ __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer)
+__aicore__ inline void Tanh(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     Tanh<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcTensor.GetSize());
 }
@@ -184,8 +183,7 @@ __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const uint32_t calCount)
+__aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     TanhImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 }

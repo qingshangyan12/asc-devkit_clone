@@ -47,7 +47,7 @@ inline uint32_t GetDequantizeMinTmpSize(const uint32_t outer, const uint32_t inn
 }
 } // namespace
 
-void GetDequantizeTmpBufferFactorSize(const ge::Shape &srcShape, uint32_t &maxLiveNodeCnt, uint32_t &extraBuf)
+void GetDequantizeTmpBufferFactorSize(const ge::Shape& srcShape, uint32_t& maxLiveNodeCnt, uint32_t& extraBuf)
 {
     extraBuf = FLOAT_PER_BLOCK + FLOAT_PER_REPEAT;
     std::vector<int64_t> shapeDims = srcShape.GetDims();

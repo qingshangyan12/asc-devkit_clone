@@ -39,8 +39,8 @@ void CheckSortHostCommon(const char *apiName, const char *hostFuncName,
 }
 } // namespace
 
-void GetSortMaxMinTmpSize(const ge::Shape &srcShape, ge::DataType valueType, ge::DataType indexType, bool isReuseSource,
-    const SortConfig &config, uint32_t &maxValue, uint32_t &minValue)
+void GetSortMaxMinTmpSize(const ge::Shape& srcShape, ge::DataType valueType, ge::DataType indexType, bool isReuseSource,
+    const SortConfig& config, uint32_t& maxValue, uint32_t& minValue)
 {
     platform_ascendc::PlatformAscendC *platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT(platform != nullptr, return, "Failed to get PlatformAscendC");

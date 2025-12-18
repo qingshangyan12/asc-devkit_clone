@@ -75,8 +75,9 @@ __aicore__ inline constexpr bool IsDataTypeValid()
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizePerTensorImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer, const DequantizeParams& params)
+__aicore__ inline void DequantizePerTensorImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const DequantizeParams& params)
 {
     if ASCEND_IS_AIC {
         return;
@@ -96,8 +97,9 @@ __aicore__ inline void DequantizePerTensorImpl(const LocalTensor<DstT> &dstTenso
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizePerChannelImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer, const DequantizeParams& params)
+__aicore__ inline void DequantizePerChannelImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const DequantizeParams& params)
 {
     static_assert(TypeUtils::IsLocalTensorType<ScaleT, OffsetT>());
     static_assert(IsSameType<SrcT, int32_t>::value, "Dtype of srcTensor should be int32_t for PER_CHANNEL");
@@ -114,8 +116,9 @@ __aicore__ inline void DequantizePerChannelImpl(const LocalTensor<DstT> &dstTens
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizePerTokenImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer, const DequantizeParams& params)
+__aicore__ inline void DequantizePerTokenImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const DequantizeParams& params)
 {
     if ASCEND_IS_AIC {
         return;
@@ -135,8 +138,9 @@ __aicore__ inline void DequantizePerTokenImpl(const LocalTensor<DstT> &dstTensor
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizePerGroupImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer, const DequantizeParams& params)
+__aicore__ inline void DequantizePerGroupImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const DequantizeParams& params)
 {
     if ASCEND_IS_AIC {
         return;
@@ -165,8 +169,8 @@ __aicore__ inline void DequantizePerGroupImpl(const LocalTensor<DstT> &dstTensor
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizePerTensorImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const DequantizeParams& params)
+__aicore__ inline void DequantizePerTensorImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
 {
     LocalTensor<uint8_t> stackTensor;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(stackTensor);
@@ -175,8 +179,8 @@ __aicore__ inline void DequantizePerTensorImpl(const LocalTensor<DstT> &dstTenso
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizePerChannelImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const DequantizeParams& params)
+__aicore__ inline void DequantizePerChannelImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
 {
     LocalTensor<uint8_t> stackTensor;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(stackTensor);
@@ -185,8 +189,8 @@ __aicore__ inline void DequantizePerChannelImpl(const LocalTensor<DstT> &dstTens
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizePerTokenImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const DequantizeParams& params)
+__aicore__ inline void DequantizePerTokenImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
 {
     LocalTensor<uint8_t> stackTensor;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(stackTensor);
@@ -195,8 +199,8 @@ __aicore__ inline void DequantizePerTokenImpl(const LocalTensor<DstT> &dstTensor
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizePerGroupImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const DequantizeParams& params)
+__aicore__ inline void DequantizePerGroupImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
 {
     LocalTensor<uint8_t> stackTensor;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(stackTensor);
@@ -205,8 +209,8 @@ __aicore__ inline void DequantizePerGroupImpl(const LocalTensor<DstT> &dstTensor
 }
 
 template <typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void CheckDequantizeTensorPos(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset)
+__aicore__ inline void CheckDequantizeTensorPos(
+    const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset)
 {
     CheckTensorPosition(dstTensor, "dstTensor", "VECIN, VECOUT, VECCALC");
     CheckTensorPosition(srcTensor, "srcTensor", "VECIN, VECOUT, VECCALC");
@@ -217,8 +221,8 @@ __aicore__ inline void CheckDequantizeTensorPos(const LocalTensor<DstT> &dstTens
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizeImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer,
+__aicore__ inline void DequantizeImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const DequantizeParams& params)
 {
     CheckDequantizeTensorPos(dstTensor, srcTensor, scale, offset);
@@ -237,8 +241,8 @@ __aicore__ inline void DequantizeImpl(const LocalTensor<DstT> &dstTensor, const 
 }
 
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void DequantizeImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const DequantizeParams& params)
+__aicore__ inline void DequantizeImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
 {
     CheckDequantizeTensorPos(dstTensor, srcTensor, scale, offset);
     if constexpr (config.policy == DequantizePolicy::PER_TENSOR) {

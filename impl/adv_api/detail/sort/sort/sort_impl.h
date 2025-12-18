@@ -27,10 +27,7 @@ struct SortConfig {
 };
 #endif
 
-namespace internal {
-constexpr SortConfig defaultSortConfig = { SortType::RADIX_SORT, false };
-
-} // namespace internal
+constexpr SortConfig DEFAULT_SORT_CONFIG = { SortType::RADIX_SORT, false };
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
 constexpr auto singleSortElementCount = singleSortElementCountL300;
@@ -42,8 +39,8 @@ constexpr auto singleSortElementCount = singleSortElementCountC310;
 
 namespace MicroAPI {
 namespace internal {
-__simd_callee__ inline void ConvertRegToWithShift(__ubuf__ uint32_t *&input, RegTensor<uint8_t> &dst,
-    const int16_t offset)
+__simd_callee__ inline void ConvertRegToWithShift(
+    __ubuf__ uint32_t*& input, RegTensor<uint8_t>& dst, const int16_t offset)
 {
     constexpr uint32_t eleCountPerVL = GetVecLen() / sizeof(uint32_t);
     MaskReg fullMask = CreateMask<uint32_t>();
@@ -67,8 +64,8 @@ __simd_callee__ inline void ConvertRegToWithShift(__ubuf__ uint32_t *&input, Reg
     DeInterleave(dst, tmpReg, (RegTensor<uint8_t> &)tmpU16Reg0, (RegTensor<uint8_t> &)tmpU16Reg2);
 }
 
-__simd_callee__ inline void ConvertRegToWithShift(__ubuf__ uint64_t *&input, RegTensor<uint8_t> &dst,
-    const int16_t offset)
+__simd_callee__ inline void ConvertRegToWithShift(
+    __ubuf__ uint64_t*& input, RegTensor<uint8_t>& dst, const int16_t offset)
 {
     constexpr uint32_t eleCountPerVL = GetVecLen() / sizeof(uint64_t);
     MaskReg fullMask = CreateMask<uint64_t>();
@@ -106,8 +103,8 @@ __simd_callee__ inline void ConvertRegToWithShift(__ubuf__ uint64_t *&input, Reg
     DeInterleave(dst, tmpReg, (RegTensor<uint8_t> &)tmpU16Reg0, (RegTensor<uint8_t> &)tmpU16Reg2);
 }
 
-__simd_callee__ inline void ConvertRegToWithShift(__ubuf__ uint16_t *&input, RegTensor<uint8_t> &dst,
-    const int16_t offset)
+__simd_callee__ inline void ConvertRegToWithShift(
+    __ubuf__ uint16_t*& input, RegTensor<uint8_t>& dst, const int16_t offset)
 {
     constexpr uint32_t eleCountPerVL = GetVecLen() / sizeof(uint16_t);
     MaskReg fullMask = CreateMask<uint16_t>();
@@ -122,8 +119,8 @@ __simd_callee__ inline void ConvertRegToWithShift(__ubuf__ uint16_t *&input, Reg
     DeInterleave(dst, tmpReg, (RegTensor<uint8_t> &)inputP0, (RegTensor<uint8_t> &)inputP1);
 }
 
-__simd_callee__ inline void ConvertRegToWithShift(__ubuf__ uint8_t *&input, RegTensor<uint8_t> &dst,
-    const int16_t offset)
+__simd_callee__ inline void ConvertRegToWithShift(
+    __ubuf__ uint8_t*& input, RegTensor<uint8_t>& dst, const int16_t offset)
 {
     constexpr uint32_t eleCountPerVL = GetVecLen();
     DataCopy<uint8_t, PostLiteral::POST_MODE_UPDATE>(dst, input, eleCountPerVL);

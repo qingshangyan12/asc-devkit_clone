@@ -324,8 +324,8 @@ scene 13：{ shape:[H, W], format:"ND"} -->{ shape:[W, H], format:"ND"};
           { shape:[N, H, W], format:"ND"} -->{ shape:[N, W, H], format:"ND"};
 */
 template <typename T>
-__aicore__ inline void ConfusionTranspose021(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    ConfusionTranspose021Tiling &tiling)
+__aicore__ inline void ConfusionTranspose021(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, ConfusionTranspose021Tiling& tiling)
 {
     constexpr uint16_t vlSize =
         IsSameType<T, int64_t>::value ? GetVecLen() / sizeof(float) : GetVecLen() / sizeof(T);
@@ -373,8 +373,8 @@ __aicore__ inline void ConfusionTranspose021(const LocalTensor<T> &dstTensor, co
 scene 14： { shape:[N, H, W], format:"ND"} -->{ shape:[H, N, W], format:"ND"};
 */
 template <typename T>
-__aicore__ inline void ConfusionTranspose102(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    ConfusionTranspose102Tiling &tiling)
+__aicore__ inline void ConfusionTranspose102(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, ConfusionTranspose102Tiling& tiling)
 {
     constexpr uint16_t vlSize =
         IsSameType<T, int64_t>::value ? GetVecLen() / sizeof(float) : GetVecLen() / sizeof(T);
@@ -411,8 +411,8 @@ __aicore__ inline void ConfusionTranspose102(const LocalTensor<T> &dstTensor, co
 scene 15： { shape:[N, H, W], format:"ND"} -->{ shape:[W, H, N], format:"ND"};
 */
 template <typename T>
-__aicore__ inline void ConfusionTranspose210(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    ConfusionTranspose210Tiling &tiling)
+__aicore__ inline void ConfusionTranspose210(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, ConfusionTranspose210Tiling& tiling)
 {
     constexpr uint16_t vlSize =
         IsSameType<T, int64_t>::value ? GetVecLen() / sizeof(float) : GetVecLen() / sizeof(T);
@@ -463,8 +463,8 @@ __aicore__ inline void ConfusionTranspose210(const LocalTensor<T> &dstTensor, co
 }
 
 template <typename T>
-__aicore__ inline void ConfusionTransposeND2NZWithInlv(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    ConfusionTranspose210Tiling& tiling)
+__aicore__ inline void ConfusionTransposeND2NZWithInlv(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, ConfusionTranspose210Tiling& tiling)
 {
     ConfusionTransposeND2NZWithInlvImpl((__ubuf__ T*) dstTensor.GetPhyAddr(), (__ubuf__ T*) srcTensor.GetPhyAddr(), tiling);
 }
