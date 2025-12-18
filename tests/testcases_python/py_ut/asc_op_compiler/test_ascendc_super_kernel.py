@@ -1433,10 +1433,10 @@ Idx Name                              Size     VMA              Type
                     sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
                     tmp.early_start_mode = SuperKernelEarlyStartMode.EarlyStartDisable
                     res = gen_inter_ops_barrier(tmp, sub_tmp1, sub_tmp2)
-                    self.assertIn("AscendC::SyncAll<false>()", res)
-                    tmp.early_start_mode = SuperKernelEarlyStartMode.EarlyStartEnableV2
-                    res = gen_inter_ops_barrier(tmp, sub_tmp1, sub_tmp2)
-                    self.assertIn("g_super_kernel_early_start_config = 10;", res)
+                    self.assertIn( \
+                        "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));", \
+                        res)
+                    self.assertIn("wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);", res)
 
 
     def test_gen_op_end_dcci_all(self):
