@@ -124,6 +124,8 @@ public:
 #if (__NPU_ARCH__ == 5102)
         } else if constexpr (IsSameType<T, int2b_t>::value) {
             typeLen = DEFAULT_BLOCK_SIZE * INT2_FOUR;
+        } else if constexpr (IsSameType<T, uint1b_t>::value) {
+            typeLen = DEFAULT_BLOCK_SIZE * INT1_EIGHT;
 #endif
         } else {
             typeLen = DEFAULT_BLOCK_SIZE / sizeof(T);
