@@ -23,14 +23,15 @@ namespace AscendC {
 #pragma begin_pipe(V)
 
 template <uint16_t Rounds = 7, typename T>
-__aicore__ inline void PhiloxRandom(const LocalTensor<T> &dstLocal, const PhiloxKey &philoxKey, const PhiloxCounter &philoxCounter, uint16_t count)
+__aicore__ inline void PhiloxRandom(
+    const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter, uint16_t count)
 {
     PhiloxRandomImpl<Rounds>(dstLocal, philoxKey, philoxCounter, count);
 }
 
 template <uint16_t Rounds = 7, typename T>
-__aicore__ inline void PhiloxRandom(const LocalTensor<T> &dstLocal, const PhiloxKey &philoxKey,
-    const PhiloxCounter &philoxCounter, const PhiloxRandomParams &params)
+__aicore__ inline void PhiloxRandom(const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey,
+    const PhiloxCounter& philoxCounter, const PhiloxRandomParams& params)
 {
     PhiloxRandomImpl<Rounds>(dstLocal, philoxKey, philoxCounter, params);
 }

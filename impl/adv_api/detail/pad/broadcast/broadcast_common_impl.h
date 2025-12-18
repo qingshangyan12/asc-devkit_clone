@@ -49,9 +49,9 @@ struct BroadcastTiling {
     uint32_t srcStride[10];
 };
 
-template <typename T, int constRank = -1, uint32_t *constDstShape = nullptr, uint32_t *constSrcShape = nullptr>
+template <typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr>
 __aicore__ inline void GetBroadcastTilingInfoImpl(
-    uint32_t rank, const uint32_t *dstShape, const uint32_t *srcShape, bool srcInnerPad, BroadcastTiling &tiling)
+    uint32_t rank, const uint32_t* dstShape, const uint32_t* srcShape, bool srcInnerPad, BroadcastTiling& tiling)
 {
     static_assert((constRank == -1) || (constRank <= 9 && constRank > 0),
         "constRank only supports -1 and the range between 1 and 9");
@@ -166,9 +166,9 @@ __aicore__ inline void GetBroadcastTilingInfoImpl(
 }
 
 template <typename T, int32_t constRank>
-__aicore__ inline void BroadcastCompute(const LocalTensor<T> &dst, const LocalTensor<T> &src,
-    const uint32_t *dstShape, const uint32_t *dstStride, const uint32_t *srcStride,
-    int32_t dim, uint32_t srcSize, uint32_t dstSize, uint32_t loopNum)
+__aicore__ inline void BroadcastCompute(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape,
+    const uint32_t* dstStride, const uint32_t* srcStride, int32_t dim, uint32_t srcSize, uint32_t dstSize,
+    uint32_t loopNum)
 {
     BroadcastInternal::DstShapeCheck(dstShape, dim);
     using BrcType = typename AscendC::BroadcastInternal::ExtractUnsignedTypeBySize<sizeof(T)>::T;
@@ -279,10 +279,10 @@ __aicore__ inline void BroadcastCompute(const LocalTensor<T> &dst, const LocalTe
     }
 }
 
-template <typename T, int constRank = -1, uint32_t *constDstShape = nullptr, uint32_t *constSrcShape = nullptr,
+template <typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr,
     bool constSrcInnerPad = false>
-__aicore__ inline void BroadcastImpl(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t *dstShape,
-    const uint32_t *srcShape, BroadcastTiling *tiling)
+__aicore__ inline void BroadcastImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape,
+    const uint32_t* srcShape, BroadcastTiling* tiling)
 {
     CheckTensorPos<T>(dst, Hardware::UB, "dstTensor", "VECIN / VECCALC / VECOUT", "Broadcast");
     CheckTensorPos<T>(src, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "Broadcast");

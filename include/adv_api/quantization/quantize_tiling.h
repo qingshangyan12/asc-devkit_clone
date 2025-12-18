@@ -37,6 +37,6 @@ void GetQuantizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize
  * \param [out] maxLiveNodeCount, the multiple of the maximum temporary space to the input occupied space
  * \param [out] extraBuf, the size of the extra temporary space
  */
-void GetQuantizeTmpBufferFactorSize(uint32_t &maxLiveNodeCount, uint32_t &extraBuf);
+void GetQuantizeTmpBufferFactorSize(uint32_t& maxLiveNodeCount, uint32_t& extraBuf);
 } // namespace AscendC
 #endif // LIB_QUANTIZATION_QUANTIZE_TILING_H

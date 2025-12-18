@@ -84,8 +84,8 @@ __simd_vf__ inline void SelectWithBytesMaskPerAxisImpl(__ubuf__ T *dstUb, __ubuf
 }
 
 template <typename T, typename U, bool reverse = false>
-__aicore__ inline void SelectWithBytesMaskProcess(const LocalTensor<T> &dst, const LocalTensor<T> &src0, T src1,
-    const LocalTensor<U> &mask, const SelectWithBytesMaskShapeInfo &info)
+__aicore__ inline void SelectWithBytesMaskProcess(const LocalTensor<T>& dst, const LocalTensor<T>& src0, T src1,
+    const LocalTensor<U>& mask, const SelectWithBytesMaskShapeInfo& info)
 {
     __ubuf__ T *src0Ub = (__ubuf__ T *)src0.GetPhyAddr();
     __ubuf__ T *dstUb = (__ubuf__ T *)dst.GetPhyAddr();
@@ -100,9 +100,9 @@ __aicore__ inline void SelectWithBytesMaskProcess(const LocalTensor<T> &dst, con
 // Selects Values from two sources and put into dst according to the mask values.
 // True: Select scalar, False: select src.
 template <typename T, typename U, bool isReuseMask, bool reverse = false>
-__aicore__ inline __inout_pipe__(V) void SelectWithBytesMaskImpl(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
-    T src1, const LocalTensor<U> &mask, const LocalTensor<uint8_t> &sharedTmpBuffer,
-    const SelectWithBytesMaskShapeInfo &info)
+__aicore__ inline __inout_pipe__(V) void SelectWithBytesMaskImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
+    T src1, const LocalTensor<U>& mask, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const SelectWithBytesMaskShapeInfo& info)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
@@ -143,15 +143,15 @@ __aicore__ inline __inout_pipe__(V) void SelectWithBytesMaskImpl(const LocalTens
 }
 
 template <typename T, typename U, bool isReuseMask = true>
-__aicore__ inline void SelectWithBytesMask(const LocalTensor<T> &dst, const LocalTensor<T> &src0, T src1,
-    const LocalTensor<U> &mask, const LocalTensor<uint8_t> &sharedTmpBuffer, const SelectWithBytesMaskShapeInfo &info)
+__aicore__ inline void SelectWithBytesMask(const LocalTensor<T>& dst, const LocalTensor<T>& src0, T src1,
+    const LocalTensor<U>& mask, const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
 {
     SelectWithBytesMaskImpl<T, U, isReuseMask, false>(dst, src0, src1, mask, sharedTmpBuffer, info);
 }
 
 template <typename T, typename U, bool isReuseMask = true>
-__aicore__ inline void SelectWithBytesMask(const LocalTensor<T> &dst, T src0, const LocalTensor<T> &src1,
-    const LocalTensor<U> &mask, const LocalTensor<uint8_t> &sharedTmpBuffer, const SelectWithBytesMaskShapeInfo &info)
+__aicore__ inline void SelectWithBytesMask(const LocalTensor<T>& dst, T src0, const LocalTensor<T>& src1,
+    const LocalTensor<U>& mask, const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
 {
     SelectWithBytesMaskImpl<T, U, isReuseMask, true>(dst, src1, src0, mask, sharedTmpBuffer, info);
 }

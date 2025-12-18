@@ -43,8 +43,8 @@ __aicore__ inline void ReduceAllARImpl(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
 }
 
 template <typename T, typename pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceAllImpl(const LocalTensor<T> &dst, const LocalTensor<T> &src, const LocalTensor<uint8_t> &sharedTmpBuffer,
-    const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceAllImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
 {
     CHECK_FUNC_HIGHLEVEL_API(ReduceAll, (T, pattern), (dst, src, sharedTmpBuffer, srcShape, srcInnerPad, srcShape[1]));
 

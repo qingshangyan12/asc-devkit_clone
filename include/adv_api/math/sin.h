@@ -62,7 +62,7 @@ namespace AscendC {
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template<typename T, bool isReuseSource = false, const SinConfig &config = defaultSinConfig>
+template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
 __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
@@ -84,9 +84,9 @@ __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template<typename T, bool isReuseSource = false, const SinConfig &config = defaultSinConfig>
-__aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer)
+template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+__aicore__ inline void Sin(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     Sin<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, srcTensor.GetSize());
 }
@@ -102,9 +102,8 @@ __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template<typename T, bool isReuseSource = false, const SinConfig &config = defaultSinConfig>
-__aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+__aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     SinImpl<T, isReuseSource, config>(dstTensor, srcTensor, calCount);
 }
@@ -119,7 +118,7 @@ __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template<typename T, bool isReuseSource = false, const SinConfig &config = defaultSinConfig>
+template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
 __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Sin<T, isReuseSource, config>(dstTensor, srcTensor, srcTensor.GetSize());
@@ -165,8 +164,8 @@ __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * Input data valid range should be [-65504, 65504]
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const LocalTensor<uint8_t>& sharedTmpBuffer)
+__aicore__ inline void Sin(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     Sin<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcTensor.GetSize());
 }
@@ -183,8 +182,7 @@ __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * Input data valid range should be [-65504, 65504]
  */
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    const uint32_t calCount)
+__aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     SinImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 }

@@ -17,8 +17,8 @@
 #include "include/adv_api/quantization/antiquantize_tiling.h"
 
 namespace AscendC {
-void GetAntiQuantizeTmpBufferFactorSize(const ge::Shape &srcShape, const ge::Shape &scaleShape,
-    ge::DataType inputDataType, ge::DataType outputDataType, uint32_t &maxLiveNodeCount, uint32_t &extraBuf)
+void GetAntiQuantizeTmpBufferFactorSize(const ge::Shape& srcShape, const ge::Shape& scaleShape,
+    ge::DataType inputDataType, ge::DataType outputDataType, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 {
     (void)srcShape;
     (void)scaleShape;
@@ -28,8 +28,8 @@ void GetAntiQuantizeTmpBufferFactorSize(const ge::Shape &srcShape, const ge::Sha
     maxLiveNodeCount = 0;
 }
 
-void GetAntiQuantizeMaxMinTmpSize(const ge::Shape &srcShape, const ge::Shape &scaleShape, bool isTranspose,
-    ge::DataType inputDataType, ge::DataType outputDataType, uint32_t &maxValue, uint32_t &minValue)
+void GetAntiQuantizeMaxMinTmpSize(const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose,
+    ge::DataType inputDataType, ge::DataType outputDataType, uint32_t& maxValue, uint32_t& minValue)
 {
     (void)srcShape;
     (void)scaleShape;

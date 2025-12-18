@@ -58,7 +58,7 @@ __simd_callee__ inline void ComputePdVar(MicroAPI::RegTensor<float>& pdVarReg, M
     // 3.3. broadcast to CalCount
     Duplicate(tmpReg2, tmpReg1, preg);
 
-    // 3.4. res1 = (-0.5) * x1Reg * (x2Reg) * res
+    // 3.4. res1 = (-0.5) * Get * (x2Reg) * res
     Mul(tmpReg2, x2Reg, tmpReg2, preg);
     Mul(tmpReg2, x1Reg, tmpReg2, preg);
     Muls(tmpReg2, tmpReg2, multiplier, preg);

@@ -35,8 +35,8 @@ __simd_vf__ inline void RoundCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint3
 }
 
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void RoundImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t calCount)
+__aicore__ inline void RoundImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
     if ASCEND_IS_AIC {
         return;
@@ -48,8 +48,8 @@ __aicore__ inline void RoundImpl(const LocalTensor<T> &dstTensor, const LocalTen
 }
 
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void RoundImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const uint32_t calCount)
+__aicore__ inline void RoundImpl(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     if ASCEND_IS_AIC {
         return;

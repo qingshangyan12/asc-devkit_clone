@@ -163,8 +163,8 @@ __simd_vf__ inline void UnPad(__ubuf__ T* dstUb, __ubuf__ T* srcUb, UnPadParams 
 }
 
 template <typename T>
-__aicore__ inline void PadCompute(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    PadParams &padParams, const LocalTensor<uint8_t> &sharedTmpBuffer, PadTiling &tiling)
+__aicore__ inline void PadCompute(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    PadParams& padParams, const LocalTensor<uint8_t>& sharedTmpBuffer, PadTiling& tiling)
 {
     static_assert(SupportType<T, int16_t, uint16_t, half, int32_t, uint32_t, float>(),
         "Pad only support int16_t/uint16_t/half/int32_t/uint32_t/float data type on current device!");
@@ -193,8 +193,8 @@ __aicore__ inline void PadCompute(const LocalTensor<T> &dstTensor, const LocalTe
  * @param [in] unPadParams.rightPad number of right unpad
  */
 template <typename T>
-__aicore__ inline void UnPadCompute(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    UnPadParams &unPadParams, LocalTensor<uint8_t> &sharedTmpBuffer, UnPadTiling &tiling)
+__aicore__ inline void UnPadCompute(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    UnPadParams& unPadParams, LocalTensor<uint8_t>& sharedTmpBuffer, UnPadTiling& tiling)
 {
     static_assert(SupportType<T, int16_t, uint16_t, half, int32_t, uint32_t, float>(),
         "UnPad only support int16_t/uint16_t/half/int32_t/uint32_t/float data type on current device!");

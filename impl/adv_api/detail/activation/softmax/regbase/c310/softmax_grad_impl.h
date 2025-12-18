@@ -113,9 +113,9 @@ __simd_vf__ inline void SoftmaxGradGenericNZWithTailVFImpl(__ubuf__ T *dstUb, __
 }
 
 template <typename T, bool isFront = true>
-__aicore__ inline void SoftmaxGradGenericNZWithTailImpl(const LocalTensor<T> &dstTensor,
-    const LocalTensor<T> &gradTensor, const LocalTensor<T> &srcTensor, const LocalTensor<float> &workLocal,
-    const SoftMaxTiling &tiling, const LastAxisShapeND &originalSrcShape)
+__aicore__ inline void SoftmaxGradGenericNZWithTailImpl(const LocalTensor<T>& dstTensor,
+    const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor, const LocalTensor<float>& workLocal,
+    const SoftMaxTiling& tiling, const LastAxisShapeND& originalSrcShape)
 {
     __ubuf__ T *srcUb = (__ubuf__ T *)srcTensor.GetPhyAddr();
     __ubuf__ T *gradUb = (__ubuf__ T *)gradTensor.GetPhyAddr();
@@ -212,9 +212,9 @@ __simd_vf__ inline void SoftmaxGradGenericNZVFImpl(__ubuf__ T *dstUb, __ubuf__ T
 }
 
 template <typename T, bool isFront = true>
-__aicore__ inline void SoftmaxGradGenericNZImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &gradTensor,
-    const LocalTensor<T> &srcTensor, const LocalTensor<float> &workLocal, const SoftMaxTiling &tiling,
-    const LastAxisShapeND &originalSrcShape)
+__aicore__ inline void SoftmaxGradGenericNZImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor,
+    const LocalTensor<T>& srcTensor, const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling,
+    const LastAxisShapeND& originalSrcShape)
 {
     __ubuf__ T *srcUb = (__ubuf__ T *)srcTensor.GetPhyAddr();
     __ubuf__ T *gradUb = (__ubuf__ T *)gradTensor.GetPhyAddr();
@@ -279,9 +279,9 @@ __simd_vf__ inline void SoftMaxGradGenericNDVFImpl(__ubuf__ T *dstUb, __ubuf__ T
 }
 
 template <typename T, bool isFront = true>
-__aicore__ inline void SoftMaxGradGenericNDImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &gradTensor,
-    const LocalTensor<T> &srcTensor, const LocalTensor<float> &workLocal, const SoftMaxTiling &tiling,
-    const LastAxisShapeND &originalSrcShape)
+__aicore__ inline void SoftMaxGradGenericNDImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor,
+    const LocalTensor<T>& srcTensor, const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling,
+    const LastAxisShapeND& originalSrcShape)
 {
     __ubuf__ T *srcUb = (__ubuf__ T *)srcTensor.GetPhyAddr();
     __ubuf__ T *gradUb = (__ubuf__ T *)gradTensor.GetPhyAddr();
@@ -292,9 +292,9 @@ __aicore__ inline void SoftMaxGradGenericNDImpl(const LocalTensor<T> &dstTensor,
 }
 
 template <typename T>
-__aicore__ inline void SoftmaxGradNZImpl(const LocalTensor<T> &dst, const LocalTensor<T> &gradTensor,
-    const LocalTensor<T> &src, const LocalTensor<float> &workLocal, const LastAxisShapeND &originalSrcShape,
-    const SoftMaxTiling &tiling, bool isFront = false)
+__aicore__ inline void SoftmaxGradNZImpl(const LocalTensor<T>& dst, const LocalTensor<T>& gradTensor,
+    const LocalTensor<T>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
+    const SoftMaxTiling& tiling, bool isFront = false)
 {
     static_assert(SupportType<T, half, float>(), "SoftMaxGrad api only support half/float on current device");
     if (tiling.srcK != originalSrcShape.k) {
@@ -313,9 +313,9 @@ __aicore__ inline void SoftmaxGradNZImpl(const LocalTensor<T> &dst, const LocalT
 }
 
 template <typename T>
-__aicore__ inline void SoftmaxGradFrontNZImpl(const LocalTensor<T> &dst, const LocalTensor<T> &gradTensor,
-    const LocalTensor<T> &src, const LocalTensor<float> &workLocal, const LastAxisShapeND &originalSrcShape,
-    const SoftMaxTiling &tiling)
+__aicore__ inline void SoftmaxGradFrontNZImpl(const LocalTensor<T>& dst, const LocalTensor<T>& gradTensor,
+    const LocalTensor<T>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
+    const SoftMaxTiling& tiling)
 {
     static_assert(SupportType<T, half, float>(), "SoftMaxGradFront api only support half/float on current device");
     if (tiling.srcK != originalSrcShape.k) {
@@ -326,9 +326,9 @@ __aicore__ inline void SoftmaxGradFrontNZImpl(const LocalTensor<T> &dst, const L
 }
 
 template <typename T>
-__aicore__ inline void SoftmaxGradPostProcess(const LocalTensor<T> &dst, const LocalTensor<T> &gradTensor,
-    const LocalTensor<T> &src, const LocalTensor<float> &workLocal, const SoftMaxTiling &tiling,
-    const LastAxisShapeND &originalSrcShape, bool isFront = false)
+__aicore__ inline void SoftmaxGradPostProcess(const LocalTensor<T>& dst, const LocalTensor<T>& gradTensor,
+    const LocalTensor<T>& src, const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling,
+    const LastAxisShapeND& originalSrcShape, bool isFront = false)
 {
     static_assert(SupportType<T, half, float>(), "SoftMaxGrad api only support half/float on current device");
     if (isFront) {
@@ -339,9 +339,9 @@ __aicore__ inline void SoftmaxGradPostProcess(const LocalTensor<T> &dst, const L
 }
 
 template <typename T, bool isBasicBlock = false>
-__aicore__ inline void SoftmaxGradFrontNDImpl(const LocalTensor<T> &dst, const LocalTensor<T> &gradTensor,
-    const LocalTensor<T> &src, const LocalTensor<float> &workLocal, const SoftMaxTiling &tiling,
-    const LastAxisShapeND &originalSrcShape)
+__aicore__ inline void SoftmaxGradFrontNDImpl(const LocalTensor<T>& dst, const LocalTensor<T>& gradTensor,
+    const LocalTensor<T>& src, const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling,
+    const LastAxisShapeND& originalSrcShape)
 {
     static_assert(SupportType<T, half, float>(), "SoftMaxGradFront api only support half/float on current device");
     SoftMaxGradGenericNDImpl<T, true>(dst, gradTensor, src, workLocal, tiling, originalSrcShape);

@@ -55,7 +55,7 @@ __aicore__ inline void Fma(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * \param [in] src1: input LocalTensor
  * \param [in] src2: input LocalTensor
  * \param [in] count: the number of elements to be processed.
- * \note dst/src0/src1/src2 Tensor must be 32B aligned, and it doesn't allow dst/src0/src1/src2/sharedTmpBuffer tensor address overlap.
+ * \note dst/src0/src1/src2 Tensor must be 32B aligned, and it doesn't allow dst/src0/src1/src2 tensor address overlap.
  */
 template <const FmaConfig& config = DEFAULT_FMA_CONFIG, typename T>
 __aicore__ inline void Fma(const LocalTensor<T>& dst, const LocalTensor<T>& src0,

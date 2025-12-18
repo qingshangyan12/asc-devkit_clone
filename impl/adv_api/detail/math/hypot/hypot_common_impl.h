@@ -199,8 +199,8 @@ __simd_vf__ inline void VfHypotImpl(__ubuf__ T *dstUb, __ubuf__ T *src0Ub, __ubu
 }
 
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void HypotImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &src0Tensor,
-    const LocalTensor<T> &src1Tensor, const uint32_t calCount)
+__aicore__ inline void HypotImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
+    const LocalTensor<T>& src1Tensor, const uint32_t calCount)
 {
     static_assert(SupportType<T, half, bfloat16_t, float>(),
         "Hypot only support half/bfloat16_t/float data type on current device!");
@@ -233,8 +233,8 @@ __aicore__ inline void HypotImpl(const LocalTensor<T> &dstTensor, const LocalTen
 }
 
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void HypotImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &src0Tensor,
-    const LocalTensor<T> &src1Tensor, const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t calCount)
+__aicore__ inline void HypotImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
+    const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {

@@ -139,7 +139,7 @@ void GetVreduceMask(const int32_t k, const uint32_t dataTypeSize, optiling::Topk
 }
 
 void GetTopKMaxMinTmpSize310(const int32_t inner, const int32_t outter, const bool isInitIndex, enum TopKMode mode,
-    uint32_t &maxValue, uint32_t &minValue)
+    uint32_t& maxValue, uint32_t& minValue)
 {
     // total：(Inner*8B)*2
     if (mode == TopKMode::TOPK_NORMAL) {
@@ -160,7 +160,7 @@ void GetTopKMaxMinTmpSize310(const int32_t inner, const int32_t outter, const bo
 }
 
 void GetTopKMaxMinTmpSize220(const int32_t inner, const int32_t outter, const bool isInitIndex, enum TopKMode mode,
-    uint32_t &maxValue, uint32_t &minValue, const bool isLargest)
+    uint32_t& maxValue, uint32_t& minValue, const bool isLargest)
 {
     // total：(Inner*4+inner*4)*2
     if ((mode == TopKMode::TOPK_NORMAL) && (isInitIndex)) {
@@ -203,8 +203,8 @@ void GetTopKMaxMinTmpSize220(const int32_t inner, const int32_t outter, const bo
     }
 }
 
-void GetTopKMaxMinTmpSize200(const int32_t inner, const int32_t outter, enum TopKMode mode, uint32_t &maxValue,
-    uint32_t &minValue, const int32_t dataTypeSize)
+void GetTopKMaxMinTmpSize200(const int32_t inner, const int32_t outter, enum TopKMode mode, uint32_t& maxValue,
+    uint32_t& minValue, const int32_t dataTypeSize)
 {
     if (mode == TopKMode::TOPK_NORMAL) {
         // proposal space Bytes: inner * 8 * dataTypeSize
@@ -471,9 +471,9 @@ void CheckTopKHostCommon(const char *apiName, const char *hostFuncName,
 }
 } // namespace
 
-bool GetTopKMaxMinTmpSize(const platform_ascendc::PlatformAscendC &ascendcPlatform, const int32_t inner,
-    const int32_t outter, const bool isReuseSource, const bool isInitIndex, enum TopKMode mode,
-    const bool isLargest, const uint32_t dataTypeSize, uint32_t &maxValue, uint32_t &minValue)
+bool GetTopKMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const int32_t inner,
+    const int32_t outter, const bool isReuseSource, const bool isInitIndex, enum TopKMode mode, const bool isLargest,
+    const uint32_t dataTypeSize, uint32_t& maxValue, uint32_t& minValue)
 {
     (void) isReuseSource;
     CheckTopKHostCommon("TopK", "GetTopKMaxMinTmpSize", ascendcPlatform, inner, outter, isInitIndex, mode, 
@@ -493,8 +493,8 @@ bool GetTopKMaxMinTmpSize(const platform_ascendc::PlatformAscendC &ascendcPlatfo
 }
 
 bool GetTopKMaxMinTmpSize(const int32_t inner, const int32_t outter, const int32_t k, const bool isReuseSource,
-    const bool isInitIndex, enum TopKMode mode, const bool isLargest, ge::DataType dataType, 
-    const TopKConfig& config, uint32_t &maxValue, uint32_t &minValue)
+    const bool isInitIndex, enum TopKMode mode, const bool isLargest, ge::DataType dataType, const TopKConfig& config,
+    uint32_t& maxValue, uint32_t& minValue)
 {
     platform_ascendc::PlatformAscendC *platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return false, "Failed to get PlatformAscendC");

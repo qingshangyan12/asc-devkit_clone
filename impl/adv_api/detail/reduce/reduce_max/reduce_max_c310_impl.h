@@ -111,8 +111,8 @@ __aicore__ inline void ReduceMaxRAReuseSourceCompute(__ubuf__ T *dstAddr, __ubuf
 }
 
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceMaxImpl(const LocalTensor<T> &dst, const LocalTensor<T> &src, const LocalTensor<uint8_t> &sharedTmpBuffer,
-    const uint32_t srcShape[], bool srcInnerPad)
+__aicore__ inline void ReduceMaxImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
 {
     CheckTensorPos<T>(dst, Hardware::UB, "dstTensor", "VECIN / VECCALC / VECOUT", "ReduceMax");
     CheckTensorPos<T>(src, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "ReduceMax");

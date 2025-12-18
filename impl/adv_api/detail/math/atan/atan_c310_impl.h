@@ -295,9 +295,9 @@ __aicore__ inline void AtanPolynomialImpl(
 }
 } // namespace Internal
 
-template <typename T, bool isReuseSource, const AtanConfig &config>
-__aicore__ inline void AtanImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const uint32_t calCount)
+template <typename T, bool isReuseSource, const AtanConfig& config>
+__aicore__ inline void AtanImpl(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN / VECCALC / VECOUT", "Atan");
     CheckTensorPos<T>(srcTensor, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "Atan");
@@ -321,9 +321,9 @@ __aicore__ inline void AtanImpl(const LocalTensor<T> &dstTensor, const LocalTens
     }
 }
 
-template <typename T, bool isReuseSource = false, const AtanConfig &config = defaultAtanConfig>
-__aicore__ inline void AtanImpl(const LocalTensor<T> &dstTensor, const LocalTensor<T> &srcTensor,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t calCount)
+template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
+__aicore__ inline void AtanImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {

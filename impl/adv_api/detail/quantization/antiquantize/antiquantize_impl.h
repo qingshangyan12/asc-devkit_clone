@@ -58,8 +58,8 @@ __aicore__ inline constexpr bool IsDataTypeValid()
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizePerTensorImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer,
+__aicore__ inline void AntiQuantizePerTensorImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const AntiQuantizeParams& params)
 {
     if ASCEND_IS_AIC {
@@ -78,9 +78,9 @@ __aicore__ inline void AntiQuantizePerTensorImpl(const LocalTensor<DstT> &dstTen
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizePerChannelImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer,
-    const AntiQuantizeParams& params)
+__aicore__ inline void AntiQuantizePerChannelImpl(const LocalTensor<DstT>& dstTensor,
+    const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const AntiQuantizeParams& params)
 {
     if ASCEND_IS_AIC {
         return;
@@ -97,8 +97,8 @@ __aicore__ inline void AntiQuantizePerChannelImpl(const LocalTensor<DstT> &dstTe
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizePerTokenImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer,
+__aicore__ inline void AntiQuantizePerTokenImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const AntiQuantizeParams& params)
 {
     if ASCEND_IS_AIC {
@@ -118,8 +118,8 @@ __aicore__ inline void AntiQuantizePerTokenImpl(const LocalTensor<DstT> &dstTens
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizePerGroupImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer,
+__aicore__ inline void AntiQuantizePerGroupImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const AntiQuantizeParams& params)
 {
     if ASCEND_IS_AIC {
@@ -167,8 +167,8 @@ __aicore__ inline void AntiQuantizePerGroupImpl(const LocalTensor<DstT> &dstTens
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizePerTensorImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const AntiQuantizeParams& params)
+__aicore__ inline void AntiQuantizePerTensorImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const AntiQuantizeParams& params)
 {
     LocalTensor<uint8_t> stackTensor;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(stackTensor);
@@ -177,8 +177,8 @@ __aicore__ inline void AntiQuantizePerTensorImpl(const LocalTensor<DstT> &dstTen
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizePerChannelImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const AntiQuantizeParams& params)
+__aicore__ inline void AntiQuantizePerChannelImpl(const LocalTensor<DstT>& dstTensor,
+    const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset, const AntiQuantizeParams& params)
 {
     LocalTensor<uint8_t> stackTensor;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(stackTensor);
@@ -187,8 +187,8 @@ __aicore__ inline void AntiQuantizePerChannelImpl(const LocalTensor<DstT> &dstTe
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizePerTokenImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const AntiQuantizeParams& params)
+__aicore__ inline void AntiQuantizePerTokenImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const AntiQuantizeParams& params)
 {
     LocalTensor<uint8_t> stackTensor;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(stackTensor);
@@ -197,8 +197,8 @@ __aicore__ inline void AntiQuantizePerTokenImpl(const LocalTensor<DstT> &dstTens
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizePerGroupImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const AntiQuantizeParams& params)
+__aicore__ inline void AntiQuantizePerGroupImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const AntiQuantizeParams& params)
 {
     LocalTensor<uint8_t> stackTensor;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(stackTensor);
@@ -207,8 +207,8 @@ __aicore__ inline void AntiQuantizePerGroupImpl(const LocalTensor<DstT> &dstTens
 }
 
 template <typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void CheckAntiQuantizeTensorPos(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset)
+__aicore__ inline void CheckAntiQuantizeTensorPos(
+    const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset)
 {
     CheckTensorPosition(dstTensor, "dstTensor", "VECIN, VECOUT, VECCALC");
     CheckTensorPosition(srcTensor, "srcTensor", "VECIN, VECOUT, VECCALC");
@@ -219,8 +219,8 @@ __aicore__ inline void CheckAntiQuantizeTensorPos(const LocalTensor<DstT> &dstTe
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizeImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer,
+__aicore__ inline void AntiQuantizeImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const AntiQuantizeParams& params)
 {
     CheckAntiQuantizeTensorPos(dstTensor, srcTensor, scale, offset);
@@ -239,8 +239,8 @@ __aicore__ inline void AntiQuantizeImpl(const LocalTensor<DstT> &dstTensor, cons
 }
 
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantizeImpl(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const AntiQuantizeParams& params)
+__aicore__ inline void AntiQuantizeImpl(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const AntiQuantizeParams& params)
 {
     CheckAntiQuantizeTensorPos(dstTensor, srcTensor, scale, offset);
 

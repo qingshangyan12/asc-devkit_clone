@@ -34,8 +34,8 @@ namespace AscendC {
  * @param [in] sharedTmpBuffer input local temporary Tensor
  */
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void Broadcast(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
-    const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<uint8_t> &sharedTmpBuffer)
+__aicore__ inline void Broadcast(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal,
+    const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer)
 {
     BroadCast<T, dim, axis, isReuseSource>(dstLocal, srcLocal, dstShape, srcShape, sharedTmpBuffer);
 }
@@ -49,7 +49,7 @@ __aicore__ inline void Broadcast(const LocalTensor<T> &dstLocal, const LocalTens
  * @param [in] srcShape, the shape of src tensor
  */
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-__aicore__ inline void Broadcast(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
+__aicore__ inline void Broadcast(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal,
     const uint32_t dstShape[dim], const uint32_t srcShape[dim])
 {
     BroadCast<T, dim, axis, isReuseSource>(dstLocal, srcLocal, dstShape, srcShape);
@@ -66,9 +66,9 @@ __aicore__ inline void Broadcast(const LocalTensor<T> &dstLocal, const LocalTens
  * @param [in] srcInnerPad, if srcShape[rank-1] is aligned
  * @param [out] tiling, BroadcastTiling
  */
-template <typename T, int constRank = -1, uint32_t *constDstShape = nullptr, uint32_t *constSrcShape = nullptr>
+template <typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr>
 __aicore__ inline void GetBroadcastTilingInfo(
-    uint32_t rank, const uint32_t *dstShape, const uint32_t *srcShape, bool srcInnerPad, BroadcastTiling &tiling)
+    uint32_t rank, const uint32_t* dstShape, const uint32_t* srcShape, bool srcInnerPad, BroadcastTiling& tiling)
 {
     GetBroadcastTilingInfoImpl<T, constRank, constDstShape, constSrcShape>(rank, dstShape, srcShape, srcInnerPad, tiling);
 }
@@ -82,10 +82,10 @@ __aicore__ inline void GetBroadcastTilingInfo(
  * @param [in] srcShape, the shape of src tensor
  * @param [in] tiling, broadcasttiling ptr
  */
-template <typename T, int constRank = -1, uint32_t *constDstShape = nullptr, uint32_t *constSrcShape = nullptr,
+template <typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr,
     bool constSrcInnerPad = false>
-__aicore__ inline void Broadcast(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t *dstShape,
-    const uint32_t *srcShape, BroadcastTiling *tiling)
+__aicore__ inline void Broadcast(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape,
+    const uint32_t* srcShape, BroadcastTiling* tiling)
 {
     BroadcastImpl<T, constRank, constDstShape, constSrcShape, constSrcInnerPad>(dst, src, dstShape, srcShape, tiling);
 }

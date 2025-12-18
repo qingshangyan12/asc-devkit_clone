@@ -311,8 +311,8 @@ __simd_vf__ inline void QuantizePerGroupForKColCommonVF(__ubuf__ DstT* dstUb, __
 
 /******************* PerGroup **********************/
 template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void QuantizePerGroupForKColCommon(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
+__aicore__ inline void QuantizePerGroupForKColCommon(const LocalTensor<DstT>& dstTensor,
+    const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
 {
     using ActualScaleT = typename ScaleT::PrimType;
     constexpr bool isScalarOffset = TypeUtils::IsInnerDefaultType<OffsetT>();
@@ -368,8 +368,8 @@ __simd_vf__ inline void QuantizePerGroupForKColFp4VF(__ubuf__ DstT* dstUb, __ubu
 }
 
 template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT>
-__aicore__ inline void QuantizePerGroupForKColFp4(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT& scale, const QuantizeParams& params)
+__aicore__ inline void QuantizePerGroupForKColFp4(const LocalTensor<DstT>& dstTensor,
+    const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const QuantizeParams& params)
 {
     using ActualScaleT = typename ScaleT::PrimType;
     __ubuf__ DstT* dstUb = (__ubuf__ DstT*)dstTensor.GetPhyAddr();
@@ -379,7 +379,7 @@ __aicore__ inline void QuantizePerGroupForKColFp4(const LocalTensor<DstT> &dstTe
 }
 
 template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void QuantizePerGroupForKCol(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
+__aicore__ inline void QuantizePerGroupForKCol(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
     const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
 {
     static_assert(TypeUtils::IsLocalTensorType<ScaleT>(), "Quantize PerGroup ScaleT should be Tensor");
@@ -505,8 +505,8 @@ __simd_vf__ inline void QuantizePerGroupForKRowCommonVF(__ubuf__ DstT* dstUb, __
 }
 
 template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void QuantizePerGroupForKRowCommon(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
+__aicore__ inline void QuantizePerGroupForKRowCommon(const LocalTensor<DstT>& dstTensor,
+    const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
 {
     using ActualScaleT = typename ScaleT::PrimType;
     constexpr bool isScalarOffset = TypeUtils::IsInnerDefaultType<OffsetT>();
@@ -587,8 +587,8 @@ __simd_vf__ inline void QuantizePerGroupForKRowFp4VF(__ubuf__ DstT* dstUb, __ubu
 }
 
 template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT>
-__aicore__ inline void QuantizePerGroupForKRowFp4(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT& scale, const QuantizeParams& params)
+__aicore__ inline void QuantizePerGroupForKRowFp4(const LocalTensor<DstT>& dstTensor,
+    const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const QuantizeParams& params)
 {
     using ActualScaleT = typename ScaleT::PrimType;
     __ubuf__ DstT* dstUb = (__ubuf__ DstT*)dstTensor.GetPhyAddr();
@@ -601,7 +601,7 @@ __aicore__ inline void QuantizePerGroupForKRowFp4(const LocalTensor<DstT> &dstTe
 }
 
 template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void QuantizePerGroupForKRow(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
+__aicore__ inline void QuantizePerGroupForKRow(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
     const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
 {
     static_assert(TypeUtils::IsLocalTensorType<ScaleT>(), "Quantize PerGroup ScaleT should be Tensor");
@@ -879,8 +879,8 @@ __aicore__ inline void QuantizePerTensor(const LocalTensor<DstT>& dstTensor, con
 }
 
 template <typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void CheckQuantizeParams(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset)
+__aicore__ inline void CheckQuantizeParams(
+    const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset)
 {
     CheckTensorPosition(dstTensor, "dstTensor", "VECIN, VECOUT, VECCALC");
     CheckTensorPosition(srcTensor, "srcTensor", "VECIN, VECOUT, VECCALC");

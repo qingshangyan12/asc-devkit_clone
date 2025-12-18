@@ -43,9 +43,9 @@ namespace AscendC {
  * \param [in] params: AntiQuantizeParams with m, n, groupSize to describe the calculation process like above.
  */
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantize(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const LocalTensor<uint8_t> &sharedTmpBuffer,
-    const AntiQuantizeParams &params)
+__aicore__ inline void AntiQuantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const AntiQuantizeParams& params)
 {
     AntiQuantizeImpl<config>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
 }
@@ -68,8 +68,8 @@ __aicore__ inline void AntiQuantize(const LocalTensor<DstT> &dstTensor, const Lo
  * \param [in] params: AntiQuantizeParams with m, n, groupSize to describe the calculation process like above.
  */
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void AntiQuantize(const LocalTensor<DstT> &dstTensor, const LocalTensor<SrcT> &srcTensor,
-    const ScaleT &scale, const OffsetT &offset, const AntiQuantizeParams &params)
+__aicore__ inline void AntiQuantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
+    const ScaleT& scale, const OffsetT& offset, const AntiQuantizeParams& params)
 {
     AntiQuantizeImpl<config>(dstTensor, srcTensor, scale, offset, params);
 }

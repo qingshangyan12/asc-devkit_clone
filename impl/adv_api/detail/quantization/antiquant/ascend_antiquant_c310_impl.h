@@ -750,11 +750,11 @@ __aicore__ inline void AntiQuantPerchannelImpl(const LocalTensor<OutputDataType>
 }
 
 template <typename SrcType, bool withOffset = true>
-__aicore__ inline void AntiQuantInnerLoop(const LocalTensor<bfloat16_t> &dst, const LocalTensor<SrcType> &src,
-    const LocalTensor<bfloat16_t> &offset, const LocalTensor<bfloat16_t> &scale,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const UnaryRepeatParams &unaryParamsCastSrc,
-    const UnaryRepeatParams &unaryParamsToFP32, const UnaryRepeatParams &unaryParamsFP32ToDst,
-    const BinaryRepeatParams &binaryParams, const uint32_t calCount)
+__aicore__ inline void AntiQuantInnerLoop(const LocalTensor<bfloat16_t>& dst, const LocalTensor<SrcType>& src,
+    const LocalTensor<bfloat16_t>& offset, const LocalTensor<bfloat16_t>& scale,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const UnaryRepeatParams& unaryParamsCastSrc,
+    const UnaryRepeatParams& unaryParamsToFP32, const UnaryRepeatParams& unaryParamsFP32ToDst,
+    const BinaryRepeatParams& binaryParams, const uint32_t calCount)
 {
     uint32_t srcFp16Pos = calCount * sizeof(bfloat16_t);
     uint32_t offsetFp32Pos = calCount * sizeof(float);
@@ -794,10 +794,10 @@ __aicore__ inline void AntiQuantInnerLoop(const LocalTensor<bfloat16_t> &dst, co
 }
 
 template <typename SrcType, bool withOffset = true>
-__aicore__ inline void AntiQuantInnerLoop(const LocalTensor<bfloat16_t> &dst, const LocalTensor<SrcType> &src,
-    const bfloat16_t offset, const bfloat16_t scale, const LocalTensor<uint8_t> &sharedTmpBuffer,
-    const UnaryRepeatParams &unaryParamsCastSrc, const UnaryRepeatParams &unaryParamsToFP32,
-    const UnaryRepeatParams &unaryParamsFP32ToDst, const UnaryRepeatParams &unaryParamsScalar, const uint32_t calCount)
+__aicore__ inline void AntiQuantInnerLoop(const LocalTensor<bfloat16_t>& dst, const LocalTensor<SrcType>& src,
+    const bfloat16_t offset, const bfloat16_t scale, const LocalTensor<uint8_t>& sharedTmpBuffer,
+    const UnaryRepeatParams& unaryParamsCastSrc, const UnaryRepeatParams& unaryParamsToFP32,
+    const UnaryRepeatParams& unaryParamsFP32ToDst, const UnaryRepeatParams& unaryParamsScalar, const uint32_t calCount)
 {
     uint32_t srcFp16Pos = calCount * sizeof(bfloat16_t);
     auto fp16TmpBuffer = sharedTmpBuffer[srcFp16Pos].ReinterpretCast<half>();
@@ -830,9 +830,9 @@ __aicore__ inline void AntiQuantInnerLoop(const LocalTensor<bfloat16_t> &dst, co
 }
 
 template <typename SrcType>
-__aicore__ inline void AscendAntiQuantNoTransposePerformance(const LocalTensor<bfloat16_t> &dst,
-    const LocalTensor<SrcType> &src, const LocalTensor<bfloat16_t> &offset, const LocalTensor<bfloat16_t> &scale,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t K, const uint32_t N)
+__aicore__ inline void AscendAntiQuantNoTransposePerformance(const LocalTensor<bfloat16_t>& dst,
+    const LocalTensor<SrcType>& src, const LocalTensor<bfloat16_t>& offset, const LocalTensor<bfloat16_t>& scale,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K, const uint32_t N)
 {
     uint32_t posOffsetScale = N * sizeof(float) * ANTIQUANT_TWO;
     uint32_t posCast = posOffsetScale + ANTIQUANT_SINGLE_N_SIZE_BF16 * K * sizeof(half);
@@ -881,9 +881,9 @@ __aicore__ inline void AscendAntiQuantNoTransposePerformance(const LocalTensor<b
 }
 
 template <typename SrcType>
-__aicore__ inline void AscendAntiQuantNoTransposePerformanceTail(const LocalTensor<bfloat16_t> &dst,
-    const LocalTensor<SrcType> &src, const LocalTensor<bfloat16_t> &offset, const LocalTensor<bfloat16_t> &scale,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t K, const uint32_t N, const uint32_t mask)
+__aicore__ inline void AscendAntiQuantNoTransposePerformanceTail(const LocalTensor<bfloat16_t>& dst,
+    const LocalTensor<SrcType>& src, const LocalTensor<bfloat16_t>& offset, const LocalTensor<bfloat16_t>& scale,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K, const uint32_t N, const uint32_t mask)
 {
     uint32_t index = N / ANTIQUANT_SINGLE_N_SIZE_BF16 * ANTIQUANT_SINGLE_N_SIZE_BF16;
     uint32_t posOffset = N * sizeof(float);
@@ -925,9 +925,9 @@ __aicore__ inline void AscendAntiQuantNoTransposePerformanceTail(const LocalTens
 }
 
 template <typename SrcType>
-__aicore__ inline void PreCast(const LocalTensor<bfloat16_t> &dst, const LocalTensor<SrcType> &src,
-    const LocalTensor<bfloat16_t> &offset, const LocalTensor<bfloat16_t> &scale,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t K)
+__aicore__ inline void PreCast(const LocalTensor<bfloat16_t>& dst, const LocalTensor<SrcType>& src,
+    const LocalTensor<bfloat16_t>& offset, const LocalTensor<bfloat16_t>& scale,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K)
 {
     uint32_t posOffset = offset.GetSize() * sizeof(float);
     uint32_t repeatEle = ONE_REPEAT_BYTE_SIZE / sizeof(bfloat16_t);
@@ -960,8 +960,8 @@ __aicore__ inline bool AntiQuantCheckPerformanceMode(const LocalTensor<OutputDat
 // scale * (src + offset)   src: N * K, scale: N, offset: N  NOffset: offset used for tmpTensorOffset, tmpTensorScale
 // For now, calCount must equal to N * K then can use brcb
 template <typename SrcType, typename OutputDataType, bool isOffset>
-__aicore__ inline void CalculationMax(const LocalTensor<SrcType> &src, const LocalTensor<OutputDataType> &dst,
-    AntiquantParams<float> &params, const uint32_t calCount, const uint32_t N, const uint32_t K, const uint32_t NOffset)
+__aicore__ inline void CalculationMax(const LocalTensor<SrcType>& src, const LocalTensor<OutputDataType>& dst,
+    AntiquantParams<float>& params, const uint32_t calCount, const uint32_t N, const uint32_t K, const uint32_t NOffset)
 {
     // store FP16 result in second half of FP32 tmpTensor to avoid input FP16 being replaced
     uint32_t srcFp16Pos = calCount / ANTIQUANT_TWO; // therefore start from (calCount / 2)th FP32 tmpTensor
@@ -1059,8 +1059,8 @@ __aicore__ inline void CastAndBrcb(const LocalTensor<OutputDataType> &offset, co
 // scale * (src + offset)   src: N * K, scale: N, offset: N  NOffset: offset used for tmpTensorOffset, tmpTensorScale
 // For now, calCount must equal to N * K then can use brcb   calCount: 64 * N
 template <typename SrcType, typename OutputDataType, bool withOffset>
-__aicore__ inline void CalculationMin(const LocalTensor<SrcType> &src, const LocalTensor<OutputDataType> &dst,
-    AntiquantParams<float> &params, const uint32_t calCount, const uint32_t n, const uint32_t srcN, const uint32_t k)
+__aicore__ inline void CalculationMin(const LocalTensor<SrcType>& src, const LocalTensor<OutputDataType>& dst,
+    AntiquantParams<float>& params, const uint32_t calCount, const uint32_t n, const uint32_t srcN, const uint32_t k)
 {
     // store FP16 result in second half of FP32 tmpTensor to avoid input FP16 being replaced
     uint32_t srcFp16Pos = calCount / ANTIQUANT_TWO; // therefore start from (calCount / 2)th FP32 tmpTensor
@@ -1111,9 +1111,9 @@ __aicore__ inline void CalculationMin(const LocalTensor<SrcType> &src, const Loc
 
 // Method2: min: N * 64
 template <typename SrcType, typename OutputDataType>
-__aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType> &dst, const LocalTensor<SrcType> &src,
-    const LocalTensor<OutputDataType> &offset, const LocalTensor<OutputDataType> &scale,
-    const LocalTensor<float> &stackBuffer, const uint32_t calCount, const uint32_t n, const uint32_t k)
+__aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType>& dst, const LocalTensor<SrcType>& src,
+    const LocalTensor<OutputDataType>& offset, const LocalTensor<OutputDataType>& scale,
+    const LocalTensor<float>& stackBuffer, const uint32_t calCount, const uint32_t n, const uint32_t k)
 {
     AntiquantParams<float> antiquantParams;
     GetAntiquantTensorInfo<OutputDataType>(scale, stackBuffer, antiquantParams);
@@ -1133,8 +1133,8 @@ __aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType> &dst
 }
 
 template <typename SrcType, typename OutputDataType>
-__aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType> &dst, const LocalTensor<SrcType> &src,
-    const LocalTensor<OutputDataType> &scale, const LocalTensor<float> &stackBuffer, const uint32_t calCount,
+__aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType>& dst, const LocalTensor<SrcType>& src,
+    const LocalTensor<OutputDataType>& scale, const LocalTensor<float>& stackBuffer, const uint32_t calCount,
     const uint32_t n, const uint32_t k)
 {
     AntiquantParams<float> antiquantParams;
@@ -1155,17 +1155,17 @@ __aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType> &dst
 }
 
 template <typename OutputDataType>
-__aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType> &dst, const LocalTensor<int4b_t> &src,
-    const LocalTensor<OutputDataType> &scale, const LocalTensor<float> &stackBuffer, const uint32_t calCount,
+__aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType>& dst, const LocalTensor<int4b_t>& src,
+    const LocalTensor<OutputDataType>& scale, const LocalTensor<float>& stackBuffer, const uint32_t calCount,
     const uint32_t n, const uint32_t k)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported type: int4b_t for AntiQuant"); });
 }
 
 template <typename OutputDataType>
-__aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType> &dst, const LocalTensor<int4b_t> &src,
-    const LocalTensor<OutputDataType> &offset, const LocalTensor<OutputDataType> &scale,
-    const LocalTensor<float> &stackBuffer, const uint32_t calCount, const uint32_t n, const uint32_t k)
+__aicore__ inline void CalculateByBrcbMin(const LocalTensor<OutputDataType>& dst, const LocalTensor<int4b_t>& src,
+    const LocalTensor<OutputDataType>& offset, const LocalTensor<OutputDataType>& scale,
+    const LocalTensor<float>& stackBuffer, const uint32_t calCount, const uint32_t n, const uint32_t k)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported type: int4b_t for AntiQuant"); });
 }
@@ -1188,10 +1188,9 @@ __aicore__ inline void AntiQuantFp16Brcb(const LocalTensor<half> &scale, const L
 }
 
 template <typename SrcType, typename OutputDataType>
-__aicore__ inline void AscendAntiQuantTranspose(const LocalTensor<OutputDataType> &dst,
-    const LocalTensor<SrcType> &src, const LocalTensor<OutputDataType> &offset,
-    const LocalTensor<OutputDataType> &scale, const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t K,
-    const AntiQuantShapeInfo &shapeInfo = {})
+__aicore__ inline void AscendAntiQuantTranspose(const LocalTensor<OutputDataType>& dst, const LocalTensor<SrcType>& src,
+    const LocalTensor<OutputDataType>& offset, const LocalTensor<OutputDataType>& scale,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K, const AntiQuantShapeInfo& shapeInfo = {})
 {
     uint32_t calCount = src.GetSize();
     uint32_t N = offset.GetSize();
@@ -1210,9 +1209,9 @@ __aicore__ inline void AscendAntiQuantTranspose(const LocalTensor<OutputDataType
 }
 
 template <typename SrcType, typename OutputDataType>
-__aicore__ inline void AscendAntiQuantTranspose(const LocalTensor<OutputDataType> &dst,
-    const LocalTensor<SrcType> &src, const LocalTensor<OutputDataType> &scale,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t K, const AntiQuantShapeInfo &shapeInfo = {})
+__aicore__ inline void AscendAntiQuantTranspose(const LocalTensor<OutputDataType>& dst, const LocalTensor<SrcType>& src,
+    const LocalTensor<OutputDataType>& scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t K,
+    const AntiQuantShapeInfo& shapeInfo = {})
 {
     uint32_t calCount = src.GetSize();
     uint32_t N = scale.GetSize();
@@ -2148,11 +2147,11 @@ __aicore__ inline void AscendAntiQuantPerGroupForRow(const LocalTensor<dstT>& ds
     }
 }
 
-template <typename dstT, typename srcT, typename scaleT, const AscendAntiQuantConfig &config,
-    const AscendAntiQuantPolicy &policy>
-__aicore__ inline void AscendAntiQuantImpl(const LocalTensor<dstT> &dstTensor, const LocalTensor<srcT> &srcTensor,
-    const LocalTensor<uint8_t> &sharedTmpBuffer, const LocalTensor<scaleT> &scaleTensor,
-    const LocalTensor<scaleT> &offsetTensor, const AscendAntiQuantParam &para)
+template <typename dstT, typename srcT, typename scaleT, const AscendAntiQuantConfig& config,
+    const AscendAntiQuantPolicy& policy>
+__aicore__ inline void AscendAntiQuantImpl(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<scaleT>& scaleTensor,
+    const LocalTensor<scaleT>& offsetTensor, const AscendAntiQuantParam& para)
 {
     if ASCEND_IS_AIC {
         return;
@@ -2198,8 +2197,8 @@ __aicore__ inline void AscendAntiQuantImpl(const LocalTensor<dstT> &dstTensor, c
 }
 
 template <typename SrcType, typename DstType, bool isTranspose>
-__aicore__ inline void AscendAntiQuantImplCommon(const LocalTensor<DstType> &dst, const LocalTensor<SrcType> &src,
-    const LocalTensor<DstType> &offset, const LocalTensor<DstType> &scale, const LocalTensor<uint8_t> &sharedTmpBuffer,
+__aicore__ inline void AscendAntiQuantImplCommon(const LocalTensor<DstType>& dst, const LocalTensor<SrcType>& src,
+    const LocalTensor<DstType>& offset, const LocalTensor<DstType>& scale, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
 {
     CheckTensorPosition(dst, "dst", "VECIN, VECOUT, VECCALC");
@@ -2210,8 +2209,8 @@ __aicore__ inline void AscendAntiQuantImplCommon(const LocalTensor<DstType> &dst
 }
 
 template <typename SrcType, typename DstType, bool isTranspose>
-__aicore__ inline void AscendAntiQuantImplCommon(const LocalTensor<DstType> &dst, const LocalTensor<SrcType> &src,
-    const DstType offset, const DstType scale, const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t k,
+__aicore__ inline void AscendAntiQuantImplCommon(const LocalTensor<DstType>& dst, const LocalTensor<SrcType>& src,
+    const DstType offset, const DstType scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k,
     const AntiQuantShapeInfo& shapeInfo = {})
 {
     CheckTensorPosition(dst, "dst", "VECIN, VECOUT, VECCALC");
