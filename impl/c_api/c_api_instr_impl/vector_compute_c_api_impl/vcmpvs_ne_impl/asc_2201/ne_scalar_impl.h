@@ -15,7 +15,7 @@
 #ifndef IMPL_INSTR_VECTOR_COMPUTE_NE_VCMPVS_ASC_2201_NE_SCALAR_IMPL_H
 #define IMPL_INSTR_VECTOR_COMPUTE_NE_VCMPVS_ASC_2201_NE_SCALAR_IMPL_H
 
-#include "c_api_utils_intf.h"
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 namespace CApiInternal {
 

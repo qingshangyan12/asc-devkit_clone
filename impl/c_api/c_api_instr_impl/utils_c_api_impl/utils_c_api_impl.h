@@ -17,30 +17,48 @@
 
 #include "c_api_utils_intf.h"
 
-#define C_API_AIC_TYPE 1
-#define C_API_AIV_TYPE 2
-#define C_API_MIX_TYPE 3
-#if (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)
-#define C_API_CV_SPLIT_CORE_TYPE C_API_AIC_TYPE
-#elif (defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)
-#define C_API_CV_SPLIT_CORE_TYPE C_API_AIV_TYPE
+constexpr uint32_t C_API_AIC_TYPE = 1;
+constexpr uint32_t C_API_AIV_TYPE = 2;
+constexpr uint32_t C_API_MIX_TYPE = 3;
+
+#if defined(ASCENDC_CPU_DEBUG)
+    extern uint32_t g_c_api_core_type;
+    #define ASC_IS_AIV (g_c_api_core_type == C_API_AIV_TYPE)
+    #define ASC_IS_AIC (g_c_api_core_type == C_API_AIC_TYPE)
+    #define ASC_IS_NOT_AIV (g_c_api_core_type != C_API_AIV_TYPE)
+    #define ASC_IS_NOT_AIC (g_c_api_core_type != C_API_AIC_TYPE)
 #else
-#define C_API_CV_SPLIT_CORE_TYPE C_API_MIX_TYPE
+    #if (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)
+        constexpr uint32_t g_c_api_core_type = C_API_AIC_TYPE;
+    #elif (defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)
+        constexpr uint32_t g_c_api_core_type = C_API_AIV_TYPE;
+    #else
+        constexpr uint32_t g_c_api_core_type = C_API_MIX_TYPE;
+    #endif
+    #define ASC_IS_AIV constexpr(g_c_api_core_type == C_API_AIV_TYPE)
+    #define ASC_IS_AIC constexpr(g_c_api_core_type == C_API_AIC_TYPE)
+    #define ASC_IS_NOT_AIV constexpr(g_c_api_core_type != C_API_AIV_TYPE)
+    #define ASC_IS_NOT_AIC constexpr(g_c_api_core_type != C_API_AIC_TYPE)
 #endif
 
 __aicore__ inline void asc_set_mask_count_begin(uint32_t count)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    set_mask_count();
-    set_vector_mask(static_cast<uint64_t>(0), static_cast<uint64_t>(count));
-#endif
+    if ASC_IS_AIV {
+        set_mask_count();
+        set_vector_mask(static_cast<uint64_t>(0), static_cast<uint64_t>(count));
+    }
 }
 
 __aicore__ inline void asc_set_mask_count_end()
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    set_mask_norm();
-#endif
+    if ASC_IS_AIV {
+        set_mask_norm();
+    }
+}
+
+__aicore__ inline void asc_sync_post_process()
+{
+    pipe_barrier(pipe_t::PIPE_ALL);
 }
 
 #endif // IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_UTILS_C_API_IMPL_H
