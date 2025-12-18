@@ -54,5 +54,11 @@ struct SortConfig {
 };
 #endif
 
+<<<<<<< HEAD
+=======
+void GetSortMaxMinTmpSize(const ge::Shape& srcShape, ge::DataType valueType, ge::DataType indexType, bool isReuseSource,
+    const SortConfig& config, uint32_t& maxValue, uint32_t& minValue);
+
+>>>>>>> a1a82929... !896 merge fix_code_style into master
 } // namespace AscendC
 #endif // LIB_SORT_SORT_TILING_INTF_H

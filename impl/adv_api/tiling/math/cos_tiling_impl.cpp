@@ -55,8 +55,8 @@ inline uint32_t GetCosMinTmpSize(const uint32_t typeSize, const bool isReuseSour
 }
 } // namespace
 
-void GetCosMaxMinTmpSize(const ge::Shape &srcShape, const uint32_t typeSize, const bool isReuseSource,
-    uint32_t &maxValue, uint32_t &minValue)
+void GetCosMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
+    uint32_t& maxValue, uint32_t& minValue)
 {
     const uint32_t inputSize = srcShape.GetShapeSize();
     ASCENDC_HOST_ASSERT(inputSize > 0, return, "Input Shape size must be greater than 0.");
@@ -65,9 +65,67 @@ void GetCosMaxMinTmpSize(const ge::Shape &srcShape, const uint32_t typeSize, con
     maxValue = GetCosMaxTmpSize(inputSize, typeSize, isReuseSource);
 }
 
-void GetCosTmpBufferFactorSize(const uint32_t typeSize, uint32_t &maxLiveNodeCount, uint32_t &extraBuf)
+void GetCosTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 {
     extraBuf = 0;
     maxLiveNodeCount = (typeSize == sizeof(float)) ? COS_FLOAT_NOREUSE_CALC_FAC : COS_HALF_CALC_FAC;
 }
+<<<<<<< HEAD
+=======
+
+void GetCosMaxMinTmpSize(const CosConfig& config, const ge::Shape& srcShape, const uint32_t typeSize,
+    const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+{
+    (void)typeSize;
+    (void)isReuseSource;
+    constexpr uint32_t alignSize = 32; 
+    platform_ascendc::PlatformAscendC *platform = platform_ascendc::PlatformAscendCManager::GetInstance();
+    ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC");
+
+    platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
+    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
+        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
+        socVersion == platform_ascendc::SocVersion::MC62CM12A),
+        return, "Unsupported SocVersion of Cos API.");
+
+    if (config.algo == CosAlgo::POLYNOMIAL_APPROXIMATION) {
+        maxValue = 0;
+        minValue = 0;
+    } else if (config.algo == CosAlgo::RADIAN_REDUCTION) {
+        std::vector<int64_t> shapeDims = srcShape.GetDims();
+        uint32_t inputSize = 1;
+        for (const auto dim : shapeDims) {
+            inputSize *= dim;
+        }
+        inputSize = (inputSize + alignSize - 1u) / alignSize * alignSize;
+        maxValue = sizeof(float) * inputSize * COS_DOUBLE + COS_EXTRA_BUF;
+        minValue = sizeof(float) * inputSize * COS_DOUBLE + COS_EXTRA_BUF;
+    }
+}
+
+void GetCosTmpBufferFactorSize(
+    const CosConfig& config, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
+{
+    platform_ascendc::PlatformAscendC *platform = platform_ascendc::PlatformAscendCManager::GetInstance();
+    ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC");
+
+    platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
+    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
+        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
+        socVersion == platform_ascendc::SocVersion::MC62CM12A),
+        return, "Unsupported SocVersion of Cos API.");
+    if (config.algo == CosAlgo::POLYNOMIAL_APPROXIMATION) {
+        extraBuf = 0;
+        maxLiveNodeCount = 0;
+    } else if (config.algo == CosAlgo::RADIAN_REDUCTION) {
+        if (typeSize == sizeof(float)) {
+            extraBuf = COS_EXTRA_BUF;
+            maxLiveNodeCount = COS_DOUBLE;
+        } else {
+            extraBuf = 0;
+            maxLiveNodeCount = COS_DOUBLE * COS_DOUBLE;
+        }
+    }
+}
+>>>>>>> a1a82929... !896 merge fix_code_style into master
 } // namespace AscendC
