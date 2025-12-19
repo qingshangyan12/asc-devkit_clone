@@ -29,6 +29,7 @@
 namespace AscendC {
 
 constexpr int32_t VECTOR_QUANT_MODE = 2;
+constexpr int32_t VECTOR_QUANT_MODE_L1 = 3;
 constexpr int32_t NUM_EIGHT = 8;
 constexpr uint16_t NUM_SIXTEEN = 16;
 constexpr uint16_t NUM_THIRTYTWO = 32;
@@ -609,6 +610,16 @@ public:
         kfcMsg_.body.setQuant = 1;
         kfcMsg_.body.quantMode = VECTOR_QUANT_MODE;
         kfcMsg_.body.quantAddr = reinterpret_cast<uint64_t>(quantTensor.GetPhyAddr());
+        kfcMsg_.body.quantSize = quantTensor.GetSize() * sizeof(uint64_t);
+    }
+
+    __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor)
+    {
+        static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
+            "SetQuantVector localTensor is not supported when enableMixDualMaster is enabled.");
+        kfcMsg_.body.setQuant = 1;
+        kfcMsg_.body.quantMode = VECTOR_QUANT_MODE_L1;
+        kfcMsg_.body.quantAddr = GetTscmAddr(quantTensor);
         kfcMsg_.body.quantSize = quantTensor.GetSize() * sizeof(uint64_t);
     }
 
