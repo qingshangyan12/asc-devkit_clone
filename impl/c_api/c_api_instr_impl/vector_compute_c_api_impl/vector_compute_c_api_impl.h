@@ -117,6 +117,7 @@
 #include "lt_scalar_impl/npu_arch_2201/asc_lt_scalar_impl.h"
 #include "sub_relu_cast_impl/npu_arch_2201/asc_sub_relu_cast_impl.h"
 #include "vand_impl/npu_arch_2201/asc_vand_impl.h"
+#include "vgather_impl/npu_arch_2201/asc_gather_impl.h"
 
 __aicore__ inline int64_t asc_get_acc_val()
 {
@@ -3990,6 +3991,41 @@ __aicore__ inline void asc_float2int16_z(__ubuf__ int16_t* dst, __ubuf__ float* 
 __aicore__ inline void asc_float2int16_z_sync(__ubuf__ int16_t* dst, __ubuf__ float* src, uint32_t count)
 {
     CApiInternal::asc_float2int16_z_sync_impl<int16_t, float>(dst, src, count);
+}
+
+// ==========asc_gather(uint16_t/uint32_t)==========
+__aicore__ inline void asc_gather(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
+    uint16_t dst_repeat_stride, uint8_t repeat)
+{
+    asc_gather_impl(dst, src, offset_addr, dst_repeat_stride, repeat);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+{
+    asc_gather_impl(dst, src, offset_addr, count);
+}
+
+__aicore__ inline void asc_gather_sync(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
+    uint32_t count)
+{
+    asc_gather_sync_impl(dst, src, offset_addr, count);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
+    uint16_t dst_repeat_stride, uint8_t repeat)
+{
+    asc_gather_impl(dst, src, offset_addr, dst_repeat_stride, repeat);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+{
+    asc_gather_impl(dst, src, offset_addr, count);
+}
+
+__aicore__ inline void asc_gather_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
+    uint32_t count)
+{
+    asc_gather_sync_impl(dst, src, offset_addr, count);
 }
 
 #endif
