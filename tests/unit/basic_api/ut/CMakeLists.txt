@@ -188,6 +188,7 @@ file(GLOB ASCENDC_TEST_ascend910_9599_AIV_MICRO_CASE_SRC_FILES
 
 # ascend910_9599 simt test cases
 file(GLOB ASCENDC_TEST_ascend910_9599_AIV_SIMT_CASE_SRC_FILES
+    ${LOCAL_DIR}/stub/simt_compiler_stub.cpp
     ${LOCAL_DIR}/testcase/tikcpp_case_common/test_kernel_pop_stack_buffer.cpp
     ${LOCAL_DIR}/testcase/common/test_kernel_tensor.cpp
     ${LOCAL_DIR}/testcase/common/test_tikcpp_fp16.cpp
@@ -237,6 +238,7 @@ file(GLOB ASCENDC_TEST_mc62cm12aa_MICRO_CASE_SRC_FILES
 
 # mc62cm12aa simt test cases
 file(GLOB ASCENDC_TEST_mc62cm12aa_SIMT_CASE_SRC_FILES
+    ${LOCAL_DIR}/stub/simt_compiler_stub.cpp
     ${LOCAL_DIR}/testcase/tikcpp_case_common/test_kernel_pop_stack_buffer.cpp
     ${LOCAL_DIR}/testcase/common/test_kernel_tensor.cpp
     ${LOCAL_DIR}/testcase/common/test_tikcpp_fp16.cpp

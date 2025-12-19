@@ -11,4 +11,9 @@
 #ifndef ASCENDC_MODULE_SIMT_MATH_C_IMPL_H
 #define ASCENDC_MODULE_SIMT_MATH_C_IMPL_H
 
+__simt_callee__ inline float expf(float x)
+{
+    return __expf(x);
+}
+
 #endif  // ASCENDC_MODULE_SIMT_MATH_C_IMPL_H

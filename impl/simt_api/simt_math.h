@@ -11,5 +11,7 @@
 #ifndef ASCENDC_MODULE_SIMT_MATH_C_INTERFACE_H
 #define ASCENDC_MODULE_SIMT_MATH_C_INTERFACE_H
 
+__simt_callee__ inline float expf(float x);
+
 #include "impl/simt_api/simt_math_impl.h"
 #endif  // ASCENDC_MODULE_SIMT_MATH_C_INTERFACE_H
