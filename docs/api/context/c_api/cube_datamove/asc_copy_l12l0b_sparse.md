@@ -17,12 +17,12 @@
 
 - 高维切分搬运
   ```c++
-  __aicore__ inline void asc_copy_l12l0b_sparse(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, const asc_copy_2d_config& config)
+  __aicore__ inline void asc_copy_l12l0b_sparse(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)
   ```
 
 - 同步搬运
   ```c++
-  __aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, const asc_copy_2d_config& config)
+  __aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)
   ```
 
 ## 参数说明
@@ -33,7 +33,8 @@
 | dst | 输出 | 目的L0B Buffer地址。 |
 | src | 输入 | 源L1 Buffer地址。 |
 | index | 输入 | 索引矩阵源L1 Buffer地址。 |
-| config | 输入 | 在高维切分场景下使用的数据搬运配置参数。详细说明请参考[asc_copy_2d_config](../struct/asc_copy_2d_config.md) 。|
+| start_index | 输入 | 分形矩阵ID，说明搬运起始位置为源操作数中第几个分形（0为源操作数中第1个分形矩阵）。取值范围：[0, 65535]。单位：512B。默认为0 |
+| repeat | 输入 | 迭代次数，每个迭代可以处理512B数据。取值范围：[1, 255]。 |
 
 ## 返回值说明
 
@@ -46,8 +47,8 @@ PIPE_MTE1
 ## 约束说明
 
 - dst、src的起始地址需要32字节对齐。
-- config中的repeat为0表示不执行。
-- config中的start_index不能小于0。
+- repeat为0表示不执行。
+- start_index不能小于0。
 - 不支持转置功能。
 
 ## 调用示例
@@ -56,5 +57,7 @@ PIPE_MTE1
 __ubuf__ int8_t dst[256 * sizeof(int8_t)];
 __ubuf__ int8_t src[256 * sizeof(int8_t)];
 __ubuf__ int8_t index[64 * sizeof(int8_t)];
-asc_copy_l12l0b_sparse(dst, src, index, config);
+uint16_t start_index = 1;
+uint8_t repeat = 8;
+asc_copy_l12l0b_sparse(dst, src, index, start_index, repeat);
 ```
