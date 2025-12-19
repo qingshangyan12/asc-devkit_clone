@@ -81,8 +81,6 @@ CPU Debug介绍
     SOC_VERSION=${1:-SOC_VERSION}
     # 配置CANN环境变量
     source ${ASCEND_INSTALL_PATH}/set_env.sh
-    # 添加Ascend C CMake Module搜索路径至环境变量
-    export LD_LIBRARY_PATH=${ASCEND_INSTALL_PATH}/tools/tikicpulib/lib:${ASCEND_INSTALL_PATH}/tools/tikicpulib/lib/${SOC_VERSION}:${ASCEND_INSTALL_PATH}/tools/simulator/${SOC_VERSION}/lib:$LD_LIBRARY_PATH
     ```
     - SOC_VERSION：昇腾AI处理器型号，如果无法确定具体的SOC_VERSION，则在安装昇腾AI处理器的服务器执行npu-smi info命令进行查询，在查询到的“Name”前增加Ascend信息，例如“Name”对应取值为xxxyy，实际配置的SOC_VERSION值为Ascendxxxyy。
 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16.0)
 project(opp)
 
-find_package(ASC REQUIRED HINTS ${ASCEND_CANN_PACKAGE_PATH}/compiler/tikcpp/ascendc_kernel_cmake)
+find_package(ASC REQUIRED)
 set(package_name ${vendor_name})
 
 npu_op_package(${package_name}
