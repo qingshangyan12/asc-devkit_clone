@@ -592,6 +592,52 @@ __aicore__ inline void CastImpl(__ubuf__ U *dst, __ubuf__ T *src, const RoundMod
     }
 }
 
+template <typename DST_TYPE, typename SRC_TYPE, RoundMode roundMode>
+__simd_vf__ inline void CastIntrinsicsB64ImplVF2(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src, const BasicAPIMaskStruct maskArrayStruct,
+    uint8_t repeatTime, const UnaryRepeatParams repeatParams)
+{
+    static constexpr MicroAPI::CastTrait castTrait = {
+        MicroAPI::RegLayout::ZERO, MicroAPI::SatMode::SAT, MicroAPI::MaskMergeMode::ZEROING, roundMode};
+    constexpr uint8_t elePerBlk = GetDataBlockSizeInBytes() / sizeof(uint32_t);
+    MicroAPI::RegTensor<SRC_TYPE> srcVreg;
+    MicroAPI::RegTensor<DST_TYPE> dstVreg;
+    MicroAPI::RegTensor<uint32_t> zeroVreg, tmpVreg;
+    MicroAPI::MaskReg fullPreg = MicroAPI::CreateMask<uint32_t, MicroAPI::MaskPattern::ALL>();
+    MicroAPI::MaskReg b32Preg = MicroAPI::MoveMask<uint32_t>();
+    MicroAPI::MaskReg b64Preg, tmpPreg;
+    MicroAPI::MaskInterleave<uint32_t>(b64Preg, tmpPreg, b32Preg, b32Preg);
+    MicroAPI::Duplicate(zeroVreg, 0, fullPreg);
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {
+            // b32->b64
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t> &)srcVreg,
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b32Preg);
+            MicroAPI::Interleave(
+                (MicroAPI::RegTensor<uint32_t> &)srcVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)srcVreg, zeroVreg);
+        } else {
+            // b64->b32
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t>&)srcVreg,
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b64Preg);
+        }
+        MicroAPI::Cast<DST_TYPE, SRC_TYPE, castTrait>(dstVreg, srcVreg, b64Preg);
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {
+            // b32->b64
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>();
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk,
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b64Preg);
+        } else {
+            // b64->b32
+            MicroAPI::DeInterleave(
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)dstVreg, zeroVreg);
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>();
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk,
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b32Preg);
+        }
+    }
+}
+
 template <typename DST_TYPE, typename SRC_TYPE>
 __simd_callee__ inline void GenLoadL0(MicroAPI::RegTensor<SRC_TYPE> &srcVreg, __ubuf__ SRC_TYPE *&srcAddr,
     MicroAPI::MaskReg &preg, const UnaryRepeatParams &repeatParams)
@@ -781,25 +827,95 @@ __simd_vf__ inline void CastIntrinsicsImplCounterVF(__ubuf__ DST_TYPE *dst, __ub
         GenStoreL0<DST_TYPE, SRC_TYPE>(dst, dstVreg, stPreg, repeatParams);
     }
 }
- 
+
+template <typename DST_TYPE, typename SRC_TYPE, RoundMode roundMode, bool isSetMask>
+__simd_vf__ inline void CastIntrinsicsB64ImplCounterVF(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src, const uint64_t mask,
+    __ubuf__ uint64_t *maskBuf, uint8_t repeatTime, const UnaryRepeatParams repeatParams)
+{
+    static constexpr MicroAPI::CastTrait castTrait = {
+        MicroAPI::RegLayout::ZERO, MicroAPI::SatMode::SAT, MicroAPI::MaskMergeMode::ZEROING, roundMode};
+    constexpr uint8_t elePerBlk = GetDataBlockSizeInBytes() / sizeof(uint32_t);
+    uint32_t countSreg = static_cast<uint32_t>(mask);
+    if constexpr (!isSetMask) {
+        // get SPR.MASK in VF
+        MicroAPI::MaskReg sprLoadMaskReg = MicroAPI::MoveMask<uint16_t>();
+        MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
+        // insert membar(vec store operation) before load maskBuf[0](scalar load operation)
+        MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
+        countSreg = static_cast<uint32_t>(maskBuf[0]);
+    }
+    constexpr uint16_t oneRepSize = GetVecLen() / sizeof(uint64_t);
+    uint16_t newRepeatTimes = CeilDivision(countSreg, oneRepSize);
+    MicroAPI::RegTensor<SRC_TYPE> srcVreg;
+    MicroAPI::RegTensor<DST_TYPE> dstVreg;
+    MicroAPI::RegTensor<uint32_t> zeroVreg, tmpVreg;
+    MicroAPI::MaskReg b32Preg, b64Preg, tmpPreg;
+    MicroAPI::MaskReg fullPreg = MicroAPI::CreateMask<uint32_t, MicroAPI::MaskPattern::ALL>();
+    MicroAPI::Duplicate(zeroVreg, 0, fullPreg);
+    for (uint16_t i = 0; i < newRepeatTimes; ++i) {
+        b32Preg = MicroAPI::UpdateMask<uint32_t>(countSreg);
+        MicroAPI::MaskInterleave<uint32_t>(b64Preg, tmpPreg, b32Preg, b32Preg);
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {
+            // b32->b64
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t> &)srcVreg,
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b32Preg);
+            MicroAPI::Interleave(
+                (MicroAPI::RegTensor<uint32_t> &)srcVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)srcVreg, zeroVreg);
+        } else {
+            // b64->b32
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t>&)srcVreg,
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b64Preg);
+        }
+        MicroAPI::Cast<DST_TYPE, SRC_TYPE, castTrait>(dstVreg, srcVreg, b64Preg);
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {
+            // b32->b64
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>();
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk,
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b64Preg);
+        } else {
+            // b64->b32
+            MicroAPI::DeInterleave(
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)dstVreg, zeroVreg);
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>();
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk,
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b32Preg);
+        }
+    }
+}
+
 template <typename DST_TYPE, typename SRC_TYPE, RoundMode roundMode, bool isSetMask>
 __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src, const uint64_t mask[],
-    uint8_t repeatTimes, const UnaryRepeatParams &repeatParams)
+    uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
+    constexpr bool b64Cast = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<float, int64_t>, Tuple<int64_t, float>,
+        Tuple<int32_t, int64_t>, Tuple<int64_t, int32_t>>();
     bool isCounterMode = Internal::IsCounterMode();
-    uint16_t maskArraySize = (mask == nullptr) ? 0 : MASK_ARRAY_SIZE;
-    BasicAPIMaskStruct maskArrayStruct;
-    for (uint16_t i = 0; i < maskArraySize; i++) {
-        maskArrayStruct.maskArray[i] = mask[i];
-    }
+
     if (isCounterMode) {
         __ubuf__ uint64_t *maskBuf = nullptr;
         if constexpr (!isSetMask) {
             maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2);
         }
-        CastIntrinsicsImplCounterVF<DST_TYPE, SRC_TYPE, roundMode, isSetMask>(
-                dst, src, mask[0], maskBuf, repeatTimes, repeatParams);
+        if constexpr (b64Cast) {
+            CastIntrinsicsB64ImplCounterVF<DST_TYPE, SRC_TYPE, roundMode, isSetMask>(
+                dst, src, mask[0], maskBuf, repeatTime, repeatParams);
+        } else {
+            CastIntrinsicsImplCounterVF<DST_TYPE, SRC_TYPE, roundMode, isSetMask>(
+                dst, src, mask[0], maskBuf, repeatTime, repeatParams);
+        }
     } else {
+        BasicAPIMaskStruct maskArrayStruct;
+        if (mask != nullptr) {
+            maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(mask));
+        }
+        if constexpr (b64Cast) {
+            if constexpr (isSetMask) {
+                SetVectorMask<uint32_t>(mask[1], mask[0]);
+            }
+            CastIntrinsicsB64ImplVF2<DST_TYPE, SRC_TYPE, roundMode>(dst, src, maskArrayStruct, repeatTime, repeatParams);
+        } else {
             if constexpr (isSetMask) {
                 if constexpr (sizeof(DST_TYPE) < sizeof(SRC_TYPE)) {
                     SetVectorMask<SRC_TYPE>(mask[1], mask[0]);
@@ -808,7 +924,8 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
                 }
             }
             CastIntrinsicsImplVF2<DST_TYPE, SRC_TYPE, roundMode>(
-                dst, src, maskArrayStruct, repeatTimes, repeatParams);
+                dst, src, maskArrayStruct, repeatTime, repeatParams);
+        }
     }
 }
  
@@ -819,14 +936,16 @@ __aicore__ inline void CastImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src, 
 {
     constexpr bool cast_round_all = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>, Tuple<int32_t, float>,
                                           Tuple<int16_t, float>, Tuple<int32_t, half>, Tuple<int16_t, half>, Tuple<int8_t, half>,
-                                          Tuple<uint8_t, half>, Tuple<int4b_t, half>, Tuple<half, int16_t>, Tuple<float, int32_t>, Tuple<half, int32_t>>();
+                                          Tuple<uint8_t, half>, Tuple<int4b_t, half>, Tuple<half, int16_t>, Tuple<float, int32_t>,
+                                          Tuple<half, int32_t>, Tuple<int64_t, float>, Tuple<float, int64_t>>();
  
     constexpr bool cast_none = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<float, half>,
                                         Tuple<half, int4b_t>, Tuple<half, uint8_t>, Tuple<uint16_t, uint8_t>, Tuple<uint32_t, uint8_t>,
                                         Tuple<half, int8_t>, Tuple<int16_t, int8_t>, Tuple<int32_t, int8_t>, Tuple<uint8_t, uint16_t>,
                                         Tuple<uint32_t, uint16_t>, Tuple<float, int16_t>, Tuple<uint8_t, int16_t>, Tuple<uint32_t, int16_t>,
                                         Tuple<int32_t, int16_t>, Tuple<uint8_t, uint32_t>, Tuple<uint16_t, uint32_t>, Tuple<int16_t, uint32_t>,
-                                        Tuple<int16_t, int32_t>, Tuple<uint8_t, int32_t>, Tuple<uint16_t, int32_t>>();
+                                        Tuple<int16_t, int32_t>, Tuple<uint8_t, int32_t>, Tuple<uint16_t, int32_t>, Tuple<int64_t, int32_t>,
+                                        Tuple<int32_t, int64_t>>();
  
     constexpr bool using_cast_rint = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4b_t, half>,
                                             Tuple<half, float>, Tuple<half, int16_t>, Tuple<float, int32_t>>();
@@ -887,6 +1006,60 @@ __aicore__ inline void CastImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src, 
             ASCENDC_ASSERT(
                 (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
             break;
+    }
+}
+
+template <typename DST_TYPE, typename SRC_TYPE, RoundMode roundMode, bool isSetMask>
+__simd_vf__ inline void CastIntrinsicsB64ImplVF1(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src, const uint64_t mask,
+    uint8_t repeatTime, const UnaryRepeatParams repeatParams)
+{
+    static constexpr MicroAPI::CastTrait castTrait = {
+        MicroAPI::RegLayout::ZERO, MicroAPI::SatMode::SAT, MicroAPI::MaskMergeMode::ZEROING, roundMode};
+    constexpr uint8_t elePerBlk = GetDataBlockSizeInBytes() / sizeof(uint32_t);
+    uint32_t b32Sreg = static_cast<uint32_t>(mask);
+    uint32_t b64Sreg = static_cast<uint32_t>(2 * mask);
+    MicroAPI::RegTensor<SRC_TYPE> srcVreg;
+    MicroAPI::RegTensor<DST_TYPE> dstVreg;
+    MicroAPI::RegTensor<uint32_t> zeroVreg, tmpVreg;
+    MicroAPI::MaskReg b32Preg;
+    MicroAPI::MaskReg b64Preg, tmpPreg;
+    if constexpr (isSetMask) {
+        b32Preg = MicroAPI::UpdateMask<uint32_t>(b32Sreg);
+        b64Preg = MicroAPI::UpdateMask<uint32_t>(b64Sreg);
+    } else {
+        b32Preg = MicroAPI::MoveMask<uint32_t>();
+        MicroAPI::MaskInterleave<uint32_t>(b64Preg, tmpPreg, b32Preg, b32Preg);
+    }
+    MicroAPI::MaskReg fullPreg = MicroAPI::CreateMask<uint32_t, MicroAPI::MaskPattern::ALL>();
+    MicroAPI::Duplicate(zeroVreg, 0, fullPreg);
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {
+            // b32 -> b64
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t> &)srcVreg,
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b32Preg);
+            MicroAPI::Interleave(
+                (MicroAPI::RegTensor<uint32_t> &)srcVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)srcVreg, zeroVreg);
+        } else {
+            // b64 -> b32
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t>&)srcVreg,
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b64Preg);
+        }
+        MicroAPI::Cast<DST_TYPE, SRC_TYPE, castTrait>(dstVreg, srcVreg, b64Preg);
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {
+            // b32 -> b64
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>();
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk,
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b64Preg);
+        } else {
+            // b64 -> b32
+            MicroAPI::DeInterleave(
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)dstVreg, zeroVreg);
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>();
+            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk,
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b32Preg);
+        }
     }
 }
 
@@ -959,19 +1132,31 @@ __simd_vf__ inline void CastIntrinsicsImplVF1(__ubuf__ DST_TYPE *dst, __ubuf__ S
 
 template <typename DST_TYPE, typename SRC_TYPE, RoundMode roundMode, bool isSetMask>
 __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src, const uint64_t mask,
-    uint8_t repeatTimes, const UnaryRepeatParams &repeatParams)
+    uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
+    constexpr bool b64Cast = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<float, int64_t>, Tuple<int64_t, float>,
+        Tuple<int32_t, int64_t>, Tuple<int64_t, int32_t>>();
     bool isCounterMode = Internal::IsCounterMode();
     if (isCounterMode) {
         __ubuf__ uint64_t *maskBuf = nullptr;
         if constexpr (!isSetMask) {
             maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2);
         }
-        CastIntrinsicsImplCounterVF<DST_TYPE, SRC_TYPE, roundMode, isSetMask>(
-                dst, src, mask, maskBuf, repeatTimes, repeatParams);
+        if constexpr (b64Cast) {
+            CastIntrinsicsB64ImplCounterVF<DST_TYPE, SRC_TYPE, roundMode, isSetMask>(
+                dst, src, mask, maskBuf, repeatTime, repeatParams);
+        } else {
+            CastIntrinsicsImplCounterVF<DST_TYPE, SRC_TYPE, roundMode, isSetMask>(
+                dst, src, mask, maskBuf, repeatTime, repeatParams);
+        }
     } else {
-        CastIntrinsicsImplVF1<DST_TYPE, SRC_TYPE, roundMode, isSetMask>(
-                dst, src, mask, repeatTimes, repeatParams);
+        if constexpr (b64Cast) {
+            CastIntrinsicsB64ImplVF1<DST_TYPE, SRC_TYPE, roundMode, isSetMask>(
+                dst, src, mask, repeatTime, repeatParams);
+        } else {
+            CastIntrinsicsImplVF1<DST_TYPE, SRC_TYPE, roundMode, isSetMask>(
+                dst, src, mask, repeatTime, repeatParams);
+        }
     }
 }
  
@@ -982,14 +1167,16 @@ __aicore__ inline void CastImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src, 
 {
     constexpr bool cast_round_all = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>, Tuple<int32_t, float>,
                                           Tuple<int16_t, float>, Tuple<int32_t, half>, Tuple<int16_t, half>, Tuple<int8_t, half>,
-                                          Tuple<uint8_t, half>, Tuple<int4b_t, half>, Tuple<half, int16_t>, Tuple<float, int32_t>, Tuple<half, int32_t>>();
+                                          Tuple<uint8_t, half>, Tuple<int4b_t, half>, Tuple<half, int16_t>, Tuple<float, int32_t>,
+                                          Tuple<half, int32_t>, Tuple<int64_t, float>, Tuple<float, int64_t>>();
  
     constexpr bool cast_none = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<float, half>,
                                         Tuple<half, int4b_t>, Tuple<half, uint8_t>, Tuple<uint16_t, uint8_t>, Tuple<uint32_t, uint8_t>,
                                         Tuple<half, int8_t>, Tuple<int16_t, int8_t>, Tuple<int32_t, int8_t>, Tuple<uint8_t, uint16_t>,
                                         Tuple<uint32_t, uint16_t>, Tuple<float, int16_t>, Tuple<uint8_t, int16_t>, Tuple<uint32_t, int16_t>,
                                         Tuple<int32_t, int16_t>, Tuple<uint8_t, uint32_t>, Tuple<uint16_t, uint32_t>, Tuple<int16_t, uint32_t>,
-                                        Tuple<int16_t, int32_t>, Tuple<uint8_t, int32_t>, Tuple<uint16_t, int32_t>>();
+                                        Tuple<int16_t, int32_t>, Tuple<uint8_t, int32_t>, Tuple<uint16_t, int32_t>, Tuple<int64_t, int32_t>,
+                                        Tuple<int32_t, int64_t>>();
  
     constexpr bool using_cast_rint = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4b_t, half>,
                                             Tuple<half, float>, Tuple<half, int16_t>, Tuple<float, int32_t>>();

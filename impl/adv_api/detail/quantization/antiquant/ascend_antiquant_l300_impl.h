@@ -12,8 +12,8 @@
  * \file ascend_antiquant_l300_impl.h
  * \brief
  */
-#ifndef IMPL_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_C310_IMPL_H
-#define IMPL_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_C310_IMPL_H
+#ifndef IMPL_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_L300_IMPL_H
+#define IMPL_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_L300_IMPL_H
 
 #include "kernel_tensor.h"
 #include "kernel_operator_intf.h"
@@ -1019,4 +1019,4 @@ __aicore__ inline void AscendAntiQuantImplCommon(const LocalTensor<DstType>& dst
     AntiQuantPertensorImpl<SrcType, DstType>(dst, src, offset, scale, sharedTmpBuffer, k, shapeInfo);
 }
 }  // namespace AscendC
-#endif  // IMPL_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_l300_IMPL_H
+#endif  // IMPL_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_L300_IMPL_H

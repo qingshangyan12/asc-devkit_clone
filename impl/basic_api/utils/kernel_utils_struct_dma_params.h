@@ -418,12 +418,12 @@ struct FixpipeParamsV300 {
 
     __aicore__ inline void SetPreQuantMode(const QuantMode_t preQuantMode_)
     {
-        quantParams.preQuantMode = preQuantMode_;
+        (void)preQuantMode_;
     }
 
     __aicore__ inline void SetPostQuantMode(const QuantMode_post postQuantMode_)
     {
-        quantParams.postQuantMode = postQuantMode_;
+        (void)postQuantMode_;
     }
 
     __aicore__ inline void SetPreReluMode(const ReluMode_t preReluMode_)
