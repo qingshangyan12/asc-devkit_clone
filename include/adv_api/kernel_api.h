@@ -145,6 +145,7 @@
 #include "utils/init_global_memory.h"
 #include "quantization/ascend_quant.h"
 #include "quantization/ascend_antiquant.h"
+#include "quantization/ascend_dequant.h"
 #include "transpose/confusion_transpose.h"
 #include "activation/softmaxflash.h"
 #include "activation/softmaxflashv2.h"

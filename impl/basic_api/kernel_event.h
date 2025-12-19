@@ -279,6 +279,11 @@ __aicore__ inline void PipeBarrierInternal()
         }
     }
 #else
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    if constexpr (pipe = PIPE_V) {
+        return;
+    }
+#endif
     pipe_barrier(pipe);
 #endif
 }

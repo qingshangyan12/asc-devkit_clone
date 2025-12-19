@@ -88,7 +88,7 @@ __aicore__ inline void CopyUbufToGmAlign(__gm__ T* dst, __ubuf__ T* src, const u
     uint32_t burstLength = blockLen * BYTE_32_ALIGN;
     uint32_t srcStride300 = srcStride;
     uint64_t dstStride300 = dstStride * BYTE_32_ALIGN;
-    copy_ubuf_to_gm_align((__gm__ T*)dst, (__ubuf__ T*)src, 0, blockCount, burstLength, srcStride300,
+    copy_ubuf_to_gm_align((__gm__ uint8_t*)dst, (__ubuf__ uint8_t*)src, 0, blockCount, burstLength, srcStride300,
         dstStride300);
 }
 
@@ -557,8 +557,10 @@ __aicore__ inline void DataCopyPadGm2UBImpl(__ubuf__ T* dst, __gm__ T* src, cons
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
         AscendCUtils::CheckGmMemOverflowNormal(src, workSpace, true, static_cast<uint64_t>(true), intriParams);
     }
-    uint32_t unitOfBytes = (padParams.isPad) ? 1 : BYTE_32_ALIGN;
-    uint32_t burstLength = intriParams.blockCount * unitOfBytes;
+
+    // DataCopy is in unit of 32 bytes, DataCopyPad is in uint of 1byte / 32bytes
+    uint32_t unitOfBytes = 1;
+    uint32_t burstLength = intriParams.blockLen * unitOfBytes;
     uint64_t srcGap300 = intriParams.srcStride * unitOfBytes;
     uint32_t dstGap300 = intriParams.dstStride;
     if constexpr (sizeof(T) == 8) {
@@ -587,8 +589,8 @@ __aicore__ inline void DataCopyPadGm2UBImpl(__ubuf__ T* dst, __gm__ T* src, cons
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
         AscendCUtils::CheckGmMemOverflowNormal(src, workSpace, true, static_cast<uint64_t>(true), intriParams);
     }
-    uint32_t unitOfBytes = (padParams.isPad) ? 1 : BYTE_32_ALIGN;
-    uint32_t burstLength = intriParams.blockCount * unitOfBytes;
+    uint32_t unitOfBytes = 1;
+    uint32_t burstLength = intriParams.blockLen * unitOfBytes;
     uint64_t srcGap300 = intriParams.srcStride * unitOfBytes;
     uint32_t dstGap300 = intriParams.dstStride;
     if constexpr (sizeof(T) == 8) {
@@ -649,7 +651,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
         AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, (uint64_t)true, intriParams);
     }
-    copy_ubuf_to_gm_align(dst, src, 0, intriParams.blockCount, intriParams.blockLen,
+    copy_ubuf_to_gm_align((__gm__ uint8_t *)dst, (__ubuf__ uint8_t *)src, 0, intriParams.blockCount, intriParams.blockLen,
         static_cast<uint32_t>(intriParams.srcStride), static_cast<uint32_t>(intriParams.dstStride));
 }
 

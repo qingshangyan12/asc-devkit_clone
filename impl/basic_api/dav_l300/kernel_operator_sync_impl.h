@@ -35,17 +35,13 @@ __aicore__ inline void WaitPreTaskEndImpl()
 template<bool isAIVOnly = true>
 __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__ int32_t* ubWorkspaceAddr, const int usedCores)
 {
-    if constexpr (!isAIVOnly) {
-        PipeBarrier<PIPE_ALL>();
-    }
+    PipeBarrier<PIPE_ALL>();
 }
 
 template <bool isAIVOnly = true>
 __aicore__ inline void SyncAllImpl()
 {
-    if constexpr (!isAIVOnly) {
-        PipeBarrier<PIPE_ALL>();
-    }
+    PipeBarrier<PIPE_ALL>();
 }
 
 template <uint8_t modeId, pipe_t pipe>
