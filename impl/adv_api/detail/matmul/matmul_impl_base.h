@@ -99,6 +99,7 @@ public:
     __aicore__ inline void SetUserDefInfo(const uint64_t tilingPtr);
     __aicore__ inline void SetQuantScalar(const uint64_t quantScalar);
     __aicore__ inline void SetQuantVector(const GlobalTensor<uint64_t>& quantTensor);
+    __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor);
     __aicore__ inline void SetTensorA(const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false);
     __aicore__ inline void SetTensorAWithCopy(const GlobalTensor<SrcAT>& gm, const LocalTensor<SrcAT>& leftMatrix,
         bool isTransposeA = false);
@@ -333,6 +334,15 @@ template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto&
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetQuantVector(
     const GlobalTensor<uint64_t>& quantTensor)
 {
+    MatmulQuantProcessor::SetQuantVector(quantTensor);
+}
+
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+    MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
+__aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SetQuantVector(
+    const LocalTensor<uint64_t>& quantTensor)
+{
+    static_assert((!Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsNeedUB()), "Quant from L1 doesn't support current platform.");
     MatmulQuantProcessor::SetQuantVector(quantTensor);
 }
 

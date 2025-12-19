@@ -234,6 +234,12 @@ public:
             cubeObj.cubeObj[0].mul.SetQuantVector(quantTensor);
         }
     }
+    __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor)
+    {
+        if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
+            cubeObj.cubeObj[0].mul.SetQuantVector(quantTensor);
+        }
+    }
     template <class T> __aicore__ inline void SetWorkspace(__gm__ T* addr, int size)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&

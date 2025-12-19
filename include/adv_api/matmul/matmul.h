@@ -160,9 +160,14 @@ public:
     __aicore__ inline void SetQuantScalar(const uint64_t quantScalar) {}
     /**
      * @brief Set the quantization vector
-     * @param [in] quantTensor: quantization vector
+     * @param [in] quantTensor: quantization vector in global memery
      */
     __aicore__ inline void SetQuantVector(const GlobalTensor<uint64_t>& quantTensor) {}
+    /**
+     * @brief Set the quantization vector
+     * @param [in] quantTensor: quantization vector in local memery
+     */
+    __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor) {}
     /**
      * @brief Set A matrix
      * @param [in] leftMatrix: A matrix in LocalTensor
