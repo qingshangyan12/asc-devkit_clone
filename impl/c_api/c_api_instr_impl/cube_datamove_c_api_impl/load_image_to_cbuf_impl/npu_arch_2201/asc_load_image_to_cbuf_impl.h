@@ -1,0 +1,60 @@
+/**
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/* !
+ * \file asc_load_image_to_cbuf_impl.h
+ * \brief
+ */
+#ifndef IMPL_C_API_INSTR_CUBE_DMAMOVE_LOAD_IMAGE_TO_CBUF_NPU_ARCH_2201_ASC_LOAD_IMAGE_TO_CBUF_IMPL_H
+#define IMPL_C_API_INSTR_CUBE_DMAMOVE_LOAD_IMAGE_TO_CBUF_NPU_ARCH_2201_ASC_LOAD_IMAGE_TO_CBUF_IMPL_H
+
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+
+// asc_load_image_to_cbuf half
+__aicore__ inline void asc_load_image_to_cbuf_impl(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
+    uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid)
+{
+#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
+    load_image_to_cbuf(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size, bot_pad_size,
+                       left_pad_size, right_pad_size, sid);
+#endif
+}
+
+__aicore__ inline void asc_load_image_to_cbuf_sync_impl(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
+    uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid)
+{
+    asc_load_image_to_cbuf_impl(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size, bot_pad_size,
+                                left_pad_size, right_pad_size, sid);
+    pipe_barrier(pipe_t::PIPE_ALL);
+}
+
+// asc_load_image_to_cbuf int8_t
+__aicore__ inline void asc_load_image_to_cbuf_impl(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
+    uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid)
+{
+#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
+    load_image_to_cbuf(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size, bot_pad_size,
+                       left_pad_size, right_pad_size, sid);
+#endif
+}
+
+__aicore__ inline void asc_load_image_to_cbuf_sync_impl(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
+    uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid)
+{
+    asc_load_image_to_cbuf_impl(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size, bot_pad_size,
+                                left_pad_size, right_pad_size, sid);
+    pipe_barrier(pipe_t::PIPE_ALL);
+}
+ 
+#endif
