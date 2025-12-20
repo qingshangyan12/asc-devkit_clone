@@ -12,45 +12,57 @@
 
 对src中的每个元素执行右移，右移大小为value。
 
+- 对于int16_t/int32_t，做算术右移（去掉最低位，最高位复制符号位）。
+- 对于uint16_t/uint32_t，做逻辑右移（去掉最低位，最高位填充为0）。
+
 ### 函数原型
 
 - 前n个数据计算
 
     ```cpp
-    __aicore__ inline void asc_shift_right(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count, bool round)
-    __aicore__ inline void asc_shift_right(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count, bool round)
-    __aicore__ inline void asc_shift_right(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t value, uint32_t count, bool round)
-    __aicore__ inline void asc_shift_right(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count, bool round)
+    __aicore__ inline void asc_shift_right(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_shift_right(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, const asc_unary_config& config, bool round)
-    __aicore__ inline void asc_shift_right(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, const asc_unary_config& config, bool round)
-    __aicore__ inline void asc_shift_right(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t value, const asc_unary_config& config, bool round)
-    __aicore__ inline void asc_shift_right(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, const asc_unary_config& config, bool round)
+    __aicore__ inline void asc_shift_right(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_shift_right(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_shift_right(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_shift_right(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_shift_right_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_shift_right_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_shift_right_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count, bool round)
-    __aicore__ inline void asc_shift_right_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count, bool round)
-    __aicore__ inline void asc_shift_right_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t value, uint32_t count, bool round)
-    __aicore__ inline void asc_shift_right_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count, bool round)
+    __aicore__ inline void asc_shift_right_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right_round_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
+    __aicore__ inline void asc_shift_right_round_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
     ```
 
 ### 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（向量）的起始地址。 |
-| src | 输入 | 源操作数（向量）的起始地址。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址。 |
+| src | 输入 | 源操作数（矢量）的起始地址。 |
 | value | 输入 | 源操作数（标量）。 |
 | count | 输入 | 参与计算的元素个数。 |
-| config | 输入 | 在高维切分计算场景下使用的计算配置参数, 详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。 |
-| round | 输入 | 右移时是否开启舍入。 |
+| repeat | 输入 | 迭代次数。 |
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
 
 ### 返回值说明
 
@@ -62,19 +74,23 @@ PIPE_V
 
 ### 约束说明
 
+- value不支持设置为负数。
+- 对于逻辑右移（uint16_t/uint32_t），如果value大于数据类型位宽，则输出0。
+- 对于算术右移（int16_t/int32_t），如果src小于0，value大于0且value大于数据类型位宽，则输出-1；如果src大于0，value大于数据类型位宽，则输出0。
 - dst、src的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
 ### 调用示例
 
 ```cpp
-// total_length指参与计算的数据长度
-uint64_t total_length = 128;
-uint64_t offset = 0;
-int16_t scalar_val = 1;
-bool round = true;
-__ubuf__ int16_t* src = src[offset];
-offset += total_length * sizeof(half);
-__ubuf__ int16_t* dst = dst[offset];
-asc_shift_right(dst, src, scalar_val, total_length, round);
+constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
+int16_t value = 1;
+__ubuf__ int16_t src[total_length * sizeof(int16_t)];
+__ubuf__ int16_t dst[total_length * sizeof(int16_t)];
+asc_shift_right(dst, src, value, total_length);    // 对src中的每个元素做算术右移一位，并存放到dst中
+// e.g. src[0] = 0b1010, dst[0] = 0b0101
+
+asc_shift_right_round(dst, src, value, total_length);    // 对src中的每个元素做算术右移一位并进行舍入，将结果存放到dst中
+// e.g. src[0] = 0b1010, dst[0] = 0b0101  被舍入最后一位为0，不进1
+// e.g. src[0] = 0b1001, dst[0] = 0b0101  被舍入最后一位为1，进1
 ```

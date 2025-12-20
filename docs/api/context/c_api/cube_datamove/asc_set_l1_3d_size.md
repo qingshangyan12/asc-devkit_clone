@@ -38,6 +38,6 @@ PIPE_S
 ## 调用示例
 
 ```c++
-uint64_t value = 1;
-asc_set_l1_3d_size(value);
+uint64_t value = 128;
+asc_set_l1_3d_size(value);    // 设置L1 Buffer的边界值为128
 ```
