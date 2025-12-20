@@ -62,6 +62,7 @@
 #include "kernel_check/quantization/antiquant/antiquant_check.h"
 #include "kernel_check/quantization/dequant/dequant_check.h"
 #include "kernel_check/quantization/quant/quant_check.h"
+#include "kernel_check/math/sincos/sincos_check.h"
 #include "kernel_check/math/acos/acos_check.h"
 #include "kernel_check/math/acosh/acosh_check.h"
 #include "kernel_check/math/asin/asin_check.h"
