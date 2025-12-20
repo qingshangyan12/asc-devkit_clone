@@ -31,10 +31,18 @@ PIPE_TYPE_S
 
 ## 约束说明
 
-无
+- 需要和asc_set_atomic_add/asc_set_atomic_max/asc_set_atomic_min接口配合使用。
+- 使用完成后，建议使用asc_set_atomic_none清空原子操作的状态，以免影响后续相关指令功能。
 
 ## 调用示例
 
 ```c++
-asc_set_atomic_f16();
+//total_length指参与搬运的数据总长度。
+uint64_t total_length = 128;
+__ubuf__ half src[total_length * sizeof(half)];
+__ubuf__ half dst[total_length * sizeof(half)];
+asc_copy_ub2gm(dst, src, total_length);    // 将数据搬运到Global Memory
+asc_sync_mte3(0);
+asc_set_atomic_min();
+asc_set_atomic_f16();    // 设置原子操作类型为float16_t
 ```

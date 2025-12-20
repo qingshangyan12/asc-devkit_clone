@@ -15,27 +15,27 @@
 
 - 前n个数据搬运
 
-```cpp
-__aicore__ inline void asc_copy_gm2ub_align_b8(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-__aicore__ inline void asc_copy_gm2ub_align_b16(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-__aicore__ inline void asc_copy_gm2ub_align_b32(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-```
+    ```cpp
+    __aicore__ inline void asc_copy_gm2ub_align_b8(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align_b16(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align_b32(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
 
 - 高维切分搬运
 
-```cpp
-__aicore__ inline void asc_copy_gm2ub_align_b8(__ubuf__ void* dst, __gm__ void* src, const asc_copy_align_config& config)
-__aicore__ inline void asc_copy_gm2ub_align_b16(__ubuf__ void* dst, __gm__ void* src, const asc_copy_align_config& config)
-__aicore__ inline void asc_copy_gm2ub_align_b32(__ubuf__ void* dst, __gm__ void* src, const asc_copy_align_config& config)
-```
+    ```cpp
+    __aicore__ inline void asc_copy_gm2ub_align_b8(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    __aicore__ inline void asc_copy_gm2ub_align_b16(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    __aicore__ inline void asc_copy_gm2ub_align_b32(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    ```
 
 - 同步计算
 
-```cpp
-__aicore__ inline void asc_copy_gm2ub_align_b8_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-__aicore__ inline void asc_copy_gm2ub_align_b16_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-__aicore__ inline void asc_copy_gm2ub_align_b32_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-```
+    ```cpp
+    __aicore__ inline void asc_copy_gm2ub_align_b8_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align_b16_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align_b32_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
 
 ## 参数说明
 
@@ -45,7 +45,11 @@ __aicore__ inline void asc_copy_gm2ub_align_b32_sync(__ubuf__ void* dst, __gm__ 
 | dst | 输出 | 目的GM地址。 |
 | src | 输入 | 源UB地址。 |
 | size | 输入 | 搬运数据大小（字节）。 |
-| config | 输入 | 在高维切分场景下使用的数据搬运配置参数。详细说明请参考[asc_copy_align_config](../struct/asc_copy_align_config.md) 。|
+| sid | 输入 | 保留，未使用。填0即可。 |
+| n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
+| len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, 65535]。 |
+| src_gap | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
+| dst_gap | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
 
 ## 返回值说明
 
@@ -59,13 +63,15 @@ PIPE_TYPE_MTE2
 
 - src的起始地址要求按照对应数据类型所占字节数对齐。
 - dst的起始地址要求32字节对齐。
-- 如果需要执行多条asc_copy_gm2ub指令，且asc_copy_gm2ub指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_gm2ub指令的串行化，防止出现异常数据。
+- 如果需要执行多条asc_copy_gm2ub_align指令，且asc_copy_gm2ub_align指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_gm2ub_align指令的串行化，防止出现异常数据。
 - 同步计算包含同步等待。
 
 ## 调用示例
 
 ```cpp
-// total_length指参与计算的数据长度
-const uint32_t total_length = 32;
-asc_copy_gm2ub(dst, src, total_length);
+// total_length指参与搬运的数据总长度。dst是外部输入的half类型的GM内存。
+constexpr uint64_t total_length = 128;
+__ubuf__ half src[total_length * sizeof(half)];
+__ubuf__ half dst[total_length * sizeof(half)];
+asc_copy_gm2ub_align(dst, src, total_length);
 ```

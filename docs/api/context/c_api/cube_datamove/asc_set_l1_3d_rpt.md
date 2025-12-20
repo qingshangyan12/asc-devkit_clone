@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-用于设置Load3Dv2接口的repeat参数。
+用于设置Load3D的repeat参数。
 
 ## 函数原型
 
@@ -39,5 +39,5 @@ PIPE_TYPE_S
 
 ```c++
 uint64_t value = 1;
-asc_set_l1_3d_rpt(value);
+asc_set_l1_3d_rpt(value); // 设置Load3D的repeat值为1
 ```

@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline uint64_t set_nthbit_impl(uint64_t bits, int64_t idx)
+__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx)
 ```
 
 ## 参数说明
@@ -25,7 +25,7 @@ __aicore__ inline uint64_t set_nthbit_impl(uint64_t bits, int64_t idx)
 | idx | 输入 | 位索引，表示需要设置为1的位的位置。 |
 ## 返回值说明
 
-位操作函数，用于将一个uint64_t整数bits的第idx位设置为1。
+修改后的uint64_t整数。
 
 ## 流水类型
 
