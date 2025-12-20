@@ -32,23 +32,23 @@ void cce_name##_##dst_type##_##src_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_
                 uint16_t dst_repeat_stride, uint16_t src_repeat_stride)                         \
 {                                                                                               \
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ dst_type *>(11));                                  \
-    EXPECT_EQ(src, reinterpret_cast<__ubuf__ src_type *>(22));                                 \
+    EXPECT_EQ(src, reinterpret_cast<__ubuf__ src_type *>(22));                                  \
     src_type scalar = 3.3;                                                                      \
-    EXPECT_EQ(value, scalar);                                                                    \
+    EXPECT_EQ(value, scalar);                                                                   \
     EXPECT_EQ(repeat, static_cast<uint8_t>(1));                                                 \
     EXPECT_EQ(dst_block_stride, static_cast<uint16_t>(1));                                      \
     EXPECT_EQ(src_block_stride, static_cast<uint16_t>(1));                                      \
     EXPECT_EQ(dst_repeat_stride, static_cast<uint16_t>(8));                                     \
     EXPECT_EQ(src_repeat_stride, static_cast<uint16_t>(8));                                     \
-}                                                                                               \                                                                                     \
+}                                                                                               \
                                                                                                 \
 }                                                                                               \
                                                                                                 \
 TEST_F(TestVectorCompute##class_name##dst_type##_##src_type, c_api_name##_half_half_half_UnaryConfig_Succ) \
 {                                                                                               \
     __ubuf__ dst_type *dst = reinterpret_cast<__ubuf__ dst_type *>(11);                         \
-    __ubuf__ src_type *src = reinterpret_cast<__ubuf__ src_type *>(22);                        \
-    src_type value = 3.3;                                                                        \
+    __ubuf__ src_type *src = reinterpret_cast<__ubuf__ src_type *>(22);                         \
+    src_type value = 3.3;                                                                       \
                                                                                                 \
     uint16_t dst_block_stride = 1;                                                              \
     uint16_t src_block_stride = 1;                                                              \
@@ -69,8 +69,8 @@ TEST_F(TestVectorCompute##class_name##dst_type##_##src_type, c_api_name##_half_h
 TEST_F(TestVectorCompute##class_name##dst_type##_##src_type, c_api_name##_sync_half_half_half_int32_t_Succ) \
 {                                                                                               \
     __ubuf__ dst_type *dst = reinterpret_cast<__ubuf__ dst_type *>(11);                         \
-    __ubuf__ src_type *src = reinterpret_cast<__ubuf__ src_type *>(22);                        \
-    src_type value = 3.3;                                                                        \
+    __ubuf__ src_type *src = reinterpret_cast<__ubuf__ src_type *>(22);                         \
+    src_type value = 3.3;                                                                       \
     uint16_t dst_block_stride = 1;                                                              \
     uint16_t src_block_stride = 1;                                                              \
     uint16_t dst_repeat_stride = 8;                                                             \

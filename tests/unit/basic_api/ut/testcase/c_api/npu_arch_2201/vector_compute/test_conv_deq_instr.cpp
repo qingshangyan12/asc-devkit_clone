@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 #define TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(class_name, c_api_name, cce_name, dst_data_type, src_data_type)       \
                                                                                                 \
@@ -60,19 +59,18 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
     __ubuf__ dst_data_type *dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);               \
     __ubuf__ src_data_type *src = reinterpret_cast<__ubuf__ src_data_type *>(22);               \
                                                                                                 \
-    asc_unary_config config;                                                                    \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src_block_stride = static_cast<uint64_t>(1);                                         \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint16_t dst_block_stride = static_cast<uint16_t>(1);                                       \
+    uint16_t src_block_stride = static_cast<uint16_t>(1);                                       \
+    uint8_t dst_repeat_stride = static_cast<uint8_t>(8);                                        \
+    uint8_t src_repeat_stride = static_cast<uint8_t>(8);                                        \
+    uint8_t repeat = static_cast<uint64_t>(1);                                                  \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ dst_data_type *, __ubuf__ src_data_type *,               \
                 uint8_t, uint16_t, uint16_t, uint8_t, uint8_t))                                 \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_UnaryCfg_Stub));        \
                                                                                                 \
-    c_api_name(dst, src, config);                                                               \
+    c_api_name(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);  \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -112,9 +110,9 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
 }                                                                                               \
 
 // ==========asc_deq_int162b8==========
-TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8H, asc_deq_int162b8_h, vconv_deqs162b8h, int8_t, int16_t);
-TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8H, asc_deq_int162b8_h, vconv_deqs162b8h, uint8_t, int16_t);
-TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8L, asc_deq_int162b8_l, vconv_deqs162b8l, int8_t, int16_t);
-TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8L, asc_deq_int162b8_l, vconv_deqs162b8l, uint8_t, int16_t);
+TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8HCApi, asc_deq_int162b8_h, vconv_deqs162b8h, int8_t, int16_t);
+TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8HCApi, asc_deq_int162b8_h, vconv_deqs162b8h, uint8_t, int16_t);
+TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8LCApi, asc_deq_int162b8_l, vconv_deqs162b8l, int8_t, int16_t);
+TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8LCApi, asc_deq_int162b8_l, vconv_deqs162b8l, uint8_t, int16_t);
 // ==========asc_int42half==========
-TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvI42H, asc_int42half, vconv_s42f16, half, void);
+TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvI42HCApi, asc_int42half, vconv_s42f16, half, void);

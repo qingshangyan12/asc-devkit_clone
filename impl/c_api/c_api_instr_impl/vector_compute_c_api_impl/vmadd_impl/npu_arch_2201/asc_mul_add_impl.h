@@ -12,40 +12,59 @@
  * \file asc_mul_add_impl.h
  * \brief
  */
-#ifndef IMPL_INSTR_VECTOR_COMPUTE_VMADD_ASC_2201_ASC_MUL_ADD_IMPL_H
-#define IMPL_INSTR_VECTOR_COMPUTE_VMADD_ASC_2201_ASC_MUL_ADD_IMPL_H
+#ifndef IMPL_INSTR_VECTOR_COMPUTE_VMADD_NPU_ARCH_2201_ASC_MUL_ADD_IMPL_H
+#define IMPL_INSTR_VECTOR_COMPUTE_VMADD_NPU_ARCH_2201_ASC_MUL_ADD_IMPL_H
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-namespace CApiInternal {
-
-template <typename T>
-__aicore__ inline void asc_mul_add_impl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const asc_binary_config& config)
+// asc_mul_add half
+__aicore__ inline void asc_mul_add_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    vmadd(dst, src0, src1, static_cast<uint8_t>(config.repeat), static_cast<uint8_t>(config.dst_block_stride),
-         static_cast<uint8_t>(config.src0_block_stride), static_cast<uint8_t>(config.src1_block_stride),
-         static_cast<uint8_t>(config.dst_repeat_stride), static_cast<uint8_t>(config.src0_repeat_stride),
-         static_cast<uint8_t>(config.src1_repeat_stride));
-#endif
+    if ASC_IS_AIV {
+        vmadd(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
+            src0_repeat_stride, src1_repeat_stride);
+    }
 }
 
-template <typename T>
-__aicore__ inline void asc_mul_add_impl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, uint32_t count)
+__aicore__ inline void asc_mul_add_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
 {
-    set_mask_count();
-    set_vector_mask(static_cast<uint64_t>(0), static_cast<uint64_t>(count));
-    asc_mul_add_impl(dst, src0, src1, CAPI_DEFAULT_BINARY_CFG);
-    set_mask_norm();
+    asc_set_mask_count_begin(count);
+    asc_mul_add_impl(dst, src0, src1, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
+        CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
 }
 
-template <typename T>
-__aicore__ inline void asc_mul_add_sync_impl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, uint32_t count)
+__aicore__ inline void asc_mul_add_sync_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
 {
-    asc_mul_add_impl<T>(dst, src0, src1, count);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_mul_add_impl(dst, src0, src1, count);
+    asc_sync_post_process();
 }
 
+// asc_mul_add float
+__aicore__ inline void asc_mul_add_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vmadd(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
+            src0_repeat_stride, src1_repeat_stride);
+    }
+}
+
+__aicore__ inline void asc_mul_add_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+{
+    asc_set_mask_count_begin(count);
+    asc_mul_add_impl(dst, src0, src1, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
+        CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
+}
+
+__aicore__ inline void asc_mul_add_sync_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+{
+    asc_mul_add_impl(dst, src0, src1, count);
+    asc_sync_post_process();
 }
 
 #endif

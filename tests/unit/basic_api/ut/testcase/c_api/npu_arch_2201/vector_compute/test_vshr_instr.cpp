@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 #define TEST_VECTOR_COMPUTE_VSHR_INSTR(class_name, c_api_name, cce_name, data_type, val_type)   \
                                                                                                 \
@@ -24,7 +23,7 @@ protected:                                                                      
                                                                                                 \
 namespace {                                                                                     \
                                                                                                 \
-void cce_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_uint16_t_Stub(__ubuf__ data_type *dst,   \
+void c_api_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_uint16_t_Stub(__ubuf__ data_type *dst,   \
                 __ubuf__ data_type *src, val_type value, uint8_t repeat,                        \
                 uint16_t dst_block_stride, uint16_t src_block_stride,                           \
                 uint16_t dst_repeat_stride, uint16_t src_repeat_stride, bool round)             \
@@ -37,10 +36,9 @@ void cce_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_uint16_t_Stub(_
     EXPECT_EQ(src_block_stride, static_cast<uint16_t>(1));                                      \
     EXPECT_EQ(dst_repeat_stride, static_cast<uint16_t>(8));                                     \
     EXPECT_EQ(src_repeat_stride, static_cast<uint16_t>(8));                                     \
-    EXPECT_EQ(round, true);                                                                     \
 }                                                                                               \
                                                                                                 \
-void  cce_name##_##data_type##_##val_type##_uint64_t_Stub(__ubuf__ data_type *dst,              \
+void  c_api_name##_##data_type##_##val_type##_uint64_t_Stub(__ubuf__ data_type *dst,              \
                 __ubuf__ data_type *src, val_type value, uint8_t repeat,                        \
                 uint16_t dst_block_stride, uint16_t src_block_stride,                           \
                 uint16_t dst_repeat_stride, uint16_t src_repeat_stride, bool round)             \
@@ -48,10 +46,9 @@ void  cce_name##_##data_type##_##val_type##_uint64_t_Stub(__ubuf__ data_type *ds
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type *>(11));                                 \
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ data_type *>(22));                                 \
     EXPECT_EQ(value, static_cast<val_type>(33));                                                \
-    EXPECT_EQ(round, true);                                                                     \
 }                                                                                               \
                                                                                                 \
-void cce_name##_##data_type##_set_vector_mask_Stub(uint64_t mask1, uint64_t mask0)              \
+void c_api_name##_##data_type##_set_vector_mask_Stub(uint64_t mask1, uint64_t mask0)              \
 {                                                                                               \
     EXPECT_EQ(mask1, static_cast<uint64_t>(0));                                                 \
     EXPECT_EQ(mask0, static_cast<uint64_t>(44));                                                \
@@ -64,21 +61,19 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_UnaryConfig_Succ) 
     __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                       \
     __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                       \
     val_type value = static_cast<val_type>(33);                                                 \
-    bool round = true;                                                                          \
                                                                                                 \
-    asc_unary_config config;                                                                    \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src_block_stride = static_cast<uint64_t>(1);                                         \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint16_t dst_block_stride = static_cast<uint16_t>(1);                                       \
+    uint16_t src_block_stride = static_cast<uint16_t>(1);                                       \
+    uint16_t dst_repeat_stride = static_cast<uint16_t>(8);                                      \
+    uint16_t src_repeat_stride = static_cast<uint16_t>(8);                                      \
+    uint8_t repeat = static_cast<uint8_t>(1);                                                   \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *,__ubuf__ data_type *,                        \
                 val_type, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, bool))               \
             .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_uint16_t_Stub));   \
+            .will(invoke(c_api_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_uint16_t_Stub));   \
                                                                                                 \
-    c_api_name(dst, src, static_cast<data_type>(value), config, round);                         \
+    c_api_name(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);    \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -88,17 +83,16 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_int
     __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                       \
     val_type value = static_cast<val_type>(33);                                                 \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
-    bool round = true;                                                                          \
     MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                       \
             .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_set_vector_mask_Stub));                       \
+            .will(invoke(c_api_name##_##data_type##_set_vector_mask_Stub));                       \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *,__ubuf__ data_type *,                        \
                 val_type, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, bool))               \
             .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_##val_type##_uint64_t_Stub));                 \
+            .will(invoke(c_api_name##_##data_type##_##val_type##_uint64_t_Stub));                 \
                                                                                                 \
-    c_api_name(dst, src, static_cast<data_type>(value), count, round);                          \
+    c_api_name(dst, src, value, count);                                                         \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -108,21 +102,24 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_half_half_hal
     __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                       \
     val_type value = static_cast<val_type>(33);                                                 \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
-    bool round = true;                                                                          \
     MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                       \
             .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_set_vector_mask_Stub));                       \
+            .will(invoke(c_api_name##_##data_type##_set_vector_mask_Stub));                       \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *,__ubuf__ data_type *,                        \
                 val_type, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, bool))               \
             .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_##val_type##_uint64_t_Stub));                 \
-    c_api_name##_sync(dst, src, static_cast<data_type>(value), count, round);                   \
+            .will(invoke(c_api_name##_##data_type##_##val_type##_uint64_t_Stub));                 \
+    c_api_name##_sync(dst, src, value, count);                                                  \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-// ==========asc_shift_right(half/float/int16_t/int32_t)==========
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRight, asc_shift_right, vshr, int16_t, int32_t);
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRight, asc_shift_right, vshr, int32_t, int32_t);
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRight, asc_shift_right, vshr, uint16_t, uint32_t);
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRight, asc_shift_right, vshr, uint32_t, uint32_t);
+// ==========asc_shift_right(int16_t/int32_t/uint16_t/uint32_t)==========
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shift_right, vshr, int16_t, int32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shift_right, vshr, int32_t, int32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shift_right, vshr, uint16_t, uint32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shift_right, vshr, uint32_t, uint32_t);
+
+// ==========asc_shift_right_round(int16_t/int32_t)==========
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightRoundCApi, asc_shift_right_round, vshr, int16_t, int32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightRoundCApi, asc_shift_right_round, vshr, int32_t, int32_t);

@@ -12,18 +12,20 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
-class TestSimdAtomicGetStoreAtomicConfig : public testing::Test { 
+class TestSimdAtomicGetStoreAtomicConfigCApi : public testing::Test { 
 protected:
     void SetUp() {}
     void TearDown() {}
 };
 
-TEST_F(TestSimdAtomicGetStoreAtomicConfig, get_st_atomic_cfg_Succ)
+TEST_F(TestSimdAtomicGetStoreAtomicConfigCApi, get_st_atomic_cfg_Succ)
 {
+    set_store_atomic_config_f32_sum_impl();
     int64_t res = asc_get_store_atomic_config();
     uint16_t atomic_type = static_cast<uint64_t>(res) & 0x7;
     uint16_t atomic_op = (static_cast<uint64_t>(res) >> 4) & 0x3;
+    EXPECT_EQ(atomic_type, 1);
+    EXPECT_EQ(atomic_op, 0);
     GlobalMockObject::verify();
 }

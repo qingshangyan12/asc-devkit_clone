@@ -12,16 +12,14 @@
  * \file asc_sflbits_impl.h
  * \brief
  */
-#ifndef IMPL_C_API_INSTR_SCALAR_COMPUTE_SFLBITS_ASC_2201_ASC_SFLBITS_IMPL_H
-#define IMPL_C_API_INSTR_SCALAR_COMPUTE_SFLBITS_ASC_2201_ASC_SFLBITS_IMPL_H
+#ifndef IMPL_C_API_INSTR_SCALAR_COMPUTE_SFLBITS_NPU_ARCH_2201_ASC_SFLBITS_IMPL_H
+#define IMPL_C_API_INSTR_SCALAR_COMPUTE_SFLBITS_NPU_ARCH_2201_ASC_SFLBITS_IMPL_H
 
-namespace CApiInternal {
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline int64_t asc_sflbits_impl(int64_t value)
 {
     return sflbits(value);
 }
-
-} // namespace CApiInternal
 
 #endif

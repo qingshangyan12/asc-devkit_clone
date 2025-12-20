@@ -12,33 +12,28 @@
  * \file copy_ubuf_to_gm_impl.h
  * \brief
  */
-#ifndef IMPL_INSTR_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_IMPL_ASC_2201_ASC_COPY_UBUF_TO_GM_IMPL_H
-#define IMPL_INSTR_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_IMPL_ASC_2201_ASC_COPY_UBUF_TO_GM_IMPL_H
+#ifndef IMPL_INSTR_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_IMPL_NPU_ARCH_2201_ASC_COPY_UBUF_TO_GM_IMPL_H
+#define IMPL_INSTR_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_IMPL_NPU_ARCH_2201_ASC_COPY_UBUF_TO_GM_IMPL_H
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void asc_copy_ub2gm_impl(__gm__ void* dst, __ubuf__ void* src, const asc_copy_config& config)
+__aicore__ inline void asc_copy_ub2gm_impl(__gm__ void* dst, __ubuf__ void* src, uint8_t sid, uint16_t n_burst,
+    uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    copy_ubuf_to_gm(dst, src, config.config);
-#endif
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm(dst, src, sid, n_burst, burst_len, src_gap, dst_gap);
+    }
 }
 
 __aicore__ inline void asc_copy_ub2gm_impl(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
 {
-    asc_copy_config config;
-    config.sid = 0;
-    config.n_burst = 1;
-    config.burst_len = size / CAPI_ONE_DATABLOCK_SIZE;
-    config.src_gap = 0;
-    config.dst_gap = 0;
-    asc_copy_ub2gm_impl(dst, src, config);
+    asc_copy_ub2gm_impl(dst, src, 0, 1, size / CAPI_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
 __aicore__ inline void asc_copy_ub2gm_sync_impl(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
 {
     asc_copy_ub2gm_impl(dst, src, size);
-    asc_sync_impl();
+    asc_sync_post_process();
 }
 
 #endif

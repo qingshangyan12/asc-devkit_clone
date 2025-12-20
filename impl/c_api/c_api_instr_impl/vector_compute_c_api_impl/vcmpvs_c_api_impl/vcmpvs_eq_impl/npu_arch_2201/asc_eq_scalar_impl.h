@@ -12,30 +12,60 @@
  * \file asc_eq_scalar_impl.h
  * \brief
  */
-#ifndef IMPL_INSTR_VECTOR_COMPUTE_VCMPVS_VCMPVS_EQ_ASC_2201_ASC_EQ_SCALAR_IMPL_H
-#define IMPL_INSTR_VECTOR_COMPUTE_VCMPVS_VCMPVS_EQ_ASC_2201_ASC_EQ_SCALAR_IMPL_H
+#ifndef IMPL_INSTR_VECTOR_COMPUTE_VCMPVS_VCMPVS_EQ_NPU_ARCH_2201_ASC_EQ_SCALAR_IMPL_H
+#define IMPL_INSTR_VECTOR_COMPUTE_VCMPVS_VCMPVS_EQ_NPU_ARCH_2201_ASC_EQ_SCALAR_IMPL_H
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-namespace CApiInternal {
-
-template <typename T>
-__aicore__ inline void asc_eq_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ T* src, T value, const asc_unary_config& config)
+// asc_eq_scalar half
+__aicore__ inline void asc_eq_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    vcmpvs_eq(dst, src, value, static_cast<uint8_t>(config.repeat), static_cast<uint16_t>(config.dst_block_stride),
-          static_cast<uint16_t>(config.src_block_stride), static_cast<uint16_t>(config.dst_repeat_stride),
-          static_cast<uint16_t>(config.src_repeat_stride));
-#endif
+    if ASC_IS_AIV {
+        vcmpvs_eq(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
 }
 
-template <typename T>
-__aicore__ inline void asc_eq_scalar_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ T* src, T value, const asc_unary_config& config)
+__aicore__ inline void asc_eq_scalar_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-    asc_eq_scalar_impl<T>(dst, src, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_eq_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride,
+        src_repeat_stride);
+    asc_sync_post_process();
 }
 
+// asc_eq_scalar float
+__aicore__ inline void asc_eq_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vcmpvs_eq(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
+}
+
+__aicore__ inline void asc_eq_scalar_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    asc_eq_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride,
+        src_repeat_stride);
+    asc_sync_post_process();
+}
+
+// asc_eq_scalar int32_t
+__aicore__ inline void asc_eq_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vcmpvs_eq(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
+}
+
+__aicore__ inline void asc_eq_scalar_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    asc_eq_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride,
+        src_repeat_stride);
+    asc_sync_post_process();
 }
 
 #endif

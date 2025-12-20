@@ -12,16 +12,14 @@
  * \file asc_get_store_atomic_config_impl.h
  * \brief
  */
-#ifndef IMPL_C_API_INSTR_SIMD_ATOMIC_GET_ST_ATOMIC_CFG_ASC_2201_ASC_GET_STORE_ATOMIC_CONFIG_IMPL_H
-#define IMPL_C_API_INSTR_SIMD_ATOMIC_GET_ST_ATOMIC_CFG_ASC_2201_ASC_GET_STORE_ATOMIC_CONFIG_IMPL_H
+#ifndef IMPL_C_API_INSTR_SIMD_ATOMIC_GET_ST_ATOMIC_CFG_NPU_ARCH_2201_ASC_GET_STORE_ATOMIC_CONFIG_IMPL_H
+#define IMPL_C_API_INSTR_SIMD_ATOMIC_GET_ST_ATOMIC_CFG_NPU_ARCH_2201_ASC_GET_STORE_ATOMIC_CONFIG_IMPL_H
 
-namespace CApiInternal {
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
  
 __aicore__ inline int64_t asc_get_store_atomic_config_impl()
 {
     return get_st_atomic_cfg();
 }
- 
-} // namespace CApiInternal
- 
+
 #endif
