@@ -54,7 +54,7 @@
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（向量）的起始地址。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | value | 输入 | 源操作数（标量）。 |
 | config | 输入 | 使用的初始化相关参数，详细说明请参考[asc_fill_value_config](../struct/asc_fill_value_config.md)。 |
 
@@ -74,8 +74,8 @@ PIPE_MTE1
 ### 调用示例
 
 ```cpp
-uint64_t offset = 0;
+constexpr uint64_t total_length = 128;    // total_length指参与搬运的数据总长度
 half value = 1;
-__cb__ half* dst = dst[offset];
-asc_fill_l0b_value(dst, value, config);
+__cb__ half dst[total_length * sizeof(half)];
+asc_fill_l0b_value(dst, value, config);    // 将dst中的元素按照config配置初始化为1
 ```

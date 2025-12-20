@@ -9,9 +9,11 @@ union asc_fill_value_config {
     uint64_t config = CAPI_DEFAULT_FILL_VALUE_CONFIG_VALUE;
     struct {
         uint64_t repeat : 15;
+        uint64_t reserved1 : 1;
         uint64_t block_num : 15;
+        uint64_t reserved2 : 1;
         uint64_t dst_gap : 15;
-        uint64_t reserved1 : 19;
+        uint64_t reserved3 : 17;
     };
 };
 ```
