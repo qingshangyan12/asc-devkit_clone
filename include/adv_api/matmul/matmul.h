@@ -160,9 +160,14 @@ public:
     __aicore__ inline void SetQuantScalar(const uint64_t quantScalar) {}
     /**
      * @brief Set the quantization vector
-     * @param [in] quantTensor: quantization vector
+     * @param [in] quantTensor: quantization vector in global memery
      */
     __aicore__ inline void SetQuantVector(const GlobalTensor<uint64_t>& quantTensor) {}
+    /**
+     * @brief Set the quantization vector
+     * @param [in] quantTensor: quantization vector in local memery
+     */
+    __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor) {}
     /**
      * @brief Set A matrix
      * @param [in] leftMatrix: A matrix in LocalTensor
@@ -385,4 +390,8 @@ namespace matmul = AscendC;
 #include "../../../impl/adv_api/detail/matmul/matmul_impl_base.h"
 #include "../../../impl/adv_api/detail/matmul/matmul_impl.h"
 #include "../../../impl/adv_api/detail/matmul/batch_matmul_impl.h"
+#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#else
+#include "../../../impl/adv_api/detail/matmul/mx_matmul_impl.h"
+#endif
 #endif

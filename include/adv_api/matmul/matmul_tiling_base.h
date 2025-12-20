@@ -31,6 +31,7 @@ constexpr int32_t FP16_BYTES = 2;
 constexpr int32_t C0_SIZE = 16;
 constexpr int32_t C0_BYTE_SIZE = 32;
 constexpr int32_t BITS_PER_BYTE = 8;
+
 enum class DataType : int32_t {
     DT_FLOAT = 0,           // float type
     DT_FLOAT16 = 1,         // fp16 type
@@ -71,7 +72,7 @@ enum class DataType : int32_t {
     DT_FLOAT4_E2M1 = 37,    // fp4_e2m1 type
     DT_FLOAT8_E8M0 = 38,    // fp8_e8m0 type
     DT_FLOAT4_E1M2 = 39,    // fp4_e1m2 type
-    DT_MAX = 40             // Mark the boundaries of data types
+    DT_MAX = 40,            // Mark the boundaries of data types
 };
 
 #if !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
@@ -166,6 +167,7 @@ enum class DequantType : int32_t {
     SCALAR = 0,       ///< Scalar type, value is 0
     TENSOR = 1,       ///< Tensor type, value is 1
 };
+
 /**
 * @enum class ScheduleType
 * @brief ScheduleType inherits from int32_t and includes a set of operation types
@@ -175,6 +177,7 @@ enum class ScheduleType : int32_t {
     OUTER_PRODUCT = 1,                  ///< Outer product operation type, value is 1
     N_BUFFER_33 = 2,                    ///< Buffer type, value is 2
 };
+
 /**
 * @struct SysTilingTempBufSize
 * @brief System tiling temporary buffer size structure
@@ -511,6 +514,9 @@ public:
     * @note this function sets matrix multiplication configuration parameters by passing a MatmulConfigParams object
     */
     void SetMatmulConfigParams(const MatmulConfigParams& configParams);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
+    int32_t SetGroupSize(int32_t groupSizeB);
+#endif
     /**
     * @brief Set the sparse matrix flag
     * @param [in] isSparseIn: input flag for sparse matrix, the matrix is sparse if true
@@ -540,6 +546,7 @@ public:
     {
         return baseK;
     }
+
     /**
     * @brief Interface to get tiling information
     * @param [in] tiling: reference to store the tiling information
@@ -631,6 +638,13 @@ public:
     int32_t minSingleK = 0;
     DequantType deqType = DequantType::SCALAR;
     bool enableSplitK_ = false;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
+    // micro slice, L1Lock params: isL1LockScenario_, isSingleCoreSplit
+    bool isL1LockScenario_ = false;  // try L1TilingAlgType::TILING_BFULL first
+    bool isUseSingleCore_ = false;   // restrict only use single-core
+    int32_t groupSize = 0;
+    bool hasFixSplit_ = false;
+#endif
     platform_ascendc::SocVersion socVersion = platform_ascendc::SocVersion::ASCEND910B;
     int32_t mmConfigType = 1; // 0: Norm; 1: MDL
     bool enableL1CacheUB = false;

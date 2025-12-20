@@ -21,6 +21,7 @@
 namespace AscendC {
 namespace Impl {
 namespace Detail {
+constexpr uint8_t INDEX_BYTES_RATE = 4;
 
 template <typename IMPL, const auto& MM_CFG, class INPUT_TYPE>
 class CopyTileToCubeWrapper<IMPL, MM_CFG, INPUT_TYPE, enable_if_t<!MatmulFeatureTrait<MM_CFG>::IsNeedUB() &&
@@ -82,7 +83,7 @@ public:
                     }
                 }
             } else {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
                 Barrier();
 #endif
                 if constexpr (IsCopyFromUB<INPUT_TYPE, MM_CFG>()) {
@@ -142,7 +143,7 @@ public:
         int32_t row = curCol * baseHeight;
         int32_t col = curRow * baseWidth;
         int32_t height = tileWidth;
-        int32_t width = tileHeight >> 2;
+        int32_t width = Ceil(tileHeight, INDEX_BYTES_RATE);
         constexpr int32_t c0Size = AuxGetC0Size<int32_t>(); // Idx Matrix c0Size=8
         ASCENDC_ASSERT((orgHeight >= height), {
             KERNEL_LOG(KERNEL_ERROR,

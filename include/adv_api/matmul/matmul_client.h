@@ -29,12 +29,13 @@
 namespace AscendC {
 
 constexpr int32_t VECTOR_QUANT_MODE = 2;
+constexpr int32_t VECTOR_QUANT_MODE_L1 = 3;
 constexpr int32_t NUM_EIGHT = 8;
 constexpr uint16_t NUM_SIXTEEN = 16;
 constexpr uint16_t NUM_THIRTYTWO = 32;
 constexpr uint16_t NUM_FORTYEIGHT = 48;
 
-
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 /**
  * @class MatmulClientBase
  *
@@ -310,7 +311,7 @@ public:
     __aicore__ inline void SetTensorA(const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             ASSERT("SetTensorA localTensor not support when enableMixDualMaster is enabled");
 #endif
             return;
@@ -380,7 +381,7 @@ public:
     __aicore__ inline void SetTensorB(const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             ASSERT("SetTensorB localTensor not support when enableMixDualMaster is enabled");
 #endif
             return;
@@ -443,7 +444,7 @@ public:
     __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             ASSERT("SetBias localTensor not support when enableMixDualMaster is enabled");
 #endif
             return;
@@ -609,6 +610,16 @@ public:
         kfcMsg_.body.setQuant = 1;
         kfcMsg_.body.quantMode = VECTOR_QUANT_MODE;
         kfcMsg_.body.quantAddr = reinterpret_cast<uint64_t>(quantTensor.GetPhyAddr());
+        kfcMsg_.body.quantSize = quantTensor.GetSize() * sizeof(uint64_t);
+    }
+
+    __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor)
+    {
+        static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
+            "SetQuantVector localTensor is not supported when enableMixDualMaster is enabled.");
+        kfcMsg_.body.setQuant = 1;
+        kfcMsg_.body.quantMode = VECTOR_QUANT_MODE_L1;
+        kfcMsg_.body.quantAddr = GetTscmAddr(quantTensor);
         kfcMsg_.body.quantSize = quantTensor.GetSize() * sizeof(uint64_t);
     }
 
@@ -964,7 +975,7 @@ public:
     {
         ASCENDC_ASSERT((!ToMatmulConfig(MM_CFG).isPartialOutput), { KERNEL_LOG(KERNEL_ERROR, "IterateAll is not supported for PartialOutput."); });
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster){
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             ASSERT("IterateAll localTensor not support when enableMixDualMaster is enabled");
 #endif
             return;
@@ -1525,6 +1536,34 @@ public:
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "SetLocalWorkspace not support when enableMixDualMaster is enabled.");
         localWorkspace_ = tmpBuffer;
+#if ASCENDC_CPU_DEBUG
+        int32_t minUbNd2NzTmpSize = 0;
+        int32_t scaleK = Ceil(singleCoreK_, AscendC::Impl::MX_BASEK_FACTOR) * 2;
+        c0Size_ = AscendCUtils::GetC0Count(sizeof(fp8_e8m0_t));
+        if constexpr (PhyMxScalePosIsUB<A_TYPE>()) {
+            if constexpr (A_TYPE::scaleFormat == CubeFormat::ND) {
+                if constexpr (A_TYPE::isScaleTrans) {
+                    minUbNd2NzTmpSize += CeilAlign(singleCoreM_, c0Size_) * scaleK;
+                } else {
+                    minUbNd2NzTmpSize += CeilAlign(scaleK, c0Size_) * singleCoreM_;
+                }
+            }
+        }
+        if constexpr (PhyMxScalePosIsUB<B_TYPE>()) {
+            if constexpr (B_TYPE::scaleFormat == CubeFormat::ND) {
+                if constexpr (B_TYPE::isScaleTrans) {
+                    minUbNd2NzTmpSize += singleCoreN_ * CeilAlign(scaleK, c0Size_);
+                } else {
+                    minUbNd2NzTmpSize += scaleK * CeilAlign(singleCoreN_, c0Size_);
+                }
+            }
+        }
+        ASCENDC_ASSERT((localWorkspace_.GetSize() >= minUbNd2NzTmpSize), {
+                 KERNEL_LOG(KERNEL_ERROR, "For mxMatmul ub position input in ND format,"
+                 " scaleA/scaleB requires at latest %d Byte of temporary space.",
+                 minUbNd2NzTmpSize);
+        });
+#endif
 #endif
     }
 
@@ -2326,6 +2365,50 @@ private:
         }
     }
 
+    template <class T>
+    __aicore__ inline void UbASizeCheck() {
+#if ASCENDC_CPU_DEBUG
+        int32_t innerDim = CeilAlign(singleCoreK_, c0Size_);
+        int32_t outDim = singleCoreM_;
+        int32_t srcUbSize = sizeAmatrix_;
+        if constexpr (A_TYPE::isTrans) {
+            innerDim = CeilAlign(singleCoreM_, c0Size_);
+            outDim = singleCoreK_;
+        }
+        int32_t minAUbSize = outDim * innerDim;
+        if constexpr (IsTypeOneOfV<T, fp4x2_e1m2_t, fp4x2_e2m1_t>) {
+            srcUbSize = srcUbSize / AscendC::Impl::FP4_TWO;
+            minAUbSize = minAUbSize/ AscendC::Impl::FP4_TWO;
+        }
+        ASCENDC_ASSERT((srcUbSize >= minAUbSize), {
+            KERNEL_LOG(KERNEL_ERROR, "The width of matrix A on UB should be 32Byte aligned, and The expected size is height * CeilAlign(width, 32B) = %d Byte; currently, it is %d Byte.",
+            minAUbSize, srcUbSize);
+        });
+#endif
+    }
+
+    template <class T>
+    __aicore__ inline void UbBSizeCheck() {
+#if ASCENDC_CPU_DEBUG
+        int32_t innerDim = CeilAlign(singleCoreN_, c0Size_);
+        int32_t outDim = singleCoreK_;
+        int32_t srcUbSize = sizeBmatrix_;
+        if constexpr (B_TYPE::isTrans) {
+            innerDim = CeilAlign(singleCoreK_, c0Size_);
+            outDim = singleCoreN_;
+        }
+        int32_t minBUbSize = outDim * innerDim;
+        if constexpr (IsTypeOneOfV<T, fp4x2_e1m2_t, fp4x2_e2m1_t>) {
+            srcUbSize = srcUbSize / AscendC::Impl::FP4_TWO;
+            minBUbSize = minBUbSize / AscendC::Impl::FP4_TWO;
+        }
+        ASCENDC_ASSERT((srcUbSize >= minBUbSize), {
+            KERNEL_LOG(KERNEL_ERROR, "The width of matrix B on UB should be 32Byte aligned, and The expected size is height * CeilAlign(width, 32B) = %d Byte; currently, it is %d Byte.",
+            minBUbSize, srcUbSize);
+        });
+#endif
+    }    
+
     __aicore__ inline void CopyUbAToL1(bool isTrans)
     {
         c0Size_ = AscendCUtils::GetC0Count(sizeof(SrcAT));
@@ -2339,6 +2422,7 @@ private:
         TBuffAddr tbufOutTmp;
         tbufOutTmp.logicPos = (uint8_t)(TPosition::A1);
         if constexpr (HasScalePosition<A_TYPE>::value && A_TYPE::format == CubeFormat::ND) {
+            UbASizeCheck<SrcAT>();
             tbufOutTmp.dataLen = ComputeAL1Size();
         } else {
             tbufOutTmp.dataLen = orgHeightAlign * orgWidthAlign * bitSize;
@@ -2463,6 +2547,7 @@ private:
         TBuffAddr tbufOutTmp;
         tbufOutTmp.logicPos = (uint8_t)(TPosition::B1);
         if constexpr (HasScalePosition<B_TYPE>::value && B_TYPE::format == CubeFormat::ND) {
+            UbBSizeCheck<SrcBT>();
             if constexpr (IsSupportMxFp4<SrcBT>()) {
                 c0Size_ = AscendC::Impl::B4_C0SIZE;
             }
@@ -2607,6 +2692,38 @@ private:
         CopyUB2L1NZ2NZ(l1Matrix, dstU8, height, width);
     }
 
+    __aicore__ inline void ScaleAUbSizeCheck(const LocalTensor<uint8_t>& srcTensor, int32_t scaleK) {
+#if ASCENDC_CPU_DEBUG
+        int32_t innerDim = CeilAlign(scaleK, c0Size_);
+        int32_t outDim = singleCoreM_;
+        if constexpr (A_TYPE::isScaleTrans) {
+            innerDim = CeilAlign(singleCoreM_, c0Size_);
+            outDim = scaleK;
+        }
+        int32_t minScaleAUbSize = outDim * innerDim;
+        ASCENDC_ASSERT((srcTensor.GetSize() >= minScaleAUbSize), {
+            KERNEL_LOG(KERNEL_ERROR, "The width of matrix scaleA on UB should be 32Byte aligned, and The expected size is height * CeilAlign(width, 32B) = %d Byte; currently, it is %d Byte.",
+            minScaleAUbSize, srcTensor.GetSize());
+        });
+#endif
+    }
+
+    __aicore__ inline void ScaleBUbSizeCheck(const LocalTensor<uint8_t>& srcTensor, int32_t scaleK) {
+#if ASCENDC_CPU_DEBUG
+        int32_t innerDim = CeilAlign(singleCoreN_, c0Size_);
+        int32_t outDim = scaleK;
+        if constexpr (B_TYPE::isScaleTrans) {
+            innerDim = CeilAlign(scaleK, c0Size_);
+            outDim = singleCoreN_;
+        }
+        int32_t minScaleBUbSize = outDim * innerDim;
+        ASCENDC_ASSERT((srcTensor.GetSize() >= minScaleBUbSize), {
+            KERNEL_LOG(KERNEL_ERROR, "The width of matrix scaleB on UB should be 32Byte aligned, and The expected size is height * CeilAlign(width, 32B) = %d Byte; currently, it is %d Byte.",
+            minScaleBUbSize, srcTensor.GetSize());
+        });
+#endif
+    }
+
     __aicore__ inline void CopyScaleUbAToL1(bool isTrans)
     {
         int32_t scaleK = Ceil(singleCoreK_, AscendC::Impl::MX_BASEK_FACTOR) * 2;
@@ -2647,6 +2764,7 @@ private:
                 DataCopy(leftMatrix, srcTensor,
                     {1, static_cast<uint16_t>(Ceil(singleCoreK_ / NUM_THIRTYTWO, c0Size_)), 0, 0});
             } else if constexpr (A_TYPE::scaleFormat == CubeFormat::ND) {
+                ScaleAUbSizeCheck(srcTensor, scaleK);
                 if (isTrans) {
                     CopyUbNZ2NZForScale(leftMatrix, srcTensor, scaleK, Ceil(singleCoreM_, BLOCK_CUBE) * BLOCK_CUBE, scaleTmpBufSize_);
                 } else {
@@ -2693,6 +2811,7 @@ private:
                     CopyUB2L1NZ2NZ(rightMatrix, srcTensor, singleCoreK_ / NUM_THIRTYTWO, singleCoreN_);
                 }
             } else if constexpr (B_TYPE::scaleFormat == CubeFormat::ND) {
+                ScaleBUbSizeCheck(srcTensor, scaleK);
                 if (isBTrans) {
                     ND2ScaleZZ(rightMatrix, srcTensor, singleCoreN_, Ceil(scaleK, c0Size_) * c0Size_, scaleK, scaleTmpBufSize_);
                 } else {
@@ -2850,5 +2969,9 @@ class MatmulClient
 public:
     __aicore__ inline MatmulClient() {}
 };
+#else
+// Kirin MatmulClient
+#include "../../../impl/adv_api/detail/matmul/kfc/matmul_client_impl_aicore.h"
+#endif
 } // namespace matmul
 #endif
