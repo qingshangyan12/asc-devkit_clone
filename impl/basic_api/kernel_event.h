@@ -387,7 +387,7 @@ hard = Hardware::L0A;
         hard = Hardware::L1;
     } else if (pos == TPosition::C2PIPE2GM) {
         hard = Hardware::FIXBUF;
-#elif (__NPU_ARCH__ == 2201)
+#elif (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3003)
     } else if (pos == TPosition::C1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::C2) {

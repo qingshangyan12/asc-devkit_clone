@@ -105,8 +105,8 @@ private:
         /*310*/ {true, false, false, true, FixpipeParamsType::V310, true, false, true, false, true, true, true, false, true, false, true},
         /*310R6*/ {true, false, false, true, FixpipeParamsType::V310, true, false, true, false, true, true, true, true, true, false, true},
         /*510R2*/ {true, false, true, false, FixpipeParamsType::V510, true, true, true, false, true, false, false, true, true, false, true},
-        /*L300*/ {true, false, false, true, FixpipeParamsType::V300, true, true, false, false, true, true, false, false, true, true, false},
-        /*L311*/ {true, false, true, false, FixpipeParamsType::V311, true, true, false, false, true, false, false, false, false, false, false}};
+        /*L300*/ {true, false, false, true, FixpipeParamsType::V300, true, true, false, false, true, true, false, false, false, true, false},
+        /*L311*/ {true, false, true, false, FixpipeParamsType::V311, true, true, true, false, true, false, false, false, false, false, false}};
 };
 }  // namespace Detail
 }  // namespace Impl

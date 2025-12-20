@@ -174,7 +174,9 @@ __simd_vf__ inline void VFDropOutByteModeCalc(__ubuf__ T* dstUb, __ubuf__ T* src
     MicroAPI::RegTensor<uint8_t> vMaskReg;
     MicroAPI::RegTensor<half> vFP16Reg;
     MicroAPI::RegTensor<float> vFP32Reg;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
     MicroAPI::RegTensor<bfloat16_t> vBF16Reg;
+#endif
     MicroAPI::MaskReg maskReg;
     constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
     uint32_t sreg = dataSize;
@@ -186,12 +188,16 @@ __simd_vf__ inline void VFDropOutByteModeCalc(__ubuf__ T* dstUb, __ubuf__ T* src
         if constexpr (sizeof(T) == 2) {
             MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vMaskReg, maskUb + i * repeatElm);
             MicroAPI::Cast<half, uint8_t, layoutZMrgZ>(vFP16Reg, vMaskReg, maskReg);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
             if constexpr (SupportType<T, half>()) {
                 MicroAPI::Mul(vDstReg, vFP16Reg, vSrcReg, maskReg);
             } else {
                 MicroAPI::Cast<bfloat16_t, half, MrgZRndR>(vBF16Reg, vFP16Reg, maskReg);
                 MicroAPI::Mul(vDstReg, vBF16Reg, vSrcReg, maskReg);
             }
+#else
+            MicroAPI::Mul(vDstReg, vFP16Reg, vSrcReg, maskReg);
+#endif
         } else {
             MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vMaskReg, maskUb + i * repeatElm);
             MicroAPI::Cast<half, uint8_t, layoutZMrgZ>(vFP16Reg, vMaskReg, maskReg);
@@ -213,7 +219,9 @@ __simd_vf__ inline void VFDropOutByteModeCalcInfo(__ubuf__ T* dstUb, __ubuf__ T*
     MicroAPI::RegTensor<uint8_t> vMaskReg;
     MicroAPI::RegTensor<half> vFP16Reg;
     MicroAPI::RegTensor<float> vFP32Reg;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
     MicroAPI::RegTensor<bfloat16_t> vBF16Reg;
+#endif
     MicroAPI::MaskReg maskReg;
     constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
     uint32_t loopWNum = CeilDivision(info.srcLastAxis, repeatElm);
@@ -227,12 +235,16 @@ __simd_vf__ inline void VFDropOutByteModeCalcInfo(__ubuf__ T* dstUb, __ubuf__ T*
                 MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(
                     vMaskReg, maskUb + loopH * info.maskLastAxis + loopW * repeatElm);
                 MicroAPI::Cast<half, uint8_t, layoutZMrgZ>(vFP16Reg, vMaskReg, maskReg);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
                 if constexpr (SupportType<T, half>()) {
                     MicroAPI::Mul(vDstReg, vFP16Reg, vSrcReg, maskReg);
                 } else {
                     MicroAPI::Cast<bfloat16_t, half, MrgZRndR>(vBF16Reg, vFP16Reg, maskReg);
                     MicroAPI::Mul(vDstReg, vBF16Reg, vSrcReg, maskReg);
                 }
+#else
+                MicroAPI::Mul(vDstReg, vFP16Reg, vSrcReg, maskReg);
+#endif
             } else {
                 MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
                     vMaskReg, maskUb + loopH * info.maskLastAxis + loopW * repeatElm);

@@ -120,14 +120,14 @@ template <typename T>
 __aicore__ inline void DataCopyGM2UBImpl(__ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams)
 {
     CopyGmToUbufAlignV2(dst, src, intriParams.blockCount, intriParams.blockLen, 0, 0, intriParams.srcStride,
-        intriParams.dstStride, false, intriParams.sid);
+        intriParams.dstStride, false);
 }
 
 template <typename T>
 __aicore__ inline void DataCopyGM2L1Impl(__cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams)
 {
     CopyGmToCbufAlignV2(dst, src, intriParams.blockCount, intriParams.blockLen, 0, 0, false,
-        intriParams.srcStride, intriParams.dstStride, false, intriParams.sid);
+        intriParams.srcStride, intriParams.dstStride, false);
 }
 
 template <typename T>
@@ -371,7 +371,7 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
         for (int i = 0; i < NBlockSize; ++i) {
             uint32_t offsetDst = ndIdx * dstNzMatrixStride + i * elementsPerBlock * dstNzC0Stride;
             uint32_t offsetSrc = ndIdx * srcNdMatrixStride + i * elementsPerBlock;
-            copy_ubuf_to_cbuf(dst + offsetDst, src + offsetSrc, 0, nValue, 1, srcDValue / elementsPerBlock = 1, dstNzNStride - 1);
+            copy_ubuf_to_cbuf(dst + offsetDst, src + offsetSrc, 0, nValue, 1, srcDValue / elementsPerBlock - 1, dstNzNStride - 1);
         }
     }
 }
@@ -597,7 +597,7 @@ __aicore__ inline void DataCopyPadGm2L1Impl(__cbuf__ T* dst, __gm__ T* src, cons
         set_pad_val_outtol1(padParams.paddingValue);
     }
     CopyGmToCbufAlignV2(dst, src, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding,
-        padParams.rightPadding, padParams.isPad, intriParams.srcStride, intriParams.dstStride, true, intriParams.sid);
+        padParams.rightPadding, padParams.isPad, intriParams.srcStride, intriParams.dstStride, true);
 }
 
 template <typename T>
@@ -665,7 +665,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
     uint64_t srcStride = AlignUp(intriParams.srcStride * BYTE_32_ALIGN + intriParams.blockLen, BYTE_32_ALIGN);
     uint32_t dstStride = intriParams.blockLen + intriParams.dstStride;
 
-    copy_cbuf_to_gm_align_v2(dst, src, intriParams.sid, intriParams.blockCount, intriParams.blockLen, dstStride,
+    copy_cbuf_to_gm_align_v2(dst, src, 0, intriParams.blockCount, intriParams.blockLen, dstStride,
         srcStride);
 }
 

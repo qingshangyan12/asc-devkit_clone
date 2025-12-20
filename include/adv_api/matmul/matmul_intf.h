@@ -22,8 +22,8 @@
 #include "include/adv_api/matmul/matmul.h"
 #endif
 
-#ifdef MIX_CORE_VEC_CUBE
-#include "impl/matmul/kfc/matmul_server_mix.h"
+#ifdef ASCENDC_MATMUL_AICORE	
+#include "../../impl/adv_api/detail/matmul/kfc/matmul_client_impl_aicore.h"
 #endif
 
 namespace AscendC {
@@ -119,8 +119,7 @@ template <
 >
 using Matmul = MatmulClient<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 
-#elif defined(MIX_CORE_VEC_CUBE)
-// Otherwise, use MatmulServiceAux
+#elif defined(ASCENDC_MATMUL_AICORE) && !defined(ASCENDC_CUBE_ONLY)
 template<
     class A_TYPE,
     class B_TYPE,
@@ -130,7 +129,7 @@ template<
     class MM_CB = AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
     MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)
 >
-using Matmul = MatmulServiceMix<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
+using Matmul = MatmulClient<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 
 #else
 // Default case: use MatmulImpl
@@ -146,7 +145,6 @@ template <
 using Matmul = MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 
 #endif // SPLIT_CORE_CUBE || SPLIT_CORE_VEC
-
 #endif // ASCENDC_CPU_DEBUG
 } //namespace AscendC
 #endif

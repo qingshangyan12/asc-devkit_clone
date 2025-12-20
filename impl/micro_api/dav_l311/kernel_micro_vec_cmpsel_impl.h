@@ -20,7 +20,7 @@
 namespace AscendC {
 namespace MicroAPI {
 template <typename T = DefaultType, CMPMODE mode = CMPMODE::EQ, typename RegT>
-__aicore__ inline void CompareImpl(MaskReg &dstMask, RegT &srcReg0, RegT &srcReg1, MaskReg &mask)
+__simd_callee__ inline void CompareImpl(MaskReg &dstMask, RegT &srcReg0, RegT &srcReg1, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -42,7 +42,7 @@ __aicore__ inline void CompareImpl(MaskReg &dstMask, RegT &srcReg0, RegT &srcReg
 }
 
 template <typename T = DefaultType, CMPMODE mode = CMPMODE::EQ, typename RegT, typename ScalarT>
-__aicore__ inline void CompareScalarImpl(MaskReg &dstMask, RegT &srcReg, ScalarT scalarValue, MaskReg &mask)
+__simd_callee__ inline void CompareScalarImpl(MaskReg &dstMask, RegT &srcReg, ScalarT scalarValue, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -71,7 +71,7 @@ __aicore__ inline void CompareScalarImpl(MaskReg &dstMask, RegT &srcReg, ScalarT
 }
 
 template <typename T = DefaultType, typename RegT>
-__aicore__ inline void SelectImpl(RegT &dstReg, RegT &srcReg0, RegT &srcReg1, MaskReg &mask)
+__simd_callee__ inline void SelectImpl(RegT &dstReg, RegT &srcReg0, RegT &srcReg1, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -81,7 +81,7 @@ __aicore__ inline void SelectImpl(RegT &dstReg, RegT &srcReg0, RegT &srcReg1, Ma
 }
 
 template <typename T>
-__aicore__ inline void SlideImpl(RegTensor<T> &dstReg, RegTensor<T> &srcReg0, RegTensor<T> &srcReg1,
+__simd_callee__ inline void SlideImpl(RegTensor<T> &dstReg, RegTensor<T> &srcReg0, RegTensor<T> &srcReg1,
     uint16_t slideAmount)
 {
     vslide(dstReg, srcReg0, srcReg1, slideAmount);
