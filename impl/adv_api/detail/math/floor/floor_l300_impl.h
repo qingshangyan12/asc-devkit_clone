@@ -9,7 +9,7 @@
 */
 
 /*!
- * \file floor_L3l00_impl.h
+ * \file floor_l300_impl.h
  * \brief
  */
 #ifndef DETAIL_MATH_FLOOR_FLOOR_L300_IMPL_H
