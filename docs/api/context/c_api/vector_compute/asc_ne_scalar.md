@@ -9,24 +9,22 @@
 
 ### 功能说明
 
-src中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst上的对应比特位为1，否则为0。
+src中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst对应比特位为1，否则为0。
 
 ### 函数原型
 
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_ne_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, const asc_unary_config& config)
-    __aicore__ inline void asc_ne_scalar(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src, int32_t value, const asc_unary_config& config)
-    __aicore__ inline void asc_ne_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, const asc_unary_config& config)
+    __aicore__ inline void asc_ne_scalar(__ubuf__ uint8_t *dst, __ubuf__ half *src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_ne_scalar(__ubuf__ uint8_t *dst, __ubuf__ float *src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_ne_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, const asc_unary_config& config)
-    __aicore__ inline void asc_ne_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src, int32_t value, const asc_unary_config& config)
-    __aicore__ inline void asc_ne_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, const asc_unary_config& config)
+    __aicore__ inline void asc_ne_scalar_sync(__ubuf__ uint8_t *dst, __ubuf__ half *src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_ne_scalar_sync(__ubuf__ uint8_t *dst, __ubuf__ float *src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 ### 参数说明
@@ -36,7 +34,11 @@ src中的每个元素逐个与标量value比较大小，如果某个位置上的
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
 | value | 输入 | 源操作数（标量）。 |
-| config | 输入 | 在高维切分计算场景下使用的计算配置参数, 详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。 |
+| repeat | 输入    | 迭代次数，默认值：1。 |
+| dst_block_stride | 输入    | 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| src_block_stride | 输入    | 源操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| dst_repeat_stride | 输入    | 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| src_repeat_stride | 输入    | 源操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
 
 ### 返回值说明
 
@@ -55,11 +57,9 @@ PIPE_TYPE_V
 
 ```cpp
 // total_length指参与计算的数据长度
-uint64_t total_length = 128;
-uint64_t offset = 0;
-__ubuf__ half* src = src[offset];
+constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
+__ubuf__ half src[total_length * sizeof(half)];
+__ubuf__ half dst[total_length * sizeof(half)];
 half value = 1;
-offset += total_length * sizeof(half);
-__ubuf__ half* dst = dst[offset];
-asc_ne_scalar(dst, src, value, config);
+asc_ne_scalar(dst, src, value, 1, 1, 1, 8, 8);
 ```

@@ -23,8 +23,8 @@
 高维切分计算
 
   ```cpp
-  __aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, const asc_gather_config& config)
-  __aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, const asc_gather_config& config)
+  __aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
+  __aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
   ```
 
 同步计算
@@ -40,10 +40,11 @@
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| offset_addr | 输入 | 源操作数的每个元素对应的地址偏移。 |
+| offset_addr | 输入 | 每个block对应的地址偏移。 |
 | count | 输入 | 参与计算的元素个数。 |
-| config | 输入 | 指令使用的计算配置参数, 详细说明请参考[asc_gatherb_config](../struct/asc_gatherb_config.md)。 |
-
+| dst_repeat_stride |输入| 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| repeat |输入| 迭代次数，默认值：1。 |
 ### 返回值说明
 
 无
@@ -53,19 +54,17 @@
 PIPE_TYPE_V
 
 ### 约束说明
-
+- offset_addr取值应保证src元素类型位宽对齐。
+- src加上offset_addr偏移后的地址不能超出Unified Buffer (UB)大小数据的范围。
 - dst、src的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
 ### 调用示例
 
 ```cpp
-// total_length指参与计算的数据长度
-uint64_t total_length = 128;
-uint64_t offset = 0;
-uint32_t offset_addr = 1;
-__ubuf__ half* src = src[offset];
-offset += total_length * sizeof(half);
-__ubuf__ half* dst = dst[offset];
+constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
+uint32_t offset_addr = 4;
+__ubuf__ half src[total_length * sizeof(half)];
+__ubuf__ half dst[total_length * sizeof(half)];
 asc_gather_datablock(dst, src, offset_addr, total_length);
 ```

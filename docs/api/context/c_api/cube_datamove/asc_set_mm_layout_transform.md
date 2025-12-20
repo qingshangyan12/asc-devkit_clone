@@ -14,14 +14,15 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_set_mm_layout_transform(bool layout_mode)
+//先通过N方向，然后通过M方向产生结果
+__aicore__ inline void asc_set_mm_layout_transform_m()
+//先通过M方向，然后通过N方向产生结果
+__aicore__ inline void asc_set_mm_layout_transform_n()
 ```
 
 ## 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| value | 输入 | 控制mmad优先通过M/N的哪个方向，bool型，支持如下两种取值：<br> true：代表CUBE将首先通过N方向，然后通过M方向产生结果。<br> true：代表CUBE将首先通过M方向，然后通过N方向产生结果。|
+无
 
 ## 返回值说明
 
@@ -37,7 +38,4 @@ PIPE_TYPE_S
 
 ## 调用示例
 
-```c++
-bool layout_mode = true;
-asc_set_mm_layout_transform(layout_mode);
-```
+无
