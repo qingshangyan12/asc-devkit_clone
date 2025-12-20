@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 class TestCacheCtrlGetIcachePreloadStatus : public testing::Test { 
 protected:
@@ -27,7 +26,7 @@ int64_t get_icache_prl_st_Stub()
 }
 }
 
-TEST_F(TestCacheCtrlGetIcachePreloadStatus, get_icache_preload_status_Succ)
+TEST_F(TestCacheCtrlGetIcachePreloadStatus, c_api_get_icache_preload_status_Succ)
 {
     MOCKER(get_icache_prl_st)
         .times(1)

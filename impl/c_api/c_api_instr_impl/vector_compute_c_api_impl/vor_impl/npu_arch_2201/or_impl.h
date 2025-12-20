@@ -17,34 +17,48 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-namespace CApiInternal
+__aicore__ inline void asc_or_impl_int16_t(__ubuf__ int16_t *dst, __ubuf__ int16_t *src0, __ubuf__ int16_t *src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
-
-    template <typename T>
-    __aicore__ inline void asc_or_impl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, const asc_binary_config &config)
-    {
-        vor(dst, src0, src1, static_cast<uint8_t>(config.repeat), static_cast<uint8_t>(config.dst_block_stride),
-             static_cast<uint8_t>(config.src0_block_stride), static_cast<uint8_t>(config.src1_block_stride),
-             static_cast<uint8_t>(config.dst_repeat_stride), static_cast<uint8_t>(config.src0_repeat_stride),
-             static_cast<uint8_t>(config.src1_repeat_stride));
+    if ASC_IS_AIV {
+        vor(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
     }
+}
 
-    template <typename T>
-    __aicore__ inline void asc_or_impl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, uint32_t count)
-    {
-        set_mask_count();
-        set_vector_mask(static_cast<uint64_t>(0), static_cast<uint64_t>(count));
-        asc_or_impl<T>(dst, src0, src1, CAPI_DEFAULT_BINARY_CFG);
-        set_mask_norm();
+__aicore__ inline void asc_or_count_impl_int16_t(__ubuf__ int16_t *dst, __ubuf__ int16_t *src0, __ubuf__ int16_t *src1, uint32_t count)
+{
+    asc_set_mask_count_begin(count);
+    asc_or_impl_int16_t(dst, src0, src1, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
+        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
+}
+
+__aicore__ inline void asc_or_sync_impl_int16_t(__ubuf__ int16_t *dst, __ubuf__ int16_t *src0, __ubuf__ int16_t *src1, uint32_t count)
+{
+    asc_or_count_impl_int16_t(dst, src0, src1, count);
+    asc_sync_post_process();
+}
+
+__aicore__ inline void asc_or_impl_uint16_t(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0, __ubuf__ uint16_t *src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vor(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
     }
+}
 
-    template <typename T>
-    __aicore__ inline void asc_or_sync_impl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, uint32_t count)
-    {
-        asc_or_impl<T>(dst, src0, src1, count);
-        pipe_barrier(pipe_t::PIPE_ALL);
-    }
+__aicore__ inline void asc_or_count_impl_uint16_t(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0, __ubuf__ uint16_t *src1, uint32_t count)
+{
+    asc_set_mask_count_begin(count);
+    asc_or_impl_uint16_t(dst, src0, src1, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
+        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
+}
 
+__aicore__ inline void asc_or_sync_impl_uint16_t(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0, __ubuf__ uint16_t *src1, uint32_t count)
+{
+    asc_or_count_impl_uint16_t(dst, src0, src1, count);
+    asc_sync_post_process();
 }
 
 #endif

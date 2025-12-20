@@ -41,6 +41,14 @@ constexpr uint32_t C_API_MIX_TYPE = 3;
     #define ASC_IS_NOT_AIC constexpr(g_c_api_core_type != C_API_AIC_TYPE)
 #endif
 
+union asc_sparse_addr_config {
+    uint64_t config;
+    struct {
+        uint64_t src : 32;
+        uint64_t index : 32;
+    };
+};
+
 __aicore__ inline void asc_set_mask_count_begin(uint32_t count)
 {
     if ASC_IS_AIV {

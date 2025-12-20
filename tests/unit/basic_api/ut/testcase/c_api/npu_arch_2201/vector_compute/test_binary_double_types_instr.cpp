@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 #define TEST_VECTOR_COMPUTE_BINARY_DOUBLE_TYPES_INSTR(class_name, c_api_name, cce_name, dst_type, src_type)          \
                                                                                                \
@@ -65,14 +64,13 @@ TEST_F(TestVectorCompute##class_name##dst_type##_##src_type, c_api_name##_half_h
     __ubuf__ src_type *src0 = reinterpret_cast<__ubuf__ src_type *>(22);                      \
     __ubuf__ src_type *src1 = reinterpret_cast<__ubuf__ src_type *>(33);                      \
                                                                                                 \
-    asc_binary_config config;                                                                   \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src0_block_stride = static_cast<uint64_t>(1);                                        \
-    config.src1_block_stride = static_cast<uint64_t>(1);                                        \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src0_repeat_stride = static_cast<uint64_t>(8);                                       \
-    config.src1_repeat_stride = static_cast<uint64_t>(8);                                       \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint8_t dst_block_stride = 1;                                                               \
+    uint8_t src0_block_stride = 1;                                                              \
+    uint8_t src1_block_stride = 1;                                                              \
+    uint8_t dst_repeat_stride = 8;                                                              \
+    uint8_t src0_repeat_stride = 8;                                                             \
+    uint8_t src1_repeat_stride = 8;                                                             \
+    uint8_t repeat = 1;                                                                         \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ dst_type *,__ubuf__ src_type *,                        \
                 __ubuf__ src_type *, uint8_t, uint8_t, uint8_t, uint8_t,                       \
@@ -80,7 +78,8 @@ TEST_F(TestVectorCompute##class_name##dst_type##_##src_type, c_api_name##_half_h
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_type##_##src_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_Stub));   \
                                                                                                 \
-    c_api_name(dst, src0, src1, config);                                                        \
+    c_api_name(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, \
+                dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);                     \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \

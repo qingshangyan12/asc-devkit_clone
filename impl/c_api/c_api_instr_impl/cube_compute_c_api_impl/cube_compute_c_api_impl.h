@@ -19,7 +19,7 @@
 
 __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config)
 {
-    CApiInternal::asc_set_l0c_copy_prequant_impl(config);
+    asc_set_l0c_copy_prequant_impl(config);
 }
 
 __aicore__ inline void asc_set_hf32_trans_mode(bool hf32_transmode)

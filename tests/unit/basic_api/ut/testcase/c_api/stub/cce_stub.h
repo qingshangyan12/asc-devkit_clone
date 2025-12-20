@@ -583,7 +583,12 @@ float abs(float in);
 } // namespace cce
 } // namespace bisheng
 
-inline uint32_t g_c_api_core_type = 2;
+#if defined(__DAV_CUBE__)
+    inline uint32_t g_c_api_core_type = 1;
+#else
+    inline uint32_t g_c_api_core_type = 2;
+#endif
+
 
 int64_t bcnt0(uint64_t in);
 int64_t bcnt1(uint64_t in);

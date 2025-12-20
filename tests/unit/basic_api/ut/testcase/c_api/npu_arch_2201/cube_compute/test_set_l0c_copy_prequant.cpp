@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 class TestCubeComputeSetL0cCopyPrequant : public testing::Test { 
 protected:
@@ -23,16 +22,17 @@ protected:
 namespace {
 void set_quant_pre_Stub(uint64_t config)
 {
-    EXPECT_EQ(0, config);
+    uint64_t conf = 123;
+    EXPECT_EQ(conf, config);
 }
 }
 
 TEST_F(TestCubeComputeSetL0cCopyPrequant, set_l0c_copy_prequant_Succ)
 {
-    MOCKER(set_quant_pre)
+    MOCKER(set_quant_pre, void(uint64_t))
         .times(1)
         .will(invoke(set_quant_pre_Stub));
-    uint64_t config = 0;
+    uint64_t config = 123;
     
     asc_set_l0c_copy_prequant(config);
     GlobalMockObject::verify();

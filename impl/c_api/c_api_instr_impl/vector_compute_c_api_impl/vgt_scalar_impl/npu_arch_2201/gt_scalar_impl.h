@@ -17,24 +17,34 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-namespace CApiInternal
+__aicore__ inline void asc_gt_scalar_impl_half(__ubuf__ uint8_t *dst, __ubuf__ half *src, half value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-
-    template <typename T>
-    __aicore__ inline void asc_gt_scalar_impl(__ubuf__ uint8_t *dst, __ubuf__ T *src0, __ubuf__ T src1, const asc_unary_config &config)
-    {
-        vcmpvs_gt(dst, src0, src1, static_cast<uint8_t>(config.repeat),
-             static_cast<uint16_t>(config.dst_block_stride), static_cast<uint16_t>(config.src_block_stride),
-             static_cast<uint16_t>(config.dst_repeat_stride), static_cast<uint16_t>(config.src_repeat_stride));
+    if ASC_IS_AIV {
+        vcmpvs_gt(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
     }
+}
 
-    template <typename T>
-    __aicore__ inline void asc_gt_scalar_sync_impl(__ubuf__ uint8_t *dst, __ubuf__ T *src0, __ubuf__ T src1, const asc_unary_config &config)
-    {
-        asc_gt_scalar_impl<T>(dst, src0, src1, config);
-        pipe_barrier(pipe_t::PIPE_ALL);
+__aicore__ inline void asc_gt_scalar_sync_impl_half(__ubuf__ uint8_t *dst, __ubuf__ half *src, half value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    asc_gt_scalar_impl_half(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    asc_sync_post_process();
+}
+
+__aicore__ inline void asc_gt_scalar_impl_float(__ubuf__ uint8_t *dst, __ubuf__ float *src, float value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vcmpvs_gt(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
     }
+}
 
+__aicore__ inline void asc_gt_scalar_sync_impl_float(__ubuf__ uint8_t *dst, __ubuf__ float *src, float value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    asc_gt_scalar_impl_float(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    asc_sync_post_process();
 }
 
 #endif

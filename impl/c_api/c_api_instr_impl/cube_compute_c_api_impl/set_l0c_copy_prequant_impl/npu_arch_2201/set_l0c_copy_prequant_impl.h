@@ -11,13 +11,13 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_CUBE_COMPUTE_C_API_IMPL_SET_L0C_COPY_PRE_IMPL_NPU_ARCH_2201_SET_L0C_COPY_PRE_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_CUBE_COMPUTE_C_API_IMPL_SET_L0C_COPY_PRE_IMPL_NPU_ARCH_2201_SET_L0C_COPY_PRE_IMPL_H
 
-namespace CApiInternal {
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline void asc_set_l0c_copy_prequant_impl(uint64_t config)
 {
-    set_quant_pre(config);
+    if ASC_IS_AIC {
+        set_quant_pre(config);
+    }
 }
-
-} // namespace CApiInternal
 
 #endif

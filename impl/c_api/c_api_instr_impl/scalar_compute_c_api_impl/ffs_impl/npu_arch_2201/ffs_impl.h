@@ -11,13 +11,11 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_SCALAR_COMPUTE_C_API_IMPL_FFS_IMPL_NPU_ARCH_2201_FFS_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_SCALAR_COMPUTE_C_API_IMPL_FFS_IMPL_NPU_ARCH_2201_FFS_IMPL_H
 
-namespace CApiInternal {
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline int64_t asc_ffs_impl(uint64_t in)
 {
     return sff1(in);
 }
-
-} // namespace CApiInternal
 
 #endif

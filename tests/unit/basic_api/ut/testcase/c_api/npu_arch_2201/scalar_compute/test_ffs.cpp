@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 class TestScalarComputeFfs : public testing::Test { 
 protected:
@@ -30,7 +29,7 @@ int64_t sff1_Stub(uint64_t in)
 }
 }
 
-TEST_F(TestScalarComputeFfs, ffs_Succ)
+TEST_F(TestScalarComputeFfs, c_api_ffs_Succ)
 {
     MOCKER(sff1)
         .times(1)

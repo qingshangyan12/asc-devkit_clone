@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 class TestSimdAtomicSetAtomicS8 : public testing::Test { 
 protected:
@@ -24,7 +23,7 @@ namespace {
 void set_atomic_s8_Stub() {}
 }
 
-TEST_F(TestSimdAtomicSetAtomicS8, set_atomic_s8_Succ)
+TEST_F(TestSimdAtomicSetAtomicS8, c_api_set_atomic_s8_Succ)
 {
     MOCKER(set_atomic_s8)
         .times(1)
