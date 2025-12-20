@@ -12,8 +12,109 @@
 #define SIMT_COMPILER_STUB_H
 
 #include "kernel_vectorized.h"
+#include "stub_def.h"
 
 float __expf(float x);
 half2 __expf(half2 x);
+
+namespace bisheng {
+namespace cce {
+namespace simt {
+
+int32_t atomicAdd(__gm__ int32_t *address, int32_t val);
+
+uint32_t atomicAdd(__gm__ uint32_t *address, uint32_t val);
+
+float atomicAdd(__gm__ float *address, float val);
+
+int64_t atomicAdd(__gm__ int64_t *address, int64_t val);
+
+uint64_t atomicAdd(__gm__ uint64_t *address, uint64_t val);
+
+int32_t atomicSub(__gm__ int32_t *address, int32_t val);
+
+uint32_t atomicSub(__gm__ uint32_t *address, uint32_t val);
+
+float atomicSub(__gm__ float *address, float val);
+
+int64_t atomicSub(__gm__ int64_t *address, int64_t val);
+
+uint64_t atomicSub(__gm__ uint64_t *address, uint64_t val);
+
+int32_t atomicExch(__gm__ int32_t *address, int32_t val);
+
+uint32_t atomicExch(__gm__ uint32_t *address, uint32_t val);
+
+int64_t atomicExch(__gm__ int64_t *address, int64_t val);
+
+uint64_t atomicExch(__gm__ uint64_t *address, uint64_t val);
+
+float atomicExch(__gm__ float *address, float val);
+
+int32_t atomicMax(__gm__ int32_t *address, int32_t val);
+
+uint32_t atomicMax(__gm__ uint32_t *address, uint32_t val);
+
+float atomicMax(__gm__ float *address, float val);
+
+int64_t atomicMax(__gm__ int64_t *address, int64_t val);
+
+uint64_t atomicMax(__gm__ uint64_t *address, uint64_t val);
+
+int32_t atomicMin(__gm__ int32_t *address, int32_t val);
+
+uint32_t atomicMin(__gm__ uint32_t *address, uint32_t val);
+
+float atomicMin(__gm__ float *address, float val);
+
+int64_t atomicMin(__gm__ int64_t *address, int64_t val);
+
+uint64_t atomicMin(__gm__ uint64_t *address, uint64_t val);
+
+uint32_t atomicInc(__gm__ uint32_t *address, uint32_t val);
+
+uint64_t atomicInc(__gm__ uint64_t *address, uint64_t val);
+
+uint32_t atomicDec(__gm__ uint32_t *address, uint32_t val);
+
+uint64_t atomicDec(__gm__ uint64_t *address, uint64_t val);
+
+int32_t atomicCAS(__gm__ int32_t *address, int32_t compare, int32_t val);
+
+uint32_t atomicCAS(__gm__ uint32_t *address, uint32_t compare, uint32_t val);
+
+int64_t atomicCAS(__gm__ int64_t *address, int64_t compare, int64_t val);
+
+uint64_t atomicCAS(__gm__ uint64_t *address, uint64_t compare, uint64_t val);
+
+float atomicCAS(__gm__ float *address, float compare, float val);
+
+int32_t atomicAnd(__gm__ int32_t *address, int32_t val);
+
+uint32_t atomicAnd(__gm__ uint32_t *address, uint32_t val);
+
+int64_t atomicAnd(__gm__ int64_t *address, int64_t val);
+
+uint64_t atomicAnd(__gm__ uint64_t *address, uint64_t val);
+
+int32_t atomicOr(__gm__ int32_t *address, int32_t val);
+
+uint32_t atomicOr(__gm__ uint32_t *address, uint32_t val);
+
+int64_t atomicOr(__gm__ int64_t *address, int64_t val);
+
+uint64_t atomicOr(__gm__ uint64_t *address, uint64_t val);
+
+int32_t atomicXOr(__gm__ int32_t *address, int32_t val);
+
+uint32_t atomicXOr(__gm__ uint32_t *address, uint32_t val);
+
+int64_t atomicXOr(__gm__ int64_t *address, int64_t val);
+
+uint64_t atomicXOr(__gm__ uint64_t *address, uint64_t val);
+
+}
+}
+}
 
 #endif
