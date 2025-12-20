@@ -9,17 +9,17 @@
 */
 
 /* !
- * \file matmul_server_mix.h
+ * \file matmul_client_impl_aicore.h
  * \brief
  */
-#ifndef IMPL_MATMUL_KFC_MATMUL_SERVER_MIX_H
-#define IMPL_MATMUL_KFC_MATMUL_SERVER_MIX_H
+#ifndef IMPL_MATMUL_KFC_MATMUL_CLIENT_IMPL_AICORE_H
+#define IMPL_MATMUL_KFC_MATMUL_CLIENT_IMPL_AICORE_H
 
 namespace AscendC {
 
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, const auto& MM_CFG = CFG_NORM,
 class MM_CB = AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
-class MatmulServiceMixBase {
+class MatmulClientBase {
     using SrcT = typename A_TYPE::T;
     using SrcAT = typename A_TYPE::T;
     using SrcBT = typename B_TYPE::T;
@@ -28,7 +28,7 @@ class MatmulServiceMixBase {
     template <class... Args> friend struct AscendC::GetCubeObjConfig;
 
 public:
-    __aicore__ inline MatmulServiceMixBase() {}
+    __aicore__ inline MatmulClientBase() {}
     MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY> mul;
 
     template <bool sync = true, bool waitIterateBatch = false>
@@ -39,7 +39,16 @@ public:
         mul.SetBatchNum(batchA, batchB);
         mul.IterateBatch(gm, enPartialSum, enAtomic, enSequentialWrite, matrixStrideA, matrixStrideB, matrixStrideC);
         mul.End();
-        // todo: 插入同步时序，等待cube算完，再继续往下走，当前case不涉及，依据具体场景而定
+    }
+
+    template <bool sync = true, bool waitIterateBatch = false>
+    __aicore__ inline void IterateBatch(const LocalTensor<DstT>& ubCmatrix, uint32_t batchA, uint32_t batchB,
+        bool enSequentialWrite, const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0,
+        const uint32_t matrixStrideC = 0, const bool enPartialSum = false, const uint8_t enAtomic = 0)
+    {
+        mul.SetBatchNum(batchA, batchB);
+        mul.IterateBatch(ubCmatrix, enPartialSum, enAtomic, enSequentialWrite, matrixStrideA, matrixStrideB, matrixStrideC);
+        mul.End();
     }
 
     __aicore__ inline void SetTensorA(const GlobalTensor<SrcAT>& gm, bool isTransposeA = false)
@@ -266,13 +275,27 @@ public:
     }
 };
 
-// Matmul Policy with CallBack parameter
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
     MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
-class MatmulServiceMix
-: public MatmulServiceMixBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY> {
+class MatmulClient
+: public MatmulClientBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY> {
 public:
-    __aicore__ inline MatmulServiceMix() {}
+    __aicore__ inline MatmulClient() {}
+
+private:
+    template <class A_TYPE_, class B_TYPE_, class C_TYPE_, class BIAS_TYPE_, const auto &MM_CFG_, class MM_CB_,
+        MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY_)>
+    friend __aicore__ inline void SetTPipe(
+        MatmulClient<A_TYPE_, B_TYPE_, C_TYPE_, BIAS_TYPE_, MM_CFG_, MM_CB_, MATMUL_POLICY_> &mm, TPipe* tpipe);
 };
+
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG, class MM_CB,
+    MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
+__aicore__ inline void SetTPipe(MatmulClient<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY> &mm,
+    TPipe* tpipe)
+{
+    SetTPipe(mm.mul, tpipe);
+}
+
 } // namespace AscendC
-#endif // __MATMUL_SERVER_H
+#endif

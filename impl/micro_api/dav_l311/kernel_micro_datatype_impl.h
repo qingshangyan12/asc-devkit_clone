@@ -58,10 +58,6 @@ template <> struct TypeGet<bool> {
 template <> struct TypeGet<int4x2_t> {
     using T = vector_s4x2;
 };
-
-template <> struct TypeGet<bfloat16_t> {
-    using T = vector_bf16;
-};
 } // namespace MicroAPI
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_DATATYPE_IMPL_H

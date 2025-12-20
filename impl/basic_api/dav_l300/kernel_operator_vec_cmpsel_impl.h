@@ -2017,7 +2017,10 @@ __aicore__ inline void VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* sr
 template <typename T>
 __aicore__ inline void GetCmpMaskImpl(__ubuf__ T* dst)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "GetCmpMask is not supported!"); });
+    pipe_barrier(PIPE_ALL);
+    ((__ubuf__ uint64_t *)dst)[0] = Internal::g_cmpMaskLow;
+    ((__ubuf__ uint64_t *)dst)[1] = Internal::g_cmpMaskHigh;
+    pipe_barrier(PIPE_ALL);
 }
 
 template <typename T>

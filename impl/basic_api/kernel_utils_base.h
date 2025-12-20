@@ -452,7 +452,7 @@ public:
         uint64_t gmLen = GetGMLen(srcEleSize, intriParams);
         CheckGmMemOverflow(gmAddr, isSrc, gmLen);
     }
-#if (__NPU_ARCH__ != 3003)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
     template <typename T, uint8_t dim>
     __aicore__ static inline void CheckGmMemOverflowNddma(__gm__ T* gmAddr, const MultiCopyLoopInfo<dim>& params)
     {

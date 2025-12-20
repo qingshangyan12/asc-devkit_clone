@@ -19,7 +19,7 @@
 namespace AscendC {
 namespace MicroAPI {
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void AbsImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void AbsImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -31,7 +31,7 @@ __aicore__ inline void AbsImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <typename T, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void ReluImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void ReluImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -43,7 +43,7 @@ __aicore__ inline void ReluImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void ExpImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void ExpImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -54,7 +54,7 @@ __aicore__ inline void ExpImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void SqrtImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void SqrtImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -65,7 +65,7 @@ __aicore__ inline void SqrtImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void RsqrtImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void RsqrtImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -76,7 +76,7 @@ __aicore__ inline void RsqrtImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void RecImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void RecImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -87,7 +87,7 @@ __aicore__ inline void RecImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void LogImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void LogImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -98,7 +98,7 @@ __aicore__ inline void LogImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <MaskMergeMode mode = MaskMergeMode::ZEROING>
-__aicore__ inline void LogXImpl(RegTensor<half> &dstReg, RegTensor<half> &srcReg,
+__simd_callee__ inline void LogXImpl(RegTensor<half> &dstReg, RegTensor<half> &srcReg,
     MaskReg &mask, const float lnXReciprocal)
 {
     vector_f16 f16RegLow;
@@ -141,7 +141,7 @@ __aicore__ inline void LogXImpl(RegTensor<half> &dstReg, RegTensor<half> &srcReg
 
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void Log2Impl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void Log2Impl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -158,7 +158,7 @@ __aicore__ inline void Log2Impl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void Log10Impl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void Log10Impl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -175,7 +175,7 @@ __aicore__ inline void Log10Impl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void NegImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void NegImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -187,7 +187,7 @@ __aicore__ inline void NegImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void NotImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void NotImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -200,7 +200,7 @@ __aicore__ inline void NotImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 
 template <typename T = DefaultType, typename SrcT = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
     typename RegT, typename RegSrcT>
-__aicore__ inline void CountBitImpl(RegT &dstReg, RegSrcT &srcReg, MaskReg &mask)
+__simd_callee__ inline void CountBitImpl(RegT &dstReg, RegSrcT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
@@ -215,7 +215,7 @@ __aicore__ inline void CountBitImpl(RegT &dstReg, RegSrcT &srcReg, MaskReg &mask
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
-__aicore__ inline void CountLeadingSignBitsImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
+__simd_callee__ inline void CountLeadingSignBitsImpl(RegT &dstReg, RegT &srcReg, MaskReg &mask)
 {
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");

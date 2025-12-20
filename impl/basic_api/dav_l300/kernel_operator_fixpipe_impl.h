@@ -366,61 +366,17 @@ __aicore__ inline void CopyDeqTensorToFbuf(const FixpipeInfoParams<SrcT>& fixpip
     uint64_t frontAddrU64 = (nIterIndex & 0x1) * 1024;
     uint64_t frontAddrU32 = (nIterIndex & 0x1) * 512;
 
-    if (GetBit(fixpipeInfo.quantCfg, QUANTPRE_SCALE_VECTOR_CFGBIT)) {
-        uint16_t deqDataSize = DivCeil(calNSize * sizeof(uint64_t), 128) * 128;  // 搬移对齐到128，数据类型写死u64
-        __fbuf__ uint64_t* deqTensorTempBuf =
-            AscendCUtils::GetTemporaryFbBufferAddr<uint64_t>(frontAddrU64, deqDataSize / sizeof(uint64_t));
-        uint32_t deqValueOffset = nIterIndex * fixpipeInfo.tiling.nSize;
-        // L1 -> FB
-        uint16_t fbufBurstLen = deqDataSize / 128;  // burst length，单位128B
-        copy_cbuf_to_fbuf(deqTensorTempBuf, fixpipeInfo.cbufWorkspace + deqValueOffset, 1, fbufBurstLen, 0, 0);
-        AscendCUtils::FreeTemporaryFbBuffer<uint64_t>(deqTensorTempBuf);
-        fpcAddr = fpcAddr | (((uint64_t)deqTensorTempBuf & 0xFFFF) >> (uint64_t)7) << 8; // 右移7位，地址也in unit of 128B
-        cbufOffset += fixpipeInfo.totalN * sizeof(uint64_t) / 8;
-    }
-
-    if (GetBit(fixpipeInfo.quantCfg, QUANTPOST_SCALE_VECTOR_CFGBIT)) {
-        uint16_t deqDataSize = DivCeil(calNSize * sizeof(uint64_t), 128) * 128;  // 搬移对齐到128，数据类型写死u64
-        __fbuf__ uint64_t* deqTensorTempBuf =
-            AscendCUtils::GetTemporaryFbBufferAddr<uint64_t>(frontAddrU64 + (QuantPostAddr << 16), deqDataSize / sizeof(uint64_t));
-        uint32_t deqValueOffset = nIterIndex * fixpipeInfo.tiling.nSize;
-        // L1 -> FB
-        uint16_t fbufBurstLen = deqDataSize / 128;  // burst length，单位128B
-        copy_cbuf_to_fbuf(deqTensorTempBuf, fixpipeInfo.cbufWorkspace + cbufOffset + deqValueOffset, 1, fbufBurstLen, 0, 0);
-        AscendCUtils::FreeTemporaryFbBuffer<uint64_t>(deqTensorTempBuf);
-        fpcAddr = fpcAddr | (((uint64_t)deqTensorTempBuf & 0xFFFF) >> (uint64_t)7) << 24; // 右移7位，地址也in unit of 128B
-        cbufOffset += fixpipeInfo.totalN * sizeof(uint64_t) / 8;
-    }
-
-    if (GetBit(fixpipeInfo.quantCfg, PRERELU_SCALE_VECTOR_CFGBIT)) {
-        uint16_t reluDataSize = DivCeil(calNSize * sizeof(uint32_t), 64) * 64;  // 搬移对齐到64，数据类型写死u32
-        __fbuf__ uint64_t* deqTensorTempBuf =
-            AscendCUtils::GetTemporaryFbBufferAddr<uint64_t>(frontAddrU32 + (ReluPreAddr << 16), reluDataSize / sizeof(uint32_t));
-        uint32_t deqValueOffset = nIterIndex * fixpipeInfo.tiling.nSize;
-        // L1 -> FB
-        uint16_t fbufBurstLen = reluDataSize / 128;  // burst length，单位128B
-        copy_cbuf_to_fbuf(deqTensorTempBuf, fixpipeInfo.cbufWorkspace + cbufOffset + deqValueOffset, 1, fbufBurstLen, 0, 0);
-        AscendCUtils::FreeTemporaryFbBuffer<uint64_t>(deqTensorTempBuf);
-        fpcAddr = fpcAddr | (((uint64_t)deqTensorTempBuf & 0xFFFF) >> (uint64_t)6);  // 右移6位，地址也in unit of 64B
-        cbufOffset += fixpipeInfo.totalN * sizeof(uint32_t) / 8;
-    }
-
-    if (GetBit(fixpipeInfo.quantCfg, POSTREELU_SCALE_VECTOR_CFGBIT)) {
-        uint16_t reluDataSize = DivCeil(calNSize * sizeof(uint32_t), 64) * 64;  // 搬移对齐到64，数据类型写死u32
-        __fbuf__ uint64_t* deqTensorTempBuf =
-            AscendCUtils::GetTemporaryFbBufferAddr<uint64_t>(frontAddrU32 + (ReluPostAddr << 16), reluDataSize / sizeof(uint32_t));
-        uint32_t deqValueOffset = nIterIndex * fixpipeInfo.tiling.nSize;
-        // L1 -> FB
-        uint16_t fbufBurstLen = reluDataSize / 128;  // burst length，单位128B
-        copy_cbuf_to_fbuf(deqTensorTempBuf, fixpipeInfo.cbufWorkspace + cbufOffset + deqValueOffset, 1, fbufBurstLen, 0, 0);
-        AscendCUtils::FreeTemporaryFbBuffer<uint64_t>(deqTensorTempBuf);
-        fpcAddr = fpcAddr | (((uint64_t)deqTensorTempBuf & 0xFFFF) >> (uint64_t)6) << 16;  // 右移6位，地址也in unit of 64B
-        cbufOffset += fixpipeInfo.totalN * sizeof(uint32_t) / 8;
-    }
-
-    if (GetBit(fixpipeInfo.quantCfg, ELTWISEANTIQ_SCALE_VECTOR_CFGBIT)) {
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Fixpipe buffer not support ANTIQ on this version!"); });
-    }
+    uint16_t deqDataSize = DivCeil(calNSize * sizeof(uint64_t), 128) * 128;  // 搬移对齐到128，数据类型写死u64
+    __fbuf__ uint64_t* deqTensorTempBuf =
+        AscendCUtils::GetTemporaryFbBufferAddr<uint64_t>(frontAddrU64, deqDataSize / sizeof(uint64_t));
+    uint32_t deqValueOffset = nIterIndex * fixpipeInfo.tiling.nSize;
+    // L1 -> FB
+    uint16_t fbufBurstLen = deqDataSize / 128;  // burst length，单位128B
+    copy_cbuf_to_fbuf(deqTensorTempBuf, fixpipeInfo.cbufWorkspace + deqValueOffset, 1, fbufBurstLen, 0, 0);
+    AscendCUtils::FreeTemporaryFbBuffer<uint64_t>(deqTensorTempBuf);
+    fpcAddr = fpcAddr | (((uint64_t)deqTensorTempBuf & 0xFFFF) >> (uint64_t)7) << 8; // 右移7位，地址也in unit of 128B
+    cbufOffset += fixpipeInfo.totalN * sizeof(uint64_t) / 8;
+    
     set_fpc(fpcAddr);
 }
 

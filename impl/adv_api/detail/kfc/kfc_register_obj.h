@@ -363,11 +363,10 @@ template <class T, class... Args> __aicore__ inline void CountMatmulObj(AscendC:
     }                                                                                                     \
     AscendC::PrintTimeStamp(static_cast<uint32_t>(AscendC::TimeStampId::TIME_STAMP_MATMUL_WAIT_EVE))
 #endif
-#elif defined(MIX_CORE_VEC_CUBE)
+#elif defined(ASCENDC_MATMUL_AICORE)
 #define REGIST_CUBE_OBJ(tpipe, workspace, ...) \
     AscendC::InitCurObj(tpipe, __VA_ARGS__);   \
     AscendC::PrintTimeStamp(static_cast<uint32_t>(AscendC::TimeStampId::TIME_STAMP_MATMUL_SERVER_OBJ))
-
 #define REGIST_CUBE_OBJ_REMOTE(tpipe, workspace, ...)
 #else
 

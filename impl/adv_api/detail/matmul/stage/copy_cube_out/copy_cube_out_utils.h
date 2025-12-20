@@ -254,11 +254,19 @@ public:
 
     __aicore__ inline constexpr void SetCastMode()
     {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+        if constexpr (IsSameType<DstT, half>::value && IsSameType<SrcT, float>::value) {
+            params_.quantParams.preQuantMode = QuantMode_t::F322F16;
+        } else if constexpr (IsSameType<DstT, bfloat16_t>::value && IsSameType<SrcT, float>::value) {
+            params_.quantParams.preQuantMode = QuantMode_t::F322BF16;
+        }
+#else
         if constexpr (IsSameType<DstT, half>::value && IsSameType<SrcT, float>::value) {
             params_.quantPre = QuantMode_t::F322F16;
         } else if constexpr (IsSameType<DstT, bfloat16_t>::value && IsSameType<SrcT, float>::value) {
             params_.quantPre = QuantMode_t::F322BF16;
         }
+#endif
     }
 
 public:

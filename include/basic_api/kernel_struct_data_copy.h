@@ -31,54 +31,7 @@ enum class DataFormat : uint8_t {
 };
 #endif // ASCC_ENUM_DATAFORMAT
 
-#if defined (__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
-struct DataCopyParamsL311 {
-    __aicore__ DataCopyParamsL311() {}
-
-    __aicore__ DataCopyParamsL311(const uint16_t count, const uint16_t len, const uint16_t srcStrideIn,
-        const uint16_t dstStrideIn, const uint16_t sidIn = 0)
-        : blockCount(count),
-          blockLen(len),
-          srcStride(srcStrideIn),
-          dstStride(dstStrideIn),
-          sid(sidIn)
-    {}
-    __aicore__ inline void SetBlockCount(const uint16_t blockCount_)
-    {
-        blockCount = blockCount_;
-    }
-
-    __aicore__ inline void SetBlockLen(const uint16_t blockLen_)
-    {
-        blockLen = blockLen_;
-    }
-
-    __aicore__ inline void SetSrcStride(const uint16_t srcStride_)
-    {
-        srcStride = srcStride_;
-    }
-
-    __aicore__ inline void SetDstStride(const uint16_t dstStride_)
-    {
-        dstStride = dstStride_;
-    }
-
-    __aicore__ inline void SetSid(const uint16_t sid_)
-    {
-        sid = sid_;
-    }
-
-    uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
-    uint16_t blockLen = 0;
-    uint16_t srcStride = DEFAULT_DATA_COPY_STRIDE;
-    uint16_t dstStride = DEFAULT_DATA_COPY_STRIDE;
-    uint16_t sid = 0;
-};
-#endif
-
-#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
-using DataCopyParams = DataCopyParamsL311;
-#elif defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103))
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103))
 struct DataCopyParams {
     __aicore__ DataCopyParams() {}
 

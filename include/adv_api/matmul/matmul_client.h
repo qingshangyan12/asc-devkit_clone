@@ -35,7 +35,7 @@ constexpr uint16_t NUM_SIXTEEN = 16;
 constexpr uint16_t NUM_THIRTYTWO = 32;
 constexpr uint16_t NUM_FORTYEIGHT = 48;
 
-
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 /**
  * @class MatmulClientBase
  *
@@ -2969,5 +2969,9 @@ class MatmulClient
 public:
     __aicore__ inline MatmulClient() {}
 };
+#else
+// Kirin MatmulClient
+#include "../../../impl/adv_api/detail/matmul/kfc/matmul_client_impl_aicore.h"
+#endif
 } // namespace matmul
 #endif
