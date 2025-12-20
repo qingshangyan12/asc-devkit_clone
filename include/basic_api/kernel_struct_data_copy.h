@@ -127,11 +127,18 @@ struct MultiCopyLoopInfo  {
     uint8_t loopRpSize[dim] = {0}; // Right padding size per loop.
 };
 
+template<uint8_t dim>
+using NdDmaLoopInfo = MultiCopyLoopInfo<dim>;
+
 template <typename T, uint8_t dim>
 struct MultiCopyParams  {
     MultiCopyLoopInfo<dim> loopInfo;
     T constantValue;
 };
+
+template <typename T, uint8_t dim>  
+using NdDmaParams = MultiCopyParams<T, dim>;
+
 #endif
 
 struct DataCopyEnhancedParams {
