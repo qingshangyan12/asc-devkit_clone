@@ -9,7 +9,7 @@
 */
 
 /* !
- * \file atan_c310_impl.h
+ * \file atan_l300_impl.h
  * \brief
  */
 #ifndef IMPL_MATH_ATAN_ATAN_L300_IMPL_H
