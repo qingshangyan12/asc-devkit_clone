@@ -10,11 +10,11 @@
 
 
 /* !
- * \file dropout_c310_impl.h
+ * \file dropout_l300_impl.h
  * \brief
  */
-#ifndef LIB_DROPOUT_DROPOUT_C310_IMPL_H
-#define LIB_DROPOUT_DROPOUT_C310_IMPL_H
+#ifndef LIB_DROPOUT_DROPOUT_L300_IMPL_H
+#define LIB_DROPOUT_DROPOUT_L300_IMPL_H
 
 #include "kernel_tensor.h"
 #include "kernel_operator_intf.h"
