@@ -107,7 +107,6 @@ __aicore__ inline void Erf(const LocalTensor<T> &dstTensor, const LocalTensor<T>
 {
     Erf<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());
 }
-
 #pragma end_pipe
 }  // namespace AscendC
 #endif
