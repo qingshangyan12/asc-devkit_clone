@@ -37,7 +37,7 @@ __aicore__ inline void asc_data_cache_preload(uint64_t* address, int64_t offset)
 
 __aicore__ inline int64_t asc_get_icache_preload_status()
 {
-    return CApiInternal::asc_get_icache_preload_status_impl();
+    return asc_get_icache_preload_status_impl();
 }
 
 #endif

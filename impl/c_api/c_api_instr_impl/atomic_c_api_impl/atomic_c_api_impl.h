@@ -30,7 +30,7 @@ __aicore__ inline void asc_set_atomic_min()
 
 __aicore__ inline void asc_set_atomic_s8()
 {
-    CApiInternal::asc_set_atomic_s8_impl();
+    asc_set_atomic_s8_impl();
 }
 
 __aicore__ inline void asc_set_atomic_s32()

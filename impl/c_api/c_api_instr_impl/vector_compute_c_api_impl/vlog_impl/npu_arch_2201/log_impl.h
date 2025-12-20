@@ -17,33 +17,47 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-namespace CApiInternal
+__aicore__ inline void asc_log_impl_half(__ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
 {
-
-    template <typename T>
-    __aicore__ inline void asc_log_impl(__ubuf__ T *dst, __ubuf__ T *src, const asc_unary_config &config)
-    {
-        vln(dst, src, static_cast<uint8_t>(config.repeat),
-             static_cast<uint16_t>(config.dst_block_stride), static_cast<uint16_t>(config.src_block_stride),
-             static_cast<uint16_t>(config.dst_repeat_stride), static_cast<uint16_t>(config.src_repeat_stride));
+    if ASC_IS_AIV {
+        vln(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
     }
+}
 
-    template <typename T>
-    __aicore__ inline void asc_log_impl(__ubuf__ T *dst, __ubuf__ T *src, uint32_t count)
-    {
-        set_mask_count();
-        set_vector_mask(static_cast<uint64_t>(0), static_cast<uint64_t>(count));
-        asc_log_impl<T>(dst, src, CAPI_DEFAULT_UNARY_CFG);
-        set_mask_norm();
+__aicore__ inline void asc_log_count_impl_half(__ubuf__ half *dst, __ubuf__ half *src, uint32_t count)
+{
+    asc_set_mask_count_begin(count);
+    asc_log_impl_half(dst, src, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
+}
+
+__aicore__ inline void asc_log_sync_impl_half(__ubuf__ half *dst, __ubuf__ half *src, uint32_t count)
+{
+    asc_log_count_impl_half(dst, src, count);
+    asc_sync_post_process();
+}
+
+__aicore__ inline void asc_log_impl_float(__ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vln(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
     }
+}
 
-    template <typename T>
-    __aicore__ inline void asc_log_sync_impl(__ubuf__ T *dst, __ubuf__ T *src, uint32_t count)
-    {
-        asc_log_impl<T>(dst, src, count);
-        pipe_barrier(pipe_t::PIPE_ALL);
-    }
+__aicore__ inline void asc_log_count_impl_float(__ubuf__ float *dst, __ubuf__ float *src, uint32_t count)
+{
+    asc_set_mask_count_begin(count);
+    asc_log_impl_float(dst, src, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
+        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
+}
 
+__aicore__ inline void asc_log_sync_impl_float(__ubuf__ float *dst, __ubuf__ float *src, uint32_t count)
+{
+    asc_log_count_impl_float(dst, src, count);
+    asc_sync_post_process();
 }
 
 #endif

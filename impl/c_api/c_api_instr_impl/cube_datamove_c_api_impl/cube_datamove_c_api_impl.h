@@ -11,6 +11,7 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_CUBE_DATAMOVE_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_CUBE_DATAMOVE_C_API_IMPL_H
  
+#include "copy_l12l0b_sparse_impl/npu_arch_2201/copy_l12l0b_sparse_impl.h"
 #include "get_fpc_impl/asc_2201/get_fpc_impl.h"
 #include "set_fmatrix_impl/asc_2201/set_fmatrix_impl.h"
 #include "set_fmatrix_b_impl/asc_2201/set_fmatrix_b_impl.h"
@@ -27,6 +28,16 @@
 #include "fill_value_c_api_impl/fill_l0a_value_impl/npu_arch_2201/asc_fill_l0a_value_impl.h"
 #include "fill_value_c_api_impl/fill_l0b_value_impl/npu_arch_2201/asc_fill_l0b_value_impl.h"
 #include "fill_value_c_api_impl/fill_l1_value_impl/npu_arch_2201/asc_fill_l1_value_impl.h"
+
+__aicore__ inline void asc_copy_l12l0b_sparse(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)
+{
+    asc_copy_l12l0b_sparse_impl(dst, src, index, start_index, repeat);
+}
+
+__aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)
+{
+    asc_copy_l12l0b_sparse_sync_impl(dst, src, index, start_index, repeat);
+}
 
 __aicore__ inline void asc_set_mm_layout_transform(bool mmLayoutMode)
 {

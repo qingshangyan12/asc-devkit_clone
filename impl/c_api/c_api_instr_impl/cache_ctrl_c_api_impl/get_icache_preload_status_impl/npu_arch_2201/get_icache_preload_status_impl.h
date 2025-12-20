@@ -11,13 +11,11 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_CACHE_CTRL_C_API_IMPL_GET_ICACHE_PRL_ST_IMPL_NPU_ARCH_2201_GET_ICACHE_PRL_ST_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_CACHE_CTRL_C_API_IMPL_GET_ICACHE_PRL_ST_IMPL_NPU_ARCH_2201_GET_ICACHE_PRL_ST_IMPL_H
 
-namespace CApiInternal {
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline int64_t asc_get_icache_preload_status_impl()
 {
     return get_icache_prl_st();
 }
-
-} // namespace CApiInternal
 
 #endif
