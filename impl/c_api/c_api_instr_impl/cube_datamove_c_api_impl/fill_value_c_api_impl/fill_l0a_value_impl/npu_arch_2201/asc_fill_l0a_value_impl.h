@@ -20,177 +20,177 @@
 // asc_fill_l0a_value half
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ half* dst, half value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ half* dst, half value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ half* dst, uint32_t value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ half* dst, uint32_t value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 // asc_fill_l0a_value float
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ float* dst, half value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ float* dst, half value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ float* dst, uint32_t value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ float* dst, uint32_t value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 // asc_fill_l0a_value int16_t
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ int16_t* dst, half value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ int16_t* dst, half value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ int16_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ int16_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 // asc_fill_l0a_value int32_t
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ int32_t* dst, half value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ int32_t* dst, half value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ int32_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ int32_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 // asc_fill_l0a_value uint16_t
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ uint16_t* dst, half value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ uint16_t* dst, half value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 // asc_fill_l0a_value uint32_t
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ uint32_t* dst, half value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ uint32_t* dst, half value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 // asc_fill_l0a_value bfloat16_t
 __aicore__ inline void asc_fill_l0a_value_impl(__ca__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    create_ca_matrix_bf16(dst, config.config, value);
-#endif
+    if ASC_IS_AIC {
+        create_ca_matrix_bf16(dst, config.config, value);
+    }
 }
 
 __aicore__ inline void asc_fill_l0a_value_sync_impl(__ca__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config)
 {
     asc_fill_l0a_value_impl(dst, value, config);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 #endif

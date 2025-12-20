@@ -22,19 +22,19 @@ __aicore__ inline void asc_load_image_to_cbuf_impl(__cbuf__ half* dst, uint16_t 
     uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    load_image_to_cbuf(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size, bot_pad_size,
-                       left_pad_size, right_pad_size, sid);
-#endif
+    if ASC_IS_AIC {
+        load_image_to_cbuf(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size,
+            bot_pad_size, left_pad_size, right_pad_size, sid);
+    }
 }
 
 __aicore__ inline void asc_load_image_to_cbuf_sync_impl(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size,
     uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid)
 {
-    asc_load_image_to_cbuf_impl(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size, bot_pad_size,
-                                left_pad_size, right_pad_size, sid);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_load_image_to_cbuf_impl(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size,
+        bot_pad_size, left_pad_size, right_pad_size, sid);
+    asc_sync_post_process();
 }
 
 // asc_load_image_to_cbuf int8_t
@@ -42,19 +42,19 @@ __aicore__ inline void asc_load_image_to_cbuf_impl(__cbuf__ int8_t* dst, uint16_
     uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIC_TYPE))
-    load_image_to_cbuf(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size, bot_pad_size,
-                       left_pad_size, right_pad_size, sid);
-#endif
+    if ASC_IS_AIC {
+        load_image_to_cbuf(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size,
+            bot_pad_size, left_pad_size, right_pad_size, sid);
+    }
 }
 
 __aicore__ inline void asc_load_image_to_cbuf_sync_impl(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size,
     uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid)
 {
-    asc_load_image_to_cbuf_impl(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size, bot_pad_size,
-                                left_pad_size, right_pad_size, sid);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_load_image_to_cbuf_impl(dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_res, top_pad_size,
+        bot_pad_size, left_pad_size, right_pad_size, sid);
+    asc_sync_post_process();
 }
  
 #endif

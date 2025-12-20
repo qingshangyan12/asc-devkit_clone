@@ -12,58 +12,101 @@
  * \file asc_shift_right_impl.h
  * \brief
  */
-#ifndef IMPL_INSTR_VECTOR_COMPUTE_VSHR_ASC_2201_SHIFT_RIGHT_IMPL_H
-#define IMPL_INSTR_VECTOR_COMPUTE_VSHR_ASC_2201_SHIFT_RIGHT_IMPL_H
+#ifndef IMPL_INSTR_VECTOR_COMPUTE_VSHR_NPU_ARCH_2201_SHIFT_RIGHT_IMPL_H
+#define IMPL_INSTR_VECTOR_COMPUTE_VSHR_NPU_ARCH_2201_SHIFT_RIGHT_IMPL_H
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-namespace CApiInternal {
-
-template <typename T>
-__aicore__ inline void asc_shift_right_impl(__ubuf__ T* dst, __ubuf__ T* src, T value, const asc_unary_config& config,
-    bool round)
+// asc_shift_right int16_t
+__aicore__ inline void asc_shift_right_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    if (round) {
-        if constexpr (std::is_same<T, int16_t>::value || std::is_same<T, int32_t>::value) {
-            vshr(dst, src, static_cast<int32_t>(value), static_cast<uint8_t>(config.repeat), static_cast<uint16_t>(
-                config.dst_block_stride), static_cast<uint16_t>(config.src_block_stride), static_cast<uint16_t>(
-                config.dst_repeat_stride), static_cast<uint16_t>(config.src_repeat_stride), true);
-        } else {
-            vshr(dst, src, static_cast<uint32_t>(value), static_cast<uint8_t>(config.repeat), static_cast<uint16_t>(
-                config.dst_block_stride), static_cast<uint16_t>(config.src_block_stride), static_cast<uint16_t>(
-                config.dst_repeat_stride), static_cast<uint16_t>(config.src_repeat_stride), true);
-        }
-    } else {
-        if constexpr (std::is_same<T, int16_t>::value || std::is_same<T, int32_t>::value) {
-            vshr(dst, src, static_cast<int32_t>(value), static_cast<uint8_t>(config.repeat), static_cast<uint16_t>(
-                config.dst_block_stride), static_cast<uint16_t>(config.src_block_stride), static_cast<uint16_t>(
-                config.dst_repeat_stride), static_cast<uint16_t>(config.src_repeat_stride), false);
-        } else {
-            vshr(dst, src, static_cast<uint32_t>(value), static_cast<uint8_t>(config.repeat), static_cast<uint16_t>(
-                config.dst_block_stride), static_cast<uint16_t>(config.src_block_stride), static_cast<uint16_t>(
-                config.dst_repeat_stride), static_cast<uint16_t>(config.src_repeat_stride), false);
-        }
+    if ASC_IS_AIV {
+        vshr(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride, false);
     }
-#endif
 }
 
-template <typename T>
-__aicore__ inline void asc_shift_right_impl(__ubuf__ T* dst, __ubuf__ T* src, T value, uint32_t count, bool round)
+__aicore__ inline void asc_shift_right_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
 {
-    set_mask_count();
-    set_vector_mask(static_cast<uint64_t>(0), static_cast<uint64_t>(count));
-    asc_shift_right_impl<T>(dst, src, value, CAPI_DEFAULT_UNARY_CFG, round);
-    set_mask_norm();
+    asc_set_mask_count_begin(count);
+    asc_shift_right_impl(dst, src, value, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
+        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
 }
 
-template <typename T>
-__aicore__ inline void asc_shift_right_sync_impl(__ubuf__ T* dst, __ubuf__ T* src, T value, uint32_t count, bool round)
+__aicore__ inline void asc_shift_right_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
 {
-    asc_shift_right_impl<T>(dst, src, value, count, round);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_shift_right_impl(dst, src, value, count);
+    asc_sync_post_process();
 }
 
+// asc_shift_right int32_t
+__aicore__ inline void asc_shift_right_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vshr(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride, false);
+    }
+}
+
+__aicore__ inline void asc_shift_right_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+{
+    asc_set_mask_count_begin(count);
+    asc_shift_right_impl(dst, src, value, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
+        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
+}
+
+__aicore__ inline void asc_shift_right_sync_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+{
+    asc_shift_right_impl(dst, src, value, count);
+    asc_sync_post_process();
+}
+
+// asc_shift_right uint16_t
+__aicore__ inline void asc_shift_right_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vshr(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride, false);
+    }
+}
+
+__aicore__ inline void asc_shift_right_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count)
+{
+    asc_set_mask_count_begin(count);
+    asc_shift_right_impl(dst, src, value, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
+        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
+}
+
+__aicore__ inline void asc_shift_right_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count)
+{
+    asc_shift_right_impl(dst, src, value, count);
+    asc_sync_post_process();
+}
+
+// asc_shift_right uint32_t
+__aicore__ inline void asc_shift_right_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vshr(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride, false);
+    }
+}
+
+__aicore__ inline void asc_shift_right_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count)
+{
+    asc_set_mask_count_begin(count);
+    asc_shift_right_impl(dst, src, value, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
+        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_set_mask_count_end();
+}
+
+__aicore__ inline void asc_shift_right_sync_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count)
+{
+    asc_shift_right_impl(dst, src, value, count);
+    asc_sync_post_process();
 }
 
 #endif

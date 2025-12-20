@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 #define TEST_SIMD_ATOMIC_SET_ATOMIC_TYPE_INSTR(class_name, c_api_name)                          \
                                                                                                 \
@@ -29,4 +28,4 @@ TEST_F(TestSimdAtomic##class_name, c_api_name##_Succ)                           
 }                                                                                               \
 
 // ==========asc_set_atomic_bf16==========
-TEST_SIMD_ATOMIC_SET_ATOMIC_TYPE_INSTR(SetAtomicBF16, asc_set_atomic_bf16);
+TEST_SIMD_ATOMIC_SET_ATOMIC_TYPE_INSTR(SetAtomicBF16CApi, asc_set_atomic_bf16);

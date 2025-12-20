@@ -40,12 +40,12 @@ __aicore__ inline void asc_set_atomic_s32()
 
 __aicore__ inline void asc_set_atomic_bf16()
 {
-    CApiInternal::asc_set_atomic_bf16_impl();
+    asc_set_atomic_bf16_impl();
 }
 
 __aicore__ inline int64_t asc_get_store_atomic_config()
 {
-    return CApiInternal::asc_get_store_atomic_config_impl();
+    return asc_get_store_atomic_config_impl();
 }
 
 __aicore__ inline void asc_set_atomic_s16()

@@ -21,9 +21,9 @@
 __aicore__ inline void asc_gather_impl(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
     uint16_t dst_repeat_stride, uint8_t repeat)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    vgather(dst, src, offset_addr, dst_repeat_stride, repeat);
-#endif
+    if ASC_IS_AIV {
+        vgather(dst, src, offset_addr, dst_repeat_stride, repeat);
+    }
 }
 
 __aicore__ inline void asc_gather_impl(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
@@ -38,16 +38,16 @@ __aicore__ inline void asc_gather_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uin
     uint32_t count)
 {
     asc_gather_impl(dst, src, offset_addr, count);
-    asc_sync_impl();
+    asc_sync_post_process();
 }
 
 // asc_gather uint32_t
 __aicore__ inline void asc_gather_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
     uint16_t dst_repeat_stride, uint8_t repeat)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    vgather(dst, src, offset_addr, dst_repeat_stride, repeat);
-#endif
+    if ASC_IS_AIV {
+        vgather(dst, src, offset_addr, dst_repeat_stride, repeat);
+    }
 }
 
 __aicore__ inline void asc_gather_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
@@ -62,7 +62,7 @@ __aicore__ inline void asc_gather_sync_impl(__ubuf__ uint32_t* dst, __ubuf__ uin
     uint32_t count)
 {
     asc_gather_impl(dst, src, offset_addr, count);
-    asc_sync_impl();
+    asc_sync_post_process();
 }
 
 #endif

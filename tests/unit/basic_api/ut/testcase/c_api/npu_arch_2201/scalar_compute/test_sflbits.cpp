@@ -12,9 +12,8 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
-class TestScalarComputeSflbits : public testing::Test {
+class TestScalarComputeSflbitsCApi : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -28,7 +27,7 @@ int64_t sflbits_Stub(int64_t value)
 }
 }
 
-TEST_F(TestScalarComputeSflbits, sflbits_uint64_t_Succ)
+TEST_F(TestScalarComputeSflbitsCApi, sflbits_uint64_t_Succ)
 {
     int64_t res = 0;
     int64_t value = 0;

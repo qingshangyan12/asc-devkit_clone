@@ -15,8 +15,12 @@
 
 class TestCubeDmamoveSetL13DSize : public testing::Test { 
 protected:
-    void SetUp() {}
-    void TearDown() {}
+    void SetUp() {
+        g_c_api_core_type = C_API_AIC_TYPE;
+    }
+    void TearDown() {
+        g_c_api_core_type = C_API_AIV_TYPE;
+    }
 };
 
 namespace {
