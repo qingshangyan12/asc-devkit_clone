@@ -22,10 +22,6 @@
 #include "include/adv_api/matmul/matmul.h"
 #endif
 
-#ifdef MIX_CORE_VEC_CUBE
-#include "impl/matmul/kfc/matmul_server_mix.h"
-#endif
-
 namespace AscendC {
 #define REGIST_MATMUL_OBJ_STATIC REGIST_CUBE_OBJ
 #define REGIST_MATMUL_OBJ REGIST_CUBE_OBJ
@@ -118,19 +114,6 @@ template <
     MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)
 >
 using Matmul = MatmulClient<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
-
-#elif defined(MIX_CORE_VEC_CUBE)
-// Otherwise, use MatmulServiceAux
-template<
-    class A_TYPE,
-    class B_TYPE,
-    class C_TYPE,
-    class BIAS_TYPE = C_TYPE,
-    const auto& MM_CFG = CFG_NORM,
-    class MM_CB = AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-    MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)
->
-using Matmul = MatmulServiceMix<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 
 #else
 // Default case: use MatmulImpl
