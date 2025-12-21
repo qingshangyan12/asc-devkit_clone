@@ -105,7 +105,6 @@ __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T
 {
     TanhImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 }
-#endif
 #pragma end_pipe
 }  // namespace AscendC
 #endif
