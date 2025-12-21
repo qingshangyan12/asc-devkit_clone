@@ -198,25 +198,6 @@ __aicore__ inline void DataCopyL12FBImpl(__fbuf__ T* dst, __cbuf__ T* src, const
     copy_cbuf_to_fbuf((__fbuf__ void*)dst, (__cbuf__ void*)src, burstNum, burstLen, srcGapSize, dstGapSize);
 }
 
-template <typename T>
-__aicore__ inline void DataCopyL12FBImpl(uint64_t dst, __cbuf__ T* src,
-    const DataCopyParams& intriParams, const DataCopyAttrParams& attrParams)
-{
-    // 该API属于ISASI，并且不支持多次分配内存，只能进行一次AllocTensor操作，然后搬运所有数据到FB。因此直接设置dst = 0确保数据从0开始排布
-    dst = 0;
-    dst |= static_cast<uint64_t>(attrParams.fixBufPos) << 16;
-
-    // ISA/API: Is the burst number in total.
-    uint16_t burstNum = intriParams.blockCount;
-    // ISA: unit of 64B    API: unit of 32B
-    uint16_t burstLen = DivCeil(intriParams.blockLen, 2);
-    // ISA/API: unit of 32B
-    uint16_t srcGapSize = intriParams.srcStride;
-    // ISA: unit of 64B    API: unit of 32B
-    uint16_t dstGapSize = DivCeil(intriParams.dstStride, 2);
-
-    copy_cbuf_to_fbuf((__fbuf__ void*)dst, (__cbuf__ void*)src, burstNum, burstLen, srcGapSize, dstGapSize);
-}
 
 template <typename T>
 __aicore__ inline void DataCopyL12PTImpl(const uint64_t dst, __cbuf__ T* src, const DataCopyParams& intriParams)

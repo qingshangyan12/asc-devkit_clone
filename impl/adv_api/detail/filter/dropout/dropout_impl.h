@@ -21,7 +21,7 @@
 #include "dropout_c220_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
 #include "dropout_m300_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "dropout_l300_impl.h"
 #endif
 #include "../../api_check/kernel_api_check.h"

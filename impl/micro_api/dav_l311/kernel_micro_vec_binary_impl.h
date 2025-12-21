@@ -201,7 +201,7 @@ __simd_callee__ inline void ModImpl(RegT &dstReg, RegT &srcReg0, RegT &srcReg1, 
     using ActualT = typename RegT::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportType<ActualT, uint16_t, uint32_t>(), "current data type is not supported on current device!");
-    constexpr auto modeValue = std::integral_constant<::Mode, static_cast<::Mode>(Mode::ZEROING)>();
+    constexpr auto modeValue = GetMaskMergeMode<MaskMergeMode::ZEROING>();
     vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
     vmul(dstReg, srcReg1, dstReg, mask, modeValue);
     vsub(dstReg, srcReg0, dstReg, mask, modeValue);

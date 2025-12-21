@@ -198,7 +198,7 @@ __simd_callee__ inline void PreluImpl(RegT &dstReg, RegT &srcReg0, RegT &srcReg1
 template <typename T = DefaultType, typename RegT>
 __simd_callee__ inline void ModImpl(RegT &dstReg, RegT &srcReg0, RegT &srcReg1, MaskReg &mask)
 {
-    constexpr auto modeValue = std::integral_constant<::Mode, static_cast<::Mode>(Mode::ZEROING)>();
+    constexpr auto modeValue = GetMaskMergeMode<MaskMergeMode::ZEROING>();
     vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
     vmul(dstReg, srcReg1, dstReg, mask, modeValue);
     vsub(dstReg, srcReg0, dstReg, mask, modeValue);

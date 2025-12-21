@@ -19,22 +19,16 @@ namespace AscendC {
 /* **************************************************************************************************
  * LoadData 2dv2                                             *
  * ************************************************************************************************* */
-__aicore__ inline void SetLoad2DsetMte2QTable0FlagCal(const Mte2QTableParam& qTableParam)
-{
-    set_mte2_qtable0(qTableParam.qTable);
-}
-
-__aicore__ inline void SetLoad2DsetMte2QTable1FlagCal(const Mte2QTableParam& qTableParam)
-{
-    set_mte2_qtable1(qTableParam.qTable);
-}
-
-__aicore__ inline void SetMte2SrcParaFlagCal(uint64_t kStride)
-{
-    set_mte2_src_para(kStride);
-}
 
 /****************************L1 To L0A******************************************/
+template <typename T>
+__aicore__ inline void LoadData2DL12L0ATransposeCal(__ca__ T *dst, __cbuf__ T *src,
+    const LoadData2dTransposeParams &loadDataParam)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR,
+        "LoadDataWithTranspose from A1 to A2 is not supported on current device"); });
+}
+
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParam)
 {
@@ -50,6 +44,20 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
 }
 
 /****************************L1 To L0B******************************************/
+template <typename T>
+__aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *src,
+    const LoadData2dTransposeParams &loadDataParam)
+{
+    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadDataWithTranspose with LoadData2dTransposeParams is not supported on current device");
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *src,
+    const LoadData2dTransposeParamsV2 &loadDataParam)
+{
+    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadDataWithTranspose with LoadData2dTransposeParamsV2 is not supported on current device");
+}
+
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParam)
 {
@@ -103,13 +111,13 @@ __aicore__ inline void LoadData2DGM2L0BCal(__cb__ T* dst, __gm__ T* src, const L
     }
     if constexpr (1 == sizeof(T)) {
         load_gm_to_cb_2dv2((__cb__ int8_t*)dst, (__gm__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.dstStride,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, loadDataParam.qmode);
+            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0);
     } else if constexpr (2 == sizeof(T)) {
         load_gm_to_cb_2dv2((__cb__ half*)dst, (__gm__ half*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.dstStride,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, loadDataParam.qmode);
+            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0);
     } else if constexpr (4 == sizeof(T)) {
         load_gm_to_cb_2dv2((__cb__ float*)dst, (__gm__ float*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.dstStride,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, loadDataParam.qmode);
+            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0);
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
     }
@@ -124,13 +132,13 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
     }
     if constexpr (1 == sizeof(T)) {
         load_gm_to_cbuf_2dv2((__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.dstStride,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, loadDataParam.qmode);
+            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0);
     } else if constexpr (2 == sizeof(T)) {
         load_gm_to_cbuf_2dv2((__cbuf__ half*)dst, (__gm__ half*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.dstStride,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, loadDataParam.qmode);
+            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0);
     } else if constexpr (4 == sizeof(T)) {
         load_gm_to_cbuf_2dv2((__cbuf__ float*)dst, (__gm__ float*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.dstStride,
-            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, loadDataParam.qmode);
+            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0);
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
     }
@@ -167,37 +175,6 @@ template <typename T>
 __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParam)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData 2dv1 is not supported!"); });
-}
-
-/* **************************************************************************************************
- * LoadData 2d with transpose                                             *
- * ************************************************************************************************* */
-template <typename T>
-__aicore__ inline void LoadData2DL12L0ATransposeCal(__ca__ T * dst, __cbuf__ T * src, const LoadData2dTransposeParams& loadDataParam)
-{
-    if constexpr (1 == sizeof(T)) {
-        load_cbuf_to_ca((__ca__ int8_t*)dst, (__cbuf__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.mStep,
-            loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, true);
-    } else if constexpr (2 == sizeof(T)) {
-        load_cbuf_to_ca((__ca__ int16_t*)dst, (__cbuf__ int16_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.mStep,
-            loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, true);
-    } else {
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
-    }
-}
-
-template <typename T>
-__aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T * dst, __cbuf__ T * src, const LoadData2dTransposeParams& loadDataParam)
-{
-    if constexpr (1 == sizeof(T)) {
-        load_cbuf_to_cb((__cb__ int8_t*)dst, (__cbuf__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.mStep,
-            loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, true);
-    } else if constexpr (2 == sizeof(T)) {
-        load_cbuf_to_cb((__cb__ int16_t*)dst, (__cbuf__ int16_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.mStep,
-            loadDataParam.kStep, loadDataParam.srcStride, loadDataParam.dstStride, true);
-    } else {
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
-    }
 }
 
 /* **************************************************************************************************
@@ -300,16 +277,13 @@ __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const Mmad
         "Unsupported input data type for mad instruction!");
 
     uint64_t config = 0;
+    uint64_t gemvCtrl = 1;
     config |= (((uint64_t)mmadParams.m & 0xfff) << 0);
     config |= (((uint64_t)mmadParams.k & 0xfff) << 12);
     config |= (((uint64_t)mmadParams.n & 0xfff) << 24);
     config |= (((uint64_t)mmadParams.fmOffset & 0xff) << 36);
-    config |= (((uint64_t)mmadParams.smaskBufferAddr & 0x7f) << 44);
     config |= (((uint64_t)mmadParams.unitFlag & 0x3) << 55);
-    config |= (((uint64_t)mmadParams.s16s8rightShift & 0x1) << 57);
-    config |= (((uint64_t)mmadParams.s16s8subDtype & 0x1) << 59);
-    config |= (((uint64_t)mmadParams.isWeightOffset & 0x1) << 60);
-    config |= (((uint64_t)mmadParams.gemvCtrl & 0x1) << 61);
+    config |= (((uint64_t)gemvCtrl & 0x1) << 61);
     config |= (((uint64_t)mmadParams.cmatrixSource & 0x1) << 62);
     config |= (((uint64_t)mmadParams.cmatrixInitVal & 0x1) << 63);
     mad(c, a, b, config);
@@ -323,74 +297,16 @@ __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, uint64_t b
         KERNEL_LOG(KERNEL_ERROR, "Mmad cmatrixSource param config error");
     });
     uint64_t config = 0;
+    uint64_t gemvCtrl = 1;
     config |= (((uint64_t)mmadParams.m & 0xfff) << 0);
     config |= (((uint64_t)mmadParams.k & 0xfff) << 12);
     config |= (((uint64_t)mmadParams.n & 0xfff) << 24);
     config |= (((uint64_t)mmadParams.fmOffset & 0xff) << 36);
-    config |= (((uint64_t)mmadParams.smaskBufferAddr & 0x7f) << 44);
     config |= (((uint64_t)mmadParams.unitFlag & 0x3) << 55);
-    config |= (((uint64_t)mmadParams.s16s8rightShift & 0x1) << 57);
-    config |= (((uint64_t)mmadParams.s16s8subDtype & 0x1) << 59);
-    config |= (((uint64_t)mmadParams.isWeightOffset & 0x1) << 60);
-    config |= (((uint64_t)mmadParams.gemvCtrl & 0x1) << 61);
+    config |= (((uint64_t)gemvCtrl & 0x1) << 61);
     config |= (((uint64_t)mmadParams.cmatrixSource & 0x1) << 62);
     config |= (((uint64_t)mmadParams.cmatrixInitVal & 0x1) << 63);
     mad(c, a, b, bias, config);
-}
-
-/* **************************************************************************************************
- * MmadFix                                          *
- * ************************************************************************************************* */
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadFixCal(__cbuf__ T* c, __cbuf__ U* a, __cb__ S* b,
-    const MmadFixParams& mmadFixParams)
-{
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported MmadFixCal"); });
-}
-
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadFixCal(__cbuf__ T* c, __cbuf__ U* a, __cb__ S* b, uint64_t bias,
-    const MmadFixParams& mmadFixParams)
-{
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported MmadFixCal"); });
-}
-
-/* **************************************************************************************************
- * ConvFix                                          *
- * ************************************************************************************************* */
-template <typename T, typename U, typename S>
-__aicore__ inline void ConvFixCal(__cbuf__ T* c, __cbuf__ U* a, __cb__ S* b,
-    const ConvFixParams& convFixParams)
-{
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported ConvFixCal"); });
-}
-
-template <typename T, typename U, typename S>
-__aicore__ inline void ConvFixCal(__cbuf__ T* c, __cbuf__ U* a, __cb__ S* b, uint64_t bias,
-    const ConvFixParams& convFixParams)
-{
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported ConvFixCal"); });
-}
-
-__aicore__ inline void SetMatrixParaImpl(uint64_t config)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetMatrixPara on this version");
-    });
-}
-
-__aicore__ inline void SetMatrixParaImpl(const MatrixParams &params)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetMatrixPara on this version");
-    });
-}
-
-__aicore__ inline void SetCubeStrideParaImpl(uint64_t config)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetCubeStridePara on this version");
-    });
 }
 
 /* **************************************************************************************************
@@ -431,21 +347,19 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
 }
 
 template <typename T>
-__aicore__ inline void Load3DSetPaddingCal(const LoadDataPaddingParam<T> &param)
+__aicore__ inline void Load3DSetPaddingCal(const T padValue)
 {
-    uint64_t config = 0;
-    config |= 0xFFFFFFFF & (uint64_t)param.padValue;
-    config |= (uint64_t)param.quantSch << 32;
-    set_padding(config);
-}
+    uint16_t paddingValue = 0;
+    uint16_t padValueShiftBit = 8;
 
-template <typename T>
-__aicore__ inline void Load3DSetPaddingBCal(const LoadDataPaddingParam<T> &param)
-{
-    uint64_t config = 0;
-    config |= 0xFFFFFFFF & (uint64_t)param.padValue;
-    config |= (uint64_t)param.quantSch << 32;
-    set_padding_b(config);
+    if constexpr (sizeof(T) == B16_BYTE_SIZE) {
+        paddingValue = (uint16_t)GetScalarBitcodeValue((T)padValue);
+    } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
+        paddingValue = (uint32_t)GetScalarBitcodeValue((T)padValue);
+    } else {
+        paddingValue = (((uint16_t)padValue) << padValueShiftBit) | (uint16_t)padValue;
+    }
+    set_padding(paddingValue);
 }
 
 /* **************************************************************************************************
@@ -576,18 +490,16 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T *dst, const InitConstValuePar
  * ************************************************************************************************* */
 __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam& repeatParams)
 {
-    uint64_t rptConfig = (uint64_t)repeatParams.repeatStride | ((uint64_t)repeatParams.repeatTime << 16) |
-        ((uint64_t)repeatParams.repeatMode << 24) | ((uint64_t)repeatParams.dstStride << 32) |
-        ((uint64_t)repeatParams.dstMposition << 48);
-    set_l3d_rpt(rptConfig);
-}
+    uint64_t rptConfig = 0;
+    constexpr uint32_t repeatTimeShiftBit = 16;
+    rptConfig |= uint64_t(repeatParams.repeatStride);
+    rptConfig |= uint64_t(repeatParams.repeatTime) << repeatTimeShiftBit;
+    constexpr uint32_t repeatModeShiftBit = 24;
+    rptConfig |= uint64_t(repeatParams.repeatMode) << repeatModeShiftBit;
 
-__aicore__ inline void SetLoadDataRepeatBCal(const LoadDataRepeatParam& repeatParams)
-{
-    uint64_t rptConfig = (uint64_t)repeatParams.repeatStride | ((uint64_t)repeatParams.repeatTime << 16) |
-        ((uint64_t)repeatParams.repeatMode << 24) | ((uint64_t)repeatParams.dstStride << 32) |
-        ((uint64_t)repeatParams.dstMposition << 48);
-    set_l3d_rpt_b(rptConfig);
+    constexpr uint32_t dstStrideShiftBit = 32;
+    rptConfig |= uint64_t(repeatParams.dstStride) << dstStrideShiftBit;
+    set_l3d_rpt(rptConfig);
 }
 
 /* **************************************************************************************************

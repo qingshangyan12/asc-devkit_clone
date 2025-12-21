@@ -19,11 +19,11 @@
 #include "impl/micro_api_inc/kernel_micro_vec_binary_scalar_intf.h"
 
 #if __NPU_ARCH__ == 3003
-#include "impl/micro_api/dav_l300/kernel_micro_vec_binary_impl.h"
+#include "micro_api/dav_l300/kernel_micro_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "impl/micro_api/dav_l311/kernel_micro_vec_binary_impl.h"
+#include "micro_api/dav_l311/kernel_micro_vec_binary_impl.h"
 #else
-#include "impl/micro_api/dav_l311/kernel_micro_vec_binary_impl.h"
+#include "micro_api/dav_l311/kernel_micro_vec_binary_impl.h"
 #endif
 
 namespace AscendC {
