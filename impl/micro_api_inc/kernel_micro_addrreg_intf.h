@@ -15,7 +15,7 @@
 #ifndef ASCENDC_MODULE_MICRO_ADDRREG_INTERFACE_H
 #define ASCENDC_MODULE_MICRO_ADDRREG_INTERFACE_H
 
-#include "kernel_micro_common_intf.h"
+#include "micro_api_inc/kernel_micro_common_intf.h"
 namespace AscendC {
 namespace MicroAPI {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))

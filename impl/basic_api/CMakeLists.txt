@@ -47,6 +47,12 @@ install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/basic_api
 install(DIRECTORY ${ASCENDC_IMPL_DIR}/basic_api
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
 )
+install(DIRECTORY ${ASCENDC_IMPL_DIR}/micro_api
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
+)
+install(DIRECTORY ${ASCENDC_IMPL_DIR}/micro_api_inc
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
+)
 
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api")
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl")
@@ -117,6 +123,8 @@ endif()
 install(CODE "file(CREATE_LINK ../../../asc/include/interface ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/interface SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../asc/include/kernel_operator.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/kernel_operator.h SYMBOLIC)")
 
+install(CODE "file(CREATE_LINK ../../../../asc/impl/micro_api ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/micro_api SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../../../asc/impl/micro_api_inc ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/micro_api_inc SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/common_types.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/common_types.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_c100 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_c100 SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_c220 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_c220 SYMBOLIC)")

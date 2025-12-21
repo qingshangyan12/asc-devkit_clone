@@ -15,7 +15,7 @@
 #ifndef ASCENDC_MODULE_MICRO_VEC_VCONV_INTERFACE_H
 #define ASCENDC_MODULE_MICRO_VEC_VCONV_INTERFACE_H
 
-#include "kernel_micro_common_intf.h"
+#include "micro_api_inc/kernel_micro_common_intf.h"
 namespace AscendC {
 namespace MicroAPI {
 template <typename T = DefaultType, typename U = DefaultType, const CastTrait& trait = castTrait, typename S,

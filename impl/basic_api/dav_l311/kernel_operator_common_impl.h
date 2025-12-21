@@ -16,6 +16,7 @@
 #define ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_struct_mm.h"
+#include "micro_api_inc/kernel_micro_intf.h"
 #define GetLoopBoundB8(x) (((x) - 1) / VECTOR_REG_WIDTH)
 #define GetLoopBoundB16(x) (((x) - 1) / (VECTOR_REG_WIDTH / B16_BYTE_SIZE))
 #define GetLoopBoundB32(x) (((x) - 1) / (VECTOR_REG_WIDTH / B32_BYTE_SIZE))
