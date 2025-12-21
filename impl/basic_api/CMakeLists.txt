@@ -18,6 +18,8 @@ add_dependencies(tikcfw_headers hostapi_headers)
 target_include_directories(tikcfw_headers INTERFACE
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/basic_api/>
+  $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/micro_api/>
+  $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/micro_api_inc/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/basic_api/>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
@@ -29,6 +31,8 @@ target_include_directories(tikcfw_headers INTERFACE
   $<INSTALL_INTERFACE:include/asc/include/basic_api>
   $<INSTALL_INTERFACE:include/asc/impl>
   $<INSTALL_INTERFACE:include/asc/impl/basic_api>
+  $<INSTALL_INTERFACE:include/asc/impl/micro_api>
+  $<INSTALL_INTERFACE:include/asc/impl/micro_api_incf>
 )
 
 install(FILES ${ASCENDC_INCLUDE_DIR}/kernel_operator.h
@@ -212,6 +216,10 @@ if(NOT BUILD_OPEN_PROJECT)
         PACKAGE tikcfw
         TARGETS tikcfw_headers
         DIRECTORY ${ASCENDC_DIR}/impl/basic_api
+        DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
+        DIRECTORY ${ASCENDC_DIR}/impl/micro_api
+        DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
+        DIRECTORY ${ASCENDC_DIR}/impl/micro_api_inc
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
 
         DIRECTORY ${ASCENDC_DIR}/include/basic_api
