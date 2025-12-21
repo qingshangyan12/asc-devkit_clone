@@ -62,6 +62,8 @@ enum class DPLATFORM {
   MC61AM21A,
   ASCEND_910_95,     // C310
   ASCEND_910_55,     // 310R6
+  KIRINX90,
+  KIRIN9030,
   DEFAULT_CURRENT
 };
 
@@ -612,7 +614,8 @@ class CceConfBase {
       Ascend_910_9584, Ascend_910_9585,    Ascend_910_9586, Ascend_910_9587,     Ascend_910_9588,
       Ascend_910_9571, Ascend_910_9572,    Ascend_910_9573, Ascend_910_9574,     Ascend_910_9575,
       Ascend_910_9576, Ascend_910_9577,    Ascend_910_9578, Ascend_910_95A1,     Ascend_910_95A2,
-      MC62CM12AA};
+      MC62CM12AA,      KirinX90,           Kirin9030
+  };
   enum platformconf::TIK_VERSION current_tik_version_ = platformconf::TIK_VERSION::TIK_1_0;
   const std::map<const std::string, platformconf::TIK_VERSION> kStringToTikVersion = {
       {"TIK1.0", platformconf::TIK_VERSION::TIK_1_0},

@@ -80,6 +80,8 @@ enum class ShortSocVersion : uint32_t {
     ASCEND910 = 2,
     ASCEND310B = 3,
     ASCEND910_95 = 4,
+    KIRINX90 = 5,
+    KIRIN9030 = 6,
     INVALID_TYPE = 0xffffffff
 };
 
