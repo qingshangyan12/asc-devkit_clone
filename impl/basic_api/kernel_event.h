@@ -578,7 +578,7 @@ __aicore__ constexpr HardEvent GetQueEvt(Hardware src, Hardware dst, bool fwdDir
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
         ASSERT(dst == Hardware::GM || dst == Hardware::UB || dst == Hardware::L1);
         return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
-#endif
+#else
 ASSERT(dst == Hardware::GM || dst == Hardware::UB);
         return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
 #endif

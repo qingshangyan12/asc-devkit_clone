@@ -16,11 +16,9 @@
 #define ASCENDC_KERNEL_MICRO_ADDRREG_INTERFACE_IMPL_H
 
 #if __NPU_ARCH__ == 3003
-#include "micro_api/dav_l300/kernel_micro_addrreg_impl.h"
-#elif __NPU_ARCH__ == 3113
-#include "micro_api/dav_l311/kernel_micro_addrreg_impl.h"
-#else
-#include "micro_api/dav_c310/kernel_micro_addrreg_impl.h"
+#include "impl/micro_api/dav_l300/kernel_micro_addrreg_impl.h"
+#else __NPU_ARCH__ == 3113
+#include "impl/micro_api/dav_l311/kernel_micro_addrreg_impl.h"
 #endif
 
 namespace AscendC {
