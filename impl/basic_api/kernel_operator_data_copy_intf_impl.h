@@ -167,7 +167,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
 
 #if  (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 3101))
+    (__NPU_ARCH__ == 3101)))
 /*
  * @ingroup DataCopy Level 0
  * @brief format transform(such as dn2nz) during data load from OUT to L1
@@ -418,22 +418,22 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<U> 
 #endif
                 DataCopyL12BTImpl((uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimSrcType*)src.GetPhyAddr(),
                     static_cast<uint16_t>(0), repeatParams);
-            } else if constexpr (Std::is_same<PrimDstType, float>::value && Std::is_same<PrimSrcType, half>::value) {
-                DataCopyL12BTImpl((uint64_t)dst.GetPhyAddr(), (__cbuf__ half *)src.GetPhyAddr(), static_cast<uint16_t>(1),
-                    repeatParams);
+                } else if constexpr (Std::is_same<PrimDstType, float>::value && Std::is_same<PrimSrcType, half>::value) {
+                    DataCopyL12BTImpl((uint64_t)dst.GetPhyAddr(), (__cbuf__ half *)src.GetPhyAddr(), static_cast<uint16_t>(1),
+                        repeatParams);
+                } else {
+                    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in DataCopy from C1 to C2, "
+                        "current api support dtype combination is U = T or src: half, dst: float.");});
+                }
             } else {
-                ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in DataCopy from C1 to C2, "
-                    "current api support dtype combination is U = T or src: half, dst: float.");});
+                ASCENDC_CHECK_TPOSITION(false, "dst", "C2",
+                    "DataCopy from LocalTensor to LocalTensor with T / U",
+                    ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
             }
         } else {
-            ASCENDC_CHECK_TPOSITION(false, "dst", "C2",
+            ASCENDC_CHECK_TPOSITION(false, "src", "C1",
                 "DataCopy from LocalTensor to LocalTensor with T / U",
-                ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
-        }
-    } else {
-        ASCENDC_CHECK_TPOSITION(false, "src", "C1",
-            "DataCopy from LocalTensor to LocalTensor with T / U",
-            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
+                ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
     }
 }
 

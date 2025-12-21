@@ -18,11 +18,11 @@
 #include "kernel_micro_maskreg_intf_impl.h"
 
 #if __NPU_ARCH__ == 3003
-#include "impl/micro_api/dav_l300/kernel_micro_datacopy_impl.h"
+#include "micro_api/dav_l300/kernel_micro_datacopy_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "impl/micro_api/dav_l311/kernel_micro_datacopy_impl.h"
+#include "micro_api/dav_l311/kernel_micro_datacopy_impl.h"
 #else
-#include "impl/micro_api/dav_l311/kernel_micro_datacopy_impl.h"
+#include "micro_api/dav_l311/kernel_micro_datacopy_impl.h"
 #endif
 
 namespace AscendC {

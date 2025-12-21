@@ -18,14 +18,13 @@
 #include "kernel_tensor.h"
 
 #if (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || defined(__ASC_NPU_HOST__)
-#include "impl/micro_api/kernel_micro_maskreg_intf.h"
+#include "micro_api_inc/kernel_micro_maskreg_intf.h"
 #elif __NPU_ARCH__ == 3003
-#include "impl/micro_api/dav_l300/kernel_micro_common_impl.h"
+#include "micro_api/dav_l300/kernel_micro_common_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "impl/micro_api/dav_l311/kernel_micro_common_impl.h"
+#include "micro_api/dav_l311/kernel_micro_common_impl.h"
 #else
-#include "impl/micro_api/dav_l311/kernel_micro_common_impl.h"
-#endif
+#include "micro_api/dav_l311/kernel_micro_common_impl.h"
 #endif
 
 namespace AscendC {

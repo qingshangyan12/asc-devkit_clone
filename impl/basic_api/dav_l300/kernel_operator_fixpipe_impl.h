@@ -44,33 +44,8 @@ __aicore__ inline void SetFixPipeConfigImpl(uint64_t config)
     set_fpc(config);
 }
 
-__aicore__ inline void SetFixPipeConfigImpl(const FixPipeConfigParams &params)
-{
-    uint64_t config = 0;
-    // 当前地址分配有问题，临时配合DataCopyL12FBImpl手动改成0，后续地址分配问题解决再删除
-    config |= (((((uint64_t)0 & 0xFFFF) >> 6) & 0xFF) << 0);
-    config |= (((((uint64_t)0 & 0xFFFF) >> 7) & 0xFF) << 8);
-    config |= (((((uint64_t)0 & 0xFFFF) >> 6) & 0xFF) << 16);
-    config |= (((((uint64_t)0 & 0xFFFF) >> 7) & 0xFF) << 24);
-    config |= (((uint64_t)params.unitFlag & 0x1) << 63);
-    set_fpc(config);
-}
-
 __aicore__ inline void SetFixpipePreQuantFlagImpl(uint64_t config)
 {
-    set_quant_pre(config);
-}
-
-template<typename T>
-__aicore__ inline void SetFixpipePreQuantFlagImpl(const FixPipePreQuantParams<T> &params)
-{
-    uint64_t config = 0;
-    config |= (((((uint64_t)params.offset0 >> 9) & 0x7F) | ((((uint64_t)params.offset0 >> 31) & 0x1) << 7)) |
-        ((((uint64_t)GetScalarBitcodeValue(params.scalarValue) >> 13) & 0x7FFFF) << 13));
-    config |= (((uint64_t)params.offset0 & 0x1FF) |
-        (((uint64_t)params.offset1 & 0xF) | ((((uint64_t)params.offset1 >> 7) & 0x1) << 4)) |
-        (((uint64_t)params.offset2 & 0xFF) | ((((uint64_t)params.offset2 >> 15) & 0x1) << 8))) << 37;
-    config |= ((uint64_t)params.isSigned & 0x1) << 46;
     set_quant_pre(config);
 }
 
@@ -79,26 +54,8 @@ __aicore__ inline void SetFixpipeLeakyReluAlphaImpl(uint64_t config)
     set_relu_alpha(config);
 }
 
-__aicore__ inline void SetFixpipeLeakyReluAlphaImpl(const FixPipeLeakyReluAlphaParams &params)
-{
-    uint64_t config = 0;
-    config |= (((uint64_t)GetScalarBitcodeValue(params.preValue) >> 13) & 0x7FFFF) << 13;
-    config |= (((uint64_t)GetScalarBitcodeValue(params.postValue) >> 13) & 0x7FFFF) << 45;
-    set_relu_alpha(config);
-}
-
 __aicore__ inline void SetFixpipeEltAnitqImpl(uint64_t config)
 {
-    set_elt_antiq_para(config);
-}
-
-template<typename T>
-__aicore__ inline void SetFixpipeEltAnitqImpl(const FixPipeEltAntiqParams<T> &params)
-{
-    uint64_t config = 0;
-    config |= (uint64_t)GetScalarBitcodeValue(params.scalarValue) & 0xFFFF;
-    config |= (((uint64_t)params.s4Offset & 0x7) | ((((uint64_t)params.s4Offset >> 7) & 0x1) << 3)) << 16;
-    config |= ((uint64_t)params.b8Offset & 0xFF) << 20;
     set_elt_antiq_para(config);
 }
 
@@ -107,28 +64,8 @@ __aicore__ inline void SetFixpipeEltwiseAddrImpl(uint64_t config)
     set_elt_src_para(config);
 }
 
-__aicore__ inline void SetFixpipeEltwiseAddrImpl(const FixpipeEltwiseAddrParams &params)
-{
-    uint64_t config = 0;
-    config |= (uint64_t)params.c0ChannelStride & 0xFFFF;
-    config |= ((uint64_t)params.eltSrcAddr & 0xFFFF) << 16;
-    set_elt_src_para(config);
-}
-
 __aicore__ inline void SetFixpipePostQuantImpl(uint64_t config)
 {
-    set_quant_post(config);
-}
-
-__aicore__ inline void SetFixpipePostQuantImpl(const FixPipePostQuantParams &params)
-{
-    uint64_t config = 0;
-    config |= ((((uint64_t)params.offset0 & 0xF) | (((uint64_t)params.offset0 & 0x80) >> 3)) |
-        (((uint64_t)params.offset1 & 0xFF) | (((uint64_t)params.offset1 & 0x8000) >> 7)) |
-        ((uint64_t)params.offset2 & 0x1FF));
-    config |= ((uint64_t)params.isSigned & 0x1) << 9;
-    config |= (((uint64_t)GetScalarBitcodeValue(params.scalarValue) >> 13) & 0x7FFFF) << 13;
-    config |= ((((uint64_t)params.offset2 >> 9) & 0x7F) | ((((uint64_t)params.offset2 >> 31) & 0x1) << 7)) << 32;
     set_quant_post(config);
 }
 
@@ -146,54 +83,19 @@ __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)
     set_fix_clip_relu(config);
 }
 
-template <typename T1, typename T2>
-__aicore__ inline void SetFixPipeClipReluImpl(const FixpipeClipReluParams<T1, T2> &intriParams)
-{
-    uint64_t config = 0;
-    config = config | (static_cast<uint64_t>(intriParams.preValue));
-    config = config | ((static_cast<uint64_t>(intriParams.postValue)) << 16);
-    set_fix_clip_relu(config);
-}
-
 __aicore__ inline void SetFixpipeLoop3Impl(uint64_t config)
 {
     set_loop3_para(config);
 }
 
-__aicore__ inline void SetFixpipeLoop3Impl(const FixpipeLoop3Params &intriParams)
-{
-    uint64_t config = 0;
-    config = config | (static_cast<uint64_t>(intriParams.loopSize));
-    config = config | ((static_cast<uint64_t>(intriParams.srcStride)) << 16);
-    config = config | ((static_cast<uint64_t>(intriParams.dstStride)) << 32);
-    set_loop3_para(config);
-}
 
 __aicore__ inline void SetFixpipeLoop4Impl(uint64_t config)
 {
     set_loop4_para(config);
 }
 
-__aicore__ inline void SetFixpipeLoop4Impl(const FixpipeLoop4Params &intriParams)
-{
-    uint64_t config = 0;
-    config = config | (static_cast<uint64_t>(intriParams.loopSize));
-    config = config | ((static_cast<uint64_t>(intriParams.srcStride)) << 16);
-    config = config | ((static_cast<uint64_t>(intriParams.dstStride)) << 32);
-    set_loop4_para(config);
-}
-
 __aicore__ inline void SetFixpipeChannnelImpl(uint64_t config)
 {
-    set_channel_para(config);
-}
-
-__aicore__ inline void SetFixpipeChannnelImpl(const FixpipeChannelParams &intriParams)
-{
-    uint64_t config = 0;
-    config = config | (static_cast<uint64_t>(intriParams.c0ChannelStride));
-    config = config | ((static_cast<uint64_t>(intriParams.channelMergeStride)) << 16);
-    config = config | ((static_cast<uint64_t>(intriParams.c0ChannelIndicator)) << 32);
     set_channel_para(config);
 }
 

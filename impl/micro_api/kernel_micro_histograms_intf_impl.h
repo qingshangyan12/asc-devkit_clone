@@ -17,11 +17,11 @@
 #define ASCENDC_KERNEL_MICRO_HISTOGRAMS_INTERFACE_IMPL_H
  
 #if __NPU_ARCH__ == 3003
-#include "impl/micro_api/dav_l300/kernel_micro_histograms_impl.h"
+#include "micro_api/dav_l300/kernel_micro_histograms_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "impl/micro_api/dav_l311/kernel_micro_histograms_impl.h"
+#include "micro_api/dav_l311/kernel_micro_histograms_impl.h"
 #else
-#include "impl/micro_api/dav_l311/kernel_micro_histograms_impl.h"
+#include "micro_api/dav_l311/kernel_micro_histograms_impl.h"
 #endif
 namespace AscendC {
 namespace MicroAPI {

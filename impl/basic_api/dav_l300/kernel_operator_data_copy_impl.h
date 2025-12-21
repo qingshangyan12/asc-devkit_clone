@@ -171,25 +171,6 @@ __aicore__ inline void DataCopyL12FBImpl(__fbuf__ T* dst, __cbuf__ T* src, const
 }
 
 template <typename T>
-__aicore__ inline void DataCopyL12FBImpl(uint64_t dst, __cbuf__ T* src, const DataCopyParams &intriParams, const DataCopyAttrParams& attrParams)
-{
-    // 该API属于ISASI，并且不支持多次分配内存，只能进行一次AllocTensor操作，然后搬运所有数据到FB。因此直接设置dst = 0确保数据从0开始排布
-    dst = 0;
-    dst |= static_cast<uint64_t>(attrParams.fixBufPos) << 16;
-
-    // ISA/API: Is the burst number in total.
-    uint16_t burstNum = intriParams.blockCount;
-    // ISA: unit of 128B    API: unit of 32B
-    uint16_t burstLen = DivCeil(intriParams.blockLen, 4);
-    // ISA/API: unit of 32B
-    uint16_t srcGapSize = intriParams.srcStride;
-    // ISA: unit of 128B    API: unit of 32B
-    uint16_t dstGapSize = DivCeil(intriParams.dstStride, 4);
-
-    copy_cbuf_to_fbuf((__fbuf__ void*)dst, (__cbuf__ void*)src, burstNum, burstLen, srcGapSize, dstGapSize);
-}
-
-template <typename T>
 __aicore__ inline void TransND2NZ(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t high, uint16_t width, T scalar)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from ub to gm nd2nz"); });
