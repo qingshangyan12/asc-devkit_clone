@@ -275,7 +275,8 @@ __aicore__ inline void PipeBarrierInternal()
             pipe_barrier(pipe);
         }
     }
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#else
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     if constexpr (pipe == PIPE_V) {
         return;
     }
@@ -580,10 +581,16 @@ __aicore__ constexpr HardEvent GetQueEvt(Hardware src, Hardware dst, bool fwdDir
 #endif
 ASSERT(dst == Hardware::GM || dst == Hardware::UB);
         return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
+#endif
     }
 #elif (__NPU_ARCH__ == 3102)
     } else if (src == Hardware::L0C) {
         ASSERT(dst == Hardware::GM || dst == Hardware::UB);
+        return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
+    }
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
+    } else if (src == Hardware::L0C) {
+        ASSERT(dst == Hardware::GM || dst == Hardware::UB || dst == Hardware::L1);
         return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
     }
 #else
