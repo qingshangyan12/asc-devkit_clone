@@ -357,6 +357,8 @@ REGISTER_TILING_DEFAULT')
         find_kfc_server = False
         default_tiling_struct = ""
         tiling_struct_expr_map = {}
+        register_tiling_struct = set()
+        tpl_tiling_struct = set()
         if not (CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_310r6()):
             code_channel = CORE_TYPE_MIX
         if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
@@ -464,6 +466,9 @@ REGISTER_TILING_DEFAULT')
         KernelInfoInfer.get_tiling_key_kernel_type_in_group(tiling_key_kernel_type, \
                                                             tiling_key_kernel_type_full)
 
+        for tiling_struct in tiling_struct_expr_map.keys():
+            register_tiling_struct.add(tiling_struct)
+
         if declare_param_str and select_param_str:
             # TPL
             extract_template_tiling_info(declare_param_str, select_param_str)
@@ -550,11 +555,15 @@ REGISTER_TILING_DEFAULT')
                                                                            tiling_struct_expr_map, compile_log_path, \
                                                                            tiling_key_group_map)
 
+        for tiling_struct in tiling_key_struct_map.values():
+            tpl_tiling_struct.add(tiling_struct)
+
         return InferChannelParamsFromIFile(tiling_key_list, code_channel, hard_sync, no_kfc_server_flag, \
                                            enable_deterministic, tiling_key_kernel_type, no_set_kernel_type, \
                                            default_kernel_type, dump_info, decode_tiling_result,
                                            default_tiling_struct, tiling_struct_expr_map, tiling_key_struct_map, \
-                                           set_task_bar, wait_task_bar, tiling_key_deterministic, tiling_key_group_map)
+                                           register_tiling_struct, tpl_tiling_struct, set_task_bar, wait_task_bar, \
+                                           tiling_key_deterministic, tiling_key_group_map)
 
     @staticmethod
     def get_tiling_key_kernel_type_in_group(tiling_key_kernel_type, tiling_key_kernel_type_origin):

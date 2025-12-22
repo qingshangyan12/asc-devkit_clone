@@ -56,6 +56,8 @@ class CompileInfo:
         self.sub_core_type: int = -1
         self.template_tiling_info: dict = {}
         self.tiling_key_struct_map: dict = {}
+        self.register_tiling_struct: set = set()    # tiling struct found in REGISTER_TILING_XXX
+        self.tpl_tiling_struct: set = set()         # tiling struct found in TPL
         self.enable_final_super_kernel_compile: bool = False
         # if enable_final_super_kernel_compile is True and super_kernel_objs is empty
         # means no fatbin, dst_file is the final file
@@ -893,6 +895,8 @@ def convert_customized_config_to_inferchannel(config: CustomizedConfig):
     tiling_struct_expr_map = {}
     tiling_key_struct_map = \
         {k: str(v.tiling_struct_name) for k, v in tiling_key_infos.items() if str(v.tiling_struct_name) != ''}
+    register_tiling_struct = set()
+    tpl_tiling_struct = set()
     set_task_bar = False
     wait_task_bar = False
     tiling_key_deterministic = {k: str(v.enable_deterministic).lower() for k, v in tiling_key_infos.items()}
@@ -901,7 +905,8 @@ def convert_customized_config_to_inferchannel(config: CustomizedConfig):
                                            enable_deterministic, tiling_key_kernel_type, no_set_kernel_type,\
                                            default_kernel_type, dump_info, template_tiling_info,
                                            default_tiling_struct, tiling_struct_expr_map, tiling_key_struct_map,\
-                                           set_task_bar, wait_task_bar, tiling_key_deterministic, None)
+                                           register_tiling_struct, tpl_tiling_struct, set_task_bar, wait_task_bar, \
+                                           tiling_key_deterministic, None)
 
 
 def get_kernel_fun_name_with_tiling_key_and_kernel_type(compile_info: CompileInfo, tiling_key: int):

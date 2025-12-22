@@ -48,7 +48,7 @@ from .ascendc_compile_gen_code import get_code_for_l2_cache, \
     gen_init_dump_code, add_op_param_to_workspace, _gen_compile_cmd, get_tiling_key_struct_size_map, \
     gen_tiling_struct_and_dfx_section_head, gen_tiling_struct_size_for_group_key, \
     gen_dfx_section_for_one_tiling_key_dynamic, gen_dfx_section_for_one_tiling_key_static, \
-    gen_tiling_struct_size_for_group_key_no_size
+    gen_tiling_struct_size_for_group_key_no_size, gen_global_isolation_macro
 from .ascendc_compile_gen_json import _gen_mix_json_from_seperate_json, \
     _gen_mix_json_from_seperate_json_for_kernel_type, _dynamic_kernel_list_to_json, \
     _dynamic_regbase_kernel_list_to_json, _static_regbase_kernel_list_to_json, _gen_mix_sub_json, \
@@ -215,7 +215,7 @@ def _json_post_process(compile_info: CompileInfo, op_info: OpInfo, tiling_info: 
         js["runInfo"] = tiling_info.raw_run_info
 
     # gen sub operator infos for super kernel feature
-    js = add_sub_super_kernel_info(js, tiling_info.static_shape_flag, compile_info)        
+    js = add_sub_super_kernel_info(js, tiling_info.static_shape_flag, compile_info)
 
     if compile_info.super_kernel_info.get("timestamp_option") is not None and \
         compile_info.super_kernel_info.get("timestamp_option"):
@@ -444,6 +444,25 @@ def _gen_set_mc2_ctx_param(opinfo: OpInfo):
     return source
 
 
+# When TPL struct is not registered through macro REGISTER_TILING, need to insert section code
+def _gen_tpl_tiling_struct_section(compile_info: CompileInfo, tiling_info: TilingInfo):
+    source = gen_global_isolation_macro(compile_info, tiling_info)
+    tiling_struct_set = set()
+    counter = 0
+    for tiling_key in compile_info.tiling_key_list:
+        original_tiling_struct = compile_info.tiling_key_struct_map[tiling_key]
+        if original_tiling_struct in compile_info.tpl_tiling_struct and \
+            original_tiling_struct not in compile_info.register_tiling_struct and \
+            original_tiling_struct not in tiling_struct_set:
+            source += f"static const uint64_t __ascendc_TPL_tiling_struct_{counter} __attribute__"
+            source += \
+                f"((used, section(\".ascendc_tiling.{original_tiling_struct}\"))) = sizeof({original_tiling_struct});\n"
+            counter += 1
+        tiling_struct_set.add(original_tiling_struct)
+    source += f"#endif\n\n"
+    return source
+
+
 def gen_meta_info_section(compile_info, op_info):
 
     meta_info = {}
@@ -612,6 +631,9 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
         func_name, opinfo, tiling_info, has_template=False)
     source += "#endif\n"
 
+    if len(compile_info.tiling_key_struct_map) > 0:
+        source += _gen_tpl_tiling_struct_section(compile_info, tiling_info)
+
     # aicore exception restart main block
     if global_var_storage.get_variable("ascendc_enable_aicore_exception_restart"):
         for key in tiling_info.tiling_key_list:
@@ -776,7 +798,7 @@ def gen_tiling_struct_size_and_dfx_section_file(compile_info: CompileInfo, tilin
                     for tiling_key_slave in compile_info.tiling_key_group_map[tiling_key]:
                         source += gen_dfx_section_for_one_tiling_key_dynamic(compile_info, tiling_key_slave, \
                                                                 tiling_info, tiling_key_struct_size_map)
-        
+
     try:
         with os.fdopen(\
             os.open(out_file, os.O_TRUNC | os.O_RDWR | os.O_CREAT, stat.S_IWUSR | stat.S_IRUSR), 'w') as ofd:
@@ -914,13 +936,13 @@ def _update_compile_option(kernel_name: str, compile_options: list, extend_optio
     import platform
     archlinux = platform.machine()
     if ascend_home_path is None or ascend_home_path == '':
-        asc_opc_path = shutil.which("asc_opc")	
-        if asc_opc_path is not None:	
+        asc_opc_path = shutil.which("asc_opc")
+        if asc_opc_path is not None:
             asc_opc_path_link = os.path.dirname(asc_opc_path)
             asc_opc_real_path = os.path.realpath(asc_opc_path_link)
-            ascend_home_path = os.path.realpath(	
+            ascend_home_path = os.path.realpath(
                     os.path.join(asc_opc_real_path, "..", ".."))
-        else:	
+        else:
             ascend_home_path = "/usr/local/Ascend/latest"
 
     if 'x86' in archlinux:
@@ -994,7 +1016,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     tiling_key_group_map = infered_info_from_ifile.tiling_key_group_map
     context_tiling_key = get_context().get_addition("tiling_key")
     # override customized tiling key list if the input is passed from
-    customize_tiling_key = "customized_tiling_key_list" 
+    customize_tiling_key = "customized_tiling_key_list"
     if customize_tiling_key in extend_options and isinstance(extend_options[customize_tiling_key], list):
         context_tiling_key = extend_options[customize_tiling_key]
     if context_tiling_key:
@@ -1048,6 +1070,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         else default_dump_info
     compile_info.template_tiling_info = infered_info_from_ifile.template_tiling_info
     compile_info.tiling_key_struct_map = infered_info_from_ifile.tiling_key_struct_map
+    compile_info.register_tiling_struct = infered_info_from_ifile.register_tiling_struct
+    compile_info.tpl_tiling_struct = infered_info_from_ifile.tpl_tiling_struct
 
     set_dump_assert_flag(compile_info)
 
