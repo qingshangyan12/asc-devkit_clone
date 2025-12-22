@@ -17,7 +17,6 @@
 #include "kernel_tensor.h"
 #include "kernel_check.h"
 #include "kernel_struct_fixpipe.h"
-#include "tile_api/kernel_tensor_tile_fixpipe_impl.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_fixpipe_impl.h"
@@ -35,6 +34,10 @@
 #include "dav_c310/kernel_operator_fixpipe_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_fixpipe_impl.h"
+#elif __NPU_ARCH__ == 3003
+#include "dav_l300/kernel_operator_fixpipe_impl.h"
+#elif __NPU_ARCH__ == 3113
+#include "dav_l311/kernel_operator_fixpipe_impl.h"
 #endif
 
 namespace AscendC {

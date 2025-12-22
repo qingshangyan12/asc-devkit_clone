@@ -156,20 +156,20 @@ extern __gm__ struct OpSystemRunCfg g_opSystemRunCfg;
 
 __aicore__ inline void GetCannVersion(__gm__ char*& versionStr, uint64_t& version, uint64_t& timeStamp)
 {
-#ifdef CANN_VERSION_STR
-    versionStr = const_cast<__gm__ char*>(CANN_VERSION_STR);
+#ifdef ASC_DEVKIT_VERSION_STR
+    versionStr = const_cast<__gm__ char*>(ASC_DEVKIT_VERSION_STR);
 #else
-    versionStr = const_cast<__gm__ char*>("Unknown CANN version");
+    versionStr = const_cast<__gm__ char*>("Unknown ASC_DEVKIT version");
 #endif
 
-#ifdef CANN_TIMESTAMP
-    timeStamp = static_cast<uint64_t>(CANN_TIMESTAMP);
+#ifdef ASC_DEVKIT_TIMESTAMP
+    timeStamp = static_cast<uint64_t>(ASC_DEVKIT_TIMESTAMP);
 #else
     timeStamp = 0;
 #endif
 
-#ifdef CANN_VERSION
-    version = static_cast<uint64_t>(CANN_VERSION);
+#ifdef ASC_DEVKIT_VERSION
+    version = static_cast<uint64_t>(ASC_DEVKIT_VERSION);
 #else
     version = 0;
 #endif
@@ -303,8 +303,15 @@ struct FunLevelMixCoreType {
 #endif
 
 #define ENABLE_DETERMINISTIC() ENABLE_FEATURE_FOR_COMPILE(deterministic, 1)
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#define KERNEL_TASK_TYPE(key, value)
+#define KERNEL_TASK_TYPE_DEFAULT(value)
+#else
 #define KERNEL_TASK_TYPE(key, value)  ENABLE_FEATURE_FOR_COMPILE(key, value)
 #define KERNEL_TASK_TYPE_DEFAULT(value)  ENABLE_FEATURE_FOR_COMPILE(default, value)
+#endif
+
 #define REGISTER_TILING_DEFAULT(tiling_struct)  ENABLE_FEATURE_FOR_TILING(default, tiling_struct)
 #define REGISTER_TILING_FOR_TILINGKEY(expression, tiling_struct)  ENABLE_FEATURE_FOR_TILING(expression, tiling_struct)
 
@@ -319,6 +326,24 @@ struct FunLevelMixCoreType {
 
 #ifndef SIMT_ONE_CORE_DUMP_SIZE
 #define SIMT_ONE_CORE_DUMP_SIZE (2048 * 2048)
+#endif
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#ifndef INT4X2_T_STRUCT
+#define INT4X2_T_STRUCT
+struct int4x2_t {
+    uint8_t data;
+
+    const static uint16_t BIT_NUM = 4u;
+
+    int4x2_t operator+(const int4x2_t &other) const
+    {
+        int4x2_t tmp;
+        tmp.data = ((((data >> BIT_NUM) + (other.data >> BIT_NUM)) & 0xfu) << BIT_NUM) + ((data + other.data) & 0xfu);
+        return tmp;
+    }
+};
+#endif
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)

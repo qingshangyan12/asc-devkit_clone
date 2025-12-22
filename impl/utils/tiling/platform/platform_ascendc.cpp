@@ -24,6 +24,7 @@
 
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
+const static uint64_t LOCAL_RESERV_SIZE_KIRIN = 10 * 1024;
 const static uint32_t WORK_SPACE_SIZE_910B = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_910_95 = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_910_55 = 16 * 1024 * 1024;
@@ -95,15 +96,17 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size)
 {
     const fe::LocalMemType localType = static_cast<fe::LocalMemType>(memType);
     this->GetPlatFormInfo()->GetLocalMemSize(localType, size);
+    auto socVersion = GetSocVersion();
     // only ascend910B need UB/L1 local reserved buf for kfc
-    if ((memType == CoreMemType::UB || memType == CoreMemType::L1)
-         && GetSocVersion() == SocVersion::ASCEND910B) {
+    if ((memType == CoreMemType::UB || memType == CoreMemType::L1) && socVersion == SocVersion::ASCEND910B) {
         size -= LOCAL_RESERV_SIZE;
     }
     if (memType == CoreMemType::UB) {
         size -= reservedMemSize_;
     }
-
+    if (memType == CoreMemType::UB && (socVersion == SocVersion::KIRINX90 || socVersion == SocVersion::KIRIN9030)) {
+        size -= LOCAL_RESERV_SIZE_KIRIN;
+    }
     if (memType == CoreMemType::FB) {
         std::string sizeStr;
         bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "fb0_size", sizeStr);
@@ -168,8 +171,7 @@ SocVersion PlatformAscendC::GetSocVersion(void) const
         {"Hi3796CV300ES", SocVersion::HI3796CV300ES},
         {"MC61AM21A", SocVersion::MC61AM21A},
         {"MC62CM12A", SocVersion::MC62CM12A},
-        {"SD3403", SocVersion::SD3403},
-        {"KirinX90", SocVersion::KIRINX90}
+        {"SD3403", SocVersion::SD3403}
     };
     auto it = convertMap.find(socVersionStr);
     if (it != convertMap.end()) {
@@ -268,49 +270,70 @@ SocVersion PlatformAscendCManager::SocVersionMap(const char *socVersionStr)
 
 namespace {
 #ifdef ASCEND_IS_AICPU
+const static std::map<std::string, std::string> convertMapInAicpu = {
+    {"Ascend910B1", "Ascend910B"}, // ascend910b_list
+    {"Ascend910B2", "Ascend910B"},
+    {"Ascend910B2C", "Ascend910B"},
+    {"Ascend910B3", "Ascend910B"},
+    {"Ascend910B4", "Ascend910B"},
+    {"Ascend910B4-1", "Ascend910B"},
+    {"Ascend910_9391", "Ascend910B"},
+    {"Ascend910_9381", "Ascend910B"},
+    {"Ascend910_9372", "Ascend910B"},
+    {"Ascend910_9392", "Ascend910B"},
+    {"Ascend910_9382", "Ascend910B"},
+    {"Ascend910_9362", "Ascend910B"},
+    {"Ascend910A","Ascend910"}, // ascend910_list
+    {"Ascend910ProA","Ascend910"},
+    {"Ascend910B","Ascend910"},
+    {"Ascend910ProB","Ascend910"},
+    {"Ascend910PremiumA","Ascend910"},
+    {"Ascend310P1", "Ascend310P"}, // ascend310p_list
+    {"Ascend310P3", "Ascend310P"},
+    {"Ascend310B1", "Ascend310B"}, // ascend310b_list
+    {"Ascend310B2", "Ascend310B"},
+    {"Ascend310B3", "Ascend310B"},
+    {"Ascend310B4", "Ascend310B"},
+    {"Ascend910_95A1", "Ascend910_95"},
+    {"Ascend910_95A2", "Ascend910_95"},
+    {"Ascend910_9591", "Ascend910_95"},
+    {"Ascend910_9592", "Ascend910_95"},
+    {"Ascend910_9595", "Ascend910_95"},
+    {"Ascend910_9596", "Ascend910_95"},
+    {"Ascend910_9581", "Ascend910_95"},
+    {"Ascend910_9582", "Ascend910_95"},
+    {"Ascend910_9583", "Ascend910_95"},
+    {"Ascend910_9584", "Ascend910_95"},
+    {"Ascend910_9585", "Ascend910_95"},
+    {"Ascend910_9586", "Ascend910_95"},
+    {"Ascend910_9587", "Ascend910_95"},
+    {"Ascend910_9588", "Ascend910_95"},
+    {"Ascend910_9571", "Ascend910_95"},
+    {"Ascend910_9572", "Ascend910_95"},
+    {"Ascend910_9573", "Ascend910_95"},
+    {"Ascend910_9574", "Ascend910_95"},
+    {"Ascend910_9575", "Ascend910_95"},
+    {"Ascend910_9576", "Ascend910_95"},
+    {"Ascend910_9577", "Ascend910_95"},
+    {"Ascend910_9578", "Ascend910_95"},
+    {"Ascend910_957b", "Ascend910_95"},
+    {"Ascend910_950z", "Ascend910_95"},
+    {"Ascend910_958b", "Ascend910_95"},
+    {"Ascend910_958a", "Ascend910_95"},
+    {"Ascend910_9599", "Ascend910_95"},
+    {"Ascend910_957d", "Ascend910_95"},
+    {"Ascend910_957c", "Ascend910_95"},
+    {"Ascend910_9589", "Ascend910_95"}, // ascend910_95_list
+    {"MC62CM12AA", "MC62CM12A"}
+};
 bool SwitchIntoShortSocVersion(const char *socVersionStr, std::string &shortSocVersion)
 {
-    const static std::map<std::string, std::string> convertMap = {
-        {"Ascend910B1", "Ascend910B"}, // ascend910b_list
-        {"Ascend910B2", "Ascend910B"},
-        {"Ascend910B2C", "Ascend910B"},
-        {"Ascend910B3", "Ascend910B"},
-        {"Ascend910B4", "Ascend910B"},
-        {"Ascend910B4-1", "Ascend910B"},
-        {"Ascend910_9391", "Ascend910B"},
-        {"Ascend910_9381", "Ascend910B"},
-        {"Ascend910_9372", "Ascend910B"},
-        {"Ascend910_9392", "Ascend910B"},
-        {"Ascend910_9382", "Ascend910B"},
-        {"Ascend910_9362", "Ascend910B"},
-        {"Ascend910A","Ascend910"}, // ascend910_list
-        {"Ascend910ProA","Ascend910"},
-        {"Ascend910B","Ascend910"},
-        {"Ascend910ProB","Ascend910"},
-        {"Ascend910PremiumA","Ascend910"},
-        {"Ascend310P1", "Ascend310P"}, // ascend310p_list
-        {"Ascend310P3", "Ascend310P"},
-        {"Ascend310B1", "Ascend310B"}, // ascend310b_list
-        {"Ascend310B2", "Ascend310B"},
-        {"Ascend310B3", "Ascend310B"},
-        {"Ascend310B4", "Ascend310B"},
-        {"Ascend910_957b", "Ascend910_95"},
-        {"Ascend910_950z", "Ascend910_95"},
-        {"Ascend910_958b", "Ascend910_95"},
-        {"Ascend910_958a", "Ascend910_95"},
-        {"Ascend910_9599", "Ascend910_95"},
-        {"Ascend910_957d", "Ascend910_95"},
-        {"Ascend910_9581", "Ascend910_95"},
-        {"Ascend910_957c", "Ascend910_95"},
-        {"Ascend910_9589", "Ascend910_95"}, // ascend910_95_list
-        {"MC62CM12AA", "MC62CM12A"}
-    };
-    const auto &iter = convertMap.find(socVersionStr);
-    if (iter != convertMap.end()) {
+    const auto &iter = convertMapInAicpu.find(socVersionStr);
+    if (iter != convertMapInAicpu.end()) {
         shortSocVersion = iter->second;
         return true;
     }
-    PF_LOGE("get platform failed, convertMap does not find short soc %s version", socVersionStr);
+    PF_LOGE("get platform failed, convertMapInAicpu does not find short soc %s version", socVersionStr);
     return false;
 }
 

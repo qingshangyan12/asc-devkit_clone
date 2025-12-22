@@ -80,6 +80,8 @@ enum class ShortSocVersion : uint32_t {
     ASCEND910 = 2,
     ASCEND310B = 3,
     ASCEND910_95 = 4,
+    KIRINX90 = 5,
+    KIRIN9030 = 6,
     INVALID_TYPE = 0xffffffff
 };
 
@@ -87,6 +89,12 @@ enum class ShortSocVersion : uint32_t {
 enum class CoreType: uint32_t {
     CUBE = 0,
     VEC
+};
+
+enum class FeatureFlag: uint32_t {
+    ASC_PRINT_MASK = 1,
+    ASC_FFTS_MASK = 2,
+    ASC_L2CACHE_HINT_MASK = 3
 };
 
 inline const std::unordered_map<KernelMetaType, std::string> KTYPE_STR_MAP = {
@@ -154,6 +162,30 @@ const std::unordered_map<std::string, AscPlugin::ShortSocVersion> SOC_VERSION_MA
     {"Ascend910_9581", AscPlugin::ShortSocVersion::ASCEND910_95},
     {"Ascend910_9589", AscPlugin::ShortSocVersion::ASCEND910_95},
     {"Ascend910_957c", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_95A1", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_95A2", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9591", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9592", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9595", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9596", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9581", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9582", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9583", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9584", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9585", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9586", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9587", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9588", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9571", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9572", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9573", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9574", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9575", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9576", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9577", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_9578", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"KirinX90", AscPlugin::ShortSocVersion::KIRINX90},
+    {"Kirin9030", AscPlugin::ShortSocVersion::KIRIN9030},
 };
 
 const std::map<std::pair<AscPlugin::ShortSocVersion, AscPlugin::CoreType>, std::string> CCE_AICORE_MAP = {
@@ -167,6 +199,10 @@ const std::map<std::pair<AscPlugin::ShortSocVersion, AscPlugin::CoreType>, std::
     {{AscPlugin::ShortSocVersion::ASCEND310B, AscPlugin::CoreType::VEC}, "dav-m300"},
     {{AscPlugin::ShortSocVersion::ASCEND910_95, AscPlugin::CoreType::CUBE}, "dav-c310-cube"},
     {{AscPlugin::ShortSocVersion::ASCEND910_95, AscPlugin::CoreType::VEC}, "dav-c310-vec"},
+    {{AscPlugin::ShortSocVersion::KIRINX90, AscPlugin::CoreType::CUBE}, "dav-l300"},
+    {{AscPlugin::ShortSocVersion::KIRINX90, AscPlugin::CoreType::VEC}, "dav-l300"},
+    {{AscPlugin::ShortSocVersion::KIRIN9030, AscPlugin::CoreType::CUBE}, "dav-l311"},
+    {{AscPlugin::ShortSocVersion::KIRIN9030, AscPlugin::CoreType::VEC}, "dav-l311"},
 };
 
 const std::unordered_map<std::string, AscPlugin::ShortSocVersion> CCE_AICORE_ARCH_MAP = {
@@ -178,6 +214,8 @@ const std::unordered_map<std::string, AscPlugin::ShortSocVersion> CCE_AICORE_ARC
     {"dav-c310-cube", AscPlugin::ShortSocVersion::ASCEND910_95},    // ascend910_95_list
     {"dav-c310-vec", AscPlugin::ShortSocVersion::ASCEND910_95},
     {"dav-c310", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"dav-l300", AscPlugin::ShortSocVersion::KIRINX90},
+    {"dav-l311", AscPlugin::ShortSocVersion::KIRIN9030},
 };
 
 const std::unordered_map<AscPlugin::KernelMetaType, std::string> KERNEL_TYPE_STR_MAP = {
@@ -197,6 +235,8 @@ const std::unordered_map<AscPlugin::ShortSocVersion, AscPlugin::KernelMetaType> 
     {AscPlugin::ShortSocVersion::ASCEND310P, AscPlugin::KernelMetaType::KERNEL_TYPE_AICORE},
     {AscPlugin::ShortSocVersion::ASCEND910B, AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2},
     {AscPlugin::ShortSocVersion::ASCEND910_95, AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2},
+    {AscPlugin::ShortSocVersion::KIRINX90, AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AICORE},
+    {AscPlugin::ShortSocVersion::KIRIN9030, AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AICORE},
 };
 
 const std::unordered_map<std::string, AscPlugin::KernelMetaType> KERNEL_TYPE_MAP_V220 = {
@@ -222,6 +262,15 @@ const std::unordered_map<std::string, AscPlugin::KernelMetaType> KERNEL_TYPE_MAP
     {"KERNEL_TYPE_MIX_AIC_1_2", AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2}
 };
 
+const std::unordered_map<std::string, AscPlugin::KernelMetaType> KERNEL_TYPE_MAP_KIRINX90 = {
+    {"KERNEL_TYPE_AICORE", AscPlugin::KernelMetaType::KERNEL_TYPE_AICORE},
+};
+
+const std::unordered_map<std::string, AscPlugin::KernelMetaType> KERNEL_TYPE_MAP_KIRIN9030 = {
+    {"KERNEL_TYPE_AICORE", AscPlugin::KernelMetaType::KERNEL_TYPE_AICORE},
+
+};
+
 constexpr int32_t ASC_SUCCESS = 0;
 constexpr int32_t ASC_FAILURE = 1;
 constexpr int32_t ASC_NULLPTR = 2;
@@ -229,13 +278,10 @@ constexpr int32_t ASC_CANNPATH_NOT_FOUND = 3;
 constexpr int32_t ASC_SOC_NOT_SUPPORT = 4;
 constexpr int32_t ASC_JSONSTR_ARG_MISSING = 5;
 
-constexpr uint32_t ASC_PRINT_MASK = 0x01;
-constexpr uint32_t ASC_FFTS_MASK = 0x02;
-constexpr uint32_t ASC_L2CACHE_HINT_MASK = 0x04;
-
 inline constexpr char ORIGIN_KERNEL_PREFIX[] = "__origin__";
 inline constexpr char DEVICE_STUB_PREFIX[] = "__device_stub__";
 inline constexpr size_t DEVICE_STUB_PREFIX_LEN = 15;
+inline constexpr char ANONYMOUS_NAME[] = "(Anonymous Namespace)";
 
 // key: kernel manglename
 // value: {kernel original name, variable1 type, variable1 name, variable2 type, variable2 name ....}
@@ -356,5 +402,11 @@ KernelMetaType ExtractKernelType(const std::unordered_set<KernelMetaType> kTypeS
  */
 std::string ToUpper(const std::string& str);
 
+/**
+ * @brief Get AscendC feature meta section string
+ * @param flag feature flag
+ * @return return string of feature meta section
+ */
+std::string GetAscFeatureMetaSection(FeatureFlag flag);
 } // namespace AscPlugin
 #endif // __INCLUDE_INTERNAL_ASC_UTILS_H__

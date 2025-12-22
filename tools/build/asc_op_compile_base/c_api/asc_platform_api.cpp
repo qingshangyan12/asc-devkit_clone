@@ -89,21 +89,33 @@ const std::unordered_map<std::string, std::vector<platformconf::DPLATFORM>> soc_
       {Ascend_910_958b, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9599, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9579, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_95A1, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_95A2, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9591, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9592, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_9595, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_9596, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9581, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9582, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_9583, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9584, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_9585, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_9586, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9587, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9588, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_9571, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9572, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_9573, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {Ascend_910_9574, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9575, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9576, {platformconf::DPLATFORM::ASCEND_910_95}},
-      {Ascend_910_9574, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9577, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_9578, {platformconf::DPLATFORM::ASCEND_910_95}},
       {Ascend_910_5591, {platformconf::DPLATFORM::ASCEND_910_55}},
-      {MC62CM12AA, {platformconf::DPLATFORM::ASCEND_910_95}}};
+      {MC62CM12AA, {platformconf::DPLATFORM::ASCEND_910_95}},
+      {KirinX90, {platformconf::DPLATFORM::KIRINX90}},
+      {Kirin9030, {platformconf::DPLATFORM::KIRIN9030}}
+  };
 }
 }
 

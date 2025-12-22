@@ -77,6 +77,7 @@ enum class SocVersion {
     MC62CM12A,
     SD3403,
     KIRINX90,
+    KIRIN9030,
     RESERVED_VERSION = 99999
 };
 

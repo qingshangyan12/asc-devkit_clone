@@ -10,73 +10,14 @@
 
    - cmake >= 3.16.0
 
-   - ccache >= 4.6.1
-
-     建议版本[release-v4.6.1](https://github.com/ccache/ccache/releases/tag/v4.6.1)，x86_64环境[下载链接](https://github.com/ccache/ccache/releases/download/v4.6.1/ccache-4.6.1-linux-x86_64.tar.xz)，aarch64环境[下载链接](https://github.com/ccache/ccache/releases/download/v4.6.1/ccache-4.6.1.tar.gz)。
-
-     x86_64环境安装步骤如下：
-     
-     ```bash
-     # 在准备安装的路径下创建buildtools目录，如有则忽略
-     # 这里以安装路径/opt为例，对安装命令进行说明
-     mkdir /opt/buildtools
-     # 切换到安装包下载路径，将ccache解压到安装路径
-     tar -xf ccache-4.6.1-linux-x86_64.tar.xz -C /opt/buildtools
-     chmod 755 /opt/buildtools/ccache-4.6.1-linux-x86_64/ccache
-     mkdir -p /usr/local/ccache/bin
-     # 建立软链接
-     ln -sf /opt/buildtools/ccache-4.6.1-linux-x86_64/ccache /usr/local/bin/ccache
-     ln -sf /opt/buildtools/ccache-4.6.1-linux-x86_64/ccache /usr/local/ccache/bin/ccache
-     # 将ccache添加到环境变量PATH
-     export PATH=/usr/local/ccache/bin:$PATH
-     ```
-     
-     aarch64环境安装步骤如下：
-     - 下载依赖项  
-       下载[zstd](https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz)和[hiredis](https://github.com/redis/hiredis/archive/refs/tags/v1.0.2.tar.gz)。
-    
-     - 编译安装
-     
-        ```bash
-        # 在准备安装的路径下创建buildtools目录，如有则忽略
-        # 这里以安装路径/opt为例，对安装命令进行说明
-        mkdir /opt/buildtools
-        # 切换到安装包下载路径，将zstd解压到安装路径
-        tar -xf zstd-1.5.0.tar.gz -C /opt/buildtools
-        cd /opt/buildtools/zstd-1.5.0
-        make -j 24
-        make install
-        cd -
-        # 切换到安装包下载路径，将hiredis解压到安装路径
-        tar -xf hiredis-1.0.2.tar.gz -C /opt/buildtools
-        cd /opt/buildtools/hiredis-1.0.2
-        make -j 24 prefix=/opt/buildtools/hiredis-1.0.2 all
-        make prefix=/opt/buildtools/hiredis-1.0.2 install
-        cd -
-        # 切换到安装包下载路径，将ccache解压到安装路径
-        tar -xf ccache-4.6.1.tar.gz -C /opt/buildtools
-        cd /opt/buildtools/ccache-4.6.1
-        mkdir build
-        cd build/
-        cmake -DCMAKE_BUILD_TYPE=Release -DZSTD_LIBRARY=/usr/local/lib/libzstd.a -DZSTD_INCLUDE_DIR=/usr/local/include -DHIREDIS_LIBRARY=/usr/local/lib/libhiredis.a -DHIREDIS_INCLUDE_DIR=/usr/local/include ..
-        make -j 24
-        make install
-        mkdir -p /usr/local/ccache/bin
-        # 建立软链接
-        ln -sf /usr/local/bin/ccache /usr/local/ccache/bin/ccache
-        # 将ccache添加到环境变量PATH
-        export PATH=/usr/local/ccache/bin:$PATH
-        ```
-
-   - lcov >= 1.13（可选，仅执行UT时依赖）
+   - lcov >= 1.16（可选，仅执行UT时依赖）
    
-     以Ubuntu系统为例，x86_64环境执行以下命令安装：
+     下载[lcov源码](https://gitcode.com/cann-src-third-party/lcov/releases/download/v1.16/lcov-1.16.tar.gz)后，执行以下命令安装：
      ```bash
-     apt install lcov
-     ```
-     以Euler系统为例，aarch64环境执行以下命令安装：
-     ```bash
-     yum install lcov
+     tar -xf lcov-1.16.tar.gz
+     cd lcov-1.16
+     make install                         # root用户安装
+     # sudo make install                  # 非root用户安装
      ```
 
    - pytest >= 5.4.2（可选，仅执行UT时依赖）
@@ -93,17 +34,20 @@
      pip3 install coverage
      ```
 
-   - googletest（可选，仅执行UT时依赖，建议版本[release-1.11.0](https://github.com/google/googletest/releases/tag/release-1.11.0)）
+   - googletest（可选，仅执行UT时依赖，建议版本[release-1.14.0](https://gitcode.com/cann-src-third-party/googletest/releases/v1.14.0)）
 
-     下载[googletest源码](https://github.com/google/googletest.git)后，执行以下命令安装：
+     下载[googletest源码](https://gitcode.com/cann-src-third-party/googletest/releases/download/v1.14.0/googletest-1.14.0.tar.gz)后，执行以下命令安装：
 
      ```bash
-     mkdir temp && cd temp                 # 在googletest源码根目录下创建临时目录并进入
+     tar -xf googletest-1.14.0.tar.gz
+     cd googletest-1.14.0
+     mkdir temp && cd temp                # 在googletest源码根目录下创建临时目录并进入
      cmake .. -DCMAKE_CXX_FLAGS="-fPIC -D_GLIBCXX_USE_CXX11_ABI=0"
      make
      make install                         # root用户安装googletest
      # sudo make install                  # 非root用户安装googletest
      ```
+
 2. **安装驱动与固件（运行态依赖）**
 
    运行算子时必须安装驱动与固件，若仅编译算子，可跳过本操作，安装指导详见《[CANN 软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstSoftware)》。
@@ -113,7 +57,7 @@
 
 1. **安装社区尝鲜版CANN toolkit包**
 
-    根据实际环境，下载对应`Ascend-cann-toolkit_${cann_version}_linux-${arch}.run`包，下载链接为[toolkit x86_64包](https://ascend-cann.obs.cn-north-4.myhuaweicloud.com/CANN/community/ascendc/Ascend-cann-toolkit_8.5.0.alpha001_linux-x86_64.run)、[toolkit aarch64包](https://ascend-cann.obs.cn-north-4.myhuaweicloud.com/CANN/community/ascendc/Ascend-cann-toolkit_8.5.0.alpha001_linux-aarch64.run)。
+    根据实际环境，下载对应`Ascend-cann-toolkit_${cann_version}_linux-${arch}.run`包，下载链接为[toolkit x86_64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/x86_64/Ascend-cann-toolkit_8.5.0-beta.1_linux-x86_64.run)、[toolkit aarch64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/aarch64/Ascend-cann-toolkit_8.5.0-beta.1_linux-aarch64.run)。
 
     ```bash
     # 确保安装包具有可执行权限
@@ -133,8 +77,8 @@
 
     根据产品型号和环境架构，下载对应`cann-${soc_name}-ops-legacy_${cann_version}_linux-${arch}.run`包，下载链接如下：
 
-    - Ascend 910B：[legacy x86_64包](https://ascend-cann.obs.cn-north-4.myhuaweicloud.com/CANN/community/ascendc/cann-910b-ops-legacy_8.5.0.0.0_linux-x86_64.run)、[legacy aarch64包](https://ascend-cann.obs.cn-north-4.myhuaweicloud.com/CANN/community/ascendc/cann-910b-ops-legacy_8.5.0.0.0_linux-aarch64.run)。
-    - Ascend 910C：[legacy x86_64包](https://ascend-cann.obs.cn-north-4.myhuaweicloud.com/CANN/community/ascendc/cann-910_93-ops-legacy_8.5.0.0.0_linux-x86_64.run)、[legacy aarch64包](https://ascend-cann.obs.cn-north-4.myhuaweicloud.com/CANN/community/ascendc/cann-910_93-ops-legacy_8.5.0.0.0_linux-aarch64.run)。
+    - Ascend 910B：[legacy x86_64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/x86_64/ops/cann-910b-ops-legacy_8.5.0-beta.1_linux-x86_64.run)、[legacy aarch64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/aarch64/ops/cann-910b-ops-legacy_8.5.0-beta.1_linux-aarch64.run)。
+    - Ascend 910C：[legacy x86_64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/x86_64/ops/cann-910_93-ops-legacy_8.5.0-beta.1_linux-x86_64.run)、[legacy aarch64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/aarch64/ops/cann-910_93-ops-legacy_8.5.0-beta.1_linux-aarch64.run)。
 
     ```bash
     # 确保安装包具有可执行权限
@@ -185,7 +129,7 @@
    编译完成后会在`build_out`目录下生成cann-asc-devkit_*<cann_version>*_linux-*\<arch\>*.run软件包。
 2. 安装
 
-   在开源仓根目录下执行下列命令，根据设置的环境变量路径，将编译生成的run包安装到CANN包的装包路径，同时会覆盖原CANN包中的Ascend C内容。
+   在开源仓根目录下执行下列命令，将编译生成的run包安装到默认路径（/usr/local/Ascend）；或安装到指定的CANN包的装包路径（${install_path}），同时会覆盖原CANN包中的Ascend C内容。
 
    ```bash
    # 切换到run包生成路径下

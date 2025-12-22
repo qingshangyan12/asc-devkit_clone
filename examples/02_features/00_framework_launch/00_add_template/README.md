@@ -3,27 +3,23 @@
 本样例以Add算子为示例，展示了Tiling模板编程。本样例使用自定义算子工程，编译并部署自定义算子包到自定义算子库中，并调用执行自定义算子。
 
 ## 支持的AI处理器
-- Ascend 910C
 - Ascend 910B
 ## 目录结构介绍
 ```
 └── 00_add_template
     ├── custom_op           // 算子编译工程目录
     │   ├── op_host             // host侧编译实现文件目录
+    │   │   ├── add_template_custom.cpp           // kernel侧算子实现文件
+    │   │   ├── add_template_custom_tiling.h      // tiling定义头文件
+    │   │   └── tiling_key_add_template_custom.h  // 模板参数定义头文件
     │   │   └── CMakeLists.txt      // host侧CMake文件
     │   ├── op_kernel           // kernel侧编译实现文件目录
+    │   │   └── add_template_custom.cpp           // host侧tiling定义
     │   │   └── CMakeLists.txt      // kernel侧CMake文件
     |   ├── build.sh            // 算子构建脚本
     |   ├── CMakeLists.txt      // 算子编译CMake文件
     |   ├── CMakePresets.json   // 算子编译配置文件
     |   └── run.sh              // 算子编译脚本
-    ├── op_dev              // 算子实现文件目录
-    │   ├── op_host             // host侧实现存放目录
-    │   │   └── add_template_custom.cpp           // host侧tiling定义
-    │   └── op_kernel           // kernel侧实现存放目录
-    │   │   ├── add_template_custom.cpp           // kernel侧算子实现文件
-    │   │   ├── add_template_custom_tiling.h      // tiling定义头文件
-    │   │   └── tiling_key_add_template_custom.h  // 模板参数定义头文件
     ├── op_verify           // 算子执行工程目录
     │   ├── inc                 // 算子执行头文件目录
     │   │   ├── common.h            // 声明公共方法类，用于读取二进制文件
@@ -95,18 +91,18 @@ Add算子实现了两个数据相加，返回相加结果的功能。本样例�
     ```bash
     cd ${git_clone_path}/examples/02_features/00_framework_launch/00_add_template
     ```
-    请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+    请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
     - 默认路径，root用户安装CANN软件包
       ```bash
-      export ASCEND_INSTALL_PATH=/usr/local/Ascend/latest
+      export ASCEND_INSTALL_PATH=/usr/local/Ascend/cann
       ```
     - 默认路径，非root用户安装CANN软件包
       ```bash
-      export ASCEND_INSTALL_PATH=$HOME/Ascend/latest
+      export ASCEND_INSTALL_PATH=$HOME/Ascend/cann
       ```
     - 指定路径install_path，安装CANN软件包
       ```bash
-      export ASCEND_INSTALL_PATH=${install_path}/latest
+      export ASCEND_INSTALL_PATH=${install_path}/cann
       ```
     配置安装路径后，执行以下命令统一配置环境变量。
     ```bash

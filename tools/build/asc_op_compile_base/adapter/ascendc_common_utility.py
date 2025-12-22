@@ -24,7 +24,6 @@ from tbe.tvm.contrib.ccec import _build_aicore_compile_cmd, switching_compilatio
 from tbe.common.buildcfg import get_current_build_config
 from tbe.tvm.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from tbe.common.utils.op_tiling import tiling_so_arch_path
-from .get_op_tiling import get_tiling_info, OpInfo, get_tiling_info_v2
 from .log_utils import LogUtil, AscendCLogLevel, CompileStage
 from .global_storage import global_var_storage
 from .ascendc_constants import CORE_TYPE_MIX, KernelMetaType, InferChannelParamsFromIFile,\
@@ -512,6 +511,32 @@ class CommonUtility:
             return True
         return False
 
+
+    @staticmethod
+    def is_l300():
+        """return if current soc version is l300
+
+        Returns:
+            res: True means l300
+        """
+        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+        if short_soc_version in ["KirinX90"]:
+            return True
+        return False
+
+
+    @staticmethod
+    def is_l311():
+        """return if current soc version is l311
+
+        Returns:
+            res: True means l311
+        """
+        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+        if short_soc_version in ["Kirin9030"]:
+            return True
+        return False
+
     @staticmethod
     def get_chip_version():
         """get chip version for (c220/c310/310r6/510r2)
@@ -652,19 +677,6 @@ format(str(stage), output))
         hex_num_str_list = list(map(reverser_hex_str, hex_num[::-1]))
         hex_num_str = ''.join(hex_num_str_list)
         return hex_num_str
-
-    @staticmethod
-    def get_tiling_info_by_tiling(op_info: OpInfo, infered_info_from_ifile, value_depends: dict):
-        CommonUtility.print_compile_log(op_info.kernel_name, "get tiling info...", AscendCLogLevel.LOG_INFO)
-        # temp enable avoid
-        enable_vd = CommonUtility.is_c310()
-        if infered_info_from_ifile.default_tiling_struct != "" or global_var_storage.get_variable(\
-            "ascendc_tiling_no_register"):
-            return get_tiling_info_v2(op_info, infered_info_from_ifile.tiling_key_list,
-                                      infered_info_from_ifile.default_tiling_struct,
-                                      infered_info_from_ifile.tiling_key_struct_map, value_depends, enable_vd)
-        else:
-            return get_tiling_info(op_info, infered_info_from_ifile.tiling_key_list, value_depends, enable_vd)
 
 
 def is_enable_sanitizer(compile_options):
@@ -901,9 +913,12 @@ def get_kernel_fun_name_with_tiling_key_and_kernel_type(compile_info: CompileInf
         full_kernel_name = full_kernel_name[:-8] + f"_{tiling_key}" + full_kernel_name[-8:]
         return full_kernel_name
     full_kernel_name += f"_{tiling_key}"
+    kernel_type = None
     if compile_info.tiling_key_kernel_type is not None:
         if tiling_key in compile_info.tiling_key_kernel_type.keys():
             kernel_type = compile_info.tiling_key_kernel_type[tiling_key]
+    if kernel_type is None:
+        raise Exception(f"get kernel type failed for tiling key {tiling_key} in TILING_KEY_LIST")
     suffix_marker = ""
     if kernel_type in [KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2, \
         KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0]:

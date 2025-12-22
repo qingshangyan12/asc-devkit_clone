@@ -4,9 +4,9 @@
 
 |结构名|说明|
 |-----------------------|-----------------------|
-| [asc_binary_config](struct/asc_binary_config.md) | 双目非连续计算API读写控制参数 |
-| [asc_unary_config](struct/asc_unary_config.md) | 单目非连续计算API读写控制参数 |
-| [asc_copy_config](struct/asc_copy_config.md) | 单目非连续计算API读写控制参数 |
+| [asc_binary_config](struct/asc_binary_config.md) | 双目高维切分计算API读写控制参数 |
+| [asc_unary_config](struct/asc_unary_config.md) | 单目高维切分计算API读写控制参数 |
+| [asc_copy_config](struct/asc_copy_config.md) | 数据搬运API读写控制参数 |
 | [asc_block_reduce_config](struct/asc_block_reduce_config.md) | block reduce类计算API配置参数 |
 | [asc_repeat_reduce_config](struct/asc_repeat_reduce_config.md) | repeat reduce类计算API配置参数 |
 | [asc_duplicate_config](struct/asc_duplicate_config.md) | asc_duplicate API配置参数 |
@@ -16,7 +16,7 @@
 
 |   API名称   |   说明   |
 |----------|-----------|
-| [asc_get_cmp_mask](vector_compute/asc_get_cmp_mask.md) | 获取compare操作的比较结果。 |
+| [asc_get_cmp_mask](vector_compute/asc_get_cmp_mask.md) | 获取Compare操作的比较结果。 |
 | [asc_set_cmp_mask](vector_compute/asc_set_cmp_mask.md) | 为Select操作设置用于选择的掩码。 |
 | [asc_get_rsvd_count](vector_compute/asc_get_rsvd_count.md) | 获取GatherMask操作后剩余的元素数量。 |
 | [asc_set_mask_count](vector_compute/asc_set_mask_count.md) | 设置Mask模式为Counter模式。 |
@@ -55,8 +55,8 @@
 
 |   API名称   |   说明   |
 |----------|-----------|
-| [asc_copy_ub2gm](datamove/asc_copy_ub2gm.md) | 将UB中的数据搬运到GM中。 |
-| [asc_copy_gm2ub](datamove/asc_copy_gm2ub.md) | 将GM中的数据搬运到UB中。 |
+| [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm.md) | 将UB中的数据搬运到GM中。 |
+| [asc_copy_gm2ub](vector_datamove/asc_copy_gm2ub.md) | 将GM中的数据搬运到UB中。 |
 
 ## 同步控制
 
@@ -77,7 +77,7 @@
 | [asc_get_block_idx](sys_var/asc_get_block_idx.md) | 获取当前运行核的索引。 |
 | [asc_get_core_id](sys_var/asc_get_core_id.md) | 获取当前核的编号。 |
 | [asc_get_sub_block_id](sys_var/asc_get_sub_block_id.md) | 获取AI Core上Vector核的ID。 |
-| [asc_get_sub_block_dim](sys_var/asc_get_sub_block_dim.md) | 分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。 |
+| [asc_get_sub_block_num](sys_var/asc_get_sub_block_num.md) | 分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。 |
 | [asc_set_ctrl](sys_var/asc_set_ctrl.md) | 设置CTRL寄存器（控制寄存器）的值。 |
 | [asc_get_ctrl](sys_var/asc_get_ctrl.md) | 读取CTRL寄存器（控制寄存器）的值。 |
 | [asc_get_phy_buf_addr](sys_var/asc_get_phy_buf_addr.md) | 基于偏移量获取片上实际物理地址。 |

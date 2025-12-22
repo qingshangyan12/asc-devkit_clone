@@ -191,6 +191,10 @@ template <typename U> __aicore__ inline LocalTensor<U> LocalTensor<T>::Reinterpr
     } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
         output.address_.dataLen = this->GetSize() / INT2_FOUR;
 #endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
+        output.address_.dataLen = this->GetSize() / INT2_FOUR;
+#endif
     } else {
         output.address_.dataLen = this->GetSize() * sizeof(PrimType);
     }
@@ -233,6 +237,27 @@ template <typename U> __inout_pipe__(S) void LocalTensor<T>::SetValue(const uint
         uint8_t maskedVal = tmp.GetValue(idx) & (~mask);
         tmp.SetValue(idx, maskedVal + (value.storage << shift));
 #endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
+        ASCENDC_DEBUG_ASSERT((this->address_.dataLen * INT2_FOUR > (index / INT2_FOUR)),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "index is %u, which can not be large than data len %u", index,
+            static_cast<uint32_t>(this->address_.dataLen * INT2_FOUR)));
+
+        LocalTensor<uint8_t> tmp = this->ReinterpretCast<uint8_t>();
+        uint32_t idx = index / INT2_FOUR;
+        uint8_t shift = 2 * (index % INT2_FOUR);
+        uint8_t val;
+        if (index % INT2_FOUR == 0) {
+            val = tmp.GetValue(idx) & 0xFC;
+        } else if (index % INT2_FOUR == 1) {
+            val = tmp.GetValue(idx) & 0xF3;
+        } else if (index % INT2_FOUR == 2) {
+            val = tmp.GetValue(idx) & 0xCF;
+        } else {
+            val = tmp.GetValue(idx) & 0x3F;
+        }
+        tmp.SetValue(idx, val + (value.storage << shift));
+#endif
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
     } else if constexpr (SupportType<PrimType, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         ASCENDC_DEBUG_ASSERT((this->address_.dataLen * ConstantsInternal::ASCENDC_B4_TWO > (index / ConstantsInternal::ASCENDC_B4_TWO)),
@@ -269,6 +294,12 @@ template <typename T> LocalTensor<T> LocalTensor<T>::operator[](const uint32_t o
         KERNEL_LOG(KERNEL_ERROR, "offset is %u, which can not be larger than data len %u", offset,
             static_cast<uint32_t>(this->address_.dataLen * INT2_FOUR)));
 #endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
+        ASCENDC_DEBUG_ASSERT((this->address_.dataLen > (offset / INT2_FOUR)),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "offset is %u, which can not be large than data len %u", offset,
+            static_cast<uint32_t>(this->address_.dataLen * INT2_FOUR)));
+#endif
     } else {
         ASCENDC_DEBUG_ASSERT((this->address_.dataLen > (offset * sizeof(PrimType))),
         KERNEL_LOG(KERNEL_ERROR, "offset is %u, which can not be larger than data len %u", offset,
@@ -286,6 +317,12 @@ template <typename T> LocalTensor<T> LocalTensor<T>::operator[](const uint32_t o
         result.address_.bufferAddr = result.address_.bufferAddr + offset / INT4_TWO;
 #if (__NPU_ARCH__ == 5102)
     } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
+        result.address_.dataLen -= (offset / INT2_FOUR);
+        result.address_.absAddr = result.address_.absAddr + offset / INT2_FOUR;
+        result.address_.bufferAddr = result.address_.bufferAddr + offset / INT2_FOUR;
+#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
         result.address_.dataLen -= (offset / INT2_FOUR);
         result.address_.absAddr = result.address_.absAddr + offset / INT2_FOUR;
         result.address_.bufferAddr = result.address_.bufferAddr + offset / INT2_FOUR;
@@ -557,6 +594,10 @@ template <typename T> __aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr(cons
     } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
         return this->address_.bufferAddr + offset / INT2_FOUR;
 #endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<T, uint2b_t>::value) {
+        return this->address_.bufferAddr + offset / INT2_FOUR;
+#endif
     } else {
         return this->address_.bufferAddr + offset * sizeof(PrimType);
     }
@@ -588,6 +629,12 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
         uint8_t val = tmp.GetValue(index / INT2_FOUR);
         return static_cast<int2b_t>(val >> (INT2_BIT_NUM * (index % INT2_FOUR)));
 #endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<T, uint2b_t>::value) {
+        LocalTensor<uint8_t> tmp = this->ReinterpretCast<uint8_t>();
+        uint8_t val = tmp.GetValue(index / INT2_FOUR);
+        return static_cast<uint2b_t>(val >> (INT2_BIT_NUM * (index % INT2_FOUR)));
+#endif
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
     } else if constexpr (SupportType<PrimType, complex32>()) {
         LocalTensor<uint32_t> tmp = this->ReinterpretCast<uint32_t>();
@@ -618,6 +665,10 @@ template <typename U> __aicore__ inline __sync_alias__ LocalTensor<U> LocalTenso
         output.address_.dataLen = this->GetSize() / INT4_TWO;
 #if (__NPU_ARCH__ == 5102)
     } else if constexpr(IsSameType<PrimType, int2b_t>::value) {
+        output.address_.dataLen = this->GetSize() / INT2_FOUR;
+#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<T, uint2b_t>::value) {
         output.address_.dataLen = this->GetSize() / INT2_FOUR;
 #endif
     } else {
@@ -655,6 +706,23 @@ template <typename U> __aicore__ inline __inout_pipe__(S)
         uint8_t maskedVal = tmp.GetValue(idx) & (~mask);
         tmp.SetValue(idx, maskedVal + (value.storage << shift));
 #endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
+        LocalTensor<uint8_t> tmp = this->ReinterpretCast<uint8_t>();
+        uint32_t idx = index / INT2_FOUR;
+        uint8_t shift = 2 * (index % INT2_FOUR);
+        uint8_t val;
+        if (index % INT2_FOUR == 0) {
+            val = tmp.GetValue(idx) & 0xFC;
+        } else if (index % INT2_FOUR == 1) {
+            val = tmp.GetValue(idx) & 0xF3;
+        } else if (index % INT2_FOUR == 2) {
+            val = tmp.GetValue(idx) & 0xCF;
+        } else {
+            val = tmp.GetValue(idx) & 0x3F;
+        }
+        tmp.SetValue(idx, val + (value.storage << shift));
+#endif
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
     } else if constexpr (SupportType<PrimType, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         LocalTensor<uint8_t> tmp = this->ReinterpretCast<uint8_t>();
@@ -684,6 +752,11 @@ template <typename T> __aicore__ inline LocalTensor<T> LocalTensor<T>::operator[
         result.address_.bufferAddr = result.address_.bufferAddr + offset / INT4_TWO;
 #if (__NPU_ARCH__ == 5102)
     } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
+        result.address_.dataLen -= (offset / INT2_FOUR);
+        result.address_.bufferAddr = result.address_.bufferAddr + offset / INT2_FOUR;
+#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
         result.address_.dataLen -= (offset / INT2_FOUR);
         result.address_.bufferAddr = result.address_.bufferAddr + offset / INT2_FOUR;
 #endif
@@ -725,6 +798,10 @@ template <typename T> __aicore__ inline void LocalTensor<T>::SetSize(const uint3
     } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
         this->address_.dataLen = size / INT2_FOUR;
 #endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
+        this->address_.dataLen = size / INT2_FOUR;
+#endif
     } else {
         this->address_.dataLen = size * sizeof(PrimType);
     }
@@ -736,6 +813,10 @@ __aicore__ inline uint32_t LocalTensor<T>::GetSize() const
         return this->address_.dataLen * INT4_TWO;
 #if (__NPU_ARCH__ == 5102)
     } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
+        return this->address_.dataLen * INT2_FOUR;
+#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
         return this->address_.dataLen * INT2_FOUR;
 #endif
     } else {
@@ -827,7 +908,21 @@ __aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr)
     static_assert(is_tensorTrait_v<T>, "only support TensorTrait type Tensor!");
     static_assert((T::tPos != TPosition::GM) && (T::tPos != TPosition::MAX),
             "TensorTrait position should not be GM or MAX!");
-    uint32_t tensorSize = Prod(this->GetTensorTrait().GetLayout().GetShape());
+    using LayoutType = GetLayoutType<T>;
+    using type = typename T::LiteType;
+    constexpr uint32_t tensorSize = LayoutType::size;
+    static_assert((tensorSize * sizeof(type)) % ONE_BLK_SIZE == 0, "The size of localTensor must be align to 32Bytes");
+    CreateTensor<typename T::LiteType>(T::tPos, addr, tensorSize);
+}
+
+template <typename T>
+template <typename U>
+__aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr, const U& layout)
+{
+    static_assert(is_tensorTrait_v<T>, "only support TensorTrait type Tensor!");
+    static_assert((T::tPos != TPosition::GM) && (T::tPos != TPosition::MAX),
+            "TensorTrait position should not be GM or MAX!");
+    uint32_t tensorSize = layout.GetSize();
     CreateTensor<typename T::LiteType>(T::tPos, addr, tensorSize);
 }
 
@@ -1038,13 +1133,23 @@ template <typename T> __aicore__ inline
         ASCENDC_DEBUG_ASSERT((offset % 2 == 0),
             KERNEL_LOG(KERNEL_ERROR, "The offset for int4b_t GetPhyAddr should be an even num."));
         return this->address_ + offset / INT4_TWO;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint4b_t>::value) {
+        ASCENDC_DEBUG_ASSERT((offset % 2 == 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "The offset for uint4b_t GetPhyAddr should be an even num."));
+        return this->address_ + offset / INT4_TWO;
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
+        ASCENDC_DEBUG_ASSERT((offset % 4 == 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "The offset for uint2b_t GetPhyAddr should be divisible by 4."));
+        return this->address_ + offset / INT2_FOUR;
+#endif
     } else {
         return this->address_ + offset;
     }
 #endif
 }
 
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
 template <typename T>
 template <typename U>
 __aicore__ inline uintptr_t GlobalTensor<T>::AlignPtr(__gm__ U* buffer) const
@@ -1054,7 +1159,7 @@ __aicore__ inline uintptr_t GlobalTensor<T>::AlignPtr(__gm__ U* buffer) const
 }
 #endif
 
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
 template <typename T> __aicore__ inline __inout_pipe__(S)
     typename GlobalTensor<T>::PrimType GlobalTensor<T>::GetValue(const uint64_t offset)
 {
@@ -1125,14 +1230,19 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 #else
     if constexpr (IsHalfByteDataType<PrimType>()) {
         __gm__ uint8_t *addr = reinterpret_cast<__gm__ uint8_t *>(this->oriAddress_) + offset / INT4_TWO;
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
         uintptr_t tmpAddr = AlignPtr<uint8_t>(addr);
         dcci(reinterpret_cast<__gm__ uint64_t *>(tmpAddr),
                 cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
 #endif
         return static_cast<PrimType>((*addr) >> (INT4_BIT_NUM * (offset % INT4_TWO)));
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
+        __gm__ uint8_t *addr = reinterpret_cast<__gm__ uint8_t *>(this->oriAddress_) + offset / INT2_FOUR;
+        return static_cast<T>((*addr) >> (INT2_BIT_NUM * (offset % INT2_FOUR)));
+#endif
     } else {
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
         uintptr_t tmpAddr = AlignPtr<PrimType>(this->oriAddress_ + offset);
         dcci(reinterpret_cast<__gm__ uint64_t *>(tmpAddr),
                 cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
@@ -1142,7 +1252,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 #endif
 }
 
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
 template <typename T> __aicore__ inline __inout_pipe__(S)
     __gm__ typename GlobalTensor<T>::PrimType& GlobalTensor<T>::operator()(const uint64_t offset)
 {
@@ -1169,7 +1279,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
     __gm__ PrimType* addr = ExtractL2CacheGmAddr(this->address_);
     return addr[offset];
 #else
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     uintptr_t tmpAddr = AlignPtr<PrimType>(this->oriAddress_ + offset);
     dcci(reinterpret_cast<__gm__ uint64_t *>(tmpAddr),
         cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
@@ -1209,7 +1319,7 @@ template <typename T> __aicore__ inline
         __gm__ uint8_t *addr = reinterpret_cast<__gm__ uint8_t *>(this->oriAddress_) + offset / INT4_TWO;
         uint8_t mask = (offset % INT4_TWO == 0)? 0xf0 : 0xf;
 
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
         if (lastWriteCacheAddr == 0) {
             lastWriteCacheAddr = AlignPtr<uint8_t>(addr);
         } else {
@@ -1224,8 +1334,29 @@ template <typename T> __aicore__ inline
         uint8_t val = (*addr) & mask;
         uint8_t shift = (offset % INT4_TWO == 0)? 0 : INT4_BIT_NUM;
         *addr = val + (value.storage << shift);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<T, uint2b_t>::value) {
+        __gm__ uint8_t *addr = reinterpret_cast<__gm__ uint8_t *>(this->oriAddress_) + offset / INT2_FOUR;
+        // example: origin data is 0b10110110, need to set higheset 2bit to 0b11, offset is 3
+        // mask is 0xCF(0b00111111), after mask operation, origin data becomes 0b00110110
+        // shift is 6, findal val is 0b00110110 + 0b11 << 6 = 0b11110110
+        uint8_t mask = 0;
+        if (offset % INT2_FOUR == 0) {
+            mask = 0xFC;
+        } else if (offset % INT2_FOUR == 1) {
+            mask = 0xF3;
+        } else if (offset % INT2_FOUR == 2) {
+            mask = 0xCF;
+        } else {
+            mask = 0x3F;
+        }
+
+        uint8_t val = (*addr) & mask;
+        uint8_t shift = 2 * (offset % INT2_FOUR);
+        *addr = val + (value.storage << shift);
+#endif
     } else {
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
         if (lastWriteCacheAddr == 0) {
             lastWriteCacheAddr = AlignPtr<PrimType>(this->oriAddress_ + offset);
         } else {
@@ -1244,13 +1375,13 @@ template <typename T> __aicore__ inline
 
 template <typename T> __aicore__ inline GlobalTensor<T>::GlobalTensor()
 {
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     this->lastWriteCacheAddr = 0;
     this->lastReadCacheAddr = 0;
 #endif
 }
 
-#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
 template <typename T> __aicore__ inline GlobalTensor<T>::~GlobalTensor()
 {
     if (lastWriteCacheAddr != 0) {
@@ -1273,6 +1404,11 @@ template <typename T> __aicore__ inline GlobalTensor<T> GlobalTensor<T>::operato
         result.oriAddress_ = result.oriAddress_ + offset / INT4_TWO;
 #if (__NPU_ARCH__ == 5102)
     } else if constexpr (SupportType<PrimType, int2b_t>()) {
+        result.address_ = result.address_ + offset / INT2_FOUR;
+        result.oriAddress_ = result.oriAddress_ + offset / INT2_FOUR;
+#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    } else if constexpr (IsSameType<PrimType, uint2b_t>::value) {
         result.address_ = result.address_ + offset / INT2_FOUR;
         result.oriAddress_ = result.oriAddress_ + offset / INT2_FOUR;
 #endif
@@ -1394,16 +1530,30 @@ __aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc(uint32_t 
     head_ += SizeOfBits<DataType>::value * tileSize / SizeOfBits<uint8_t>::value;
     return output;
 }
-
 template <Hardware hard>
 template <class TensorTraitType>
 __aicore__ inline LocalTensor<TensorTraitType> LocalMemAllocator<hard>::Alloc()
 {
     static_assert(is_tensorTrait_v<TensorTraitType>, "only support TensorTrait type!");
     static_assert(GetPhyType(TensorTraitType::tPos) == hard, "logic pos and hardware pos not matched.");
-    LocalTensor<TensorTraitType> output(head_);
-    head_ += SizeOfBits<typename TensorTraitType::LiteType>::value * output.GetSize() / SizeOfBits<uint8_t>::value;
-    return output;
+    using liteType = typename TensorTraitType::LiteType;
+    static_assert(SupportBytes<liteType, B8_BYTE_SIZE, B16_BYTE_SIZE, B32_BYTE_SIZE, B64_BYTE_SIZE>(), "Only supoort B8/B16/B32/B64 datatype");
+    LocalTensor<TensorTraitType> tensorOut(head_);
+    head_ += SizeOfBits<liteType>::value * tensorOut.GetSize() / SizeOfBits<uint8_t>::value;
+    return tensorOut;
 }
+
+template <Hardware hard>
+template <class TensorTraitType, typename LayoutType>
+__aicore__ inline LocalTensor<TensorTraitType> LocalMemAllocator<hard>::Alloc(const LayoutType& layout)
+{
+    static_assert(is_tensorTrait_v<TensorTraitType>, "only support TensorTrait type!");
+    static_assert(GetPhyType(TensorTraitType::tPos) == hard, "logic pos and hardware pos not matched.");
+    using liteType = typename TensorTraitType::LiteType;
+    static_assert(SupportBytes<liteType, B8_BYTE_SIZE, B16_BYTE_SIZE, B32_BYTE_SIZE, B64_BYTE_SIZE>(), "Only supoort B8/B16/B32/B64 datatype");
+    LocalTensor<TensorTraitType> tensorOut(head_, layout);
+    head_ += SizeOfBits<liteType>::value * tensorOut.GetSize() / SizeOfBits<uint8_t>::value;
+    return tensorOut;
+}   
 }
 #endif // KERNEL_TENSOR_H
