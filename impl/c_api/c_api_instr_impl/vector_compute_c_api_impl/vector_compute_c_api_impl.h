@@ -128,6 +128,7 @@
 #include "sub_relu_cast_impl/npu_arch_2201/asc_sub_relu_cast_impl.h"
 #include "vand_impl/npu_arch_2201/asc_vand_impl.h"
 #include "vgather_impl/npu_arch_2201/asc_gather_impl.h"
+#include "vgatherb_impl/npu_arch_2201/asc_gather_datablock_impl.h"
 
 __aicore__ inline int64_t asc_get_acc_val()
 {
@@ -4117,6 +4118,39 @@ __aicore__ inline void asc_gather_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t
     uint32_t count)
 {
     asc_gather_sync_impl(dst, src, offset_addr, count);
+}
+
+// ==========asc_gather_datablock(uint16_t/uint32_t)==========
+__aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, 
+            uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
+{
+    asc_gather_datablock_impl(dst, src, offset_addr, dst_repeat_stride, dst_block_stride, repeat);
+}
+
+__aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+{
+    asc_gather_datablock_impl(dst, src, offset_addr, count);
+}
+
+__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+{
+    asc_gather_datablock_sync_impl(dst, src, offset_addr, count);
+}
+
+__aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, 
+            uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
+{
+    asc_gather_datablock_impl(dst, src, offset_addr, dst_repeat_stride, dst_block_stride, repeat);
+}
+
+__aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+{
+    asc_gather_datablock_impl(dst, src, offset_addr, count);
+}
+
+__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+{
+    asc_gather_datablock_sync_impl(dst, src, offset_addr, count);
 }
 
 #endif
