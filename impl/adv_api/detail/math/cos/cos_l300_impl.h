@@ -239,7 +239,7 @@ __aicore__ inline void CosCastFullMask(
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template <typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
+template <typename T, bool isReuseSource = false, const CosConfig &config>
 __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
@@ -262,7 +262,7 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template<typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
+template<typename T, bool isReuseSource = false, const CosConfig &config>
 __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
@@ -279,7 +279,7 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template <typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
+template <typename T, bool isReuseSource = false, const CosConfig &config>
 __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Cos<T, isReuseSource, config>(dstTensor, srcTensor, srcTensor.GetSize());
@@ -296,7 +296,7 @@ __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  * Input data valid range should be [-65504, 65504]
  */
-template<typename T, bool isReuseSource = false, const CosConfig &config = defaultCosConfig>
+template<typename T, bool isReuseSource = false, const CosConfig &config>
 __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const uint32_t calCount)
 {
