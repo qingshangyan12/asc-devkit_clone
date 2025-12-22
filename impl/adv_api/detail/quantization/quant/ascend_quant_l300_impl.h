@@ -22,6 +22,22 @@ namespace AscendC {
 constexpr uint32_t ASCENDC_QUANT_B16_VF_LEN = GetVecLen() / sizeof(uint16_t);
 constexpr uint32_t ASCENDC_QUANT_B32_VF_LEN = GetVecLen() / sizeof(uint32_t);
 
+enum class AscendQuantPolicy : int32_t {
+    PER_TENSOR,
+    PER_CHANNEL,
+    PER_TOKEN,
+    PER_GROUP,
+    PER_CHANNEL_PER_GROUP,
+    PER_TOKEN_PER_GROUP
+};
+
+struct AscendQuantParam {
+  uint32_t m;
+  uint32_t n;
+  uint32_t calCount;
+  uint32_t groupSize = 0;
+};
+
 template <typename dstT, typename srcT>
 __simd_vf__ inline void QuantPertensorForB8VF(__ubuf__ dstT* dstUb, __ubuf__ srcT* srcUb,
     const float scale, const float offset, const uint32_t calCount)
@@ -665,14 +681,8 @@ __simd_callee__ inline void GetPerTokenScaleAndOffset(__ubuf__ scaleT* scaleAddr
 {
     if constexpr (SupportType<scaleT, half>()) {
         MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_BRC_B16>(scaleVreg, scaleAddr);
-        if constexpr (config.hasOffset) {
-            MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_BRC_B16>(offsetVreg, offsetAddr);
-        }
     } else {
         MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_BRC_B32>(scaleVreg, scaleAddr);
-        if constexpr (config.hasOffset) {
-            MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_BRC_B32>(offsetVreg, offsetAddr);
-        }
     }
 }
 
@@ -794,15 +804,6 @@ __aicore__ inline void GetPerGroupOffsetEntry(__ubuf__ scaleT* offsetAddr, const
         MicroAPI::RegTensor<scaleT> oriOffsetVreg;
         MicroAPI::RegTensor<scaleT> tempVreg;
         MicroAPI::RegTensor<scaleT> offsetVreg;
-        if constexpr (config.hasOffset) {
-            GetPerGroupOffset(offsetAddr, start, para, config, oriOffsetVreg);
-            MicroAPI::Interleave(offsetVreg, tempVreg, oriOffsetVreg, zeroVreg);
-            MicroAPI::Cast<float, scaleT, layoutZMrgZ>(f32OffsetVreg, offsetVreg, preg);
-        }
-    } else {
-        if constexpr (config.hasOffset) {
-            GetPerGroupOffset(offsetAddr, start, para, config, f32OffsetVreg);
-        }
     }
 }
 
@@ -826,16 +827,6 @@ __simd_callee__ inline void GetPerGroupKRowOffsetEntry(__ubuf__ scaleT* offsetAd
 {
     MicroAPI::MaskReg b32FullPreg = MicroAPI::CreateMask<uint32_t, MicroAPI::MaskPattern::ALL>();
     MicroAPI::RegTensor<scaleT> tempVreg;
-    if constexpr (SupportType<scaleT, half>()) {
-        if constexpr (config.hasOffset) {
-            MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_UNPACK_B16>(tempVreg, offsetAddr);
-            MicroAPI::Cast<float, scaleT, layoutZMrgZ>(f32OffsetVreg, tempVreg, b32FullPreg);
-        }
-    } else {
-        if constexpr (config.hasOffset) {
-            MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_NORM>(f32OffsetVreg, offsetAddr);
-        }
-    }
 }
 
 template <typename dstT, typename scaleT, const MicroAPI::CastTrait& castTrait>
@@ -871,9 +862,6 @@ __simd_callee__ inline void LoadContinousScaleAndOffset(__ubuf__ scaleT* scaleAd
                                                    MicroAPI::RegTensor<scaleT>& offsetVreg)
 {
     MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_NORM>(scaleVreg, scaleAddr);
-    if constexpr (config.hasOffset) {
-        MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_NORM>(offsetVreg, offsetAddr);
-    }
 }
 
 template <typename srcT>
@@ -893,26 +881,8 @@ template <typename scaleT, const AscendQuantConfig& config>
 __simd_callee__ inline void AddQuantOffsetIfExist(MicroAPI::RegTensor<float>& vreg, MicroAPI::RegTensor<float>& offsetVreg,
                                              MicroAPI::MaskReg& preg)
 {
-    if constexpr (config.hasOffset) {
-        MicroAPI::Add<scaleT, MicroAPI::MaskMergeMode::ZEROING>(vreg, vreg, offsetVreg, preg);
-    }
 }
 
-enum class AscendQuantPolicy : int32_t {
-    PER_TENSOR,
-    PER_CHANNEL,
-    PER_TOKEN,
-    PER_GROUP,
-    PER_CHANNEL_PER_GROUP,
-    PER_TOKEN_PER_GROUP
-};
-
-struct AscendQuantParam {
-  uint32_t m;
-  uint32_t n;
-  uint32_t calCount;
-  uint32_t groupSize = 0;
-};
 
 }  //  namespace AscendC
 #endif  // LIB_ASCEND_QUANT_ASCEND_QUANT_L300_IMPL_H
