@@ -1,0 +1,141 @@
+/**
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_INSTRUCTION_FORWARD_H
+#define IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_INSTRUCTION_FORWARD_H
+
+extern  __gm__ uint8_t* g_sysPrintFifoSpace;
+
+class instruction_forward 
+{
+private:
+    template<cache_line_t cache_line, dcci_dst_t dcci_dst>
+    __aicore__ static inline void dcci_impl(__gm__ uint64_t* addr)
+    {
+        if constexpr (CURRENT_ARCH_VERSION == arch_version::v2201) {
+            dcci(addr, cache_line, dcci_dst);
+        }
+    }
+
+    __aicore__ static inline void sync_impl() 
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+        asc_sync();
+#endif
+    }
+
+    __aicore__ static inline auto get_core_id_impl() 
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+        return asc_get_core_id();
+#else   
+        return 0;
+#endif
+    }
+
+    __aicore__ static inline auto get_system_cycle_impl() 
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+        return asc_get_system_cycle();
+#else   
+        return 0;
+#endif
+    }
+
+    __aicore__ static inline void set_mask_none_impl() 
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+        set_atomic_none();
+#endif
+    }
+
+    __aicore__ static inline auto get_ctrl_impl() 
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+        return asc_get_ctrl();
+#else   
+        return 0;
+#endif
+    }
+
+    template<typename T>
+    __aicore__ static inline void set_ctrl_impl(T ctrl) 
+    {
+        if constexpr (CURRENT_ARCH_VERSION == arch_version::v2201) {
+            asc_set_ctrl(ctrl);
+       }
+    }
+    
+    template <typename T>
+    __aicore__ static inline void copy_ub2gm(__gm__ T* dst, __ubuf__ T* src, const asc_copy_config& config) 
+    {
+        if constexpr (CURRENT_ARCH_VERSION == arch_version::v2201) {
+            asc_copy_ub2gm(reinterpret_cast<__gm__ void*>(dst), reinterpret_cast<__ubuf__ void*>(src), config);
+        }
+    }
+
+    __aicore__ static inline auto get_g_sys_print_fifo_space() {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+        return g_sysPrintFifoSpace;
+#else   
+        return nullptr;
+#endif
+    }
+public:
+    template<cache_line_t cache_line, dcci_dst_t dcci_dst>
+    __aicore__ static inline void call_dcci(__gm__ uint64_t* addr)
+    {
+        dcci_impl<cache_line, dcci_dst>(addr);
+    }
+
+    __aicore__ static inline void call_sync()
+    {
+        sync_impl();
+    }
+
+    __aicore__ static inline auto call_get_core_id()
+    {
+        return get_core_id_impl();
+    }
+
+    __aicore__ static inline auto call_get_system_cycle()
+    {
+        return get_system_cycle_impl();
+    }
+
+    __aicore__ static inline void call_set_mask_none()
+    {
+        set_mask_none_impl();
+    }
+
+    __aicore__ static inline decltype(auto) call_get_ctrl()
+    {
+        return get_ctrl_impl();
+    }
+    
+    template<typename T>
+    __aicore__ static inline void call_set_ctrl(T ctrl)
+    {
+        set_ctrl_impl(ctrl);
+    }
+    
+    template<typename T>
+    __aicore__ static inline void call_copy_ub2gm(__gm__ T* dst, __ubuf__ T* src, const asc_copy_config& config) 
+    {
+        copy_ub2gm(dst, src, config);
+    }
+
+    __aicore__ static inline auto call_get_g_sys_print_fifo_space()
+    {
+        return get_g_sys_print_fifo_space();
+    }
+};
+
+#endif

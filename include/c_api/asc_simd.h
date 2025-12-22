@@ -22,5 +22,6 @@
 #include "sys_var/sys_var.h"
 #include "vector_compute/vector_compute.h"
 #include "vector_datamove/vector_datamove.h"
+#include "utils/debug/asc_dump.h"
 
 #endif
