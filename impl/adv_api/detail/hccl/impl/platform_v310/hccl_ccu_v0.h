@@ -341,11 +341,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     int8_t resourceId = reqId % CCU_MAX_MSG_NUM;
     KERNEL_LOG(KERNEL_INFO, "ApiClient CcuSendMsg reqId:%d, resourceId:%d", reqId, resourceId);
 
-    if (resourceId >= 8 || resourceId < 0) {
+    if (resourceId >= CCU_MAX_MSG_NUM || resourceId < 0) {
         KERNEL_LOG(KERNEL_ERROR, "CcuSendMsg resourceId %d is invalid.", resourceId);
         return;
     }
-    ccuMsg_.xnAddr = ccuConfig_.xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_MAX_MSG_NUM;
+    ccuMsg_.xnAddr = ccuConfig_.xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
     ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
     ccuMsg_.waitCKEAddr = GetWaitCkeAddr(resourceId);
     KERNEL_LOG(KERNEL_INFO, "ApiClient CcuSendMsg xnAddr:0x%llx, commitCKEAddr:0x%llx, value:%d, waitCKEAddr:0x%llx, value:%d",
@@ -524,7 +524,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         KERNEL_LOG(KERNEL_INFO, "ApiClient Finalize handleId:%d, reqId:%d, resourceId:%d", handleId, reqId, resourceId);
 
         ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
-        ccuMsg_.xnAddr = hcclContext_->xnOffset + CCU_MSG_XN_NUM * CCU_MAX_MSG_NUM * resourceId;
+        ccuMsg_.xnAddr = hcclContext_->xnOffset + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * resourceId;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
         FlushDataCache(ccuMsg_.xnAddr);
 

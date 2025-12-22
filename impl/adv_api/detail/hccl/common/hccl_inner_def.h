@@ -123,7 +123,7 @@ struct HcclOpResParam {
 constexpr uint16_t CCU_CKE_SIZE = 8;
 constexpr uint64_t CCU_XN_DATA_SIZE = 8; // Number of bytes per xn
 constexpr uint16_t CCU_USED_XN_NUM = 9;  // Currently only the first 9 xn are used
-constexpr uint16_t CCU_MAX_MSG_NUM = 8;  // The message queue length sent to CCU is 8
+constexpr uint16_t CCU_MAX_MSG_NUM = 64;  // The message queue length sent to CCU is 64
 constexpr uint16_t CCU_MSG_XN_NUM = 64;  // Maximum xn number, each CCU message body occupies 8 registers
                                          // the message body length is 64*8B=512B
 constexpr uint64_t CCU_LOOP_COUNT = 64;  // CCU cycle number, MC2 is not aware of it
