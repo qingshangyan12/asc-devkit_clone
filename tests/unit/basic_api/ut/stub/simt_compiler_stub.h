@@ -14,6 +14,10 @@
 #include "kernel_vectorized.h"
 #include "stub_def.h"
 
+constexpr int32_t MAX_SHLF_OFFSET = 31;
+constexpr int32_t WARP_SIZE = 32;
+
+
 float __expf(float x);
 half2 __expf(half2 x);
 
@@ -113,8 +117,78 @@ int64_t atomicXOr(__gm__ int64_t *address, int64_t val);
 
 uint64_t atomicXOr(__gm__ uint64_t *address, uint64_t val);
 
+int32_t __all(int32_t predicate);
+
+int32_t __any(int32_t predicate);
+
+uint32_t __ballot(int32_t predicate);
+
+uint32_t __activemask();
+
+int32_t __shfl(int32_t var, int32_t num);
+
+uint32_t __shfl(uint32_t var, int32_t num);
+
+float __shfl(float var, int32_t num);
+
+int64_t __shfl(int64_t var, int32_t num);
+
+uint64_t __shfl(uint64_t var, int32_t num);
+
+int32_t __shfl_up(int32_t var, int32_t num);
+
+uint32_t __shfl_up(uint32_t var, int32_t num);
+
+float __shfl_up(float var, int32_t num);
+
+int64_t __shfl_up(int64_t var, int32_t num);
+
+uint64_t __shfl_up(uint64_t var, int32_t num);
+
+int32_t __shfl_down(int32_t var, int32_t num);
+
+uint32_t __shfl_down(uint32_t var, int32_t num);
+
+float __shfl_down(float var, int32_t num);
+
+int64_t __shfl_down(int64_t var, int32_t num);
+
+uint64_t __shfl_down(uint64_t var, int32_t num);
+
+int32_t __shfl_xor(int32_t var, int32_t num);
+
+uint32_t __shfl_xor(uint32_t var, int32_t num);
+
+float __shfl_xor(float var, int32_t num);
+
+int64_t __shfl_xor(int64_t var, int32_t num);
+
+uint64_t __shfl_xor(uint64_t var, int32_t num);
+
+int32_t __reduce_add(int32_t val);
+
+uint32_t __reduce_add(uint32_t val);
+
+float __reduce_add(float val);
+
+int32_t __reduce_max(int32_t val);
+
+uint32_t __reduce_max(uint32_t val);
+
+float __reduce_max(float val);
+
+int32_t __reduce_min(int32_t val);
+
+uint32_t __reduce_min(uint32_t val);
+
+float __reduce_min(float val);
+
+void __threadfence();
+
 }
 }
 }
+
+void __sync_workitems();
 
 #endif
