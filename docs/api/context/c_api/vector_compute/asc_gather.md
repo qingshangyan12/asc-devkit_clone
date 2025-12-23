@@ -68,5 +68,5 @@ constexpr uint64_t total_length = 128;    // total_length指参与计算的数�
 uint32_t offset_addr = 4;
 __ubuf__ half src[total_length * sizeof(half)];
 __ubuf__ half dst[total_length * sizeof(half)];
-asc_gather(dst, src, offset_addr, total_length);    // 将src中的每个元素按照4 Bytes（half类型则偏移两个元素）的偏移收集到dst中
+asc_gather(dst, src, offset_addr, total_length);    // 将src中的每个元素往后偏移两个元素（4 / sizeof(half)）收集到dst中
 ```

@@ -53,7 +53,7 @@
     __aicore__ inline void asc_half2int4_z(__ubuf__ void* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
-- 同步转换
+- 同步计算
 
     ```c++
     //在转换有精度损失时表示RINT舍入模式，不涉及精度损失时代表不舍入

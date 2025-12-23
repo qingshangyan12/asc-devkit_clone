@@ -55,7 +55,7 @@ PIPE_MTE2
 ### 约束说明
 
 - dst的起始地址需要32字节对齐。
-- 需配合asc_set_aipp_functions接口使用，该接口用于配置图像预处理的相关参数。
+- 需配合[asc_set_aipp_functions](./asc_set_aipp_functions.md)接口使用，该接口用于配置图像预处理的相关参数。
 - 当通过asc_set_aipp_functions接口配置padding模式为块填充模式或者镜像块填充模式时，左右padding的长度必须小于或等于hor_size，上下padding的长度必须小于或等于ver_size。
 - 加载到dst的图片大小加上asc_set_aipp_functions接口配置的padding大小必须小于等于所在存储空间的大小。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
@@ -65,5 +65,7 @@ PIPE_MTE2
 ```cpp
 constexpr uint64_t total_length = 128;    // total_length指参与搬运的数据总长度
 __ca__ half dst[total_length * sizeof(half)];
-asc_load_image_to_cbuf(dst, params);
+// 将asc_set_aipp_functions接口设置的位于Global Memory上的源图片搬运到L1 Buffer
+// 加载图片时的高度与宽度均为1，起始地址为(0,0)，源图片水平宽度为1，不做padding
+asc_load_image_to_cbuf(dst, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0);
 ```

@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-将int64类型数据转换为int32类型。
+将int64_t类型数据转换为int32_t类型。
 
 ## 函数原型
 
@@ -25,7 +25,7 @@
     __aicore__ inline void asc_int642int32(__ubuf__ int32_t* dst, __ubuf__ int64_t* src, uint8_t repeat uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
-- 同步转换
+- 同步计算
 
     ```c++
     __aicore__ inline void asc_int642int32_sync(__ubuf__ int32_t* dst, __ubuf__ int64_t* src, uint32_t count)
@@ -64,5 +64,5 @@ PIPE_V
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
 __ubuf__ int64_t src[total_length * sizeof(int64_t)];
 __ubuf__ int32_t dst[total_length * sizeof(int32_t)];
-asc_int642int32(dst, src, total_length);    // 将src转化为int32_t类型并存放到dst中
+asc_int642int32(dst, src, total_length);    // 将src转换为int32_t类型并存放到dst中
 ```

@@ -31,8 +31,8 @@ PIPE_S
 
 ## 约束说明
 
-- 需要和asc_set_atomic_add/[asc_set_atomic_max](./asc_set_atomic_max.md)/[asc_set_atomic_min](./asc_set_atomic_min.md)接口配合使用。
-- 使用完成后，建议使用asc_set_atomic_none清空原子操作的状态，以免影响后续相关指令功能。
+- 需配合[asc_set_atomic_add](./asc_set_atomic_add.md)/[asc_set_atomic_max](./asc_set_atomic_max.md)/[asc_set_atomic_min](./asc_set_atomic_min.md)接口使用。
+- 使用完成后，建议使用[asc_set_atomic_none](./asc_set_atomic_none.md)清空原子操作的状态，以免影响后续相关指令功能。
 
 ## 调用示例
 
@@ -44,4 +44,5 @@ asc_copy_ub2gm(dst, src, total_length * sizeof(half));    // 将数据搬运到G
 asc_sync_mte3(0);
 asc_set_atomic_min();
 asc_set_atomic_bf16();    // 设置原子操作类型为bfloat16_t
+asc_set_atomic_none();    // 清空原子操作的状态
 ```

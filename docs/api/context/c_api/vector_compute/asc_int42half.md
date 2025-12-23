@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-将int4类型数据转换为half类型。
+将int4_t类型数据转换为half类型。
 
 ## 函数原型
 
@@ -25,7 +25,7 @@
     __aicore__ inline void asc_int42half(__ubuf__ half* dst, __ubuf__ void* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
     ```
 
-- 同步转换
+- 同步计算
 
     ```c++
     __aicore__ inline void asc_int42half_sync(__ubuf__ half* dst, __ubuf__ void* src, uint32_t count)
@@ -57,7 +57,7 @@ PIPE_V
 
 - dst、src的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
-- 当src为int4b_t时，前n个数据计算接口的count必须为偶数；
+- 当src为int4b_t时，前n个数据计算接口的count必须为偶数。
 
 ## 调用示例
 
@@ -65,5 +65,5 @@ PIPE_V
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
 __ubuf__ int4b_t src[total_length / 2];    // int4b_t的sizeof为1/2
 __ubuf__ half dst[total_length * sizeof(half)];
-asc_int42half(dst, src, total_length);    // 将src转化为half类型并存放到dst中
+asc_int42half(dst, src, total_length);    // 将src转换为half类型并存放到dst中
 ```

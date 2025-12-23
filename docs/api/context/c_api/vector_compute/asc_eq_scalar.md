@@ -63,5 +63,6 @@ constexpr uint64_t total_length = 128;    // total_length指参与计算的数�
 __ubuf__ half src[total_length * sizeof(half)];
 half value = 1;
 __ubuf__ half dst[total_length * sizeof(half)];
-asc_eq_scalar(dst, src, value, config);    // 将src按元素与value进行比较运算，若值相等则输出1，否则输出0
+// 做一次迭代计算，dst和src单次迭代内DataBlock间地址步长为1，相邻迭代间相同DataBlock地址步长为8
+asc_eq_scalar(dst, src, value, 1, 1, 1, 8, 8);    // 将src按元素与value进行比较运算，若值相等则输出1，否则输出0
 ```

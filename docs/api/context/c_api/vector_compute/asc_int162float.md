@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-将int16类型数据转换为float类型。
+将int16_t类型数据转换为float类型。
 
 ## 函数原型
 
@@ -25,7 +25,7 @@
     __aicore__ inline void asc_int162float(__ubuf__ float* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
-- 同步转换
+- 同步计算
 
     ```c++
     __aicore__ inline void asc_int162float_sync(__ubuf__ float* dst, __ubuf__ int16_t* src, uint32_t count)
@@ -64,5 +64,5 @@ PIPE_V
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
 __ubuf__ int16_t src[total_length * sizeof(int16_t)];
 __ubuf__ float dst[total_length * sizeof(float)];
-asc_int162float(dst, src, total_length);    // 将src转化为float类型并存放到dst中
+asc_int162float(dst, src, total_length);    // 将src转换为float类型并存放到dst中
 ```

@@ -25,7 +25,7 @@
    __aicore__ inline void int642float(__ubuf__ float* dst, __ubuf__ int64_t* src, const asc_unary_config& config)
     ```
 
-- 同步转换
+- 同步计算
 
     ```c++
     __aicore__ inline void int642float_sync(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
