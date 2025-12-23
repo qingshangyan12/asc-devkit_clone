@@ -19,7 +19,7 @@ __aicore__ inline void asc_bf162float(__ubuf__ float* dst, __ubuf__ bfloat16_t* 
 ```
 - 高维切分计算
 ```cpp
-__aicore__ inline void asc_bf162float(__ubuf__ float* dst, __ubuf__ bfloat16_t* src, const asc_unary_config& config)
+__aicore__ inline void asc_bf162float(__ubuf__ float* dst, __ubuf__ bfloat16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 ```
 - 同步计算
 ```cpp
@@ -33,7 +33,11 @@ __aicore__ inline void asc_bf162float_sync(__ubuf__ float* dst, __ubuf__ bfloat1
 |dst|输出|目的操作数。|
 |src|输入|源操作数。|
 |count|输入|参与计算的元素个数。|
-|config|输入|在非连续场景下使用的计算配置参数。<br/>详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。|
+| dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src_block_stride |输入| 源操作数单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride |输入| 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src_repeat_stride |输入| 源操作数相邻迭代间相同DataBlock的地址步长。 |
+| repeat |输入| 迭代次数。 |
 
 ## 返回值说明
 
