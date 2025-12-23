@@ -53,7 +53,7 @@ __aicore__ inline void asc_repeat_reduce_min_index_value_impl(__ubuf__ half* dst
 {
     asc_set_mask_count_begin(count);
     asc_repeat_reduce_min_index_value_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
-        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE);
+        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
@@ -61,7 +61,7 @@ __aicore__ inline void asc_repeat_reduce_min_value_index_impl(__ubuf__ half* dst
 {
     asc_set_mask_count_begin(count);
     asc_repeat_reduce_min_value_index_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
-        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE);
+        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
@@ -69,7 +69,7 @@ __aicore__ inline void asc_repeat_reduce_min_only_value_impl(__ubuf__ half* dst,
 {
     asc_set_mask_count_begin(count);
     asc_repeat_reduce_min_only_value_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
-        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE);
+        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
@@ -77,7 +77,7 @@ __aicore__ inline void asc_repeat_reduce_min_only_index_impl(__ubuf__ half* dst,
 {
     asc_set_mask_count_begin(count);
     asc_repeat_reduce_min_only_index_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
-        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE);
+        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
@@ -141,7 +141,7 @@ __aicore__ inline void asc_repeat_reduce_min_index_value_impl(__ubuf__ float* ds
 {
     asc_set_mask_count_begin(count);
     asc_repeat_reduce_min_index_value_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
-        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE);
+        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
@@ -149,7 +149,7 @@ __aicore__ inline void asc_repeat_reduce_min_value_index_impl(__ubuf__ float* ds
 {
     asc_set_mask_count_begin(count);
     asc_repeat_reduce_min_value_index_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
-        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE);
+        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
@@ -157,7 +157,7 @@ __aicore__ inline void asc_repeat_reduce_min_only_value_impl(__ubuf__ float* dst
 {
     asc_set_mask_count_begin(count);
     asc_repeat_reduce_min_only_value_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
-        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE);
+        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
@@ -165,7 +165,7 @@ __aicore__ inline void asc_repeat_reduce_min_only_index_impl(__ubuf__ float* dst
 {
     asc_set_mask_count_begin(count);
     asc_repeat_reduce_min_only_index_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
-        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE);
+        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 

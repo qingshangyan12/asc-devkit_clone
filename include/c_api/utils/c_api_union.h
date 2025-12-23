@@ -17,17 +17,6 @@ constexpr uint64_t CAPI_DEFAULT_BINARY_CONFIG_VALUE = 0x0100080808010101;
 constexpr uint64_t CAPI_DEFAULT_UNARY_CONFIG_VALUE = 0x0100800800010001;
 constexpr uint64_t CAPI_DEFAULT_FILL_VALUE_CONFIG_VALUE = 0x0000000000000000;
 
-union asc_copy_config {
-    uint64_t config;
-    struct {
-        uint64_t sid : 4;
-        uint64_t n_burst : 12;
-        uint64_t burst_len : 16;
-        uint64_t src_gap : 16;
-        uint64_t dst_gap : 16;
-    };
-};
-
 union asc_binary_config {
     uint64_t config = CAPI_DEFAULT_BINARY_CONFIG_VALUE;
     struct {

@@ -13,7 +13,7 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ int4x2_t* dst, __cbuf__ int4x2_t* src,
+__aicore__ inline void asc_copy_l12l0b_impl(__cb__ void* dst, __cbuf__ void* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
 {
     if ASC_IS_AIC {
@@ -22,7 +22,7 @@ __aicore__ inline void asc_copy_l12l0b_impl(__cb__ int4x2_t* dst, __cbuf__ int4x
     }
 }
 
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ int4x2_t* dst, __cbuf__ int4x2_t* src,
+__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ void* dst, __cbuf__ void* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
 {
     asc_copy_l12l0b_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);

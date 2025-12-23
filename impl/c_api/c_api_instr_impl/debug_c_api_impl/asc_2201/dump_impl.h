@@ -209,15 +209,10 @@ private:
             instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>((__gm__ uint64_t*)(dst));
         } else if constexpr (hardware == Hardware::UB) {
             __gm__ T* dump_addr = reinterpret_cast<__gm__ T*>(dump_tensor_tlv + 1);
-            asc_copy_config copy_params;
-            copy_params.sid = 0;
-            copy_params.n_burst = 1;
-            copy_params.burst_len = static_cast<uint16_t>(align_dump_len / ASC_ONE_DATABLOCK_SIZE);
-            copy_params.src_gap = 0;
-            copy_params.dst_gap = 0;
+            uint16_t burst_len = static_cast<uint16_t>(align_dump_len / ASC_ONE_DATABLOCK_SIZE);
             instruction_forward::call_sync();
             if (dump_tensor_tlv->position == static_cast<uint16_t>(Hardware::UB)) {
-                instruction_forward::call_copy_ub2gm(dump_addr, src, copy_params);
+                instruction_forward::call_copy_ub2gm(dump_addr, src, 0, 1, burst_len, 0, 0);
             }
             instruction_forward::call_sync();
             instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>((__gm__ uint64_t*)(dump_addr));
