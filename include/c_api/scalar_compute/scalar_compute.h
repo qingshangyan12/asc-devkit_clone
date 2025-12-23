@@ -12,5 +12,7 @@
 #define INCLUDE_C_API_SCALAR_COMPUTE_H
  
 #include "c_api_instr_impl/scalar_compute_c_api_impl/scalar_compute_c_api_impl.h"
- 
+
+__aicore__ inline int64_t asc_ffs(uint64_t in);
+
 #endif

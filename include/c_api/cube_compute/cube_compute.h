@@ -13,4 +13,6 @@
 
 #include "c_api_instr_impl/cube_compute_c_api_impl/cube_compute_c_api_impl.h"
 
+__aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
+
 #endif

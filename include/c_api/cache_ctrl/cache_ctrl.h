@@ -14,5 +14,7 @@
 #include "c_api_instr_impl/cache_ctrl_c_api_impl/cache_ctrl_c_api_impl.h"
  
 __aicore__ inline void asc_data_cache_clean_and_invalid(__gm__ void* dst, uint64_t entire);
+
+__aicore__ inline int64_t asc_get_icache_preload_status();
  
 #endif
