@@ -105,7 +105,7 @@ BT_SIZE = "BT_SIZE"
 CORE_TYPE_LIST = "CORE_TYPE_LIST"
 L0A_LAYOUT_IS_zN = "L0A_LAYOUT_IS_zN"
 UB_BLOCK_SIZE = "ubblock_size"
-
+VECTOR_REG_WIDTH = "VECTOR_REG_WIDTH"
 
 def get_soc_spec(key):
     """
@@ -126,7 +126,7 @@ def get_soc_spec(key):
 
     str2int_list = (CORE_NUM, UB_SIZE, L2_SIZE, L1_SIZE, L0A_SIZE, L0B_SIZE, L0C_SIZE, SMASK_SIZE, VREG_SIZE, WREG_SIZE,
                     WIDE_REG_WIDTH, AREG_SIZE, PREG_SIZE, UREG_SIZE, CUBE_VECTOR_SPLIT, FB_SIZE, FB0_SIZE, FB1_SIZE,
-                    FB2_SIZE, FB3_SIZE, BT_SIZE, UB_BLOCK_SIZE)
+                    FB2_SIZE, FB3_SIZE, BT_SIZE, UB_BLOCK_SIZE, VECTOR_REG_WIDTH)
 
     str2bool_list = (L0A_LAYOUT_IS_zN,)
 
