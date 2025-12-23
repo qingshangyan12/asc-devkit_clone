@@ -39,7 +39,7 @@ enum class SocVersion {
     ASCEND310P,     // Ascend310P1, Ascend310P3
     ASCEND310B,     // Ascend310B1, Ascend310B2, Ascend310B3, Ascend310B4
     ASCEND910_95,   // ASCEND910_95, __DAV_C310__
-    ASCEND910_55,   // Ascend910_55, __DAV_310R6__
+    ASCEND910_55,   // ASCEND910_55, __DAV_310R6__
     RESERVED_VERSION = 99999
 };
 

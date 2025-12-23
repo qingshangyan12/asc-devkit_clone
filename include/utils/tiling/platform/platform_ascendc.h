@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <mutex>
+#include "tiling/platform/soc_spec.h"
 
 #if !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
 
@@ -61,7 +62,7 @@ enum class SocVersion {
     ASCEND310P,    // Ascend310P1, Ascend310P3
     ASCEND310B,    // Ascend310B1, Ascend310B2, Ascend310B3, Ascend310B4
     ASCEND910_95,  // ASCEND910_95, __DAV_C310__
-    ASCEND910_55,  // Ascend910_55, __DAV_310R6__
+    ASCEND910_55,  // ASCEND910_55, __DAV_310R6__
     AS31XM1,
     ASCEND031,
     ASCEND035,
@@ -136,12 +137,14 @@ public:
      * @return Enum SocVersion
      */
     SocVersion GetSocVersion(void) const;
+    NpuArch GetCurNpuArch(void) const;
 
 private:
     fe::PlatFormInfos *platformInfo_;
     fe::PlatFormInfos* GetPlatFormInfo(void) const;
     uint32_t reservedMemSize_ = 0;
 };
+
 class PlatformAscendCManager {
 public:
     static PlatformAscendC* GetInstance()
