@@ -69,4 +69,13 @@ __aicore__ inline void asc_sync_post_process()
     pipe_barrier(pipe_t::PIPE_ALL);
 }
 
+union asc_capi_arch_version {
+    uint64_t full;
+    struct {
+        uint64_t low_bit : 32;
+        uint64_t core_ver : 12;
+        uint64_t reserved : 20;
+    };
+};
+
 #endif // IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_UTILS_C_API_IMPL_H

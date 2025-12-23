@@ -65,15 +65,14 @@ TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_half_half_half
     __ubuf__ dst_data_type *dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
     __ubuf__ src_data_type *src0 = reinterpret_cast<__ubuf__ src_data_type *>(22);                      \
     __ubuf__ src_data_type *src1 = reinterpret_cast<__ubuf__ src_data_type *>(33);                      \
-                                                                                                \
-    asc_binary_config config;                                                                   \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src0_block_stride = static_cast<uint64_t>(1);                                        \
-    config.src1_block_stride = static_cast<uint64_t>(1);                                        \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src0_repeat_stride = static_cast<uint64_t>(8);                                       \
-    config.src1_repeat_stride = static_cast<uint64_t>(8);                                       \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+                                                                                                        \
+    uint8_t dst_block_stride = 1;                                         \
+    uint8_t src0_block_stride = 1;                                        \
+    uint8_t src1_block_stride = 1;                                        \
+    uint8_t dst_repeat_stride = 8;                                        \
+    uint8_t src0_repeat_stride = 8;                                       \
+    uint8_t src1_repeat_stride = 8;                                       \
+    uint8_t repeat = 1;                                                   \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ dst_data_type *,__ubuf__ src_data_type *,                        \
                 __ubuf__ src_data_type *, uint8_t, uint8_t, uint8_t, uint8_t,                       \
@@ -81,7 +80,8 @@ TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_half_half_half
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_bool_Stub));   \
                                                                                                 \
-    c_api_name(dst, src0, src1, config);                                                        \
+    c_api_name(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, \
+                dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);                                                        \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \

@@ -21,7 +21,7 @@
 #include "set_atomic_s32_impl/npu_arch_2201/asc_set_atomic_s32_impl.h"
 #include "zero_bits_cnt_impl/npu_arch_2201/asc_zero_bits_cnt_impl.h"
 #include "ffz_impl/npu_arch_2201/asc_ffz_impl.h"
-#include "set_atomic_f32_impl/asc_2201/asc_set_atomic_f32_impl.h"
+#include "set_atomic_f32_impl/npu_arch_2201/asc_set_atomic_f32_impl.h"
 
 __aicore__ inline void asc_set_atomic_min()
 {
@@ -105,6 +105,6 @@ __aicore__ inline int64_t asc_ffz(uint64_t in)
 
 __aicore__ inline void asc_set_atomic_f32()
 {
-    CApiInternal::asc_set_atomic_f32_impl();
+    asc_set_atomic_f32_impl();
 }
 #endif
