@@ -26,8 +26,8 @@ __aicore__ inline void asc_add_relu_cast_s162s8_impl(__ubuf__ int8_t* dst, __ubu
 __aicore__ inline void asc_add_relu_cast_s162s8_impl(__ubuf__ int8_t* dst,  __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_add_relu_cast_s162s8_impl(dst, src0, src1,  CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE,
-        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_add_relu_cast_s162s8_impl(dst, src0, src1,  ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE,
+        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 

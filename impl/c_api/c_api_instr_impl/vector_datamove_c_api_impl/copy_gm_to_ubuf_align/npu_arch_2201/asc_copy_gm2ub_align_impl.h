@@ -18,9 +18,9 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-constexpr uint8_t CAPI_DEFAULT_SID_PADDING_GAP = 0;
-constexpr uint16_t CAPI_DEFAULT_NBURST = 1;
-constexpr uint32_t CAPI_DEFAULT_LEN_BURST = 0;
+constexpr uint8_t ASC_DEFAULT_SID_PADDING_GAP = 0;
+constexpr uint16_t ASC_DEFAULT_NBURST = 1;
+constexpr uint32_t ASC_DEFAULT_LEN_BURST = 0;
 
 __aicore__ inline void asc_copy_gm2ub_align_b8_impl(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst,
             uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -30,8 +30,8 @@ __aicore__ inline void asc_copy_gm2ub_align_b8_impl(__ubuf__ void* dst, __gm__ v
 
 __aicore__ inline void asc_copy_gm2ub_align_b8_impl(__ubuf__  void* dst, __gm__ void* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_b8_impl(dst, src, CAPI_DEFAULT_SID_PADDING_GAP, CAPI_DEFAULT_NBURST, size / CAPI_ONE_DATABLOCK_SIZE, CAPI_DEFAULT_SID_PADDING_GAP,
-                CAPI_DEFAULT_SID_PADDING_GAP, CAPI_DEFAULT_SID_PADDING_GAP, CAPI_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_b8_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size / ASC_ONE_DATABLOCK_SIZE, ASC_DEFAULT_SID_PADDING_GAP,
+                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_b8_sync_impl(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
@@ -48,8 +48,8 @@ __aicore__ inline void asc_copy_gm2ub_align_b16_impl(__ubuf__ void* dst, __gm__ 
 
 __aicore__ inline void asc_copy_gm2ub_align_b16_impl(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_b16_impl(dst, src, CAPI_DEFAULT_SID_PADDING_GAP, CAPI_DEFAULT_NBURST, size / CAPI_ONE_DATABLOCK_SIZE, CAPI_DEFAULT_SID_PADDING_GAP,
-                CAPI_DEFAULT_SID_PADDING_GAP, CAPI_DEFAULT_SID_PADDING_GAP, CAPI_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_b16_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size / ASC_ONE_DATABLOCK_SIZE, ASC_DEFAULT_SID_PADDING_GAP,
+                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_b16_sync_impl(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
@@ -66,8 +66,8 @@ __aicore__ inline void asc_copy_gm2ub_align_b32_impl(__ubuf__ void* dst, __gm__ 
 
 __aicore__ inline void asc_copy_gm2ub_align_b32_impl(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_b32_impl(dst, src, CAPI_DEFAULT_SID_PADDING_GAP, CAPI_DEFAULT_NBURST, size / CAPI_ONE_DATABLOCK_SIZE, CAPI_DEFAULT_SID_PADDING_GAP,
-                CAPI_DEFAULT_SID_PADDING_GAP, CAPI_DEFAULT_SID_PADDING_GAP, CAPI_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_b32_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size / ASC_ONE_DATABLOCK_SIZE, ASC_DEFAULT_SID_PADDING_GAP,
+                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_b32_sync_impl(__ubuf__ void* dst, __gm__ void* src, uint32_t size)

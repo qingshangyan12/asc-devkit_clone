@@ -28,7 +28,7 @@ __aicore__ inline void asc_log_impl_half(__ubuf__ half *dst, __ubuf__ half *src,
 __aicore__ inline void asc_log_count_impl_half(__ubuf__ half *dst, __ubuf__ half *src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_log_impl_half(dst, src, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_log_impl_half(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
@@ -49,8 +49,8 @@ __aicore__ inline void asc_log_impl_float(__ubuf__ float *dst, __ubuf__ float *s
 __aicore__ inline void asc_log_count_impl_float(__ubuf__ float *dst, __ubuf__ float *src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_log_impl_float(dst, src, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
-        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_log_impl_float(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
+        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 

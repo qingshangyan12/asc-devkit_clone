@@ -28,8 +28,8 @@ __aicore__ inline void asc_int322int64_impl(__ubuf__ int64_t* dst, __ubuf__ int3
 __aicore__ inline void asc_int322int64_impl(__ubuf__ int64_t* dst, __ubuf__ int32_t* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_int322int64_impl(dst, src, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
-        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE / 2);
+    asc_int322int64_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
+        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE / 2);
     asc_set_mask_count_end();
 }
 

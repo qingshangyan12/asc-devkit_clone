@@ -212,7 +212,7 @@ private:
             asc_copy_config copy_params;
             copy_params.sid = 0;
             copy_params.n_burst = 1;
-            copy_params.burst_len = static_cast<uint16_t>(align_dump_len / CAPI_ONE_DATABLOCK_SIZE);
+            copy_params.burst_len = static_cast<uint16_t>(align_dump_len / ASC_ONE_DATABLOCK_SIZE);
             copy_params.src_gap = 0;
             copy_params.dst_gap = 0;
             instruction_forward::call_sync();
@@ -262,7 +262,7 @@ private:
         if (block_ring_buf_info == nullptr) {
             return;
         }
-        uint32_t align_dump_len = align_up(dump_size * sizeof(T), CAPI_ONE_DATABLOCK_SIZE);
+        uint32_t align_dump_len = align_up(dump_size * sizeof(T), ASC_ONE_DATABLOCK_SIZE);
         uint32_t tlv_len = sizeof(DumpTensorTlvInfoHead) + align_dump_len;
         if (!call_check_and_wait_ring_buf_space(block_ring_buf_info, tlv_len)) {
             return;

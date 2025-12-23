@@ -30,7 +30,7 @@ __aicore__ inline void asc_gather_impl(__ubuf__ uint16_t* dst, __ubuf__ uint32_t
     uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, offset_addr, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT);
+    asc_gather_impl(dst, src, offset_addr, ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT);
     asc_set_mask_count_end();
 }
 
@@ -54,7 +54,7 @@ __aicore__ inline void asc_gather_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t
     uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, offset_addr, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT);
+    asc_gather_impl(dst, src, offset_addr, ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT);
     asc_set_mask_count_end();
 }
 

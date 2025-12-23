@@ -28,8 +28,8 @@ __aicore__ inline void asc_or_impl_int16_t(__ubuf__ int16_t *dst, __ubuf__ int16
 __aicore__ inline void asc_or_count_impl_int16_t(__ubuf__ int16_t *dst, __ubuf__ int16_t *src0, __ubuf__ int16_t *src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_or_impl_int16_t(dst, src0, src1, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
-        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_or_impl_int16_t(dst, src0, src1, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
+        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
@@ -50,8 +50,8 @@ __aicore__ inline void asc_or_impl_uint16_t(__ubuf__ uint16_t *dst, __ubuf__ uin
 __aicore__ inline void asc_or_count_impl_uint16_t(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0, __ubuf__ uint16_t *src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_or_impl_uint16_t(dst, src0, src1, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
-        CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    asc_or_impl_uint16_t(dst, src0, src1, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
+        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 

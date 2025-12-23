@@ -28,9 +28,9 @@ __aicore__ inline void asc_deq_int322half_impl(__ubuf__ half* dst, __ubuf__ int3
 __aicore__ inline void asc_deq_int322half_impl(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    constexpr uint8_t dst_repeat_stride = static_cast<uint8_t>(CAPI_DEFAULT_REPEAT_STRIDE / (sizeof(int32_t) / sizeof(half)));
-    asc_deq_int322half_impl(dst, src, CAPI_DEFAULT_REPEAT, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
-        dst_repeat_stride, CAPI_DEFAULT_REPEAT_STRIDE);
+    constexpr uint8_t dst_repeat_stride = static_cast<uint8_t>(ASC_DEFAULT_REPEAT_STRIDE / (sizeof(int32_t) / sizeof(half)));
+    asc_deq_int322half_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
+        dst_repeat_stride, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 

@@ -31,10 +31,10 @@ __aicore__ inline void asc_mul_cast_half2int8_impl(__ubuf__ int8_t* dst, __ubuf_
 __aicore__ inline void asc_mul_cast_half2int8_impl(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    constexpr uint8_t dst_repeat_stride = static_cast<uint8_t>(CAPI_DEFAULT_REPEAT_STRIDE / (sizeof(half) / sizeof(int8_t)));
-    asc_mul_cast_half2int8_impl(dst, src0, src1, CAPI_DEFAULT_REPEAT,
-        CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE, CAPI_DEFAULT_BLOCK_STRIDE,
-        dst_repeat_stride, CAPI_DEFAULT_REPEAT_STRIDE, CAPI_DEFAULT_REPEAT_STRIDE);
+    constexpr uint8_t dst_repeat_stride = static_cast<uint8_t>(ASC_DEFAULT_REPEAT_STRIDE / (sizeof(half) / sizeof(int8_t)));
+    asc_mul_cast_half2int8_impl(dst, src0, src1, ASC_DEFAULT_REPEAT,
+        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
+        dst_repeat_stride, ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 

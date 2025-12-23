@@ -13,7 +13,7 @@
 
 __aicore__ inline uint16_t asc_get_datablock_size_impl()
 {
-    return CAPI_ONE_DATABLOCK_SIZE;
+    return ASC_ONE_DATABLOCK_SIZE;
 }
 
 #endif
