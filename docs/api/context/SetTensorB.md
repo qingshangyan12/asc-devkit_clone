@@ -19,6 +19,16 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p20751740131216"><a name="p20751740131216"></a><a name="p20751740131216"></a>√</p>
 </td>
 </tr>
+<tr id="row436141614210"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p07746191307"><a name="p07746191307"></a><a name="p07746191307"></a><span id="ph880814542020"><a name="ph880814542020"></a><a name="ph880814542020"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p18774619608"><a name="p18774619608"></a><a name="p18774619608"></a>√</p>
+</td>
+</tr>
+<tr id="row15487816124216"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p4336317115"><a name="p4336317115"></a><a name="p4336317115"></a><span id="ph115418716"><a name="ph115418716"></a><a name="ph115418716"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p73313312117"><a name="p73313312117"></a><a name="p73313312117"></a>√</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -77,6 +87,8 @@ __aicore__ inline void SetTensorB(SrcBT bScalar)
 <td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1490395212411"><a name="p1490395212411"></a><a name="p1490395212411"></a>B矩阵。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="GlobalTensor.md">GlobalTensor</a>。</span></span></span>SrcBT参数表示B矩阵的数据类型。</p>
 <p id="p169694814194"><a name="p169694814194"></a><a name="p169694814194"></a><span id="ph13754548217"><a name="ph13754548217"></a><a name="ph13754548217"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Ascend 910C</term></span>，支持的数据类型为：half/float/bfloat16_t/int8_t/int4b_t</p>
 <p id="p116811630632"><a name="p116811630632"></a><a name="p116811630632"></a><span id="ph398410521454"><a name="ph398410521454"></a><a name="ph398410521454"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Ascend 910B</term></span>，支持的数据类型为：half/float/bfloat16_t/int8_t/int4b_t</p>
+<p id="p116811630634"><a name="p116811630634"></a><a name="p116811630634"></a><span id="ph1292674871117"><a name="ph1292674871117"></a><a name="ph1292674871117"></a>Kirin X90</span>，支持的数据类型为：half/int8_t</p>
+<p id="p116811630638"><a name="p116811630638"></a><a name="p116811630638"></a><span id="ph1292674871119"><a name="ph1292674871119"></a><a name="ph1292674871119"></a>Kirin 9030</span>，支持的数据类型为：half</p>
 </td>
 </tr>
 <tr id="row36481043185619"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.4.1.1 "><p id="p9779137113719"><a name="p9779137113719"></a><a name="p9779137113719"></a>rightMatrix</p>
@@ -86,6 +98,8 @@ __aicore__ inline void SetTensorB(SrcBT bScalar)
 <td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p55019672515"><a name="p55019672515"></a><a name="p55019672515"></a>B矩阵。<span id="ph173308471594"><a name="ph173308471594"></a><a name="ph173308471594"></a><span id="ph9902231466"><a name="ph9902231466"></a><a name="ph9902231466"></a><span id="ph1782115034816"><a name="ph1782115034816"></a><a name="ph1782115034816"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为TSCM/VECOUT。</span></span></span>SrcBT参数表示B矩阵的数据类型。</p>
 <p id="p61861832113112"><a name="p61861832113112"></a><a name="p61861832113112"></a><span id="ph118683216317"><a name="ph118683216317"></a><a name="ph118683216317"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Ascend 910C</term></span>，支持的数据类型为：half/float/bfloat16_t/int8_t/int4b_t</p>
 <p id="p1085283116555"><a name="p1085283116555"></a><a name="p1085283116555"></a><span id="ph10828115135510"><a name="ph10828115135510"></a><a name="ph10828115135510"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Ascend 910B</term></span>，支持的数据类型为：half/float/bfloat16_t/int8_t/int4b_t</p>
+<p id="p116811630630"><a name="p116811630630"></a><a name="p116811630630"></a><span id="ph1292674871115"><a name="ph1292674871115"></a><a name="ph1292674871115"></a>Kirin X90</span>，支持的数据类型为：half/int8_t</p>
+<p id="p116811630632"><a name="p116811630632"></a><a name="p116811630632"></a><span id="ph1292674871113"><a name="ph1292674871113"></a><a name="ph1292674871113"></a>Kirin 9030</span>，支持的数据类型为：half</p>
 <p id="p1446474164516"><a name="p1446474164516"></a><a name="p1446474164516"></a>若设置TSCM首地址，默认矩阵可全载，已经位于TSCM，Iterate接口无需再进行GM-&gt;A1/B1搬运。</p>
 </td>
 </tr>

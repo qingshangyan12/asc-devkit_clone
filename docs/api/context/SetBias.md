@@ -19,6 +19,11 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p20751740131216"><a name="p20751740131216"></a><a name="p20751740131216"></a>√</p>
 </td>
 </tr>
+<tr id="row436141614210"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p07746191307"><a name="p07746191307"></a><a name="p07746191307"></a><span id="ph880814542020"><a name="ph880814542020"></a><a name="ph880814542020"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p18774619608"><a name="p18774619608"></a><a name="p18774619608"></a>√</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -56,6 +61,7 @@ __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
 <td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p1122321813286"><a name="p1122321813286"></a><a name="p1122321813286"></a>Bias矩阵。<span id="ph15942199192220"><a name="ph15942199192220"></a><a name="ph15942199192220"></a><span id="ph1294215916225"><a name="ph1294215916225"></a><a name="ph1294215916225"></a><span id="ph894279182218"><a name="ph894279182218"></a><a name="ph894279182218"></a>类型为<a href="GlobalTensor.md">GlobalTensor</a>。</span></span></span></p>
 <p id="p17660350113216"><a name="p17660350113216"></a><a name="p17660350113216"></a><span id="ph10660350183213"><a name="ph10660350183213"></a><a name="ph10660350183213"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Ascend 910C</term></span>，支持的数据类型为：half/float/int32_t，其中仅在A、B的数据类型为int8_t时，Bias的数据类型可以设置为int32_t</p>
 <p id="p116811630632"><a name="p116811630632"></a><a name="p116811630632"></a><span id="ph398410521454"><a name="ph398410521454"></a><a name="ph398410521454"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Ascend 910B</term></span>，支持的数据类型为：half/float/int32_t，其中仅在A、B的数据类型为int8_t时，Bias的数据类型可以设置为int32_t</p>
+<p id="p116811630634"><a name="p116811630634"></a><a name="p116811630634"></a><span id="ph1292674871117"><a name="ph1292674871117"></a><a name="ph1292674871117"></a>Kirin X90</span>，支持的数据类型为：half/int32_t，其中仅在A、B的数据类型为int8_t时，Bias的数据类型可以设置为int32_t</p>
 <p id="p10199121963712"><a name="p10199121963712"></a><a name="p10199121963712"></a>A矩阵、B矩阵、Bias支持的数据类型组合可参考<a href="Matmul使用说明.md#table1996113269499">Matmul输入输出数据类型的组合说明</a>。</p>
 </td>
 </tr>
@@ -66,6 +72,7 @@ __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
 <td class="cellrowborder" valign="top" width="72.99%" headers="mcps1.2.4.1.3 "><p id="p837816382280"><a name="p837816382280"></a><a name="p837816382280"></a>Bias矩阵。<span id="ph173308471594"><a name="ph173308471594"></a><a name="ph173308471594"></a><span id="ph9902231466"><a name="ph9902231466"></a><a name="ph9902231466"></a><span id="ph1782115034816"><a name="ph1782115034816"></a><a name="ph1782115034816"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECOUT。</span></span></span></p>
 <p id="p17790185515333"><a name="p17790185515333"></a><a name="p17790185515333"></a><span id="ph137907556334"><a name="ph137907556334"></a><a name="ph137907556334"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Ascend 910C</term></span>，支持的数据类型为：half/float/int32_t，其中仅在A、B的数据类型为int8_t时，Bias的数据类型可以设置为int32_t</p>
 <p id="p9442547115515"><a name="p9442547115515"></a><a name="p9442547115515"></a><span id="ph1828183114552"><a name="ph1828183114552"></a><a name="ph1828183114552"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Ascend 910B</term></span>，支持的数据类型为：half/float/int32_t，其中仅在A、B的数据类型为int8_t时，Bias的数据类型可以设置为int32_t</p>
+<p id="p116811630630"><a name="p116811630630"></a><a name="p116811630630"></a><span id="ph1292674871115"><a name="ph1292674871115"></a><a name="ph1292674871115"></a>Kirin X90</span>，支持的数据类型为：half/int32_t，其中仅在A、B的数据类型为int8_t时，Bias的数据类型可以设置为int32_t</p>
 <p id="p145281958144415"><a name="p145281958144415"></a><a name="p145281958144415"></a>A矩阵、B矩阵、Bias支持的数据类型组合可参考<a href="Matmul使用说明.md#table1996113269499">Matmul输入输出数据类型的组合说明</a>。</p>
 </td>
 </tr>
