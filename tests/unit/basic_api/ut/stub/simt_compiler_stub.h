@@ -16,6 +16,11 @@
 
 constexpr int32_t MAX_SHLF_OFFSET = 31;
 constexpr int32_t WARP_SIZE = 32;
+constexpr uint32_t half_inf = 0x7C00;
+constexpr uint32_t half_max_nan = 0x7FFF;
+constexpr uint32_t half_neg_inf = 0xFC00;
+constexpr uint32_t b_half_inf = 0x7F80;
+constexpr uint32_t b_half_neg_inf = 0xFF80;
 
 
 float __expf(float x);
@@ -190,5 +195,45 @@ void __threadfence();
 }
 
 void __sync_workitems();
+
+bool __isnan(half x);
+
+bool __isnan(bfloat16_t x);
+
+bool __isinf(half x);
+
+bool __isinf(bfloat16_t x);
+
+float __floorf(float x);
+
+half __floorf(half x);
+
+bfloat16_t __floorf(bfloat16_t x);
+
+float __roundf(float x);
+
+float __rintf(float x);
+
+half __rintf(half x);
+
+bfloat16_t __rintf(bfloat16_t x);
+
+float __ceilf(float x);
+
+half __ceilf(half x);
+
+bfloat16_t __ceilf(bfloat16_t x);
+
+float __fma(float x, float y, float z);
+
+half __fma(half x, half y, half z);
+
+bfloat16_t __fma(bfloat16_t x, bfloat16_t y, bfloat16_t z);
+
+float __fabsf(float x);
+
+float __fmaxf(float x, float y);
+
+float __fminf(float x, float y);
 
 #endif

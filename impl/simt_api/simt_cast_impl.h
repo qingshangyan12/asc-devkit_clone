@@ -11,4 +11,52 @@
 #ifndef ASCENDC_MODULE_SIMT_CAST_C_IMPL_H
 #define ASCENDC_MODULE_SIMT_CAST_C_IMPL_H
 
+__simt_callee__ inline half hfloor(half x)
+{
+    return __floorf(x);
+}
+
+__simt_callee__ inline bfloat16_t hfloor(bfloat16_t x)
+{
+    return __floorf(x);
+}
+
+__simt_callee__ inline half hrint(half x)
+{
+    return __rintf(x);
+}
+
+__simt_callee__ inline bfloat16_t hrint(bfloat16_t x)
+{
+    return __rintf(x);
+}
+
+__simt_callee__ inline half hceil(half x)
+{
+    return __ceilf(x);
+}
+
+__simt_callee__ inline bfloat16_t hceil(bfloat16_t x)
+{
+    return __ceilf(x);
+}
+
+__simt_callee__ inline half htrunc(half x)
+{
+    if (x > (half)0) {
+        return __floorf(x);
+    } else {
+        return __ceilf(x);
+    }
+}
+
+__simt_callee__ inline bfloat16_t htrunc(bfloat16_t x)
+{
+    if (x > (bfloat16_t)0) {
+        return __floorf(x);
+    } else {
+        return __ceilf(x);
+    }
+}
+
 #endif  // ASCENDC_MODULE_SIMT_CAST_C_IMPL_H

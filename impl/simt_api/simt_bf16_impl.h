@@ -11,4 +11,44 @@
 #ifndef ASCENDC_MODULE_SIMT_BF16_C_IMPL_H
 #define ASCENDC_MODULE_SIMT_BF16_C_IMPL_H
 
+__simt_callee__ inline bool __hisnan(bfloat16_t x)
+{
+    return __isnan(x);
+}
+
+__simt_callee__ inline bool __hisinf(bfloat16_t x)
+{
+    return __isinf(x);
+}
+
+__simt_callee__ inline bfloat16_t __habs(bfloat16_t x)
+{
+    uint16_t bits = *(uint16_t*)&x;
+    bits &= 0x7FFF;
+    return *(bfloat16_t*)&bits;
+}
+
+__simt_callee__ inline bfloat16_t __hfma(bfloat16_t x, bfloat16_t y, bfloat16_t z)
+{
+    return __fma(x, y, z);
+}
+
+__simt_callee__ inline bfloat16_t __hmax(bfloat16_t x, bfloat16_t y)
+{
+    if (x > y) {
+        return x;
+    } else {
+        return y;
+    }
+}
+
+__simt_callee__ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
+{
+    if (x < y) {
+        return x;
+    } else {
+        return y;
+    }
+}
+
 #endif  // ASCENDC_MODULE_SIMT_BF16_C_IMPL_H

@@ -1094,3 +1094,217 @@ void __sync_workitems()
 {
     AscendC::Simt::Sync();
 }
+
+bool __isnan(half x)
+{
+    uint16_t* intX = (uint16_t*)&x;
+    return (*intX > half_inf && *intX <= half_max_nan) ||
+                (*intX > half_neg_inf);
+}
+
+bool __isnan(bfloat16_t x)
+{
+    uint16_t* intX = (uint16_t*)&x;
+    return (*intX > b_half_inf && *intX <= half_max_nan) ||
+                (*intX > b_half_neg_inf);
+}
+
+bool __isinf(half x)
+{
+    uint16_t* intX = (uint16_t*)&x;
+    return (*intX == half_inf) || (*intX == half_neg_inf);
+}
+
+bool __isinf(bfloat16_t x)
+{
+    uint16_t* intX = (uint16_t*)&x;
+    return (*intX == b_half_inf || *intX == b_half_neg_inf);
+}
+
+float __floorf(float x)
+{
+    return floor(x);
+}
+
+half __floorf(half x)
+{
+    if (__isinf(x)) {
+        return x;
+    }
+    return floor(x);
+}
+
+template <typename T>
+__aicore__ inline T FindNear2ndPow(T x)
+{
+    if ((T)2 >= x) {
+        return (T)1;
+    } else {
+        return (T)pow(2, static_cast<uint32_t>(log2(x)));
+    }
+}
+
+bfloat16_t __floorf(bfloat16_t x)
+{
+    if (__isinf(x)) {
+        return x;
+    }
+    uint16_t *uintX = (uint16_t *)(&x);
+    uint16_t bf16Sign15Bit = 0xf;
+    uint16_t bf16Frac7Bit = 0x7;
+    int8_t sign = ((((*uintX) >> bf16Sign15Bit) & 0x1) == 0) ? 1 : -1;
+    uint16_t exp = ((*uintX) >> bf16Frac7Bit) & 0xff;
+    bfloat16_t frac = (*uintX) & 0x7f;
+    bfloat16_t two = 2.0;
+    uint16_t bfl16Exp126Bit = 0x7e;
+    uint16_t bfl16Exp127Bit = 0x7f;
+    if (exp == 0xff && frac == 0) {
+        return (bfloat16_t)(sign * INFINITY);
+    } else if (exp == 0xff && frac != 0) {
+        return (bfloat16_t)(sign * NAN);
+    } else {
+        bfloat16_t base;
+        bfloat16_t minVal;
+        if (exp == 0) {
+            base = sign * (pow(two, (exp - bfl16Exp126Bit)) * (frac / (pow(two, bf16Frac7Bit))));
+            if (exp - bfl16Exp126Bit > 0) {
+                minVal = sign * (pow(two, (exp - bfl16Exp126Bit)));
+            } else {
+                minVal = 0;
+            }
+        } else {
+            base = sign * (pow(two, (exp - bfl16Exp127Bit)) * (1 + (frac / (pow(two, bf16Frac7Bit)))));
+            if (exp - bfl16Exp127Bit > 0) {
+                minVal = sign * (pow(two, (exp - bfl16Exp127Bit)));
+            } else {
+                minVal = 0;
+            }
+        }
+        if (base > minVal) {
+            while (base - minVal >= 1) {
+                minVal += FindNear2ndPow(base - minVal);
+            }
+            return minVal;
+        } else if (base < minVal) {
+            while (minVal - base > 0) {
+                minVal -= FindNear2ndPow(minVal - base);
+            }
+            return minVal;
+        } else {
+            return base;
+        }
+    }
+}
+
+float __roundf(float x)
+{
+    return round(x);
+}
+
+float __rintf(float x)
+{
+    return rint(x);
+}
+
+half __rintf(half x)
+{
+    if (__isinf(x)) {
+        return x;
+    }
+    return rint(x);
+}
+
+bfloat16_t __rintf(bfloat16_t x)
+{
+    if (__isinf(x)) {
+        return x;
+    }
+    bfloat16_t floorX = __floorf(x);
+    if (x == floorX) {
+        return x;
+    }
+    bfloat16_t ceilX = floorX + (bfloat16_t)1;
+    bfloat16_t midVal = 0.5;
+    if (x - floorX > midVal) {
+        return ceilX;
+    } else if (x - floorX < midVal) {
+        return floorX;
+    } else {
+        // Same Distance Round to Even
+        uint16_t two = 2;
+        if (((int32_t)ceilX) % two == 0) {
+            return ceilX;
+        } else {
+            return floorX;
+        }
+    }
+}
+
+float __ceilf(float x)
+{
+    return ceil(x);
+}
+
+half __ceilf(half x)
+{
+    if (__isinf(x)) {
+        return x;
+    }
+    return ceil(x);
+}
+
+bfloat16_t __ceilf(bfloat16_t x)
+{
+    bfloat16_t floorX = __floorf(x);
+    if (floorX == x) {
+        return floorX;
+    }
+    return floorX + (bfloat16_t)1;
+}
+
+float __fma(float x, float y, float z)
+{
+    if (__isnan(z) || __isnan(x) || __isnan(y)) {
+        return NAN;
+    }
+    return std::fmaf(x, y, z);
+}
+
+half __fma(half x, half y, half z)
+{
+    if (__isnan(z) || __isnan(x) || __isnan(y)) {
+        return NAN;
+    }
+    return (static_cast<float>(x) * static_cast<float>(y)) + static_cast<float>(z);
+}
+
+bfloat16_t __fma(bfloat16_t x, bfloat16_t y, bfloat16_t z)
+{
+    if (__isnan(z) || __isnan(x) || __isnan(y)) {
+        return NAN;
+    }
+    return x * y + z;
+}
+
+float __fabsf(float x)
+{
+    return fabs(x);
+}
+
+float __fmaxf(float x, float y)
+{
+    if (x > y) {
+        return x;
+    } else {
+        return y;
+    }
+}
+
+float __fminf(float x, float y)
+{
+    if (x < y) {
+        return x;
+    } else {
+        return y;
+    }
+}

@@ -11,5 +11,17 @@
 #ifndef ASCENDC_MODULE_SIMT_FP16_C_INTERFACE_H
 #define ASCENDC_MODULE_SIMT_FP16_C_INTERFACE_H
 
+__simt_callee__ inline bool __hisnan(half x);
+
+__simt_callee__ inline bool __hisinf(half x);
+
+__simt_callee__ inline half __hfma(half x, half y, half z);
+
+__simt_callee__ inline half __habs(half x);
+
+__simt_callee__ inline half __hmax(half x, half y);
+
+__simt_callee__ inline half __hmin(half x, half y);
+
 #include "impl/simt_api/simt_fp16_impl.h"
 #endif  // ASCENDC_MODULE_SIMT_FP16_C_INTERFACE_H

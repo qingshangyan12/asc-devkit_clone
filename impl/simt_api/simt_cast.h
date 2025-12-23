@@ -11,5 +11,21 @@
 #ifndef ASCENDC_MODULE_SIMT_CAST_C_INTERFACE_H
 #define ASCENDC_MODULE_SIMT_CAST_C_INTERFACE_H
 
+__simt_callee__ inline half hfloor(half x);
+
+__simt_callee__ inline bfloat16_t hfloor(bfloat16_t x);
+
+__simt_callee__ inline half hrint(half x);
+
+__simt_callee__ inline bfloat16_t hrint(bfloat16_t x);
+
+__simt_callee__ inline half hceil(half x);
+
+__simt_callee__ inline bfloat16_t hceil(bfloat16_t x);
+
+__simt_callee__ inline half htrunc(half x);
+
+__simt_callee__ inline bfloat16_t htrunc(bfloat16_t x);
+
 #include "impl/simt_api/simt_cast_impl.h"
 #endif  // ASCENDC_MODULE_SIMT_CAST_C_INTERFACE_H

@@ -11,5 +11,17 @@
 #ifndef ASCENDC_MODULE_SIMT_BF16_C_INTERFACE_H
 #define ASCENDC_MODULE_SIMT_BF16_C_INTERFACE_H
 
+__simt_callee__ inline bool __hisnan(bfloat16_t x);
+
+__simt_callee__ inline bool __hisinf(bfloat16_t x);
+
+__simt_callee__ inline bfloat16_t __habs(bfloat16_t x);
+
+__simt_callee__ inline bfloat16_t __hfma(bfloat16_t x, bfloat16_t y, bfloat16_t z);
+
+__simt_callee__ inline bfloat16_t __hmax(bfloat16_t x, bfloat16_t y);
+
+__simt_callee__ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y);
+
 #include "impl/simt_api/simt_bf16_impl.h"
 #endif  // ASCENDC_MODULE_SIMT_BF16_C_INTERFACE_H
