@@ -16,13 +16,18 @@
 ### 函数原型
 
 ```cpp
-__aicore__ inline int64_t asc_get_arch_ver()
+__aicore__ inline void asc_get_arch_ver(uint32_t& coreVersion)
 ```
 
+### 参数说明
+
+| 参数名  | 输入/输出 | 描述 |
+| :----- | :------- | :------- |
+| coreVersion | 输出 | AIj处理器架构版本，数据类型uint32_t。 |
 
 ### 返回值说明
 
-int64数据类型，表示AI处理器架构版本。
+无
 
 ### 流水类型
 
@@ -30,10 +35,13 @@ PIPE_TYPE_S
 
 ### 约束说明
 
-无
+在调用asc_get_arch_ver接口前，需先定义coreVersion,调用asc_get_arch_ver接口后coreVersion会变成相对应架构版本号的值。
+由于硬件约束，在查看转换后的AI处理器架构版本号时需要将其打印成十六进制的数或者自行转换成十六进制的数。
 
 ### 调用示例
 
 ```cpp
-asc_get_arch_version();
+uint32_t coreVersion = 0;// 定义AI处理器版本
+asc_get_arch_version(coreVersion);
+AscendC::PRINTF("core version is %x", coreVersion);//需用%x将其打印成十六进制的数
 ```

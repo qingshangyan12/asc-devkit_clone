@@ -40,17 +40,17 @@
 
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
-  __aicore__ inline void asc_int322float(__ubuf__ float* dst, __ubuf__ int32_t* src, const asc_unary_config& config)
+  __aicore__ inline void asc_int322float(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   // RINT舍入模式
-  __aicore__ inline void asc_int322float_r(__ubuf__ float* dst, __ubuf__ int32_t* src, const asc_unary_config& config)
+  __aicore__ inline void asc_int322float_r(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   // ROUND舍入模式
-  __aicore__ inline void asc_int322float_a(__ubuf__ float* dst, __ubuf__ int32_t* src, const asc_unary_config& config)
+  __aicore__ inline void asc_int322float_a(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   // FLOOR舍入模式
-  __aicore__ inline void asc_int322float_f(__ubuf__ float* dst, __ubuf__ int32_t* src, const asc_unary_config& config)
+  __aicore__ inline void asc_int322float_f(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   // CEIL舍入模式
-  __aicore__ inline void asc_int322float_c(__ubuf__ float* dst, __ubuf__ int32_t* src, const asc_unary_config& config)
+  __aicore__ inline void asc_int322float_c(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   // TRUNC舍入模式
-  __aicore__ inline void asc_int322float_z(__ubuf__ float* dst, __ubuf__ int32_t* src, const asc_unary_config& config)
+  __aicore__ inline void asc_int322float_z(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   ```
 
 - 同步计算
@@ -79,7 +79,11 @@
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src  | 输入 | 源操作数（矢量）的起始地址。|
 | count | 输入 | 参与计算的元素个数。 |
-| config | 输入 | 在高维切分计算场景下使用的计算配置参数，详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。|
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| repeat | 输入 | 迭代次数，默认值：1。 |
 
 ## 返回值说明
 

@@ -29,10 +29,10 @@ $$
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_min_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, const asc_unary_config& config)
-    __aicore__ inline void asc_min_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, const asc_unary_config& config)
-    __aicore__ inline void asc_min_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, const asc_unary_config& config)
-    __aicore__ inline void asc_min_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, const asc_unary_config& config)
+    __aicore__ inline void asc_min_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_min_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_min_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_min_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
@@ -52,7 +52,11 @@ $$
 | src | 输入 | 源操作数（矢量）的起始地址。 |
 | value | 输入 | 源操作数（标量）。 |
 | count | 输入 | 参与计算的元素个数。 |
-| config | 输入 | 在高维切分计算场景下使用的计算配置参数, 详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。 |
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| repeat | 输入 | 迭代次数，默认值：1。 |
 
 ### 返回值说明
 
