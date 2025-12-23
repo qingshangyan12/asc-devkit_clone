@@ -26,11 +26,11 @@ public:
 private:
     __aicore__ __gm__ inline BlockRingBufInfo* get_block_ring_buf_info()
     {
-        uint32_t block_idx = instruction_forward::call_get_core_id() % DUMP_CORE_COUNT;
+        uint32_t block_idx = instruction_forward::call_get_core_id() % ASC_DUMP_CORE_COUNT;
         uint32_t block_length = reinterpret_cast<__gm__ BlockRingBufInfo*>(instruction_forward::call_get_g_sys_print_fifo_space())->length;
         __gm__ BlockRingBufInfo* ring_buf_info =
             reinterpret_cast<__gm__ BlockRingBufInfo*>(instruction_forward::call_get_g_sys_print_fifo_space() + block_length * block_idx);
-        return ring_buf_info->magic == MAGIC_NUMBER ? ring_buf_info : nullptr;
+        return ring_buf_info->magic == ASC_MAGIC_NUM_CHECK ? ring_buf_info : nullptr;
     }
 };
 
@@ -59,7 +59,7 @@ private:
         const uint64_t& first_time_stamp = static_cast<uint64_t>(instruction_forward::call_get_system_cycle());
         while (read_info->bufOffset == 0) {
             uint64_t spend_time = static_cast<uint64_t>(instruction_forward::call_get_system_cycle()) - first_time_stamp;
-            if (spend_time > TIMEOUT_CYCLE) {
+            if (spend_time > ASC_TIMEOUT_CYCLE) {
                 return false;
             }
             instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>(reinterpret_cast<__gm__ uint64_t*>(read_info));
@@ -93,7 +93,7 @@ private:
         const uint64_t& first_time_stamp = static_cast<uint64_t>(instruction_forward::call_get_system_cycle());
         while (write_info->bufOffset < read_info->bufOffset && write_info->bufOffset + tlv_len >= read_info->bufOffset) {
             uint64_t spend_time = static_cast<uint64_t>(instruction_forward::call_get_system_cycle()) - first_time_stamp;
-            if (spend_time > TIMEOUT_CYCLE) {
+            if (spend_time > ASC_TIMEOUT_CYCLE) {
                 return false;
             }
             instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>(reinterpret_cast<__gm__ uint64_t*>(read_info));

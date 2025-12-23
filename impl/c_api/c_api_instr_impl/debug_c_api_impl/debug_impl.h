@@ -12,6 +12,8 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_DEBUG_C_API_IMPL_DEBUG_IMPL_H
  
 #include "asc_2201/dump_routing.h"
+#include "asc_printf_impl/asc_2201/printf_impl.h"
+
 template <typename T>
 __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dump_size)
 {
@@ -25,5 +27,37 @@ __aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t 
     using dump = dump_routing_ubuf<CURRENT_ARCH_VERSION>::type;
     dump{}.template run<T>(input, desc, dump_size);
 }
+
+namespace __asc_aicore {
+template <class... Args>
+__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+{
+    simd_printf_impl(DumpType::DUMP_SCALAR, fmt, args...);
+}
+}
+
+namespace __cce_scalar {
+    using namespace __asc_aicore;
+}
+
+#define asc_assert_msg__(prompt, expr, fmt)                                                                  \
+    do {                                                                                                          \
+        if (!(expr)) {                                                                                            \
+            simd_printf_impl(DumpType::DUMP_ASSERT, "%s[ASSERT] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr); \
+            trap();                                                                                               \
+        }                                                                                                         \
+    } while (0)
+
+#if defined(__ENABLE_ASCENDC_PRINTF__)
+#if defined (ASCENDC_DUMP) && (ASCENDC_DUMP == 1)
+#define asc_assert_impl(expr)                      \
+    do {                                           \
+        __gm__ const char* prompt = "";            \
+        if (!(expr)) {                             \
+            asc_assert_msg__(prompt, expr, "\n");  \
+        }                                          \
+    } while (0)
+#endif
+#endif
 
 #endif

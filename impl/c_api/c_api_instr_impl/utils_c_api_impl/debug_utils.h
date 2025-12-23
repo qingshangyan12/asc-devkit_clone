@@ -34,8 +34,12 @@
 #define K_MAX_SHAPE_DIM 8
 #endif
 
-constexpr uint32_t MAGIC_NUMBER = 0xAE86;
-constexpr uint64_t TIMEOUT_CYCLE = 50 * 1000 * 1000 * 5; // 5s
+inline __gm__ uint8_t* g_sysPrintFifoSpace = nullptr;
+
+constexpr uint16_t ASC_ONE_PARAM_SIZE = 8;
+constexpr uint32_t ASC_DUMP_CORE_COUNT = 75;
+constexpr uint32_t ASC_MAGIC_NUM_CHECK = 0xAE86;
+constexpr uint64_t ASC_TIMEOUT_CYCLE = 50 * 1000 * 1000 * 5; // 5s
 
 struct arch_version {
     static constexpr uint32_t v2201 = 2201;
@@ -115,9 +119,6 @@ __aicore__ inline void enable_printf()
 #endif
 }
 
-constexpr uint32_t DUMP_CORE_COUNT = 75;
-inline __gm__ uint8_t* g_sysPrintFifoSpace = nullptr;
-
 enum class DumpType : uint8_t {
     DUMP_DEFAULT = 0,
     DUMP_SCALAR,
@@ -141,7 +142,7 @@ struct BlockRingBufInfo {
     uint16_t flag = 0U;          // 0: simd, 1: simt
     uint32_t rsv = 0U;           // reserve
     uint64_t ringBufAddr = 0U;   // start addr of fifo buff
-    uint32_t resv_mem[6];        // reserved
+    uint32_t resvMem[6];        // reserved
 };
 
 struct RingBufWriteInfo {
@@ -161,6 +162,13 @@ struct RingBufReadInfo {
 struct SkipTlvInfo {
     uint32_t type = static_cast<uint32_t>(DumpType::DUMP_SKIP); // DumpType = DUMP_SKIP
     uint32_t length = 0U;
+};
+
+struct PrintTlvInfoHead {
+    uint32_t type = static_cast<uint32_t>(DumpType::DUMP_SCALAR);
+    uint32_t length = 0U;
+    uint32_t resvMem[2];         // reserved
+    uint64_t fmtOffset = 0U;     // offset of fmt string from the start of fmtOffset addr
 };
 
 constexpr uint32_t MIN_TLV_LEN = sizeof(SkipTlvInfo);

@@ -23,5 +23,7 @@
 #include "vector_compute/vector_compute.h"
 #include "vector_datamove/vector_datamove.h"
 #include "utils/debug/asc_dump.h"
+#include "utils/debug/asc_printf.h"
+#include "utils/debug/asc_assert.h"
 
 #endif
