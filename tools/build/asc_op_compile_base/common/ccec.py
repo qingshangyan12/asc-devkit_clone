@@ -188,11 +188,13 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
     is_enable_vector_core = current_build_config().get(enable_vector_core)
 
     def get_init_cmd():
-        optimization_level = "-O2"
+        opt_level_map = {"dav-l300": 3, "dav-l311", 3}
+        opt_level = opt_level_map.get(cce_arch, 2)
         # 2 enable tbe debug : ccec compiler with "O0 - g"
         if current_build_config().get(tbe_debug_level) == 2 or \
                 "ccec_O0" in current_build_config().get(op_debug_config):
-            optimization_level = "-O0"
+            opt_level = 0
+        optimization_level = f"-O{opt_level}"
         arch = "cce-aicore-only"
         cce_arch_prefix = "cce-aicore-arch"
         cmd = [CCECInfo.get_exe("ccec"),
@@ -259,7 +261,7 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
         cmd += ["-mllvm", "-instcombine-code-sinking=false"]
         from asc_op_compile_base.common.platform.platform_info import VECTOR_INST_BLOCK_WIDTH
         vec_len = get_soc_spec("VECTOR_REG_WIDTH")
-        if vec_len != VECTOR_INST_BLOCK_WIDTH:
+        if vec_len != VECTOR_INST_BLOCK_WIDTH and vec_len != "0":
             cmd += ["-Xclang", "-fcce-vf-vl=" + str(vec_len)]
     cmd = modify_cmd_by_enable_cce_debug_mode(cmd)
     skt_env = os.getenv('SKT_ENABLE')
