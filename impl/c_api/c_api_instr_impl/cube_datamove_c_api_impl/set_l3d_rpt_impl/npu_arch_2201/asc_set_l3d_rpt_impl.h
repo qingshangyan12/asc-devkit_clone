@@ -8,20 +8,14 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#include <gtest/gtest.h>
-#include <mockcpp/mockcpp.hpp>
-#include "c_api/stub/cce_stub.h"
-#include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_SET_L3D_RPT_IMPL_NPU_ARCH_2201_ASC_SET_L3D_RPT_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_SET_L3D_RPT_IMPL_NPU_ARCH_2201_ASC_SET_L3D_RPT_IMPL_H
 
-class TestSimdAtomicSetAtomicf16 : public testing::Test { 
-protected:
-    void SetUp() {}
-    void TearDown() {}
-};
-
-TEST_F(TestSimdAtomicSetAtomicf16, set_atomic_f16_Succ)
+__aicore__ inline void asc_set_l1_3d_rpt_impl(uint64_t value)
 {
-    asc_set_mm_layout_transform(true);
-    GlobalMockObject::verify();
+    if ASC_IS_AIV {
+        set_l3d_rpt(value);
+    }
 }
+
+#endif

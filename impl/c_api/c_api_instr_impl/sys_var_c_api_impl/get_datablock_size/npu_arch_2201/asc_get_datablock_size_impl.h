@@ -7,17 +7,13 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+#ifndef IMPL_C_API_INSTR_SYS_VAR_GET_DATABLOCK_SIZE_IMPL_NPU_ARCH_2201_ASC_GET_DATABLOCK_SIZE_IMPL_H
+#define IMPL_C_API_INSTR_SYS_VAR_GET_DATABLOCK_SIZE_IMPL_NPU_ARCH_2201_ASC_GET_DATABLOCK_SIZE_IMPL_H
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_SET_L3D_RPT_IMPL_ASC_2201_SET_L3D_RPT_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_SET_L3D_RPT_IMPL_ASC_2201_SET_L3D_RPT_IMPL_H
-
-namespace CApiInternal {
-
-__aicore__ inline void set_l1_3d_rpt_impl(uint64_t value)
+__aicore__ inline uint16_t asc_get_datablock_size_impl()
 {
-    set_l3d_rpt(value);
+    return CAPI_ONE_DATABLOCK_SIZE;
 }
-
-} // namespace CApiInternal
 
 #endif

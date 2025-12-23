@@ -11,13 +11,13 @@
 #ifndef IMPL_C_API_INSTR_VECTOR_COMPUTE_SET_NTHBIT_ASC_2201_SET_NTHBIT_IMPL_H
 #define IMPL_C_API_INSTR_VECTOR_COMPUTE_SET_NTHBIT_ASC_2201_SET_NTHBIT_IMPL_H
 
-namespace CApiInternal {
-
 __aicore__ inline uint64_t set_nthbit_impl(uint64_t bits, int64_t idx)
 {
-    return sbitset1(static_cast<uint64_t>(bits), static_cast<int64_t>(idx));
+    if ASC_IS_AIV {
+        return sbitset1(bits, idx);
+    } else {
+        return 0;
+    }
 }
-
-} // namespace CApiInternal
 
 #endif

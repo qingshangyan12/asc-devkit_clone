@@ -19,15 +19,29 @@ protected:
     void TearDown() {}
 };
 
+namespace {
+void set_atomic_f16_Stub() {
+}
+
+void set_atomic_cfg_Stub(atomic_type_t type, atomic_op_t op) {}
+}
+
 TEST_F(TestSimdAtomicSetAtomicf16, set_atomic_f16_Succ)
 {
+    MOCKER(set_atomic_f16, void(void))
+        .times(1)
+        .will(invoke(set_atomic_f16_Stub));
+    MOCKER(set_st_atomic_cfg, void(atomic_type_t, atomic_op_t))
+        .times(1)
+        .will(invoke(set_atomic_cfg_Stub));
+    
     asc_set_atomic_f16();
-    asc_set_store_atomic_config_none_sum_impl();
-    asc_set_store_atomic_config_f32_sum_impl();
-    asc_set_store_atomic_config_f16_sum_impl();
-    asc_set_store_atomic_config_s16_sum_impl();
-    asc_set_store_atomic_config_s32_sum_impl();
-    asc_set_store_atomic_config_s8_sum_impl();
-    asc_set_store_atomic_config_bf16_sum_impl();
+    asc_set_store_atomic_config_none_sum();
+    asc_set_store_atomic_config_f32_sum();
+    asc_set_store_atomic_config_f16_sum();
+    asc_set_store_atomic_config_s16_sum();
+    asc_set_store_atomic_config_s32_sum();
+    asc_set_store_atomic_config_s8_sum();
+    asc_set_store_atomic_config_bf16_sum();
     GlobalMockObject::verify();
 }

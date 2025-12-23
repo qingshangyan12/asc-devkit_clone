@@ -16,12 +16,11 @@
 #include "set_fmatrix_impl/asc_2201/set_fmatrix_impl.h"
 #include "set_fmatrix_b_impl/asc_2201/set_fmatrix_b_impl.h"
 #include "set_fpc_impl/asc_2201/set_fpc_impl.h"
-#include "set_l3d_rpt_impl/asc_2201/set_l3d_rpt_impl.h"
 #include "set_nd_para_impl/asc_2201/set_nd_para_impl.h"
 #include "set_padding_impl/asc_2201/set_padding_impl.h"
 #include "set_quant_pre_impl/asc_2201/set_quant_pre_impl.h"
-#include "set_mm_layout_transform_impl/asc_2201/set_mm_layout_transform_impl.h"
-#include "set_l3d_rpt_impl/asc_2201/set_l3d_rpt_impl.h"
+#include "set_mm_layout_transform_impl/npu_arch_2201/asc_set_mm_layout_transform_impl.h"
+#include "set_l3d_rpt_impl/npu_arch_2201/asc_set_l3d_rpt_impl.h"
 #include "set_l0c_copy_params_impl/npu_arch_2201/asc_set_l0c_copy_params_impl.h"
 #include "set_l1_3d_size_impl/npu_arch_2201/asc_set_l1_3d_size_impl.h"
 #include "load_image_to_cbuf_impl/npu_arch_2201/asc_load_image_to_cbuf_impl.h"
@@ -39,14 +38,18 @@ __aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t* dst, __cbuf__ 
     asc_copy_l12l0b_sparse_sync_impl(dst, src, index, start_index, repeat);
 }
 
-__aicore__ inline void asc_set_mm_layout_transform(bool mmLayoutMode)
+__aicore__ inline void asc_set_mm_layout_transform_m()
 {
-    CApiInternal::set_mm_layout_transform_impl(mmLayoutMode);
+    asc_set_mm_layout_transform_m_impl();
 }
 
+__aicore__ inline void asc_set_mm_layout_transform_n()
+{
+    asc_set_mm_layout_transform_n_impl();
+}
 __aicore__ inline void asc_set_l1_3d_rpt(uint64_t value)
 {
-    CApiInternal::set_l1_3d_rpt_impl(value);
+    asc_set_l1_3d_rpt_impl(value);
 }
 
 // ==========asc_l0c_copy_params()==========

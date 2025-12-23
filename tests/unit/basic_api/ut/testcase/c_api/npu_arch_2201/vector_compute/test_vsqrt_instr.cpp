@@ -7,17 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#ifndef IMPL_C_API_INSTR_SYS_VAR_GET_DATABLOCK_SIZE_ASC_2201_GET_DATABLOCK_SIZE_IMPL_H
-#define IMPL_C_API_INSTR_SYS_VAR_GET_DATABLOCK_SIZE_ASC_2201_GET_DATABLOCK_SIZE_IMPL_H
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "c_api/npu_arch_2201/utils/test_unary_instr_utils.h"
 
-namespace CApiInternal {
-
-__aicore__ inline uint16_t get_datablock_size_impl()
-{
-    return CAPI_ONE_DATABLOCK_SIZE;
-}
-
-}
-
-#endif
+// ==========asc_sqrt(half/float)==========
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Sqrt, asc_sqrt, vsqrt, half);
+TEST_VECTOR_COMPUTE_UNARY_INSTR(Sqrt, asc_sqrt, vsqrt, float);

@@ -9,7 +9,7 @@
 */
 
 /* !
- * \file subs_impl.h
+ * \file asc_gather_datablock_impl.h
  * \brief
  */
 #ifndef IMPL_INSTR_VECTOR_COMPUTE_C_API_IMPL_VGATHERB_NPU_ARCH_2201_ASC_GATHER_DATABLOCK_IMPL_H
@@ -19,7 +19,7 @@
 __aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, 
             uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
 {
-    if (ASC_IS_AIV) {
+    if ASC_IS_AIV {
         vgatherb(dst, src, offset_addr, dst_repeat_stride, dst_block_stride, repeat);
     }
 }
@@ -40,7 +40,7 @@ __aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint16_t* dst, __
 __aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, 
             uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
 {
-    if (ASC_IS_AIV) {
+    if ASC_IS_AIV {
         vgatherb(dst, src, offset_addr, dst_repeat_stride, dst_block_stride, repeat);
     }
 }

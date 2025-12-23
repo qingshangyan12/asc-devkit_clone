@@ -35,7 +35,7 @@ TEST_F(TestCubeDmamoveSetL13DRpt, set_l1_3d_rpt_uint32_t_Succ)
         .will(invoke(set_l1_3d_rpt_Stub));
 
     asc_set_l1_3d_rpt(value);
-    bool mmLayoutMode = true;
-    asc_set_mm_layout_transform(mmLayoutMode);
+    asc_set_mm_layout_transform_m();
+    asc_set_mm_layout_transform_n();
     GlobalMockObject::verify();
 }

@@ -22,7 +22,7 @@
 #include "set_ctrl_impl/asc_2201/asc_set_ctrl_impl.h"
 #include "get_block_idx_impl/asc_2201/asc_get_block_idx_impl.h"
 #include "get_block_num_impl/asc_2201/asc_get_block_num_impl.h"
-#include "get_datablock_size/asc_2201/get_datablock_size_impl.h"
+#include "get_datablock_size/npu_arch_2201/asc_get_datablock_size_impl.h"
 
 __aicore__ inline int64_t asc_get_core_id()
 {
@@ -81,7 +81,7 @@ __aicore__ inline void asc_set_ctrl(uint64_t config)
 
 __aicore__ inline uint16_t asc_get_datablock_size()
 {
-    return CApiInternal::get_datablock_size_impl();
+    return asc_get_datablock_size_impl();
 }
 
 #endif

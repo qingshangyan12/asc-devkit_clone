@@ -7,21 +7,11 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+#include "c_api/npu_arch_2201/utils/test_conv_instr_utils.h"
 
-/* !
- * \file set_atomic_f16_impl.h
- * \brief
- */
-#ifndef IMPL_C_API_INSTR_SIMD_ATOMIC_SET_ATOMIC_TYPE_SET_ATOMIC_F16_ASC_2201_SET_ATOMIC_F16_IMPL_H
-#define IMPL_C_API_INSTR_SIMD_ATOMIC_SET_ATOMIC_TYPE_SET_ATOMIC_F16_ASC_2201_SET_ATOMIC_F16_IMPL_H
-
-namespace CApiInternal {
- 
-__aicore__ inline void set_atomic_f16_impl()
-{
-    set_atomic_f16();
-}
- 
-} // namespace CApiInternal
- 
-#endif
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16, asc_int162half, vconv_s162f16, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16a, asc_int162half_a, vconv_s162f16a, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16c, asc_int162half_c, vconv_s162f16c, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16f, asc_int162half_f, vconv_s162f16f, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16r, asc_int162half_r, vconv_s162f16r, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16z, asc_int162half_z, vconv_s162f16z, half, int16_t);
