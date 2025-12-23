@@ -872,19 +872,6 @@ check_install_for_all() {
     fi
 }
 
-pre_check() {
-    local check_shell_path="${curpath}/prereq_check.bash"
-    if [ ! -f "${check_shell_path}" ]; then
-        log "WARNING" "${check_shell_path} not exist."
-        return 0
-    fi
-    if [ "x$is_quiet" = "xy" ]; then
-        sh "${check_shell_path}" --quiet
-    else
-        sh "${check_shell_path}" --no-quiet
-    fi
-}
-
 uninstall_none_multi_version() {
     if [ "$hetero_arch" = "y" ]; then
         return
@@ -1184,20 +1171,6 @@ fi
 
 if [ "$hetero_arch" = "y" ]; then
     log "INFO" "package is running in hetero arch mode!"
-fi
-
-# 执行预检查
-if [ "$input_pre_check" = "y" ]; then
-    log "INFO" "AscDevkit do pre check started."
-    pre_check
-    if [ $? -ne 0 ]; then
-        log "WARNING" "AscDevkit do pre check failed."
-    else
-        log "INFO" "AscDevkit do pre check finished."
-    fi
-    if [ "$is_install" = "n" ] && [ "$upgrade" = "n" ]; then
-        exit_install_log 0
-    fi
 fi
 
 # 版本兼容性检查
