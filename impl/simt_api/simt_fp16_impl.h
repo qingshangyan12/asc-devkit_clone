@@ -96,4 +96,76 @@ __simt_callee__ inline half __hmin(half x, half y)
     }
 }
 
+__simt_callee__ inline half hcos(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = cosf(tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hsin(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = sinf(tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half htanh(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = tanhf(tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hexp(half x)
+{
+    return __expf(x);
+}
+
+__simt_callee__ inline half hexp2(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = powf(2.0f, tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hexp10(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = powf(10.0f, tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hlog(half x)
+{
+    return __logf(x);
+}
+
+__simt_callee__ inline half hlog2(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = logf(x) / logf(2.0f);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+__simt_callee__ inline half hlog10(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = logf(x) / logf(10.0f);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hsqrt(half x)
+{
+    return __sqrtf(x);
+}
+__simt_callee__ inline half hrsqrt(half x)
+{
+    return (half)1.0 / hsqrt(x);
+}
+
+__simt_callee__ inline half hrcp(half x)
+{
+    return (half)1.0 / x;
+}
+
 #endif  // ASCENDC_MODULE_SIMT_FP16_C_IMPL_H

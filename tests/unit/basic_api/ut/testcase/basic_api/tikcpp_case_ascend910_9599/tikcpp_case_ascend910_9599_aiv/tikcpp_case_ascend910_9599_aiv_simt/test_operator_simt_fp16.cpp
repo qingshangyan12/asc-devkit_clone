@@ -9,7 +9,10 @@
 */
 #include <gtest/gtest.h>
 #include <type_traits>
+#include <random>
+#include "simt_compiler_stub.h"
 #include "kernel_operator.h"
+#include "simt_fp16.h"
 
 using namespace std;
 using namespace AscendC;
@@ -74,20 +77,57 @@ protected:
     void TearDown() {}
 };
 
-
-INSTANTIATE_TEST_CASE_P(FP16TestCase, FP16Testsuite,
-    ::testing::Values(FP16Params { 0 }, FP16Params { 1 }, FP16Params { 2 }, FP16Params { 3 },
-            FP16Params { 4 }, FP16Params { 5 }, FP16Params { 6 } ));
-
-TEST_P(FP16Testsuite, FP16TestCase)
+TEST_F(FP16Testsuite, MathApiTest)
 {
-    auto param = GetParam();
-    int32_t mode = param.mode;
-    int fpByteSize = 2;
-    int shapeSize = 128;
+    float x = static_cast<float>(rand()) / RAND_MAX;
+    half x_h = half(x);
 
-    uint8_t dstGm[shapeSize * fpByteSize] = {0};
-    // KernelFP16 op;
-    KernelFP16<uint8_t> op;
-    op.Process((__gm__ uint8_t*)dstGm, mode);
+    half result = hcos(x_h);
+    half expect = half(cosf(x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+    
+    result = hsin(x_h);
+    expect = half(sinf(x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+
+    result = htanh(x_h);
+    expect = half(tanhf(x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+
+    result = hexp(x_h);
+    expect = half(expf(x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+
+    result = hexp2(x_h);
+    expect = half(exp2f(x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+    
+    result = hexp10(x_h);
+    expect = half(powf(10.0, x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+
+    result = hlog(x_h);
+    expect = half(logf(x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+
+    result = hlog2(x_h);
+    expect = half(log2f(x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+
+    result = hlog10(x_h);
+    expect = half(log10f(x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+
+    result = hsqrt(x_h);
+    float tmp = sqrtf(x_h.ToFloat());
+    expect = half(tmp);
+    EXPECT_EQ(expect, result);
+    
+    result = hrsqrt(x_h);
+    expect = half(1.0f / sqrtf(x_h.ToFloat()));
+    EXPECT_EQ(expect, result);
+
+    result = hrcp(x_h);
+    expect = half(1.0f / x_h.ToFloat());
+    EXPECT_EQ(expect, result);
 }

@@ -51,4 +51,85 @@ __simt_callee__ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
     }
 }
 
+__simt_callee__ inline bfloat16_t hcos(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = cosf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hsin(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = sinf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t htanh(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = tanhf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hexp(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = expf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hexp2(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = exp2f(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+__simt_callee__ inline bfloat16_t hexp10(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = exp10f(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hlog(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = logf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hlog2(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = log2f(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hlog10(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = log10f(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hsqrt(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = sqrtf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hrsqrt(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = 1.0f / sqrtf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hrcp(bfloat16_t x)
+{
+    return (bfloat16_t)1.0 / x;
+}
+
 #endif  // ASCENDC_MODULE_SIMT_BF16_C_IMPL_H

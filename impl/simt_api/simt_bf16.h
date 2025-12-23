@@ -23,5 +23,22 @@ __simt_callee__ inline bfloat16_t __hmax(bfloat16_t x, bfloat16_t y);
 
 __simt_callee__ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y);
 
+__simt_callee__ inline bfloat16_t hcos(bfloat16_t x);
+__simt_callee__ inline bfloat16_t hsin(bfloat16_t x);
+__simt_callee__ inline bfloat16_t htanh(bfloat16_t x);
+
+__simt_callee__ inline bfloat16_t hexp(bfloat16_t x);
+__simt_callee__ inline bfloat16_t hexp2(bfloat16_t x);
+__simt_callee__ inline bfloat16_t hexp10(bfloat16_t x);
+
+__simt_callee__ inline bfloat16_t hlog(bfloat16_t x);
+__simt_callee__ inline bfloat16_t hlog2(bfloat16_t x);
+__simt_callee__ inline bfloat16_t hlog10(bfloat16_t x);
+
+__simt_callee__ inline bfloat16_t hsqrt(bfloat16_t x);
+__simt_callee__ inline bfloat16_t hrsqrt(bfloat16_t x);
+
+__simt_callee__ inline bfloat16_t hrcp(bfloat16_t x);
+
 #include "impl/simt_api/simt_bf16_impl.h"
 #endif  // ASCENDC_MODULE_SIMT_BF16_C_INTERFACE_H

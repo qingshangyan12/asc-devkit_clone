@@ -23,5 +23,22 @@ __simt_callee__ inline half __hmax(half x, half y);
 
 __simt_callee__ inline half __hmin(half x, half y);
 
+__simt_callee__ inline half hcos(half x);
+__simt_callee__ inline half hsin(half x);
+__simt_callee__ inline half htanh(half x);
+
+__simt_callee__ inline half hexp(half x);
+__simt_callee__ inline half hexp2(half x);
+__simt_callee__ inline half hexp10(half x);
+
+__simt_callee__ inline half hlog(half x);
+__simt_callee__ inline half hlog2(half x);
+__simt_callee__ inline half hlog10(half x);
+
+__simt_callee__ inline half hsqrt(half x);
+__simt_callee__ inline half hrsqrt(half x);
+
+__simt_callee__ inline half hrcp(half x);
+
 #include "impl/simt_api/simt_fp16_impl.h"
 #endif  // ASCENDC_MODULE_SIMT_FP16_C_INTERFACE_H

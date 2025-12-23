@@ -14,17 +14,6 @@
 #include "dav_c310/kernel_simt_cpu.h"
 #include "stub_def.h"
 #include <cmath>
-
-float __expf(float x)
-{
-    return exp(x);
-}
-
-half2 __expf(half2 x)
-{
-    return x;
-}
-
 namespace bisheng {
 namespace cce {
 namespace simt {
@@ -1307,4 +1296,56 @@ float __fminf(float x, float y)
     } else {
         return y;
     }
+}
+float __expf(float x)
+{
+    return exp(x);
+}
+
+half __expf(half x)
+{
+    float tmp = x.ToFloat();
+    tmp = exp(tmp);
+    return half(tmp);
+}
+
+half2 __expf(half2 x)
+{
+    return x;
+}
+
+float __powf(float base, float x)
+{
+    return powf(base, x);
+}
+
+half __powf(half base, half x)
+{
+    float base_f = base.ToFloat();
+    float exponent = x.ToFloat();
+    return half(powf(base, exponent));
+}
+
+float __logf(float x)
+{
+    return logf(x);
+}
+
+half __logf(half x)
+{
+    float tmp = x.ToFloat();
+    tmp = logf(tmp);
+    return half(tmp);
+}
+
+float __sqrtf(float x)
+{
+    return sqrtf(x);
+}
+
+half __sqrtf(half x)
+{
+    float tmp = x.ToFloat();
+    tmp = sqrtf(tmp);
+    return half(tmp);
 }

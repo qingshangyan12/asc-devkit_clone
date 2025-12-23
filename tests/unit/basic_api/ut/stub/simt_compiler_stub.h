@@ -13,6 +13,7 @@
 
 #include "kernel_vectorized.h"
 #include "stub_def.h"
+#include "stub_fun.h"
 
 constexpr int32_t MAX_SHLF_OFFSET = 31;
 constexpr int32_t WARP_SIZE = 32;
@@ -22,9 +23,60 @@ constexpr uint32_t half_neg_inf = 0xFC00;
 constexpr uint32_t b_half_inf = 0x7F80;
 constexpr uint32_t b_half_neg_inf = 0xFF80;
 
+typedef enum
+{
+    CAST_RINT = 0,
+    CAST_ROUND = 1,
+    CAST_FLOOR = 2,
+    CAST_CEIL = 3,
+    CAST_TRUNC = 4,
+    CAST_ODD = 5,
+    CAST_HYBRID = 6,
+    R,
+    A,
+    F,
+    C,
+    Z,
+    O,
+    // H,
+} ROUND;
+
+template <ROUND rnd = ROUND::R, RoundingSaturation sat = RoundingSaturation::RS_DISABLE_VALUE, typename SRC_TYPE>
+float __cvt_float(SRC_TYPE src) {
+    if constexpr (std::is_same<SRC_TYPE, half>::value) {
+        return static_cast<float>(src);
+    }
+    if constexpr (std::is_same<SRC_TYPE, bfloat16_t>::value) {
+        return static_cast<float>(src);
+    }
+}
+
+template <ROUND rnd = ROUND::R, RoundingSaturation sat = RoundingSaturation::RS_DISABLE_VALUE, typename SRC_TYPE>
+half __cvt_half(SRC_TYPE src) {
+    if constexpr (std::is_same<SRC_TYPE, float>::value) {
+        return half(src);
+    }
+}
+
+template <ROUND rnd = ROUND::R, RoundingSaturation sat = RoundingSaturation::RS_DISABLE_VALUE, typename SRC_TYPE>
+bfloat16_t __cvt_bfloat16_t(SRC_TYPE src) {
+    if constexpr (std::is_same<SRC_TYPE, float>::value) {
+        return bfloat16_t(src);
+    }
+}
 
 float __expf(float x);
+half __expf(half x);
 half2 __expf(half2 x);
+
+float __powf(float x);
+half __powf(half x);
+
+float __logf(float x);
+half __logf(half x);
+
+float __sqrtf(float x);
+half __sqrtf(half x);
 
 namespace bisheng {
 namespace cce {

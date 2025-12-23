@@ -201,6 +201,7 @@ typedef enum {
     EVEN = 0,
     ODD = 1,
 } Part;
+#ifndef SIMT_COMPILER_STUB_H
 typedef enum {
     CAST_RINT = 0,
     CAST_ROUND = 1,
@@ -210,6 +211,7 @@ typedef enum {
     CAST_ODD = 5,
     CAST_HYBRID = 6,
 } ROUND;
+#endif
 typedef enum {
     RS_DISABLE_VALUE = 0,
     RS_ENABLE_VALUE = 1,
