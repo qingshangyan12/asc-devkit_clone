@@ -20,16 +20,12 @@
 constexpr int32_t CAPI_MM_LAYOUT_MODE_BIT = 51;
 __aicore__ inline void asc_set_mm_layout_transform_m_impl()
 {
-    if ASC_IS_AIV {
-        set_ctrl(sbitset1(get_ctrl(), CAPI_MM_LAYOUT_MODE_BIT));
-    }
+    set_ctrl(sbitset1(get_ctrl(), CAPI_MM_LAYOUT_MODE_BIT));
 }
 
 __aicore__ inline void asc_set_mm_layout_transform_n_impl()
 {
-    if ASC_IS_AIV {
-        set_ctrl(sbitset0(get_ctrl(), CAPI_MM_LAYOUT_MODE_BIT));
-    }
+    set_ctrl(sbitset0(get_ctrl(), CAPI_MM_LAYOUT_MODE_BIT));
 }
 
 #endif

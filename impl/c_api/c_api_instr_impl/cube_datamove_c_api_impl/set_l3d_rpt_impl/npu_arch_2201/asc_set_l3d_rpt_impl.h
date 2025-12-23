@@ -13,7 +13,7 @@
 
 __aicore__ inline void asc_set_l1_3d_rpt_impl(uint64_t value)
 {
-    if ASC_IS_AIV {
+    if ASC_IS_AIC {
         set_l3d_rpt(value);
     }
 }

@@ -12,12 +12,15 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
 class TestCubeDmamoveSetL13DRpt : public testing::Test { 
 protected:
-    void SetUp() {}
-    void TearDown() {}
+    void SetUp() {
+        g_c_api_core_type = C_API_AIC_TYPE;
+    }
+    void TearDown() {
+        g_c_api_core_type = C_API_AIV_TYPE;
+    }
 };
 
 namespace {
@@ -35,7 +38,5 @@ TEST_F(TestCubeDmamoveSetL13DRpt, set_l1_3d_rpt_uint32_t_Succ)
         .will(invoke(set_l1_3d_rpt_Stub));
 
     asc_set_l1_3d_rpt(value);
-    asc_set_mm_layout_transform_m();
-    asc_set_mm_layout_transform_n();
     GlobalMockObject::verify();
 }

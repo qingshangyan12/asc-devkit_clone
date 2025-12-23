@@ -18,7 +18,7 @@
 #include "set_atomic_type_c_api_impl/set_atomic_bf16_impl/npu_arch_2201/asc_set_atomic_bf16_impl.h"
 #include "get_st_atomic_cfg_impl/npu_arch_2201/asc_get_store_atomic_config_impl.h"
 #include "set_atomic_s16_impl/asc_2201/asc_set_atomic_s16_impl.h"
-#include "set_atomic_f16_impl/npu_arch_2201/asc_set_atomic_f16_impl.h"
+#include "set_atomic_type_c_api_impl/set_atomic_f16_impl/npu_arch_2201/asc_set_atomic_f16_impl.h"
 #include "set_st_atomic_cfg_impl/npu_arch_2201/asc_set_store_atomic_config_impl.h"
 #include "set_atomic_s32_impl/npu_arch_2201/asc_set_atomic_s32_impl.h"
 #include "zero_bits_cnt_impl/npu_arch_2201/asc_zero_bits_cnt_impl.h"
