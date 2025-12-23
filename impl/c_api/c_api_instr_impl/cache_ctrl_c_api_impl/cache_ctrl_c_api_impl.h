@@ -17,12 +17,12 @@
 
 __aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire)
 {
-    CApiInternal::asc_dcci_impl(dst, entire);
+    asc_dcci_impl(dst, entire);
 }
 
 __aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire, uint64_t type)
 {
-    CApiInternal::asc_dcci_impl(dst, entire, type);
+    asc_dcci_impl(dst, entire, type);
 }
 
 __aicore__ inline void asc_data_cache_preload(uint64_t* address, int16_t offset)

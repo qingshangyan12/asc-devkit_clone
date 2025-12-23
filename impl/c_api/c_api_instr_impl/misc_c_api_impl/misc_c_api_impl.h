@@ -15,7 +15,7 @@
 
 __aicore__ inline void asc_init()
 {
-    CApiInternal::asc_init_soc_state_impl();
+    asc_init_soc_state_impl();
 }
 
 #endif

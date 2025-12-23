@@ -13,15 +13,14 @@
  
 #include "get_core_id_impl/asc_2201/asc_get_core_id_impl.h"
 #include "get_ctrl_impl/asc_2201/asc_get_ctrl_impl.h"
-#include "get_imm_impl/asc_2201/asc_get_phy_buf_addr_impl.h"
+#include "get_imm_impl/npu_arch_2201/asc_get_phy_buf_addr_impl.h"
 #include "get_overflow_status_impl/asc_2201/asc_get_overflow_status_impl.h"
-#include "get_sub_block_dim_impl/asc_2201/asc_get_sub_block_dim_impl.h"
-#include "get_sub_block_id_impl/asc_2201/asc_get_sub_block_id_impl.h"
-#include "get_sub_block_num_impl/asc_2201/asc_get_sub_block_num_impl.h"
-#include "get_sys_cnt_impl/asc_2201/asc_get_sys_cnt_impl.h"
+#include "get_sub_block_id_impl/npu_arch_2201/asc_get_sub_block_id_impl.h"
+#include "get_sub_block_num_impl/npu_arch_2201/asc_get_sub_block_num_impl.h"
+#include "get_sys_cnt_impl/npu_arch_2201/asc_get_sys_cnt_impl.h"
 #include "set_ctrl_impl/asc_2201/asc_set_ctrl_impl.h"
-#include "get_block_idx_impl/asc_2201/asc_get_block_idx_impl.h"
-#include "get_block_num_impl/asc_2201/asc_get_block_num_impl.h"
+#include "get_block_idx_impl/npu_arch_2201/asc_get_block_idx_impl.h"
+#include "get_block_num_impl/npu_arch_2201/asc_get_block_num_impl.h"
 #include "get_datablock_size/npu_arch_2201/asc_get_datablock_size_impl.h"
 #include "get_arch_ver_impl/npu_arch_2201/asc_get_arch_ver_impl.h"
 
@@ -53,11 +52,6 @@ __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset)
 __aicore__ inline uint64_t asc_get_overflow_status()
 {
     return asc_get_overflow_status_impl();
-}
-
-__aicore__ inline int64_t asc_get_sub_block_dim()
-{
-    return asc_get_sub_block_dim_impl();
 }
 
 __aicore__ inline int64_t asc_get_sub_block_id()

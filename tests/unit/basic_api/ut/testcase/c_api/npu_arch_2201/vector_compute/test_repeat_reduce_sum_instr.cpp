@@ -58,18 +58,17 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_Red
     __ubuf__ data_type *dst =  reinterpret_cast<__ubuf__ data_type *>(11);                      \
     __ubuf__ data_type *src =  reinterpret_cast<__ubuf__ data_type *>(22);                      \
                                                                                                 \
-    asc_repeat_reduce_config config;                                                            \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint16_t dst_repeat_stride = 8;                                                             \
+    uint16_t src_block_stride = 1;                                                              \
+    uint16_t src_repeat_stride = 8;                                                             \
+    uint8_t repeat = 1;                                                                         \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, __ubuf__ data_type *,                       \
                 uint8_t, uint16_t, uint16_t, uint16_t, bool))                                   \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_Stub));    \
                                                                                                 \
-    c_api_name(dst, src, config);                                                               \
+    c_api_name(dst, src, repeat, dst_repeat_stride, src_block_stride, src_repeat_stride);       \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \

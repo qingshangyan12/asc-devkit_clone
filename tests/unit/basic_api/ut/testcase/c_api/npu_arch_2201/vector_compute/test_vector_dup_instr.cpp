@@ -60,19 +60,18 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_Vec
     __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                       \
     data_type src = static_cast<data_type>(33);                                                 \
                                                                                                 \
-    asc_duplicate_config config;                                                                \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src_block_stride = static_cast<uint64_t>(1);                                         \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint16_t dst_block_stride = static_cast<uint16_t>(1);                                       \
+    uint16_t src_block_stride = static_cast<uint16_t>(1);                                       \
+    uint16_t dst_repeat_stride = static_cast<uint16_t>(8);                                      \
+    uint16_t src_repeat_stride = static_cast<uint16_t>(8);                                      \
+    uint8_t repeat = static_cast<uint8_t>(1);                                                   \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, data_type,                                  \
                 uint8_t, uint16_t, uint16_t, uint16_t, uint16_t))                               \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_uint8_t_uint16_t_uint16_t_uint16_t_uint16_t_Stub));   \
                                                                                                 \
-    c_api_name(dst, src, config);                                                               \
+    c_api_name(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride); \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \

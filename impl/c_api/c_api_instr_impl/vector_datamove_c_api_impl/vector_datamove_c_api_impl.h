@@ -11,18 +11,19 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_DATAMOVE_C_API_IMPL_VECTOR_DATAMOVE_C_API_IMPL_VECTOR_DATAMOVE_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_DATAMOVE_C_API_IMPL_VECTOR_DATAMOVE_C_API_IMPL_VECTOR_DATAMOVE_C_API_IMPL_H
 
-#include "copy_gm_to_ubuf_impl/asc_2201/asc_copy_gm_to_ubuf_impl.h"
+#include "copy_gm_to_ubuf_impl/npu_arch_2201/asc_copy_gm_to_ubuf_impl.h"
 #include "copy_ubuf_to_gm_impl/npu_arch_2201/asc_copy_ubuf_to_gm_impl.h"
 #include "copy_gm_to_ubuf_align/npu_arch_2201/asc_copy_gm2ub_align_impl.h"
+
+__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint8_t sid,
+    uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+{
+    asc_copy_gm2ub_impl(dst, src, sid, n_burst, burst_len, src_gap, dst_gap);
+}
 
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
 {
     asc_copy_gm2ub_impl(dst, src, size);
-}
-
-__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, const asc_copy_config& config)
-{
-    asc_copy_gm2ub_impl(dst, src, config);
 }
 
 __aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)

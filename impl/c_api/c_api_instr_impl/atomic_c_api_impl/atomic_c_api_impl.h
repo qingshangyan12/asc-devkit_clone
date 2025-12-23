@@ -11,7 +11,9 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_ATOMIC_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_ATOMIC_C_API_IMPL_H
 
-#include "set_atomic_min_impl/asc_2201/asc_set_atomic_min_impl.h"
+#include "set_atomic_add_impl/npu_arch_2201/asc_set_atomic_add_impl.h"
+#include "set_atomic_none_impl/npu_arch_2201/asc_set_atomic_none_impl.h"
+#include "set_atomic_min_impl/npu_arch_2201/asc_set_atomic_min_impl.h"
 #include "set_atomic_s8_impl/npu_arch_2201/set_atomic_s8_impl.h"
 #include "set_atomic_type_c_api_impl/set_atomic_bf16_impl/npu_arch_2201/asc_set_atomic_bf16_impl.h"
 #include "get_st_atomic_cfg_impl/npu_arch_2201/asc_get_store_atomic_config_impl.h"
@@ -22,6 +24,16 @@
 #include "zero_bits_cnt_impl/npu_arch_2201/asc_zero_bits_cnt_impl.h"
 #include "ffz_impl/npu_arch_2201/asc_ffz_impl.h"
 #include "set_atomic_f32_impl/npu_arch_2201/asc_set_atomic_f32_impl.h"
+
+__aicore__ inline void asc_set_atomic_add()
+{
+    asc_set_atomic_add_impl();
+}
+
+__aicore__ inline void asc_set_atomic_none()
+{
+    asc_set_atomic_none_impl();
+}
 
 __aicore__ inline void asc_set_atomic_min()
 {

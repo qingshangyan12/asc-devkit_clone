@@ -10,18 +10,16 @@
  
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_MISC_C_API_IMPL_INIT_SOC_STATE_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_MISC_C_API_IMPL_INIT_SOC_STATE_IMPL_H
- 
-namespace CApiInternal {
- 
+
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+
 __aicore__ inline void asc_init_soc_state_impl()
 {
-    set_atomic_none();
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    set_mask_norm();
-    set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
-#endif
+    if ASC_IS_AIV {
+        set_atomic_none();
+        set_mask_norm();
+        set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
+    }
 }
- 
-} // namespace CApiInternal
  
 #endif

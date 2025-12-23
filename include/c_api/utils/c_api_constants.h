@@ -37,5 +37,7 @@ constexpr uint16_t CAPI_ONE_DATABLOCK_SIZE = 32;
 constexpr uint8_t CAPI_DEFAULT_REPEAT = 1;
 constexpr uint8_t CAPI_DEFAULT_BLOCK_STRIDE = 1;
 constexpr uint8_t CAPI_DEFAULT_REPEAT_STRIDE = 8;
+constexpr uint8_t CAPI_HALF_DEFAULT_REPEAT_STRIDE = 4;
+constexpr uint8_t CAPI_ONE_FOURTH_DEFAULT_REPEAT_STRIDE = 2;
 
 #endif

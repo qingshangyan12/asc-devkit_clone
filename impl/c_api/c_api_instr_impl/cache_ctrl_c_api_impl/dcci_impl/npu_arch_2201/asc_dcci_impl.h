@@ -10,9 +10,7 @@
  
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_DCCI_IMPL_NPU_ARCH_2201_ASC_DCCI_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_DCCI_IMPL_NPU_ARCH_2201_ASC_DCCI_IMPL_H
- 
-namespace CApiInternal {
- 
+
 __aicore__ inline void asc_dcci_impl(__gm__ void* dst, uint64_t entire)
 {
     dcci(dst, entire);
@@ -22,7 +20,5 @@ __aicore__ inline void asc_dcci_impl(__gm__ void* dst, uint64_t entire, uint64_t
 {
     dcci(dst, entire, type);
 }
- 
-} // namespace CApiInternal
  
 #endif

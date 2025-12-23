@@ -48,17 +48,16 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_BrcbConfig_Succ)  
     __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                       \
     __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                       \
                                                                                                 \
-    asc_brcb_config config;                                                                     \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint16_t dst_block_stride = static_cast<uint16_t>(1);                                       \
+    uint16_t dst_repeat_stride = static_cast<uint16_t>(8);                                      \
+    uint8_t  repeat = static_cast<uint8_t>(1);                                                  \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, __ubuf__ data_type *,                       \
                 uint16_t, uint16_t, uint8_t))                                                   \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_uint8_t_uint16_t_uint16_Stub));               \
                                                                                                 \
-    c_api_name(dst, src, config);                                                               \
+    c_api_name(dst, src, dst_block_stride, dst_repeat_stride, repeat);                          \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -67,17 +66,16 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_BrcbConfig_Su
     __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                       \
     __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                       \
                                                                                                 \
-    asc_brcb_config config;                                                                     \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint16_t dst_block_stride = static_cast<uint16_t>(1);                                       \
+    uint16_t dst_repeat_stride = static_cast<uint16_t>(8);                                      \
+    uint8_t repeat = static_cast<uint8_t>(1);                                                   \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, __ubuf__ data_type *,                       \
                 uint16_t, uint16_t, uint8_t))                                                   \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_uint8_t_uint16_t_uint16_Stub));               \
                                                                                                 \
-    c_api_name##_sync(dst, src, config);                                                        \
+    c_api_name##_sync(dst, src, dst_block_stride, dst_repeat_stride, repeat);                   \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 

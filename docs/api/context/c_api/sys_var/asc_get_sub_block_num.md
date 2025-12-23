@@ -1,4 +1,4 @@
-# asc_get_sub_block_dim
+# asc_get_sub_block_num
 
 ## AI处理器支持情况
 

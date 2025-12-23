@@ -116,3 +116,5 @@ TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8LCApi, asc_deq_int162b8_l, vconv
 TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqI162B8LCApi, asc_deq_int162b8_l, vconv_deqs162b8l, uint8_t, int16_t);
 // ==========asc_int42half==========
 TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvI42HCApi, asc_int42half, vconv_s42f16, half, void);
+// ==========asc_deq_int322half==========
+TEST_VECTOR_COMPUTE_CONV_DEQ_INSTR(ConvDeqS322F16CApi, asc_deq_int322half, vconv_deq, half, int32_t);

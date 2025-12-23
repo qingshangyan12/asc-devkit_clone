@@ -15,8 +15,6 @@
 
 constexpr uint64_t CAPI_DEFAULT_BINARY_CONFIG_VALUE = 0x0100080808010101;
 constexpr uint64_t CAPI_DEFAULT_UNARY_CONFIG_VALUE = 0x0100800800010001;
-constexpr uint64_t CAPI_DEFAULT_REDUCE_CONFIG_VALUE = 0x0100000800010001;
-constexpr uint64_t CAPI_DEFAULT_DUPLICATE_CONFIG_VALUE = 0x0100800800010001;
 constexpr uint64_t CAPI_DEFAULT_FILL_VALUE_CONFIG_VALUE = 0x0000000000000000;
 
 union asc_copy_config {
@@ -55,50 +53,6 @@ union asc_unary_config {
     };
 };
 
-union asc_block_reduce_config {
-    uint64_t config = CAPI_DEFAULT_REDUCE_CONFIG_VALUE;
-    struct {
-        uint64_t dst_repeat_stride : 16;
-        uint64_t src_block_stride : 16;
-        uint64_t src_repeat_stride : 16;
-        uint64_t reserved : 8;
-        uint64_t repeat : 8;
-    };
-};
-
-union asc_repeat_reduce_config {
-    uint64_t config = CAPI_DEFAULT_REDUCE_CONFIG_VALUE;
-    struct {
-        uint64_t dst_repeat_stride : 16;
-        uint64_t src_block_stride : 16;
-        uint64_t src_repeat_stride : 16;
-        uint64_t reserved : 8;
-        uint64_t repeat : 8;
-    };
-};
-
-union asc_duplicate_config {
-    uint64_t config = CAPI_DEFAULT_DUPLICATE_CONFIG_VALUE;
-    struct {
-        uint64_t dst_block_stride : 16;
-        uint64_t src_block_stride : 16;
-        uint64_t dst_repeat_stride : 12;
-        uint64_t src_repeat_stride : 12;
-        uint64_t repeat : 8;
-    };
-};
-
-union asc_brcb_config {
-    uint64_t config;
-    struct {
-        uint64_t dst_block_stride : 16;
-        uint64_t reserved1 : 16;
-        uint64_t dst_repeat_stride : 12;
-        uint64_t reserved2 : 12;
-        uint64_t repeat : 8;
-    };
-};
-
 union asc_fill_value_config {
     uint64_t config = CAPI_DEFAULT_FILL_VALUE_CONFIG_VALUE;
     struct {
@@ -113,8 +67,5 @@ union asc_fill_value_config {
 
 constexpr asc_binary_config CAPI_DEFAULT_BINARY_CFG{};
 constexpr asc_unary_config CAPI_DEFAULT_UNARY_CFG{};
-constexpr asc_block_reduce_config CAPI_BLOCK_DEFAULT_REDUCE_CFG{};
-constexpr asc_repeat_reduce_config CAPI_REPEAT_DEFAULT_REDUCE_CFG{};
-constexpr asc_duplicate_config CAPI_DEFAULT_DUPLICATE_CFG{};
 constexpr asc_fill_value_config CAPI_DEFAULT_FILL_VALUE_CFG{};
 #endif
