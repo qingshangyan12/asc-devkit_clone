@@ -63,6 +63,26 @@ TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_FunctionDecl_printf)
     manager.hasPrintf_ = false;
 }
 
+TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_FunctionDecl_simt_printf)
+{
+    clang::ASTContext context = clang::ASTContext();
+    clang::CompilerInstance compiler = clang::CompilerInstance();
+    AscPlugin::ASTDeviceVisitor visitor(context, compiler);
+    clang::CallExpr CE;
+    clang::CallExpr *callExpr = &CE;
+    clang::FunctionDecl FD(context);
+    clang::FunctionDecl *funcDecl = &FD;
+    MOCKER(&clang::CallExpr::getDirectCallee).stubs().will(returnValue(funcDecl));
+    auto& manager = AscPlugin::InfoManager::GetInstance();
+    manager.pathInfo_.cannPath = "llt_cann_stub_path";
+    EXPECT_EQ(manager.hasSimtPrintf_, false);
+    MOCKER(&clang::FunctionDecl::getQualifiedNameAsString).stubs()
+        .will(returnValue(std::string("__asc_simt_vf::printf")));
+    EXPECT_EQ(visitor.VisitCallExpr(callExpr), true);
+    EXPECT_EQ(manager.hasSimtPrintf_, true);
+    manager.hasSimtPrintf_ = false;
+}
+
 TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_FunctionDecl_assert)
 {
     clang::ASTContext context = clang::ASTContext();
