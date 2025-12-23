@@ -24,7 +24,7 @@ namespace AscendC {
 __aicore__ inline void GetArchVersionImpl(uint32_t& coreVersion)
 {
     const int32_t coreVersionOffset = 32;
-    coreVersion = static_cast<uint32_t>((static_cast<uint64_t>(get_arch_ver()) >> coreVersionOffset) & 0xFFF);
+    coreVersion = static_cast<uint32_t>((static_cast<uint64_t>(bisheng::cce::get_arch_ver()) >> coreVersionOffset) & 0xFFF);
 }
 
 __aicore__ inline int64_t GetSubBlockNumImpl()
@@ -35,14 +35,14 @@ __aicore__ inline int64_t GetSubBlockNumImpl()
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         return g_taskRation;
 #else
-        return get_subblockdim();
+        return bisheng::cce::get_subblockdim();
 #endif
     }
 }
 
 __aicore__ inline int64_t GetProgramCounterImpl()
 {
-    int64_t pc = static_cast<int64_t>(static_cast<uint64_t>(get_pc()) & 0xFFFFFFFFFFFF);
+    int64_t pc = static_cast<int64_t>(static_cast<uint64_t>(bisheng::cce::get_pc()) & 0xFFFFFFFFFFFF);
     return pc;
 }
 

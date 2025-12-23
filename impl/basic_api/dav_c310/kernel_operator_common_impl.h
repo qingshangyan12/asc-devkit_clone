@@ -23,7 +23,7 @@ __aicore__ inline int64_t GetSubBlockIdxImpl()
     }
     return 0;
 #else
-    return get_subblockid();
+    return bisheng::cce::get_subblockid();
 #endif
 }
 
@@ -35,7 +35,7 @@ __aicore__ inline int64_t GetTaskRationImpl()
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         return g_taskRation;
 #else
-        return get_subblockdim();
+        return bisheng::cce::get_subblockdim();
 #endif
     }
 }
@@ -45,7 +45,7 @@ __aicore__ inline int64_t TscmGetTaskRation()
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         return g_taskRation;
 #else
-        return get_subblockdim();
+        return bisheng::cce::get_subblockdim();
 #endif
 }
 
@@ -58,7 +58,7 @@ __aicore__ inline int64_t GetBlockIdxImpl()
     return block_idx;
 #else
     if ASCEND_IS_AIV {
-        return get_block_idx() * get_subblockdim() + get_subblockid();
+        return get_block_idx() * bisheng::cce::get_subblockdim() + bisheng::cce::get_subblockid();
     } else {
         return get_block_idx();
     }
@@ -104,12 +104,12 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 
 __aicore__ inline int64_t GetStoreAtomicConfigImpl()
 {
-    return get_st_atomic_cfg();
+    return bisheng::cce::get_st_atomic_cfg();
 }
 
 __aicore__ inline void GetStoreAtomicConfigImpl(uint16_t &atomicType, uint16_t &atomicOp)
 {
-    int64_t stAtomic = get_st_atomic_cfg();
+    int64_t stAtomic = bisheng::cce::get_st_atomic_cfg();
     constexpr uint64_t typeMask = 0x7;
     constexpr uint64_t opBit = 4;
     constexpr uint64_t opMask = 0x3;
@@ -122,22 +122,22 @@ __aicore__ inline void DataCachePreloadImpl(__gm__ uint64_t *src, const T cacheO
 {
     static_assert(SupportType<T, int16_t, int64_t>(),
         "Failed to check dtype in DataCachePreload, current api support dtype is int16_t / int64_t");
-    dc_preload(src, cacheOffset);
+    bisheng::cce::dc_preload(src, cacheOffset);
 }
 
 __aicore__ inline void PreLoadImpl(void *pc, const int64_t preFetchLen)
 {
-    preload(pc, preFetchLen);
+    bisheng::cce::preload(pc, preFetchLen);
 }
 
 __aicore__ inline int64_t GetICachePreloadStatusImpl()
 {
-    return get_icache_prl_st();
+    return bisheng::cce::get_icache_prl_st();
 }
 
 __aicore__ inline void PreLoad(const int64_t preFetchLen)
 {
-    int64_t pc = get_pc() & 0xFFFFFFFFFFFF;
+    int64_t pc = bisheng::cce::get_pc() & 0xFFFFFFFFFFFF;
     PreLoadImpl(reinterpret_cast<void *>(pc), preFetchLen);
 }
 
@@ -158,7 +158,7 @@ __aicore__ inline int64_t GetSprImpl()
 {
     static_assert(SupportEnum<spr, SpecialPurposeReg::AR>(),
         "current GetSpr api only support SpecialPurposeReg AR on current device!");
-    return get_ar();
+    return bisheng::cce::get_ar();
 }
  
 __simd_vf__ inline void ClearARImpl()
@@ -188,21 +188,21 @@ __aicore__ static inline void SetCtrlSprImpl(int64_t value)
                                               startBit == 59 || startBit == 60)),
                   "Invalid startBit/endBit on current device!");
     if (endBit - startBit == 63) {
-        set_ctrl(value);
+        bisheng::cce::set_ctrl(value);
         return;
     }
     uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
     mask = ~mask;
-    int64_t setValue = get_ctrl() & mask;
+    int64_t setValue = bisheng::cce::get_ctrl() & mask;
     setValue |= (value << startBit);
-    set_ctrl(setValue);
+    bisheng::cce::set_ctrl(setValue);
 }
 
 template <int8_t startBit, int8_t endBit>
 __aicore__ static inline int64_t GetCtrlSprImpl()
 {
     static_assert((startBit <= endBit && startBit >= 0 && endBit < 64), "Invalid bit range on current device!");
-    int64_t value = get_ctrl();
+    int64_t value = bisheng::cce::get_ctrl();
     if (endBit - startBit == 63) {
         return value;
     }
@@ -221,15 +221,15 @@ __aicore__ static inline void ResetCtrlSprImpl()
                   "Invalid startBit/endBit on current device!");
     int64_t defaultCtrl = 0x1000000000000008; // default value of ctrl
     if (endBit - startBit == 63) {
-        set_ctrl(defaultCtrl);
+        bisheng::cce::set_ctrl(defaultCtrl);
         return;
     }
     uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
     defaultCtrl = defaultCtrl & mask;
     mask = ~mask;
-    int64_t value = get_ctrl() & mask;
+    int64_t value = bisheng::cce::get_ctrl() & mask;
     value = value | defaultCtrl;
-    set_ctrl(value);
+    bisheng::cce::set_ctrl(value);
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H

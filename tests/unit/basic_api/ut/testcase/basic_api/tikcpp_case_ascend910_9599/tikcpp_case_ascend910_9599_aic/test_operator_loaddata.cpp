@@ -451,7 +451,7 @@ __aicore__ inline void E2eKernel(GM_ADDR aGM, GM_ADDR bGM, GM_ADDR cGM, GM_ADDR 
     auto gmC = cGlobal[offsetC];
     auto gmBias = biasGlobal[offsetBias];
 
-    set_atomic_none();
+    bisheng::cce::set_atomic_none();
     TPipe que;
     E2eCase<AType, BType, CType, BiasType> ins;
     ins.Init(&que, m, n, k, hasBias);
@@ -462,7 +462,7 @@ __aicore__ inline void E2eKernel(GM_ADDR aGM, GM_ADDR bGM, GM_ADDR cGM, GM_ADDR 
     }
 
     ins.IterateAll(gmC);
-    set_atomic_none();
+    bisheng::cce::set_atomic_none();
     return;
 }
 
@@ -652,7 +652,7 @@ private:
         }
         LocalTensor<Src0T> featureMapA1 = inQueueFmA1.AllocTensor<Src0T>();
         // set repeat
-        set_l3d_rpt(0);
+        bisheng::cce::set_l3d_rpt(0);
         // init l1
         InitConstValue<Src0T>(featureMapA1,
             { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(Src0T) / 32), 0, static_cast<Src0T>(1) });

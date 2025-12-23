@@ -47,8 +47,8 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
         uint8_t kStep = loadDataParam.repeatTimes;
         int16_t srcStride = static_cast<int16_t>(loadDataParam.srcStride);
         uint16_t dstStride = loadDataParam.dstGap + 1;
-        set_mte2_src_para(uint64_t(srcStride));
-        load_gm_to_cbuf_2dv2(dst, src, mStartPosition, kStartPosition, dstStride, mStep, kStep, loadDataParam.sid, 0, cacheMode);
+        bisheng::cce::set_mte2_src_para(uint64_t(srcStride));
+        bisheng::cce::load_gm_to_cbuf_2dv2(dst, src, mStartPosition, kStartPosition, dstStride, mStep, kStep, loadDataParam.sid, 0, cacheMode);
     }
 }
 
@@ -66,9 +66,9 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
         uint16_t dstStride = loadDataParam.dstGap + 1;
  
         if (loadDataParam.ifTranspose) {
-            load_cbuf_to_ca(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, 1);
+            bisheng::cce::load_cbuf_to_ca(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, 1);
         } else {
-            load_cbuf_to_ca(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, 0);
+            bisheng::cce::load_cbuf_to_ca(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, 0);
         }
     }
 }
@@ -88,11 +88,11 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
  
         if (loadDataParam.ifTranspose) {
             for (uint8_t i = 0; i < kStep; i++) {
-                load_cbuf_to_cb(
+                bisheng::cce::load_cbuf_to_cb(
                     dst + i * VALUE_512 / sizeof(T) * dstStride, src, mStartPosition, i, 1, 1, srcStride, dstStride, 1);
             }
         } else {
-            load_cbuf_to_cb(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, 0);
+            bisheng::cce::load_cbuf_to_cb(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, 0);
         }
     }
 }
@@ -109,7 +109,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T *dst, __cbuf__ T *src, const
     if ASCEND_IS_AIC {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         if (loadDataParam.GetIfTranspose()) {
-            load_cbuf_to_ca(dst,
+            bisheng::cce::load_cbuf_to_ca(dst,
                 src,
                 loadDataParam.GetMStartPosition(),
                 loadDataParam.GetKStartPosition(),
@@ -119,7 +119,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T *dst, __cbuf__ T *src, const
                 loadDataParam.GetDstStride(),
                 1);
         } else {
-            load_cbuf_to_ca(dst,
+            bisheng::cce::load_cbuf_to_ca(dst,
                 src,
                 loadDataParam.GetMStartPosition(),
                 loadDataParam.GetKStartPosition(),
@@ -246,7 +246,7 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *s
         "LoadDataWithTranspose only support uint8_t, int8_t, half, bfloat16_t, float, int32_t, uint32_t \
          on current device!");
     if ASCEND_IS_AIC {
-        load_cbuf_to_cb_transpose(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes,
+        bisheng::cce::load_cbuf_to_cb_transpose(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap, loadDataParam.srcFracGap);
     }
 }
@@ -263,7 +263,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ U *dst, __cbuf__ T *src0, __cb
     if ASCEND_IS_AIC {
         if constexpr (SupportType<U, mx_fp8_e4m3_t, mx_fp8_e5m2_t>()) {
             if (loadDataParam.ifTranspose) {
-                load_cbuf_to_ca(reinterpret_cast<__ca__ T *>(dst),
+                bisheng::cce::load_cbuf_to_ca(reinterpret_cast<__ca__ T *>(dst),
                     (__cbuf__ T *)src0,
                     loadDataParam.mStartPosition,
                     loadDataParam.kStartPosition,
@@ -273,7 +273,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ U *dst, __cbuf__ T *src0, __cb
                     loadDataParam.dstStride,
                     1);
             } else {
-                load_cbuf_to_ca(reinterpret_cast<__ca__ T *>(dst),
+                bisheng::cce::load_cbuf_to_ca(reinterpret_cast<__ca__ T *>(dst),
                     (__cbuf__ T *)src0,
                     loadDataParam.mStartPosition,
                     loadDataParam.kStartPosition,
@@ -285,7 +285,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ U *dst, __cbuf__ T *src0, __cb
             }
         } else {
             if (loadDataParam.ifTranspose) {
-                load_cbuf_to_ca_s4((__ca__ T *)dst,
+                bisheng::cce::load_cbuf_to_ca_s4((__ca__ T *)dst,
                     (__cbuf__ T *)src0,
                     loadDataParam.mStartPosition,
                     loadDataParam.kStartPosition,
@@ -295,7 +295,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ U *dst, __cbuf__ T *src0, __cb
                     loadDataParam.dstStride,
                     1);
             } else {
-                load_cbuf_to_ca_s4((__ca__ T *)dst,
+                bisheng::cce::load_cbuf_to_ca_s4((__ca__ T *)dst,
                     (__cbuf__ T *)src0,
                     loadDataParam.mStartPosition,
                     loadDataParam.kStartPosition,
@@ -315,7 +315,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ U *dst, __cbuf__ T *src0, __cb
 #else
         uint64_t mxDstAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
 #endif
-        load_cbuf_to_ca_mx(mxDstAddr,
+        bisheng::cce::load_cbuf_to_ca_mx(mxDstAddr,
             static_cast<__cbuf__ void *>(src1),
             loadMxDataParams.xStartPosition,
             loadMxDataParams.yStartPosition,
@@ -338,7 +338,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ U *dst, __cbuf__ T *src0, __cb
     if ASCEND_IS_AIC {
         if constexpr (SupportType<U, mx_fp8_e4m3_t, mx_fp8_e5m2_t>()) {
             if (loadDataParam.ifTranspose) {
-                load_cbuf_to_cb(reinterpret_cast<__cb__ T *>(dst),
+                bisheng::cce::load_cbuf_to_cb(reinterpret_cast<__cb__ T *>(dst),
                     (__cbuf__ T *)(src0),
                     loadDataParam.mStartPosition,
                     loadDataParam.kStartPosition,
@@ -348,7 +348,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ U *dst, __cbuf__ T *src0, __cb
                     loadDataParam.dstStride,
                     1);
             } else {
-                load_cbuf_to_cb(reinterpret_cast<__cb__ T *>(dst),
+                bisheng::cce::load_cbuf_to_cb(reinterpret_cast<__cb__ T *>(dst),
                     (__cbuf__ T *)(src0),
                     loadDataParam.mStartPosition,
                     loadDataParam.kStartPosition,
@@ -360,7 +360,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ U *dst, __cbuf__ T *src0, __cb
             }
         } else {
             if (loadDataParam.ifTranspose) {
-                load_cbuf_to_cb_s4((__cb__ T *)dst,
+                bisheng::cce::load_cbuf_to_cb_s4((__cb__ T *)dst,
                     (__cbuf__ T *)src0,
                     loadDataParam.mStartPosition,
                     loadDataParam.kStartPosition,
@@ -370,7 +370,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ U *dst, __cbuf__ T *src0, __cb
                     loadDataParam.dstStride,
                     1);
             } else {
-                load_cbuf_to_cb_s4((__cb__ T *)dst,
+                bisheng::cce::load_cbuf_to_cb_s4((__cb__ T *)dst,
                     (__cbuf__ T *)src0,
                     loadDataParam.mStartPosition,
                     loadDataParam.kStartPosition,
@@ -391,7 +391,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ U *dst, __cbuf__ T *src0, __cb
 #else
         uint64_t mxDstAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
 #endif
-        load_cbuf_to_cb_mx(mxDstAddr,
+        bisheng::cce::load_cbuf_to_cb_mx(mxDstAddr,
             static_cast<__cbuf__ void *>(src1),
             loadMxDataParams.xStartPosition,
             loadMxDataParams.yStartPosition,
@@ -427,12 +427,12 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T *dst, __gm__ T *src, const 
         "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
     if ASCEND_IS_AIC {
-        set_mte2_src_para(uint64_t(loadDataParam.srcStride));
+        bisheng::cce::set_mte2_src_para(uint64_t(loadDataParam.srcStride));
         if constexpr (SupportType<T, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
-            load_gm_to_cbuf_2dv2_s4(dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+            bisheng::cce::load_gm_to_cbuf_2dv2_s4(dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
                 loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0, cacheMode);
         } else {
-            load_gm_to_cbuf_2dv2(dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+            bisheng::cce::load_gm_to_cbuf_2dv2(dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
                 loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0, cacheMode);
         }
     }
@@ -475,10 +475,10 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
             using BType = typename GetDstType<Src1T>::Type;
             uint64_t l0aMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a)) / MX_BUFFER_SCALE;
             uint64_t l0bMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b)) / MX_BUFFER_SCALE;
-            mad_mx(c, 0, (__ca__ AType*)a, l0aMxBufferStartAddr, (__cb__ BType*)b, l0bMxBufferStartAddr, mmadParams.m, mmadParams.k,
+            bisheng::cce::mad_mx(c, 0, (__ca__ AType*)a, l0aMxBufferStartAddr, (__cb__ BType*)b, l0bMxBufferStartAddr, mmadParams.m, mmadParams.k,
                 mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv, mmadParams.cmatrixSource, cmatrixInitVal);
         } else {
-            mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
+            bisheng::cce::mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
                 mmadParams.cmatrixSource, cmatrixInitVal);
         }
     }
@@ -507,10 +507,10 @@ __aicore__ inline void MmadCal(
         if constexpr (isMx) {
             using AType = typename GetDstType<Src0T>::Type;
             using BType = typename GetDstType<Src1T>::Type;
-            mad_mx((__cc__ DstT*)c, (__ca__ AType*)a, (__cb__ BType*)b, bias, mmadParams.m, mmadParams.k, mmadParams.n,
+            bisheng::cce::mad_mx((__cc__ DstT*)c, (__ca__ AType*)a, (__cb__ BType*)b, bias, mmadParams.m, mmadParams.k, mmadParams.n,
                 mmadParams.unitFlag, mmadParams.disableGemv, cmatrixSource, cmatrixInitVal);
         } else {
-            mad(c, a, b, bias, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
+            bisheng::cce::mad(c, a, b, bias, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
                 cmatrixSource, cmatrixInitVal);
         }
 #else
@@ -520,12 +520,12 @@ __aicore__ inline void MmadCal(
             using BType = typename GetDstType<Src1T>::Type;
             uint64_t l0aMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a)) / MX_BUFFER_SCALE;
             uint64_t l0bMxBufferStartAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b)) / MX_BUFFER_SCALE;
-            mad_mx(c, bias, (__ca__ AType*)a, l0aMxBufferStartAddr, (__cb__ BType*)b, l0bMxBufferStartAddr, mmadParams.m, mmadParams.k,
+            bisheng::cce::mad_mx(c, bias, (__ca__ AType*)a, l0aMxBufferStartAddr, (__cb__ BType*)b, l0bMxBufferStartAddr, mmadParams.m, mmadParams.k,
                 mmadParams.n,mmadParams.unitFlag, mmadParams.disableGemv, cmatrixSource, cmatrixInitVal);
         } else {
             // Xd[31:0]: matrix c addr in L0C, Xd[63:32]: bias addr in bias table buffer;
             uint64_t xd = ((uint64_t)c) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
-            mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
+            bisheng::cce::mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
                 cmatrixSource, cmatrixInitVal);
         }
 #endif
@@ -549,10 +549,10 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
         if constexpr (isMx) {
             using AType = typename GetDstType<Src0T>::Type;
             using BType = typename GetDstType<Src1T>::Type;
-            mad_mx(c, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
+            bisheng::cce::mad_mx(c, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
                 mmadParams.cmatrixSource, cmatrixInitVal);
         } else {
-            mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
+            bisheng::cce::mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
                 mmadParams.cmatrixSource, cmatrixInitVal);
         }
     }
@@ -577,10 +577,10 @@ __aicore__ inline void MmadCal(
         if constexpr (isMx) {
             using AType = typename GetDstType<Src0T>::Type;
             using BType = typename GetDstType<Src1T>::Type;
-            mad_mx((__cc__ DstT*)c, (__ca__ AType*)a, (__cb__ BType*)b, bias, mmadParams.m, mmadParams.k, mmadParams.n,
+            bisheng::cce::mad_mx((__cc__ DstT*)c, (__ca__ AType*)a, (__cb__ BType*)b, bias, mmadParams.m, mmadParams.k, mmadParams.n,
                 mmadParams.unitFlag, mmadParams.disableGemv, cmatrixSource, cmatrixInitVal);
         } else {
-            mad(c, a, b, bias, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
+            bisheng::cce::mad(c, a, b, bias, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
                 cmatrixSource, cmatrixInitVal);
         }
 #else
@@ -589,10 +589,10 @@ __aicore__ inline void MmadCal(
         if constexpr (isMx) {
             using AType = typename GetDstType<Src0T>::Type;
             using BType = typename GetDstType<Src1T>::Type;
-            mad_mx((__cc__ DstT*)xd, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.m, mmadParams.k, mmadParams.n,
+            bisheng::cce::mad_mx((__cc__ DstT*)xd, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.m, mmadParams.k, mmadParams.n,
                 mmadParams.unitFlag, mmadParams.disableGemv, cmatrixSource, cmatrixInitVal);
         } else {
-            mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
+            bisheng::cce::mad((__cc__ DstT*)xd, a, b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv,
                 cmatrixSource, cmatrixInitVal);
         }
 #endif
@@ -696,13 +696,13 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T *dst, const InitConstValuePara
         int64_t repeatBit = (static_cast<uint64_t>(initConstValueParams.blockNum) << 16) |
                             (static_cast<uint64_t>(initConstValueParams.dstGap) << 32) | initConstValueParams.repeatTimes;
         if constexpr (IsSameType<T, bfloat16_t>::value) {
-            create_cbuf_matrix_bf16(dst, repeatBit, initConstValueParams.initValue);
+            bisheng::cce::create_cbuf_matrix_bf16(dst, repeatBit, initConstValueParams.initValue);
         } else if constexpr (IsSameType<T, uint32_t>::value || IsSameType<T, half>::value) {
-            create_cbuf_matrix(dst, repeatBit, static_cast<T>(initConstValueParams.initValue));
+            bisheng::cce::create_cbuf_matrix(dst, repeatBit, static_cast<T>(initConstValueParams.initValue));
         } else if constexpr (IsSameType<T, int16_t>::value || IsSameType<T, uint16_t>::value) {
-            create_cbuf_matrix(dst, repeatBit, GetScalarBitcodeToHalf(initConstValueParams.initValue));
+            bisheng::cce::create_cbuf_matrix(dst, repeatBit, GetScalarBitcodeToHalf(initConstValueParams.initValue));
         } else if constexpr (IsSameType<T, float>::value || IsSameType<T, int32_t>::value) {
-            create_cbuf_matrix(
+            bisheng::cce::create_cbuf_matrix(
                 dst, repeatBit, static_cast<uint32_t>(GetScalarBitcodeValue(initConstValueParams.initValue)));
         } else {
             ASCENDC_ASSERT(false,
@@ -771,7 +771,7 @@ __aicore__ inline void Load3DSetFMatrixCal(uint16_t l1H, uint16_t l1W, const uin
         for (uint32_t i = 0; i < padNumber; i++) {
             regFMatrix |= uint64_t(padList[i] & 0xFF) << (padListShiftBase + i * padListShiftBit);
         }
-        set_fmatrix(regFMatrix);
+        bisheng::cce::set_fmatrix(regFMatrix);
     }
 }
 
@@ -797,7 +797,7 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
         for (uint32_t i = 0; i < padNumber; i++) {
             regFMatrix |= uint64_t(padList[i] & 0xFF) << (padListShiftBase + i * padListShiftBit);
         }
-        set_fmatrix_b(regFMatrix);
+        bisheng::cce::set_fmatrix_b(regFMatrix);
     }
 }
 
@@ -823,7 +823,7 @@ __aicore__ inline void Load3DSetPaddingCal(const T padValue)
         uint16_t u16Value = static_cast<uint16_t>(padValue) & 0xFFu;
         paddingValue = (u16Value << padValueShiftBit) | u16Value;
     }
-    set_padding(paddingValue);
+    bisheng::cce::set_padding(paddingValue);
 }
 
 __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam repeatParams)
@@ -837,7 +837,7 @@ __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam repeatPara
 
     constexpr uint32_t dstStrideShiftBit = 32;
     rptConfig |= uint64_t(repeatParams.dstStride) << dstStrideShiftBit;
-    set_l3d_rpt(rptConfig);
+    bisheng::cce::set_l3d_rpt(rptConfig);
 }
 
 /* **************************************************************************************************
@@ -860,7 +860,7 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ T* dst, __cbuf__ T* src,
         "LoadData 3dv2 only support uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, uint16_t, int16_t, float, int32_t, uint32_t on current device!");
     if ASCEND_IS_AIC {
-        img2colv2_cbuf_to_ca(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
+        bisheng::cce::img2colv2_cbuf_to_ca(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
             loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
             loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
             loadDataParams.filterSizeW, loadDataParams.filterSizeH, loadDataParams.enTranspose,
@@ -877,7 +877,7 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ T* dst, __cbuf__ T* src,
         "LoadData 3dv2 only support uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, uint16_t, int16_t, float, int32_t, uint32_t on current device!");
     if ASCEND_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
+        bisheng::cce::img2colv2_cbuf_to_cb(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
             loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
             loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
             loadDataParams.filterSizeW, loadDataParams.filterSizeH, loadDataParams.enTranspose,
@@ -889,7 +889,7 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ half* dst, __cbuf__ half* sr
     const LoadData3DParamsV2<bfloat16_t>& loadDataParams)
 {
     if ASCEND_IS_AIC {
-        img2colv2_cbuf_to_ca(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
+        bisheng::cce::img2colv2_cbuf_to_ca(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
             loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
             loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
             loadDataParams.filterSizeW, loadDataParams.filterSizeH, loadDataParams.enTranspose,
@@ -901,7 +901,7 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ half* dst, __cbuf__ half* sr
     const LoadData3DParamsV2<bfloat16_t>& loadDataParams)
 {
     if ASCEND_IS_AIC {
-        img2colv2_cbuf_to_cb(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
+        bisheng::cce::img2colv2_cbuf_to_cb(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
             loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
             loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
             loadDataParams.filterSizeW, loadDataParams.filterSizeH, loadDataParams.enTranspose,
@@ -974,7 +974,7 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ T *dst, __cbuf__ T *src,
         "LoadData 3dv2Pro only support uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
     if ASCEND_IS_AIC {
-        img2colv2_cbuf_to_ca(dst, src, loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
+        bisheng::cce::img2colv2_cbuf_to_ca(dst, src, loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
             loadDataParams.extConfig >> LOAD_K_START_POSITION, loadDataParams.extConfig >> LOAD_M_START_POSITION,
             loadDataParams.filterConfig, loadDataParams.filterConfig >> LOAD_STRIDE_H,
             loadDataParams.filterConfig >> LOAD_FILTER_W, loadDataParams.filterConfig >> LOAD_FILTER_H,
@@ -990,7 +990,7 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ bfloat16_t* dst, __cbuf__ bf
     const LoadData3DParamsV2Pro& loadDataParams)
 {
     if ASCEND_IS_AIC {
-        img2colv2_cbuf_to_ca((__ca__ half*)dst, (__cbuf__ half*)src,
+        bisheng::cce::img2colv2_cbuf_to_ca((__ca__ half*)dst, (__cbuf__ half*)src,
             loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
             loadDataParams.extConfig >> LOAD_K_START_POSITION, loadDataParams.extConfig >> LOAD_M_START_POSITION,
             loadDataParams.filterConfig, loadDataParams.filterConfig >> LOAD_STRIDE_H,
@@ -1011,7 +1011,7 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ T *dst, __cbuf__ T *src,
         "LoadData 3dv2Pro only support uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
     if ASCEND_IS_AIC {
-            img2colv2_cbuf_to_cb(dst, src, loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
+            bisheng::cce::img2colv2_cbuf_to_cb(dst, src, loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
                 loadDataParams.extConfig >> LOAD_K_START_POSITION, loadDataParams.extConfig >> LOAD_M_START_POSITION,
                 loadDataParams.filterConfig, loadDataParams.filterConfig >> LOAD_STRIDE_H,
                 loadDataParams.filterConfig >> LOAD_FILTER_W, loadDataParams.filterConfig >> LOAD_FILTER_H,
@@ -1027,7 +1027,7 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ bfloat16_t* dst, __cbuf__ bf
     const LoadData3DParamsV2Pro& loadDataParams)
 {
     if ASCEND_IS_AIC {
-        img2colv2_cbuf_to_cb((__cb__ half*)dst, (__cbuf__ half*)src,
+        bisheng::cce::img2colv2_cbuf_to_cb((__cb__ half*)dst, (__cbuf__ half*)src,
             loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
             loadDataParams.extConfig >> LOAD_K_START_POSITION, loadDataParams.extConfig >> LOAD_M_START_POSITION,
             loadDataParams.filterConfig, loadDataParams.filterConfig >> LOAD_STRIDE_H,

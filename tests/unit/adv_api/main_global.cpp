@@ -14,7 +14,7 @@
 
 int32_t main(int32_t argc, char** argv)
 {
-AscendC::StubInit();
+    AscendC::StubInit();
     AscendC::TPipe tpipe;
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

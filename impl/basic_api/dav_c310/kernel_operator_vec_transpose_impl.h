@@ -263,7 +263,7 @@ __aicore__ inline void TransDataTo5HDVldVaRegImpl(
 template <typename T> __aicore__ inline void TransposeImpl(__ubuf__ T* dst, __ubuf__ T* src)
 {
     if ASCEND_IS_AIV {
-        vtranspose((__ubuf__ uint16_t*)dst, (__ubuf__ uint16_t*)src);
+        bisheng::cce::vtranspose((__ubuf__ uint16_t*)dst, (__ubuf__ uint16_t*)src);
     }
 }
 

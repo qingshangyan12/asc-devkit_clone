@@ -17,7 +17,8 @@
 
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 2103) || \
     (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3103)) || \
-    ((__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
+    ((__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__) || \
+    (__NPU_ARCH__ == 5102)
 #include "kernel_micro_maskreg_intf_impl.h"
 #include "kernel_micro_addrreg_intf_impl.h"
 #include "kernel_micro_common_intf_impl.h"

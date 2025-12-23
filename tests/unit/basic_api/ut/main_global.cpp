@@ -10,9 +10,11 @@
 #include <gtest/gtest.h>
 #include "kernel_common.h"
 #include "kernel_tpipe_impl.h"
+#include "stub_reg.h"
 
 int32_t main(int32_t argc, char** argv)
 {
+    AscendC::StubInit();
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
