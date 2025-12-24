@@ -3,7 +3,7 @@
 ## AI处理器支持情况
 
 |AI处理器类型   | 是否支持 |
-| ------------|:----:|
+| :------------|:----:|
 | Ascend 910C | √    |
 | Ascend 910B | √    |
 
@@ -14,18 +14,15 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_data_cache_preload(uint64_t* address, int16_t offset)
-__aicore__ inline void asc_data_cache_preload(uint64_t* address, int64_t offset)
+__aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset)
 ```
 
 ## 参数说明
 
-表1 参数说明
-
 |参数名|输入/输出|描述|
 |------------|------------|-----------|
 | address     | 输入     | 源操作数的起始地址。   |
-| offset     | 输入     | 在源操作数上偏移offset大小开始加载数据，单位为Byte。|
+| offset     | 输入     | 在源操作数上偏移offset大小开始加载数据，单位为Bytes。|
 
 ## 返回值说明
 
@@ -42,7 +39,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-uint64_t* addr;
+__gm__ uint64_t* addr;
 int64_t offset = 0;
-asc_data_cache_preload(addr, offset);
+asc_datacache_preload(addr, offset);
 ```

@@ -12,7 +12,7 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_CACHE_CTRL_C_API_IMPL_CACHE_CTRL_C_API_IMPL_H
 
 #include "get_icache_preload_status_impl/npu_arch_2201/get_icache_preload_status_impl.h"
-#include "dc_preload_impl/asc_2201/asc_data_cache_preload_impl.h"
+#include "dc_preload_impl/npu_arch_2201/asc_data_cache_preload_impl.h"
 #include "dcci_impl/npu_arch_2201/asc_dcci_impl.h"
 
 __aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire)
@@ -25,14 +25,9 @@ __aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire, uint64_t type
     asc_dcci_impl(dst, entire, type);
 }
 
-__aicore__ inline void asc_data_cache_preload(uint64_t* address, int16_t offset)
+__aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset)
 {
-    CApiInternal::asc_data_cache_preload_impl<int16_t>(address, offset);
-}
-
-__aicore__ inline void asc_data_cache_preload(uint64_t* address, int64_t offset)
-{
-    CApiInternal::asc_data_cache_preload_impl<int64_t>(address, offset);
+    asc_datacache_preload_impl(address, offset);
 }
 
 __aicore__ inline int64_t asc_get_icache_preload_status()

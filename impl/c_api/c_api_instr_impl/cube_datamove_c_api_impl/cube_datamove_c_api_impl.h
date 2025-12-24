@@ -12,6 +12,7 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_CUBE_DATAMOVE_C_API_IMPL_H
  
 #include "copy_l12l0b_sparse_impl/npu_arch_2201/copy_l12l0b_sparse_impl.h"
+#include "copy_cbuf_to_bt_impl/npu_arch_2201/asc_copy_l12bt.h"
 #include "get_fpc_impl/asc_2201/get_fpc_impl.h"
 #include "set_fmatrix_impl/asc_2201/set_fmatrix_impl.h"
 #include "set_fmatrix_b_impl/asc_2201/set_fmatrix_b_impl.h"
@@ -969,6 +970,22 @@ __aicore__ inline void asc_fill_l1_value(__cbuf__ bfloat16_t* dst, bfloat16_t va
 __aicore__ inline void asc_fill_l1_value_sync(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config)
 {
     asc_fill_l1_value_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+{
+    asc_copy_l12bt_impl(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
+{
+    asc_copy_l12bt_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size)
+{
+    asc_copy_l12bt_sync_impl(dst, src, size);
 }
 
 #endif

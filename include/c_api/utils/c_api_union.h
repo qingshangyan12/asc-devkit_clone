@@ -64,6 +64,17 @@ union asc_store_atomic_config {
     };
 };
 
+union asc_deq_scale_config {
+    uint64_t val = 0;
+    struct {
+        uint64_t reserved1 : 5;
+        uint64_t offset : 9;
+        uint64_t sign_mode : 1;
+        uint64_t reserved2 : 17;
+        uint64_t scale;
+    };
+};
+
 constexpr asc_binary_config CAPI_DEFAULT_BINARY_CFG{};
 constexpr asc_unary_config CAPI_DEFAULT_UNARY_CFG{};
 constexpr asc_fill_value_config ASC_FILL_VALUE_DEFAULT_CFG{};

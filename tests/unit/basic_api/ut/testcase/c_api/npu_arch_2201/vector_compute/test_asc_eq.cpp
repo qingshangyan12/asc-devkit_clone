@@ -8,29 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-/* !
- * \file subs_impl.h
- * \brief
- */
-#ifndef IMPL_INSTR_VECTOR_COMPUTE_VTRANSPOSE_ASC_2201_ASC_TRANSPOSE_IMPL_H
-#define IMPL_INSTR_VECTOR_COMPUTE_VTRANSPOSE_ASC_2201_ASC_TRANSPOSE_IMPL_H
+#include "../utils/test_vcmp_instr_utils.h"
+#include "../utils/test_vcmpv_instr_utils.h"
 
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+// ==========asc_eq(half/float)==========
+TEST_VECTOR_COMPUTE_COMPARE_VCMP_INSTR(VCmpEQCApi, asc_eq, vcmp_eq, half);
+TEST_VECTOR_COMPUTE_COMPARE_VCMP_INSTR(VCmpEQCApi, asc_eq, vcmp_eq, float);
 
-namespace CApiInternal {
-
-template<typename T>
-__aicore__ inline void asc_transpose_impl(__ubuf__ T* dst, __ubuf__ T* src)
-{
-    vtranspose(dst, src);
-}
-
-template<typename T>
-__aicore__ inline void asc_transpose_sync_impl(__ubuf__ T* dst, __ubuf__ T* src)
-{
-    asc_transpose_impl<T>(dst, src);
-}
-
-}
-
-#endif
+// ==========asc_lt(half/float)==========
+TEST_VECTOR_COMPUTE_COMPARE_VCMPV_INSTR(VCmpVEQCApi, asc_eq, vcmpv_eq, uint8_t, half);
+TEST_VECTOR_COMPUTE_COMPARE_VCMPV_INSTR(VCmpVEQCApi, asc_eq, vcmpv_eq, uint8_t, float);

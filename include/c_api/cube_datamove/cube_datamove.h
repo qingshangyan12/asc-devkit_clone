@@ -454,4 +454,11 @@ __aicore__ inline void asc_fill_l1_value(__cbuf__ bfloat16_t* dst, bfloat16_t va
 
 __aicore__ inline void asc_fill_l1_value_sync(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size);
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size);
+
 #endif

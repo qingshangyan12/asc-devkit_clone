@@ -11,7 +11,6 @@
 #ifndef INCLUDE_C_API_ASC_SIMD_H
 #define INCLUDE_C_API_ASC_SIMD_H
 
-#include "c_api_utils_intf.h"
 #include "atomic/atomic.h"
 #include "cache_ctrl/cache_ctrl.h"
 #include "cube_compute/cube_compute.h"

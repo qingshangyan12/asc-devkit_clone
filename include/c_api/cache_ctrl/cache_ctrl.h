@@ -17,4 +17,6 @@ __aicore__ inline void asc_data_cache_clean_and_invalid(__gm__ void* dst, uint64
 
 __aicore__ inline int64_t asc_get_icache_preload_status();
  
+__aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset);
+
 #endif

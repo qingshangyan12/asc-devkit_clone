@@ -11,6 +11,7 @@
 | [asc_repeat_reduce_config](struct/asc_repeat_reduce_config.md) | repeat reduce类计算API配置参数 |
 | [asc_duplicate_config](struct/asc_duplicate_config.md) | asc_duplicate API配置参数 |
 | [asc_brcb_config](struct/asc_brcb_config.md) |asc_brcb API配置参数 |
+| [asc_deq_scale_config](struct/asc_deq_scale_config.md) | asc_deq_scale API配置参数 |
 
 ## 矢量计算
 
@@ -54,6 +55,8 @@
 | [asc_half2int16](vector_compute/asc_half2int16.md) | 数据类型转换。将half类型的数据转换为int16_t类型。 |
 | [asc_half2int32](vector_compute/asc_half2int32.md) | 数据类型转换。将half类型的数据转换为int32_t类型。 |
 | [asc_set_deq_scale](vector_compute/asc_set_deq_scale.md) | 设置DEQSCALAR寄存器的值。 |
+| [asc_eq](vector_compute/asc_eq.md) | 比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。 |
+| [asc_transpose](vector_compute/asc_transpose.md) | 用于实现16*16的二维矩阵数据块转置。 |
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -64,6 +67,7 @@
 
 |   API名称   |   说明   |
 |----------|-----------|
+| [asc_clz](cube_compute/asc_clz.md)| 计算参数前导零的数量（二进制从最高位到第一个1共有多少个0）。 |
 
 ## 同步控制
 
@@ -96,11 +100,13 @@
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_data_cache_clean_and_invalid](cache_ctrl/asc_data_cache_clean_and_invalid.md)| 用于刷新Cache， 保证Cache的一致性。 |
+| [asc_datacache_preload](cache_ctrl/asc_datacache_preload.md)| 从源地址所在的特定GM地址预加载数据到Data Cache中。 |
 
 ## 原子操作
 
 |   API名称   |   说明   |
 |----------|-----------|
+| [asc_set_atomic_min](simd_atomic/asc_set_atomic_min.md)| 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输内容与GM中已有内容进行比较，并将最小值写入GM。 |
 
 ## 其他操作
 

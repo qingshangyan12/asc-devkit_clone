@@ -11,11 +11,9 @@
 #ifndef IMPL_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_SET_ATOMIC_MIN_IMPL_NPU_ARCH_2201_SET_ATOMIC_MIN_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_SET_ATOMIC_MIN_IMPL_NPU_ARCH_2201_SET_ATOMIC_MIN_IMPL_H
 
-namespace CApiInternal {
 __aicore__ inline void asc_set_atomic_min_impl()
 {
     set_atomic_min();
 }
-} // namespace CApiInternal
 
 #endif

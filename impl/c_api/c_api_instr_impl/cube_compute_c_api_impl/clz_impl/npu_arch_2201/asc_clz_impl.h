@@ -7,18 +7,18 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
- 
-#ifndef IMPL_C_API_INSTR_SIMD_ATOMIC_DC_PRELOAD_ASC_2201_ASC_DATA_CACHE_PRELOAD_IMPL_H
-#define IMPL_C_API_INSTR_SIMD_ATOMIC_DC_PRELOAD_ASC_2201_ASC_DATA_CACHE_PRELOAD_IMPL_H
- 
-namespace CApiInternal {
 
-template<typename T>
-__aicore__ inline void asc_data_cache_preload_impl(uint64_t* address, T offset)
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_CUBE_COMPUTE_C_API_IMPL_CLZ_IMPL_NPU_ARCH_2201_ASC_CLZ_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_CUBE_COMPUTE_C_API_IMPL_CLZ_IMPL_NPU_ARCH_2201_ASC_CLZ_IMPL_H
+
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+
+__aicore__ inline int64_t asc_clz_impl(uint64_t value_in)
 {
-    dc_preload(address, offset);
-}
-
+    if ASC_IS_AIC {
+        return clz(value_in);
+    }
+    return 0;
 }
 
 #endif
