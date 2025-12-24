@@ -65,8 +65,10 @@ inline void CheckParams(std::vector<int64_t> shapeDims, bool isSrcInnerPad, Redu
     ASCENDC_HOST_ASSERT(pattern == ReducePattern::AR || pattern == ReducePattern::RA,
         return,
         "[%s][%s] Currently only support AR and RA pattern.", apiName.c_str(), funcName.c_str());
-    ASCENDC_HOST_ASSERT(first > 0 && last > 0, return,
+    if (!(socVersion == platform_ascendc::SocVersion::ASCEND910_95 || socVersion == platform_ascendc::SocVersion::ASCEND910_55)) {
+        ASCENDC_HOST_ASSERT(first > 0 && last > 0, return,
         "[%s][%s] both first and last axis must be greater than 0.", apiName.c_str(), funcName.c_str());
+    }
 }
 } // namespace
 
