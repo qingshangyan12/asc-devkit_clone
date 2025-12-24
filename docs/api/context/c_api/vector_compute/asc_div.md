@@ -19,24 +19,28 @@ $$
 
 - 前n个数据计算
 
-    ```cpp
-    __aicore__ inline void asc_div(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
-    __aicore__ inline void asc_div(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
-    ```
+```cpp
+__aicore__ inline void asc_div(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+__aicore__ inline void asc_div(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+```
 
 - 高维切分计算
 
-    ```cpp
-    __aicore__ inline void asc_div(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, const asc_binary_config& config)
-    __aicore__ inline void asc_div(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, const asc_binary_config& config)
-    ```
+```cpp
+__aicore__ inline void asc_div(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, 
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+__aicore__ inline void asc_div(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, 
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+```
 
 - 同步计算
 
-    ```cpp
-    __aicore__ inline void asc_div_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
-    __aicore__ inline void asc_div_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
-    ```
+```cpp
+__aicore__ inline void asc_div_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+__aicore__ inline void asc_div_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+```
 
 ## 参数说明
 
@@ -46,7 +50,12 @@ $$
 | src0 | 输入 | 源操作数0地址 |
 | src1 | 输入 | 源操作数1地址 |
 | count | 输入 | 参与连续计算的元素个数 |
-| config | 输入 | 在高维切分计算场景下使用的计算配置参数。详细说明请参考[asc_binary_config](../struct/asc_binary_config.md) |
+| dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src0_block_stride |输入| 源操作数0单次迭代内不同DataBlock间地址步长。 |
+| src1_block_stride |输入| 源操作数1单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride |输入| 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src0_repeat_stride |输入| 源操作数0相邻迭代间相同DataBlock的地址步长。 |
+| src1_repeat_stride |输入| 源操作数1相邻迭代间相同DataBlock的地址步长。 |
 
 ## 返回值说明
 
@@ -71,6 +80,6 @@ __ubuf__ half* src0 = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 offset += total_length * sizeof(half);
 __ubuf__ half* src1 = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
 offset += total_length * sizeof(half);
-__ubuf__ half* dst= (__ubuf__ half*)asc_get_phy_buf_addr(offset);
+__ubuf__ half* dst = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
 asc_div(dst, src0, src1, 128);
 ```

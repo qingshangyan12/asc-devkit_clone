@@ -11,15 +11,11 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_CMP_MASK_IMPL_ASC_2201_SET_CMP_MASK_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_CMP_MASK_IMPL_ASC_2201_SET_CMP_MASK_IMPL_H
 
-namespace CApiInternal {
-
 __aicore__ inline void asc_set_cmp_mask_impl(__ubuf__ void* sel_mask)
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    set_cmpmask(sel_mask);
-#endif
+    if ASC_IS_AIV {
+        set_cmpmask(sel_mask);
+    }
 }
-
-} // namespace CApiInternal
 
 #endif

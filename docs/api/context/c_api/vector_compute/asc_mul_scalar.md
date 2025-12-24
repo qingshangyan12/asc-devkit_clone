@@ -13,37 +13,41 @@
 执行矢量与标量的乘法运算。计算公式如下
 
 $$
-dst_i = src_i * a
+dst_i = src_i * value
 $$
 
 ### 函数原型
 
 - 前n个数据计算
 
-    ```cpp
-    __aicore__ inline void asc_mul_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t a, uint32_t count)
-    __aicore__ inline void asc_mul_scalar(__ubuf__ half* dst, __ubuf__ half* src, half a, uint32_t count)
-    __aicore__ inline void asc_mul_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t a, uint32_t count)
-    __aicore__ inline void asc_mul_scalar(__ubuf__ float* dst, __ubuf__ float* src, float a, uint32_t count)
-    ```
+```cpp
+__aicore__ inline void asc_mul_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
+__aicore__ inline void asc_mul_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+__aicore__ inline void asc_mul_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+__aicore__ inline void asc_mul_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+```
 
 - 高维切分计算
 
-    ```cpp
-    __aicore__ inline void asc_mul_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t a, const asc_unary_config& config)
-    __aicore__ inline void asc_mul_scalar(__ubuf__ half* dst, __ubuf__ half* src, half a, const asc_unary_config& config)
-    __aicore__ inline void asc_mul_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t a, const asc_unary_config& config)
-    __aicore__ inline void asc_mul_scalar(__ubuf__ float* dst, __ubuf__ float* src, float a, const asc_unary_config& config)
-    ```
+```cpp
+__aicore__ inline void asc_mul_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat, 
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+__aicore__ inline void asc_mul_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, 
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+__aicore__ inline void asc_mul_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, 
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+__aicore__ inline void asc_mul_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, 
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+```
 
 - 同步计算
 
-    ```cpp
-    __aicore__ inline void asc_mul_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t a, uint32_t count)
-    __aicore__ inline void asc_mul_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half a, uint32_t count)
-    __aicore__ inline void asc_mul_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t a, uint32_t count)
-    __aicore__ inline void asc_mul_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float a, uint32_t count)
-    ```
+```cpp
+__aicore__ inline void asc_mul_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
+__aicore__ inline void asc_mul_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+__aicore__ inline void asc_mul_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+__aicore__ inline void asc_mul_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+```
 
 ### 参数说明
 
@@ -51,9 +55,12 @@ $$
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数地址。 |
 | src | 输入 | 源操作数地址。 |
-| a | 输入 | 标量源操作数。 |
+| value | 输入 | 标量源操作数。 |
 | count | 输入 | 参与计算的元素个数。 |
-| config | 输入 | 在高维切分计算场景下使用的计算配置参数, 详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。 |
+| dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src_block_stride |输入| 源操作数单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride |输入| 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src_repeat_stride |输入| 源操作数相邻迭代间相同DataBlock的地址步长。 |
 
 ### 返回值说明
 
@@ -71,9 +78,9 @@ PIPE_V
 ### 调用示例
 
 ```cpp
-uint64_t offset = 0;
 // total_length指参与计算的数据长度
 uint64_t offset = 0;
+half scalar_val = 0.0f;
 __ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 offset += totalLength * sizeof(half);
 __ubuf__ half* dst = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
