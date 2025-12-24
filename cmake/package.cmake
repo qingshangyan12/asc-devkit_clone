@@ -65,16 +65,6 @@ install(FILES ${SCRIPTS_FILES}
     DESTINATION asc-devkit/script
 )
 
-set(BIN_FILES
-    ${CMAKE_SOURCE_DIR}/scripts/package/scripts/prereq_check.bash
-    ${CMAKE_SOURCE_DIR}/scripts/package/scripts/prereq_check.csh
-    ${CMAKE_SOURCE_DIR}/scripts/package/scripts/prereq_check.fish
-)
-
-install(FILES ${BIN_FILES}
-    DESTINATION asc-devkit/bin
-)
-
 set(COMMON_FILES
     ${CMAKE_SOURCE_DIR}/scripts/package/common/sh/install_common_parser.sh
     ${CMAKE_SOURCE_DIR}/scripts/package/common/sh/common_func_v2.inc
@@ -111,7 +101,7 @@ install(FILES ${LATEST_MANGER_FILES}
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/package/latest_manager/scripts/
     DESTINATION latest_manager
 )
-install(FILES ${CMAKE_SOURCE_DIR}/version.info
+install(FILES ${ASC_DEVKIT_VERSION_FILE}
     DESTINATION .
 )
 # install(DIRECTORY ${CMAKE_BINARY_DIR}/packages/${ARCH}-linux/ascendc DESTINATION ascendc)
