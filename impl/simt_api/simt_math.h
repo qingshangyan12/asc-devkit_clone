@@ -13,5 +13,41 @@
 
 __simt_callee__ inline float expf(float x);
 
+__simt_callee__ inline long int lroundf(float x);
+
+__simt_callee__ inline long long int llroundf(float x);
+
+__simt_callee__ inline long int lrintf(float x);
+
+__simt_callee__ inline long long int llrintf(float x);
+
+__simt_callee__ inline float truncf(float x);
+
+__simt_callee__ inline float roundf(float x);
+
+__simt_callee__ inline float rintf(float x);
+
+__simt_callee__ inline float floorf(float x);
+
+__simt_callee__ inline float ceilf(float x);
+
+__simt_callee__ inline float sqrtf(float x);
+
+__simt_callee__ inline float rsqrtf(float x);
+
+__simt_callee__ inline float log2f(float x);
+
+__simt_callee__ inline float logf(float x);
+
+__simt_callee__ inline float expf(float x);
+
+__simt_callee__ inline float fmaf(float x, float y, float z);
+
+__simt_callee__ inline float fabsf(float x);
+
+__simt_callee__ inline float normcdfinvf(float x);
+
+__simt_callee__ inline float modff(float x, float &n);
+
 #include "impl/simt_api/simt_math_impl.h"
 #endif  // ASCENDC_MODULE_SIMT_MATH_C_INTERFACE_H

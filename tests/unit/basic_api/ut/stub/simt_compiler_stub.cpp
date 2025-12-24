@@ -14,6 +14,7 @@
 #include "dav_c310/kernel_simt_cpu.h"
 #include "stub_def.h"
 #include <cmath>
+
 namespace bisheng {
 namespace cce {
 namespace simt {
@@ -1073,6 +1074,35 @@ float __reduce_min(float val)
 
 void __threadfence()
 {    
+}
+
+float roundf(float x) {
+    return round(x);
+}
+
+float rintf(float x) {
+    return rint(x);
+}
+
+float floorf(float x) {
+    return floor(x);
+}
+
+float ceilf(float x) {
+    return ceil(x);
+}
+
+float __fma(float x, float y, float z) {
+    return fma(x, y, z);
+}
+
+template<ROUND rnd, RoundingSaturation sat>
+int64_t __cvt_int64_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
 }
 
 }

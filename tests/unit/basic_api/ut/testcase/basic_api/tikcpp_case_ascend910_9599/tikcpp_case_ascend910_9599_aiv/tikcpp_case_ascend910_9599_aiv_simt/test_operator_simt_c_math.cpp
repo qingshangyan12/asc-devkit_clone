@@ -154,3 +154,19 @@ TEST_F(FloatComputeTestsuite1, FloatComputeTestCase_minbfloat16t)
     bfloat16_t y = 2.0;
     EXPECT_EQ(static_cast<bfloat16_t>(1.0), __hmin(x, y));
 }
+
+void VerifyFloatNumberMath(float x, float xExpected, float epsilon = 1e-5)
+{
+    if (std::isnan(xExpected)) {
+        EXPECT_TRUE(std::isnan(x));
+    } else if (std::isinf(xExpected)) {
+        EXPECT_TRUE(std::isinf(x));
+        if (xExpected > 0.0) {
+            EXPECT_GT(x, 0.0);
+        } else {
+            EXPECT_LT(x, 0.0);
+        }
+    } else {
+        EXPECT_NEAR(x, xExpected, epsilon);
+    }
+}

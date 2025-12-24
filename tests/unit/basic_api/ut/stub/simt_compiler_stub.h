@@ -40,7 +40,6 @@ typedef enum
     O,
     // H,
 } ROUND;
-
 template <ROUND rnd = ROUND::R, RoundingSaturation sat = RoundingSaturation::RS_DISABLE_VALUE, typename SRC_TYPE>
 float __cvt_float(SRC_TYPE src) {
     if constexpr (std::is_same<SRC_TYPE, half>::value) {
@@ -241,6 +240,19 @@ uint32_t __reduce_min(uint32_t val);
 float __reduce_min(float val);
 
 void __threadfence();
+
+float roundf(float x);
+
+float rintf(float x);
+
+float floorf(float x);
+
+float ceilf(float x);
+
+float __fma(float x, float y, float z);
+
+template<ROUND rnd, RoundingSaturation sat>
+int64_t __cvt_int64_t(float x);
 
 }
 }

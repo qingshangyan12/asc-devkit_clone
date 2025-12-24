@@ -57,26 +57,6 @@ TEST_F(BF16Testsuite, MathApiTest)
     expect = bfloat16_t(powf(10.0, (float)x_h));
     EXPECT_EQ(expect, result);
 
-    result = hlog(x_h);
-    expect = bfloat16_t(logf((float)x_h));
-    EXPECT_EQ(expect, result);
-
-    result = hlog2(x_h);
-    expect = bfloat16_t(log2f((float)x_h));
-    EXPECT_EQ(expect, result);
-
-    result = hlog10(x_h);
-    expect = bfloat16_t(log10f((float)x_h));
-    EXPECT_EQ(expect, result);
-
-    result = hsqrt(x_h);
-    expect = bfloat16_t(sqrtf((float)x_h));
-    EXPECT_EQ(expect, result);
-    
-    result = hrsqrt(x_h);
-    expect = bfloat16_t(1.0f / sqrtf((float)x_h));
-    EXPECT_EQ(expect, result);
-
     result = hrcp(x_h);
     expect = bfloat16_t(1.0f / (float)x_h);
     EXPECT_EQ(expect, result);

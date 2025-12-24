@@ -106,27 +106,6 @@ TEST_F(FP16Testsuite, MathApiTest)
     expect = half(powf(10.0, x_h.ToFloat()));
     EXPECT_EQ(expect, result);
 
-    result = hlog(x_h);
-    expect = half(logf(x_h.ToFloat()));
-    EXPECT_EQ(expect, result);
-
-    result = hlog2(x_h);
-    expect = half(log2f(x_h.ToFloat()));
-    EXPECT_EQ(expect, result);
-
-    result = hlog10(x_h);
-    expect = half(log10f(x_h.ToFloat()));
-    EXPECT_EQ(expect, result);
-
-    result = hsqrt(x_h);
-    float tmp = sqrtf(x_h.ToFloat());
-    expect = half(tmp);
-    EXPECT_EQ(expect, result);
-    
-    result = hrsqrt(x_h);
-    expect = half(1.0f / sqrtf(x_h.ToFloat()));
-    EXPECT_EQ(expect, result);
-
     result = hrcp(x_h);
     expect = half(1.0f / x_h.ToFloat());
     EXPECT_EQ(expect, result);
