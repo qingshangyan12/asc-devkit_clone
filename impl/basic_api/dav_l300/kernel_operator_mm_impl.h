@@ -482,15 +482,8 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T *dst, const InitConstValuePar
  * ************************************************************************************************* */
 __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam& repeatParams)
 {
-    uint64_t rptConfig = 0;
-    constexpr uint32_t repeatTimeShiftBit = 16;
-    rptConfig |= uint64_t(repeatParams.repeatStride);
-    rptConfig |= uint64_t(repeatParams.repeatTime) << repeatTimeShiftBit;
-    constexpr uint32_t repeatModeShiftBit = 24;
-    rptConfig |= uint64_t(repeatParams.repeatMode) << repeatModeShiftBit;
-
-    constexpr uint32_t dstStrideShiftBit = 32;
-    rptConfig |= uint64_t(repeatParams.dstStride) << dstStrideShiftBit;
+    uint64_t rptConfig = static_cast<uint64_t>(repeatParams.repeatStride) | (static_cast<uint64_t>(repeatParams.repeatTime) << 16) |
+        (static_cast<uint64_t>(repeatParams.repeatMode) << 24);
     set_l3d_rpt(rptConfig);
 }
 
