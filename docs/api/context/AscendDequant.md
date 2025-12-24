@@ -29,6 +29,16 @@
 <td class="cellrowborder" align="center" valign="top" width="42.05%" headers="mcps1.1.3.1.2 "><p id="p92202035131117"><a name="p92202035131117"></a><a name="p92202035131117"></a>√</p>
 </td>
 </tr>
+<tr id="row89591478362"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p7959157163619"><a name="p7959157163619"></a><a name="p7959157163619"></a><span id="ph1995997193619"><a name="ph1995997193619"></a><a name="ph1995997193619"></a><term id="zh-cn_topic_0000001312391781_term11962195213215"><a name="zh-cn_topic_0000001312391781_term11962195213215"></a><a name="zh-cn_topic_0000001312391781_term11962195213215"></a>Kirin X90</term></span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p149598793615"><a name="p149598793615"></a><a name="p149598793615"></a>√</p>
+</td>
+</tr>
+<tr id="row89591478362"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p7959157163619"><a name="p7959157163619"></a><a name="p7959157163619"></a><span id="ph1995997193619"><a name="ph1995997193619"></a><a name="ph1995997193619"></a><term id="zh-cn_topic_0000001312391781_term11962195213215"><a name="zh-cn_topic_0000001312391781_term11962195213215"></a><a name="zh-cn_topic_0000001312391781_term11962195213215"></a>Kirin 9030</term></span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p149598793615"><a name="p149598793615"></a><a name="p149598793615"></a>√</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -187,10 +197,17 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
 <td class="cellrowborder" valign="top" width="9.24%" headers="mcps1.2.4.1.2 "><p id="p047412984813"><a name="p047412984813"></a><a name="p047412984813"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="75.21%" headers="mcps1.2.4.1.3 "><p id="p3989161814016"><a name="p3989161814016"></a><a name="p3989161814016"></a>目的操作数。类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</p>
+<<<<<<< HEAD
 <p id="p3343929193720"><a name="p3343929193720"></a><a name="p3343929193720"></a><span id="ph1634312291372"><a name="ph1634312291372"></a><a name="ph1634312291372"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_1"><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a>Atlas A3 推理系列产品</term></span>，支持的数据类型为：half、bfloat16_t、float。</p>
 <p id="p1647418294485"><a name="p1647418294485"></a><a name="p1647418294485"></a><span id="ph74741329164816"><a name="ph74741329164816"></a><a name="ph74741329164816"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_1"><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a>Atlas A2 推理系列产品</term></span>，支持的数据类型为：half、bfloat16_t、float。</p>
 <p id="p152497566102"><a name="p152497566102"></a><a name="p152497566102"></a><span id="ph184955111218"><a name="ph184955111218"></a><a name="ph184955111218"></a>Kirin X90</span>，支持的数据类型为：half、float。</p>
 <p id="p174578443119"><a name="p174578443119"></a><a name="p174578443119"></a><span id="ph69300917129"><a name="ph69300917129"></a><a name="ph69300917129"></a>Kirin 9030</span>，支持的数据类型为：half、float。</p>
+=======
+<p id="p3343929193720"><a name="p3343929193720"></a><a name="p3343929193720"></a><span id="ph1634312291372"><a name="ph1634312291372"></a><a name="ph1634312291372"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Ascend 910C</term></span>，支持的数据类型为：half、bfloat16_t、float。</p>
+<p id="p1647418294485"><a name="p1647418294485"></a><a name="p1647418294485"></a><span id="ph74741329164816"><a name="ph74741329164816"></a><a name="ph74741329164816"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Ascend 910B</term></span>，支持的数据类型为：half、bfloat16_t、float。</p>
+<p id="p3343929193720"><a name="p3343929193720"></a><a name="p3343929193720"></a><span id="ph1634312291372"><a name="ph1634312291372"></a><a name="ph1634312291372"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Kirin X90</term></span>，支持的数据类型为：half、float。</p>
+<p id="p1647418294485"><a name="p1647418294485"></a><a name="p1647418294485"></a><span id="ph74741329164816"><a name="ph74741329164816"></a><a name="ph74741329164816"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Kirin 9030</term></span>，支持的数据类型为：half、float。</p>
+>>>>>>> a17686d... 新增api
 <a name="ul66981895213"></a><a name="ul66981895213"></a><ul id="ul66981895213"><li>dstTensor的行数和srcTensor的行数保持一致。</li><li>n * sizeof(dstT)不满足32字节对齐时，需要<strong id="b1782911052214"><a name="b1782911052214"></a><a name="b1782911052214"></a>向上补齐为32字节</strong>，n_dst为向上补齐后的列数。如srcTensor数据类型为int32_t，shape为 (4, 8)，dstTensor为bfloat16_t，则n_dst应从8补齐为16，dstTensor shape为(4, 16)。补齐的计算过程为：n_dst = (8 * sizeof(bfloat16_t) + 32 - 1) / 32 * 32 / sizeof(bfloat16_t)。</li></ul>
 </td>
 </tr>
@@ -199,10 +216,17 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
 <td class="cellrowborder" valign="top" width="9.24%" headers="mcps1.2.4.1.2 "><p id="p144741829194814"><a name="p144741829194814"></a><a name="p144741829194814"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="75.21%" headers="mcps1.2.4.1.3 "><p id="p143185337247"><a name="p143185337247"></a><a name="p143185337247"></a>源操作数。类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</p>
+<<<<<<< HEAD
 <p id="p149295884015"><a name="p149295884015"></a><a name="p149295884015"></a><span id="ph8929208184020"><a name="ph8929208184020"></a><a name="ph8929208184020"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_2"><a name="zh-cn_topic_0000001312391781_term131434243115_2"></a><a name="zh-cn_topic_0000001312391781_term131434243115_2"></a>Atlas A3 推理系列产品</term></span>，支持的数据类型为：int32_t。</p>
 <p id="p14496195212317"><a name="p14496195212317"></a><a name="p14496195212317"></a><span id="ph104968521634"><a name="ph104968521634"></a><a name="ph104968521634"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_2"><a name="zh-cn_topic_0000001312391781_term184716139811_2"></a><a name="zh-cn_topic_0000001312391781_term184716139811_2"></a>Atlas A2 推理系列产品</term></span>，支持的数据类型为：int32_t。</p>
 <p id="p1550603911125"><a name="p1550603911125"></a><a name="p1550603911125"></a><span id="ph850653981211"><a name="ph850653981211"></a><a name="ph850653981211"></a>Kirin X90</span>，支持的数据类型为：int32_t。</p>
 <p id="p155063394127"><a name="p155063394127"></a><a name="p155063394127"></a><span id="ph1050619395120"><a name="ph1050619395120"></a><a name="ph1050619395120"></a>Kirin 9030</span>，支持的数据类型为：int32_t。</p>
+=======
+<p id="p149295884015"><a name="p149295884015"></a><a name="p149295884015"></a><span id="ph8929208184020"><a name="ph8929208184020"></a><a name="ph8929208184020"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Ascend 910C</term></span>，支持的数据类型为：int32_t。</p>
+<p id="p14496195212317"><a name="p14496195212317"></a><a name="p14496195212317"></a><span id="ph104968521634"><a name="ph104968521634"></a><a name="ph104968521634"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Ascend 910B</term></span>，支持的数据类型为：int32_t。</p>
+<p id="p149295884015"><a name="p149295884015"></a><a name="p149295884015"></a><span id="ph8929208184020"><a name="ph8929208184020"></a><a name="ph8929208184020"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Kirin X90</term></span>，支持的数据类型为：int32_t。</p>
+<p id="p14496195212317"><a name="p14496195212317"></a><a name="p14496195212317"></a><span id="ph104968521634"><a name="ph104968521634"></a><a name="ph104968521634"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Kirin 9030</term></span>，支持的数据类型为：int32_t。</p>
+>>>>>>> a17686d... 新增api
 <p id="p2836135311718"><a name="p2836135311718"></a><a name="p2836135311718"></a>shape为 [m, n]，n个输入数据所占字节数要求<strong id="b733515211256"><a name="b733515211256"></a><a name="b733515211256"></a>32字节对齐</strong>。</p>
 </td>
 </tr>
