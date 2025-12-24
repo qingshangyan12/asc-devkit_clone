@@ -192,7 +192,7 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
                 "ccec_g" in current_build_config().get(op_debug_config)
 
     def get_init_cmd():
-        opt_level_map = {"dav-l300": 3, "dav-l311", 3}
+        opt_level_map = {"dav-l300": 3, "dav-l311": 3}
         opt_level = opt_level_map.get(cce_arch, 2)
         # 2 enable tbe debug : ccec compiler with "O0 - g"
         if compile_disable_opt:
