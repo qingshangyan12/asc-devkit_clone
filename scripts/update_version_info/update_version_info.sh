@@ -1,5 +1,4 @@
-#!/usr/bin/env csh
-# Perform pre-check for asc-devkit package
+#!/bin/bash
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2025 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -10,20 +9,39 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-set MIN_PIP_VERSION=19
-set PYTHON_VERSION=3.7.5
+set -e
 
-set version=`pip3 --version | cut -d" " -f2 | cut -d"." -f1`
-if (${version} < ${MIN_PIP_VERSION}) then
-    echo "pip3 version is lower than ${MIN_PIP_VERSION}"
-endif
+INPUT_FILE="$1"
+OUTPUT_FILE="$2"
+OUTPUT_DIR=$(dirname ${OUTPUT_FILE})
 
-set python_version=`python3 --version | cut -d" " -f2`
-foreach num (1 2 3)
-    set version_num=`echo ${python_version} | cut -d"." -f${num}`
-    set min_version_num=`echo ${PYTHON_VERSION} | cut -d"." -f${num}`
-    if (${version_num} < ${min_version_num}) then
-        echo "python version ${python_version} is lower than ${PYTHON_VERSION}."
-        break
-    endif
-end
+if [ ! -f "${INPUT_FILE}" ];then
+    echo "ERROR: input file '${INPUT_FILE}' not found."
+    exit 1
+fi
+
+if [ -n "${tagInfo}" ];then
+    TIME_STAMP_ENV=$(echo "${tagInfo}" | sed -n 's/.*\([0-9]\{8\}_[0-9]\{9\}\).*/\1/p')
+fi
+
+if [ -n "${TIME_STAMP_ENV}" ];then
+    TIME_STAMP=${TIME_STAMP_ENV}
+else
+    TIME_STAMP=$(date +"%Y%m%d_%H%M%S%3N")
+fi
+
+if [ ! -d "${OUTPUT_DIR}" ];then
+    mkdir -p ${OUTPUT_DIR}
+fi
+
+cp -f ${INPUT_FILE} ${OUTPUT_FILE}
+
+if ! grep -q "^timestamp=" "$OUTPUT_FILE"; then
+    if [ -s "$OUTPUT_FILE" ] && [ "$(tail -c 1 "$OUTPUT_FILE")" != "" ]; then
+        printf '\n' >> "$OUTPUT_FILE"
+    fi
+
+    printf 'timestamp=%s\n' "${TIME_STAMP}" >> "$OUTPUT_FILE"
+fi
+
+exit 0

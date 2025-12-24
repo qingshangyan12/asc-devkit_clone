@@ -9,6 +9,8 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+set -e
+
 vendor_name=customize
 targetdir=/usr/local/Ascend/opp
 target_custom=0
@@ -178,7 +180,7 @@ upgrade()
                 log "[INFO] ${targetdir}/$vendordir/$1 is empty !!"
 		        return 1
 	          fi
-            grep -q $file_b <<<`ls ${targetdir}/$vendordir/$1`;
+            grep -q $file_b <<<"$(ls "${targetdir}/${vendordir}/${1}")";
             if [[ $? -eq 0 ]]; then
                 echo -n "${file_b} "
                 has_same_file=0
@@ -288,6 +290,31 @@ upgrade_file()
     return 0
 }
 
+upgrade_uninstall()
+{
+    uninstall_file=$(realpath ${sourcedir}/../uninstall.sh)
+    dst_path=$targetdir/$vendordir/scripts
+    if [ ! -e ${uninstall_file} ]; then
+        log "[INFO] no need to upgrade uninstall.sh file"
+        return 0
+    fi
+
+    log "[INFO] copy new uninstall.sh files ......"
+    if [ ! -e ${dst_path} ]; then
+        create_dir "${dst_path}" "750" "${INSTALL_FOR_ALL}"
+    fi
+    if [ ! -w ${dst_path} ]; then
+        apply_chmod "$dst_path" "750" "${INSTALL_FOR_ALL}"
+    fi
+    cp -f ${uninstall_file} $dst_path
+    if [ $? -ne 0 ];then
+        log "[ERROR] copy new uninstall.sh file failed"
+        return 1
+    fi
+    apply_chmod "$dst_path" "550" "${INSTALL_FOR_ALL}"
+    return 0
+}
+
 delete_optiling_file()
 {
   if [ ! -d ${targetdir}/vendors ];then
@@ -300,8 +327,6 @@ delete_optiling_file()
   fi
   return 0
 }
-
-log "[INFO] copy uninstall sh success"
 
 if [ ! -d "${targetdir}/vendors" ];then
     log "[INFO] create ${targetdir}/vendors."
@@ -344,6 +369,12 @@ fi
 
 log "[INFO] upgrade op api"
 upgrade op_api
+if [ $? -ne 0 ];then
+    exit 1
+fi
+
+log "[INFO] upgrade uninstall"
+upgrade_uninstall
 if [ $? -ne 0 ];then
     exit 1
 fi
