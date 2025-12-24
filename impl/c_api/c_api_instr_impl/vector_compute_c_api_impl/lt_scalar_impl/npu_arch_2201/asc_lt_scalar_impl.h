@@ -9,22 +9,22 @@
 */
 
 /* !
- * \file lt_scalar_impl.h
+ * \file asc_lt_scalar_impl.h
  * \brief
  */
 #ifndef IMPL_CAPI_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_LT_SCALAR_IMPL_NPU_ARCH_2201_ASC_LT_SCALAR_IMPL_H
 #define IMPL_CAPI_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_LT_SCALAR_IMPL_NPU_ARCH_2201_ASC_LT_SCALAR_IMPL_H
 
-namespace CApiInternal {
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-template <typename T>
-__aicore__ inline void asc_lt_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ T* src0, T value, const asc_unary_config& config)
+__aicore__ inline void asc_lt_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src0, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride)
 {
-    vcmpvs_lt(dst, src0, value, static_cast<uint8_t>(config.repeat), static_cast<uint16_t>(config.dst_block_stride),
-            static_cast<uint16_t>(config.src_block_stride), static_cast<uint16_t>(config.dst_repeat_stride),
-            static_cast<uint16_t>(config.src_repeat_stride));
+    vcmpvs_lt(dst, src0, value, repeat, dst_block_stride, src0_block_stride, dst_repeat_stride, src0_repeat_stride);
 }
 
+__aicore__ inline void asc_lt_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ float* src0, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride)
+{
+    vcmpvs_lt(dst, src0, value, repeat, dst_block_stride, src0_block_stride, dst_repeat_stride, src0_repeat_stride);
 }
 
 #endif

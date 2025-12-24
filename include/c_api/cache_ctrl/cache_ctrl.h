@@ -12,10 +12,16 @@
 #define INCLUDE_C_API_SIMD_ATOMIC_H
  
 #include "c_api_instr_impl/cache_ctrl_c_api_impl/cache_ctrl_c_api_impl.h"
- 
-__aicore__ inline void asc_data_cache_clean_and_invalid(__gm__ void* dst, uint64_t entire);
 
 __aicore__ inline int64_t asc_get_icache_preload_status();
+
+__aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire);
+
+__aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire, uint64_t type);
+
+__aicore__ inline void asc_icache_preload(const void* addr);
+
+__aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len);
  
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset);
 

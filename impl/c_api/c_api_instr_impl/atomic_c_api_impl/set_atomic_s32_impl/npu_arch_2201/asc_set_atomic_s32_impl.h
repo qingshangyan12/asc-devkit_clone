@@ -10,14 +10,12 @@
  
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_SET_ATOMIC_S32_IMPL_NPU_ARCH_2201_ASC_SET_ATOMIC_S32_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_SET_ATOMIC_S32_IMPL_NPU_ARCH_2201_ASC_SET_ATOMIC_S32_IMPL_H
- 
-namespace CApiInternal {
+
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
  
 __aicore__ inline void asc_set_atomic_s32_impl()
 {
     set_atomic_s32();
 }
- 
-} // namespace CApiInternal
  
 #endif

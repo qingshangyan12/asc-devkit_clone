@@ -7,9 +7,16 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+
+/* !
+ * \file asc_dcci_impl.h
+ * \brief
+ */
  
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_DCCI_IMPL_NPU_ARCH_2201_ASC_DCCI_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_DCCI_IMPL_NPU_ARCH_2201_ASC_DCCI_IMPL_H
+ 
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline void asc_dcci_impl(__gm__ void* dst, uint64_t entire)
 {

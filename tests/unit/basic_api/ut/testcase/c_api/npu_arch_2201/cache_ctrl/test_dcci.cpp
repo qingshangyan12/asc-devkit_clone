@@ -23,15 +23,15 @@ protected:
 namespace {
 void dcci_Stub(__gm__ void* dst, uint64_t entire)
 {
-    EXPECT_EQ((__gm__ void*)0, dst);
-    EXPECT_EQ(0, entire);
+    EXPECT_EQ((__gm__ void*)1, dst);
+    EXPECT_EQ(2, entire);
 }
 }
 
 TEST_F(TestSimdAtomicDcci, dcci_gm_void_ptr_uint64_t_Succ)
 {
-    __gm__ void* dst = (__gm__ void*)0;
-    uint64_t entire = 0;
+    __gm__ void* dst = (__gm__ void*)1;
+    uint64_t entire = 2;
     MOCKER(dcci, void(__gm__ void*, uint64_t))
         .times(1)
         .will(invoke(dcci_Stub));
@@ -48,16 +48,16 @@ protected:
 
 void dcci_3Stub(__gm__ void* dst, uint64_t entire, uint64_t type)
 {
-    EXPECT_EQ((__gm__ void*)0, dst);
-    EXPECT_EQ(0, entire);
-    EXPECT_EQ(0, type);
+    EXPECT_EQ((__gm__ void*)1, dst);
+    EXPECT_EQ(2, entire);
+    EXPECT_EQ(3, type);
 }
 
 TEST_F(TestSimdAtomicDcci3, dcci_gm_void_ptr_uint64_t_uint64_t_Succ)
 {
-    __gm__ void* dst = (__gm__ void*)0;
-    uint64_t entire = 0;
-    uint64_t type = 0;
+    __gm__ void* dst = (__gm__ void*)1;
+    uint64_t entire = 2;
+    uint64_t type = 3;
     MOCKER(dcci, void(__gm__ void*, uint64_t, uint64_t))
         .times(1)
         .will(invoke(dcci_3Stub));

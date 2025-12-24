@@ -14,28 +14,30 @@
 #include "c_api/asc_simd.h"
 #include "c_api/c_api_utils_intf.h"
 
-
-class TestSimdAtomicFfz : public testing::Test {
+class TestCubeComputeSetL0cCopyParams : public testing::Test { 
 protected:
-    void SetUp() {}
-    void TearDown() {}
+    void SetUp() {g_c_api_core_type = C_API_AIC_TYPE;}
+    void TearDown() {g_c_api_core_type = C_API_AIC_TYPE;}
 };
 
 namespace {
-int64_t asc_ffz_Stub(uint64_t offset)
+void set_set_l0c_copy_params_Stub(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride)
 {
-    return 2;
+    EXPECT_EQ(1, nd_num);
+    EXPECT_EQ(4, src_nd_stride);
+    EXPECT_EQ(8, dst_nd_stride);
 }
 }
 
-TEST_F(TestSimdAtomicFfz, ffz_Succ)
+TEST_F(TestCubeComputeSetL0cCopyParams, set_l0c_copy_params_Succ)
 {
-    uint64_t offset = 3;
-    MOCKER_CPP(sff0)
-            .times(1)
-            .will(invoke(asc_ffz_Stub));
-
-    uint64_t val = asc_ffz(offset);
-    EXPECT_EQ(2, val);
+    MOCKER(asc_set_l0c_copy_params, void(uint16_t, uint16_t, uint16_t))
+        .times(1)
+        .will(invoke(set_set_l0c_copy_params_Stub));
+    uint64_t nd_num = 1;
+    uint64_t src_nd_stride = 4;
+    uint64_t dst_nd_stride = 8;
+    
+    asc_set_l0c_copy_params(nd_num, src_nd_stride, dst_nd_stride);
     GlobalMockObject::verify();
 }

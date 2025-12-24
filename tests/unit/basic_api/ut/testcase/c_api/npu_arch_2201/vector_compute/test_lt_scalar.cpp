@@ -18,20 +18,20 @@
                                                                                                 \
 class TestVectorCompute##class_name##data_type : public testing::Test {                         \
 protected:                                                                                      \
-    void SetUp() {}                                                                             \
-    void TearDown() {}                                                                          \
+    void SetUp() {}                                          \
+    void TearDown() {}                                       \
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
                                                                                                 \
 void cce_name##_##data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_Stub(__ubuf__ uint8_t *dst,   \
-                __ubuf__ data_type *src, data_type a, uint8_t repeat,                           \
+                __ubuf__ data_type *src, data_type value, uint8_t repeat,                           \
                 uint16_t dst_block_stride, uint16_t src_block_stride,                           \
-                uint16_t dst_repeat_stride, uint16_t src_repeat_stride)                         \  
+                uint16_t dst_repeat_stride, uint16_t src_repeat_stride)                         \
 {                                                                                               \
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ uint8_t *>(11));                                 \
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ data_type *>(22));                                 \
-    EXPECT_EQ(a, static_cast<data_type>(33));                                                   \
+    EXPECT_EQ(value, static_cast<data_type>(33));                                                   \
     EXPECT_EQ(repeat, static_cast<uint8_t>(1));                                                 \
     EXPECT_EQ(dst_block_stride, static_cast<uint16_t>(1));                                      \
     EXPECT_EQ(src_block_stride, static_cast<uint16_t>(1));                                      \
@@ -46,21 +46,20 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_Una
 {                                                                                               \
     __ubuf__ uint8_t *dst = reinterpret_cast<__ubuf__ uint8_t *>(11);                       \
     __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                       \
-    data_type a = static_cast<data_type>(33);                                                   \
+    data_type value = static_cast<data_type>(33);                                                   \
                                                                                                 \
-    asc_unary_config config;                                                                    \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src_block_stride = static_cast<uint64_t>(1);                                         \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint16_t dst_block_stride = 1;                                         \
+    uint16_t src_block_stride = 1;                                         \
+    uint16_t dst_repeat_stride = 8;                                        \
+    uint16_t src_repeat_stride = 8;                                        \
+    uint8_t repeat = 1;                                                   \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ uint8_t *,__ubuf__ data_type *,                        \
                 data_type, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t))                    \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_Stub));   \
                                                                                                 \
-    c_api_name(dst, src, a ,config);                                                 \
+    c_api_name(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);               \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 

@@ -23,6 +23,7 @@
 #include "set_mm_layout_transform_impl/npu_arch_2201/asc_set_mm_layout_transform_impl.h"
 #include "set_l3d_rpt_impl/npu_arch_2201/asc_set_l3d_rpt_impl.h"
 #include "set_l0c_copy_params_impl/npu_arch_2201/asc_set_l0c_copy_params_impl.h"
+#include "copy_l12l0b_trans_impl/npu_arch_2201/asc_copy_l12l0b_trans_impl.h"
 #include "set_l1_3d_size_impl/npu_arch_2201/asc_set_l1_3d_size_impl.h"
 #include "load_image_to_cbuf_impl/npu_arch_2201/asc_load_image_to_cbuf_impl.h"
 #include "fill_value_c_api_impl/fill_l0a_value_impl/npu_arch_2201/asc_fill_l0a_value_impl.h"
@@ -536,9 +537,9 @@ __aicore__ inline void asc_copy_l12l0a_sync(__ca__ float * dst, __cbuf__ float* 
 }
 
 // ==========asc_l0c_copy_params()==========
-__aicore__ inline void asc_set_l0c_copy_params(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
+__aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride)
 {
-    CApiInternal::set_l0c_copy_params_impl(ndNum, srcNdStride, dstNdStride);
+    set_l0c_copy_params_impl(nd_num, src_nd_stride, dst_nd_stride);
 }
 
 __aicore__ inline void asc_set_l1_3d_size(uint64_t value)
@@ -971,6 +972,37 @@ __aicore__ inline void asc_fill_l1_value_sync(__cbuf__ bfloat16_t* dst, bfloat16
 {
     asc_fill_l1_value_sync_impl(dst, value, config);
 }
+// ==========asc_copy_l12l0b_trans_impl=========
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t frac_stride)
+{
+    copy_l12l0b_trans_impl(dst, src, index_id, repeat, src_stride, dst_stride, addrmode, frac_stride);
+}
+
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride)
+{
+    copy_l12l0b_trans_impl(dst, src, index_id, repeat, src_stride, dst_stride, addrmode, frac_stride);
+}
+
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ int32_t* dst, __cbuf__ int32_t* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride)
+{
+    copy_l12l0b_trans_impl(dst, src, index_id, repeat, src_stride, dst_stride, addrmode, frac_stride);
+}
+
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride)
+{
+    copy_l12l0b_trans_impl(dst, src, index_id, repeat, src_stride, dst_stride, addrmode, frac_stride);
+}
+
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint32_t* dst, __cbuf__ uint32_t* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride)
+{
+    copy_l12l0b_trans_impl(dst, src, index_id, repeat, src_stride, dst_stride, addrmode, frac_stride);
+}
+
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride)
+{
+    copy_l12l0b_trans_impl(dst, src, index_id, repeat, src_stride, dst_stride, addrmode, frac_stride);
+}
+
 
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)

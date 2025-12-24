@@ -16,7 +16,7 @@
 
 #define TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(class_name, c_api_name, cce_name, dst_data_type, src_data_type)          \
                                                                                                \
-class TestVectorCompute##class_name##src_data_type : public testing::Test {                        \
+class TestVectorCompute##class_name##src_data_type##dst_data_type : public testing::Test {                        \
 protected:                                                                                     \
     void SetUp() {}                                                                            \
     void TearDown() {}                                                                         \
@@ -52,46 +52,45 @@ void  cce_name##_##dst_data_type##_##src_data_type##_uint64_t_bool_Stub(__ubuf__
     EXPECT_EQ(src1, reinterpret_cast<__ubuf__ src_data_type *>(33));                                \
 }                                                                                               \
                                                                                                 \
-void cce_name##_set_vector_mask_Stub(uint64_t mask1, uint64_t mask0)              \
+void cce_name##_set_vector_mask_Stub(uint32_t mask0)              \
 {                                                                                               \
-    EXPECT_EQ(mask1, static_cast<uint64_t>(0));                                                 \
     EXPECT_EQ(mask0, static_cast<uint64_t>(44));                                                \
 }                                                                                               \
                                                                                                 \
 }                                                                                               \
                                                                                                 \
-TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_half_half_half_BinaryConfig_Succ) \
+TEST_F(TestVectorCompute##class_name##src_data_type##dst_data_type, c_api_name##_half_half_half_BinaryConfig_Succ) \
 {                                                                                               \
-    __ubuf__ dst_data_type *real_dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
-    __ubuf__ src_data_type *src0 = reinterpret_cast<__ubuf__ src_data_type *>(22);                      \
-    __ubuf__ src_data_type *src1 = reinterpret_cast<__ubuf__ src_data_type *>(33);                      \
+    __ubuf__ dst_data_type *real_dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);          \
+    __ubuf__ src_data_type *src0 = reinterpret_cast<__ubuf__ src_data_type *>(22);              \
+    __ubuf__ src_data_type *src1 = reinterpret_cast<__ubuf__ src_data_type *>(33);              \
                                                                                                 \
-    asc_binary_config config;                                                                   \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src0_block_stride = static_cast<uint64_t>(1);                                        \
-    config.src1_block_stride = static_cast<uint64_t>(1);                                        \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src0_repeat_stride = static_cast<uint64_t>(8);                                       \
-    config.src1_repeat_stride = static_cast<uint64_t>(8);                                       \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+    uint8_t dst_block_stride = 1;                                                               \
+    uint8_t src0_block_stride = 1;                                                              \
+    uint8_t src1_block_stride = 1;                                                              \
+    uint8_t dst_repeat_stride = 8;                                                              \
+    uint8_t src0_repeat_stride = 8;                                                             \
+    uint8_t src1_repeat_stride = 8;                                                             \
+    uint8_t repeat = 1;                                                                         \
+    bool h = false;                                                                             \
                                                                                                 \
-    MOCKER_CPP(cce_name, void(__ubuf__ dst_data_type *,__ubuf__ src_data_type *,                        \
-                __ubuf__ src_data_type *, uint8_t, uint8_t, uint8_t, uint8_t,                       \
-                uint8_t, uint8_t, uint8_t, bool))                                                     \
+    MOCKER_CPP(cce_name, void(__ubuf__ dst_data_type *,__ubuf__ src_data_type *,                \
+                __ubuf__ src_data_type *, uint8_t, uint8_t, uint8_t, uint8_t,                   \
+                uint8_t, uint8_t, uint8_t, bool))                                               \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_bool_Stub));   \
                                                                                                 \
-    c_api_name(real_dst, src0, src1, config);                                                        \
+    c_api_name(real_dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride, h);                                                        \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
-TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_half_half_half_int32_t_Succ)      \
+TEST_F(TestVectorCompute##class_name##src_data_type##dst_data_type, c_api_name##_half_half_half_int32_t_Succ)      \
 {                                                                                               \
     __ubuf__ dst_data_type *real_dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
     __ubuf__ src_data_type *src0 = reinterpret_cast<__ubuf__ src_data_type *>(22);                      \
     __ubuf__ src_data_type *src1 = reinterpret_cast<__ubuf__ src_data_type *>(33);                      \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
-    MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                       \
+    MOCKER_CPP(asc_set_mask_count_begin, void(uint32_t))                                       \
             .times(1)                                                                           \
             .will(invoke(cce_name##_set_vector_mask_Stub));                                    \
                                                                                                 \
@@ -105,13 +104,13 @@ TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_half_half_half
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
-TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_sync_half_half_half_int32_t_Succ) \
+TEST_F(TestVectorCompute##class_name##src_data_type##dst_data_type, c_api_name##_sync_half_half_half_int32_t_Succ) \
 {                                                                                               \
     __ubuf__ dst_data_type *real_dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);                       \
     __ubuf__ src_data_type *src0 = reinterpret_cast<__ubuf__ src_data_type *>(22);                      \
     __ubuf__ src_data_type *src1 = reinterpret_cast<__ubuf__ src_data_type *>(33);                      \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
-    MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                       \
+    MOCKER_CPP(asc_set_mask_count_begin, void(uint32_t))                                       \
             .times(1)                                                                           \
             .will(invoke(cce_name##_set_vector_mask_Stub));                       \
                                                                                                 \

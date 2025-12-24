@@ -7,17 +7,20 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+
+/* !
+ * \file asc_zero_bits_cnt_impl.h
+ * \brief
+ */
  
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_FFZ_IMPL_NPU_ARCH_2201_ASC_FFZ_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_FFZ_IMPL_NPU_ARCH_2201_ASC_FFZ_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_SCALAR_COMPUTE_C_API_IMPL_ZERO_BITS_CNT_IMPL_NPU_ARCH_2201_ASC_ZERO_BITS_CNT_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_SCALAR_COMPUTE_C_API_IMPL_ZERO_BITS_CNT_IMPL_NPU_ARCH_2201_ASC_ZERO_BITS_CNT_IMPL_H
  
-namespace CApiInternal {
- 
-__aicore__ inline int64_t asc_ffz_impl(uint64_t in)
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+
+__aicore__ inline int64_t asc_zero_bits_cnt_impl(uint64_t value)
 {
-    return sff0(in);
+    return bcnt0(value);
 }
- 
-} // namespace CApiInternal
  
 #endif

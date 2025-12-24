@@ -461,4 +461,19 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t
 
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size);
 
+// ==========copy_l12l0b_trans_impl==========
+__aicore__ inline void copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t frac_stride);
+
+__aicore__ inline void copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride);
+
+__aicore__ inline void copy_l12l0b_trans(__cb__ int32_t* dst, __cbuf__ int32_t* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride);
+
+__aicore__ inline void copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride);
+
+__aicore__ inline void copy_l12l0b_trans(__cb__ uint32_t* dst, __cbuf__ uint32_t* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride);
+
+__aicore__ inline void copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src,  uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t frac_stride);
+
+__aicore__ inline void set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride);
+
 #endif

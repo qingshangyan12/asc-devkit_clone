@@ -9,38 +9,53 @@
 */
 
 /* !
- * \file sub_impl.h
+ * \file asc_leaky_relu_scalar_impl.h
  * \brief
  */
 #ifndef IMPL_CAPI_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_LEAKYRELU_SCALAR_IMPL_NPU_ARCH_2201_ASC_LEAKYRELU_SCALAR_IMPL_H
 #define IMPL_CAPI_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_LEAKYRELU_SCALAR_IMPL_NPU_ARCH_2201_ASC_LEAKYRELU_SCALAR_IMPL_H
 
-namespace CApiInternal {
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-template <typename T>
-__aicore__ inline void asc_leakyrelu_impl(__ubuf__ T* dst, __ubuf__ T* src0, T src1, const asc_unary_config& config)
+__aicore__ inline void asc_leakyrelu_scalar_impl(__ubuf__ half* dst, __ubuf__ half* src0, half src1, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride)
 {
-    vlrelu(dst, src0, src1, static_cast<uint8_t>(config.repeat), static_cast<uint16_t>(config.dst_block_stride),
-          static_cast<uint16_t>(config.src_block_stride), static_cast<uint16_t>(config.dst_repeat_stride),
-          static_cast<uint16_t>(config.src_repeat_stride));
+    if ASC_IS_AIV {
+        vlrelu(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, dst_repeat_stride, src0_repeat_stride);
+    }
 }
 
-template <typename T>
-__aicore__ inline void asc_leakyrelu_impl(__ubuf__ T* dst, __ubuf__ T* src0, T src1, uint32_t count)
+__aicore__ inline void asc_leakyrelu_scalar_impl(__ubuf__ half* dst, __ubuf__ half* src0, half src1, uint32_t count)
 {
-    set_mask_count();
-    set_vector_mask(static_cast<uint64_t>(0), static_cast<uint64_t>(count));
-    asc_leakyrelu_impl<T>(dst, src0, src1, CAPI_DEFAULT_UNARY_CFG);
+    asc_set_mask_count_begin(count);
+    asc_leakyrelu_scalar_impl(dst, src0, src1, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     set_mask_norm();
+    asc_set_mask_count_end();
 }
 
-template <typename T>
-__aicore__ inline void asc_leakyrelu_sync_impl(__ubuf__ T* dst, __ubuf__ T* src0, T src1, uint32_t count)
+__aicore__ inline void asc_leakyrelu_scalar_sync_impl(__ubuf__ half* dst, __ubuf__ half* src0, half src1, uint32_t count)
 {
-    asc_leakyrelu_impl<T>(dst, src0, src1, count);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_leakyrelu_scalar_impl(dst, src0, src1, count);
+    asc_sync_post_process();
 }
 
+__aicore__ inline void asc_leakyrelu_scalar_impl(__ubuf__ float* dst, __ubuf__ float* src0, float src1, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride)
+{
+    if ASC_IS_AIV {
+        vlrelu(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, dst_repeat_stride, src0_repeat_stride);
+    }
 }
 
+__aicore__ inline void asc_leakyrelu_scalar_impl(__ubuf__ float* dst, __ubuf__ float* src0, float src1, uint32_t count)
+{
+    asc_set_mask_count_begin(count);
+    asc_leakyrelu_scalar_impl(dst, src0, src1, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    set_mask_norm();
+    asc_set_mask_count_end();
+}
+
+__aicore__ inline void asc_leakyrelu_scalar_sync_impl(__ubuf__ float* dst, __ubuf__ float* src0, float src1, uint32_t count)
+{
+    asc_leakyrelu_scalar_impl(dst, src0, src1, count);
+    asc_sync_post_process();
+}
 #endif

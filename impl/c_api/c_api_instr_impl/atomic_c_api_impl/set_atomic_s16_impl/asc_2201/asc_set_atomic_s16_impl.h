@@ -8,6 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+/* !
+ * \file asc_set_atomic_s16_impl.h
+ * \brief
+ */
+
 #ifndef IMPL_C_API_INSTR_SIMD_ATOMIC_SET_ATOMIC_S16_ASC_2201_ASC_SET_ATOMIC_S16_IMPL_H
 #define IMPL_C_API_INSTR_SIMD_ATOMIC_SET_ATOMIC_S16_ASC_2201_ASC_SET_ATOMIC_S16_IMPL_H
 

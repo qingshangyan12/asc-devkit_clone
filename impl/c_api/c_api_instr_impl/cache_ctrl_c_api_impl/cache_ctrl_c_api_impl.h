@@ -14,6 +14,7 @@
 #include "get_icache_preload_status_impl/npu_arch_2201/get_icache_preload_status_impl.h"
 #include "dc_preload_impl/npu_arch_2201/asc_data_cache_preload_impl.h"
 #include "dcci_impl/npu_arch_2201/asc_dcci_impl.h"
+#include "icache_preload_impl/npu_arch_2201/asc_icache_preload_impl.h"
 
 __aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire)
 {
@@ -33,6 +34,16 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
 __aicore__ inline int64_t asc_get_icache_preload_status()
 {
     return asc_get_icache_preload_status_impl();
+}
+
+__aicore__ inline void asc_icache_preload(const void* addr)
+{
+    asc_icache_preload_impl(addr);
+}
+
+__aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len)
+{
+    asc_icache_preload_impl(addr, prefetch_len);
 }
 
 #endif

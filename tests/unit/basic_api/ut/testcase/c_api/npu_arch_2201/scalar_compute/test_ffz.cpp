@@ -14,27 +14,31 @@
 #include "c_api/asc_simd.h"
 #include "c_api/c_api_utils_intf.h"
 
-class TestSimdAtomicBcnt : public testing::Test {
+
+class TestSimdAtomicFfz : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
 };
 
 namespace {
-int64_t asc_zero_bits_cnt_Stub(uint64_t offset)
+int64_t asc_ffz_Stub(uint64_t offset)
 {
+    uint64_t value = 3;
+    EXPECT_EQ(value, offset);
     return 2;
 }
 }
 
-TEST_F(TestSimdAtomicBcnt, zero_bits_cnt_Succ)
+TEST_F(TestSimdAtomicFfz, ffz_Succ)
 {
-    uint64_t offset = 0xfffffffffffffff3;
-    MOCKER_CPP(bcnt0)
+    
+    MOCKER_CPP(sff0, int64_t(uint64_t))
             .times(1)
-            .will(invoke(asc_zero_bits_cnt_Stub));
+            .will(invoke(asc_ffz_Stub));
 
-    int64_t val = asc_zero_bits_cnt(offset);
-    EXPECT_EQ(2, val);
+    uint64_t offset = 3;
+    int64_t out = asc_ffz(offset);
+    EXPECT_EQ(2, out);
     GlobalMockObject::verify();
 }
