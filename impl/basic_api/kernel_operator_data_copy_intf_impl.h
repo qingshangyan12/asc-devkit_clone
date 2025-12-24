@@ -1016,7 +1016,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<U>
     DataCopyL0C2GMImpl((__gm__ PrimT<T>*)dst.GetPhyAddr(), (__cc__ PrimT<U>*)src.GetPhyAddr(), intriParams);
 }
 
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
 // float to bfloat16_t
 template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, bfloat16_t>::value &&
     Std::is_same<PrimT<U>, float>::value, bool>::type>
