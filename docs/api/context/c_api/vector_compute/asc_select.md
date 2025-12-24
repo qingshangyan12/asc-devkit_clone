@@ -59,18 +59,16 @@ PIPE_V
 
 ## 约束说明
 
+- 需要配合[asc_set_cmp_mask](asc_set_cmp_mask.md)接口使用。
 - dst、src的起始地址需要32字节对齐
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
 ## 调用示例
 
 ```c++
-//total_length指参与计算的数据总长度
-uint64_t offset = 0;
-__ubuf__ half* src0 = (__ubuf__ half*)asc_get_phy_buf_addr(0);
-offset += total_length * sizeof(half);
-__ubuf__ half* src1 = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
-offset += total_length * sizeof(half);
-__ubuf__ half* dst = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
+constexpr uint32_t total_length = 256;//total_length指参与计算的数据总长度
+__ubuf__ half src0[total_length];
+__ubuf__ half src1[total_length];
+__ubuf__ half dst[total_length];
 asc_select(dst, src0, src1, total_length);
 ```

@@ -38,8 +38,13 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-__ubuf__ void* sel_mask = (__ubuf__ void*)asc_get_phy_buf_addr(0);
-...     //计算sel_mask的值
+constexpr uint32_t total_length = 256;
+uint64_t mask = 64;
+__ubuf__ void sel_mask[total_length];
+__ubuf__ half dst[total_length];
+__ubuf__ half src0[total_length];
+__ubuf__ half src1[total_length];
 asc_set_cmp_mask(sel_mask);
-...    // 进行Select操作
+asc_sync_pipe(PIPE_V);
+asc_select(dst, src0, src1, total_length);
 ```
