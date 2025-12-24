@@ -19,6 +19,16 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p149598793615"><a name="p149598793615"></a><a name="p149598793615"></a>√</p>
 </td>
 </tr>
+<tr id="row177153301877"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p871618304717"><a name="p871618304717"></a><a name="p871618304717"></a><span id="ph2010715480019"><a name="ph2010715480019"></a><a name="ph2010715480019"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p107166301277"><a name="p107166301277"></a><a name="p107166301277"></a>√</p>
+</td>
+</tr>
+<tr id="row63371527104112"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14731298411"><a name="p14731298411"></a><a name="p14731298411"></a><span id="ph114731729174114"><a name="ph114731729174114"></a><a name="ph114731729174114"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p14473329104113"><a name="p14473329104113"></a><a name="p14473329104113"></a>√</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -168,6 +178,8 @@
 <p id="p1747492917489"><a name="p1747492917489"></a><a name="p1747492917489"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p3990133464118"><a name="p3990133464118"></a><a name="p3990133464118"></a><span id="ph4990133415414"><a name="ph4990133415414"></a><a name="ph4990133415414"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Ascend 910C</term></span>，支持的数据类型为：half、bfloat16_t。</p>
 <p id="p46511918154210"><a name="p46511918154210"></a><a name="p46511918154210"></a><span id="ph1365191854214"><a name="ph1365191854214"></a><a name="ph1365191854214"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Ascend 910B</term></span>，支持的数据类型为：half、bfloat16_t。</p>
+<p id="p224712912014"><a name="p224712912014"></a><a name="p224712912014"></a><span id="ph4561153016111"><a name="ph4561153016111"></a><a name="ph4561153016111"></a>Kirin X90</span>，支持的数据类型为：half、bfloat16_t。</p>
+<p id="p121951054215"><a name="p121951054215"></a><a name="p121951054215"></a><span id="ph112191010124214"><a name="ph112191010124214"></a><a name="ph112191010124214"></a>Kirin 9030</span>，支持的数据类型为：half、bfloat16_t。</p>
 </td>
 </tr>
 <tr id="row18474729124817"><td class="cellrowborder" valign="top" width="16.45%" headers="mcps1.2.4.1.1 "><p id="p54741029164810"><a name="p54741029164810"></a><a name="p54741029164810"></a>src</p>
@@ -178,6 +190,8 @@
 <p id="p1493334184019"><a name="p1493334184019"></a><a name="p1493334184019"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_1"><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_1"><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_1"><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p826895613424"><a name="p826895613424"></a><a name="p826895613424"></a><span id="ph926810565425"><a name="ph926810565425"></a><a name="ph926810565425"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Ascend 910C</term></span>，支持的数据类型为：int8_t、int4b_t。</p>
 <p id="p14496195212317"><a name="p14496195212317"></a><a name="p14496195212317"></a><span id="ph104968521634"><a name="ph104968521634"></a><a name="ph104968521634"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_3"><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a>Ascend 910B</term></span>，支持的数据类型为：int8_t、int4b_t。</p>
+<p id="p224712912014"><a name="p224712912014"></a><a name="p224712912014"></a><span id="ph4561153016111"><a name="ph4561153016111"></a><a name="ph4561153016111"></a>Kirin X90</span>，支持的数据类型为：int8_t、int4b_t。</p>
+<p id="p121951054215"><a name="p121951054215"></a><a name="p121951054215"></a><span id="ph112191010124214"><a name="ph112191010124214"></a><a name="ph112191010124214"></a>Kirin 9030</span>，支持的数据类型为：int8_t、int4b_t。</p>
 </td>
 </tr>
 <tr id="row2891175273813"><td class="cellrowborder" valign="top" width="16.45%" headers="mcps1.2.4.1.1 "><p id="p118911521386"><a name="p118911521386"></a><a name="p118911521386"></a>offset</p>
@@ -188,6 +202,8 @@
 <p id="p6374105824017"><a name="p6374105824017"></a><a name="p6374105824017"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_2"><a name="zh-cn_topic_0000001530181537_ph173308471594_2"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_2"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_2"><a name="zh-cn_topic_0000001530181537_ph9902231466_2"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_2"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_2"><a name="zh-cn_topic_0000001530181537_ph1782115034816_2"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_2"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p115780585428"><a name="p115780585428"></a><a name="p115780585428"></a><span id="ph115788581422"><a name="ph115788581422"></a><a name="ph115788581422"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_3"><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a>Ascend 910C</term></span>，支持的数据类型为：half、bfloat16_t。</p>
 <p id="p048922617469"><a name="p048922617469"></a><a name="p048922617469"></a><span id="ph114896267467"><a name="ph114896267467"></a><a name="ph114896267467"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_4"><a name="zh-cn_topic_0000001312391781_term11962195213215_4"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_4"></a>Ascend 910B</term></span>，支持的数据类型为：half、bfloat16_t。</p>
+<p id="p224712912014"><a name="p224712912014"></a><a name="p224712912014"></a><span id="ph4561153016111"><a name="ph4561153016111"></a><a name="ph4561153016111"></a>Kirin X90</span>，支持的数据类型为：half、bfloat16_t。</p>
+<p id="p121951054215"><a name="p121951054215"></a><a name="p121951054215"></a><span id="ph112191010124214"><a name="ph112191010124214"></a><a name="ph112191010124214"></a>Kirin 9030</span>，支持的数据类型为：half、bfloat16_t。</p>
 </td>
 </tr>
 <tr id="row617218172310"><td class="cellrowborder" valign="top" width="16.45%" headers="mcps1.2.4.1.1 "><p id="p16660132211315"><a name="p16660132211315"></a><a name="p16660132211315"></a>scale</p>
@@ -198,6 +214,8 @@
 <p id="p76604221311"><a name="p76604221311"></a><a name="p76604221311"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_3"><a name="zh-cn_topic_0000001530181537_ph173308471594_3"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_3"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_3"><a name="zh-cn_topic_0000001530181537_ph9902231466_3"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_3"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_3"><a name="zh-cn_topic_0000001530181537_ph1782115034816_3"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_3"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p1652418117435"><a name="p1652418117435"></a><a name="p1652418117435"></a><span id="ph1152416117433"><a name="ph1152416117433"></a><a name="ph1152416117433"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_4"><a name="zh-cn_topic_0000001312391781_term1253731311225_4"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_4"></a>Ascend 910C</term></span>，支持的数据类型为：half、bfloat16_t。</p>
 <p id="p0428163416468"><a name="p0428163416468"></a><a name="p0428163416468"></a><span id="ph15428134154615"><a name="ph15428134154615"></a><a name="ph15428134154615"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_5"><a name="zh-cn_topic_0000001312391781_term11962195213215_5"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_5"></a>Ascend 910B</term></span>，支持的数据类型为：half、bfloat16_t。</p>
+<p id="p224712912014"><a name="p224712912014"></a><a name="p224712912014"></a><span id="ph4561153016111"><a name="ph4561153016111"></a><a name="ph4561153016111"></a>Kirin X90</span>，支持的数据类型为：half、bfloat16_t。</p>
+<p id="p121951054215"><a name="p121951054215"></a><a name="p121951054215"></a><span id="ph112191010124214"><a name="ph112191010124214"></a><a name="ph112191010124214"></a>Kirin 9030</span>，支持的数据类型为：half、bfloat16_t。</p>
 </td>
 </tr>
 <tr id="row1747412296483"><td class="cellrowborder" valign="top" width="16.45%" headers="mcps1.2.4.1.1 "><p id="p74741029204817"><a name="p74741029204817"></a><a name="p74741029204817"></a>sharedTmpBuffer</p>
