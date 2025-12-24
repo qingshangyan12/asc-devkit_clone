@@ -33,6 +33,7 @@ test_two_targets=(
   ascendc_utest_kernel
   ascendc_utest_asc_plugin
   ascendc_utest_aclrtc
+  ascendc_utest_asc_compile_base
   tikcpp_utest_ascend910B1_AIC
   tikcpp_utest_ascend910B1_AIV
   tikcpp_tiling_utest_ascend910

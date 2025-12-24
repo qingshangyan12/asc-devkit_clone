@@ -1043,3 +1043,59 @@ foreach(impl_mode ${TIKCPP_TPL_TILING_MODE})
         TASK_NUM 1
     )
 endforeach()
+
+
+# ############################################ asc_op_compile_base ut ############################################
+set(ASC_COMPILE_BASE_TEST_HEADERS_FILES
+    ${LOCAL_DIR}/../common/
+    ${ASCENDC_DIR}/tools/build/asc_op_compile_base/c_api/
+    ${ASCENDC_DIR}/tools/build/common/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/base/
+)
+
+file(GLOB ASC_COMPILE_BASE_SRC_FILES
+    ${ASCENDC_DIR}/tools/build/asc_op_compile_base/c_api/*.cpp
+    ${ASCENDC_DIR}/tools/build/asc_op_compile_base/c_api/*.cc
+)
+
+file(GLOB TEST_ASC_COMPILE_BASE_SRC_FILES
+    ${LOCAL_DIR}/main.cpp
+    ${LOCAL_DIR}/testcase/asc_op_compile_base/*.cpp
+)
+
+add_executable(ascendc_utest_asc_compile_base
+    ${ASC_COMPILE_BASE_SRC_FILES}
+    ${TEST_ASC_COMPILE_BASE_SRC_FILES}
+)
+add_dependencies(ascendc_utest_asc_compile_base gen_ut_kernel_tiling)
+target_compile_definitions(ascendc_utest_asc_compile_base PRIVATE
+    UT_TEST
+)
+target_compile_definitions(ascendc_utest_asc_compile_base PRIVATE ASCENDC_CPU_DEBUG=1)
+target_include_directories(ascendc_utest_asc_compile_base PRIVATE
+    ${ASC_COMPILE_BASE_TEST_HEADERS_FILES}
+)
+target_compile_options(ascendc_utest_asc_compile_base PRIVATE
+    -g
+    -Werror
+)
+target_link_directories(ascendc_utest_asc_compile_base PRIVATE
+    ${ASCEND_DEP_LIB_DIR}
+)
+target_link_libraries(ascendc_utest_asc_compile_base PRIVATE
+    $<BUILD_INTERFACE:intf_llt_pub_basic>
+    -Wl,--no-as-needed
+    c_sec
+    dl
+    -Wl,--as-needed
+    platform
+    mmpa
+    alog
+    error_manager
+)
+
+run_llt_test(
+    TARGET ascendc_utest_asc_compile_base
+    TASK_NUM 1
+)
