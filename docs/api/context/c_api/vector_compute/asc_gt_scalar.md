@@ -32,11 +32,11 @@ src中的每个元素逐个与标量value比较大小，如果某个位置上的
 | dst       | 输出    | 目的操作数（矢量）的起始地址。 |
 | src       | 输入    | 源操作数（矢量）的起始地址。 |
 | value       | 输入    | 源操作数（标量）。          |
-| repeat | 输入    | 迭代次数，默认值：1。 |
-| dst_block_stride | 输入    | 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
-| src_block_stride | 输入    | 源操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
-| dst_repeat_stride | 输入    | 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
-| src_repeat_stride | 输入    | 源操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| repeat | 输入    | 迭代次数。 |
+| dst_block_stride | 输入    | 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src_block_stride | 输入    | 源操作数单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride | 输入    | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src_repeat_stride | 输入    | 源操作数相邻迭代间相同DataBlock的地址步长。 |
 
 ## 返回值说明
 
@@ -54,8 +54,8 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-__ubuf__ uint8_t dst[256 * sizeof(uint8_t)];
-__ubuf__ half src[256 * sizeof(half)];
+__ubuf__ uint8_t dst[256];
+__ubuf__ half src[256];
 half value = 1;
 asc_gt_scalar(dst, src, value, 1, 1, 1, 8, 8);
 ```

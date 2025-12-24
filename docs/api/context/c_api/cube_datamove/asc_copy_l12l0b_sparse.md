@@ -30,10 +30,10 @@
 表1 参数说明
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| dst | 输出 | 目的L0B Buffer地址。 |
-| src | 输入 | 源L1 Buffer地址。 |
-| index | 输入 | 索引矩阵源L1 Buffer地址。 |
-| start_index | 输入 | 分形矩阵ID，说明搬运起始位置为源操作数中第几个分形（0为源操作数中第1个分形矩阵）。取值范围：[0, 65535]。单位：512B。默认为0 |
+| dst | 输出 | 目的操作数在L0B Buffer的起始地址。 |
+| src | 输入 | 源操作数在L1 Buffer的起始地址。 |
+| index | 输入 | 索引矩阵在L1 Buffer的起始地址。 |
+| start_index | 输入 | 分形矩阵ID，说明搬运起始位置为源操作数中第几个分形（0为源操作数中第1个分形矩阵）。取值范围：[0, 65535]。单位：512B。 |
 | repeat | 输入 | 迭代次数，每个迭代可以处理512B数据。取值范围：[1, 255]。 |
 
 ## 返回值说明
@@ -54,9 +54,9 @@ PIPE_MTE1
 ## 调用示例
 
 ```cpp
-__ubuf__ int8_t dst[256 * sizeof(int8_t)];
-__ubuf__ int8_t src[256 * sizeof(int8_t)];
-__ubuf__ int8_t index[64 * sizeof(int8_t)];
+__ubuf__ int8_t dst[256];
+__ubuf__ int8_t src[256];
+__ubuf__ int8_t index[64];
 uint16_t start_index = 1;
 uint8_t repeat = 8;
 asc_copy_l12l0b_sparse(dst, src, index, start_index, repeat);

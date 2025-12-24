@@ -44,13 +44,13 @@ $$
 | dst       | 输出    | 目的操作数（矢量）的起始地址。 |
 | src0、src1 | 输入    | 源操作数（矢量）的起始地址。 |
 | count     | 输入    | 参与计算的元素个数。        |
-| repeat | 输入    | 迭代次数，默认值：1。 |
-| dst_block_stride | 输入    | 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
-| src0_block_stride | 输入    | 源操作数0单次迭代内不同DataBlock间地址步长，默认值：1。 |
-| src1_block_stride | 输入    | 源操作数1单次迭代内不同DataBlock间地址步长，默认值：1。 |
-| dst_repeat_stride | 输入    | 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
-| src0_repeat_stride | 输入    | 源操作数0相邻迭代间相同DataBlock的地址步长，默认值：8。 |
-| src1_repeat_stride | 输入    | 源操作数1相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| repeat | 输入    | 迭代次数。 |
+| dst_block_stride | 输入    | 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src0_block_stride | 输入    | 源操作数0单次迭代内不同DataBlock间地址步长。 |
+| src1_block_stride | 输入    | 源操作数1单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride | 输入    | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src0_repeat_stride | 输入    | 源操作数0相邻迭代间相同DataBlock的地址步长。 |
+| src1_repeat_stride | 输入    | 源操作数1相邻迭代间相同DataBlock的地址步长。 |
 
 ## 返回值说明
 
@@ -68,8 +68,8 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-__ubuf__ half dst[256 * sizeof(half)];
-__ubuf__ half src0[256 * sizeof(half)];
-__ubuf__ half src1[256 * sizeof(half)];
+__ubuf__ half dst[256];
+__ubuf__ half src0[256];
+__ubuf__ half src1[256];
 asc_mul_add_dst(dst, src0, src1, 256);
 ```

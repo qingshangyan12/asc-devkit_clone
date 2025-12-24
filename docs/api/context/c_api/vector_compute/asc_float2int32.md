@@ -75,11 +75,11 @@
 | dst    | 输出    | 目的操作数（矢量）的起始地址。 |
 | src    | 输入    | 源操作数（矢量）的起始地址。   |
 | count  | 输入    | 参与连续计算的元素个数。      |
-| repeat | 输入    | 迭代次数，默认值：1。 |
-| dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
-| src_block_stride |输入| 源操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
-| dst_repeat_stride |输入| 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
-| src_repeat_stride |输入| 源操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| repeat | 输入    | 迭代次数。 |
+| dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src_block_stride |输入| 源操作数单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride |输入| 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src_repeat_stride |输入| 源操作数相邻迭代间相同DataBlock的地址步长。 |
 
 ## 返回值说明
 
@@ -97,7 +97,7 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-__ubuf__ int32_t dst[256 * sizeof(int32_t)];
-__ubuf__ float src[256 * sizeof(float)];
+__ubuf__ int32_t dst[256];
+__ubuf__ float src[256];
 asc_float2int32_r(dst, src, 256);
 ```
