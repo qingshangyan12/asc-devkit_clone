@@ -29,12 +29,12 @@ int64_t asc_zero_bits_cnt_Stub(uint64_t offset)
 
 TEST_F(TestSimdAtomicBcnt, zero_bits_cnt_Succ)
 {
-    uint64_t offset = 0;
-    MOCKER_CPP(bcnt0, int64_t(uint64_t))
+    uint64_t offset = 0xfffffffffffffff3;
+    MOCKER_CPP(bcnt0)
             .times(1)
             .will(invoke(asc_zero_bits_cnt_Stub));
 
-    int64_t val = 2;
+    int64_t val = asc_zero_bits_cnt(offset);
     EXPECT_EQ(2, val);
     GlobalMockObject::verify();
 }

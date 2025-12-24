@@ -17,9 +17,9 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
  
-__aicore__ inline int64_t asc_get_store_atomic_config_impl()
+__aicore__ inline void asc_get_store_atomic_config_impl(asc_store_atomic_config& config)
 {
-    return get_st_atomic_cfg();
+    config.config = get_st_atomic_cfg();
 }
 
 #endif

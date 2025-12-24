@@ -30,12 +30,12 @@ int64_t asc_ffz_Stub(uint64_t offset)
 
 TEST_F(TestSimdAtomicFfz, ffz_Succ)
 {
-    uint64_t offset = 0;
-    MOCKER_CPP(asc_ffz, int64_t(uint64_t))
+    uint64_t offset = 3;
+    MOCKER_CPP(sff0)
             .times(1)
             .will(invoke(asc_ffz_Stub));
 
-    uint64_t val = 2;
+    uint64_t val = asc_ffz(offset);
     EXPECT_EQ(2, val);
     GlobalMockObject::verify();
 }

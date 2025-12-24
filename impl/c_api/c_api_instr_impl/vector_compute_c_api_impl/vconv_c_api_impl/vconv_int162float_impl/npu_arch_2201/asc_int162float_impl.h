@@ -29,7 +29,7 @@ __aicore__ inline void asc_int162float_impl(__ubuf__ float* dst, __ubuf__ int16_
 {
     asc_set_mask_count_begin(count);
     asc_int162float_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE / 2);
+        ASC_DEFAULT_REPEAT_STRIDE, ASC_HALF_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 

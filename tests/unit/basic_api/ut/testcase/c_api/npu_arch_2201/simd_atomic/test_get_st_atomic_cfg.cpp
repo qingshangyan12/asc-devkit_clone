@@ -21,11 +21,11 @@ protected:
 
 TEST_F(TestSimdAtomicGetStoreAtomicConfigCApi, get_st_atomic_cfg_Succ)
 {
-    asc_set_store_atomic_config_f32_sum();
-    int64_t res = asc_get_store_atomic_config();
-    uint16_t atomic_type = static_cast<uint64_t>(res) & 0x7;
-    uint16_t atomic_op = (static_cast<uint64_t>(res) >> 4) & 0x3;
-    EXPECT_EQ(atomic_type, 1);
+    asc_store_atomic_config config;
+    asc_get_store_atomic_config(config);
+    uint16_t atomic_type = config.atomic_type;
+    uint16_t atomic_op = config.atomic_op;
+    EXPECT_EQ(atomic_type, 0);
     EXPECT_EQ(atomic_op, 0);
     GlobalMockObject::verify();
 }

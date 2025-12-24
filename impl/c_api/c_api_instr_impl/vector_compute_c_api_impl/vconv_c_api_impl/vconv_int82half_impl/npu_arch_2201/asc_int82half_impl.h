@@ -30,7 +30,7 @@ __aicore__ inline void asc_int82half_impl(__ubuf__ half* dst, __ubuf__ int8_t* s
 {
     asc_set_mask_count_begin(count);
     asc_int82half_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE / 2);
+        ASC_DEFAULT_REPEAT_STRIDE, ASC_HALF_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 

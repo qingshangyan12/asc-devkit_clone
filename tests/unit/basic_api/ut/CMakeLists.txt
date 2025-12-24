@@ -110,7 +110,7 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CAPI_CASE_SRC_FILES
 
 # ascend910B1 aiv c api test cases
 file(GLOB ASCENDC_TEST_ascend910B1_AIV_CAPI_CASE_SRC_FILES
-    ${LOCAL_DIR}/testcase/c_api/npu_arch_2201/atomic/*.cpp
+    ${LOCAL_DIR}/testcase/c_api/npu_arch_2201/simd_atomic/*.cpp
     ${LOCAL_DIR}/testcase/c_api/npu_arch_2201/cache_ctrl/*.cpp
     ${LOCAL_DIR}/testcase/c_api/npu_arch_2201/sync/*.cpp
     ${LOCAL_DIR}/testcase/c_api/npu_arch_2201/sys_var/*.cpp

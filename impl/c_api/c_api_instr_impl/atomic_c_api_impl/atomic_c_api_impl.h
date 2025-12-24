@@ -55,9 +55,9 @@ __aicore__ inline void asc_set_atomic_bf16()
     asc_set_atomic_bf16_impl();
 }
 
-__aicore__ inline int64_t asc_get_store_atomic_config()
+__aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
 {
-    return asc_get_store_atomic_config_impl();
+    asc_get_store_atomic_config_impl(config);
 }
 
 __aicore__ inline void asc_set_atomic_s16()

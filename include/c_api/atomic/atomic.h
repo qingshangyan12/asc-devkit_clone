@@ -19,4 +19,7 @@ __aicore__ inline void asc_set_atomic_none();
 
 __aicore__ inline void asc_set_atomic_s8();
 
+__aicore__ inline void asc_set_atomic_bf16();
+
+__aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
 #endif

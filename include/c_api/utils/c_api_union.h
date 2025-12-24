@@ -15,7 +15,8 @@
 
 constexpr uint64_t CAPI_DEFAULT_BINARY_CONFIG_VALUE = 0x0100080808010101;
 constexpr uint64_t CAPI_DEFAULT_UNARY_CONFIG_VALUE = 0x0100800800010001;
-constexpr uint64_t CAPI_DEFAULT_FILL_VALUE_CONFIG_VALUE = 0x0000000000000000;
+constexpr uint64_t ASC_FILL_VALUE_DEFAULT_VALUE = 0x0000000000000000;
+constexpr uint64_t ASC_STORE_ATOMIC_DEFAULT_VALUE = 0x0000000000000000;
 
 union asc_binary_config {
     uint64_t config = CAPI_DEFAULT_BINARY_CONFIG_VALUE;
@@ -43,7 +44,7 @@ union asc_unary_config {
 };
 
 union asc_fill_value_config {
-    uint64_t config = CAPI_DEFAULT_FILL_VALUE_CONFIG_VALUE;
+    uint64_t config = ASC_FILL_VALUE_DEFAULT_VALUE;
     struct {
         uint64_t repeat : 15;
         uint64_t reserved1 : 1;
@@ -54,7 +55,17 @@ union asc_fill_value_config {
     };
 };
 
+union asc_store_atomic_config {
+    uint64_t config = ASC_STORE_ATOMIC_DEFAULT_VALUE;
+    struct {
+        uint64_t atomic_type : 3;
+        uint64_t atomic_op : 2;
+        uint64_t reserved1 : 59;
+    };
+};
+
 constexpr asc_binary_config CAPI_DEFAULT_BINARY_CFG{};
 constexpr asc_unary_config CAPI_DEFAULT_UNARY_CFG{};
-constexpr asc_fill_value_config CAPI_DEFAULT_FILL_VALUE_CFG{};
+constexpr asc_fill_value_config ASC_FILL_VALUE_DEFAULT_CFG{};
+constexpr asc_store_atomic_config ASC_STORE_ATOMIC_DEFAULT_CFG{};
 #endif

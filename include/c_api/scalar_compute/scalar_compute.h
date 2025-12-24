@@ -15,4 +15,6 @@
 
 __aicore__ inline int64_t asc_ffs(uint64_t in);
 
+__aicore__ inline int64_t asc_sflbits(int64_t value);
+
 #endif
