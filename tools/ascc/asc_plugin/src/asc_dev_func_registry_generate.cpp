@@ -20,26 +20,23 @@
 
 namespace AscPlugin {
 constexpr size_t FUNCREG_SIZE_CODE_BUFFER_LEN = 16 * 1024;
-constexpr const char *FUNC_REGISTER_CODE = R"(#include <stdio.h>
+constexpr const char* FUNC_REGISTER_CODE = R"(#include <stdio.h>
 #include <cstdint>
 extern "C" {
 uint32_t AllocAscendMemDevice(void **devMem, uint64_t size);
 uint32_t FreeAscendMemDevice(void *devMem);
-int32_t AscendFunctionRegister(void *handle, const char *stubFunc);
-uint32_t GetAscendCoreSyncAddr(void **addr);
 }
 namespace Adx {
 void AdumpPrintWorkSpace(const void *workSpaceAddr, const size_t dumpWorkSpaceSize,
     void *stream, const char *opType);
 } // namespace Adx
 namespace AscPluginGenerator {
-typedef void (*KernelFuncRegister)(void*);
-int32_t BindKernelRegisterFunc(KernelFuncRegister func);
-uint32_t LaunchAndProfiling(const char *stubFunc, uint32_t blockDim, void *stream, void **args, uint32_t size,
+int32_t BindKernelRegisterFunc(void (*)(void*));
+uint32_t LaunchAndProfiling(const char *kernelName, uint32_t blockDim, void *stream, void **args, uint32_t size,
                             uint32_t ktype, const uint32_t ubufDynamicSize);
-void GetHandleUnregisterInst();
 uint32_t ascendc_set_exception_dump_info(uint32_t dumpSize);
 } // namespace AscPluginGenerator
+static const int32_t g_ascend_plugin_register = AscPluginGenerator::BindKernelRegisterFunc(nullptr);
 
 #define ASC_PLUGIN_LAUNCH_LOGE(kernelName, stream, blockDim, fmt, ...)                      \
     ::printf("[ERROR] [AscPlugin] Kernel: [%s] Stream: [%p] BlockDim: [%u] " fmt "\n",      \
@@ -56,29 +53,12 @@ static const struct BinaryMetaVersion __ascendc_binary_version__ __attribute__ (
 
 std::string FunctionRegistryImpl()
 {
-    auto& infoManager = InfoManager::GetInstance();
     std::stringstream codeSource;
     std::string buffer;
     buffer.reserve(FUNCREG_SIZE_CODE_BUFFER_LEN);
     codeSource.str(std::move(buffer));
     codeSource << FUNC_REGISTER_CODE;
-    codeSource << "static void AscFunctionRegister(void* g_kernel_handle)\n{\n";
-    codeSource << "    int32_t retRegister = 0;\n";
-    codeSource << "    const char *kernelFuncMangling = nullptr;\n";
-    for (const auto& GlobalSymbolInfo : infoManager.GetGlobalSymbolInfo()) {
-        codeSource << "    kernelFuncMangling = \"";
-        codeSource << GlobalSymbolInfo.first.substr(DEVICE_STUB_PREFIX_LEN);
-        codeSource << "\";\n";
-        codeSource << "    retRegister = AscendFunctionRegister(g_kernel_handle, kernelFuncMangling);\n";
-        codeSource << "    if (retRegister != 0) {\n";
-        codeSource << "        ::printf(\"[ERROR] [AscPlugin] Kernel [%s] : function register failure! ret %d\\n\", kernelFuncMangling, "
-                      "retRegister);\n";
-        codeSource << "    }\n";
-    }
-    codeSource << "}\n";
-    codeSource << "static const int32_t g_regiter_regfunc_ret = "
-                  "AscPluginGenerator::BindKernelRegisterFunc(AscFunctionRegister);";
-    if (infoManager.HasKernelFunc()) {
+    if (InfoManager::GetInstance().HasKernelFunc()) {
         codeSource << KERNEL_BINARY_VERSION_SECTION;
     }
     ASC_LOGD("call device stub registry function is: %s", codeSource.str().c_str());

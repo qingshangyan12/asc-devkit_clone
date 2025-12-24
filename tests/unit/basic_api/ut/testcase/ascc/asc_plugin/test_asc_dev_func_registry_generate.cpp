@@ -35,21 +35,18 @@ TEST_F(TestAscDevFuncRegistryGenerate, asc_FunctionRegistryImpl)
 extern "C" {
 uint32_t AllocAscendMemDevice(void **devMem, uint64_t size);
 uint32_t FreeAscendMemDevice(void *devMem);
-int32_t AscendFunctionRegister(void *handle, const char *stubFunc);
-uint32_t GetAscendCoreSyncAddr(void **addr);
 }
 namespace Adx {
 void AdumpPrintWorkSpace(const void *workSpaceAddr, const size_t dumpWorkSpaceSize,
     void *stream, const char *opType);
 } // namespace Adx
 namespace AscPluginGenerator {
-typedef void (*KernelFuncRegister)(void*);
-int32_t BindKernelRegisterFunc(KernelFuncRegister func);
-uint32_t LaunchAndProfiling(const char *stubFunc, uint32_t blockDim, void *stream, void **args, uint32_t size,
+int32_t BindKernelRegisterFunc(void (*)(void*));
+uint32_t LaunchAndProfiling(const char *kernelName, uint32_t blockDim, void *stream, void **args, uint32_t size,
                             uint32_t ktype, const uint32_t ubufDynamicSize);
-void GetHandleUnregisterInst();
 uint32_t ascendc_set_exception_dump_info(uint32_t dumpSize);
 } // namespace AscPluginGenerator
+static const int32_t g_ascend_plugin_register = AscPluginGenerator::BindKernelRegisterFunc(nullptr);
 
 #define ASC_PLUGIN_LAUNCH_LOGE(kernelName, stream, blockDim, fmt, ...)                      \
     ::printf("[ERROR] [AscPlugin] Kernel: [%s] Stream: [%p] BlockDim: [%u] " fmt "\n",      \
@@ -57,16 +54,6 @@ uint32_t ascendc_set_exception_dump_info(uint32_t dumpSize);
         stream,                                                                             \
         blockDim,                                                                           \
         ##__VA_ARGS__)
-static void AscFunctionRegister(void* g_kernel_handle)
-{
-    int32_t retRegister = 0;
-    const char *kernelFuncMangling = nullptr;
-    kernelFuncMangling = "test_mangled";
-    retRegister = AscendFunctionRegister(g_kernel_handle, kernelFuncMangling);
-    if (retRegister != 0) {
-        ::printf("[ERROR] [AscPlugin] Kernel [%s] : function register failure! ret %d\n", kernelFuncMangling, retRegister);
-    }
-}
-static const int32_t g_regiter_regfunc_ret = AscPluginGenerator::BindKernelRegisterFunc(AscFunctionRegister);)";
+)";
     EXPECT_EQ(res, expectRes);
 }

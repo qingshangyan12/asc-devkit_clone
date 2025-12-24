@@ -54,7 +54,6 @@ TEST_F(TEST_ASC_HOST_STUB_GENERATOR, asc_get_host_stub_namespace)
         ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "kernel launch failure!");
         return;
     }
-    AscPluginGenerator::GetHandleUnregisterInst();
 }
 )";
     AscPlugin::KernelInfo kernelInfo;
@@ -124,7 +123,6 @@ TEST_F(TEST_ASC_HOST_STUB_GENERATOR, asc_get_host_stub_namespace_mix_aiv_1_0)
         ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "kernel launch failure!");
         return;
     }
-    AscPluginGenerator::GetHandleUnregisterInst();
 }
 )";
     AscPlugin::KernelInfo kernelInfo;
@@ -194,7 +192,6 @@ TEST_F(TEST_ASC_HOST_STUB_GENERATOR, asc_get_host_stub_namespace_mix_aic_1_0)
         ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "kernel launch failure!");
         return;
     }
-    AscPluginGenerator::GetHandleUnregisterInst();
 }
 )";
     AscPlugin::KernelInfo kernelInfo;
@@ -267,7 +264,6 @@ TEST_F(TEST_ASC_HOST_STUB_GENERATOR, asc_get_host_stub_bisheng_core_ratio)
         ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "kernel launch failure!");
         return;
     }
-    AscPluginGenerator::GetHandleUnregisterInst();
 }
 )";
     AscPlugin::KernelInfo kernelInfo;
@@ -323,21 +319,31 @@ TEST_F(TEST_ASC_HOST_STUB_GENERATOR, asc_get_host_stub_bisheng_core_ratio)
 
 TEST_F(TEST_ASC_HOST_STUB_GENERATOR, asc_get_host_stub_printf)
 {
+    using namespace AscPlugin;
     // single_src/hello_world
-    std::string golden = R"(void hello_world(uint32_t __ascendc_blockDim, void* __ascendc_hold, void* __ascendc_stream)
+    std::string golden = R"(void hello_world(uint32_t __ascendc_blockDim, uint32_t __ascendc_ubufDynamicSize, void* __ascendc_stream)
 {
     struct {
-    } __ascendc_args {};
+        void* __ascendc_dump;
+    } __ascendc_args {nullptr, };
     uint32_t __ascendc_ret;
+    constexpr uint32_t __ascendc_one_core_dump_size = 1048576;
+    AllocAscendMemDevice(&(__ascendc_args.__ascendc_dump), __ascendc_one_core_dump_size * 108 + 72 * 2048 * 2048);
     const char* __ascendc_name = "hello_world";
     uint32_t __ascendc_kType = 10;
     const char* __ascendc_manglingName = "_Z26__device_stub__hello_worldv";
-    __ascendc_ret = AscPluginGenerator::LaunchAndProfiling(__ascendc_manglingName, __ascendc_blockDim, __ascendc_stream, (void **)&__ascendc_args, sizeof(__ascendc_args), __ascendc_kType, 0);
+    __ascendc_ret = AscPluginGenerator::ascendc_set_exception_dump_info(__ascendc_one_core_dump_size);
+    if(__ascendc_ret != 0) {
+        ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "init assert dump failure!");
+        return;
+    }
+    __ascendc_ret = AscPluginGenerator::LaunchAndProfiling(__ascendc_manglingName, __ascendc_blockDim, __ascendc_stream, (void **)&__ascendc_args, sizeof(__ascendc_args), __ascendc_kType, __ascendc_ubufDynamicSize);
     if(__ascendc_ret != 0) {
         ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "kernel launch failure!");
         return;
     }
-    AscPluginGenerator::GetHandleUnregisterInst();
+    Adx::AdumpPrintWorkSpace(__ascendc_args.__ascendc_dump, __ascendc_one_core_dump_size * 108 + 72 * 2048 * 2048, __ascendc_stream, __ascendc_name);
+    FreeAscendMemDevice(__ascendc_args.__ascendc_dump);
 }
 )";
     AscPlugin::KernelInfo kernelInfo;
@@ -352,12 +358,45 @@ TEST_F(TEST_ASC_HOST_STUB_GENERATOR, asc_get_host_stub_printf)
     kernelInfo.templateInstances = {};
 
     auto& manager = AscPlugin::InfoManager::GetInstance();
+    manager.shortSocVersion_ = ShortSocVersion::ASCEND910_95;
     manager.SetHasPrintf(true);
-    manager.SetHasAssert(false);
+    manager.SetHasAssert(true);
     manager.SetUserDumpStatus(true);
+    manager.SetHasSimtPrintf(true);
     std::unordered_set<AscPlugin::KernelMetaType> kernelType = {AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2};
     auto hostStubCode = GetHostStubCode(kernelInfo, kernelType);
     EXPECT_EQ(hostStubCode, golden);
+
+    std::string golden_no_smit = R"(void hello_world(uint32_t __ascendc_blockDim, uint32_t __ascendc_ubufDynamicSize, void* __ascendc_stream)
+{
+    struct {
+        void* __ascendc_dump;
+    } __ascendc_args {nullptr, };
+    uint32_t __ascendc_ret;
+    constexpr uint32_t __ascendc_one_core_dump_size = 1048576;
+    AllocAscendMemDevice(&(__ascendc_args.__ascendc_dump), __ascendc_one_core_dump_size * 108);
+    const char* __ascendc_name = "hello_world";
+    uint32_t __ascendc_kType = 10;
+    const char* __ascendc_manglingName = "_Z26__device_stub__hello_worldv";
+    __ascendc_ret = AscPluginGenerator::ascendc_set_exception_dump_info(__ascendc_one_core_dump_size);
+    if(__ascendc_ret != 0) {
+        ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "init assert dump failure!");
+        return;
+    }
+    __ascendc_ret = AscPluginGenerator::LaunchAndProfiling(__ascendc_manglingName, __ascendc_blockDim, __ascendc_stream, (void **)&__ascendc_args, sizeof(__ascendc_args), __ascendc_kType, __ascendc_ubufDynamicSize);
+    if(__ascendc_ret != 0) {
+        ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "kernel launch failure!");
+        return;
+    }
+    Adx::AdumpPrintWorkSpace(__ascendc_args.__ascendc_dump, __ascendc_one_core_dump_size * 108, __ascendc_stream, __ascendc_name);
+    FreeAscendMemDevice(__ascendc_args.__ascendc_dump);
+}
+)";
+    manager.SetHasSimtPrintf(false);
+    hostStubCode = GetHostStubCode(kernelInfo, kernelType);
+    EXPECT_EQ(hostStubCode, golden_no_smit);
+
+    manager.shortSocVersion_ = ShortSocVersion::ASCEND910B;
 }
 
 TEST_F(TEST_ASC_HOST_STUB_GENERATOR, asc_get_host_stub_template)
@@ -394,7 +433,6 @@ template<typename T, int32_t Y, const auto& U, template<typename , typename > cl
         ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "kernel launch failure!");
         return;
     }
-    AscPluginGenerator::GetHandleUnregisterInst();
 }
 )";
     AscPlugin::KernelInfo kernelInfo;

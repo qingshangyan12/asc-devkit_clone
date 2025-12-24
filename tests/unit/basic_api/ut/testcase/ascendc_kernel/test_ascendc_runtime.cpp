@@ -7,23 +7,41 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include <gtest/gtest.h>
+
 #include <cmath>
 #include <fstream>
-#include <stdlib.h>
-#include "securec.h"
-#include <fcntl.h>
+#include <cstdlib>
 #include <ctime>
 #include <string>
-#include "ascendc_runtime.h"
-#include "runtime/kernel.h"
-#include <mockcpp/mockcpp.hpp>
 #include <unordered_map>
-#include "acl/acl_base.h"
-#include "acl/acl_rt.h"
+#include <fcntl.h>
+
+#include <gtest/gtest.h>
+#include <mockcpp/mockcpp.hpp>
+
+#include "ascendc_runtime.h"
+#include "securec.h"
+#include "runtime/kernel.h"
+#include "acl_rt.h"
+#include "ascendc_tool_log.h"
 
 #include <iostream>
 using namespace std;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+aclError aclrtBinaryGetFunction(const aclrtBinHandle binHandle, const char *kernelName,
+                                                    aclrtFuncHandle *funcHandle) { return 0; }
+aclError aclrtLaunchKernelWithHostArgs(aclrtFuncHandle funcHandle, uint32_t blockDim,
+                                                           aclrtStream stream, aclrtLaunchKernelCfg *cfg,
+                                                           void *hostArgs, size_t argsSize,
+                                                           aclrtPlaceHolderInfo *placeHolderArray,
+                                                           size_t placeHolderNum) { return 0; }
+
+#ifdef __cplusplus
+}
+#endif
 
 class TEST_ASCENDC_RUNTIME : public testing::Test {
 protected:
@@ -93,6 +111,7 @@ TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeDevBinaryRegisterTest) {
 TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeMemoryFailedTest){
     size_t bufsize = 16;
     uint32_t ret;
+    MOCKER(aclrtMalloc).expects(once()).will(returnValue(1));
     ret = AllocAscendMemDevice(nullptr, bufsize);
     EXPECT_NE(ret, 0);
     ret = FreeAscendMemDevice(nullptr);
@@ -188,5 +207,34 @@ TEST_F(TEST_ASCENDC_RUNTIME, LaunchAscendKernelA){
     aclrtLaunchKernelCfg *cfg = nullptr;
     aclrtLaunchKernelWithConfig(handle, blockDim, stream, cfg, nullptr, nullptr);
     uint32_t ret = LaunchAscendKernel(handle, key, blockDim, args, size, stream);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendDevBinaryLazyRegister) {
+    const char* binBuf = "test_binary";
+    size_t binSize = strlen(binBuf);
+    void** handle = nullptr;
+    int32_t ret = AscendDevBinaryLazyRegister(binBuf, binSize, handle);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendGetFuncFromBinary) {
+    void* const binHandle = nullptr;
+    const char* kernelName = "test_kernel";
+    void** funcHandle = nullptr;
+    int32_t ret = AscendGetFuncFromBinary(binHandle, kernelName, funcHandle);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs) {
+    void* funcHandle = nullptr;
+    uint32_t blockDim = 1;
+    void* stream = nullptr;
+    void* hostArgs = nullptr;
+    size_t argsSize = 0;
+    int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, blockDim, stream, hostArgs, argsSize, 0);
+    EXPECT_EQ(ret, 0);
+    uint32_t ubufDynamicSize = 512;
+    ret = AscendLaunchKernelWithHostArgs(funcHandle, blockDim, stream, hostArgs, argsSize, ubufDynamicSize);
     EXPECT_EQ(ret, 0);
 }

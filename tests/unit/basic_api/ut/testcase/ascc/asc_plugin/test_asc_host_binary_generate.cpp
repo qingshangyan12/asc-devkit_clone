@@ -30,7 +30,6 @@ TEST_F(TEST_ASC_HOST_BINARY_GENERATE, asc_get_host_binary_succeed)
 {
     std::string golden = R"(#include <stdio.h>
 #include <stdint.h>
-#include <vector>
 
 namespace AscPluginGenerator {
 constexpr unsigned int ascendcExceptionDumpHead = 2U;
@@ -76,10 +75,10 @@ __attribute__ ((visibility("hidden"))) uint32_t ascendc_set_exception_dump_info(
 } // namespace AscPluginGenerator
 
 extern "C" {
-int32_t AscendDevBinaryRegister(const void *fileBuf, size_t fileSize, void **handle);
-int32_t AscendKernelLaunchWithFlagV2(const char *stubFunc, const uint32_t blockDim, void **args,
-    uint32_t size, const void *stream, const uint32_t ubufDynamicSize);
-int UnregisterAscendBinary(void *hdl);
+int32_t AscendDevBinaryLazyRegister(const char* binBuf, size_t binSize, void** handle);
+int32_t AscendGetFuncFromBinary(void* const binHandle, const char* kernelName, void** funcHandle);
+int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
+    uint32_t blockDim, void* stream, void* hostArgs, size_t argsSize, uint32_t ubufDynamicSize);
 void StartAscendProf(const char *name, uint64_t *startTime);
 void ReportAscendProf(const char *name, uint32_t blockDim, uint32_t taskType, const uint64_t startTime);
 bool GetAscendProfStatus();
@@ -87,113 +86,54 @@ void AscendProfRegister();
 }
 
 namespace {
-char ascendcErrMsg[4096] = {0};
-void *g_kernel_handle = nullptr;
-
-typedef void (*KernelFuncRegister)(void*);
-
-class AscPluginRegFuncRegister {
+class AscProfRegister {
 public:
-    inline static AscPluginRegFuncRegister& GetInstance()
-    {
-        static AscPluginRegFuncRegister instance;
-        return instance;
-    }
-
-public:
-    std::vector<KernelFuncRegister> regFuncCallbackList;
-private:
-    AscPluginRegFuncRegister() = default;
-    ~AscPluginRegFuncRegister() = default;
-    AscPluginRegFuncRegister(const AscPluginRegFuncRegister&) = delete;
-    AscPluginRegFuncRegister& operator=(const AscPluginRegFuncRegister&) = delete;
-    AscPluginRegFuncRegister(AscPluginRegFuncRegister&&) = delete;
-    AscPluginRegFuncRegister& operator=(AscPluginRegFuncRegister&&) = delete;
-};
-
-void RegisterKernels(void)
-{
-    int32_t ret;
-    ret = AscendDevBinaryRegister(fatbinDataPtr, fatbinDataLength, &g_kernel_handle);
-    if (ret != 0) {
-        ::printf("[ERROR] [AscPlugin] Kernel binary register failure! ret %d \n", ret);
-    }
-    AscendProfRegister();
-}
-
-class KernelHandleGradUnregister {
-private:
-    KernelHandleGradUnregister() = default;
-    ~KernelHandleGradUnregister() {
-        if (g_kernel_handle) {
-            UnregisterAscendBinary(g_kernel_handle);
-            g_kernel_handle = nullptr;
-        }
-    }
-    KernelHandleGradUnregister(const KernelHandleGradUnregister&) = delete;
-    KernelHandleGradUnregister& operator=(const KernelHandleGradUnregister&) = delete;
-public:
-    static KernelHandleGradUnregister& GetInstance() {
-        static KernelHandleGradUnregister instance;
-        return instance;
-    }
-};
-
-class AscendCOperatorRegister {
-public:
-static AscendCOperatorRegister& GetInstance() {
-    static AscendCOperatorRegister instance;
+static AscProfRegister& GetInstance() {
+    static AscProfRegister instance;
     return instance;
 }
 private:
-AscendCOperatorRegister() {
-    RegisterKernels();
-    const auto& inst = AscPluginRegFuncRegister::GetInstance();
-    for (auto func : inst.regFuncCallbackList) {
-        func(g_kernel_handle);
-    }
+AscProfRegister() {
+    AscendProfRegister();
 }
-~AscendCOperatorRegister() = default;
-AscendCOperatorRegister(const AscendCOperatorRegister&) = delete;
-AscendCOperatorRegister& operator=(const AscendCOperatorRegister&) = delete;
+~AscProfRegister() = default;
+AscProfRegister(const AscProfRegister&) = delete;
+AscProfRegister& operator=(const AscProfRegister&) = delete;
 };
 
 } // namespace
 
 namespace AscPluginGenerator {
-__attribute__ ((visibility("hidden"))) int32_t BindKernelRegisterFunc(KernelFuncRegister func)
-{
-    auto& inst = AscPluginRegFuncRegister::GetInstance();
-    inst.regFuncCallbackList.emplace_back(func);
-    return 0;
-}
+__attribute__ ((visibility("hidden"))) int32_t BindKernelRegisterFunc(void (*)(void*)) { return 0; }
 
-__attribute__ ((visibility("hidden"))) void GetHandleUnregisterInst() {
-    auto& regMng = KernelHandleGradUnregister::GetInstance();
-}
-
-__attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *stubFunc, uint32_t blockDim,
+__attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *kernelName, uint32_t blockDim,
     void *stream, void **args, uint32_t size, uint32_t ktype, const uint32_t ubufDynamicSize)
 {
-    const auto& reg = AscendCOperatorRegister::GetInstance();
-    uint64_t startTime;
-    const char *name = stubFunc;
-    bool profStatus = GetAscendProfStatus();
-    if (profStatus) {
-        StartAscendProf(name, &startTime);
+    static auto& reg = AscProfRegister::GetInstance();
+    void* binHandle = nullptr;
+    int32_t ret = AscendDevBinaryLazyRegister(fatbinDataPtr, fatbinDataLength, &binHandle);
+    if (ret != 0) {
+        ::printf("[ERROR] [AscPlugin] Kernel binary register failure! ret %d \n", ret);
     }
-    if (g_kernel_handle == nullptr) {
-        ::printf("[ERROR] [AscPlugin] %s\n", ascendcErrMsg);
+    void* funcHandle = nullptr;
+    ret = AscendGetFuncFromBinary(binHandle, kernelName, &funcHandle);
+    if (ret != 0) {
+        ::printf("[ERROR] [AscPlugin] Get kernel function failure! ret %d \n", ret);
         return 1;
     }
-    int32_t retLaunch = AscendKernelLaunchWithFlagV2(stubFunc, blockDim, args, size, stream, ubufDynamicSize);
-    if (retLaunch != 0) {
-        ::printf("[ERROR] [AscPlugin] AscendKernelLaunchWithFlagV2 ret %u\n", retLaunch);
+    uint64_t startTime;
+    bool profStatus = GetAscendProfStatus();
+    if (profStatus) {
+        StartAscendProf(kernelName, &startTime);
+    }
+    ret = AscendLaunchKernelWithHostArgs(funcHandle, blockDim, stream, (void*)args, size, ubufDynamicSize);
+    if (ret != 0) {
+        ::printf("[ERROR] [AscPlugin] Launch kernel failure! ret %u\n", ret);
     }
     if (profStatus) {
-        ReportAscendProf(name, blockDim, ktype, startTime);
+        ReportAscendProf(kernelName, blockDim, ktype, startTime);
     }
-    return retLaunch;
+    return ret;
 }
 
 } // namespace AscPluginGenerator

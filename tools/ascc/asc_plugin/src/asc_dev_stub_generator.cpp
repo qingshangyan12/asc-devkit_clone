@@ -25,7 +25,6 @@
 #include "asc_info_manager.h"
 
 namespace AscPlugin {
-constexpr size_t CODE_BUFFER_LEN = 16 * 1024;
 namespace {
 enum class ParamJoinType : uint8_t {
     ONLY_NAME = 0,
@@ -80,7 +79,8 @@ AscDevStubGenerator::AscDevStubGenerator(const KernelInfo &kernelInfo, const std
 {
     // init stringstream
     std::string buffer;
-    buffer.reserve(CODE_BUFFER_LEN);
+    constexpr size_t codeBuffLen = 16 * 1024;
+    buffer.reserve(codeBuffLen);
     codeStream_.str(std::move(buffer));
 
     // init dump flag

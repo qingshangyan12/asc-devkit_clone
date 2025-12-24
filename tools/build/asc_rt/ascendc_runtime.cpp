@@ -17,29 +17,14 @@
 #include <utility>
 #include <cstdint>
 #include <mutex>
-#include <functional>
 #include <unordered_set>
-#include <iostream>
 #include <unordered_map>
+#include <string>
 
-#include <string.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-#include "runtime/context.h"
-#include "runtime/base.h"
+#include "runtime/rt_ffts.h"
 #include "runtime/kernel.h"
-#include "runtime/stream.h"
-#include "rt_ffts.h"
-#include "kernel.h"
-#include "aprof_pub.h"
-#include "mmpa/mmpa_api.h"
-#include "acl/acl_rt.h"
-#include "mem.h"
-#include "ascendc_tool_log.h"
 #include "acl_rt.h"
-#include "acl/acl_base.h"
+#include "ascendc_tool_log.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -150,7 +135,7 @@ bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
         {"ascend910_957d", "Ascend910_957d"},
         {"ascend910_950z", "Ascend910_950z"},
         {"ascend910_958a", "Ascend910_958a"},
-        {"ascend910_95a1", "ascend910_95A1"}, 
+        {"ascend910_95a1", "ascend910_95A1"},
         {"ascend910_95a2", "ascend910_95A2"},
         {"ascend910_9591", "ascend910_9591"},
         {"ascend910_9592", "ascend910_9592"},
@@ -171,7 +156,7 @@ bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
         {"ascend910_9575", "ascend910_9575"},
         {"ascend910_9576", "ascend910_9576"},
         {"ascend910_9577", "ascend910_9577"},
-        {"ascend910_9578", "ascend910_9578"}, 
+        {"ascend910_9578", "ascend910_9578"},
 
         {"ascend910a", "Ascend910A"},
         {"ascend910proa", "Ascend910ProA"},
@@ -228,6 +213,43 @@ bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
     }
     return true;
 }
+
+int32_t AscendDevBinaryLazyRegister(const char* binBuf, size_t binSize, void** handle)
+{
+    constexpr uint32_t optLen = 2;
+    aclrtBinaryLoadOption opList[optLen] = {
+        {ACL_RT_BINARY_LOAD_OPT_LAZY_MAGIC, {ACL_RT_BINARY_MAGIC_ELF_AICORE}},
+        {ACL_RT_BINARY_LOAD_OPT_LAZY_LOAD, {/* isLazyLoad = */1}}
+    };
+    aclrtBinaryLoadOptions opts = {opList, optLen};
+    return aclrtBinaryLoadFromData(binBuf, binSize, &opts, handle);
+}
+
+int32_t AscendGetFuncFromBinary(void* const binHandle, const char* kernelName, void** funcHandle)
+{
+    return aclrtBinaryGetFunction(binHandle, kernelName, funcHandle);
+}
+
+int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
+    uint32_t blockDim, void* stream, void* hostArgs, size_t argsSize, uint32_t ubufDynamicSize)
+{
+#ifdef ASC_OLD_PROJECT
+    return 0;
+#else
+    if (ubufDynamicSize == 0) {
+        return aclrtLaunchKernelWithHostArgs(funcHandle, blockDim, stream, nullptr, hostArgs, argsSize, nullptr, 0);
+    }
+    constexpr uint32_t attrLen = 1;
+    aclrtLaunchKernelAttrValue attrValue = {0};
+    attrValue.localMemorySize = ubufDynamicSize;
+    aclrtLaunchKernelAttr attrList[attrLen] = {
+        {ACL_RT_LAUNCH_KERNEL_ATTR_LOCAL_MEMORY_SIZE, attrValue},
+    };
+    aclrtLaunchKernelCfg cfg = {attrList, attrLen};
+    return aclrtLaunchKernelWithHostArgs(funcHandle, blockDim, stream, &cfg, hostArgs, argsSize, nullptr, 0);
+#endif
+}
+
 uint32_t RegisterAscendBinary(const char *fileBuf, size_t fileSize, uint32_t type, void **handle)
 {
     rtDevBinary_t binary;
@@ -449,20 +471,22 @@ void ReportAscendProf(const char *name, uint32_t blockDim, uint32_t taskType, co
 
 uint32_t AllocAscendMemDevice(void **devMem, uint64_t size)
 {
-    const rtError_t rtErr = rtMalloc(devMem, size, RT_MEMORYINFO_HBM_HUGE, 0);
+    constexpr aclrtMemMallocPolicy policy =
+        static_cast<aclrtMemMallocPolicy>(ACL_MEM_MALLOC_HUGE_ONLY | ACL_MEM_TYPE_HIGH_BAND_WIDTH);
+    const aclError rtErr = aclrtMalloc(devMem, size, policy);
     if (rtErr != 0) {
         ASCENDLOGE(" alloc device memory failed, runtime result = %d\n", rtErr);
-        return rtErr;
+        return static_cast<uint32_t>(rtErr);
     }
     return 0;
 }
 
 uint32_t FreeAscendMemDevice(void *devMem)
 {
-    const rtError_t rtErr = aclrtFree(devMem);
+    const aclError rtErr = aclrtFree(devMem);
     if (rtErr != 0) {
         ASCENDLOGE(" free device memory failed, runtime result = %d\n", rtErr);
-        return rtErr;
+        return static_cast<uint32_t>(rtErr);
     }
     return 0;
 }

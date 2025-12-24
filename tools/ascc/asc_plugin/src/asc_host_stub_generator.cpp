@@ -46,7 +46,14 @@ public:
     }
 };
 AscHostStubGenerator::AscHostStubGenerator(const KernelInfo& kernelInfo,
-    const std::unordered_set<KernelMetaType>& kernelType) : kernelInfo_(kernelInfo), kernelType_(kernelType) {}
+    const std::unordered_set<KernelMetaType>& kernelType) : kernelInfo_(kernelInfo), kernelType_(kernelType)
+{
+    // init stringstream
+    std::string buffer;
+    constexpr size_t codeBuffLen = 16 * 1024;
+    buffer.reserve(codeBuffLen);
+    kernelCallStub_.str(std::move(buffer));
+}
 
 std::string AscHostStubGenerator::GenStubFuncDecl() const
 {
@@ -166,58 +173,59 @@ void AscHostStubGenerator::ParseKernelName()
 
 void AscHostStubGenerator::GenStubFuncImpl()
 {
-    auto &infoManager = InfoManager::GetInstance();
+    auto& infoManager = InfoManager::GetInstance();
     uint32_t maxCoreNum = infoManager.GetMaxCoreNum();
     bool isSupportFifoDump = infoManager.IsSupportFifoDump();
     KernelMetaType defaultKtype = ExtractKernelType(kernelType_);
-    std::ostringstream funcImplCode;
-    funcImplCode << GenStubFuncDecl() << "\n{\n";
-    funcImplCode << "    struct {\n";
+    kernelCallStub_ << GenStubFuncDecl() << "\n{\n";
+    kernelCallStub_ << "    struct {\n";
     if (!isSupportFifoDump && infoManager.IsDumpOn()) {
-        funcImplCode << "        void* __ascendc_dump;\n";
+        kernelCallStub_ << "        void* __ascendc_dump;\n";
     }
-    for (auto &param : kernelInfo_.kernelParameters) {
-        funcImplCode << "        alignas(((alignof(" << MapParamTypeToVoid(param.type) << ") + 3) >> 2) << 2) "
-                     << MapParamTypeToVoid(param.type) << " " << param.name << ";\n";
+    for (auto& param : kernelInfo_.kernelParameters) {
+        kernelCallStub_ << "        alignas(((alignof(" << MapParamTypeToVoid(param.type) << ") + 3) >> 2) << 2) "
+                        << MapParamTypeToVoid(param.type) << " " << param.name << ";\n";
     }
-    funcImplCode << "    } __ascendc_args {";
+    kernelCallStub_ << "    } __ascendc_args {";
     if (!isSupportFifoDump && infoManager.IsDumpOn()) {
-        funcImplCode << "nullptr, ";
+        kernelCallStub_ << "nullptr, ";
     }
-    for (auto &param : kernelInfo_.kernelParameters) {
-        funcImplCode << param.name << ", ";
+    for (auto& param : kernelInfo_.kernelParameters) {
+        kernelCallStub_ << param.name << ", ";
     }
-    funcImplCode << "};\n";
+    kernelCallStub_ << "};\n";
 
     // args declare code
-    funcImplCode << "    uint32_t __ascendc_ret;\n";
+    kernelCallStub_ << "    uint32_t __ascendc_ret;\n";
     if (!isSupportFifoDump && infoManager.IsDumpOn()) {
-        funcImplCode << "    constexpr uint32_t __ascendc_one_core_dump_size = "
-                     << std::to_string(infoManager.GetOneCoreDumpSize()) << ";\n";
+        kernelCallStub_ << "    constexpr uint32_t __ascendc_one_core_dump_size = "
+                        << std::to_string(infoManager.GetOneCoreDumpSize()) << ";\n";
         if (infoManager.HasSimtPrintf()) {
-            funcImplCode << "    AllocAscendMemDevice(&(__ascendc_args.__ascendc_dump), __ascendc_one_core_dump_size * "
-                         << maxCoreNum << " + 72 * 2048 * 2048);\n";
+            kernelCallStub_
+                << "    AllocAscendMemDevice(&(__ascendc_args.__ascendc_dump), __ascendc_one_core_dump_size * "
+                << maxCoreNum << " + 72 * 2048 * 2048);\n";
         } else {
-            funcImplCode << "    AllocAscendMemDevice(&(__ascendc_args.__ascendc_dump), __ascendc_one_core_dump_size * "
-                         << maxCoreNum << ");\n";
+            kernelCallStub_
+                << "    AllocAscendMemDevice(&(__ascendc_args.__ascendc_dump), __ascendc_one_core_dump_size * "
+                << maxCoreNum << ");\n";
         }
     }
-    funcImplCode << "    const char* __ascendc_name = \"" << kernelInfo_.kernelName << "\";\n";
+    kernelCallStub_ << "    const char* __ascendc_name = \"" << kernelInfo_.kernelName << "\";\n";
 
     // when no template, only has 1 kernel type
-    funcImplCode << "    uint32_t __ascendc_kType = " << KTYPE_TO_LAUNCH_PARAMS.at(defaultKtype) << ";\n";
-    funcImplCode << ManglingNameJudgeCode();
+    kernelCallStub_ << "    uint32_t __ascendc_kType = " << KTYPE_TO_LAUNCH_PARAMS.at(defaultKtype) << ";\n";
+    kernelCallStub_ << ManglingNameJudgeCode();
 
     if (!isSupportFifoDump && infoManager.IsDumpOn() && infoManager.HasAssert()) {
-        funcImplCode << "    __ascendc_ret = "
-                        "AscPluginGenerator::ascendc_set_exception_dump_info(__ascendc_one_core_dump_size);\n";
-        funcImplCode << "    if(__ascendc_ret != 0) {\n";
-        funcImplCode << "        ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "
-                        "\"init assert dump failure!\");\n";
-        funcImplCode << "        return;\n";
-        funcImplCode << "    }\n";
+        kernelCallStub_ << "    __ascendc_ret = "
+                           "AscPluginGenerator::ascendc_set_exception_dump_info(__ascendc_one_core_dump_size);\n";
+        kernelCallStub_ << "    if(__ascendc_ret != 0) {\n";
+        kernelCallStub_ << "        ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "
+                           "\"init assert dump failure!\");\n";
+        kernelCallStub_ << "        return;\n";
+        kernelCallStub_ << "    }\n";
     }
-    const char *fmtLaunchAndProfiling =
+    const char* fmtLaunchAndProfiling =
         "    __ascendc_ret = AscPluginGenerator::LaunchAndProfiling(__ascendc_manglingName, "
         "__ascendc_blockDim, __ascendc_stream, (void **)&__ascendc_args, sizeof(__ascendc_args), "
         "__ascendc_kType, %s);\n";
@@ -229,33 +237,33 @@ void AscHostStubGenerator::GenStubFuncImpl()
     } else {
         snprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmtLaunchAndProfiling, "0");
     }
-    funcImplCode << buffer;
+    kernelCallStub_ << buffer;
 
-    funcImplCode << "    if(__ascendc_ret != 0) {\n";
-    funcImplCode << "        ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "
-                    "\"kernel launch failure!\");\n";
-    funcImplCode << "        return;\n";
-    funcImplCode << "    }\n";
-    funcImplCode << "    AscPluginGenerator::GetHandleUnregisterInst();\n";
+    kernelCallStub_ << "    if(__ascendc_ret != 0) {\n";
+    kernelCallStub_ << "        ASC_PLUGIN_LAUNCH_LOGE(__ascendc_name, __ascendc_stream, __ascendc_blockDim, "
+                       "\"kernel launch failure!\");\n";
+    kernelCallStub_ << "        return;\n";
+    kernelCallStub_ << "    }\n";
     if (!isSupportFifoDump && infoManager.IsDumpOn() && (infoManager.HasPrintf() || infoManager.HasSimtPrintf())) {
         if (infoManager.HasSimtPrintf()) {
-            funcImplCode << "    Adx::AdumpPrintWorkSpace(__ascendc_args.__ascendc_dump, __ascendc_one_core_dump_size * "
-                         << maxCoreNum << " + 72 * 2048 * 2048, __ascendc_stream, __ascendc_name);\n";
+            kernelCallStub_
+                << "    Adx::AdumpPrintWorkSpace(__ascendc_args.__ascendc_dump, __ascendc_one_core_dump_size * "
+                << maxCoreNum << " + 72 * 2048 * 2048, __ascendc_stream, __ascendc_name);\n";
         } else {
-            funcImplCode << "    Adx::AdumpPrintWorkSpace(__ascendc_args.__ascendc_dump, __ascendc_one_core_dump_size * "
-                         << maxCoreNum << ", __ascendc_stream, __ascendc_name);\n";
+            kernelCallStub_
+                << "    Adx::AdumpPrintWorkSpace(__ascendc_args.__ascendc_dump, __ascendc_one_core_dump_size * "
+                << maxCoreNum << ", __ascendc_stream, __ascendc_name);\n";
         }
     }
     if (!isSupportFifoDump && infoManager.IsDumpOn()) {
-        funcImplCode << "    FreeAscendMemDevice(__ascendc_args.__ascendc_dump);\n";
+        kernelCallStub_ << "    FreeAscendMemDevice(__ascendc_args.__ascendc_dump);\n";
     }
-    funcImplCode << "}\n";
+    kernelCallStub_ << "}\n";
     if (hasAnonymousSpace_) {
         for (size_t i = 0; i < kernelInfo_.namespaces.size(); ++i) {
-            funcImplCode << "}\n";
+            kernelCallStub_ << "}\n";
         }
     }
-    kernelCallStub_ << funcImplCode.str();
 }
 
 std::string AscHostStubGenerator::GenCode()

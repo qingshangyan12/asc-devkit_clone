@@ -16,7 +16,7 @@
 #ifndef __INCLUDE_INTERNAL_ASC_DEV_FUNCREGISTRY_GENERATE_H__
 #define __INCLUDE_INTERNAL_ASC_DEV_FUNCREGISTRY_GENERATE_H__
 
-#include "asc_utils.h"
+#include <string>
 
 namespace AscPlugin {
 
