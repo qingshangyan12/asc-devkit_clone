@@ -9,7 +9,7 @@
 */
 
 /*!
- * \file asc_dev_funcRegistry_generate.h
+ * \file asc_dev_func_registry_generate.h
  * \brief
  */
 

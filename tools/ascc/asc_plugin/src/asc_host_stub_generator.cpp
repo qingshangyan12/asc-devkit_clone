@@ -48,15 +48,14 @@ public:
 AscHostStubGenerator::AscHostStubGenerator(const KernelInfo& kernelInfo,
     const std::unordered_set<KernelMetaType>& kernelType) : kernelInfo_(kernelInfo), kernelType_(kernelType) {}
 
-std::string AscHostStubGenerator::GenStubFuncDecl(bool hasNameSpace, bool hasAnonymousSpace) const
+std::string AscHostStubGenerator::GenStubFuncDecl() const
 {
     std::string functionEntryReplace = "";
     auto &infoManager = InfoManager::GetInstance();
     ShortSocVersion shortSoc = infoManager.GetShortSocVersion();
     std::string paramsList = "";
     if (shortSoc == ShortSocVersion::ASCEND910_95 && infoManager.HasUbufDynamicSize()) {
-        paramsList = "(uint32_t __ascendc_blockDim, void* __ascendc_hold, void* __ascendc_stream, "
-                     "uint32_t __ascendc_ubufDynamicSize";
+        paramsList = "(uint32_t __ascendc_blockDim, uint32_t __ascendc_ubufDynamicSize, void* __ascendc_stream";
     } else {
         paramsList = "(uint32_t __ascendc_blockDim, void* __ascendc_hold, void* __ascendc_stream";
     }
@@ -64,8 +63,7 @@ std::string AscHostStubGenerator::GenStubFuncDecl(bool hasNameSpace, bool hasAno
         paramsList += ", " + param.type + " " + param.name;
     }
     paramsList += ")";
-    std::string kernelNameSpace = "";
-    if (hasAnonymousSpace) {
+    if (hasAnonymousSpace_) {
         for (const auto& spaceName : kernelInfo_.namespaces) {
             if (spaceName == std::string(ANONYMOUS_NAME)) {
                 functionEntryReplace += "namespace {\n";
@@ -73,12 +71,7 @@ std::string AscHostStubGenerator::GenStubFuncDecl(bool hasNameSpace, bool hasAno
                 functionEntryReplace += "namespace " + spaceName + " {\n";
             }
         }
-    } else {
-        for (auto &nameSpace : kernelInfo_.namespaces) {
-            kernelNameSpace += nameSpace + "::";
-        }
     }
-    std::string kernelName = hasNameSpace ? kernelNameSpace + kernelInfo_.kernelName : kernelInfo_.kernelName;
     std::string tempParamDecl;
     if (kernelInfo_.isTemplate) {
         tempParamDecl = "template<";
@@ -91,9 +84,9 @@ std::string AscHostStubGenerator::GenStubFuncDecl(bool hasNameSpace, bool hasAno
         tempParamDecl += ">";
     }
     if (!kernelInfo_.isTemplate) {
-        functionEntryReplace += "void " + kernelName + paramsList;
+        functionEntryReplace += "void " + kernelNameWithNameSpace_ + paramsList;
     } else {
-        functionEntryReplace += tempParamDecl + " void " + kernelName + paramsList;
+        functionEntryReplace += tempParamDecl + " void " + kernelNameWithNameSpace_ + paramsList;
     }
     return functionEntryReplace;
 }
@@ -155,6 +148,22 @@ inline std::string MapParamTypeToVoid(std::string paramType)
     return (paramType == "uint8_t *" || paramType == "unsigned char *") ? "void*" : paramType;
 }
 
+void AscHostStubGenerator::ParseKernelName()
+{
+    // judge the anonymous space
+    auto it = std::find(kernelInfo_.namespaces.begin(), kernelInfo_.namespaces.end(), std::string(ANONYMOUS_NAME));
+    if (it != kernelInfo_.namespaces.end()) {
+        hasAnonymousSpace_ = true;
+    }
+    std::string kernelNameSpace = "";
+    if (!hasAnonymousSpace_) {
+        for (auto &nameSpace : kernelInfo_.namespaces) {
+            kernelNameSpace += nameSpace + "::";
+        }
+    }
+    kernelNameWithNameSpace_ = hasNameSpace_ ? kernelNameSpace + kernelInfo_.kernelName : kernelInfo_.kernelName;
+}
+
 void AscHostStubGenerator::GenStubFuncImpl()
 {
     auto &infoManager = InfoManager::GetInstance();
@@ -162,12 +171,7 @@ void AscHostStubGenerator::GenStubFuncImpl()
     bool isSupportFifoDump = infoManager.IsSupportFifoDump();
     KernelMetaType defaultKtype = ExtractKernelType(kernelType_);
     std::ostringstream funcImplCode;
-    bool hasAnonymous = false;
-    auto it = std::find(kernelInfo_.namespaces.begin(), kernelInfo_.namespaces.end(), std::string(ANONYMOUS_NAME));
-    if (it != kernelInfo_.namespaces.end()) {
-        hasAnonymous = true;
-    }
-    funcImplCode << GenStubFuncDecl(/* hasNameSpace = */true, hasAnonymous) << "\n{\n";
+    funcImplCode << GenStubFuncDecl() << "\n{\n";
     funcImplCode << "    struct {\n";
     if (!isSupportFifoDump && infoManager.IsDumpOn()) {
         funcImplCode << "        void* __ascendc_dump;\n";
@@ -246,7 +250,7 @@ void AscHostStubGenerator::GenStubFuncImpl()
         funcImplCode << "    FreeAscendMemDevice(__ascendc_args.__ascendc_dump);\n";
     }
     funcImplCode << "}\n";
-    if (hasAnonymous) {
+    if (hasAnonymousSpace_) {
         for (size_t i = 0; i < kernelInfo_.namespaces.size(); ++i) {
             funcImplCode << "}\n";
         }
@@ -257,6 +261,7 @@ void AscHostStubGenerator::GenStubFuncImpl()
 std::string AscHostStubGenerator::GenCode()
 {
     ASC_LOGI("Kernel [%s] : generate host stub.", kernelInfo_.kernelName.c_str());
+    ParseKernelName();
     GenStubFuncImpl();
     ASC_LOGD("type judge code is [\n%s\n]", typeJudgePreCode_.str().c_str());
     ASC_LOGD("host stub code is [\n%s\n]", kernelCallStub_.str().c_str());

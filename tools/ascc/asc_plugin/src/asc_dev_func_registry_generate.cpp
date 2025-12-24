@@ -8,29 +8,19 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#include "asc_dev_funcRegistry_generate.h"
+/*!
+ * \file asc_dev_func_registry_generate.cpp
+ * \brief
+ */
 
-#include <gtest/gtest.h>
-#include <mockcpp/mockcpp.hpp>
-#define private public
+#include "asc_dev_func_registry_generate.h"
 #include "asc_log.h"
 
 #include <sstream>
-class TEST_ASC_DEV_FUNCREGISTRY_GENERATE : public testing::Test {
-protected:
-    void SetUp() {}
-    void TearDown()
-    {
-        GlobalMockObject::verify();
-    }
-};
 
-TEST_F(TEST_ASC_DEV_FUNCREGISTRY_GENERATE, asc_FunctionRegistryImpl)
-{
-    AscPlugin::InfoManager::GetInstance().kernelFuncSymbolToFuncInfo_.insert({"__device_stub__test_mangled",
-        {AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2, "test.cpp", 2, 2, AscPlugin::KfcScene::Close}});
-    std::string res = AscPlugin::FunctionRegistryImpl();
-    std::string expectRes = R"(#include <stdio.h>
+namespace AscPlugin {
+constexpr size_t FUNCREG_SIZE_CODE_BUFFER_LEN = 16 * 1024;
+constexpr const char *FUNC_REGISTER_CODE = R"(#include <stdio.h>
 #include <cstdint>
 extern "C" {
 uint32_t AllocAscendMemDevice(void **devMem, uint64_t size);
@@ -57,16 +47,41 @@ uint32_t ascendc_set_exception_dump_info(uint32_t dumpSize);
         stream,                                                                             \
         blockDim,                                                                           \
         ##__VA_ARGS__)
-static void AscFunctionRegister(void* g_kernel_handle)
+)";
+
+constexpr const char *KERNEL_BINARY_VERSION_SECTION = R"(
+static const struct BinaryMetaVersion __ascendc_binary_version__ __attribute__ ((used, section (".ascend.meta"))) =
+    {0, 4, 1};
+)";
+
+std::string FunctionRegistryImpl()
 {
-    int32_t retRegister = 0;
-    const char *kernelFuncMangling = nullptr;
-    kernelFuncMangling = "test_mangled";
-    retRegister = AscendFunctionRegister(g_kernel_handle, kernelFuncMangling);
-    if (retRegister != 0) {
-        ::printf("[ERROR] [AscPlugin] Kernel [%s] : function register failure! ret %d\n", kernelFuncMangling, retRegister);
+    auto& infoManager = InfoManager::GetInstance();
+    std::stringstream codeSource;
+    std::string buffer;
+    buffer.reserve(FUNCREG_SIZE_CODE_BUFFER_LEN);
+    codeSource.str(std::move(buffer));
+    codeSource << FUNC_REGISTER_CODE;
+    codeSource << "static void AscFunctionRegister(void* g_kernel_handle)\n{\n";
+    codeSource << "    int32_t retRegister = 0;\n";
+    codeSource << "    const char *kernelFuncMangling = nullptr;\n";
+    for (const auto& GlobalSymbolInfo : infoManager.GetGlobalSymbolInfo()) {
+        codeSource << "    kernelFuncMangling = \"";
+        codeSource << GlobalSymbolInfo.first.substr(DEVICE_STUB_PREFIX_LEN);
+        codeSource << "\";\n";
+        codeSource << "    retRegister = AscendFunctionRegister(g_kernel_handle, kernelFuncMangling);\n";
+        codeSource << "    if (retRegister != 0) {\n";
+        codeSource << "        ::printf(\"[ERROR] [AscPlugin] Kernel [%s] : function register failure! ret %d\\n\", kernelFuncMangling, "
+                      "retRegister);\n";
+        codeSource << "    }\n";
     }
+    codeSource << "}\n";
+    codeSource << "static const int32_t g_regiter_regfunc_ret = "
+                  "AscPluginGenerator::BindKernelRegisterFunc(AscFunctionRegister);";
+    if (infoManager.HasKernelFunc()) {
+        codeSource << KERNEL_BINARY_VERSION_SECTION;
+    }
+    ASC_LOGD("call device stub registry function is: %s", codeSource.str().c_str());
+    return codeSource.str();
 }
-static const int32_t g_regiter_regfunc_ret = AscPluginGenerator::BindKernelRegisterFunc(AscFunctionRegister);)";
-    EXPECT_EQ(res, expectRes);
-}
+} // namespace AscPlugin

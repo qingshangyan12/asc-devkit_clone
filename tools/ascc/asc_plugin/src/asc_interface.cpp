@@ -14,7 +14,7 @@
  */
 #include "asc_interface.h"
 #include "asc_dev_section_generate.h"
-#include "asc_dev_funcRegistry_generate.h"
+#include "asc_dev_func_registry_generate.h"
 #include "asc_info_manager.h"
 #include "asc_ast_utils.h"
 #include "asc_ast_device_analyzer.h"

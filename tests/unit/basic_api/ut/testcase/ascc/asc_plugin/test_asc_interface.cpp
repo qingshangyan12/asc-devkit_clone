@@ -22,7 +22,7 @@
 #include "asc_json_string.h"
 #include "asc_struct.h"
 #include "asc_ast_device_analyzer.h"
-#include "asc_dev_funcRegistry_generate.h"
+#include "asc_dev_func_registry_generate.h"
 
 static std::string registerBinary(R"(#include <stdio.h>
 #include <stdint.h>
@@ -195,7 +195,7 @@ __attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *s
 } // namespace AscPluginGenerator
 )");
 
-class TEST_ASC_INTERFACE : public testing::Test {
+class TestAscInterFace : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown()
@@ -293,7 +293,7 @@ void PrologueConfigUpdate(AscPlugin::PrologueConfig& config)
 }
 
 // Note: should be the first testcase in this .cpp
-TEST_F(TEST_ASC_INTERFACE, asc_cannpath_init)
+TEST_F(TestAscInterFace, asc_cannpath_init)
 {
     AscPlugin::InfoManager::GetInstance().saveTempRequested_ = false;
     MOCKER(AscPlugin::EndsWith).stubs().will(returnValue(true));
@@ -308,7 +308,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_cannpath_init)
     manager.SetCannPath("/usr/local/Ascend/latest");
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_plugin_gen_kernel_failure_with_no_kernel)
+TEST_F(TestAscInterFace, asc_plugin_gen_kernel_failure_with_no_kernel)
 {
     AscPlugin::KernelInfo info;
     info.ratio = {false, 0, 0};
@@ -320,7 +320,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_plugin_gen_kernel_failure_with_no_kernel)
     free(const_cast<char*>(infoObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_plugin_gen_kernel_failure_with_no_mangling)
+TEST_F(TestAscInterFace, asc_plugin_gen_kernel_failure_with_no_mangling)
 {
     AscPlugin::KernelInfo info;
     info.ratio = {false, 0, 0};
@@ -333,14 +333,14 @@ TEST_F(TEST_ASC_INTERFACE, asc_plugin_gen_kernel_failure_with_no_mangling)
     free(const_cast<char*>(infoObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_plugin_gen_kernel_failure_with_nullptr)
+TEST_F(TestAscInterFace, asc_plugin_gen_kernel_failure_with_nullptr)
 {
     const char* a;
     auto res = AscPlugin::PluginGenKernel(&a, nullptr);
     EXPECT_EQ(res, AscPlugin::ASC_NULLPTR);
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_plugin_gen_kernel_success)
+TEST_F(TestAscInterFace, asc_plugin_gen_kernel_success)
 {
     std::string golden = R"(namespace Foo1::Foo2 {
 extern "C" __global__ __aicore__ void __device_stub__mangling_add()
@@ -371,7 +371,7 @@ extern "C" __global__ __aicore__ void __device_stub__mangling_add()
     free(const_cast<char*>(infoObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue)
+TEST_F(TestAscInterFace, asc_PluginPrologue)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
@@ -387,7 +387,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp)
+TEST_F(TestAscInterFace, asc_PluginPrologue_saveTemp)
 {
     AscPlugin::PrologueConfig config;
     config.saveTemp = true;
@@ -414,7 +414,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp)
     system("rm -rf /tmp/asc_plugin");
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_logFolderPath_fail)
+TEST_F(TestAscInterFace, asc_PluginPrologue_saveTemp_logFolderPath_fail)
 {
     AscPlugin::PrologueConfig config;
     config.saveTemp = true;
@@ -437,7 +437,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_logFolderPath_fail)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_tmpFolderPath_fail)
+TEST_F(TestAscInterFace, asc_PluginPrologue_saveTemp_tmpFolderPath_fail)
 {
     AscPlugin::PrologueConfig config;
     config.saveTemp = true;
@@ -463,7 +463,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_tmpFolderPath_fail)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_logPathFolderNotExist)
+TEST_F(TestAscInterFace, asc_PluginPrologue_saveTemp_logPathFolderNotExist)
 {
     AscPlugin::PrologueConfig config;
     config.saveTemp = true;
@@ -486,7 +486,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_logPathFolderNotExist)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_tmpPathFolderNotExist)
+TEST_F(TestAscInterFace, asc_PluginPrologue_saveTemp_tmpPathFolderNotExist)
 {
     AscPlugin::PrologueConfig config;
     config.saveTemp = true;
@@ -509,7 +509,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_tmpPathFolderNotExist)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_unDefaultFolderPath)
+TEST_F(TestAscInterFace, asc_PluginPrologue_saveTemp_unDefaultFolderPath)
 {
     system("mkdir -p /tmp/ut_test_ascc_plugin/ut_test/temp");
     system("mkdir -p /tmp/ut_test_ascc_plugin/ut_test/log");
@@ -539,7 +539,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_unDefaultFolderPath)
     system("rm -rf /tmp/ut_test_ascc_plugin");
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_GenerateTimestamp_fail)
+TEST_F(TestAscInterFace, asc_PluginPrologue_saveTemp_GenerateTimestamp_fail)
 {
     AscPlugin::PrologueConfig config;
     config.saveTemp = true;
@@ -562,7 +562,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_saveTemp_GenerateTimestamp_fail)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_error_npuArch)
+TEST_F(TestAscInterFace, asc_PluginPrologue_error_npuArch)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
@@ -577,7 +577,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_error_npuArch)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_empty_compileArgs)
+TEST_F(TestAscInterFace, asc_PluginPrologue_empty_compileArgs)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
@@ -592,7 +592,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_empty_compileArgs)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_error_soc)
+TEST_F(TestAscInterFace, asc_PluginPrologue_error_soc)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
@@ -607,7 +607,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_error_soc)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_null_soc)
+TEST_F(TestAscInterFace, asc_PluginPrologue_null_soc)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
@@ -623,7 +623,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_null_soc)
     free(const_cast<char*>(a));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_ast_failed)
+TEST_F(TestAscInterFace, asc_PluginPrologue_ast_failed)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
@@ -637,7 +637,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_ast_failed)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_binary_register_code_failed)
+TEST_F(TestAscInterFace, asc_PluginPrologue_binary_register_code_failed)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
@@ -650,7 +650,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_binary_register_code_failed)
     free(const_cast<char*>(configObjPtr));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_nullptr)
+TEST_F(TestAscInterFace, asc_PluginPrologue_nullptr)
 {
     AscPlugin::PrologueResult res;
     AscPlugin::PrologueConfig config;
@@ -664,7 +664,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPrologue_nullptr)
 }
 
 // Support MIX_1_1 and MIX_1_2 at same time in 71
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMix11_Mix12)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_WithMix11_Mix12)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetCannPath("A");
@@ -678,7 +678,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMix11_Mix12)
 }
 
 // MIX_1_2 with MIX_AIV_only is ok. Because has MIX, has -DA=A_mix_aiv/aic
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIV_Mix12)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_WithMixAIV_Mix12)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetCannPath("A");
@@ -733,7 +733,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIV_Mix12)
 
 // MIX_1_2 with MIX_AIC_only is ok. Because has MIX.
 // Because has MIX_1_1
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIC_Mix11)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_WithMixAIC_Mix11)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetCannPath("A");
@@ -789,7 +789,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_WithMixAIC_Mix11)
 }
 
 // no function call, still pass device compile options
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_no_device_call)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_no_device_call)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetCannPath("A");
@@ -840,7 +840,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_no_device_call)
 
 // when not has mix, do not need extra compile options
 // AIC_ONLY do not need -DA=A_mix_aic/aiv
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue)
+TEST_F(TestAscInterFace, asc_PluginEpilogue)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetCannPath("A");
@@ -894,13 +894,13 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue)
     free(const_cast<char*>(expectedRes));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_nullptr)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_nullptr)
 {
     int32_t exec_res = AscPlugin::PluginEpilogue(nullptr);
     EXPECT_EQ(exec_res, AscPlugin::ASC_NULLPTR);
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_no_dump)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_no_dump)
 {
     const char* a;
     auto& manager = AscPlugin::InfoManager::GetInstance();
@@ -957,7 +957,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_no_dump)
     free(const_cast<char*>(expectedRes));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_310P)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_310P)
 {
     AscPlugin::PrologueResult res2;
     AscPlugin::PrologueConfig config;
@@ -1021,7 +1021,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_310P)
     manager.SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910B);
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_optimize_lv1)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_optimize_lv1)
 {
     AscPlugin::PrologueResult res2;
     AscPlugin::PrologueConfig config;
@@ -1086,7 +1086,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_optimize_lv1)
     free(const_cast<char*>(expectedRes));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_no_dump)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_user_no_dump)
 {
     AscPlugin::PrologueResult res2;
     AscPlugin::PrologueConfig config;
@@ -1152,7 +1152,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_no_dump)
     free(const_cast<char*>(expectedRes));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_dump_on)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetCannPath("A");
@@ -1207,7 +1207,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on)
     free(const_cast<char*>(expectedRes));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on_assert)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_dump_on_assert)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetCannPath("A");
@@ -1264,7 +1264,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_dump_on_assert)
     free(const_cast<char*>(expectedRes));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_dump_on)
+TEST_F(TestAscInterFace, asc_PluginEpilogue_user_dump_on)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
@@ -1330,7 +1330,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginEpilogue_user_dump_on)
     free(const_cast<char*>(expectedRes));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginFatbinLink)
+TEST_F(TestAscInterFace, asc_PluginFatbinLink)
 {
     AscPlugin::FatbinLinkResult res;
     auto& manager = AscPlugin::InfoManager::GetInstance();
@@ -1354,13 +1354,13 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginFatbinLink)
     free(const_cast<char*>(a));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginFatbinLink_nullptr)
+TEST_F(TestAscInterFace, asc_PluginFatbinLink_nullptr)
 {
     int32_t exec_res = AscPlugin::PluginFatbinLink(nullptr);
     EXPECT_EQ(exec_res, AscPlugin::ASC_NULLPTR);
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginFatbinLink_null_soc)
+TEST_F(TestAscInterFace, asc_PluginFatbinLink_null_soc)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetCannPath("A");
@@ -1396,7 +1396,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginFatbinLink_null_soc)
     free(const_cast<char*>(a));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginFatbinLink_910B4_1)
+TEST_F(TestAscInterFace, asc_PluginFatbinLink_910B4_1)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
@@ -1433,7 +1433,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginFatbinLink_910B4_1)
     system("rm -rf /tmp/asc_plugin");
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPreCompile)
+TEST_F(TestAscInterFace, asc_PluginPreCompile)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetCannPath("A");
@@ -1488,7 +1488,7 @@ TEST_F(TEST_ASC_INTERFACE, asc_PluginPreCompile)
     free(const_cast<char*>(a));
 }
 
-TEST_F(TEST_ASC_INTERFACE, asc_PluginPreCompile_nullptr)
+TEST_F(TestAscInterFace, asc_PluginPreCompile_nullptr)
 {
     auto res = AscPlugin::PluginGetPreCompileOpts(nullptr);
     EXPECT_EQ(res, AscPlugin::ASC_NULLPTR);
