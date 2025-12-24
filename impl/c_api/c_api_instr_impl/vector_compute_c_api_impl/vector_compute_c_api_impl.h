@@ -136,6 +136,8 @@
 #include "vand_impl/npu_arch_2201/asc_vand_impl.h"
 #include "vgather_impl/npu_arch_2201/asc_gather_impl.h"
 #include "vgatherb_impl/npu_arch_2201/asc_gather_datablock_impl.h"
+#include "set_va_reg_impl/npu_arch_2201/asc_set_va_reg_impl.h"
+#include "transdata_to_5hd_impl/npu_arch_2201/asc_transdata_to_5hd_impl.h"
 
 __aicore__ inline int64_t asc_get_acc_val()
 {

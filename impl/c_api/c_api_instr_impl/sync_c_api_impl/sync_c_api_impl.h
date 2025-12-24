@@ -16,6 +16,7 @@
 #include "set_flag_impl/asc_2201/asc_set_flag_impl.h"
 #include "wait_flag_impl/asc_2201/asc_wait_flag_impl.h"
 #include "pipe_barrier_impl/asc_2201/asc_pipe_barrier_impl.h"
+#include "sync_data_barrier_impl/npu_arch_2201/asc_sync_data_barrier_impl.h"
 
 __aicore__ inline void asc_sync_vec()
 {

@@ -1058,6 +1058,18 @@ __aicore__ inline void asc_sub_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* s
 
 __aicore__ inline void asc_sub_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t a, uint32_t count);
 
+// ==========asc_set_va_reg==========
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, uint64_t* src_array);
+
+// ==========asc_transdata_to_5hd_b8==========
+__aicore__ inline void asc_transdata_to_5hd_b8(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half);
+
+// ==========asc_transdata_to_5hd_b16==========
+__aicore__ inline void asc_transdata_to_5hd_b16(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+
+// ==========asc_transdata_to_5hd_b32==========
+__aicore__ inline void asc_transdata_to_5hd_b32(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+
 // ==========asc_or(int16_t/uint16_t)==========
 __aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
 
