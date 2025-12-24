@@ -251,8 +251,80 @@ float ceilf(float x);
 
 float __fma(float x, float y, float z);
 
-template<ROUND rnd, RoundingSaturation sat>
+template<ROUND rnd, RoundingSaturation rst>
+int32_t __cvt_int32_t(float x);
+
+template<ROUND rnd, RoundingSaturation rst>
+int32_t __cvt_int32_t(half x);
+
+template<ROUND rnd, RoundingSaturation rst>
+int32_t __cvt_int32_t(bfloat16_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+uint32_t __cvt_uint32_t(float x);
+
+template<ROUND rnd, RoundingSaturation rst>
+uint32_t __cvt_uint32_t(half x);
+
+template<ROUND rnd, RoundingSaturation rst>
+uint32_t __cvt_uint32_t(bfloat16_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
 int64_t __cvt_int64_t(float x);
+
+template<ROUND rnd, RoundingSaturation rst>
+uint64_t __cvt_uint64_t(float x);
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(int32_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(uint32_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(int32_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(uint32_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(int64_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(uint64_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(int32_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(uint32_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(half x);
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(float x);
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(bfloat16_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(bfloat16_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(half x);
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(float x);
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(bfloat16_t x);
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(half x);
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(float x);
 
 }
 }

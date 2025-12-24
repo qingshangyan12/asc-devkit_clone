@@ -1096,10 +1096,372 @@ float __fma(float x, float y, float z) {
     return fma(x, y, z);
 }
 
-template<ROUND rnd, RoundingSaturation sat>
+template<ROUND rnd, RoundingSaturation rst>
+int32_t __cvt_int32_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+int32_t __cvt_int32_t(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+int32_t __cvt_int32_t(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+uint32_t __cvt_uint32_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+uint32_t __cvt_uint32_t(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+uint32_t __cvt_uint32_t(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
 int64_t __cvt_int64_t(float x) {
     if (rnd == ROUND::R) {
         return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+uint64_t __cvt_uint64_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(int32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(uint32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(int32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(uint32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(int64_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(uint64_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(int32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(uint32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+half __cvt_half(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+bfloat16_t __cvt_bfloat16_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
+
+template<ROUND rnd, RoundingSaturation rst>
+float __cvt_float(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
     } else if (rnd == ROUND::A) {
         return round(x);
     }
