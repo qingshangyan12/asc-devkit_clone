@@ -23,51 +23,51 @@
 
     ```c++
     //在转换有精度损失时表示RINT舍入模式，不涉及精度损失时代表不舍入
-    __aicore__ inline void asc_half2int4(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //RINT舍入模式
-    __aicore__ inline void asc_half2int4_r(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_r(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //FLOOR舍入模式
-    __aicore__ inline void asc_half2int4_f(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_f(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //ROUND舍入模式
-    __aicore__ inline void asc_half2int4_a(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_a(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //CEIL舍入模式
-    __aicore__ inline void asc_half2int4_c(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_c(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //TRUNC舍入模式
-    __aicore__ inline void asc_half2int4_z(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_z(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```c++
     //在转换有精度损失时表示RINT舍入模式，不涉及精度损失时代表不舍入
-    __aicore__ inline void asc_half2int4(__ubuf__ void* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2int4(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     //RINT舍入模式
-    __aicore__ inline void asc_half2int4_r(__ubuf__ void* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2int4_r(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     //FLOOR舍入模式
-    __aicore__ inline void asc_half2int4_f(__ubuf__ void* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2int4_f(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     //ROUND舍入模式
-    __aicore__ inline void asc_half2int4_a(__ubuf__ void* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2int4_a(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     //CEIL舍入模式
-    __aicore__ inline void asc_half2int4_c(__ubuf__ void* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2int4_c(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     //TRUNC舍入模式
-    __aicore__ inline void asc_half2int4_z(__ubuf__ void* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2int4_z(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```c++
     //在转换有精度损失时表示RINT舍入模式，不涉及精度损失时代表不舍入
-    __aicore__ inline void asc_half2int4_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //RINT舍入模式
-    __aicore__ inline void asc_half2int4_r_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_r_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //FLOOR舍入模式
-    __aicore__ inline void asc_half2int4_f_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_f_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //ROUND舍入模式
-    __aicore__ inline void asc_half2int4_a_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_a_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //CEIL舍入模式
-    __aicore__ inline void asc_half2int4_c_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_c_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     //TRUNC舍入模式
-    __aicore__ inline void asc_half2int4_z_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2int4_z_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count)
     ```
 
 ## 参数说明

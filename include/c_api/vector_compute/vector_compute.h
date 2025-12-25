@@ -542,41 +542,41 @@ __aicore__ inline void asc_half2float(__ubuf__ float* dst, __ubuf__ half* src, u
 __aicore__ inline void asc_half2float_sync(__ubuf__ float* dst, __ubuf__ half* src, uint32_t count);
 
 // ==========asc_half2int4==========
-__aicore__ inline void asc_half2int4(__ubuf__ void* dst, __ubuf__ half* src, const asc_unary_config& config);
+__aicore__ inline void asc_half2int4(__ubuf__ int4b_t* dst, __ubuf__ half* src, const asc_unary_config& config);
 
-__aicore__ inline void asc_half2int4(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_a(__ubuf__ void* dst, __ubuf__ half* src, const asc_unary_config& config);
+__aicore__ inline void asc_half2int4_a(__ubuf__ int4b_t* dst, __ubuf__ half* src, const asc_unary_config& config);
 
-__aicore__ inline void asc_half2int4_a(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_a(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_a_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_a_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_c(__ubuf__ void* dst, __ubuf__ half* src, const asc_unary_config& config);
+__aicore__ inline void asc_half2int4_c(__ubuf__ int4b_t* dst, __ubuf__ half* src, const asc_unary_config& config);
 
-__aicore__ inline void asc_half2int4_c(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_c(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_c_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_c_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_f(__ubuf__ void* dst, __ubuf__ half* src, const asc_unary_config& config);
+__aicore__ inline void asc_half2int4_f(__ubuf__ int4b_t* dst, __ubuf__ half* src, const asc_unary_config& config);
 
-__aicore__ inline void asc_half2int4_f(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_f(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_f_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_f_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_r(__ubuf__ void* dst, __ubuf__ half* src, const asc_unary_config& config);
+__aicore__ inline void asc_half2int4_r(__ubuf__ int4b_t* dst, __ubuf__ half* src, const asc_unary_config& config);
 
-__aicore__ inline void asc_half2int4_r(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_r(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_r_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_r_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_z(__ubuf__ void* dst, __ubuf__ half* src, const asc_unary_config& config);
+__aicore__ inline void asc_half2int4_z(__ubuf__ int4b_t* dst, __ubuf__ half* src, const asc_unary_config& config);
 
-__aicore__ inline void asc_half2int4_z(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_z(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
-__aicore__ inline void asc_half2int4_z_sync(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count);
+__aicore__ inline void asc_half2int4_z_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
 // ==========asc_half2int8==========
 __aicore__ inline void asc_half2int8(__ubuf__ int8_t* dst, __ubuf__ half* src, uint8_t repeat,

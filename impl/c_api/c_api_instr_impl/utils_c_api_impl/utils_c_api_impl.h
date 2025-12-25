@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <type_traits>
 #include "c_api_utils_intf.h"
+#include "utils_c_api_type.h"
 
 constexpr uint32_t C_API_AIC_TYPE = 1;
 constexpr uint32_t C_API_AIV_TYPE = 2;

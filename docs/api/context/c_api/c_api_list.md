@@ -58,10 +58,12 @@
 | [asc_eq](vector_compute/asc_eq.md) | 比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。 |
 | [asc_transpose](vector_compute/asc_transpose.md) | 用于实现16*16的二维矩阵数据块转置。 |
 
+## 数据搬运
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm.md) | 将UB中的数据搬运到GM中。 |
 | [asc_copy_gm2ub](vector_datamove/asc_copy_gm2ub.md) | 将GM中的数据搬运到UB中。 |
+| [asc_fixpipe_l0c2out](cube_datamove/asc_fixpipe_l0c2out.md) | 将L0C中的数据搬运到GM中。 |
 
 ## 标量操作
 
