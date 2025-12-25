@@ -27,8 +27,10 @@ $$
 - 高维切分计算
 
   ```c++
-  __aicore__ inline void asc_rsqrt(__ubuf__ half* dst, __ubuf__ half* src, const asc_binary_config& config)
-  __aicore__ inline void asc_rsqrt(__ubuf__ float* dst, __ubuf__ float* src, const asc_binary_config& config)
+  __aicore__ inline void asc_rsqrt(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride,
+    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  __aicore__ inline void asc_rsqrt(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride,
+    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   ```
 
 - 同步计算
@@ -47,7 +49,11 @@ $$
 | dst | 输出 | 目的操作数起始地址。                                                                    |
 | src  | 输入 | 源操作数起始地址。                                                                         |
 | count | 输入 | 参与计算的元素个数。                                                                    |
-| config | 输入 | 在高维切分计算场景下使用的计算配置参数。详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。 |
+| repeat | 输入 | 迭代次数，默认值：1。 |
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。|
+| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长，默认值：1。|
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
 
 ## 返回值说明
 
@@ -66,7 +72,7 @@ PIPE_TYPE_V
 
 ```cpp
 //total_length指参与计算的数据总长度
-uint64_t total_length = 128;
+constexpr uint64_t total_length = 128;
 __ubuf__ half* value[total_length];
 __ubuf__ half* dst[total_length];
 asc_rsqrt(dst, value, total_length);

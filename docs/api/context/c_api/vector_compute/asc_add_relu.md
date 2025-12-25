@@ -28,9 +28,15 @@ $$
 - 高维切分计算
 
   ```c++
-  __aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, const asc_binary_config& config)
-  __aicore__ inline void asc_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, const asc_binary_config& config)
-  __aicore__ inline void asc_add_relu(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, const asc_binary_config& config)
+  __aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride)
+  __aicore__ inline void asc_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride)
+  __aicore__ inline void asc_add_relu(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride)
   ```
 
 - 同步计算
@@ -50,7 +56,14 @@ $$
 | dst       | 输出 | 目的操作数的起始地址。                                                                     |
 | src0、src1 | 输入 | 源操作数的起始地址。                                                                      |
 | count     | 输入 | 参与计算的元素个数。                                                                      |
-| config    | 输入 | 在高维切分计算场景下使用的计算配置参数。详细说明请参考[asc_binary_config](../struct/asc_binary_config.md)。 |
+| repeat | 输入 | 迭代次数，默认值：1。 |
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| src0_block_stride | 输入 | 源操作数0单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| src1_block_stride | 输入 | 源操作数1单次迭代内不同DataBlock间地址步长，默认值：1。 |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| src0_repeat_stride | 输入 | 源操作数0相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| src1_repeat_stride | 输入 | 源操作数1相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+
 
 ## 返回值说明
 
@@ -69,7 +82,7 @@ PIPE_TYPE_V
 
 ```cpp
 //total_length指参与计算的数据总长度
-uint64_t total_length = 128;
+constexpr uint64_t total_length = 128;
 __ubuf__ half* value0[total_length];
 __ubuf__ half* value1[total_length];
 __ubuf__ half* dst[total_length];
