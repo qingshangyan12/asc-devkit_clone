@@ -1751,3 +1751,21 @@ half __sqrtf(half x)
     tmp = sqrtf(tmp);
     return half(tmp);
 }
+
+bfloat16_t max(bfloat16_t x, bfloat16_t y)
+{
+    if (x > y) {
+        return x;
+    } else {
+        return y;
+    }
+}
+
+bfloat16_t min(bfloat16_t x, bfloat16_t y)
+{
+    if (x < y) {
+        return x;
+    } else {
+        return y;
+    }
+}

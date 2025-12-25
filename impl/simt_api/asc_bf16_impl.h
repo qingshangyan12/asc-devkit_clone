@@ -39,20 +39,12 @@ __simt_callee__ inline bfloat16_t __hfma(bfloat16_t x, bfloat16_t y, bfloat16_t 
 
 __simt_callee__ inline bfloat16_t __hmax(bfloat16_t x, bfloat16_t y)
 {
-    if (x > y) {
-        return x;
-    } else {
-        return y;
-    }
+    return max(x, y);
 }
 
 __simt_callee__ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
 {
-    if (x < y) {
-        return x;
-    } else {
-        return y;
-    }
+    return min(x, y);
 }
 
 __simt_callee__ inline bfloat16_t hcos(bfloat16_t x)

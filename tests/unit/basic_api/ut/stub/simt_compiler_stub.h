@@ -381,6 +381,10 @@ float __fmaxf(float x, float y);
 
 float __fminf(float x, float y);
 
+bfloat16_t max(bfloat16_t x, bfloat16_t y);
+
+bfloat16_t min(bfloat16_t x, bfloat16_t y);
+
 #ifndef SIMT_CCE
 #define SIMT_CCE
 namespace cce {
