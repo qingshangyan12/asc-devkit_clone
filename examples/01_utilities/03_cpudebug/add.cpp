@@ -106,7 +106,7 @@ int32_t main(int32_t argc, char *argv[])
     AscendC::SetKernelMode(KernelMode::AIV_MODE);
     ICPU_RUN_KF(add_custom, blockDim, x, y, z); // use this macro for cpu debug
 
-    WriteFile("./output_z.bin", z, outputByteSize);
+    WriteFile("./output.bin", z, outputByteSize);
 
     AscendC::GmFree((void *)x);
     AscendC::GmFree((void *)y);

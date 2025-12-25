@@ -86,18 +86,11 @@ CPU Debug介绍
 
   - 样例执行
     ```bash
-    set -e && rm -rf build out && mkdir -p build
-    cmake -B build -DCMAKE_INSTALL_PREFIX=./ -DSOC_VERSION=${SOC_VERSION}
-    cmake --build build -j
-    cmake --install build
-    rm -f add
-    cp ./build/add ./
-    python3 scripts/gen_data.py
-    (
-      export LD_LIBRARY_PATH=$(pwd)/out/lib:$(pwd)/out/lib64:${ASCEND_INSTALL_PATH}/lib64:$LD_LIBRARY_PATH
-      ./add | tee $file_path
-    )
-    python3 scripts/verify_result.py output_z.bin golden.bin
+    mkdir -p build && cd build;
+    cmake .. -DSOC_VERSION=${SOC_VERSION}; make -j
+    python3 ../scripts/gen_data.py
+    ./add
+    python3 ../scripts/verify_result.py output.bin golden.bin
     ```
     执行结果如下，说明精度对比成功。
     ```bash
@@ -106,17 +99,9 @@ CPU Debug介绍
   - 进入gdb模式调试
     在上述指令中"./add"前加入"gdb --args"，再次执行指令即可进入gdb模式。
     ```bash
-    set -e && rm -rf build out && mkdir -p build
-    cmake -B build -DCMAKE_INSTALL_PREFIX=./ -DSOC_VERSION=${SOC_VERSION}
-    cmake --build build -j
-    cmake --install build
-    rm -f add
-    cp ./build/add ./
-    python3 scripts/gen_data.py
-    (
-      export LD_LIBRARY_PATH=$(pwd)/out/lib:$(pwd)/out/lib64:${ASCEND_INSTALL_PATH}/lib64:$LD_LIBRARY_PATH
-      #在下一行最前方加入"gdb --args"
-      gdb --args ./add | tee $file_path
-    )
-    python3 scripts/verify_result.py output_z.bin golden.bin
+    mkdir -p build && cd build;
+    cmake .. -DSOC_VERSION=${SOC_VERSION}; make -j
+    python3 ../scripts/gen_data.py
+    gdb --args ./add
+    python3 ../scripts/verify_result.py output.bin golden.bin
     ```
