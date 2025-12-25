@@ -349,6 +349,8 @@ class CommonUtility:
 
     @staticmethod
     def ascendc_raise_python_err(err_code, msg):
+        CommonUtility.print_compile_log("", f"err_msg: {msg}.",
+                AscendCLogLevel.LOG_ERROR)
         raise_tbe_python_err(err_code, msg)
 
     @staticmethod
