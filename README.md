@@ -1,5 +1,5 @@
 # Ascend C
-
+# cie test
 ## 🔥Latest News
 
 - [2025/11] Ascend C项目基于Ascend 910C/Ascend 910B全面开源开放，包含以下新特性：
