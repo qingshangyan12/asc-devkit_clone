@@ -18,6 +18,9 @@
 #include "set_hf32_trans2even_impl/npu_arch_2201/asc_set_hf32_trans2even_impl.h"
 #include "set_hf32_trans2zero_impl/npu_arch_2201/asc_set_hf32_trans2zero_impl.h"
 #include "clz_impl/npu_arch_2201/asc_clz_impl.h"
+#include "mad_sp_impl/npu_arch_2201/asc_mmad_sparse_impl.h"
+#include "set_hf32_mode_impl/npu_arch_2201/asc_set_hf32_mode_impl.h"
+#include "set_fp32_mode_impl/npu_arch_2201/asc_set_fp32_mode_impl.h"
 
 __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config)
 {
@@ -37,6 +40,26 @@ __aicore__ inline void asc_set_hf32_trans2zero()
 __aicore__ inline int64_t asc_clz(uint64_t value_in)
 {
     return asc_clz_impl(value_in);
+}
+
+__aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unitFlag, bool cmatrixSource, bool cmatrixInitVal)
+{
+    asc_mmad_sparse_impl(c, a, b, m, k, n, unitFlag, cmatrixSource, cmatrixInitVal);
+}
+
+__aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unitFlag, bool cmatrixSource, bool cmatrixInitVal)
+{
+    asc_mmad_sparse_sync_impl(c, a, b, m, k, n, unitFlag, cmatrixSource, cmatrixInitVal);
+}
+
+__aicore__ inline void asc_set_hf32_mode()
+{
+    asc_set_hf32_mode_impl();
+}
+
+__aicore__ inline void asc_set_fp32_mode()
+{
+    asc_set_fp32_mode_impl();
 }
 
 #endif

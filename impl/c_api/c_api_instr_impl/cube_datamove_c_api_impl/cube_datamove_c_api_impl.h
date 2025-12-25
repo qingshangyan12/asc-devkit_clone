@@ -29,6 +29,7 @@
 #include "fill_value_c_api_impl/fill_l0a_value_impl/npu_arch_2201/asc_fill_l0a_value_impl.h"
 #include "fill_value_c_api_impl/fill_l0b_value_impl/npu_arch_2201/asc_fill_l0b_value_impl.h"
 #include "fill_value_c_api_impl/fill_l1_value_impl/npu_arch_2201/asc_fill_l1_value_impl.h"
+#include "copy_cbuf_to_fbuf_impl/npu_arch_2201/asc_copy_l12fb_impl.h"
 #include "copy_l12l0a_impl/npu_arch_2201/asc_copy_l12l0a_2d_impl.h"
 #include "copy_l12l0a_impl/npu_arch_2201/asc_copy_l12l0a_3d_impl.h"
 #include "copy_l12l0b_impl/npu_arch_2201/asc_copy_l12l0b_2d_impl.h"
@@ -1018,6 +1019,22 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size)
 {
     asc_copy_l12bt_sync_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_num, uint16_t burst_len,
+                                      uint16_t src_gap_size, uint16_t dst_gap_size)
+{
+    asc_copy_l12fb_impl(dst, src, burst_num, burst_len, src_gap_size, dst_gap_size);
+}
+
+__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
+{
+    asc_copy_l12fb_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
+{
+    asc_copy_l12fb_sync_impl(dst, src, size);
 }
 
 #endif

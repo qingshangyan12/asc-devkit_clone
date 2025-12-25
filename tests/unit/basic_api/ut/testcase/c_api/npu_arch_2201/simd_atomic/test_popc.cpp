@@ -8,19 +8,33 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-/* !
- * \file asc_set_atomic_s16_impl.h
- * \brief
- */
+#include <gtest/gtest.h>
+#include <mockcpp/mockcpp.hpp>
+#include "c_api/stub/cce_stub.h"
+#include "c_api/asc_simd.h"
 
-#ifndef IMPL_C_API_INSTR_SIMD_ATOMIC_SET_ATOMIC_S16_ASC_2201_ASC_SET_ATOMIC_S16_IMPL_H
-#define IMPL_C_API_INSTR_SIMD_ATOMIC_SET_ATOMIC_S16_ASC_2201_ASC_SET_ATOMIC_S16_IMPL_H
+class TestSimdAtomicPopcCAPI : public testing::Test {
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
 
-namespace CApiInternal {
-__aicore__ inline void asc_set_atomic_s16_impl()
+namespace {
+int64_t asc_popc_Stub(uint64_t offset)
 {
-    set_atomic_s16();
+    EXPECT_EQ(3, offset);
+    return 2;
 }
-} // namespace CApiInternal
+}
 
-#endif
+TEST_F(TestSimdAtomicPopcCAPI, popc_Succ)
+{
+    uint64_t offset = 3;
+    MOCKER_CPP(bcnt1, int64_t(uint64_t))
+            .times(1)
+            .will(invoke(asc_popc_Stub));
+
+    int64_t val = asc_popc(offset);
+    EXPECT_EQ(2, val);
+    GlobalMockObject::verify();
+}

@@ -12,9 +12,8 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
 
-class TestSimdAtomicSetAtomicS16 : public testing::Test { 
+class TestSimdAtomicSetAtomicS16CAPI : public testing::Test { 
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -24,7 +23,7 @@ namespace {
 void set_atomic_s16_Stub() {}
 }
 
-TEST_F(TestSimdAtomicSetAtomicS16, set_atomic_s16_Succ)
+TEST_F(TestSimdAtomicSetAtomicS16CAPI, c_api_set_atomic_s16_Succ)
 {
     MOCKER(set_atomic_s16, void(void))
         .times(1)

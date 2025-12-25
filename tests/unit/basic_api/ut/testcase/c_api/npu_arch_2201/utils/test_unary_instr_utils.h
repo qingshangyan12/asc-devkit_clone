@@ -110,6 +110,6 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_half_half_hal
             .will(invoke(cce_name##_##data_type##_##data_type##_##data_type##_uint64_t_Stub));  \
     c_api_name##_sync(dst, src, count);                                                         \
     GlobalMockObject::verify();                                                                 \
-}                                                                                               \
+}                                                          
 
 #endif
