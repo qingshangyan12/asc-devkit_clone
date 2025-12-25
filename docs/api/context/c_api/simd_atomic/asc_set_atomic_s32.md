@@ -35,11 +35,11 @@ PIPE_S
 ## 调用示例
 
 ```c++
-// 本演示示例使用asc_copy_ub2gm从ubuf搬出到外部gm时进行原子最小，并调用asc_set_atomic_none修改原子最小的数据类型。
+// 本演示示例使用asc_copy_ub2gm从ubuf搬出到外部gm时进行原子最小操作，并调用asc_set_atomic_none修改原子最小的数据类型。
 //total_length指参与搬运的数据总长度。dst是外部输入的int32_t类型的gm内存。
-uint64_t offset = 0;
-uint64_t total_length = 256;
-src = (__ubuf__ int32_t*)asc_get_phy_buf_addr(offset);
+constexpr uint64_t offset = 0;
+constexpr uint64_t total_length = 256;
+__ubuf__ int32_t src[total_length];
 asc_set_atomic_min()
 asc_set_atomic_s32();
 asc_copy_ub2gm(dst, src, total_length * sizeof(half));

@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline int64_t asc_zero_bits_cnt(uint64_t in)
+__aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value)
 ```
 
 ## 参数说明
@@ -22,11 +22,11 @@ __aicore__ inline int64_t asc_zero_bits_cnt(uint64_t in)
 
 |参数名|输入/输出|描述|
 | :------ | :--- | :------------ |
-|in   |输入   |被统计的二进制数字。
+|value   |输入   |被统计的二进制数字。
 
 ## 返回值说明
 
-in中0的个数。
+value中0的个数。
 
 ## 流水类型
 
@@ -39,8 +39,8 @@ PIPE_S
 ## 调用示例
 
 ```c++
-uint64_t scalar = 33;
-asc_zero_bits_cnt(uint64_t in);
+uint64_t value = 33;
+asc_zero_bits_cnt(value);
 // 输出数据count_zero为6
-int64_t count_zero = asc_zero_bits_cnt(uint64_t scalar);
+int64_t count_zero = asc_zero_bits_cnt(value);
 ```

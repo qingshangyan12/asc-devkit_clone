@@ -26,7 +26,7 @@ $$
 - 高维切分计算
 
     ```cpp
-    _aicore__ inline void asc_and(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, const asc_binary_config& config)
+    _aicore__ inline void asc_and(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
     ```
 
 - 同步计算
@@ -44,7 +44,13 @@ $$
 | dst       | 输出    | 目的操作数。            |
 | src0、src1 | 输入    | 源操作数。             |
 | count     | 输入    | 参与计算的元素个数。        |
-| config    | 输入    | 在高维切分计算场景下使用的计算配置参数。<br/>详细说明请参考[asc_binary_config](../struct/asc_binary_config.md)。 |
+| dst_block_stride   | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src0_block_stride  | 输入 | 源操作数0单次迭代内不同DataBlock间地址步长。 |
+| src1_block_stride  | 输入 | 源操作数1单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride  | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src0_repeat_stride | 输入 | 源操作数0相邻迭代间相同DataBlock的地址步长。 |
+| src1_repeat_stride | 输入 | 源操作数1相邻迭代间相同DataBlock的地址步长。 |
+| repeat             | 输入 | 迭代次数。 |
 
 ## 返回值说明
 
@@ -62,10 +68,10 @@ PIPE_V
 ## 调用示例
 
 ```c++
-#define TOTAL_LENGTH 64
-//TOTAL_LENGTH 指参与计算的数据长度
-__ubuf__ int16_t src0[TOTAL_LENGTH];
-__ubuf__ int16_t src1[TOTAL_LENGTH];
-__ubuf__ int16_t dst[TOTAL_LENGTH];
-asc_and(dst, src0, src1, TOTAL_LENGTH);
+constexpr total_length = 64;
+//total_length 指参与计算的数据长度
+__ubuf__ int16_t src0[total_length];
+__ubuf__ int16_t src1[total_length];
+__ubuf__ int16_t dst[total_length];
+asc_and(dst, src0, src1, total_length);
 ```

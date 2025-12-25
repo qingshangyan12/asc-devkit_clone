@@ -52,10 +52,10 @@ PIPE_S
 
 ```cpp
 // 示例1：SINGLE_CACHE_LINE 模式，假设mmAddr_为0x40（64B对齐）
-// TOTAL_LENGTH 指参与计算的数据长度
-#define TOTAL_LENGTH 32;
-__gm__ int16_t src[TOTAL_LENGTH];
-for( int i = 0; i < TOTAL_LENGTH; i++) {
+// total_length 指参与计算的数据长度
+constexpr uint64_t total_length = 32;
+__gm__ int16_t src[total_length];
+for( int i = 0; i < total_length; i++) {
    src[i] = i;
 }
 asc_dcci(src, SINGLE_CACHE_LINE, CACHELINE_ALL)

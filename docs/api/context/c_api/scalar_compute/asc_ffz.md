@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline int64_t asc_ffz(uint64_t in)
+__aicore__ inline int64_t asc_ffz(uint64_t value)
 ```
 
 ## 参数说明
@@ -26,7 +26,7 @@ __aicore__ inline int64_t asc_ffz(uint64_t in)
 
 ## 返回值说明
 
-int64_t类型的数，valueIn中第一个0出现的位置。
+value中第一个0出现的位置。
 
 ## 流水类型
 
@@ -39,7 +39,7 @@ PIPE_S
 ## 调用示例
 
 ```c++
-uint64_t scalar = 33;
+uint64_t value = 33;
 // 输出数据count_first_zero为1
-int64_t count_first_zero = asc_ffz(uint64_t scalar);
+int64_t count_first_zero = asc_ffz(value);
 ```
