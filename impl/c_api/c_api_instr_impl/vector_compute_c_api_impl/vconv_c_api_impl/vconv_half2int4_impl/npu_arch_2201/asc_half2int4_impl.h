@@ -29,8 +29,9 @@ __aicore__ inline void asc_half2int4_impl(__ubuf__ void* dst, __ubuf__ half* src
 __aicore__ inline void asc_half2int4_impl(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int4_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-                        ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_half2int4_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
     asc_set_mask_count_end();
 }
 
@@ -52,8 +53,9 @@ __aicore__ inline void asc_half2int4_a_impl(__ubuf__ void* dst, __ubuf__ half* s
 __aicore__ inline void asc_half2int4_a_impl(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int4_a_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-                        ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_half2int4_a_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
     asc_set_mask_count_end();
 }
 
@@ -75,8 +77,9 @@ __aicore__ inline void asc_half2int4_c_impl(__ubuf__ void* dst, __ubuf__ half* s
 __aicore__ inline void asc_half2int4_c_impl(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int4_c_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-                        ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_half2int4_c_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
     asc_set_mask_count_end();
 }
 
@@ -98,8 +101,9 @@ __aicore__ inline void asc_half2int4_f_impl(__ubuf__ void* dst, __ubuf__ half* s
 __aicore__ inline void asc_half2int4_f_impl(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int4_f_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-                        ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_half2int4_f_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
     asc_set_mask_count_end();
 }
 
@@ -121,8 +125,9 @@ __aicore__ inline void asc_half2int4_r_impl(__ubuf__ void* dst, __ubuf__ half* s
 __aicore__ inline void asc_half2int4_r_impl(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int4_r_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-                        ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_half2int4_r_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
     asc_set_mask_count_end();
 }
 
@@ -144,8 +149,9 @@ __aicore__ inline void asc_half2int4_z_impl(__ubuf__ void* dst, __ubuf__ half* s
 __aicore__ inline void asc_half2int4_z_impl(__ubuf__ void* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int4_z_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-                        ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_half2int4_z_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
     asc_set_mask_count_end();
 }
 

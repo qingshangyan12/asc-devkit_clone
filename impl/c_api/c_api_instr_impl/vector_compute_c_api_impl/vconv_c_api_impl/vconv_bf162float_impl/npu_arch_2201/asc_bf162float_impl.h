@@ -29,8 +29,9 @@ __aicore__ inline void asc_bf162float_impl(__ubuf__ float* dst, __ubuf__ bfloat1
 __aicore__ inline void asc_bf162float_impl(__ubuf__ float* dst, __ubuf__ bfloat16_t* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_bf162float_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-                        ASC_DEFAULT_REPEAT_STRIDE, ASC_HALF_DEFAULT_REPEAT_STRIDE);
+    asc_bf162float_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
+                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE),
+                        static_cast<uint16_t>(ASC_HALF_DEFAULT_REPEAT_STRIDE));
     asc_set_mask_count_end();
 }
 
