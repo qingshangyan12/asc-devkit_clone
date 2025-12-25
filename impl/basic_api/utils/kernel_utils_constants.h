@@ -151,9 +151,9 @@ const uint32_t CACHE_LINE_SIZE = 64;
 const uint32_t TOTAL_L0C_SIZE = 128 * 1024;
 const uint32_t VECTOR_REG_WIDTH = 256;
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
-const int32_t TOTAL_VEC_LOCAL_SIZE = 112 * 1024;
-const uint32_t TOTAL_UB_SIZE = 120 * 1024;
-const uint32_t TMP_UB_OFFSET = 112 * 1024;
+const int32_t TOTAL_VEC_LOCAL_SIZE = 118 * 1024;
+const uint32_t TOTAL_UB_SIZE = 118 * 1024;
+const uint32_t TMP_UB_OFFSET = 118 * 1024;
 const uint32_t TOTAL_L1_SIZE = 1024 * 1024;
 const uint32_t VECTOR_REG_WIDTH = 256;
 const uint32_t ONE_BLOCK_SIZE = 32;
@@ -187,9 +187,9 @@ const uint32_t VECTOR_REG_WIDTH = 128;
 const uint32_t ONE_BLOCK_SIZE = 32;
 const uint32_t TOTAL_L0C_SIZE = 32 * 1024;
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
-const int32_t TOTAL_VEC_LOCAL_SIZE = 112 * 1024;
-const uint32_t TOTAL_UB_SIZE = 120 * 1024;
-const uint32_t TMP_UB_OFFSET = 112 * 1024;
+const int32_t TOTAL_VEC_LOCAL_SIZE = 118 * 1024;
+const uint32_t TOTAL_UB_SIZE = 118 * 1024;
+const uint32_t TMP_UB_OFFSET = 118 * 1024;
 const uint32_t TOTAL_L1_SIZE = 512 * 1024;
 const uint32_t TOTAL_L0C_SIZE = 64 * 1024;
 const uint32_t VECTOR_REG_WIDTH = 256;
