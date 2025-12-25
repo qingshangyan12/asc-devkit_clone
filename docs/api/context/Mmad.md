@@ -29,6 +29,20 @@
 <td class="cellrowborder" align="center" valign="top" width="22.689999999999998%" headers="mcps1.1.4.1.3 "><p id="p1830183013305"><a name="p1830183013305"></a><a name="p1830183013305"></a>√</p>
 </td>
 </tr>
+<tr id="row173226882416"><td class="cellrowborder" valign="top" width="52.800000000000004%" headers="mcps1.1.4.1.1 "><p id="p14832120181816"><a name="p14832120181816"></a><a name="p14832120181816"></a><span id="ph1483216010189"><a name="ph1483216010189"></a><a name="ph1483216010189"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="24.51%" headers="mcps1.1.4.1.2 "><p id="p19948143911821"><a name="p19948143911821"></a><a name="p19948143911821"></a>√</p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="22.689999999999998%" headers="mcps1.1.4.1.3 "><p id="p1830183013306"><a name="p1830183013306"></a><a name="p1830183013306"></a>√</p>
+</td>
+</tr>
+<tr id="row173226882417"><td class="cellrowborder" valign="top" width="52.800000000000004%" headers="mcps1.1.4.1.1 "><p id="p14832120181817"><a name="p14832120181817"></a><a name="p14832120181817"></a><span id="ph1483216010180"><a name="ph1483216010180"></a><a name="ph1483216010180"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="24.51%" headers="mcps1.1.4.1.2 "><p id="p19948143911821"><a name="p19948143911821"></a><a name="p19948143911821"></a>√</p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="22.689999999999998%" headers="mcps1.1.4.1.3 "><p id="p1830183013306"><a name="p1830183013306"></a><a name="p1830183013306"></a>√</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -239,6 +253,8 @@
 <a name="ul206805011715"></a><a name="ul206805011715"></a><ul id="ul206805011715"><li>true：来源于C2。</li></ul>
 <p id="p136815501475"><a name="p136815501475"></a><a name="p136815501475"></a><span id="ph14689501479"><a name="ph14689501479"></a><a name="ph14689501479"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Ascend 910B</term></span>，支持配置为true/false。</p>
 <p id="p91531273575"><a name="p91531273575"></a><a name="p91531273575"></a><span id="ph9153152715719"><a name="ph9153152715719"></a><a name="ph9153152715719"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Ascend 910C</term></span>，支持配置为true/false。</p>
+<p id="p91531273576"><a name="p91531273576"></a><a name="p91531273576"></a><span id="ph9153152715718"><a name="ph9153152715718"></a><a name="ph9153152715718"></a></a>Kirin X90</span>，仅支持配置为false。</p>
+<p id="p91531273577"><a name="p91531273577"></a><a name="p91531273577"></a><span id="ph9153152715717"><a name="ph9153152715717"></a><a name="ph9153152715717"></a></a>Kirin 9030</span>，仅支持配置为false。</p>
 <p id="p18124101113283"><a name="p18124101113283"></a><a name="p18124101113283"></a>注意：带bias输入的接口配置该参数无效，会根据bias输入的位置来判断C矩阵初始值是否来源于CO1还是C2。</p>
 </td>
 </tr>
@@ -377,6 +393,65 @@
 <td class="cellrowborder" valign="top" width="22.39%" headers="mcps1.2.5.1.3 "><p id="p11929548172310"><a name="p11929548172310"></a><a name="p11929548172310"></a>float</p>
 </td>
 <td class="cellrowborder" valign="top" width="30.8%" headers="mcps1.2.5.1.4 "><p id="p136811522122220"><a name="p136811522122220"></a><a name="p136811522122220"></a>float</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 6**  dst、fm、filter、bias支持的精度类型组合（Kirin X90）
+
+<a name="table1068062217227"></a>
+<table><thead align="left"><tr id="row14680182202214"><th class="cellrowborder" valign="top" width="23.1%" id="mcps1.2.5.1.1"><p id="p1680192219226"><a name="p1680192219226"></a><a name="p1680192219226"></a><strong id="b126801322112218"><a name="b126801322112218"></a><a name="b126801322112218"></a>左矩阵fm type</strong></p>
+</th>
+<th class="cellrowborder" valign="top" width="23.71%" id="mcps1.2.5.1.2"><p id="p11680222102215"><a name="p11680222102215"></a><a name="p11680222102215"></a><strong id="b168082214227"><a name="b168082214227"></a><a name="b168082214227"></a>右矩阵filter type</strong></p>
+</th>
+<th class="cellrowborder" valign="top" width="22.39%" id="mcps1.2.5.1.3"><p id="p16618105212226"><a name="p16618105212226"></a><a name="p16618105212226"></a><strong id="b671210581221"><a name="b671210581221"></a><a name="b671210581221"></a>bias type</strong></p>
+</th>
+<th class="cellrowborder" valign="top" width="30.8%" id="mcps1.2.5.1.4"><p id="p17680162220224"><a name="p17680162220224"></a><a name="p17680162220224"></a><strong id="b8680122213228"><a name="b8680122213228"></a><a name="b8680122213228"></a>结果矩阵dst type</strong></p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row1668111225224"><td class="cellrowborder" valign="top" width="23.1%" headers="mcps1.2.5.1.1 "><p id="p206812223228"><a name="p206812223228"></a><a name="p206812223228"></a>int8_t</p>
+</td>
+<td class="cellrowborder" valign="top" width="23.71%" headers="mcps1.2.5.1.2 "><p id="p186816226225"><a name="p186816226225"></a><a name="p186816226225"></a>int8_t</p>
+</td>
+<td class="cellrowborder" valign="top" width="22.39%" headers="mcps1.2.5.1.3 "><p id="p555512397237"><a name="p555512397237"></a><a name="p555512397237"></a>int32_t</p>
+</td>
+<td class="cellrowborder" valign="top" width="30.8%" headers="mcps1.2.5.1.4 "><p id="p2681152210221"><a name="p2681152210221"></a><a name="p2681152210221"></a>int32_t</p>
+</td>
+</tr>
+<tr id="row16681822102221"><td class="cellrowborder" valign="top" width="23.1%" headers="mcps1.2.5.1.1 "><p id="p1968110226226"><a name="p1968110226226"></a><a name="p1968110226226"></a>half</p>
+</td>
+<td class="cellrowborder" valign="top" width="23.71%" headers="mcps1.2.5.1.2 "><p id="p1681222132216"><a name="p1681222132216"></a><a name="p1681222132216"></a>half</p>
+</td>
+<td class="cellrowborder" valign="top" width="22.39%" headers="mcps1.2.5.1.3 "><p id="p166181252182217"><a name="p166181252182217"></a><a name="p166181252182217"></a>half</p>
+</td>
+<td class="cellrowborder" valign="top" width="30.8%" headers="mcps1.2.5.1.4 "><p id="p1668162262217"><a name="p1668162262217"></a><a name="p1668162262217"></a>half</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 7**  dst、fm、filter、bias支持的精度类型组合（Kirin 9030）
+
+<a name="table1068062217228"></a>
+<table><thead align="left"><tr id="row14680182202214"><th class="cellrowborder" valign="top" width="23.1%" id="mcps1.2.5.1.1"><p id="p1680192219227"><a name="p1680192219227"></a><a name="p1680192219227"></a><strong id="b126801322112217"><a name="b126801322112217"></a><a name="b126801322112217"></a>左矩阵fm type</strong></p>
+</th>
+<th class="cellrowborder" valign="top" width="23.71%" id="mcps1.2.5.1.2"><p id="p11680222102216"><a name="p11680222102216"></a><a name="p11680222102216"></a><strong id="b168082214226"><a name="b168082214226"></a><a name="b168082214226"></a>右矩阵filter type</strong></p>
+</th>
+<th class="cellrowborder" valign="top" width="22.39%" id="mcps1.2.5.1.3"><p id="p16618105212227"><a name="p16618105212227"></a><a name="p16618105212227"></a><strong id="b671210581222"><a name="b671210581222"></a><a name="b671210581222"></a>bias type</strong></p>
+</th>
+<th class="cellrowborder" valign="top" width="30.8%" id="mcps1.2.5.1.4"><p id="p17680162220225"><a name="p17680162220225"></a><a name="p17680162220225"></a><strong id="b8680122213227"><a name="b8680122213227"></a><a name="b8680122213227"></a>结果矩阵dst type</strong></p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row16681822102222"><td class="cellrowborder" valign="top" width="23.1%" headers="mcps1.2.5.1.1 "><p id="p1968110226223"><a name="p1968110226223"></a><a name="p1968110226223"></a>half</p>
+</td>
+<td class="cellrowborder" valign="top" width="23.71%" headers="mcps1.2.5.1.2 "><p id="p1681222132217"><a name="p1681222132217"></a><a name="p1681222132217"></a>half</p>
+</td>
+<td class="cellrowborder" valign="top" width="22.39%" headers="mcps1.2.5.1.3 "><p id="p166181252182218"><a name="p166181252182218"></a><a name="p166181252182218"></a>half</p>
+</td>
+<td class="cellrowborder" valign="top" width="30.8%" headers="mcps1.2.5.1.4 "><p id="p1668162262216"><a name="p1668162262216"></a><a name="p1668162262216"></a>half</p>
 </td>
 </tr>
 </tbody>
