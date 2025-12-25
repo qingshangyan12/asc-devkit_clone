@@ -102,13 +102,13 @@ template <CO2Layout format = CO2Layout::ROW_MAJOR>
 struct FixpipeParamsL311 {
     __aicore__ FixpipeParamsL311() {}
 
-    __aicore__ FixpipeParamsL311(const uint16_t nSizeIn, const uint16_t mSizeIn, const uint16_t srcStrideIn,
-        const uint32_t dstStrideIn)
+    __aicore__ FixpipeParamsL311(const uint16_t nSizeIn_, const uint16_t mSizeIn_, const uint16_t srcStrideIn_,
+        const uint32_t dstStrideIn_)
     {
-        nSize = nSizeIn;
-        mSize = mSizeIn;
-        srcStride = srcStrideIn;
-        dstStride = dstStrideIn;
+        nSize = nSizeIn_;
+        mSize = mSizeIn_;
+        srcStride = srcStrideIn_;
+        dstStride = dstStrideIn_;
     }
 
     uint16_t nSize = 0;
@@ -196,21 +196,21 @@ __aicore__ inline void SetLoop3Para(const FixpipeParamsL311<config.format>& intr
 {
     // the loop3DstStride range has increased.
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        ASCENDC_ASSERT((intriParams.params.ndNum > 0), { KERNEL_LOG(KERNEL_ERROR, "ndNum must be larger than 0"); });
+        ASCENDC_ASSERT((intriParams.params.ndNum > 0), { KERNEL_LOG(KERNEL_ERROR, "ndNum must larger than 0"); });
         // Loop3_dst_stride in uint of element
         uint64_t loop3Para = static_cast<uint64_t>(intriParams.params.dstNdStride) << 32;  // LOOP3_PARA[63:32]
         // original src_nd_stride in uint of fractal_size(1024B = 16 * 16 * sizeof(SrcT))
         // src_nd_stride in unit of C0_SIZE, Loop3_src_stride
-        loop3Para |= static_cast<uint64_t>(intriParams.params.srcNdStride) << 16;  // LOOP3_PARA[31:16]
         loop3Para |= static_cast<uint64_t>(intriParams.params.ndNum);              // LOOP3_PARA[15:0]
+        loop3Para |= static_cast<uint64_t>(intriParams.params.srcNdStride) << 16;  // LOOP3_PARA[31:16]
         set_loop3_para(loop3Para);
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        ASCENDC_ASSERT((intriParams.params.dnNum > 0), { KERNEL_LOG(KERNEL_ERROR, "dnNum must be larger than 0"); });
+        ASCENDC_ASSERT((intriParams.params.dnNum > 0), { KERNEL_LOG(KERNEL_ERROR, "dnNum must larger than 0"); });
         // Loop3_dst_stride in uint of element
         uint64_t loop3Para = static_cast<uint64_t>(intriParams.params.dstDnMatrixStride) << 32;  // LOOP3_PARA[63:32]
         // src_nd_stride in unit of C0_SIZE, Loop3_src_stride
-        loop3Para |= static_cast<uint64_t>(intriParams.params.srcNzMatrixStride) << 16;  // LOOP3_PARA[31:16]
         loop3Para |= static_cast<uint64_t>(intriParams.params.dnNum);                    // LOOP3_PARA[15:0]
+        loop3Para |= static_cast<uint64_t>(intriParams.params.srcNzMatrixStride) << 16;  // LOOP3_PARA[31:16]
         set_loop3_para(loop3Para);
     }
 }
@@ -255,19 +255,19 @@ template <const FixpipeConfig& config>
 __aicore__ inline uint64_t GetGMLen(const FixpipeParamsL311<config.format>& intriParams,
                                     const uint16_t calNSize, const uint16_t dstEleSize)
 {
-    constexpr uint16_t fractalNsize = 16;
-    uint64_t cburstNum = calNSize / fractalNsize;
+    constexpr uint16_t fracNsize = 16;
+    uint64_t cburstNum = calNSize / fracNsize;
     uint64_t gmLen = (cburstNum - 1) * intriParams.dstStride * dstEleSize +
-                     intriParams.mSize * fractalNsize * dstEleSize;
+                     intriParams.mSize * fracNsize * dstEleSize;
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         // dstStride is dst_D Loop2_dst_stride
         gmLen = (static_cast<uint64_t>(intriParams.params.ndNum) - 1) * dstEleSize * intriParams.params.dstNdStride +
                 (intriParams.mSize - 1) * intriParams.dstStride * dstEleSize +
-                cburstNum * fractalNsize * dstEleSize;
+                cburstNum * fracNsize * dstEleSize;
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
         gmLen = (static_cast<uint64_t>(intriParams.params.dnNum) - 1) * dstEleSize * intriParams.params.dstDnMatrixStride +
                 (intriParams.nSize - 1) * intriParams.dstStride * dstEleSize +
-                intriParams.mSize / fractalNsize * fractalNsize * dstEleSize;
+                intriParams.mSize / fracNsize * fracNsize * dstEleSize;
     }
     return gmLen;
 }
@@ -469,19 +469,19 @@ __aicore__ inline void TransFixpipeParamsV220ToFixpipeParamsL311(
     dstParams.mSize = intriParams.mSize;
     dstParams.srcStride = intriParams.srcStride;
     dstParams.dstStride = intriParams.dstStride;
-    dstParams.quantPre = intriParams.quantPre;
     dstParams.deqScalar = intriParams.deqScalar;
+    dstParams.quantPre = intriParams.quantPre;
     dstParams.reluEn = intriParams.reluEn;
     dstParams.unitFlag = intriParams.unitFlag;
     dstParams.isChannelSplit = intriParams.isChannelSplit;
     if constexpr (format == CO2Layout::ROW_MAJOR) {
         dstParams.params.ndNum = intriParams.ndNum;
-        dstParams.params.srcNdStride =  intriParams.srcNdStride;
         dstParams.params.dstNdStride = intriParams.dstNdStride;
+        dstParams.params.srcNdStride =  intriParams.srcNdStride;       
     } else if constexpr(format == CO2Layout::COLUMN_MAJOR) {
         dstParams.params.ndNum = intriParams.ndNum;
-        dstParams.params.srcNdStride = intriParams.srcNdStride;
         dstParams.params.dstNdStride = intriParams.srcNdStride;
+        dstParams.params.srcNdStride = intriParams.srcNdStride;
     }
 }
 

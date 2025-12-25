@@ -22,8 +22,7 @@ namespace AscendC {
 
 /****************************L1 To L0A******************************************/
 template <typename T>
-__aicore__ inline void LoadData2DL12L0ATransposeCal(__ca__ T *dst, __cbuf__ T *src,
-    const LoadData2dTransposeParams &loadDataParam)
+__aicore__ inline void LoadData2DL12L0ATransposeCal(__ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR,
         "LoadDataWithTranspose from A1 to A2 is not supported on current device"); });
@@ -45,17 +44,18 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
 
 /****************************L1 To L0B******************************************/
 template <typename T>
-__aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *src,
-    const LoadData2dTransposeParams &loadDataParam)
+__aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadDataWithTranspose with LoadData2dTransposeParams is not supported on current device");
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR,
+        "LoadDataWithTranspose with LoadData2dTransposeParams from B1 to B2 is not supported on current device"); });
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *src,
     const LoadData2dTransposeParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadDataWithTranspose with LoadData2dTransposeParamsV2 is not supported on current device");
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR,
+        "LoadDataWithTranspose with LoadData2dTransposeParamsV2 from B1 to B2 is not supported on current device"); });
 }
 
 template <typename T>

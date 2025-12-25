@@ -216,7 +216,6 @@ struct Nz2NdParamsFull {
     uint16_t dstNdMatrixStride = 1;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 struct Dn2NzParams {
     __aicore__ Dn2NzParams() {}
 
@@ -273,7 +272,6 @@ struct LoopModeParams {
     uint64_t loop2SrcStride = 0;
     uint64_t loop2DstStride = 0;
 };
-#endif
 
 struct SliceInfo {
     __aicore__ SliceInfo() {}
