@@ -1,7 +1,9 @@
-# SIMT & SIMD混合编程实现gather & adds算子样例
+# SIMT与SIMD新同构编程实现gather & adds算子样例
 
 ## 概述
 本样例以实现gather和adds功能的算子为例，展示了SIMT和SIMD混合编程的算子开发方式。算子中使用SIMT编程方式实现离散内存访问操作gather，使用SIMD编程方式实现连续内存访问操作adds。
+
+  > ⚠️ **注意** 当前软件版本只支持该样例执行，不保证基于该样例扩展或参考该样例进行自定义算子开发功能支持，完整自定义算子开发功能将在下个版本提供。
 
 ## 支持的AI处理器
 - Ascend 950PR/Ascend 950DT
