@@ -19,6 +19,16 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911820"><a name="p19948143911820"></a><a name="p19948143911820"></a>√</p>
 </td>
 </tr>
+<tr id="row173226882416"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181816"><a name="p14832120181816"></a><a name="p14832120181816"></a><span id="ph1483216010187"><a name="ph1483216010187"></a><a name="ph1483216010187"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911821"><a name="p19948143911821"></a><a name="p19948143911821"></a>√</p>
+</td>
+</tr>
+<tr id="row173226882417"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181817"><a name="p14832120181817"></a><a name="p14832120181817"></a><span id="ph1483216010186"><a name="ph1483216010186"></a><a name="ph1483216010186"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911822"><a name="p19948143911822"></a><a name="p19948143911822"></a>×</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -61,6 +71,9 @@ Load3D用于完成image to column操作，将多维feature map转为二维矩阵
 <p id="p7145122512582"><a name="p7145122512582"></a><a name="p7145122512582"></a><span id="ph8145132513582"><a name="ph8145132513582"></a><a name="ph8145132513582"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Ascend 910C</term></span>，</p>
 <a name="ul14193394403"></a><a name="ul14193394403"></a><ul id="ul14193394403"><li>TPosition为A1/A2时，支持数据类型为：uint8_t/int8_t/half/bfloat16_t/uint32_t/int32_t/float/int4b_t</li><li>TPosition为B1/B2时，支持数据类型为：half/bfloat16_t/uint32_t/int32_t/float</li></ul>
 <a name="ul8314334018"></a><a name="ul8314334018"></a>
+<p id="p7145122512581"><a name="p7145122512581"></a><a name="p7145122512581"></a><span id="ph8145132513581"><a name="ph8145132513581"></a><a name="ph8145132513581"></a>Kirin X90</span>，</p>
+<a name="ul14193394404"></a><a name="ul14193394404"></a><ul id="ul14193394404"><li>TPosition为A1/A2时，支持数据类型为：int8_t/half</li><li>TPosition为B1/B2时，支持数据类型为：int8_t/half</li></ul>
+<a name="ul8314334019"></a><a name="ul8314334019"></a>
 </li></ul>
 </td>
 </tr>
@@ -266,6 +279,7 @@ Load3D用于完成image to column操作，将多维feature map转为二维矩阵
 <p id="p175715359111"><a name="p175715359111"></a><a name="p175715359111"></a>针对以下型号，channelSize的取值要求为：对于uint32_t/int32_t/float，channelSize可取值为4，N * 8，N * 8 + 4；对于half/bfloat16，channelSize可取值为4，8，N * 16，N * 16 + 4，N * 16 + 8；对于int8_t/uint8_t，channelSize可取值为4，8，16， 32 * N，N * 32 + 4，N * 32 + 8，N * 32 + 16；对于int4b_t，ChannelSize可取值为8，16，32，N * 64，N * 64 + 8，N * 64 + 16，N * 64 + 32。N为正整数。</p>
 <p id="p118494416125"><a name="p118494416125"></a><a name="p118494416125"></a><span id="ph484924119124"><a name="ph484924119124"></a><a name="ph484924119124"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Ascend 910B</term></span></p>
 <p id="p784964121215"><a name="p784964121215"></a><a name="p784964121215"></a><span id="ph108492414128"><a name="ph108492414128"></a><a name="ph108492414128"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Ascend 910C</term></span></p>
+<p id="p784964121216"><a name="p784964121216"></a><a name="p784964121216"></a><span id="ph108492414127"><a name="ph108492414127"></a><a name="ph108492414127"></a>Kirin X90</span></p>
 </td>
 </tr>
 <tr id="row203511732113417"><td class="cellrowborder" valign="top" width="18.56%" headers="mcps1.2.3.1.1 "><p id="p184429433356"><a name="p184429433356"></a><a name="p184429433356"></a>kExtension</p>

@@ -19,6 +19,16 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911820"><a name="p19948143911820"></a><a name="p19948143911820"></a>√</p>
 </td>
 </tr>
+<tr id="row173226882416"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181816"><a name="p14832120181816"></a><a name="p14832120181816"></a><span id="ph1483216010187"><a name="ph1483216010187"></a><a name="ph1483216010187"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911821"><a name="p19948143911821"></a><a name="p19948143911821"></a>√</p>
+</td>
+</tr>
+<tr id="row173226882417"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181817"><a name="p14832120181817"></a><a name="p14832120181817"></a><span id="ph1483216010186"><a name="ph1483216010186"></a><a name="ph1483216010186"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911822"><a name="p19948143911822"></a><a name="p19948143911822"></a>×</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -124,6 +134,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 </td>
 <td class="cellrowborder" valign="top" width="77.13%" headers="mcps1.2.3.1.2 "><p id="p990614114434"><a name="p990614114434"></a><a name="p990614114434"></a><span id="ph17565161613616"><a name="ph17565161613616"></a><a name="ph17565161613616"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Ascend 910B</term></span>，支持的数据类型为：int4b_t/int8_t/uint8_t/half/bfloat16_t/float/int32_t/uint32_t。</p>
 <p id="p523904010149"><a name="p523904010149"></a><a name="p523904010149"></a><span id="ph16239174011416"><a name="ph16239174011416"></a><a name="ph16239174011416"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Ascend 910C</term></span>，支持的数据类型为：int4b_t/int8_t/uint8_t/half/bfloat16_t/float/int32_t/uint32_t。</p>
+<p id="p523904010148"><a name="p523904010148"></a><a name="p523904010148"></a><span id="ph16239174011417"><a name="ph16239174011417"></a><a name="ph16239174011417"></a>Kirin X90</span>，支持的数据类型为：int8_t/half。</p>
 <p id="p1978741114"><a name="p1978741114"></a><a name="p1978741114"></a>其中int4b_t数据类型仅在LocalTensor的TPosition为B2时支持。</p>
 </td>
 </tr>
@@ -148,6 +159,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 <td class="cellrowborder" valign="top" width="66.96669666966696%" headers="mcps1.2.4.1.3 "><p id="p7937181983414"><a name="p7937181983414"></a><a name="p7937181983414"></a>目的操作数，结果矩阵，类型为LocalTensor。</p>
 <p id="p16287121461618"><a name="p16287121461618"></a><a name="p16287121461618"></a><span id="ph16453145783416"><a name="ph16453145783416"></a><a name="ph16453145783416"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Ascend 910B</term></span>，支持的TPosition为A2/B2。</p>
 <p id="p1118816112359"><a name="p1118816112359"></a><a name="p1118816112359"></a><span id="ph1229951712358"><a name="ph1229951712358"></a><a name="ph1229951712358"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Ascend 910C</term></span>，支持的TPosition为A2/B2。</p>
+<p id="p1118816112358"><a name="p1118816112358"></a><a name="p1118816112358"></a><span id="ph1229951712357"><a name="ph1229951712357"></a><a name="ph1229951712357"></a>Kirin X90</span>，支持的TPosition为A2/B2。</p>
 <p id="p9467144018445"><a name="p9467144018445"></a><a name="p9467144018445"></a>LocalTensor的起始地址需要保证512字节对齐。</p>
 <p id="p1127919573117"><a name="p1127919573117"></a><a name="p1127919573117"></a>数据类型和src的数据类型保持一致。</p>
 </td>
@@ -159,6 +171,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 <td class="cellrowborder" valign="top" width="66.96669666966696%" headers="mcps1.2.4.1.3 "><p id="p7888103453511"><a name="p7888103453511"></a><a name="p7888103453511"></a>源操作数，类型为LocalTensor。</p>
 <p id="p54481413617"><a name="p54481413617"></a><a name="p54481413617"></a><span id="ph3441114173620"><a name="ph3441114173620"></a><a name="ph3441114173620"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_3"><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a>Ascend 910B</term></span>，支持的TPosition为A1/B1。</p>
 <p id="p344151412368"><a name="p344151412368"></a><a name="p344151412368"></a><span id="ph174481423610"><a name="ph174481423610"></a><a name="ph174481423610"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_3"><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a>Ascend 910C</term></span>，支持的TPosition为A1/B1。</p>
+<p id="p1118816112357"><a name="p1118816112357"></a><a name="p1118816112357"></a><span id="ph1229951712356"><a name="ph1229951712356"></a><a name="ph1229951712356"></a>Kirin X90</span>，支持的TPosition为A1/B1。</p>
 <p id="p128771714204514"><a name="p128771714204514"></a><a name="p128771714204514"></a>LocalTensor的起始地址需要保证32字节对齐。</p>
 <p id="p9810121419213"><a name="p9810121419213"></a><a name="p9810121419213"></a>数据类型和dst的数据类型保持一致。</p>
 </td>

@@ -19,6 +19,16 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911820"><a name="p19948143911820"></a><a name="p19948143911820"></a>√</p>
 </td>
 </tr>
+<tr id="row173226882416"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181816"><a name="p14832120181816"></a><a name="p14832120181816"></a><span id="ph1483216010187"><a name="ph1483216010187"></a><a name="ph1483216010187"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911821"><a name="p19948143911821"></a><a name="p19948143911821"></a>√</p>
+</td>
+</tr>
+<tr id="row173226882417"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181817"><a name="p14832120181817"></a><a name="p14832120181817"></a><span id="ph1483216010186"><a name="ph1483216010186"></a><a name="ph1483216010186"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911822"><a name="p19948143911822"></a><a name="p19948143911822"></a>√</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -53,6 +63,8 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue)
 <td class="cellrowborder" valign="top" width="75.98759875987598%" headers="mcps1.2.4.1.3 "><p id="p15979173252514"><a name="p15979173252514"></a><a name="p15979173252514"></a>Pad填充值的数值。</p>
 <p id="p990614114434"><a name="p990614114434"></a><a name="p990614114434"></a><span id="ph126684217571"><a name="ph126684217571"></a><a name="ph126684217571"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Ascend 910B</term></span>，支持数据类型：int8_t/uint8_t/half/int16_t/uint16_t/bfloat16_t/int32_t/uint32_t/float</p>
 <p id="p523904010149"><a name="p523904010149"></a><a name="p523904010149"></a><span id="ph16239174011416"><a name="ph16239174011416"></a><a name="ph16239174011416"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Ascend 910C</term></span>，支持数据类型：int8_t/uint8_t/half/int16_t/uint16_t/bfloat16_t/int32_t/uint32_t/float</p>
+<p id="p523904010148"><a name="p523904010148"></a><a name="p523904010148"></a><span id="ph16239174011417"><a name="ph16239174011417"></a><a name="ph16239174011417"></a>Kirin X90</span>，支持的数据类型为：int8_t/half</p>
+<p id="p523904010147"><a name="p523904010147"></a><a name="p523904010147"></a><span id="ph16239174011416"><a name="ph16239174011416"></a><a name="ph16239174011416"></a>Kirin 9030</span>，支持的数据类型为：half</p>
 </td>
 </tr>
 </tbody>
