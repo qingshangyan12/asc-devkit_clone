@@ -19,6 +19,16 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p149598793615"><a name="p149598793615"></a><a name="p149598793615"></a>√</p>
 </td>
 </tr>
+<tr id="row1746517132416"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p171071651104613"><a name="p171071651104613"></a><a name="p171071651104613"></a><span id="ph8960167193611"><a name="ph8960167193611"></a><a name="ph8960167193611"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p096010715361"><a name="p096010715361"></a><a name="p096010715361"></a>√</p>
+</td>
+</tr>
+<tr id="row787411713248"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p18587175114614"><a name="p18587175114614"></a><a name="p18587175114614"></a><span id="ph5776533104711"><a name="ph5776533104711"></a><a name="ph5776533104711"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p2058745154620"><a name="p2058745154620"></a><a name="p2058745154620"></a>√</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -60,6 +70,8 @@ __aicore__ inline bool AdjustSoftMaxRes(const LocalTensor<T1>& softMaxRes, const
 <td class="cellrowborder" valign="top" width="80.61%" headers="mcps1.2.3.1.2 "><p id="p125969172719"><a name="p125969172719"></a><a name="p125969172719"></a>softMaxRes的数据类型。</p>
 <p id="p1314412701316"><a name="p1314412701316"></a><a name="p1314412701316"></a><span id="ph11441227191318"><a name="ph11441227191318"></a><a name="ph11441227191318"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Ascend 910C</term></span>，支持的数据类型为：half、float。</p>
 <p id="p822365313487"><a name="p822365313487"></a><a name="p822365313487"></a><span id="ph142231253104816"><a name="ph142231253104816"></a><a name="ph142231253104816"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Ascend 910B</term></span>，支持的数据类型为：half、float。</p>
+<p id="p184962505471"><a name="p184962505471"></a><a name="p184962505471"></a><span id="ph9713141120484"><a name="ph9713141120484"></a><a name="ph9713141120484"></a>Kirin X90</span>，支持的数据类型为：half、float。</p>
+<p id="p8588195884716"><a name="p8588195884716"></a><a name="p8588195884716"></a><span id="ph1601215144817"><a name="ph1601215144817"></a><a name="ph1601215144817"></a>Kirin 9030</span>，支持的数据类型为：half、float。</p>
 </td>
 </tr>
 <tr id="row197562193260"><td class="cellrowborder" valign="top" width="19.39%" headers="mcps1.2.3.1.1 "><p id="p18961115352610"><a name="p18961115352610"></a><a name="p18961115352610"></a>T2</p>
@@ -67,6 +79,8 @@ __aicore__ inline bool AdjustSoftMaxRes(const LocalTensor<T1>& softMaxRes, const
 <td class="cellrowborder" valign="top" width="80.61%" headers="mcps1.2.3.1.2 "><p id="p1287421219275"><a name="p1287421219275"></a><a name="p1287421219275"></a>maxTensor的数据类型。</p>
 <p id="p39397599267"><a name="p39397599267"></a><a name="p39397599267"></a><span id="ph89391159162619"><a name="ph89391159162619"></a><a name="ph89391159162619"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Ascend 910C</term></span>，支持的数据类型为：half、float。</p>
 <p id="p49394599264"><a name="p49394599264"></a><a name="p49394599264"></a><span id="ph20939105919265"><a name="ph20939105919265"></a><a name="ph20939105919265"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Ascend 910B</term></span>，支持的数据类型为：half、float。</p>
+<p id="p1437829253"><a name="p1437829253"></a><a name="p1437829253"></a><span id="ph104386212515"><a name="ph104386212515"></a><a name="ph104386212515"></a>Kirin X90</span>，支持的数据类型为：half、float。</p>
+<p id="p134381292519"><a name="p134381292519"></a><a name="p134381292519"></a><span id="ph74384210250"><a name="ph74384210250"></a><a name="ph74384210250"></a>Kirin 9030</span>，支持的数据类型为：half、float。</p>
 </td>
 </tr>
 <tr id="row9756719122620"><td class="cellrowborder" valign="top" width="19.39%" headers="mcps1.2.3.1.1 "><p id="p1954365362720"><a name="p1954365362720"></a><a name="p1954365362720"></a>isDataFormatNZ</p>
