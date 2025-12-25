@@ -48,7 +48,7 @@ SocVersion SocVersionStrMap(const char *socVersionStr)
         {"Ascend310P", SocVersion::ASCEND310P},
         {"Ascend910", SocVersion::ASCEND910},
         {"Ascend910B", SocVersion::ASCEND910B},
-        {"Ascend910_93", SocVersion::ASCEND910_93},
+        {"Ascend910_93", SocVersion::ASCEND910B},
         {"Ascend310B", SocVersion::ASCEND310B},
         {"Ascend910_95", SocVersion::ASCEND910_95},
         {"Ascend910_55", SocVersion::ASCEND910_55},
