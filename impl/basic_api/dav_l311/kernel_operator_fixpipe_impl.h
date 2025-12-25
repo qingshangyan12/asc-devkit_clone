@@ -286,13 +286,13 @@ __aicore__ inline void FixpipeL0cToOut(__gm__ DstT* dst, __cc__ SrcT* src,
             "when isChannelSplit is set true, format must be set as NZ \n"));
     }
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
-    uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
     uint32_t dstOffset = 0;
-    bool nz2ndEn = false;
+    uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
     bool nz2dnEn = false;
+    bool nz2ndEn = false;
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        dstOffset = nIterIndex * fixpipeTiling.nSize;
         nz2ndEn = true;
+        dstOffset = nIterIndex * fixpipeTiling.nSize;
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
         dstOffset = nIterIndex * fixpipeTiling.nSize * intriParams.dstStride;
         nz2dnEn = true;
@@ -410,9 +410,9 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src,
     SetLoop3Para<config>(intriParams);
     // nz2dn mode need set CHANNEL_PARA extra
     if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride)
+        uint64_t channelParams = static_cast<uint64_t>(intriParams.params.srcNzC0Stride)
                                 << 48;  // CHANNEL_PARA[63:48]
-        set_channel_para(channelPara);
+        set_channel_para(channelParams);
     }
     /*
     make code for scalar quant mode:
@@ -424,8 +424,8 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src,
     }
     PipeBarrier<PIPE_FIX>();
     // LOC -> GM
-    FixpipeTiling fixpipeTiling;
-    FixpipeL0cToOut<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, intriParams.nSize);
+    FixpipeTiling fixpipeTilingParam;
+    FixpipeL0cToOut<DstT, SrcT, config>(dst, src, intriParams, fixpipeTilingParam, intriParams.nSize);
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
