@@ -690,6 +690,40 @@ uint64_t __shfl(uint64_t var, int32_t num)
     return warp.WarpShuffleOp(var, laneId, srcLane);
 }
 
+half __shfl(half var, int32_t num)
+{
+    int32_t srcLane = num & 0xff;
+    int32_t width = 32 - ((num >> 16) & 0xff);
+    ASCENDC_ASSERT((width <= WARP_SIZE && width > 0 && WARP_SIZE % width == 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "width must be a power of 2 and in (0, 32]"); });
+    ASCENDC_ASSERT((srcLane < WARP_SIZE && srcLane >= 0), { KERNEL_LOG(KERNEL_ERROR, "srcLane must be in [0, 32)"); });
+
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    uint32_t laneId = AscendC::Simt::GetLaneId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    int32_t minLane = laneId / width * width;
+    srcLane = minLane + srcLane % width;
+
+    return warp.WarpShuffleOp(var, laneId, srcLane);
+}
+
+half2 __shfl(half2 var, int32_t num)
+{
+    int32_t srcLane = num & 0xff;
+    int32_t width = 32 - ((num >> 16) & 0xff);
+    ASCENDC_ASSERT((width <= WARP_SIZE && width > 0 && WARP_SIZE % width == 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "width must be a power of 2 and in (0, 32]"); });
+    ASCENDC_ASSERT((srcLane < WARP_SIZE && srcLane >= 0), { KERNEL_LOG(KERNEL_ERROR, "srcLane must be in [0, 32)"); });
+
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    uint32_t laneId = AscendC::Simt::GetLaneId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    int32_t minLane = laneId / width * width;
+    srcLane = minLane + srcLane % width;
+
+    return warp.WarpShuffleOp(var, laneId, srcLane);
+}
+
 int32_t __shfl_up(int32_t var, int32_t num)
 {
     int32_t delta = num & 0xff;
@@ -759,6 +793,40 @@ int64_t __shfl_up(int64_t var, int32_t num)
 }
 
 uint64_t __shfl_up(uint64_t var, int32_t num)
+{
+    int32_t delta = num & 0xff;
+    int32_t width = 32 - ((num >> 16) & 0xff);
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    uint32_t laneId = AscendC::Simt::GetLaneId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    int32_t minLane = laneId / width * width;
+    int32_t srcLane = laneId - delta;
+
+    if (srcLane < minLane) {
+        srcLane = laneId;
+    }
+
+    return warp.WarpShuffleOp(var, laneId, srcLane);
+}
+
+half __shfl_up(half var, int32_t num)
+{
+    int32_t delta = num & 0xff;
+    int32_t width = 32 - ((num >> 16) & 0xff);
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    uint32_t laneId = AscendC::Simt::GetLaneId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    int32_t minLane = laneId / width * width;
+    int32_t srcLane = laneId - delta;
+
+    if (srcLane < minLane) {
+        srcLane = laneId;
+    }
+
+    return warp.WarpShuffleOp(var, laneId, srcLane);
+}
+
+half2 __shfl_up(half2 var, int32_t num)
 {
     int32_t delta = num & 0xff;
     int32_t width = 32 - ((num >> 16) & 0xff);
@@ -864,6 +932,50 @@ int64_t __shfl_down(int64_t var, int32_t num)
 }
 
 uint64_t __shfl_down(uint64_t var, int32_t num)
+{
+    int32_t delta = num & 0xff;
+    int32_t width = 32 - ((num >> 16) & 0xff);
+    ASCENDC_ASSERT((width <= WARP_SIZE && width > 0 && WARP_SIZE % width == 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "width must be a power of 2 and in (0, 32]"); });
+    ASCENDC_ASSERT((delta < WARP_SIZE && delta >= 0), { KERNEL_LOG(KERNEL_ERROR, "delta must be in [0, 32)"); });
+
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    uint32_t laneId = AscendC::Simt::GetLaneId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    int32_t minLane = laneId / width * width;
+    int32_t maxLane = minLane + MAX_SHLF_OFFSET % width;
+    int32_t srcLane = laneId + delta;
+
+    if (srcLane > maxLane) {
+        srcLane = laneId;
+    }
+
+    return warp.WarpShuffleOp(var, laneId, srcLane);
+}
+
+half __shfl_down(half var, int32_t num)
+{
+    int32_t delta = num & 0xff;
+    int32_t width = 32 - ((num >> 16) & 0xff);
+    ASCENDC_ASSERT((width <= WARP_SIZE && width > 0 && WARP_SIZE % width == 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "width must be a power of 2 and in (0, 32]"); });
+    ASCENDC_ASSERT((delta < WARP_SIZE && delta >= 0), { KERNEL_LOG(KERNEL_ERROR, "delta must be in [0, 32)"); });
+
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    uint32_t laneId = AscendC::Simt::GetLaneId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    int32_t minLane = laneId / width * width;
+    int32_t maxLane = minLane + MAX_SHLF_OFFSET % width;
+    int32_t srcLane = laneId + delta;
+
+    if (srcLane > maxLane) {
+        srcLane = laneId;
+    }
+
+    return warp.WarpShuffleOp(var, laneId, srcLane);
+}
+
+half2 __shfl_down(half2 var, int32_t num)
 {
     int32_t delta = num & 0xff;
     int32_t width = 32 - ((num >> 16) & 0xff);
@@ -1000,6 +1112,52 @@ uint64_t __shfl_xor(uint64_t var, int32_t num)
     return warp.WarpShuffleOp(var, laneId, srcLane);
 }
 
+half __shfl_xor(half var, int32_t num)
+{
+    int32_t laneMask = num & 0xff;
+    int32_t width = 32 - ((num >> 16) & 0xff);
+    ASCENDC_ASSERT((width <= WARP_SIZE && width > 0 && WARP_SIZE % width == 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "width must be a power of 2 and in (0, 32]"); });
+    ASCENDC_ASSERT((laneMask < WARP_SIZE && laneMask >= 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "laneMask must be in [0, 32)"); });
+
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    uint32_t laneId = AscendC::Simt::GetLaneId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    int32_t minLane = laneId / width * width;
+    int32_t maxLane = minLane + MAX_SHLF_OFFSET % width;
+    int32_t srcLane = laneId ^ laneMask;
+
+    if (srcLane < 0 || srcLane > maxLane) {
+        srcLane = laneId;
+    }
+
+    return warp.WarpShuffleOp(var, laneId, srcLane);
+}
+
+half2 __shfl_xor(half2 var, int32_t num)
+{
+    int32_t laneMask = num & 0xff;
+    int32_t width = 32 - ((num >> 16) & 0xff);
+    ASCENDC_ASSERT((width <= WARP_SIZE && width > 0 && WARP_SIZE % width == 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "width must be a power of 2 and in (0, 32]"); });
+    ASCENDC_ASSERT((laneMask < WARP_SIZE && laneMask >= 0),
+                   { KERNEL_LOG(KERNEL_ERROR, "laneMask must be in [0, 32)"); });
+
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    uint32_t laneId = AscendC::Simt::GetLaneId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    int32_t minLane = laneId / width * width;
+    int32_t maxLane = minLane + MAX_SHLF_OFFSET % width;
+    int32_t srcLane = laneId ^ laneMask;
+
+    if (srcLane < 0 || srcLane > maxLane) {
+        srcLane = laneId;
+    }
+
+    return warp.WarpShuffleOp(var, laneId, srcLane);
+}
+
 int32_t __reduce_add(int32_t val)
 {
     uint32_t warpId = AscendC::Simt::GetWarpId();
@@ -1021,6 +1179,14 @@ float __reduce_add(float val)
     uint32_t warpId = AscendC::Simt::GetWarpId();
     AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
     auto customFunc = [](float a, float b) -> float { return a + b; };
+    return warp.WarpOp(val, customFunc);
+}
+
+half __reduce_add(half val)
+{
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    auto customFunc = [](half a, half b) -> half { return a + b; };
     return warp.WarpOp(val, customFunc);
 }
 
@@ -1048,6 +1214,14 @@ float __reduce_max(float val)
     return warp.WarpOp(val, customFunc);
 }
 
+half __reduce_max(half val)
+{
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    auto customFunc = [](half a, half b) -> half { return a > b ? a : b; };
+    return warp.WarpOp(val, customFunc);
+}
+
 int32_t __reduce_min(int32_t val)
 {
     uint32_t warpId = AscendC::Simt::GetWarpId();
@@ -1069,6 +1243,14 @@ float __reduce_min(float val)
     uint32_t warpId = AscendC::Simt::GetWarpId();
     AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
     auto customFunc = [](float a, float b) -> float { return a < b ? a : b; };
+    return warp.WarpOp(val, customFunc);
+}
+
+half __reduce_min(half val)
+{
+    uint32_t warpId = AscendC::Simt::GetWarpId();
+    AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
+    auto customFunc = [](half a, half b) -> half { return a < b ? a : b; };
     return warp.WarpOp(val, customFunc);
 }
 

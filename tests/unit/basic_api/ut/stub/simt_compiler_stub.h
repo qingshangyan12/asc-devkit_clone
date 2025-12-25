@@ -196,6 +196,10 @@ int64_t __shfl(int64_t var, int32_t num);
 
 uint64_t __shfl(uint64_t var, int32_t num);
 
+half __shfl(half var, int32_t num);
+
+half2 __shfl(half2 var, int32_t num);
+
 int32_t __shfl_up(int32_t var, int32_t num);
 
 uint32_t __shfl_up(uint32_t var, int32_t num);
@@ -205,6 +209,10 @@ float __shfl_up(float var, int32_t num);
 int64_t __shfl_up(int64_t var, int32_t num);
 
 uint64_t __shfl_up(uint64_t var, int32_t num);
+
+half __shfl_up(half var, int32_t num);
+
+half2 __shfl_up(half2 var, int32_t num);
 
 int32_t __shfl_down(int32_t var, int32_t num);
 
@@ -216,6 +224,10 @@ int64_t __shfl_down(int64_t var, int32_t num);
 
 uint64_t __shfl_down(uint64_t var, int32_t num);
 
+half __shfl_down(half var, int32_t num);
+
+half2 __shfl_down(half2 var, int32_t num);
+
 int32_t __shfl_xor(int32_t var, int32_t num);
 
 uint32_t __shfl_xor(uint32_t var, int32_t num);
@@ -226,11 +238,17 @@ int64_t __shfl_xor(int64_t var, int32_t num);
 
 uint64_t __shfl_xor(uint64_t var, int32_t num);
 
+half __shfl_xor(half var, int32_t num);
+
+half2 __shfl_xor(half2 var, int32_t num);
+
 int32_t __reduce_add(int32_t val);
 
 uint32_t __reduce_add(uint32_t val);
 
 float __reduce_add(float val);
+
+half __reduce_add(half val);
 
 int32_t __reduce_max(int32_t val);
 
@@ -238,11 +256,15 @@ uint32_t __reduce_max(uint32_t val);
 
 float __reduce_max(float val);
 
+half __reduce_max(half val);
+
 int32_t __reduce_min(int32_t val);
 
 uint32_t __reduce_min(uint32_t val);
 
 float __reduce_min(float val);
+
+half __reduce_min(half val);
 
 void __threadfence();
 
