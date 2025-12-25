@@ -41,7 +41,11 @@ $$
 |dst|输出|目的操作数（向量）的起始地址。|
 |src|输入|源操作数（向量）的起始地址。|
 |count|输入|参与计算的元素个数。|
-|config|输入|在非连续场景下使用的计算配置参数。<br/>详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。|
+| repeat | 输入 | 迭代次数。 |
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
 
 ## 返回值说明
 

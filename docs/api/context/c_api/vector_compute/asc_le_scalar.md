@@ -32,7 +32,11 @@
 |dst|输出|目的操作数（矢量）的起始地址。|
 |src|输入|源操作数（矢量）的起始地址。|
 |value|输入|源操作数（标量）的起始地址。|
-|config|输入|在高维切分场景下使用的计算配置参数。<br/>详细说明请参考[asc_unary_config](../struct/asc_unary_config.md)。|
+| repeat | 输入 | 迭代次数。 |
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
 
 ## 返回值说明
 
@@ -47,7 +51,7 @@ PIPE_TYPE_V
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 - dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
-- 当结果输出到寄存器中时，固定处理256B的数据，config中的repeat字段不生效。
+- 当结果输出到寄存器中时，固定处理256B的数据，repeat字段不生效。
 
 ## 调用示例
 

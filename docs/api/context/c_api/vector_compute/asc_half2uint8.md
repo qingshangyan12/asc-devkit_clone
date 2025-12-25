@@ -23,63 +23,66 @@
 - 前n个数据计算
 
     ```c++
-    //NONE舍入模式
+    // NONE舍入模式
     __aicore__ inline void asc_half2uint8(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //RINT舍入模式
+    // RINT舍入模式
     __aicore__ inline void asc_half2uint8_r(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //FLOOR舍入模式
+    // FLOOR舍入模式
     __aicore__ inline void asc_half2uint8_f(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //ROUND舍入模式
+    // ROUND舍入模式
     __aicore__ inline void asc_half2uint8_a(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //CEIL舍入模式
+    // CEIL舍入模式
     __aicore__ inline void asc_half2uint8_c(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //TRUNC舍入模式
+    // TRUNC舍入模式
     __aicore__ inline void asc_half2uint8_z(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```c++
-    //NONE舍入模式
+    // NONE舍入模式
     __aicore__ inline void asc_half2uint8(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    //RINT舍入模式
+    // RINT舍入模式
     __aicore__ inline void asc_half2uint8_r(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    //FLOOR舍入模式
+    // FLOOR舍入模式
     __aicore__ inline void asc_half2uint8_f(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    //ROUND舍入模式
+    // ROUND舍入模式
     __aicore__ inline void asc_half2uint8_a(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    //CEIL舍入模式
+    // CEIL舍入模式
     __aicore__ inline void asc_half2uint8_c(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    //TRUNC舍入模式
+    // TRUNC舍入模式
     __aicore__ inline void asc_half2uint8_z(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```c++
-    //NONE舍入模式
+    // NONE舍入模式
     __aicore__ inline void asc_half2uint8_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //RINT舍入模式
+    // RINT舍入模式
     __aicore__ inline void asc_half2uint8_r_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //FLOOR舍入模式
+    // FLOOR舍入模式
     __aicore__ inline void asc_half2uint8_f_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //ROUND舍入模式
+    // ROUND舍入模式
     __aicore__ inline void asc_half2uint8_a_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //CEIL舍入模式
+    // CEIL舍入模式
     __aicore__ inline void asc_half2uint8_c_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    //TRUNC舍入模式
+    // TRUNC舍入模式
     __aicore__ inline void asc_half2uint8_z_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     ```
 
 ## 参数说明
 
-表1 参数说明
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
 | count | 输入 | 参与计算的元素个数。 |
-| config | 输入 | 在高维切分场景下使用的计算配置参数。详细说明请参考[asc_unary_config](../struct/asc_unary_config.md) 。 |
+| repeat | 输入 | 迭代次数。 |
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
 
 ## 返回值说明
 
