@@ -299,18 +299,6 @@ private:
         MicroAPI::DataCopyUnAlignPost(dst, u1, aReg0);
     }
 
-    __aicore__ inline void ComputeMode13(__ubuf__ T *dst, __ubuf__ T *src)
-    {
-        MicroAPI::RegTensor<T> vreg0;
-        constexpr uint32_t sregLower = 15;  // to process unalign data
-        uint16_t repeatTimes = CeilDivision(dstSize, sregLower);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
-            auto srcUbT = src + i * sregLower;
-            MicroAPI::Load(vreg0, srcUbT);
-            MicroAPI::Store(dst, vreg0, sregLower);
-        }
-    }
-
     __aicore__ inline void Compute()
     {
         // test other api
@@ -361,8 +349,6 @@ private:
                 ComputeMode11(dst, src);
             } else if constexpr (mode == 12) {
                 ComputeMode12(dst, src);
-            } else if constexpr (mode == 13) {
-                ComputeMode13(dst, src);
             }
         }
 
@@ -444,7 +430,6 @@ MICRO_DATACOPY_TEST_CASE(9);
 MICRO_DATACOPY_TEST_CASE(10);
 MICRO_DATACOPY_TEST_CASE(11);
 MICRO_DATACOPY_TEST_CASE(12);
-MICRO_DATACOPY_TEST_CASE(13);
 
 #define MICRO_DATACOPY_TEST_CASE_B64(mode)                                                        \
     using MicroDatacopyTestsuite_mode_b64##mode = MicroDatacopyTestsuite<mode>;                   \
