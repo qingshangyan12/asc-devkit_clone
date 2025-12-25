@@ -12,9 +12,7 @@
 // #include <cmath>
 #include "simt_compiler_stub.h"
 #include "kernel_operator.h"
-#include "simt_math.h"
-#include "simt_fp16.h"
-#include "simt_bf16.h"
+#include "simt_api/asc_bf16.h"
 using namespace std;
 using namespace AscendC;
 using namespace AscendC::Simt;

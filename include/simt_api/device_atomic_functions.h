@@ -8,8 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef ASCENDC_MODULE_SIMT_ATOMIC_C_INTERFACE_H
-#define ASCENDC_MODULE_SIMT_ATOMIC_C_INTERFACE_H
+#ifndef INCLUDE_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_H
+#define INCLUDE_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_H
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#endif
+
 __simt_callee__ inline int32_t asc_atomic_add(__ubuf__ int32_t *address, int32_t val);
 
 __simt_callee__ inline uint32_t asc_atomic_add(__ubuf__ uint32_t *address, uint32_t val);
@@ -154,5 +159,10 @@ __simt_callee__ inline int64_t asc_atomic_xor(__gm__ int64_t *address, int64_t v
 
 __simt_callee__ inline uint64_t asc_atomic_xor(__gm__ uint64_t *address, uint64_t val);
 
-#include "impl/simt_api/simt_atomic_impl.h"
-#endif  // ASCENDC_MODULE_SIMT_ATOMIC_C_INTERFACE_H
+#include "impl/simt_api/device_atomic_functions_impl.h"
+
+#if defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#endif
+
+#endif  // INCLUDE_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_H

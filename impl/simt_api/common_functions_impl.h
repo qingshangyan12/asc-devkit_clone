@@ -8,29 +8,22 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-/*!
- * \file simt_common_impl.h
+
+/* !
+ * \file common_functions_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_SIMT_C_COMMON_IMPL_H
-#define ASCENDC_MODULE_SIMT_C_COMMON_IMPL_H
+#ifndef IMPL_SIMT_API_COMMON_FUNCTIONS_IMPL_H
+#define IMPL_SIMT_API_COMMON_FUNCTIONS_IMPL_H
 
-__simt_callee__ inline int32_t asc_get_block_idx_impl()
+__simt_callee__ inline int32_t asc_get_block_idx()
 {
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    return block_idx;
-#else
     return bisheng::cce::simt::get_block_idx();
-#endif
 }
 
-__simt_callee__ inline int32_t asc_get_block_num_impl()
+__simt_callee__ inline int32_t asc_get_block_num()
 {
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    return block_num;
-#else
     return bisheng::cce::simt::get_block_num();
-#endif
 }
 
-#endif  // ASCENDC_MODULE_SIMT_C_COMMON_IMPL_H
+#endif  // IMPL_SIMT_API_COMMON_FUNCTIONS_IMPL_H

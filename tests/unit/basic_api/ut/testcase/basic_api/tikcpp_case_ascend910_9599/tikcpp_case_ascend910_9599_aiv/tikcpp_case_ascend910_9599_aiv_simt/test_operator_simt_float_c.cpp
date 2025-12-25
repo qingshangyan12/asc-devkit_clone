@@ -11,7 +11,7 @@
 #include <type_traits>
 #include "simt_compiler_stub.h" // must include before simt api header
 #include "kernel_operator.h"
-#include "simt_math.h"
+#include "simt_api/asc_simt.h"
 
 using namespace std;
 using namespace AscendC;

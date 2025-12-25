@@ -1467,6 +1467,16 @@ float __cvt_float(float x) {
     }
 }
 
+int32_t get_block_idx()
+{
+    return block_idx;
+}
+
+int32_t get_block_num()
+{
+    return block_num;
+}
+
 }
 }
 }

@@ -12,8 +12,188 @@
  * \file asc_fp16_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_SIMT_C_ASC_FP16_IMPL_H
-#define ASCENDC_MODULE_SIMT_C_ASC_FP16_IMPL_H
+#ifndef IMPL_SIMT_API_ASC_FP16_IMPL_H
+#define IMPL_SIMT_API_ASC_FP16_IMPL_H
+
+constexpr uint32_t HALF_INF = 0x7C00;
+constexpr uint32_t HALF_NEG_INF = 0xFC00;
+
+__simt_callee__ inline bool __hisnan(half x)
+{
+    return __isnan(x);
+}
+
+__simt_callee__ inline bool __hisinf(half x)
+{
+    return __isinf(x);
+}
+
+__simt_callee__ inline half __hfma(half x, half y, half z)
+{
+    return __fma(x, y, z);
+}
+
+__simt_callee__ inline half __habs(half x)
+{
+    uint16_t bits = *(uint16_t*)&x;
+    bits &= 0x7FFF;
+    return *(half*)&bits;
+}
+
+__aicore__ inline bool ispositiveinf(float x)
+{
+    uint16_t* intX = (uint16_t*)&x;
+    return *intX == HALF_INF;
+}
+
+__aicore__ inline bool isnegativeinf(float x)
+{
+    uint16_t* intX = (uint16_t*)&x;
+    return *intX == HALF_NEG_INF;
+}
+
+__simt_callee__ inline half __hmax(half x, half y)
+{
+    if (__hisnan(x)) {
+        return y;
+    } else if (__hisnan(y)) {
+        return x;
+    }
+    if (ispositiveinf(x)) {
+        return x;
+    } else if (ispositiveinf(y)) {
+        return y;
+    }
+    if (isnegativeinf(x)) {
+        return y;
+    } else if (isnegativeinf(y)) {
+        return x;
+    }
+    if (x > y) {
+        return x;
+    } else {
+        return y;
+    }
+}
+
+__simt_callee__ inline half __hmin(half x, half y)
+{
+    if (__hisnan(x)) {
+        return y;
+    } else if (__hisnan(y)) {
+        return x;
+    }
+    if (isnegativeinf(x)) {
+        return x;
+    } else if (isnegativeinf(y)) {
+        return y;
+    }
+    if (ispositiveinf(x)) {
+        return y;
+    } else if (ispositiveinf(y)) {
+        return x;
+    }
+    if (x < y) {
+        return x;
+    } else {
+        return y;
+    }
+}
+
+__simt_callee__ inline half hcos(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = cosf(tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hsin(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = sinf(tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half htanh(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = tanhf(tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hexp(half x)
+{
+    return __expf(x);
+}
+
+__simt_callee__ inline half hexp2(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = powf(2.0f, tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hexp10(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = powf(10.0f, tmp);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hlog(half x)
+{
+    return __logf(x);
+}
+
+__simt_callee__ inline half hlog2(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = logf(x) / logf(2.0f);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+__simt_callee__ inline half hlog10(half x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = logf(x) / logf(10.0f);
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline half hsqrt(half x)
+{
+    return __sqrtf(x);
+}
+__simt_callee__ inline half hrsqrt(half x)
+{
+    return (half)1.0 / hsqrt(x);
+}
+
+__simt_callee__ inline half hrcp(half x)
+{
+    return (half)1.0 / x;
+}
+
+__simt_callee__ inline half hfloor(half x)
+{
+    return __floorf(x);
+}
+
+__simt_callee__ inline half hrint(half x)
+{
+    return __rintf(x);
+}
+
+__simt_callee__ inline half hceil(half x)
+{
+    return __ceilf(x);
+}
+__simt_callee__ inline half htrunc(half x)
+{
+    if (x > (half)0) {
+        return __floorf(x);
+    } else {
+        return __ceilf(x);
+    }
+}
 
 __simt_callee__ inline half __float2half(const float x) {
     return bisheng::cce::simt::__cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
@@ -229,4 +409,4 @@ __simt_callee__ inline half __ll2half_ru(const long long int x) {
     return bisheng::cce::simt::__cvt_half<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(f);
 }
 
-#endif  // ASCENDC_MODULE_SIMT_C_ASC_FP16_IMPL_H
+#endif  // IMPL_SIMT_API_ASC_FP16_IMPL_H

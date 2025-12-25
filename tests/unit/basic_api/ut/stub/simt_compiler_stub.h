@@ -11,10 +11,15 @@
 #ifndef SIMT_COMPILER_STUB_H
 #define SIMT_COMPILER_STUB_H
 
+#include "simt_api/dav_c310/kernel_simt_cpu.h"
 #include "kernel_vectorized.h"
 #include "stub_def.h"
 #include "stub_fun.h"
 
+#ifndef SIMT_WARP_SIZE
+#define SIMT_WARP_SIZE
+constexpr int32_t warpSize = 32;
+#endif
 constexpr int32_t MAX_SHLF_OFFSET = 31;
 constexpr int32_t WARP_SIZE = 32;
 constexpr uint32_t half_inf = 0x7C00;
@@ -326,6 +331,10 @@ float __cvt_float(half x);
 template<ROUND rnd, RoundingSaturation rst>
 float __cvt_float(float x);
 
+int32_t get_block_idx();
+
+int32_t get_block_num();
+
 }
 }
 }
@@ -371,5 +380,42 @@ float __fabsf(float x);
 float __fmaxf(float x, float y);
 
 float __fminf(float x, float y);
+
+#ifndef SIMT_CCE
+#define SIMT_CCE
+namespace cce {
+struct dim3 {
+    uint32_t x = 1u, y = 1u, z = 1u;
+    dim3(uint32_t x_) { x = x_; }
+    dim3(uint32_t x_, uint32_t y_)
+    {
+        x = x_;
+        y = y_;
+    }
+    dim3(uint32_t x_, uint32_t y_, uint32_t z_)
+    {
+        x = x_;
+        y = y_;
+        z = z_;
+    }
+};
+
+template <auto funcPtr, typename... Args>
+void async_invoke(const dim3 &dim, Args &&...args)
+{
+    g_threadDimX = dim.x;
+    g_threadDimY = dim.y;
+    g_threadDimZ = dim.z;
+    AscendC::Simt::ThreadBlock &threadBlock = AscendC::Simt::ThreadBlock::GetBlockInstance();
+    const uint32_t threadNum = g_threadDimX * g_threadDimY * g_threadDimZ;
+    threadBlock.Init(threadNum);
+    auto func = [&args...]() { funcPtr(args...); };
+    for (uint32_t i = 0; i < threadNum; i++) {
+        threadBlock.Schedule(func, i);
+    }
+    threadBlock.FinishJobs();
+}
+}  // namespace cce
+#endif
 
 #endif

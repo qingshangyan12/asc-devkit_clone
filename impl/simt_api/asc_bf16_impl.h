@@ -12,8 +12,151 @@
  * \file asc_bf16_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_SIMT_C_ASC_BF16_IMPL_H
-#define ASCENDC_MODULE_SIMT_C_ASC_BF16_IMPL_H
+#ifndef IMPL_SIMT_API_ASC_BF16_IMPL_H
+#define IMPL_SIMT_API_ASC_BF16_IMPL_H
+
+__simt_callee__ inline bool __hisnan(bfloat16_t x)
+{
+    return __isnan(x);
+}
+
+__simt_callee__ inline bool __hisinf(bfloat16_t x)
+{
+    return __isinf(x);
+}
+
+__simt_callee__ inline bfloat16_t __habs(bfloat16_t x)
+{
+    uint16_t bits = *(uint16_t*)&x;
+    bits &= 0x7FFF;
+    return *(bfloat16_t*)&bits;
+}
+
+__simt_callee__ inline bfloat16_t __hfma(bfloat16_t x, bfloat16_t y, bfloat16_t z)
+{
+    return __fma(x, y, z);
+}
+
+__simt_callee__ inline bfloat16_t __hmax(bfloat16_t x, bfloat16_t y)
+{
+    if (x > y) {
+        return x;
+    } else {
+        return y;
+    }
+}
+
+__simt_callee__ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
+{
+    if (x < y) {
+        return x;
+    } else {
+        return y;
+    }
+}
+
+__simt_callee__ inline bfloat16_t hcos(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = cosf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hsin(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = sinf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t htanh(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = tanhf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hexp(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = expf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hexp2(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = exp2f(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+__simt_callee__ inline bfloat16_t hexp10(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = exp10f(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hlog(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = logf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hlog2(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = log2f(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hlog10(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = log10f(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hsqrt(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = sqrtf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hrsqrt(bfloat16_t x)
+{
+    float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = 1.0f / sqrtf(tmp);
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__simt_callee__ inline bfloat16_t hrcp(bfloat16_t x)
+{
+    return (bfloat16_t)1.0 / x;
+}
+
+__simt_callee__ inline bfloat16_t hfloor(bfloat16_t x)
+{
+    return __floorf(x);
+}
+
+__simt_callee__ inline bfloat16_t hrint(bfloat16_t x)
+{
+    return __rintf(x);
+}
+__simt_callee__ inline bfloat16_t hceil(bfloat16_t x)
+{
+    return __ceilf(x);
+}
+__simt_callee__ inline bfloat16_t htrunc(bfloat16_t x)
+{
+    if (x > (bfloat16_t)0) {
+        return __floorf(x);
+    } else {
+        return __ceilf(x);
+    }
+}
 
 __simt_callee__ inline bfloat16_t __float2bfloat16(const float x) {
     return bisheng::cce::simt::__cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
@@ -238,4 +381,4 @@ __simt_callee__ inline bfloat16_t __ll2bfloat16_ru(const long long int x) {
     return bisheng::cce::simt::__cvt_bfloat16_t<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(f);
 }
 
-#endif  //  ASCENDC_MODULE_SIMT_C_ASC_BF16_IMPL_H
+#endif  // IMPL_SIMT_API_ASC_BF16_IMPL_H

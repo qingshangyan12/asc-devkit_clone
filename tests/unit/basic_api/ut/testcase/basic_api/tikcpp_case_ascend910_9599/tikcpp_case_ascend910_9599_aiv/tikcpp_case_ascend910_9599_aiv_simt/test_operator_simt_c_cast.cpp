@@ -10,8 +10,8 @@
 #include <gtest/gtest.h>
 #include <type_traits>
 #include "simt_compiler_stub.h"
-#include "simt_api/asc_simt.h"
-#include "simt_cast.h"
+#include "kernel_operator.h"
+#include "simt_api/asc_bf16.h"
 using namespace std;
 using namespace AscendC;
 using namespace AscendC::Simt;

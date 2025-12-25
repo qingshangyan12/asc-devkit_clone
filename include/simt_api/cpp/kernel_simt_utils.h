@@ -16,10 +16,15 @@
 #define ASCENDC_MODULE_SIMT_UTILS_H
 
 #ifdef ASCENDC_CPU_DEBUG
+#ifndef SIMT_WARP_SIZE
+#define SIMT_WARP_SIZE
 constexpr int32_t warpSize = 32;
+#endif
 #endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#ifndef SIMT_CCE
+#define SIMT_CCE
 namespace cce {
 struct Dim3 {
     uint32_t x = 1u, y = 1u, z = 1u;
@@ -55,6 +60,7 @@ void async_invoke(const dim3 &dim, Args &&...args)
     threadBlock.FinishJobs();
 }
 }  // namespace cce
+#endif
 #endif
 
 namespace AscendC {

@@ -12,7 +12,7 @@
 #include <random>
 #include "simt_compiler_stub.h"
 #include "kernel_operator.h"
-#include "simt_fp16.h"
+#include "simt_api/asc_fp16.h"
 
 using namespace std;
 using namespace AscendC;

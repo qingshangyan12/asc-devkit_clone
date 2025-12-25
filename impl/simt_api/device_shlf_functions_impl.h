@@ -8,8 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef ASCENDC_MODULE_SIMT_WARP_C_IMPL_H
-#define ASCENDC_MODULE_SIMT_WARP_C_IMPL_H
+/* !
+ * \file device_shlf_functions_impl.h
+ * \brief
+ */
+#ifndef IMPL_SIMT_API_DEVICE_SHLF_FUNCTIONS_IMPL_H
+#define IMPL_SIMT_API_DEVICE_SHLF_FUNCTIONS_IMPL_H
 
 // clamp the max source lane, except up mode
 constexpr int32_t MAX_OFFSET_OF_MODE = 0x1f;
@@ -20,26 +24,6 @@ constexpr int32_t MAX_OFFSET_OF_UP_MODE = 0;
 // the start position of max offset and lane mask
 constexpr int32_t MAX_OFFSET_START_POS = 8;
 constexpr int32_t LANE_MASK_START_POS = 16;
-
-__simt_callee__ inline int32_t asc_all(int32_t predicate)
-{
-    return bisheng::cce::simt::__all(predicate);
-}
-
-__simt_callee__ inline int32_t asc_any(int32_t predicate)
-{
-    return bisheng::cce::simt::__any(predicate);
-}
-
-__simt_callee__ inline uint32_t asc_ballot(int32_t predicate)
-{
-    return bisheng::cce::simt::__ballot(predicate);
-}
-
-__simt_callee__ inline uint32_t asc_activemask()
-{
-    return bisheng::cce::simt::__activemask();
-}
 
 __simt_callee__ inline int32_t asc_shfl(int32_t var, int32_t src_lane, int32_t width)
 {
@@ -206,14 +190,5 @@ __simt_callee__ inline float asc_reduce_min(float val)
     return bisheng::cce::simt::__reduce_min(val);
 }
 
-__simt_callee__ inline void asc_syncthreads()
-{
-    __sync_workitems();
-}
 
-__simt_callee__ inline void asc_threadfence()
-{
-    bisheng::cce::simt::__threadfence();
-}
-
-#endif  // ASCENDC_MODULE_SIMT_WARP_C_IMPL_H
+#endif  // IMPL_SIMT_API_DEVICE_SHLF_FUNCTIONS_IMPL_H

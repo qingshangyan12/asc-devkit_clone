@@ -8,9 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef ASCENDC_MODULE_SIMT_ATOMIC_C_IMPL_H
-#define ASCENDC_MODULE_SIMT_ATOMIC_C_IMPL_H
-
+/* !
+ * \file device_atomic_functions_impl.h
+ * \brief
+ */
+#ifndef IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H
+#define IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H
 #ifndef ASCENDC_CPU_DEBUG
 __simt_callee__ inline int32_t asc_atomic_add(__ubuf__ int32_t *address, int32_t val)
 {
@@ -372,4 +375,5 @@ __simt_callee__ inline uint64_t asc_atomic_xor(__gm__ uint64_t *address, uint64_
 {
     return bisheng::cce::simt::atomicXOr(address, val);
 }
-#endif  // ASCENDC_MODULE_SIMT_ATOMIC_C_IMPL_H
+
+#endif  // IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H

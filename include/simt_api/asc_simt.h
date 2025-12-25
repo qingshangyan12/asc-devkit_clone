@@ -12,19 +12,21 @@
  * \file asc_simt.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_SIMT_C_INTERFACE_H
-#define ASCENDC_MODULE_SIMT_C_INTERFACE_H
+#ifndef INCLUDE_SIMT_API_ASC_SIMT_H
+#define INCLUDE_SIMT_API_ASC_SIMT_H
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
-#include "simt_api/cpp/kernel_simt_intf.h"
-#include "simt_common_intf.h"
-#include "simt_atomic_intf.h"
-#include "simt_cast_inf.h"
-#include "simt_cmp_inf.h"
-#include "simt_math_intf.h"
-#include "simt_transcendental_intf.h"
-#include "simt_warp_level_intf.h"
-#include "simt_bessel_intf.h"
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #endif
 
-#endif  // ASCENDC_MODULE_SIMT_C_INTERFACE_H
+#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#include "simt_api/common_functions.h"
+#include "simt_api/math_functions.h"
+#include "simt_api/device_functions.h"
+#endif
+
+#if defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#endif
+
+#endif  // INCLUDE_SIMT_API_ASC_SIMT_H

@@ -12,8 +12,8 @@
  * \file device_functions_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_SIMT_C_DEVICE_FUNCTIONS_IMPL_H
-#define ASCENDC_MODULE_SIMT_C_DEVICE_FUNCTIONS_IMPL_H
+#ifndef IMPL_SIMT_API_DEVICE_FUNCTIONS_IMPL_H
+#define IMPL_SIMT_API_DEVICE_FUNCTIONS_IMPL_H
 
 __simt_callee__ inline unsigned int __float2uint_rn(const float x) {
     return bisheng::cce::simt::__cvt_uint32_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
@@ -186,4 +186,5 @@ __simt_callee__ inline unsigned int __float_as_uint(const float x) {
     union Data data = {.f = x};
     return data.u;
 }
-#endif //ASCENDC_MODULE_SIMT_C_DEVICE_FUNCTIONS_IMPL_H
+
+#endif  // IMPL_SIMT_API_DEVICE_FUNCTIONS_IMPL_H
