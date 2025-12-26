@@ -1,7 +1,7 @@
 # Ascend C
 
 ## 🔥Latest News
-
+- [2025/12] Ascend C项目新增对Kirin X90和Kirin 9030处理器的支持。
 - [2025/11] Ascend C项目基于Ascend 910C/Ascend 910B全面开源开放，包含以下新特性：
   - 实现分仓分包，支持分包独立安装部署，包括Ascend C算子开发所需的核心仓asc-devkit、调试工具仓[asc-tools](https://gitcode.com/cann/asc-tools)、Vector算子模板库仓[atvc](https://gitcode.com/cann/atvc)和[atvoss](https://gitcode.com/cann/atvoss)、Python前端仓[pyasc](https://gitcode.com/cann/pyasc)。
   - 编程API能力扩展
@@ -75,6 +75,7 @@ Ascend C是[CANN](https://hiascend.com/software/cann) （Compute Architecture fo
   |---------|--------|
   |[Ascend C编程指南](https://hiascend.com/document/redirect/CannCommunityOpdevAscendC)|基于昇腾AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
   |[Ascend C最佳实践](https://hiascend.com/document/redirect/CannCommunityAscendCBestPractice) | 基于已完成开发的Ascend C算子，介绍如何进一步优化算子性能。 |
+  |[Ascend C编程指南（鸿蒙）](https://gitcode.com/cann/cann-recipes-harmony-infer/blob/master/docs/ascendc_develop_guide.md)|基于麒麟AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
 
 ## 📌后续规划
 
