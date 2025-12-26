@@ -81,4 +81,38 @@ union asc_capi_arch_version {
     };
 };
 
+
+union asc_capi_fpc_reg_config {
+    uint64_t config;
+    struct {
+        uint64_t relu_units : 8; 
+        uint64_t quant_units : 8;
+        uint64_t reserved : 47;
+        uint64_t unit_flag : 1;
+    };
+};
+union asc_scalar_bitcode_half {
+    uint64_t config;
+    struct{
+        uint16_t input : 16;
+        uint64_t output : 48;
+    };
+};
+
+union asc_scalar_bitcode_int16_t {
+    uint64_t config;
+    struct{
+        uint16_t input : 16;
+        uint64_t output : 48;
+    };
+};
+
+union asc_scalar_bitcode_uint16_t {
+    uint64_t config;
+    struct{
+        uint16_t input : 16;
+        uint64_t output : 48;
+    };
+};
+
 #endif // IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_UTILS_C_API_IMPL_H

@@ -14,6 +14,7 @@
 #include "copy_gm_to_ubuf_impl/npu_arch_2201/asc_copy_gm_to_ubuf_impl.h"
 #include "copy_ubuf_to_gm_impl/npu_arch_2201/asc_copy_ubuf_to_gm_impl.h"
 #include "copy_gm_to_ubuf_align/npu_arch_2201/asc_copy_gm2ub_align_impl.h"
+#include "copy_ubuf_to_gm_align_impl/npu_arch_2201/asc_copy_ubuf_to_gm_align_impl.h"
 
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint8_t sid,
     uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
@@ -94,6 +95,55 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint32_t* dst, __gm__ uint3
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
 {
     asc_copy_gm2ub_align_sync_impl(dst, src, size);
+}
+
+//asc_copy_ub2gm_align
+__aicore__ inline void asc_copy_ub2gm_align_b8(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+{
+    asc_copy_ub2gm_align_b8_impl(dst, src, sid, n_burst, len_burst, left_padding_num, right_padding_num, src_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align_b8(__ubuf__  void* dst, __gm__ void* src, uint32_t size)
+{
+    asc_copy_ub2gm_align_b8_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align_b8_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+{
+    asc_copy_ub2gm_align_b8_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align_b16(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+{
+    asc_copy_ub2gm_align_b16_impl(dst, src, sid, n_burst, len_burst, left_padding_num, right_padding_num, src_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align_b16(__ubuf__  void* dst, __gm__ void* src, uint32_t size)
+{
+    asc_copy_ub2gm_align_b16_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align_b16_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+{
+    asc_copy_ub2gm_align_b16_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align_b32(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+{
+    asc_copy_ub2gm_align_b32_impl(dst, src, sid, n_burst, len_burst, left_padding_num, right_padding_num, src_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align_b32(__ubuf__  void* dst, __gm__ void* src, uint32_t size)
+{
+    asc_copy_ub2gm_align_b32_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align_b32_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+{
+    asc_copy_ub2gm_align_b32_impl(dst, src, size);
 }
 
 #endif
