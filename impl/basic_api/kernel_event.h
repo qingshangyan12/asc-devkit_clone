@@ -424,6 +424,8 @@ hard = Hardware::L0A;
         hard = Hardware::BIAS;
     } else if (pos == TPosition::CO2) {
         hard = Hardware::GM;
+    } else if (pos == TPosition::C2PIPE2GM) {
+        hard = Hardware::FIXBUF;
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 3113))
     } else if (pos == TPosition::C1) {
         hard = Hardware::L1;

@@ -18,8 +18,9 @@
 namespace AscendC {
 __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)
 {
-    (void)(config);
-    ASCENDC_REPORT_NOT_SUPPORT(false, "SetFixPipeClipRelu");
+#if !defined(ASCENDC_CPU_DEBUG)
+    set_fix_clip_relu(config);
+#endif
 }
 
 template <typename T>
@@ -91,6 +92,22 @@ __aicore__ inline void SetDeqScalarDepOnMode(QuantMode_t mode, uint64_t deqScala
     } else {
         set_quant_pre(deqScalar);
     }
+}
+
+__aicore__ inline void SetReluScalarOnMode(QuantMode_t mode, uint64_t reluScalar)
+{
+#if !defined(ASCENDC_CPU_DEBUG)
+    if (mode == QuantMode_t::DEQF16 || mode == QuantMode_t::REQ8) {
+        constexpr uint16_t shift = 23;
+        constexpr uint64_t mask = 0xFFULL << shift;
+        uint64_t originalBits = (reluScalar & mask) >> shift;
+        uint64_t newBits = (originalBits - 16) & 0xFF;
+        uint64_t newScalar = (reluScalar & ~mask) | (newBits << shift);
+        set_relu_alpha(newScalar);
+    } else {
+        set_relu_alpha(reluScalar);
+    }
+#endif
 }
 
 /* **************************************************************************************************
@@ -215,8 +232,8 @@ __aicore__ inline void FixpipeL0cToL1(__cbuf__ DstT* dst, __cc__ SrcT* src,
     // LOC -> L1 only n direction need fixpipeTiling, m no need fixpipeTiling
     return copy_matrix_cc_to_cbuf((__cbuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
         0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, 0,
-        0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
-        static_cast<uint8_t>(intriParams.reluEn), false, nz2ndEn,
+        static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
+        static_cast<uint8_t>(intriParams.preReluMode), false, nz2ndEn,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
         false, false, nz2dnEn);
 }
@@ -266,8 +283,8 @@ __aicore__ inline void FixpipeL0cToUB(__ubuf__ DstT* dst, __cc__ SrcT* src,
     // LOC -> UB only n direction need fixpipeTiling, m no need fixpipeTiling
     return copy_matrix_cc_to_ub((__ubuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
         calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, intriParams.dualDstCtl,
-        intriParams.subBlockId, 0, intriParams.unitFlag,
-        static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
+        intriParams.subBlockId, static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag,
+        static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.preReluMode),
         false, nz2ndEn,
         static_cast<uint64_t>(QuantMode_post::NoConv),
         0, false, false, 0, false, false, false, false, false, nz2dnEn);
@@ -330,8 +347,8 @@ __aicore__ inline void FixpipeL0cToOut(__gm__ DstT* dst, __cc__ SrcT* src,
     // LOC -> GM only n direction need fixpipeTiling, m no need fixpipeTiling
     return copy_matrix_cc_to_gm((__gm__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
         0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, cacheMode,
-        0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
-        static_cast<uint8_t>(intriParams.reluEn), intriParams.isChannelSplit, nz2ndEn,
+        static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
+        static_cast<uint8_t>(intriParams.preReluMode), intriParams.isChannelSplit, nz2ndEn,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
         false, false, nz2dnEn);
 }
@@ -416,6 +433,18 @@ __aicore__ inline void CheckFixpipeParams(__cc__ SrcT *src, const FixpipeParamsC
         "Failed to check dtype in Fixpipe");
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     CheckFixpipeQuantParams<DstT, SrcT, config>(params);
+    if(params.preClipReluMode == ClipReluMode::CLIP_RELU) {
+        ASCENDC_ASSERT((params.preReluMode == ReluMode::NORMAL_RELU),
+            {KERNEL_LOG(KERNEL_ERROR,"When preClipReluMode is CLIP_RELU, preReluMode must be NORMAL_RELU"); });
+    }
+    if(params.preReluMode == ReluMode::SCALAR_RELU || params.preReluMode == ReluMode::VECTOR_RELU) {
+        ASCENDC_ASSERT(!(params.quantPre == QuantMode_t::NoQuant),
+            {KERNEL_LOG(KERNEL_ERROR,"When preReluMode is SCALAR_RELU or VECTOR_RELU, quantPre can not be NoQuant"); });
+    }
+    if(params.preReluMode == ReluMode::SCALAR_RELU || params.preReluMode == ReluMode::VECTOR_RELU || params.preReluMode == ReluMode::NORMAL_RELU) {
+        ASCENDC_ASSERT(!(params.reluEn == true),
+            {KERNEL_LOG(KERNEL_ERROR,"When preReluMode is enable, reluEn must be true"); });
+    }
     constexpr uint32_t L0C_SRC_ALIGN = 16 * sizeof(float); // src must align with 16 elements, each of them is F32 / S32
     uint64_t srcAbsAddr = src - (SrcT*)(GetTPipePtr()->GetBaseAddr(int8_t(TPosition::CO1)));
     ASCENDC_ASSERT((srcAbsAddr % L0C_SRC_ALIGN == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check src start "\
@@ -513,6 +542,9 @@ __aicore__ inline void FixpipeL0C2L1Impl(
         // deq factor of uint64 bits describe: bits[31:13] is deq value of fp32,
         SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar);
     }
+    if (intriParams.preReluMode == ReluMode::SCALAR_RELU) {
+        SetReluScalarOnMode(intriParams.quantPre, intriParams.reluScalar);
+    }
     PipeBarrier<PIPE_FIX>();
     FixpipeTiling fixpipeTiling;
     // LOC -> L1
@@ -578,6 +610,9 @@ __aicore__ inline void FixpipeL0C2UBImpl(
         // deq factor of uint64 bits describe: bits[31:13] is deq value of fp32
         SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar); // float32->uint64_t
     }
+    if (intriParams.preReluMode == ReluMode::SCALAR_RELU) {
+        SetReluScalarOnMode(intriParams.quantPre, intriParams.reluScalar);
+    }
     PipeBarrier<PIPE_FIX>();
     // LOC->UB
     FixpipeTiling fixpipeTiling;
@@ -639,6 +674,9 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src,
     */
     if (IsScalarQuantMode(intriParams.quantPre)) {
         SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar);
+    }
+    if (intriParams.preReluMode == ReluMode::SCALAR_RELU) {
+        SetReluScalarOnMode(intriParams.quantPre, intriParams.reluScalar);
     }
     PipeBarrier<PIPE_FIX>();
     // LOC -> GM

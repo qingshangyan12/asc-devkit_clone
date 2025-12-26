@@ -145,7 +145,11 @@ struct FixpipeParamsC310 {
         srcStride = srcStrideIn;
         dstStride = dstStrideIn;
     }
-
+#if (__NPU_ARCH__ == 5102)
+    ReluMode preReluMode = ReluMode::NO_RELU;
+    ClipReluMode preClipReluMode = ClipReluMode::NOCLIP_RELU;
+    uint64_t reluScalar;
+#endif
     uint16_t nSize = 0;
     uint16_t mSize = 0;  // M-DirectionSize
     uint16_t srcStride = 0;
