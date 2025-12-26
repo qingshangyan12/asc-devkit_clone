@@ -1672,4 +1672,6 @@ __aicore__ inline void asc_fixpipe_l0c2out_vreq8_sync(__gm__ int32_t* dst, __cc_
     uint16_t n_size, uint16_t m_size, uint16_t dst_stride_dst_d, uint16_t src_stride, uint8_t unit_flag_mode,
     uint8_t relu_pre, bool channel_split, bool nz2nd_en);
 
+__aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
+
 #endif

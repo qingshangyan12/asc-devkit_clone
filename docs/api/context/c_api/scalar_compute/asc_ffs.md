@@ -14,16 +14,14 @@ FindFirstSet接口，输入数据的二进制表示中从最低位向最高位�
 ## 函数原型
 
 ```c++
-__aicore__ inline int64_t asc_ffs(uint64_t in)
+__aicore__ inline int64_t asc_ffs(uint64_t value)
 ```
 
 ## 参数说明
 
-表1 参数说明
-
 |参数名|输入/输出|描述|
 |------------|------------|-----------|
-| in     | 输入     | 输入数据。|
+| value     | 输入     | 输入数据。|
 
 ## 返回值说明
 
@@ -40,6 +38,6 @@ PIPE_S
 ## 调用示例
 
 ```c++
-uint64_t in = 10;
-int64_t ret = asc_ffs(in);
+uint64_t value = 10;
+int64_t ret = asc_ffs(value);
 ```

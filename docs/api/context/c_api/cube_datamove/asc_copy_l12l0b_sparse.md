@@ -46,6 +46,7 @@ PIPE_MTE1
 
 ## 约束说明
 
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 - dst、src的起始地址需要32字节对齐。
 - repeat为0表示不执行。
 - start_index不能小于0。

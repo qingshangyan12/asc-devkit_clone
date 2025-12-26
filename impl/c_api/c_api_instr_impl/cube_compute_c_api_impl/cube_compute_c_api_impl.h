@@ -11,7 +11,6 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_CUBE_COMPUTE_C_API_IMPL_CUBE_COMPUTE_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_CUBE_COMPUTE_C_API_IMPL_CUBE_COMPUTE_C_API_IMPL_H
 
-#include "set_l0c_copy_prequant_impl/npu_arch_2201/set_l0c_copy_prequant_impl.h"
 #include "set_hf32_trans2even_impl/npu_arch_2201/asc_set_hf32_trans2even_impl.h"
 #include "set_hf32_trans2zero_impl/npu_arch_2201/asc_set_hf32_trans2zero_impl.h"
 #include "clz_impl/npu_arch_2201/asc_clz_impl.h"
@@ -19,11 +18,6 @@
 #include "set_hf32_mode_impl/npu_arch_2201/asc_set_hf32_mode_impl.h"
 #include "set_fp32_mode_impl/npu_arch_2201/asc_set_fp32_mode_impl.h"
 #include "mad_impl/npu_arch_2201/asc_mmad_impl.h"
-
-__aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config)
-{
-    asc_set_l0c_copy_prequant_impl(config);
-}
 
 __aicore__ inline void asc_set_hf32_trans2even()
 {

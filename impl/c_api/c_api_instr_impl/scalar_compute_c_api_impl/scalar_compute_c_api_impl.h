@@ -19,9 +19,9 @@
 #include "ffz_impl/npu_arch_2201/asc_ffz_impl.h"
 #include "popc_impl/npu_arch_2201/asc_popc_impl.h"
 
-__aicore__ inline int64_t asc_ffs(uint64_t in)
+__aicore__ inline int64_t asc_ffs(uint64_t value)
 {
-    return asc_ffs_impl(in);
+    return asc_ffs_impl(value);
 }
 
 __aicore__ inline int64_t asc_sflbits(int64_t value)

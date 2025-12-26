@@ -13,7 +13,7 @@
  
 #include "c_api_instr_impl/scalar_compute_c_api_impl/scalar_compute_c_api_impl.h"
 
-__aicore__ inline int64_t asc_ffs(uint64_t in);
+__aicore__ inline int64_t asc_ffs(uint64_t value);
 
 __aicore__ inline int64_t asc_sflbits(int64_t value);
 

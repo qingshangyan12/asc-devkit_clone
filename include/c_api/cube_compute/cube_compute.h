@@ -13,8 +13,6 @@
 
 #include "c_api_instr_impl/cube_compute_c_api_impl/cube_compute_c_api_impl.h"
 
-__aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
-
 __aicore__ inline int64_t asc_clz(uint64_t value_in);
 
 // asc_mmad(float-bfloat16_t)

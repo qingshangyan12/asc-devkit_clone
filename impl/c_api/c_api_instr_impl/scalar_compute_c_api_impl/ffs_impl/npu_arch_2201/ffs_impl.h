@@ -13,9 +13,9 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline int64_t asc_ffs_impl(uint64_t in)
+__aicore__ inline int64_t asc_ffs_impl(uint64_t value)
 {
-    return sff1(in);
+    return sff1(value);
 }
 
 #endif

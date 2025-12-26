@@ -16,6 +16,7 @@
 #include "set_mm_layout_transform_impl/npu_arch_2201/asc_set_mm_layout_transform_impl.h"
 #include "set_l3d_rpt_impl/npu_arch_2201/asc_set_l3d_rpt_impl.h"
 #include "set_l0c_copy_params_impl/npu_arch_2201/asc_set_l0c_copy_params_impl.h"
+#include "set_l0c_copy_prequant_impl/npu_arch_2201/set_l0c_copy_prequant_impl.h"
 #include "copy_l12l0b_trans_impl/npu_arch_2201/asc_copy_l12l0b_trans_impl.h"
 #include "set_l1_3d_size_impl/npu_arch_2201/asc_set_l1_3d_size_impl.h"
 #include "load_image_to_cbuf_impl/npu_arch_2201/asc_load_image_to_cbuf_impl.h"
@@ -3421,6 +3422,11 @@ __aicore__ inline void asc_fixpipe_l0c2out_vreq8_sync(__gm__ int32_t* dst, __cc_
 {
     asc_fixpipe_l0c2out_vreq8_sync_impl(dst, src, sid, n_size, m_size,dst_stride_dst_d,
                              src_stride, unit_flag_mode, relu_pre, channel_split, nz2nd_en);
+}
+
+__aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config)
+{
+    asc_set_l0c_copy_prequant_impl(config);
 }
 
 #endif
