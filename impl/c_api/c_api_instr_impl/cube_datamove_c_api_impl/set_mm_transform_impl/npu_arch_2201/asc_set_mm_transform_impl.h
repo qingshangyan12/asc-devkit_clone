@@ -9,16 +9,23 @@
 */
 
 /* !
- * \file asc_set_atomic_f16_impl.h
+ * \file asc_set_mm_transform_impl.h
  * \brief
  */
-#ifndef IMPL_C_API_INSTR_SIMD_ATOMIC_SET_ATOMIC_TYPE_SET_ATOMIC_F16_IMPL_NPU_ARCH_2201_ASC_SET_ATOMIC_F16_IMPL_H
-#define IMPL_C_API_INSTR_SIMD_ATOMIC_SET_ATOMIC_TYPE_SET_ATOMIC_F16_IMPL_NPU_ARCH_2201_ASC_SET_ATOMIC_F16_IMPL_H
+
+#ifndef IMPL_C_API_INSTR_CUBE_DMAMOVE_SET_MM_TRANSFORM_IMPL_NPU_ARCH_2201_ASC_SET_MM_TRANSFORM_IMPL_H
+#define IMPL_C_API_INSTR_CUBE_DMAMOVE_SET_MM_TRANSFORM_IMPL_NPU_ARCH_2201_ASC_SET_MM_TRANSFORM_IMPL_H
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void set_atomic_f16_impl()
+constexpr int32_t CAPI_MM_LAYOUT_MODE_BIT = 51;
+__aicore__ inline void asc_set_mm_transform_m_impl()
 {
-    set_atomic_f16();
+    set_ctrl(sbitset1(get_ctrl(), CAPI_MM_LAYOUT_MODE_BIT));
 }
- 
+
+__aicore__ inline void asc_set_mm_transform_n_impl()
+{
+    set_ctrl(sbitset0(get_ctrl(), CAPI_MM_LAYOUT_MODE_BIT));
+}
+
 #endif

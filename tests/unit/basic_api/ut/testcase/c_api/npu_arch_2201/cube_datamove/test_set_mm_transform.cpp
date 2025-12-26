@@ -13,16 +13,31 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-class TestSysVarGetDataBlockSize : public testing::Test {
+class TestCubeDmamoveSetL13DRpt : public testing::Test { 
 protected:
     void SetUp() {}
     void TearDown() {}
 };
 
+namespace {
 
-TEST_F(TestSysVarGetDataBlockSize, get_datablock_size_succ)
+uint64_t set_mm_layout_transform_Stub(uint64_t bits, int64_t idx) 
 {
-    uint16_t val = asc_get_datablock_size();
-    EXPECT_EQ(32, val);
+    if (idx >= 0 && idx < 64) {
+        bits |= (1ULL << idx);
+    }
+    return bits;
+}
+
+}
+
+TEST_F(TestCubeDmamoveSetL13DRpt, set_mm_layout_Transform_Succ)
+{
+    MOCKER(sbitset1, uint64_t(uint64_t, int64_t))
+        .times(1)
+        .will(invoke(set_mm_layout_transform_Stub));
+
+    asc_set_mm_transform_m();
+    asc_set_mm_transform_n();
     GlobalMockObject::verify();
 }

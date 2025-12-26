@@ -16,39 +16,9 @@
 #define IMPL_C_API_INSTR_SIMD_ATOMIC_SET_ST_ATOMIC_CFG_IMPL_NPU_ARCH_2201_ASC_SET_STORE_ATOMIC_CONFIG_IMPL_H
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void asc_set_store_atomic_config_none_sum_impl()
+__aicore__ inline void asc_set_store_atomic_config_impl(asc_store_atomic_config& config)
 {
-    set_st_atomic_cfg(ATOMIC_NONE, ATOMIC_SUM);
+    set_st_atomic_cfg(config.config);
 }
 
-__aicore__ inline void asc_set_store_atomic_config_f32_sum_impl()
-{
-    set_st_atomic_cfg(ATOMIC_F32, ATOMIC_SUM);
-}
-
-__aicore__ inline void asc_set_store_atomic_config_f16_sum_impl()
-{
-    set_st_atomic_cfg(ATOMIC_F16, ATOMIC_SUM);
-}
-
-__aicore__ inline void asc_set_store_atomic_config_s16_sum_impl()
-{
-    set_st_atomic_cfg(ATOMIC_S16, ATOMIC_SUM);
-}
-
-__aicore__ inline void asc_set_store_atomic_config_s32_sum_impl()
-{
-    set_st_atomic_cfg(ATOMIC_S32, ATOMIC_SUM);
-}
-
-__aicore__ inline void asc_set_store_atomic_config_s8_sum_impl()
-{
-    set_st_atomic_cfg(ATOMIC_S8, ATOMIC_SUM);
-}
-
-__aicore__ inline void asc_set_store_atomic_config_bf16_sum_impl()
-{
-    set_st_atomic_cfg(ATOMIC_BF16, ATOMIC_SUM);
-}
- 
 #endif

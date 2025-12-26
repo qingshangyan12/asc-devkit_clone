@@ -31,12 +31,5 @@ TEST_F(TestSimdAtomicSetAtomicf16, set_atomic_f16_Succ)
         .will(invoke(set_atomic_f16_Stub));
     
     asc_set_atomic_f16();
-    asc_set_store_atomic_config_none_sum();
-    asc_set_store_atomic_config_f32_sum();
-    asc_set_store_atomic_config_f16_sum();
-    asc_set_store_atomic_config_s16_sum();
-    asc_set_store_atomic_config_s32_sum();
-    asc_set_store_atomic_config_s8_sum();
-    asc_set_store_atomic_config_bf16_sum();
     GlobalMockObject::verify();
 }

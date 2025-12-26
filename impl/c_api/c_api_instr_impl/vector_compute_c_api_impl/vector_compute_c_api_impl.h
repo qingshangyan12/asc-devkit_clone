@@ -134,7 +134,6 @@
 #include "vaxpy_impl/npu_arch_2201/asc_axpy_impl.h"
 #include "vcmp_c_api_impl/vcmp_lt_impl/npu_arch_2201/asc_lt_impl.h"
 #include "vcmpvs_c_api_impl/vcmpvs_ne_impl/npu_arch_2201/asc_ne_scalar_impl.h"
-#include "set_nthbit_impl/asc_2201/set_nthbit_impl.h"
 #include "vconv_c_api_impl/vconv_int162half_impl/npu_arch_2201/asc_int162half_impl.h"
 #include "vconv_c_api_impl/vconv_int162half_impl/npu_arch_2201/asc_int162half_a_impl.h"
 #include "vconv_c_api_impl/vconv_int162half_impl/npu_arch_2201/asc_int162half_c_impl.h"
@@ -4464,12 +4463,6 @@ __aicore__ inline void asc_ne_scalar_sync(__ubuf__ uint8_t *dst, __ubuf__ float 
            uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
     asc_ne_scalar_sync_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-// ==========asc_set_nthbit==========
-__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx) 
-{
-    return set_nthbit_impl(bits, idx);
 }
 
 // ==========asc_int162half==========

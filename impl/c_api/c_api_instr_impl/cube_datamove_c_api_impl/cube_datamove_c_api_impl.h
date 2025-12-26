@@ -13,7 +13,7 @@
  
 #include "copy_l12l0b_sparse_impl/npu_arch_2201/copy_l12l0b_sparse_impl.h"
 #include "copy_cbuf_to_bt_impl/npu_arch_2201/asc_copy_l12bt.h"
-#include "set_mm_layout_transform_impl/npu_arch_2201/asc_set_mm_layout_transform_impl.h"
+#include "set_mm_transform_impl/npu_arch_2201/asc_set_mm_transform_impl.h"
 #include "set_l3d_rpt_impl/npu_arch_2201/asc_set_l3d_rpt_impl.h"
 #include "set_l0c_copy_params_impl/npu_arch_2201/asc_set_l0c_copy_params_impl.h"
 #include "set_l0c_copy_prequant_impl/npu_arch_2201/set_l0c_copy_prequant_impl.h"
@@ -58,14 +58,14 @@ __aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t* dst, __cbuf__ 
     asc_copy_l12l0b_sparse_sync_impl(dst, src, index, start_index, repeat);
 }
 
-__aicore__ inline void asc_set_mm_layout_transform_m()
+__aicore__ inline void asc_set_mm_transform_m()
 {
-    asc_set_mm_layout_transform_m_impl();
+    asc_set_mm_transform_m_impl();
 }
 
-__aicore__ inline void asc_set_mm_layout_transform_n()
+__aicore__ inline void asc_set_mm_transform_n()
 {
-    asc_set_mm_layout_transform_n_impl();
+    asc_set_mm_transform_n_impl();
 }
 __aicore__ inline void asc_set_l1_3d_rpt(uint64_t value)
 {

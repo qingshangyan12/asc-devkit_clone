@@ -70,42 +70,12 @@ __aicore__ inline void asc_set_atomic_s16()
 
 __aicore__ inline void asc_set_atomic_f16()
 {
-    set_atomic_f16_impl();
+    asc_set_atomic_f16_impl();
 }
 
-__aicore__ inline void asc_set_store_atomic_config_none_sum()
+__aicore__ inline void asc_set_store_atomic_config(asc_store_atomic_config& config)
 {
-    asc_set_store_atomic_config_none_sum_impl();
-}
-
-__aicore__ inline void asc_set_store_atomic_config_f32_sum()
-{
-    asc_set_store_atomic_config_f32_sum_impl();
-}
-
-__aicore__ inline void asc_set_store_atomic_config_f16_sum()
-{
-    asc_set_store_atomic_config_f16_sum_impl();
-}
-
-__aicore__ inline void asc_set_store_atomic_config_s16_sum()
-{
-    asc_set_store_atomic_config_s16_sum_impl();
-}
-
-__aicore__ inline void asc_set_store_atomic_config_s32_sum()
-{
-    asc_set_store_atomic_config_s32_sum_impl();
-}
-
-__aicore__ inline void asc_set_store_atomic_config_s8_sum()
-{
-    asc_set_store_atomic_config_s8_sum_impl();
-}
-
-__aicore__ inline void asc_set_store_atomic_config_bf16_sum()
-{
-    asc_set_store_atomic_config_bf16_sum_impl();
+    asc_set_store_atomic_config_impl(config);
 }
 
 #endif

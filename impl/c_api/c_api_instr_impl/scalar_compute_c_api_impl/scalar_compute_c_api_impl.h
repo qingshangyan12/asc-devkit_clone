@@ -18,6 +18,7 @@
 #include "zero_bits_cnt_impl/npu_arch_2201/asc_zero_bits_cnt_impl.h"
 #include "ffz_impl/npu_arch_2201/asc_ffz_impl.h"
 #include "popc_impl/npu_arch_2201/asc_popc_impl.h"
+#include "set_nthbit_impl/npu_arch/asc_set_nthbit_impl.h"
 
 __aicore__ inline int64_t asc_ffs(uint64_t value)
 {
@@ -42,6 +43,12 @@ __aicore__ inline int64_t asc_ffz(uint64_t value)
 __aicore__ inline int64_t asc_popc(uint64_t value)
 {
     return asc_popc_impl(value);
+}
+
+// ==========asc_set_nthbit==========
+__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx) 
+{
+    return asc_set_nthbit_impl(bits, idx);
 }
 
 #endif
