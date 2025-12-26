@@ -21,6 +21,14 @@ __simt_callee__ inline uint32_t asc_atomic_add(__ubuf__ uint32_t *address, uint3
 
 __simt_callee__ inline float asc_atomic_add(__ubuf__ float *address, float val);
 
+__simt_callee__ inline half asc_atomic_add(__ubuf__ half *address, half val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_add(__ubuf__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline half2 asc_atomic_add(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_add(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
+
 __simt_callee__ inline int32_t asc_atomic_add(__gm__ int32_t *address, int32_t val);
 
 __simt_callee__ inline uint32_t asc_atomic_add(__gm__ uint32_t *address, uint32_t val);
@@ -31,11 +39,23 @@ __simt_callee__ inline int64_t asc_atomic_add(__gm__ int64_t *address, int64_t v
 
 __simt_callee__ inline uint64_t asc_atomic_add(__gm__ uint64_t *address, uint64_t val);
 
+__simt_callee__ inline half asc_atomic_add(__gm__ half *address, half val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_add(__gm__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline half2 asc_atomic_add(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_add(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
 __simt_callee__ inline int32_t asc_atomic_sub(__ubuf__ int32_t *address, int32_t val);
 
 __simt_callee__ inline uint32_t asc_atomic_sub(__ubuf__ uint32_t *address, uint32_t val);
 
 __simt_callee__ inline float asc_atomic_sub(__ubuf__ float *address, float val);
+
+__simt_callee__ inline half2 asc_atomic_sub(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_sub(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
 
 __simt_callee__ inline int32_t asc_atomic_sub(__gm__ int32_t *address, int32_t val);
 
@@ -47,9 +67,17 @@ __simt_callee__ inline int64_t asc_atomic_sub(__gm__ int64_t *address, int64_t v
 
 __simt_callee__ inline uint64_t asc_atomic_sub(__gm__ uint64_t *address, uint64_t val);
 
+__simt_callee__ inline half2 asc_atomic_sub(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_sub(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
 __simt_callee__ inline int32_t asc_atomic_exch(__ubuf__ int32_t *address, int32_t val);
 
 __simt_callee__ inline uint32_t asc_atomic_exch(__ubuf__ uint32_t *address, uint32_t val);
+
+__simt_callee__ inline half2 asc_atomic_exch(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_exch(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
 
 __simt_callee__ inline float asc_atomic_exch(__ubuf__ float *address, float val);
 
@@ -63,11 +91,23 @@ __simt_callee__ inline uint64_t asc_atomic_exch(__gm__ uint64_t *address, uint64
 
 __simt_callee__ inline float asc_atomic_exch(__gm__ float *address, float val);
 
+__simt_callee__ inline half2 asc_atomic_exch(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_exch(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
 __simt_callee__ inline int32_t asc_atomic_max(__ubuf__ int32_t *address, int32_t val);
 
 __simt_callee__ inline uint32_t asc_atomic_max(__ubuf__ uint32_t *address, uint32_t val);
 
 __simt_callee__ inline float asc_atomic_max(__ubuf__ float *address, float val);
+
+__simt_callee__ inline half asc_atomic_max(__ubuf__ half *address, half val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_max(__ubuf__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline half2 asc_atomic_max(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_max(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
 
 __simt_callee__ inline int32_t asc_atomic_max(__gm__ int32_t *address, int32_t val);
 
@@ -79,11 +119,27 @@ __simt_callee__ inline int64_t asc_atomic_max(__gm__ int64_t *address, int64_t v
 
 __simt_callee__ inline uint64_t asc_atomic_max(__gm__ uint64_t *address, uint64_t val);
 
+__simt_callee__ inline half asc_atomic_max(__gm__ half *address, half val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_max(__gm__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline half2 asc_atomic_max(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_max(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
 __simt_callee__ inline int32_t asc_atomic_min(__ubuf__ int32_t *address, int32_t val);
 
 __simt_callee__ inline uint32_t asc_atomic_min(__ubuf__ uint32_t *address, uint32_t val);
 
 __simt_callee__ inline float asc_atomic_min(__ubuf__ float *address, float val);
+
+__simt_callee__ inline half asc_atomic_min(__ubuf__ half *address, half val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_min(__ubuf__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline half2 asc_atomic_min(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_min(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
 
 __simt_callee__ inline int32_t asc_atomic_min(__gm__ int32_t *address, int32_t val);
 
@@ -94,6 +150,14 @@ __simt_callee__ inline float asc_atomic_min(__gm__ float *address, float val);
 __simt_callee__ inline int64_t asc_atomic_min(__gm__ int64_t *address, int64_t val);
 
 __simt_callee__ inline uint64_t asc_atomic_min(__gm__ uint64_t *address, uint64_t val);
+
+__simt_callee__ inline half asc_atomic_min(__gm__ half *address, half val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_min(__gm__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline half2 asc_atomic_min(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_min(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
 
 __simt_callee__ inline uint32_t asc_atomic_inc(__ubuf__ uint32_t *address, uint32_t val);
 
@@ -113,6 +177,10 @@ __simt_callee__ inline uint32_t asc_atomic_cas(__ubuf__ uint32_t *address, uint3
 
 __simt_callee__ inline float asc_atomic_cas(__ubuf__ float *address, float compare, float val);
 
+__simt_callee__ inline half2 asc_atomic_cas(__ubuf__ half2 *address, half2 compare, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_cas(__ubuf__ bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val);
+
 __simt_callee__ inline int32_t asc_atomic_cas(__gm__ int32_t *address, int32_t compare, int32_t val);
 
 __simt_callee__ inline uint32_t asc_atomic_cas(__gm__ uint32_t *address, uint32_t compare, uint32_t val);
@@ -122,6 +190,10 @@ __simt_callee__ inline int64_t asc_atomic_cas(__gm__ int64_t *address, int64_t c
 __simt_callee__ inline uint64_t asc_atomic_cas(__gm__ uint64_t *address, uint64_t compare, uint64_t val);
 
 __simt_callee__ inline float asc_atomic_cas(__gm__ float *address, float compare, float val);
+
+__simt_callee__ inline half2 asc_atomic_cas(__gm__ half2 *address, half2 compare, half2 val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_cas(__gm__ bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val);
 
 __simt_callee__ inline int32_t asc_atomic_and(__ubuf__ int32_t *address, int32_t val);
 

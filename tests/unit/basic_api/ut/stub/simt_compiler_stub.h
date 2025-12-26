@@ -16,6 +16,8 @@
 #include "stub_def.h"
 #include "stub_fun.h"
 
+using bfloat16x2_t = bhalf2;
+
 #ifndef SIMT_WARP_SIZE
 #define SIMT_WARP_SIZE
 constexpr int32_t warpSize = 32;
@@ -356,6 +358,42 @@ float __cvt_float(float x);
 int32_t get_block_idx();
 
 int32_t get_block_num();
+
+half atomicAdd(__gm__ half *address, half val);
+
+bfloat16_t atomicAdd(__gm__ bfloat16_t *address, bfloat16_t val);
+
+half2 atomicAdd(__gm__ half2 *address, half2 val);
+
+bfloat16x2_t atomicAdd(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+half2 atomicSub(__gm__ half2 *address, half2 val);
+
+bfloat16x2_t atomicSub(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+half atomicMax(__gm__ half *address, half val);
+
+bfloat16_t atomicMax(__gm__ bfloat16_t *address, bfloat16_t val);
+
+half2 atomicMax(__gm__ half2 *address, half2 val);
+
+bfloat16x2_t atomicMax(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+half atomicMin(__gm__ half *address, half val);
+
+bfloat16_t atomicMin(__gm__ bfloat16_t *address, bfloat16_t val);
+
+half2 atomicMin(__gm__ half2 *address, half2 val);
+
+bfloat16x2_t atomicMin(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+half2 atomicExch(__gm__ half2 *address, half2 val);
+
+bfloat16x2_t atomicExch(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+half2 atomicCAS(__gm__ half2 *address, half2 compare, half2 val);
+
+bfloat16x2_t atomicCAS(__gm__ bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val);
 
 }
 }

@@ -1659,6 +1659,162 @@ int32_t get_block_num()
     return block_num;
 }
 
+half atomicAdd(__gm__ half *address, half val)
+{
+    half ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() { *address += val; });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+bfloat16_t atomicAdd(__gm__ bfloat16_t *address, bfloat16_t val)
+{
+    bfloat16_t ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() { *address += val; });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+half2 atomicAdd(__gm__ half2 *address, half2 val)
+{
+    return val;
+}
+
+bfloat16x2_t atomicAdd(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return val;
+}
+
+half atomicSub(__gm__ half *address, half val)
+{
+    half ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() { *address -= val; });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+bfloat16_t atomicSub(__gm__ bfloat16_t *address, bfloat16_t val)
+{
+    bfloat16_t ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() { *address -= val; });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+half2 atomicSub(__gm__ half2 *address, half2 val)
+{
+    return val;
+}
+
+bfloat16x2_t atomicSub(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return val;
+}
+
+half atomicMax(__gm__ half *address, half val)
+{
+    half ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        if (*address < val) {
+            *address = val;
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+bfloat16_t atomicMax(__gm__ bfloat16_t *address, bfloat16_t val)
+{
+    bfloat16_t ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        if (*address < val) {
+            *address = val;
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+half2 atomicMax(__gm__ half2 *address, half2 val)
+{
+    return val;
+}
+
+bfloat16x2_t atomicMax(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return val;
+}
+
+half atomicMin(__gm__ half *address, half val)
+{
+    half ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        if (*address > val) {
+            *address = val;
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+bfloat16_t atomicMin(__gm__ bfloat16_t *address, bfloat16_t val)
+{
+    bfloat16_t ret;
+    AscendC::ProcessLock::GetProcessLock()->Write();
+    ret = *address;
+    AscendC::Simt::ThreadBlock::GetBlockInstance().AtomicOp([address, val]() {
+        if (*address > val) {
+            *address = val;
+        }
+    });
+    AscendC::ProcessLock::GetProcessLock()->Unlock();
+    return ret;
+}
+
+half2 atomicMin(__gm__ half2 *address, half2 val)
+{
+    return val;
+}
+
+bfloat16x2_t atomicMin(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return val;
+}
+
+half2 atomicExch(__gm__ half2 *address, half2 val)
+{
+    return val;
+}
+
+bfloat16x2_t atomicExch(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return val;
+}
+
+half2 atomicCAS(__gm__ half2 *address, half2 compare, half2 val)
+{
+    return val;
+}
+
+bfloat16x2_t atomicCAS(__gm__ bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val)
+{
+    return val;
+}
+
 }
 }
 }
