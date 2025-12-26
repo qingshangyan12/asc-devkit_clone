@@ -19,6 +19,16 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p149598793615"><a name="p149598793615"></a><a name="p149598793615"></a>√</p>
 </td>
 </tr>
+<tr id="row2064043572"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p171071651104613"><a name="p171071651104613"></a><a name="p171071651104613"></a><span id="ph8960167193611"><a name="ph8960167193611"></a><a name="ph8960167193611"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p096010715361"><a name="p096010715361"></a><a name="p096010715361"></a>√</p>
+</td>
+</tr>
+<tr id="row258755154613"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p18587175114614"><a name="p18587175114614"></a><a name="p18587175114614"></a><span id="ph5776533104711"><a name="ph5776533104711"></a><a name="ph5776533104711"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p2058745154620"><a name="p2058745154620"></a><a name="p2058745154620"></a>√</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -29,6 +39,10 @@
 Ascend 910C采用方式一。
 
 Ascend 910B采用方式一。
+
+Kirin X90采用方式一。
+
+Kirin 9030采用方式一。
 
 -   排布方式一：
 
@@ -85,6 +99,8 @@ __aicore__ inline void Sort(const LocalTensor<T> &dst, const LocalTensor<T> &con
 <td class="cellrowborder" valign="top" width="80.82000000000001%" headers="mcps1.2.3.1.2 "><p id="p8299155010420"><a name="p8299155010420"></a><a name="p8299155010420"></a>操作数的数据类型。</p>
 <p id="p120314548496"><a name="p120314548496"></a><a name="p120314548496"></a><span id="ph10203145494919"><a name="ph10203145494919"></a><a name="ph10203145494919"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Ascend 910C</term></span>，支持的数据类型为：half、float。</p>
 <p id="p7265124521915"><a name="p7265124521915"></a><a name="p7265124521915"></a><span id="ph4684166535"><a name="ph4684166535"></a><a name="ph4684166535"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Ascend 910B</term></span>，支持的数据类型为：half、float。</p>
+<p id="p184962505471"><a name="p184962505471"></a><a name="p184962505471"></a><span id="ph9713141120484"><a name="ph9713141120484"></a><a name="ph9713141120484"></a>Kirin X90</span>，支持的数据类型为：half、float。</p>
+<p id="p8588195884716"><a name="p8588195884716"></a><a name="p8588195884716"></a><span id="ph1601215144817"><a name="ph1601215144817"></a><a name="ph1601215144817"></a>Kirin 9030</span>，支持的数据类型为：half、float。</p>
 </td>
 </tr>
 <tr id="row1623812985111"><td class="cellrowborder" valign="top" width="19.18%" headers="mcps1.2.3.1.1 "><p id="p152385297515"><a name="p152385297515"></a><a name="p152385297515"></a>isFullSort</p>
@@ -149,7 +165,7 @@ __aicore__ inline void Sort(const LocalTensor<T> &dst, const LocalTensor<T> &con
 <td class="cellrowborder" valign="top" width="12.591259125912593%" headers="mcps1.2.4.1.2 "><p id="p63676515516"><a name="p63676515516"></a><a name="p63676515516"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="73.74737473747375%" headers="mcps1.2.4.1.3 "><p id="p636715110511"><a name="p636715110511"></a><a name="p636715110511"></a>重复迭代次数，int32_t类型。</p>
-<a name="ul1879420254213"></a><a name="ul1879420254213"></a><ul id="ul1879420254213"><li><span id="ph13349111912302"><a name="ph13349111912302"></a><a name="ph13349111912302"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_3"><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a>Ascend 910C</term></span>：每次迭代完成32个元素的排序，下次迭代concat和index各跳过32个elements，dst跳过32*8 Byte空间。取值范围：repeatTime∈[0,255]。</li><li><span id="ph128215620306"><a name="ph128215620306"></a><a name="ph128215620306"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_3"><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a>Ascend 910B</term></span>：每次迭代完成32个元素的排序，下次迭代concat和index各跳过32个elements，dst跳过32*8 Byte空间。取值范围：repeatTime∈[0,255]。</li></ul>
+<a name="ul1879420254213"></a><a name="ul1879420254213"></a><ul id="ul1879420254213"><li><span id="ph13349111912302"><a name="ph13349111912302"></a><a name="ph13349111912302"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_3"><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a>Ascend 910C</term></span>：每次迭代完成32个元素的排序，下次迭代concat和index各跳过32个elements，dst跳过32*8 Byte空间。取值范围：repeatTime∈[0,255]。</li><li><span id="ph128215620306"><a name="ph128215620306"></a><a name="ph128215620306"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_3"><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a>Ascend 910B</term></span>：每次迭代完成32个元素的排序，下次迭代concat和index各跳过32个elements，dst跳过32*8 Byte空间。取值范围：repeatTime∈[0,255]。</li><li><span id="ph79109544438"><a name="ph79109544438"></a><a name="ph79109544438"></a>Kirin X90</span>：每次迭代完成32个元素的排序，下次迭代concat和index各跳过32个elements，dst跳过32*8 Byte空间。取值范围：repeatTime∈[0,255]。</li><li><span id="ph8910155454315"><a name="ph8910155454315"></a><a name="ph8910155454315"></a>Kirin 9030</span>：每次迭代完成32个元素的排序，下次迭代concat和index各跳过32个elements，dst跳过32*8 Byte空间。取值范围：repeatTime∈[0,255]。</li></ul>
 </td>
 </tr>
 </tbody>
@@ -174,6 +190,10 @@ __aicore__ inline void Sort(const LocalTensor<T> &dst, const LocalTensor<T> &con
     Ascend 910B
 
     Ascend 910C
+
+    Kirin X90
+
+    Kirin 9030
 
     ```
     uint32_t elementCount = 128;
