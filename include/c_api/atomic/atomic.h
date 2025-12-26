@@ -13,8 +13,10 @@
  
 #include "c_api_instr_impl/atomic_c_api_impl/atomic_c_api_impl.h"
 
+__aicore__ inline void asc_set_atomic_max();
+
 __aicore__ inline void asc_set_atomic_s32();
- 
+
 __aicore__ inline void asc_set_atomic_add();
 
 __aicore__ inline void asc_set_atomic_none();

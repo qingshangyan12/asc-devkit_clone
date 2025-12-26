@@ -11,6 +11,7 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_ATOMIC_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_ATOMIC_C_API_IMPL_H
 
+#include "set_atomic_max_impl/npu_arch_2201/asc_set_atomic_max_impl.h"
 #include "set_atomic_add_impl/npu_arch_2201/asc_set_atomic_add_impl.h"
 #include "set_atomic_none_impl/npu_arch_2201/asc_set_atomic_none_impl.h"
 #include "set_atomic_min_impl/npu_arch_2201/asc_set_atomic_min_impl.h"
@@ -35,6 +36,11 @@ __aicore__ inline void asc_set_atomic_none()
 __aicore__ inline void asc_set_atomic_min()
 {
     asc_set_atomic_min_impl();
+}
+
+__aicore__ inline void asc_set_atomic_max()
+{
+    asc_set_atomic_max_impl();
 }
 
 __aicore__ inline void asc_set_atomic_s8()

@@ -58,13 +58,12 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
 {                                                                                               \
     __ubuf__ dst_data_type *dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);               \
     __ubuf__ src_data_type *src = reinterpret_cast<__ubuf__ src_data_type *>(22);               \
-                                                                                                \
-    asc_unary_config config;                                                                    \
-    config.dst_block_stride = static_cast<uint64_t>(1);                                         \
-    config.src_block_stride = static_cast<uint64_t>(1);                                         \
-    config.dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.src_repeat_stride = static_cast<uint64_t>(8);                                        \
-    config.repeat = static_cast<uint64_t>(1);                                                   \
+                                                                                                 \
+    uint64_t dst_block_stride = static_cast<uint64_t>(1);                                         \
+    uint64_t src_block_stride = static_cast<uint64_t>(1);                                         \
+    uint64_t dst_repeat_stride = static_cast<uint64_t>(8);                                        \
+    uint64_t src_repeat_stride = static_cast<uint64_t>(8);                                        \
+    uint64_t repeat = static_cast<uint64_t>(1);                                                   \
                                                                                                 \
     MOCKER_CPP(cce_name,                                                                        \
         void(__ubuf__ dst_data_type *, __ubuf__ src_data_type *,                               \
@@ -72,11 +71,11 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_UnaryCfg_Stub));        \
                                                                                                 \
-    c_api_name(dst, src, config);                                                               \
+    c_api_name(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);    \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
-TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_name##_##dst_data_type##_##src_data_type##_uint32_t_Succ)      \
+TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_name##_##dst_data_type##_##src_data_type##_uint32_t_Succ)    \
 {                                                                                               \
     __ubuf__ dst_data_type *dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);               \
     __ubuf__ src_data_type *src = reinterpret_cast<__ubuf__ src_data_type *>(22);               \
@@ -107,7 +106,7 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_set_vector_mask_Stub)); \
                                                                                                 \
     MOCKER_CPP(cce_name,                                                                        \
-        void(*)(__ubuf__ dst_data_type *, __ubuf__ src_data_type *,                           \
+        void(*)(__ubuf__ dst_data_type *, __ubuf__ src_data_type *,                            \
                 uint8_t, uint16_t, uint16_t, uint8_t, uint8_t))                                \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_uint32_t_Stub));        \
@@ -121,5 +120,5 @@ TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8h_int8, asc_vdeq_int162b8_h, vconv_vdeq
 TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8h_uint8, asc_vdeq_int162b8_h, vconv_vdeqs162b8h, uint8_t, int16_t);
 
 // ========== asc_vdeq_int162b8_l==========
-TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8l_int8, asc_vdeq_int162b8l, vconv_vdeqs162b8l, int8_t, int16_t);
-TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8l_uint8, asc_vdeq_int162b8l, vconv_vdeqs162b8l, uint8_t, int16_t);
+TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8l_int8, asc_vdeq_int162b8_l, vconv_vdeqs162b8l, int8_t, int16_t);
+TEST_VECTOR_COMPUTE_VDEQ_INSTR(VdeqI162B8l_uint8, asc_vdeq_int162b8_l, vconv_vdeqs162b8l, uint8_t, int16_t);

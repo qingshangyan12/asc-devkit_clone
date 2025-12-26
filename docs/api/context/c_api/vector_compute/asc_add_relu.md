@@ -85,6 +85,6 @@ PIPE_TYPE_V
 constexpr uint64_t total_length = 128;
 __ubuf__ half* value0[total_length];
 __ubuf__ half* value1[total_length];
-__ubuf__ half* dst[total_length];
+__ubuf__ half* dst[total_length]; 
 asc_cast_deq(dst, value0, value1, total_length);
 ```

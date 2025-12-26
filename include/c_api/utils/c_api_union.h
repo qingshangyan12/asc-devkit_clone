@@ -15,6 +15,9 @@
 
 constexpr uint64_t CAPI_DEFAULT_BINARY_CONFIG_VALUE = 0x0100080808010101;
 constexpr uint64_t CAPI_DEFAULT_UNARY_CONFIG_VALUE = 0x0100800800010001;
+constexpr uint64_t CAPI_DEFAULT_REDUCE_CONFIG_VALUE = 0x0100000800010001;
+constexpr uint64_t CAPI_DEFAULT_DUPLICATE_CONFIG_VALUE = 0x0100800800010001;
+constexpr uint64_t CAPI_DEFAULT_FILL_VALUE_CONFIG_VALUE = 0x0000000000000000;
 constexpr uint64_t ASC_FILL_VALUE_DEFAULT_VALUE = 0x0000000000000000;
 constexpr uint64_t ASC_STORE_ATOMIC_DEFAULT_VALUE = 0x0000000000000000;
 constexpr uint64_t ASC_DEFAULT_COPY_L12L0B_TRANS_CONFIG_VALUE = 0x0000000000000000;
@@ -41,6 +44,61 @@ union asc_unary_config {
         uint64_t src_block_stride : 16;
         uint64_t dst_repeat_stride : 12;
         uint64_t src_repeat_stride : 12;
+        uint64_t repeat : 8;
+    };
+};
+
+union asc_block_reduce_config {
+    uint64_t config = CAPI_DEFAULT_REDUCE_CONFIG_VALUE;
+    struct {
+        uint64_t dst_repeat_stride : 16;
+        uint64_t src_block_stride : 16;
+        uint64_t src_repeat_stride : 16;
+        uint64_t reserved : 8;
+        uint64_t repeat : 8;
+    };
+};
+
+union asc_repeat_reduce_config {
+    uint64_t config = CAPI_DEFAULT_REDUCE_CONFIG_VALUE;
+    struct {
+        uint64_t dst_repeat_stride : 16;
+        uint64_t src_block_stride : 16;
+        uint64_t src_repeat_stride : 16;
+        uint64_t reserved : 8;
+        uint64_t repeat : 8;
+    };
+};
+
+union asc_reduce_config {
+    uint64_t config = CAPI_DEFAULT_REDUCE_CONFIG_VALUE;
+    struct {
+        uint64_t dst_repeat_stride : 16;
+        uint64_t src_block_stride : 16;
+        uint64_t src_repeat_stride : 16;
+        uint64_t reserved : 8;
+        uint64_t repeat : 8;
+    };
+};
+
+union asc_duplicate_config {
+    uint64_t config = CAPI_DEFAULT_DUPLICATE_CONFIG_VALUE;
+    struct {
+        uint64_t dst_block_stride : 16;
+        uint64_t src_block_stride : 16;
+        uint64_t dst_repeat_stride : 12;
+        uint64_t src_repeat_stride : 12;
+        uint64_t repeat : 8;
+    };
+};
+
+union asc_brcb_config {
+    uint64_t config;
+    struct {
+        uint64_t dst_block_stride : 16;
+        uint64_t reserved1 : 16;
+        uint64_t dst_repeat_stride : 12;
+        uint64_t reserved2 : 12;
         uint64_t repeat : 8;
     };
 };
@@ -101,6 +159,11 @@ constexpr asc_binary_config CAPI_DEFAULT_BINARY_CFG{};
 constexpr asc_unary_config CAPI_DEFAULT_UNARY_CFG{};
 constexpr asc_fill_value_config ASC_FILL_VALUE_DEFAULT_CFG{};
 constexpr asc_store_atomic_config ASC_STORE_ATOMIC_DEFAULT_CFG{};
+constexpr asc_block_reduce_config CAPI_BLOCK_DEFAULT_REDUCE_CFG{};
+constexpr asc_repeat_reduce_config CAPI_REPEAT_DEFAULT_REDUCE_CFG{};
+constexpr asc_reduce_config CAPI_DEFAULT_REDUCE_CFG{};
+constexpr asc_duplicate_config CAPI_DEFAULT_DUPLICATE_CFG{};
+constexpr asc_fill_value_config CAPI_DEFAULT_FILL_VALUE_CFG{};
 constexpr asc_copy_l12l0b_trans_config ASC_DEFAULT_COPY_L12L0B_TRANS_CFG{};
 constexpr asc_set_l0c_copy_params_config ASC_DEFAULT_SET_L0C_COPY_PARAMS_CFG{};
 #endif

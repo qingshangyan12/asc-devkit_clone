@@ -1497,4 +1497,175 @@ __aicore__ inline void asc_float2int16_z(__ubuf__ int16_t* dst, __ubuf__ float* 
 
 __aicore__ inline void asc_float2int16_z_sync(__ubuf__ int16_t* dst, __ubuf__ float* src, uint32_t count);
 
+// ==========asc_rsqrt(half/float)==========
+__aicore__ inline void asc_rsqrt(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_rsqrt(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride,
+    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_rsqrt_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
+
+__aicore__ inline void asc_rsqrt(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+__aicore__ inline void asc_rsqrt(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride,
+    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_rsqrt_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
+
+// ==========asc_add_relu(half/float/int16_t)==========
+__aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
+
+__aicore__ inline void asc_add_relu_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
+
+__aicore__ inline void asc_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
+
+__aicore__ inline void asc_add_relu_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
+
+__aicore__ inline void asc_add_relu(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_add_relu(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
+
+__aicore__ inline void asc_add_relu_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
+
+// ==========asc_ge(half/float/uint16_t)==========
+__aicore__ inline void asc_ge(__ubuf__ half* scr0, __ubuf__ half* scr1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, int8_t src0_repeat_stride,
+    int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_ge_sync(__ubuf__ half* scr0, __ubuf__ half* scr1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, int8_t src0_repeat_stride,
+    int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_ge(__ubuf__ float* scr0, __ubuf__ float* scr1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, int8_t src0_repeat_stride,
+    int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_ge_sync(__ubuf__ float* scr0, __ubuf__ float* scr1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, int8_t src0_repeat_stride,
+    int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_ge(__ubuf__ uint8_t* dst, __ubuf__ half* scr0, __ubuf__ half* scr1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_ge_sync(__ubuf__ uint8_t* dst, __ubuf__ half* scr0, __ubuf__ half* scr1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_ge(__ubuf__ uint8_t* dst, __ubuf__ float* scr0, __ubuf__ float* scr1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride);
+
+__aicore__ inline void asc_ge_sync(__ubuf__ uint8_t* dst, __ubuf__ float* scr0, __ubuf__ float* scr1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    int8_t src0_repeat_stride, int8_t src1_repeat_stride);
+
+// ==========asc_reduce(uint16_t/uint32_t)==========
+__aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1,
+    uint16_t dst_repeat_stride, uint8_t src_block_stride, uint8_t src_repeat_stride, uint16_t reserved, uint8_t repeat);
+
+__aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count);
+
+__aicore__ inline void asc_reduce_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count);
+
+__aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1,
+    uint16_t dst_repeat_stride, uint8_t src_block_stride, uint8_t src_repeat_stride, uint16_t reserved, uint8_t repeat);
+
+__aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count);
+
+__aicore__ inline void asc_reduce_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count);
+
+// ==========asc_int642float_a==========
+__aicore__ inline void asc_int642float_a(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_int642float_a(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+__aicore__ inline void asc_int642float_a_sync(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+// ==========asc_int642float_c==========
+__aicore__ inline void asc_int642float_c(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_int642float_c(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+__aicore__ inline void asc_int642float_c_sync(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+// ==========asc_int642float_f==========
+__aicore__ inline void asc_int642float_f(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_int642float_f(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+__aicore__ inline void asc_int642float_f_sync(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+// ==========asc_int642float_r==========
+__aicore__ inline void asc_int642float_r(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_int642float_r(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+__aicore__ inline void asc_int642float_r_sync(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+// ==========asc_int642float_z==========
+__aicore__ inline void asc_int642float_z(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_int642float_z(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+__aicore__ inline void asc_int642float_z_sync(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count);
+
+// ==========asc_vdeq_int162b8_h==========
+__aicore__ inline void asc_vdeq_int162b8_h(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count);
+
+__aicore__ inline void asc_vdeq_int162b8_h(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
+
+__aicore__ inline void asc_vdeq_int162b8_h_sync(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count);
+
+__aicore__ inline void asc_vdeq_int162b8_h(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
+
+__aicore__ inline void asc_vdeq_int162b8_h(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
+
+__aicore__ inline void asc_vdeq_int162b8_h_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
+
+// ==========asc_vdeq_int162b8_l(int8_t/uint8_t)==========
+__aicore__ inline void asc_vdeq_int162b8_l(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
+
+__aicore__ inline void asc_vdeq_int162b8_l(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count);
+
+__aicore__ inline void asc_vdeq_int162b8_l_sync(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count);
+
+__aicore__ inline void asc_vdeq_int162b8_l(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
+
+__aicore__ inline void asc_vdeq_int162b8_l(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
+
+__aicore__ inline void asc_vdeq_int162b8_l_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
+
+// ==========asc_reduce(uint16_t/uint32_t)==========
+__aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, const asc_reduce_config& config);
+
+__aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count);
+
+__aicore__ inline void asc_reduce_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count);
+
+__aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, const asc_reduce_config& config);
+
+__aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count);
+
+__aicore__ inline void asc_reduce_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count);
+
 #endif
