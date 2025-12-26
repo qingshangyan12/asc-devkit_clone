@@ -320,7 +320,7 @@ int32_t AscendKernelLaunchWithFlagV2(const char *stubFunc, const uint32_t blockD
     argsInfo.args = static_cast<void*>(args);
     argsInfo.argsSize = size;
     if (ubufDynamicSize > 0) {
-        rtTaskCfgInfo_t cfgInfo = {0};
+        rtTaskCfgInfo_t cfgInfo{};
         cfgInfo.localMemorySize = ubufDynamicSize;
         return rtKernelLaunchWithFlagV2(stubFunc, blockDim, &argsInfo, nullptr, stream, 0, &cfgInfo);
     }

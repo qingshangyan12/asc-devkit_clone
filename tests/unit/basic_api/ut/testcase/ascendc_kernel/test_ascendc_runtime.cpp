@@ -99,12 +99,14 @@ TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeDevBinaryRegisterTest) {
     const char* stubFunc = "hello_world";
     ret = AscendFunctionRegister(handle, stubFunc);
     EXPECT_EQ(ret, 0);
-    MOCKER(rtKernelLaunchWithFlagV2).expects(once()).will(returnValue(0));
+    MOCKER(rtKernelLaunchWithFlagV2).stubs().will(returnValue(0));
     uint32_t blockDim;
     void **args = nullptr;
     uint32_t size;
     rtStream_t stream = nullptr;
     ret = AscendKernelLaunchWithFlagV2(stubFunc, blockDim, args, size, stream, 0);
+    EXPECT_EQ(ret, 0);
+    ret = AscendKernelLaunchWithFlagV2(stubFunc, blockDim, args, size, stream, 2048);
     EXPECT_EQ(ret, 0);
 }
 
