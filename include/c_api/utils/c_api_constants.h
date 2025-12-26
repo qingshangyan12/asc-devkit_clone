@@ -40,4 +40,6 @@ constexpr uint8_t ASC_DEFAULT_REPEAT_STRIDE = 8;
 constexpr uint8_t ASC_HALF_DEFAULT_REPEAT_STRIDE = 4;
 constexpr uint8_t ASC_ONE_FOURTH_DEFAULT_REPEAT_STRIDE = 2;
 
+constexpr uint8_t ASC_MRGSORT_ELEMENT_LEN = 4;
+
 #endif

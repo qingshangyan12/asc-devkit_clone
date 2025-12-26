@@ -24,19 +24,19 @@ __aicore__ inline void asc_sync_vec_impl()
 
 __aicore__ inline void asc_sync_mte2_impl(int id)
 {
-    set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, id);
-    set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, id);
-    wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, id);
-    wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, id);
+    set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
+    set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, static_cast<event_t>(id));
+    wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
+    wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, static_cast<event_t>(id));
     pipe_barrier(pipe_t::PIPE_MTE2);
 }
 
 __aicore__ inline void asc_sync_mte3_impl(int id)
 {
-    set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, id);
-    set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_V, id);
-    wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, id);
-    wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_V, id);
+    set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, static_cast<event_t>(id));
+    set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_V, static_cast<event_t>(id));
+    wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, static_cast<event_t>(id));
+    wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_V, static_cast<event_t>(id));
     pipe_barrier(pipe_t::PIPE_MTE3);
 }
 

@@ -6,11 +6,6 @@
 |-----------------------|-----------------------|
 | [asc_binary_config](struct/asc_binary_config.md) | 双目高维切分计算API读写控制参数 |
 | [asc_unary_config](struct/asc_unary_config.md) | 单目高维切分计算API读写控制参数 |
-| [asc_copy_config](struct/asc_copy_config.md) | 数据搬运API读写控制参数 |
-| [asc_block_reduce_config](struct/asc_block_reduce_config.md) | block reduce类计算API配置参数 |
-| [asc_repeat_reduce_config](struct/asc_repeat_reduce_config.md) | repeat reduce类计算API配置参数 |
-| [asc_duplicate_config](struct/asc_duplicate_config.md) | asc_duplicate API配置参数 |
-| [asc_brcb_config](struct/asc_brcb_config.md) |asc_brcb API配置参数 |
 | [asc_deq_scale_config](struct/asc_deq_scale_config.md) | asc_deq_scale API配置参数 |
 
 ## 矢量计算

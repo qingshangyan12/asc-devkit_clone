@@ -4929,8 +4929,8 @@ void vmrgsort4(__ubuf__ half* const arg0, __ubuf__ half** const arg1, uint64_t a
 void vmrgsort4(__ubuf__ float* const arg0, __ubuf__ float** const arg1, uint64_t arg2);
 void vmrgsort4(__ubuf__ half* dst, __ubuf__ half** src0, uint64_t src1, uint64_t config);
 void vmrgsort4(__ubuf__ float* dst, __ubuf__ float** src0, uint64_t src1, uint64_t config);
-void vmrgsort4(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t regionProposalLi0, uint16_t regionProposalLi1, uint16_t regionProposalLi2, uint16_t regionProposalLi3, bool isAllStored, uint8_t maskSignal);
-void vmrgsort4(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t regionProposalLi0, uint16_t regionProposalLi1, uint16_t regionProposalLi2, uint16_t regionProposalLi3, bool isAllStored, uint8_t maskSignal);
+void vmrgsort4(__ubuf__ half* dst, __ubuf__ half** src, uint8_t repeat, uint16_t regionProposalLi0, uint16_t regionProposalLi1, uint16_t regionProposalLi2, uint16_t regionProposalLi3, bool isAllStored, uint8_t maskSignal);
+void vmrgsort4(__ubuf__ float* dst, __ubuf__ float** src, uint8_t repeat, uint16_t regionProposalLi0, uint16_t regionProposalLi1, uint16_t regionProposalLi2, uint16_t regionProposalLi3, bool isAllStored, uint8_t maskSignal);
 void vmul(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint64_t config);
 void vmul(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dstBlockStride, uint8_t src0BlockStride, uint8_t src1BlockStride, uint8_t dstRepeatStride, uint8_t src0RepeatStride, uint8_t src1RepeatStride);
 void vmul(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dstBlockStride, uint8_t src0BlockStride, uint8_t src1BlockStride, uint8_t dstRepeatStride, uint8_t src0RepeatStride, uint8_t src1RepeatStride, bool repeatStrideMode, bool strideSizeMode);
