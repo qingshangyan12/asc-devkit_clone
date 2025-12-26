@@ -19,18 +19,9 @@ endif()
 
 set(CMAKE_INCLUDE_FLAG_ASC "-I")
 
-# CMAKE_ASC_COMPILE_OBJECT not support pass list as argument, need to convert to string
-# variable in CMAKE_ASC_COMPILE_OBJECT does not support generator expressions
-# refer to host_intf.cmake and bisheng_intf.cmake
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(host_optimize_level "-O0")
-else()
-    set(host_optimize_level "-O2")
+    set(debug_compile_options "-O0 -g")
 endif()
-set(kernel_compile_options_list -O3 -std=c++17)
-set(host_compile_options_list -fPIC ${host_optimize_level})
-list(JOIN kernel_compile_options_list " " KERNEL_OPTIONS_LIST)
-list(JOIN host_compile_options_list " " HOST_OPTIONS_LIST)
 
 set(CMAKE_DEPFILE_FLAGS_ASC "-MD -MT <DEP_TARGET> -MF <DEP_FILE>")
 if((NOT DEFINED CMAKE_DEPENDS_USE_COMPILER OR CMAKE_DEPENDS_USE_COMPILER) AND CMAKE_GENERATOR MATCHES "Makefiles|WMake")
@@ -55,8 +46,8 @@ endif()
 # rule variable to compile a single .o file
 # CMAKE_ASC_COMPILER: bisheng
 if(NOT CMAKE_ASC_COMPILE_OBJECT)
-    set(CMAKE_ASC_COMPILE_OBJECT "<CMAKE_ASC_COMPILER> <DEFINES> <INCLUDES> -Xaicore-start \
-${KERNEL_OPTIONS_LIST} -Xaicore-end -Xhost-start ${HOST_OPTIONS_LIST} -Xhost-end <FLAGS> -o <OBJECT> -c -x asc <SOURCE>")
+    set(CMAKE_ASC_COMPILE_OBJECT "<CMAKE_ASC_COMPILER> <DEFINES> <INCLUDES> -fPIC ${debug_compile_options} \
+<FLAGS> -o <OBJECT> -c -x asc <SOURCE>")
 endif()
 
 # Create a static archive incrementally for large object file counts.
