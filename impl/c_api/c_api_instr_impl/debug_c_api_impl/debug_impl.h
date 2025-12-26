@@ -11,7 +11,7 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_DEBUG_C_API_IMPL_DEBUG_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_DEBUG_C_API_IMPL_DEBUG_IMPL_H
  
-#include "asc_2201/dump_routing.h"
+#include "asc_dump_impl/asc_2201/dump_routing.h"
 #include "asc_printf_impl/asc_2201/printf_impl.h"
 
 template <typename T>

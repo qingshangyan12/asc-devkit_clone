@@ -31,7 +31,6 @@ __aicore__ inline void asc_add_impl(__ubuf__ float* dst, __ubuf__ float* src0, _
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
     uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
-if ASC_IS_AIV
     if ASC_IS_AIV {
         vadd(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
             dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
@@ -42,7 +41,6 @@ __aicore__ inline void asc_add_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
     uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
-if ASC_IS_AIV
     if ASC_IS_AIV {
         vadd(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
             dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);

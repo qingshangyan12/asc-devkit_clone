@@ -12,8 +12,8 @@
  * \file dump_impl.h
  * \brief
  */
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_DEBUG_C_API_IMPL_ASC_2201_DUMP_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_DEBUG_C_API_IMPL_ASC_2201_DUMP_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_DEBUG_C_API_IMPL_ASC_DUMP_IMPL_ASC_2201_DUMP_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_DEBUG_C_API_IMPL_ASC_DUMP_IMPL_ASC_2201_DUMP_IMPL_H
 
 #include "c_api_instr_impl/utils_c_api_impl/debug_utils.h"
 #include "c_api_instr_impl/utils_c_api_impl/instruction_forward.h"
@@ -274,10 +274,12 @@ private:
         call_update_write_info(write_info, tlv_len);
     }
 
-    __aicore__ inline int64_t asc_dump_pre_process() 
+    __aicore__ inline uint64_t asc_dump_pre_process() 
     {
         enable_printf();
-        return instruction_forward::call_get_ctrl();
+        uint64_t ret = instruction_forward::call_get_ctrl();
+        instruction_forward::call_set_atomic_none();
+        return ret;
     }
 
     template <typename T>

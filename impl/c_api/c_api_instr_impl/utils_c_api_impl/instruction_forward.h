@@ -49,7 +49,7 @@ private:
 #endif
     }
 
-    __aicore__ static inline void set_mask_none_impl() 
+    __aicore__ static inline void set_atomic_none_impl() 
     {
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
         set_atomic_none();
@@ -112,9 +112,9 @@ public:
         return get_system_cycle_impl();
     }
 
-    __aicore__ static inline void call_set_mask_none()
+    __aicore__ static inline void call_set_atomic_none()
     {
-        set_mask_none_impl();
+        set_atomic_none_impl();
     }
 
     __aicore__ static inline decltype(auto) call_get_ctrl()
