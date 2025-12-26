@@ -441,15 +441,11 @@ template <typename T>
 __simd_vf__ inline void BrcLastLessThanVLUnaligned(
     __ubuf__ T *dstUb, __ubuf__ T *srcUb, uint16_t size0, uint16_t size1)
 {
-    MicroAPI::MaskReg pregCnt;
     MicroAPI::RegTensor<T> srcReg;
     MicroAPI::UnalignReg ureg0;
 
-    uint32_t sreg = size1;
-    pregCnt = MicroAPI::UpdateMask<T>(sreg);
     for (uint16_t i = 0; i < size0; ++i) {
         BrcLoad<T>(srcReg, srcUb + i);
-        MicroAPI::Duplicate(srcReg, srcReg, pregCnt);
         MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size1);
     }
     MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
@@ -459,16 +455,12 @@ template <typename T>
 __simd_vf__ inline void BrcLastLessThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint16_t size0,
     uint16_t size1, uint16_t size2, uint16_t srcStride0, uint16_t srcStride1)
 {
-    MicroAPI::MaskReg pregCnt;
     MicroAPI::RegTensor<T> srcReg;
     MicroAPI::UnalignReg ureg0;
 
-    uint32_t sreg = size2;
-    pregCnt = MicroAPI::UpdateMask<T>(sreg);
     for (uint16_t i = 0; i < size0; ++i) {
         for (uint16_t j = 0; j < size1; ++j) {
             BrcLoad<T>(srcReg, srcUb + j * srcStride1 + i * srcStride0);
-            MicroAPI::Duplicate(srcReg, srcReg, pregCnt);
             MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size2);
         }
     }
@@ -479,17 +471,13 @@ template <typename T>
 __simd_vf__ inline void BrcLastLessThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint16_t size0,
     uint16_t size1, uint16_t size2, uint16_t size3, uint16_t srcStride0, uint16_t srcStride1, uint16_t srcStride2)
 {
-    MicroAPI::MaskReg pregCnt;
     MicroAPI::RegTensor<T> srcReg;
     MicroAPI::UnalignReg ureg0;
 
-    uint32_t sreg = size3;
-    pregCnt = MicroAPI::UpdateMask<T>(sreg);
     for (uint16_t i = 0; i < size0; ++i) {
         for (uint16_t j = 0; j < size1; ++j) {
             for (uint16_t k = 0; k < size2; ++k) {
                 BrcLoad<T>(srcReg, srcUb + i * srcStride0 + j * srcStride1 + k * srcStride2);
-                MicroAPI::Duplicate(srcReg, srcReg, pregCnt);
                 MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size3);
             }
         }
@@ -771,18 +759,14 @@ __simd_vf__ inline void BrcLastLargerThanVLUnaligned(
     uint16_t factor = size1 / VF_LEN;
     uint32_t size1tail = size1 - factor * VF_LEN;
 
-    MicroAPI::MaskReg pregCnt;
     MicroAPI::RegTensor<T> srcReg;
     MicroAPI::UnalignReg ureg0;
 
-    uint32_t sreg = size1tail;
-    pregCnt = MicroAPI::UpdateMask<T>(sreg);
     for (uint16_t i = 0; i < size0; ++i) {
         BrcLoad<T>(srcReg, srcUb + i);
         for (uint16_t j = 0; j < factor; ++j) {
             MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, VF_LEN);
         }
-        MicroAPI::Duplicate(srcReg, srcReg, pregCnt);
         MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size1tail);
     }
     MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
@@ -796,19 +780,15 @@ __simd_vf__ inline void BrcLastLargerThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__
     uint16_t factor = size2 / VF_LEN;
     uint32_t size2tail = size2 - factor * VF_LEN;
 
-    MicroAPI::MaskReg pregCnt;
     MicroAPI::RegTensor<T> srcReg;
     MicroAPI::UnalignReg ureg0;
 
-    uint32_t sreg = size2tail;
-    pregCnt = MicroAPI::UpdateMask<T>(sreg);
     for (uint16_t i = 0; i < size0; ++i) {
         for (uint16_t j = 0; j < size1; ++j) {
             BrcLoad<T>(srcReg, srcUb + j * srcStride1 + i * srcStride0);
             for (uint16_t k = 0; k < factor; ++k) {
                 MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, VF_LEN);
             }
-            MicroAPI::Duplicate(srcReg, srcReg, pregCnt);
             MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size2tail);
         }
     }
@@ -823,12 +803,9 @@ __simd_vf__ inline void BrcLastLargerThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__
     uint16_t factor = size3 / VF_LEN;
     uint32_t size3tail = size3 - factor * VF_LEN;
 
-    MicroAPI::MaskReg pregCnt;
     MicroAPI::RegTensor<T> srcReg;
     MicroAPI::UnalignReg ureg0;
 
-    uint32_t sreg = size3tail;
-    pregCnt = MicroAPI::UpdateMask<T>(sreg);
     for (uint16_t i = 0; i < size0; ++i) {
         for (uint16_t j = 0; j < size1; ++j) {
             for (uint16_t k = 0; k < size2; ++k) {
@@ -836,7 +813,6 @@ __simd_vf__ inline void BrcLastLargerThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__
                 for (uint16_t t = 0; t < factor; ++t) {
                     MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, VF_LEN);
                 }
-                MicroAPI::Duplicate(srcReg, srcReg, pregCnt);
                 MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size3tail);
             }
         }
