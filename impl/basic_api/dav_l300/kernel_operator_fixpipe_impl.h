@@ -445,7 +445,7 @@ __aicore__ inline void FixpipeL0C2GMImpl(__gm__ DstT* dst, __cc__ SrcT* src, __c
                 dst, src, cbufWorkspace, intriParams, fixpTiling, fixpTiling.nSize, i);
         }
         // deal with the tail, it also need copy deq/relu tensor from L1 to fb1
-        if (fixpipeTiling.tailNSize > 0) {
+        if (fixpTiling.tailNSize > 0) {
             FixpipeL0C2GMImplN<DstT, SrcT, config>(dst, src, cbufWorkspace, intriParams,
                 fixpTiling, fixpTiling.tailNSize, fixpTiling.nIterNum);
         }
