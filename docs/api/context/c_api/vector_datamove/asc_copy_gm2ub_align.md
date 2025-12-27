@@ -16,25 +16,25 @@
 - 前n个数据搬运
 
     ```cpp
-    __aicore__ inline void asc_copy_gm2ub_align_b8(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-    __aicore__ inline void asc_copy_gm2ub_align_b16(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-    __aicore__ inline void asc_copy_gm2ub_align_b32(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
     ```
 
 - 高维切分搬运
 
     ```cpp
-    __aicore__ inline void asc_copy_gm2ub_align_b8(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
-    __aicore__ inline void asc_copy_gm2ub_align_b16(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
-    __aicore__ inline void asc_copy_gm2ub_align_b32(__ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_copy_gm2ub_align_b8_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-    __aicore__ inline void asc_copy_gm2ub_align_b16_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
-    __aicore__ inline void asc_copy_gm2ub_align_b32_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size)
+    __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
     ```
 
 ## 参数说明
@@ -57,7 +57,7 @@
 
 ## 流水类型
 
-PIPE_TYPE_MTE2
+PIPE_MTE2
 
 ## 约束说明
 
@@ -71,7 +71,7 @@ PIPE_TYPE_MTE2
 ```cpp
 // total_length指参与搬运的数据总长度。dst是外部输入的half类型的GM内存。
 constexpr uint64_t total_length = 128;
-__ubuf__ half src[total_length * sizeof(half)];
-__ubuf__ half dst[total_length * sizeof(half)];
+__ubuf__ half src[total_length];
+__ubuf__ half dst[total_length];
 asc_copy_gm2ub_align(dst, src, total_length);
 ```

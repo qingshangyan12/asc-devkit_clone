@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-计算一个uint64_t类型数字的指定二进制为置为1，其余位保持不变。
+计算一个uint64_t类型数字的指定二进制位置为1，其余位保持不变。
 
 ## 函数原型
 
@@ -21,7 +21,7 @@ __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx)
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| x | 输入 | 输入数据。 |
+| bits | 输入 | 输入数据。 |
 | idx | 输入 | 位索引，表示需要设置为1的位的位置。 |
 ## 返回值说明
 
@@ -29,7 +29,7 @@ __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx)
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 
@@ -40,6 +40,5 @@ PIPE_TYPE_S
 ```cpp
 uint64_t bits = 0x0;
 int64_t  idx = 0x2;
-uint64_t res = set_nthbit_impl(bits, idx);
-res = 0x4;
+uint64_t res = set_nthbit_impl(bits, idx); //结果res = 0x4
 ```

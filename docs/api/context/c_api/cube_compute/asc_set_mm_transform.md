@@ -1,4 +1,4 @@
-# asc_set_mm_layout_transform
+# asc_set_mm_transform
 
 ## 产品支持情况
 
@@ -15,9 +15,9 @@
 
 ```c++
 //先通过N方向，然后通过M方向产生结果
-__aicore__ inline void asc_set_mm_layout_transform_m()
+__aicore__ inline void asc_set_mm_transform_m()
 //先通过M方向，然后通过N方向产生结果
-__aicore__ inline void asc_set_mm_layout_transform_n()
+__aicore__ inline void asc_set_mm_transform_n()
 ```
 
 ## 参数说明
@@ -30,7 +30,7 @@ __aicore__ inline void asc_set_mm_layout_transform_n()
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

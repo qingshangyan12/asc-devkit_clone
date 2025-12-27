@@ -9,39 +9,30 @@
 
 ## 功能说明
 
-设置原子操作使能位与原子操作类型。
+设置原子操作使能位与原子操作类型的值。
+
+- 原子操作使能位对应获取值的bit[2:0]。
+
+- 原子操作类型对应获取值的bit[4:3]。
 
 ## 函数原型
 
 ```c++
-// 无需原子操作
-__aicore__ inline void asc_set_store_atomic_config_none_sum();
-// 配置float类型原子求和操作
-__aicore__ inline void asc_set_store_atomic_config_f32_sum();
-// 配置half类型原子求和操作
-__aicore__ inline void asc_set_store_atomic_config_f16_sum();
-// 配置int16_t类型原子求和操作
-__aicore__ inline void asc_set_store_atomic_config_s16_sum();
-// 配置int32_t类型原子求和操作
-__aicore__ inline void asc_set_store_atomic_config_s32_sum();
-// 配置int8_t类型原子求和操作
-__aicore__ inline void asc_set_store_atomic_config_s8_sum();
-// 配置bfloat16_t类型原子求和操作
-__aicore__ inline void asc_set_store_atomic_config_bf16_sum();
-
+__aicore__ inline void asc_set_store_atomic_config(asc_store_atomic_config& config)
 ```
 
 ## 参数说明
 
-无
-
+| 参数名       | 输入/输出 | 描述               |
+| --------- | ----- | ---------------- |
+| asc_store_atomic_config       | 输入   | 用于设置原子操作使能位和原子操作类型的值，详细说明请参考[asc_store_atomic_config](../struct/asc_store_atomic_config.md) 。|
 ## 返回值说明
 
 无。
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 
@@ -49,4 +40,9 @@ PIPE_TYPE_S
 
 ## 调用示例
 
-无
+```c++
+asc_store_atomic_config config;
+config.atomic_type = 1; // 使能原子操作,进行原子操作的数据类型为float，值为1
+config.atomic_op = 0; // 求和操作,值为0
+asc_set_store_atomic_config(config); // 配置float类型原子求和操作
+```

@@ -9,19 +9,19 @@
 
 ## 功能说明
 
-用于设置Load3D的repeat参数。
+用于设置Load3Dv2接口的repeat参数。
 
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_set_l1_3d_rpt(uint64_t value)
+__aicore__ inline void asc_set_l1_3d_rpt(asc_load3d_v2_config& config)
 ```
 
 ## 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| value | 输入 | 源操作数（标量）。 |
+| config | 输入 | 用于设置Load3Dv2接口的repeat参数，详细说明请参考[asc_load3d_v2_config.md](../struct/asc_load3d_v2_config.md)。 |
 
 ## 返回值说明
 
@@ -29,15 +29,15 @@ __aicore__ inline void asc_set_l1_3d_rpt(uint64_t value)
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 
-无
+- 需配合[asc_load3d_v2_config.md](../struct/asc_load3d_v2_config.md)接口使用，用于设置Load3Dv2接口的repeat参数。
 
 ## 调用示例
 
 ```c++
-uint64_t value = 1;
-asc_set_l1_3d_rpt(value); // 设置Load3D的repeat值为1
+asc_load3d_v2_config config;
+asc_set_l1_3d_rpt(config); // 设置Load3D的repeat相关参数为默认值rpt_stride：0，rpt_time：1，rpt_mode：0
 ```
