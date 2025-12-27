@@ -36,18 +36,19 @@
 
 ## 参数说明
 
-| 参数名       | 输入/输出 | 描述               |
+|参数名|输入/输出|描述|
 | :--- | :--- | :--- |
-| dst       | 输出    | 目的操作数（矢量）的起始地址。 |
-| src、src1 | 输入    | 源操作数（矢量）的起始地址。 |
-| count     | 输入    | 参与计算的元素个数。 |
+| dst  | 输出  | 目的操作数（矢量）的起始地址。 |
+| src0 | 输入  | 源操作数0（矢量）的起始地址。 |
+| src1 | 输入  | 源操作数1（矢量）的起始地址。 |
+| count | 输入    | 参与计算的元素个数。 |
+| repeat | 输入    | 迭代次数。 |
 | dst_block_stride | 输入    | 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src0_block_stride | 输入    | 源操作数0单次迭代内不同DataBlock间地址步长。 |
 | src1_block_stride | 输入    | 源操作数1单次迭代内不同DataBlock间地址步长。 |
 | dst_repeat_stride | 输入    | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
 | src0_repeat_stride | 输入    | 源操作数0相邻迭代间相同DataBlock的地址步长。 |
 | src1_repeat_stride | 输入    | 源操作数1相邻迭代间相同DataBlock的地址步长。 |
-| repeat | 输入    | 迭代次数。 |
 
 ## 返回值说明
 
@@ -60,15 +61,19 @@ PIPE_V
 ## 约束说明
 
 - 需要配合[asc_set_cmp_mask](asc_set_cmp_mask.md)接口使用。
-- dst、src的起始地址需要32字节对齐
+- dst、src0、src1的起始地址需要32字节对齐
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
 ## 调用示例
 
 ```c++
-constexpr uint32_t total_length = 256;//total_length指参与计算的数据总长度
-__ubuf__ half src0[total_length];
-__ubuf__ half src1[total_length];
-__ubuf__ half dst[total_length];
+constexpr uint32_t total_length = 256;
+constexpr uint32_t sel_length = 8;
+__ubuf__ uint8_t sel_mask[sel_length];
+__ubuf__ float dst[total_length];
+__ubuf__ float src0[total_length];
+__ubuf__ float src1[total_length];
+asc_set_cmp_mask(sel_mask);
+asc_sync_pipe(PIPE_V);
 asc_select(dst, src0, src1, total_length);
 ```

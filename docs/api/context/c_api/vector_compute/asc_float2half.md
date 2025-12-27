@@ -79,18 +79,16 @@
 
 ## 参数说明
 
-表1 参数说明
-
 | 参数名 | 输入/输出 | 描述 |
 | :----| :-----| :-----|
 | dst | 输出 | 目的操作数。 |
 | src  | 输入 | 源操作数。|
 | count | 输入 | 参与计算的元素个数。 |
+| repeat |输入 | 迭代次数。 |
 | dst_block_stride |输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src_block_stride |输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
 | dst_repeat_stride |输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
 | src_repeat_stride |输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
-| repeat |输入 | 迭代次数。 |
 
 ## 返回值说明
 
@@ -108,10 +106,8 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-// total_length指参与计算的数据长度
-uint64_t offset = 0;
-__ubuf__ float* src = (__ubuf__ float*)asc_get_phy_buf_addr(0);
-offset += total_length * sizeof(float);
-__ubuf__ half* dst = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
+constexpr uint32_t total_length = 256;
+__ubuf__ float src[total_length];
+__ubuf__ half dst[total_length];
 asc_float2half(dst, src, total_length);
 ```
