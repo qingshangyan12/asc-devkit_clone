@@ -21,7 +21,9 @@
 __aicore__ inline void asc_min_scalar_impl(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-    vmins(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    if ASC_IS_AIV {
+        vmins(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
 }
 
 __aicore__ inline void asc_min_scalar_impl(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
@@ -34,14 +36,16 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ half* dst, __ubuf__ half* sr
 __aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
 {
     asc_min_scalar_impl(dst, src, value, count);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 // asc_min_scalar float
 __aicore__ inline void asc_min_scalar_impl(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-    vmins(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    if ASC_IS_AIV {
+        vmins(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
 }
 
 __aicore__ inline void asc_min_scalar_impl(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
@@ -54,14 +58,16 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ float* dst, __ubuf__ float* 
 __aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
 {
     asc_min_scalar_impl(dst, src, value, count);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 // asc_min_scalar int16_t
 __aicore__ inline void asc_min_scalar_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-    vmins(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    if ASC_IS_AIV {
+        vmins(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
 }
 
 __aicore__ inline void asc_min_scalar_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
@@ -74,14 +80,16 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ int16_t* dst, __ubuf__ int16
 __aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
 {
     asc_min_scalar_impl(dst, src, value, count);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 // asc_min_scalar int32_t
 __aicore__ inline void asc_min_scalar_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-    vmins(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    if ASC_IS_AIV {
+        vmins(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
 }
 
 __aicore__ inline void asc_min_scalar_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
@@ -94,7 +102,7 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ int32_t* dst, __ubuf__ int32
 __aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
 {
     asc_min_scalar_impl(dst, src, value, count);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 #endif

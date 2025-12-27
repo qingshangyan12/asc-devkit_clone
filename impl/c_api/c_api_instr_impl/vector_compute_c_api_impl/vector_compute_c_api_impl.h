@@ -20,7 +20,6 @@
 #include "set_mask_count_impl/npu_arch_2201/asc_set_mask_count_impl.h"
 #include "set_mask_norm_impl/npu_arch_2201/asc_set_mask_norm_impl.h"
 #include "set_vector_mask_impl/npu_arch_2201/asc_set_vector_mask_impl.h"
-#include "clear_nthbit_impl/npu_arch_2201/asc_clear_nthbit_impl.h"
 #include "vabs_impl/npu_arch_2201/asc_vabs_impl.h"
 #include "vadd_impl/npu_arch_2201/asc_add_impl.h"
 #include "vadds_impl/npu_arch_2201/asc_add_scalar_impl.h"
@@ -200,11 +199,6 @@ __aicore__ inline void asc_set_mask_norm()
 __aicore__ inline void asc_set_vector_mask(uint64_t mask1, uint64_t mask0)
 {
     asc_set_vector_mask_impl(mask1, mask0);
-}
-
-__aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx)
-{
-    return asc_clear_nthbit_impl(bits, idx);
 }
 
 __aicore__ inline void asc_set_deq_scale(const asc_deq_scale_config config)

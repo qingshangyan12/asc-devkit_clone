@@ -20,7 +20,9 @@
 __aicore__ inline void asc_add_relu_cast_s162s8_impl(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, 
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
-    vaddreluconv_s162s8(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride, false);
+    if ASC_IS_AIV {
+        vaddreluconv_s162s8(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride, false);
+    }
 }
 
 __aicore__ inline void asc_add_relu_cast_s162s8_impl(__ubuf__ int8_t* dst,  __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
@@ -34,7 +36,7 @@ __aicore__ inline void asc_add_relu_cast_s162s8_impl(__ubuf__ int8_t* dst,  __ub
 __aicore__ inline void asc_add_relu_cast_s162s8_sync_impl(__ubuf__ int8_t* dst,  __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
 {
     asc_add_relu_cast_s162s8_impl(dst, src0, src1, count);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 #endif

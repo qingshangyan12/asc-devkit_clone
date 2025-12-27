@@ -59,11 +59,11 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
     __ubuf__ dst_data_type *dst = reinterpret_cast<__ubuf__ dst_data_type *>(11);               \
     __ubuf__ src_data_type *src = reinterpret_cast<__ubuf__ src_data_type *>(22);               \
                                                                                                  \
-    uint64_t dst_block_stride = static_cast<uint64_t>(1);                                         \
-    uint64_t src_block_stride = static_cast<uint64_t>(1);                                         \
-    uint64_t dst_repeat_stride = static_cast<uint64_t>(8);                                        \
-    uint64_t src_repeat_stride = static_cast<uint64_t>(8);                                        \
-    uint64_t repeat = static_cast<uint64_t>(1);                                                   \
+    uint16_t dst_block_stride = static_cast<uint16_t>(1);                                         \
+    uint16_t src_block_stride = static_cast<uint16_t>(1);                                         \
+    uint8_t dst_repeat_stride = static_cast<uint8_t>(8);                                        \
+    uint8_t src_repeat_stride = static_cast<uint8_t>(8);                                        \
+    uint8_t repeat = static_cast<uint8_t>(1);                                                   \
                                                                                                 \
     MOCKER_CPP(cce_name,                                                                        \
         void(__ubuf__ dst_data_type *, __ubuf__ src_data_type *,                               \

@@ -20,21 +20,23 @@
 __aicore__ inline void asc_int322float_z_impl(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-    vconv_s322f32z(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    if ASC_IS_AIV {
+        vconv_s322f32z(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
 }
 
 __aicore__ inline void asc_int322float_z_impl(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
     asc_int322float_z_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE/2);
+        ASC_DEFAULT_REPEAT_STRIDE, ASC_HALF_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
 
 __aicore__ inline void asc_int322float_z_sync_impl(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
 {
     asc_int322float_z_impl(dst, src, count);
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 #endif
