@@ -8,7 +8,7 @@
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √ |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √ |
 
-### 功能说明
+## 功能说明
 
 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用[asc_set_deq_scale](./asc_set_deq_scale.md)接口设置量化参数。
 
@@ -21,7 +21,7 @@ $$
 dst_i = (src_i*scale)+offset
 $$
 
-### 函数原型
+## 函数原型
 
 - 前n个数据计算
 
@@ -50,7 +50,7 @@ $$
     __aicore__ inline void asc_deq_int162b8_l_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count)
     ```
 
-### 参数说明
+## 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -63,26 +63,26 @@ $$
 | dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
 | src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
 
-### 返回值说明
+## 返回值说明
 
 无
 
-### 流水类型
+## 流水类型
 
 PIPE_V
 
-### 约束说明
+## 约束说明
 
 - 需配合[asc_set_deq_scale](./asc_set_deq_scale.md)接口的非向量模式使用，该接口用于设置量化参数。
 - dst、src的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
-### 调用示例
+## 调用示例
 
 ```cpp
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
-__ubuf__ int16_t src[total_length * sizeof(int16_t)];
-__ubuf__ int8_t dst[total_length * sizeof(int8_t)];
+__ubuf__ int16_t src[total_length];
+__ubuf__ int8_t dst[total_length];
 asc_deq_scale_config config;
 config.scale = 1;        // 量化参数为1
 config.offset = 0;       // 不带偏移

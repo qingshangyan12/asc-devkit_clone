@@ -33,7 +33,6 @@
 
 ## 参数说明
 
-表1 参数说明
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
@@ -62,7 +61,7 @@ PIPE_V
 
 ```cpp
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
-__ubuf__ uint8_t src[total_length * sizeof(uint8_t)];
-__ubuf__ half dst[total_length * sizeof(half)];
+__ubuf__ uint8_t src[total_length];
+__ubuf__ half dst[total_length];
 asc_uint82half(dst, src, total_length);    // 将src转换为half类型并存放到dst中
 ```

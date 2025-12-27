@@ -33,7 +33,6 @@ __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src,
 
 ## 参数说明
 
-表1 参数说明
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | dst | 输出 | 目的GM地址。 |
@@ -65,6 +64,6 @@ PIPE_MTE3
 ```cpp
 // total_length指参与搬运的数据总长度。dst是外部输入的half类型的GM内存。
 constexpr uint64_t total_length = 128;
-__ubuf__ half src[total_length * sizeof(half)];
-asc_copy_ub2gm(dst, src, total_length * sizeof(half));
+__ubuf__ half src[total_length];
+asc_copy_ub2gm(dst, src, total_length);
 ```

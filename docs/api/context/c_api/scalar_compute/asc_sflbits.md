@@ -25,7 +25,7 @@ __aicore__ inline int64_t asc_sflbits(int64_t value)
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| value | 输入 | 源操作数（标量）。 |
+| value | 输入 | 输入数据。 |
 
 ## 返回值说明
 
