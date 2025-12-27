@@ -2,7 +2,7 @@
 ## 概述
 本样例介绍了Bias矩阵为自定义TSCM输入的bfloat16类型的数据，实现Matmul算子的方式。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```

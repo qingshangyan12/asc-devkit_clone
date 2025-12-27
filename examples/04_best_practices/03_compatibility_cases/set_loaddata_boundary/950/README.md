@@ -1,7 +1,7 @@
 # SetLoadDataBoundary兼容性样例
 ## 概述
 兼容实现L1 Buffer设置边界值。
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```

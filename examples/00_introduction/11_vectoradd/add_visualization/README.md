@@ -1,10 +1,10 @@
 # AddVisualization算子直调样例
 ## 概述
 本样例介绍Add算子的核函数直调方法，算子支持批量张量相加，通过流水线机制实现高效数据搬运与计算。算子支持单核运行。
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
-- Ascend 910C
-- Ascend 910B
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── add_visualization

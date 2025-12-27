@@ -1,7 +1,7 @@
 # MDL模板下A矩阵为TSCM输入的Matmul算子样例
 ## 概述
 本样例介绍了A矩阵为自定义TSCM输入的Matmul算子，将多次计算的数据一次性搬到TSCM上，通过使能MDL模板，使用SetOrgShape接口，实现TSCM内存自主管理。
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```

@@ -1,7 +1,7 @@
 # TensorTile直调样例
 ## 概述
 本样例介绍TensorTile端到端用例的核函数直调方法，算子支持单核运行。
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```

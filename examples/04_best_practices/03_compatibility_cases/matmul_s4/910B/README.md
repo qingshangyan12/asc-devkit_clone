@@ -1,8 +1,8 @@
 # int4b_t数据类型下Matmul兼容性样例
 ## 概述
 int4b_t矩阵乘计算的端到端用例。
-## 支持的AI处理器
-- Ascend 910B
+## 支持的产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── matmul_s4

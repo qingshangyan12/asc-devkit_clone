@@ -1,7 +1,7 @@
 # Matmul算子使用SplitM模板策略直调样例
 ## 概述
 本样例介绍Matmul算子使用SplitM模板策略，A矩阵和B矩阵同时使能IBShare参数，每次Iterate的计算结果在矩阵的M方向一分为二，分别搬运到两个AIV核，再进行后续的数据处理。
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```

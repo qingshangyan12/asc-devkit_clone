@@ -3,10 +3,10 @@
 ## 概述
 本样例通过Ascend C编程语言实现了Add算子的CPU Debug调测。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 910A
-- Ascend 910B
-- Ascend 910C
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
  
 ## 目录结构介绍
 ```

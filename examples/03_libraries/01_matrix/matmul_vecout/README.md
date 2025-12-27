@@ -1,7 +1,7 @@
 # 输入矩阵为VECOUT的Matmul算子直调样例
 ## 概述
 本样例介绍了Matmul API中数据来源为VECOUT的矩阵乘实现方式。在本样例中，A矩阵输入的逻辑位置为VECOUT，B矩阵输入的逻辑位置为GM，使用Matmul API完成矩阵乘计算。
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```

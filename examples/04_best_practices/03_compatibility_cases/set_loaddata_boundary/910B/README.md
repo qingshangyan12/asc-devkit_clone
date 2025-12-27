@@ -1,8 +1,8 @@
 # SetLoadDataBoundary兼容性样例
 ## 概述
 L1 Buffer设置边界值。
-## 支持的AI处理器
-- Ascend 910B
+## 支持的产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── set_loaddata_boundary

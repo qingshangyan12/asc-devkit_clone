@@ -1,7 +1,7 @@
 # InitConstValue兼容性样例
 ## 概述
 L0A Buffer和L0B Buffer初始化值的端到端用例。
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```
