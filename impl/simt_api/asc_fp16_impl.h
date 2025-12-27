@@ -409,4 +409,102 @@ __simt_callee__ inline half __ll2half_ru(const long long int x) {
     return bisheng::cce::simt::__cvt_half<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(f);
 }
 
+#ifndef ASCENDC_CPU_DEBUG
+__simt_callee__ inline half asc_atomic_add(__ubuf__ half *address, half val)
+{
+    bisheng::cce::simt::atomicAdd(address, val);
+    return *address;
+}
+
+__simt_callee__ inline half2 asc_atomic_add(__ubuf__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicAdd(address, val);
+}
+
+__simt_callee__ inline half2 asc_atomic_sub(__ubuf__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicSub(address, val);
+}
+
+__simt_callee__ inline half2 asc_atomic_exch(__ubuf__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicExch(address, val);
+}
+
+__simt_callee__ inline half asc_atomic_max(__ubuf__ half *address, half val)
+{
+    bisheng::cce::simt::atomicMax(address, val);
+    return *address;
+}
+
+__simt_callee__ inline half2 asc_atomic_max(__ubuf__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicMax(address, val);
+}
+
+__simt_callee__ inline half asc_atomic_min(__ubuf__ half *address, half val)
+{
+    bisheng::cce::simt::atomicMin(address, val);
+    return *address;
+}
+
+__simt_callee__ inline half2 asc_atomic_min(__ubuf__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicMin(address, val);
+}
+
+__simt_callee__ inline half2 asc_atomic_cas(__ubuf__ half2 *address, half2 compare, half2 val)
+{
+    return bisheng::cce::simt::atomicCAS(address, compare, val);
+}
+#endif
+
+__simt_callee__ inline half asc_atomic_add(__gm__ half *address, half val)
+{
+    bisheng::cce::simt::atomicAdd(address, val);
+    return *address;
+}
+
+__simt_callee__ inline half2 asc_atomic_add(__gm__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicAdd(address, val);
+}
+
+__simt_callee__ inline half2 asc_atomic_sub(__gm__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicSub(address, val);
+}
+
+__simt_callee__ inline half2 asc_atomic_exch(__gm__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicExch(address, val);
+}
+
+__simt_callee__ inline half asc_atomic_max(__gm__ half *address, half val)
+{
+    bisheng::cce::simt::atomicMax(address, val);
+    return *address;
+}
+
+__simt_callee__ inline half2 asc_atomic_max(__gm__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicMax(address, val);
+}
+
+__simt_callee__ inline half asc_atomic_min(__gm__ half *address, half val)
+{
+    bisheng::cce::simt::atomicMin(address, val);
+    return *address;
+}
+
+__simt_callee__ inline half2 asc_atomic_min(__gm__ half2 *address, half2 val)
+{
+    return bisheng::cce::simt::atomicMin(address, val);
+}
+
+__simt_callee__ inline half2 asc_atomic_cas(__gm__ half2 *address, half2 compare, half2 val)
+{
+    return bisheng::cce::simt::atomicCAS(address, compare, val);
+}
+
 #endif  // IMPL_SIMT_API_ASC_FP16_IMPL_H

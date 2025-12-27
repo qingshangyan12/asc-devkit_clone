@@ -146,6 +146,42 @@ __simt_callee__ inline bfloat16_t __ll2bfloat16_rd(const long long int x);
 
 __simt_callee__ inline bfloat16_t __ll2bfloat16_ru(const long long int x);
 
+__simt_callee__ inline bfloat16_t asc_atomic_add(__ubuf__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_add(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_add(__gm__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_add(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_sub(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_sub(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_exch(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_exch(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_max(__ubuf__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_max(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_max(__gm__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_max(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_min(__ubuf__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_min(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16_t asc_atomic_min(__gm__ bfloat16_t *address, bfloat16_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_min(__gm__ bfloat16x2_t *address, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_cas(__ubuf__ bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val);
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_cas(__gm__ bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val);
+
 #include "impl/simt_api/asc_bf16_impl.h"
 
 #if defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)

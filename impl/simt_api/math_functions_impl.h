@@ -15,22 +15,7 @@
 #ifndef IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
 #define IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
 
-constexpr float SIMT_FP32_INF = (__builtin_inff());
-constexpr uint32_t MAN_BIT_FLOAT = 0x7FFFFF;
-constexpr uint32_t EXP_BIT_FLOAT = 0x7F800000;
-constexpr uint32_t NEG_SIGN_BIT = 0x80000000;
-constexpr uint8_t FOUR_BYTE_LEN = 32;
-constexpr float PI = 3.141592653589793;
-constexpr float PI_OF_2 = 1.5707963267948966;
-constexpr float PI_OF_4 = 0.7853981633974483;
-constexpr float PI_OF_8 = 0.39269908169872415480783042290994;
-constexpr float SCALAR_LN2 = 0.69314718055994530941723212145818;
-constexpr uint32_t INF = 0x7F800000;
-constexpr int32_t S32_MIN_VAL = 0x80000000;
-constexpr int32_t SIMT_INT32_INF = 2139095040;
-constexpr float TWO_OVER_PI = 0.63661975f; 
-constexpr float MINUS_PI_OVER_TWO_HI = -1.5707964f;
-constexpr float MINUS_PI_OVER_TWO_LO = 4.371139e-8f;
+#define ASCRT_FOUR_BYTE_LEN_U       32U
 
 __simt_callee__ inline long int lroundf(float x)
 {
@@ -350,8 +335,8 @@ __simt_callee__ inline float remquof(float x, float y, int32_t *quo)
     bool is_x_pos = x >= 0;
     float abs_x = abs(x);
     float abs_y = abs(y);
-    bool is_x_inf = abs_x > SIMT_FP32_INF || isnan(x);
-    bool is_y_inf = abs_y > SIMT_FP32_INF || isnan(y);
+    bool is_x_inf = abs_x > ASCRT_INF_F || isnan(x);
+    bool is_y_inf = abs_y > ASCRT_INF_F || isnan(y);
     *quo = 0;
     int32_t n_sign = ((x <= 0 && y <= 0) || (x >= 0 && y >= 0)) ? 1 : -1;
     float res = x + y;
@@ -359,8 +344,8 @@ __simt_callee__ inline float remquof(float x, float y, int32_t *quo)
         return res;
     }
 
-    res = SIMT_FP32_INF / SIMT_FP32_INF;
-    if ((abs_x == SIMT_FP32_INF) || (abs_y == 0)) {
+    res = ASCRT_INF_F / ASCRT_INF_F;
+    if ((abs_x == ASCRT_INF_F) || (abs_y == 0)) {
         return res;
     }
 
@@ -372,9 +357,9 @@ __simt_callee__ inline float remquof(float x, float y, int32_t *quo)
     }
 
     uint32_t *u_abs_y = (uint32_t *)(&abs_y);
-    uint32_t u_y = (*u_abs_y) & MAN_BIT_FLOAT;
+    uint32_t u_y = (*u_abs_y) & ASCRT_MAN_BIT_FLOAT_U;
     uint32_t *u_abs_x = (uint32_t *)(&abs_x);
-    uint32_t u_x = (*u_abs_x) & EXP_BIT_FLOAT;
+    uint32_t u_x = (*u_abs_x) & ASCRT_EXP_BIT_FLOAT_U;
     float x_y_val = 0.0;
     uint32_t *uf26 = (uint32_t *)(&x_y_val);
     *uf26 = u_y | u_x;
@@ -400,7 +385,7 @@ __simt_callee__ inline float remquof(float x, float y, int32_t *quo)
 __simt_callee__ inline float set_res_mod_neg(float mod_res)
 {
     uint32_t *u_mod_res = (uint32_t *)(&mod_res);
-    *u_mod_res = (*u_mod_res) | NEG_SIGN_BIT;
+    *u_mod_res = (*u_mod_res) | ASCRT_NEG_SIGN_BIT_U;
     return mod_res;
 }
 
@@ -415,19 +400,19 @@ __simt_callee__ inline float fmodf(float x, float y)
     bool is_inf_not_nan = isinf(abs_x) && !is_x_nan;
     bool is_zero_not_nan = (abs_y == 0) && !is_y_nan;
     if (is_inf_not_nan | is_zero_not_nan) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     if (is_y_nan || is_x_nan || abs_x < abs_y) {
-        bool gt_inf_or_nan = (abs_y > SIMT_FP32_INF) || is_x_nan || is_y_nan;
+        bool gt_inf_or_nan = (abs_y > ASCRT_INF_F) || is_x_nan || is_y_nan;
         float xy_val = (gt_inf_or_nan) ? (x + y) : x;
         bool lt_zero_or_nan = (abs_x <= 0) || is_x_nan;
         return (lt_zero_or_nan) ? (xy_val + x) : xy_val;
     }
 
     uint32_t *uabs_y = (uint32_t *)&abs_y;
-    uint32_t y_man_bits = (*uabs_y) & MAN_BIT_FLOAT;
+    uint32_t y_man_bits = (*uabs_y) & ASCRT_MAN_BIT_FLOAT_U;
     uint32_t *uabs_x = (uint32_t *)(&abs_x);
-    uint32_t x_exp_bits = (*uabs_x) & EXP_BIT_FLOAT;
+    uint32_t x_exp_bits = (*uabs_x) & ASCRT_EXP_BIT_FLOAT_U;
     uint32_t xy_bits = y_man_bits | x_exp_bits;
 
     float xy_val = 0;
@@ -570,9 +555,9 @@ __simt_callee__ inline float payne_hanek_radian_reduction(float x, int *output_q
     // Step 4: Compute exponent remainder and shift table entries accordingly
     int32_t exponent_remainder = static_cast<uint32_t>(exponent) & 0x1F;
     if (exponent_remainder != 0) {
-        high_term = (high_term << exponent_remainder) | (mid_term >> (FOUR_BYTE_LEN - exponent_remainder));
-        mid_term = (mid_term << exponent_remainder) | (low_term >> (FOUR_BYTE_LEN - exponent_remainder));
-        low_term = (low_term << exponent_remainder) | (last_term >> (FOUR_BYTE_LEN - exponent_remainder));
+        high_term = (high_term << exponent_remainder) | (mid_term >> (ASCRT_FOUR_BYTE_LEN_U - exponent_remainder));
+        mid_term = (mid_term << exponent_remainder) | (low_term >> (ASCRT_FOUR_BYTE_LEN_U - exponent_remainder));
+        low_term = (low_term << exponent_remainder) | (last_term >> (ASCRT_FOUR_BYTE_LEN_U - exponent_remainder));
     }
 
     // Step 5: Extract and normalize the mantissa
@@ -581,8 +566,8 @@ __simt_callee__ inline float payne_hanek_radian_reduction(float x, int *output_q
 
     // Step 6: Compute product = (mantissa * high_term) << 32 + mantissa * mid_term + mantissa * low_term
     uint64_t product = static_cast<uint64_t>(normalized_mantissa) * low_term;
-    product = static_cast<uint64_t>(normalized_mantissa) * mid_term + (product >> FOUR_BYTE_LEN);
-    product = (static_cast<uint64_t>(normalized_mantissa * high_term) << FOUR_BYTE_LEN) + product;
+    product = static_cast<uint64_t>(normalized_mantissa) * mid_term + (product >> ASCRT_FOUR_BYTE_LEN_U);
+    product = (static_cast<uint64_t>(normalized_mantissa * high_term) << ASCRT_FOUR_BYTE_LEN_U) + product;
 
     // Step 7: Extract quotient and remainder
     int32_t quotient = static_cast<int32_t>(product >> 62);
@@ -701,7 +686,7 @@ __simt_callee__ inline float tanhf(float x)
  */
 __simt_callee__ inline float tanpif(float x)
 {
-    return tanf(x * PI);
+    return tanf(x * ASCRT_PI_F);
 }
 
 __simt_callee__ inline void taylor_expand(float &dst, float &src, float &square_v, uint32_t expand_level, float *factor)
@@ -761,7 +746,7 @@ __simt_callee__ inline float atanf(float x)
     atan_expand(tmp, abs_v, tmp2, 0.4142135623730950); // 0.4142135623730950 : TAN_PI_OF_8
     taylor_expand(tmp2, tmp, square_v, 4); //4 : Taylor expansion count
 
-    tmp2 = tmp2 + PI_OF_8;
+    tmp2 = tmp2 + ASCRT_PIO8_F;
     dst = fminf(dst, tmp2);
 
     tmp2 = abs_v + 1.0f;
@@ -770,14 +755,14 @@ __simt_callee__ inline float atanf(float x)
     tmp = fabsf(tmp);
 
     taylor_expand(tmp2, tmp, square_v, 4); //4 : Taylor expansion count
-    tmp2 = tmp2 + PI_OF_4;
+    tmp2 = tmp2 + ASCRT_PIO4_F;
     dst = fminf(dst, tmp2);
 
     atan_expand(tmp2, tmp, square_v, 0.4142135623730950); // 0.4142135623730950 : TAN_PI_OF_8
     taylor_expand(tmp, tmp2, square_v, 6); //6 : Taylor expansion count
 
-    tmp = tmp + PI_OF_8;
-    tmp = tmp + PI_OF_4;
+    tmp = tmp + ASCRT_PIO8_F;
+    tmp = tmp + ASCRT_PIO4_F;
     dst = fminf(dst, tmp);
 
     Sign(tmp, clip, tmp2);
@@ -801,26 +786,26 @@ __simt_callee__ inline float atan2f(float y, float x)
         if (x < 0) {
             s = 3; // 3 : ATAN2_THREE
         }
-        return d * PI_OF_4 * s;
+        return d * ASCRT_PIO4_F * s;
     } else if (isinf(y)) {
-        return d * PI_OF_2;
+        return d * ASCRT_PIO2_F;
     } else if (isinf(x)) {
         if (x > 0) {
             d = 0;
         }
-        return d * PI;
+        return d * ASCRT_PI_F;
     }
 
     if (x == 0) {
         if (y == 0) {
             d = 0;
         }
-        return d * PI_OF_2;
+        return d * ASCRT_PIO2_F;
     } else if (x > 0) {
         d = 0;
     }
 
-    return atanf(y / x) + d * PI;
+    return atanf(y / x) + d * ASCRT_PI_F;
 }
 
 __simt_callee__ inline float atanhf(float x)
@@ -896,7 +881,7 @@ __simt_callee__ inline float cosf(float x)
 __simt_callee__ inline float coshf(float x)
 {
     float y = fabsf(x);
-    const float tmp = expf(y - SCALAR_LN2);
+    const float tmp = expf(y - ASCRT_SCALAR_LN2_F);
     return tmp + 0.25f / tmp;
 }
 
@@ -907,13 +892,13 @@ __simt_callee__ inline float coshf(float x)
  */
 __simt_callee__ inline float cospif(float x)
 {
-    return cosf(x * PI);
+    return cosf(x * ASCRT_PI_F);
 }
 
 __simt_callee__ inline float asinf(float x)
 {
     if (fabsf(x) > 1) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     float square_v = 0;
     float dst = 0;
@@ -934,23 +919,23 @@ __simt_callee__ inline float asinf(float x)
     } else if (x < -0.7071067811865476f) { // -0.7071067811865476 : SCALAR_ACOS_MIN_LIMIT
         src = sqrtf(1.0f - x * x);
         taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
-        return dst - PI_OF_2;
+        return dst - ASCRT_PIO2_F;
     } else {
         src = sqrtf(1.0f - x * x);
         taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
-        return PI_OF_2 - dst;
+        return ASCRT_PIO2_F - dst;
     }
 }
 
 __simt_callee__ inline float acosf(float x)
 {
-    return PI_OF_2 - asinf(x);
+    return ASCRT_PIO2_F - asinf(x);
 }
 
 __simt_callee__ inline float acoshf(float x)
 {
     if (x < 1) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     return logf(x + sqrtf(x * x - 1.0f));
 }
@@ -984,7 +969,7 @@ __simt_callee__ inline float sinf(float x)
 __simt_callee__ inline float sinhf(float x)
 {
     if (fabsf(x) > 0.1f) {
-        return expf(x - SCALAR_LN2) - expf(x * (-1.0f) - SCALAR_LN2);
+        return expf(x - ASCRT_SCALAR_LN2_F) - expf(x * (-1.0f) - ASCRT_SCALAR_LN2_F);
     } else {
         float square_v = 0;
         float dst = 0;
@@ -1007,7 +992,7 @@ __simt_callee__ inline float sinhf(float x)
  */
 __simt_callee__ inline float sinpif(float x)
 {
-    return sinf(x * PI);
+    return sinf(x * ASCRT_PI_F);
 }
 
 __simt_callee__ inline float asinhf(float x)
@@ -1067,7 +1052,7 @@ __simt_callee__ inline void sincosf(float x, float &s, float &c)
  */
 __simt_callee__ inline void sincospif(float x, float &s, float &c)
 {
-    return sincosf(x * PI, s, c);
+    return sincosf(x * ASCRT_PI_F, s, c);
 }
 
 __simt_callee__ inline float powf(float x, float y)
@@ -1093,7 +1078,7 @@ __simt_callee__ inline float expm1f(float x)
 __simt_callee__ inline bool is_positive_inf_impl(float x)
 {
     uint32_t* int_x = (uint32_t*)&x;
-    return *int_x == INF;
+    return *int_x == ASCRT_INF_U;
 }
 
 /**
@@ -1140,7 +1125,7 @@ __simt_callee__ inline float ldexpf(float x, int exp)
         return x;
     }
     if (exp > 280) {  // 280: 1e-45*(2^280) = inf
-        return copysignf(SIMT_FP32_INF, x);
+        return copysignf(ASCRT_INF_F, x);
     }
     if (exp < -280) {  // -280: 3.4028234e+38*(2^-280) = 0
         return copysignf(0.0f, x);
@@ -1173,7 +1158,7 @@ __simt_callee__ inline float hypotf(float x, float y)
     float abs_x = fabsf(x);
     float abs_y = fabsf(y);
     if (is_positive_inf_impl(abs_x) || is_positive_inf_impl(abs_y)) {
-        return SIMT_FP32_INF;
+        return ASCRT_INF_F;
     }
     if (isnan(abs_x)) {
         return abs_x;
@@ -1216,10 +1201,10 @@ __simt_callee__ inline float rhypotf(float x, float y)
 __simt_callee__ inline float norm3df(float a, float b, float c)
 {
     if (isinf(a) || isinf(b) || isinf(c)) {
-        return SIMT_FP32_INF;
+        return ASCRT_INF_F;
     }
     if (isnan(a) || isnan(b) || isnan(c)) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     float m = fmaxf(fabsf(a), fabsf(b));
     m = fmaxf(m, fabsf(c));
@@ -1266,10 +1251,10 @@ __simt_callee__ inline float rnorm3df(float a, float b, float c)
 __simt_callee__ inline float norm4df(float a, float b, float c, float d)
 {
     if (isinf(a) || isinf(b) || isinf(c) || isinf(d)) {
-        return SIMT_FP32_INF;
+        return ASCRT_INF_F;
     }
     if (isnan(a) || isnan(b) || isnan(c) || isnan(d)) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     float m = fmaxf(fabsf(a), fabsf(b));
     m = fmaxf(m, fabsf(c));
@@ -1325,14 +1310,14 @@ __simt_callee__ inline float normf(int n, __gm__ float* a)
     for (int i = 0; i < n; i++) {
         m = fmaxf(m, fabsf(a[i]));
         if (isinf(a[i])) {
-            return SIMT_FP32_INF;
+            return ASCRT_INF_F;
         }
         if (isnan(a[i])) {
             has_nan = 1;
         }
     }
     if (has_nan) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     if (m == 0.0f || isnan(m)) {
         return m;
@@ -1379,7 +1364,7 @@ __simt_callee__ inline float logbf(float x)
     if (x < 0) {
         x = -x;
     }
-    float inf = SIMT_FP32_INF;
+    float inf = ASCRT_INF_F;
     if (isinf(x)) {
         return inf;
     }
@@ -1412,7 +1397,7 @@ __simt_callee__ inline int32_t ilogbf(float x)
         x = -x;
     }
     if (isnan(x)) {
-        return S32_MIN_VAL;
+        return ASCRT_MIN_VAL_S;
     }
     return static_cast<int>(logbf(x));
 }
@@ -1482,7 +1467,7 @@ __simt_callee__ inline float cbrtf(float x)
 __simt_callee__ inline float rcbrtf(float x)
 {
     if (x == 0.0f) {
-        return SIMT_FP32_INF;
+        return ASCRT_INF_F;
     }
     if (isnan(x)) {
         return x;
@@ -1759,7 +1744,7 @@ __simt_callee__ inline float erfcinvf(float x)
 __simt_callee__ inline float erfcxf(float x)
 {
     if (x < -9.43f) {
-        return SIMT_FP32_INF;
+        return ASCRT_INF_F;
     }
     float abs_x = fabsf(x);
     if (abs_x < 10.055f) {
@@ -1777,7 +1762,7 @@ __simt_callee__ inline float erfcxf(float x)
         float neg_x2 = -x_sq;
         float term4 = fmaf(abs_x, abs_x, neg_x2);
         float term5 = fmaf(x_sq, 0.00572498f, 0.5f);
-        term5 = fminf(term5, SIMT_FP32_INF);  // prevent overflow
+        term5 = fminf(term5, ASCRT_INF_F);  // prevent overflow
         float term6 = fmaf(term5, 252.0f, 12582913.0f);
         float term7 = term6 -12583039.0f;
         float neg_term7 = -term7;
@@ -1872,8 +1857,8 @@ __simt_callee__ inline float compute_ln(float x)
     // ln(mantissa) + exponent*ln(2)
     y = fmaf(exponent, 0.693147182f, y);     // 0.693147182f     :   ln2
 
-    if (u32 >= SIMT_INT32_INF || x == 0) {
-        y = fmaf(x, SIMT_FP32_INF, SIMT_FP32_INF);
+    if (u32 >= ASCRT_INT32_INF_S || x == 0) {
+        y = fmaf(x, ASCRT_INF_F, ASCRT_INF_F);
     }
     return y;
 }
@@ -2096,7 +2081,7 @@ __simt_callee__ inline float tgammaf(float x)
         return 1.0f / x;
     }
     if (x < 0.0f && nearbyintf(x) == x) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     float abs_x = fabsf(x);
     if (abs_x < 1.5f) {
@@ -2242,7 +2227,7 @@ __simt_callee__ inline float lgammaf(float x)
     }
     if (x < 0) {
         if (bisheng::cce::simt::floorf(abs_x) == abs_x) {
-            return SIMT_FP32_INF;
+            return ASCRT_INF_F;
         } else if (abs_x < 9.9999996e-20f) {                 // 9.9999996e-20 : minimum-value
             //  According Euler's Reflection Formula
             //  As x ~ 0 : then sin(pi*x) ~ pi*x
@@ -2406,11 +2391,11 @@ __simt_callee__ inline float normcdff(float x)
 __simt_callee__ inline float trig_red_slowpath_f_fast_mode(float a, int *quadrant)
 {
     uint64_t q, q2;
-    q = (uint64_t)(a * TWO_OVER_PI);
-    a = fmaf(q, MINUS_PI_OVER_TWO_HI, a);
-    a = fmaf(q, MINUS_PI_OVER_TWO_LO, a);
-    q2 = (uint64_t)(a * TWO_OVER_PI);
-    a = fmaf(q2, MINUS_PI_OVER_TWO_HI, a);
+    q = (uint64_t)(a * ASCRT_2OPI_F);
+    a = fmaf(q, ASCRT_MINUS_PIO2_HI_F, a);
+    a = fmaf(q, ASCRT_MINUS_PIO2_LO_F, a);
+    q2 = (uint64_t)(a * ASCRT_2OPI_F);
+    a = fmaf(q2, ASCRT_MINUS_PIO2_HI_F, a);
     q = q % 4 + q2 % 4; // 4:Number of quadrants
     a = a - 0.7853982f;
     *quadrant = q % 4; // 4:Number of quadrants
@@ -2598,7 +2583,7 @@ __simt_callee__ inline float jn_yn_asymptotic_bessel_amplitude(int n, float x, i
         s += 3 * (mu - 1) * (mu - 9) / (txq * txq * 8); // 3,1,9,8:Constants in formulas
         s += 15 * (mu - 1) * (mu - 9) * (mu - 25) / (txq * txq * txq * 8 * 6); // 15,1,9,25,8,6:Constants in formulas
     }
-    return sqrtf(s * 2 / (PI * x)); // 2:Constants in formulas    sqrt(2*s/(π*x))
+    return sqrtf(s * 2 / (ASCRT_PI_F * x)); // 2:Constants in formulas    sqrt(2*s/(π*x))
 }
 
 __simt_callee__ inline float jn_yn_asymptotic_bessel_phase_mx(int n, float x)
@@ -2861,14 +2846,14 @@ __simt_callee__ inline float yn_case1(int n, float x)
 {
     float lgamma_n = lgammaf(n);
     float gamma_n = expf(lgamma_n);
-    return -gamma_n / PI * powf(2 / x, (float)n); // 2:Constants in formulas -(n - 1)! * (2 / x)^n / π
+    return -gamma_n / ASCRT_PI_F * powf(2 / x, (float)n); // 2:Constants in formulas -(n - 1)! * (2 / x)^n / π
 }
 
 __simt_callee__ inline float yn_case2(int n, float x)
 {
     float ampl = jn_yn_asymptotic_bessel_amplitude(n, x, 1); // 1: Calculate YnAsymptoticBesselAmplitude
     float phase = jn_yn_asymptotic_bessel_phase_mx(n, x);
-    float phase_shift = n * float(PI)/2 + float(PI)/4;
+    float phase_shift = n * float(ASCRT_PI_F)/2 + float(ASCRT_PI_F)/4;
     float cos_x = cosf(x);
     float sin_x = sinf(x);
     float cos_shift = cosf(phase_shift - phase);
@@ -2910,7 +2895,7 @@ __simt_callee__ inline float yn_case3(int n, float x)
 __simt_callee__ inline float j0f(float x)
 {
     if (isnan(x)) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     float f1 = fabsf(x);
     if (f1 > 1e13f && isfinite(f1)) {
@@ -2926,7 +2911,7 @@ __simt_callee__ inline float j0f(float x)
 __simt_callee__ inline float j1f(float x)
 {
     if (isnan(x)) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     float f1 = fabsf(x);
     if (f1 > 1e13f && isfinite(f1)) {
@@ -2950,7 +2935,7 @@ __simt_callee__ inline float jnf(int n, float x)
         return j1f(x);
     }
     if (n < 0 || isnan(x)) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     if (x == 0) {
         return 0;
@@ -2978,7 +2963,7 @@ __simt_callee__ inline float jnf(int n, float x)
 __simt_callee__ inline float y0f(float x)
 {
     if (x < 0 || isnan(x)) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     float f1 = fabsf(x);
     if (f1 > 1e13f && isfinite(f1)) {
@@ -3000,14 +2985,14 @@ __simt_callee__ inline float y0f(float x)
 __simt_callee__ inline float y1f(float x)
 {
     if (x < 0 || isnan(x)) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     float f1 = fabsf(x);
     if (f1 > 1e13f && isfinite(f1)) {
         return 0;
     }
     if (x == 0.0f) {
-        return -SIMT_FP32_INF;  
+        return -ASCRT_INF_F;  
     }
     float minus_two_over_pi_mul_inv_x = -0.636619772367f / f1;                
     float res;     
@@ -3029,13 +3014,13 @@ __simt_callee__ inline float y1f(float x)
 __simt_callee__ inline float ynf(int n, float x)
 {
     if (x == 0) {
-        return -SIMT_FP32_INF;
+        return -ASCRT_INF_F;
     }
     if (is_positive_inf_impl(x)) {
         return 0;
     }
     if (n < 0 || x < 0 || isnan(x)) {
-        return SIMT_FP32_INF / SIMT_FP32_INF;
+        return ASCRT_INF_F / ASCRT_INF_F;
     }
     if (n == 0) {
         return y0f(x);

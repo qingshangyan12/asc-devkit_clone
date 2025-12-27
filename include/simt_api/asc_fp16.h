@@ -130,6 +130,42 @@ __simt_callee__ inline half __ull2half_rd(const unsigned long long int x);
 
 __simt_callee__ inline half __ull2half_ru(const unsigned long long int x);
 
+__simt_callee__ inline half asc_atomic_add(__ubuf__ half *address, half val);
+
+__simt_callee__ inline half2 asc_atomic_add(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline half asc_atomic_add(__gm__ half *address, half val);
+
+__simt_callee__ inline half2 asc_atomic_add(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline half2 asc_atomic_sub(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline half2 asc_atomic_sub(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline half2 asc_atomic_exch(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline half2 asc_atomic_exch(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline half asc_atomic_max(__ubuf__ half *address, half val);
+
+__simt_callee__ inline half2 asc_atomic_max(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline half asc_atomic_max(__gm__ half *address, half val);
+
+__simt_callee__ inline half2 asc_atomic_max(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline half asc_atomic_min(__ubuf__ half *address, half val);
+
+__simt_callee__ inline half2 asc_atomic_min(__ubuf__ half2 *address, half2 val);
+
+__simt_callee__ inline half asc_atomic_min(__gm__ half *address, half val);
+
+__simt_callee__ inline half2 asc_atomic_min(__gm__ half2 *address, half2 val);
+
+__simt_callee__ inline half2 asc_atomic_cas(__ubuf__ half2 *address, half2 compare, half2 val);
+
+__simt_callee__ inline half2 asc_atomic_cas(__gm__ half2 *address, half2 compare, half2 val);
+
 #include "impl/simt_api/asc_fp16_impl.h"
 
 #if defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)

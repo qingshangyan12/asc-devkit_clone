@@ -373,4 +373,102 @@ __simt_callee__ inline bfloat16_t __ll2bfloat16_ru(const long long int x) {
     return bisheng::cce::simt::__cvt_bfloat16_t<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(f);
 }
 
+#ifndef ASCENDC_CPU_DEBUG
+__simt_callee__ inline bfloat16_t asc_atomic_add(__ubuf__ bfloat16_t *address, bfloat16_t val)
+{
+    bisheng::cce::simt::atomicAdd(address, val);
+    return *address;
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_add(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicAdd(address, val);
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_sub(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicSub(address, val);
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_exch(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicExch(address, val);
+}
+
+__simt_callee__ inline bfloat16_t asc_atomic_max(__ubuf__ bfloat16_t *address, bfloat16_t val)
+{
+    bisheng::cce::simt::atomicMax(address, val);
+    return *address;
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_max(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicMax(address, val);
+}
+
+__simt_callee__ inline bfloat16_t asc_atomic_min(__ubuf__ bfloat16_t *address, bfloat16_t val)
+{
+    bisheng::cce::simt::atomicMin(address, val);
+    return *address;
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_min(__ubuf__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicMin(address, val);
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_cas(__ubuf__ bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicCAS(address, compare, val);
+}
+#endif
+
+__simt_callee__ inline bfloat16_t asc_atomic_add(__gm__ bfloat16_t *address, bfloat16_t val)
+{
+    bisheng::cce::simt::atomicAdd(address, val);
+    return *address;
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_add(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicAdd(address, val);
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_sub(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicSub(address, val);
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_exch(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicExch(address, val);
+}
+
+__simt_callee__ inline bfloat16_t asc_atomic_max(__gm__ bfloat16_t *address, bfloat16_t val)
+{
+    bisheng::cce::simt::atomicMax(address, val);
+    return *address;
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_max(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicMax(address, val);
+}
+
+__simt_callee__ inline bfloat16_t asc_atomic_min(__gm__ bfloat16_t *address, bfloat16_t val)
+{
+    bisheng::cce::simt::atomicMin(address, val);
+    return *address;
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_min(__gm__ bfloat16x2_t *address, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicMin(address, val);
+}
+
+__simt_callee__ inline bfloat16x2_t asc_atomic_cas(__gm__ bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val)
+{
+    return bisheng::cce::simt::atomicCAS(address, compare, val);
+}
+
 #endif  // IMPL_SIMT_API_ASC_BF16_IMPL_H
