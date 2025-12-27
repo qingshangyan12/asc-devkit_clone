@@ -81,15 +81,15 @@ link_mode: SuperKernelLinkMode, split_mode, compile_log_path=None):
             objs_cube.append(sub_op["aic_bin"])
         if "dynamic_bin" in sub_op:
             objs_dynamic.append(sub_op["dynamic_bin"])
-    if link_mode == SuperKernelLinkMode.PerVecHerCube:
+    if link_mode.value == SuperKernelLinkMode.PerVecHerCube.value:
         objs += super_kernl_files
         objs += objs_vec
         objs += objs_cube
-    elif link_mode == SuperKernelLinkMode.PerCubeHerVec:
+    elif link_mode.value == SuperKernelLinkMode.PerCubeHerVec.value:
         objs += super_kernl_files
         objs += objs_cube
         objs += objs_vec
-    elif link_mode == SuperKernelLinkMode.PerCubeHerVecWithSuper:
+    elif link_mode.value == SuperKernelLinkMode.PerCubeHerVecWithSuper.value:
         if len(super_kernl_files) == 1:
             objs += super_kernl_files
             objs += objs_cube

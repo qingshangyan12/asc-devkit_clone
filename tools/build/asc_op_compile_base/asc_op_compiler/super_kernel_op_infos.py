@@ -544,7 +544,7 @@ f"ERROR: super kernel do not support self send/receive pair within 1 real stream
                     CommonUtility().ascendc_raise_python_err(ERR_CODE, (\
 f"ERROR: super kernel do not support self send/receive pair within 1 real stream: oplist: {self.op_list} "))
                 elif former_op.stream_index != op.stream_index and not connect_set:
-                    if self.stream_fusin_mode == SuperKernelStreamFusionMode.StreamFusionEnable:
+                    if self.stream_fusin_mode.value == SuperKernelStreamFusionMode.StreamFusionEnable.value:
                         CommonUtility.print_compile_log("", \
                             f"enter into 2 real stream mode, oplist: {self.op_list} ", AscendCLogLevel.LOG_DEBUG)
                         self.enable_double_stream = True
@@ -720,9 +720,9 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
     def gen_super_kernel_params(self):
         for sub_operator in self.info_base:
             self.super_kernel_params += sub_operator.kernel_params
-            if sub_operator.sub_op_task_type is SubOperatorType.DYNAMIC_OP:
+            if sub_operator.sub_op_task_type.value == SubOperatorType.DYNAMIC_OP.value:
                 self.super_kernel_params += sub_operator.extra_kernel_params
-            elif sub_operator.sub_op_task_type is SubOperatorType.STATIC_OP:
+            elif sub_operator.sub_op_task_type.value == SubOperatorType.STATIC_OP.value:
                 self.super_kernel_params += sub_operator.extra_kernel_params
         CommonUtility.dump_compile_log(['### SK Arg: FFTS', ','.join(self.super_kernel_params)], \
             CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
@@ -737,7 +737,7 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
 
 
     def calc_workspace_size(self):
-        if self.feed_sync_all_mode == SuperKernelFeedSyncAllMode.FeedSyncAllDisable:
+        if self.feed_sync_all_mode.value == SuperKernelFeedSyncAllMode.FeedSyncAllDisable.value:
             self.workspace_size = 0
             return
         if self.kernel_type in [KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0, \
@@ -752,15 +752,15 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
         if exist_dynamic_sub_ops:
             options.append("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
 
-        if self.early_start_mode != SuperKernelEarlyStartMode.EarlyStartDisable:
+        if self.early_start_mode.value != SuperKernelEarlyStartMode.EarlyStartDisable.value:
             options.append("-D__ASCENDC_ENABLE_SET_NEXT_TASK_START")
             options.append("-D__ASCENDC_ENABLE_WAIT_PRE_TASK_END")
-            if self.early_start_mode == SuperKernelEarlyStartMode.EarlyStartEnableV1:
+            if self.early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartEnableV1.value:
                 options.append("-D__ASCENDC_SUPERKERNEL_EARLY_START_V1")
             else:
                 options.append("-D__ASCENDC_SUPERKERNEL_EARLY_START_V2")
 
-        if self.feed_sync_all_mode == SuperKernelFeedSyncAllMode.FeedSyncAllEnable:
+        if self.feed_sync_all_mode.value == SuperKernelFeedSyncAllMode.FeedSyncAllEnable.value:
             options.append("-D__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__")
 
         if self.timestamp_option:

@@ -106,7 +106,7 @@ def _json_except_info(compile_info: CompileInfo):
     chip_version = CommonUtility.get_chip_version()
     if 'stream-fusion' in compile_info.super_kernel_info["sp_options"]:
         stream_fusion = compile_info.super_kernel_info["sp_options"]['stream-fusion']
-        if stream_fusion == SuperKernelStreamFusionMode.StreamFusionEnable:
+        if stream_fusion.value == SuperKernelStreamFusionMode.StreamFusionEnable.value:
             key = 'stream'
     i = 0
     for sub_op in compile_info.super_kernel_info["op_list"]:
