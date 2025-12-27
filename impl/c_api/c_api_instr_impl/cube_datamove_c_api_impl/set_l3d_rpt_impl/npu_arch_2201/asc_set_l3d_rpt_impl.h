@@ -12,10 +12,10 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_SET_L3D_RPT_IMPL_NPU_ARCH_2201_ASC_SET_L3D_RPT_IMPL_H
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void asc_set_l1_3d_rpt_impl(uint64_t value)
+__aicore__ inline void asc_set_l1_3d_rpt_impl(asc_load3d_v2_config& config)
 {
     if ASC_IS_AIC {
-        set_l3d_rpt(value);
+        set_l3d_rpt(config.config);
     }
 }
 

@@ -745,6 +745,8 @@ __aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t* dst, __cbuf__ 
 
 __aicore__ inline void asc_set_l1_3d_size(uint64_t value);
 
+__aicore__ inline void asc_set_l1_3d_rpt(asc_load3d_v2_config& config);
+
 // ==========asc_load_image_to_cbuf(half/int8_t)==========
 __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size,
     uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,

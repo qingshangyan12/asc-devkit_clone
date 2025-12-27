@@ -57,9 +57,9 @@ __aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t* dst, __cbuf__ 
     asc_copy_l12l0b_sparse_sync_impl(dst, src, index, start_index, repeat);
 }
 
-__aicore__ inline void asc_set_l1_3d_rpt(uint64_t value)
+__aicore__ inline void asc_set_l1_3d_rpt(asc_load3d_v2_config& config)
 {
-    asc_set_l1_3d_rpt_impl(value);
+    asc_set_l1_3d_rpt_impl(config);
 }
 
 // ==========asc_copy_l12l0b, 2D, int4x2_t/int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float==========

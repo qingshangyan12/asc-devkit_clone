@@ -23,20 +23,13 @@ protected:
     }
 };
 
-namespace {
-void set_l1_3d_rpt_Stub(uint64_t value)
-{
-    EXPECT_EQ(value, static_cast<uint64_t>(1));
-}
-}
 
 TEST_F(TestCubeDmamoveSetL13DRpt, set_l1_3d_rpt_uint32_t_Succ)
 {
-    uint64_t value = 1;
-    MOCKER(set_l3d_rpt, void(uint64_t))
-        .times(1)
-        .will(invoke(set_l1_3d_rpt_Stub));
-
-    asc_set_l1_3d_rpt(value);
+    asc_load3d_v2_config config;
+    asc_set_l1_3d_rpt(config);
+    EXPECT_EQ(config.rpt_stride, 0);
+    EXPECT_EQ(config.rpt_time, 1);
+    EXPECT_EQ(config.rpt_mode, 0);
     GlobalMockObject::verify();
 }

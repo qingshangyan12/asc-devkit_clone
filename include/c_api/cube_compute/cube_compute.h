@@ -92,4 +92,7 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t
     uint16_t right_width, uint16_t n_dim, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset,
     bool c_matrix_source, bool c_matrix_init_val);
 
+__aicore__ inline void asc_set_mm_transform_m();
+
+__aicore__ inline void asc_set_mm_transform_n();
 #endif
