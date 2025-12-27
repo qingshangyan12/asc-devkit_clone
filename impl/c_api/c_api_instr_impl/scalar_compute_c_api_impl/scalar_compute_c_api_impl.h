@@ -13,6 +13,7 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_SCALAR_COMPUTE_C_API_IMPL_SCALAR_COMPUTE_C_API_IMPL_H
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "clz_impl/npu_arch_2201/asc_clz_impl.h"
 #include "ffs_impl/npu_arch_2201/ffs_impl.h"
 #include "sflbits_impl/npu_arch_2201/asc_sflbits_impl.h"
 #include "zero_bits_cnt_impl/npu_arch_2201/asc_zero_bits_cnt_impl.h"
@@ -20,6 +21,11 @@
 #include "popc_impl/npu_arch_2201/asc_popc_impl.h"
 #include "set_nthbit_impl/npu_arch/asc_set_nthbit_impl.h"
 #include "clear_nthbit_impl/npu_arch_2201/asc_clear_nthbit_impl.h"
+
+__aicore__ inline int64_t asc_clz(uint64_t value_in)
+{
+    return asc_clz_impl(value_in);
+}
 
 __aicore__ inline int64_t asc_ffs(uint64_t value)
 {

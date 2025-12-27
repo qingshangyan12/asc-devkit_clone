@@ -14,7 +14,7 @@
 #include "get_acc_val_impl/npu_arch_2201/asc_get_acc_val_impl.h"
 #include "get_cmp_mask_impl/asc_2201/get_cmp_mask_impl.h"
 #include "get_max_min_cnt_impl/npu_arch_2201/asc_get_reduce_max_min_cnt_impl.h"
-#include "get_rsvd_cnt_impl/asc_2201/get_rsvd_cnt_impl.h"
+#include "get_rsvd_cnt_impl/npu_arch_2201/get_rsvd_cnt_impl.h"
 #include "get_vms4_sr_impl/npu_arch_2201/asc_get_vms4_sr_impl.h"
 #include "set_cmp_mask_impl/asc_2201/set_cmp_mask_impl.h"
 #include "set_mask_count_impl/npu_arch_2201/asc_set_mask_count_impl.h"
@@ -173,7 +173,7 @@ __aicore__ inline void asc_get_reduce_max_min_cnt(float& val, uint32_t& index)
 
 __aicore__ inline int64_t asc_get_rsvd_count()
 {
-    return CApiInternal::asc_get_rsvd_count_impl();
+    return asc_get_rsvd_count_impl();
 }
 
 __aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[4])

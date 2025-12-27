@@ -13,8 +13,6 @@
 
 #include "c_api_instr_impl/cube_compute_c_api_impl/cube_compute_c_api_impl.h"
 
-__aicore__ inline int64_t asc_clz(uint64_t value_in);
-
 // asc_mmad(float-bfloat16_t)
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix,
     uint16_t left_height, uint16_t right_width, uint16_t n_dim, uint8_t unit_flag, bool k_direction_align,

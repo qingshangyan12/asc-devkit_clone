@@ -47,7 +47,9 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-int total_length = 256; // dst指目的操作数的地址 total_length指参与计算的数据总长度
+// total_length指参与计算的数据总长度
+constexpr int total_length = 256; 
 __ubuf__ int16_t src[total_length];
+// dst指目的操作数的地址
 asc_transpose(dst, src);
 ```

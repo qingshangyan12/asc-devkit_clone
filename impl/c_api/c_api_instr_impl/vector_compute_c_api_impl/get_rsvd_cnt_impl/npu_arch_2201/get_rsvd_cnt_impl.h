@@ -11,17 +11,14 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_RSVD_CNT_IMPL_ASC_2201_GET_RSVD_CNT_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_RSVD_CNT_IMPL_ASC_2201_GET_RSVD_CNT_IMPL_H
 
-namespace CApiInternal {
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline int64_t asc_get_rsvd_count_impl()
 {
-#if ((__NPU_ARCH__ == 2201) && (C_API_CV_SPLIT_CORE_TYPE == C_API_AIV_TYPE))
-    return get_rsvd_cnt();
-#else
+    if ASC_IS_AIV {
+        return get_rsvd_cnt();
+    }
     return 0;
-#endif
 }
-
-} // namespace CApiInternal
 
 #endif

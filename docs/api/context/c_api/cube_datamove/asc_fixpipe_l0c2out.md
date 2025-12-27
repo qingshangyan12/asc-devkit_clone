@@ -253,14 +253,14 @@
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
-| src | 输入 | 源操作数的起始地址。 |
-| sid | 输入 | 。 |
-| n_size | 输入 | 源NZ矩阵在N方向上的大小。- 不使能NZ2ND功能：若使能channel_split功能，n_size必须为8的倍数，取值范围为[1, 4095]。若不使能channel_split功能，n_size必须为16的倍数，取值范围为[1, 4095]。- 使能NZ2ND功能：m_size的取值范围为[1, 4095]。 |
-| m_size | 输入 | 源NZ矩阵在M方向上的大小。- 不使能NZ2ND功能：取值范围为[1, 65535]。- 使能NZ2ND功能，m_size的取值范围为[1, 8192]。 |
-| dst_stride_dst_d | 输入 |目的相邻ND矩阵其实地址之间的偏移 。 |
-| src_stride | 输入 | 源NZ矩阵中相邻Z排布的其实地址偏移，取值范围为[0, 65535]，单位为16*sizeof(数据类型)。 |
+| src | 输入 | 源操作数（矢量）的起始地址。 |
+| sid | 输入 | 预留参数，开发者无需关注，传0即可。 |
+| n_size | 输入 | 源NZ矩阵在N方向上的大小。<br> - 不使能NZ2ND功能：若使能channel_split功能，n_size必须为8的倍数，取值范围为[1, 4095]。若不使能channel_split功能，n_size必须为16的倍数，取值范围为[1, 4095]。<br>- 使能NZ2ND功能：m_size的取值范围为[1, 4095]。 |
+| m_size | 输入 | 源NZ矩阵在M方向上的大小。<br> - 不使能NZ2ND功能：取值范围为[1, 65535]。<br> - 使能NZ2ND功能，m_size的取值范围为[1, 8192]。 |
+| dst_stride_dst_d | 输入 |目的相邻ND矩阵起始地址之间的偏移 。 |
+| src_stride | 输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为[0, 65535]，单位为16*sizeof(数据类型)。 |
 | unit_flag | 输入 | asc_mmad接口和本接口细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。 |
-| unit_flag_mode | 输入 | 与unit_flag参数相关，取值如下：0 保留值；2 使能unit_flag，硬件执行完指令之后，不会设置寄存器；3 使能unit_flag，硬件执行完指令后，会将unit_flag关闭。 |
+| unit_flag_mode | 输入 | 与unit_flag参数相关，取值如下：<br>0：保留值；<br>2：使能unit_flag，硬件执行完指令之后，不会设置寄存器；<br>3：使能unit_flag，硬件执行完指令后，会将unit_flag关闭。 |
 | relu_pre | 输入 | 使能relu。 |
 | channel_split | 输入 | 是否使能通道拆分的功能，默认false，不使能该功能。仅在src和dst都为float时才能使能通道拆分，且不能同时使能channel_split和NZ2ND功能。 |
 | nz2nd_en | 输入 |使能nz2nd开关，false：不使能；true：使能 。 |
@@ -275,7 +275,7 @@ PIPE_MTE1
 
 ### 约束说明
 
-- dst的起始地址需要32字节对齐。
+- dst、src的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
 ### 调用示例
@@ -284,5 +284,5 @@ PIPE_MTE1
 constexpr uint64_t total_length = 128;    // total_length指参与搬运的数据总长度
 half value = 1;
 __cbuf__ half dst[total_length];
-asc_fixpipe_l0c2out_noquant(dst, value, config);
+asc_fixpipe_l0c2out_noquant(dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode, relu_pre, channel_split, nz2nd_en);
 ```

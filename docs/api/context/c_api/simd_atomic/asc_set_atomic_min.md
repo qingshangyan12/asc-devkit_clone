@@ -31,12 +31,14 @@ PIPE_S
 
 ## 约束说明
 
-使用结束后，建议通过[asc_set_atomic_none](./asc_set_atomic_none())关闭原子最小操作，以免影响后续相关指令功能。
+使用结束后，建议通过[asc_set_atomic_none](./asc_set_atomic_none.md)关闭原子最小操作，以免影响后续相关指令功能。
 
 ## 调用示例
 
 ```cpp
-// dst为目标数据地址，src0, src1为源数据地址，total_length指参与计算的数据长度
+// total_length指参与计算的数据长度
+constexpr uint32_t total_length = 256;
+// dst为目标数据地址，src0, src1为源数据地址
 asc_copy_ub2gm(dst, src0, total_length);
 asc_sync_pipe(PIPE_MTE3);
 asc_set_atomic_min();

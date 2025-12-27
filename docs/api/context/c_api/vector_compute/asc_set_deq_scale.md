@@ -14,7 +14,7 @@
 ## 函数原型
 
   ```cpp
-    __aicore__ inline void asc_set_deq_scale(const asc_deq_scale_config& config)
+    __aicore__ inline void asc_set_deq_scale(const asc_deq_scale_config config)
     __aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* config)
   ```
 
@@ -39,10 +39,9 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-uint32_t src_size = 256;
+constexpr uint32_t src_size = 256;
 __ubuf__ half src[src_size];
 __ubuf__ half dst[src_size];
-
 asc_deq_scale_config config;
 config.scale = 1;
 config.offset = 0;
