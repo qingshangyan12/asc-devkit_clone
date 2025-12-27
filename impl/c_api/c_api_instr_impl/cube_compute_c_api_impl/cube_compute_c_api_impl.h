@@ -20,6 +20,7 @@
 #include "mad_impl/npu_arch_2201/asc_mmad_impl.h"
 #include "set_l0c_copy_config_impl/npu_arch_2201/asc_set_l0c_copy_config_impl.h"
 #include "set_l1_3d_padding_value_impl/npu_arch_2201/asc_set_l1_3d_padding_value_impl.h"
+#include "set_mm_transform_impl/npu_arch_2201/asc_set_mm_transform_impl.h"
 
 __aicore__ inline void asc_set_hf32_trans2even()
 {
@@ -54,6 +55,16 @@ __aicore__ inline void asc_set_hf32_mode()
 __aicore__ inline void asc_set_fp32_mode()
 {
     asc_set_fp32_mode_impl();
+}
+
+__aicore__ inline void asc_set_mm_transform_m()
+{
+    asc_set_mm_transform_m_impl();
+}
+
+__aicore__ inline void asc_set_mm_transform_n()
+{
+    asc_set_mm_transform_n_impl();
 }
 
 // asc_mmad(float-bfloat16_t)
