@@ -12,7 +12,7 @@
 #define INCLUDE_SIMT_API_DEVICE_SYNC_FUNCTIONS_H
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_SYNC_FUNCTIONS_H__
 #endif
 
 __simt_callee__ inline int32_t asc_all(int32_t predicate);
@@ -29,8 +29,9 @@ __simt_callee__ inline void asc_threadfence();
 
 #include "impl/simt_api/device_sync_functions_impl.h"
 
-#if defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_SYNC_FUNCTIONS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_SYNC_FUNCTIONS_H__
 #endif
 
 #endif  // INCLUDE_SIMT_API_DEVICE_SYNC_FUNCTIONS_H

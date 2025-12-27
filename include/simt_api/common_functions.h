@@ -13,6 +13,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_H__
 #endif
 
 #ifndef __aicore__
@@ -41,7 +42,8 @@ __simt_callee__ inline int32_t asc_get_block_num();
 
 #include "impl/simt_api/common_functions_impl.h"
 
-#if defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_H__
 #endif
 #endif  // INCLUDE_SIMT_API_COMMON_FUNCTIONS_H

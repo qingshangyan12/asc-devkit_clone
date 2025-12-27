@@ -15,6 +15,12 @@
 #ifndef IMPL_SIMT_API_DEVICE_SHLF_FUNCTIONS_IMPL_H
 #define IMPL_SIMT_API_DEVICE_SHLF_FUNCTIONS_IMPL_H
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_SHLF_FUNCTIONS_IMPL__
+#warning "device_shlf_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "device_shlf_functions.h" and use public functions or variables defined in interface header files."
+#endif
+
 // clamp the max source lane, except up mode
 constexpr int32_t MAX_OFFSET_OF_MODE = 0x1f;
 
@@ -252,5 +258,10 @@ __simt_callee__ inline half asc_reduce_min(half val)
 {
     return bisheng::cce::simt::__reduce_min(val);
 }
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_SHLF_FUNCTIONS_IMPL__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_SHLF_FUNCTIONS_IMPL__
+#endif
 
 #endif  // IMPL_SIMT_API_DEVICE_SHLF_FUNCTIONS_IMPL_H

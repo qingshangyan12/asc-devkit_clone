@@ -16,6 +16,12 @@
 #ifndef IMPL_SIMT_API_COMMON_FUNCTIONS_IMPL_H
 #define IMPL_SIMT_API_COMMON_FUNCTIONS_IMPL_H
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_IMPL__
+#warning "common_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "common_functions.h" and use public functions or variables defined in interface header files."
+#endif
+
 __simt_callee__ inline int32_t asc_get_block_idx()
 {
     return bisheng::cce::simt::get_block_idx();
@@ -25,5 +31,10 @@ __simt_callee__ inline int32_t asc_get_block_num()
 {
     return bisheng::cce::simt::get_block_num();
 }
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_IMPL__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_IMPL__
+#endif
 
 #endif  // IMPL_SIMT_API_COMMON_FUNCTIONS_IMPL_H

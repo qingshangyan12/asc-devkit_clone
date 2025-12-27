@@ -13,6 +13,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_H__
 #endif
 
 #include "simt_api/device_sync_functions.h"
@@ -94,8 +95,9 @@ __simt_callee__ inline unsigned int __float_as_uint(const float x);
 
 #include "impl/simt_api/device_functions_impl.h"
 
-#if defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_H__
 #endif
 
 #endif  // INCLUDE_SIMT_API_DEVICE_FUNCTIONS_H

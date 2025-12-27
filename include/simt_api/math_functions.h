@@ -13,6 +13,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_H__
 #endif
 
 #include "simt_api/math_constants.h"
@@ -450,8 +451,9 @@ __simt_callee__ inline float ynf(int n, float x);
 
 #include "impl/simt_api/math_functions_impl.h"
 
-#if defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_H__
 #endif
 
 #endif  // INCLUDE_SIMT_API_MATH_FUNCTIONS_H

@@ -15,6 +15,12 @@
 #ifndef IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
 #define IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_IMPL__
+#warning "math_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "math_functions.h" and use public functions or variables defined in interface header files."
+#endif
+
 #define ASCRT_FOUR_BYTE_LEN_U       32U
 
 __simt_callee__ inline long int lroundf(float x)
@@ -3042,6 +3048,11 @@ __simt_callee__ inline float ynf(int n, float x)
     return yn_case3(n, x);
 }
 
+#endif
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_IMPL__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_IMPL__
 #endif
 
 #endif  // IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H

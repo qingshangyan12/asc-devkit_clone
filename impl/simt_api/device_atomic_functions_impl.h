@@ -14,6 +14,13 @@
  */
 #ifndef IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H
 #define IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_ATOMIC_FUNCTIONS_IMPL__
+#warning "device_atomic_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "device_atomic_functions.h" and use public functions or variables defined in interface header files."
+#endif
+
 #ifndef ASCENDC_CPU_DEBUG
 __simt_callee__ inline int32_t asc_atomic_add(__ubuf__ int32_t *address, int32_t val)
 {
@@ -375,5 +382,10 @@ __simt_callee__ inline uint64_t asc_atomic_xor(__gm__ uint64_t *address, uint64_
 {
     return bisheng::cce::simt::atomicXOr(address, val);
 }
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_ATOMIC_FUNCTIONS_IMPL__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_ATOMIC_FUNCTIONS_IMPL__
+#endif
 
 #endif  // IMPL_SIMT_API_DEVICE_ATOMIC_FUNCTIONS_IMPL_H

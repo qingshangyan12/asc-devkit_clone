@@ -13,6 +13,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_BF16_H__
 #endif
 
 #include "simt_api/asc_fp16.h"
@@ -184,8 +185,9 @@ __simt_callee__ inline bfloat16x2_t asc_atomic_cas(__gm__ bfloat16x2_t *address,
 
 #include "impl/simt_api/asc_bf16_impl.h"
 
-#if defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_BF16_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_BF16_H__
 #endif
 
 #endif  // INCLUDE_SIMT_API_ASC_BF16_H

@@ -15,6 +15,12 @@
 #ifndef IMPL_SIMT_API_DEVICE_FUNCTIONS_IMPL_H
 #define IMPL_SIMT_API_DEVICE_FUNCTIONS_IMPL_H
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_IMPL__
+#warning "device_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "device_functions.h" and use public functions or variables defined in interface header files."
+#endif
+
 __simt_callee__ inline unsigned int __float2uint_rn(const float x) {
     return bisheng::cce::simt::__cvt_uint32_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
@@ -186,5 +192,10 @@ __simt_callee__ inline unsigned int __float_as_uint(const float x) {
     union Data data = {.f = x};
     return data.u;
 }
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_IMPL__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_IMPL__
+#endif
 
 #endif  // IMPL_SIMT_API_DEVICE_FUNCTIONS_IMPL_H
