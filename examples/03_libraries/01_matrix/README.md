@@ -10,3 +10,4 @@
 | [matmul_vecout](./matmul_vecout) | 本样例介绍Matmul API输入矩阵为VECOUT的场景 |
 | [matmul_bias_bf16_tscm](./matmul_bias_bf16_tscm) | 本样例介绍Matmu API Bias输入为TSCM bfloat16类型的场景 |
 | [matmul_tscm_mdl_setorgshape](./matmul_tscm_mdl_setorgshape) | 本样例介绍Matmul API MDL模板 A矩阵输入为TSCM的场景|
+| [fixpipe_co12gm_quantization_f322f16](./fixpipe_co12gm_quantization_f322f16/) | 本样例介绍基础API Fixpipe将矩阵乘的结果从CO1搬入GM，并使能随路量化将矩阵乘后float类型数据量化为half类型。|
