@@ -3,7 +3,6 @@
 ## 概述
 本样例以实现gather和adds功能的算子为例，展示了SIMT和SIMD混合编程的算子开发方式。算子中使用SIMT编程方式实现离散内存访问操作gather，使用SIMD编程方式实现连续内存访问操作adds。
 
-  > ⚠️ **注意** 当前软件版本只支持该样例执行，不保证基于该样例扩展或参考该样例进行自定义算子开发功能支持，完整自定义算子开发功能将在下个版本提供。
 
 ## 支持的AI处理器
 - Ascend 950PR/Ascend 950DT
@@ -104,3 +103,74 @@
   ```
   [Success] Case accuracy is verification passed.
   ```
+    
+## 性能调优
+算子调优工具支持上板调优和仿真调优两种模式，可分别获取算子在实际硬件/仿真环境下的性能数据，用于定位性能瓶颈、优化算子实现。
+### 上板调优
+基于编译生成的可执行文件，直接在NPU硬件上采集算子性能数据，数据为算子预热后的真实运行指标。
+
+**操作步骤**
+
+**1.执行调优命令**
+
+基于编译得到的demo文件，运行算子调优工具。
+```bash
+msprof op ./demo
+```
+**2.查看性能数据**
+
+在当前目录下会生成OPPPROF_为前缀的文件夹，目录结构及文件说明如下：
+```bash 
+OPPROF_2025xxxx_XXXXXX
+├── dump                             # 原始性能数据（无需关注）
+├── OpBasicInfo.csv                  # 算子基础数据
+├── ArithmeticUtilization.csv        # cube及vector类型指令的cycle占比数据
+├──  ResourceConflictRatio.csv       # 资源冲突占比数据
+├── ... (开启的aic-metrics)
+└──  visualize_data.bin               # 算子可视化文件（可通过MindStudio Insight加载，直观查看算子性能）
+```
+可直接查看.csv文件获取算子block级性能数据或通过MindStudio Insight工具打开`visualize_data.bin`文件可视化查看性能数据。
+
+### 仿真调优
+在无NPU硬件环境的场景下，通过编译仿真版算子可执行文件，结合模拟器获取算子仿真性能数据，适用于开发阶段的快速调优。
+
+**操作步骤**
+
+**1.仿真算子编译**
+
+```bash
+# 创建并进入build目录
+mkdir -p build && cd build
+# 替换${SOC_VERSION}为实际NPU型号，可通过npu-smi info命令进行查询，如Ascend910_957c。
+cmake -DRUN_MODE=sim -DSOC_VERSION=${SOC_VERSION} ..
+# 多线程编译
+make -j$(nproc)     
+```
+**2.配置运行时依赖**
+
+添加运行时依赖库路径（需替换{SOC_VERSION}为实际NPU型号）：
+```bash
+export LD_LIBRARY_PATH=${ASCEND_HOME_PATH}/tools/simulator/${SOC_VERSION}/lib/:$LD_LIBRARY_PATH  
+```
+**3.执行仿真调优命令**
+
+```bash
+msprof op simulator ./demo
+```
+**4.查看仿真性能数据**
+
+当前目录下会生成OPPROF_前缀的文件夹，目录结构如下：
+```bash
+OPPROF_2025xxxx_XXXXXX
+├── dump                                    # 原始性能数据，无需关注
+└── simulation                              # 仿真性能数据分析结果
+    ├── core0.veccore0                      # 算子block级子核
+        ├── core0.veccore1_code_exe.csv     # 代码行耗时
+        ├── core0.veccore1_instr_exe.csv    # 程序代码指令详细信息
+        └── trace.json                      # 算子block级子核流水图
+    ├── ...
+    ├── visualize_data.bin                  # 算子可视化文件（可通过MindStudio Insight加载，直观查看算子性能）
+    └── trace.json                          # 算子所有核的流水图
+```
+**补充说明**
+更多性能指标的详细说明及调优方案，可参考《算子开发工具》手册。
