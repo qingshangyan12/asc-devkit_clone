@@ -34,16 +34,16 @@
 
 ## 参数说明
 
-| 参数名    | 输入/输出 | 描述                |
-| ------ | ----- | ----------------- |
-| dst    | 输出    | 目的操作数。            |
-| src    | 输入    | 源操作数。             |
-| count  | 输入    | 参与连续计算的元素个数。      |
-| repeat | 输入 | 迭代次数，默认值：1。 |
-| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。|
-| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长，默认值：1。|
-| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
-| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
+| 参数名    | 输入/输出 | 描述                                |
+| ------ | ----- |-----------------------------------|
+| dst    | 输出    | 目的操作数（矢量）的起始地址。                   |
+| src    | 输入    | 源操作数（矢量）的起始地址。                             |
+| count  | 输入    | 参与连续计算的元素个数。                      |
+| repeat | 输入 | 迭代次数。                       |
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。  |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。  |
 
 ## 返回值说明
 
@@ -51,7 +51,7 @@
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 
@@ -61,10 +61,10 @@ PIPE_TYPE_V
 ## 调用示例
 
 ```cpp
-//total_length指参与转换的数据总长度
+// total_length指参与转换的数据总长度
 contexpr uint64_t offset = 0;
-__ubuf__ int64_t* src = src[offset];
-offset += total_length * sizeof(float);
-__ubuf__ float* dst = dst[offset];
+__ubuf__ int64_t* src = (__ubuf__ int64_t*)asc_get_phy_buf_addr(0);
+offset += total_length* sizeof(float);
+__ubuf__ float* dst = (__ubuf__ float*)asc_get_phy_buf_addr(offset);
 asc_int642float(dst, src, total_length);
 ```

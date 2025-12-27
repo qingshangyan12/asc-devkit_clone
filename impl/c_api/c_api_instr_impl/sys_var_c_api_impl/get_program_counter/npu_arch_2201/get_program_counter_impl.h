@@ -11,6 +11,7 @@
 #ifndef IMPL_C_API_INSTR_SYS_VAR_GET_PROGRAM_COUNTER_NPU_ARCH_2201_GET_PROGRAM_COUNTER_IMPL_H
 #define IMPL_C_API_INSTR_SYS_VAR_GET_PROGRAM_COUNTER_NPU_ARCH_2201_GET_PROGRAM_COUNTER_IMPL_H
 
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline int64_t asc_get_program_counter_impl()
 {
