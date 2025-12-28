@@ -21,39 +21,15 @@
 #warning "asc_printf_simt_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "asc_printf.h" and use public functions or variables defined in interface header files."
 #endif
 
+#include "kernel_scalar_convert.h"
+#include "utils/kernel_utils_dump_constants.h"
+#include "utils/kernel_utils_ceil_oom_que.h"
+
 #ifdef ASCENDC_DUMP
 namespace {
 constexpr uint32_t SIMT_DUMP_BLOCK_NUM = 72;
 constexpr uint32_t SIMT_DUMP_SIZE = 2048;
 constexpr uint32_t SIMT_MAX_THREAD_NUM = 2048;
-
-constexpr int32_t ONE_DUMP_BACKUP_SIZE = 1024;
-constexpr int32_t DUMP_UB_SIZE = 256;
-constexpr int32_t DUMP_EXC_FLAG = 7;
-
-// BlockInfo Pos
-constexpr uint32_t BLOCK_INFO_LEN_POS = 0;
-constexpr uint32_t BLOCK_INFO_CORE_POS = 1;
-constexpr uint32_t BLOCK_INFO_BLOCKNUM_POS = 2;
-constexpr uint32_t BLOCK_INFO_DUMPOFFSET_POS = 3;
-constexpr uint32_t BLOCK_INFO_MAGIC_POS = 4;
-constexpr uint32_t BLOCK_INFO_RSV_POS = 5;
-constexpr uint32_t BLOCK_INFO_DUMP_ADDR = 6;
-constexpr uint32_t BLOCK_INFO_MAGIC_NUM = 0x5aa5bccd;
-// DUMP_META Pos 以uint8_t为单位计算位置
-constexpr uint32_t DUMP_META_TYPE_POS = 0;
-constexpr uint32_t DUMP_META_LEN_POS = 4;
-constexpr uint16_t DUMP_META_SIMT_THREAD_ID_POS = 8;
-constexpr uint32_t DUMP_META_RSV_POS = 12;
-// DumpMessageHead Pos
-constexpr uint32_t DUMP_MESSAGE_HEAD_LEN_POS = 1;
-constexpr uint32_t DUMP_MESSAGE_HEAD_ADDR_POS = 2;
-constexpr uint32_t DUMP_MESSAGE_HEAD_DATA_TYPE_POS = 3;
-constexpr uint32_t DUMP_MESSAGE_HEAD_DESC_POS = 4;
-constexpr uint32_t DUMP_MESSAGE_HEAD_BUFFERID_POS = 5;
-constexpr uint32_t DUMP_MESSAGE_HEAD_POSITION_POS = 6;
-constexpr uint32_t DUMP_MESSAGE_HEAD_DUMP_SIZE_POS = 7;
-constexpr uint32_t DUMP_SCALAR_POS = 8;
 }
 
 namespace AscendC {
