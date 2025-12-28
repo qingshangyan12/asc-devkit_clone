@@ -35,7 +35,6 @@
 #include "kernel_simt_cast_impl.h"
 #include "kernel_simt_cmp_impl.h"
 #include "kernel_simt_common_impl.h"
-#include "kernel_simt_print_impl.h"
 #include "kernel_simt_constant.h"
 #include "kernel_simt_math_impl.h"
 #include "kernel_simt_transcendental_impl.h"
