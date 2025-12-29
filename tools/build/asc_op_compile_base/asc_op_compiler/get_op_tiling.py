@@ -91,10 +91,19 @@ def get_custom_opp_pathlist():
 
 def load_op_host_tiling_lib():
     LogUtil.print_compile_log("", f"load op host tiling lib.", AscendCLogLevel.LOG_INFO)
-    builtin_op_host_tiling_pattern = os.environ.get(_ASCEND_OPP_PATH_ENV, _ASCEND_OPP_PATH_DEFAULT) + \
-        "/" + op_impl_path + f"/ai_core/tbe/op_host/**/*.so"
+    builtin_op_host_tiling_prefix = os.environ.get(_ASCEND_OPP_PATH_ENV, _ASCEND_OPP_PATH_DEFAULT) + \
+        "/" + op_impl_path + f"/ai_core/tbe/op_host/"
+    builtin_op_host_tiling_pattern = builtin_op_host_tiling_prefix + f"**/*.so"
     builtin_op_host_tiling_file_path = glob.glob(builtin_op_host_tiling_pattern, recursive=True)
+    import platform
+    archlinux = platform.machine()
+    if 'x86' in archlinux:
+        incompatiable_arch_name = "aarch64"
+    else:
+        incompatiable_arch_name = "x86_64"
     for tiling_path in builtin_op_host_tiling_file_path:
+        if incompatiable_arch_name in tiling_path[len(builtin_op_host_tiling_prefix):]:
+            continue
         try:
             if os.path.exists(tiling_path):
                 lib_tiling_builtin = ctypes.CDLL(tiling_path)
@@ -1436,15 +1445,17 @@ def get_info_by_traverse_py_stack(op_info: OpInfo, input_tiling_info_dict: dict)
                 is_offline_op = True
             else:
                 LogUtil.print_compile_log(op_info.op_type, \
-                    f"[Main process] custom tiling so not existed: {custom_opp_offline_path}", \
+                    f"[Main process] Custom tiling so not existed: {custom_opp_offline_path} in offline compile op.", \
                     AscendCLogLevel.LOG_WARNING)
             break
         elif online_op_compile_file == frame_file:
             # online op compile
             # built-in op
-            build_in_compile_file_dir = os.path.join(os.environ.get(_ASCEND_OPP_PATH_ENV, _ASCEND_OPP_PATH_DEFAULT), \
-                op_impl_path, "ai_core", "tbe", "impl")
-            if op_compile_dir.startswith(build_in_compile_file_dir):
+            build_in_compile_file_dir = os.path.join(op_impl_path, "ai_core", "tbe", "impl")
+            if build_in_compile_file_dir in op_compile_dir:
+                LogUtil.print_compile_log(op_info.op_type, \
+                    f"[Main process] Identified in Build-in online compile.", \
+                    AscendCLogLevel.LOG_INFO)
                 is_build_in_op = True
                 break
 
@@ -1454,7 +1465,7 @@ def get_info_by_traverse_py_stack(op_info: OpInfo, input_tiling_info_dict: dict)
                 custom_op_tiling_path = custom_opp_online_path
             else:
                 LogUtil.print_compile_log(op_info.op_type, \
-                    f"[Main process] custom tiling so not existed: {custom_opp_online_path}", \
+                    f"[Main process] Custom tiling so not existed: {custom_opp_online_path} in online compile op.", \
                     AscendCLogLevel.LOG_WARNING)
             break
     return is_offline_op, is_build_in_op, custom_op_tiling_path
