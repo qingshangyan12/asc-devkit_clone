@@ -606,7 +606,9 @@ def gen_static_shape(tiling_def, tilingdata, struct_tiling_def_base, all_dynamic
     class_body += f"#ifdef ASCENDC_CPU_DEBUG\n"
     class_body += f"#include \"kernel_log.h\"\n"
     class_body += "#else\n"
+    class_body += "#ifndef __aicore__\n"
     class_body += "#define __aicore__ [aicore]\n"
+    class_body += "#endif\n"
     class_body += "#endif\n"
     if not global_var_storage.get_variable("ascendc_tiling_no_register"):
         class_body += "#define REGISTER_TILINGDATA_SIZE(tiling_struct, counter) \n\n"
@@ -759,7 +761,9 @@ def gen_dynamic_shape(tiling_def, struct_tiling_def_base):
     class_body += f"#ifdef ASCENDC_CPU_DEBUG\n"
     class_body += f"#include \"kernel_log.h\"\n"
     class_body += "#else\n"
+    class_body += "#ifndef __aicore__\n"
     class_body += "#define __aicore__ [aicore]\n"
+    class_body += "#endif\n"
     class_body += "#endif\n"
     if not global_var_storage.get_variable("ascendc_tiling_no_register"):
         class_body += "#define REGISTER_TILINGDATA_SIZE(tiling_struct, counter) \n\n"
@@ -975,7 +979,9 @@ def get_header_and_sub_struct_def(tiling_def, struct_tiling_def_base):
     start_body += f"#ifdef ASCENDC_CPU_DEBUG\n"
     start_body += f"#include \"kernel_log.h\"\n"
     start_body += "#else\n"
+    start_body += "#ifndef __aicore__\n"
     start_body += "#define __aicore__ [aicore]\n"
+    start_body += "#endif\n"
     start_body += "#endif\n"
     if not global_var_storage.get_variable("ascendc_tiling_no_register"):
         start_body += "#define REGISTER_TILINGDATA_SIZE(tiling_struct, counter) \n\n"
@@ -1268,7 +1274,9 @@ def gen_static_shape_v2(optype: str, tiling_struct: str, tiling_raw_data: str):
     class_body += f"#ifdef ASCENDC_CPU_DEBUG\n"
     class_body += f"#include \"kernel_log.h\"\n"
     class_body += "#else\n"
+    class_body += "#ifndef __aicore__\n"
     class_body += "#define __aicore__ [aicore]\n"
+    class_body += "#endif\n"
     class_body += "#endif\n"
     if global_var_storage.get_variable("ascendc_tiling_no_register"):
         class_body += "#define ASCENDC_INTERNAL_STR(x) #x \n"
@@ -1304,7 +1312,9 @@ def gen_dynamic_shape_v2(optype: str, tiling_struct: str):
     class_body += f"#ifdef ASCENDC_CPU_DEBUG\n"
     class_body += f"#include \"kernel_log.h\"\n"
     class_body += "#else\n"
+    class_body += "#ifndef __aicore__\n"
     class_body += "#define __aicore__ [aicore]\n"
+    class_body += "#endif\n"
     class_body += "#endif\n"
     if global_var_storage.get_variable("ascendc_tiling_no_register"):
         class_body += "#define ASCENDC_INTERNAL_STR(x) #x \n"

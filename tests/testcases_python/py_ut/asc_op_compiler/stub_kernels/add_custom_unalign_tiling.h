@@ -5,7 +5,9 @@
 #ifdef ASCENDC_CPU_DEBUG
 #include "kernel_log.h"
 #else
+#ifndef __aicore__
 #define __aicore__ [aicore]
+#endif
 #endif
 class TilingDataUnalign
 {
