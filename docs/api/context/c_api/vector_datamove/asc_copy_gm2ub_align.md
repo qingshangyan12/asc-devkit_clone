@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-将数据从Global Memory (GM) 搬运到 Unified Buffer (UB),并支持8位/16位/32位对齐和分块拷贝操作。
+将数据从Global Memory (GM) 搬运到 Unified Buffer (UB)，并支持8位/16位/32位对齐和分块拷贝操作。
 
 ## 函数原型
 
@@ -71,7 +71,7 @@ PIPE_MTE2
 ```cpp
 // total_length指参与搬运的数据总长度。dst是外部输入的half类型的GM内存。
 constexpr uint64_t total_length = 128;
-__ubuf__ half src[total_length];
-__ubuf__ half dst[total_length];
+__ubuf__ uint8_t dst[total_length];
+__gm__ uint8_t src[total_length];
 asc_copy_gm2ub_align(dst, src, total_length);
 ```

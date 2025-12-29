@@ -64,7 +64,7 @@ PIPE_V
 ```cpp
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
 uint32_t offset_addr = 4;
-__ubuf__ uint16_t src[total_length];
 __ubuf__ uint32_t dst[total_length];
+__ubuf__ uint32_t src[total_length];
 asc_gather_datablock(dst, src, offset_addr, total_length);
 ```
