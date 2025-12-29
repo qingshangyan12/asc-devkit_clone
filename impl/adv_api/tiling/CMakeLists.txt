@@ -168,7 +168,6 @@ target_compile_options(
           -Wfloat-equal
           -D_FORTIFY_SOURCE=2
           -O2
-          $<$<STREQUAL:${PRODUCT_SIDE},host>:-DLOG_CPP>
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fPIC>
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fstack-protector-strong>
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fstack-protector-all>

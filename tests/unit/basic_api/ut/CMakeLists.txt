@@ -539,6 +539,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
     target_include_directories(tikcpp_utest_${product_type} PRIVATE
         ${LOCAL_DIR}/stub/
         ${ASCENDC_TEST_HEADER_FILES}
+        ${ASCENDC_SYS_DIR}/pkg_inc/base/
         ${ASCENDC_SYS_DIR}/include/base/
         ${ASCENDC_SYS_DIR}/include/metadef/
         mmpa_headers
@@ -1091,7 +1092,7 @@ target_link_libraries(ascendc_utest_asc_compile_base PRIVATE
     -Wl,--as-needed
     platform
     mmpa
-    alog
+    unified_dlog
     error_manager
 )
 

@@ -795,7 +795,6 @@ function(npu_op_package_add target_package_name)
       set_source_files_properties(${op_registry} PROPERTIES GENERATED TRUE)
       target_sources(${_ascendc_aclnn_target} PRIVATE ${op_registry})
       target_compile_definitions(${_ascendc_aclnn_target} PRIVATE ACLNN_WITH_BINARY)
-      target_compile_options(${_ascendc_aclnn_target} PRIVATE -DLOG_CPP)
     endif()
   endif()
 

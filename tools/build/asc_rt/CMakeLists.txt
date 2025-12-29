@@ -46,7 +46,7 @@ target_compile_options(ascend_runtime_base PRIVATE
 target_link_libraries(ascend_runtime_base PRIVATE
     $<BUILD_INTERFACE:intf_pub>
     mmpa
-    alog
+    unified_dlog
     $<$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>:acl_rt>
     $<$<NOT:$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>>:ascendcl>
 )

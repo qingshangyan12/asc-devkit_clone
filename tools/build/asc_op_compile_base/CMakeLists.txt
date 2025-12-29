@@ -40,7 +40,7 @@ endif()
 target_link_libraries(asc_platform PRIVATE 
   platform
   mmpa
-  alog
+  unified_dlog
   error_manager
 )
 target_compile_options(asc_platform PRIVATE 

@@ -1279,7 +1279,7 @@ TEST_F(TestAscInterFace, asc_PluginFatbinLink)
     const char* a;
     int32_t exec_res = AscPlugin::PluginFatbinLink(&a);
     std::vector<std::string> expLinkOptions = {
-        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lascendalog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++",
+        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++",
         "-LA/lib64",
         "-LA/tools/simulator/Ascend910B1/lib"
     };
@@ -1321,7 +1321,7 @@ TEST_F(TestAscInterFace, asc_PluginFatbinLink_null_soc)
     const char* a;
     int32_t exec_res2 = AscPlugin::PluginFatbinLink(&a);
     std::vector<std::string> expLinkOptions = {
-        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lascendalog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++",
+        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++",
         "-LA/lib64"
     };
     EXPECT_EQ(exec_res, AscPlugin::ASC_SUCCESS);
@@ -1355,7 +1355,7 @@ TEST_F(TestAscInterFace, asc_PluginFatbinLink_910B4_1)
     const char* a;
     int32_t exec_res2 = AscPlugin::PluginFatbinLink(&a);
     std::vector<std::string> expLinkOptions = {
-        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lascendalog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++",
+        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++",
         "-LA/lib64",
         "-LA/tools/simulator/Ascend910B4/lib"
     };

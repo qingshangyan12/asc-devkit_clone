@@ -105,7 +105,7 @@ endif()
 # when language is set to ASC, execute when add_executable. Add default link libraries and path in default.
 # FLAGS: -D
 # ASC_LINK_FLAGS: link options
-set(DEFAULT_LINK_LIBS "-lascendc_runtime -lruntime -lerror_manager -lprofapi -lascendalog -lmmpa -lascend_dump -lc_sec")
+set(DEFAULT_LINK_LIBS "-lascendc_runtime -lruntime -lerror_manager -lprofapi -lunified_dlog -lmmpa -lascend_dump -lc_sec")
 set(DEFAULT_LINK_PATH "-L${ASCEND_HOME_PATH}/lib64")
 if(NOT CMAKE_ASC_LINK_EXECUTABLE)
     set(CMAKE_ASC_LINK_EXECUTABLE

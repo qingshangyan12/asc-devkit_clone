@@ -28,7 +28,7 @@ function(library_interface_setup target_name)
         error_manager
         profapi
         ge_common_base
-        ascendalog
+        unified_dlog
         mmpa
         dl
         ascend_dump

@@ -17,7 +17,7 @@ set(CMAKE_MODULE_PATH
 message(STATUS "CMAKE_MODULE_PATH            :${CMAKE_MODULE_PATH}")
 
 
-find_package(alog MODULE REQUIRED)
+find_package(unified_dlog MODULE REQUIRED)
 find_package(securec MODULE REQUIRED)
 find_package(mmpa MODULE REQUIRED)
 find_package(metadef MODULE REQUIRED)

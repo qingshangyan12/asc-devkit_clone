@@ -398,7 +398,7 @@ function(ascendc_library target_name target_type)
                 tiling_api
                 register
                 platform
-                ascendalog
+                unified_dlog
                 mmpa
                 c_sec
                 dl
@@ -421,7 +421,7 @@ function(ascendc_library target_name target_type)
                 error_manager
                 profapi
                 ge_common_base
-                ascendalog
+                unified_dlog
                 mmpa
                 dl
             PUBLIC
