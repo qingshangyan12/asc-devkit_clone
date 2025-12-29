@@ -14,7 +14,7 @@ set(ascend310b_list ascend310b1 ascend310b2 ascend310b3 ascend310b4)
 set(ascend910_95_list ascend910_9599 ascend910_9589 ascend910_9579 ascend910_958b ascend910_957b ascend910_957d ascend910_950z ascend910_958a ascend910_957c
     ascend910_95a1 ascend910_95a2 ascend910_9591 ascend910_9592 ascend910_9595 ascend910_9596 ascend910_9581 ascend910_9582 ascend910_9583 ascend910_9584
     ascend910_9585 ascend910_9586 ascend910_9587 ascend910_9588 ascend910_9571 ascend910_9572 ascend910_9573 ascend910_9574 ascend910_9575 ascend910_9576
-    ascend910_9577 ascend910_9578)
+    ascend910_9577 ascend910_9578 ascend910_950x ascend910_950y)
 set(ascend910_55_list ascend910_5591)
 set(kirinx90_list kirinx90)
 set(kirin9030_list kirin9030)

@@ -155,6 +155,8 @@ const std::unordered_map<std::string, AscPlugin::ShortSocVersion> SOC_VERSION_MA
     {"Ascend310B4", AscPlugin::ShortSocVersion::ASCEND310B},
 
     {"Ascend910_957b", AscPlugin::ShortSocVersion::ASCEND910_95},   // ascend910_95_list
+    {"Ascend910_950x", AscPlugin::ShortSocVersion::ASCEND910_95},
+    {"Ascend910_950y", AscPlugin::ShortSocVersion::ASCEND910_95},
     {"Ascend910_950z", AscPlugin::ShortSocVersion::ASCEND910_95},
     {"Ascend910_958b", AscPlugin::ShortSocVersion::ASCEND910_95},
     {"Ascend910_958a", AscPlugin::ShortSocVersion::ASCEND910_95},
