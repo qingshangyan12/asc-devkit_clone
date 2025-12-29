@@ -10,6 +10,7 @@
 
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_CMP_MASK_IMPL_ASC_2201_SET_CMP_MASK_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_CMP_MASK_IMPL_ASC_2201_SET_CMP_MASK_IMPL_H
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline void asc_set_cmp_mask_impl(__ubuf__ void* sel_mask)
 {

@@ -58,13 +58,14 @@ __aicore__ inline void asc_mul_sync(__ubuf__ float* dst, __ubuf__ float* src0, _
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数地址。 |
 | src0、src1 | 输入 | 源操作数地址。 |
-| count | 输入 | 参与计算的元素个数。 |
+| repeat     | 输入    | 迭代次数。        |
 | dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src0_block_stride |输入| 源操作数0单次迭代内不同DataBlock间地址步长。 |
 | src1_block_stride |输入| 源操作数1单次迭代内不同DataBlock间地址步长。 |
 | dst_repeat_stride |输入| 目的操作数相邻迭代间相同DataBlock的地址步长。 |
 | src0_repeat_stride |输入| 源操作数0相邻迭代间相同DataBlock的地址步长。 |
 | src1_repeat_stride |输入| 源操作数1相邻迭代间相同DataBlock的地址步长。 |
+| count | 输入 | 参与计算的元素个数。 |
 
 ### 返回值说明
 
@@ -84,11 +85,9 @@ PIPE_V
 mask连续模式
 
 ```cpp
-uint64_t offset = 0;
-__ubuf__ half* src0 = (__ubuf__ half*)asc_get_phy_buf_addr(0);
-offset += totalLength * sizeof(half);
-__ubuf__ half* src1 = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
-offset += totalLength * sizeof(half);
-__ubuf__ half* dst = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
+uint64_t total_length = 64;
+__ubuf__ half* src0[total_length];
+__ubuf__ half* src1[total_length];
+__ubuf__ half* dst[total_length];
 asc_mul(dst, src0, src1, total_length);
 ```
