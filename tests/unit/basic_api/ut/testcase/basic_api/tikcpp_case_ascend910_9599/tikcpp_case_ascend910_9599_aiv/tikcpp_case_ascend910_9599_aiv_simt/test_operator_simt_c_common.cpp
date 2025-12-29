@@ -10,8 +10,8 @@
 #include <gtest/gtest.h>
 #include <type_traits>
 #include "simt_compiler_stub.h"
-#include "kernel_operator.h"
 #include "simt_api/asc_simt.h"
+#include "kernel_operator.h"
 
 class CommoncTestsuite : public testing::Test {
 protected:

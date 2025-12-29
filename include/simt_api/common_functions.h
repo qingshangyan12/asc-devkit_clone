@@ -16,8 +16,6 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_H__
 #endif
 
-#include "utils/debug/asc_printf.h"
-
 #ifndef __aicore__
 #define __aicore__ [aicore]
 #endif
