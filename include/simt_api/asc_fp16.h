@@ -167,6 +167,28 @@ __simt_callee__ inline half2 asc_atomic_cas(__ubuf__ half2 *address, half2 compa
 
 __simt_callee__ inline half2 asc_atomic_cas(__gm__ half2 *address, half2 compare, half2 val);
 
+__simt_callee__ inline half asc_shfl(half var, int32_t src_lane, int32_t width = warpSize);
+
+__simt_callee__ inline half2 asc_shfl(half2 var, int32_t src_lane, int32_t width = warpSize);
+
+__simt_callee__ inline half asc_shfl_up(half var, uint32_t delta, int32_t width = warpSize);
+
+__simt_callee__ inline half2 asc_shfl_up(half2 var, uint32_t delta, int32_t width = warpSize);
+
+__simt_callee__ inline half asc_shfl_down(half var, uint32_t delta, int32_t width = warpSize);
+
+__simt_callee__ inline half2 asc_shfl_down(half2 var, uint32_t delta, int32_t width = warpSize);
+
+__simt_callee__ inline half asc_shfl_xor(half var, int32_t lane_mask, int32_t width = warpSize);
+
+__simt_callee__ inline half2 asc_shfl_xor(half2 var, int32_t lane_mask, int32_t width = warpSize);
+
+__simt_callee__ inline half asc_reduce_add(half val);
+
+__simt_callee__ inline half asc_reduce_max(half val);
+
+__simt_callee__ inline half asc_reduce_min(half val);
+
 #include "impl/simt_api/asc_fp16_impl.h"
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_FP16_H__)

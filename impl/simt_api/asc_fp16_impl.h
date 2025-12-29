@@ -513,6 +513,69 @@ __simt_callee__ inline half2 asc_atomic_cas(__gm__ half2 *address, half2 compare
     return bisheng::cce::simt::atomicCAS(address, compare, val);
 }
 
+__simt_callee__ inline half asc_shfl(half var, int32_t src_lane, int32_t width)
+{
+    return bisheng::cce::simt::__shfl(var,
+        ((warpSize - width) << LANE_MASK_START_POS) | (MAX_OFFSET_OF_MODE << MAX_OFFSET_START_POS) | (src_lane));
+}
+
+__simt_callee__ inline half2 asc_shfl(half2 var, int32_t src_lane, int32_t width)
+{
+    return bisheng::cce::simt::__shfl(var,
+        ((warpSize - width) << LANE_MASK_START_POS) | (MAX_OFFSET_OF_MODE << MAX_OFFSET_START_POS) | (src_lane));
+}
+
+__simt_callee__ inline half asc_shfl_up(half var, uint32_t delta, int32_t width)
+{
+    return bisheng::cce::simt::__shfl_up(var,
+        ((warpSize - width) << LANE_MASK_START_POS) | (MAX_OFFSET_OF_UP_MODE << MAX_OFFSET_START_POS) | (delta));
+}
+
+__simt_callee__ inline half2 asc_shfl_up(half2 var, uint32_t delta, int32_t width)
+{
+    return bisheng::cce::simt::__shfl_up(var,
+        ((warpSize - width) << LANE_MASK_START_POS) | (MAX_OFFSET_OF_UP_MODE << MAX_OFFSET_START_POS) | (delta));
+}
+
+__simt_callee__ inline half asc_shfl_down(half var, uint32_t delta, int32_t width)
+{
+    return bisheng::cce::simt::__shfl_down(var,
+                       ((warpSize - width) << LANE_MASK_START_POS) | (MAX_OFFSET_OF_MODE << MAX_OFFSET_START_POS) | (delta));
+}
+
+__simt_callee__ inline half2 asc_shfl_down(half2 var, uint32_t delta, int32_t width)
+{
+    return bisheng::cce::simt::__shfl_down(var,
+                       ((warpSize - width) << LANE_MASK_START_POS) | (MAX_OFFSET_OF_MODE << MAX_OFFSET_START_POS) | (delta));
+}
+
+__simt_callee__ inline half asc_shfl_xor(half var, int32_t lane_mask, int32_t width)
+{
+    return bisheng::cce::simt::__shfl_xor(var,
+                      ((warpSize - width) << LANE_MASK_START_POS) | (MAX_OFFSET_OF_MODE << MAX_OFFSET_START_POS) | (lane_mask));
+}
+
+__simt_callee__ inline half2 asc_shfl_xor(half2 var, int32_t lane_mask, int32_t width)
+{
+    return bisheng::cce::simt::__shfl_xor(var,
+                      ((warpSize - width) << LANE_MASK_START_POS) | (MAX_OFFSET_OF_MODE << MAX_OFFSET_START_POS) | (lane_mask));
+}
+
+__simt_callee__ inline half asc_reduce_add(half val)
+{
+    return bisheng::cce::simt::__reduce_add(val);
+}
+
+__simt_callee__ inline half asc_reduce_max(half val)
+{
+    return bisheng::cce::simt::__reduce_max(val);
+}
+
+__simt_callee__ inline half asc_reduce_min(half val)
+{
+    return bisheng::cce::simt::__reduce_min(val);
+}
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_FP16_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_FP16_IMPL__
