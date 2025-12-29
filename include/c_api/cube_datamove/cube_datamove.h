@@ -749,19 +749,19 @@ __aicore__ inline void asc_set_l1_3d_rpt(asc_load3d_v2_config& config);
 
 // ==========asc_load_image_to_cbuf(half/int8_t)==========
 __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size,
-    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid);
 
 __aicore__ inline void asc_load_image_to_cbuf_sync(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size,
-    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid);
 
 __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size,
-    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid);
 
 __aicore__ inline void asc_load_image_to_cbuf_sync(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size,
-    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_res, uint8_t top_pad_size, uint8_t bot_pad_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid);
 
 // ==========asc_fill_l0a_value(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========

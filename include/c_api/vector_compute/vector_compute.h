@@ -1332,12 +1332,12 @@ __aicore__ inline void asc_deq_int162b8_l(__ubuf__ uint8_t* dst, __ubuf__ int16_
 __aicore__ inline void asc_deq_int162b8_l_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
 // ==========asc_int42half==========
-__aicore__ inline void asc_int42half(__ubuf__ half* dst, __ubuf__ void* src, uint8_t repeat,
+__aicore__ inline void asc_int42half(__ubuf__ half* dst, __ubuf__ int4b_t* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
-__aicore__ inline void asc_int42half(__ubuf__ half* dst, __ubuf__ void* src, uint32_t count);
+__aicore__ inline void asc_int42half(__ubuf__ half* dst, __ubuf__ int4b_t* src, uint32_t count);
 
-__aicore__ inline void asc_int42half_sync(__ubuf__ half* dst, __ubuf__ void* src, uint32_t count);
+__aicore__ inline void asc_int42half_sync(__ubuf__ half* dst, __ubuf__ int4b_t* src, uint32_t count);
 
 // ==========asc_int82half==========
 __aicore__ inline void asc_int82half(__ubuf__ half* dst, __ubuf__ int8_t* src, uint8_t repeat,
