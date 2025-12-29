@@ -12,3 +12,10 @@
 | [matmul_tscm_mdl_setorgshape](./matmul_tscm_mdl_setorgshape) | 本样例介绍Matmul API MDL模板 A矩阵输入为TSCM的场景|
 | [fixpipe_co12gm_quantization_f322f16](./fixpipe_co12gm_quantization_f322f16/) | 本样例介绍基础API Fixpipe将矩阵乘的结果从CO1搬入GM，并使能随路量化将矩阵乘后float类型数据量化为half类型。|
 | [matmul_perf](./matmul_perf) | 本样例介绍Matmul API实现三种性能优化特性（纯Cube模式、MDL模板、UnitFlag）的单算子|
+| [fixpipe_co12gm_tensor_quantization_s322f16](./fixpipe_co12gm_tensor_quantization_s322f16) | 本样例介绍基础API Fixpipe将矩阵乘的结果从CO1搬入GM，并使能随路量化将矩阵乘后int32_t类型数据量化为half类型 |
+| [load_data_with_transpose_b8](./load_data_with_transpose_b8) | 本样例介绍基础API LoadDataWithTranspose b8数据类型下的使用样例 |
+| [load_data_with_transpose_b16](./load_data_with_transpose_b16) | 本样例介绍基础API LoadDataWithTranspose b16数据类型下的使用样例 |
+| [load_data_with_transpose_b32](./load_data_with_transpose_b32) | 本样例介绍基础API LoadDataWithTranspose b32数据类型下的使用样例 |
+| [mmad](./mmad) | 本样例介绍基于基础API实现矩阵乘Mmad样例 |
+| [mmad_with_bias](./mmad_with_bias) | 本样例介绍基于基础API实现带Bias的矩阵乘Mmad样例 |
+| [mmad_with_sparse](./mmad_with_sparse) | 本样例介绍基础API MmadWithSparse调用样例 |
