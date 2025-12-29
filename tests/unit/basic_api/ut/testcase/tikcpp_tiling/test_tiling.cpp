@@ -18,6 +18,7 @@
 #include "adv_api/matmul/matmul_tilingdata.h"
 #include "platform_ascendc.h"
 #include "platform/platform_info.h"
+#include "platform/soc_spec.h"
 #include "utils/context/context_builder.h"
 #include "utils/context/context_builder_impl.h"
 

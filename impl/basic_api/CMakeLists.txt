@@ -266,8 +266,6 @@ if(NOT BUILD_OPEN_PROJECT)
 
         FILES ${ASCENDC_DIR}/include/utils/tiling/platform/platform_ascendc.h
         DESTINATION ${INSTALL_INCLUDE_DIR}/ascendc/include/highlevel_api/tiling/platform
-        FILES ${ASCENDC_DIR}/include/utils/tiling/platform/soc_spec.h
-        DESTINATION ${INSTALL_INCLUDE_DIR}/ascendc/include/highlevel_api/tiling/platform
         FILES ${ASCENDC_DIR}/include/utils/context/context_builder.h
         DESTINATION ${INSTALL_INCLUDE_DIR}/ascendc/include/highlevel_api/tiling/context
         FILES ${ASCENDC_DIR}/include/utils/tiling/template_argument.h

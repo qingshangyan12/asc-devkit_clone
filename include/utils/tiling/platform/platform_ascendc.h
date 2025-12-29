@@ -18,7 +18,6 @@
 
 #include <cstdint>
 #include <mutex>
-#include "tiling/platform/soc_spec.h"
 
 #if !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
 
@@ -41,6 +40,7 @@
 namespace fe {
 class PlatFormInfos;
 }
+enum class NpuArch : uint32_t;
 
 namespace platform_ascendc {
 enum class CoreMemType {

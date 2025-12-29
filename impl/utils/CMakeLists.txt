@@ -29,7 +29,6 @@ file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/incl
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/highlevel_api/utils/log")
 
 install(CODE "file(CREATE_LINK ../../utils/tiling/platform/platform_ascendc.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/tiling/platform/platform_ascendc.h SYMBOLIC)")
-install(CODE "file(CREATE_LINK ../../utils/tiling/platform/soc_spec.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/tiling/platform/soc_spec.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../utils/context/context_builder.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/tiling/context/context_builder.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../../asc/include/utils/tiling/template_argument.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/host_api/include/tiling/template_argument.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../../asc/include/utils/log/asc_cpu_log.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/host_api/include/log/asc_cpu_log.h SYMBOLIC)")

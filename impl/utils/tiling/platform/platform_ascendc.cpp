@@ -20,6 +20,7 @@
 #include "platform/platform_info.h"
 #include "platform_ascendc_log.h"
 #include "platform/platform_infos_def.h"
+#include "platform/soc_spec.h"
 #include "platform_ascendc.h"
 
 namespace platform_ascendc {
