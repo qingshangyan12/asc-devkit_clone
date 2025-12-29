@@ -116,7 +116,7 @@ private:
             // in case of mdl && basek=8, the unit of mStartPosition is 16, so don't use it
             loadDataParams.mStartPosition = 0;
             loadDataParams.kStartPosition = 0;
-            uint64_t matrixOffset = aL1MOffset * aL1K + aL1KOffset * B32_C0SIZE;
+            uint64_t matrixOffset = aL1MOffset * CeilAlign(aL1K, BLOCK_CUBE) + aL1KOffset * B32_C0SIZE;
             LoadData(dst, aMatrix[matrixOffset], loadDataParams);
         } else {
             LoadData(dst, aMatrix, loadDataParams);
