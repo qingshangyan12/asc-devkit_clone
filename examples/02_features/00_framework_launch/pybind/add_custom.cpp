@@ -7,12 +7,13 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include <pybind11/pybind11.h>
-#include <torch/extension.h>
 
-#include "torch_npu/csrc/core/npu/NPUStream.h"
+/* !
+ * \file add_custom.cpp
+ * \brief
+ */
+
 #include "kernel_operator.h"
-
 constexpr int32_t BUFFER_NUM = 2; // tensor num for each queue
 
 class KernelAdd {
@@ -79,35 +80,9 @@ private:
     uint32_t tileLength;
 };
 
-__global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength)
+extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength)
 {
-    KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);
     KernelAdd op;
     op.Init(x, y, z, totalLength);
     op.Process();
-}
-
-
-namespace my_add {
-at::Tensor run_add_custom(const at::Tensor &x, const at::Tensor &y)
-{
-    auto aclStream = c10_npu::getCurrentNPUStream().stream(false);
-    at::Tensor z = at::empty_like(x);
-    uint32_t blockDim = 8;
-    uint32_t totalLength = 1;
-    for (uint32_t size : x.sizes()) {
-        totalLength *= size;
-    }
-    auto xGm = static_cast<uint8_t *>(const_cast<void *>(x.storage().data()));
-    auto yGm = static_cast<uint8_t *>(const_cast<void *>(y.storage().data()));
-    auto zGm = static_cast<uint8_t *>(const_cast<void *>(z.storage().data()));
-    add_custom<<<blockDim, nullptr, aclStream>>>(xGm, yGm, zGm, totalLength);
-    return z;
-}
-} // namespace my_add
-
-PYBIND11_MODULE(add_custom, m)
-{
-    m.doc() = "add_custom pybind11 interfaces"; // optional module docstring
-    m.def("run_add_custom", &my_add::run_add_custom, "");
 }

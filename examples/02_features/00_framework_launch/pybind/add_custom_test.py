@@ -10,11 +10,10 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 
-import sys
-import os
 import torch
 import torch_npu
 from torch_npu.testing.testcase import TestCase, run_tests
+import sys, os
 
 sys.path.append(os.getcwd())
 import add_custom

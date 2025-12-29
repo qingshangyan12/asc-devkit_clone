@@ -10,9 +10,11 @@
 ## 目录结构介绍
 ```
 ├── pybind
-│   ├── CMakeLists.txt        // 编译工程文件
-│   ├── add_custom_test.py    // Python调用脚本
-│   └── add_custom.asc        // Ascend C算子实现 & Pybind封装
+│   ├── add_custom_test.py      // python调用脚本
+│   ├── add_custom.cpp          // 算子实现
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── pybind11.cpp            // pybind11函数封装
+│   └── run.sh                  // 编译运行算子的脚本
 ```
 
 ## 算子描述
