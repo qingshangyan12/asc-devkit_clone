@@ -15,7 +15,7 @@
 #ifndef LIB_MATMUL_MATMUL_CLIENT_H
 #define LIB_MATMUL_MATMUL_CLIENT_H
 
-#include "kernel_operator.h"
+#include "kernel_basic_intf.h"
 #include "include/adv_api/matmul/constant_tiling.h"
 #include "include/adv_api/matmul/tiling.h"
 #include "../../../impl/adv_api/detail/matmul/policy/matmul_policy.h"

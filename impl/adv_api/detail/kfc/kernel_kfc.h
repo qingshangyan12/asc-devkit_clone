@@ -20,7 +20,7 @@
 #include <unistd.h>
 #endif
 
-#include "kernel_operator.h"
+#include "kernel_basic_intf.h"
 #ifdef LIB_MATMUL_MATMUL_INTF_H
 #include "include/adv_api/matmul/matmul_client.h"
 #include "../matmul/kfc/matmul_server_aux.h"

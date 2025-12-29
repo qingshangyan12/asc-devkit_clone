@@ -143,6 +143,9 @@ install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_vdeq.h ${CMAKE_INSTALL
 install(CODE "file(CREATE_LINK ../basic_api/kernel_tensor.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_tensor.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/kernel_tpipe.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_tpipe.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/kernel_type.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_type.h SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../basic_api/kernel_basic_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_basic_intf.h SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../basic_api/kernel_cube_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_cube_intf.h SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../basic_api/kernel_vec_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_vec_intf.h SYMBOLIC)")
 
 # 2 ascendc/include/basic_api
 if(NOT BUILD_OPEN_PROJECT)
