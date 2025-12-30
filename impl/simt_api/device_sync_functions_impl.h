@@ -21,26 +21,6 @@
 #warning "device_sync_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "device_sync_functions.h" and use public functions or variables defined in interface header files."
 #endif
 
-__simt_callee__ inline int32_t asc_all(int32_t predicate)
-{
-    return bisheng::cce::simt::__all(predicate);
-}
-
-__simt_callee__ inline int32_t asc_any(int32_t predicate)
-{
-    return bisheng::cce::simt::__any(predicate);
-}
-
-__simt_callee__ inline uint32_t asc_ballot(int32_t predicate)
-{
-    return bisheng::cce::simt::__ballot(predicate);
-}
-
-__simt_callee__ inline uint32_t asc_activemask()
-{
-    return bisheng::cce::simt::__activemask();
-}
-
 __simt_callee__ inline void asc_syncthreads()
 {
     __sync_workitems();

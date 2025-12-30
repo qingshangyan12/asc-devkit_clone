@@ -17,7 +17,7 @@
 #endif
 
 #include "simt_api/device_sync_functions.h"
-#include "simt_api/device_shfl_functions.h"
+#include "simt_api/device_warp_functions.h"
 #include "simt_api/device_atomic_functions.h"
 
 __simt_callee__ inline unsigned int __float2uint_rn(const float x);

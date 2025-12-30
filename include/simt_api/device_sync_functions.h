@@ -15,14 +15,6 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_SYNC_FUNCTIONS_H__
 #endif
 
-__simt_callee__ inline int32_t asc_all(int32_t predicate);
-
-__simt_callee__ inline int32_t asc_any(int32_t predicate);
-
-__simt_callee__ inline uint32_t asc_ballot(int32_t predicate);
-
-__simt_callee__ inline uint32_t asc_activemask();
-
 __simt_callee__ inline void asc_syncthreads();
 
 __simt_callee__ inline void asc_threadfence();
