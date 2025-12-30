@@ -42,7 +42,7 @@ void VecCast(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __restrict__ sr
     TBuffAddr tbuf1;
     tbuf1.logicPos = static_cast<uint8_t>(TPosition::VECCALC);
     outputLocal.SetAddr(tbuf1);
-    outputLocal.InitBuffer(dataSize * sizeof(PrimT<T2>) * 2, dataSize);
+    outputLocal.InitBuffer(dataSize * sizeof(PrimT<T1>), dataSize);
 
     for (int32_t i = 0; i < dataSize; ++i) {
         inputLocal.SetValue(i, 1);

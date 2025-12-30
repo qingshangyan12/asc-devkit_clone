@@ -20,7 +20,7 @@ set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910 ascend610 ascend310p ascend910B1_AIC a
     mc62cm12aa_AIC mc62cm12aa_BASIC mc62cm12aa_FRAMEWORK mc62cm12aa_MICRO mc62cm12aa_SIMT)
 # set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910)
 
-add_compile_definitions(ASCENDC_CPU_DEBUG=1 ASCENDC_DUMP=0)
+add_compile_definitions(ASCENDC_CPU_DEBUG=1 ASCENDC_DUMP=0 ASCENDC_DEBUG=1)
 
 message(STATUS "tikcpp_ut_test compile start")
 set(CMAKE_CXX_STANDARD 17)

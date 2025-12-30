@@ -57,7 +57,7 @@ TEST_F(TEST_TSCM, TEST_ALLOC_TOO_MUCH_BUFFER_IN_ONE_INITBUFFER) {
     g_coreType = AscendC::AIV_TYPE;
     TPipe pipe;
     TQue<TPosition::VECIN, 1> tque1;
-    MOCKER(raise, int(*)(int)).times(1).will(returnValue(0));
+    MOCKER(raise, int(*)(int)).times(2).will(returnValue(0));
 
     static int32_t count =0;
     std::string fileName = "print_ut_aiv_init_buffer" + std::to_string(getpid()) + "_" + std::to_string(count)+ ".txt";
