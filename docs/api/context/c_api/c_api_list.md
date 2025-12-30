@@ -7,6 +7,8 @@
 | [asc_binary_config](struct/asc_binary_config.md) | 双目高维切分计算API读写控制参数 |
 | [asc_unary_config](struct/asc_unary_config.md) | 单目高维切分计算API读写控制参数 |
 | [asc_deq_scale_config](struct/asc_deq_scale_config.md) | asc_deq_scale API配置参数 |
+| [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | Load3Dv2接口的repeat参数 |
+| [asc_store_atomic_config](struct/asc_store_atomic_config.md) | 原子操作使能位与原子操作类型的值 |
 
 ## 矢量计算
 
@@ -52,19 +54,33 @@
 | [asc_set_deq_scale](vector_compute/asc_set_deq_scale.md) | 设置DEQSCALAR寄存器的值。 |
 | [asc_eq](vector_compute/asc_eq.md) | 比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。 |
 | [asc_transpose](vector_compute/asc_transpose.md) | 用于实现16*16的二维矩阵数据块转置。 |
+| [asc_sqrt](vector_compute/asc_sqrt.md) | 对元素进行开方。 |
+| [asc_vaxpy](vector_compute/asc_axpy.md) | 源操作数中每个元素与标量求积后和目的操作数中的对应元素相加。 |
+| [asc_lt](vector_compute/asc_lt.md) | 按元素判断src0 < src1是否成立，若成立则输出结果上的对应比特位为1，否则为0。 |
+| [asc_ne_scalar](vector_compute/asc_ne_scalar.md) | 按元素判断是否不等于输入标量，若成立则输出结果上的对应比特位为1，否则为0。 |
+| [asc_gather_datablock](vector_compute/asc_gather_datablock.md) | 根据偏移地址按照DataBlock的粒度将源操作数收集到目的操作数中。 |
+| [asc_int162half](vector_compute/asc_int162half.md) | 数据类型转换。将int16_t类型的数据转换为half类型。 |
 
 ## 数据搬运
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm.md) | 将UB中的数据搬运到GM中。 |
 | [asc_copy_gm2ub](vector_datamove/asc_copy_gm2ub.md) | 将GM中的数据搬运到UB中。 |
+| [asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align.md) | 将GM中的对齐数据搬运到UB中。 |
 | [asc_fixpipe_l0c2out](cube_datamove/asc_fixpipe_l0c2out.md) | 将L0C中的数据搬运到GM中。 |
+| [asc_set_l1_3d_rpt](cube_datamove/asc_set_l1_3d_rpt.md) | 用于设置Load3Dv2接口的repeat参数。 |
 
 ## 标量操作
 
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_clz](scalar_compute/asc_clz.md)| 计算参数前导零的数量（二进制从最高位到第一个1共有多少个0）。 |
+| [asc_set_nthbit](scalar_compute/asc_set_nthbit.md)| 计算一个uint64_t类型数字的指定二进制位置为1，其余位保持不变。 |
+
+## 矩阵计算
+|   API名称   |   说明   |
+|----------|-----------|
+| [asc_set_mm_transform](cube_compute/asc_set_mm_transform.md)| 设置mmad计算时优先通过M/N中的哪个方向。 |
 
 ## 同步控制
 
@@ -104,6 +120,8 @@
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_set_atomic_min](simd_atomic/asc_set_atomic_min.md)| 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输内容与GM中已有内容进行比较，并将最小值写入GM。 |
+| [asc_set_atomic_f16](simd_atomic/asc_set_atomic_f16.md)| 设置原子操作数据类型为half。 |
+| [asc_set_store_atomic_config](simd_atomic/asc_set_store_atomic_config.md)| 设置原子操作使能位与原子操作类型的值。 |
 
 ## 其他操作
 
