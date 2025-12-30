@@ -9,18 +9,22 @@
 
 ## 功能说明
 
-完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。对于矩阵A，在asc_mmad_sparse计算时完成稠密化；对于矩阵B，在计算执行前的输入数据准备时自行完成稠密化，所以输入本接口的矩阵B为稠密矩阵。稠密矩阵B需要通过[asc_copy_l12l0b_sparse](xxxxxxxxxxxxxx)载入，同时加载索引矩阵，索引矩阵在矩阵B稠密化的过程中生成，再用于矩阵A的稠密化。
+完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。对于矩阵A，在asc_mmad_sparse计算时完成稠密化；对于矩阵B，在计算执行前的输入数据准备时自行完成稠密化（按照下文中介绍的稠密算法进行稠密化），所以输入本接口的矩阵B为稠密矩阵。稠密矩阵B需要通过[asc_copy_l12l0b_sparse](./asc_copy_l12l0b_sparse.md)载入，同时加载索引矩阵，索引矩阵在矩阵B稠密化的过程中生成，再用于矩阵A的稠密化。
 
 ## 函数原型
 
+- 常规计算
 ```cpp
 __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unitFlag, bool cmatrixSource, bool cmatrixInitVal)
 ```
 
+- 同步计算
+```cpp
+__aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unitFlag, bool cmatrixSource, bool cmatrixInitVal)
+```
+
 
 ## 参数说明
-
-表1 参数说明
 
 | 参数名       | 输入/输出 | 描述               |
 | --------- | ----- | ---------------- |
@@ -47,6 +51,125 @@ PIPE_MTE1
 
 - 原始稀疏矩阵B每4个元素中应保证最多2个非零元素，如果存在3个或更多非零元素，则仅使用前2个非零元素。
 - 当m、k、n中的任意一个值为0时，该指令不会被执行。
+
+## 稠密算法说明
+
+假设原始稀疏矩阵B的每4个元素中至少有2个零，稠密化后的矩阵B是一个在每4个元素中过滤掉2个零的稠密矩阵。矩阵B稠密化的过程中生成索引矩阵，过程如下：对于稀疏矩阵B中的每4个元素，将在index矩阵中生成2个2位索引，并按照以下规则进行编码。索引必须在{0, 1, 2}范围内。
+<br>&bull; 第一个索引用于指示前3个元素中第1个非零元素的相对位置。
+<br>&bull; 第二个索引用于指示第2个非零元素在后3个元素中的相对位置。
+<br>具体可参考下表。其中，“-” 表示算法不关心该位置上的值，因为其会被过滤。
+<table border="1" style="border-collapse: collapse; width: 100%; text-align: center;">
+  <!-- 第1行：不合并 -->
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">示例</td>
+    <td style="padding: 8px; border: 1px solid #333;">ele0</td>
+    <td style="padding: 8px; border: 1px solid #333;">ele1</td>
+    <td style="padding: 8px; border: 1px solid #333;">ele2</td>
+    <td style="padding: 8px; border: 1px solid #333;">ele3</td>
+    <td style="padding: 8px; border: 1px solid #333;">Index_a[i]</td>
+    <td style="padding: 8px; border: 1px solid #333;">Index_b[i]</td>
+  </tr>
+
+  <!-- 第2-7行：第一列合并 (共6行) -->
+  <tr>
+    <td rowspan="6" style="padding: 8px; border: 1px solid #333; vertical-align: middle;">Two non-zero elements</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">Y</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b10</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b10</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">Y</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b01</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b10</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">Y</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b10</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">Y</td>
+    <td style="padding: 8px; border: 1px solid #333;">-</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b01</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b01</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">Y</td>
+    <td style="padding: 8px; border: 1px solid #333;">-</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b01</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">Y</td>
+    <td style="padding: 8px; border: 1px solid #333;">-</td>
+    <td style="padding: 8px; border: 1px solid #333;">-</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+  </tr>
+
+  <!-- 第8-11行：第一列合并 (共4行) -->
+  <tr>
+    <td rowspan="4" style="padding: 8px; border: 1px solid #333; vertical-align: middle;">One non-zero element</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b10</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b10</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b01</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">X</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+  </tr>
+
+  <!-- 第12行：不合并 -->
+  <tr>
+    <td style="padding: 8px; border: 1px solid #333;">All zero</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">0</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+    <td style="padding: 8px; border: 1px solid #333;">2'b00</td>
+  </tr>
+</table>
+该索引矩阵用于A矩阵的稠密化，根据索引矩阵从MatrixA中的4个元素中选择2个元素参与计算，如下图所示：
+
+![ ](../../figures/asc_mmad_sparse_稠密算法说明.png)
 
 ## 调用示例
 

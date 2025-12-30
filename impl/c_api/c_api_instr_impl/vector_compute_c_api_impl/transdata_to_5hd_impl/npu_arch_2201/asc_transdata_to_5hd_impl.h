@@ -11,6 +11,8 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_MASK_NORM_IMPL_NPU_ARCH_2201_ASC_TRANSDATA_TO_5HD_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_MASK_NORM_IMPL_NPU_ARCH_2201_ASC_TRANSDATA_TO_5HD_IMPL_H
 
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+
 #define asc_transdata_to_5hd_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) scatter_vnchwconv_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)
 
 #define asc_transdata_to_5hd_b16(dst, src, repeat, dstStride, srcStride) scatter_vnchwconv_b16(dst, src, repeat, dstStride, srcStride)

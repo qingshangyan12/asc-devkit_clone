@@ -28,6 +28,4 @@ __aicore__ inline void asc_sync_mte2(int id);
 
 __aicore__ inline void asc_sync();
 
-__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
-
 #endif

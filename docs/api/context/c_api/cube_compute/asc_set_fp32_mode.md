@@ -18,7 +18,7 @@
 
 
  ```cpp
-   __aicore__ inline void asc_set_fp32_mode()
+__aicore__ inline void asc_set_fp32_mode()
 ```
 
 
@@ -28,7 +28,7 @@
 
 ### 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ### 约束说明
 

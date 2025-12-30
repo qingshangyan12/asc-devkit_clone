@@ -53,7 +53,7 @@ $$
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 
@@ -64,7 +64,7 @@ PIPE_TYPE_V
 
 ```cpp
 // total_length指参与计算的数据总长度
-uint32_t total_length = 128;
+constexpr uint32_t total_length = 128;
 __ubuf__ int16_t src[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_not(dst, src, total_length);

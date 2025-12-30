@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
+__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg)
 ```
 
 ## 参数说明
@@ -30,7 +30,7 @@ __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

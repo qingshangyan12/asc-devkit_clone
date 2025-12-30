@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-将操作数地址序列与地址寄存器关联。
+用于设置transpose的地址，将操作数地址序列与地址寄存器关联。
 
 ## 函数原型
 
@@ -21,7 +21,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, uint64_t* src_array)
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
-|addr|输出|地址寄存器。|
+|addr|输出|地址寄存器，类型为ub_addr8_t，可取值为：<br>&bull; VA0<br>&bull; VA1<br>&bull; VA2<br>&bull; VA3<br>&bull; VA4<br>&bull; VA5<br>&bull; VA6<br>&bull; VA7<br>数字代表寄存器顺序，使用方法请参考调用示例|
 |src_array|输入|操作数地址序列。|
 
 ## 返回值说明
@@ -30,7 +30,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, uint64_t* src_array)
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 

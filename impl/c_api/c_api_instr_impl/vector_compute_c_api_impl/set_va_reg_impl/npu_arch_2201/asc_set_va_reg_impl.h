@@ -11,6 +11,8 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_MASK_NORM_IMPL_NPU_ARCH_2201_ASC_SET_VA_REG_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_SET_MASK_NORM_IMPL_NPU_ARCH_2201_ASC_SET_VA_REG_IMPL_H
 
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+
 #define asc_set_va_reg(addr, src_array) set_va_reg_sb(addr, src_array)
 
 #endif

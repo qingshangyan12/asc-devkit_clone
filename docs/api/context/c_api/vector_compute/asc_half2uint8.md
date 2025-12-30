@@ -90,7 +90,7 @@
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 
@@ -101,7 +101,7 @@ PIPE_TYPE_V
 
 ```cpp
 //total_length指参与转换的数据总长度
-uint32_t total_length = 128;
+constexpr uint32_t total_length = 128;
 __ubuf__ half src[total_length];
 __ubuf__ uint8_t dst[total_length];
 asc_half2uint8(dst, src, total_length);
