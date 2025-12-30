@@ -44,13 +44,6 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &reluPre, const Loc
 template <typename T, bool setRelu = false>
 __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &preData, bool isUnitFlag = false);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-   (__NPU_ARCH__ == 3113))
-__aicore__ inline void SetFixPipeConfig(uint64_t config);
- 
-__aicore__ inline void SetFixPipeConfig(const FixPipeConfigParams &params);
-#endif
-
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride);
 #else
@@ -63,44 +56,6 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config);
 
 template <typename T>
 __aicore__ inline void SetFixPipeAddr(const LocalTensor<T> &eleWiseData, uint16_t c0ChStride);
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-   (__NPU_ARCH__ == 3113))
-template<typename T>
-__aicore__ inline void SetFixpipePreQuantFlag(const FixPipePreQuantParams<T> &params);
-
-__aicore__ inline void SetFixpipeLeakyReluAlpha(uint64_t config);
- 
-__aicore__ inline void SetFixpipeLeakyReluAlpha(const FixPipeLeakyReluAlphaParams &params);
- 
-__aicore__ inline void SetFixpipeEltAnitq(uint64_t config);
- 
-template<typename T>
-__aicore__ inline void SetFixpipeEltAnitq(const FixPipeEltAntiqParams<T> &params);
- 
-__aicore__ inline void SetFixpipeEltwiseAddr(uint64_t config);
- 
-__aicore__ inline void SetFixpipeEltwiseAddr(const FixpipeEltwiseAddrParams &params);
- 
-__aicore__ inline void SetFixpipePostQuant(uint64_t config);
- 
-__aicore__ inline void SetFixpipePostQuant(const FixPipePostQuantParams &params);
- 
-template <typename T, typename U>
-__aicore__ inline void SetFixPipeClipRelu(const FixpipeClipReluParams<T, U>& intriParams);
- 
-__aicore__ inline void SetFixpipeLoop3(uint64_t config);
- 
-__aicore__ inline void SetFixpipeLoop3(const FixpipeLoop3Params& intriParams);
- 
-__aicore__ inline void SetFixpipeLoop4(uint64_t config);
- 
-__aicore__ inline void SetFixpipeLoop4(const FixpipeLoop4Params& intriParams);
- 
-__aicore__ inline void SetFixpipeChannnel(uint64_t config);
- 
-__aicore__ inline void SetFixpipeChannnel(const FixpipeChannelParams& intriParams);
-#endif
 
 #if defined(__NPU_ARCH__) &&                                                                            \
     (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2103 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 ||    \

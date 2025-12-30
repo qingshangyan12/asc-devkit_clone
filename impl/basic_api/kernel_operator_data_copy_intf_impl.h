@@ -166,9 +166,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
 }
 #endif
 
-#if  (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 2103) || \
-    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))) || \
-    (__NPU_ARCH__ == 3101)
+#if  (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3101)))
 /*
  * @ingroup DataCopy Level 0
  * @brief format transform(such as dn2nz) during data load from OUT to L1
@@ -187,10 +185,6 @@ template <typename T, bool enableSmallC0>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
     const Dn2NzParams& intriParams)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-    (__NPU_ARCH__ == 3113))
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported DataCopy dn2nz"); });
-#else
     using PrimType = PrimT<T>;
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     if (dstHWPos == Hardware::L1) {  // GM -> L1
@@ -200,7 +194,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
         return;
     }
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopy dn2nz only support position:GM to position: L1"); });
-#endif
 }
 #endif
 
@@ -372,19 +365,6 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
             ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
     }
 }
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-    (__NPU_ARCH__ == 3113))
-template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src,
-    const DataCopyParams &repeatParams, const DataCopyAttrParams& attrParams)
-{
-    const Hardware dstHWPos = GetPhyType((QuePosition)dst.GetPosition());
-    const Hardware srcHWPos = GetPhyType((QuePosition)src.GetPosition());
-    ASCENDC_ASSERT(((dstHWPos == Hardware::FIXBUF) && (srcHWPos == Hardware::L1)),
-        { KERNEL_LOG(KERNEL_ERROR, "DataCopyPad src position must be A1/B1, dst position must be FIXBUF"); });
-    DataCopyL12FBImpl((uint64_t)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), repeatParams, attrParams);
-}
-#endif
 
 /*
  * @ingroup DataCopy Level 0
@@ -1044,8 +1024,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<U>
     DataCopyL0C2GMImpl((__gm__ PrimT<T>*)dst.GetPhyAddr(), (__cc__ PrimT<U>*)src.GetPhyAddr(), intriParams);
 }
 
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)) || (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113)
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
 // float to bfloat16_t
 template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, bfloat16_t>::value &&
     Std::is_same<PrimT<U>, float>::value, bool>::type>

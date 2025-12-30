@@ -269,38 +269,6 @@ __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const LocalTensor<V>& bias, MmadBitModeParams& mmadParams);
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-    (__NPU_ARCH__ == 3113))
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadFix(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
-    const LocalTensor<S>& filter, const MmadFixParams& mmadFixParams);
- 
-template <typename T, typename U, typename S, typename V>
-__aicore__ inline void MmadFix(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
-    const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadFixParams& mmadFixParams);
- 
-template <typename T, typename U, typename S>
-__aicore__ inline void ConvFix(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
-    const LocalTensor<S>& filter, const ConvFixParams& convFixParams);
- 
-template <typename T, typename U, typename S, typename V>
-__aicore__ inline void ConvFix(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
-    const LocalTensor<S>& filter, const LocalTensor<V>& bias, const ConvFixParams& convFixParams);
-
-template <typename T, typename U>
-__aicore__ inline void PostProc(const LocalTensor<T>& dst, const LocalTensor<U>& fm, uint64_t config);
-
-__aicore__ inline void SetMatrixPara(uint64_t config);
- 
-__aicore__ inline void SetMatrixPara(const MatrixParams &params);
- 
-__aicore__ inline void SetCubeStridePara(uint64_t config);
-
-#if (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
-__aicore__ inline void SetCubeStridePara(const CubeStrideParams &params);
-#endif
-#endif
-
 #if __NPU_ARCH__ == 2201
 template <typename T = int32_t, typename U = int8_t,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true,
@@ -416,23 +384,6 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 template <typename T>
 __aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTensor<T>& src);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-   (__NPU_ARCH__ == 3113))
-/* **************************************************************************************************
- * SetMte2QTable0Flag                                             *
- * ************************************************************************************************* */
-__aicore__ inline void SetMte2QTable0Flag(const Mte2QTableParam& qTableParam);
- 
-/* **************************************************************************************************
- * SetMte2QTable1Flag                                             *
- * ************************************************************************************************* */
-__aicore__ inline void SetMte2QTable1Flag(const Mte2QTableParam& qTableParam);
- 
-/* **************************************************************************************************
- * SetMte2SrcParaFlag                                             *
- * ************************************************************************************************* */
-__aicore__ inline void SetMte2SrcParaFlag(uint64_t kStride);
-#endif
 } // namespace AscendC
 
 /* **************************************************************************************************

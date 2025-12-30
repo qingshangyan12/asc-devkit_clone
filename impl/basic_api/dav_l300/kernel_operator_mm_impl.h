@@ -56,7 +56,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
 }
 
 /****************************L1 To L0B******************************************/
-template <typename T>
+template <typename T>	
 __aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T* dst, __cbuf__ T* src,
     const LoadData2dTransposeParams& loadDataParam)
 {
@@ -72,6 +72,13 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T* dst, __cbuf__ T* s
     } else {
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
     }
+}
+
+template <typename T>
+__aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *src,
+    const LoadData2dTransposeParamsV2 &loadDataParam)
+{
+    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadDataWithTranspose with LoadData2dTransposeParamsV2 is not supported on current device");
 }
 
 template <typename T>
@@ -290,11 +297,7 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
     config |= ((static_cast<uint64_t>(mmadParams.k) & 0xfff) << 12);
     config |= ((static_cast<uint64_t>(mmadParams.n) & 0xfff) << 24);
     config |= ((static_cast<uint64_t>(mmadParams.fmOffset) & 0xff) << 36);
-    config |= ((static_cast<uint64_t>(mmadParams.smaskBufferAddr) & 0x7f) << 44);
     config |= ((static_cast<uint64_t>(mmadParams.unitFlag) & 0x3) << 55);
-    config |= ((static_cast<uint64_t>(mmadParams.s16s8rightShift) & 0x1) << 57);
-    config |= ((static_cast<uint64_t>(mmadParams.s16s8subDtype) & 0x1) << 59);
-    config |= ((static_cast<uint64_t>(mmadParams.isWeightOffset) & 0x1) << 60);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixSource) & 0x1) << 62);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixInitVal) & 0x1) << 63);
     mad(c, a, b, config);
@@ -312,69 +315,10 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
     config |= ((static_cast<uint64_t>(mmadParams.k) & 0xfff) << 12);
     config |= ((static_cast<uint64_t>(mmadParams.n) & 0xfff) << 24);
     config |= ((static_cast<uint64_t>(mmadParams.fmOffset) & 0xff) << 36);
-    config |= ((static_cast<uint64_t>(mmadParams.smaskBufferAddr) & 0x7f) << 44);
     config |= ((static_cast<uint64_t>(mmadParams.unitFlag) & 0x3) << 55);
-    config |= ((static_cast<uint64_t>(mmadParams.s16s8rightShift) & 0x1) << 57);
-    config |= ((static_cast<uint64_t>(mmadParams.s16s8subDtype) & 0x1) << 59);
-    config |= ((static_cast<uint64_t>(mmadParams.isWeightOffset) & 0x1) << 60);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixSource) & 0x1) << 62);
     config |= ((static_cast<uint64_t>(mmadParams.cmatrixInitVal) & 0x1) << 63);
     mad(c, a, b, bias, config);
-}
-
-/* **************************************************************************************************
- * MmadFix                                          *
- * ************************************************************************************************* */
-template <typename DstT, typename Src0T, typename Src1T>
-__aicore__ inline void MmadFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b,
-    const MmadFixParams& mmadFixParams)
-{
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported MmadFixCal"); });
-}
-
-template <typename DstT, typename Src0T, typename Src1T>
-__aicore__ inline void MmadFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, uint64_t bias,
-    const MmadFixParams& mmadFixParams)
-{
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported MmadFixCal"); });
-}
-
-/* **************************************************************************************************
- * ConvFix                                          *
- * ************************************************************************************************* */
-template <typename DstT, typename Src0T, typename Src1T>
-__aicore__ inline void ConvFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b,
-    const ConvFixParams& convFixParams)
-{
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported ConvFixCal"); });
-}
-
-template <typename DstT, typename Src0T, typename Src1T>
-__aicore__ inline void ConvFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, uint64_t bias,
-    const ConvFixParams& convFixParams)
-{
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported ConvFixCal"); });
-}
-
-__aicore__ inline void SetMatrixParaImpl(uint64_t config)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetMatrixPara on this version");
-    });
-}
-
-__aicore__ inline void SetMatrixParaImpl(const MatrixParams &params)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetMatrixPara on this version");
-    });
-}
-
-__aicore__ inline void SetCubeStrideParaImpl(uint64_t config)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetCubeStridePara on this version");
-    });
 }
 
 /* **************************************************************************************************
@@ -559,8 +503,9 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T *dst, const InitConstValuePar
  * ************************************************************************************************* */
 __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam& repeatParams)
 {
-    ASCENDC_ASSERT(
-        false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetLoadDataRepeat"); });
+    uint64_t rptConfig = static_cast<uint64_t>(repeatParams.repeatStride) | (static_cast<uint64_t>(repeatParams.repeatTime) << 16) |
+        (static_cast<uint64_t>(repeatParams.repeatMode) << 24);
+    set_l3d_rpt(rptConfig);
 }
 
 /* **************************************************************************************************
@@ -572,48 +517,5 @@ __aicore__ inline void SetLoadDataBoundaryCal(uint32_t boundaryValue)
         false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetLoadDataBoundary"); });
 }
 
-__aicore__ inline void SetLoad2DsetMte2QTable0FlagCal(const Mte2QTableParam& qTableParam)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetMte2QTable0Flag");
-    });
-}
-
-__aicore__ inline void SetLoad2DsetMte2QTable1FlagCal(const Mte2QTableParam& qTableParam)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetMte2QTable1Flag");
-    });
-}
-
-__aicore__ inline void SetMte2SrcParaFlagCal(uint64_t kStride)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetMte2SrcParaFlag");
-    });
-}
-
-template <typename T>
-__aicore__ inline void Load3DSetPaddingCal(const LoadDataPaddingParam<T> &param)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetLoadDataPaddingValue");
-    });
-}
-
-template <typename T>
-__aicore__ inline void Load3DSetPaddingBCal(const LoadDataPaddingParam<T> &param)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetLoadDataPaddingValue");
-    });
-}
-
-__aicore__ inline void SetLoadDataRepeatBCal(const LoadDataRepeatParam& repeatParams)
-{
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported SetLoadDataRepeat");
-    });
-}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_IMPL_H

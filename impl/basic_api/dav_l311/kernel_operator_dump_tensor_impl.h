@@ -228,15 +228,20 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
         DataCopyL12GMImpl((__gm__ T *)(ptr->dumpAddr), (__cbuf__ T *)src.GetPhyAddr(), repeatParams);  // L1 to GM
     } else if (srcHWPos == Hardware::L0C) {
         // L0C to GM
-        FixpipeParams<half> fixpipeParams = GetFixpipeParamImpl(dumpSize);
-        copy_matrix_cc_to_gm((__gm__ half *)(ptr->dumpAddr), (__cc__ half *)(src.GetPhyAddr()), 0,
-            fixpipeParams.nSize, fixpipeParams.mSize, fixpipeParams.dstStride,
-            fixpipeParams.srcStride, (uint8_t)fixpipeParams.preClipReluMode, fixpipeParams.unitFlag,
-            fixpipeParams.quantParams.preQuantMode, fixpipeParams.preReluMode, fixpipeParams.channelSplitEnable,
-            fixpipeParams.nz2ndEnable, fixpipeParams.quantParams.postQuantMode, fixpipeParams.postReluMode,
-            (bool)fixpipeParams.postClipReluMode, fixpipeParams.loopEnhanceEnable, (uint8_t)fixpipeParams.eltwiseOp,
-            fixpipeParams.eltwiseAntiqEnable, fixpipeParams.loopEnhanceMergeEnable, fixpipeParams.c0PadEnable,
-            fixpipeParams.postWinoEnable, fixpipeParams.broadCastEnable, fixpipeParams.nz2dnEnable);
+        uint16_t align = (dumpSize % DEFAULT_BLOCK_SIZE == 0) ? 0 : 1;
+        uint16_t countBlks = align + dumpSize / DEFAULT_BLOCK_SIZE;
+
+        uint16_t burstLen = static_cast<uint16_t>(SRC_BURST_LEN_SIZE_ELE * SRC_BURST_LEN_SIZE_ELE
+            * sizeof(float) / ONE_BLK_SIZE);
+        uint16_t n = countBlks * BLOCK_CUBE;
+        uint16_t m = (burstLen * ONE_BLK_SIZE / B32_BYTE_SIZE) / BLOCK_CUBE;
+        bool nz2dnEn = true;
+        copy_matrix_cc_to_gm((__gm__ float *)(ptr->dumpAddr), (__cc__ float *)(src.GetPhyAddr()),
+            0, n, m, m * BLOCK_CUBE, m,
+            0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant),
+            static_cast<uint8_t>(false), false, false,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true,
+            false, false, false);
     }
     PipeBarrier<PIPE_ALL>();
     ptr->dumpOffset -= offset;

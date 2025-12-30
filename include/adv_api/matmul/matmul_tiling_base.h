@@ -514,9 +514,6 @@ public:
     * @note this function sets matrix multiplication configuration parameters by passing a MatmulConfigParams object
     */
     void SetMatmulConfigParams(const MatmulConfigParams& configParams);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
-    int32_t SetGroupSize(int32_t groupSizeB);
-#endif
     /**
     * @brief Set the sparse matrix flag
     * @param [in] isSparseIn: input flag for sparse matrix, the matrix is sparse if true
@@ -638,13 +635,6 @@ public:
     int32_t minSingleK = 0;
     DequantType deqType = DequantType::SCALAR;
     bool enableSplitK_ = false;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
-    // micro slice, L1Lock params: isL1LockScenario_, isSingleCoreSplit
-    bool isL1LockScenario_ = false;  // try L1TilingAlgType::TILING_BFULL first
-    bool isUseSingleCore_ = false;   // restrict only use single-core
-    int32_t groupSize = 0;
-    bool hasFixSplit_ = false;
-#endif
     platform_ascendc::SocVersion socVersion = platform_ascendc::SocVersion::ASCEND910B;
     int32_t mmConfigType = 1; // 0: Norm; 1: MDL
     bool enableL1CacheUB = false;

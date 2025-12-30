@@ -678,14 +678,6 @@ void MatmulApiTilingBase::SetMatmulConfigParams(const MatmulConfigParams& config
     this->enVecND2NZ = configParams.enVecND2NZ;
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-int32_t MatmulApiTilingBase::SetGroupSize(int32_t groupSizeB)
-{
-    this->groupSize = groupSizeB;
-    return 0;
-}
-#endif
-
 bool MatmulApiTilingBase::CheckSetParam()
 {
     if (socVersion == platform_ascendc::SocVersion::ASCEND910 ||

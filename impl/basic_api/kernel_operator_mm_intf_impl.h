@@ -340,74 +340,6 @@ __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-    (__NPU_ARCH__ == 3113))
-/* **************************************************************************************************
- * MmadFix                                          *
- * ************************************************************************************************* */
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadFix(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
-    const LocalTensor<S>& filter, const MmadFixParams& mmadFixParams)
-{
-    MmadFixImpl(dst, fm, filter, mmadFixParams);
-}
-
-template <typename T, typename U, typename S, typename V>
-__aicore__ inline void MmadFix(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
-    const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadFixParams& mmadFixParams)
-{
-    MmadFixImpl(dst, fm, filter, bias, mmadFixParams);
-}
-
-/* **************************************************************************************************
- * ConvFix                                          *
- * ************************************************************************************************* */
-template <typename T, typename U, typename S>
-__aicore__ inline void ConvFix(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
-    const LocalTensor<S>& filter, const ConvFixParams& convFixParams)
-{
-    ConvFixImpl(dst, fm, filter, convFixParams);
-}
-
-template <typename T, typename U, typename S, typename V>
-__aicore__ inline void ConvFix(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
-    const LocalTensor<S>& filter, const LocalTensor<V>& bias, const ConvFixParams& convFixParams)
-{
-    ConvFixImpl(dst, fm, filter, bias, convFixParams);
-}
-
-/* **************************************************************************************************
- * PostProc                                          *
- * ************************************************************************************************* */
-template <typename T, typename U>
-__aicore__ inline void PostProc(const LocalTensor<T>& dst, const LocalTensor<U>& fm, uint64_t config)
-{
-    PostProcImpl(dst, fm, config);
-}
-
-__aicore__ inline void SetMatrixPara(uint64_t config)
-{
-    SetMatrixParaImpl(config);
-}
-
-__aicore__ inline void SetMatrixPara(const MatrixParams &params)
-{
-    SetMatrixParaImpl(params);
-}
-
-__aicore__ inline void SetCubeStridePara(uint64_t config)
-{
-    SetCubeStrideParaImpl(config);
-}
-
-#if (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
-__aicore__ inline void SetCubeStridePara(const CubeStrideParams &params)
-{
-    SetCubeStrideParaImpl(params);
-}
-#endif
-#endif
-
 #if __NPU_ARCH__ == 2201
 template <typename T, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type,
@@ -479,30 +411,6 @@ __aicore__ inline void InitConstValue(const LocalTensor<T> &dst,
     InitConstValueImpl(dst, initConstValueParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-    (__NPU_ARCH__ == 3113))
-__aicore__ inline void SetMte2QTable0Flag(const Mte2QTableParam& qTableParam)
-{
-    SetMte2QTable0FlagImpl(qTableParam);
-}
-
-/* **************************************************************************************************
- * SetMte2QTable1Flag                                             *
- * ************************************************************************************************* */
-__aicore__ inline void SetMte2QTable1Flag(const Mte2QTableParam& qTableParam)
-{
-    SetMte2QTable1FlagImpl(qTableParam);
-}
-
-/* **************************************************************************************************
- * SetMte2SrcParaFlag                                             *
- * ************************************************************************************************* */
-__aicore__ inline void SetMte2SrcParaFlag(uint64_t kStride)
-{
-    SetMte2SrcParaFlagImpl(kStride);
-}
-#endif
-
 /* **************************************************************************************************
  * SetLoadDataPaddingValue                                             *
  * ************************************************************************************************* */
@@ -516,15 +424,6 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue)
 {
     Load3DSetPaddingImpl(padValue);
 }
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-    (__NPU_ARCH__ == 3113))
-template <typename T>
-__aicore__ inline void SetLoadDataPaddingValue(const LoadDataPaddingParam<T> &param, const FmatrixMode& fmatrixMode)
-{
-    Load3DSetPaddingImpl(param, fmatrixMode);
-}
-#endif
 
 /* **************************************************************************************************
  * SetFmatrix                                             *
@@ -563,17 +462,9 @@ __aicore__ inline void SetLoadDataBoundary(uint32_t boundaryValue)
     SetLoadDataBoundaryImpl(boundaryValue);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-    (__NPU_ARCH__ == 3113))
 /* **************************************************************************************************
  * SetLoadDataRepeat                                             *
  * ************************************************************************************************* */
-__aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams, const FmatrixMode& fmatrixMode)
-{
-    SetLoadDataRepeatImpl(repeatParams, fmatrixMode);
-}
-#endif
-
 __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams)
 {
     ASCENDC_CHECK_VALUE_RANGE(repeatParams.repeatMode, 0, 1, "repeatMode", "SetLoadDataRepeat");

@@ -1475,6 +1475,14 @@ __aicore__ inline auto CreateAddrReg(uint16_t stride0, uint16_t stride1, uint16_
     return vag_b32(stride0, stride1, stride2, stride3);
 }
 
+__aicore__ inline void Barrier()
+{
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    __asm__ __volatile__("" ::: "memory");
+#else
+    __asm__ __volatile__("");
+#endif
+}
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
