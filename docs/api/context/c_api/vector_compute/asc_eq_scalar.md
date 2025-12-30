@@ -65,4 +65,6 @@ half value = 1;
 __ubuf__ half dst[total_length];
 // 做一次迭代计算，dst和src单次迭代内DataBlock间地址步长为1，相邻迭代间相同DataBlock地址步长为8
 asc_eq_scalar(dst, src, value, 1, 1, 1, 8, 8);    // 将src按元素与value进行比较运算，若值相等则输出1，否则输出0
+// src [0, 1, 0, 1, ..., 1]
+// dst [0, 1, 0, 1, ..., 1]
 ```

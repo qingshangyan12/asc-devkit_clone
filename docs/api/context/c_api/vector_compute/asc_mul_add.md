@@ -44,7 +44,8 @@ $$
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
-| src0、src1 | 输入 | 源操作数（矢量）的起始地址。 |
+| src0 | 输入 | 源操作数（矢量）的起始地址。 |
+| src1 | 输入 | 源操作数（矢量）的起始地址。 |
 | count | 输入 | 参与计算的元素个数。 |
 | repeat | 输入 | 迭代次数。 |
 | dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
@@ -75,4 +76,8 @@ __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];
 asc_mul_add(dst, src0, src1, total_length);    // dst = (src0 * dst) + src1
+// src0 [1, 2, 3, ..., 128]
+// src1 [1, 1, 1, ..., 1]
+// 计算前dst [2, 2, 2, ..., 2]
+// 计算后dst [3, 5, 7, ..., 257]
 ```

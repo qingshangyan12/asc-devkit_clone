@@ -51,6 +51,14 @@
 | [asc_half2int8](vector_compute/asc_half2int8.md) | 数据类型转换。将half类型的数据转换为int8_t类型。 |
 | [asc_half2int16](vector_compute/asc_half2int16.md) | 数据类型转换。将half类型的数据转换为int16_t类型。 |
 | [asc_half2int32](vector_compute/asc_half2int32.md) | 数据类型转换。将half类型的数据转换为int32_t类型。 |
+| [asc_int42half](vector_compute/asc_int42half.md) | 数据类型转换。将int4b_t类型的数据转换为half类型。 |
+| [asc_int82half](vector_compute/asc_int82half.md) | 数据类型转换。将int8_t类型的数据转换为half类型。 |
+| [asc_uint82half](vector_compute/asc_uint82half.md) | 数据类型转换。将uint8_t类型的数据转换为half类型。 |
+| [asc_int162float](vector_compute/asc_int162float.md) | 数据类型转换。将int16_t类型的数据转换为float类型。 |
+| [asc_int322int16](vector_compute/asc_int322int16.md) | 数据类型转换。将int32_t类型的数据转换为int16_t类型。 |
+| [asc_int322int64](vector_compute/asc_int322int64.md) | 数据类型转换。将int32_t类型的数据转换为int64_t类型。 |
+| [asc_int642int32](vector_compute/asc_int642int32.md) | 数据类型转换。将int64_t类型的数据转换为int32_t类型。 |
+| [asc_deq_int162b8](vector_compute/asc_deq_int162b8.md) | 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。 |
 | [asc_set_deq_scale](vector_compute/asc_set_deq_scale.md) | 设置DEQSCALAR寄存器的值。 |
 | [asc_eq](vector_compute/asc_eq.md) | 比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。 |
 | [asc_transpose](vector_compute/asc_transpose.md) | 用于实现16*16的二维矩阵数据块转置。 |
@@ -60,6 +68,12 @@
 | [asc_ne_scalar](vector_compute/asc_ne_scalar.md) | 按元素判断是否不等于输入标量，若成立则输出结果上的对应比特位为1，否则为0。 |
 | [asc_gather_datablock](vector_compute/asc_gather_datablock.md) | 根据偏移地址按照DataBlock的粒度将源操作数收集到目的操作数中。 |
 | [asc_int162half](vector_compute/asc_int162half.md) | 数据类型转换。将int16_t类型的数据转换为half类型。 |
+| [asc_rcp](vector_compute/asc_rcp.md) | 执行矢量的取倒数运算。 |
+| [asc_shift_right](vector_compute/asc_shift_right.md) | 对源操作数中的每个元素执行右移。 |
+| [asc_mul_add](vector_compute/asc_mul_add.md) | 执行矢量的乘加运算。 |
+| [asc_eq_scalar](vector_compute/asc_eq_scalar.md) | 执行矢量与标量的比较运算，如果值相等则输出1，否则输出0。 |
+| [asc_gather](vector_compute/asc_gather.md) | 将源操作数按照给定的偏移按元素收集到目的操作数中。 |
+
 
 ## 数据搬运
 |   API名称   |   说明   |
@@ -69,6 +83,11 @@
 | [asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align.md) | 将GM中的对齐数据搬运到UB中。 |
 | [asc_fixpipe_l0c2out](cube_datamove/asc_fixpipe_l0c2out.md) | 将L0C中的数据搬运到GM中。 |
 | [asc_set_l1_3d_rpt](cube_datamove/asc_set_l1_3d_rpt.md) | 用于设置Load3Dv2接口的repeat参数。 |
+| [asc_fill_l0a_value](cube_datamove/asc_fill_l0a_value.md) | 将L0A Buffer的Local Memory初始化为某一具体数值。 |
+| [asc_fill_l0b_value](cube_datamove/asc_fill_l0b_value.md) | 将L0B Buffer的Local Memory初始化为某一具体数值。 |
+| [asc_fill_l1_value](cube_datamove/asc_fill_l1_value.md) | 将L1 Buffer的Local Memory初始化为某一具体数值。 |
+| [asc_set_l1_3d_size](cube_datamove/asc_set_l1_3d_size.md) | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)的3D格式搬运接口在L1 Buffer的边界值。 |
+| [asc_load_image_to_cbuf](cube_datamove/asc_load_image_to_cbuf.md) | 将图像数据从Global Memory搬运到L1 Buffer。 |
 
 ## 标量操作
 
@@ -76,6 +95,7 @@
 |----------|-----------|
 | [asc_clz](scalar_compute/asc_clz.md)| 计算参数前导零的数量（二进制从最高位到第一个1共有多少个0）。 |
 | [asc_set_nthbit](scalar_compute/asc_set_nthbit.md)| 计算一个uint64_t类型数字的指定二进制位置为1，其余位保持不变。 |
+| [asc_sflbits](scalar_compute/asc_sflbits.md)| 计算一个int64_t类型数字的二进制中，从最高数值位开始与符号位相同的连续比特位的个数。 |
 
 ## 矩阵计算
 |   API名称   |   说明   |
@@ -122,6 +142,8 @@
 | [asc_set_atomic_min](simd_atomic/asc_set_atomic_min.md)| 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输内容与GM中已有内容进行比较，并将最小值写入GM。 |
 | [asc_set_atomic_f16](simd_atomic/asc_set_atomic_f16.md)| 设置原子操作数据类型为half。 |
 | [asc_set_store_atomic_config](simd_atomic/asc_set_store_atomic_config.md)| 设置原子操作使能位与原子操作类型的值。 |
+| [asc_set_atomic_bf16](simd_atomic/asc_set_atomic_bf16.md)| 设置原子操作数据类型为bfloat16_t。 |
+| [asc_get_store_atomic_config](simd_atomic/asc_get_store_atomic_config.md)| 获取原子操作使能位与原子操作类型的值。 |
 
 ## 其他操作
 

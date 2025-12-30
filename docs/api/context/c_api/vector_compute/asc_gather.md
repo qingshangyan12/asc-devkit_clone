@@ -69,4 +69,6 @@ uint32_t offset_addr = 4;
 __ubuf__ half src[total_lengt];
 __ubuf__ half dst[total_length];
 asc_gather(dst, src, offset_addr, total_length);    // 将src中的每个元素往后偏移两个元素（4 / sizeof(half)）收集到dst中
+// src [1, 2, 3, ..., 128]
+// dst [0, 0, 1, ..., 126]，dst的前两位保持不变
 ```
