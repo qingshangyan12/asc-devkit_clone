@@ -84,6 +84,9 @@ __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ub
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T* srcAddr);
 
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void Load(U& dstReg, __ubuf__ T* srcAddr);
+
 // vlda/vldu
 template <typename T>
 __simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, __ubuf__ T* srcAddr, AddrReg& areg);
@@ -99,6 +102,12 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, U& srcReg, Unalig
 
 template <typename T, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE>
 __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegForStore& ureg, int32_t postUpdateStride);
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void Store(__ubuf__ T* dstAddr, U& srcReg);
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void Store(__ubuf__ T* dstAddr, U& srcReg, uint32_t count);
 
 // vstu/vsta
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>

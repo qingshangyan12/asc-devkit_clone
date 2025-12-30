@@ -393,6 +393,23 @@ __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf__ T*& dstAddr, Unalig
     }
 }
 
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg)
+{
+    UnalignRegForStore ureg;
+    constexpr uint32_t count = GetVecLen() / sizeof(T);
+    DataCopyUnAlignImpl<T, PostLiteral::POST_MODE_UPDATE, U>(dstAddr, srcReg, ureg, count);
+    DataCopyUnAlignPostImpl<T, PostLiteral::POST_MODE_UPDATE>(dstAddr, ureg, 0);
+}
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg, uint32_t count)
+{
+    UnalignRegForStore ureg;
+    DataCopyUnAlignImpl<T, PostLiteral::POST_MODE_UPDATE, U>(dstAddr, srcReg, ureg, count);
+    DataCopyUnAlignPostImpl<T, PostLiteral::POST_MODE_UPDATE>(dstAddr, ureg, 0);
+}
+
 // vstu/vsta
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
 __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, U& srcReg, UnalignReg& ureg, AddrReg& areg)
