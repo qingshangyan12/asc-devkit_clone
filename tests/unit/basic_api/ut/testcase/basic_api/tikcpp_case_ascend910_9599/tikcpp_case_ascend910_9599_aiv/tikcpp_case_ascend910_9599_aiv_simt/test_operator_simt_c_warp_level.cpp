@@ -9,8 +9,8 @@
 */
 #include <gtest/gtest.h>
 #include "simt_compiler_stub.h"
-#include "simt_api/asc_simt.h"
 #include "kernel_operator.h"
+#include "simt_api/asc_simt.h"
 
 using namespace std;
 using namespace AscendC;

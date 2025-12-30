@@ -11,6 +11,18 @@
 #ifndef ASCENDC_MODULE_SIMT_PRINT_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_SIMT_PRINT_INTERFACE_IMPL_H
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_CPP__
+#endif
+
+#include "utils/debug/asc_printf_simt_impl.h"
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_CPP__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_CPP__
+#endif
+
 namespace AscendC {
 namespace Simt {
 
@@ -39,7 +51,7 @@ template <class... Args>
 __aicore__ inline void PRINTF(const __gm__ char* fmt, Args&&... args)
 {
 #ifdef ASCENDC_DUMP
-    AscendC::Simt::PrintfImpl(fmt, args...);
+    __asc_simt_vf::PrintfImpl(fmt, args...);
 #endif
 }
 
@@ -47,7 +59,7 @@ template <class... Args>
 __aicore__ inline void printf(const __gm__ char* fmt, Args&&... args)
 {
 #ifdef ASCENDC_DUMP
-    AscendC::Simt::PrintfImpl(fmt, args...);
+    __asc_simt_vf::PrintfImpl(fmt, args...);
 #endif
 }
 
