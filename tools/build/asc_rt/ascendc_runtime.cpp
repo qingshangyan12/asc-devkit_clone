@@ -238,6 +238,12 @@ int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
     uint32_t blockDim, void* stream, void* hostArgs, size_t argsSize, uint32_t ubufDynamicSize)
 {
 #ifdef ASC_OLD_PROJECT
+    (void)funcHandle;
+    (void)blockDim;
+    (void)stream;
+    (void)hostArgs;
+    (void)argsSize;
+    (void)ubufDynamicSize;
     return 0;
 #else
     if (ubufDynamicSize == 0) {

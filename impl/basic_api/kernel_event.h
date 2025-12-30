@@ -311,6 +311,7 @@ template <pipe_t srcPipe, pipe_t dstPipe>
 __aicore__ inline void WaitFlagInternal(event_t evt)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+    (void)evt;
     if constexpr (IsSplitVectorPipe<srcPipe>() && IsSplitVectorPipe<dstPipe>()) {
         if ASCEND_IS_AIV {
             wait_flag(srcPipe, dstPipe, evt);

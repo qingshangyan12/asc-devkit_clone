@@ -516,7 +516,7 @@ bool CceConfBase::SetOptionalAicoreNum(const std::string& key) {//COVER
   }
   if (!(soc_version == Ascend_310P1) && !(soc_version == Ascend_310P3) &&
       !(soc_version == Ascend_310P5) && !(soc_version == Ascend_310P7)) {
-    CHECK(aicore_num <= max_aicore_num, ("Unsupported AICore_Num: " + std::to_string(aicore_num) + ".\n"));
+    CHECK(aicore_num <= max_aicore_num, ("Unsupported AICore_Num: " + std::to_string(aicore_num) + ".\n").c_str());
   }
   if (aicore_num > 0) {
     std::map<std::string, std::string> map_res;
