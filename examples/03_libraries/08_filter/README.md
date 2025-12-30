@@ -1,0 +1,9 @@
+# 数据过滤算子样例介绍
+## 概述
+本样例集介绍了数据过滤算子不同特性的典型用法，给出了对应的端到端实现。
+
+## 算子开发样例
+|  目录名称                                                   |  功能描述                                              |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| [dropout](./dropout) | 本样例介绍了调用DropOut高阶API实现dropout算子，提供根据MaskTensor对SrcTensor（源操作数，输入Tensor）进行过滤的功能，得到DstTensor（目的操作数、输出Tensor） |
+| [selectwithbytesmask](./selectwithbytesmask) | 本样例基于Kernel直调算子工程，介绍了调用SelectWithBytesMask高阶API实现SelectWithBytesMaskCustom单算子，主要演示SelectWithBytesMask高阶API在Kernel直调工程中的调用 |
