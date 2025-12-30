@@ -75,12 +75,14 @@ TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_FunctionDecl_simt_printf)
     MOCKER(&clang::CallExpr::getDirectCallee).stubs().will(returnValue(funcDecl));
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.pathInfo_.cannPath = "llt_cann_stub_path";
+    manager.SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910_95);
     EXPECT_EQ(manager.hasSimtPrintf_, false);
     MOCKER(&clang::FunctionDecl::getQualifiedNameAsString).stubs()
-        .will(returnValue(std::string("__asc_simt_vf::printf")));
+        .will(returnValue(std::string("printf")));
     EXPECT_EQ(visitor.VisitCallExpr(callExpr), true);
     EXPECT_EQ(manager.hasSimtPrintf_, true);
     manager.hasSimtPrintf_ = false;
+    manager.SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910B);
 }
 
 TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_FunctionDecl_assert)

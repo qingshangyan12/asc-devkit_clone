@@ -124,8 +124,9 @@ bool ASTDeviceVisitor::VisitCallExpr(clang::CallExpr *exprCall)
                    qualifiedName.find("AscendC::AssertPrint") != std::string::npos) {
             manager.SetHasAssert(true);
             ASC_LOGD("Found %s call at line: %u, file: %s", qualifiedName.c_str(), pLoc.getLine(), fname);
-        } else if (qualifiedName.find("AscendC::Simt::printf") != std::string::npos ||
-                   qualifiedName.find("__asc_simt_vf::printf") != std::string::npos) {
+        } else if (manager.GetShortSocVersion() == ShortSocVersion::ASCEND910_95 &&
+                    (qualifiedName.find("AscendC::Simt::printf") != std::string::npos ||
+                     qualifiedName.find("printf") != std::string::npos)) {
             manager.SetHasSimtPrintf(true);
             ASC_LOGD("Found %s call at line: %u, file: %s", qualifiedName.c_str(), pLoc.getLine(), fname);
         }
