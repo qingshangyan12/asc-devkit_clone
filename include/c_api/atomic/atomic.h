@@ -31,4 +31,6 @@ __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& conf
 
 __aicore__ inline void asc_set_store_atomic_config(asc_store_atomic_config& config);
 
+
+__aicore__ inline void asc_set_atomic_f32();
 #endif

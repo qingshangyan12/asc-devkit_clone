@@ -22,6 +22,7 @@
 #include "set_atomic_type_c_api_impl/set_atomic_f16_impl/npu_arch_2201/asc_set_atomic_f16_impl.h"
 #include "set_st_atomic_cfg_impl/npu_arch_2201/asc_set_store_atomic_config_impl.h"
 #include "set_atomic_s32_impl/npu_arch_2201/asc_set_atomic_s32_impl.h"
+#include "set_atomic_f32_impl/npu_arch_2201/asc_set_atomic_f32_impl.h"
 
 __aicore__ inline void asc_set_atomic_add()
 {
@@ -76,6 +77,11 @@ __aicore__ inline void asc_set_atomic_f16()
 __aicore__ inline void asc_set_store_atomic_config(asc_store_atomic_config& config)
 {
     asc_set_store_atomic_config_impl(config);
+}
+
+__aicore__ inline void asc_set_atomic_f32()
+{
+    asc_set_atomic_f32_impl();
 }
 
 #endif

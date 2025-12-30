@@ -91,28 +91,13 @@ union asc_capi_fpc_reg_config {
         uint64_t unit_flag : 1;
     };
 };
-union asc_scalar_bitcode_half {
-    uint64_t config;
-    struct{
-        uint16_t input : 16;
-        uint64_t output : 48;
-    };
-};
 
-union asc_scalar_bitcode_int16_t {
-    uint64_t config;
-    struct{
-        uint16_t input : 16;
-        uint64_t output : 48;
-    };
-};
-
-union asc_scalar_bitcode_uint16_t {
-    uint64_t config;
-    struct{
-        uint16_t input : 16;
-        uint64_t output : 48;
-    };
+union asc_scalar_bitcode {
+        __aicore__ asc_scalar_bitcode() {}
+        half input_half;
+        int16_t input_int16_t;
+        uint16_t input_uint16_t;
+        uint64_t output;
 };
 
 #endif // IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_UTILS_C_API_IMPL_H

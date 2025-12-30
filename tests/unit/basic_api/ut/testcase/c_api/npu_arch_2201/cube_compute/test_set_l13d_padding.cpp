@@ -23,45 +23,45 @@ protected:
     }
 };
 
-TEST_F(TestCubeComputeSetL13DPaddingValue, set_l1_3d_padding_uint64_t_Succ)
+TEST_F(TestCubeComputeSetL13DPaddingValue, set_l13d_padding_uint64_t_Succ)
 {
     MOCKER(set_padding, void(uint64_t))
         .times(1);
     
     uint64_t config = 1;
-    asc_set_l1_3d_padding_value(config);
+    asc_set_l13d_padding(config);
     
     GlobalMockObject::verify();
 }
-TEST_F(TestCubeComputeSetL13DPaddingValue, set_l1_3d_padding_half_Succ)
+TEST_F(TestCubeComputeSetL13DPaddingValue, set_l13d_padding_half_Succ)
 {
     MOCKER(set_padding, void(uint64_t))
         .times(1);
     
     uint64_t config = 1;
-    asc_set_l1_3d_padding_value(config);
+    asc_set_l13d_padding(config);
     
     GlobalMockObject::verify();
 }
 
-TEST_F(TestCubeComputeSetL13DPaddingValue, set_l1_3d_padding_value_int16_t_Succ)
+TEST_F(TestCubeComputeSetL13DPaddingValue, set_l13d_padding_int16_t_Succ)
 {
     MOCKER(set_padding, void(uint64_t))
         .times(1);
     
     int16_t config = 1;
-    asc_set_l1_3d_padding_value(config);
+    asc_set_l13d_padding(config);
     
     GlobalMockObject::verify();
 }
 
-TEST_F(TestCubeComputeSetL13DPaddingValue, set_l1_3d_padding_value_uint16_t_Succ)
+TEST_F(TestCubeComputeSetL13DPaddingValue, set_l13d_padding_uint16_t_Succ)
 {
     MOCKER(set_padding, void(uint64_t))
         .times(1);
     
     uint16_t config = 1;
-    asc_set_l1_3d_padding_value(config);
+    asc_set_l13d_padding(config);
     
     GlobalMockObject::verify();
 }

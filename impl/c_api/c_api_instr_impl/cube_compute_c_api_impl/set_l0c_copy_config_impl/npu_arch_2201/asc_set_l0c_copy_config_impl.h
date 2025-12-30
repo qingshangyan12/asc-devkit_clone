@@ -13,7 +13,7 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void asc_set_l0c_copy_config_mode_impl(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag = false)
+__aicore__ inline void asc_set_l0c_copy_config_impl(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag)
 {
     if ASC_IS_AIC {
         asc_capi_fpc_reg_config config;

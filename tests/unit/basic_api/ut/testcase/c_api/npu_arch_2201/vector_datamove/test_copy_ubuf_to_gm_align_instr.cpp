@@ -14,7 +14,7 @@
 #include "c_api/asc_simd.h"
 #include "c_api/c_api_utils_intf.h"
 
-#define TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(class_name, c_api_name, cce_name)      \
+#define TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(class_name, c_api_name, cce_name, data_type)      \
                                                                                                 \
 class TestVectorDatamove##class_name : public testing::Test {                                   \
 protected:                                                                                      \
@@ -42,8 +42,8 @@ void cce_name##_uint64_t_Stub(__ubuf__ void *dst, __gm__ void *src, uint8_t sid,
                                                                                                 \
 TEST_F(TestVectorDatamove##class_name, c_api_name##_CopyConfig_Succ)                            \
 {                                                                                               \
-    __ubuf__ void *dst = reinterpret_cast<__ubuf__ void *>(11);                                     \
-    __gm__ void *src = reinterpret_cast<__gm__ void *>(22);                                 \
+    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                                     \
+    __gm__ data_type *src = reinterpret_cast<__gm__ data_type *>(22);                                 \
                                                                                                 \
     uint8_t sid = static_cast<uint8_t>(0);                                                      \
     uint16_t n_burst = static_cast<uint64_t>(1);                                                \
@@ -63,8 +63,8 @@ TEST_F(TestVectorDatamove##class_name, c_api_name##_CopyConfig_Succ)            
                                                                                                 \
 TEST_F(TestVectorDatamove##class_name, c_api_name##_size_Succ)                                  \
 {                                                                                               \
-    __ubuf__ void *dst = reinterpret_cast<__ubuf__ void *>(11);                                     \
-    __gm__ void *src = reinterpret_cast<__gm__ void *>(22);                                 \
+    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                                     \
+    __gm__ data_type *src = reinterpret_cast<__gm__ data_type *>(22);                                 \
     uint32_t size = static_cast<uint32_t>(44);                                                  \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ void *, __gm__ void *, uint8_t, uint16_t, uint32_t, uint8_t, uint8_t, uint32_t, uint32_t))\
@@ -77,8 +77,8 @@ TEST_F(TestVectorDatamove##class_name, c_api_name##_size_Succ)                  
                                                                                                 \
 TEST_F(TestVectorDatamove##class_name, c_api_name##_sync_Succ)                                  \
 {                                                                                               \
-    __ubuf__ void *dst = reinterpret_cast<__ubuf__ void *>(11);                                     \
-    __gm__ void *src = reinterpret_cast<__gm__ void *>(22);                                 \
+    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                                     \
+    __gm__ data_type *src = reinterpret_cast<__gm__ data_type *>(22);                                 \
     uint32_t size = static_cast<uint32_t>(44);                                                  \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ void *, __gm__ void *, uint8_t, uint16_t, uint32_t, uint8_t, uint8_t, uint32_t, uint32_t))\
@@ -89,6 +89,6 @@ TEST_F(TestVectorDatamove##class_name, c_api_name##_sync_Succ)                  
 }                                                                                               \
 
 // ==========asc_copy_ub2gm_align==========
-TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNB8, asc_copy_ub2gm_align_b8, copy_ubuf_to_gm_align_b8);
-TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNB16, asc_copy_ub2gm_align_b16, copy_ubuf_to_gm_align_b16);
-TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNB32, asc_copy_ub2gm_align_b32, copy_ubuf_to_gm_align_b32);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNB8, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b8, uint8_t);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNB16, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b16, uint16_t);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNB32, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, uint32_t);

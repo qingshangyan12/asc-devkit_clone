@@ -93,4 +93,14 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t
 __aicore__ inline void asc_set_mm_transform_m();
 
 __aicore__ inline void asc_set_mm_transform_n();
+__aicore__ inline void asc_set_l0c_copy_config(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag = false);
+
+__aicore__ inline void asc_set_l13d_padding(uint64_t config);
+
+__aicore__ inline void asc_set_l13d_padding(half config);
+
+__aicore__ inline void asc_set_l13d_padding(int16_t config);
+
+__aicore__ inline void asc_set_l13d_padding(uint16_t config);
+
 #endif
