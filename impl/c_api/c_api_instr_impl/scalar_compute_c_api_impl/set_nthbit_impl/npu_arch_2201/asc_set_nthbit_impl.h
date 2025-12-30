@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef IMPL_C_API_INSTR_VECTOR_COMPUTE_SET_NTHBIT_ASC_2201_SET_NTHBIT_IMPL_H
-#define IMPL_C_API_INSTR_VECTOR_COMPUTE_SET_NTHBIT_ASC_2201_SET_NTHBIT_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_SCALAR_COMPUTE_C_API_IMPL_SET_NTHBIT_NPU_ARCH_2201_ASC_SET_NTHBIT_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_SCALAR_COMPUTE_C_API_IMPL_SET_NTHBIT_NPU_ARCH_2201_ASC_SET_NTHBIT_IMPL_H
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline uint64_t asc_set_nthbit_impl(uint64_t bits, int64_t idx)

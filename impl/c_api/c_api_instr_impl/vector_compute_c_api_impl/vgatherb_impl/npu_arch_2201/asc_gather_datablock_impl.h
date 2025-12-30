@@ -12,8 +12,8 @@
  * \file asc_gather_datablock_impl.h
  * \brief
  */
-#ifndef IMPL_INSTR_VECTOR_COMPUTE_C_API_IMPL_VGATHERB_NPU_ARCH_2201_ASC_GATHER_DATABLOCK_IMPL_H
-#define IMPL_INSTR_VECTOR_COMPUTE_C_API_IMPL_VGATHERB_NPU_ARCH_2201_ASC_GATHER_DATABLOCK_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VGATHERB_NPU_ARCH_2201_ASC_GATHER_DATABLOCK_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VGATHERB_NPU_ARCH_2201_ASC_GATHER_DATABLOCK_IMPL_H
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
 __aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, 

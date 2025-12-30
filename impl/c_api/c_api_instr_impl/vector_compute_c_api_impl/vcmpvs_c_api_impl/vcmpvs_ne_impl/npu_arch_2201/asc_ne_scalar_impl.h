@@ -12,11 +12,11 @@
  * \file asc_ne_scalar_impl.h
  * \brief
  */
-#ifndef IMPL_INSTR_VECTOR_COMPUTE_NE_VCMPVS_IMPL_NPU_ARCH_2201_ASC_NE_SCALAR_IMPL_H
-#define IMPL_INSTR_VECTOR_COMPUTE_NE_VCMPVS_IMPL_NPU_ARCH_2201_ASC_NE_SCALAR_IMPL_H
+#ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VCMPVS_C_API_IMPL_VCMPVS_NE_IMPL_NPU_ARCH_2201_ASC_NE_SCALAR_IMPL_H
+#define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VCMPVS_C_API_IMPL_VCMPVS_NE_IMPL_NPU_ARCH_2201_ASC_NE_SCALAR_IMPL_H
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
-//asc_ne_scalar_impl src:half
+
 __aicore__ inline void asc_ne_scalar_impl(__ubuf__ uint8_t *dst, __ubuf__ half *src, half value, uint8_t repeat, uint16_t dst_block_stride,
            uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
@@ -31,7 +31,7 @@ __aicore__ inline void asc_ne_scalar_sync_impl(__ubuf__ uint8_t *dst, __ubuf__ h
     asc_ne_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
     asc_sync_post_process();
 }
-//asc_ne_scalar_impl src:float
+
 __aicore__ inline void asc_ne_scalar_impl(__ubuf__ uint8_t *dst, __ubuf__ float *src, float value, uint8_t repeat, uint16_t dst_block_stride,
            uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {

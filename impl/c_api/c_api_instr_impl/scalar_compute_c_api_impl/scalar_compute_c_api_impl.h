@@ -19,7 +19,7 @@
 #include "zero_bits_cnt_impl/npu_arch_2201/asc_zero_bits_cnt_impl.h"
 #include "ffz_impl/npu_arch_2201/asc_ffz_impl.h"
 #include "popc_impl/npu_arch_2201/asc_popc_impl.h"
-#include "set_nthbit_impl/npu_arch/asc_set_nthbit_impl.h"
+#include "set_nthbit_impl/npu_arch_2201/asc_set_nthbit_impl.h"
 #include "clear_nthbit_impl/npu_arch_2201/asc_clear_nthbit_impl.h"
 
 __aicore__ inline int64_t asc_clz(uint64_t value_in)
