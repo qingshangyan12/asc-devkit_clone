@@ -30,7 +30,7 @@ __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx)
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 

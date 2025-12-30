@@ -74,6 +74,13 @@
 | [asc_eq_scalar](vector_compute/asc_eq_scalar.md) | 执行矢量与标量的比较运算，如果值相等则输出1，否则输出0。 |
 | [asc_gather](vector_compute/asc_gather.md) | 将源操作数按照给定的偏移按元素收集到目的操作数中。 |
 
+| [asc_min_scalar](vector_compute/asc_min_scalar.md) | 源操作数矢量逐元素与标量相比，取较小值。 |
+| [asc_add_relu_cast_f162s8](vector_compute/asc_add_relu_cast_f162s8.md) | 按元素求和，结果和0对比取较大值，并将结果从half类型转换为int8_t类型。 |
+| [asc_add_relu_cast_f322f16](vector_compute/asc_add_relu_cast_f322f16.md) | 按元素求和，结果和0对比取较大值，并将结果从float类型转换为half类型。 |
+| [asc_add_relu_cast_s162s8](vector_compute/asc_add_relu_cast_s162s8.md) | 按元素求和，结果和0对比取较大值，并将结果从int16_t类型转换为int8_t类型。 |
+| [asc_gt](vector_compute/asc_gt.md) | 按元素比较两个矢量的大小关系，若比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
+| [asc_vdeq_int162b8](vector_compute/asc_vdeq_int162b8.md) | 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。 |
+| [asc_int322float](vector_compute/asc_int322float.md) | 将int32_t类型数据转换为float类型。 |
 
 ## 数据搬运
 |   API名称   |   说明   |
@@ -88,6 +95,8 @@
 | [asc_fill_l1_value](cube_datamove/asc_fill_l1_value.md) | 将L1 Buffer的Local Memory初始化为某一具体数值。 |
 | [asc_set_l1_3d_size](cube_datamove/asc_set_l1_3d_size.md) | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)的3D格式搬运接口在L1 Buffer的边界值。 |
 | [asc_load_image_to_cbuf](cube_datamove/asc_load_image_to_cbuf.md) | 将图像数据从Global Memory搬运到L1 Buffer。 |
+| [asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align.md) | 将UB中的数据搬运到GM中,支持8位/16位/32位分块拷贝操作。|
+
 
 ## 标量操作
 
@@ -96,11 +105,16 @@
 | [asc_clz](scalar_compute/asc_clz.md)| 计算参数前导零的数量（二进制从最高位到第一个1共有多少个0）。 |
 | [asc_set_nthbit](scalar_compute/asc_set_nthbit.md)| 计算一个uint64_t类型数字的指定二进制位置为1，其余位保持不变。 |
 | [asc_sflbits](scalar_compute/asc_sflbits.md)| 计算一个int64_t类型数字的二进制中，从最高数值位开始与符号位相同的连续比特位的个数。 |
+| [asc_clear_nthbit](scalar_compute/asc_clear_nthbit.md)| 位操作函数，用于将一个uint64_t整数bits的第idx位设置为0。 |
 
 ## 矩阵计算
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_set_mm_transform](cube_compute/asc_set_mm_transform.md)| 设置mmad计算时优先通过M/N中的哪个方向。 |
+| [asc_set_l13d_padding](cube_compute/asc_set_l13d_padding.md)| 设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。 |
+| [asc_set_l0c_copy_config](cube_compute/asc_set_l0c_copy_config.md)| 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。 |
+| [asc_set_hf32_trans2even](cube_compute/asc_set_hf32_trans2even.md)| 设置HF32模式取整方式, FP32以最接近偶数的方式四舍五入为HF32。 |
+| [asc_set_hf32_trans2zero](cube_compute/asc_set_hf32_trans2zero.md)| 设置HF32模式取整方式, FP32以向零靠近的方式四舍五入为HF32。 |
 
 ## 同步控制
 
@@ -127,6 +141,7 @@
 | [asc_get_ctrl](sys_var/asc_get_ctrl.md) | 读取CTRL寄存器（控制寄存器）的值。 |
 | [asc_get_phy_buf_addr](sys_var/asc_get_phy_buf_addr.md) | 基于偏移量获取片上实际物理地址。 |
 | [asc_get_system_cycle](sys_var/asc_get_system_cycle.md) | 获取当前系统cycle数。 |
+| [asc_get_arch_version](sys_var/asc_get_arch_version.md) | 获取当前AI处理器架构版本号。 |
 
 ## 缓存控制
 
@@ -144,6 +159,7 @@
 | [asc_set_store_atomic_config](simd_atomic/asc_set_store_atomic_config.md)| 设置原子操作使能位与原子操作类型的值。 |
 | [asc_set_atomic_bf16](simd_atomic/asc_set_atomic_bf16.md)| 设置原子操作数据类型为bfloat16_t。 |
 | [asc_get_store_atomic_config](simd_atomic/asc_get_store_atomic_config.md)| 获取原子操作使能位与原子操作类型的值。 |
+| [asc_set_atomic_f32](simd_atomic/asc_set_atomic_f32.md)| 设置原子操作的数据类型为float。 |
 
 ## 其他操作
 
