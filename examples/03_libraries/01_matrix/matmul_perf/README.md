@@ -2,8 +2,8 @@
 ## 概述
 本样例介绍Matmul API实现三种性能优化特性（纯Cube模式、MDL模板、UnitFlag）的单算子。
 ## 支持的AI处理器
-- Ascend 910C
-- Ascend 910B
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── matmul_perf
