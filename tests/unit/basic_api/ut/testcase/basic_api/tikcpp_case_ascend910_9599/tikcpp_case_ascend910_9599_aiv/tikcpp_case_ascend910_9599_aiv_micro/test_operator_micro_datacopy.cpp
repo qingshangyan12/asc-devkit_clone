@@ -299,6 +299,28 @@ private:
         MicroAPI::DataCopyUnAlignPost(dst, u1, aReg0);
     }
 
+    __aicore__ inline void ComputeMode13(__ubuf__ T *dst, __ubuf__ T *src)
+    {
+        MicroAPI::RegTensor<T> vreg0;
+        constexpr uint32_t count = 15;
+        uint16_t repeatTimes = CeilDivision(dstSize, count);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
+            MicroAPI::Load(vreg0, src + i * count);
+            MicroAPI::Store(dst + i * count, vreg0, count);
+        }
+    }
+
+    __aicore__ inline void ComputeMode14(__ubuf__ T *dst, __ubuf__ T *src)
+    {
+        MicroAPI::RegTensor<T> vreg0;
+        constexpr uint32_t count = GetVecLen() / sizeof(T);
+        uint16_t repeatTimes = CeilDivision(dstSize, count);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
+            MicroAPI::Load(vreg0, src + i * count);
+            MicroAPI::Store(dst + i * count, vreg0);
+        }
+    }
+
     __aicore__ inline void Compute()
     {
         // test other api
@@ -349,6 +371,10 @@ private:
                 ComputeMode11(dst, src);
             } else if constexpr (mode == 12) {
                 ComputeMode12(dst, src);
+            } else if constexpr (mode == 13) {
+                ComputeMode13(dst, src);
+            } else if constexpr (mode == 14) {
+                ComputeMode14(dst, src);
             }
         }
 
@@ -430,6 +456,8 @@ MICRO_DATACOPY_TEST_CASE(9);
 MICRO_DATACOPY_TEST_CASE(10);
 MICRO_DATACOPY_TEST_CASE(11);
 MICRO_DATACOPY_TEST_CASE(12);
+MICRO_DATACOPY_TEST_CASE(13);
+MICRO_DATACOPY_TEST_CASE(14);
 
 #define MICRO_DATACOPY_TEST_CASE_B64(mode)                                                        \
     using MicroDatacopyTestsuite_mode_b64##mode = MicroDatacopyTestsuite<mode>;                   \

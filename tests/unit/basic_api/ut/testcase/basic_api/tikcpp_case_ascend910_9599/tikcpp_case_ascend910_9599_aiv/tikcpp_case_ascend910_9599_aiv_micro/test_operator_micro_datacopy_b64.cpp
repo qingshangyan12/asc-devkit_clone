@@ -188,6 +188,28 @@ private:
         }
     }
 
+    __aicore__ inline void ComputeMode7(__ubuf__ T *dst, __ubuf__ T *src)
+    {
+        MicroAPI::RegTensor<T, MicroAPI::RegTraitNumOne> vreg0;
+        constexpr uint32_t calcount = 32;
+        uint16_t repeatTimes = CeilDivision(dstSize, calcount);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
+            MicroAPI::Load(vreg0, src + i * calcount);
+            MicroAPI::Store(dst + i * calcount, vreg0, calcount);
+        }
+    }
+
+    __aicore__ inline void ComputeMode8(__ubuf__ T *dst, __ubuf__ T *src)
+    {
+        MicroAPI::RegTensor<T, MicroAPI::RegTraitNumOne> vreg0;
+        constexpr uint32_t calcount = GetVecLen() / sizeof(T);
+        uint16_t repeatTimes = CeilDivision(dstSize, calcount);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
+            MicroAPI::Load(vreg0, src + i * calcount);
+            MicroAPI::Store(dst + i * calcount, vreg0);
+        }
+    }
+
     __aicore__ inline void Compute()
     {
         LocalTensor<T> dstLocal = outQueue.AllocTensor<T>();
@@ -213,7 +235,15 @@ private:
                 ComputeMode5(dst, src);
             } else if constexpr (mode == 700) {
                 ComputeMode6(dst, src);
-            }
+            } else if constexpr (mode == 800) {
+                __ubuf__ T *src1 = (__ubuf__ T *)srcLocal[dstSize - count].GetPhyAddr();
+                __ubuf__ T *dst1 = (__ubuf__ T *)dstLocal[dstSize - count].GetPhyAddr();
+                ComputeMode7(dst1, src1);
+            } else if constexpr (mode == 900) {
+                __ubuf__ T *src1 = (__ubuf__ T *)srcLocal[dstSize - count].GetPhyAddr();
+                __ubuf__ T *dst1 = (__ubuf__ T *)dstLocal[dstSize - count].GetPhyAddr();
+                ComputeMode8(dst1, src1);
+            } 
         }
 
         outQueue.EnQue<T>(dstLocal);
@@ -294,6 +324,8 @@ MICRO_DATACOPY_B64_TEST_CASE(300, 128, 1);
 MICRO_DATACOPY_B64_TEST_CASE(500, 128, 1);
 MICRO_DATACOPY_B64_TEST_CASE(600, 128, 1);
 MICRO_DATACOPY_B64_TEST_CASE(700, 128, 1);
+MICRO_DATACOPY_B64_TEST_CASE(800, 128, 1);
+MICRO_DATACOPY_B64_TEST_CASE(900, 128, 1);
 MICRO_DATACOPY_B64_TEST_CASE(0, 128, 2);
 MICRO_DATACOPY_B64_TEST_CASE(1, 128, 2);
 MICRO_DATACOPY_B64_TEST_CASE(2, 128, 2);
