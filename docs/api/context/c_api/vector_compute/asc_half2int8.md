@@ -102,6 +102,6 @@ PIPE_V
 // total_length指参与计算的数据总长度
 constexpr uint32_t total_length = 256; 
 __ubuf__ half src[total_length];
-__ubuf__ int16_t dst[total_length];
+__ubuf__ int8_t dst[total_length];
 asc_half2int8_r(dst, src, total_length);
 ```

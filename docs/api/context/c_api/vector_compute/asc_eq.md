@@ -73,7 +73,7 @@ __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 // 通过寄存器获取比较结果
 // repeat 为迭代次数
-// dst_block_stride, src0_block_stride, src1_block_stride 单词迭代内的步长
+// dst_block_stride, src0_block_stride, src1_block_stride 单次迭代内的步长
 // dst_repeat_stride, src0_repeat_stride, src1_repeat_stride 相邻迭代间的步长
 asc_eq(src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 // 通过dst获取比较结果

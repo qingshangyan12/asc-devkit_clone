@@ -76,8 +76,8 @@ PIPE_V
 ```cpp
 constexpr int total_length = 256; //total_length 指参与计算的数据长度
 half value = 10;
-___ubuf__ half src[total_length];
-___ubuf__ half dst[total_length];
+__ubuf__ half src[total_length];
+__ubuf__ half dst[total_length];
 asc_max_scalar(dst, src, value, total_length);
 // src : [1, 2, 3, 4, ... , 256]
 // value : 3 

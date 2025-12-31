@@ -13,9 +13,9 @@
 
 ## 函数原型
 
-```c++
-__aicore__ inline int64_t asc_clz(uint64_t value_in)
-```
+    ```c++
+    __aicore__ inline int64_t asc_clz(uint64_t value_in)
+    ```
 
 ## 参数说明
 
