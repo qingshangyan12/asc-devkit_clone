@@ -45,25 +45,20 @@ constexpr float LOG2_REDUCE_COEFF1 = 0.70710678f;
 constexpr int32_t LOG2_REDUCE_COEFF2 = 0xff800000;
 constexpr float LOG2_REDUCE_FMAF_COEFF1 = 1.19209290e-7f;
 
-constexpr float LOG2_BEST_FMAF_COEFF1 = 0.37282535f;
-constexpr float LOG2_BEST_FMAF_COEFF2 = 0.4097556f;
-constexpr float LOG2_BEST_FMAF_COEFF3 = 0.57711965f;
-constexpr float LOG2_BEST_FMAF_COEFF4 = 0.96179646f;
-constexpr float LOG2_BEST_FMAF_COEFF5 = 2.88539f;
-constexpr float LOG2_BEST_FMAF_COEFF6 = 0.00000003851926f;
-
-constexpr float EXPF_BEST_FMAF_COEFF1 = 0.000152392517f;
-constexpr float EXPF_BEST_FMAF_COEFF2 = 0.00133913534f;
-constexpr float EXPF_BEST_FMAF_COEFF3 = 0.00961883925f;
-constexpr float EXPF_BEST_FMAF_COEFF4 = 0.0555035882f;
-constexpr float EXPF_BEST_FMAF_COEFF5 = 0.240226448f;
-constexpr float EXPF_BEST_FMAF_COEFF6 = 0.693147182f;
+constexpr float LOG2_BEST_FMAF_COEFF1 = 0.129394531f;
+constexpr float LOG2_BEST_FMAF_COEFF2 = 0.141957462f;
+constexpr float LOG2_BEST_FMAF_COEFF3 = 0.200015724f;
+constexpr float LOG2_BEST_FMAF_COEFF4 = 0.333333254f;
+constexpr float LOG2_HI1 = 6.93147182e-1f;
+constexpr float LOG2_HI2 = -6.93147182e-1f;
+constexpr float LOG2_LO = -1.90465421e-9f;
 
 constexpr int32_t EXPF_INTERVAL_CMP = -2097152000; 
 constexpr int32_t EXPF_INTERVAL_CAST = 2130706432; 
 
-constexpr float EXP_OVFL_UNFL_F = 152.0f; 
-constexpr int32_t INF = 0x7f800000; 
+constexpr float EXP_OVFL_UNFL_F = -104.0f;
+constexpr float EXP_MIN_F = 88.7228390f;
+constexpr int32_t INF = 0x7f800000;
 constexpr int32_t NEG_INF = 0xff800000;
 constexpr int32_t I32_NAN = 0x7f7fffff;
 constexpr int32_t F32_NAN = 0x7fc00000;
@@ -86,16 +81,6 @@ struct PowerLogParams {
     MicroAPI::RegTensor<float> addReg2;
 };
 
-struct PowerExpParams {
-    MicroAPI::RegTensor<float> zeroReg;
-    MicroAPI::RegTensor<float> oneReg;
-    MicroAPI::RegTensor<float> expReg2;
-    MicroAPI::RegTensor<float> expReg3;
-    MicroAPI::RegTensor<float> expReg4;
-    MicroAPI::RegTensor<float> expReg5;
-    MicroAPI::RegTensor<float> expReg6;
-};
-
 __simd_callee__ inline void PowerLogParamsInit(PowerLogParams& params) {
     MicroAPI::Duplicate(params.zeroReg, 0.0f);
     MicroAPI::Duplicate(params.oneReg, 1.0f);
@@ -105,16 +90,6 @@ __simd_callee__ inline void PowerLogParamsInit(PowerLogParams& params) {
     MicroAPI::Duplicate(params.rReg, LOG2_BEST_FMAF_COEFF2);
     MicroAPI::Duplicate(params.addReg1, LOG2_BEST_FMAF_COEFF3);
     MicroAPI::Duplicate(params.addReg2, LOG2_BEST_FMAF_COEFF4);
-}
-
-__simd_callee__ inline void PowerExpParamsInit(PowerExpParams& params) {
-    MicroAPI::Duplicate(params.zeroReg, 0.0f);
-    MicroAPI::Duplicate(params.oneReg, 1.0f);
-    MicroAPI::Duplicate(params.expReg2, EXPF_BEST_FMAF_COEFF2);
-    MicroAPI::Duplicate(params.expReg3, EXPF_BEST_FMAF_COEFF3);
-    MicroAPI::Duplicate(params.expReg4, EXPF_BEST_FMAF_COEFF4);
-    MicroAPI::Duplicate(params.expReg5, EXPF_BEST_FMAF_COEFF5);
-    MicroAPI::Duplicate(params.expReg6, EXPF_BEST_FMAF_COEFF6);
 }
 
 __simd_callee__ inline void IsInfNum(MicroAPI::MaskReg &infMask, MicroAPI::RegTensor<float> &srcReg,
@@ -156,22 +131,6 @@ __aicore__ inline void CopySignF(MicroAPI::RegTensor<float>& dstReg, MicroAPI::R
     MicroAPI::Abs(tmpFloatReg, srcReg1, mask);
     MicroAPI::Neg(tmpFloatReg2, tmpFloatReg, mask);
     MicroAPI::Select(dstReg, tmpFloatReg, tmpFloatReg2, cmpMask1);
-}
-
-__simd_callee__ inline void FMaf(MicroAPI::RegTensor<float>& dstReg, MicroAPI::RegTensor<float>& srcReg1,
-    MicroAPI::RegTensor<float>& srcReg2, MicroAPI::RegTensor<float>& srcReg3, MicroAPI::MaskReg& mask)
-{
-    MicroAPI::RegTensor<float> tmpReg = srcReg1;
-    MicroAPI::FusedMulDstAdd(tmpReg, srcReg2, srcReg3, mask);
-    dstReg = tmpReg;
-}
-
-__simd_callee__ inline void FMaf(MicroAPI::RegTensor<float>& dstReg, MicroAPI::RegTensor<float>& srcReg1,
-    float scalarValue, MicroAPI::RegTensor<float>& srcReg2, MicroAPI::MaskReg& mask)
-{
-    MicroAPI::RegTensor<float> tmpReg;
-    MicroAPI::Duplicate(tmpReg, scalarValue, mask);
-    FMaf(dstReg, srcReg1, tmpReg, srcReg2, mask);
 }
 
 __simd_callee__ inline void GetLogFExtStepOne(MicroAPI::RegTensor<float>& tmpIReg, MicroAPI::RegTensor<float>& tmpMReg,
@@ -218,19 +177,18 @@ __simd_callee__ inline void GetLogFExtStepTwo(MicroAPI::RegTensor<float>& logHig
     MicroAPI::Muls(tmpFloatReg, tmpQHIReg, -2.0f, mask);
     MicroAPI::Add(tmpFloatReg, tmpFloatReg, tmpMReg, mask);
     MicroAPI::Neg(tmpFloatReg2, tmpMReg, mask);
-    MicroAPI::Mul(tmpFloatReg2, tmpQHIReg, tmpFloatReg2, mask);
-    MicroAPI::Add(tmpFloatReg, tmpFloatReg2, tmpFloatReg, mask);
+    MicroAPI::FusedMulDstAdd(tmpFloatReg2, tmpQHIReg, tmpFloatReg, mask);
     // step 8：qlo = r * qhi1
-    MicroAPI::Mul(tmpQLOReg, tmpRReg, tmpFloatReg, mask);
+    MicroAPI::Mul(tmpQLOReg, tmpRReg, tmpFloatReg2, mask);
     // step 9：s = qhi * qhi;
     MicroAPI::RegTensor<float> tmpSReg;
     MicroAPI::Mul(tmpSReg, tmpQHIReg, tmpQHIReg, mask);
     /* 
      * step 10：
-     * r =  0.37282535f;
-     * r = fmaf (r, s, 0.4097556f)
-     * r = fmaf (r, s, 0.57711965f)
-     * r = fmaf (r, s, 0.96179646f)
+     * r =  0.129394531f;
+     * r = fmaf (r, s, 0.141957462f)
+     * r = fmaf (r, s, 0.200015724f)
+     * r = fmaf (r, s, 0.333333254f)
      */
     tmpRReg = params.rReg;
     MicroAPI::Axpy<float>(tmpRReg, tmpSReg, LOG2_BEST_FMAF_COEFF1, mask);
@@ -238,104 +196,54 @@ __simd_callee__ inline void GetLogFExtStepTwo(MicroAPI::RegTensor<float>& logHig
     MicroAPI::FusedMulDstAdd<float>(tmpRReg, tmpSReg, params.addReg2, mask);
     // step 11：r = r * s
     MicroAPI::Mul(tmpRReg, tmpRReg, tmpSReg, mask);
-    /*
+    /* 
      * step 12:
-     * first_hi = fmaf(2.88539f, qhi, i)
-     * first_lo = fmaf(2.88539f, qhi, i-first_hi)
+     * qhi = qhi + qhi
+     * qlo = qlo + qlo
     */
+    MicroAPI::Add(tmpQHIReg, tmpQHIReg, tmpQHIReg, mask);
+    MicroAPI::Add(tmpQLOReg, tmpQLOReg, tmpQLOReg, mask);
+    // step 13: first_hi = fmaf(LOG2_HI, i, qhi)
     MicroAPI::RegTensor<float> tmpFHIReg, tmpFLOReg;
-    MicroAPI::Muls(tmpFHIReg, tmpQHIReg, LOG2_BEST_FMAF_COEFF5, mask);
-    MicroAPI::Add(tmpFHIReg, tmpFHIReg, tmpIReg, mask);
-    MicroAPI::Sub(tmpFLOReg, tmpIReg, tmpFHIReg, mask);
-    MicroAPI::Axpy(tmpFLOReg, tmpQHIReg, LOG2_BEST_FMAF_COEFF5, mask);
+    MicroAPI::Muls(tmpFHIReg, tmpIReg, LOG2_HI1, mask);
+    MicroAPI::Add(tmpFHIReg, tmpFHIReg, tmpQHIReg, mask);
+    // step 14: first_lo = fmaf(-LOG2_HI, i, first_hi)
+    tmpFloatReg2 = tmpFHIReg;
+    MicroAPI::Axpy(tmpFloatReg2, tmpIReg, LOG2_HI2, mask);
+    MicroAPI::Sub(tmpFLOReg, tmpQHIReg, tmpFloatReg2, mask);
+    // step 15: second_lo = fmaf(r, qhi, first_lo)
+    MicroAPI::FusedMulDstAdd(tmpQHIReg, tmpRReg, tmpFLOReg, mask);
+    // step 16: last_lo = fmaf(3*qlo, r, qlo)
+    MicroAPI::Muls(tmpFloatReg, tmpQLOReg, 3.0f, mask);
+    MicroAPI::MulAddDst(tmpQLOReg, tmpFloatReg, tmpRReg, mask);
+    // step 17: sum_lo = fmaf(LOG2_LO, i, last_lo) + second_lo
+    MicroAPI::Axpy(tmpQLOReg, tmpIReg, LOG2_LO, mask);
+    MicroAPI::Add(tmpQLOReg, tmpQLOReg, tmpQHIReg, mask);
     /*
-     * step 13:
-     * GOOD:
-     * last_lo = fmaf(r, qhi, fmaf(2.88539f, qlo, first_lo));
-     * sum_lo = fmaf(0.00000003851926f, qhi, last_lo);
-     * BETTER:
-     * last_lo = fmaf(r, qhi, fmaf(2.88539f, qlo, r * qlo));
-     * sum_lo = fmaf(0.00000003851926f, qhi, last_lo) + first_lo;
-     * BEST:
-     * last_lo = fmaf(r, qhi, fmaf(2.88539f, qlo, 3.0f * r * qlo));
-     * sum_lo = fmaf(0.00000003851926f, qhi, last_lo) + first_lo;
-    */
-    MicroAPI::RegTensor<float> tmpLLOReg, tmpSLOReg;
-    MicroAPI::Mul(tmpLLOReg, tmpRReg, tmpQLOReg, mask);
-    MicroAPI::Axpy(tmpLLOReg, tmpQLOReg, LOG2_BEST_FMAF_COEFF5, mask);
-    MicroAPI::MulAddDst(tmpLLOReg, tmpRReg, tmpQHIReg, mask);
-    MicroAPI::Axpy(tmpLLOReg, tmpQHIReg, LOG2_BEST_FMAF_COEFF6, mask);
-    MicroAPI::Add(tmpSLOReg, tmpLLOReg, tmpFLOReg, mask);
-    /*
-     * step 14:
+     * step 18:
      * loghi = first_hi + sum_lo;
      * loglo = (first_hi - *loghi) + sum_lo;    
     */
-    MicroAPI::Add(logHigh, tmpFHIReg, tmpSLOReg, mask);
+    MicroAPI::Add(logHigh, tmpFHIReg, tmpQLOReg, mask);
     MicroAPI::Sub(tmpFloatReg, tmpFHIReg, logHigh, mask);
-    MicroAPI::Add(logLow, tmpFloatReg, tmpSLOReg, mask);
+    MicroAPI::Add(logLow, tmpFloatReg, tmpQLOReg, mask);
 }
 
-__simd_callee__ inline void GetExpfUnchecked(MicroAPI::RegTensor<float>& dstReg,MicroAPI::RegTensor<float>& tmPHIReg,
-    MicroAPI::RegTensor<float>& tmPLOReg, PowerExpParams& params, MicroAPI::MaskReg& mask)
-{
-    /*
-     * step 1:
-     * r = fmaf (0.000152392517f, plo, 0.00133913534f);
-     * r = fmaf (r, plo, 0.00961883925f);
-     * r = fmaf (r, plo, 0.0555035882f);
-     * r = fmaf (r, plo, 0.240226448f);
-     * r = fmaf (r, plo, 0.693147182f);
-     * r = fmaf (r, plo, 1.0f);
-     */
-    MicroAPI::RegTensor<float> tmpFloatReg;
-    MicroAPI::RegTensor<float> tmpRReg = params.expReg2;
-    MicroAPI::Axpy(tmpRReg, tmPLOReg, EXPF_BEST_FMAF_COEFF1, mask);
-    MicroAPI::FusedMulDstAdd(tmpRReg, tmPLOReg, params.expReg3, mask);
-    MicroAPI::FusedMulDstAdd(tmpRReg, tmPLOReg, params.expReg4, mask);
-    MicroAPI::FusedMulDstAdd(tmpRReg, tmPLOReg, params.expReg5, mask);
-    MicroAPI::FusedMulDstAdd(tmpRReg, tmPLOReg, params.expReg6, mask);
-    MicroAPI::FusedMulDstAdd(tmpRReg, tmPLOReg, params.oneReg, mask);
-    // step 2: r1 = (phi > 0.0f) ? 0 : -2097152000;
-    MicroAPI::RegTensor<float> tmpF1Reg, tmpF2Reg;
-    MicroAPI::RegTensor<int32_t> tmpR1Reg, tmpR2Reg;
-    MicroAPI::MaskReg cmpMask;
-    MicroAPI::CompareScalar<float,CMPMODE::LE>(cmpMask,tmPHIReg, 0, mask);
-    MicroAPI::Duplicate(tmpR1Reg, EXPF_INTERVAL_CMP, cmpMask);
-    // step 3: r2 = r1 + 2130706432;
-    MicroAPI::Adds(tmpR2Reg, tmpR1Reg, EXPF_INTERVAL_CAST, mask);
-    // step 4: f1 = r * s32_to_f32(r2);
-    MicroAPI::Mul(tmpF1Reg, tmpRReg, (MicroAPI::RegTensor<float>&)tmpR2Reg, mask);
-    /*
-     * step 5: int32_t r5 = cvt_rzi(phi);
-     * if (phi < 0.0f) return (int32_t)ceilf(phi);
-     * else return (int32_t)floorf(phi);
-    */
-    MicroAPI::RegTensor<int32_t> tmpR5Reg;
-    MicroAPI::MaskReg condMask;
-    MicroAPI::Cast<int32_t, float, castTraitI32F32>(tmpR5Reg, tmPHIReg, mask);
-    // step 6: f2 = s32_to_f32((r5 << 23) - r1);
-    MicroAPI::RegTensor<int32_t> tmpTReg;
-    MicroAPI::ShiftLefts(tmpR5Reg, tmpR5Reg, SHITF_OFFSET, mask);
-    MicroAPI::Sub(tmpTReg, tmpR5Reg, tmpR1Reg, mask);
-    tmpF2Reg = (MicroAPI::RegTensor<float>&)tmpTReg;
-    // step 7: f1 * f2
-    MicroAPI::Mul(dstReg, tmpF1Reg, tmpF2Reg, mask);
-}
-
-__simd_callee__ inline void ComputeExpoOddInt(MicroAPI::MaskReg& oddMask, MicroAPI::RegTensor<float>& expReg, MicroAPI::MaskReg& mask)
+__simd_callee__ inline void ComputeExpoOddInt(MicroAPI::MaskReg& oddMask, MicroAPI::RegTensor<float>& expReg,
+    MicroAPI::RegTensor<float>& twoReg, MicroAPI::MaskReg& mask)
 {
     // calculate exp is odd or not: expo_odd_int = fmaf (-2.0f, floorf (0.5f * b), b) == 1.0f;
     MicroAPI::RegTensor<float> tmpFloatReg;
     MicroAPI::Muls(tmpFloatReg, expReg, 0.5f, mask);
     RFloor(tmpFloatReg, tmpFloatReg, mask);
-    FMaf(tmpFloatReg, tmpFloatReg, -2.0f, expReg, mask);
+    MicroAPI::FusedMulDstAdd(tmpFloatReg, twoReg, expReg, mask);
     MicroAPI::CompareScalar<float, CMPMODE::EQ>(oddMask, tmpFloatReg, 1.0f, mask);
 }
 
 
 __simd_callee__ inline void ProcessSpecialCaseForPowF(MicroAPI::RegTensor<float>& dstReg, MicroAPI::RegTensor<float>& baseReg,
-    MicroAPI::RegTensor<float>& expReg, MicroAPI::RegTensor<int32_t>& tmpR10Reg, MicroAPI::RegTensor<int32_t>& tmpR12Reg, MicroAPI::MaskReg& mask)
+    MicroAPI::RegTensor<float>& expReg, MicroAPI::RegTensor<int32_t>& tmpR10Reg, MicroAPI::RegTensor<int32_t>& tmpR12Reg,
+    MicroAPI::RegTensor<float>& twoReg, MicroAPI::MaskReg& mask)
 {
     MicroAPI::RegTensor<float> tmpFloatReg, tmpFloatReg2;
     MicroAPI::MaskReg cmpMask1, cmpMask2, curMask;
@@ -374,7 +282,7 @@ __simd_callee__ inline void ProcessSpecialCaseForPowF(MicroAPI::RegTensor<float>
     MicroAPI::Xor((MicroAPI::RegTensor<int32_t>&)tmpFloatReg, (MicroAPI::RegTensor<int32_t>&)baseReg, tmpR10Reg, curMask);
     MicroAPI::Select(tmpFloatReg, tmpFloatReg, baseReg, cmpMask2);
     MicroAPI::And((MicroAPI::RegTensor<int32_t>&)tmpFloatReg2, (MicroAPI::RegTensor<int32_t>&)tmpFloatReg, tmpR12Reg, curMask);
-    ComputeExpoOddInt(cmpMask2, expReg, mask);
+    ComputeExpoOddInt(cmpMask2, expReg, twoReg, mask);
     MicroAPI::Select(tmpFloatReg, tmpFloatReg, tmpFloatReg2, cmpMask2);
     MicroAPI::Select(dstReg, tmpFloatReg, dstReg, cmpMask1);
     MicroAPI::MaskXor(curMask, cmpMask1, curMask, mask);
@@ -403,33 +311,33 @@ __simd_callee__ inline void ProcessSpecialCaseForPowF(MicroAPI::RegTensor<float>
     MicroAPI::Duplicate<float, MicroAPI::MaskMergeMode::MERGING>(dstReg, 1.0f, cmpMask2);
 }
 
-__simd_callee__ inline void GetExpCore(MicroAPI::RegTensor<float>& dstReg, 
-    MicroAPI::RegTensor<float>& tmpLHIReg, MicroAPI::RegTensor<float>& tmpLLOReg,
-    MicroAPI::RegTensor<float>& expReg, PowerExpParams& params, MicroAPI::MaskReg& mask)
+__simd_callee__ inline void GetExpCore(MicroAPI::RegTensor<float>& dstReg, MicroAPI::RegTensor<float>& tmpLHIReg,
+    MicroAPI::RegTensor<float>& tmpLLOReg, MicroAPI::RegTensor<float>& expReg, MicroAPI::MaskReg& mask)
 {
-    MicroAPI::RegTensor<float> tmpTHIReg, tmPHIReg, tmPLOReg, tmpRReg;
+    MicroAPI::RegTensor<float> tmPHIReg, tmPLOReg, tmpRReg;
     // step 1: thi = lhi * b;
-    MicroAPI::Mul(tmpTHIReg, tmpLHIReg, expReg, mask);
-    // step 2: phi = roundf(thi);
-    MicroAPI::Truncate<float, RoundMode::CAST_ROUND>(tmPHIReg, tmpTHIReg, mask);
-    // step 3: plo = fmaf(lhi, b, -phi)+llo*b;
+    MicroAPI::Mul(tmPHIReg, tmpLHIReg, expReg, mask);
+    // step 2: plo = fmaf(lhi, b, -phi) + llo*b;
     MicroAPI::RegTensor<float> tmpFloatReg, tmpFloatReg2;
     MicroAPI::Neg(tmPLOReg, tmPHIReg, mask);
     MicroAPI::MulAddDst(tmPLOReg, tmpLHIReg, expReg, mask);
     MicroAPI::MulAddDst(tmPLOReg, tmpLLOReg, expReg, mask);
-    // step 4: my_expf__improved(phi, plo, &r);
-    GetExpfUnchecked(tmpRReg, tmPHIReg, tmPLOReg, params, mask);
+    // step 3: r = exp(phi)
+    MicroAPI::Exp(tmpRReg, tmPHIReg, mask);
+    // step 4: r = plo*r + r
+    MicroAPI::MulAddDst(tmpRReg, tmPLOReg, tmpRReg, mask);
     /*
      * step 5:
-     * tmp_r =(thi < 0.0f) ?0.0f : MY_INF_F;
-     * r = (fabsf(thi) > EXP_OVFL_UNFL_F) ? tmp_r : r;
+     * tmp_r =(phi < 0.0f) ?0.0f : MY_INF_F;
+     * r = (phi > EXP_MIN_F or phi < EXP_OVFL_UNFL_F) ? tmp_r : r;
      */
     MicroAPI::MaskReg cmpMask1, cmpMask2;
-    MicroAPI::CompareScalar<float, CMPMODE::GE>(cmpMask1, tmpTHIReg, 0.0f, mask);
+    MicroAPI::CompareScalar<float, CMPMODE::GE>(cmpMask1, tmPHIReg, 0.0f, mask);
     // mode zeroing dup inf/zero reg.
     MicroAPI::Duplicate((MicroAPI::RegTensor<int32_t>&)tmpFloatReg, INF, cmpMask1);
-    MicroAPI::Abs(tmpFloatReg2, tmpTHIReg, mask);
-    MicroAPI::CompareScalar<float, CMPMODE::GT>(cmpMask2, tmpFloatReg2, EXP_OVFL_UNFL_F, mask);
+    MicroAPI::CompareScalar<float, CMPMODE::GT>(cmpMask2, tmPHIReg, EXP_MIN_F, mask);
+    MicroAPI::CompareScalar<float, CMPMODE::LT>(cmpMask1, tmPHIReg, EXP_OVFL_UNFL_F, mask);
+    MicroAPI::MaskOr(cmpMask2, cmpMask1, cmpMask2, mask);
     MicroAPI::Select(dstReg, tmpFloatReg, tmpRReg, cmpMask2);
 }
 
@@ -579,15 +487,12 @@ __simd_vf__ inline void ComputePowFExpImpl(__ubuf__ float* tmpExpBuffer, __ubuf_
     MicroAPI::MaskReg mask;
     MicroAPI::RegTensor<float> tmpLHIReg, tmpLLOReg, tmpExpReg, tmpDstReg;
 
-    PowerExpParams params;
-    PowerExpParamsInit(params);
-
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         LoadSrcData(tmpLHIReg, tmpLogHighBuffer, i, mask);
         LoadSrcData(tmpLLOReg, tmpLogLowBuffer, i, mask);
         LoadSrcData(tmpExpReg, src1, i, mask);
-        GetExpCore(tmpDstReg, tmpLHIReg, tmpLLOReg, tmpExpReg, params, mask);
+        GetExpCore(tmpDstReg, tmpLHIReg, tmpLLOReg, tmpExpReg, mask);
         MicroAPI::DataCopy(tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpDstReg, mask);
     }
 }
@@ -600,14 +505,11 @@ __simd_vf__ inline void ComputePowFExpImpl(__ubuf__ float* tmpExpBuffer, __ubuf_
     MicroAPI::RegTensor<float> tmpLHIReg, tmpLLOReg, tmpExpReg, tmpDstReg;
     LoadSrcScalarData(tmpExpReg, scalarValue);
 
-    PowerExpParams params;
-    PowerExpParamsInit(params);
-
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         LoadSrcData(tmpLHIReg, tmpLogHighBuffer, i, mask);
         LoadSrcData(tmpLLOReg, tmpLogLowBuffer, i, mask);
-        GetExpCore(tmpDstReg, tmpLHIReg, tmpLLOReg, tmpExpReg, params, mask);
+        GetExpCore(tmpDstReg, tmpLHIReg, tmpLLOReg, tmpExpReg, mask);
         MicroAPI::DataCopy(tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpDstReg, mask);
     }
 }
@@ -617,16 +519,17 @@ __simd_vf__ inline void ComputePowFSpecialCaseImpl(__ubuf__ T* dst, __ubuf__ T* 
     __ubuf__ float* tmpExpBuffer, uint32_t calCount, uint16_t repeatTime)
 {
     MicroAPI::MaskReg mask;
-    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
+    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
     MicroAPI::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
     MicroAPI::Duplicate(tmpR10Reg, R10_COEFF);
     MicroAPI::Duplicate(tmpR12Reg, R12_COEFF);
+    MicroAPI::Duplicate(twoReg, -2.0f);
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         LoadSrcData(tmpBaseReg, src0, i, mask);
         LoadSrcData(tmpExpReg, src1, i, mask);
         MicroAPI::DataCopy(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, mask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, mask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -636,16 +539,17 @@ __simd_vf__ inline void ComputePowFSpecialCaseImpl(__ubuf__ T* dst, __ubuf__ T* 
     __ubuf__ float* tmpExpBuffer, uint32_t calCount, uint16_t repeatTime)
 {
     MicroAPI::MaskReg mask;
-    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
+    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
     MicroAPI::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
     MicroAPI::Duplicate(tmpR10Reg, R10_COEFF);
     MicroAPI::Duplicate(tmpR12Reg, R12_COEFF);
+    MicroAPI::Duplicate(twoReg, -2.0f);
     LoadSrcScalarData(tmpExpReg, scalarValue);
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         LoadSrcData(tmpBaseReg, src0, i, mask);
         MicroAPI::DataCopy(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, mask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, mask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -655,16 +559,17 @@ __simd_vf__ inline void ComputePowFSpecialCaseImpl(__ubuf__ T* dst, const T scal
     __ubuf__ float* tmpExpBuffer, uint32_t calCount, uint16_t repeatTime)
 {
     MicroAPI::MaskReg mask;
-    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
+    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
     MicroAPI::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
     MicroAPI::Duplicate(tmpR10Reg, R10_COEFF);
     MicroAPI::Duplicate(tmpR12Reg, R12_COEFF);
+    MicroAPI::Duplicate(twoReg, -2.0f);
     LoadSrcScalarData(tmpBaseReg, scalarValue);
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         LoadSrcData(tmpExpReg, src1, i, mask);
         MicroAPI::DataCopy(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, mask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, mask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -757,17 +662,18 @@ __simd_vf__ inline void PowFInstrinsicTensorTensorImpl(__ubuf__ T* dst, __ubuf__
     uint32_t calCount, uint16_t repeatTime)
 {
     MicroAPI::MaskReg mask, tmpMask;
-    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
+    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
     MicroAPI::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
     MicroAPI::Duplicate(tmpR10Reg, R10_COEFF);
     MicroAPI::Duplicate(tmpR12Reg, R12_COEFF);
+    MicroAPI::Duplicate(twoReg, -2.0f);
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         tmpMask = mask;
         LoadSrcData(tmpBaseReg, src0, i, mask);
         LoadSrcData(tmpExpReg, src1, i, mask);
         GetPowFInstrinsicCore(castDstReg, tmpBaseReg, tmpExpReg, mask);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, tmpMask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, tmpMask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -777,17 +683,18 @@ __simd_vf__ inline void PowFInstrinsicTensorScalarImpl(__ubuf__ T* dst, __ubuf__
     uint32_t calCount, uint16_t repeatTime)
 {
     MicroAPI::MaskReg mask, tmpMask;
-    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
+    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
     MicroAPI::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
     MicroAPI::Duplicate(tmpR10Reg, R10_COEFF);
     MicroAPI::Duplicate(tmpR12Reg, R12_COEFF);
+    MicroAPI::Duplicate(twoReg, -2.0f);
     LoadSrcScalarData(tmpExpReg, scalarValue);
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         tmpMask = mask;
         LoadSrcData(tmpBaseReg, src0, i, mask); 
         GetPowFInstrinsicCore(castDstReg, tmpBaseReg, tmpExpReg, mask);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg,tmpMask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, tmpMask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
@@ -797,17 +704,18 @@ __simd_vf__ inline void PowFInstrinsicScalarTensorImpl(__ubuf__ T* dst, const T 
     uint32_t calCount, uint16_t repeatTime)
 {
     MicroAPI::MaskReg mask, tmpMask;
-    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg;
+    MicroAPI::RegTensor<float> tmpBaseReg, tmpExpReg, castDstReg, twoReg;
     MicroAPI::RegTensor<int32_t> tmpR10Reg, tmpR12Reg;
     MicroAPI::Duplicate(tmpR10Reg, R10_COEFF);
     MicroAPI::Duplicate(tmpR12Reg, R12_COEFF);
+    MicroAPI::Duplicate(twoReg, -2.0f);
     LoadSrcScalarData(tmpBaseReg, scalarValue);
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         tmpMask = mask;
         LoadSrcData(tmpExpReg, src1, i, mask);
         GetPowFInstrinsicCore(castDstReg, tmpBaseReg, tmpExpReg, mask);
-        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, tmpMask);
+        ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, tmpMask);
         StoreDstData(dst, castDstReg, i, mask);
     }
 }
