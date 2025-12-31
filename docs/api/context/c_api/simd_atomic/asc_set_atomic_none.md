@@ -42,8 +42,8 @@ __ubuf__ half src1[total_length];
 __gm__ half dst[total_length];
 asc_set_atomic_add();
 asc_set_atomic_f16();
-asc_copy_ub2gm_sync(dst, src0, total_length);
-asc_copy_ub2gm_sync(dst, src1, total_length);
+asc_copy_ub2gm_sync(dst, src0, total_length * sizeof(half));
+asc_copy_ub2gm_sync(dst, src1, total_length * sizeof(half));
 asc_set_atomic_none();
 ```
 

@@ -11,6 +11,8 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_ACC_VAL_IMPL_NPU_ARCH_2201_ASC_GET_ACC_VAL_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_GET_ACC_VAL_IMPL_NPU_ARCH_2201_ASC_GET_ACC_VAL_IMPL_H
 
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+
 __aicore__ inline int64_t asc_get_acc_val_impl()
 {
     if ASC_IS_AIV {

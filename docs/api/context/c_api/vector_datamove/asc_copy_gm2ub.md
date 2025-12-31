@@ -64,7 +64,7 @@ PIPE_MTE2
 
 ```cpp
 //total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。
-uint64_t offset = 0;
-dst = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
+constexpr uint64_t total_length = 128;
+__ubuf__ half src[total_length * sizeof(half)];
 asc_copy_gm2ub(dst, src, total_length * sizeof(half));
 ```

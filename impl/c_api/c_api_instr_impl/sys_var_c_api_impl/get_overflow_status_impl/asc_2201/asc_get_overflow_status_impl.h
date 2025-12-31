@@ -11,6 +11,8 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_OVERFLOW_STATUS_IMPL_ASC_2201_ASC_GET_OVERFLOW_STATUS_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_GET_OVERFLOW_STATUS_IMPL_ASC_2201_ASC_GET_OVERFLOW_STATUS_IMPL_H
 
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+
 __aicore__ inline uint64_t asc_get_overflow_status_impl()
 {
     return get_overflow_status();

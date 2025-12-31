@@ -15,6 +15,8 @@ $$
 dst_i = Cast(src0 * src1)
 $$
 
+- 精度转换规则：将源操作数的乘积按照RINT舍入模式（四舍六入五成双舍入），溢出做饱和处理。
+
 ### 函数原型
 
 - 前n个数据计算
@@ -40,7 +42,8 @@ $$
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
-| src0、src1 | 输入 | 源操作数（矢量）的起始地址。 |
+| src0 | 输入 | 源操作数0（矢量）的起始地址。 |
+| src1 | 输入 | 源操作数1（矢量）的起始地址。 |
 | count | 输入 | 参与计算的元素个数。 |
 | repeat | 输入 | 迭代次数。 |
 | dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
@@ -67,7 +70,7 @@ PIPE_V
 
 ```cpp
 // total_length指参与计算的数据长度
-uint32_t total_length = 128;
+constexpr uint32_t total_length = 128;
 __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 __ubuf__ uint8_t dst[total_length];

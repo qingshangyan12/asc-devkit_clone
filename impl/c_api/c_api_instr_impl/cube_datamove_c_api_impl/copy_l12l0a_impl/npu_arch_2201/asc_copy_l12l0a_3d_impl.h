@@ -13,19 +13,19 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void asc_copy_l12l0a_impl(__ca__ void* dst, __cbuf__ void* src,
+__aicore__ inline void asc_copy_l12l0a_impl(__ca__ int4b_t* dst, __cbuf__ int4b_t* src,
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
-        img2colv2_cbuf_to_ca_s4(reinterpret_cast<__ca__ void*>(dst), reinterpret_cast<__cbuf__ void*>(src),
+        img2colv2_cbuf_to_ca_s4(dst, src,
             k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h, dilation_filter_w,
             dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
 
-__aicore__ inline void asc_copy_l12l0a_sync_impl(__ca__ void* dst, __cbuf__ void* src,
+__aicore__ inline void asc_copy_l12l0a_sync_impl(__ca__ int4b_t* dst, __cbuf__ int4b_t* src,
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size)

@@ -11,6 +11,8 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_SET_FLAG_IMPL_ASC_2201_ASC_SET_FLAG_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_SET_FLAG_IMPL_ASC_2201_ASC_SET_FLAG_IMPL_H
 
-#define asc_sync_notify_impl(pipe, tpipe, id) set_flag(pipe, tpipe, static_cast<event_t>(id))
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+
+#define asc_sync_notify_impl(pipe, tpipe, id) set_flag(pipe, tpipe, id)
 
 #endif

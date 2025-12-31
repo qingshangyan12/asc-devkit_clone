@@ -74,7 +74,7 @@ PIPE_V
 
 ```cpp
 // 结果输出到寄存器中，固定为128个元素
-uint32_t total_length = 128;
+constexpr uint32_t total_length = 128;
 __ubuf__ half dst[total_length];
 __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];

@@ -56,8 +56,8 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-// 结果输出到寄存器中，固定为128个元素
-uint32_t total_length = 128;
+// 结果输出到目标地址中，固定为128个元素
+constexpr uint32_t total_length = 128;
 __ubuf__ half dst[total_length];
 __ubuf__ half src[total_length];
 half scalar = 20;

@@ -37,14 +37,14 @@ PIPE_S
 
 ```c++
 //total_length指参与搬运的数据总长度。
-uint32_t total_length = 256;
+constexpr uint32_t total_length = 256;
 __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 __gm__ half dst[total_length];
 asc_set_atomic_add();
 asc_set_atomic_f16();
-asc_copy_ub2gm_sync(dst, src0, total_length);
-asc_copy_ub2gm_sync(dst, src1, total_length);
+asc_copy_ub2gm_sync(dst, src0, total_length * sizeof(half));
+asc_copy_ub2gm_sync(dst, src1, total_length * sizeof(half));
 asc_set_atomic_none();
 ```
 
