@@ -14,17 +14,16 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_icache_preload(const void *addr);
-
-__aicore__ inline void asc_icache_preload(const void *addr, int16_t prefetch_len);
+__aicore__ inline void asc_icache_preload(const void* addr)
+__aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len)
 ```
 
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| addr | 输入| 加载数据的地址。 |
-| offset | 输入 | 加载数据的长度。 |
+| addr | 输入| 预加载数据的地址。 |
+| prefetch_len | 输入 | 预加载数据的长度。 |
 
 ## 返回值说明
 

@@ -7,11 +7,11 @@
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品| √ |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品| √ |
 
-### 功能说明
+## 功能说明
 
 执行矢量中每个位置和标量比较，如果值小于标量值则为1，否则为0，结果为每个bit位按小端序排布。
 
-### 函数原型
+## 函数原型
 
 - 高维切分计算
 
@@ -29,7 +29,7 @@
     __aicore__ inline void asc_lt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
-### 参数说明
+## 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -43,26 +43,26 @@
 | repeat | 迭代次数。 |
 
 
-### 返回值说明
+## 返回值说明
 
 无
 
-### 流水类型
+## 流水类型
 
 PIPE_V
 
-### 约束说明
+## 约束说明
 
 - dst、src的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
-### 调用示例
+## 调用示例
 
 ```cpp
 // total_length指参与计算的数据长度
 constexpr uint64_t total_length = 64
 half scalar_val = 1;
-__ubuf__ half* src[total_length];
-__ubuf__ uint8_t* dst[total_length];
+__ubuf__ half src[total_length];
+__ubuf__ uint8_t dst[total_length];
 asc_lt_scalar(dst, src, scalar_val, config);
 ```
