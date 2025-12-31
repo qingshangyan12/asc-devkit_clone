@@ -15,7 +15,7 @@ target_compile_options(demo PRIVATE
 )
 
 target_link_directories(demo PRIVATE
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:$ENV{ASCEND_HOME_PATH}/tools/simulator/${SOC}/lib>>
+    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:$ENV{ASCEND_HOME_PATH}/tools/simulator/${SOC_VERSION}/lib>>
 )
 
 target_link_libraries(demo PRIVATE 
