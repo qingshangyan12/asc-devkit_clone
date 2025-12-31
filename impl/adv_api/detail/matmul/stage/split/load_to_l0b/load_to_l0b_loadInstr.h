@@ -150,7 +150,7 @@ private:
             // startIndex, repeatTimes, srcStride, dstGap, dstFracGap, addrMode
             LoadData2dTransposeParams loadData2dTransposeParams{0, static_cast<uint8_t>(l0bRepeat), l0bSrcstride, 1, 0, inc};
 
-#if __NPU_ARCH__ != 3113
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113))
             if constexpr (IsSameType<TransT, int4b_t>::value) {
                 loadData2dTransposeParams.dstGap = Ceil(c0Size_, ALIGN_NUM) - 1;
             }

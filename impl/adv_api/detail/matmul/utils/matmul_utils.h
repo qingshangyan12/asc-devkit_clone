@@ -127,7 +127,7 @@ struct CopyGMParams {
     bool isComputeLineByLine { false };
 };
 
-#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #else
 template <> struct GetMmDstType<float> {
     using Type = float;
@@ -158,7 +158,7 @@ template <> struct GetMmDstType<int16_t> {
 template <> struct GetMmDstType<half> {
     using Type = int32_t;
 };
-#elif __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <> struct GetMmDstType<half> {
     using Type = half;
 };
