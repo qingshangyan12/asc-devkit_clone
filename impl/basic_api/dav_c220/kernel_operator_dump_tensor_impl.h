@@ -197,6 +197,7 @@ __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo);
 
 __aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
 {
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         WriteRingBufShapeInfo(shapeInfo);
     } else {
@@ -280,6 +281,7 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         DumpTensorRingBufImpl(src, desc, dumpSize);
     } else {
@@ -443,6 +445,7 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         DumpTensorRingBufImpl(src, desc, dumpSize);
     } else {
@@ -1085,6 +1088,7 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         PrintfRingBufImpl(printType, fmt, args...);
     } else {
@@ -1147,6 +1151,7 @@ __aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId)
 
 __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
 {
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         WriteRingBufTimeStampInfo(descId);
     } else {

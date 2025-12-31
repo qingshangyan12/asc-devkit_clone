@@ -46,7 +46,9 @@ aclError aclrtLaunchKernelWithHostArgs(aclrtFuncHandle funcHandle, uint32_t bloc
 class TEST_ASCENDC_RUNTIME : public testing::Test {
 protected:
     void SetUp() {}
-    void TearDown() {}
+    void TearDown() {
+        GlobalMockObject::verify();
+    }
 };
 
 TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeProfTest){
@@ -239,4 +241,36 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs) {
     uint32_t ubufDynamicSize = 512;
     ret = AscendLaunchKernelWithHostArgs(funcHandle, blockDim, stream, hostArgs, argsSize, ubufDynamicSize);
     EXPECT_EQ(ret, 0);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtype) {
+    void* funcHandle = nullptr;
+    unsigned int kernelType = 5;
+    uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &kernelType);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKCoreRation) {
+    void* funcHandle = nullptr;
+    unsigned short aicRation;
+    unsigned short aivRation;
+    uint32_t ret = AscendCFunctionGetMetaInfoKCoreRation(funcHandle, &aicRation, &aivRation);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtypeFailed) {
+    void* funcHandle = nullptr;
+    unsigned int kernelType = 5;
+    MOCKER(rtFunctionGetMetaInfo).stubs().will(returnValue(1));
+    uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &kernelType);
+    EXPECT_EQ(ret, 1);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKCoreRationFailed) {
+    void* funcHandle = nullptr;
+    unsigned short aicRation;
+    unsigned short aivRation;
+    MOCKER(rtFunctionGetMetaInfo).stubs().will(returnValue(1));
+    uint32_t ret = AscendCFunctionGetMetaInfoKCoreRation(funcHandle, &aicRation, &aivRation);
+    EXPECT_EQ(ret, 1);
 }

@@ -37,7 +37,7 @@ public:
     uint8_t msgRcvPos;
     uint8_t msgSendPos;  // Index used for circular queues. msgQueueHead = msgQueueStart + msgPos
     uint8_t eventID_;
-    uint8_t enableHardWare; 
+    uint8_t enableHardWare;
 
 public:
     __aicore__ inline KfcCommClient(GM_ADDR workspace, int subBlockID, uint8_t enableHardWare = 0)
@@ -110,7 +110,7 @@ public:
     }
 
     template <bool isAck>
-    __aicore__ inline void PostMessage(__gm__ KfcMsg *msg)
+    __disable_kernel_type_autoinfer__ __aicore__ inline void PostMessage(__gm__ KfcMsg *msg)
     {
         event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
         SetFlag<HardEvent::S_MTE3>(eventID);
@@ -201,7 +201,7 @@ public:
 
 
 #if __NPU_ARCH__ == 2201
-#if defined(__DAV_CUBE__) 
+#if defined(__DAV_CUBE__)
 #elif defined(__DAV_VEC__)
 __BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient;
 #else
@@ -212,7 +212,7 @@ __BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient;
 __aicore__ inline AscendC::KfcCommClient* GetKfcClient()
 {
 #if __NPU_ARCH__ == 2201
-#if !defined(__DAV_CUBE__) 
+#if !defined(__DAV_CUBE__)
     return reinterpret_cast<AscendC::KfcCommClient*>(g_kfcClient);
 #else
     return nullptr;

@@ -725,6 +725,44 @@ uint32_t GetCoreNumForMixVectorCore(uint32_t *aiCoreNum, uint32_t *vectorCoreNum
     return 0;
 }
 
+typedef struct {
+    unsigned int ktype;
+} AscendCFunMetaKType;
+
+typedef struct {
+    unsigned short taskRation0;
+    unsigned short taskRation1;
+} AscendCFunMetaMixCoreType;
+
+uint32_t AscendCFunctionGetMetaInfoKtype(const rtFuncHandle funcHandle, unsigned int *kernelType)
+{
+    uint64_t data;
+    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_KERNEL_TYPE, &data, sizeof(unsigned int));
+    if (rtErr != 0) {
+        ASCENDLOGE(" get function meta info ktype failed, runtime result = %d\n", rtErr);
+        return rtErr;
+    }
+    AscendCFunMetaKType* metaKtype = reinterpret_cast<AscendCFunMetaKType*>(data);
+    *kernelType = metaKtype->ktype;
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoKCoreRation(const rtFuncHandle funcHandle, unsigned short *aicRation,
+    unsigned short *aivRation)
+{
+    uint64_t data;
+    const rtError_t rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_MIX_TASK_RATION, &data,
+        sizeof(unsigned int));
+    if (rtErr != 0) {
+        ASCENDLOGE(" get function meta info core ration failed, runtime result = %d\n", rtErr);
+        return rtErr;
+    }
+    AscendCFunMetaMixCoreType* mixration = reinterpret_cast<AscendCFunMetaMixCoreType*>(data);
+    *aicRation = mixration->taskRation0;
+    *aivRation = mixration->taskRation1;
+    return 0;
+}
+
 #ifdef __cplusplus
 }
 #endif

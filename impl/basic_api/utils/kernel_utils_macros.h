@@ -82,6 +82,8 @@ enum SidOutSMMU {
 };
 #endif
 
+#ifndef __PLUGIN__KERNEL_META_TYPE_ENUME_DEFINED__
+#define __PLUGIN__KERNEL_META_TYPE_ENUME_DEFINED__
 // define macro for deterministic compile options
 enum KernelMetaType : uint8_t {
     KERNEL_TYPE_AIV_ONLY,
@@ -96,6 +98,7 @@ enum KernelMetaType : uint8_t {
     KERNEL_TYPE_MIX_VECTOR_CORE,
     KERNEL_TYPE_MAX,
 };
+#endif
 
 enum KernelType {
     K_TYPE_AICORE = 1,              // c100/m200
@@ -349,7 +352,10 @@ struct FunLevelMixCoreType {
 #define KERNEL_TASK_TYPE_DEFAULT(value)
 #else
 #define KERNEL_TASK_TYPE(key, value)  ENABLE_FEATURE_FOR_COMPILE(key, value)
+#ifndef __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
+#define __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
 #define KERNEL_TASK_TYPE_DEFAULT(value)  ENABLE_FEATURE_FOR_COMPILE(default, value)
+#endif
 #endif
 
 #define REGISTER_TILING_DEFAULT(tiling_struct)  ENABLE_FEATURE_FOR_TILING(default, tiling_struct)

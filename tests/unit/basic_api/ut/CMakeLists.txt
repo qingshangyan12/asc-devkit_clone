@@ -310,6 +310,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=1001
             __DAV_C100__
             __UT_CHIP_VER__=910
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -323,6 +324,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=2002
             __DAV_M200__
             __UT_CHIP_VER__=610
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -336,6 +338,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=2002
             __DAV_M200__
             __UT_CHIP_VER__=710
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -350,6 +353,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __DAV_C220__
             __DAV_C220_CUBE__
             __DAV_CUBE__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -364,6 +368,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __DAV_C220__
             __DAV_C220_VEC__
             __DAV_VEC__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -377,6 +382,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=3002
             __DAV_M300__
             __UT_CHIP_VER__=300
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -390,6 +396,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __DAV_M310__
             __NPU_ARCH__=3102
             __UT_CHIP_VER__=310
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -404,6 +411,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=3101
             __ST_CHIP_VER__=310
             __DAV_C310_VEC__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -418,6 +426,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=3101
             __ST_CHIP_VER__=310
             __DAV_C310_VEC__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -432,6 +441,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=3101
             __ST_CHIP_VER__=310
             __DAV_C310_VEC__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -446,6 +456,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=3101
             __ST_CHIP_VER__=310
             __DAV_C310_VEC__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -460,6 +471,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=3101
             __ST_CHIP_VER__=310
             __DAV_C310_VEC__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -474,6 +486,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             __NPU_ARCH__=3101
             __UT_CHIP_VER__=310
             __DAV_C310_CUBE__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -484,6 +497,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         target_compile_definitions(tikcpp_utest_${product_type} PRIVATE
             UT_TEST
             __NPU_ARCH__=5102
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -494,6 +508,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         target_compile_definitions(tikcpp_utest_${product_type} PRIVATE
             UT_TEST
             __NPU_ARCH__=5102
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -504,6 +519,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         target_compile_definitions(tikcpp_utest_${product_type} PRIVATE
             UT_TEST
             __NPU_ARCH__=5102
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -514,6 +530,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         target_compile_definitions(tikcpp_utest_${product_type} PRIVATE
             UT_TEST
             __NPU_ARCH__=5102
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -524,6 +541,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         target_compile_definitions(tikcpp_utest_${product_type} PRIVATE
             UT_TEST
             __NPU_ARCH__=5102
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(tikcpp_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -620,42 +638,49 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         UT_TEST
         __CCE_AICORE__=100
         __NPU_ARCH__=1001
+        __disable_kernel_type_autoinfer__=
     )
     elseif(${product_type} STREQUAL "ascend610")
         target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=200
             __NPU_ARCH__=2002
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend310p")
         target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=200
             __NPU_ARCH__=2002
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend910B1_AIC")
         target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=220
             __NPU_ARCH__=2201
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend910B1_AIV")
         target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=220
             __NPU_ARCH__=2201
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend310B1")
         target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=300
             __NPU_ARCH__=3002
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend610Lite")
         target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=310
             __NPU_ARCH__=3102
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend910_9599_AIC")
         target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE
@@ -663,6 +688,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __CCE_AICORE__=310
             __DAV_C310__
             __NPU_ARCH__=3101
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend910_9599_AIV")
         target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE
@@ -670,6 +696,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __CCE_AICORE__=310
             __DAV_C310__
             __NPU_ARCH__=3101
+            __disable_kernel_type_autoinfer__=
         )
     endif()
 
@@ -755,6 +782,7 @@ add_executable(ascendc_utest_kernel
 add_dependencies(ascendc_utest_kernel gen_ut_kernel_tiling)
 target_compile_definitions(ascendc_utest_kernel PRIVATE
     UT_TEST
+    __disable_kernel_type_autoinfer__=
 )
 target_compile_definitions(ascendc_utest_kernel PRIVATE ASCENDC_CPU_DEBUG=1)
 target_include_directories(ascendc_utest_kernel PRIVATE
@@ -822,6 +850,7 @@ add_executable(ascendc_utest_ascc
 add_dependencies(ascendc_utest_ascc gen_ut_kernel_tiling)
 target_compile_definitions(ascendc_utest_ascc PRIVATE
     UT_TEST
+    __disable_kernel_type_autoinfer__=
 )
 target_compile_definitions(ascendc_utest_ascc PRIVATE ASCENDC_CPU_DEBUG=1)
 target_include_directories(ascendc_utest_ascc PRIVATE
@@ -873,6 +902,7 @@ add_executable(ascendc_utest_ascendfe
 add_dependencies(ascendc_utest_ascendfe gen_ut_kernel_tiling)
 target_compile_definitions(ascendc_utest_ascendfe PRIVATE
     UT_TEST
+    __disable_kernel_type_autoinfer__=
 )
 target_compile_definitions(ascendc_utest_ascendfe PRIVATE ASCENDC_CPU_DEBUG=1)
 target_include_directories(ascendc_utest_ascendfe PRIVATE
@@ -924,6 +954,7 @@ add_executable(ascendc_utest_asc_plugin
 add_dependencies(ascendc_utest_asc_plugin  gen_ut_kernel_tiling)
 target_compile_definitions(ascendc_utest_asc_plugin PRIVATE
     UT_TEST
+    __disable_kernel_type_autoinfer__=
 )
 target_compile_definitions(ascendc_utest_asc_plugin PRIVATE ASCENDC_CPU_DEBUG=1)
 target_include_directories(ascendc_utest_asc_plugin PRIVATE
@@ -974,6 +1005,7 @@ add_executable(ascendc_utest_aclrtc
 add_dependencies(ascendc_utest_aclrtc gen_ut_kernel_tiling)
 target_compile_definitions(ascendc_utest_aclrtc PRIVATE
     UT_TEST
+    __disable_kernel_type_autoinfer__=
 )
 target_compile_definitions(ascendc_utest_aclrtc PRIVATE ASCENDC_CPU_DEBUG=1)
 target_include_directories(ascendc_utest_aclrtc PRIVATE
@@ -1073,6 +1105,7 @@ add_executable(ascendc_utest_asc_compile_base
 add_dependencies(ascendc_utest_asc_compile_base gen_ut_kernel_tiling)
 target_compile_definitions(ascendc_utest_asc_compile_base PRIVATE
     UT_TEST
+    __disable_kernel_type_autoinfer__=
 )
 target_compile_definitions(ascendc_utest_asc_compile_base PRIVATE ASCENDC_CPU_DEBUG=1)
 target_include_directories(ascendc_utest_asc_compile_base PRIVATE
