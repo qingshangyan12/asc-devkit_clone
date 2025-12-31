@@ -80,8 +80,6 @@ enum class ShortSocVersion : uint32_t {
     ASCEND910 = 2,
     ASCEND310B = 3,
     ASCEND910_95 = 4,
-    KIRINX90 = 5,
-    KIRIN9030 = 6,
     INVALID_TYPE = 0xffffffff
 };
 
@@ -187,8 +185,6 @@ const std::unordered_map<std::string, AscPlugin::ShortSocVersion> SOC_VERSION_MA
     {"Ascend910_9576", AscPlugin::ShortSocVersion::ASCEND910_95},
     {"Ascend910_9577", AscPlugin::ShortSocVersion::ASCEND910_95},
     {"Ascend910_9578", AscPlugin::ShortSocVersion::ASCEND910_95},
-    {"KirinX90", AscPlugin::ShortSocVersion::KIRINX90},
-    {"Kirin9030", AscPlugin::ShortSocVersion::KIRIN9030},
 };
 
 const std::map<std::pair<AscPlugin::ShortSocVersion, AscPlugin::CoreType>, std::string> CCE_AICORE_MAP = {
@@ -202,10 +198,6 @@ const std::map<std::pair<AscPlugin::ShortSocVersion, AscPlugin::CoreType>, std::
     {{AscPlugin::ShortSocVersion::ASCEND310B, AscPlugin::CoreType::VEC}, "dav-m300"},
     {{AscPlugin::ShortSocVersion::ASCEND910_95, AscPlugin::CoreType::CUBE}, "dav-c310-cube"},
     {{AscPlugin::ShortSocVersion::ASCEND910_95, AscPlugin::CoreType::VEC}, "dav-c310-vec"},
-    {{AscPlugin::ShortSocVersion::KIRINX90, AscPlugin::CoreType::CUBE}, "dav-l300"},
-    {{AscPlugin::ShortSocVersion::KIRINX90, AscPlugin::CoreType::VEC}, "dav-l300"},
-    {{AscPlugin::ShortSocVersion::KIRIN9030, AscPlugin::CoreType::CUBE}, "dav-l311"},
-    {{AscPlugin::ShortSocVersion::KIRIN9030, AscPlugin::CoreType::VEC}, "dav-l311"},
 };
 
 const std::unordered_map<std::string, AscPlugin::ShortSocVersion> CCE_AICORE_ARCH_MAP = {
@@ -217,8 +209,6 @@ const std::unordered_map<std::string, AscPlugin::ShortSocVersion> CCE_AICORE_ARC
     {"dav-c310-cube", AscPlugin::ShortSocVersion::ASCEND910_95},    // ascend910_95_list
     {"dav-c310-vec", AscPlugin::ShortSocVersion::ASCEND910_95},
     {"dav-c310", AscPlugin::ShortSocVersion::ASCEND910_95},
-    {"dav-l300", AscPlugin::ShortSocVersion::KIRINX90},
-    {"dav-l311", AscPlugin::ShortSocVersion::KIRIN9030},
 };
 
 const std::unordered_map<AscPlugin::KernelMetaType, std::string> KERNEL_TYPE_STR_MAP = {
@@ -238,8 +228,6 @@ const std::unordered_map<AscPlugin::ShortSocVersion, AscPlugin::KernelMetaType> 
     {AscPlugin::ShortSocVersion::ASCEND310P, AscPlugin::KernelMetaType::KERNEL_TYPE_AICORE},
     {AscPlugin::ShortSocVersion::ASCEND910B, AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2},
     {AscPlugin::ShortSocVersion::ASCEND910_95, AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2},
-    {AscPlugin::ShortSocVersion::KIRINX90, AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AICORE},
-    {AscPlugin::ShortSocVersion::KIRIN9030, AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AICORE},
 };
 
 const std::unordered_map<std::string, AscPlugin::KernelMetaType> KERNEL_TYPE_MAP_V220 = {

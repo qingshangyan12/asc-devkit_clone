@@ -1119,7 +1119,7 @@ __aicore__ inline void WriteTimeStampInfo(uint32_t descId)
 
 __aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId)
 {
-#ifdef ASCENDC_TIME_STAMP_ON
+#if defined(ASCENDC_TIME_STAMP_ON) && !defined(ASCENDC_CPU_DEBUG)
     EnablePrintf();
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
     if (blockRingBufInfo == nullptr) {
@@ -1138,7 +1138,7 @@ __aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId)
     timeStampTlv->resv = static_cast<uint32_t>(0U);
     timeStampTlv->cycle = static_cast<uint64_t>(GetSystemCycle());
     timeStampTlv->pc = static_cast<uint64_t>(get_pc());
-    timeStampTlv->entry = static_cast<uint64_t>(0U);
+    timeStampTlv->entry = static_cast<uint64_t>(__get_entry_sys_cnt());
     timeStampTlv->resvMem[0] = static_cast<uint32_t>(0U);
     timeStampTlv->resvMem[1] = static_cast<uint32_t>(0U);
     dcci((__gm__ uint64_t*)timeStampTlv, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);

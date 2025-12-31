@@ -29,6 +29,7 @@ AscHostBinaryGenerator::AscHostBinaryGenerator()
 
 static const char *BINARY_REGISTER_CODE = R"(#include <stdio.h>
 #include <stdint.h>
+#include <unordered_map>
 
 namespace AscPluginGenerator {
 constexpr unsigned int ascendcExceptionDumpHead = 2U;
@@ -104,7 +105,7 @@ AscProfRegister& operator=(const AscProfRegister&) = delete;
 
 namespace AscPluginGenerator {
 __attribute__ ((visibility("hidden"))) int32_t BindKernelRegisterFunc(void (*)(void*)) { return 0; }
-
+uint32_t GetProfkTypeImpl(void *funcHandle);
 __attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *kernelName, uint32_t blockDim,
     void *stream, void **args, uint32_t size, uint32_t ktype, const uint32_t ubufDynamicSize)
 {
@@ -123,6 +124,7 @@ __attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *k
     uint64_t startTime;
     bool profStatus = GetAscendProfStatus();
     if (profStatus) {
+        ktype = GetProfkTypeImpl(funcHandle);
         StartAscendProf(kernelName, &startTime);
     }
     ret = AscendLaunchKernelWithHostArgs(funcHandle, blockDim, stream, (void*)args, size, ubufDynamicSize);
@@ -136,6 +138,84 @@ __attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *k
 }
 
 } // namespace AscPluginGenerator
+
+extern "C" {
+using rtFuncHandle = void*;
+uint32_t AscendCFunctionGetMetaInfoKtype(const rtFuncHandle funcHandle, unsigned int *kernelType);
+uint32_t AscendCFunctionGetMetaInfoKCoreRation(const rtFuncHandle funcHandle, unsigned short *aicRation,
+    unsigned short *aivRation);
+}
+
+namespace AscPluginGenerator {
+typedef enum KernelType : unsigned int {
+    K_TYPE_AICORE = 1,
+    K_TYPE_AIC = 2,
+    K_TYPE_AIV = 3,
+    K_TYPE_MIX_AIC_MAIN = 4,
+    K_TYPE_MIX_AIV_MAIN = 5,
+    K_TYPE_AIC_ROLLBACK = 6,
+    K_TYPE_AIV_ROLLBACK = 7
+} KernelTypeAsc;
+
+enum KernelMetaTypeAsc {
+    KERNEL_TYPE_AIV_ONLY = 0,
+    KERNEL_TYPE_AIC_ONLY = 1,
+    KERNEL_TYPE_MIX_AIV_1_0 = 2,
+    KERNEL_TYPE_MIX_AIC_1_0 = 3,
+    KERNEL_TYPE_MIX_AIC_1_1 = 4,
+    KERNEL_TYPE_MIX_AIC_1_2 = 5
+};
+
+__attribute__ ((visibility("hidden"))) uint32_t GetProfkTypeImpl(void *funcHandle)
+{
+    const std::unordered_map<KernelMetaTypeAsc, uint32_t> kernelTaskTypeMap = {
+        {KERNEL_TYPE_AIV_ONLY, 5},
+        {KERNEL_TYPE_AIC_ONLY, 6},
+        {KERNEL_TYPE_MIX_AIV_1_0, 7},
+        {KERNEL_TYPE_MIX_AIC_1_0, 8},
+        {KERNEL_TYPE_MIX_AIC_1_1, 9},
+        {KERNEL_TYPE_MIX_AIC_1_2, 10}
+    };
+    unsigned int curKernelType;
+    uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &curKernelType);
+    if (ret != 0) {
+        ::printf("[ERROR] [AscPlugin] AscendCFunctionGetMetaInfoKtype failure! ret %d \n", ret);
+        return 5;
+    }
+    if (curKernelType == K_TYPE_MIX_AIC_MAIN || curKernelType == K_TYPE_MIX_AIV_MAIN) {
+        unsigned short coreAicRation;
+        unsigned short coreAivRation;
+        uint32_t res = AscendCFunctionGetMetaInfoKCoreRation(funcHandle, &coreAicRation, &coreAivRation);
+        if (res != 0) {
+            ::printf("[ERROR] [AscPlugin] AscendCFunctionGetMetaInfoKCoreRation failure! ret %d \n", ret);
+            return 5;
+        }
+        if (curKernelType == K_TYPE_MIX_AIV_MAIN && coreAicRation == 0 && coreAivRation == 1) {
+            return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIV_1_0);
+        }
+        if (curKernelType == K_TYPE_MIX_AIC_MAIN) {
+            if (coreAicRation == 1 && coreAivRation == 0) {
+                return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_0);
+            }
+            if (coreAicRation == 1 && coreAivRation == 1) {
+                return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_1);
+            }
+            if (coreAicRation == 1 && coreAivRation == 2) {
+                return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_2);
+            }
+        }
+    } else if (curKernelType == K_TYPE_AIC || curKernelType == K_TYPE_AIC_ROLLBACK) {
+        return kernelTaskTypeMap.at(KERNEL_TYPE_AIC_ONLY);
+    } else if (curKernelType == K_TYPE_AIV || curKernelType == K_TYPE_AIV_ROLLBACK) {
+        return kernelTaskTypeMap.at(KERNEL_TYPE_AIV_ONLY);
+    } else {
+        ::printf("[ERROR] [AscPlugin] Get unsupported kernel Type %d \n", curKernelType);
+        return 5;
+    }
+    return 5;
+}
+} // namespace AscPluginGenerator
+
 )";
 
 std::string AscHostBinaryGenerator::GenCode()

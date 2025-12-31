@@ -210,7 +210,7 @@ TEST_F(TEST_ASC_UTILS, asc_GetAscFeatureMetaSection) {
     EXPECT_EQ(printMeta, std::string("static const struct BinaryMetaAscFeature __ascendc_feature_print__ __attribute__ "
                                      "((used, section (\".ascend.meta\"))) = {4, 4, 1};\n"));
     std::string fftsMeta = GetAscFeatureMetaSection(FeatureFlag::ASC_FFTS_MASK);
-    EXPECT_EQ(fftsMeta, std::string("static const struct BinaryMetaAscFeature __ascendc_feature_ffts__5 __attribute__ "
+    EXPECT_EQ(fftsMeta, std::string("static const struct BinaryMetaAscFeature __ascendc_feature_ffts__4 __attribute__ "
                                     "((used, section (\".ascend.meta\"))) = {4, 4, 2};\n"));
     std::string l2cacheMeta = GetAscFeatureMetaSection(FeatureFlag::ASC_L2CACHE_HINT_MASK);
     EXPECT_EQ(l2cacheMeta,

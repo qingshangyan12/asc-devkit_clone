@@ -97,7 +97,7 @@ AscDevStubGenerator::AscDevStubGenerator(const KernelInfo &kernelInfo, const std
 std::string AscDevStubGenerator::GetWorkspaceArgName() const
 {
     for (const auto& param : kernelInfo_.kernelParameters) {
-        if (param.attribute.find(std::string("kfc_workspace")) != std::string::npos) {
+        if (param.attribute.find(std::string("cce_kfc_workspace")) != std::string::npos) {
             ASC_LOGI("Kernel [%s] : the kernel utilizes the workspace.", kernelInfo_.kernelName.c_str());
             return param.name;
         }

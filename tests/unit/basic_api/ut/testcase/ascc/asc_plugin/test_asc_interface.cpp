@@ -23,9 +23,12 @@
 #include "asc_struct.h"
 #include "asc_ast_device_analyzer.h"
 #include "asc_dev_func_registry_generate.h"
+#include "asc_ast_device_consumer.h"
+#include "asc_dev_section_generate.h"
 
 static std::string registerBinary(R"(#include <stdio.h>
 #include <stdint.h>
+#include <unordered_map>
 
 namespace AscPluginGenerator {
 constexpr unsigned int ascendcExceptionDumpHead = 2U;
@@ -101,7 +104,7 @@ AscProfRegister& operator=(const AscProfRegister&) = delete;
 
 namespace AscPluginGenerator {
 __attribute__ ((visibility("hidden"))) int32_t BindKernelRegisterFunc(void (*)(void*)) { return 0; }
-
+uint32_t GetProfkTypeImpl(void *funcHandle);
 __attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *kernelName, uint32_t blockDim,
     void *stream, void **args, uint32_t size, uint32_t ktype, const uint32_t ubufDynamicSize)
 {
@@ -120,6 +123,7 @@ __attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *k
     uint64_t startTime;
     bool profStatus = GetAscendProfStatus();
     if (profStatus) {
+        ktype = GetProfkTypeImpl(funcHandle);
         StartAscendProf(kernelName, &startTime);
     }
     ret = AscendLaunchKernelWithHostArgs(funcHandle, blockDim, stream, (void*)args, size, ubufDynamicSize);
@@ -133,6 +137,84 @@ __attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *k
 }
 
 } // namespace AscPluginGenerator
+
+extern "C" {
+using rtFuncHandle = void*;
+uint32_t AscendCFunctionGetMetaInfoKtype(const rtFuncHandle funcHandle, unsigned int *kernelType);
+uint32_t AscendCFunctionGetMetaInfoKCoreRation(const rtFuncHandle funcHandle, unsigned short *aicRation,
+    unsigned short *aivRation);
+}
+
+namespace AscPluginGenerator {
+typedef enum KernelType : unsigned int {
+    K_TYPE_AICORE = 1,
+    K_TYPE_AIC = 2,
+    K_TYPE_AIV = 3,
+    K_TYPE_MIX_AIC_MAIN = 4,
+    K_TYPE_MIX_AIV_MAIN = 5,
+    K_TYPE_AIC_ROLLBACK = 6,
+    K_TYPE_AIV_ROLLBACK = 7
+} KernelTypeAsc;
+
+enum KernelMetaTypeAsc {
+    KERNEL_TYPE_AIV_ONLY = 0,
+    KERNEL_TYPE_AIC_ONLY = 1,
+    KERNEL_TYPE_MIX_AIV_1_0 = 2,
+    KERNEL_TYPE_MIX_AIC_1_0 = 3,
+    KERNEL_TYPE_MIX_AIC_1_1 = 4,
+    KERNEL_TYPE_MIX_AIC_1_2 = 5
+};
+
+__attribute__ ((visibility("hidden"))) uint32_t GetProfkTypeImpl(void *funcHandle)
+{
+    const std::unordered_map<KernelMetaTypeAsc, uint32_t> kernelTaskTypeMap = {
+        {KERNEL_TYPE_AIV_ONLY, 5},
+        {KERNEL_TYPE_AIC_ONLY, 6},
+        {KERNEL_TYPE_MIX_AIV_1_0, 7},
+        {KERNEL_TYPE_MIX_AIC_1_0, 8},
+        {KERNEL_TYPE_MIX_AIC_1_1, 9},
+        {KERNEL_TYPE_MIX_AIC_1_2, 10}
+    };
+    unsigned int curKernelType;
+    uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &curKernelType);
+    if (ret != 0) {
+        ::printf("[ERROR] [AscPlugin] AscendCFunctionGetMetaInfoKtype failure! ret %d \n", ret);
+        return 5;
+    }
+    if (curKernelType == K_TYPE_MIX_AIC_MAIN || curKernelType == K_TYPE_MIX_AIV_MAIN) {
+        unsigned short coreAicRation;
+        unsigned short coreAivRation;
+        uint32_t res = AscendCFunctionGetMetaInfoKCoreRation(funcHandle, &coreAicRation, &coreAivRation);
+        if (res != 0) {
+            ::printf("[ERROR] [AscPlugin] AscendCFunctionGetMetaInfoKCoreRation failure! ret %d \n", ret);
+            return 5;
+        }
+        if (curKernelType == K_TYPE_MIX_AIV_MAIN && coreAicRation == 0 && coreAivRation == 1) {
+            return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIV_1_0);
+        }
+        if (curKernelType == K_TYPE_MIX_AIC_MAIN) {
+            if (coreAicRation == 1 && coreAivRation == 0) {
+                return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_0);
+            }
+            if (coreAicRation == 1 && coreAivRation == 1) {
+                return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_1);
+            }
+            if (coreAicRation == 1 && coreAivRation == 2) {
+                return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_2);
+            }
+        }
+    } else if (curKernelType == K_TYPE_AIC || curKernelType == K_TYPE_AIC_ROLLBACK) {
+        return kernelTaskTypeMap.at(KERNEL_TYPE_AIC_ONLY);
+    } else if (curKernelType == K_TYPE_AIV || curKernelType == K_TYPE_AIV_ROLLBACK) {
+        return kernelTaskTypeMap.at(KERNEL_TYPE_AIV_ONLY);
+    } else {
+        ::printf("[ERROR] [AscPlugin] Get unsupported kernel Type %d \n", curKernelType);
+        return 5;
+    }
+    return 5;
+}
+} // namespace AscPluginGenerator
+
 )");
 
 class TestAscInterFace : public testing::Test {
@@ -280,19 +362,84 @@ TEST_F(TestAscInterFace, asc_plugin_gen_kernel_failure_with_nullptr)
     EXPECT_EQ(res, AscPlugin::ASC_NULLPTR);
 }
 
+TEST_F(TestAscInterFace, asc_plugin_gen_kernel_gen_device_code_failure)
+{
+    const char* a;
+    AscPlugin::KernelInfo info;
+    info.kernelName = "add";
+    info.lineNum = 32U;
+    info.colNum = 24U;
+    info.isTemplate = true;
+    info.fileName = "test.cpp";
+    info.kernelMangledName = "mangling_add";
+    info.kernelMangledNameConsiderPrefix = "prefix_mangling_add";
+    nlohmann::json infoObj= info;
+    const char* infoObjPtr = strdup(infoObj.dump().c_str());
+    std::unordered_set<AscPlugin::KernelMetaType> test_set{AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2};
+    std::pair<std::unordered_set<AscPlugin::KernelMetaType>, AscPlugin::KfcScene> test_pair{test_set, AscPlugin::KfcScene::Open};
+    MOCKER(AscPlugin::GetKernelFuncScene).stubs().will(returnValue(test_pair));
+    MOCKER(AscPlugin::GetDeviceCode).stubs().will(returnValue(std::tuple{1, std::string("a"), std::string("a")}));
+    AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend910_9591");
+    AscPlugin::InfoManager::GetInstance().SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910_95);
+    auto res = AscPlugin::PluginGenKernel(&a, infoObjPtr);
+    EXPECT_EQ(res, AscPlugin::ASC_FAILURE);
+    AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend910B");
+    AscPlugin::InfoManager::GetInstance().SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910B);
+}
+
+TEST_F(TestAscInterFace, asc_plugin_gen_kernel_gen_device_code_success_without_910B)
+{
+    const char* a;
+    AscPlugin::KernelInfo info;
+    info.kernelName = "add";
+    info.lineNum = 32U;
+    info.colNum = 24U;
+    info.isTemplate = true;
+    info.fileName = "test.cpp";
+    info.kernelMangledName = "mangling_add";
+    info.kernelMangledNameConsiderPrefix = "prefix_mangling_add";
+    nlohmann::json infoObj= info;
+    const char* infoObjPtr = strdup(infoObj.dump().c_str());
+    std::unordered_set<AscPlugin::KernelMetaType> test_set{AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2};
+    std::pair<std::unordered_set<AscPlugin::KernelMetaType>, AscPlugin::KfcScene> test_pair{test_set, AscPlugin::KfcScene::Open};
+    MOCKER(AscPlugin::GetKernelFuncScene).stubs().will(returnValue(test_pair));
+    MOCKER(AscPlugin::GetDeviceCode).stubs().will(returnValue(std::tuple{0, std::string("a"), std::string("a")}));
+    AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend910_9591");
+    AscPlugin::InfoManager::GetInstance().SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910_95);
+    auto res = AscPlugin::PluginGenKernel(&a, infoObjPtr);
+    EXPECT_EQ(res, AscPlugin::ASC_SUCCESS);
+    AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend910B");
+    AscPlugin::InfoManager::GetInstance().SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910B);
+}
+
+TEST_F(TestAscInterFace, asc_plugin_gen_kernel_910B_template)
+{
+    const char* a;
+    AscPlugin::KernelInfo info;
+    info.kernelName = "add";
+    info.lineNum = 32U;
+    info.colNum = 24U;
+    info.isTemplate = true;
+    info.fileName = "test.cpp";
+    info.kernelMangledName = "mangling_add";
+    info.kernelMangledNameConsiderPrefix = "prefix_mangling_add";
+    AscPlugin::TemplateInstance instanA, instanB;
+    instanA.instanceMangledName = "tetsMangledName_a";
+    instanB.instanceMangledName = "tetsMangledName_b";
+    info.templateInstances = {instanA, instanB};
+    nlohmann::json infoObj= info;
+    const char* infoObjPtr = strdup(infoObj.dump().c_str());
+    std::unordered_set<AscPlugin::KernelMetaType> test_set{AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2};
+    std::pair<std::unordered_set<AscPlugin::KernelMetaType>, AscPlugin::KfcScene> test_pair{test_set, AscPlugin::KfcScene::Open};
+    MOCKER(AscPlugin::GetKernelFuncScene).stubs().will(returnValue(test_pair));
+    MOCKER(AscPlugin::GetDeviceCode).stubs().will(returnValue(std::tuple{1, std::string("a"), std::string("a")}));
+    auto res = AscPlugin::PluginGenKernel(&a, infoObjPtr);
+    EXPECT_EQ(res, AscPlugin::ASC_SUCCESS);
+}
+
 TEST_F(TestAscInterFace, asc_plugin_gen_kernel_success)
 {
-    std::string golden = R"(namespace Foo1::Foo2 {
-extern "C" __global__ __aicore__ void __device_stub__mangling_add()
-{
-    icache_preload(1);
-    if (g_sysFftsAddr != nullptr) {
-        set_ffts_base_addr((uint64_t)g_sysFftsAddr);
-    }
-    __origin__add();
-}
-}
-)";
+    std::string golden = R"()";
     AscPlugin::KernelInfo info;
     info.kernelName = "add";
     info.kernelMangledName = "mangling_add";
@@ -567,14 +714,17 @@ TEST_F(TestAscInterFace, asc_PluginPrologue_ast_failed)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
+    config.npuSoc = "Ascend910_9591";
+    config.npuArch = "dav-c310";
     nlohmann::json configObj= config;
     const char* configObjPtr = strdup(configObj.dump().c_str());
     const char* a;
     MOCKER(&AscPlugin::AscAstDeviceAnalyzer::Process).stubs().will(returnValue(AscPlugin::ASC_FAILURE));
     int32_t exec_res = AscPlugin::PluginPrologue(&a, configObjPtr);
-    auto& manager = AscPlugin::InfoManager::GetInstance();
     EXPECT_EQ(exec_res, AscPlugin::ASC_FAILURE);
     free(const_cast<char*>(configObjPtr));
+    AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend910B");
+    AscPlugin::InfoManager::GetInstance().SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910B);
 }
 
 TEST_F(TestAscInterFace, asc_PluginPrologue_binary_register_code_failed)
@@ -1279,7 +1429,7 @@ TEST_F(TestAscInterFace, asc_PluginFatbinLink)
     const char* a;
     int32_t exec_res = AscPlugin::PluginFatbinLink(&a);
     std::vector<std::string> expLinkOptions = {
-        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++",
+        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++", "-lm",
         "-LA/lib64",
         "-LA/tools/simulator/Ascend910B1/lib"
     };
@@ -1321,7 +1471,7 @@ TEST_F(TestAscInterFace, asc_PluginFatbinLink_null_soc)
     const char* a;
     int32_t exec_res2 = AscPlugin::PluginFatbinLink(&a);
     std::vector<std::string> expLinkOptions = {
-        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++",
+        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++", "-lm",
         "-LA/lib64"
     };
     EXPECT_EQ(exec_res, AscPlugin::ASC_SUCCESS);
@@ -1355,7 +1505,7 @@ TEST_F(TestAscInterFace, asc_PluginFatbinLink_910B4_1)
     const char* a;
     int32_t exec_res2 = AscPlugin::PluginFatbinLink(&a);
     std::vector<std::string> expLinkOptions = {
-        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++",
+        "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa", "-lascend_dump", "-lc_sec", "-lstdc++", "-lm",
         "-LA/lib64",
         "-LA/tools/simulator/Ascend910B4/lib"
     };

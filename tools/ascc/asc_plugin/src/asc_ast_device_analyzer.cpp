@@ -74,8 +74,6 @@ void AscAstDeviceAnalyzer::InitCompileDeviceArgs(const std::string &source)
         {ShortSocVersion::ASCEND910, {"-D__DAV_C100__", "-D__CCE_AICORE__=100", "-D__NPU_ARCH__=1001"}},
         {ShortSocVersion::ASCEND310B, {"-D__DAV_M300__", "-D__CCE_AICORE__=300", "-D__NPU_ARCH__=3002"}},
         {ShortSocVersion::ASCEND910_95, {"-D__DAV_C310_CUBE__", "-D__CCE_AICORE__=310", "-D__NPU_ARCH__=3101", "-D__DAV_CUBE__"}},
-        {ShortSocVersion::KIRINX90, {"-D__DAV_L300__", "-D__CCE_AICORE__=300", "-D__NPU_ARCH__=3003"}},
-        {ShortSocVersion::KIRIN9030, {"-D__DAV_L311__", "-D__CCE_AICORE__=311", "-D__NPU_ARCH__=3113"}},
     };
 
     static const std::vector<std::string> innerOpts = {
@@ -88,6 +86,8 @@ void AscAstDeviceAnalyzer::InitCompileDeviceArgs(const std::string &source)
         "-DGM_ADDR= __gm__ uint8_t*",
         "-D__gm__= __attribute__((annotate(\"cce_global\")))",
         "-D__host_aicore__=",
+        "-D__kfc_workspace__=",
+        "-D__disable_kernel_type_autoinfer__=",
         "-DASCENDC_DUMP=1",
         "-D__CHECK_FEATURE_AT_PRECOMPILE",
         "-Dhalf=__fp16",

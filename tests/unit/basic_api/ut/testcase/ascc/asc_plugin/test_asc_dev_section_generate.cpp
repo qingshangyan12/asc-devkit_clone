@@ -183,7 +183,7 @@ extern "C" __global__ __aicore__ void __device_stub__add_mangling_int_float(__at
     info.kernelMangledName = "add_mangling";
     info.kernelParameters = {
         {"int", "i", false, "", ""},
-        {"uint8_t*", "workspace", false, "", "__attribute__((annotate(\"kfc_workspace\")))"}
+        {"uint8_t*", "workspace", false, "", "__attribute__((\"cce_kfc_workspace\"))"}
     };
     info.ratio = {false, 0, 0};
     info.templateParameters = {
@@ -220,8 +220,8 @@ TEST_F(TEST_ASC_DEV_SECTION_GENERATE, asc_dev_stub_workspace_arg)
     info.kernelName = "add";
     info.kernelMangledName = "add_mangling";
     info.kernelParameters = {
-        {"uint8_t*", "workspace", false, "", "__attribute__((annotate(\"kfc_workspace\")))"},
-        {"uint8_t*", "workspace_bak", false, "", "__attribute__((annotate(\"kfc_workspace\")))"}
+        {"uint8_t*", "workspace", false, "", "__attribute__((\"cce_kfc_workspace\"))"},
+        {"uint8_t*", "workspace_bak", false, "", "__attribute__((\"cce_kfc_workspace\"))"}
     };
     AscPlugin::AscDevStubGenerator devStubGen = AscPlugin::AscDevStubGenerator(
         info, {AscPlugin::KernelMetaType::KERNEL_TYPE_AIV_ONLY}, AscPlugin::KfcScene::Close);

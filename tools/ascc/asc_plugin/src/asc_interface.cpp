@@ -188,11 +188,13 @@ int32_t PluginPrologue(const char** result, const char* config)
     manager.SetCompileArgs(configInfo.compileArgs);
     manager.SetSourceFile(configInfo.source);
 
-    // do AST analyze to extract kernel type and printf/assert
-    AscPlugin::AscAstDeviceAnalyzer deviceAnalyzer(configInfo.source);
-    if (deviceAnalyzer.Process() != ASC_SUCCESS) {
-        ASC_LOGE("AscAstAnalyzer run failed. Please check log.");
-        return ASC_FAILURE;
+    if (manager.GetShortSocVersion() != ShortSocVersion::ASCEND910B) {
+        // do AST analyze to extract kernel type and printf/assert
+        AscPlugin::AscAstDeviceAnalyzer deviceAnalyzer(configInfo.source);
+        if (deviceAnalyzer.Process() != ASC_SUCCESS) {
+            ASC_LOGE("AscAstAnalyzer run failed. Please check log.");
+            return ASC_FAILURE;
+        }
     }
 
     if (!manager.GetAclrtHeaderPath().empty()) {
@@ -217,13 +219,35 @@ int32_t PluginGenKernel(const char** result, const char* info)
     if (fromJsonRes != ASC_SUCCESS) {
         return fromJsonRes;
     }
-    static auto flag = InfoManager::GetInstance().SetKernelFuncFlag();
+    auto &manager = InfoManager::GetInstance();
+    static auto flag = manager.SetKernelFuncFlag();
     (void)flag;
-    const auto& [kernelType, kfcScene] = GetKernelFuncScene(kernelInfo);
 
-    const auto [deviceResult, deviceStub, metaInfo] = GetDeviceCode(kernelInfo, kernelType, kfcScene);
-    if (deviceResult != 0) {
-        return ASC_FAILURE;
+    std::string deviceStub;
+    std::string metaInfo;
+    std::unordered_set<KernelMetaType> kernelType;
+    if (manager.GetShortSocVersion() != ShortSocVersion::ASCEND910B) { // deviceStub generate by bisheng in 71
+        auto &&[kType, kfcScene] = GetKernelFuncScene(kernelInfo);
+        auto &&[deviceResult, devStub, meta] = GetDeviceCode(kernelInfo, kType, kfcScene);
+        if (deviceResult != 0) {
+            return ASC_FAILURE;
+        }
+        deviceStub = std::move(devStub);
+        metaInfo = std::move(meta);
+        kernelType = std::move(kType);
+    } else {
+        if (kernelInfo.isTemplate) {
+            for (const auto& tmpInst : kernelInfo.templateInstances) {
+                manager.AddGlobalSymbolInfo(std::string(DEVICE_STUB_PREFIX) + tmpInst.instanceMangledName,
+                    KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2, kernelInfo.fileName, kernelInfo.lineNum, kernelInfo.colNum,
+                    KfcScene::Close);
+            }
+        } else {
+            manager.AddGlobalSymbolInfo(std::string(DEVICE_STUB_PREFIX) + kernelInfo.kernelMangledName,
+                KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2, kernelInfo.fileName, kernelInfo.lineNum, kernelInfo.colNum,
+                KfcScene::Close);
+        }
+        kernelType = {KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2};
     }
 
     std::string hostStub  = GetHostStubCode(kernelInfo, kernelType);
@@ -269,7 +293,7 @@ int32_t PluginFatbinLink(const char** result)
     std::vector<std::string> linkOptions = {
         // link libraies
         "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa",
-        "-lascend_dump", "-lc_sec", "-lstdc++",
+        "-lascend_dump", "-lc_sec", "-lstdc++", "-lm",
         // link path
         "-L" + cannPath + "/lib64"
     };
