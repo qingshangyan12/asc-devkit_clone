@@ -56,7 +56,7 @@
   
   simt_gather负责从输入input（Global Memory）中获取指定索引的数据。基于上述数据切分，首先计算线程应处理数据的索引，然后通过赋值操作将数据存储到Local Memory上。
   ```
-  int idx = asc_get_block_idx() * blockDim.x + threadIdx.x;
+  int idx = blockIdx.x * blockDim.x + threadIdx.x;
   ...
   uint32_t gather_idx = index[idx];
   ...
