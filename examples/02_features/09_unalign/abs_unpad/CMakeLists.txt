@@ -15,7 +15,7 @@ find_package(ASC REQUIRED HINTS $ENV{ASCEND_HOME_PATH}/lib64/cmake)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    abs_unpad_custom.asc
+    abs_unpad.asc
 )
 
 target_link_libraries(demo PRIVATE

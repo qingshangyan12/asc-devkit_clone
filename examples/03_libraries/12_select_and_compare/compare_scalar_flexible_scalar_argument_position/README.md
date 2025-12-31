@@ -1,11 +1,9 @@
 # CompareScalarFlexibleScalarArgumentPosition算子直调样例
 ## 概述
-本样例基于CompareScalar（灵活标量位置），实现与CompareScalar相同，特殊在于该接口还支持标量参数位置在前和在后两种场景，其中标量输入还支持配置LocalTensor单点元素。
-本样例通过Ascend C编程语言实现了CompareScalarFlexibleScalarArgumentPosition算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
+本样例利用Ascend 950PR/Ascend 950DT产品的新增特性，实现了具有灵活标量位置能力的CompareScalarFlexibleScalarArgumentPosition算子，该算子实现与CompareScalar相同，特殊在于该接口还支持标量参数位置在前和在后两种场景，其中标量输入还支持配置LocalTensor单点元素。
 
 ## 支持的产品
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+- Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
 ```

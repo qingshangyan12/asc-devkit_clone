@@ -15,12 +15,10 @@ import numpy as np
 
 
 def gen_golden_data_simple():
-    input_x = 0
     golden = np.arange(32)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
     golden.tofile("./output/golden.bin")
 
 
