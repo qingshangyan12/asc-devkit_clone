@@ -1850,6 +1850,14 @@ bool __isinf(bfloat16_t x)
     return (*intX == b_half_inf || *intX == b_half_neg_inf);
 }
 
+bool __isfinite(float x)
+{
+    uint32_t* intX = (uint32_t*)&x;
+    bool isNan = (*intX > b_float_inf && *intX <= max_nan) || (*intX > b_float_neg_inf);
+    bool isInf = (*intX == b_float_inf) || (*intX == b_float_neg_inf);
+    return !isNan && !isInf;
+}
+
 float __floorf(float x)
 {
     return floor(x);

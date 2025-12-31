@@ -29,6 +29,9 @@ constexpr uint32_t half_max_nan = 0x7FFF;
 constexpr uint32_t half_neg_inf = 0xFC00;
 constexpr uint32_t b_half_inf = 0x7F80;
 constexpr uint32_t b_half_neg_inf = 0xFF80;
+constexpr uint32_t b_float_inf = 0x7F800000;
+constexpr uint32_t max_nan = 0x7FFFFFFF;
+constexpr uint32_t b_float_neg_inf = 0xFF800000;
 
 typedef enum
 {
@@ -408,6 +411,8 @@ bool __isnan(bfloat16_t x);
 bool __isinf(half x);
 
 bool __isinf(bfloat16_t x);
+
+bool __isfinite(float x);
 
 float __floorf(float x);
 

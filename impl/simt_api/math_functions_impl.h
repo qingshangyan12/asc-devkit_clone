@@ -196,7 +196,7 @@ __simt_callee__ inline float modff(float x, float &n)
         float f;
         unsigned int i;
     };
-    if (absX < 0x7F800000) {
+    if (__isfinite(absX)) {
         float integral_x = truncf(x);
         n = integral_x;
         float decimal = x - integral_x;
