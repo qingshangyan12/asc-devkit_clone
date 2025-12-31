@@ -49,6 +49,7 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_SYS_DIR}/include/base
     ${ASCEND_CANN_PACKAGE_PATH}/tools/tikicpulib/lib/include
     ${LOCAL_DIR}/../common
+    ${LOCAL_DIR}/../../common
     ${LOCAL_DIR}/common/
     ${LOCAL_DIR}/testcase/
     ${ASCENDC_DIR}
@@ -267,35 +268,35 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         ${LOCAL_DIR}/../common/alog_stub.cpp
         ${LOCAL_DIR}/../common/dlog_stub.cpp
         $<$<STREQUAL:${product_type},ascend910>:${ASCENDC_TEST_COMMON_CASE_SRC_FILES};${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},ascend910>:${LOCAL_DIR}/../common/tik_pv_wrapper.cpp>
+        $<$<STREQUAL:${product_type},ascend910>:${LOCAL_DIR}/../../common/tik_pv_wrapper.cpp>
         $<$<STREQUAL:${product_type},ascend610>:${ASCENDC_TEST_COMMON_CASE_SRC_FILES};${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},ascend610>:${LOCAL_DIR}/../common/tik_pv_wrapper.cpp>
+        $<$<STREQUAL:${product_type},ascend610>:${LOCAL_DIR}/../../common/tik_pv_wrapper.cpp>
         $<$<STREQUAL:${product_type},ascend310p>:${ASCENDC_TEST_COMMON_CASE_SRC_FILES};${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},ascend310p>:${LOCAL_DIR}/../common/tik_pv_wrapper.cpp>
+        $<$<STREQUAL:${product_type},ascend310p>:${LOCAL_DIR}/../../common/tik_pv_wrapper.cpp>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:${ASCENDC_API_CHECK_CASE_SRC_FILES};${ASCENDC_TEST_ascend910B1_AIC_CAPI_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},ascend910B1_AIC>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend910B1_AIC>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:${ASCENDC_API_CHECK_CASE_SRC_FILES};${ASCENDC_TEST_ascend910B1_AIV_CAPI_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},ascend910B1_AIV>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},ascend310B1>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},ascend610Lite>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend910B1_AIV>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend310B1>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend610Lite>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend910_9599_AIV_BASIC>:${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_BASIC>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIV_BASIC>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend910_9599_AIV_FRAMEWORK>:${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_FRAMEWORK>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIV_FRAMEWORK>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend910_9599_AIV_MICRO>:${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_MICRO>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIV_MICRO>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend910_9599_AIV_SIMT>:${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_SIMT>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIV_SIMT>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},mc62cm12aa_MICRO>:${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},mc62cm12aa_MICRO>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},mc62cm12aa_MICRO>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},mc62cm12aa_SIMT>:${ASCENDC_API_CHECK_CASE_SRC_FILES}>
-        $<$<STREQUAL:${product_type},mc62cm12aa_SIMT>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},mc62cm12aa_SIMT>:${LOCAL_DIR}/../../common/k3_pvwrap.cpp>
         ${ASCENDC_TEST_${product_type}_CASE_SRC_FILES}
     )
 
@@ -607,7 +608,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         ${LOCAL_DIR}/main.cpp
         ${ASCENDC_TILING_SRC_FILES}
         ${ASCENDC_TILING_TEST_SRC_FILES}
-        ${LOCAL_DIR}/../common/platform_stub.cpp
+        ${LOCAL_DIR}/../../common/platform_stub.cpp
         ${LOCAL_DIR}/common/common.cpp
         ${LOCAL_DIR}/../common/alog_stub.cpp
         ${LOCAL_DIR}/../common/dlog_stub.cpp

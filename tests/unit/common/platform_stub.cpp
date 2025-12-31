@@ -9,9 +9,7 @@
 */
 #include <cstdint>
 #include <string>
-#include <map>
-#include "tiling/platform/platform_ascendc.h"
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
 static const char *g_core_num_aic = "1";
 static const char *g_core_num_aiv = "1";
 static const char *g_core_num_cub = "1";
@@ -19,7 +17,7 @@ static const char *g_core_type_list = "AICore,CubeCore,VectorCore";
 static const char *g_chip_version = "Ascend310B";
 static const char *g_npu_arch = "3002";
 static uint32_t g_core_num = 1;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 static const char *g_core_num_aic = "24";
 static const char *g_core_num_aiv = "48";
 static const char *g_core_num_cub = "24";
@@ -27,7 +25,7 @@ static const char *g_core_type_list = "CubeCore,VectorCore";
 static const char *g_chip_version = "Ascend910B";
 static const char *g_npu_arch = "2201";
 static uint32_t g_core_num = 48;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
 static const char *g_core_num_aic = "10";
 static const char *g_core_num_aiv = "8";
 static const char *g_core_num_cub = "10";
@@ -74,6 +72,11 @@ void platfrom_stub_set_ctl(const char *num)
     g_core_type_list = num;
 }
 
+void platfrom_stub_set_npuarch(const char *num)
+{
+    g_npu_arch = num;
+}
+
 void platfrom_stub_set_chip_version(const char *num)
 {
     g_chip_version = num;
@@ -104,7 +107,6 @@ class OptionalInfos {
 class PlatFormInfos {
 public:
 uint32_t GetCoreNum(void) const;
-uint32_t GetCoreNumAiv(void) const;
 bool GetPlatformRes(const std::string &label, const std::string &key, std::string &val);
 bool GetPlatformResWithLock(const std::string &label, const std::string &key, std::string &val);
 void GetLocalMemSize(const LocalMemType &mem_type, uint64_t &size);
@@ -116,10 +118,6 @@ void PlatFormInfos::SetCoreNumByCoreType(const std::string &core_type)
     return;
 }
 uint32_t PlatFormInfos::GetCoreNum(void) const
-{
-    return g_core_num;
-}
-uint32_t PlatFormInfos::GetCoreNumAiv(void) const
 {
     return g_core_num;
 }
@@ -155,7 +153,7 @@ bool PlatFormInfos::GetPlatformResWithLock(const std::string &label, const std::
     return GetPlatformRes(label, key, val);
 }
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
 void PlatFormInfos::GetLocalMemSize(const LocalMemType &mem_type, uint64_t &size)
 {
     switch(mem_type) {
@@ -200,7 +198,7 @@ void PlatFormInfos::GetLocalMemBw(const LocalMemType &mem_type, uint64_t &bw_siz
     }
 
 }
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 void PlatFormInfos::GetLocalMemSize(const LocalMemType &mem_type, uint64_t &size)
 {
     switch(mem_type) {
@@ -245,7 +243,7 @@ void PlatFormInfos::GetLocalMemBw(const LocalMemType &mem_type, uint64_t &bw_siz
     }
 
 }
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
 void PlatFormInfos::GetLocalMemSize(const LocalMemType &mem_type, uint64_t &size)
 {
     switch(mem_type) {
@@ -357,58 +355,5 @@ uint32_t PlatformInfoManager::GetPlatformInfos(const std::string SoCVersion,
 PlatformInfoManager& PlatformInfoManager::GeInstance() {
   static PlatformInfoManager pf;
   return pf;
-}
-}
-namespace platform_ascendc {
-PlatformAscendC* PlatformAscendCManager::platformInfo = nullptr;
-std::mutex PlatformAscendCManager::platformInitMtx;
-SocVersion PlatformAscendCManager::SocVersionMap(const char *socVersionStr)
-{
-    return SocVersion::ASCEND910B;
-}
-fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char *customSocVersion)
-{
-    return nullptr;
-}
-PlatformAscendC* PlatformAscendCManager::PlatformAscendCManagerInit(const char *customSocVersion)
-{
-    fe::PlatFormInfos pfs;
-    static PlatformAscendC pfc(&pfs);
-    platformInfo = &pfc;
-    return nullptr;
-}
-SocVersion PlatformAscendC::GetSocVersion(void) const {
-    std::string socVersionStr;
-    const auto ret = this->platformInfo_->GetPlatformResWithLock("version", "Short_SoC_version", socVersionStr);
-    if (!ret) {
-        return SocVersion::RESERVED_VERSION;
-    }
-    static std::map<std::string, SocVersion> convertMap = {
-        {"Ascend310P", SocVersion::ASCEND310P},
-        {"Ascend910", SocVersion::ASCEND910},
-        {"Ascend910B", SocVersion::ASCEND910B},
-        {"Ascend910_93", SocVersion::ASCEND910B},
-        {"Ascend910_95", SocVersion::ASCEND910_95},
-        {"Ascend310B", SocVersion::ASCEND310B},
-        {"MC62CM12A", SocVersion::MC62CM12A},
-    };
-    auto it = convertMap.find(socVersionStr);
-    if (it != convertMap.end()) {
-        return it->second;
-    }
-    return SocVersion::RESERVED_VERSION;
-}
-void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size) const {
-    const fe::LocalMemType localType = static_cast<fe::LocalMemType>(memType);
-    this->platformInfo_->GetLocalMemSize(localType, size);
-    // only ascend910B need UB/L1 local reserved buf for kfc
-    if ((memType == CoreMemType::UB || memType == CoreMemType::L1)
-         && GetSocVersion() == SocVersion::ASCEND910B) {
-        size -= 256;
-    }
-}
-
-uint32_t PlatformAscendC::GetCoreNumAiv(void) const {
-    return this->platformInfo_->GetCoreNumAiv();
 }
 }

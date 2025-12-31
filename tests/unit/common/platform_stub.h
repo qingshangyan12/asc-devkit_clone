@@ -24,13 +24,16 @@ enum class LocalMemType {
   HBM = 6,
   RESERVED
 };
+
 class PlatFormInfos {
 public:
 uint32_t GetCoreNum(void) const;
+uint32_t GetCoreNumAiv(void) const;
 bool GetPlatformRes(const std::string &label, const std::string &key, std::string &val);
 bool GetPlatformResWithLock(const std::string &label, const std::string &key, std::string &val);
 void GetLocalMemSize(const LocalMemType &mem_type, uint64_t &size);
 void GetLocalMemBw(const LocalMemType &mem_type, uint64_t &bw_size);
+void SetCoreNumByCoreType(const std::string &core_type);
 };
 
 inline gert::TilingContext* GetFakeTilingContext()

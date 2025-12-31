@@ -608,6 +608,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         ${ASCENDC_TILING_TEST_SRC_FILES}
         ${ASCENDC_TILING_TEST_${product_type}_CASE_SRC_FILES}
         ${ASCENDC_UNIT_TESTS_DIR}/common/platform_stub.cpp
+        ${ASCENDC_UNIT_TESTS_DIR}/common/platform_asc_stub.cpp
         ${ASCENDC_TESTS_DIR}/tiling/main.cpp
     )
 
