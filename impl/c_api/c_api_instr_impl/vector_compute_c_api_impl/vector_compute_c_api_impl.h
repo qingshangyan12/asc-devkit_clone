@@ -12,11 +12,11 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_H
 
 #include "get_acc_val_impl/npu_arch_2201/asc_get_acc_val_impl.h"
-#include "get_cmp_mask_impl/asc_2201/get_cmp_mask_impl.h"
+#include "get_cmp_mask_impl/npu_arch_2201/asc_get_cmp_mask_impl.h"
 #include "get_max_min_cnt_impl/npu_arch_2201/asc_get_reduce_max_min_cnt_impl.h"
 #include "get_rsvd_cnt_impl/npu_arch_2201/get_rsvd_cnt_impl.h"
 #include "get_vms4_sr_impl/npu_arch_2201/asc_get_vms4_sr_impl.h"
-#include "set_cmp_mask_impl/asc_2201/set_cmp_mask_impl.h"
+#include "set_cmp_mask_impl/npu_arch_2201/asc_set_cmp_mask_impl.h"
 #include "set_mask_count_impl/npu_arch_2201/asc_set_mask_count_impl.h"
 #include "set_mask_norm_impl/npu_arch_2201/asc_set_mask_norm_impl.h"
 #include "set_vector_mask_impl/npu_arch_2201/asc_set_vector_mask_impl.h"
