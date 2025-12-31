@@ -179,9 +179,9 @@ void main_vec_select_level2_demo(__gm__ uint8_t* __restrict__ dst_gm, __gm__ uin
         AscendC::ResetMask();
         AscendC::SetVectorMask<T, AscendC::MaskMode::NORMAL>((uint64_t)0x00000000, (uint64_t)0x0000ffff);
         if (sel_mode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
-            uint32_t selAddr = static_cast<uint32_t>(
-                reinterpret_cast<int64_t>(reinterpret_cast<__ubuf__ int64_t *>(sel_mask_local.GetPhyAddr())));
-            Duplicate(tmpLocal, selAddr, 32);
+            auto selAddr = reinterpret_cast<int64_t>(reinterpret_cast<__ubuf__ int64_t *>(sel_mask_local.GetPhyAddr()));
+            auto tmpLocalPtr = (int64_t*)tmpLocal.GetPhyAddr();
+            *tmpLocalPtr = selAddr;
             SetCmpMask(tmpLocal);
             Select<T, SELMODE::VSEL_TENSOR_TENSOR_MODE>(output_local, input0_local, input1_local, repeatTime, { 1, 1, 1, 8, 8, 8 });
         } else if (sel_mode == SELMODE::VSEL_TENSOR_SCALAR_MODE) {
