@@ -25,7 +25,7 @@ CPU_NUM=$(($(cat /proc/cpuinfo | grep "^processor" | wc -l)))
 THREAD_NUM=16
 BUILD_TYPE="Release"
 
-dotted_line="----------------------------------------------------------------"
+dotted_line="------------------------------------------"
 
 function log() {
     local current_time=$(date +"%Y-%m-%d %H:%M:%S")
