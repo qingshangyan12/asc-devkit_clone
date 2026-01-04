@@ -31,9 +31,6 @@ else()
     ${TOP_DIR}/abl/slog/inc/toolchain
     ${TOP_DIR}/asc/asc-devkit/tools/build/common
   )
-  target_compile_definitions(ascend_runtime_base PRIVATE
-    ASC_OLD_PROJECT
-  )
 endif()
 
 target_compile_options(ascend_runtime_base PRIVATE

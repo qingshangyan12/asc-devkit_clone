@@ -237,15 +237,6 @@ int32_t AscendGetFuncFromBinary(void* const binHandle, const char* kernelName, v
 int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
     uint32_t blockDim, void* stream, void* hostArgs, size_t argsSize, uint32_t ubufDynamicSize)
 {
-#ifdef ASC_OLD_PROJECT
-    (void)funcHandle;
-    (void)blockDim;
-    (void)stream;
-    (void)hostArgs;
-    (void)argsSize;
-    (void)ubufDynamicSize;
-    return 0;
-#else
     if (ubufDynamicSize == 0) {
         return aclrtLaunchKernelWithHostArgs(funcHandle, blockDim, stream, nullptr, hostArgs, argsSize, nullptr, 0);
     }
@@ -253,11 +244,10 @@ int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
     aclrtLaunchKernelAttrValue attrValue = {0};
     attrValue.localMemorySize = ubufDynamicSize;
     aclrtLaunchKernelAttr attrList[attrLen] = {
-        {ACL_RT_LAUNCH_KERNEL_ATTR_LOCAL_MEMORY_SIZE, attrValue},
+        {static_cast<aclrtLaunchKernelAttrId>(2)/* ACL_RT_LAUNCH_KERNEL_ATTR_LOCAL_MEMORY_SIZE */, attrValue},
     };
     aclrtLaunchKernelCfg cfg = {attrList, attrLen};
     return aclrtLaunchKernelWithHostArgs(funcHandle, blockDim, stream, &cfg, hostArgs, argsSize, nullptr, 0);
-#endif
 }
 
 uint32_t RegisterAscendBinary(const char *fileBuf, size_t fileSize, uint32_t type, void **handle)
