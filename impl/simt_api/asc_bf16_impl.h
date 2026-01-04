@@ -45,11 +45,21 @@ __simt_callee__ inline bfloat16_t __hfma(bfloat16_t x, bfloat16_t y, bfloat16_t 
 
 __simt_callee__ inline bfloat16_t __hmax(bfloat16_t x, bfloat16_t y)
 {
+    if (__hisnan(x)) {
+        return y;
+    } else if (__hisnan(y)) {
+        return x;
+    }
     return max(x, y);
 }
 
 __simt_callee__ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
 {
+    if (__hisnan(x)) {
+        return y;
+    } else if (__hisnan(y)) {
+        return x;
+    }
     return min(x, y);
 }
 

@@ -524,11 +524,21 @@ __simt_callee__ inline float scalblnf(float x, int64_t n)
 
 __simt_callee__ inline float fmaxf(float x, float y)
 {
+    if (isnan(x)) {
+        return y;
+    } else if (isnan(y)) {
+        return x;
+    }
     return __fmaxf(x, y);
 }
 
 __simt_callee__ inline float fminf(float x, float y)
 {
+    if (isnan(x)) {
+        return y;
+    } else if (isnan(y)) {
+        return x;
+    }
     return __fminf(x, y);
 }
 

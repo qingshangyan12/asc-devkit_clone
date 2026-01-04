@@ -46,13 +46,13 @@ __simt_callee__ inline half __habs(half x)
     return *(half*)&bits;
 }
 
-__aicore__ inline bool ispositiveinf(float x)
+__simt_callee__ inline bool ispositiveinf(half x)
 {
     uint16_t* intX = (uint16_t*)&x;
     return *intX == HALF_INF;
 }
 
-__aicore__ inline bool isnegativeinf(float x)
+__simt_callee__ inline bool isnegativeinf(half x)
 {
     uint16_t* intX = (uint16_t*)&x;
     return *intX == HALF_NEG_INF;
@@ -74,6 +74,15 @@ __simt_callee__ inline half __hmax(half x, half y)
         return y;
     } else if (isnegativeinf(y)) {
         return x;
+    }
+    if (x == (half)0 && y == (half)0) {
+        bool sign_bitx = ((uint16_t&)x) & 0x8000;
+        bool sign_bity = ((uint16_t&)y) & 0x8000;
+        if (sign_bitx) {
+            return y;
+        } else if (sign_bity) {
+            return x;
+        }
     }
     if (x > y) {
         return x;
@@ -98,6 +107,15 @@ __simt_callee__ inline half __hmin(half x, half y)
         return y;
     } else if (ispositiveinf(y)) {
         return x;
+    }
+    if (x == (half)0 && y == (half)0) {
+        bool sign_bitx = ((uint16_t&)x) & 0x8000;
+        bool sign_bity = ((uint16_t&)y) & 0x8000;
+        if (sign_bitx) {
+            return x;
+        } else if (sign_bity) {
+            return y;
+        }
     }
     if (x < y) {
         return x;
