@@ -82,8 +82,6 @@ PIPE_V
 
 ### 调用示例
 
-mask连续模式
-
 ```cpp
 constexpr uint64_t total_length = 64;
 __ubuf__ half src0[total_length];
