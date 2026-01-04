@@ -1258,19 +1258,19 @@ void __threadfence()
 {    
 }
 
-float roundf(float x) {
+float __roundf(float x) {
     return round(x);
 }
 
-float rintf(float x) {
+float __rintf(float x) {
     return rint(x);
 }
 
-float floorf(float x) {
+float __floorf(float x) {
     return floor(x);
 }
 
-float ceilf(float x) {
+float __ceilf(float x) {
     return ceil(x);
 }
 
@@ -2098,7 +2098,7 @@ half __sqrtf(half x)
     return half(tmp);
 }
 
-bfloat16_t max(bfloat16_t x, bfloat16_t y)
+bfloat16_t __max(bfloat16_t x, bfloat16_t y)
 {
     if (x > y) {
         return x;
@@ -2107,7 +2107,7 @@ bfloat16_t max(bfloat16_t x, bfloat16_t y)
     }
 }
 
-bfloat16_t min(bfloat16_t x, bfloat16_t y)
+bfloat16_t __min(bfloat16_t x, bfloat16_t y)
 {
     if (x < y) {
         return x;

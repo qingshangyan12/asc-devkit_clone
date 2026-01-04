@@ -43,7 +43,7 @@ __aicore__ inline T ExpImpl(T x)
 
 __aicore__ inline half2 ExpImpl(half2 x)
 {
-    return exp(x);
+    return __exp(x);
 }
 #endif
 
@@ -534,7 +534,7 @@ __aicore__ inline T LogImpl(T x)
 
 __aicore__ inline half2 LogImpl(half2 x)
 {
-    return log(x);
+    return __log(x);
 }
 #endif
 

@@ -264,13 +264,13 @@ half __reduce_min(half val);
 
 void __threadfence();
 
-float roundf(float x);
+float __roundf(float x);
 
-float rintf(float x);
+float __rintf(float x);
 
-float floorf(float x);
+float __floorf(float x);
 
-float ceilf(float x);
+float __ceilf(float x);
 
 float __fma(float x, float y, float z);
 
@@ -437,9 +437,9 @@ float __fmaxf(float x, float y);
 
 float __fminf(float x, float y);
 
-bfloat16_t max(bfloat16_t x, bfloat16_t y);
+bfloat16_t __max(bfloat16_t x, bfloat16_t y);
 
-bfloat16_t min(bfloat16_t x, bfloat16_t y);
+bfloat16_t __min(bfloat16_t x, bfloat16_t y);
 
 #ifndef SIMT_CCE
 #define SIMT_CCE

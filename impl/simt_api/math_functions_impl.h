@@ -25,55 +25,55 @@
 
 __simt_callee__ inline long int lroundf(float x)
 {
-    float tmp = bisheng::cce::simt::roundf(x);
+    float tmp = bisheng::cce::simt::__roundf(x);
     return bisheng::cce::simt::__cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
 __simt_callee__ inline long long int llroundf(float x)
 {
-    float tmp = bisheng::cce::simt::roundf(x);
+    float tmp = bisheng::cce::simt::__roundf(x);
     return bisheng::cce::simt::__cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
 __simt_callee__ inline long int lrintf(float x)
 {
-    float tmp = bisheng::cce::simt::rintf(x);
+    float tmp = bisheng::cce::simt::__rintf(x);
     return bisheng::cce::simt::__cvt_int64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
 __simt_callee__ inline long long int llrintf(float x)
 {
-    float tmp = bisheng::cce::simt::rintf(x);
+    float tmp = bisheng::cce::simt::__rintf(x);
     return bisheng::cce::simt::__cvt_int64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
 __simt_callee__ inline float truncf(float x)
 {
     if (x > 0.0f) {
-        return bisheng::cce::simt::floorf(x);
+        return bisheng::cce::simt::__floorf(x);
     } else {
-        return bisheng::cce::simt::ceilf(x);
+        return bisheng::cce::simt::__ceilf(x);
     }
 }
 
 __simt_callee__ inline float roundf(float x)
 {
-    return bisheng::cce::simt::roundf(x);
+    return bisheng::cce::simt::__roundf(x);
 }
 
 __simt_callee__ inline float rintf(float x)
 {
-    return bisheng::cce::simt::rintf(x);
+    return bisheng::cce::simt::__rintf(x);
 }
 
 __simt_callee__ inline float floorf(float x)
 {
-    return bisheng::cce::simt::floorf(x);
+    return bisheng::cce::simt::__floorf(x);
 }
 
 __simt_callee__ inline float ceilf(float x)
 {
-    return bisheng::cce::simt::ceilf(x);
+    return bisheng::cce::simt::__ceilf(x);
 }
 
 __simt_callee__ inline float fabsf(float x)
@@ -467,7 +467,7 @@ __simt_callee__ inline float nearbyintf(float x)
     if (isinf(x) || isnan(x)) {
         return x;
     }
-    return bisheng::cce::simt::rintf(x);
+    return bisheng::cce::simt::__rintf(x);
 }
 
 __simt_callee__ inline float nextafterf(float x, float y)
@@ -1627,7 +1627,7 @@ __simt_callee__ inline float erfcf(float x)
     float neg_x2 = -x_squared;
     float f1 = 1.442695f;
     float scaled = neg_x2 * f1;
-    float int_part = scaled > 0 ? bisheng::cce::simt::floorf(x) : bisheng::cce::simt::ceilf(x);
+    float int_part = scaled > 0 ? bisheng::cce::simt::__floorf(x) : bisheng::cce::simt::__ceilf(x);
     float abs_part = fabsf(int_part);
     uint32_t sign_bit = *reinterpret_cast<uint32_t *>(&int_part) & 0x80000000;
     float clamped_bits = sign_bit | 0x42FC0000;
@@ -2242,7 +2242,7 @@ __simt_callee__ inline float lgammaf(float x)
         result = y3 - abs_x + y3 + y2 + 0.9189385f;          //  0.9189385f : ln[(2*pi)/2]
     }
     if (x < 0) {
-        if (bisheng::cce::simt::floorf(abs_x) == abs_x) {
+        if (bisheng::cce::simt::__floorf(abs_x) == abs_x) {
             return ASCRT_INF_F;
         } else if (abs_x < 9.9999996e-20f) {                 // 9.9999996e-20 : minimum-value
             //  According Euler's Reflection Formula

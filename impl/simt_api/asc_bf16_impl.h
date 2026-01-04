@@ -50,7 +50,7 @@ __simt_callee__ inline bfloat16_t __hmax(bfloat16_t x, bfloat16_t y)
     } else if (__hisnan(y)) {
         return x;
     }
-    return max(x, y);
+    return __max(x, y);
 }
 
 __simt_callee__ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
@@ -60,7 +60,7 @@ __simt_callee__ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
     } else if (__hisnan(y)) {
         return x;
     }
-    return min(x, y);
+    return __min(x, y);
 }
 
 __simt_callee__ inline bfloat16_t hcos(bfloat16_t x)

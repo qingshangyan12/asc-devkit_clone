@@ -375,7 +375,7 @@ __aicore__ inline T FloorIntrinsicsImpl(T x)
     if constexpr (SupportType<T, int32_t, int64_t>()) {
         return x;
     } else if constexpr (SupportType<T, half, float, bfloat16_t>()) {
-        return bisheng::cce::simt::floorf(x);
+        return bisheng::cce::simt::__floorf(x);
     }
 }
 
@@ -443,7 +443,7 @@ __aicore__ inline T RoundIntrinsicsImpl(T x)
     if constexpr (SupportType<T, int32_t, int64_t>()) {
         return x;
     } else if constexpr (SupportType<T, half, float, bfloat16_t, hifloat8_t>()) {
-        return bisheng::cce::simt::roundf(x);
+        return bisheng::cce::simt::__roundf(x);
     }
 }
 
@@ -530,7 +530,7 @@ __aicore__ inline T RintIntrinsicsImpl(T x)
     if constexpr (SupportType<T, int32_t, int64_t>()) {
         return x;
     } else if constexpr (SupportType<T, half, float, bfloat16_t>()) {
-        return bisheng::cce::simt::rintf(x);
+        return bisheng::cce::simt::__rintf(x);
     }
 }
 
@@ -618,7 +618,7 @@ __aicore__ inline T CeilIntrinsicsImpl(T x)
     if constexpr (SupportType<T, int32_t, int64_t>()) {
         return x;
     } else if constexpr (SupportType<T, half, float, bfloat16_t>()) {
-        return bisheng::cce::simt::ceilf(x);
+        return bisheng::cce::simt::__ceilf(x);
     }
 }
 
