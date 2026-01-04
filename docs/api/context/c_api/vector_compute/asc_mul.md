@@ -85,9 +85,9 @@ PIPE_V
 mask连续模式
 
 ```cpp
-uint64_t total_length = 64;
-__ubuf__ half* src0[total_length];
-__ubuf__ half* src1[total_length];
-__ubuf__ half* dst[total_length];
+constexpr uint64_t total_length = 64;
+__ubuf__ half src0[total_length];
+__ubuf__ half src1[total_length];
+__ubuf__ half dst[total_length];
 asc_mul(dst, src0, src1, total_length);
 ```

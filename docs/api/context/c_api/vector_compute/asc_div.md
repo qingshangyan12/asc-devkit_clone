@@ -76,9 +76,9 @@ PIPE_V
 
 ```cpp
 //total_length 指参与计算的数据长度
-uint64_t total_length = 64;
-__ubuf__ half* src0[total_length];
-__ubuf__ half* src1[total_length];
-__ubuf__ half* dst[total_length];
+constexpr uint64_t total_length = 64;
+__ubuf__ half src0[total_length];
+__ubuf__ half src1[total_length];
+__ubuf__ half dst[total_length];
 asc_div(dst, src0, src1, total_length);
 ```

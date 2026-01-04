@@ -79,9 +79,9 @@ PIPE_V
 
 ```cpp
 //total_length 指参与计算的数据长度
-uint64_t total_length = 64;
+constexpr uint64_t total_length = 64;
 half scalar_val = 0.0f;
-__ubuf__ half* src[total_length];
-__ubuf__ half* dst[total_length];
+__ubuf__ half src[total_length];
+__ubuf__ half dst[total_length];
 asc_add_scalar(dst, src, scalar_val, total_length);
 ```
