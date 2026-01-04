@@ -44,6 +44,8 @@ __aicore__ inline void SetSimtDumpWorkspace(GM_ADDR workspace)
 }  // namespace Simt
 }  // namespace AscendC
 
+#ifndef ASCENDC_CPU_DEBUG
+
 namespace __asc_simt_vf {
 
 __simt_callee__ inline uint32_t GetArgsNum()
@@ -285,6 +287,7 @@ __simt_callee__ inline void PrintfImpl(const __gm__ char *fmt, Args &&...args)
 }
 }   // namespace __asc_simt_vf
 #endif
+#endif
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 
@@ -292,8 +295,10 @@ namespace __asc_simt_vf {
 template <class... Args>
 __attribute__((noinline)) __simt_callee__ void printf(const __gm__ char* fmt, Args&&... args)
 {
+#ifndef ASCENDC_CPU_DEBUG
 #ifdef ASCENDC_DUMP
     __asc_simt_vf::PrintfImpl(fmt, args...);
+#endif
 #endif
 }
 
