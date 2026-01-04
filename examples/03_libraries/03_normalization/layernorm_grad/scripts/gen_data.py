@@ -34,7 +34,7 @@ def gen_golden_data_simple():
     inputVariance = np.mean(
         np.power((inputX - inputMean), 2), axis=reduce_axis, keepdims=True)
     
-    os.system("mkdir -p ./input")
+    os.makedirs("input", exist_ok=True)
     inputDy.tofile("./input/input_inputDy.bin")
     inputX.tofile("./input/input_inputX.bin")
     inputMean.tofile("./input/input_inputMean.bin")
@@ -57,7 +57,7 @@ def gen_golden_data_simple():
         pd_var, np.divide(2.0, shapeDy[-1])), tmp1Tensor)), np.multiply(pd_xl, tmp2Tensor))
     res_for_gamma = np.multiply(tmp1Tensor, tmp2Tensor)
 
-    os.system("mkdir -p ./output")
+    os.makedirs("output", exist_ok=True)
     pd_x.tofile("./output/golden_outputPdX.bin")
     res_for_gamma.tofile("./output/golden_resForGamma.bin")
 

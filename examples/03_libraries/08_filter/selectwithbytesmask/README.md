@@ -2,8 +2,10 @@
 ## 概述
 本样例基于Kernel直调算子工程，介绍了调用SelectWithBytesMask高阶API实现SelectWithBytesMaskCustom单算子，给定两个源操作数src0和src1，根据maskTensor相应位置的值（非bit位）选取元素，得到目的操作数dst。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 ```

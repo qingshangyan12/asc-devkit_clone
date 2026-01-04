@@ -19,8 +19,8 @@ def gen_golden_data_simple():
     n, c, h, w, g = 2, 16, 8, 8, 4
     dtype = np.float32
     eps = 1e-5
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     input_x = np.random.rand(n, c, h, w).astype(dtype)
     gamma = np.random.rand(1, c, 1, 1).astype(dtype)
     beta = np.random.rand(1, c, 1, 1).astype(dtype)

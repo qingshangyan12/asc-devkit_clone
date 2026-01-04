@@ -2,8 +2,10 @@
 ## 概述
 本样例介绍了基于Ascend C异构混合编程模型演示Erf融合算子的核函数直调实现，按元素做误差函数计算（也称为高斯误差函数，error function or Gauss error function）。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 ```

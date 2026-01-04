@@ -26,8 +26,8 @@ def gen_golden_data_simple():
     result = gamma*((inputX - mean) / np.sqrt(variance + 0.0001)) + beta
     rstd = 1 / np.sqrt(variance + 0.0001)
 
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     inputX.tofile("./input/input_inputX.bin")
     gamma.tofile("./input/input_gamma.bin")
     beta.tofile("./input/input_beta.bin")

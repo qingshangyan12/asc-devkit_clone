@@ -25,8 +25,8 @@ def gen_golden_data_simple():
     sortedIndexGolden = np.argsort(srcValue)[::-1].astype(np.uint32)
     sortedValueGolden = srcValue[sortedIndexGolden]
     
-    os.system("mkdir -p ./input")
-    os.system("mkdir -p ./output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
 
     srcValue.tofile("./input/srcValue.bin")
     srcIndex.tofile("./input/srcIndex.bin")

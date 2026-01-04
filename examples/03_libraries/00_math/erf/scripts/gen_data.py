@@ -36,9 +36,9 @@ def gen_golden_data_simple():
     for i in range(count):
         golden[i] = math.erf(src[i])
 
-    os.system("mkdir -p ./input")
+    os.makedirs("input", exist_ok=True)
     src.tofile("./input/input_x.bin")
-    os.system("mkdir -p ./output")
+    os.makedirs("output", exist_ok=True)
     golden.tofile("./output/golden.bin")
 
 if __name__ == "__main__":

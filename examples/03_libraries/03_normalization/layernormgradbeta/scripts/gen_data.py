@@ -27,14 +27,14 @@ def gen_golden_data_simple():
     inputDy = inputDy.astype(dtype)
     res_for_gamma = res_for_gamma.astype(dtype)
 
-    os.system("mkdir -p input")
+    os.makedirs("input", exist_ok=True)
     inputDy.tofile("./input/input_inputDy.bin")
     res_for_gamma.tofile("./input/input_resForGamma.bin")
 
     pd_gamma = pd_gamma.astype(dtype)
     pd_beta = pd_beta.astype(dtype)
 
-    os.system("mkdir -p output")
+    os.makedirs("output", exist_ok=True)
     pd_gamma.tofile("./output/golden_output_PdGamma.bin")
     pd_beta.tofile("./output/golden_output_PdBeta.bin")
 

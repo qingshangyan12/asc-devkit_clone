@@ -84,8 +84,8 @@ def gen_golden_data_simple():
 
     tiling = np.array([32, 160], dtype="uint32")
     
-    os.system("mkdir -p ./input")
-    os.system("mkdir -p ./output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
 
     src_gm.reshape(-1).tofile("./input/input_x.bin")
     tiling.tofile("./input/input_tiling.bin")

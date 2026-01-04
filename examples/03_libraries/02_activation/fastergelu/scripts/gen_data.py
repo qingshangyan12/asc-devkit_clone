@@ -20,8 +20,8 @@ def gen_golden_data_simple():
     src = np.random.uniform(low=-4, high=4, size=shape).astype(np.float32)
     golden = src / (1 + np.exp(-1.702 * src))
 
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     src.tofile("./input/input.bin")
     golden.tofile("./output/golden.bin")
 

@@ -31,11 +31,11 @@ def gen_golden_data_simple():
         golden1[i] = x2[i] + (x1[i] - x2[i]) * n
         golden2[i] = x3[i] + (x1[i] - x2[i]) * (x1[i] - golden1[i])
 
-    os.system("mkdir -p ./input")
+    os.makedirs("input", exist_ok=True)
     x1.tofile("./input/input_srcGm.bin")
     x2.tofile("./input/input_inMeanGm.bin")
     x3.tofile("./input/input_inVarGm.bin")
-    os.system("mkdir -p ./output")
+    os.makedirs("output", exist_ok=True)
     golden1.tofile("./output/golden_outMeanGm.bin")
     golden2.tofile("./output/golden_outVarGm.bin")
 

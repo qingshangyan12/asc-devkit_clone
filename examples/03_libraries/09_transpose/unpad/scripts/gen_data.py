@@ -33,10 +33,10 @@ def gen_golden_data_simple():
         for j in range(left, width - right):
             golden[i][j - left] = input[i][j]
 
-    os.system("mkdir -p ./input")
+    os.makedirs("input", exist_ok=True)
     input.tofile("./input/input_x.bin")
 
-    os.system("mkdir -p ./output")
+    os.makedirs("output", exist_ok=True)
     golden.tofile("./output/golden.bin")
 
 if __name__ == "__main__":

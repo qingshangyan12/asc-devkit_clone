@@ -47,8 +47,8 @@ def gen_golden_data_simple():
     output_max = np.zeros([x_shape[0], 8], dtype=np.float32)
 
     softmax_out, max_val, sum_val = softmax_py_float(x)
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     softmax_out.tofile("./input/input_softmax.bin")
 
     adjust_softmax_res(softmax_out, max_val, softmax_out.shape)

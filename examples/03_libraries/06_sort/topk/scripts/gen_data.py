@@ -27,7 +27,7 @@ def gen_golden_data_simple():
 
     finishlocal = np.random.randint(0, 2, OUTTER, dtype=bool)
 
-    os.system("mkdir -p ./input")
+    os.makedirs("input", exist_ok=True)
     x1.tofile("./input/input_srcGmValue.bin")
     x2.tofile("./input/input_srcGmIndex.bin")
     finishlocal.tofile("./input/input_finishGm.bin")
@@ -51,7 +51,7 @@ def gen_golden_data_simple():
         if (finishlocal[i] == True):
             golden1[i, :K] = N
 
-    os.system("mkdir -p ./output")
+    os.makedirs("output", exist_ok=True)
     golden0.tofile("./output/golden_dstGmValue.bin")
     golden1.tofile("./output/golden_dstGmIndex.bin")
 

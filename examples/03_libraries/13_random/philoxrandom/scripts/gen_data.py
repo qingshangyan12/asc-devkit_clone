@@ -103,7 +103,7 @@ def gen_golden_data_simple():
         golden = golden.astype(dtype)
     golden = np.concatenate((golden, np.zeros(256).astype(dtype)))
 
-    os.system("mkdir -p output")
+    os.makedirs("output", exist_ok=True)
     golden.tofile("./output/golden.bin")
 
 if __name__ == "__main__":

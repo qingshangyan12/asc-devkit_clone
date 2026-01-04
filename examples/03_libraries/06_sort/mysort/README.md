@@ -2,8 +2,10 @@
 ## 概述
 本样例基于Kernel直调算子工程，介绍了调用MySort高阶API实现mysort单算子，将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 ```

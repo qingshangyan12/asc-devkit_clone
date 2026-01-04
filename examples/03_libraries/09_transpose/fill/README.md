@@ -2,8 +2,10 @@
 ## 概述
 本样例基于Kernel直调算子工程，介绍了调用Fill高阶API实现fill单算子，主要演示Fill高阶API在Kernel直调工程中的调用。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 ```

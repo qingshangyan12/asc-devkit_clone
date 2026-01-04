@@ -27,8 +27,8 @@ def gen_golden_data_simple():
     tiling_shape = [1]
     tiling_dtype = np.float32
 
-    os.system("mkdir -p ./input")
-    os.system("mkdir -p ./output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
 
     src = np.random.uniform(-100, 100, src_shape).astype(src_dtype)
     golden = np.zeros(dst_shape).astype(dst_dtype)

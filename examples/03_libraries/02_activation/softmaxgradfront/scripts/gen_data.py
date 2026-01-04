@@ -34,8 +34,8 @@ def gen_golden_data_simple():
 
     golden = softmax_grad_float(x, y, True)
     golden = golden + z
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     x.tofile("./input/input_x.bin")
     y.tofile("./input/input_y.bin")
     golden.tofile("./output/golden.bin")

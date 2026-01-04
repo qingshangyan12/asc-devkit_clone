@@ -24,8 +24,8 @@ def gen_golden_data_simple():
         for j in range(shape[0]):
             golden[j][i]=inp[j][i]*scale[i]
     golden = golden.astype(np.float32)
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     inp.tofile("./input/input.bin")
     scale.tofile("./input/scale.bin")
     golden.tofile("./output/golden.bin")

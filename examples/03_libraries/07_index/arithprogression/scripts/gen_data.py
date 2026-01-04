@@ -23,8 +23,8 @@ def gen_golden_data_simple():
     stop = start + difference * (length - 1)
     golden = np.linspace(start, stop, length, dtype=np.float32)
 
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     start.tofile("./input/first.bin")
     difference.tofile("./input/diff.bin")
     length.tofile("./input/length.bin")

@@ -24,8 +24,8 @@ def gen_golden_data_simple():
     golden = src
     golden[mask] = scalar
 
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     src.tofile("./input/srcinput.bin")
     mask.tofile("./input/maskinput.bin")
     golden.tofile("./output/golden.bin")

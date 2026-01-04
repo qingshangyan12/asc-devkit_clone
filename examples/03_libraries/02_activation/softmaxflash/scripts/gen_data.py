@@ -44,8 +44,8 @@ def gen_golden_data_simple():
     golden_max = golden_max + output_max
     golden_sum = golden_sum + output_sum
 
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     x.tofile("./input/input_x.bin")
     workspace.tofile("./input/workspace.bin")
     golden_max.tofile("./output/golden_max.bin")

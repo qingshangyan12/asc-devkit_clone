@@ -23,8 +23,8 @@ def gen_golden_data_simple(testcase):
         y_shape = (96, 96)
     x = np.random.uniform(-10, 10, x_shape).astype(np.float32)
     y = np.broadcast_to(x, y_shape).astype(np.float32)
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     x.tofile("./input/input.bin")
     y.tofile("./output/golden.bin")
 

@@ -2,7 +2,7 @@
 ## 概述
 本样例基于Kernel直调算子工程，介绍了调用RmsNorm高阶API实现rmsnorm单算子，实现对shape大小为[B，S，H]的输入数据的RmsNorm归一化。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍

@@ -21,8 +21,8 @@ def gen_golden_data_simple():
     # half conversion is important otherwise test failed
     golden = np.round(src*2.0 + 0.9).astype(np.int8)
     src = src.astype(np.float32)
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     src.tofile("./input/input.bin")
     golden.tofile("./output/golden.bin")
 

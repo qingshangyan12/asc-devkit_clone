@@ -21,11 +21,11 @@ def gen_golden_data_simple():
     y = np.random.uniform(-60000, 60000, [SIZE]).astype(np.float32)
     z = x + y
 
-    os.system("mkdir -p ./input")
+    os.makedirs("input", exist_ok=True)
     x.tofile("./input/input_x.bin")
     y.tofile("./input/input_y.bin")
 
-    os.system("mkdir -p ./output")
+    os.makedirs("output", exist_ok=True)
     z.tofile("./output/golden_z.bin")
 
 if __name__ == "__main__":

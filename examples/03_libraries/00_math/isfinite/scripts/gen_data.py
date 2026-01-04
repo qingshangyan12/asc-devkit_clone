@@ -74,9 +74,9 @@ def gen_golden_data_simple():
 
     golden[:count] = np.isfinite(src[:count]).astype(dst_type)
 
-    os.system("mkdir -p ./input")
+    os.makedirs("input", exist_ok=True)
     src.tofile("./input/input_x.bin")
-    os.system("mkdir -p ./output")
+    os.makedirs("output", exist_ok=True)
     golden.tofile("./output/golden.bin")
 
 if __name__ == "__main__":

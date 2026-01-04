@@ -36,7 +36,7 @@ def gen_golden_data_simple():
         beta[j] = np.float32(0)
         gamma[j] = np.float32(0)
 
-    os.system("mkdir -p ./input")
+    os.makedirs("input", exist_ok=True)
     inputX.tofile("./input/input_srcGm.bin")
     meanX.tofile("./input/input_inMeanGm.bin")
     varX.tofile("./input/input_inVarGm.bin")
@@ -70,7 +70,7 @@ def gen_golden_data_simple():
             else:
                 result[i][j] = 0
 
-    os.system("mkdir -p ./output")
+    os.makedirs("output", exist_ok=True)
     result.tofile("./output/golden_outGm.bin")
     outputRstd.tofile("./output/golden_outRstdGm.bin")
 

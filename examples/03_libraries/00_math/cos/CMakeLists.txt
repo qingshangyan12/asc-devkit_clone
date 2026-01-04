@@ -11,7 +11,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-find_package(ASC REQUIRED HINTS $ENV{ASCEND_INSTALL_PATH}/compiler/tikcpp/ascendc_kernel_cmake)
+find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
@@ -27,8 +27,14 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
+# ======================================================================================
+# NPU 编译选项配置
+#
+# 说明：
+#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+# ======================================================================================
 target_compile_options(demo PRIVATE
-
-    # 该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3101>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
+    # # 该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
+    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3101>
 )

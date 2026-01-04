@@ -133,8 +133,8 @@ def gen_golden_data_simple():
     tiling[5] = split_mean_cnt
     tiling[6] = en_update
 
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     tiling.tofile("./input/tiling.bin")
 
     loopcnt = tiling[4]

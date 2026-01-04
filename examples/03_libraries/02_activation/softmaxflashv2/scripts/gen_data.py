@@ -69,8 +69,8 @@ def gen_golden_data_simple():
     sum_dtype = dtype
     dst_dtype = dtype
 
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
 
     shapeinfo.tofile("./input/shapeinfo.bin")
     
