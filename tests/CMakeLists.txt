@@ -10,5 +10,16 @@
 project(ascendc_tests)
 cmake_minimum_required(VERSION 3.16.0)
 
-add_subdirectory(unit)
-add_subdirectory(testcases_python)
+set(CMAKE_CXX_STANDARD 17)
+
+if (BUILD_OPEN_PROJECT)
+    include(cmake/config.cmake)
+    include(cmake/intf.cmake)
+    include(cmake/func.cmake)
+endif()
+
+add_subdirectory(api)
+if (${TEST_MOD} STREQUAL "all" OR ${TEST_MOD} STREQUAL "adv")
+    add_subdirectory(tools)
+    add_subdirectory(python)
+endif ()

@@ -442,7 +442,7 @@ function build_test_part() {
     return 0
   fi
 
-  source ${CURRENT_DIR}/tests/unit/basic_api/common/ci/basic_tests_part.sh
+  source ${CURRENT_DIR}/tests/basic_tests_part.sh
 
   if [ "$TEST_PART" == "basic_test_one" ]; then
     BASIC_TEST_PART=("${test_one_targets[@]}")
