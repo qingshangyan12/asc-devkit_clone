@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-给定一个输入张量，每一次取输入张量中的8个数填充到结果张量的8个datablock（32Bytes）中去，每个数对应一个datablock。
+给定一个输入矢量，每一次取输入矢量中的8个数填充到结果张量的8个datablock（32Bytes）中去，每个数对应一个datablock。
 
 ## 函数原型
 
@@ -33,9 +33,9 @@
 | :--- | :--- | :--- |
 | dst | 输出 | 目的操作数地址。 |
 | src | 输入 | 源操作数地址。 |
-| dst_block_stride | 目的操作数单次迭代内不同DataBlock间地址步长。 |
-| dst_repeat_stride | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
-| repeat | 迭代次数。 |
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
+| repeat | 输入 | 迭代次数。 |
 
 ## 返回值说明
 

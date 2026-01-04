@@ -134,7 +134,10 @@ public:
 
     __aicore__ inline LocalTensor<L0cT> GetTensor() {
         LocalTensor<L0cT> out;
-        out.SetAddr({ .logicPos = 2, });
+        TBuffAddr addr;
+        addr.logicPos = 2;
+        addr.absAddr = 0;
+        out.SetAddr(addr);
         out.SetSize(1);
         return out;
     }

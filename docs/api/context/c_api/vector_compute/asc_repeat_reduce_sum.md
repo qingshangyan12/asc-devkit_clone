@@ -48,7 +48,7 @@
 | src  | 输入 | 源操作数（矢量）的起始地址。|
 | count | 输入 | 参与计算的元素个数。 |
 | repeat | 输入 | 迭代次数。|
-| dst_repeat_stride | 输入 | 目的操作数相邻迭代间的地址步长，单位为一个repeat计算后的长度，具体如下：<br>若输出数据类型为half，则单位为2字节。<br> 若输出数据类型为half，则单位为4字节。 |
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间的地址步长，单位为一个repeat计算后的长度，具体如下：<br>若输出数据类型为half，则单位为2字节。<br> 若输出数据类型为float，则单位为4字节。 |
 | src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。|
 | src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。|
 

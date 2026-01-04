@@ -74,7 +74,7 @@ constexpr uint32_t dst_length = 16;
 __ubuf__ half src[src_length];
 __ubuf__ half dst[dst_length];
 // 每次repeat256B，2次repeat，无间隔
-asc_datablock_reduce_sum(dst, src, 2, 8, 1, 8);
+asc_datablock_reduce_sum(dst, src, 2, 1, 1, 8);
 ```
 
 结果示例：
