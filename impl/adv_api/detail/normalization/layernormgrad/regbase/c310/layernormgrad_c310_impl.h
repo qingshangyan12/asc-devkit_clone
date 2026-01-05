@@ -49,11 +49,11 @@ __simd_callee__ inline void ComputePdVar(MicroAPI::RegTensor<float>& pdVarReg, M
     // 3.1. inputVariance + EPSILON
     Adds(tmpReg1, inputVarianceReg, epsilon, pregOne);
     // 3.2. res = np.power((inputVariance + EPSILON), (-1.5))
+    Mul(tmpReg2, tmpReg1, tmpReg1, pregOne);
+    Mul(tmpReg1, tmpReg2, tmpReg1, pregOne);
     Sqrt(tmpReg1, tmpReg1, pregOne);
     Duplicate(tmpReg2, 1.0f, pregOne);
     Div(tmpReg1, tmpReg2, tmpReg1, pregOne);
-    Mul(tmpReg2, tmpReg1, tmpReg1, pregOne);
-    Mul(tmpReg1, tmpReg2, tmpReg1, pregOne);
 
     // 3.3. broadcast to CalCount
     Duplicate(tmpReg2, tmpReg1, preg);
