@@ -2,6 +2,7 @@
 ## 概述
 本样例通过使用Matmul模板参数MatmulPolicy中TrianUpperMatmulPolicy（上三角模板策略）和TrianLowerMatmulPolicy（下三角模板策略），实现了上下三角矩阵计算的单算子。
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
@@ -122,6 +123,12 @@
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
     ```
+
+- 修改编译选项（Ascend 950PR/Ascend 950DT）  
+  对于Ascend 950PR/Ascend 950DT，执行前需要修改CMakeLists.txt中编译选项--npu-arch，具体修改如下：  
+  ```
+  --npu-arch=dav-3101
+  ```
 
 - 样例执行  
   ```bash
