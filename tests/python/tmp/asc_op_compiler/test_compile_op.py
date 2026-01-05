@@ -2735,7 +2735,7 @@ Contents of section
                     mock_soc.return_value = "Ascend910_95"
                     self.assertFalse(is_enable_sanitizer(compile_options))
         with mock.patch('os.path.exists') as mock_exists:
-            with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': '/usr/local/Ascend/latest'}):
+            with mock.patch.dict('os.environ', {'ASCEND_HOME_PATH': '/usr/local/Ascend/cann'}):
                 mock_exists.return_value = False
                 compile_options = ["-sanitizer"]
                 self.assertRaises(Exception, is_enable_sanitizer, compile_options)
@@ -3781,7 +3781,7 @@ Contents of section
         extend_options = {'opp_kernel_hidden_dat_path': os.path.join(TOP_PATH, 'tmp')}
         
         def custom_exists(path):
-            if path == '/usr/local/Ascend/latest/compiler/tikcpp/../../include/ascendc/asc_devkit_version.h':
+            if path == '/usr/local/Ascend/cann/compiler/tikcpp/../../include/ascendc/asc_devkit_version.h':
                 return True
             else:
                 return mock.DEFAULT

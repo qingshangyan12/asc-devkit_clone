@@ -13,7 +13,7 @@ function(map_get_value map_name key out_var)
 endfunction()
 
 # Setup env variable: ASCEND_HOME_PATH
-set(DEFAULT_ASCEND_PATH "/usr/local/Ascend/ascend-toolkit/latest/")
+set(DEFAULT_ASCEND_PATH "/usr/local/Ascend/cann/")
 if(NOT EXISTS $ENV{ASCEND_HOME_PATH})
     message(WARNING "Env variable ASCEND_HOME_PATH is not set. Set to default value ${DEFAULT_ASCEND_PATH}.")
     set(ASCEND_HOME_PATH ${DEFAULT_ASCEND_PATH})

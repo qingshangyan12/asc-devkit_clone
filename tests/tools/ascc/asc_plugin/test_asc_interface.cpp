@@ -327,7 +327,7 @@ TEST_F(TestAscInterFace, asc_cannpath_init)
     EXPECT_EQ(manager.GetCannPath().empty(), false);
     EXPECT_EQ(res, AscPlugin::ASC_SUCCESS);
     free(const_cast<char*>(a));
-    manager.SetCannPath("/usr/local/Ascend/latest");
+    manager.SetCannPath("/usr/local/Ascend/cann");
 }
 
 TEST_F(TestAscInterFace, asc_plugin_gen_kernel_failure_with_no_kernel)

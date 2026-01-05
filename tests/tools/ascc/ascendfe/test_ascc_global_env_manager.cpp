@@ -71,7 +71,7 @@ TEST_F(TEST_ASCC_GLOBAL_ENV_MANAGER, ascc_PrintOutInfo)
 
 TEST_F(TEST_ASCC_GLOBAL_ENV_MANAGER, ascc_cannot_find_executable)
 {
-    std::string path = "/usr/local/Ascend/latest";
+    std::string path = "/usr/local/Ascend/cann";
     char* res = nullptr;
     MOCKER(Ascc::CheckAndGetFullPath, std::string(const char*)).stubs().will(returnValue(path));
     Ascc::AsccGlobalEnvManager &manager = Ascc::AsccGlobalEnvManager::GetInstance();
