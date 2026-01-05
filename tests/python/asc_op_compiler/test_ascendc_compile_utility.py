@@ -3,6 +3,7 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2024-2025. All rights reserved.
 import os
 import sys
+import platform
 import unittest
 from unittest import mock
 
@@ -125,7 +126,7 @@ class TestCompileUtility(unittest.TestCase):
         with mock.patch('os.path.exists', return_value=False):
             res = get_op_tiling_so_path(
                 "/usr/local/Ascend/CANN-7.8/opp/vendors/customize/op_impl/ai_core/tbe/customize_impl/dynamic/test.cpp")
-            self.assertIn("op_tiling/lib/linux/x86_64/liboptiling.so", res)
+            self.assertIn(f"op_tiling/lib/linux/{platform.machine()}/liboptiling.so", res)
 
         mock_communicate = mock.Mock(\
             return_value=\

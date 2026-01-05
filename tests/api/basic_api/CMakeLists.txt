@@ -253,6 +253,7 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
 
     target_link_libraries(ascendc_ut_basic_api_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
+        kernel_tiling
         $<$<STREQUAL:${product_type},ascend910>:tikicpulib::ascend910>
         $<$<STREQUAL:${product_type},ascend610>:tikicpulib::ascend610>
         $<$<STREQUAL:${product_type},ascend310p>:tikicpulib::ascend310p>

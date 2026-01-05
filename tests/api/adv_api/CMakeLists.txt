@@ -411,6 +411,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
 
     target_link_libraries(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
+        kernel_tiling
         $<$<STREQUAL:${product_type},ascend310p>:tikicpulib::ascend310p>
         $<$<STREQUAL:${product_type},ascend610>:tikicpulib::ascend610>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:tikicpulib::ascend910B1>
@@ -510,6 +511,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
 
     target_link_libraries(ascendc_ut_adv_api_tiling_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
+        kernel_tiling
         register
         platform
         graph

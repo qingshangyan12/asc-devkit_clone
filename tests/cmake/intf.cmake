@@ -10,8 +10,7 @@
 
 add_library(intf_llt_pub_basic INTERFACE)
 
-target_include_directories(intf_llt_pub_basic INTERFACE
-)
+target_include_directories(intf_llt_pub_basic INTERFACE)
 
 target_compile_definitions(intf_llt_pub_basic INTERFACE
     CFG_BUILD_DEBUG
@@ -33,12 +32,37 @@ target_link_options(intf_llt_pub_basic INTERFACE
     $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address -static-libasan -fsanitize=undefined  -static-libubsan -fsanitize=leak -static-libtsan>
 )
 
-target_link_directories(intf_llt_pub_basic INTERFACE
-)
+target_link_directories(intf_llt_pub_basic INTERFACE)
 
 target_link_libraries(intf_llt_pub_basic INTERFACE
     gtest
     mockcpp_static
     -lpthread
     $<$<BOOL:${ENABLE_GCOV}>:-lgcov>
+)
+
+# gen tiling header file
+set(GEN_TILING_SCRIPT ${ASCENDC_DIR}/impl/adv_api/cmake/scripts/gen_kernel_tiling_data_def.py)
+set(TILING_DEF_DIR ${ASCENDC_DIR}/include/adv_api)
+set(KERNEL_TILING_FILE ${CMAKE_CURRENT_BINARY_DIR}/kernel_tiling/kernel_tiling.h)
+
+add_custom_command(
+    OUTPUT ${KERNEL_TILING_FILE}
+    COMMAND ${Python3_EXECUTABLE} ${GEN_TILING_SCRIPT} ${TILING_DEF_DIR} ${KERNEL_TILING_FILE}
+    DEPENDS ${GEN_TILING_SCRIPT} ${TILING_DEF_DIR}
+    COMMENT "Generating kernel tiling configuration header"
+)
+add_custom_target(generate_kernel_headers ALL
+    DEPENDS ${KERNEL_TILING_FILE}
+    COMMENT "Ensuring kernel headers are generated"
+)
+
+add_library(kernel_tiling INTERFACE)
+target_include_directories(kernel_tiling INTERFACE
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+add_dependencies(kernel_tiling generate_kernel_headers)
+set_source_files_properties(
+    ${KERNEL_TILING_FILE}
+    PROPERTIES GENERATED TRUE
 )
