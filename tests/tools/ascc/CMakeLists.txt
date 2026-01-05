@@ -49,6 +49,7 @@ target_compile_options(ascendc_ut_asc_plugin PRIVATE
 
 target_link_libraries(ascendc_ut_asc_plugin PRIVATE
     $<BUILD_INTERFACE:intf_llt_pub_basic>
+    json
     -Wl,--no-as-needed
     c_sec
     dl
@@ -91,6 +92,7 @@ target_compile_definitions(ascendc_utest_ascc PRIVATE
 
 target_include_directories(ascendc_utest_ascc PRIVATE
     ${ASCC_TEST_HEADERS_FILES}
+    ${JSON_INCLUDE_DIR}
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/base/
 )
@@ -101,6 +103,7 @@ target_compile_options(ascendc_utest_ascc PRIVATE
 
 target_link_libraries(ascendc_utest_ascc PRIVATE
     $<BUILD_INTERFACE:intf_llt_pub_basic>
+    json
     -Wl,--no-as-needed
     c_sec
     -Wl,--as-needed

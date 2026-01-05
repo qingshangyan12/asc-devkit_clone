@@ -13,7 +13,7 @@ function(run_llt_test)
     string(REPLACE "," ";" TARGET_LIST "${TEST_MOD}")
     list(REMOVE_ITEM TARGET_LIST "")
     if (NOT "${TEST_MOD}" STREQUAL "all" AND NOT ${LLT_TARGET} IN_LIST TARGET_LIST)
-      return()
+        return()
     endif()
 
     if (ENABLE_ASAN)
@@ -27,16 +27,15 @@ function(run_llt_test)
         # 谨慎修改 ASAN_OPTIONS_ 取值, 当前出现 ASAN 告警会使 UT 失败.
         set(ASAN_OPTIONS_ "ASAN_OPTIONS=detect_leaks=0:halt_on_error=0")
         add_custom_command(
-                TARGET ${LLT_TARGET} POST_BUILD
-                COMMAND
-                COMMAND export LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH} && ${LD_PRELOAD_} && ulimit -s 32768 && ${ASAN_OPTIONS_} $<TARGET_FILE:${LLT_TARGET}>
-                COMMENT "Run ${LLT_TARGET} with asan"
+            TARGET ${LLT_TARGET} POST_BUILD
+            COMMAND export LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH} && ${LD_PRELOAD_} && ulimit -s 32768 && ${ASAN_OPTIONS_} $<TARGET_FILE:${LLT_TARGET}>
+            COMMENT "Run ${LLT_TARGET} with asan"
         )
     else()
         add_custom_command(
-                TARGET ${LLT_TARGET} POST_BUILD
-                COMMAND export LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH} && $<TARGET_FILE:${LLT_TARGET}>
-                COMMENT "Run ${LLT_TARGET}"
+            TARGET ${LLT_TARGET} POST_BUILD
+            COMMAND export LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH} && $<TARGET_FILE:${LLT_TARGET}>
+            COMMENT "Run ${LLT_TARGET}"
         )
     endif()
 
@@ -51,8 +50,8 @@ function(run_llt_test)
 
         if (NOT TARGET ${_collect_coverage_data_target})
             add_custom_target(${_collect_coverage_data_target} ALL
-                    COMMAND bash ${GENERATE_CPP_COV} ${_ops_builtin_bin_path} ${_cov_data} ${_cov_html} ${_pkg_path}
-                    COMMENT "Run collect coverage data"
+                COMMAND bash ${GENERATE_CPP_COV} ${_ops_builtin_bin_path} ${_cov_data} ${_cov_html} ${_pkg_path}
+                COMMENT "Run collect coverage data"
             )
         endif()
 

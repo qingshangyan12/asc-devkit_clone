@@ -24,7 +24,7 @@ add_custom_target(install_adapter_api_ut ALL
 )
 
 run_python_llt_test(
-    TARGET ascendc_aclrt_launch_kernel_python_ut
+    TARGET ascendc_pyut_aclrt_launch_kernel
     SRC_FILES_DIR ${ASCENDC_DIR}/cmake/
     TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/aclrt_launch_kernel/
     PRE_TEST_COMMAND
@@ -40,7 +40,7 @@ run_python_llt_test(
     )
 
 run_python_llt_test(
-    TARGET asc_op_compiler_python_ut
+    TARGET ascendc_pyut_asc_op_compiler
     SRC_FILES_DIR ${ASCENDC_DIR}/tools/build/asc_op_compile_base/asc_op_compiler/
     TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/asc_op_compiler/
     ENV_FILE ${ASCENDC_DIR}/tests/python/ci/set_python_env.sh
@@ -49,7 +49,7 @@ run_python_llt_test(
     COVERAGERC_DIR
 )
 
-add_dependencies(asc_op_compiler_python_ut
+add_dependencies(ascendc_pyut_asc_op_compiler
     register
     gen_kernel_tiling
     install_adapter_api_ut
@@ -58,7 +58,7 @@ add_dependencies(asc_op_compiler_python_ut
 )
 
 run_python_llt_test(
-    TARGET tikcpp_utest_compile_trace_log
+    TARGET ascendc_pyut_compile_trace_log
     SRC_FILES_DIR ${ASCENDC_DIR}/tools/scripts/compile_trace_log
     TEST_FILES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/compile_trace_log
     EXPORT_PYTHONPATH ${CMAKE_CURRENT_SOURCE_DIR}/stub/
