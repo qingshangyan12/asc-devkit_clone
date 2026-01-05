@@ -12,6 +12,13 @@
  * \file asc_fill_l0b_value_impl.h
  * \brief
  */
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
+#warning "cube_datamove_c_api_impl/fill_value_c_api_impl/fill_l0b_value_impl/npu_arch_2201/asc_fill_l0b_value_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif    
+
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_FILL_VALUE_C_API_IMPL_FILL_L0B_VALUE_IMPL_NPU_ARCH_2201_ASC_FILL_L0B_VALUE_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_CUBE_DATAMOVE_C_API_IMPL_FILL_VALUE_C_API_IMPL_FILL_L0B_VALUE_IMPL_NPU_ARCH_2201_ASC_FILL_L0B_VALUE_IMPL_H
 
@@ -194,3 +201,9 @@ __aicore__ inline void asc_fill_l0b_value_sync_impl(__cb__ bfloat16_t* dst, bflo
 }
 
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif  
+

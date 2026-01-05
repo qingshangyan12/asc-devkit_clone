@@ -13,6 +13,13 @@
  * \brief
  */
 
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
+#warning "vector_compute_c_api_impl/vcmpvs_c_api_impl/vcmpvs_ge_impl/npu_arch_2201/asc_ge_scalar_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif    
+
 #ifndef IMPL_INSTR_VECTOR_COMPUTE_VCMPVS_VCMPVS_GE_NPU_ARCH_2201_ASC_GE_SCALAR_IMPL_H
 #define IMPL_INSTR_VECTOR_COMPUTE_VCMPVS_VCMPVS_GE_NPU_ARCH_2201_ASC_GE_SCALAR_IMPL_H
 
@@ -49,3 +56,9 @@ __aicore__ inline void asc_ge_scalar_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ f
 }
 
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif  
+

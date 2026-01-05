@@ -8,6 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#endif     
+
 #ifndef INCLUDE_C_API_UTILS_DEBUG_ASC_DUMP_H
 #define INCLUDE_C_API_UTILS_DEBUG_ASC_DUMP_H
 
@@ -19,3 +25,9 @@ __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dump
 template <typename T>
 __aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size);
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#endif    
+

@@ -8,6 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#endif     
+
 #ifndef INCLUDE_C_API_VECTOR_DATAMOVE_H
 #define INCLUDE_C_API_VECTOR_DATAMOVE_H
 
@@ -72,3 +78,9 @@ __aicore__ inline void asc_copy_ub2gm_align(__ubuf__  uint32_t* dst, __gm__ uint
 __aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size);
 
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#endif    
+

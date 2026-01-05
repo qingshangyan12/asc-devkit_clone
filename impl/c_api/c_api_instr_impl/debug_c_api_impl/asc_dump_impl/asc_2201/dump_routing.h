@@ -12,6 +12,13 @@
  * \file dump_routing.h
  * \brief
  */
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
+#warning "c_api_instr_impl/debug_c_api_impl/asc_dump_impl/asc_2201/dump_routing.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif    
+
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_DEBUG_C_API_IMPL_ASC_DUMP_IMPL_ASC_2201_DUMP_ROUTING_H
 #define IMPL_C_API_C_API_INSTR_IMPL_DEBUG_C_API_IMPL_ASC_DUMP_IMPL_ASC_2201_DUMP_ROUTING_H
 
@@ -49,3 +56,9 @@ struct dump_routing_ubuf<arch_version::v2201> {
     using type = dump_v2201_ubuf;
 };
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif  
+

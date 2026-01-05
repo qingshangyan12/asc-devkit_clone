@@ -8,6 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#endif     
+
 #ifndef INCLUDE_C_API_CUBE_DATAMOVE_H
 #define INCLUDE_C_API_CUBE_DATAMOVE_H
 
@@ -1677,3 +1683,9 @@ __aicore__ inline void asc_fixpipe_l0c2out_vreq8_sync(__gm__ int32_t* dst, __cc_
 __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
 
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#endif    
+

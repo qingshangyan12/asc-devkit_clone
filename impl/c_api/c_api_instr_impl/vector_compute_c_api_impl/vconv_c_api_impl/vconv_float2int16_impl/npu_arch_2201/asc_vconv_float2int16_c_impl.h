@@ -13,6 +13,13 @@
  * \brief
  */
 
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
+#warning "vector_compute_c_api_impl/vconv_c_api_impl/vconv_float2int16_impl/npu_arch_2201/asc_vconv_float2int16_c_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif    
+
 #ifndef IMPL_CAPI_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VONV_C_API_IMPL_VCONV_FLOAT2INT16_IMPL_NPU_ARCH_2201_ASC_VONV_FLOAT2INT16_C_IMPL_H
 #define IMPL_CAPI_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VONV_C_API_IMPL_VCONV_FLOAT2INT16_IMPL_NPU_ARCH_2201_ASC_VONV_FLOAT2INT16_C_IMPL_H
 
@@ -38,3 +45,9 @@ __aicore__ inline void asc_float2int16_c_sync_impl(__ubuf__ int16_t* dst, __ubuf
     asc_sync_post_process();
 }
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif  
+

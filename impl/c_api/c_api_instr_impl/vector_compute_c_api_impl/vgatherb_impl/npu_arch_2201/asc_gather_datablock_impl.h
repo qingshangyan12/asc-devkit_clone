@@ -12,6 +12,13 @@
  * \file asc_gather_datablock_impl.h
  * \brief
  */
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
+#warning "c_api_instr_impl/vector_compute_c_api_impl/vgatherb_impl/npu_arch_2201/asc_gather_datablock_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif    
+
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VGATHERB_NPU_ARCH_2201_ASC_GATHER_DATABLOCK_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VGATHERB_NPU_ARCH_2201_ASC_GATHER_DATABLOCK_IMPL_H
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
@@ -59,3 +66,9 @@ __aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint32_t* dst, __
 }
 
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif  
+

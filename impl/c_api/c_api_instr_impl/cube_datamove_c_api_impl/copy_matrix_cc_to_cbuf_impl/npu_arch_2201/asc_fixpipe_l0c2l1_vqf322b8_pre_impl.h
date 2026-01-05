@@ -8,6 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
+#warning "c_api_instr_impl/cube_datamove_c_api_impl/copy_matrix_cc_to_cbuf_impl/npu_arch_2201/asc_fixpipe_l0c2l1_vqf322b8_pre_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif    
+
 #ifndef IMPL_C_API_INSTR_CUBE_DMAMOVE_COPY_MATRIX_CC_TO_CBUF_NPU_ARCH_2201_FIXPIPE_L0C2L1_VQF322B8_PRE_IMPL_H
 #define IMPL_C_API_INSTR_CUBE_DMAMOVE_COPY_MATRIX_CC_TO_CBUF_NPU_ARCH_2201_FIXPIPE_L0C2L1_VQF322B8_PRE_IMPL_H
 
@@ -134,3 +141,9 @@ __aicore__ inline void asc_copy_l0c2l1_vqf322b8_pre_sync_impl(__cbuf__ uint8_t *
 }
 
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
+#endif  
+
