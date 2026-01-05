@@ -1,6 +1,6 @@
 # Add算子直调样例
 ## 概述
-本样例介绍基于静态Tensor方式编程的场景下Add算子的实现方法，支持main函数和kernel函数在同一个cpp文件中实现，并提供<<<>>>直调方法。
+本样例演示基于静态Tensor编程模型的Add算子实现，该实现采用LocalMemAllocator内存分配器简化代码逻辑，特别适用于Bank冲突不敏感场景。
 
 ## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品

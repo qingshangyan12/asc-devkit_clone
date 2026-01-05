@@ -1,6 +1,6 @@
 # MicroApiAdd样例
 ## 概述
-本样例介绍基于微指令API实现Add样例，展示了通过微指令API直接对芯片中涉及Vector计算的寄存器进行操作，算子支持单核运行。
+本样例基于Ascend C微指令API编程模型，演示Add算子的底层寄存器级实现。通过直接操作Vector计算单元的寄存器，实现对半精度（half）数据的加法运算，支持单核运行模式。该实现突破了基础API对LocalTensor的依赖限制，允许直接操作RegTensor和MaskReg寄存器，适用于需要极致性能优化的场景。
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
