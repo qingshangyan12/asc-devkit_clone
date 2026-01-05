@@ -15,6 +15,9 @@
 #include "kernel_struct_mm.h"
 
 namespace AscendC {
+
+__gm__ __inline__ uint64_t g_rptConfig = 0x10000;
+
 /* **************************************************************************************************
  * LoadData 2dv1                                             *
  * ************************************************************************************************* */
@@ -834,9 +837,14 @@ __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam repeatPara
     rptConfig |= uint64_t(repeatParams.repeatTime) << repeatTimeShiftBit;
     constexpr uint32_t repeatModeShiftBit = 24;
     rptConfig |= uint64_t(repeatParams.repeatMode) << repeatModeShiftBit;
+    g_rptConfig = rptConfig;
+    bisheng::cce::set_l3d_rpt(rptConfig);
+}
 
+__aicore__ inline void SetLoadDataRepeatStride(uint16_t dstStride) {
+    uint64_t rptConfig = g_rptConfig;
     constexpr uint32_t dstStrideShiftBit = 32;
-    rptConfig |= uint64_t(repeatParams.dstStride) << dstStrideShiftBit;
+    rptConfig |= uint64_t(dstStride) << dstStrideShiftBit;
     bisheng::cce::set_l3d_rpt(rptConfig);
 }
 
@@ -860,6 +868,8 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ T* dst, __cbuf__ T* src,
         "LoadData 3dv2 only support uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, uint16_t, int16_t, float, int32_t, uint32_t on current device!");
     if ASCEND_IS_AIC {
+        uint16_t dstStride = CeilDivision(loadDataParams.mExtension, BLOCK_CUBE);
+        SetLoadDataRepeatStride(dstStride);
         bisheng::cce::img2colv2_cbuf_to_ca(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
             loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
             loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
@@ -877,6 +887,8 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ T* dst, __cbuf__ T* src,
         "LoadData 3dv2 only support uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, uint16_t, int16_t, float, int32_t, uint32_t on current device!");
     if ASCEND_IS_AIC {
+        uint16_t dstStride = CeilDivision(loadDataParams.kExtension, BLOCK_CUBE);
+        SetLoadDataRepeatStride(dstStride);
         bisheng::cce::img2colv2_cbuf_to_cb(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
             loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
             loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
@@ -889,6 +901,8 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ half* dst, __cbuf__ half* sr
     const LoadData3DParamsV2<bfloat16_t>& loadDataParams)
 {
     if ASCEND_IS_AIC {
+        uint16_t dstStride = CeilDivision(loadDataParams.mExtension, BLOCK_CUBE);
+        SetLoadDataRepeatStride(dstStride);
         bisheng::cce::img2colv2_cbuf_to_ca(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
             loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
             loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
@@ -901,6 +915,8 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ half* dst, __cbuf__ half* sr
     const LoadData3DParamsV2<bfloat16_t>& loadDataParams)
 {
     if ASCEND_IS_AIC {
+        uint16_t dstStride = CeilDivision(loadDataParams.kExtension, BLOCK_CUBE);
+        SetLoadDataRepeatStride(dstStride);
         bisheng::cce::img2colv2_cbuf_to_cb(dst, src, loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt,
             loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
             loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
@@ -927,6 +943,8 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ T* dst, __cbuf__ T* src, con
             loadDataParams.GetFilterSizeW(), loadDataParams.GetFilterSizeH(), loadDataParams.GetTranspose(),
             loadDataParams.GetFMatrixCtrl(), loadDataParams.GetChannelSize());
 #else
+        uint16_t dstStride = CeilDivision(loadDataParams.GetMExtension(), BLOCK_CUBE);
+        SetLoadDataRepeatStride(dstStride);
         if constexpr (std::is_same<T, bfloat16_t>::value) {
             img2colv2_cbuf_to_ca((__ca__ half *)dst, (__cbuf__ half *)src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
         } else {
@@ -947,6 +965,8 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ T* dst, __cbuf__ T* src, con
             loadDataParams.GetFilterSizeW(), loadDataParams.GetFilterSizeH(), loadDataParams.GetTranspose(),
             loadDataParams.GetFMatrixCtrl(), loadDataParams.GetChannelSize());
 #else
+        uint16_t dstStride = CeilDivision(loadDataParams.GetKExtension(), BLOCK_CUBE);
+        SetLoadDataRepeatStride(dstStride);
         if constexpr (std::is_same<T, bfloat16_t>::value) {
             img2colv2_cbuf_to_cb((__cb__ half *)dst, (__cbuf__ half *)src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
         } else {
@@ -974,6 +994,8 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ T *dst, __cbuf__ T *src,
         "LoadData 3dv2Pro only support uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
     if ASCEND_IS_AIC {
+        uint16_t dstStride = CeilDivision(loadDataParams.extConfig >> LOAD_M_EXTENSION, BLOCK_CUBE);
+        SetLoadDataRepeatStride(dstStride);
         bisheng::cce::img2colv2_cbuf_to_ca(dst, src, loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
             loadDataParams.extConfig >> LOAD_K_START_POSITION, loadDataParams.extConfig >> LOAD_M_START_POSITION,
             loadDataParams.filterConfig, loadDataParams.filterConfig >> LOAD_STRIDE_H,
@@ -990,6 +1012,8 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ bfloat16_t* dst, __cbuf__ bf
     const LoadData3DParamsV2Pro& loadDataParams)
 {
     if ASCEND_IS_AIC {
+        uint16_t dstStride = CeilDivision(loadDataParams.extConfig >> LOAD_M_EXTENSION, BLOCK_CUBE);
+        SetLoadDataRepeatStride(dstStride);
         bisheng::cce::img2colv2_cbuf_to_ca((__ca__ half*)dst, (__cbuf__ half*)src,
             loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
             loadDataParams.extConfig >> LOAD_K_START_POSITION, loadDataParams.extConfig >> LOAD_M_START_POSITION,
@@ -1011,6 +1035,8 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ T *dst, __cbuf__ T *src,
         "LoadData 3dv2Pro only support uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
     if ASCEND_IS_AIC {
+            uint16_t dstStride = CeilDivision(loadDataParams.extConfig, BLOCK_CUBE);
+            SetLoadDataRepeatStride(dstStride);
             bisheng::cce::img2colv2_cbuf_to_cb(dst, src, loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
                 loadDataParams.extConfig >> LOAD_K_START_POSITION, loadDataParams.extConfig >> LOAD_M_START_POSITION,
                 loadDataParams.filterConfig, loadDataParams.filterConfig >> LOAD_STRIDE_H,
@@ -1027,6 +1053,8 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ bfloat16_t* dst, __cbuf__ bf
     const LoadData3DParamsV2Pro& loadDataParams)
 {
     if ASCEND_IS_AIC {
+        uint16_t dstStride = CeilDivision(loadDataParams.extConfig, BLOCK_CUBE);
+        SetLoadDataRepeatStride(dstStride);
         bisheng::cce::img2colv2_cbuf_to_cb((__cb__ half*)dst, (__cbuf__ half*)src,
             loadDataParams.extConfig, loadDataParams.extConfig >> LOAD_M_EXTENSION,
             loadDataParams.extConfig >> LOAD_K_START_POSITION, loadDataParams.extConfig >> LOAD_M_START_POSITION,
