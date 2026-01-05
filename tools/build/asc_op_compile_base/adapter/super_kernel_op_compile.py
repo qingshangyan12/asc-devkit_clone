@@ -317,6 +317,12 @@ def localize_symbol_of_sk(split_mode, sks, spk_dst_file, compile_log_path):
 
 
 def super_kernel_compile(kernel_info, compile_log_path):
+    # global_var_storage must be reset before every entry of compile
+    global_var_storage.global_storage_reset()
+    if not CommonUtility.is_support_super_kernel():
+        CommonUtility().ascendc_raise_python_err(ERR_CODE, \
+        f'current soc: {global_var_storage.get_variable("ascendc_short_soc_version")} '
+        f'series do not support super kernel feature')
     global_var_storage.set_variable("super_kenel_save_sub_op_files", True)
     op_info = OpInfo()
     compile_options = kernel_info["compile_option"]
