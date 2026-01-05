@@ -43,8 +43,8 @@ public:
     {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3113)
         set_atomic_none();
-    #endif
-    #if __NPU_ARCH__ == 2201
+#endif
+#if __NPU_ARCH__ == 2201
         set_mask_norm();
         if ASCEND_IS_AIC {
             set_l1_3d_size(static_cast<uint64_t>(0));
@@ -52,7 +52,7 @@ public:
         } else {
             set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
         }
-    #elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3101
         set_mask_norm();
         uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
         uint64_t val = 0x1000000000000008 | prevCtrl;
@@ -66,11 +66,11 @@ public:
             set_loop_size_outtoub(loopSizePara);
         }
         set_st_atomic_cfg(0b00100100);
-    #elif __NPU_ARCH__ == 3002
+#elif __NPU_ARCH__ == 3002
         set_padding(static_cast<uint64_t>(0));
-    #elif (__NPU_ARCH__ == 5102)
+#elif (__NPU_ARCH__ == 5102)
         set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
-    #endif
+#endif
     }
 
     __aicore__ static inline int32_t GetC0Count(const int32_t dtypeSize)
