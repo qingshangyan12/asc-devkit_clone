@@ -65,6 +65,7 @@ target_compile_options(ascendfe PRIVATE
     -Wfloat-equal
     -D_FORTIFY_SOURCE=2
     -Os
+    -Werror
 )
 
 target_link_options(ascendfe PRIVATE

@@ -406,6 +406,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
 
     target_compile_options(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
         -fno-access-control
+        -Werror
     )
 
     target_link_libraries(ascendc_ut_adv_api_kernel_${product_type} PRIVATE

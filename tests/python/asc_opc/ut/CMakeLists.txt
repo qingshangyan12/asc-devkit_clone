@@ -25,6 +25,7 @@ target_compile_options(ge_ir_parser PRIVATE
   -fvisibility-inlines-hidden
   -Wextra
   -Wall
+  -Werror
 )
 target_link_libraries(ge_ir_parser PRIVATE ascend_protobuf_static)
 

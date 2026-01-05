@@ -25,6 +25,7 @@ target_compile_options(intf_llt_pub_basic INTERFACE
     $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address -fno-omit-frame-pointer -static-libasan -fsanitize=undefined -static-libubsan -fsanitize=leak -static-libtsan>
     -fPIC
     -pipe
+    -Werror
 )
 
 target_link_options(intf_llt_pub_basic INTERFACE

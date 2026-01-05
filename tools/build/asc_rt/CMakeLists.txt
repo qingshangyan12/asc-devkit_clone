@@ -38,6 +38,7 @@ target_compile_options(ascend_runtime_base PRIVATE
   -Wfloat-equal
   -fvisibility-inlines-hidden
   -fvisibility=hidden
+  -Werror
 )
 
 target_link_libraries(ascend_runtime_base PRIVATE
