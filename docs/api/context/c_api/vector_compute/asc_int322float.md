@@ -103,7 +103,7 @@ PIPE_V
 ```cpp
 // total_length指参与计算的数据长度
 constexpr uint32_t total_length = 32;
-__ubuf__ half dst[total_length];
-__ubuf__ half src[total_length];
+__ubuf__ float dst[total_length];
+__ubuf__ int32_t src[total_length];
 asc_int322float(dst, src, total_length);
 ```

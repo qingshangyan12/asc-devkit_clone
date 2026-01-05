@@ -72,5 +72,7 @@ PIPE_MTE2
 ```cpp
 //size指参与搬运的数据总长度。
 constexpr uint32_t size = 32;
+__ubuf__ uint8_t dst[total_length];
+__ubuf__ uint8_t src[total_length];
 asc_copy_ub2gm_align_b8(dst, src, size);
 ```

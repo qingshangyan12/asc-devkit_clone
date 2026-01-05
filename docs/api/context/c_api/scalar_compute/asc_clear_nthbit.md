@@ -38,4 +38,8 @@ PIPE_S
 
 ## 调用示例
 
-无
+```cpp
+uint64_t bits = 0x0;
+int64_t  idx = 0x2;
+uint64_t res = asc_clear_nthbit(bits, idx);
+```
