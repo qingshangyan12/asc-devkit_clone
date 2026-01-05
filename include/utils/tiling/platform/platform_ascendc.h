@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <mutex>
+#include "platform/soc_spec.h"
 
 #if !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
 
