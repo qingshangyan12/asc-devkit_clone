@@ -250,11 +250,11 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtype) {
     EXPECT_EQ(ret, 0);
 }
 
-TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKCoreRation) {
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoCoreRation) {
     void* funcHandle = nullptr;
     unsigned short aicRation;
     unsigned short aivRation;
-    uint32_t ret = AscendCFunctionGetMetaInfoKCoreRation(funcHandle, &aicRation, &aivRation);
+    uint32_t ret = AscendCFunctionGetMetaInfoCoreRation(funcHandle, &aicRation, &aivRation);
     EXPECT_EQ(ret, 0);
 }
 
@@ -266,11 +266,151 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtypeFailed) {
     EXPECT_EQ(ret, 1);
 }
 
-TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKCoreRationFailed) {
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoCoreRationFailed) {
     void* funcHandle = nullptr;
     unsigned short aicRation;
     unsigned short aivRation;
     MOCKER(rtFunctionGetMetaInfo).stubs().will(returnValue(1));
-    uint32_t ret = AscendCFunctionGetMetaInfoKCoreRation(funcHandle, &aicRation, &aivRation);
+    uint32_t ret = AscendCFunctionGetMetaInfoCoreRation(funcHandle, &aicRation, &aivRation);
     EXPECT_EQ(ret, 1);
+}
+
+typedef enum KernelType : unsigned int {
+    K_TYPE_AICORE = 1,
+    K_TYPE_AIC = 2,
+    K_TYPE_AIV = 3,
+    K_TYPE_MIX_AIC_MAIN = 4,
+    K_TYPE_MIX_AIV_MAIN = 5,
+    K_TYPE_AIC_ROLLBACK = 6,
+    K_TYPE_AIV_ROLLBACK = 7
+} KernelTypeUt;
+
+uint32_t AscendCFunctionGetMetaInfoKtypeStubAicore(void *funcHandle, unsigned int *curKernelType)
+{
+    *curKernelType = K_TYPE_AICORE;
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoKtypeStubAic(void *funcHandle, unsigned int *curKernelType)
+{
+    *curKernelType = K_TYPE_AIC;
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoKtypeStubAiv(void *funcHandle, unsigned int *curKernelType)
+{
+    *curKernelType = K_TYPE_AIV;
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoKtypeStubMixAic(void *funcHandle, unsigned int *curKernelType)
+{
+    *curKernelType = K_TYPE_MIX_AIC_MAIN;
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoKtypeStubMixAiv(void *funcHandle, unsigned int *curKernelType)
+{
+    *curKernelType = K_TYPE_MIX_AIV_MAIN;
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoKCoreRation0_1(void *funcHandle, unsigned short *coreAicRation,
+    unsigned short *coreAivRation)
+{
+    *coreAicRation = 0;
+    *coreAivRation = 1;
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoKCoreRation1_0(void *funcHandle, unsigned short *coreAicRation,
+    unsigned short *coreAivRation)
+{
+    *coreAicRation = 1;
+    *coreAivRation = 0;
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoKCoreRation1_1(void *funcHandle, unsigned short *coreAicRation,
+    unsigned short *coreAivRation)
+{
+    *coreAicRation = 1;
+    *coreAivRation = 1;
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoKCoreRation1_2(void *funcHandle, unsigned short *coreAicRation,
+    unsigned short *coreAivRation)
+{
+    *coreAicRation = 1;
+    *coreAivRation = 2;
+    return 0;
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplGetKtypeFailed) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(returnValue(1));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 5);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplGetCoreRationFailed) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubMixAic));
+    MOCKER(AscendCFunctionGetMetaInfoCoreRation).stubs().will(returnValue(1));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 5);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplMixAiv1_0) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubMixAiv));
+    MOCKER(AscendCFunctionGetMetaInfoCoreRation).stubs().will(invoke(AscendCFunctionGetMetaInfoKCoreRation0_1));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 7);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplMixAic1_0) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubMixAic));
+    MOCKER(AscendCFunctionGetMetaInfoCoreRation).stubs().will(invoke(AscendCFunctionGetMetaInfoKCoreRation1_0));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 8);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplMixAic1_1) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubMixAic));
+    MOCKER(AscendCFunctionGetMetaInfoCoreRation).stubs().will(invoke(AscendCFunctionGetMetaInfoKCoreRation1_1));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 9);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplMixAic1_2) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubMixAic));
+    MOCKER(AscendCFunctionGetMetaInfoCoreRation).stubs().will(invoke(AscendCFunctionGetMetaInfoKCoreRation1_2));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 10);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplAic) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubAic));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 6);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplAiv) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubAiv));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 5);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplothers) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubAicore));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 5);
 }

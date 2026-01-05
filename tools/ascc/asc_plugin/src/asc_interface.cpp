@@ -293,7 +293,7 @@ int32_t PluginFatbinLink(const char** result)
     std::vector<std::string> linkOptions = {
         // link libraies
         "-lascendc_runtime", "-lascendcl", "-lruntime", "-lerror_manager", "-lprofapi", "-lunified_dlog", "-lmmpa",
-        "-lascend_dump", "-lc_sec", "-lstdc++", "-lm",
+        "-lascend_dump", "-lc_sec", "-lstdc++",
         // link path
         "-L" + cannPath + "/lib64"
     };
