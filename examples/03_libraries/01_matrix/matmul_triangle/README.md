@@ -1,12 +1,12 @@
 # Matmul算子三角模板策略直调样例
 ## 概述
 本样例通过使用Matmul模板参数MatmulPolicy中TrianUpperMatmulPolicy（上三角模板策略）和TrianLowerMatmulPolicy（下三角模板策略），实现了上下三角矩阵计算的单算子。
-## 支持的AI处理器
+## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── matmul_splitk
+├── matmul_triangle
 │   └── scripts
 │       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │       └── verify_result.py    // 真值对比文件
@@ -25,14 +25,14 @@
 
 - 算子规格： 
 
-  在核函数直调样例中，算子实现支持的shape为：M = 2558, N = 2045, K = 128
+  本样例中，算子实现支持的shape为：M = 2558, N = 2045, K = 128。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">-</td><td align="center">-</td><td align="center">-</td></tr>
+  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
@@ -42,7 +42,11 @@
 - 算子实现： 
  
   - Kernel实现
-    - 关键步骤：
+    - 计算逻辑：C = A * B + Bias。
+      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
+      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
+      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
+    - 具体步骤：
       - 创建Matmul对象，分别创建常规Matmul对象mmNormal，和使用上/下三角模板策略的Matmul对象mmTriangle。
         ```
         // 创建常规Matmul对象mmNormal
@@ -58,6 +62,7 @@
         CFG_NORM, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
         AscendC::Impl::Detail::TrianUpperMatmulPolicy> mmTriangle;
         ```
+      - 初始化操作。
       - 判断当前核执行三角矩阵计算或常规矩阵乘计算，使用mmTriangle或者mmNormal对象设置左矩阵A、右矩阵B、Bias。
         ```
         int32_t blockIdx = AscendC::GetBlockIdx();
@@ -84,6 +89,19 @@
             mmNormal.End();
         }
         ```
+      - 完成矩阵乘操作。
+      - 结束矩阵乘操作。
+
+  - Tiling实现
+      - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
+      - 获取Tiling参数的流程如下：
+        - 创建一个Tiling对象。
+        - 设置A、B、C、Bias的参数类型信息，以及SingleShape和baseM、baseN、baseK信息。
+          ```
+          cubeTiling->SetSingleShape(640, 512, 128);
+          cubeTiling->SetFixSplit(80, 64, -1);
+          ```
+        - 调用GetTiling接口，获取Tiling信息。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

@@ -25,3 +25,5 @@
 | [matmul_unaligned](./matmul_unaligned) | 本样例介绍Matmul高阶API实现多核非对齐切分的单算子 |
 | [matmul_channelsplit](./matmul_channelsplit) | 本样例介绍Matmul API实现矩阵乘输出Channel拆分功能的单算子 |
 | [matmul_quant](./matmul_quant) | 本样例介绍Matmul API实现int8类型输入、half类型输出的Matmul反量化场景的算子，支持同一系数的反量化模式和向量的反量化模式 |
+| [matmul_int4](./matmul_int4) | 本样例介绍Matmul API实现int4数据类型输入，int32数据类型输出的单算子 |
+| [matmul_tscm_src_vecout](./matmul_tscm_src_vecout) | 本样例介绍Matmul API使用数据来源为VECOUT的用户自定义TSCM的输入 |

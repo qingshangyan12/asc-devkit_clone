@@ -1,12 +1,12 @@
 # Matmul算子多核非对齐切分场景直调样例
 ## 概述
 本样例介绍Matmul高阶API实现多核非对齐切分的单算子。多核非对齐的切分为M，N，K无法整除singleCoreM, singleCoreN, singleCoreK时，需要在不改变原有Tiling的情况下，在Kernel侧调用SetTail接口重新设置本次计算的singleCoreM/singleCoreN/singleCoreK。
-## 支持的AI处理器
+## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── matmul_splitk
+├── matmul_unaligned
 │   └── scripts
 │       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │       └── verify_result.py    // 真值对比文件
@@ -17,23 +17,18 @@
 ## 算子描述
 - 算子功能： 
 
-  本样例中实现的是[M, K, N]为[1000, 500, 700]的Matmul算子。
-  Matmul算子的数学表达式为：
-  $$
-  C = A * B + Bias
-  $$
-  其中A的形状为[1000, 500], B的形状为[500, 700], C的形状为[128, 128], Bias的形状为[1, 700]。
+  Matmul算子调用Matmul API，对多核非对齐切分的A、B矩阵做矩阵乘和加Bias偏置。
 
 - 算子规格： 
 
-  在核函数直调样例中，算子实现支持的shape为：M = 1000, N = 700, K = 500
+  本样例中，算子实现支持的shape为：M = 1000, N = 700, K = 500。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">-</td><td align="center">-</td><td align="center">-</td></tr>
+  <tr><td align="center">bias</td><td align="center">1 * N</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
@@ -43,8 +38,15 @@
 - 算子实现： 
 
   - Kernel实现
-    - 关键步骤：
-      - 进行Matmul计算前，先计算tailM、tailN、tailK，当tailM < singleCoreM || tailN < singleCoreN || tailK < singleCoreK时处理尾块，调用SetTail接口进行设置尾块大小。
+    - 计算逻辑：C = A * B + Bias。
+      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
+      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
+      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
+    - 具体步骤：
+      - 创建Matmul对象。
+      - 初始化操作。
+      - 设置右矩阵A、右矩阵B、Bias。
+      - 计算tailM、tailN、tailK，当tailM < singleCoreM || tailN < singleCoreN || tailK < singleCoreK时处理尾块，调用SetTail接口进行设置尾块大小。
         ```
         auto temp0 = AscendC::Ceil(tiling.M, tiling.singleCoreM);
         auto temp1 = AscendC::Ceil(tiling.N, tiling.singleCoreN);
@@ -67,6 +69,15 @@
         }
         matmulObj.IterateAll(cGlobal);
         ```
+      - 完成矩阵乘操作。
+      - 结束矩阵乘操作。
+
+  - Tiling实现
+      - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
+      - 获取Tiling参数的流程如下：
+        - 创建一个Tiling对象。
+        - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等。
+        - 调用GetTiling接口，获取Tiling信息。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

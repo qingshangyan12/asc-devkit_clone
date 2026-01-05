@@ -1,12 +1,12 @@
 # Matmul算子开启UnitFlag功能直调样例
 ## 概述
 本样例介绍Matmul API实现MDL模板开启UnitFlag功能的单算子。使能UnitFlag功能，可以使算子中的CUBE计算流水与FIXPIPE数据搬出流水并行，提升算子性能。Norm模板、IBShare模板默认使能UnitFlag功能，MDL模板默认不使能UnitFlag功能。
-## 支持的AI处理器
+## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── matmul_splitk
+├── matmul_unitflag
 │   └── scripts
 │       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │       └── verify_result.py    // 真值对比文件
@@ -17,23 +17,18 @@
 ## 算子描述
 - 算子功能： 
 
-  本样例中实现的是[M, K, N]为[1024, 1024, 4096]的Matmul算子。
-  Matmul算子的数学表达式为：
-  $$
-  C = A * B + Bias
-  $$
-  其中A的形状为[1024, 1024], B的形状为[1024, 4096], C的形状为[1024, 4096], Bias的形状为[1, 4096]。
+  Matmul算子调用Matmul API计算时，通过配置MatmulConfig中的enUnitFlag参数为true，使能MDL模板开启UnitFlag功能，对输入的A、B矩阵做矩阵乘和加bias偏置。算子使能UnitFlag功能后，在Matmul API内部实现MMAD指令和FIXPIPE指令的细粒度同步，从而使计算流水与数据搬出流水并行，提升算子性能。
 
 - 算子规格： 
 
-  在核函数直调样例中，算子实现支持的shape为：M = 1024, N = 4096, K = 1024
+  本样例中，算子实现支持的shape为：M = 1024, N = 4096, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">-</td><td align="center">-</td><td align="center">-</td></tr>
+  <tr><td align="center">bias</td><td align="center">1 * N</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
@@ -45,24 +40,44 @@
     - UnitFlag功能只支持Norm、IBshare、MDL三个模板。
     - 使能UnitFlag功能时，不支持算子内同时存在L0C搬出到Global Memory和L1搬出到Global Memory的两种流水。
     - 使能UnitFlag功能时，若同时使能L0C累加功能，不支持多次Iterate计算，一次GetTensorC输出。
- 
-  - Kernel实现
-    - 关键步骤：
-      - 创建Matmul对象时，自定义MatmulConfig参数，将其中的enUnitFlag参数设置为true，使能UnitFlag功能，获得自定义的使用MDL模板的Matmul对象。
+
+  - 算子Kernel实现
+    - 计算逻辑：C = A * B + Bias。
+      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
+      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
+      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
+    - 具体步骤：
+      - 创建Matmul对象。  
+        创建Matmul对象时，自定义MatmulConfig参数，将其中的enUnitFlag参数设置为true，使能UnitFlag功能，获得自定义的使用MDL模板的Matmul对象。
         ```
-        __aicore__ inline constexpr MatmulConfig GetCustomMDLCFG()
+        __aicore__ inline constexpr MatmulConfig GetUnitFlagCfg()
         {
             auto mmCfg = CFG_MDL;
-            mmCfg.enUnitFlag = false;
+        #ifdef ENABLE_UNITFLAG_FEATURE
+            // enable UnitFlag feature
+            mmCfg.enUnitFlag = true;
+        #endif
             return mmCfg;
         }
-        constexpr static MatmulConfig CUSTOM_CFG_MDL = GetCustomMDLCFG();
-        AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CUSTOM_CFG_MDL>
-        matmulObj;
+        constexpr static MatmulConfig CFG_MDL_UNITFLAG = GetUnitFlagCfg();
+
+        using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
+        using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
+        using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+        using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+        AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_UNITFLAG> matmulObj;
         ```
+      - 初始化操作。
+      - 设置左矩阵A、右矩阵B。
+      - 完成矩阵乘操作。
+      - 结束矩阵乘操作。
+
+  - 算子Tiling实现
+    - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
+    - 获取Tiling参数的流程如下：
+      - 创建一个Tiling对象。
+      - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等。
+      - 调用GetTiling接口，获取Tiling信息。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

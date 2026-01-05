@@ -17,15 +17,11 @@
 ## 算子描述
 - 算子功能： 
 
-  本样例中实现的是[M, K, N]固定为[16, 1024, 16]的Matmul算子。
-  Matmul算子的数学表达式为：
-  $$
-  C = A * B
-  $$
-  其中A的形状为[16, 1024], B的形状为[1024, 16], C的形状为[16, 16]。
+  Matmul算子通过调用Matmul API开启多核切K的功能，对输入的A、B矩阵做矩阵乘和加Bias偏置。
+
 - 算子规格： 
 
-  在核函数直调样例中，算子实现支持的shape为：M = 16, N = 16, K = 1024。
+  本样例中，算子实现支持的shape为：M = 16, N = 16, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
@@ -47,16 +43,33 @@
     - 使能多核切K的场景，不支持开启Bias。
  
   - kernel实现  
-    关键步骤：  
-    - 初始化完成后，对C矩阵的输出Global Memory地址清零。
-      ```
-      Fill(cGlobal, tiling.M * tiling.N, (cType)0);
-      ```
-    - 开启AtomicAdd累加，完成矩阵乘操作。
-      ```
-      uint8_t enAtomic = 1;
-      matmulObj.IterateAll(cGlobal, enAtomic);
-      ```
+    - 计算逻辑：C = A * B
+      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
+      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
+    - 具体步骤：
+      - 创建Matmul对象。
+      - 初始化操作。
+      - 对C矩阵的输出Global Memory地址清零。
+          ```
+          Fill(cGlobal, tiling.M * tiling.N, (cType)0);
+          ```
+      - 设置左矩阵A、右矩阵B、Bias。
+      - 开启AtomicAdd累加，完成矩阵乘操作。
+          ```
+          uint8_t enAtomic = 1; // set AtomicAdd
+          matmulObj.IterateAll(cGlobal, enAtomic);
+          ```
+      - 结束矩阵乘操作。
+
+  - Tiling实现
+    - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，并且使能多核切K，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
+    - 获取Tiling参数的流程如下：
+      - 创建一个Tiling对象。
+      - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等，调用EnableMultiCoreSplitK使能多核切K。
+          ```
+          cubeTiling->EnableMultiCoreSplitK(true);
+          ```
+      - 调用GetTiling接口，获取Tiling信息。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

@@ -1,12 +1,12 @@
 # Matmul算子输出Channel拆分功能直调样例
 ## 概述
 本样例介绍Matmul API实现矩阵乘输出Channel拆分功能的单算子。当Matmul计算结果C矩阵的格式为NZ时，C矩阵采用分形存储，若C矩阵数据类型为float，默认情况下分形大小为16 * 16。Channel拆分功能可以将该场景下C矩阵的每个16 * 16分形切分为16 * 8的分形，使C矩阵按照16 * 8的分形进行存储。
-## 支持的AI处理器
+## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── matmul_splitk
+├── matmul_channelsplit
 │   └── scripts
 │       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │       └── verify_result.py    // 真值对比文件
@@ -17,23 +17,18 @@
 ## 算子描述
 - 算子功能： 
 
-  本样例中实现的是[M, K, N]为[1024, 1024, 4096]的Matmul算子。
-  Matmul算子的数学表达式为：
-  $$
-  C = A * B + Bias
-  $$
-  其中A的形状为[1024, 1024], B的形状为[1024, 4096], C的形状为[1024, 4096], Bias的形状为[1, 4096]。
+  Matmul算子调用Matmul API计算时，通过配置MatmulConfig中的isEnableChannelSplit参数为true，使能矩阵乘输出的Channel拆分功能，对输入的A、B矩阵做矩阵乘和加bias偏置。
 
 - 算子规格： 
 
-  在核函数直调样例中，算子实现支持的shape为：M = 1024, N = 4096, K = 1024
+  本样例中，Matmul算子实现支持的shape为：M = 1024, N = 4096, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">-</td><td align="center">-</td><td align="center">-</td></tr>
+  <tr><td align="center">bias</td><td align="center">1 * N</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
@@ -41,29 +36,34 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 - 算子实现： 
-  - 约束条件
-    - C矩阵的数据排布格式为CubeFormat::NZ。
-    - C矩阵的数据类型为float。
-    - C矩阵的内存逻辑位置为Gloabl Memory。
- 
   - Kernel实现
-    - 关键步骤：
-      - 创建Matmul对象时，自定义MatmulConfig参数，将其中的isEnableChannelSplit参数设置为true，使能矩阵乘输出的Channel拆分功能，获得自定义的使用Norm模板的  Matmul对象。
+    - 计算逻辑：C = A * B + Bias。
+      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
+      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
+      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
+    - 具体步骤：
+      - 创建Matmul对象。  
+        创建Matmul对象时，自定义MatmulConfig参数，将其中的isEnableChannelSplit参数设置为true，使能矩阵乘输出的Channel拆分功能，获得自定义的使用Norm模板的Matmul对象。
         ```
-        __aicore__ inline constexpr MatmulConfig GetCustomNORMCFG()
-        {
-            auto mmCfg = CFG_NORM;
-            mmCfg.isEnableChannelSplit = true;
-            return mmCfg;
-        }
-        constexpr static MatmulConfig CUSTOM_CFG_NORM = GetCustomNORMCFG();
-        AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::NZ, CType>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CUSTOM_CFG_NORM>
-            matmulObj;
+        constexpr static MatmulConfigMode configMode = MatmulConfigMode::CONFIG_NORM;
+        constexpr static MatmulFuncParams funcParamsChannelSplit{
+            false, false, false, false, 0, IterateOrder::ORDER_M, ScheduleType::INNER_PRODUCT,
+            true, false, false, false, true/*isEnableChannelSplit*/
+        };
+        constexpr static MatmulConfig CFG_NORM = GetMMConfig<configMode>(funcParamsChannelSplit);
         ```
+      - 初始化操作。
+      - 完成矩阵乘操作。
+      - 结束矩阵乘操作。
 
+  - Tiling实现
+    - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。
+    - 只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
+    - 获取Tiling参数的流程如下：
+      - 创建一个Tiling对象。
+      - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等。
+      - 调用GetTiling接口，获取Tiling信息。
+  
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 

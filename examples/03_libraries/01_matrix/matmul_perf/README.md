@@ -1,7 +1,7 @@
 # Matmul算子性能优化场景直调样例
 ## 概述
 本样例介绍Matmul API实现三种性能优化特性（纯Cube模式、MDL模板、UnitFlag）的单算子。
-## 支持的AI处理器
+## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
@@ -24,7 +24,7 @@
 
 - 算子规格： 
 
-  在核函数直调样例中，算子实现的shape为：M = 128, N = 30720, K = 64。
+  本样例中，算子实现的shape为：M = 128, N = 30720, K = 64。
   <table>性能优化特性
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
@@ -40,62 +40,125 @@
   </table>
 - 算子实现： 
   - kernel实现  
-    - 默认实现，使用默认的NORM模板CFG_NORM创建Matmul对象。
-      ```
-      #include "lib/matmul_intf.h"
+    - 计算逻辑：C = A * B + Bias。
+      - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
+      - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
+      - Bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该Bias进行偏置。
+    - 具体步骤：
+      - 创建Matmul对象。  
+        - 默认实现，使用默认的NORM模板CFG_NORM创建Matmul对象。
+          ```
+          #include "lib/matmul_intf.h"
 
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+          using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
+          using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
+          using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+          using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
 
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
-      ```
-    - 使能纯Cube模式实现，在定义Matmul对象的代码中，设置ASCEND_CUBE_ONLY宏，且必须在#include "lib/matmul_intf.h"之前设置。
-      ```
-      #define ASCNEND_CUBE_ONLY // 设置ASCEND_CUBE_ONLY宏
-      #include "lib/matmul_intf.h"
+          AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
+          ```
+        - 使能纯Cube模式实现，在定义Matmul对象的代码中，设置ASCEND_CUBE_ONLY宏，且必须在#include "lib/matmul_intf.h"之前设置。
+          ```
+          #define ASCNEND_CUBE_ONLY // 设置ASCEND_CUBE_ONLY宏
+          #include "lib/matmul_intf.h"
 
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+          using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
+          using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
+          using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+          using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
 
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
-      ```
-    - 使能MDL模板实现，使用默认的MDL模板CFG_MDL创建Matmul对象。
-      ```
-      #define ASCNEND_CUBE_ONLY // 设置ASCEND_CUBE_ONLY宏
-      #include "lib/matmul_intf.h"
+          AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
+          ```
+        - 使能MDL模板实现，使用默认的MDL模板CFG_MDL创建Matmul对象。
+          ```
+          #define ASCNEND_CUBE_ONLY // 设置ASCEND_CUBE_ONLY宏
+          #include "lib/matmul_intf.h"
 
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+          using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
+          using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
+          using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+          using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
 
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj; // 使用CFG_MDL创建Matmul对象
-      ```
-    - 使能UnitFlag功能实现，自定义MatmulConfig参数，将其中的enUnitFlag参数设置为true，使能UnitFlag功能。
-      ```
-      #define ASCNEND_CUBE_ONLY // 设置ASCEND_CUBE_ONLY宏
-      #include "lib/matmul_intf.h"
+          AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj; // 使用CFG_MDL创建Matmul对象
+          ```
+        - 使能UnitFlag功能实现，自定义MatmulConfig参数，将其中的enUnitFlag参数设置为true，使能UnitFlag功能。
+          ```
+          #define ASCNEND_CUBE_ONLY // 设置ASCEND_CUBE_ONLY宏
+          #include "lib/matmul_intf.h"
 
-      __aicore__ inline constexpr MatmulConfig GetUnitFlagCfg()
-      {
-          auto mmCfg = CFG_MDL;
-          mmCfg.enUnitFlag = true; // 设置enUnitFlag参数为true
-          return mmCfg;
-      }
-      constexpr static MatmulConfig CFG_MDL_UNITFLAG = GetUnitFlagCfg();
+          __aicore__ inline constexpr MatmulConfig GetUnitFlagCfg()
+          {
+              auto mmCfg = CFG_MDL;
+              mmCfg.enUnitFlag = true; // 设置enUnitFlag参数为true
+              return mmCfg;
+          }
+          constexpr static MatmulConfig CFG_MDL_UNITFLAG = GetUnitFlagCfg();
 
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+          using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
+          using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
+          using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+          using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
 
-      // 使用自定义的MatmulConfig参数CFG_MDL_UNITFLAG创建Matmul对象
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_UNITFLAG> matmulObj;
-      ```
+          AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_UNITFLAG> matmulObj; // 使用自定义的MatmulConfig参数CFG_MDL_UNITFLAG创建Matmul对象
+          ```
+      - 初始化操作。
+        - 默认实现
+          ```
+          REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), matmulObj, &tiling); // 初始化matmul对象
+          ```
+        - 使能纯Cube模式实现，同默认实现。
+        - 使能MDL模板实现，同默认实现。
+        - 使能UnitFlag功能实现，同默认实现。
+      - 设置左矩阵A、右矩阵B、Bias。
+        - 默认实现
+          ```
+          mm.SetTensorA(aGlobal);    // 设置左矩阵A
+          mm.SetTensorB(bGlobal);    // 设置右矩阵B
+          mm.SetBias(biasGlobal);    // 设置Bias
+          ```
+        - 使能纯Cube模式实现，同默认实现。
+        - 使能MDL模板实现，同默认实现。
+        - 使能UnitFlag功能实现，同默认实现。
+      - 完成矩阵乘操作。
+        ```
+        matmulObj.IterateAll(cGlobal);
+        ```
+      - 结束矩阵乘操作。
+        ```
+        matmulObj.End();
+        ```
+
+  - Tiling实现
+    - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
+    - 获取Tiling参数的流程如下：
+      - 创建一个Tiling对象。
+        ```
+        auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
+        matmul_tiling::MultiCoreMatmulTiling cubeTiling(*ascendcPlatform);
+        ```
+      - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等。
+        ```
+        auto blockDim = ascendcPlatform->GetCoreNumAiv(); // 方式一：非纯Cube模式，SetDim设置为AIV的核数
+        auto blockDim = ascendcPlatform->GetCoreNumAic(); // 方式二：纯Cube模式，SetDim设置为AIC的核数
+
+        cubeTiling.SetDim(blockDim);
+        cubeTiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+            matmul_tiling::DataType::DT_FLOAT16, isAtrans);
+        cubeTiling.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+            matmul_tiling::DataType::DT_FLOAT16, isBtrans);
+        cubeTiling.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+            matmul_tiling::DataType::DT_FLOAT);
+        cubeTiling.SetBiasType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+            matmul_tiling::DataType::DT_FLOAT);
+        cubeTiling.SetOrgShape(M, N, K);
+        cubeTiling.SetShape(-1, -1, K);
+        cubeTiling.EnableBias(isBias);
+        ```
+      - 调用GetTiling接口，获取Tiling信息。
+        ```
+        TCubeTiling tilingData; 
+        int64_t ret = tiling.GetTiling(tilingData);    // if ret = -1, get tiling failed 
+        ```
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
