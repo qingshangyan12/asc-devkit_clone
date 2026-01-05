@@ -69,8 +69,8 @@ PIPE_V
 
 ```cpp
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
-__ubuf__ half src[total_length * sizeof(half)];
-__ubuf__ half dst[total_length * sizeof(half)];
+__ubuf__ half src[total_length];
+__ubuf__ half dst[total_length];
 asc_rcp(dst, src, total_length);    // dst = 1 / src
 // src [1, 2, 3, ..., 128]
 // dst [1, 0.5, 0.3333333, ..., 0.0078125]

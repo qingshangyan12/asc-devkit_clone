@@ -77,5 +77,6 @@ PIPE_MTE1
 constexpr uint64_t total_length = 128;    // total_length指参与搬运的数据总长度
 half value = 1;
 __ca__ half dst[total_length];
+asc_fill_value_config config;    // 使用默认配置
 asc_fill_l0a_value(dst, value, config);    // 将dst中的元素按照config配置初始化为1
 ```

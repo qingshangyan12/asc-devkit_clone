@@ -1,12 +1,13 @@
 # asc_fill_value_config
 
-asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a_value](../cube_dmamove/asc_fill_l0a_value.md)/[asc_fill_l0b_value](../cube_dmamove/asc_fill_l0b_value.md)/[asc_fill_l1_value](../cube_dmamove/asc_fill_l1_value.md)接口需要配置的各种初始化参数。
+asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a_value](../cube_datamove/asc_fill_l0a_value.md)/[asc_fill_l0b_value](../cube_datamove/asc_fill_l0b_value.md)/[asc_fill_l1_value](../cube_datamove/asc_fill_l1_value.md)接口需要配置的各种初始化参数。
 
 ## 结构体具体定义
 
 ```cpp
+constexpr uint64_t ASC_FILL_VALUE_DEFAULT_VALUE = 0x0000000000000000;
 union asc_fill_value_config {
-    uint64_t config = CAPI_DEFAULT_FILL_VALUE_CONFIG_VALUE;
+    uint64_t config = ASC_FILL_VALUE_DEFAULT_VALUE;
     struct {
         uint64_t repeat : 15;
         uint64_t reserved1 : 1;
