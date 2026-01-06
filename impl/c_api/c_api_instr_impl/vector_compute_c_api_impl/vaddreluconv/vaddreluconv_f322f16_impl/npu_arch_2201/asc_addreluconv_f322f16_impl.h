@@ -35,7 +35,7 @@ __aicore__ inline void asc_add_relu_cast_f322f16_impl(__ubuf__ half* dst, __ubuf
 __aicore__ inline void asc_add_relu_cast_f322f16_impl(__ubuf__ half* dst,  __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_add_relu_cast_f322f16_impl(dst, src0, src1, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE,
+    asc_add_relu_cast_f322f16_impl(dst, src0, src1, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_HALF_DEFAULT_REPEAT_STRIDE,
         ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }

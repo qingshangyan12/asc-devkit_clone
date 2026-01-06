@@ -70,8 +70,8 @@ PIPE_V
 ```cpp
 // total_length指参与计算的数据长度
 constexpr uint32_t total_length = 32;
-__ubuf__ half dst[total_length];
-__ubuf__ half src0[total_length];
-__ubuf__ half src1[total_length];
+__ubuf__ int8_t dst[total_length];
+__ubuf__ int16_t src0[total_length];
+__ubuf__ int16_t src1[total_length];
 asc_add_relu_cast_s162s8(dst, src0, src1, total_length);
 ```

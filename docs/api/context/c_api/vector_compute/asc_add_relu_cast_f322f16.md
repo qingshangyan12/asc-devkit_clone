@@ -71,7 +71,7 @@ PIPE_V
 // total_length指参与计算的数据长度
 constexpr uint32_t total_length = 32;
 __ubuf__ half dst[total_length];
-__ubuf__ half src0[total_length];
-__ubuf__ half src1[total_length];
+__ubuf__ float src0[total_length];
+__ubuf__ float src1[total_length];
 asc_add_relu_cast_f322f16(dst, src0, src1, total_length);
 ```
