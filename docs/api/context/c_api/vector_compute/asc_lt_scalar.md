@@ -59,10 +59,17 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-// total_length指参与计算的数据长度
-constexpr uint64_t total_length = 64
-half scalar_val = 1;
+// 结果输出到目标地址中，固定为128个元素
+constexpr uint32_t total_length = 128;
+__ubuf__ uint8_t dst[total_length / 8];
 __ubuf__ half src[total_length];
-__ubuf__ uint8_t dst[total_length];
-asc_lt_scalar(dst, src, scalar_val, config);
+half scalar = 20;
+uint8_t repeat = 1;
+uint8_t dst_block_stride = 1;
+uint8_t src_block_stride = 1;
+uint8_t dst_repeat_stride = 8;
+uint8_t src_repeat_stride = 8;
+…… // 数据搬运及同步操作
+asc_lt_scalar(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+…… // 同步操作
 ```

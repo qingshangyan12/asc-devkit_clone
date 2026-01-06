@@ -59,12 +59,17 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
+// 结果输出到目标地址中，固定为128个元素
+constexpr uint32_t total_length = 128;
+__ubuf__ uint8_t dst[total_length / 8];
 __ubuf__ half src[total_length];
-half value = 1;
-__ubuf__ half dst[total_length];
-// 做一次迭代计算，dst和src单次迭代内DataBlock间地址步长为1，相邻迭代间相同DataBlock地址步长为8
-asc_eq_scalar(dst, src, value, 1, 1, 1, 8, 8);    // 将src按元素与value进行比较运算，若值相等则输出1，否则输出0
-// src [0, 1, 0, 1, ..., 1]
-// dst [0, 1, 0, 1, ..., 1]
+half scalar = 20;
+uint8_t repeat = 1;
+uint8_t dst_block_stride = 1;
+uint8_t src_block_stride = 1;
+uint8_t dst_repeat_stride = 8;
+uint8_t src_repeat_stride = 8;
+…… // 数据搬运及同步操作
+asc_eq_scalar(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+…… // 同步操作
 ```
