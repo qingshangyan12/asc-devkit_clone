@@ -42,7 +42,7 @@ $$
 | 参数名       | 输入/输出 | 描述                |
 | --------- | ----- | ----------------- |
 | dst       | 输出    | 目的操作数。            |
-| src0、src1 | 输入    | 源操作数。             |
+| src0、src1 | 输入    | 源操作数（矢量）。             |
 | count     | 输入    | 参与计算的元素个数。        |
 | dst_block_stride   | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src0_block_stride  | 输入 | 源操作数0单次迭代内不同DataBlock间地址步长。 |
@@ -68,7 +68,7 @@ PIPE_V
 ## 调用示例
 
 ```c++
-constexpr total_length = 64;
+constexpr uint64_t total_length = 64;
 //total_length 指参与计算的数据长度
 __ubuf__ int16_t src0[total_length];
 __ubuf__ int16_t src1[total_length];

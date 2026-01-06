@@ -12,7 +12,7 @@
 执行矢量减运算，并将结果进行Relu和类型转换。计算公式如下：
 
 $$
-dst_i = Cast(ReLU(src0_i - src1_i))
+dst_i = Cast(ReLU(src0_i - src1_i), dstType)
 $$
 
 ## 函数原型
@@ -82,7 +82,7 @@ PIPE_V
 
 ```c++
 //total_length 指参与计算的数据长度
-constexpr uint64_t total_length = 0;
+constexpr uint64_t total_length = 256;
 __ubuf__ int16_t src0[total_length];
 __ubuf__ int16_t src1[total_length];
 __ubuf__ int8_t dst[total_length];

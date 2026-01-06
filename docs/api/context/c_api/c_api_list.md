@@ -1,4 +1,5 @@
 # C API
+C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 ## 数据结构
 
@@ -11,6 +12,8 @@
 | [asc_store_atomic_config](struct/asc_store_atomic_config.md) | 原子操作使能位与原子操作类型的值 |
 
 ## 矢量计算
+
+矢量计算类API，单独使用时可以引入vector_compute.h，此类API列表如下：
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -105,7 +108,6 @@
 | [asc_mul_add_relu](vector_compute/asc_mul_add_relu.md) | 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。 |
 | [asc_mul_cast_half2int8](vector_compute/asc_mul_cast_half2int8.md) | 按元素求积，并将结果转换为int8_t类型 |
 | [asc_mul_cast_half2uint8](vector_compute/asc_mul_cast_half2uint8.md) | 按元素求积，并将结果转换为uint8_t类型。 |
-| [asc_nchw_to_5hd](vector_compute/asc_nchw_to_5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
 | [asc_ne](vector_compute/asc_ne.md) | 按元素判断src0 != src1是否成立，若成立则输出结果为1，否则为0。 |
 | [asc_not](vector_compute/asc_not.md) | 按元素做按位取反，计算公式如下。 |
 | [asc_or](vector_compute/asc_or.md) | 每对元素按位或运算。 |
@@ -120,6 +122,9 @@
 
 
 ## 数据搬运
+
+数据搬运类API，单独使用时可以引入vector_datamove.h和cube_datamove.h，此类API列表如下：
+
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_fixpipe_l0c2out](cube_datamove/asc_fixpipe_l0c2out.md) | 将L0C中的数据搬运到GM中。 |
@@ -154,6 +159,8 @@
 
 ## 标量操作
 
+标量操作类API，单独使用时可以引入scalar_compute.h，此类API列表如下：
+
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_clz](scalar_compute/asc_clz.md)| 计算参数前导零的数量（二进制从最高位到第一个1共有多少个0）。 |
@@ -166,6 +173,9 @@
 | [asc_zero_bits_cnt](scalar_compute/asc_zero_bits_cnt.md) | 获取一个uint64_t类型数字的二进制中0的个数。 |
 
 ## 矩阵计算
+
+标量操作类API，单独使用时可以引入cube_compute.h，此类API列表如下：
+
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_set_mm_transform](cube_compute/asc_set_mm_transform.md)| 设置mmad计算时优先通过M/N中的哪个方向。 |
@@ -181,6 +191,8 @@
 
 ## 同步控制
 
+同步控制类API，单独使用时可以引入sync.h，此类API列表如下：
+
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_sync_notify](sync/asc_sync_notify.md)| 设置同步标志。 |
@@ -194,6 +206,8 @@
 
 
 ## 系统变量
+
+系统变量类API，单独使用时可以引入sys_var.h，此类API列表如下：
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -212,6 +226,8 @@
 
 ## 缓存控制
 
+缓存控制类API，单独使用时可以引入cache_ctrl.h，此类API列表如下：
+
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_datacache_preload](cache_ctrl/asc_datacache_preload.md)| 从源地址所在的特定GM地址预加载数据到Data Cache中。 |
@@ -220,6 +236,8 @@
 | [asc_icache_preload](asc_icache_preload.md) | 从指令所在DDR地址预加载数据到对应的cacheline中。 |
 
 ## 原子操作
+
+原子操作类API，单独使用时可以引入atomic.h，此类API列表如下：
 
 |   API名称   |   说明   |
 |----------|-----------|

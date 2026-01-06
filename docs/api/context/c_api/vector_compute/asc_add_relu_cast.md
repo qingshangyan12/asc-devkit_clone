@@ -1,5 +1,5 @@
 
-# asc_add_relu_cast_f322f16
+# asc_add_relu_cast_s162s8
 
 ## 产品支持情况
 
@@ -10,10 +10,10 @@
 
 ## 功能说明
 
-按元素求和，结果和0对比取较大值，并将结果从float类型转换为half类型。计算公式如下：
+按元素求和，结果和0对比取较大值，并将结果从int16_t类型转换为int8_t类型。计算公式如下：
 
 $$
-dst_i = Cast(max((src0_i+src1_i), 0),half)
+dst_i = Cast(max((src0_i+src1_i), 0))
 $$
 
 ## 函数原型
@@ -21,19 +21,25 @@ $$
 - 前n个数据计算
 
     ```cpp
+   __aicore__ inline void asc_add_relu_cast_s162s8(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
    __aicore__ inline void asc_add_relu_cast_f322f16(__ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+   __aicore__ inline void asc_add_relu_cast_f162s8(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
+    __aicore__ inline void asc_add_relu_cast_s162s8(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
     __aicore__ inline void asc_add_relu_cast_f322f16(__ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    __aicore__ inline void asc_add_relu_cast_f162s8(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
     ```
 
 - 同步计算
 
     ```cpp
+    __aicore__ inline void asc_add_relu_cast_s162s8_sync(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
     __aicore__ inline void asc_add_relu_cast_f322f16_sync(__ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+    __aicore__ inline void asc_add_relu_cast_f162s8_sync(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
     ```
 
 ## 参数说明
@@ -70,8 +76,8 @@ PIPE_V
 ```cpp
 // total_length指参与计算的数据长度
 constexpr uint32_t total_length = 32;
-__ubuf__ half dst[total_length];
-__ubuf__ float src0[total_length];
-__ubuf__ float src1[total_length];
-asc_add_relu_cast_f322f16(dst, src0, src1, total_length);
+__ubuf__ int8_t dst[total_length];
+__ubuf__ int16_t src0[total_length];
+__ubuf__ int16_t src1[total_length];
+asc_add_relu_cast_s162s8(dst, src0, src1, total_length);
 ```

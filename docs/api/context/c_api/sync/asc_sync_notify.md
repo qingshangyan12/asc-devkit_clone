@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, int id)
+__aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
 ```
 
 ## 参数说明
