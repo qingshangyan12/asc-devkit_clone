@@ -15,7 +15,7 @@
 #ifndef LIB_HCCL_HCCL_H
 #define LIB_HCCL_HCCL_H
 
-#include "kernel_operator.h"
+#include "kernel_basic_intf.h"
 #include "hccl_common.h"
 #include "../../../impl/adv_api/detail/hccl/impl/hccl_impl_def.h"
 
