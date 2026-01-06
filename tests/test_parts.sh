@@ -75,6 +75,7 @@ basic_test_two_targets=(
 )
 
 basic_test_three_targets=(
+    ascendc_pyut_asc_compile_common
     ascendc_pyut_asc_op_compiler
     ascendc_pyut_aclrt_launch_kernel
     ascendc_pyut_compile_trace_log

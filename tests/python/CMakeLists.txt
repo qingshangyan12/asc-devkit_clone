@@ -32,12 +32,16 @@ run_python_llt_test(
 )
 
 run_python_llt_test(
-    TARGET asc_compile_common_python_ut
+    TARGET ascendc_pyut_asc_compile_common
     SRC_FILES_DIR ${ASCENDC_DIR}/tools/build/asc_op_compile_base/common/
     TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/asc_compile_common/
     PRE_TEST_COMMAND
     COVERAGERC_DIR
     )
+
+add_dependencies(ascendc_pyut_asc_compile_common
+    asc_platform_test
+)
 
 run_python_llt_test(
     TARGET ascendc_pyut_asc_op_compiler
