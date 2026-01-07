@@ -1,46 +1,42 @@
 # SyncAll样例
 ## 概述
-本样例基于Init实现核间同步。
-
-## 支持的AI处理器
+本样例基于SyncAll实现核间同步，适用于以下场景：不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题，通过调用本接口来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
-- Ascend 910C
-- Ascend 910B
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 ```
-├── init
+├── sync_all
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── init.asc      // Ascend C算子实现 & 调用样例
+│   └── sync_all.asc      // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
 - 算子功能：  
- 用于内存和同步流水事件EventID的初始化。
+  功能为使用8个核进行数据处理，每个核均是处理32个float类型数据，对该数据乘2后再与其他核上进行同样乘2的数据进行相加，中间结果保存到workGm，调用SyncAll实现8个核间的同步。
+
 - 算子规格：  
- <table>
-
-
+  <table>
+  <tr><th align="center"></th><th colspan="5" align="center"></th></tr>  
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">128</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">z</td><td align="center">128</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
-
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">init_custom</td></tr>
+  <tr><td align="center">z</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">sync_all_custom</td></tr>
   </table>
 
 
 - 算子实现：  
-  本样例中实现的是固定shape为512的copy算子。
   - kernel实现   
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Copy基础API接口将输入srcLocal的数值搬运到dstLocal中，再搬出到外部存储上。
-
-    CopyCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行Copy指令，将srcLocal搬运到dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    
+    本算子实现了8个核的核间同步，Process中每个核都执行以下三个基本任务：CopyIn、FirstCompute、CopyToWorkGlobal。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中。Compute任务负责对srcLocal与标量2相乘，并将结果存储到dstLocal中。CopyToWorkGlobal任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor WorkGlobal。接着Process调用SyncAll等待所有核都完成计算，最终累加结果需要等所有核都计算完成。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

@@ -8,7 +8,7 @@
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-# See LICENSE in the root of the software repository for the full text of the License.s
+# See LICENSE in the root of the software repository for the full text of the License.
 
 import os
 import sys
@@ -23,6 +23,9 @@ def verify_result(real_result, golden):
     output_type = np.uint8
     real_result = np.fromfile(real_result, dtype=output_type) # 从bin文件读取实际运算结果
     golden = np.fromfile(golden, dtype=output_type) # 从bin文件读取预期运算结果
+    block_length = 64
+    real_result = real_result[0:block_length // 8]
+    golden = golden[0:block_length // 8]
     result = np.abs(real_result - golden) # 计算运算结果和预期结果偏差
     deno = np.maximum(np.abs(real_result), np.abs(golden)) # 获取最大值并组成新数组
     result_atol = np.less_equal(result, LOSS) # 计算绝对误差

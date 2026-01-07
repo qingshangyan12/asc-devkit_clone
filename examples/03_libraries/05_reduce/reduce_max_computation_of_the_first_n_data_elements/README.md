@@ -1,10 +1,10 @@
 # ReduceMax样例
 ## 概述
-本样例基于ReduceMax实现最大值归约，可用于从所有的输入数据中找出最大值及最大值对应的索引位置。
-## 支持的AI处理器
+本样例基于ReduceMax的tensor前n个数据计算接口实现最大值归约，可用于指定从输入tensor的前n个数据中计算找出最大值及最大值对应的索引位置。
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
-- Ascend 910C
-- Ascend 910B
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── reduce_max
@@ -18,7 +18,7 @@
 
 ## 算子描述
 - 算子功能：  
-  ReduceMaxCustom算子在所有的输入tensor数据中找出最小值及最小值对应的索引位置。
+  ReduceMaxCustom算子在所有的输入tensor数据的前n个数据中找出最大值及最大值对应的索引位置。
 - 算子规格：  
   <table>
   <tr><td rowspan="1" align="center"></td><td colspan="4" align="center"></td></tr>
@@ -39,7 +39,7 @@
 
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用ReduceMax基础API接口完成计算，得到最终结果，再搬出到外部存储上。
 
-    ReduceMaxCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责从srcLocal找出最小值及最小值对应的索引位置，并将结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    ReduceMaxCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中。Compute任务负责从srcLocal的前288个数据中找出最大值及最大值对应的索引位置，并将结果存储在dstLocal中。CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
 
 
@@ -68,6 +68,7 @@
   cmake ..;make -j;             # 编译工程
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash

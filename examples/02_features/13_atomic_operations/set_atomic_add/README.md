@@ -2,10 +2,10 @@
 ## 概述
 本样例基于SetAtomicAdd为后续的从VECOUT/L0C/L1到GM的数据传输开启原子累加。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
-- Ascend 910C
-- Ascend 910B
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 ```
@@ -20,27 +20,26 @@
 
 ## 算子描述
 - 算子功能：  
+
   调用SetAtomicAdd接口后，可对后续的从VECOUT/L0C/L1到GM的数据传输开启原子累加，通过模板参数设定不同的累加数据类型。
 - 算子规格：  
- <table>
 
-
+  <table>
+  
+  
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">算子输出</td></tr>
   <tr><td align="center">z</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
-
+  
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">set_atomic_add_custom</td></tr>
   </table>
 
 
-- 算子实现：  
-  本样例中实现的是固定shape为256的SetAtomicAdd算子。
+- 算子实现：
   - kernel实现   
-    计算逻辑是：
-    set_atomic_add_custom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行Copy指令，将srcLocal搬运到dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
-
+    本算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn和Compute任务不进行任何操作。CopyOut任务负责将Global Memory上的输入Tensor src0Gm和src1Gm存储在src0Local中，随后为后续的VECOUT/L0C/L1到GM的数据传输开启原子累加，最后输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 

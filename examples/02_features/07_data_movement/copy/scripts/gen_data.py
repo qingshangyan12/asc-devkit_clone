@@ -24,7 +24,7 @@ def get_range_by_dtype(input_type):
         print(f"Unsupported data type:{input_type}")
 
 def gen_golden_data_simple():
-    input_type = np.uint32
+    input_type = np.int32
     output_type = input_type
     block_length = 512
 

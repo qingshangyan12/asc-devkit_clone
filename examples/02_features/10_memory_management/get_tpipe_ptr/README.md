@@ -1,37 +1,61 @@
-# TGetTPipePtr样例
+# GetTPipePtr样例
 ## 概述
-如下样例中，在核函数入口处创建TPipe对象，对象初始化会设置全局唯一的TPipe指针。在调用KernelAdd类Init函数时，无需显式传入TPipe指针，而是在函数内直接使用GetTPipePtr获取全局TPipe指针，用来做InitBuffer等操作。
-创建TPipe对象时，对象初始化会设置全局唯一的TPipe指针。本接口用于获取该指针，获取该指针后，可进行TPipe相关的操作。
+样例基于GetTPipePtr获取全局TPipe指针，核函数无需显式传入TPipe指针，即可进行TPipe相关的操作。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
-- Ascend 910C
-- Ascend 910B
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── get_tpipe_ptr
-│   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
-│   └── get_tpipe_ptr.asc      // Ascend C算子实现 & 调用样例
+│   └── get_tpipe_ptr.asc      // Ascend C算子实现 & 调用样例 & 输入和真值数据生成 & 输出和真值校验
 ```
 
 ## 算子描述
-初始化TBufPool内存资源池。本接口适用于内存资源有限时，希望手动指定UB/L1内存资源复用的场景。本接口初始化后在整体内存资源中划分出一块子资源池。划分出的子资源池TBufPool。
+- 算子功能： 
+
+  创建TPipe对象时，对象初始化会设置全局唯一的TPipe指针。本接口用于获取该指针，获取该指针后，可进行TPipe相关的操作。
 
 - 算子规格：  
-  <table>  
-  <tr><th align="center"></th><th colspan="5" align="center"></th></tr>  
-  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center"></td></tr>  
-  <tr><td align="center">x</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td><td align="center"></td></tr>  
-  <tr><td align="center">y</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td><td align="center"></td></tr>  
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td><td align="center"></td></tr>  
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">get_tpipe_ptr_custom</td></tr>  
+  <table>
+    <tr>
+      <td align="center">类别</td>
+      <td align="center">name</td>
+      <td align="center">shape</td>
+      <td align="center">data type</td>
+      <td align="center">format</td>
+    </tr>
+    <tr>
+      <td rowspan="2" align="center">算子输入</td>
+      <td align="center">x</td>
+      <td align="center">8 * 2048</td>
+      <td align="center">float</td>
+      <td align="center">ND</td>
+    </tr>
+    <tr>
+      <td align="center">y</td>
+      <td align="center">8 * 2048</td>
+      <td align="center">float</td>
+      <td align="center">ND</td>
+    </tr>
+    <tr>
+      <td align="center">算子输出</td>
+      <td align="center">z</td>
+      <td align="center">8 * 2048</td>
+      <td align="center">float</td>
+      <td align="center">ND</td>
+    </tr>
+    <tr>
+      <td align="center">核函数名</td>
+      <td colspan="4" align="center">get_tpipe_ptr_custom</td>
+    </tr>
   </table>
 
+
+
 - 算子实现：  
-  样例中实现的是使用Compare基础API实现逐元素比较两个tensor大小的功能。
 
   - Kernel实现
 
@@ -64,10 +88,9 @@
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  [Success] Case accuracy is verification passed.
   ```

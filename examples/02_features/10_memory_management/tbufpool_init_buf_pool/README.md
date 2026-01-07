@@ -1,11 +1,12 @@
 # TBufPool::InitBufPool样例
-## 概述通过Tpipe::InitBufPool接口可划分出整块资源，整块TbufPool资源可以继续通过TBufPool::InitBufPool接口划分成小块资源
-本样例基于TBufPool::InitBufPool,
+## 概述
 
-## 支持的AI处理器
+本样例基于TBufPool::InitBufPool进行TBufPool资源划分，适用于将Tpipe::InitBufPool接口划分的整块资源，继续划分成小块资源的场景。
+
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
-- Ascend 910C
-- Ascend 910B
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── tpipe_init_buf_pool
@@ -17,26 +18,54 @@
 ```
 
 ## 算子描述
-初始化TBufPool内存资源池。本接口适用于内存资源有限时，希望手动指定UB/L1内存资源复用的场景。本接口初始化后在整体内存资源中划分出一块子资源池。划分出的子资源池TBufPool。
+- 算子功能： 
 
-- 算子规格：  
-  <table>  
-  <tr><th align="center"></th><th colspan="5" align="center"></th></tr>  
-  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center"></td></tr>  
-  <tr><td align="center">x</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td><td align="center"></td></tr>  
-  <tr><td align="center">y</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td><td align="center"></td></tr>  
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td><td align="center"></td></tr>  
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">tpipe_init_buf_pool_custom</td></tr>  
+  初始化TBufPool内存资源池。本接口适用于内存资源有限时，希望手动指定UB/L1内存资源复用的场景。本接口初始化后在整体内存资源中划分出一块子资源池。划分出的子资源池TBufPool。
+
+- 算子规格：
+  <table>
+    <tr>
+      <td align="center">类别</td>
+      <td align="center">name</td>
+      <td align="center">shape</td>
+      <td align="center">data type</td>
+      <td align="center">format</td>
+    </tr>
+    <tr>
+      <td rowspan="2" align="center">算子输入</td>
+      <td align="center">x</td>
+      <td align="center">3 * 32768</td>
+      <td align="center">float</td>
+      <td align="center">ND</td>
+    </tr>
+    <tr>
+      <td align="center">y</td>
+      <td align="center">3 * 32768</td>
+      <td align="center">float</td>
+      <td align="center">ND</td>
+    </tr>
+    <tr>
+      <td align="center">算子输出</td>
+      <td align="center">z</td>
+      <td align="center">3 * 32768</td>
+      <td align="center">float</td>
+      <td align="center">ND</td>
+    </tr>
+    <tr>
+      <td align="center">核函数名</td>
+      <td colspan="4" align="center">tpipe_init_buf_pool_custom</td>
+    </tr>
   </table>
 
 - 算子实现：  
-  样例中实现的是使用Compare基础API实现逐元素比较两个tensor大小的功能。
+
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Compare基础API接口完成计算，得到最终结果，再搬出到外部存储上。
-
-    CompareCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor src0Gm和src1Gm存储在src0Local和src1Local中，Compute任务负责比较两个输入tensor的大小，并将结果存储到dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    数据量较大且内存有限时，无法一次完成所有数据搬运，需要拆分成多个阶段计算，每次计算使用其中的一部分数据，可以通过TBufPool资源池进行内存地址复用。本例中，从Tpipe划分出资源池tbufPool0，tbufPool0为src0Gm分配空间后，继续分配了资源池tbufPool1，指定tbufPool1与tbufPool2复用并分别运用于第一、二轮计算，此时tbufPool1及tbufPool2共享起始地址及长度。
+    
+    接着执行以下
+    3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm和yGm搬运到Local Memory，分别存储在xLocal、yLocal，Compute任务负责对xLocal、yLocal执行加法操作，计算结果存储在zLocal中，CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
 
 
 
@@ -65,6 +94,7 @@
   cmake ..;make -j;             # 编译工程
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash

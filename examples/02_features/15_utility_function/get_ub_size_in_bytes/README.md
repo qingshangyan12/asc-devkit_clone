@@ -1,10 +1,9 @@
 # GetUBSizeInBytes样例
 ## 概述
-本样例基于GetUBSizeInBytes获取UB的大小（单位为Byte），开发者可以根据UB大小计算循环次数等参数值。
+【新特性】本样例基于GetUBSizeInBytes获取UB的大小（单位为Byte），开发者可以根据UB大小计算循环次数等参数值。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
-
 ## 目录结构介绍
 ```
 ├── get_ub_size_in_bytes
@@ -20,38 +19,23 @@
 - 算子功能：  
   根据UB大小以及输入数据总量来计算op.process()函数的循环次数。
 - 算子规格：  
-  <!-- <table>  
-  <tr><th align="center">算子类型(OpType)</th><th colspan="4" align="center">Addcdiv</th></tr>  
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>  
-  <tr><td align="center">x</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td></tr>  
-  <tr><td align="center">y</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td></tr>  
-  <tr><td align="center">z</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td></tr>  
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">out</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td></tr>  
-  <tr><td align="center">attr属性</td><td align="center">value</td><td align="center"> </td><td align="center">float16</td><td align="center"> </td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">get_ub_size_in_bytes_custom</td></tr>  
-  </table> -->
+   <table>
+  <tr><td rowspan="1" align="center"></td><td colspan="4" align="center"></td></tr>
 
-  <table>  
-  <tr><th align="center">算子类型(OpType)</th><th colspan="5" align="center">Addcdiv</th></tr>  
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">default</td></tr>  
-  <tr><td align="center">x</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr>  
-  <tr><td align="center">y</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr>  
-  <tr><td align="center">z</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr>  
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">out</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr>  
-  <tr><td align="center">attr属性</td><td align="center">value</td><td align="center">\</td><td align="center">float16</td><td align="center">\</td><td align="center">1.0</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">get_ub_size_in_bytes_custom</td></tr>  
+  <tr><td rowspan="3" align="center">算子输入</td></tr>
+  <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">16384</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">算子输出</td></tr>
+  <tr><td align="center">z</td><td align="center">16384</td><td align="center">half</td><td align="center">ND</td></tr>
+
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">get_ub_size_in_bytes_custom</td></tr>
+  </table>
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape为8*2048的Addcdiv算子。
   - kernel实现   
-    Addcdiv算子的数学表达式为：  
-    ```
-    out = (x + (y / z) * value)
-    ```
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数y,z相除，再乘属性值value，该结果再加上输入参数x，得到最终结果，再搬出到外部存储上。   
 
-    Addcdiv算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm，yGm和zGm搬运至Local Memory，分别存储在xLocal，yLocal，zLocal,Compute任务负责对xLocal，yLocal，zLocal执行相关操作，计算结果存储在outLocal中，CopyOut任务负责将输出数据从outLocal搬运至Global Memory上的输出Tensor outGm中。
+    本算子中Init中通过调用GetUBSizeInBytes获取UB的大小，从而计算出Process被调用的次数。Process的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm搬运至Local Memory，存储在xLocal中。Compute任务负责对xLocal求绝对值，结果存储在outLocal中。CopyOut任务负责将输出数据从outLocal搬运至Global Memory上的输出Tensor outGm中。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

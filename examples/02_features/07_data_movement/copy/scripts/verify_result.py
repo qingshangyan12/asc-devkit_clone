@@ -8,7 +8,7 @@
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-# See LICENSE in the root of the software repository for the full text of the License.s
+# See LICENSE in the root of the software repository for the full text of the License.
 
 import os
 import sys
@@ -20,7 +20,7 @@ MINIMUM = 10e-10
 
 
 def verify_result(real_result, golden):
-    output_type = np.uint32
+    output_type = np.int32
     real_result = np.fromfile(real_result, dtype=output_type) # 从bin文件读取实际运算结果
     golden = np.fromfile(golden, dtype=output_type) # 从bin文件读取预期运算结果
     result = np.abs(real_result - golden) # 计算运算结果和预期结果偏差

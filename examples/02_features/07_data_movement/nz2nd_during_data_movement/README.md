@@ -2,10 +2,10 @@
 ## 概述
 本样例基于DataCopy实现数据搬运，可用于在数据搬运时进行NZ到ND格式的转换。
 
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
-- Ascend 910C
-- Ascend 910B
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 ```
@@ -20,27 +20,23 @@
 
 ## 算子描述
 - 算子功能：  
- 支持在数据搬运时进行NZ到ND格式的转换。
+
+  支持在数据搬运时进行NZ到ND格式的转换。
 - 算子规格：  
- <table>
-
-
+  <table>
+  <tr><td rowspan="1" align="center"></td><td colspan="4" align="center"></td></tr>
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">32 * 32</td><td align="center">half</td><td align="center">Nz</td></tr>
   <tr><td rowspan="2" align="center">算子输出</td></tr>
   <tr><td align="center">z</td><td align="center">32 * 32</td><td align="center">half</td><td align="center">ND</td></tr>
-
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">nz2nd_during_data_movement_custom</td></tr>
   </table>
 
 
 - 算子实现：  
-  本样例中实现的是固定shape为512的copy算子。
   - kernel实现   
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Copy基础API接口将输入srcLocal的数值搬运到dstLocal中，再搬出到外部存储上。
-
-    CopyCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行Copy指令，将srcLocal搬运到dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    CopyCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务调用了负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，在数据搬运时进行NZ到ND格式的转换。Compute任务负责将srcLocal搬运到dstLocal中。CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

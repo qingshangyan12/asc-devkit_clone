@@ -2,10 +2,9 @@
 ## 概述
 本样例基于GatherMask基础API的用户自定义模式接口实现数据聚合，可用于以用户输入的Tensor数值对应的二进制为gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。
 
-## 支持的AI处理器
-- Ascend 950PR/Ascend 950DT
-- Ascend 910C
-- Ascend 910B
+## 支持的产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── gather_mask_custom_mode
@@ -65,6 +64,7 @@
   cmake ..;make -j;             # 编译工程
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash

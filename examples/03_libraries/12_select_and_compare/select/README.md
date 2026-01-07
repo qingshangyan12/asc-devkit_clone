@@ -2,10 +2,9 @@
 ## 概述
 本样例基于Select完成选择操作，可用于给定两个源操作数src0和src1，根据selMask（用于选择的Mask掩码）的比特位值选取元素，得到目的操作数dst。
 
-## 支持的AI处理器
-- Ascend 950PR/Ascend 950DT
-- Ascend 910C
-- Ascend 910B
+## 支持的产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── select
