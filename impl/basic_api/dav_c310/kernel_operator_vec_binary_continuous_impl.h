@@ -560,7 +560,7 @@ __simd_vf__ inline void AddDeqReluImpl(__ubuf__ half *dst, __ubuf__ int32_t *src
         MicroAPI::Add<int32_t>(src0Reg, src0Reg, src1Reg, preg);
         MicroAPI::Cast<float, int32_t, CastParam::s322floatCastTrait>(tmpReg, src0Reg, preg);
         MicroAPI::Muls<float>(tmpReg, tmpReg, static_cast<float>(DEQ_SHIFT_RIGHT_17_BIT), preg);
-        MicroAPI::Muls<float>(tmpReg, tmpReg, static_cast<float>(g_deqValue), preg);
+        MicroAPI::Muls<float>(tmpReg, tmpReg, static_cast<float>(Internal::g_deqValue), preg);
         MicroAPI::Muls<float>(tmpReg, tmpReg, static_cast<float>(DEQ_SHIFT_LEFT_17_BIT), preg);
         MicroAPI::Maxs<float>(tmpReg, tmpReg, scalarValue, preg);
         MicroAPI::Cast<half, float, CastParam::float2halfCastTrait>(dstReg, tmpReg, preg);

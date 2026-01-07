@@ -27,6 +27,11 @@
 #include "kernel_scalar_convert.h"
 
 namespace AscendC {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+namespace Internal {
+__BLOCK_LOCAL__ extern __inline__ half g_deqValue;
+}
+#endif
 class AscendCUtils {
 public:
     __aicore__ static inline int32_t GetBitSize(int32_t byteSize)
@@ -55,6 +60,7 @@ public:
         }
     #elif __NPU_ARCH__ == 3101
         set_mask_norm();
+        Internal::g_deqValue = (half)1.0f;
         uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
         uint64_t val = 0x1000000000000008 | prevCtrl;
         set_ctrl(val);

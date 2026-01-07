@@ -292,7 +292,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
         CastIntrinsicsB64ImplVF<DST_TYPE, SRC_TYPE, roundMode>(dst, src, calCount);
     } else {
         if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
-            scale = g_deqValue;
+            scale = Internal::g_deqValue;
             event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
             SetFlag<HardEvent::S_V>(eventIdSToV);
             WaitFlag<HardEvent::S_V>(eventIdSToV);
@@ -1420,13 +1420,13 @@ __aicore__ inline void CastImpl(
     constexpr bool using_cast_rint =
         SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4x2_t, half>,
         Tuple<half, float>, Tuple<half, int16_t>, Tuple<float, int32_t>, Tuple<complex32, complex64>>();
-    constexpr bool cast_odd = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>, Tuple<complex32, complex64>>();
+    constexpr bool cast_odd = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>, Tuple<complex32, complex64>, Tuple<half, int32_t>>();
     constexpr bool cast_rint = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<fp8_e5m2_t, float>,
         Tuple<fp8_e4m3fn_t, float>>();
     constexpr bool cast_round =
         SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>>();
     constexpr bool cast_hybrid =
-        SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>>();
+        SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>, Tuple<half, int32_t>>();
     constexpr bool cast_double = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<float, double>,
         Tuple<double, int64_t>, Tuple<bfloat16_t, double>>();
     constexpr bool cast_double0 = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<int32_t, double>,
@@ -1820,7 +1820,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
                 dst, src, mask[0], maskBuf, repeatTime, repeatParams);
         } else {
             if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
-                scale = g_deqValue;
+                scale = Internal::g_deqValue;
                 event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
                 SetFlag<HardEvent::S_V>(eventIdSToV);
                 WaitFlag<HardEvent::S_V>(eventIdSToV);
@@ -1847,7 +1847,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
                 }
             }
             if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
-                scale = g_deqValue;
+                scale = Internal::g_deqValue;
                 event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
                 SetFlag<HardEvent::S_V>(eventIdSToV);
                 WaitFlag<HardEvent::S_V>(eventIdSToV);
@@ -1886,13 +1886,13 @@ __aicore__ inline void CastImpl(__ubuf__ ORI_DST_TYPE *oriDst, __ubuf__ ORI_SRC_
     constexpr bool using_cast_rint =
         SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4x2_t, half>,
         Tuple<half, float>, Tuple<half, int16_t>, Tuple<float, int32_t>>();
-    constexpr bool cast_odd = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>>();
+    constexpr bool cast_odd = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>, Tuple<half, int32_t>>();
     constexpr bool cast_rint = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<fp8_e5m2_t, float>,
         Tuple<fp8_e4m3fn_t, float>>();
     constexpr bool cast_round =
         SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>>();
     constexpr bool cast_hybrid =
-        SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>>();
+        SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>, Tuple<half, int32_t>>();
     switch (roundMode) {
         case RoundMode::CAST_RINT:
             if constexpr (cast_round_all || cast_rint) {
@@ -2100,7 +2100,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
                 dst, src, mask, maskBuf, repeatTime, repeatParams);
         } else {
             if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
-                scale = g_deqValue;
+                scale = Internal::g_deqValue;
                 event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
                 SetFlag<HardEvent::S_V>(eventIdSToV);
                 WaitFlag<HardEvent::S_V>(eventIdSToV);
@@ -2114,7 +2114,7 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
                 dst, src, mask, repeatTime, repeatParams);
         } else {
             if constexpr (AscendC::Std::is_same<SRC_TYPE, int32_t>::value && AscendC::Std::is_same<DST_TYPE, half>::value) {
-                scale = g_deqValue;
+                scale = Internal::g_deqValue;
                 event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
                 SetFlag<HardEvent::S_V>(eventIdSToV);
                 WaitFlag<HardEvent::S_V>(eventIdSToV);
@@ -2153,13 +2153,13 @@ __aicore__ inline void CastImpl(__ubuf__ ORI_DST_TYPE *oriDst, __ubuf__ ORI_SRC_
     constexpr bool using_cast_rint =
         SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4x2_t, half>,
         Tuple<half, float>, Tuple<half, int16_t>, Tuple<float, int32_t>>();
-    constexpr bool cast_odd = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>>();
+    constexpr bool cast_odd = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<half, float>, Tuple<half, int32_t>>();
     constexpr bool cast_rint = SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<fp8_e5m2_t, float>,
         Tuple<fp8_e4m3fn_t, float>>();
     constexpr bool cast_round =
         SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>>();
     constexpr bool cast_hybrid =
-        SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>>();
+        SupportType<Tuple<DST_TYPE, SRC_TYPE>, Tuple<hifloat8_t, float>, Tuple<hifloat8_t, half>, Tuple<half, int32_t>>();
     switch (roundMode) {
         case RoundMode::CAST_RINT:
             if constexpr (cast_round_all || cast_rint) {
@@ -2514,7 +2514,7 @@ __aicore__ inline void CastDeqImpl(__ubuf__ U *dst, __ubuf__ T *src, const uint3
         "Failed to check dtype in CastDeqImpl, current api support dtype combination is src: int16_t dst: int8_t/uint8_t"
         ", src:int32_t dst:half.");
     if constexpr (IsSameType<T, int32_t>::value) {
-        half scale = g_deqValue;
+        half scale = Internal::g_deqValue;
         event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
@@ -2745,7 +2745,7 @@ __aicore__ inline void CastDeqImpl(
         SetVectorMask<T>(mask[1], mask[0]);
     }
     if constexpr (IsSameType<T, int32_t>::value) {
-        half scale = g_deqValue;
+        half scale = Internal::g_deqValue;
         event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
@@ -2803,7 +2803,7 @@ __aicore__ inline void CastDeqImpl(
     bool isCounterMode = Internal::IsCounterMode();
     __ubuf__ uint64_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 4);
     if constexpr (IsSameType<T, int32_t>::value) {
-        half scale = g_deqValue;
+        half scale = Internal::g_deqValue;
         event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
@@ -3108,7 +3108,7 @@ template <typename T> __aicore__ inline void SetDeqScaleImpl(T config)
     event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
-    g_deqValue = config;
+    Internal::g_deqValue = config;
 }
 // Truncate::Level2
 template <typename T, RoundMode roundMode>

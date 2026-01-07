@@ -393,7 +393,7 @@ __aicore__ inline void AddDeqRelu(RegU &dstReg, RegT &srcReg0, RegT &srcReg1, Mi
     MicroAPI::Add(srcReg0, srcReg0, srcReg1, mask);
     MicroAPI::Cast<float, int32_t, CastParam::s322floatCastTrait>(tmpReg, srcReg0, mask);
     MicroAPI::Muls(tmpReg, tmpReg, static_cast<float>(DEQ_SHIFT_RIGHT_17_BIT), mask);
-    MicroAPI::Muls(tmpReg, tmpReg, static_cast<float>(g_deqValue), mask);
+    MicroAPI::Muls(tmpReg, tmpReg, static_cast<float>(Internal::g_deqValue), mask);
     MicroAPI::Muls(tmpReg, tmpReg, static_cast<float>(DEQ_SHIFT_LEFT_17_BIT), mask);
     MicroAPI::Maxs(tmpReg, tmpReg, (T)0, mask);
     MicroAPI::Cast<half, float, CastParam::float2halfCastTrait>(dstReg, tmpReg, mask);
