@@ -16,7 +16,6 @@
 - FLOOR舍入模式：向负无穷舍入。
 - CEIL舍入模式：向正无穷舍入。
 - TRUNC舍入模式：向零舍入。
-- ODD舍入模式：Von Neumann rounding，最近邻奇数舍入。
 
 ## 函数原型
 

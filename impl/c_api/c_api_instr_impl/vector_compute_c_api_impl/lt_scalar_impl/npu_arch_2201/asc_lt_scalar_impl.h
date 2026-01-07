@@ -24,14 +24,30 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void asc_lt_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src0, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride)
+__aicore__ inline void asc_lt_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-    vcmpvs_lt(dst, src0, value, repeat, dst_block_stride, src0_block_stride, dst_repeat_stride, src0_repeat_stride);
+    if ASC_IS_AIV{
+        vcmpvs_lt(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
 }
 
-__aicore__ inline void asc_lt_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ float* src0, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride)
+__aicore__ inline void asc_lt_scalar_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
-    vcmpvs_lt(dst, src0, value, repeat, dst_block_stride, src0_block_stride, dst_repeat_stride, src0_repeat_stride);
+    asc_lt_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    asc_sync_post_process();
+}
+
+__aicore__ inline void asc_lt_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    if ASC_IS_AIV{
+        vcmpvs_lt(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    }
+}
+
+__aicore__ inline void asc_lt_scalar_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+{
+    asc_lt_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+    asc_sync_post_process();
 }
 
 #endif
@@ -40,4 +56,3 @@ __aicore__ inline void asc_lt_scalar_impl(__ubuf__ uint8_t* dst, __ubuf__ float*
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif  
-
