@@ -5,7 +5,7 @@
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```
-├── matmul_dual_dst
+├── matmul_splitm
 │   └── scripts
 │       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │       └── verify_result.py    // 真值对比文件
