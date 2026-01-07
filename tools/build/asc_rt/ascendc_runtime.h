@@ -71,6 +71,6 @@ extern "C" int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
 extern "C" uint32_t AscendCFunctionGetMetaInfoKtype(const rtFuncHandle funcHandle, unsigned int *kernelType);
 extern "C" uint32_t AscendCFunctionGetMetaInfoCoreRation(const rtFuncHandle funcHandle, unsigned short *aicRation,
     unsigned short *aivRation);
-extern "C" uint32_t AscendCGetProfkTypeImpl(void *funcHandle);
+extern "C" uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle);
 
 #endif // __ASCENDC_RUNTIME_H__

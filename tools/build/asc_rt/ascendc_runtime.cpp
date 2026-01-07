@@ -772,7 +772,7 @@ enum KernelMetaTypeAsc {
     KERNEL_TYPE_MIX_AIC_1_2 = 5
 };
 
-uint32_t AscendCGetProfkTypeImpl(void *funcHandle)
+uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle)
 {
     static const std::unordered_map<KernelMetaTypeAsc, uint32_t> kernelTaskTypeMap = {
         {KERNEL_TYPE_AIV_ONLY, 5},
@@ -806,7 +806,7 @@ uint32_t AscendCGetProfkTypeImpl(void *funcHandle)
             if (coreAicRation == 1 && coreAivRation == 1) {
                 return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_1);
             }
-            if (coreAicRation == 1 && coreAivRation == 2) {
+            if (coreAicRation == 1 && coreAivRation == 2) { // aic num 1, aiv num 2
                 return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_2);
             }
         }

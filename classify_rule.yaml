@@ -23,6 +23,8 @@ asc-devkit:
       - examples
       - scripts
       - tests
+      - include/**/*.h
+      - tools/**/*.h
   llt:
     ut_check: true
     st_check: false

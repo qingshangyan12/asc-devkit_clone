@@ -83,7 +83,8 @@ void StartAscendProf(const char *name, uint64_t *startTime);
 void ReportAscendProf(const char *name, uint32_t blockDim, uint32_t taskType, const uint64_t startTime);
 bool GetAscendProfStatus();
 void AscendProfRegister();
-uint32_t AscendCGetProfkTypeImpl(void *funcHandle);
+using rtFuncHandle = void*;
+uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle);
 }
 
 namespace {
