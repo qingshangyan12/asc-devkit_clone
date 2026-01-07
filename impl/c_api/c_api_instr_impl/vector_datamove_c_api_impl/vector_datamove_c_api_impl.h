@@ -20,7 +20,7 @@
 
 #include "copy_gm_to_ubuf_impl/npu_arch_2201/asc_copy_gm_to_ubuf_impl.h"
 #include "copy_ubuf_to_gm_impl/npu_arch_2201/asc_copy_ubuf_to_gm_impl.h"
-#include "copy_gm_to_ubuf_align/npu_arch_2201/asc_copy_gm2ub_align_impl.h"
+#include "copy_gm_to_ubuf_align_impl/npu_arch_2201/asc_copy_gm2ub_align_impl.h"
 #include "copy_ubuf_to_gm_align_impl/npu_arch_2201/asc_copy_ubuf_to_gm_align_impl.h"
 
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint8_t sid,
