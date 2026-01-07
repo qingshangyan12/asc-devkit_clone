@@ -70,8 +70,8 @@ basic_test_two_targets=(
     ascendc_ut_basic_api_mc62cm12aa_AIC
     ascendc_ut_basic_api_mc62cm12aa_BASIC
     ascendc_ut_basic_api_mc62cm12aa_FRAMEWORK
-    ascendc_ut_basic_api_mc62cm12aa_MICRO
-    ascendc_ut_basic_api_mc62cm12aa_SIMT
+    ascendc_ut_micro_api_mc62cm12aa
+    ascendc_ut_simt_api_mc62cm12aa
 )
 
 basic_test_three_targets=(
@@ -84,6 +84,6 @@ basic_test_three_targets=(
     ascendc_ut_basic_api_ascend910_9599_AIC
     ascendc_ut_basic_api_ascend910_9599_AIV_BASIC
     ascendc_ut_basic_api_ascend910_9599_AIV_FRAMEWORK
-    ascendc_ut_basic_api_ascend910_9599_AIV_MICRO
-    ascendc_ut_basic_api_ascend910_9599_AIV_SIMT
+    ascendc_ut_micro_api_ascend910_9599
+    ascendc_ut_simt_api_ascend910_9599
 )
