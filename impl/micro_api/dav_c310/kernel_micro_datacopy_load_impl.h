@@ -315,6 +315,10 @@ __simd_callee__ inline void DataCopyUnAlignImpl(U& dstReg, UnalignReg& ureg, __u
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void LoadImpl(U& dstReg, __ubuf__ T* srcAddr)
 {
+    using ActualT = typename U::ActualT;
+    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
+                  "Load only support type b8/b16/b32/b64 on current device");
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     UnalignRegForLoad ureg;
     DataCopyUnAlignPreImpl<T>(ureg, srcAddr);
