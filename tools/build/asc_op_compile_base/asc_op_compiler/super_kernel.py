@@ -17,7 +17,7 @@ import stat
 from .global_storage import global_var_storage
 from .super_kernel_utility import KernelMetaType, \
     CommonUtility, gen_func_align_attribute
-from .super_kernel_op_compile import super_kernel_compile, gen_file_header
+from .super_kernel_op_compile import compile_super_kernel, gen_file_header
 from .super_kernel_constants import SuperKernelPreLoadMode, SuperKernelDataCacheMode, \
     SuperKernelEarlyStartMode, SubOperatorType, SuperKernelDebugDcciAllMode, SuperKernelDebugSyncAllMode, \
     SuperKernelFeedSyncAllMode, SuperKernelProfilingMode, ERR_CODE
@@ -1009,5 +1009,5 @@ def compile(kernel_infos, called_kernel_name="ascendc_super_kernel_plus", impl_m
         CommonUtility().ascendc_raise_python_err(ERR_CODE, ("super kernel compile must provide op lists"))
     super_operator = SuperOperatorInfos(kernel_infos, called_kernel_name)
     gen_super_kernel_file(super_operator)
-    super_kernel_compile(super_operator.compile_info, super_operator.compile_log_path)
+    compile_super_kernel(super_operator.compile_info, super_operator.compile_log_path)
     return

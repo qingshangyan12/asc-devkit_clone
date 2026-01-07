@@ -316,7 +316,7 @@ def localize_symbol_of_sk(split_mode, sks, spk_dst_file, compile_log_path):
             run_local_cmd(local_synbol_cmds, compile_log_path)
 
 
-def super_kernel_compile(kernel_info, compile_log_path):
+def compile_super_kernel(kernel_info, compile_log_path, enable_features: dict = None):
     # global_var_storage must be reset before every entry of compile
     global_var_storage.global_storage_reset()
     if not CommonUtility.is_support_super_kernel():
@@ -357,3 +357,7 @@ def super_kernel_compile(kernel_info, compile_log_path):
     localization_sub_op_func_sym(compile_info.dst_file, kernel_info["sub_operator"])
     _json_post_process(compile_info, op_info, tiling_info, True, True, compile_info.compile_log_path)
     localize_symbol_of_sk(kernel_info["split_mode"], _sk_new, compile_info.dst_file, compile_info.compile_log_path)
+
+
+def super_kernel_compile(kernel_info, compile_log_path):
+    compile_super_kernel(kernel_info, compile_log_path)

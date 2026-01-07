@@ -610,7 +610,7 @@ class TestAscendSuperKernel(unittest.TestCase):
         print(f"-------------------TearDown-------------")
 
     def test_ascendc_super_kernel_plus(self):
-        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.super_kernel_compile"):
+        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"):
             with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
                 with mock.patch('json.load', return_value=op_json):
                     with mock.patch.object(CommonUtility, 'is_support_super_kernel', return_value=True):
@@ -626,7 +626,7 @@ class TestAscendSuperKernel(unittest.TestCase):
                             },
                             "super_kernel"
                         )
-        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.super_kernel_compile"):
+        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"):
             with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
                 with mock.patch('json.load', return_value=op_json1):
                     with mock.patch.object(CommonUtility, 'is_support_super_kernel', return_value=True):
@@ -656,7 +656,7 @@ class TestAscendSuperKernel(unittest.TestCase):
     def test_extract_sub_op_bin_files(self):
         op_options = {'split-mode': 4, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable}
         compile_log_path = "./tmp/"
-        with (mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.super_kernel_compile"),
+        with (mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"),
             mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}'),
             mock.patch('json.load', return_value=op_json),
             mock.patch('os.fdopen')):
@@ -677,7 +677,7 @@ class TestAscendSuperKernel(unittest.TestCase):
         SetCurrentSocInfo("Ascend910B1")
         op_options = {'split-mode': 4, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable}
         compile_log_path = "./tmp/"
-        with (mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.super_kernel_compile"),
+        with (mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"),
             mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}'),
             mock.patch('json.load', return_value=op_json1),
             mock.patch('os.fdopen')):
@@ -816,7 +816,7 @@ Idx Name                              Size     VMA              Type
 
     def test_gen_super_kernel_file(self):
         SetCurrentSocInfo("Ascend910_9599")
-        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.super_kernel_compile"):
+        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"):
             with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
                 with mock.patch('json.load', return_value=op_json):
                     with mock.patch('os.fdopen') as mock_fdopen:
@@ -843,7 +843,7 @@ Idx Name                              Size     VMA              Type
         self.assertNotEqual(super_kernel_file, "")
 
     def test_ascendc_super_kernel_plus_multi_ops(self):
-        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.super_kernel_compile"), \
+        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"), \
             mock.patch.object(SubOperatorInfos, 'extract_sub_bin_file_of_mix_kernel'):
             mock_returns = [B_op_json, C_op_json, D_op_json, F_op_json, E_op_json, G_op_json, H_op_json, I_op_json, J_op_json, K_op_json]
             with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
