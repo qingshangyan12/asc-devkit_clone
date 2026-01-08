@@ -9,6 +9,8 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+# test
+
 set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p")
