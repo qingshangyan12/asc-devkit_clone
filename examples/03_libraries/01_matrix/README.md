@@ -30,3 +30,8 @@
 | [matmul_nz](./matmul_nz) | 本样例介绍Matmul API输入矩阵内轴非256B对齐的场景下，在AIV核上使用DataCopyPad实现ND转换NZ格式的单算子 |
 | [matmul_nbuffer33](./matmul_nbuffer33) | 本样例介绍Matmul API实现NBuffer33算法的单算子，以及介绍模板参数MatmulPolicy中NBuffer33MatmulPolicy的使用方式 |
 | [matmul_k_reorder_load](./matmul_k_reorder_load) | 本样例介绍Matmul API使能K轴错峰加载数据的场景 |
+| [matmul_async_iterate](./matmul_async_iterate) | 本样例介绍调用Matmul API实现异步场景下的Matmul矩阵乘法，实现方式为调用Iterate和GetTensorC输出到VECIN |
+| [matmul_async_iterate_all](./matmul_async_iterate_all) | 本样例介绍调用Matmul API实现异步场景下的Matmul矩阵乘法，实现方式为调用IterateAll输出到GM |
+| [matmul_a2b2_share](./matmul_a2b2_share) | 本样例介绍调用Matmul API实现开启A2和B2全局管理的单算子 |
+| [matmul_callback](./matmul_callback) | 本样例介绍Matmul API模板参数MatmulCallbackFunc的自定义使用方式 |
+| [matmul_l0c_extend](./matmul_l0c_extend) | 本样例介绍Matmul API用户自主管理CO1的Iterate接口的自定义使用方式 |
