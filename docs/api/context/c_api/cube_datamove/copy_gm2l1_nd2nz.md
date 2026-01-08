@@ -108,7 +108,6 @@ PIPE_MTE2
 ```cpp
 //total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。
 constexpr uint64_t total_length = 128;
-__gm__ int8_t src[total_length];
 __cbuf__ int8_t dst[total_length];
-asc_copy_gm2l1_nd2nz_b8(dst, src, param);
+asc_copy_gm2l1_nd2nz(dst, src, total_length);
 ```

@@ -16,20 +16,36 @@
 - 前n个数据计算
 
     ```c++
-    __aicore__ inline void int642float(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_a(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_c(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_f(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_r(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_z(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```c++
-   __aicore__ inline void int642float(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+   __aicore__ inline void int642float_a(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  __aicore__ inline void int642float_c(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  __aicore__ inline void int642float_f(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  __aicore__ inline void int642float_r(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  __aicore__ inline void int642float_z(__ubuf__ float* dst, __ubuf__ int64_t* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```c++
-    __aicore__ inline void int642float_sync(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_sync_a(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_sync_c(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_sync_f(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_sync_r(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
+    __aicore__ inline void int642float_sync_z(__ubuf__ float* dst, __ubuf__ int64_t* src, uint32_t count)
     ```
 
 ## 参数说明
@@ -62,9 +78,8 @@ PIPE_V
 
 ```cpp
 // total_length指参与转换的数据总长度
-contexpr uint64_t offset = 0;
-__ubuf__ int64_t* src = (__ubuf__ int64_t*)asc_get_phy_buf_addr(0);
-offset += total_length* sizeof(float);
-__ubuf__ float* dst = (__ubuf__ float*)asc_get_phy_buf_addr(offset);
-asc_int642float(dst, src, total_length);
+constexpr uint64_t total_length = 128;
+__ubuf__ int64_t src[total_length];
+__ubuf__ float dst[total_length];
+asc_int642float(dst, src, total_length);    // 将src转换为int64_t类型并存放到dst中
 ```

@@ -9,8 +9,7 @@
 
 ## 功能说明
 
-Reduce（归约）是将一组数据通过指定运算聚合（聚合指将将一组分散、多个的数据通过某种规则合并成一个或少数几个的操作）为单个、少量结果的核心操作，包括ReduceMax、ReduceMin和ReduceSum等。 \
-以ReduceMax为例，其核心规则是从一组数据中找出最大值（将多个数据聚合为一个最大值）。
+以内置固定模式对应的二进制或者用户自定义输入的数值对应的gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。
 
 ## 函数原型
 
@@ -25,9 +24,9 @@ Reduce（归约）是将一组数据通过指定运算聚合（聚合指将将�
 
   ```c++
   __aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf uint16_t* src1,
-    uint16_t dst_repeat_stride, uint8_t src_block_stride, uint8_t src_repeat_stride, uint16_t reserved, uint8_t repeat)
+    uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
   __aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf uint32_t* src1,
-    uint16_t dst_repeat_stride, uint8_t src_block_stride, uint8_t src_repeat_stride, uint16_t reserved, uint8_t repeat)
+    uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
   ```
 
 - 同步计算
@@ -41,16 +40,17 @@ Reduce（归约）是将一组数据通过指定运算聚合（聚合指将将�
 
 表1 参数说明
 
-| 参数名       | 输入/输出 | 描述                                                                              |
-|:----------| :-----|:--------------------------------------------------------------------------------|
-| dst       | 输出 | 目的操作数的起始地址。                                                                     |
-| src0、src1 | 输入 | 源操作数的起始地址。                                                                      |
-| count     | 输入 | 参与计算的元素个数。                                                                      |
-| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长，默认值：1。|
-| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长，默认值：1。|
-| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
-| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长，默认值：8。 |
-| repeat | 输入 | 迭代次数，默认值：1。 |
+| 参数名       | 输入/输出 | 描述                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+|:----------| :-----|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| dst       | 输出 | 目的操作数（矢量）的起始地址。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| src0 | 输入 | 源操作数（矢量）的起始地址。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| src1 | 输入 | 在用户自定义模式下，由用户自定义的数据收集的掩码。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| count     | 输入 | 参与计算的元素个数。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| repeat | 输入 | 迭代次数。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| src0_block_stride | 输入 | 源操作数0单次迭代内不同DataBlock间地址步长。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| pattern_mode | 输入 | gather mask（数据收集的掩码），分为内置固定模式和用户自定义模式两种，根据内置固定模式对应的二进制或者用户自定义输入的数值对应的二进制从源操作数中选取元素写入目的操作数中。<br/>&bull; 内置固定模式：pattern_mode数据类型为uint8_t，取值范围为[1, 7]，所有迭代使用相同的gather mask。不支持配置src1。<br/>&nbsp;&nbsp;&bull; 1：01010101...0101 # 每个repeat取偶数索引元素<br/>&nbsp;&nbsp;&bull; 2：10101010...1010 # 每个repeat取奇数索引元素<br/>&nbsp;&nbsp;&bull; 3：00010001...0001 # 每个repeat内每四个元素取第一个元素<br/>&nbsp;&nbsp;&bull; 4：00100010...0010 # 每个repeat每四个元素取第二个元素<br/>&nbsp;&nbsp;&bull; 5：01000100...0100 # 每个repeat内每四个元素取第三个元素<br/>&nbsp;&nbsp;&bull; 6：10001000...10000 # 每个repeat内每四个元素区第四个元素<br/>&nbsp;&nbsp;&bull; 7：11111111...1111 # 每个repeat内取全部元素<br/>&bull;用户自定义模式：pattern_mode取值为0时为用户自定义模式，用户通过src1参数输入自定义的gather mask，迭代间隔由src1_repeat_stride决定。 |
+| src0_repeat_stride | 输入 | 源操作数0相邻迭代间相同DataBlock的地址步长。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| src1_repeat_stride | 输入 | 源操作数1相邻迭代间相同DataBlock的地址步长。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 ## 返回值说明
 
@@ -58,7 +58,7 @@ Reduce（归约）是将一组数据通过指定运算聚合（聚合指将将�
 
 ## 流水类型
 
-PIPE_TYPE_V
+PIPE_V
 
 ## 约束说明
 
@@ -70,8 +70,8 @@ PIPE_TYPE_V
 ```cpp
 //total_length指参与计算的数据总长度
 constexpr uint64_t total_length = 128;
-__ubuf__ uint_16* value0[total_length];
-__ubuf__ uint_16* value1[total_length];
-__ubuf__ uint_16* dst[total_length];
-asc_reduce(dst, value0, value1, total_length);
+__ubuf__ uint_16 src0[total_length];
+__ubuf__ uint_16 src1[total_length];
+__ubuf__ uint_16 dst[total_length];
+asc_reduce(dst, src0, src1, total_length);
 ```

@@ -173,9 +173,8 @@ PIPE_FIX
 ## 调用示例
 
 ```cpp
-//total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。
+//total_length指参与搬运的数据总长度
 constexpr uint64_t total_length = 128;
-__gm__ void src[total_length * sizeof(void)];
-__cbuf__ void dst[total_length * sizeof(void)];
-asc_fixpipe_l02cl1(dst, src, total_length);
+__cbuf__ void dst[total_length];
+asc_fixpipe_l0c2l1_deqf16(dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode, relu_pre, channel_split, nz2nd_en);
 ```

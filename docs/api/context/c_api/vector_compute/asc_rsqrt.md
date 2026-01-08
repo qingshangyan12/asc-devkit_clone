@@ -42,8 +42,6 @@ $$
 
 ## 参数说明
 
-表1 参数说明
-
 | 参数名 | 输入/输出 | 描述                          |
 | :----| :-----|:----------------------------|
 | dst | 输出 | 目的操作数（矢量）的起始地址。             |
@@ -73,7 +71,7 @@ PIPE_V
 ```cpp
 // total_length指参与计算的数据总长度
 constexpr uint64_t total_length = 128;
-__ubuf__ half* src[total_length];
-__ubuf__ half* dst[total_length];
+__ubuf__ half src[total_length];
+__ubuf__ half dst[total_length];
 asc_rsqrt(dst, src, total_length);
 ```
