@@ -11,4 +11,4 @@
 #include "../utils/test_conv_instr_utils.h"
 
 // ==========asc_bf162float(NA)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvBf162F, asc_bf162float, vconv_bf162f32, float, bfloat16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvBf162F, asc_bfloat162float, vconv_bf162f32, float, bfloat16_t);

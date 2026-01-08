@@ -24,45 +24,45 @@
 
     ```cpp
     // Rint模式
-    __aicore__ inline void asc_float2float_r(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_rn(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     // Floor模式
-    __aicore__ inline void asc_float2float_f(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_rd(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     // Ceil模式
-    __aicore__ inline void asc_float2float_c(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_ru(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     // Round模式
-    __aicore__ inline void asc_float2float_a(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_rna(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     // Trunc模式
-    __aicore__ inline void asc_float2float_z(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_rz(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
     // Rint模式
-    __aicore__ inline void asc_float2float_r(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_float2float_rn(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // Floor模式
-    __aicore__ inline void asc_float2float_f(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_float2float_rd(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // Ceil模式
-    __aicore__ inline void asc_float2float_c(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_float2float_ru(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // Round模式
-    __aicore__ inline void asc_float2float_a(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_float2float_rna(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // Trunc模式
-    __aicore__ inline void asc_float2float_z(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_float2float_rz(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步模式
 
     ```cpp
     // Rint模式
-    __aicore__ inline void asc_float2float_r_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_rn_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     // Floor模式
-    __aicore__ inline void asc_float2float_f_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_rd_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     // Ceil模式
-    __aicore__ inline void asc_float2float_c_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_ru_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     // Round模式
-    __aicore__ inline void asc_float2float_a_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_rna_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     // Trunc模式
-    __aicore__ inline void asc_float2float_z_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
+    __aicore__ inline void asc_float2float_rz_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     ```
 
 ### 参数说明
@@ -97,5 +97,5 @@ PIPE_V
 constexpr uint32_t total_length = 256;
 __ubuf__ float src[total_length];
 __ubuf__ float dst[total_length];
-asc_float2float_r(dst, src, total_length);
+asc_float2float_rn(dst, src, total_length);
 ```

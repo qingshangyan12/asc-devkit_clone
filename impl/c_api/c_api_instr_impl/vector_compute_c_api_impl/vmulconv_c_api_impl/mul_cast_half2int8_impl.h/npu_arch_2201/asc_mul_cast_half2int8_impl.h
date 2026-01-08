@@ -38,10 +38,10 @@ __aicore__ inline void asc_mul_cast_half2int8_impl(__ubuf__ int8_t* dst, __ubuf_
 __aicore__ inline void asc_mul_cast_half2int8_impl(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    constexpr uint8_t dst_repeat_stride = static_cast<uint8_t>(ASC_DEFAULT_REPEAT_STRIDE / (sizeof(half) / sizeof(int8_t)));
-    asc_mul_cast_half2int8_impl(dst, src0, src1, ASC_DEFAULT_REPEAT,
-        ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        dst_repeat_stride, ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    constexpr uint8_t dst_repeat_stride = static_cast<uint8_t>(ASC_C_API_DEFAULT_REPEAT_STRIDE.U8 / (sizeof(half) / sizeof(int8_t)));
+    asc_mul_cast_half2int8_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8,
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
+        dst_repeat_stride, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
     asc_set_mask_count_end();
 }
 

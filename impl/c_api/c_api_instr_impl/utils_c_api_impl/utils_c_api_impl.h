@@ -24,8 +24,12 @@
 
 #include <cstdint>
 #include <type_traits>
-#include "c_api_utils_intf.h"
+#include "utils_intf.h"
 #include "utils_c_api_type.h"
+
+#ifndef __aicore__
+#define __aicore__ [aicore]
+#endif // __aicore__
 
 constexpr uint32_t C_API_AIC_TYPE = 1;
 constexpr uint32_t C_API_AIV_TYPE = 2;
@@ -50,6 +54,42 @@ constexpr uint32_t C_API_MIX_TYPE = 3;
     #define ASC_IS_NOT_AIV constexpr(g_c_api_core_type != C_API_AIV_TYPE)
     #define ASC_IS_NOT_AIC constexpr(g_c_api_core_type != C_API_AIC_TYPE)
 #endif
+
+struct asc_c_api_default_repeat {
+    uint8_t U8 = 1;
+};
+
+struct asc_c_api_default_block_stride {
+    uint8_t U8 = 1;
+    uint16_t U16 = 1;
+};
+
+struct asc_c_api_default_repeat_stride {
+    uint8_t U8 = 8;
+    uint16_t U16 = 8;
+};
+
+struct asc_c_api_half_default_repeat_stride {
+    uint8_t U8 = 4;
+    uint16_t U16 = 4;
+};
+
+struct asc_c_api_one_fourth_default_repeat_stride {
+    uint8_t U8 = 2;
+    uint16_t U16 = 2;
+};
+
+constexpr asc_c_api_default_repeat ASC_C_API_DEFAULT_REPEAT;
+constexpr asc_c_api_default_block_stride ASC_C_API_DEFAULT_BLOCK_STRIDE;
+constexpr asc_c_api_default_repeat_stride ASC_C_API_DEFAULT_REPEAT_STRIDE;
+constexpr asc_c_api_half_default_repeat_stride ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE;
+constexpr asc_c_api_one_fourth_default_repeat_stride ASC_C_API_ONE_FOURTH_DEFAULT_REPEAT_STRIDE;
+
+constexpr uint16_t ASC_C_API_DATABLOCK_NUM = 8;
+constexpr uint8_t ASC_C_API_MRGSORT_ELEMENT_LEN = 4;
+constexpr uint16_t ASC_C_API_ONE_DATABLOCK_SIZE = 32;
+
+using order_t = Order_t;
 
 union asc_sparse_addr_config {
     uint64_t config;

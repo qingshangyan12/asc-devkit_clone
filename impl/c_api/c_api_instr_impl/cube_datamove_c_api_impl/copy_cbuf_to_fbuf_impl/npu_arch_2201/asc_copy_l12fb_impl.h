@@ -30,7 +30,7 @@ __aicore__ inline void asc_copy_l12fb_impl(__fbuf__ void* dst, __cbuf__ void* sr
 
 __aicore__ inline void asc_copy_l12fb_impl(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
 {
-    asc_copy_l12fb_impl(dst, src, 1, size / ASC_ONE_DATABLOCK_SIZE, 0, 0);
+    asc_copy_l12fb_impl(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
 __aicore__ inline void asc_copy_l12fb_sync_impl(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)

@@ -18,7 +18,7 @@
 #define INCLUDE_C_API_SYNC_H
 
 #include "c_api_instr_impl/sync_c_api_impl/sync_c_api_impl.h"
-#include "c_api_utils_intf.h"
+#include "utils_intf.h"
 
 #define asc_sync_notify(pipe, tpipe, id) asc_sync_notify_impl(pipe, tpipe, id)
 

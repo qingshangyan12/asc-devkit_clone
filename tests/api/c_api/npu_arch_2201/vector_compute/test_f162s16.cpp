@@ -11,8 +11,8 @@
 #include "../utils/test_conv_instr_utils.h"
 
 // ==========asc_half2int16(a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16a, asc_half2int16_a, vconv_f162s16a, int16_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16c, asc_half2int16_c, vconv_f162s16c, int16_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16f, asc_half2int16_f, vconv_f162s16f, int16_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16r, asc_half2int16_r, vconv_f162s16r, int16_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16z, asc_half2int16_z, vconv_f162s16z, int16_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16a, asc_half2int16_rna, vconv_f162s16a, int16_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16c, asc_half2int16_ru, vconv_f162s16c, int16_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16f, asc_half2int16_rd, vconv_f162s16f, int16_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16r, asc_half2int16_rn, vconv_f162s16r, int16_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2I16z, asc_half2int16_rz, vconv_f162s16z, int16_t, half);

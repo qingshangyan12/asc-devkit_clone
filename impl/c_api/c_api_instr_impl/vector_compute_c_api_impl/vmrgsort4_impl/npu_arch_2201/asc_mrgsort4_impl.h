@@ -26,7 +26,7 @@
 
 // repeat == 1, no limit
 // repeat > 1, limit: len0==len1==len2==len3, valid_bit==0xb1111, if_exhausted_suspension==false
-__aicore__ inline void asc_mrgsort4_impl(__ubuf__ half* dst, __ubuf__ half* src[ASC_MRGSORT_ELEMENT_LEN],
+__aicore__ inline void asc_mrgsort4_impl(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
     uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
 {
@@ -36,7 +36,7 @@ __aicore__ inline void asc_mrgsort4_impl(__ubuf__ half* dst, __ubuf__ half* src[
     }
 }
 
-__aicore__ inline void asc_mrgsort4_sync_impl(__ubuf__ half* dst, __ubuf__ half* src[ASC_MRGSORT_ELEMENT_LEN],
+__aicore__ inline void asc_mrgsort4_sync_impl(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
     uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
 {
@@ -45,7 +45,7 @@ __aicore__ inline void asc_mrgsort4_sync_impl(__ubuf__ half* dst, __ubuf__ half*
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_mrgsort4_impl(__ubuf__ float* dst, __ubuf__ float* src[ASC_MRGSORT_ELEMENT_LEN],
+__aicore__ inline void asc_mrgsort4_impl(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
     uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
 {
@@ -55,7 +55,7 @@ __aicore__ inline void asc_mrgsort4_impl(__ubuf__ float* dst, __ubuf__ float* sr
     }
 }
 
-__aicore__ inline void asc_mrgsort4_sync_impl(__ubuf__ float* dst, __ubuf__ float* src[ASC_MRGSORT_ELEMENT_LEN],
+__aicore__ inline void asc_mrgsort4_sync_impl(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
     uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
 {

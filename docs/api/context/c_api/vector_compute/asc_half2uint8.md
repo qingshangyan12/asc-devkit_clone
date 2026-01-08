@@ -26,15 +26,15 @@
     // NONE舍入模式
     __aicore__ inline void asc_half2uint8(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // RINT舍入模式
-    __aicore__ inline void asc_half2uint8_r(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_rn(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // FLOOR舍入模式
-    __aicore__ inline void asc_half2uint8_f(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_rd(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // ROUND舍入模式
-    __aicore__ inline void asc_half2uint8_a(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_rna(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // CEIL舍入模式
-    __aicore__ inline void asc_half2uint8_c(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_ru(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // TRUNC舍入模式
-    __aicore__ inline void asc_half2uint8_z(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_rz(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     ```
 
 - 高维切分计算
@@ -43,15 +43,15 @@
     // NONE舍入模式
     __aicore__ inline void asc_half2uint8(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // RINT舍入模式
-    __aicore__ inline void asc_half2uint8_r(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2uint8_rn(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // FLOOR舍入模式
-    __aicore__ inline void asc_half2uint8_f(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2uint8_rd(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // ROUND舍入模式
-    __aicore__ inline void asc_half2uint8_a(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2uint8_rna(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // CEIL舍入模式
-    __aicore__ inline void asc_half2uint8_c(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2uint8_ru(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // TRUNC舍入模式
-    __aicore__ inline void asc_half2uint8_z(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_half2uint8_rz(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
@@ -60,15 +60,15 @@
     // NONE舍入模式
     __aicore__ inline void asc_half2uint8_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // RINT舍入模式
-    __aicore__ inline void asc_half2uint8_r_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_rn_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // FLOOR舍入模式
-    __aicore__ inline void asc_half2uint8_f_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_rd_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // ROUND舍入模式
-    __aicore__ inline void asc_half2uint8_a_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_rna_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // CEIL舍入模式
-    __aicore__ inline void asc_half2uint8_c_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_ru_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     // TRUNC舍入模式
-    __aicore__ inline void asc_half2uint8_z_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
+    __aicore__ inline void asc_half2uint8_rz_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     ```
 
 ## 参数说明

@@ -11,7 +11,7 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
+#include "c_api/utils_intf.h"
 #include "../utils/test_unary_scalar_instr_utils.h"
 
 // ==========asc_min_scalar(half/float/int16_t/int32_t)==========

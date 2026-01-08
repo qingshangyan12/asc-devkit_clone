@@ -216,7 +216,7 @@ private:
             instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>((__gm__ uint64_t*)(dst));
         } else if constexpr (hardware == Hardware::UB) {
             __gm__ T* dump_addr = reinterpret_cast<__gm__ T*>(dump_tensor_tlv + 1);
-            uint16_t burst_len = static_cast<uint16_t>(align_dump_len / ASC_ONE_DATABLOCK_SIZE);
+            uint16_t burst_len = static_cast<uint16_t>(align_dump_len / ASC_C_API_ONE_DATABLOCK_SIZE);
             instruction_forward::call_sync();
             if (dump_tensor_tlv->position == static_cast<uint16_t>(Hardware::UB)) {
                 instruction_forward::call_copy_ub2gm(dump_addr, src, 0, 1, burst_len, 0, 0);
@@ -264,7 +264,7 @@ private:
         if (block_ring_buf_info == nullptr) {
             return;
         }
-        uint32_t align_dump_len = align_up(dump_size * sizeof(T), ASC_ONE_DATABLOCK_SIZE);
+        uint32_t align_dump_len = align_up(dump_size * sizeof(T), ASC_C_API_ONE_DATABLOCK_SIZE);
         uint32_t tlv_len = sizeof(DumpTensorTlvInfoHead) + align_dump_len;
         if (!call_check_and_wait_ring_buf_space(block_ring_buf_info, tlv_len)) {
             return;

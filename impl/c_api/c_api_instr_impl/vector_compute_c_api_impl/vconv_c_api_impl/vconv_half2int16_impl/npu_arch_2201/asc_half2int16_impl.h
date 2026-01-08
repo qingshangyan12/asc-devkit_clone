@@ -24,8 +24,8 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-// asc_half2int16_a
-__aicore__ inline void asc_half2int16_a_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
+// asc_half2int16_rna
+__aicore__ inline void asc_half2int16_rna_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
     if ASC_IS_AIV {
@@ -33,23 +33,22 @@ __aicore__ inline void asc_half2int16_a_impl(__ubuf__ int16_t* dst, __ubuf__ hal
     }
 }
 
-__aicore__ inline void asc_half2int16_a_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_rna_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int16_a_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
+    asc_half2int16_rna_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int16_a_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_rna_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
-    asc_half2int16_a_impl(dst, src, count);
+    asc_half2int16_rna_impl(dst, src, count);
     asc_sync_post_process();
 }
 
-// asc_half2int16_c
-__aicore__ inline void asc_half2int16_c_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
+// asc_half2int16_ru
+__aicore__ inline void asc_half2int16_ru_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
     if ASC_IS_AIV {
@@ -57,23 +56,22 @@ __aicore__ inline void asc_half2int16_c_impl(__ubuf__ int16_t* dst, __ubuf__ hal
     }
 }
 
-__aicore__ inline void asc_half2int16_c_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_ru_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int16_c_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
+    asc_half2int16_ru_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int16_c_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_ru_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
-    asc_half2int16_c_impl(dst, src, count);
+    asc_half2int16_ru_impl(dst, src, count);
     asc_sync_post_process();
 }
 
-// asc_half2int16_f
-__aicore__ inline void asc_half2int16_f_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
+// asc_half2int16_rd
+__aicore__ inline void asc_half2int16_rd_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
     if ASC_IS_AIV {
@@ -81,23 +79,22 @@ __aicore__ inline void asc_half2int16_f_impl(__ubuf__ int16_t* dst, __ubuf__ hal
     }
 }
 
-__aicore__ inline void asc_half2int16_f_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_rd_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int16_f_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
+    asc_half2int16_rd_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int16_f_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_rd_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
-    asc_half2int16_f_impl(dst, src, count);
+    asc_half2int16_rd_impl(dst, src, count);
     asc_sync_post_process();
 }
 
-// asc_half2int16_r
-__aicore__ inline void asc_half2int16_r_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
+// asc_half2int16_rn
+__aicore__ inline void asc_half2int16_rn_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
     if ASC_IS_AIV {
@@ -105,23 +102,22 @@ __aicore__ inline void asc_half2int16_r_impl(__ubuf__ int16_t* dst, __ubuf__ hal
     }
 }
 
-__aicore__ inline void asc_half2int16_r_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_rn_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int16_r_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
+    asc_half2int16_rn_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int16_r_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_rn_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
-    asc_half2int16_r_impl(dst, src, count);
+    asc_half2int16_rn_impl(dst, src, count);
     asc_sync_post_process();
 }
 
-// asc_half2int16_z
-__aicore__ inline void asc_half2int16_z_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
+// asc_half2int16_rz
+__aicore__ inline void asc_half2int16_rz_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
     if ASC_IS_AIV {
@@ -129,18 +125,17 @@ __aicore__ inline void asc_half2int16_z_impl(__ubuf__ int16_t* dst, __ubuf__ hal
     }
 }
 
-__aicore__ inline void asc_half2int16_z_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_rz_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_half2int16_z_impl(dst, src, ASC_DEFAULT_REPEAT, static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_BLOCK_STRIDE), static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE),
-                        static_cast<uint16_t>(ASC_DEFAULT_REPEAT_STRIDE));
+    asc_half2int16_rz_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int16_z_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int16_rz_sync_impl(__ubuf__ int16_t* dst, __ubuf__ half* src, uint32_t count)
 {
-    asc_half2int16_z_impl(dst, src, count);
+    asc_half2int16_rz_impl(dst, src, count);
     asc_sync_post_process();
 }
 

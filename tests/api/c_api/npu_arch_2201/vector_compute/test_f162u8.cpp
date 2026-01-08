@@ -12,8 +12,8 @@
 
 // ==========asc_half2uint8(NA/a/c/f/r/z)==========
 TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8CAPI, asc_half2uint8, vconv_f162u8, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8aCAPI, asc_half2uint8_a, vconv_f162u8a, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8cCAPI, asc_half2uint8_c, vconv_f162u8c, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8fCAPI, asc_half2uint8_f, vconv_f162u8f, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8rCAPI, asc_half2uint8_r, vconv_f162u8r, uint8_t, half);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8zCAPI, asc_half2uint8_z, vconv_f162u8z, uint8_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8aCAPI, asc_half2uint8_rna, vconv_f162u8a, uint8_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8cCAPI, asc_half2uint8_ru, vconv_f162u8c, uint8_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8fCAPI, asc_half2uint8_rd, vconv_f162u8f, uint8_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8rCAPI, asc_half2uint8_rn, vconv_f162u8r, uint8_t, half);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvH2U8zCAPI, asc_half2uint8_rz, vconv_f162u8z, uint8_t, half);

@@ -35,8 +35,8 @@ __aicore__ inline void asc_shift_left_impl(__ubuf__ int16_t* dst, __ubuf__ int16
 __aicore__ inline void asc_shift_left_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t distance, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_shift_left_impl(dst, src, distance, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_shift_left_impl(dst, src, distance, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -57,8 +57,8 @@ __aicore__ inline void asc_shift_left_impl(__ubuf__ uint16_t* dst, __ubuf__ uint
 __aicore__ inline void asc_shift_left_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t distance, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_shift_left_impl(dst, src, distance, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_shift_left_impl(dst, src, distance, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -79,8 +79,8 @@ __aicore__ inline void asc_shift_left_impl(__ubuf__ int32_t* dst, __ubuf__ int32
 __aicore__ inline void asc_shift_left_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t distance, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_shift_left_impl(dst, src, distance, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_shift_left_impl(dst, src, distance, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -101,8 +101,8 @@ __aicore__ inline void asc_shift_left_impl(__ubuf__ uint32_t* dst, __ubuf__ uint
 __aicore__ inline void asc_shift_left_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t distance, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_shift_left_impl(dst, src, distance, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_shift_left_impl(dst, src, distance, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 

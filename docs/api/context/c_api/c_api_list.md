@@ -44,9 +44,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_brcb](vector_compute/asc_brcb.md) | 将源操作数中的每一个数填充到目的操作数的一个DataBlock中。 |
 | [asc_duplicate](vector_compute/asc_duplicate.md) | 将一个变量或立即数填充到一个矢量中。 |
 | [asc_select](vector_compute/asc_select.md) | 根据掩码，从两个源操作数中选取元素，输出到目的操作数。 |
-| [asc_bf162float](vector_compute/asc_bf162float.md) | 数据类型转换。将bfloat16_t类型的数据转换为float类型。 |
-| [asc_bf162int32](vector_compute/asc_bf162int32.md) | 数据类型转换。将bfloat16_t类型的数据转换为int32_t类型。 |
-| [asc_float2bf16](vector_compute/asc_float2bf16.md) | 数据类型转换。将float类型的数据转换为bfloat16_t类型。 |
+| [asc_bfloat162float](vector_compute/asc_bfloat162float.md) | 数据类型转换。将bfloat16_t类型的数据转换为float类型。 |
+| [asc_bfloat16162int32](vector_compute/asc_bf162int32.md) | 数据类型转换。将bfloat16_t类型的数据转换为int32_t类型。 |
+| [asc_float2bfloat16](vector_compute/asc_float2bf16.md) | 数据类型转换。将float类型的数据转换为bfloat16_t类型。 |
 | [asc_float2float](vector_compute/asc_float2float.md) | 数据类型转换。将float类型的数据转换为float类型。 |
 | [asc_float2half](vector_compute/asc_float2half.md) | 数据类型转换。将float类型的数据转换为half类型。 |
 | [asc_half2float](vector_compute/asc_half2float.md) | 数据类型转换。将half类型的数据转换为float类型。 |

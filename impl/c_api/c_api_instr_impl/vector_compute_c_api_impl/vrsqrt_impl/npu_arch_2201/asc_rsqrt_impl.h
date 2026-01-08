@@ -34,8 +34,8 @@ __aicore__ inline void asc_rsqrt_impl(__ubuf__ half* dst, __ubuf__ half* src, ui
 
 __aicore__ inline void asc_rsqrt_impl(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count){
     asc_set_mask_count_begin(count);
-    asc_rsqrt_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-                        ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT);
+    asc_rsqrt_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -54,8 +54,8 @@ __aicore__ inline void asc_rsqrt_impl(__ubuf__ float* dst, __ubuf__ float* src, 
 
 __aicore__ inline void asc_rsqrt_impl(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count){
     asc_set_mask_count_begin(count);
-    asc_rsqrt_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-                        ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT);
+    asc_rsqrt_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 

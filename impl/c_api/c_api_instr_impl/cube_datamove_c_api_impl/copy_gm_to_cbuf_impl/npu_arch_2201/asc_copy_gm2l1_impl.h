@@ -35,7 +35,7 @@ __aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ void* dst, __gm__ void* src,
 
 __aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
 {
-    asc_copy_gm2l1_impl(dst, src, 0, 1, size / ASC_ONE_DATABLOCK_SIZE, 0, 0, (pad_t)0);
+    asc_copy_gm2l1_impl(dst, src, 0, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0, (pad_t)0);
 }
 
 __aicore__ inline void asc_copy_gm2l1_sync_impl(__cbuf__ void* dst, __gm__ void* src, uint32_t size)

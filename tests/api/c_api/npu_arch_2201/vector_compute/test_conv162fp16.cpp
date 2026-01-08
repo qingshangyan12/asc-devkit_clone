@@ -10,8 +10,8 @@
 #include "c_api/npu_arch_2201/utils/test_conv_instr_utils.h"
 
 TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16, asc_int162half, vconv_s162f16, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16a, asc_int162half_a, vconv_s162f16a, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16c, asc_int162half_c, vconv_s162f16c, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16f, asc_int162half_f, vconv_s162f16f, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16r, asc_int162half_r, vconv_s162f16r, half, int16_t);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16z, asc_int162half_z, vconv_s162f16z, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16a, asc_int162half_rna, vconv_s162f16a, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16c, asc_int162half_ru, vconv_s162f16c, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16f, asc_int162half_rd, vconv_s162f16f, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16r, asc_int162half_rn, vconv_s162f16r, half, int16_t);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvS162fp16z, asc_int162half_rz, vconv_s162f16z, half, int16_t);

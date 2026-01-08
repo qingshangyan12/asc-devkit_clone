@@ -11,8 +11,8 @@
 #include "../utils/test_conv_instr_utils.h"
 
 // ==========asc_float2bf16(r/a/f/c/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16r, asc_float2bf16_r, vconv_f322bf16r, bfloat16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16f, asc_float2bf16_f, vconv_f322bf16f, bfloat16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16c, asc_float2bf16_c, vconv_f322bf16c, bfloat16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16z, asc_float2bf16_z, vconv_f322bf16z, bfloat16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16a, asc_float2bf16_a, vconv_f322bf16a, bfloat16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16r, asc_float2bfloat16_rn, vconv_f322bf16r, bfloat16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16f, asc_float2bfloat16_rd, vconv_f322bf16f, bfloat16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16c, asc_float2bfloat16_ru, vconv_f322bf16c, bfloat16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16z, asc_float2bfloat16_rz, vconv_f322bf16z, bfloat16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2Bf16a, asc_float2bfloat16_rna, vconv_f322bf16a, bfloat16_t, float);

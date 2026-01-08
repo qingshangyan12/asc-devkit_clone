@@ -35,8 +35,8 @@ __aicore__ inline void asc_duplicate_impl(__ubuf__ half* dst, half src, uint8_t 
 __aicore__ inline void asc_duplicate_impl(__ubuf__ half* dst, half src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_duplicate_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_duplicate_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -57,8 +57,8 @@ __aicore__ inline void asc_duplicate_impl(__ubuf__ int16_t* dst, int16_t src, ui
 __aicore__ inline void asc_duplicate_impl(__ubuf__ int16_t* dst, int16_t src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_duplicate_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_duplicate_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -79,8 +79,8 @@ __aicore__ inline void asc_duplicate_impl(__ubuf__ uint16_t* dst, uint16_t src, 
 __aicore__ inline void asc_duplicate_impl(__ubuf__ uint16_t* dst, uint16_t src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_duplicate_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_duplicate_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -101,8 +101,8 @@ __aicore__ inline void asc_duplicate_impl(__ubuf__ bfloat16_t* dst, bfloat16_t s
 __aicore__ inline void asc_duplicate_impl(__ubuf__ bfloat16_t* dst, bfloat16_t src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_duplicate_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_duplicate_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -123,8 +123,8 @@ __aicore__ inline void asc_duplicate_impl(__ubuf__ float* dst, float src, uint8_
 __aicore__ inline void asc_duplicate_impl(__ubuf__ float* dst, float src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_duplicate_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_duplicate_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -145,8 +145,8 @@ __aicore__ inline void asc_duplicate_impl(__ubuf__ int32_t* dst, int32_t src, ui
 __aicore__ inline void asc_duplicate_impl(__ubuf__ int32_t* dst, int32_t src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_duplicate_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_duplicate_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -167,8 +167,8 @@ __aicore__ inline void asc_duplicate_impl(__ubuf__ uint32_t* dst, uint32_t src, 
 __aicore__ inline void asc_duplicate_impl(__ubuf__ uint32_t* dst, uint32_t src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_duplicate_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_BLOCK_STRIDE,
-        ASC_DEFAULT_REPEAT_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
+    asc_duplicate_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
+        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 

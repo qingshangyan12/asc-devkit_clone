@@ -38,10 +38,10 @@ PIPE_S
 ```cpp
 // total_length指参与计算的数据长度
 constexpr uint32_t total_length = 256;
-// dst为目标数据地址，src0, src1为源数据地址
-asc_copy_ub2gm(dst, src0, total_length);
+// dst为目标数据地址，src0, src1为源数据地址 均为half类型
+asc_copy_ub2gm(dst, src0, total_length * sizeof(half));
 asc_sync_pipe(PIPE_MTE3);
 asc_set_atomic_min();
-asc_copy_ub2gm(dst, src1, total_length);
+asc_copy_ub2gm(dst, src1, total_length * sizeof(half));
 asc_set_atomic_none();
 ```

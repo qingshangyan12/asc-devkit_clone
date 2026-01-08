@@ -26,16 +26,17 @@
 
 //asc_reduce uint16_t
 __aicore__ inline void asc_reduce_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1,
-    uint16_t dst_repeat_stride, uint8_t src_block_stride, uint8_t src_repeat_stride, uint16_t reserved, uint8_t repeat){
+    uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride){
     if ASC_IS_AIV {
-        vreducev2(dst, src0, src1, dst_repeat_stride, src_block_stride, src_repeat_stride, reserved, repeat);
+        vreducev2(dst, src0, src1, repeat, src0_block_stride, pattern_mode, src0_repeat_stride, src1_repeat_stride);
     }
 }
 
 __aicore__ inline void asc_reduce_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_reduce_impl(dst, src0, src1, 16, 16, 16, 8, 8);
+    asc_reduce_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, 0,
+        ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -47,16 +48,17 @@ __aicore__ inline void asc_reduce_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uin
 
 //asc_reduce uint32_t
 __aicore__ inline void asc_reduce_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1,
-    uint16_t dst_repeat_stride, uint8_t src_block_stride, uint8_t src_repeat_stride, uint16_t reserved, uint8_t repeat){
+    uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride){
     if ASC_IS_AIV {
-        vreducev2(dst, src0, src1, dst_repeat_stride, src_block_stride, src_repeat_stride, reserved, repeat);
+        vreducev2(dst, src0, src1, repeat, src0_block_stride, pattern_mode, src0_repeat_stride, src1_repeat_stride);
     }
 }
 
 __aicore__ inline void asc_reduce_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_reduce_impl(dst, src0, src1, 16, 16, 16, 8, 8);
+    asc_reduce_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, 0,
+        ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 

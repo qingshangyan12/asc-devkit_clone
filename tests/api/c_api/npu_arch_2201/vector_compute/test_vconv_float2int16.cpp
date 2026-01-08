@@ -109,8 +109,8 @@ TEST_F(TestVectorCompute##class_name##_##dst_data_type##_##src_data_type, c_api_
 }                                                                                               \
 
 // ==========asc_float2int16(a/c/f/r/z)==========
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16a, asc_float2int16_a, vconv_f322s16a, int16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16c, asc_float2int16_c, vconv_f322s16c, int16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16f, asc_float2int16_f, vconv_f322s16f, int16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16r, asc_float2int16_r, vconv_f322s16r, int16_t, float);
-TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16z, asc_float2int16_z, vconv_f322s16z, int16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16a, asc_float2int16_rna, vconv_f322s16a, int16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16c, asc_float2int16_ru, vconv_f322s16c, int16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16f, asc_float2int16_rd, vconv_f322s16f, int16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16r, asc_float2int16_rn, vconv_f322s16r, int16_t, float);
+TEST_VECTOR_COMPUTE_CONV_INSTR(ConvF2I16z, asc_float2int16_rz, vconv_f322s16z, int16_t, float);

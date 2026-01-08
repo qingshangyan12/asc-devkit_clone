@@ -12,7 +12,7 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
+#include "c_api/utils_intf.h"
 
 #define TEST_VECTOR_COMPUTE_REPATE_REDUCE_INSTR(class_name, c_api_name, cce_name, data_type, in_order)    \
                                                                                                 \
@@ -26,7 +26,7 @@ namespace {                                                                     
                                                                                                 \
 void cce_name##_##data_type##_##in_order##_uint8_t_uint16_t_uint16_t_uint16_t_Stub(__ubuf__ data_type *dst,  \
                 __ubuf__ data_type *src, uint8_t repeat, uint16_t dst_repeat_stride,            \
-                uint16_t src0_stride, uint16_t src1_stride, order_t order)                      \
+                uint16_t src0_stride, uint16_t src1_stride, Order_t order)                      \
 {                                                                                               \
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type *>(11));                                 \
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ data_type *>(22));                                 \
@@ -34,17 +34,17 @@ void cce_name##_##data_type##_##in_order##_uint8_t_uint16_t_uint16_t_uint16_t_St
     EXPECT_EQ(dst_repeat_stride, static_cast<uint16_t>(8));                                     \
     EXPECT_EQ(src0_stride, static_cast<uint16_t>(1));                                           \
     EXPECT_EQ(src1_stride, static_cast<uint16_t>(8));                                           \
-    EXPECT_EQ(order, order_t::in_order);                                                        \
+    EXPECT_EQ(order, Order_t::in_order);                                                        \
 }                                                                                               \
                                                                                                 \
 void cce_name##_##data_type##_##in_order##_uint64_t_Stub(__ubuf__ data_type *dst,               \
                 __ubuf__ data_type *src, uint8_t repeat,                                        \
                 uint16_t dst_repeat_stride, uint16_t src0_stride, uint16_t src1_stride,         \
-                order_t order)                                                                  \
+                Order_t order)                                                                  \
 {                                                                                               \
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type *>(11));                                 \
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ data_type *>(22));                                 \
-    EXPECT_EQ(order, order_t::in_order);                                                        \
+    EXPECT_EQ(order, Order_t::in_order);                                                        \
 }                                                                                               \
                                                                                                 \
 void cce_name##_##data_type##_##in_order##_set_vector_mask_Stub(uint64_t mask1, uint64_t mask0)              \
@@ -66,7 +66,7 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_Red
     uint8_t repeat = 1;                                                                         \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, __ubuf__ data_type *,                       \
-                uint8_t, uint16_t, uint16_t, uint16_t, order_t))                                \
+                uint8_t, uint16_t, uint16_t, uint16_t, Order_t))                                \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_##in_order##_uint8_t_uint16_t_uint16_t_uint16_t_Stub));    \
                                                                                                 \
@@ -84,7 +84,7 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_int
                 .will(invoke(cce_name##_##data_type##_##in_order##_set_vector_mask_Stub));                   \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, __ubuf__ data_type *,                       \
-                uint8_t, uint16_t, uint16_t, uint16_t, order_t))                                \
+                uint8_t, uint16_t, uint16_t, uint16_t, Order_t))                                \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_##in_order##_uint64_t_Stub));                 \
                                                                                                 \
@@ -102,7 +102,7 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_half_half_hal
                 .will(invoke(cce_name##_##data_type##_##in_order##_set_vector_mask_Stub));                   \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *, __ubuf__ data_type *,                       \
-                uint8_t, uint16_t, uint16_t, uint16_t, order_t))                                \
+                uint8_t, uint16_t, uint16_t, uint16_t, Order_t))                                \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_##in_order##_uint64_t_Stub));                \
     c_api_name##_sync(dst, src, count);                                                         \

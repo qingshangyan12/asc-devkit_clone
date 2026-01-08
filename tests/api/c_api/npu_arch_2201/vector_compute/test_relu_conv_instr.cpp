@@ -12,7 +12,7 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/c_api_utils_intf.h"
+#include "c_api/utils_intf.h"
 
 #define TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(class_name, c_api_name, cce_name, dst_data_type, src_data_type)          \
                                                                                                \
@@ -130,3 +130,10 @@ TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(AddReluF162S8, asc_add_relu_cast_f162s8, vad
 TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(AddReluF322F16, asc_add_relu_cast_f322f16, vaddreluconv_f322f16, half, float);
 // ==========asc_add_relu_cast_s162s8==========
 TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(AddReluS162S8, asc_add_relu_cast_s162s8, vaddreluconv_s162s8, int8_t, int16_t);
+
+// ==========asc_sub_relu_cast_f162s8==========
+TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(SubReluF162S8, asc_sub_relu_castf162s8, vsubreluconv_f162s8, int8_t, half);
+// ==========asc_sub_relu_cast_f322f16==========
+TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(SubReluF322F16, asc_sub_relu_castf322f16, vsubreluconv_f322f16, half, float);
+// ==========asc_sub_relu_cast_s162s8==========
+TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(SubReluS162S8, asc_sub_relu_casts162s8, vsubreluconv_s162s8, int8_t, int16_t);

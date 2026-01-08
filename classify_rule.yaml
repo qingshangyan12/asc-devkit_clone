@@ -25,6 +25,7 @@ asc-devkit:
       - tests
       - include/**/*.h
       - tools/**/*.h
+      - impl/c_api/**/*.h
   llt:
     ut_check: true
     st_check: false
