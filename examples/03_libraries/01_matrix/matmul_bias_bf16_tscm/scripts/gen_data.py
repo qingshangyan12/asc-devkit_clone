@@ -12,7 +12,8 @@
 
 import os
 import numpy as np
-
+import tensorflow as tf
+bfloat16 = tf.bfloat16.as_numpy_dtype
 
 def gen_golden_data():
     m = 3
@@ -20,7 +21,7 @@ def gen_golden_data():
     k = 7
     x1_gm = np.random.randint(1, 10, [m, k]).astype(np.float16)
     x2_gm = np.random.randint(1, 10, [k, n]).astype(np.float16)
-    bias_gm = np.random.randint(1, 10, [1, n]).astype(np.bfloat16)
+    bias_gm = np.random.randint(1, 10, [1, n]).astype(bfloat16)
     golden = (np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)) + \
         bias_gm.astype(np.float32)).astype(np.float32)
     os.makedirs("input", exist_ok=True)
