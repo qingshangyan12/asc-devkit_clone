@@ -13,6 +13,9 @@ project(asc-devkit)
 
 option(BUILD_OPEN_PROJECT "Build open asc-devkit lib project" ON)
 
+set(CMAKE_C_FLAGS_RELEASE "")
+set(CMAKE_CXX_FLAGS_RELEASE "")
+
 if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   message(STATUS "compile project asc-devkit with library")
   option(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG "Build asc-devkit with cann pkg" ON)
@@ -47,6 +50,7 @@ if(BUILD_OPEN_PROJECT)
 endif()
 
 add_subdirectory(tools)
+add_subdirectory(cmake)
 
 set(ASC_DEVKIT_VERSION_FILE ${CMAKE_CURRENT_BINARY_DIR}/_CPack_Packages/makeself_staging/share/info/asc-devkit/version.info)
 add_custom_command(

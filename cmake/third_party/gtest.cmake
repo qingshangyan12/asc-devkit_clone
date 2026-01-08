@@ -3,10 +3,11 @@
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
-# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-# See LICENSE in the root of the software repository for the full text of the License.
-# ----------------------------------------------------------------------------------------------------------
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+# BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE. See LICENSE in the root of
+# the software repository for the full text of the License.
+# ----------------------------------------------------------------------------
+
 unset(gtest_FOUND CACHE)
 unset(GTEST_INCLUDE CACHE)
 unset(GTEST_STATIC_LIBRARY CACHE)
@@ -105,5 +106,3 @@ set_target_properties(gtest PROPERTIES
 set_target_properties(gtest_main PROPERTIES
         IMPORTED_LOCATION ${GTEST_INSTALL_PATH}/lib/libgtest_main.a
         INTERFACE_INCLUDE_DIRECTORIES ${GTEST_INSTALL_PATH}/include)
-
-
