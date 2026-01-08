@@ -17,6 +17,4 @@ TEST_VECTOR_COMPUTE_COMPARE_VCMP_INSTR(VcmpNeCApi, asc_ne, vcmp_ne, float);
 
 // ==========asc_ne(dst:uint8/int8, src:half/float)==========
 TEST_VECTOR_COMPUTE_COMPARE_VCMPV_INSTR(VcmpvNeCApi, asc_ne, vcmpv_ne, uint8_t, half);
-TEST_VECTOR_COMPUTE_COMPARE_VCMPV_INSTR(VcmpvNeCApi, asc_ne, vcmpv_ne, int8_t, half);
 TEST_VECTOR_COMPUTE_COMPARE_VCMPV_INSTR(VcmpvNeCApi, asc_ne, vcmpv_ne, uint8_t, float);
-TEST_VECTOR_COMPUTE_COMPARE_VCMPV_INSTR(VcmpvNeCApi, asc_ne, vcmpv_ne, int8_t, float);

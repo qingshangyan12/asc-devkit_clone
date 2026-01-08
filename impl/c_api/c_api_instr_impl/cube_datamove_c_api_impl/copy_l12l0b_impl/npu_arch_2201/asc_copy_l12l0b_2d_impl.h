@@ -67,38 +67,6 @@ __aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ uint8_t* dst, __cbuf__ u
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ int16_t* dst, __cbuf__ int16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    if ASC_IS_AIC {
-        load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap,
-            sid, transpose, static_cast<addr_cal_mode_t>(addr_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ int16_t* dst, __cbuf__ int16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0b_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-    asc_sync_post_process();
-}
-
-__aicore__ inline void asc_copy_l12l0b_impl(__cb__ uint16_t* dst, __cbuf__ uint16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    if ASC_IS_AIC {
-        load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap,
-            sid, transpose, static_cast<addr_cal_mode_t>(addr_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_l12l0b_sync_impl(__cb__ uint16_t* dst, __cbuf__ uint16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0b_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-    asc_sync_post_process();
-}
-
 __aicore__ inline void asc_copy_l12l0b_impl(__cb__ half* dst, __cbuf__ half* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
 {

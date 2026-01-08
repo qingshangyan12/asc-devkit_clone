@@ -69,7 +69,7 @@ __aicore__ inline void asc_set_l1_3d_rpt(asc_load3d_v2_config& config)
     asc_set_l1_3d_rpt_impl(config);
 }
 
-// ==========asc_copy_l12l0b, 2D, int4b_t/int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float==========
+// ==========asc_copy_l12l0b, 2D, int4b_t/int8_t/uint8_t/half/bfloat16_t/int32_t/uint32_t/float==========
 __aicore__ inline void asc_copy_l12l0b(__cb__ int4b_t* dst, __cbuf__ int4b_t* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
 {
@@ -101,30 +101,6 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ uint8_t* dst, __cbuf__ uint8_t* sr
 }
 
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ uint8_t* dst, __cbuf__ uint8_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0b_sync_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-}
-
-__aicore__ inline void asc_copy_l12l0b(__cb__ int16_t* dst, __cbuf__ int16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0b_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-}
-
-__aicore__ inline void asc_copy_l12l0b_sync(__cb__ int16_t* dst, __cbuf__ int16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0b_sync_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-}
-
-__aicore__ inline void asc_copy_l12l0b(__cb__ uint16_t* dst, __cbuf__ uint16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0b_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-}
-
-__aicore__ inline void asc_copy_l12l0b_sync(__cb__ uint16_t* dst, __cbuf__ uint16_t* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
 {
     asc_copy_l12l0b_sync_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
@@ -281,7 +257,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(__cb__ float* dst, __cbuf__ float* s
         filter_h, dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
 }
 
-// ==========asc_copy_l12l0a, 2D, int4b_t*/int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float==========
+// ==========asc_copy_l12l0a, 2D, int4b_t*/int8_t/uint8_t/half/bfloat16_t/int32_t/uint32_t/float==========
 __aicore__ inline void asc_copy_l12l0a(__ca__ int4b_t*  dst, __cbuf__ int4b_t*  src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
 {
@@ -313,30 +289,6 @@ __aicore__ inline void asc_copy_l12l0a(__ca__ uint8_t* dst, __cbuf__ uint8_t* sr
 }
 
 __aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint8_t* dst, __cbuf__ uint8_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0a_sync_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-}
-
-__aicore__ inline void asc_copy_l12l0a(__ca__ int16_t* dst, __cbuf__ int16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0a_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-}
-
-__aicore__ inline void asc_copy_l12l0a_sync(__ca__ int16_t* dst, __cbuf__ int16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0a_sync_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-}
-
-__aicore__ inline void asc_copy_l12l0a(__ca__ uint16_t* dst, __cbuf__ uint16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
-{
-    asc_copy_l12l0a_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);
-}
-
-__aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint16_t* dst, __cbuf__ uint16_t* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint8_t sid, bool transpose, uint8_t addr_mode)
 {
     asc_copy_l12l0a_sync_impl(dst, src, start_index, repeat, src_stride, dst_gap, sid, transpose, addr_mode);

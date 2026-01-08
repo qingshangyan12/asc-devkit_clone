@@ -94,8 +94,6 @@ TEST_F(TestCubeDmamove##class_name##data_type, c_api_name##_sync_Succ)          
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0A2DCApi, asc_copy_l12l0a, load_cbuf_to_ca_s4, __ca__, int4b_t, void);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0A2DCApi, asc_copy_l12l0a, load_cbuf_to_ca, __ca__, int8_t, int8_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0A2DCApi, asc_copy_l12l0a, load_cbuf_to_ca, __ca__, uint8_t, uint8_t);
-TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0A2DCApi, asc_copy_l12l0a, load_cbuf_to_ca, __ca__, int16_t, int16_t);
-TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0A2DCApi, asc_copy_l12l0a, load_cbuf_to_ca, __ca__, uint16_t, uint16_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0A2DCApi, asc_copy_l12l0a, load_cbuf_to_ca, __ca__, half, half);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0A2DCApi, asc_copy_l12l0a, load_cbuf_to_ca, __ca__, bfloat16_t, bfloat16_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0A2DCApi, asc_copy_l12l0a, load_cbuf_to_ca, __ca__, int32_t, int32_t);
@@ -105,8 +103,6 @@ TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0A2DCApi, asc_copy_l12l0a, load_cbuf_to
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0B2DCApi, asc_copy_l12l0b, load_cbuf_to_cb_s4, __cb__, int4b_t, void);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0B2DCApi, asc_copy_l12l0b, load_cbuf_to_cb, __cb__, int8_t, int8_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0B2DCApi, asc_copy_l12l0b, load_cbuf_to_cb, __cb__, uint8_t, uint8_t);
-TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0B2DCApi, asc_copy_l12l0b, load_cbuf_to_cb, __cb__, int16_t, int16_t);
-TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0B2DCApi, asc_copy_l12l0b, load_cbuf_to_cb, __cb__, uint16_t, uint16_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0B2DCApi, asc_copy_l12l0b, load_cbuf_to_cb, __cb__, half, half);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0B2DCApi, asc_copy_l12l0b, load_cbuf_to_cb, __cb__, bfloat16_t, bfloat16_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0_2D(CopyL12L0B2DCApi, asc_copy_l12l0b, load_cbuf_to_cb, __cb__, int32_t, int32_t);

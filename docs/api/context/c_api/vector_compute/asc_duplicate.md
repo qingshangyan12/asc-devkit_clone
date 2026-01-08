@@ -56,7 +56,7 @@
 | dst | 输出 | 目的操作数地址。 |
 | src | 输入 | 源标量值。 |
 | count | 输入 | 参与连续复制的元素个数。 |
-| repeat | 迭代次数。 |
+| repeat | 输入  | 迭代次数。 |
 | dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长，该参数固定填1。 |
 | dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |

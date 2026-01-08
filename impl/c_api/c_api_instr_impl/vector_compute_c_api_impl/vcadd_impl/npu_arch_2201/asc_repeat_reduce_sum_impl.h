@@ -35,7 +35,7 @@ __aicore__ inline void asc_repeat_reduce_sum_impl(__ubuf__ half* dst, __ubuf__ h
 __aicore__ inline void asc_repeat_reduce_sum_impl(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_repeat_reduce_sum_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
+    asc_repeat_reduce_sum_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_REDUCE_REPEAT_STRIDE,
         ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
@@ -57,7 +57,7 @@ __aicore__ inline void asc_repeat_reduce_sum_impl(__ubuf__ float* dst, __ubuf__ 
 __aicore__ inline void asc_repeat_reduce_sum_impl(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_repeat_reduce_sum_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_DEFAULT_REPEAT_STRIDE,
+    asc_repeat_reduce_sum_impl(dst, src, ASC_DEFAULT_REPEAT, ASC_REDUCE_REPEAT_STRIDE,
         ASC_DEFAULT_BLOCK_STRIDE, ASC_DEFAULT_REPEAT_STRIDE);
     asc_set_mask_count_end();
 }
