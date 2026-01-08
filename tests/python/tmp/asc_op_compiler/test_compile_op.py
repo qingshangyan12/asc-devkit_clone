@@ -4751,8 +4751,7 @@ void add_custom();
             mock.patch.object(super_kernel_compile_module, 'link_relocatable'),\
             mock.patch.object(super_kernel_compile_module, 'localization_sub_op_func_sym'),\
             mock.patch.object(super_kernel_compile_module, '_compile_ascendc_cce_v220_with_kernel_type_for_static'),\
-            mock.patch.object(super_kernel_compile_module, '_json_post_process'), \
-            mock.patch.object(CommonUtility, "is_support_super_kernel", return_value=True)):
+            mock.patch.object(super_kernel_compile_module, '_json_post_process')):
             with open(os.devnull, 'a') as file:
                 with mock.patch('os.open', return_value=file):
                     with mock.patch('os.fdopen') as mock_fdopen:
