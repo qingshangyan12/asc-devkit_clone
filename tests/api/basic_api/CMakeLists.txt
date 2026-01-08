@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
 find_package(tikicpulib REQUIRED)
 
-set(TIKCPP_UT_PRODUCT_TYPE_LIST
+set(BASIC_UT_PRODUCT_TYPE_LIST_INIT
     ascend910
     ascend610
     ascend310p
@@ -27,6 +27,7 @@ set(TIKCPP_UT_PRODUCT_TYPE_LIST
     mc62cm12aa_BASIC
     mc62cm12aa_FRAMEWORK
 )
+set(BASIC_UT_PRODUCT_TYPE_LIST ${BASIC_UT_PRODUCT_TYPE_LIST_INIT} CACHE STRING "Supported product types")
 
 set(ASCENDC_TEST_HEADER_FILES
     common
@@ -48,98 +49,98 @@ file(GLOB ASCENDC_TEST_COMMON_SRC_FILES
 
 # common test cases
 file(GLOB ASCENDC_TEST_COMMON_CASE_SRC_FILES
-    tikcpp_case_common/*.cpp
+    ascendc_case_common/*.cpp
 )
 
 # ascend910 test cases
 file(GLOB ASCENDC_TEST_ascend910_CASE_SRC_FILES
-    tikcpp_case_ascend910/*.cpp
+    ascendc_case_ascend910/*.cpp
 )
 
 # ascend610 test cases
 file(GLOB ASCENDC_TEST_ascend610_CASE_SRC_FILES
-    tikcpp_case_ascend610/*.cpp
+    ascendc_case_ascend610/*.cpp
 )
 
 # ascend310p test cases
 file(GLOB ASCENDC_TEST_ascend310p_CASE_SRC_FILES
-    tikcpp_case_ascend310p/*.cpp
+    ascendc_case_ascend310p/*.cpp
 )
 
 # ascend910B1 aiv test cases
 file(GLOB ASCENDC_TEST_ascend910B1_AIV_CASE_SRC_FILES
-    tikcpp_case_common/test_data_copy_slice.cpp
-    tikcpp_case_common/test_tscm_data.cpp
-    tikcpp_case_ascend910b1/tikcpp_case_ascend910b1_aiv/*.cpp
+    ascendc_case_common/test_data_copy_slice.cpp
+    ascendc_case_common/test_tscm_data.cpp
+    ascendc_case_ascend910b1/ascendc_case_ascend910b1_aiv/*.cpp
 )
 
 # ascend910B1 aic test cases
 file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
-    tikcpp_case_ascend910b1/tikcpp_case_ascend910b1_aic/*.cpp
+    ascendc_case_ascend910b1/ascendc_case_ascend910b1_aic/*.cpp
 )
 
 # ascend310B1 test cases
 file(GLOB ASCENDC_TEST_ascend310B1_CASE_SRC_FILES
-    tikcpp_case_common/test_kernel_pop_stack_buffer.cpp
-    tikcpp_case_ascend310b1/*.cpp
+    ascendc_case_common/test_kernel_pop_stack_buffer.cpp
+    ascendc_case_ascend310b1/*.cpp
 )
 
 # ascend610Lite test cases
 file(GLOB ASCENDC_TEST_ascend610Lite_CASE_SRC_FILES
-    tikcpp_case_common/test_kernel_pop_stack_buffer.cpp
-    tikcpp_case_ascend610lite/*.cpp
+    ascendc_case_common/test_kernel_pop_stack_buffer.cpp
+    ascendc_case_ascend610lite/*.cpp
 )
 
 # ascend910_9599 basic test cases
 file(GLOB ASCENDC_TEST_ascend910_9599_AIV_BASIC_CASE_SRC_FILES
-    tikcpp_case_common/test_kernel_pop_stack_buffer.cpp
-    tikcpp_case_common/test_kernel_tensor.cpp
-    tikcpp_case_common/test_type_check.cpp
-    tikcpp_case_ascend910_9599/test_pipe_framework.cpp
-    tikcpp_case_ascend910_9599/tikcpp_case_ascend910_9599_aiv_basic/*.cpp
+    ascendc_case_common/test_kernel_pop_stack_buffer.cpp
+    ascendc_case_common/test_kernel_tensor.cpp
+    ascendc_case_common/test_type_check.cpp
+    ascendc_case_ascend910_9599/test_pipe_framework.cpp
+    ascendc_case_ascend910_9599/ascendc_case_ascend910_9599_aiv_basic/*.cpp
 )
 
 # ascend910_9599 framework test cases
 file(GLOB ASCENDC_TEST_ascend910_9599_AIV_FRAMEWORK_CASE_SRC_FILES
-    tikcpp_case_common/test_kernel_pop_stack_buffer.cpp
-    tikcpp_case_common/test_kernel_tensor.cpp
-    tikcpp_case_common/test_type_check.cpp
-    tikcpp_case_ascend910_9599/test_pipe_framework.cpp
-    tikcpp_case_ascend910_9599/tikcpp_case_ascend910_9599_aiv_framework/*.cpp
+    ascendc_case_common/test_kernel_pop_stack_buffer.cpp
+    ascendc_case_common/test_kernel_tensor.cpp
+    ascendc_case_common/test_type_check.cpp
+    ascendc_case_ascend910_9599/test_pipe_framework.cpp
+    ascendc_case_ascend910_9599/ascendc_case_ascend910_9599_aiv_framework/*.cpp
 )
 
 # ascend910_9599 aic test cases
 file(GLOB ASCENDC_TEST_ascend910_9599_AIC_CASE_SRC_FILES
-    tikcpp_case_common/test_kernel_tensor.cpp
-    tikcpp_case_common/test_type_check.cpp
-    tikcpp_case_ascend910_9599/test_pipe_framework.cpp
-    tikcpp_case_ascend910_9599/tikcpp_case_ascend910_9599_aic/*.cpp
+    ascendc_case_common/test_kernel_tensor.cpp
+    ascendc_case_common/test_type_check.cpp
+    ascendc_case_ascend910_9599/test_pipe_framework.cpp
+    ascendc_case_ascend910_9599/ascendc_case_ascend910_9599_aic/*.cpp
 )
 
 # mc62cm12aa basic test cases
 file(GLOB ASCENDC_TEST_mc62cm12aa_BASIC_CASE_SRC_FILES
-    tikcpp_case_common/test_kernel_pop_stack_buffer.cpp
-    tikcpp_case_common/test_kernel_tensor.cpp
-    tikcpp_case_common/test_type_check.cpp
-    tikcpp_case_mc62cm12aa/tikcpp_case_mc62cm12aa_basic/*.cpp
+    ascendc_case_common/test_kernel_pop_stack_buffer.cpp
+    ascendc_case_common/test_kernel_tensor.cpp
+    ascendc_case_common/test_type_check.cpp
+    ascendc_case_mc62cm12aa/ascendc_case_mc62cm12aa_basic/*.cpp
 )
 
 # mc62cm12aa framework test cases
 file(GLOB ASCENDC_TEST_mc62cm12aa_FRAMEWORK_CASE_SRC_FILES
-    tikcpp_case_common/test_kernel_pop_stack_buffer.cpp
-    tikcpp_case_common/test_kernel_tensor.cpp
-    tikcpp_case_common/test_type_check.cpp
-    tikcpp_case_mc62cm12aa/tikcpp_case_mc62cm12aa_framework/*.cpp
+    ascendc_case_common/test_kernel_pop_stack_buffer.cpp
+    ascendc_case_common/test_kernel_tensor.cpp
+    ascendc_case_common/test_type_check.cpp
+    ascendc_case_mc62cm12aa/ascendc_case_mc62cm12aa_framework/*.cpp
 )
 
 # mc62cm12aa aic test cases
 file(GLOB ASCENDC_TEST_mc62cm12aa_AIC_CASE_SRC_FILES
-    tikcpp_case_common/test_kernel_tensor.cpp
-    tikcpp_case_common/test_type_check.cpp
-    tikcpp_case_mc62cm12aa/tikcpp_case_mc62cm12aa_aic/*.cpp
+    ascendc_case_common/test_kernel_tensor.cpp
+    ascendc_case_common/test_type_check.cpp
+    ascendc_case_mc62cm12aa/ascendc_case_mc62cm12aa_aic/*.cpp
 )
 
-foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
+foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_basic_api_${product_type}
         ${ASCENDC_DIR}/tests/main_global.cpp
         ${ASCENDC_TEST_COMMON_SRC_FILES}

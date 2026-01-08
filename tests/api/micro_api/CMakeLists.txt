@@ -28,12 +28,12 @@ set(ASCENDC_TEST_HEADER_FILES
 # # ================ micro_api kernel ut ================
 # ascend910_9599 micro test cases
 file(GLOB ASCENDC_TEST_ascend910_9599_MICRO_CASE_SRC_FILES
-    tikcpp_case_ascend910_9599_micro/*.cpp
+    ascendc_case_ascend910_9599_micro/*.cpp
 )
 
 # mc62cm12aa micro test cases
 file(GLOB ASCENDC_TEST_mc62cm12aa_MICRO_CASE_SRC_FILES
-    tikcpp_case_mc62cm12aa_micro/*.cpp
+    ascendc_case_mc62cm12aa_micro/*.cpp
 )
 
 foreach(product_type ${MICRO_PRODUCT_TYPE_LIST})

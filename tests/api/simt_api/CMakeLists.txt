@@ -30,13 +30,13 @@ set(ASCENDC_TEST_HEADER_FILES
 # ascend910_9599 simt test cases
 file(GLOB ASCENDC_TEST_ascend910_9599_SIMT_CASE_SRC_FILES
     common_simt/simt_compiler_stub.cpp
-    tikcpp_case_ascend910_9599_simt/*.cpp
+    ascendc_case_ascend910_9599_simt/*.cpp
 )
 
 # mc62cm12aa simt test cases
 file(GLOB ASCENDC_TEST_mc62cm12aa_SIMT_CASE_SRC_FILES
     common_simt/simt_compiler_stub.cpp
-    tikcpp_case_mc62cm12aa_simt/*.cpp
+    ascendc_case_mc62cm12aa_simt/*.cpp
 )
 
 foreach(product_type ${SIMT_PRODUCT_TYPE_LIST})
