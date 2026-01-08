@@ -13,9 +13,9 @@
 
 ## 函数原型
 
-    ```c++
-    __aicore__ inline void asc_set_atomic_add()
-    ```
+```c++
+__aicore__ inline void asc_set_atomic_add()
+```
 
 ## 参数说明
 

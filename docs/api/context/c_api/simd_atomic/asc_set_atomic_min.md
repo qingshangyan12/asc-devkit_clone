@@ -13,9 +13,9 @@
 
 ## 函数原型
 
-    ```cpp
-    __aicore__ inline void asc_set_atomic_min()
-    ```
+```c++
+__aicore__ inline void asc_set_atomic_min()
+```
 
 ## 参数说明
 

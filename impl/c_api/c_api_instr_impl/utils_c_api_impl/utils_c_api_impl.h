@@ -88,6 +88,7 @@ constexpr asc_c_api_one_fourth_default_repeat_stride ASC_C_API_ONE_FOURTH_DEFAUL
 constexpr uint16_t ASC_C_API_DATABLOCK_NUM = 8;
 constexpr uint8_t ASC_C_API_MRGSORT_ELEMENT_LEN = 4;
 constexpr uint16_t ASC_C_API_ONE_DATABLOCK_SIZE = 32;
+constexpr uint16_t ASC_C_API_REDUCE_DEFAULT_REPEAT_STRIDE = 1;
 
 using order_t = Order_t;
 
