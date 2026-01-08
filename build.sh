@@ -12,7 +12,7 @@
 set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p")
-SUPPORTED_LONG_OPTS=(
+SUPPORTED_LONG_OPTS=(11111
     "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type"
 )
 
