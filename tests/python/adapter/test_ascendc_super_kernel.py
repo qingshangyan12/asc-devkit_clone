@@ -1936,6 +1936,102 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                 self.assertIn("SYNC_AIC_FLAG", sync_and_event_code.strip())
 
 
+    def test_gen_wait_block_extra_sync(self):
+        compile_log_path = "./tmp/"
+        op_options = {'split-mode': 4}
+        with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
+            with mock.patch('json.load', return_value=op_json):
+                super_op = SuperOperatorInfos({
+                    "op_list": [
+                        {
+                            "bin_path": "op1.o",
+                            "json_path": "op1.json",
+                            "kernel_name": "op1"
+                        },
+                    ]
+                },
+                "super_kernel")
+                sub_op1 = SubOperatorInfos(0, {"bin_path": "./op1.o","json_path": "op1.json","kernel_name": "op1"}, 100,
+                    op_options, compile_log_path)
+                sub_op2 = SubOperatorInfos(1, {"bin_path": "./op2.o","json_path": "op2.json","kernel_name": "op2"}, 100,
+                    op_options, compile_log_path)
+                sub_op2.recv_event_list = [1]
+                sub_op2.wait_block = "sub_op2 wait block\n"
+
+                # wait block extra sync case: aic to aiv, need extra aiv sync
+                wait_block_extra_sync_aic_to_aiv_pairs = \
+                    {(KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0),
+                     (KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_AIV_ONLY),
+                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0),
+                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_AIV_ONLY),
+                    }
+
+                golden_extra_aiv_sync_code = '''    sub_op2 wait block
+    // extra sync for wait event
+    AscendC::SyncAll<true>();
+'''
+
+                for sub_op1_type, sub_op2_type in wait_block_extra_sync_aic_to_aiv_pairs:
+                    sub_op1.kernel_type = sub_op1_type
+                    sub_op2.kernel_type = sub_op2_type
+                    sync_and_event_code = gen_sync_and_event_code(super_op, sub_op1, sub_op2)
+                    self.assertIn(golden_extra_aiv_sync_code, sync_and_event_code)
+
+                # wait block extra sync case: aic to mix, need extra aiv sync
+                wait_block_extra_sync_aic_to_mix_pairs = \
+                    {(KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1),
+                     (KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2),
+                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1),
+                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2),
+                    }
+
+                for sub_op1_type, sub_op2_type in wait_block_extra_sync_aic_to_mix_pairs:
+                    sub_op1.kernel_type = sub_op1_type
+                    sub_op2.kernel_type = sub_op2_type
+                    sync_and_event_code = gen_sync_and_event_code(super_op, sub_op1, sub_op2)
+                    self.assertIn(golden_extra_aiv_sync_code, sync_and_event_code)
+
+                # wait block extra sync case: aiv to aic, need extra aic sync
+                wait_block_extra_sync_aiv_to_aic_pairs = \
+                    {(KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0, KernelMetaType.KERNEL_TYPE_AIC_ONLY),
+                     (KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0),
+                     (KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_AIC_ONLY),
+                     (KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0),
+                    }
+
+                golden_extra_aic_sync_code = '''    sub_op2 wait block
+
+    // extra sync for wait event
+    ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
+    wait_flag_dev(AscendC::SYNC_AIC_FLAG);
+'''
+
+                for sub_op1_type, sub_op2_type in wait_block_extra_sync_aiv_to_aic_pairs:
+                    sub_op1.kernel_type = sub_op1_type
+                    sub_op2.kernel_type = sub_op2_type
+                    sync_and_event_code = gen_sync_and_event_code(super_op, sub_op1, sub_op2)
+                    self.assertIn(golden_extra_aic_sync_code, sync_and_event_code)
+
+                # wait block extra sync case: else, no extra sync
+                wait_block_extra_no_sync_pairs = \
+                    {(KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2),
+                     (KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2, KernelMetaType.KERNEL_TYPE_AIC_ONLY),
+                     (KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2, KernelMetaType.KERNEL_TYPE_AIV_ONLY),
+                     (KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2),
+                     (KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_AIV_ONLY),
+                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_AIC_ONLY),
+                    }
+
+                for sub_op1_type, sub_op2_type in wait_block_extra_no_sync_pairs:
+                    sub_op1.kernel_type = sub_op1_type
+                    sub_op2.kernel_type = sub_op2_type
+                    sync_and_event_code = gen_sync_and_event_code(super_op, sub_op1, sub_op2)
+                    self.assertNotIn("// extra sync for wait event", sync_and_event_code)
+                    self.assertNotIn("AscendC::SyncAll<true>();", sync_and_event_code)
+                    self.assertNotIn("ffts_cross_core_sync", sync_and_event_code)
+                    self.assertNotIn("wait_flag_dev", sync_and_event_code)
+
+
     def test_get_sync_code_by_kernel_type(self):
         sync_code = get_sync_code_by_kernel_type(KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1)
         self.assertIn("SyncAll", sync_code.strip())
