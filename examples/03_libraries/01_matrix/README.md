@@ -27,6 +27,7 @@
 | [matmul_quant](./matmul_quant) | 本样例介绍Matmul API实现int8类型输入、half类型输出的Matmul反量化场景的算子，支持同一系数的反量化模式和向量的反量化模式 |
 | [matmul_int4](./matmul_int4) | 本样例介绍Matmul API实现int4数据类型输入，int32数据类型输出的单算子 |
 | [matmul_tscm_src_vecout](./matmul_tscm_src_vecout) | 本样例介绍Matmul API使用数据来源为VECOUT的用户自定义TSCM的输入 |
+| [batch_matmul_bias_no_batch](./batch_matmul_bias_no_batch) | 本样例介绍调用Matmul高阶API实现BatchMatmul单算子复用Bias矩阵的场景|
 | [matmul_nz](./matmul_nz) | 本样例介绍Matmul API输入矩阵内轴非256B对齐的场景下，在AIV核上使用DataCopyPad实现ND转换NZ格式的单算子 |
 | [matmul_nbuffer33](./matmul_nbuffer33) | 本样例介绍Matmul API实现NBuffer33算法的单算子，以及介绍模板参数MatmulPolicy中NBuffer33MatmulPolicy的使用方式 |
 | [matmul_k_reorder_load](./matmul_k_reorder_load) | 本样例介绍Matmul API使能K轴错峰加载数据的场景 |
