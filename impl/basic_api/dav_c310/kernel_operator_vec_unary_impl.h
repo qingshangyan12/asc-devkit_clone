@@ -344,7 +344,7 @@ __aicore__ inline void Reciprocal(RegT &dstReg, RegT &srcReg, MicroAPI::MaskReg 
         MicroAPI::Div(dstReg, dstReg, srcReg, mask);
     } else {
         static constexpr AscendC::MicroAPI::DivSpecificMode mode = 
-                                        {MicroAPI::MaskMergeMode::ZEROING, true, DivAlgo::PRECISION_1ULP_FTZ_FALSE};
+                                        {MicroAPI::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_1ULP_FTZ_FALSE};
         MicroAPI::Div<T, &mode>(dstReg, dstReg, srcReg, mask);
     }
 }

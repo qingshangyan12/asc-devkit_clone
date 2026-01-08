@@ -1093,8 +1093,6 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     Select(scale, tmp1, scale, mask0);
     Muls(z1, dst, 2, mask0);
     Select(dst, z1, dst, mask0);
-    MaskNot(mask0, mask0, mask);
-    MaskAnd(maskValid, mask0, maskValid, mask);
 
     Compare<int32_t, CMPMODE::GT>(mask0, scale, (RegTensor<int32_t>&)tmp0, mask);
     MaskAnd(mask0, mask0, maskValid, mask);
@@ -1312,8 +1310,6 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
     Select(scale, tmp1, scale, mask0);
     Muls(z1, dst, 2, mask0);
     Select(dst, z1, dst, mask0);
-    MaskNot(mask0, mask0, mask);
-    MaskAnd(maskValid, mask0, maskValid, mask);
 
     Compare<int16_t, CMPMODE::GT>(mask0, scale, (RegTensor<int16_t>&)tmp0, mask);
     MaskAnd(mask0, mask0, maskValid, mask);
