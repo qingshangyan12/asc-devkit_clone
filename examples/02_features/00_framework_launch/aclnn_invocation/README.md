@@ -1,7 +1,7 @@
 ## 概述
 本样例基于AddCustom算子工程，介绍了aclnn单算子调用方式进行编译和执行。
 
-## 支持的AI处理器
+## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -77,10 +77,12 @@ CANN软件包中提供了工程创建工具msOpGen，add_custom算子工程可�
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+    
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh

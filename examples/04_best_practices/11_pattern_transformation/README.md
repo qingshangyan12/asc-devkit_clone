@@ -1,7 +1,7 @@
 # pattern_transformation样例
 ## 概述
 分型转换适配基础样例
-## 支持的AI处理器
+## 支持的产品
 - Ascend 950PR/Ascend 950DT
 ## 目录结构介绍
 ```
@@ -41,14 +41,17 @@
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
     ```
+    
 - 样例执行
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录

@@ -96,20 +96,23 @@ Add算子实现了两个数据相加，返回相加结果的功能。本样例�
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
     ```
-  - 样例执行
-    ```bash
-    bash run.sh -v float16
-    ```
-    -v 可选择tiling模板，可选参数有float16和float
-    执行结果如下，说明精度对比成功。
-    ```bash
-    test pass
-    ```
+
+- 样例执行
+  ```bash
+  bash run.sh -v float16
+  ```
+  -v 可选择tiling模板，可选参数有float16和float
+  执行结果如下，说明精度对比成功。
+  ```bash
+  test pass
+  ```

@@ -1,6 +1,9 @@
 ## 概述
 本样例介绍通过onnx网络调用的方式调用LeakyReluCustom算子。
 
+## 支持的产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── onnx_plugin                  // 使用框架调用的方式调用LeakyRelu自定义算子
@@ -36,13 +39,6 @@ $$
 </tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">leaky_relu_custom</td></tr>
 </table>
-
-## 支持的产品型号
-本样例支持如下产品型号：
-- Atlas 训练系列产品
-- Atlas 推理系列产品AI Core
-- Atlas A2训练系列产品/Atlas 800I A2推理产品
-- Atlas 200/500 A2推理产品
 
 ## 算子工程介绍
 其中，算子工程目录LeakyReluCustom包含算子的实现文件，如下所示：

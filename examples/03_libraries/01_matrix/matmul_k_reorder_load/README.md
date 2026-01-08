@@ -82,10 +82,12 @@ enableKdimReorderLoad用于配置是否使能K轴错峰加载数据。基于相�
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+    
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh

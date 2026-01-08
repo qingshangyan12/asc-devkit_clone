@@ -2,6 +2,9 @@
 本样例基于AddCustom算子工程，提供支持Tiling下沉的自定义算子开发样例。
 若要使能Tiling下沉，算子Tiling函数必须独立实现，详细开发指导请参考[Ascend C算子开发](https://hiascend.com/document/redirect/CannCommunityOpdevAscendC)手册中的Tiling下沉章节。
 
+## 支持的产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├─op_host									// host侧实现文件
@@ -46,11 +49,6 @@ z = x + y
                           SRC ${CMAKE_CURRENT_SOURCE_DIR}/add_custom_tiling_sink_tiling.cpp)
   ```
 - 算子kernel实现：通过KERNEL_TASK_TYPE_DEFAULT接口将算子强制指定在AIC、AIV混合场景运行，满足Tiling下沉算子条件。
-
-## 支持的产品型号
-本样例支持如下产品型号：
-- Atlas A2 训练系列产品/Atlas 800I A2 推理产品/A200I A2 Box 异构组件
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
 
 ## 编译运行样例算子
 针对自定义算子工程，编译运行包含如下步骤：

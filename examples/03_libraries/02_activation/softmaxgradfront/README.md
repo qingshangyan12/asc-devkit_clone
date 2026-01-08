@@ -46,7 +46,7 @@
 
     softmaxgradfront算子的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用softmaxGradFront高阶API的tiling函数获取API所需tiling参数，尾核计算所需的高阶API的tiling由kernel侧自行计算。
 
-## 编译运行：  
+## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
@@ -54,14 +54,17 @@
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
     ```
+    
 - 样例执行
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录

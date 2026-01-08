@@ -36,7 +36,7 @@
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Select基础API接口完成计算，得到最终结果，再搬出到外部存储上。
 
     SelectCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor src0Gm、src1Gm和selGm存储在src0Local、src1Local和selLocal中。Compute任务是根据selLocal的比特位值从src0Local、src1Local选取元素，得到目的操作数dstLocal。CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
-## 编译运行：  
+## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
@@ -44,14 +44,17 @@
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+    
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
     ```
+    
 - 样例执行
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录

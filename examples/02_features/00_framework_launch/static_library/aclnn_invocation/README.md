@@ -2,9 +2,9 @@
 ## 概述
 本样例基于add_custom算子工程和matmul_custom算子工程，介绍了自定义算子工程静态库的集成和使用。
 
-## 支持的AI处理器
-- Ascend 910C
-- Ascend 910B
+## 支持的产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 ```
@@ -76,10 +76,11 @@ target_link_libraries(execute_static_op
     ```bash
     cd aclnn_invocation
     ```
-  - 样例执行
+    
+- 样例执行
 
-    样例执行过程中会自动生成测试数据，然后编译与运行aclnn样例，最后检验运行结果。具体过程可参见run.sh脚本。
+  样例执行过程中会自动生成测试数据，然后编译与运行aclnn样例，最后检验运行结果。具体过程可参见run.sh脚本。
 
-    ```bash
-    bash run.sh
-    ```
+  ```bash
+  bash run.sh
+  ```

@@ -1,7 +1,7 @@
 ## 概述
 本样例基于add_custom算子工程，介绍了aclopExecuteV2入图调用的方式进行编译和执行。
 
-## 支持的AI处理器
+## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -58,10 +58,12 @@ CANN软件包中提供了工程创建工具msOpGen，add_custom算子工程可�
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
@@ -72,6 +74,7 @@ CANN软件包中提供了工程创建工具msOpGen，add_custom算子工程可�
       ```bash
       bash install.sh -v [SOC_VERSION] -i [ASCEND_INSTALL_PATH]
       ```
+      
     参数说明：
     - SOC_VERSION：昇腾AI处理器型号，如果无法确定具体的[SOC_VERSION]，则在安装昇腾AI处理器的服务器执行npu-smi info命令进行查询，在查询到的“Name”前增加Ascend信息，例如“Name”对应取值为xxxyy，实际配置的[SOC_VERSION]值为Ascendxxxyy。支持以下产品型号：
         - Atlas 训练系列产品

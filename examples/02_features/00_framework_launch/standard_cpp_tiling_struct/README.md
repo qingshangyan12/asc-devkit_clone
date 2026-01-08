@@ -2,7 +2,7 @@
 ## 概述
 本样例基于matmul_custom算子工程，展示了标准C++语法定义Tiling结构体样例。本样例使用自定义算子工程，编译并部署自定义算子包到自定义算子库中，并调用执行自定义算子。
 
-## 支持的AI处理器
+## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -56,14 +56,17 @@ CANN软件包中提供了工程创建工具msOpGen，matmul_custom算子工程�
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
     ```
+    
 - 生成自定义算子工程，复制host和kernel实现并编译算子
   - 调用脚本，生成自定义算子工程，复制host和kernel实现并编译算子
     ```bash

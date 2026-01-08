@@ -35,7 +35,6 @@ aclnnStatus aclnnLeakyReluCustom(void *workspace, uint64_t workspaceSize, aclOpE
     ```
 
   - 样例执行
-
     样例执行过程中会自动生成测试数据，然后编译与运行aclnn样例，最后检验运行结果。具体过程可参见run.sh脚本。
     ```bash
     bash run.sh

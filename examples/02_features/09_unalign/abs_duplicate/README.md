@@ -2,7 +2,7 @@
 ## 概述
 本样例介绍无DataCopyPad的非对齐abs_duplicate算子实现，采用核函数<<<>>>调用，有效降低调度开销，实现高效的算子执行。
 
-## 支持的AI处理器
+## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -64,14 +64,17 @@
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
     ```
+    
 - 样例执行
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录

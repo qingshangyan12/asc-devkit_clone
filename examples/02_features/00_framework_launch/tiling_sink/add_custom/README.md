@@ -1,6 +1,9 @@
 ## 概述
 本样例以AddCustom自定义算子为例，介绍了在开发自定义算子时如何启用Tiling下沉，以及如何通过PyTorch在图模式下调用该自定义算子的完整流程。
 
+## 支持的产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 
 ```
@@ -27,11 +30,6 @@ z = x + y
 </tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom_tiling_sink</td></tr>
 </table>
-
-## 支持的产品型号
-本样例支持如下产品型号：
-- Atlas A2 训练系列产品/Atlas 800I A2 推理产品/A200I A2 Box 异构组件
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
 
 ## 编译运行样例算子
 

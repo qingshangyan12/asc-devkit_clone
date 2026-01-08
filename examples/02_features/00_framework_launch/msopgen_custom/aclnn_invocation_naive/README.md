@@ -36,22 +36,20 @@
     CMakeLists.txt文件内设置"CUST_PKG_PATH"的变量为"../CustomOp/build_out/op_api"，是使用的相对路径，若自定义算子工程编译产物在其他路径，请修改为实际路径。
 
   - 环境变量配置
-
     需要设置NPU_HOST_LIB环境变量，以x86为例
     ```bash
     export NPU_HOST_LIB=/home/HwHiAiUser/Ascend/ascend-toolkit/latest/x86_64-linux/lib64
     ```
-  - 样例执行
 
-    样例执行过程中会自动生成测试数据，然后编译与运行aclnn样例，最后打印运行结果。
-    ```bash
-    mkdir -p build
-    cd build
-    cmake .. && make
-    ./execute_add_op
-    ```
-
-    用户亦可参考run.sh脚本进行编译与运行。
-    ```bash
-    bash run.sh
-    ```
+- 样例执行
+  样例执行过程中会自动生成测试数据，然后编译与运行aclnn样例，最后打印运行结果。
+  ```bash
+  mkdir -p build
+  cd build
+  cmake .. && make
+  ./execute_add_op
+  ```
+  用户亦可参考run.sh脚本进行编译与运行。
+  ```bash
+  bash run.sh
+  ```

@@ -1,8 +1,6 @@
 # TBufPool::InitBufPool样例
 ## 概述
-
 本样例基于TBufPool::InitBufPool进行TBufPool资源划分，适用于将Tpipe::InitBufPool接口划分的整块资源，继续划分成小块资源的场景。
-
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -72,7 +70,7 @@
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行：  
+## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
@@ -80,14 +78,17 @@
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
     ```
+    
 - 样例执行
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录

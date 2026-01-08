@@ -18,23 +18,23 @@ REGISTER_CUSTOM_OP("AddCustom")
 ```
 
 ### 3.TensorFlow调用的方式调用样例运行
-
   - 进入到样例目录   
     以命令行方式下载样例代码，master分支为例。
     ```bash
     cd ${git_clone_path}/examples/02_features/00_framework_launch/transformer_custom/ascend_custom_to_tensorflow_custom
     ```
+
   - 编译TensorFlow算子库
     ```bash
     bash build.sh
     ```
 
   - 样例执行(TensorFlow1.15)
-
     样例执行过程中会自动生成随机测试数据，然后通过TensorFlow调用算子，最后对比TensorFlow原生算子和Ascend C算子运行结果。具体过程可参见run_add_custom_tf_1.15.py脚本。
     ```bash
     python3 run_add_custom_tf_1.15.py
     ```
+
   - 样例执行(TensorFlow2.6.5)
     样例执行过程中会自动生成随机测试数据，然后通过TensorFlow调用算子，最后对比TensorFlow原生算子和Ascend C算子运行结果。具体过程可参见run_add_custom_tf_2.6.5.py脚本。
     ```bash

@@ -4,7 +4,6 @@
 本样例通过Ascend C编程语言实现了Add算子的CPU Debug调测。
 
 ## 支持的产品
-- Ascend 910A
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
  
@@ -60,48 +59,52 @@ CPU Debug介绍
 
     Add算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm和yGm搬运到Local Memory，分别存储在xLocal、yLocal，Compute任务负责对xLocal、yLocal执行加法操作，计算结果存储在zLocal中，CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
 
-## 编译运行：  
+## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-    - 默认路径，root用户安装CANN软件包
-      ```bash
-      export ASCEND_INSTALL_PATH=/usr/local/Ascend/cann
-      ```
-    - 默认路径，非root用户安装CANN软件包
-      ```bash
-      export ASCEND_INSTALL_PATH=$HOME/Ascend/cann
-      ```
-    - 指定路径install_path，安装CANN软件包
-      ```bash
-      export ASCEND_INSTALL_PATH=${install_path}/cann
-      ```
+  - 默认路径，root用户安装CANN软件包
     ```bash
-    # 选择芯片型号
-    SOC_VERSION=${1:-SOC_VERSION}
-    # 配置CANN环境变量
-    source ${ASCEND_INSTALL_PATH}/set_env.sh
+    export ASCEND_INSTALL_PATH=/usr/local/Ascend/cann
     ```
-    - SOC_VERSION：昇腾AI处理器型号，如果无法确定具体的SOC_VERSION，则在安装昇腾AI处理器的服务器执行npu-smi info命令进行查询，在查询到的“Name”前增加Ascend信息，例如“Name”对应取值为xxxyy，实际配置的SOC_VERSION值为Ascendxxxyy。
 
-  - 样例执行
+  - 默认路径，非root用户安装CANN软件包
     ```bash
-    mkdir -p build && cd build;
-    cmake .. -DSOC_VERSION=${SOC_VERSION}; make -j
-    python3 ../scripts/gen_data.py
-    ./add
-    python3 ../scripts/verify_result.py output.bin golden.bin
+    export ASCEND_INSTALL_PATH=$HOME/Ascend/cann
     ```
-    执行结果如下，说明精度对比成功。
+
+  - 指定路径install_path，安装CANN软件包
     ```bash
-    test pass
+    export ASCEND_INSTALL_PATH=${install_path}/cann
     ```
-  - 进入gdb模式调试
-    在上述指令中"./add"前加入"gdb --args"，再次执行指令即可进入gdb模式。
-    ```bash
-    mkdir -p build && cd build;
-    cmake .. -DSOC_VERSION=${SOC_VERSION}; make -j
-    python3 ../scripts/gen_data.py
-    gdb --args ./add
-    python3 ../scripts/verify_result.py output.bin golden.bin
-    ```
+
+  ```bash
+  # 选择芯片型号
+  SOC_VERSION=${1:-SOC_VERSION}
+  # 配置CANN环境变量
+  source ${ASCEND_INSTALL_PATH}/set_env.sh
+  ```
+  - SOC_VERSION：昇腾AI处理器型号，如果无法确定具体的SOC_VERSION，则在安装昇腾AI处理器的服务器执行npu-smi info命令进行查询，在查询到的“Name”前增加Ascend信息，例如“Name”对应取值为xxxyy，实际配置的SOC_VERSION值为Ascendxxxyy。
+
+- 样例执行
+  ```bash
+  mkdir -p build && cd build;
+  cmake .. -DSOC_VERSION=${SOC_VERSION}; make -j
+  python3 ../scripts/gen_data.py
+  ./add
+  python3 ../scripts/verify_result.py output.bin golden.bin
+  ```
+  执行结果如下，说明精度对比成功。
+  ```bash
+  test pass
+  ```
+  
+- 进入gdb模式调试
+  在上述指令中"./add"前加入"gdb --args"，再次执行指令即可进入gdb模式。
+  ```bash
+  mkdir -p build && cd build;
+  cmake .. -DSOC_VERSION=${SOC_VERSION}; make -j
+  python3 ../scripts/gen_data.py
+  gdb --args ./add
+  python3 ../scripts/verify_result.py output.bin golden.bin
+  ```

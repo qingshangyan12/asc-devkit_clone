@@ -2,9 +2,9 @@
 ## 概述
 本样例基于MatmulCustom算子工程，介绍了aclnn调用方式。
 
-## 支持的AI处理器
-- Ascend 910C
-- Ascend 910B
+## 支持的产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 └── AclNNInvocation             // 通过aclnn调用的方式调用MatmulCustom算子
@@ -47,16 +47,18 @@ aclnnStatus aclnnMatmulCustom(void *workspace, uint64_t workspaceSize, aclOpExec
     ```bash
     source /usr/local/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/ascend-toolkit/set_env.sh
     ```
+
   - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/ascend-toolkit/set_env.sh
     ```
-- 样例执行
 
+- 样例执行
   样例执行过程中会自动生成测试数据，然后编译与运行aclnn样例，最后检验运行结果。具体过程可参见run.sh脚本。
   ```bash
   bash run.sh
