@@ -85,6 +85,7 @@ void AscAstDeviceAnalyzer::InitCompileDeviceArgs(const std::string &source)
         "-D__CCE__",
         "-DGM_ADDR= __gm__ uint8_t*",
         "-D__gm__= __attribute__((annotate(\"cce_global\")))",
+        "-D__forceinline__=",
         "-D__host_aicore__=",
         "-D__kfc_workspace__=",
         "-D__disable_kernel_type_autoinfer__=",

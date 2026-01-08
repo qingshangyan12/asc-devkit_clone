@@ -760,7 +760,8 @@ typedef enum KernelType : unsigned int {
     K_TYPE_MIX_AIC_MAIN = 4,
     K_TYPE_MIX_AIV_MAIN = 5,
     K_TYPE_AIC_ROLLBACK = 6,
-    K_TYPE_AIV_ROLLBACK = 7
+    K_TYPE_AIV_ROLLBACK = 7,
+    K_TYPE_MAX
 } KernelTypeAsc;
 
 enum KernelMetaTypeAsc {
@@ -769,12 +770,14 @@ enum KernelMetaTypeAsc {
     KERNEL_TYPE_MIX_AIV_1_0 = 2,
     KERNEL_TYPE_MIX_AIC_1_0 = 3,
     KERNEL_TYPE_MIX_AIC_1_1 = 4,
-    KERNEL_TYPE_MIX_AIC_1_2 = 5
+    KERNEL_TYPE_MIX_AIC_1_2 = 5,
+    KERNEL_TYPE_AICORE = 6
 };
 
 uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle)
 {
     static const std::unordered_map<KernelMetaTypeAsc, uint32_t> kernelTaskTypeMap = {
+        {KERNEL_TYPE_AICORE, 2},
         {KERNEL_TYPE_AIV_ONLY, 5},
         {KERNEL_TYPE_AIC_ONLY, 6},
         {KERNEL_TYPE_MIX_AIV_1_0, 7},
@@ -814,6 +817,8 @@ uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle)
         return kernelTaskTypeMap.at(KERNEL_TYPE_AIC_ONLY);
     } else if (curKernelType == K_TYPE_AIV || curKernelType == K_TYPE_AIV_ROLLBACK) {
         return kernelTaskTypeMap.at(KERNEL_TYPE_AIV_ONLY);
+    } else if (curKernelType == K_TYPE_AICORE) {
+        return kernelTaskTypeMap.at(KERNEL_TYPE_AICORE);
     } else {
         ASCENDLOGE(" Get unsupported kernel Type %d \n", curKernelType);
         return 5;  // 5 is KERNEL_TYPE_AIV_ONLY

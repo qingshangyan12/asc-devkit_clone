@@ -282,8 +282,15 @@ typedef enum KernelType : unsigned int {
     K_TYPE_MIX_AIC_MAIN = 4,
     K_TYPE_MIX_AIV_MAIN = 5,
     K_TYPE_AIC_ROLLBACK = 6,
-    K_TYPE_AIV_ROLLBACK = 7
+    K_TYPE_AIV_ROLLBACK = 7,
+    K_TYPE_MAX
 } KernelTypeUt;
+
+uint32_t AscendCFunctionGetMetaInfoKtypeStubMax(void *funcHandle, unsigned int *curKernelType)
+{
+    *curKernelType = K_TYPE_MAX;
+    return 0;
+}
 
 uint32_t AscendCFunctionGetMetaInfoKtypeStubAicore(void *funcHandle, unsigned int *curKernelType)
 {
@@ -408,9 +415,16 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplAiv) {
     EXPECT_EQ(ret, 5);
 }
 
-TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplothers) {
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplAicore) {
     void* funcHandle = nullptr;
     MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubAicore));
+    uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
+    EXPECT_EQ(ret, 2);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplothers) {
+    void* funcHandle = nullptr;
+    MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubMax));
     uint32_t ret = AscendCGetProfkTypeImpl(funcHandle);
     EXPECT_EQ(ret, 5);
 }
