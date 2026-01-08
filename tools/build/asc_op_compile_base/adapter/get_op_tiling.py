@@ -357,7 +357,8 @@ def _decode_tiling_data(tiling_def, run_info_tiling_data, struct_tiling_def_base
         "int64_t": "int64",
         "uint64_t": "uint64",
         "float": "float",
-        "struct": "struct"
+        "struct": "struct",
+        "bool": "bool",
     }
     tiling_format = {}
     struct_binary_info_list = []
