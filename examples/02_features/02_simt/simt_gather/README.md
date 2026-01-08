@@ -1,7 +1,7 @@
 # 新同构编程实现gather算子样例
 
 ## 概述
-本样例以实现gather功能的算子为例，展示了新同构SIMT编程的算子开发方式。算子中使用SIMT编程方式实现离散内存访问操作gather。
+样例基于Ascend新同构编程模型SIMT方式实现gather算子，从100000×128的输入张量中采集12288行数据，展示离散内存访问类算子的开发方法。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -17,7 +17,7 @@
 ## 算子描述
 
 - 算子功能：  
-  gather算子实现了从长度为10万的一维向量中获取指定索引的8192个数据的功能。算子输出output第i个数据计算公式为：
+  gather算子实现了从形状为100000 * 128的二维向量中获取指定索引的12288行数据的功能。算子输出output第i行数据计算公式为：
   
   ```
   output[i] = input[index[i]]
@@ -28,31 +28,31 @@
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">gather</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input</td><td align="center">100000</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">index</td><td align="center">8192</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">input</td><td align="center">100000 * 128</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">index</td><td align="center">12288</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">8192</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">12288 * 128</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_kernel</td></tr>
   </table>
 
 - 数据切分：  
-  本例中算子输入index的形状为8192，可设置核数为32，每个核处理数据量为256，设置线程数THREAD_COUNT为256，每个线程处理1个数据，因此单个核只需调用1次simt_gather函数即可完成gather运算。
-
-  > ⚠️ **注意** 当单核处理数据量大于设置的线程数时，需要切分数据到多个线程块，可使用asc_vf_call多次调用simt_gather函数启动多个线程块完成获取指定索引数据的操作。
-
+  * 核数：48核
+  * 每核线程数：256线程
+  * 单线程处理：1行（128列）
+  * 总处理能力：48×256=12288行（覆盖索引长度）
 
 - 算子实现：  
   gather算子的实现流程只有1个步骤：simt_gather。
   
-  simt_gather负责从输入input（Global Memory）中获取指定索引的数据。基于上述数据切分，首先计算线程应处理数据的索引，然后通过赋值操作将数据存储到Global Memory上。
+  simt_gather负责从输入input（Global Memory）中获取指定索引的数据。基于上述数据切分，首先计算线程应处理数据的索引，然后通过赋值操作将一行数据存储到Global Memory上。
   ```
-  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  int32_t out_row = blockIdx.x * blockDim.x + threadIdx.x;
   ...
-  uint32_t gather_idx = index[idx];
+  uint32_t in_row = index[out_row];
   ...
-  gather_output[threadIdx.x] = input[gather_idx];
+  gather_output[row[out_row]] = input[row[in_row]];
   ```
 
 - 调用实现：
