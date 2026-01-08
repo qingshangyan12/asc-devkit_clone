@@ -50,8 +50,9 @@ extern aclError aclrtcGetLoweredName(aclrtcProg prog, const char *nameExpr, cons
 extern inline bool EndsWith(std::string_view str, std::string_view suffix);
 extern std::string ExtractCannPath(const std::string& pluginPath);
 extern bool PathCheck(const char* path);
+extern std::string GetCannPath();
 extern void* handle;
-extern void LoadExtraLib();
+extern aclError LoadExtraLib();
 extern void UnloadExtraLib();
 
 extern const int ACL_ERROR_RTC_INVALID_PROG = 176000;
@@ -70,7 +71,6 @@ extern const int ACL_SUCCESS = 0;
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetCompileLogSize)
 {
     MOCKER(PathCheck).stubs().will(returnValue(true));
-    LoadExtraLib();
     asrtcGetProgramLogSizeFuncPtr originalPtr = asrtcGetProgramLogSizePtr;
     auto mockFunc = [](asrtcProgram, size_t*) -> asrtcResult {
         return ASRTC_ERROR_NOT_IMPLEMENTED;
@@ -174,8 +174,25 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcCreateProg)
 __global__ __aicore__ void add_custom(GM_ADDR x) {*x = 3 + MY_CONST;}
 // extern "C" __global__ __aicore__ void add_custom(GM_ADDR x) {*x = 3 + MY_CONST;}
 )"""";
+    MOCKER(LoadExtraLib).stubs().will(returnValue(ACL_SUCCESS));
     aclError result = aclrtcCreateProg(&prog, src, "test_kernel", 0, nullptr, nullptr);
     EXPECT_EQ(result, ACL_SUCCESS);
+}
+
+TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcCreateProg_fail)
+{
+    aclrtcProg prog = nullptr;
+    const char *src = R""""(
+#include "const.h"
+#include "kernel_operator.h"
+#include "acl/acl.h"
+
+__global__ __aicore__ void add_custom(GM_ADDR x) {*x = 3 + MY_CONST;}
+// extern "C" __global__ __aicore__ void add_custom(GM_ADDR x) {*x = 3 + MY_CONST;}
+)"""";
+    MOCKER(LoadExtraLib).stubs().will(returnValue(ACL_ERROR_RTC_FAILURE));
+    aclError result = aclrtcCreateProg(&prog, src, "test_kernel", 0, nullptr, nullptr);
+    EXPECT_EQ(result, ACL_ERROR_RTC_FAILURE);
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcDestroyProg)
@@ -193,7 +210,7 @@ __global__ __aicore__ void add_custom(GM_ADDR x) {*x = 3 + MY_CONST;}
 // extern "C" __global__ __aicore__ void add_custom(GM_ADDR x) {*x = 3 + MY_CONST;}
 )"""";
     asrtcDestroyProgramPtr = mockFunc;
-
+    MOCKER(LoadExtraLib).stubs().will(returnValue(ACL_SUCCESS));
     aclrtcProg prog = nullptr;
     aclrtcCreateProg(&prog, src, "test_kernel", 0, nullptr, nullptr);
     aclError result = aclrtcDestroyProg(&prog);
@@ -255,5 +272,24 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_UnloadExtraLib)
     handle = reinterpret_cast<void*>(0x1234);
     MOCKER(dlclose).expects(exactly(1)).will(returnValue(0));
     UnloadExtraLib();
+    ASSERT_EQ(handle, nullptr);
+}
+
+TEST_F(TEST_ACL_RT_COMPILE, aclrtc_LoadExtraLib)
+{
+    MOCKER(GetCannPath).stubs().will(returnValue(std::string("")));
+    MOCKER(PathCheck).stubs().will(returnValue(true));
+    MOCKER(dlopen).stubs().will(returnValue((void*)("fake_handle")));
+    MOCKER(dlsym).stubs().will(returnValue((void*)("fake_handle")));
+    aclError ret = LoadExtraLib();
+    ASSERT_EQ(ret, ACL_SUCCESS);
+}
+
+TEST_F(TEST_ACL_RT_COMPILE, aclrtc_LoadExtraLib_fail)
+{
+    MOCKER(GetCannPath).stubs().will(returnValue(std::string("")));
+    MOCKER(PathCheck).stubs().will(returnValue(true));
+    MOCKER(dlopen).stubs().will(returnValue(static_cast<void*>(nullptr)));
+    LoadExtraLib();
     ASSERT_EQ(handle, nullptr);
 }
