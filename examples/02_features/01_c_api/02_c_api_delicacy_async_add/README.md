@@ -1,6 +1,6 @@
-## C_API Add算子直调样例
+## 使用C_API实现Add算子样例（异步场景，自主控制流水间同步）
 ## 概述
-本样例采用C_API接口编写Add算子样例，基于异步搬运、计算接口和精细化同步接口实现。
+本样例采用C_API接口编写Add算子样例，基于异步搬运、计算接口和手动添加的同步指令实现。
 
 ## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -17,34 +17,33 @@
 ## 算子描述
 - 算子功能：  
 Add算子实现了两个数据相加，返回相加结果的功能。对应的数学表达式为：  
-```
-z = x + y
-```
+  ```
+  z = x + y
+  ```
 - 算子规格：
-<table>
-<tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
-</tr>
-<tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">x</td><td align="center">8 * 2048</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td align="center">y</td><td align="center">8 * 2048</td><td align="center">float</td><td align="center">ND</td></tr>
-</tr>
-</tr>
-<tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">8 * 2048</td><td align="center">float</td><td align="center">ND</td></tr>
-</tr>
-<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
-</table>
+  <table>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
+  </tr>
+  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">8 * 2048</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">8 * 2048</td><td align="center">float</td><td align="center">ND</td></tr>
+  </tr>
+  </tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">8 * 2048</td><td align="center">float</td><td align="center">ND</td></tr>
+  </tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
+  </table>
 
 - 算子实现： 
-  - kernel实现  
-    C_API输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。
+  C_API输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。计算过程中使用asc_sync_notify和asc_sync_wait控制流水间的同步。
 
-    Add算子的实现流程分为3个步骤：
+  Add算子的实现流程分为3个步骤：
 
-    第一步将Global Memory上的输入x和y搬运到Local Memory，分别存储在xLocal、yLocal。
-    
-    第二步对xLocal、yLocal执行加法操作，计算结果存储在zLocal中。
-    
-    第三步将输出数据从zLocal搬运至Global Memory上的输出z中。
+  第一步将Global Memory上的输入x和y搬运到Local Memory，分别存储在xLocal、yLocal。
+  
+  第二步对xLocal、yLocal执行加法操作，计算结果存储在zLocal中。
+  
+  第三步将输出数据从zLocal搬运至Global Memory上的输出z中。
 
 - 调用实现  
   使用内核调用符<<<>>>调用核函数。
@@ -55,15 +54,15 @@ z = x + y
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
-    source /usr/local/Ascend/ascend-toolkit/set_env.sh
+    source /usr/local/Ascend/cann/set_env.sh
     ```
   - 默认路径，非root用户安装CANN软件包
     ```bash
-    source $HOME/Ascend/ascend-toolkit/set_env.sh
+    source $HOME/Ascend/cann/set_env.sh
     ```
   - 指定路径install_path，安装CANN软件包
     ```bash
-    source ${install_path}/ascend-toolkit/set_env.sh
+    source ${install_path}/cann/set_env.sh
     ```
 - 样例执行
   ```bash

@@ -34,7 +34,6 @@ Score和Index分别存储在src0和src1中，按Score进行排序（Score大的�
 | dst       | 输出    | 目的操作数（矢量）的起始地址。 |
 | src0      | 输入    | 源操作数（矢量）的起始地址。 |
 | src1      | 输入    | 源操作数（矢量）的起始地址。 |
-| count     | 输入    | 参与计算的元素个数。        |
 | repeat    | 输入    | 重复迭代次数，每次迭代完成32个元素的排序，下次迭代src0和src1个跳过32个元素，dst跳过256 Byte空间。取值范围：[0, 255]。 |
 
 ## 返回值说明
@@ -56,5 +55,5 @@ PIPE_V
 __ubuf__ half dst[256];
 __ubuf__ half src0[256];
 __ubuf__ uint32_t src1[256];
-asc_bitsort(dst, src0, src1, 32);
+asc_bitsort(dst, src0, src1, 8);
 ```

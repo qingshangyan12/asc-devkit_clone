@@ -1,6 +1,6 @@
-# 使用C_API构建Add算子样例
+# 使用C_API实现Add算子样例（同步场景）
 ## 概述
-本样例展示了使用C_API 基于同步搬运/计算接口构建Add算子样例的编译流程，支持main函数和kernel函数在同一个cpp文件中实现。
+本样例采用C_API接口编写Add算子样例，基于同步搬运、计算接口实现。
 ## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
@@ -55,15 +55,15 @@
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
-    source /usr/local/Ascend/ascend-toolkit/set_env.sh
+    source /usr/local/Ascend/cann/set_env.sh
     ```
   - 默认路径，非root用户安装CANN软件包
     ```bash
-    source $HOME/Ascend/ascend-toolkit/set_env.sh
+    source $HOME/Ascend/cann/set_env.sh
     ```
   - 指定路径install_path，安装CANN软件包
     ```bash
-    source ${install_path}/ascend-toolkit/set_env.sh
+    source ${install_path}/cann/set_env.sh
     ```
   - 样例执行
     ```bash
