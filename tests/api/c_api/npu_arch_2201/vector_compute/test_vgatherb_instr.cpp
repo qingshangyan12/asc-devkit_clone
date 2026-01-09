@@ -28,8 +28,8 @@ void cce_name##_##data_type##_uint8_t_uint16_t_uint16_Stub(__ubuf__ data_type *d
                 uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)           \
 {                                                                                               \
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type *>(11));                                 \
-    EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));                                  \
-    EXPECT_EQ(offset_addr, static_cast<uint32_t>(1));                                           \
+    EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(33));                                  \
+    EXPECT_EQ(offset_addr, static_cast<uint32_t>(22));                                           \
     EXPECT_EQ(dst_repeat_stride, static_cast<uint16_t>(8));                                     \
     EXPECT_EQ(dst_block_stride, static_cast<uint8_t>(1));                                       \
     EXPECT_EQ(repeat, static_cast<uint8_t>(1));                                                 \
@@ -40,7 +40,7 @@ void  cce_name##_##data_type##_uint32_t_uint64_t_Stub(__ubuf__ data_type *dst,  
                 uint8_t repeat)                                                                 \
 {                                                                                               \
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type *>(11));                                 \
-    EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));                                 \
+    EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(33));                                 \
 }                                                                                               \
                                                                                                 \
 void cce_name##_##data_type##_set_vector_mask_Stub(uint64_t mask1, uint64_t mask0)              \
@@ -53,9 +53,8 @@ void cce_name##_##data_type##_set_vector_mask_Stub(uint64_t mask1, uint64_t mask
 TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_GatherbConfig_Succ)               \
 {                                                                                               \
     __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                       \
-    __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);                         \
-                                                                                                \
-    uint32_t offset_addr = static_cast<uint32_t>(1);                                              \
+    __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                         \
+    __ubuf__ uint32_t *src_offset = reinterpret_cast<__ubuf__ uint32_t *>(33);                  \
     uint16_t dst_repeat_stride = static_cast<uint16_t>(8);                                        \
     uint8_t dst_block_stride = static_cast<uint8_t>(1);                                         \
     uint8_t repeat = static_cast<uint8_t>(1);                                                   \
@@ -65,15 +64,15 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_GatherbConfig_Succ
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_uint8_t_uint16_t_uint16_Stub));               \
                                                                                                 \
-    c_api_name(dst, src, offset_addr, dst_repeat_stride, dst_block_stride, repeat);             \
+    c_api_name(dst, src, src_offset, dst_repeat_stride, dst_block_stride, repeat);             \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
 TEST_F(TestVectorCompute##class_name##data_type, c_api_name##GatherbCount_Succ)                 \
 {                                                                                               \
     __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                       \
-    __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);                         \
-    uint32_t offset_addr = static_cast<uint32_t>(1);                                            \
+    __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                         \
+    __ubuf__ uint32_t *src_offset = reinterpret_cast<__ubuf__ uint32_t *>(33);                  \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
                                                                                                 \
     MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                       \
@@ -85,15 +84,15 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##GatherbCount_Succ) 
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_uint32_t_uint64_t_Stub));                     \
                                                                                                 \
-    c_api_name(dst, src, offset_addr, count);                                                  \
+    c_api_name(dst, src, src_offset, count);                                                  \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
 TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_GatherbConfig_Succ)          \
 {                                                                                               \
     __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                       \
-    __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);                         \
-    uint32_t offset_addr = static_cast<uint32_t>(1);                                            \
+    __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                         \
+    __ubuf__ uint32_t *src_offset = reinterpret_cast<__ubuf__ uint32_t *>(33);                  \
     uint32_t count = static_cast<uint32_t>(44);                                                 \
                                                                                                 \
     MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                       \
@@ -104,7 +103,7 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_GatherbConfig
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_uint32_t_uint64_t_Stub));                     \
                                                                                                 \
-    c_api_name##_sync(dst, src, offset_addr, count);                                            \
+    c_api_name##_sync(dst, src, src_offset, count);                                            \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 // ==========asc_gather_datablock(uint16_t/uint32_t)==========

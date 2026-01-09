@@ -23,45 +23,45 @@
 #define IMPL_C_API_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VGATHERB_NPU_ARCH_2201_ASC_GATHER_DATABLOCK_IMPL_H
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, 
+__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, 
             uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
 {
     if ASC_IS_AIV {
-        vgatherb(dst, src, offset_addr, dst_repeat_stride, dst_block_stride, repeat);
+        vgatherb(dst, src_offset, (uint64_t)src, dst_repeat_stride, dst_block_stride, repeat);
     }
 }
 
-__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_datablock_impl(dst, src, offset_addr, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT.U8);
+    asc_gather_datablock_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT.U8);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+__aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
-    asc_gather_datablock_impl(dst, src, offset_addr, count);
+    asc_gather_datablock_impl(dst, src, src_offset, count);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, 
+__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, 
             uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
 {
     if ASC_IS_AIV {
-        vgatherb(dst, src, offset_addr, dst_repeat_stride, dst_block_stride, repeat);
+        vgatherb(dst, src_offset, (uint64_t)src, dst_repeat_stride, dst_block_stride, repeat);
     }
 }
 
-__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_datablock_impl(dst, src, offset_addr, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT.U8);
+    asc_gather_datablock_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT.U8);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
+__aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
-    asc_gather_datablock_impl(dst, src, offset_addr, count);
+    asc_gather_datablock_impl(dst, src, src_offset, count);
     asc_sync_post_process();
 }
 
