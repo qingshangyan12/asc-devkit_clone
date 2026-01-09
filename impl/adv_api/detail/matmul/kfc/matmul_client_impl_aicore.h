@@ -16,7 +16,7 @@
 #define IMPL_MATMUL_KFC_MATMUL_CLIENT_IMPL_AICORE_H
 
 namespace AscendC {
-
+// test
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, const auto& MM_CFG = CFG_NORM,
 class MM_CB = AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
 class MatmulClientBase {
