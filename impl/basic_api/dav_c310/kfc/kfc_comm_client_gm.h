@@ -70,7 +70,12 @@ public:
 #endif
             eventID_ = GetTPipePtr()->AllocEventID<HardEvent::MTE3_S>();
             SetFlag<HardEvent::MTE3_S>((event_t)eventID_);
- 
+            
+ #ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+            if (MIX_NUM == 1 && GetSubBlockIdxImpl() == 1) {
+                WaitFlag<HardEvent::MTE3_S>((event_t)eventID_);
+            }
+#endif
             ubStart = GetUBMapAddr(workspace, subBlockID);
             ubAvalidTail = GetUBAvaliedAddr(workspace, subBlockID);
             head = 0;
