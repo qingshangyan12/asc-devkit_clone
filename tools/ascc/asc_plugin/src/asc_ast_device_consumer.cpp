@@ -126,7 +126,7 @@ bool ASTDeviceVisitor::VisitCallExpr(clang::CallExpr *exprCall)
             ASC_LOGD("Found %s call at line: %u, file: %s", qualifiedName.c_str(), pLoc.getLine(), fname);
         } else if (manager.GetShortSocVersion() == ShortSocVersion::ASCEND910_95 &&
                     (qualifiedName.find("AscendC::Simt::printf") != std::string::npos ||
-                     qualifiedName.find("printf") != std::string::npos)) {
+                     qualifiedName == "printf")) {
             manager.SetHasSimtPrintf(true);
             ASC_LOGD("Found %s call at line: %u, file: %s", qualifiedName.c_str(), pLoc.getLine(), fname);
         }

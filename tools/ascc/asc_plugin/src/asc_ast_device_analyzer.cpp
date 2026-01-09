@@ -95,11 +95,11 @@ void AscAstDeviceAnalyzer::InitCompileDeviceArgs(const std::string &source)
         "-Dbfloat16_t=__bf16",
         "-D__NPU_DEVICE__",
         // simt and simd attribute
-        "-D__simt_callee__",
-        "-D__simt_vf__",
-        "-D__simd_callee__",
-        "-D__simd_vf__",
-        "-D__no_simd_vf_fusion__",
+        "-D__simt_callee__=",
+        "-D__simt_vf__=",
+        "-D__simd_callee__=",
+        "-D__simd_vf__=",
+        "-D__no_simd_vf_fusion__=",
         // bisheng kernel type attribute
         "-D__mix__(cube, vec)=",
         "-D__cube__=",

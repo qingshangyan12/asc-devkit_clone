@@ -136,7 +136,7 @@ void AscDevStubGenerator::StubFuncDumpAndHardSyncImpl(const bool& isMix, const b
         }
     }
     const auto& infoManager = InfoManager::GetInstance();
-    if (infoManager.HasSimtPrintf()) {
+    if (infoManager.IsDumpOn() && infoManager.HasSimtPrintf()) {
         codeStream_ << "    AscendC::Simt::SetSimtDumpWorkspace(__ascendc_dump_addr + "
                     << "(ONE_CORE_DUMP_SIZE * 108 + 72 * 2048 * 2048));\n";
     }
