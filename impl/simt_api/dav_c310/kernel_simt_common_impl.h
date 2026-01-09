@@ -341,7 +341,7 @@ __aicore__ inline half FloorIntrinsicsImpl(half x)
     if (IsInfImpl(x)) {
         return RoundInf(x);
     }
-    return floor(x);
+    return half(floor(float(x)));
 }
 
 template <typename DstType, typename SrcType>
@@ -428,7 +428,7 @@ __aicore__ inline half RoundIntrinsicsImpl(half x)
     if (IsInfImpl(x)) {
         return RoundInf(x);
     }
-    return round(x);
+    return half(round(float(x)));
 }
 
 template <typename DstType, typename SrcType>
@@ -492,7 +492,7 @@ __aicore__ inline half RintIntrinsicsImpl(half x)
     if (IsInfImpl(x)) {
         return RoundInf(x);
     }
-    return rint(x);
+    return half(rint(float(x)));
 }
 
 template <typename DstType, typename SrcType>
@@ -584,7 +584,7 @@ __aicore__ inline half CeilIntrinsicsImpl(half x)
     if (IsInfImpl(x)) {
         return RoundInf(x);
     }
-    return ceil(x);
+    return half(ceil(float(x)));
 }
 
 template <typename DstType, typename SrcType>
