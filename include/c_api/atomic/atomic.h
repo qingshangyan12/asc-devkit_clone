@@ -19,26 +19,47 @@
  
 #include "c_api_instr_impl/atomic_c_api_impl/atomic_c_api_impl.h"
 
-__aicore__ inline void asc_set_atomic_max();
-
-__aicore__ inline void asc_set_atomic_s32();
-
-__aicore__ inline void asc_set_atomic_add();
-
 __aicore__ inline void asc_set_atomic_none();
-
-__aicore__ inline void asc_set_atomic_s8();
-
-__aicore__ inline void asc_set_atomic_bf16();
-
-__aicore__ inline void asc_set_atomic_f16();
 
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
 
 __aicore__ inline void asc_set_store_atomic_config(asc_store_atomic_config& config);
 
+__aicore__ inline void asc_set_atomic_add_bfloat();
 
-__aicore__ inline void asc_set_atomic_f32();
+__aicore__ inline void asc_set_atomic_add_float();
+
+__aicore__ inline void asc_set_atomic_add_float16();
+
+__aicore__ inline void asc_set_atomic_add_int();
+
+__aicore__ inline void asc_set_atomic_add_int8();
+
+__aicore__ inline void asc_set_atomic_add_int16();
+
+__aicore__ inline void asc_set_atomic_max_bfloat();
+
+__aicore__ inline void asc_set_atomic_max_float();
+
+__aicore__ inline void asc_set_atomic_max_float16();
+
+__aicore__ inline void asc_set_atomic_max_int();
+
+__aicore__ inline void asc_set_atomic_max_int8();
+
+__aicore__ inline void asc_set_atomic_max_int16();
+
+__aicore__ inline void asc_set_atomic_min_bfloat();
+
+__aicore__ inline void asc_set_atomic_min_float();
+
+__aicore__ inline void asc_set_atomic_min_float16();
+
+__aicore__ inline void asc_set_atomic_min_int();
+
+__aicore__ inline void asc_set_atomic_min_int8();
+
+__aicore__ inline void asc_set_atomic_min_int16();
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  

@@ -18,52 +18,32 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_ATOMIC_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_ATOMIC_C_API_IMPL_ATOMIC_C_API_IMPL_H
 
-#include "set_atomic_max_impl/npu_arch_2201/asc_set_atomic_max_impl.h"
-#include "set_atomic_add_impl/npu_arch_2201/asc_set_atomic_add_impl.h"
 #include "set_atomic_none_impl/npu_arch_2201/asc_set_atomic_none_impl.h"
-#include "set_atomic_min_impl/npu_arch_2201/asc_set_atomic_min_impl.h"
-#include "set_atomic_s8_impl/npu_arch_2201/set_atomic_s8_impl.h"
-#include "set_atomic_type_c_api_impl/set_atomic_bf16_impl/npu_arch_2201/asc_set_atomic_bf16_impl.h"
 #include "get_st_atomic_cfg_impl/npu_arch_2201/asc_get_store_atomic_config_impl.h"
-#include "set_atomic_s16_impl/npu_arch_2201/asc_set_atomic_s16_impl.h"
-#include "set_atomic_type_c_api_impl/set_atomic_f16_impl/npu_arch_2201/asc_set_atomic_f16_impl.h"
 #include "set_st_atomic_cfg_impl/npu_arch_2201/asc_set_store_atomic_config_impl.h"
-#include "set_atomic_s32_impl/npu_arch_2201/asc_set_atomic_s32_impl.h"
-#include "set_atomic_f32_impl/npu_arch_2201/asc_set_atomic_f32_impl.h"
+#include "set_atomic_add_bfloat_impl/npu_arch_2201/asc_set_atomic_add_bfloat_impl.h"
+#include "set_atomic_add_float_impl/npu_arch_2201/asc_set_atomic_add_float_impl.h"
+#include "set_atomic_add_float16_impl/npu_arch_2201/asc_set_atomic_add_float16_impl.h"
+#include "set_atomic_add_int_impl/npu_arch_2201/asc_set_atomic_add_int_impl.h"
+#include "set_atomic_add_int8_impl/npu_arch_2201/asc_set_atomic_add_int8_impl.h"
+#include "set_atomic_add_int16_impl/npu_arch_2201/asc_set_atomic_add_int16_impl.h"
+#include "set_atomic_max_bfloat_impl/npu_arch_2201/asc_set_atomic_max_bfloat_impl.h"
+#include "set_atomic_max_float_impl/npu_arch_2201/asc_set_atomic_max_float_impl.h"
+#include "set_atomic_max_float16_impl/npu_arch_2201/asc_set_atomic_max_float16_impl.h"
+#include "set_atomic_max_int_impl/npu_arch_2201/asc_set_atomic_max_int_impl.h"
+#include "set_atomic_max_int8_impl/npu_arch_2201/asc_set_atomic_max_int8_impl.h"
+#include "set_atomic_max_int16_impl/npu_arch_2201/asc_set_atomic_max_int16_impl.h"
+#include "set_atomic_min_bfloat_impl/npu_arch_2201/asc_set_atomic_min_bfloat_impl.h"
+#include "set_atomic_min_float_impl/npu_arch_2201/asc_set_atomic_min_float_impl.h"
+#include "set_atomic_min_float16_impl/npu_arch_2201/asc_set_atomic_min_float16_impl.h"
+#include "set_atomic_min_int_impl/npu_arch_2201/asc_set_atomic_min_int_impl.h"
+#include "set_atomic_min_int8_impl/npu_arch_2201/asc_set_atomic_min_int8_impl.h"
+#include "set_atomic_min_int16_impl/npu_arch_2201/asc_set_atomic_min_int16_impl.h"
 
-__aicore__ inline void asc_set_atomic_add()
-{
-    asc_set_atomic_add_impl();
-}
 
 __aicore__ inline void asc_set_atomic_none()
 {
     asc_set_atomic_none_impl();
-}
-
-__aicore__ inline void asc_set_atomic_min()
-{
-    asc_set_atomic_min_impl();
-}
-
-__aicore__ inline void asc_set_atomic_max()
-{
-    asc_set_atomic_max_impl();
-}
-
-__aicore__ inline void asc_set_atomic_s8()
-{
-    asc_set_atomic_s8_impl();
-}
-
-__aicore__ inline void asc_set_atomic_s32()
-{
-    asc_set_atomic_s32_impl();
-}
-
-__aicore__ inline void asc_set_atomic_bf16()
-{
-    asc_set_atomic_bf16_impl();
 }
 
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
@@ -71,24 +51,99 @@ __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& conf
     asc_get_store_atomic_config_impl(config);
 }
 
-__aicore__ inline void asc_set_atomic_s16()
-{
-    asc_set_atomic_s16_impl();
-}
-
-__aicore__ inline void asc_set_atomic_f16()
-{
-    asc_set_atomic_f16_impl();
-}
-
 __aicore__ inline void asc_set_store_atomic_config(asc_store_atomic_config& config)
 {
     asc_set_store_atomic_config_impl(config);
 }
 
-__aicore__ inline void asc_set_atomic_f32()
+__aicore__ inline void asc_set_atomic_add_bfloat()
 {
-    asc_set_atomic_f32_impl();
+    asc_set_atomic_add_bfloat_impl();
+}
+
+__aicore__ inline void asc_set_atomic_add_float()
+{
+    asc_set_atomic_add_float_impl();
+}
+
+__aicore__ inline void asc_set_atomic_add_float16()
+{
+    asc_set_atomic_add_float16_impl();
+}
+
+__aicore__ inline void asc_set_atomic_add_int()
+{
+    asc_set_atomic_add_int_impl();
+}
+
+__aicore__ inline void asc_set_atomic_add_int8()
+{
+    asc_set_atomic_add_int8_impl();
+}
+
+__aicore__ inline void asc_set_atomic_add_int16()
+{
+    asc_set_atomic_add_int16_impl();
+}
+
+__aicore__ inline void asc_set_atomic_max_bfloat()
+{
+    asc_set_atomic_max_bfloat_impl();
+}
+
+__aicore__ inline void asc_set_atomic_max_float()
+{
+    asc_set_atomic_max_float_impl();
+}
+
+__aicore__ inline void asc_set_atomic_max_float16()
+{
+    asc_set_atomic_max_float16_impl();
+}
+
+__aicore__ inline void asc_set_atomic_max_int()
+{
+    asc_set_atomic_max_int_impl();
+}
+
+__aicore__ inline void asc_set_atomic_max_int8()
+{
+    asc_set_atomic_max_int8_impl();
+}
+
+__aicore__ inline void asc_set_atomic_max_int16()
+{
+    asc_set_atomic_max_int16_impl();
+}
+
+__aicore__ inline void asc_set_atomic_min_bfloat()
+{
+    asc_set_atomic_min_bfloat_impl();
+}
+
+__aicore__ inline void asc_set_atomic_min_float()
+{
+    asc_set_atomic_min_float_impl();
+}
+
+__aicore__ inline void asc_set_atomic_min_float16()
+{
+    asc_set_atomic_min_float16_impl();
+}
+
+__aicore__ inline void asc_set_atomic_min_int()
+{
+    asc_set_atomic_min_int_impl();
+}
+
+__aicore__ inline void asc_set_atomic_min_int8()
+{
+    asc_set_atomic_min_int8_impl();
+}
+
+__aicore__ inline void asc_set_atomic_min_int16()
+{
+    asc_set_atomic_min_int16_impl();
 }
 
 #endif

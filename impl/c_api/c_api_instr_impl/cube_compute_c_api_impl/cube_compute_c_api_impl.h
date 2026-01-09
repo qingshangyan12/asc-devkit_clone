@@ -18,24 +18,24 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_CUBE_COMPUTE_C_API_IMPL_CUBE_COMPUTE_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_CUBE_COMPUTE_C_API_IMPL_CUBE_COMPUTE_C_API_IMPL_H
 
-#include "set_hf32_trans2even_impl/npu_arch_2201/asc_set_hf32_trans2even_impl.h"
-#include "set_hf32_trans2zero_impl/npu_arch_2201/asc_set_hf32_trans2zero_impl.h"
 #include "mad_sp_impl/npu_arch_2201/asc_mmad_sparse_impl.h"
-#include "set_hf32_mode_impl/npu_arch_2201/asc_set_hf32_mode_impl.h"
 #include "set_fp32_mode_impl/npu_arch_2201/asc_set_fp32_mode_impl.h"
 #include "mad_impl/npu_arch_2201/asc_mmad_impl.h"
 #include "set_l0c_copy_config_impl/npu_arch_2201/asc_set_l0c_copy_config_impl.h"
 #include "set_l13d_padding_impl/npu_arch_2201/asc_set_l13d_padding_impl.h"
-#include "set_mm_transform_impl/npu_arch_2201/asc_set_mm_transform_impl.h"
+#include "set_mmad_direction_m_impl/npu_arch_2201/asc_set_mmad_direction_m_impl.h"
+#include "set_mmad_direction_n_impl/npu_arch_2201/asc_set_mmad_direction_n_impl.h"
+#include "enable_hf32_impl/npu_arch_2201/asc_enable_hf32_impl.h"
+#include "enable_hf32_trans_impl/npu_arch_2201/asc_enable_hf32_trans_impl.h"
 
-__aicore__ inline void asc_set_hf32_trans2even()
+__aicore__ inline void asc_enable_hf32()
 {
-    asc_set_hf32_trans2even_impl();
+    asc_enable_hf32_impl();
 }
 
-__aicore__ inline void asc_set_hf32_trans2zero()
+__aicore__ inline void asc_enable_hf32_trans(uint32_t mode)
 {
-    asc_set_hf32_trans2zero_impl();
+    asc_enable_hf32_trans_impl(mode);
 }
 
 __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unitFlag, bool cmatrixSource, bool cmatrixInitVal)
@@ -48,24 +48,19 @@ __aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a,
     asc_mmad_sparse_sync_impl(c, a, b, m, k, n, unitFlag, cmatrixSource, cmatrixInitVal);
 }
 
-__aicore__ inline void asc_set_hf32_mode()
-{
-    asc_set_hf32_mode_impl();
-}
-
 __aicore__ inline void asc_set_fp32_mode()
 {
     asc_set_fp32_mode_impl();
 }
 
-__aicore__ inline void asc_set_mm_transform_m()
+__aicore__ inline void asc_set_mmad_direction_m()
 {
-    asc_set_mm_transform_m_impl();
+    asc_set_mmad_direction_m_impl();
 }
 
-__aicore__ inline void asc_set_mm_transform_n()
+__aicore__ inline void asc_set_mmad_direction_n()
 {
-    asc_set_mm_transform_n_impl();
+    asc_set_mmad_direction_n_impl();
 }
 
 // asc_mmad(float-bfloat16_t)
