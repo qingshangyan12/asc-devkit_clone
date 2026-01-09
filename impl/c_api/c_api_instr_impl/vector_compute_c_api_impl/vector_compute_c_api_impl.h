@@ -4703,39 +4703,131 @@ __aicore__ inline void asc_float2int16_rz_sync(__ubuf__ int16_t* dst, __ubuf__ f
     asc_float2int16_rz_sync_impl(dst, src, count);
 }
 
-// ==========asc_gather(uint16_t/uint32_t)==========
-__aicore__ inline void asc_gather(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
+// ==========asc_gather(int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
+__aicore__ inline void asc_gather(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset,
     uint16_t dst_repeat_stride, uint8_t repeat)
 {
-    asc_gather_impl(dst, src, offset_addr, dst_repeat_stride, repeat);
+    asc_gather_impl(dst, src, src_offset, dst_repeat_stride, repeat);
 }
 
-__aicore__ inline void asc_gather(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
-{
-    asc_gather_impl(dst, src, offset_addr, count);
-}
-
-__aicore__ inline void asc_gather_sync(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
+__aicore__ inline void asc_gather(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset,
     uint32_t count)
 {
-    asc_gather_sync_impl(dst, src, offset_addr, count);
+    asc_gather_impl(dst, src, src_offset, count);
 }
 
-__aicore__ inline void asc_gather(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
+__aicore__ inline void asc_gather_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_sync_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset,
     uint16_t dst_repeat_stride, uint8_t repeat)
 {
-    asc_gather_impl(dst, src, offset_addr, dst_repeat_stride, repeat);
+    asc_gather_impl(dst, src, src_offset, dst_repeat_stride, repeat);
 }
 
-__aicore__ inline void asc_gather(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr, uint32_t count)
-{
-    asc_gather_impl(dst, src, offset_addr, count);
-}
-
-__aicore__ inline void asc_gather_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t offset_addr,
+__aicore__ inline void asc_gather(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset,
     uint32_t count)
 {
-    asc_gather_sync_impl(dst, src, offset_addr, count);
+    asc_gather_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_sync_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset,
+    uint16_t dst_repeat_stride, uint8_t repeat)
+{
+    asc_gather_impl(dst, src, src_offset, dst_repeat_stride, repeat);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather_sync(__ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_sync_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset,
+    uint16_t dst_repeat_stride, uint8_t repeat)
+{
+    asc_gather_impl(dst, src, src_offset, dst_repeat_stride, repeat);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather_sync(__ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_sync_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset,
+    uint16_t dst_repeat_stride, uint8_t repeat)
+{
+    asc_gather_impl(dst, src, src_offset, dst_repeat_stride, repeat);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_sync_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset,
+    uint16_t dst_repeat_stride, uint8_t repeat)
+{
+    asc_gather_impl(dst, src, src_offset, dst_repeat_stride, repeat);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_sync_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset,
+    uint16_t dst_repeat_stride, uint8_t repeat)
+{
+    asc_gather_impl(dst, src, src_offset, dst_repeat_stride, repeat);
+}
+
+__aicore__ inline void asc_gather(__ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_impl(dst, src, src_offset, count);
+}
+
+__aicore__ inline void asc_gather_sync(__ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset,
+    uint32_t count)
+{
+    asc_gather_sync_impl(dst, src, src_offset, count);
 }
 
 // ==========asc_gather_datablock(uint16_t/uint32_t)==========
