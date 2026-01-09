@@ -1255,7 +1255,6 @@ def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_op
     """
     LogUtil.detail_log_print(op_info.kernel_name, COMPILE_STAGE_MSG_INFO["compile_op_start"], AscendCLogLevel.LOG_INFO)
     LogUtil.detail_log_print(op_info.kernel_name, COMPILE_STAGE_MSG_INFO["preprocess_start"], AscendCLogLevel.LOG_INFO)
-    process_ascendc_api_version(cce_file, compile_options, extend_options)
     # online compile reuses thread, dfx infos need to be reset.
     global_var_storage.global_storage_reset()
     if extend_options.get('opp_kernel_hidden_dat_path', None) is None and not os.path.exists(cce_file):
@@ -1314,7 +1313,6 @@ def compile_op_with_customized_config(cce_file: str, origin_func_name: str, op_i
     """
     LogUtil.detail_log_print(op_info.kernel_name, COMPILE_STAGE_MSG_INFO["compile_op_start"], AscendCLogLevel.LOG_INFO)
     LogUtil.detail_log_print(op_info.kernel_name, COMPILE_STAGE_MSG_INFO["preprocess_start"], AscendCLogLevel.LOG_INFO)
-    process_ascendc_api_version(cce_file, compile_options, extend_options)
     # online compile reuses thread, dfx infos need to be reset.
     global_var_storage.global_storage_reset()
     if extend_options.get('opp_kernel_hidden_dat_path', None) is None and not os.path.exists(cce_file):

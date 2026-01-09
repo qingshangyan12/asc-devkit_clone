@@ -570,6 +570,29 @@ function(npu_op_code_gen)
     message("opbuild ops result: ${EXEC_RESULT}")
     message(FATAL_ERROR "opbuild ops error: ${EXEC_ERROR}")
   endif()
+
+  if (${ASCEND_CHECK_OPTYPE_DUPLICATE})
+    foreach(compute_unit ${ASCEND_COMPUTE_UNIT})
+      if (NOT EXISTS ${OPBUILD_OUT_DIR}/aic-${compute_unit}-ops-info.ini)
+        message(FATAL_ERROR "file: ${OPBUILD_OUT_DIR}/aic-${compute_unit}-ops-info.ini not exist")
+      endif()
+      execute_process(COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_check_optype_duplicate.py
+        --ini-file=${OPBUILD_OUT_DIR}/aic-${compute_unit}-ops-info.ini --soc-version=${compute_unit}
+        RESULT_VARIABLE EXEC_RESULT
+        OUTPUT_VARIABLE EXEC_INFO
+        ERROR_VARIABLE  EXEC_ERROR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+      if (NOT ${EXEC_RESULT} EQUAL 0)
+        if (${EXEC_RESULT} EQUAL 2)
+          message(FATAL_ERROR "Error: Op '${EXEC_ERROR}' is DUPLICATE with built-in operators")
+        else()
+          message(FATAL_ERROR "Error: ${EXEC_ERROR}")
+        endif()
+      endif()
+    endforeach()
+  endif()
+
   message(STATUS "Opbuild generating sources - done")
 endfunction()
 
