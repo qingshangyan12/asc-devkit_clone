@@ -45,7 +45,6 @@ TEST_F(TestTiling, TestMxMatmulFP4NDTiling)
     tiling.SetMadType(MatrixMadType::MXMODE);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -63,7 +62,6 @@ TEST_F(TestTiling, TestMxMatmulFP4NZTiling)
     tiling.SetMadType(MatrixMadType::MXMODE);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -81,7 +79,6 @@ TEST_F(TestTiling, TestMxMatmulFP8NDTilingCase1)
     tiling.SetMadType(MatrixMadType::MXMODE);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -99,7 +96,6 @@ TEST_F(TestTiling, TestMxMatmulFP8NDTilingCase2)
     tiling.SetMadType(MatrixMadType::MXMODE);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -119,7 +115,6 @@ TEST_F(TestTiling, MultiCoreSmallMNFP4)
     ret = rnnMatmul3.SetBufferSpace(-1, -1, -1); // will use all buffer space if not explicitly specified
     optiling::TCubeTiling tilingData;
     ret = rnnMatmul3.GetTiling(tilingData);
-    rnnMatmul3.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -139,7 +134,6 @@ TEST_F(TestTiling, MultiCoreSmallMNFP8)
     ret = rnnMatmul3.SetBufferSpace(-1, -1, -1); // will use all buffer space if not explicitly specified
     optiling::TCubeTiling tilingData;
     ret = rnnMatmul3.GetTiling(tilingData);
-    rnnMatmul3.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -161,7 +155,6 @@ TEST_F(TestTiling, TestMxMatmulFP8NDTiling_CaseTscm)
     tiling.SetMadType(MatrixMadType::MXMODE);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -187,7 +180,6 @@ TEST_F(TestTiling, TestMxMatmulTilingCeilKIsOdd)
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingData.get_stepM(), 1);
     EXPECT_EQ(tilingData.get_depthA1(), 1);
@@ -216,7 +208,6 @@ TEST_F(TestTiling, TestMxMatmulTilingEnableL1BankConflictOptimise)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -243,7 +234,6 @@ TEST_F(TestTiling, TestMxMatmulTilingScaleBNoTransEnableL1BankConflictOptimise)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -269,7 +259,6 @@ TEST_F(TestTiling, TestMatmulTilingEnableL1BankConflictOptimiseFP16)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -294,7 +283,6 @@ TEST_F(TestTiling, TestMatmulTilingEnableL1BankConflictOptimiseFP16TSCM)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -320,7 +308,6 @@ TEST_F(TestTiling, TestMatmulTilingEnableL1BankConflictOptimiseFP16NORM)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -345,7 +332,6 @@ TEST_F(TestTiling, TestMatmulTilingEnableL1BankConflictOptimiseFP32)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -449,7 +435,6 @@ TEST_F(TestTiling, TestMxMatmulGemvFP4BaseNAlign64Case)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingData.get_baseM(), 16);
     EXPECT_EQ(tilingData.get_baseN(), 32);
@@ -478,7 +463,6 @@ TEST_F(TestTiling, TestMxMatmulGemvbaseKalign1024Case)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 
     // MX Gemv baseK must align 1024,
@@ -504,7 +488,6 @@ TEST_F(TestTiling, TestMxMatmulL1)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -527,7 +510,6 @@ TEST_F(TestTiling, TestMxMatmulUB)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -550,7 +532,6 @@ TEST_F(TestTiling, TestMxMatmulMNInnerNZSmallSize)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -574,7 +555,6 @@ TEST_F(TestTiling, TestMxMatmulL1GMLargeSize)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -598,6 +578,5 @@ TEST_F(TestTiling, TestMxMatmulGML1LargeSize)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }

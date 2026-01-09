@@ -65,7 +65,6 @@ file(GLOB ASCENDC_TEST_ASCEND310P_CASE_SRC_PART_FILES
     matmul/test_operator_matmul_v200.cpp
     matmul/copy_cube_in/test_copy_cube_in_mdl_310p.cpp
     matmul/copy_cube_in/test_copy_cube_in_norm_310p.cpp
-    #matmul/bias/test_copy_bias_in_310p.cpp
     math/power/test_operator_power_v200.cpp
     reduce/reduce_xor_sum/test_operator_reduce_xor_sum.cpp
     normalization/welfordupdate/test_operator_welfordupdate.cpp
@@ -214,7 +213,6 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/bias/test_bias_c1_buffer.cpp
     matmul/bias/test_bias_c2_buffer.cpp
     matmul/bias/test_copy_bias_in.cpp
-    # matmul/bias/test_copy_bias_in_batch.cpp
     matmul/scheduler/test_scheduler_mdl.cpp
     matmul/scheduler/test_scheduler_special_mdl.cpp
     matmul/scheduler/test_scheduler_norm.cpp
@@ -223,7 +221,6 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/scheduler/test_scheduler_mdl_outer_product.cpp
     matmul/scheduler/test_scheduler_n_buffer.cpp
     matmul/scheduler/test_scheduler_mdl_fullload.cpp
-    #matmul/scheduler/bias_scheduler/test_bias_scheduler_batch.cpp
     matmul/scheduler/bias_scheduler/test_bias_scheduler_v220.cpp
     matmul/scheduler/batch_scheduler/test_batch_scheduler.cpp
     matmul/scheduler/batch_scheduler/test_batch_scheduler_single.cpp

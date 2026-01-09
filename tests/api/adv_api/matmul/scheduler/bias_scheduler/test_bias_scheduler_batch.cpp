@@ -142,7 +142,7 @@ public:
             auto srcOffset = outer * batchNum * MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreN();
             auto bias = MATMUL_MODULE(BiasScheduler)->CopyIn(
                         MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreN(), batchNum, srcOffset);
-            mLoop->GetTotalIter()
+            mLoop->GetTotalIter();
             for (int m = 0; m < mLoop->GetTotalIter(); ++m) {
                 for (int n = 0; n < nLoop->GetTotalIter(); ++n) {
                     auto baseUseN =  (n + 1 == nLoop->GetTotalIter()) ? var.tailN_ : tiling.GetBaseN();
