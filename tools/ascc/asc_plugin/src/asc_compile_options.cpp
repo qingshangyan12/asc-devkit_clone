@@ -109,20 +109,7 @@ void UpdateManglingNameSuffix(std::vector<std::string>& compileOptions, const Co
     }
 }
 
-CompileOptionManager::CompileOptionManager()
-{
-    auto& manager = InfoManager::GetInstance();
-    optiLevel_ = manager.GetOptimizeLevel();
-    socVersion_ = manager.GetShortSocVersion();
-    isAutoSyncOn_ = manager.IsAutoSyncOn();
-    userDumpStatus_ = manager.UserDumpRequested();
-    isDumpOn_ = manager.IsDumpOn();
-    oneCoreDumpSize_ = manager.GetOneCoreDumpSize();
-    l2CacheOn_ = manager.IsL2CacheEnabled();
-    cannVersionHeader_ = manager.GetPathInfo().cannVersionHeader;
-}
-
-void CompileOptionManager::SetOldPrintOptions(std::vector<std::string>& devSocOpts)
+void CompileOptionManager::SetOldPrintOptions(std::vector<std::string>& devSocOpts) const
 {
     if (userDumpStatus_ && isDumpOn_) {
         devSocOpts.emplace_back("-DONE_CORE_DUMP_SIZE=" + std::to_string(oneCoreDumpSize_));
@@ -133,16 +120,11 @@ void CompileOptionManager::SetOldPrintOptions(std::vector<std::string>& devSocOp
     }
 }
 
-template<ShortSocVersion soc>
-std::vector<std::string> CompileOptionManager::GetDeviceCompileOptionsWithSoc(CoreType coreType)
-{
-    return {};
-}
-
 template <>
 std::vector<std::string> CompileOptionManager::GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND910B>(
-    CoreType coreType)
+    CoreType coreType) const
 {
+    (void)coreType;
     std::vector<std::string> devSocOpts = {"-mllvm", "-cce-aicore-stack-size=0x8000",
                                            "-mllvm", "-cce-aicore-function-stack-size=0x8000",
                                            "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
@@ -150,13 +132,12 @@ std::vector<std::string> CompileOptionManager::GetDeviceCompileOptionsWithSoc<Sh
     if (l2CacheOn_) {
         devSocOpts.emplace_back("-DL2_CACHE_HINT");
     }
-    UpdateManglingNameSuffix(devSocOpts, coreType);
     return devSocOpts;
 }
 
 template <>
 std::vector<std::string> CompileOptionManager::GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND910_95>(
-    CoreType coreType)
+    CoreType coreType) const
 {
     KernelTypeResult kernelTypeRes = CheckHasMixKernelFunc();
     if ((kernelTypeRes.hasMixOneToOneWithKfc && kernelTypeRes.hasMixOneToTwo) ||
@@ -184,37 +165,57 @@ std::vector<std::string> CompileOptionManager::GetDeviceCompileOptionsWithSoc<Sh
 
 template <>
 std::vector<std::string> CompileOptionManager::GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND310P>(
-    CoreType coreType)
+    CoreType coreType) const
 {
     std::vector<std::string> devSocOpts = {// bisheng will add --cce-mask-opt for 310P in default
                                            "-mllvm", "-cce-aicore-fp-ceiling=2",
                                            "-mllvm", "-cce-aicore-record-overflow=false",
-                                           "-mllvm", "-cce-aicore-mask-opt=false"};
+                                           "-mllvm", "-cce-aicore-mask-opt=false",
+                                           "-D__ENABLE_ASCENDC_PRINTF__"};
 
     if (coreType == CoreType::VEC) {
         devSocOpts.emplace_back("-D__ENABLE_VECTOR_CORE__");
     }
-    SetOldPrintOptions(devSocOpts);
     UpdateManglingNameSuffix(devSocOpts, coreType);
     return devSocOpts;
 }
 
-std::vector<std::string> CompileOptionManager::GetDeviceCompileOptions(CoreType type)
+template<ShortSocVersion soc>
+void CompileOptionManager::RegisterOptHandler()
+{
+    dispatchTable_[soc] = [this](CoreType type) {
+        return this->GetDeviceCompileOptionsWithSoc<soc>(type);
+    };
+}
+
+void CompileOptionManager::InitDispatchTable()
+{
+    RegisterOptHandler<ShortSocVersion::ASCEND910B>();
+    RegisterOptHandler<ShortSocVersion::ASCEND910_95>();
+    RegisterOptHandler<ShortSocVersion::ASCEND310P>();
+}
+
+CompileOptionManager::CompileOptionManager() :
+    socVersion_(InfoManager::GetInstance().GetShortSocVersion()),
+    isAutoSyncOn_(InfoManager::GetInstance().IsAutoSyncOn()),
+    userDumpStatus_(InfoManager::GetInstance().UserDumpRequested()),
+    isDumpOn_(InfoManager::GetInstance().IsDumpOn()),
+    l2CacheOn_(InfoManager::GetInstance().IsL2CacheEnabled()),
+    oneCoreDumpSize_(InfoManager::GetInstance().GetOneCoreDumpSize()),
+    optiLevel_(InfoManager::GetInstance().GetOptimizeLevel()),
+    cannVersionHeader_(InfoManager::GetInstance().GetPathInfo().cannVersionHeader)
+{
+    InitDispatchTable();
+}
+
+std::vector<std::string> CompileOptionManager::GetDeviceCompileOptions(CoreType type) const
 {
     std::vector<std::string> devSocOpts;
-    switch (socVersion_) {
-        case ShortSocVersion::ASCEND910B:
-            devSocOpts = GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND910B>(type);
-            break;
-        case ShortSocVersion::ASCEND910_95:
-            devSocOpts = GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND910_95>(type);
-            break;
-        case ShortSocVersion::ASCEND310P:
-            devSocOpts = GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND310P>(type);
-            break;
-        default:
-            return {};
-            break;
+    auto it = dispatchTable_.find(socVersion_);
+    if (it != dispatchTable_.end()) {
+        devSocOpts = it->second(type); // GetDeviceCompileOptionsWithSoc<socVersion_>
+    } else {
+        return {};
     }
     if (devSocOpts.empty()) {
         return {};

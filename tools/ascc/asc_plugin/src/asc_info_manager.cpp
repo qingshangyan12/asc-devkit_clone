@@ -436,7 +436,7 @@ bool InfoManager::IsAutoSyncOn() const
 
 bool InfoManager::IsSupportFifoDump() const
 {
-    return shortSocVersion_ == ShortSocVersion::ASCEND910B;
+    return shortSocVersion_ == ShortSocVersion::ASCEND910B || shortSocVersion_ == ShortSocVersion::ASCEND310P;
 }
 
 bool InfoManager::HasKernelFunc() const

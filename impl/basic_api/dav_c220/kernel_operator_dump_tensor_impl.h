@@ -723,16 +723,26 @@ __aicore__ inline void SkipRingBufWithInfo(
     return;
 }
 
+template <uint64_t timeoutCycle = 1000 * 1000> // 20ms
+__aicore__ inline void RingBufferWaitRtsSync()
+{
+    const uint64_t firstTimeStamp = static_cast<uint64_t>(GetSystemCycle());
+    while (static_cast<uint64_t>(GetSystemCycle()) - firstTimeStamp < timeoutCycle) {
+        // Wait for RTS sync
+    }
+}
+
 __aicore__ inline bool RingBufferWait(__gm__ RingBufReadInfo* readInfo, __gm__ RingBufWriteInfo* writeInfo,
                                       const uint32_t& tlvLen)
 {
-    const uint64_t firstTimeStamp = static_cast<uint64_t>(GetSystemCycle());
-    constexpr uint64_t timeoutCycle = 50 * 1000 * 1000 * 5; // 5s
+    constexpr uint32_t maxCounter = 15;
+    volatile uint32_t counter = 0;
     while (writeInfo->bufOffset < readInfo->bufOffset && writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
-        uint64_t spendTime = static_cast<uint64_t>(GetSystemCycle()) - firstTimeStamp;
-        if (spendTime > timeoutCycle) {
+        if (counter >= maxCounter) { // max wait 300ms, rts read gm per 200ms
             return false;
         }
+        RingBufferWaitRtsSync(); // wait 20 ms
+        ++counter;
         dcci(reinterpret_cast<__gm__ uint64_t*>(readInfo), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     }
     return true;
@@ -797,13 +807,14 @@ __aicore__ __gm__ inline RingBufWriteInfo* GetRingBufWriteInfo(__gm__ BlockRingB
 
 __aicore__ inline bool WaitRingBufBeginRead(__gm__ RingBufReadInfo* readInfo)
 {
-    const uint64_t firstTimeStamp = static_cast<uint64_t>(GetSystemCycle());
-    constexpr uint64_t timeoutCycle = 50 * 1000 * 1000 * 5; // 5s
+    constexpr uint32_t maxCounter = 15;
+    volatile uint32_t counter = 0;
     while (readInfo->bufOffset == 0) {
-        uint64_t spendTime = static_cast<uint64_t>(GetSystemCycle()) - firstTimeStamp;
-        if (spendTime > timeoutCycle) {
+        if (counter >= maxCounter) { // max wait 300ms, rts read gm per 200ms
             return false;
         }
+        RingBufferWaitRtsSync(); // wait 20 ms
+        ++counter;
         dcci(reinterpret_cast<__gm__ uint64_t*>(readInfo), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     }
     return true;
@@ -998,6 +1009,7 @@ template <typename T>
 __aicore__ inline void WriteRingBufTlvData(
     const GlobalTensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv, const uint32_t& dumpSize)
 {
+    PipeBarrier<PIPE_ALL>();
     __gm__ uint8_t* dst = reinterpret_cast<__gm__ uint8_t*>(dumpTensorTlv + 1);
     MemCopyGm2Gm(dst, reinterpret_cast<__gm__ const uint8_t*>(src.GetPhyAddr()), dumpSize * sizeof(T));
 }

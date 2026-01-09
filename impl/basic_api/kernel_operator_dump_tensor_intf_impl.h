@@ -16,7 +16,7 @@
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
 
-inline __gm__ uint8_t* g_sysPrintFifoSpace = nullptr;
+inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_dump_tensor_impl.h"
@@ -158,7 +158,7 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 #endif
 }
 
-#else // !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__) 
+#else // !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
 
 #ifdef ASCENDC_CPU_DEBUG
 using ::printf;

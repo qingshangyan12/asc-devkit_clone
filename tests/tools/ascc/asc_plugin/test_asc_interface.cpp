@@ -718,8 +718,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_WithMixAIV_Mix12)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom_mix_aic",
-        "-D__device_stub__add_custom=add_custom_mix_aic",
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
@@ -731,8 +729,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_WithMixAIV_Mix12)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom_mix_aiv",
-        "-D__device_stub__add_custom=add_custom_mix_aiv"
     };
 
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
@@ -774,8 +770,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_WithMixAIC_Mix11)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom_mix_aic",
-        "-D__device_stub__add_custom=add_custom_mix_aic"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
@@ -788,8 +782,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_WithMixAIC_Mix11)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom_mix_aiv",
-        "-D__device_stub__add_custom=add_custom_mix_aiv"
     };
 
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
@@ -880,8 +872,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
@@ -894,8 +884,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
 
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
@@ -941,8 +929,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_no_dump)
         "-D__ENABLE_ASCENDC_PRINTF__",
         // include paths
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
@@ -957,8 +943,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_no_dump)
         "-D__ENABLE_ASCENDC_PRINTF__",
         // include paths
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
     EXPECT_EQ(exec_res, 0);
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
@@ -1006,6 +990,7 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_310P)
         "-DASCENDC_DUMP=0",
         "-mllvm", "-cce-aicore-fp-ceiling=2",
         "-mllvm", "-cce-aicore-record-overflow=false", "-mllvm", "-cce-aicore-mask-opt=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom"
     };
@@ -1018,6 +1003,7 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_310P)
         "-DASCENDC_DUMP=0",
         "-mllvm", "-cce-aicore-fp-ceiling=2",
         "-mllvm", "-cce-aicore-record-overflow=false", "-mllvm", "-cce-aicore-mask-opt=false",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "-D__ENABLE_VECTOR_CORE__",
         "-D__device_stub__sub_custom=sub_custom",
         "-D__device_stub__add_custom=add_custom",
@@ -1072,8 +1058,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_optimize_lv1)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
@@ -1087,8 +1071,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_optimize_lv1)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
         expDeviceVecExtraCompileOptions};
@@ -1138,8 +1120,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_user_no_dump)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
@@ -1153,8 +1133,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_user_no_dump)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
         expDeviceVecExtraCompileOptions};
@@ -1193,8 +1171,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_dump_on)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
@@ -1208,8 +1184,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_dump_on)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
         expDeviceVecExtraCompileOptions};
@@ -1250,8 +1224,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_dump_on_assert)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
@@ -1265,8 +1237,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_dump_on_assert)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
         expDeviceVecExtraCompileOptions};
@@ -1316,8 +1286,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_user_dump_on)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
@@ -1331,8 +1299,6 @@ TEST_F(TestAscInterFace, asc_PluginEpilogue_user_dump_on)
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
         "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT",
-        "-D__device_stub__sub_custom=sub_custom",
-        "-D__device_stub__add_custom=add_custom"
     };
     AscPlugin::EpilogueResult expectRes = {"", expHostExtraCompileOptions, expDeviceCubeExtraCompileOptions,
         expDeviceVecExtraCompileOptions};
