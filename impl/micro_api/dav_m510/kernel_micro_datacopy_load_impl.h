@@ -312,6 +312,12 @@ __simd_callee__ inline void DataCopyUnAlignImpl(U& dstReg, UnalignReg& ureg, __u
     }
 }
 
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void LoadImpl(U& dstReg, __ubuf__ T* srcAddr)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Load is not supported on current device!"); });
+}
+
 // vlda/vldu
 template <typename T>
 __simd_callee__ inline void DataCopyUnAlignPreImpl(UnalignReg& ureg, __ubuf__ T* srcAddr, AddrReg& areg)

@@ -14,8 +14,8 @@
  */
 #ifndef ASCENDC_MODULE_MICRO_DATACOPY_IMPL_H
 #define ASCENDC_MODULE_MICRO_DATACOPY_IMPL_H
-#include "micro_api/dav_c310/kernel_micro_datacopy_load_impl.h"
-#include "micro_api/dav_c310/kernel_micro_datacopy_store_impl.h"
+#include "micro_api/dav_m510/kernel_micro_datacopy_load_impl.h"
+#include "micro_api/dav_m510/kernel_micro_datacopy_store_impl.h"
 
 namespace AscendC {
 namespace MicroAPI {

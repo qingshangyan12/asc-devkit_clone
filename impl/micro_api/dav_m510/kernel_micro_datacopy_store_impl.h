@@ -393,6 +393,18 @@ __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf__ T*& dstAddr, Unalig
     }
 }
 
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Store is not supported on current device!"); });
+}
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg, uint32_t count)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Store is not supported on current device!"); });
+}
+
 // vstu/vsta
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
 __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, U& srcReg, UnalignReg& ureg, AddrReg& areg)
