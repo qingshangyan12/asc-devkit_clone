@@ -66,7 +66,7 @@
       - 完成矩阵乘操作。
       - 结束矩阵乘操作。
 
-  - 算子Tiling实现
+  - Tiling实现
     - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
     - 获取Tiling参数的流程如下：
       - 创建一个Tiling对象。

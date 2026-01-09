@@ -40,7 +40,7 @@
   </table>
 - 算子实现： 
  
-  - kernel实现  
+  - Kernel实现  
     关键步骤：  
     1、使用Matmul API，关键配置如下：1）A矩阵MatmulType的POSITION为TPosition::VECOUT，B矩阵MatmulType的POSITION为TPosition::GM。  
     2、使用DataCopyPad接口将A矩阵输入搬运到相应VECOUT位置，且尾轴需要32B对齐（填充数据值无要求）。  

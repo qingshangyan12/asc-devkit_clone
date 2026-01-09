@@ -44,7 +44,7 @@ enableKdimReorderLoad用于配置是否使能K轴错峰加载数据。基于相�
   </table>
 - 算子实现： 
  
-  - kernel实现  
+  - Kernel实现  
     - 具体步骤  
       - 创建Matmul对象：调用GetMDLConfig接口将enableKdimReorderLoad参数设置为true，获取自定义模板CFG_MDL_REORDER，通过传入模板参数创建Matmul对象。
         ```

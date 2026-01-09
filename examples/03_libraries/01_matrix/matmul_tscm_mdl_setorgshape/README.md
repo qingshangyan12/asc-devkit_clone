@@ -40,7 +40,7 @@
   </table>
 - 算子实现： 
  
-  - kernel实现  
+  - Kernel实现  
     关键步骤：  
     1、使用MDL模板构造Matmul对象，指定A矩阵的TPosition为TSCM。   
     ```

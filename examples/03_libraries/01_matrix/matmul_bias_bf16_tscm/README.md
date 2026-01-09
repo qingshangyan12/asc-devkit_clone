@@ -41,7 +41,7 @@
   </table>
 - 算子实现： 
  
-  - kernel实现  
+  - Kernel实现  
     关键步骤：  
     声明Matmul对象时，指定Bias的TPosition为GM，数据类型为bfloat16。   
 

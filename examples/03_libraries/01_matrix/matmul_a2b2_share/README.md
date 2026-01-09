@@ -41,7 +41,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
     </table>
 - 算子实现： 
-  - kernel实现
+  - Kernel实现
     - 计算逻辑是：Ascend C提供一组Matmul高阶API，方便用户快速实现Matmul矩阵乘法的运算操作。Matmul的计算公式为：C = A * B + Bias。
       - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
       - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。

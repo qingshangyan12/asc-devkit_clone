@@ -40,7 +40,7 @@
   </table>
 - 算子实现： 
  
-  - kernel实现  
+  - Kernel实现  
     关键步骤：  
     1、使用Matmul API，关键配置如下：1）A矩阵和B矩阵MatmulType的IBSHARE同时为true，2）使用NORM模板，3）使用SplitM模板策略。  
     2、使用for循环搭配Iterate和GetTensorC接口，将每次Iterate的计算结果在矩阵的M方向一分为二后的数据分别获取到当前AIV核。  

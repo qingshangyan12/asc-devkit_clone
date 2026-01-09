@@ -39,7 +39,7 @@
   - 约束条件
     - 输入和输出的Layout类型都为NORMAL时，不支持BatchMode为SINGLE_LARGE_THAN_L1的场景。
  
-  - kernel实现  
+  - Kernel实现  
     - 计算逻辑：C = A * B + Bias
       - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
       - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。

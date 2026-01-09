@@ -41,7 +41,7 @@
     - 使能UnitFlag功能时，不支持算子内同时存在L0C搬出到Global Memory和L1搬出到Global Memory的两种流水。
     - 使能UnitFlag功能时，若同时使能L0C累加功能，不支持多次Iterate计算，一次GetTensorC输出。
 
-  - 算子Kernel实现
+  - Kernel实现
     - 计算逻辑：C = A * B + Bias。
       - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
       - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
@@ -72,7 +72,7 @@
       - 完成矩阵乘操作。
       - 结束矩阵乘操作。
 
-  - 算子Tiling实现
+  - Tiling实现
     - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数。
     - 获取Tiling参数的流程如下：
       - 创建一个Tiling对象。

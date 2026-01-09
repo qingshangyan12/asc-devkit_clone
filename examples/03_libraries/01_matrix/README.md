@@ -5,6 +5,7 @@
 ## 算子开发样例
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
+| [matmul](./matmul) | 本样例介绍调用Matmul API实现matmul单算子 |
 | [matmul_splitm](./matmul_splitm) | 本样例介绍Matmul API使用SplitM模板策略的场景 |
 | [matmul_splitk](./matmul_splitk) | 本样例介绍调用Matmul高阶API实现多核切K场景下的单算子。多核切K的应用场景为矩阵乘的M、N较小，不能在M、N方向开启多核，需要切K满足将切分后的矩阵分配到更多核上并行处理。|
 | [matmul_vecout](./matmul_vecout) | 本样例介绍Matmul API输入矩阵为VECOUT的场景 |
@@ -36,3 +37,6 @@
 | [matmul_a2b2_share](./matmul_a2b2_share) | 本样例介绍调用Matmul API实现开启A2和B2全局管理的单算子 |
 | [matmul_callback](./matmul_callback) | 本样例介绍Matmul API模板参数MatmulCallbackFunc的自定义使用方式 |
 | [matmul_l0c_extend](./matmul_l0c_extend) | 本样例介绍Matmul API用户自主管理CO1的Iterate接口的自定义使用方式 |
+| [matmul_l2cache](./matmul_l2cache) | 本样例介绍调用Matmul API实现L2 Cache切分的功能的Matmul单算子 |
+| [matmul_mixdualmaster](./matmul_mixdualmaster) | 本样例介绍通过配置模板参数中enableMixDualMaster使能Matmul双主模式MixDualMaster的使用方式 |
+| [matmul_nd_align](./matmul_nd_align) | 本样例介绍调用Matmul API在输入矩阵的N方向非对齐场景下，矩阵乘输出时使能N方向对齐的实现方式 |

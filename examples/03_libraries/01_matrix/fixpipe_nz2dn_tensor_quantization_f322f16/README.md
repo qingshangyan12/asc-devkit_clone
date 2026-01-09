@@ -34,7 +34,7 @@
   </table>
 - 算子实现： 
  
-  - kernel实现  
+  - Kernel实现  
     关键步骤：  
     对 L0C 中的计算结果通过Fixpipe接口从L0C搬运至 GM 中，并执行ReLU 激活、F32 转 F16 量化操作以及NZ2DN分形转换。
 
