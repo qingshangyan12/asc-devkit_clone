@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-按元素求差，再进行Relu计算（结果和0对比取较大值）。计算公式如下：
+按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。计算公式如下：
 
 $$
 dst_i  = Relu(src0_i -src1_i)
@@ -23,6 +23,9 @@ $$
   __aicore__ inline void asc_sub_relu(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
   __aicore__ inline void asc_sub_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
   __aicore__ inline void asc_sub_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+  __aicore__ inline void asc_sub_relu(_ubuf__ int8_t* dst, _ubuf__ half* src0, _ubuf__ half* src1, uint32_t count)
+  __aicore__ inline void asc_sub_relu(_ubuf__ half* dst, _ubuf__ float* src0, _ubuf__ float* src1, uint32_t count)
+  __aicore__ inline void asc_sub_relu(_ubuf__ int8_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, uint32_t count)
   ```
 
 - 高维切分计算
@@ -31,6 +34,9 @@ $$
   __aicore__ inline void asc_sub_relu(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
   __aicore__ inline void asc_sub_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
   __aicore__ inline void asc_sub_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  __aicore__ inline void asc_sub_relu(_ubuf__ int8_t* dst, _ubuf__ half* src0, _ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  __aicore__ inline void asc_sub_relu(_ubuf__ half* dst, _ubuf__ float* src0, _ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  __aicore__ inline void asc_sub_relu(_ubuf__ int8_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
   ```
 
 - 同步计算
@@ -39,6 +45,9 @@ $$
   __aicore__ inline void asc_sub_relu_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
   __aicore__ inline void asc_sub_relu_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
   __aicore__ inline void asc_sub_relu_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+  __aicore__ inline void asc_sub_relu_sync(_ubuf__ int8_t* dst, _ubuf__ half* src0, _ubuf__ half* src1, uint32_t count)
+  __aicore__ inline void asc_sub_relu_sync(_ubuf__ half* dst, _ubuf__ float* src0, _ubuf__ float* src1, uint32_t count)
+  __aicore__ inline void asc_sub_relu_sync(_ubuf__ int8_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, uint32_t count)
   ```
 
 ## 参数说明
@@ -73,10 +82,21 @@ PIPE_V
 ## 调用示例
 
 ```cpp
+// 目的操作数和源操作数的数据类型一致
 // total_length指参与计算的数据长度
 constexpr uint32_t total_length = 128;
 __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];
+asc_sub_relu(dst, src0, src1, total_length);
+```
+
+```c++
+// 目的操作数和源操作数的数据类型不一致（s162s8）
+// total_length 指参与计算的数据长度
+constexpr uint64_t total_length = 256;
+__ubuf__ int16_t src0[total_length];
+__ubuf__ int16_t src1[total_length];
+__ubuf__ int8_t dst[total_length];
 asc_sub_relu(dst, src0, src1, total_length);
 ```

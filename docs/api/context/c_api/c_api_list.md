@@ -72,19 +72,16 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_gather_datablock](vector_compute/asc_gather_datablock.md) | 根据偏移地址按照DataBlock的粒度将源操作数收集到目的操作数中。 |
 | [asc_int162half](vector_compute/asc_int162half.md) | 数据类型转换。将int16_t类型的数据转换为half类型。 |
 | [asc_rcp](vector_compute/asc_rcp.md) | 执行矢量的取倒数运算。 |
-| [asc_shift_right](vector_compute/asc_shift_right.md) | 对源操作数中的每个元素执行右移。 |
+| [asc_shiftright](vector_compute/asc_shiftright.md) | 对源操作数中的每个元素执行右移。 |
 | [asc_mul_add](vector_compute/asc_mul_add.md) | 执行矢量的乘加运算。 |
 | [asc_eq_scalar](vector_compute/asc_eq_scalar.md) | 执行矢量与标量的比较运算，如果值相等则输出1，否则输出0。 |
 | [asc_gather](vector_compute/asc_gather.md) | 将源操作数按照给定的偏移按元素收集到目的操作数中。 |
 | [asc_min_scalar](vector_compute/asc_min_scalar.md) | 源操作数矢量逐元素与标量相比，取较小值。 |
-| [asc_add_relu_cast_f162s8](vector_compute/asc_add_relu_cast_f162s8.md) | 按元素求和，结果和0对比取较大值，并将结果从half类型转换为int8_t类型。 |
-| [asc_add_relu_cast_f322f16](vector_compute/asc_add_relu_cast_f322f16.md) | 按元素求和，结果和0对比取较大值，并将结果从float类型转换为half类型。 |
-| [asc_add_relu_cast_s162s8](vector_compute/asc_add_relu_cast_s162s8.md) | 按元素求和，结果和0对比取较大值，并将结果从int16_t类型转换为int8_t类型。 |
 | [asc_gt](vector_compute/asc_gt.md) | 按元素比较两个矢量的大小关系，若比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
 | [asc_vdeq_int162b8](vector_compute/asc_vdeq_int162b8.md) | 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。 |
 | [asc_int322float](vector_compute/asc_int322float.md) | 将int32_t类型数据转换为float类型。 |
 | [asc_abs](vector_compute/asc_abs.md) | 按元素取绝对值 |
-| [asc_add_relu](vector_compute/asc_add_relu.md) | 按元素求和，再进行Relu计算（结果和0对比取较大值）。 |
+| [asc_add_relu](vector_compute/asc_add_relu.md) | 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
 | [asc_and](vector_compute/asc_and.md) | 执行矢量与运算。 |
 | [asc_axpy](vector_compute/asc_axpy.md) | 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加 |
 | [asc_bitsort](vector_compute/asc_bitsort.md) | Score和Index分别存储在src0和src1中，按Score进行排序（Score大的元素排前面），排序后的Score与其对应的Index一起以（Score，Index）的结构存储在dst中。 |
@@ -99,12 +96,12 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_half2uint8](vector_compute/asc_half2uint8.md) | 将half类型数据转换为uint8_t类型，支持多种舍入模式。 |
 | [asc_int642float](vector_compute/asc_int642float.md) | 将int64_t类型数据转换为float类型。 |
 | [asc_le](vector_compute/asc_le.md) | 按元素判断src0 <= src1是否成立，若成立则输出结果为1，否则为0。 |
-| [asc_leakyrelu_scalar](vector_compute/asc_leakyrelu_scalar.md) | 执行矢量Leaky Relu运算。 |
+| [asc_leakyrelu](vector_compute/asc_leakyrelu.md) | 执行矢量Leaky Relu运算。 |
 | [asc_le_scalar](vector_compute/asc_le_scalar.md) | 按元素判断src <= value是否成立，若成立则输出结果为1，否则为0。 |
 | [asc_log](vector_compute/asc_log.md) | 按元素取自然对数。 |
 | [asc_lt_scalar](vector_compute/asc_lt_scalar.md) | 执行矢量中每个位置和标量比较，如果值小于标量值则为1，否则为0，结果为每个bit位按小端序排布 |
 | [asc_mrgsort4](vector_compute/asc_mrgsort4.md) | 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。 |
-| [asc_mul_add_dst](vector_compute/asc_mul_add_dst.md) | 按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中。 |
+| [asc_fma](vector_compute/asc_fma.md) | 按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中。 |
 | [asc_mul_add_relu](vector_compute/asc_mul_add_relu.md) | 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。 |
 | [asc_mul_cast_half2int8](vector_compute/asc_mul_cast_half2int8.md) | 按元素求积，并将结果转换为int8_t类型 |
 | [asc_mul_cast_half2uint8](vector_compute/asc_mul_cast_half2uint8.md) | 按元素求积，并将结果转换为uint8_t类型。 |
@@ -114,10 +111,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_reduce](vector_compute/asc_reduce.md) | Reduce（归约）是将一组数据通过指定运算聚合（聚合指将将一组分散、多个的数据通过某种规则合并成一个或少数几个的操作）为单个、少量结果的核心操作，包括ReduceMax、ReduceMin和ReduceSum等。 |
 | [asc_rsqrt](vector_compute/asc_rsqrt.md) | 按元素进行开方后取倒数的计算。 |
 | [asc_set_va_reg](vector_compute/asc_set_va_reg.md) | 用于设置transpose的地址，将操作数地址序列与地址寄存器关联。 |
-| [asc_shift_left](vector_compute/asc_shift_left.md) | 将所有元素左移distance位。 |
-| [asc_sub_relu](vector_compute/asc_sub_relu.md) | 按元素求差，再进行Relu计算（结果和0对比取较大值）。 |
-| [asc_sub_relu_cast](vector_compute/asc_sub_relu_cast.md) | 执行矢量减运算，并将结果进行Relu和类型转换。 |
-| [asc_transdata_to_5hd](vector_compute/asc_transdata_to_5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
+| [asc_shiftleft](vector_compute/asc_shiftleft.md) | 将所有元素左移distance位。 |
+| [asc_sub_relu](vector_compute/asc_sub_relu.md) | 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
+| [asc_transdto5hd](vector_compute/asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
 
 
 

@@ -25,11 +25,14 @@ TEST_F(TestVectorComputeGetReduceMaxMinCnt, get_max_min_cnt_half_int32_t_Succ)
     half val = 0.0;
     uint32_t index = 1;
     MOCKER(get_max_min_cnt, int64_t(void))
-        .times(1)
+        .times(2)
         .will(returnValue(int64_t(0x00000000FFFF3C00)));
     
-    asc_get_reduce_max_min_cnt(val, index);
-    EXPECT_EQ(val, (half)1.0);
+    asc_get_reduce_max_cnt(val, index);
+    EXPECT_FLOAT_EQ(val, (float)1.0);
+    EXPECT_EQ(index, 0);
+    asc_get_reduce_min_cnt(val, index);
+    EXPECT_FLOAT_EQ(val, (float)1.0);
     EXPECT_EQ(index, 0);
     GlobalMockObject::verify();
 }
@@ -39,10 +42,13 @@ TEST_F(TestVectorComputeGetReduceMaxMinCnt, get_max_min_cnt_float_int32_t_Succ)
     float val = 0.0;
     uint32_t index = 1;
     MOCKER(get_max_min_cnt, int64_t(void))
-        .times(1)
+        .times(2)
         .will(returnValue(int64_t(0x000000003F800000)));
     
-    asc_get_reduce_max_min_cnt(val, index);
+    asc_get_reduce_max_cnt(val, index);
+    EXPECT_FLOAT_EQ(val, (float)1.0);
+    EXPECT_EQ(index, 0);
+    asc_get_reduce_min_cnt(val, index);
     EXPECT_FLOAT_EQ(val, (float)1.0);
     EXPECT_EQ(index, 0);
     GlobalMockObject::verify();

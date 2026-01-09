@@ -115,11 +115,11 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_half_half_hal
 }                                                                                               \
 
 // ==========asc_shift_right(int16_t/int32_t/uint16_t/uint32_t)==========
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shift_right, vshr, int16_t, int32_t);
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shift_right, vshr, int32_t, int32_t);
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shift_right, vshr, uint16_t, uint32_t);
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shift_right, vshr, uint32_t, uint32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shiftright, vshr, int16_t, int32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shiftright, vshr, int32_t, int32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shiftright, vshr, uint16_t, uint32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightCApi, asc_shiftright, vshr, uint32_t, uint32_t);
 
 // ==========asc_shift_right_round(int16_t/int32_t)==========
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightRoundCApi, asc_shift_right_round, vshr, int16_t, int32_t);
-TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightRoundCApi, asc_shift_right_round, vshr, int32_t, int32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightRoundCApi, asc_shiftright_round, vshr, int16_t, int32_t);
+TEST_VECTOR_COMPUTE_VSHR_INSTR(ShiftRightRoundCApi, asc_shiftright_round, vshr, int32_t, int32_t);

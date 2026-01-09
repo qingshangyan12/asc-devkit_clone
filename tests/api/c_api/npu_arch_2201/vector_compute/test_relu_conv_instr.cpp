@@ -125,15 +125,15 @@ TEST_F(TestVectorCompute##class_name##src_data_type, c_api_name##_sync_half_half
 }
 
 // ==========asc_add_relu_cast_f162s8==========
-TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(AddReluF162S8, asc_add_relu_cast_f162s8, vaddreluconv_f162s8, int8_t, half);
+TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(AddReluF162S8, asc_add_relu, vaddreluconv_f162s8, int8_t, half);
 // ==========asc_add_relu_cast_f322f16==========
-TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(AddReluF322F16, asc_add_relu_cast_f322f16, vaddreluconv_f322f16, half, float);
+TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(AddReluF322F16, asc_add_relu, vaddreluconv_f322f16, half, float);
 // ==========asc_add_relu_cast_s162s8==========
-TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(AddReluS162S8, asc_add_relu_cast_s162s8, vaddreluconv_s162s8, int8_t, int16_t);
+TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(AddReluS162S8, asc_add_relu, vaddreluconv_s162s8, int8_t, int16_t);
 
 // ==========asc_sub_relu_cast_f162s8==========
-TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(SubReluF162S8, asc_sub_relu_castf162s8, vsubreluconv_f162s8, int8_t, half);
+TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(SubReluF162S8, asc_sub_relu, vsubreluconv_f162s8, int8_t, half);
 // ==========asc_sub_relu_cast_f322f16==========
-TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(SubReluF322F16, asc_sub_relu_castf322f16, vsubreluconv_f322f16, half, float);
+TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(SubReluF322F16, asc_sub_relu, vsubreluconv_f322f16, half, float);
 // ==========asc_sub_relu_cast_s162s8==========
-TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(SubReluS162S8, asc_sub_relu_casts162s8, vsubreluconv_s162s8, int8_t, int16_t);
+TEST_VECTOR_COMPUTE_RELU_CONV_INSTR(SubReluS162S8, asc_sub_relu, vsubreluconv_s162s8, int8_t, int16_t);

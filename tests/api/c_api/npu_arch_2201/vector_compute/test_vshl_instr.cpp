@@ -115,7 +115,7 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_sync_half_half_hal
 }                                                                                               \
 
 // ==========asc_shift_left(int16_t/int32_t/uint16_t/uint32_t)==========
-TEST_VECTOR_COMPUTE_VSHL_INSTR(ShiftLeftCApi, asc_shift_left, vshl, int16_t, uint32_t);
-TEST_VECTOR_COMPUTE_VSHL_INSTR(ShiftLeftCApi, asc_shift_left, vshl, int32_t, uint32_t);
-TEST_VECTOR_COMPUTE_VSHL_INSTR(ShiftLeftCApi, asc_shift_left, vshl, uint16_t, uint32_t);
-TEST_VECTOR_COMPUTE_VSHL_INSTR(ShiftLeftCApi, asc_shift_left, vshl, uint32_t, uint32_t);
+TEST_VECTOR_COMPUTE_VSHL_INSTR(ShiftLeftCApi, asc_shiftleft, vshl, int16_t, uint32_t);
+TEST_VECTOR_COMPUTE_VSHL_INSTR(ShiftLeftCApi, asc_shiftleft, vshl, int32_t, uint32_t);
+TEST_VECTOR_COMPUTE_VSHL_INSTR(ShiftLeftCApi, asc_shiftleft, vshl, uint16_t, uint32_t);
+TEST_VECTOR_COMPUTE_VSHL_INSTR(ShiftLeftCApi, asc_shiftleft, vshl, uint32_t, uint32_t);
