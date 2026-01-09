@@ -1,0 +1,42 @@
+# asc_set_mask_norm
+
+## 产品支持情况
+
+|产品|是否支持|
+| :------------ | :------------: |
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √ |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √ |
+
+## 功能说明
+
+设置Mask模式为Normal模式，该模式为系统默认模式。
+
+## 函数原型
+
+```cpp
+__aicore__ inline void asc_set_mask_norm()
+```
+
+## 参数说明
+
+无
+
+## 返回值说明
+
+无
+
+## 流水类型
+
+PIPE_TYPE_S
+
+## 约束说明
+
+无
+
+## 调用示例
+
+```cpp
+asc_set_mask_norm();
+asc_set_vector_mask(0xffffffffffffffff, 0xffffffffffffffff);
+... //计算操作
+```
