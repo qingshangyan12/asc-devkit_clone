@@ -749,6 +749,9 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
 
 
     def add_define_options(self, exist_dynamic_sub_ops, options: list):
+        if self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1 and \
+                                (CommonUtility.is_c310() or CommonUtility.is_310r6()):
+            options.append("-D__ASCENDC_DAVID_SPLIT_CORE__")
         if exist_dynamic_sub_ops:
             options.append("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
 

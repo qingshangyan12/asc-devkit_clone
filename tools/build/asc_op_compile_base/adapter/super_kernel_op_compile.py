@@ -338,7 +338,8 @@ def compile_super_kernel(kernel_info, compile_log_path, enable_features: dict = 
     if CommonUtility.is_c310() or CommonUtility.is_310r6() or CommonUtility.is_m510():
         compile_option_tuple.compile_options.append('--cce-no-dcache-flush')
     if kernel_info["timestamp_option"]:
-        compile_options.append('-DONE_CORE_DUMP_SIZE=' + str(compile_info.super_kernel_info["debug_size"] / 75))
+        compile_options.append('-DONE_CORE_DUMP_SIZE=' + str(compile_info.super_kernel_info["debug_size"] \
+                               / CommonUtility.get_dump_core_num()))
     _compile_ascendc_cce_v220_with_kernel_type_for_static(compile_info, compile_option_tuple, tiling_info) 
     sub_objs = gen_super_kernel_link_obj_sequence(compile_info, kernel_info["sub_operator"], kernel_info["link_mode"],
         kernel_info["split_mode"], compile_info.compile_log_path)

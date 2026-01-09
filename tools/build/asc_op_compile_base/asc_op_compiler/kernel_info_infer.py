@@ -139,11 +139,7 @@ AscendCLogLevel.LOG_ERROR)
     @staticmethod
     def get_dump_info_from_i_file(content):
         dump_info = {"dump_type": "", "dump_size": 1048576}
-        actual_dump_size = 1048576
-        if CommonUtility.is_c310() or CommonUtility.is_310r6():
-            actual_dump_size *= 108
-        else:
-            actual_dump_size *= 75
+        actual_dump_size = 1048576 * CommonUtility.get_dump_core_num()
 
         match_printf = re.search(r"__enable_feature_for_compile_printf = 1", content)
         match_assert = re.search(r"__enable_feature_for_compile_assert = 1;", content)
@@ -171,13 +167,12 @@ AscendCLogLevel.LOG_ERROR)
                 if match:
                     dump_info["dump_size"] = int(match.group(1))
 
-        if CommonUtility.is_c310() or CommonUtility.is_310r6():
-            actual_dump_size = 108 * dump_info["dump_size"]
-        else:
-            actual_dump_size = 75 * dump_info["dump_size"]
+        actual_dump_size = CommonUtility.get_dump_core_num() * dump_info["dump_size"]
+
         simt_in_c310 = match_simtvf and (CommonUtility.is_c310() or CommonUtility.is_310r6())
         if dump_info["dump_type"] != "" and simt_in_c310:
-            actual_dump_size = 1048576 * 108 + 72 * 2048 * 2048 # david 72 vec + 36 cube + simt
+            # david 72 vec + 36 cube + simt
+            actual_dump_size = 1048576 * CommonUtility.get_dump_core_num() + 72 * 2048 * 2048 
             dump_info["dump_size"] = 1048576 # reserved for ONE_CORE_DUMP_SIZE
 
         global_var_storage.set_variable("ascendc_required_dump_workspace_size", actual_dump_size)

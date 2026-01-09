@@ -89,7 +89,7 @@ class SuperOperatorInfos:
         self.creat_compile_log()
         self.info_base = []
         self.super_kernel_params = []
-        self.enable_double_stream:bool = False
+        self.enable_double_stream: bool = False
         self.op_options = parse_super_kernel_options(kernel_infos.get("super_kernel_options", ""))
         self.split_mode = self.op_options.get('split-mode', 4)
         self.profiling_mode = self.op_options.get('profiling', SuperKernelProfilingMode.ProfilingDisable)
@@ -749,6 +749,9 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
 
 
     def add_define_options(self, exist_dynamic_sub_ops, options: list):
+        if self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1 and \
+                                (CommonUtility.is_c310() or CommonUtility.is_310r6()):
+            options.append("-D__ASCENDC_DAVID_SPLIT_CORE__")
         if exist_dynamic_sub_ops:
             options.append("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
 
@@ -906,20 +909,20 @@ split_dynamic_o_in_super_kernel(orign_bin_path, rename_file_path_list[i-1], i, s
             "sub_operator": sub_operator_info,
             "kernel_file": self.kernel_file,
             "compile_option": options,
-            "kernel_name":self.kernel_name,
+            "kernel_name": self.kernel_name,
             "link_mode": self.link_mode,
             "timestamp_option": self.timestamp_option,
-            "debug_option":self.debug_option,
-            "debug_size":self.debug_size,
+            "debug_option": self.debug_option,
+            "debug_size": self.debug_size,
             "split_mode": self.split_mode,
-            "op_list" : self.op_list,
+            "op_list": self.op_list,
             "sp_options": self.op_options,
             "workspace_size": self.workspace_size,
             "param_offset": param_offset,
             "notify_param_offset": notify_param_offset,
             "wait_param_offset": wait_param_offset,
-            "send_event_list":send_event_list,
-            "recv_event_list":recv_event_list
+            "send_event_list": send_event_list,
+            "recv_event_list": recv_event_list
         }
 
 
