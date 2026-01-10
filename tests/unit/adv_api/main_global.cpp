@@ -17,6 +17,7 @@ int32_t main(int32_t argc, char** argv)
 AscendC::StubInit();
     AscendC::TPipe tpipe;
     testing::InitGoogleTest(&argc, argv);
+    AscendC::print("123")
     return RUN_ALL_TESTS();
 }
 
