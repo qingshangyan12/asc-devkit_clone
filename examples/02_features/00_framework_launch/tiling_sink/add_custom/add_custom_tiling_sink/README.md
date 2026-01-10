@@ -3,6 +3,7 @@
 若要使能Tiling下沉，算子Tiling函数必须独立实现，详细开发指导请参考[Ascend C算子开发](https://hiascend.com/document/redirect/CannCommunityOpdevAscendC)手册中的Tiling下沉章节。
 
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍

@@ -2,6 +2,7 @@
 本样例以AddCustom自定义算子为例，介绍了在开发自定义算子时如何启用Tiling下沉，以及如何通过PyTorch在图模式下调用该自定义算子的完整流程。
 
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍

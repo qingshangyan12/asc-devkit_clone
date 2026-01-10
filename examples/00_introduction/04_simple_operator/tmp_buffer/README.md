@@ -2,6 +2,7 @@
 ## 概述
 本样例展示了一个支持bfloat16_t数据类型的向量加法（Add）算子，并重点演示了在算子计算过程中使用临时缓冲区（TmpBuf）进行数据转换的典型方法。
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
@@ -49,17 +50,17 @@
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
-    source /usr/local/Ascend/ascend-toolkit/set_env.sh
+    source /usr/local/Ascend/cann/set_env.sh
     ```
 
   - 默认路径，非root用户安装CANN软件包
     ```bash
-    source $HOME/Ascend/ascend-toolkit/set_env.sh
+    source $HOME/Ascend/cann/set_env.sh
     ```
 
   - 指定路径install_path，安装CANN软件包
     ```bash
-    source ${install_path}/ascend-toolkit/set_env.sh
+    source ${install_path}/cann/set_env.sh
     ```
     
 - 样例执行

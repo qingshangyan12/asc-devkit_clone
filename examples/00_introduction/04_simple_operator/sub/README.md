@@ -2,6 +2,7 @@
 ## 概述
 本样例演示了如何通过自定义核函数实现高性能的逐元素减法（Sub）运算。算子核心功能是完成两个形状相同的输入张量x与y的逐元素相减，即z = x - y。通过绕过AI框架、直接调用核函数的方式，有效避免了额外的调度开销，适用于对计算延迟和吞吐量有严格要求的场景。
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
@@ -46,17 +47,17 @@
   请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
-    source /usr/local/Ascend/ascend-toolkit/set_env.sh
+    source /usr/local/Ascend/cann/set_env.sh
     ```
 
   - 默认路径，非root用户安装CANN软件包
     ```bash
-    source $HOME/Ascend/ascend-toolkit/set_env.sh
+    source $HOME/Ascend/cann/set_env.sh
     ```
 
   - 指定路径install_path，安装CANN软件包
     ```bash
-    source ${install_path}/ascend-toolkit/set_env.sh
+    source ${install_path}/cann/set_env.sh
     ```
     
 - 样例执行
