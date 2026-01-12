@@ -55,7 +55,7 @@ run_python_llt_test(
 
 add_dependencies(ascendc_pyut_asc_op_compiler
     register
-    kernel_tiling
+    gen_kernel_tiling
     install_adapter_api_ut
     generate_hidden_dat_file_ut
     asc_platform_test
