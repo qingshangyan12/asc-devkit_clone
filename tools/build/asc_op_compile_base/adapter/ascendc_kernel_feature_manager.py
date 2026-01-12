@@ -134,6 +134,22 @@ def register_feature(manager: AscendCKernelFeatureManager):
     """
     decorator: used to quickly register a feature class to a specified manager
     :param manager: feature manager instance
+    example
+    @register_feature(global_ascendc_kernel_feature_manager)
+    class FeatureExample(BaseFeature):
+        def __init__(self):
+            super().__init__(1) # feature value
+
+        @property
+        def feature_name(self) -> str:
+            return "test_feature_class"
+
+        def get_feature_value(self) -> int:
+            return self.value
+
+        def check_value_valid(self, data: int):
+            if data != 1:
+                raise ValueError(f"feature value {data} is not supported")
     """
     def decorator(feature_cls: Type[BaseFeature]) -> Type[BaseFeature]:
         manager.register_feature(feature_cls)
@@ -145,19 +161,5 @@ def register_feature(manager: AscendCKernelFeatureManager):
 global_ascendc_kernel_feature_manager = AscendCKernelFeatureManager()
 
 
-#example
-@register_feature(global_ascendc_kernel_feature_manager)
-class FeatureExample(BaseFeature):
-    def __init__(self):
-        super().__init__(1) # feature value
-
-    @property
-    def feature_name(self) -> str:
-        return "test_feature_class"
-
-    def get_feature_value(self) -> int:
-        return self.value
-
-    def check_value_valid(self, data: int):
-        if data != 1:
-            raise ValueError(f"feature value {data} is not supported")
+def get_features():
+    return global_ascendc_kernel_feature_manager.get_all_feature_value()
