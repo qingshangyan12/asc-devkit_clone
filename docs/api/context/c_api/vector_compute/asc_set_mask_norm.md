@@ -44,6 +44,5 @@ constexpr uint32_t total_length = 128; //total_length指参与计算的数据总
 _ubuf__ half src0[total_length];
 _ubuf__ half src1[total_length];
 _ubuf__ half dst[total_length];
-asc_binary_config config{}; // 本例中asc_binary_config参数使用默认值即可。
 asc_add(dst, src0, src1, config);
 ```

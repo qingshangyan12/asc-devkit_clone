@@ -23,22 +23,22 @@ $$
 - 前n个数据计算
 
     ```c++
-    __aicore__ inline void asc_leakyrelu(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-    __aicore__ inline void asc_leakyrelu(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+    __aicore__ inline void asc_leakyrelu_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+    __aicore__ inline void asc_leakyrelu_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_leakyrelu(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint8_t dst_block_stride, uint8_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
-    __aicore__ inline void asc_leakyrelu(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint8_t dst_block_stride, uint8_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride) 
+    __aicore__ inline void asc_leakyrelu_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint8_t dst_block_stride, uint8_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
+    __aicore__ inline void asc_leakyrelu_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint8_t dst_block_stride, uint8_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride) 
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_leakyrelu_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-    __aicore__ inline void asc_leakyrelu_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+    __aicore__ inline void asc_leakyrelu_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+    __aicore__ inline void asc_leakyrelu_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
     ```
 
 ## 参数说明
@@ -48,7 +48,7 @@ $$
 | --------- | ----- | ----------------- |
 | dst       | 输出    | 目的操作数（向量）的起始地址。            |
 | src | 输入    | 源操作数（矢量）的起始地址，为待处理数据。             |
-| value | 输入    | 源操作数（标量）的起始地址，leaky_relu中alpha的值。             |
+| value | 输入    | 源操作数（标量），leaky_relu中alpha的值。             |
 | count     | 输入    | 参与计算的元素个数。        |
 | dst_block_stride   | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src_block_stride  | 输入 | 源操作数0单次迭代内不同DataBlock间地址步长。 |

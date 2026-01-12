@@ -5,8 +5,6 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 |结构名|说明|
 |-----------------------|-----------------------|
-| [asc_binary_config](struct/asc_binary_config.md) | 双目高维切分计算API读写控制参数 |
-| [asc_unary_config](struct/asc_unary_config.md) | 单目高维切分计算API读写控制参数 |
 | [asc_deq_scale_config](struct/asc_deq_scale_config.md) | asc_deq_scale API配置参数 |
 | [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | Load3Dv2接口的repeat参数 |
 | [asc_store_atomic_config](struct/asc_store_atomic_config.md) | 原子操作使能位与原子操作类型的值 |
@@ -85,7 +83,6 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_and](vector_compute/asc_and.md) | 执行矢量与运算。 |
 | [asc_axpy](vector_compute/asc_axpy.md) | 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加 |
 | [asc_bitsort](vector_compute/asc_bitsort.md) | Score和Index分别存储在src0和src1中，按Score进行排序（Score大的元素排前面），排序后的Score与其对应的Index一起以（Score，Index）的结构存储在dst中。 |
-| [asc_cast_deq](vector_compute/asc_cast_deq.md) | 对输入做量化并进行精度转换。 |
 | [asc_deq_int322half](vector_compute/asc_deq_int322half.md) | 对输入的int32_t类型的数据按元素做量化并转换为half类型 |
 | [asc_float2int16](vector_compute/asc_float2int16.md) | 将float类型数据转换为int16_t类型。 |
 | [asc_float2int32](vector_compute/asc_float2int32.md) | 将float类型数据转换为int16_t类型 |
@@ -113,7 +110,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_va_reg](vector_compute/asc_set_va_reg.md) | 用于设置transpose的地址，将操作数地址序列与地址寄存器关联。 |
 | [asc_shiftleft](vector_compute/asc_shiftleft.md) | 将所有元素左移distance位。 |
 | [asc_sub_relu](vector_compute/asc_sub_relu.md) | 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
-| [asc_transdto5hd](vector_compute/asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
+| [asc_transto5hd](vector_compute/asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
 
 
 
