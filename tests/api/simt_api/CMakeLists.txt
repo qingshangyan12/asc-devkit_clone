@@ -52,7 +52,6 @@ foreach(product_type ${SIMT_PRODUCT_TYPE_LIST})
         ASCENDC_DUMP=0
         $<$<STREQUAL:${product_type},ascend910_9599>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
         $<$<STREQUAL:${product_type},mc62cm12aa>:__NPU_ARCH__=5102>
-        __disable_kernel_type_autoinfer__=
     )
 
     target_include_directories(ascendc_ut_simt_api_${product_type} PRIVATE

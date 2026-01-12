@@ -20,7 +20,6 @@ target_compile_definitions(ascendc_ut_aicpu_api PRIVATE
     UT_TEST
     ASCENDC_DEBUG=1
     ASCENDC_CPU_DEBUG=1
-    __disable_kernel_type_autoinfer__=
 )
 
 target_include_directories(ascendc_ut_aicpu_api PRIVATE

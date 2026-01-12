@@ -109,7 +109,6 @@ add_executable(ascendc_ut_asc_runtime
 target_compile_definitions(ascendc_ut_asc_runtime PRIVATE
     UT_TEST
     ASCENDC_CPU_DEBUG=1
-    __disable_kernel_type_autoinfer__=
 )
 
 target_include_directories(ascendc_ut_asc_runtime PRIVATE
