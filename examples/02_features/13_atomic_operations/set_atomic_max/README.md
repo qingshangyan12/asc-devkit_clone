@@ -15,22 +15,20 @@
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── set_atomic_max_custom.asc      // Ascend C算子实现 & 调用样例
+│   └── set_atomic_max.asc      // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
 - 算子功能：  
   调用SetAtomicMax接口后，可设置后续从VECOUT传输到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，将最大值写入GM。可通过设置模板参数来设定不同的数据类型。
 - 算子规格：  
-<table>
-  <tr><td rowspan="3" align="center">算子输入</td></tr>
-  <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">8*2048</td><td align="center">float</td><td align="center">ND</td></tr>
-  <td align="center">x</td><td align="center">8*2048</td><td align="center">float</td><td align="center">ND</td>
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">y</td><td align="center">8*2048</td><td align="center">float</td><td align="center">ND</td></tr>
-
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">cos_custom</td></tr>
+  <table>  
+  <tr><th align="center"></th><th colspan="5" align="center"></th></tr>  
+  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center"></td></tr>  
+  <tr><td align="center">x</td><td align="center">256</td><td align="center">half</td><td align="center">ND</td><td align="center"></td></tr>  
+  <tr><td align="center">y</td><td align="center">256</td><td align="center">half</td><td align="center">ND</td><td align="center"></td></tr>  
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">256</td><td align="center">half</td><td align="center">ND</td><td align="center"></td></tr>  
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">set_atomic_max_custom</td></tr>  
   </table>
 
 - 算子实现：
