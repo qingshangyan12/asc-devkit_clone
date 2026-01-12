@@ -13,7 +13,7 @@ set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type"
+    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "utils_test" "build-type"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -59,6 +59,7 @@ usage() {
         echo "    -j                   Compile thread nums, default is 16, eg: -j 8"
         echo "    --adv_test            Build and run the adv part of unit tests"
         echo "    --basic_test_one      Build and run the basic_one part of unit tests"
+        echo "    --utils_test          Build and run the utils part of unit tests"
         echo "    --basic_test_two      Build and run the basic_two part of unit tests"
         echo "    --basic_test_three    Build and run the basic_three part of unit tests"
         echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
@@ -93,6 +94,7 @@ usage() {
   echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/latest"
   echo "    --adv_test            Build and run the adv part of unit tests"
   echo "    --basic_test_one      Build and run the basic_one part of unit tests"
+  echo "    --utils_test          Build and run the utils part of unit tests"
   echo "    --basic_test_two      Build and run the basic_two part of unit tests"
   echo "    --basic_test_three    Build and run the basic_three part of unit tests"
   echo "    --pkg                Compile run package"
@@ -142,6 +144,7 @@ check_help_combinations() {
     case "$arg" in
       -t|--test) has_test=true ;;
       --adv_test) test_part="adv_test" ;;
+      --utils_test) test_part="utils_test" ;;
       --basic_test_one) test_part="basic_test_one" ;;
       --basic_test_two) test_part="basic_test_two" ;;
       --basic_test_three) test_part="basic_test_three" ;;
@@ -201,6 +204,7 @@ check_param_with_help() {
           --pkg) SHOW_HELP="package" ;;
           -t|--test) SHOW_HELP="test" ;;
           --adv_test) SHOW_HELP="test" ;;
+ 	        --utils_test) SHOW_HELP="test" ;; 
           --basic_test_one) SHOW_HELP="test" ;;
           --basic_test_two) SHOW_HELP="test" ;;
           --basic_test_three) SHOW_HELP="test" ;;
@@ -284,6 +288,11 @@ set_options() {
       check_param_test_part
       shift
       ;;
+    --utils_test)
+            TEST_PART="utils_test"
+            check_param_test_part
+            shift
+            ;;
     --basic_test_one)
       TEST_PART="basic_test_one"
       check_param_test_part
@@ -430,6 +439,12 @@ function build_test_part() {
     CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=adv"
     build_test
     return 0
+  fi
+
+  if [[ "$TEST_PART" == "utils_test" ]]; then
+        CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=utils"
+        build_test
+        return 0
   fi
 
   source ${CURRENT_DIR}/tests/unit/basic_api/common/ci/basic_tests_part.sh
