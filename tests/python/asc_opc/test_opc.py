@@ -16,6 +16,21 @@ import unittest
 import os
 import sys
 import json
+from unittest.mock import patch
+
+THIS_FILE_NAME = __file__
+FILE_PATH = os.path.dirname(os.path.realpath(THIS_FILE_NAME))
+TOP_PATH = os.path.join(FILE_PATH, "../../../")
+FRAMEWORK_PATH = os.path.join(
+    TOP_PATH, "tools/build/")
+ASC_OPC_PATH = os.path.join(
+    TOP_PATH, "tools/build/asc_opc/python/asc_opc_tool/")
+OPC_STUB_PATH = os.path.join(
+    TOP_PATH, "tests/python/asc_opc/stub/")
+sys.path.insert(0, FRAMEWORK_PATH)
+sys.path.insert(0, ASC_OPC_PATH)
+sys.path.insert(0, OPC_STUB_PATH)
+
 from opc import OpcOptionParser
 import opc as opc
 import opc_api as opc_api
@@ -23,8 +38,7 @@ from constant import (GraphDtype, OpcCompileMode, OpcOptions, CompileParam, Supp
 from op_compilation import OpCompilation
 from opc_common import get_int64_mode
 from op_info_store import load_set_op_content
-from graph_parser import GraphParser
-import tbe.common.utils.log as logger
+import asc_op_compile_base.common.utils.log as logger
 from op_compile_info_check import check_op_optional_paramtype
 import tempfile
 
@@ -108,8 +122,7 @@ class TestOpc02(unittest.TestCase):
     def test_options_parser_01(self):
         logger.info(current_dir)
         logger.info("Start to execute ==============test_options_parser_01==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
 
         sys.argv = ["xx", "--op_path=./op_impl/dynamic/mat_mul.py", "--main_func=mat_mul",
@@ -139,8 +152,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_02==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
 
         sys.argv = ["xx", "../../stub/files/mat_mul.py", "--main_func=mat_mul",
@@ -170,8 +182,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_03==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test_false.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
         sys.argv = ["xx", op_path, "--main_func=mat_mul",
@@ -203,8 +214,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_04==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
 
         sys.argv = ["xx", "--main_func=mat_mul",
@@ -234,8 +244,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_05==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -266,8 +275,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_06==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -298,8 +306,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_07==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -330,8 +337,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_08==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -362,8 +368,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_09==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -394,8 +399,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_09_01==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -428,8 +432,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_09_02==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -464,8 +467,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_10==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -497,8 +499,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_11==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -529,8 +530,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============test_options_parser_12==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -602,109 +602,12 @@ class TestOpc02(unittest.TestCase):
         self.assertEqual(opt_parser.check_input_params(), False)
         self.check_options(options, expect_options)
 
-    def test_options_parser_15(self):
-        logger.info("Start to execute ==============test_options_parser_15==============")
-        op_type = "conv2d"
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
-        path = test_root_dir + "/stub/files/build.txt"
-        debug_path = test_root_dir + "/debug_dir"
-        output_path = test_root_dir + "/output"
-        sys.argv = ["xx", "--graph=" + path, "--soc_version=Ascend910A", "--output=" + output_path,
-                    "--debug_dir=" + debug_path, "--bin_filename=add1", "--op_debug_level=1",
-                    "--op_debug_config=dump_cce", "--core_type=AiCore"]
-        ret, opt_parser = opc.parse_args()
-        result = opc.op_compile_classify(opt_parser)
-        op_compile_mode = opt_parser.get_option(OpcOptions.OP_COMPILE_MODE)
-        logger.debug("op_compile_mode is {}".format(op_compile_mode))
-        self.assertEqual(op_compile_mode, "single_op_compile_graph_mode")
-
-        if op_compile_mode != "single_op_compile_config_file_mode":
-            graph_parser = GraphParser(opt_parser.get_all_options())
-            graph_parser.group_compile_param()
-        json_path = test_root_dir + "/stub/files/ascend910.json"
-        load_set_op_content(json_path)
-        op_compile = OpCompilation(opt_parser.get_all_options())
-        ret = op_compile.op_compilation()
-        self.assertEqual(ret, True)
-        logger.info("End to execute ==============test_options_parser_15==============")
-
-    def test_options_parser_16(self):
-        logger.info("Start to execute ==============test_options_parser_16==============")
-        op_type = "leaky_relu"
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
-        path = test_root_dir + "/stub/files/build_1.txt"
-        debug_path = test_root_dir + "/debug_dir"
-        output_path = test_root_dir + "/output"
-        sys.argv = ["xx", "--graph=" + path, "--soc_version=Ascend910A", "--output=" + output_path,
-                    "--debug_dir=" + debug_path, "--bin_filename=add3", "--core_type=AiCore"]
-        ret, opt_parser = opc.parse_args()
-        result = opc.op_compile_classify(opt_parser)
-        op_compile_mode = opt_parser.get_option(OpcOptions.OP_COMPILE_MODE)
-        self.assertEqual(op_compile_mode, "fusion_op_compile_graph_mode")
-        logger.debug("op_compile_mode is {}".format(op_compile_mode))
-
-        if op_compile_mode != "single_op_compile_config_file_mode":
-            graph_parser = GraphParser(opt_parser.get_all_options())
-            graph_parser.group_compile_param()
-        op_compile = OpCompilation(opt_parser.get_all_options())
-        ret = op_compile.op_compilation()
-        self.assertEqual(ret, True)
-        logger.info("End to execute ==============test_options_parser_16==============")
-
-    def test_options_parser_16_2(self):
-        logger.info("Start to execute ==============test_options_parser_16_2==============")
-        op_type = "leaky_relu"
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
-        path = test_root_dir + "/stub/files/build_1.txt"
-        debug_path = test_root_dir + "/debug_dir"
-        output_path = test_root_dir + "/output"
-        sys.argv = ["xx", "--graph=" + path, "--soc_version=Ascend910A", "--output=" + output_path,
-                    "--debug_dir=" + debug_path, "--bin_filename=add4"]
-        ret, opt_parser = opc.parse_args()
-        result = opc.op_compile_classify(opt_parser)
-        op_compile_mode = opt_parser.get_option(OpcOptions.OP_COMPILE_MODE)
-        self.assertEqual(op_compile_mode, "fusion_op_compile_graph_mode")
-        logger.debug("op_compile_mode is %s", op_compile_mode)
-        graph_parser = GraphParser(opt_parser.get_all_options())
-        graph_parser.group_compile_param()
-        op_compile = OpCompilation(opt_parser.get_all_options())
-        ret = op_compile.op_compilation()
-        self.assertEqual(ret, True)
-        logger.info("End to execute ==============test_options_parser_16_2==============")
-
-    def test_options_parser_17(self):
-        logger.info("Start to execute ==============test_options_parser_17==============")
-        op_type = "leaky_relu"
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
-        path = test_root_dir + "/stub/files/build_2.txt"
-        debug_path = test_root_dir + "/debug_dir"
-        output_path = test_root_dir + "/output"
-        sys.argv = ["xx", "--graph=" + path, "--soc_version=Ascend910A", "--output=" + output_path,
-                    "--debug_dir=" + debug_path, "--bin_filename=add2", "--core_type=AiCore"]
-        ret, opt_parser = opc.parse_args()
-        result = opc.op_compile_classify(opt_parser)
-        op_compile_mode = opt_parser.get_option(OpcOptions.OP_COMPILE_MODE)
-        self.assertEqual(op_compile_mode, "fusion_op_compile_graph_mode")
-        logger.debug("op_compile_mode is {}".format(op_compile_mode))
-
-        if op_compile_mode != "single_op_compile_config_file_mode":
-            graph_parser = GraphParser(opt_parser.get_all_options())
-            graph_parser.group_compile_param()
-        op_compile = OpCompilation(opt_parser.get_all_options())
-        ret = op_compile.op_compilation()
-        self.assertEqual(ret, True)
-
     def test_options_parser_18(self):
         '''
         test invalid core_type: ai_vector
         '''
         logger.info("Start to execute ==============test_options_parser_18==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -734,8 +637,7 @@ class TestOpc02(unittest.TestCase):
         test invalid aicore_num: sih
         '''
         logger.info("Start to execute ==============test_options_parser_19==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -754,14 +656,13 @@ class TestOpc02(unittest.TestCase):
         test invalid mdl_bank_path
         '''
         logger.info("Start to execute ==============test_options_parser_20==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
         sys.argv = ["xx", op_path, "--main_func=mat_mul",
                     "--input_param=" + input_param_path, "--soc_version=Ascend910A",
-                    "--output=./output", "--log=debug", "--mdl_bank_path=dffgfds"]
+                    "--output=./output", "--log=debug"]
         ret, opt_parser = opc.parse_args()
         opc.op_compile_classify(opt_parser)
         options = opt_parser.get_all_options()
@@ -772,14 +673,13 @@ class TestOpc02(unittest.TestCase):
         test invalid op_bank_path
         '''
         logger.info("Start to execute ==============test_options_parser_21==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
         sys.argv = ["xx", op_path, "--main_func=mat_mul",
                     "--input_param=" + input_param_path, "--soc_version=Ascend910A",
-                    "--output=./output", "--log=debug", "--op_bank_path=dffgfds"]
+                    "--output=./output", "--log=debug"]
         ret, opt_parser = opc.parse_args()
         opc.op_compile_classify(opt_parser)
         options = opt_parser.get_all_options()
@@ -790,8 +690,7 @@ class TestOpc02(unittest.TestCase):
         test invalid op_debug_level
         '''
         logger.info("Start to execute ==============test_options_parser_22==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -809,8 +708,7 @@ class TestOpc02(unittest.TestCase):
         test invalid impl_mode: ascend
         '''
         logger.info("Start to execute ==============test_options_parser_23==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -828,8 +726,7 @@ class TestOpc02(unittest.TestCase):
         test valid core_type, aicore_num, mdl_bank_path, op_bank_path, impl_mode
         '''
         logger.info("Start to execute ==============test_options_parse_24==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         path = test_root_dir + "/output"
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -837,8 +734,7 @@ class TestOpc02(unittest.TestCase):
         sys.argv = ["xx", op_path, "--main_func=mat_mul",
                     "--input_param=" + input_param_path, "--soc_version=Ascend910A",
                     "--output=./output", "--log=debug", "--core_type=AiCore",
-                    "--aicore_num=1", "--mdl_bank_path=" + path, "--op_bank_path=" + path,
-                    "--impl_mode=high_performance"]
+                    "--aicore_num=1", "--impl_mode=high_performance"]
         ret, opt_parser = opc.parse_args()
         opc.op_compile_classify(opt_parser)
         options = opt_parser.get_all_options()
@@ -849,8 +745,7 @@ class TestOpc02(unittest.TestCase):
         test valid core_type, aicore_num, mdl_bank_path, op_bank_path, impl_mode
         '''
         logger.info("Start to execute ==============test_options_parse_25==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         path = test_root_dir + "/output"
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -858,8 +753,8 @@ class TestOpc02(unittest.TestCase):
         sys.argv = ["xx", op_path, "--main_func=mat_mul",
                     "--input_param=" + input_param_path, "--soc_version=Ascend910A",
                     "--output=./output", "--log=debug", "--core_type=AiCore,VectorCore",
-                    "--aicore_num=1", "--mdl_bank_path=" + path, "--op_bank_path=" + path,
-                    "--impl_mode=high_performance", "--simplified_key_mode=0"]
+                    "--aicore_num=1", "--impl_mode=high_performance", 
+                    "--simplified_key_mode=0"]
         ret, opt_parser = opc.parse_args()
         opc.op_compile_classify(opt_parser)
         options = opt_parser.get_all_options()
@@ -871,8 +766,7 @@ class TestOpc02(unittest.TestCase):
         :return:
         '''
         logger.info("Start to execute ==============ut_test_options_parser_debug_config==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
 
@@ -911,8 +805,7 @@ class TestOpc02(unittest.TestCase):
         test valid core_type, aicore_num, mdl_bank_path, op_bank_path, impl_mode
         '''
         logger.info("Start to execute ==============test_options_parse_24==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         path = test_root_dir + "/output"
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -920,37 +813,19 @@ class TestOpc02(unittest.TestCase):
         sys.argv = ["xx", op_path, "--main_func=mat_mul",
                     "--input_param=" + input_param_path, "--soc_version=Ascend910A",
                     "--output=./output", "--log=debug", "--core_type=AiCore",
-                    "--aicore_num=1", "--mdl_bank_path=" + path, "--op_bank_path=" + path,
-                    "--impl_mode=high_performance", "--optional_input_mode=gen_placeholder"]
+                    "--aicore_num=1", "--impl_mode=high_performance",
+                    "--optional_input_mode=gen_placeholder"]
         ret, opt_parser = opc.parse_args()
+        self.assertEqual(ret, 0)
         opc.op_compile_classify(opt_parser)
         options = opt_parser.get_all_options()
         self.assertEqual(opt_parser.check_input_params(), True)
-
-    def test_options_parser_25(self):
-        logger.info("Start to execute ==============test_options_parser_25==============")
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
-        path = test_root_dir + "/stub/files/conv2d_2inputs_conv_relu_dynamic.txt"
-        debug_path = test_root_dir + "/debug_dir"
-        output_path = test_root_dir + "/output"
-        sys.argv = ["xx", "--graph=" + path, "--soc_version=Ascend910A", "--output=" + output_path,
-                    "--debug_dir=" + debug_path, "--bin_filename=add1", "--op_debug_level=1"]
-        ret, opt_parser = opc.parse_args()
-        result = opc.op_compile_classify(opt_parser)
-        op_compile_mode = opt_parser.get_option(OpcOptions.OP_COMPILE_MODE)
-        logger.debug("op_compile_mode is {}".format(op_compile_mode))
-
-        graph_parser = GraphParser(opt_parser.get_all_options())
-        graph_parser.group_compile_param()
-        self.assertEqual("a_value_range" in str(opt_parser.get_all_options()), True)
 
     def test_op_compilation_config_file(self):
         """test test_op_compilation_config_file"""
         logger.debug("Start to execute ============ test_op_compilation_config_file ============")
 
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_1.json"
         opc_compile_args = {
             "input_param" : input_param_path,
@@ -974,8 +849,7 @@ class TestOpc02(unittest.TestCase):
         """test check_op_optional_paramtype"""
         logger.debug("Start to execute ============ test_check_op_optional_paramtype ============")
 
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/apply_adam_v2.json"
         op_path = test_root_dir + "/stub/files/apply_adam_v2.py"
         opc_compile_args = {
@@ -1004,8 +878,7 @@ class TestOpc02(unittest.TestCase):
         """test_get_int64_mode"""
         logger.debug("Start to execute ============ test_get_int64_mode ============")
 
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/ConcatD.json"
         with open(input_param_path, "r") as file_in:
             json_data = json.load(file_in)
@@ -1022,22 +895,23 @@ class TestOpc02(unittest.TestCase):
         """test_compile_op_api"""
         logger.debug("Start to execute ============ test_compile_op_api ============")
 
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/sqrt.json"
         output_dir = test_root_dir + "/output"
         debug_dir = test_root_dir + "/debug_dir"
-        op_path = test_root_dir + "/stub/files/sqrt.py"
+        op_path = test_root_dir + "/stub/files/Sqrt.py"
         with open(input_param_path, "r") as file_in:
             json_data = json.load(file_in)
 
         build_options = {
+            "main_func": "sqrt",
+            "op_debug_level": 2,
             "op_path" : op_path,
             "soc_version" : "Ascend910A",
             "output" : output_dir,
             "debug_dir" : debug_dir,
             "optional_input_mode": "gen_placeholder",
-            "bin_filename": "ConcatD"
+            "bin_filename": "Sqrt"
         }
         res = opc_api.compile_op(json_data, build_options)
         self.assertEqual(res, True)
@@ -1048,8 +922,7 @@ class TestOpc02(unittest.TestCase):
         """test_compile_op_api"""
         logger.debug("Start to execute ============ test_compile_op_api_fail ============")
 
-        test_file_dir = os.path.abspath(os.path.dirname(__file__))
-        test_root_dir =  os.path.abspath(os.path.join(test_file_dir, "../.."))
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/MatMul_no_op_type.json"
         output_dir = test_root_dir + "/output"
         debug_dir = test_root_dir + "/debug_dir"
@@ -1070,16 +943,6 @@ class TestOpc02(unittest.TestCase):
         self.assertEqual(res, False)
 
         logger.debug("End to execute ============ test_compile_op_api_fail ============")
-
-    def test_op_mode_is_single_op_1(self):
-        logger.debug("Start to execute ============ test_op_mode_is_single_op_1 ============")
-        self.assertEqual(opc.op_mode_is_single_op("single_op_compile_config_file_mode"), True)
-        logger.debug("End to execute ============ test_op_mode_is_single_op_1 ============")
-
-    def test_op_mode_is_single_op_2(self):
-        logger.debug("Start to execute ============ test_op_mode_is_single_op_2 ============")
-        self.assertEqual(opc.op_mode_is_single_op("fusion_op_compile_graph_mode"), False)
-        logger.debug("End to execute ============ test_op_mode_is_single_op_2 ============")
 
 
 if __name__ == '__main__':

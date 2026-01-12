@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 import os
 from shutil import copy
+import json
 
 
 current_dir = os.path.abspath(os.getcwd())
@@ -39,7 +40,11 @@ def copy_compile_res_files_to_output(kernel_name):
         print(current_dir)
         
         try:
-            copy(os.path.realpath(json_res_path), json_output_path)
+            with open(json_res_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            data['binFileName'] = 'Sqrt'
+            with open(json_output_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
             copy(os.path.realpath(o_res_path), o_output_path)
         except Exception as e:
             raise RuntimeError("Copy [%s] to [%s] filed, reason: %s." %

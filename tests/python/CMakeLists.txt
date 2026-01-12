@@ -69,3 +69,17 @@ run_python_llt_test(
     PRE_TEST_COMMAND
     COVERAGERC_DIR
 )
+
+set(OPC_BASE "${CMAKE_CURRENT_SOURCE_DIR}")
+file(MAKE_DIRECTORY ${OPC_BASE}/asc_opc/output)
+file(WRITE ${OPC_BASE}/asc_opc/stub/files/kernel_meta/MatMul_build_res.o "")
+
+run_python_llt_test(
+        TARGET opc_unittest
+        SRC_FILES_DIR ${ASCENDC_DIR}/tools/build/asc_opc/python
+        TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/asc_opc
+        EXPORT_PYTHONPATH  ${ASCENDC_DIR}/tools/build/asc_opc
+        ENV_FILE ${ASCENDC_DIR}/tests/python/asc_opc/common/ci/set_python_env.sh
+        ENV_PARAMS ${ASCENDC_DIR}\ py_ut\ 310
+        COVERAGERC_DIR
+)

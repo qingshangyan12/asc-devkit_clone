@@ -13,7 +13,20 @@
 Opc test case
 """
 import unittest
-import tbe.common.utils.log as logger
+import os
+import sys
+
+THIS_FILE_NAME = __file__
+FILE_PATH = os.path.dirname(os.path.realpath(THIS_FILE_NAME))
+TOP_PATH = os.path.join(FILE_PATH, "../../../")
+FRAMEWORK_PATH = os.path.join(
+    TOP_PATH, "tools/build/")
+ASC_OPC_PATH = os.path.join(
+    TOP_PATH, "tools/build/asc_opc/python/asc_opc_tool/")
+sys.path.insert(0, FRAMEWORK_PATH)
+sys.path.insert(0, ASC_OPC_PATH)
+
+import asc_op_compile_base.common.utils.log as logger
 
 from op_info_parser import (OpInfoParser, TensorData)
 
