@@ -21,6 +21,10 @@ if (${TEST_MOD} STREQUAL "all" OR ${TEST_MOD} STREQUAL "adv")
   add_subdirectory(adv_api)
 endif ()
 
-if (${TEST_MOD} STREQUAL "all" OR NOT ${TEST_MOD} STREQUAL "adv")
+if (${TEST_MOD} STREQUAL "all" OR ${TEST_MOD} STREQUAL "utils")
+ 	   add_subdirectory(utils)
+endif ()
+
+if (${TEST_MOD} STREQUAL "all" OR ((NOT ${TEST_MOD} STREQUAL "adv") AND (NOT ${TEST_MOD} STREQUAL "utils")))
   add_subdirectory(basic_api)
 endif ()
