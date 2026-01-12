@@ -24,6 +24,7 @@ from asc_op_compile_base.asc_op_compiler.super_kernel import *
 from asc_op_compile_base.asc_op_compiler.ascendc_super_kernel import ascendc_super_kernel_plus
 from asc_op_compile_base.asc_op_compiler.super_kernel_constants import SuperKernelLinkMode
 from asc_op_compile_base.asc_op_compiler.super_kernel_op_compile import gen_super_kernel_link_obj_sequence
+from asc_op_compile_base.asc_op_compiler.super_kernel_utility import get_wait_flag_for_chip
 import importlib
 from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storage
 
@@ -1436,7 +1437,7 @@ Idx Name                              Size     VMA              Type
                     self.assertIn( \
                         "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));", \
                         res)
-                    self.assertIn("wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);", res)
+                    self.assertIn(f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}", res)
 
 
     def test_gen_op_end_dcci_all(self):
@@ -1501,13 +1502,13 @@ Idx Name                              Size     VMA              Type
                     self.assertEqual(res, "")
                     tmp.debug_sync_all_mode = SuperKernelDebugSyncAllMode.DebugSyncAllEnable
                     res = gen_2_real_stream_op_end_debug_sync_all_by_arch(tmp, "aic")
-                    self.assertIn("pipe_barrier(PIPE_ALL);\n\
+                    self.assertIn(f"pipe_barrier(PIPE_ALL);\n\
 ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n\
-wait_flag_dev(AscendC::SYNC_AIC_FLAG);", res)
+{get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}", res)
                     res = gen_2_real_stream_op_end_debug_sync_all_by_arch(tmp, "aiv")
-                    self.assertIn("pipe_barrier(PIPE_ALL);\n\
+                    self.assertIn(f"pipe_barrier(PIPE_ALL);\n\
 ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n\
-wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);", res)
+{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}", res)
 
 
     def test_tpl_of_gen_switch_case_call(self):
@@ -1624,13 +1625,13 @@ wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);", res)
                     res = gen_2_real_stream_code_by_arch(tmp, "aic", "x, y, z", False, sub_ops)
                     golden = f"pipe_barrier(PIPE_ALL);\n\
 ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n\
-wait_flag_dev(AscendC::SYNC_AIC_FLAG);"
+{get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}"
                     self.assertEqual(res.count(indent_code_func(golden)), 3)
 
                     res = gen_2_real_stream_code_by_arch(tmp, "aiv", "x, y, z", False, sub_ops)
                     golden = f"pipe_barrier(PIPE_ALL);\n\
 ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n\
-wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);"
+{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}"
                     self.assertEqual(res.count(indent_code_func(golden)), 3)
 
                     # test dcci all option in two real stream case
@@ -1999,11 +2000,11 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                      (KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0),
                     }
 
-                golden_extra_aic_sync_code = '''    sub_op2 wait block
+                golden_extra_aic_sync_code = f'''    sub_op2 wait block
 
     // extra sync for wait event
     ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
-    wait_flag_dev(AscendC::SYNC_AIC_FLAG);
+    {get_wait_flag_for_chip("AscendC::SYNC_AIC_FLAG")}
 '''
 
                 for sub_op1_type, sub_op2_type in wait_block_extra_sync_aiv_to_aic_pairs:

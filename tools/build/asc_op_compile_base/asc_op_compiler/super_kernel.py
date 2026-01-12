@@ -16,7 +16,7 @@ import os
 import stat
 from .global_storage import global_var_storage
 from .super_kernel_utility import KernelMetaType, \
-    CommonUtility, gen_func_align_attribute
+    CommonUtility, gen_func_align_attribute, get_wait_flag_for_chip
 from .super_kernel_op_compile import compile_super_kernel, gen_file_header
 from .super_kernel_constants import SuperKernelPreLoadMode, SuperKernelDataCacheMode, \
     SuperKernelEarlyStartMode, SubOperatorType, SuperKernelDebugDcciAllMode, SuperKernelDebugSyncAllMode, \
@@ -134,14 +134,14 @@ def get_sync_code_by_kernel_type(kernel_type):
         return "AscendC::SyncAll<false>();\n\n"
     elif kernel_type in [KernelMetaType.KERNEL_TYPE_AIC_ONLY, \
                 KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0]:
-        return """
+        return f"""
 ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
-wait_flag_dev(AscendC::SYNC_AIC_FLAG);
+{get_wait_flag_for_chip("AscendC::SYNC_AIC_FLAG")}
 """
     else:
-        return """
+        return f"""
 ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
-wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);
+{get_wait_flag_for_chip("AscendC::SYNC_AIV_ONLY_ALL")}
 """
 
 
@@ -185,11 +185,11 @@ def gen_2_real_stream_op_end_debug_sync_all_by_arch(super_operator: SuperOperato
         if arch == "aiv":
             op_end_debug_sync_all += f"pipe_barrier(PIPE_ALL);\n\
 ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n\
-wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);\n\n"
+{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}\n\n"
         elif arch == "aic":
             op_end_debug_sync_all += f"pipe_barrier(PIPE_ALL);\n\
 ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n\
-wait_flag_dev(AscendC::SYNC_AIC_FLAG);\n\n"
+{get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}\n\n"
 
     return op_end_debug_sync_all
 
@@ -300,7 +300,7 @@ def gen_2_real_stream_send_code(super_operator, op, arch):
         code = f'// Rule 1 : sync all {arch} must be insert behind each {arch} sub operator, when has real send info\n'
         code += f'// sync all C->C kernel_name:{op.kernel_name}, send_info:{op.send_info}\n'
         code += 'ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n'
-        code += 'wait_flag_dev(AscendC::SYNC_AIC_FLAG);\n\n'
+        code += f"{get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}\n\n"
 
         for single in op.send_info:
             info_pairs = op.send_info[single].split(';')
@@ -319,7 +319,7 @@ kernel_name:{op.kernel_name}, send_info:{op.send_info}\n'
         code = f'// Rule 1 : sync all {arch} must be insert behind each {arch} sub operator, when has real send info\n'
         code += f'// sync all V->V kernel_name:{op.kernel_name}, send_info:{op.send_info}\n'
         code += 'ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n'
-        code += 'wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);\n\n'
+        code += f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}\n\n"
 
         for single in op.send_info:
             info_pairs = op.send_info[single].split(';')
@@ -345,14 +345,14 @@ def gen_2_real_stream_recv_code(op, arch):
                 super_kernel_file += f'// Rule 3.2 : sync all v2c must be insert when recvinfo has v2c, \
 kernel_name:{op.kernel_name}, send_info:{op.recv_info}\n'
                 super_kernel_file += '// receive sync of V->C;\n'
-                super_kernel_file += 'wait_flag_dev(AscendC::SYNC_AIV_FLAG);\n'
+                super_kernel_file += f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_FLAG')}\n"
     else:
         for single in op.recv_info:
             if 'cub:vec' in op.recv_info[single].split(';'):
                 super_kernel_file += f'// Rule 3.2 : sync all c2v must be insert when recvinfo has c2v, \
 kernel_name:{op.kernel_name}, send_info:{op.recv_info}\n'
                 super_kernel_file += '// receive sync of C->V;\n'
-                super_kernel_file += 'wait_flag_dev(AscendC::SYNC_AIC_AIV_FLAG);\n'
+                super_kernel_file += f"{get_wait_flag_for_chip('AscendC::SYNC_AIC_AIV_FLAG')}\n"
     return super_kernel_file
 
 
@@ -393,12 +393,12 @@ def gen_sync_and_event_code_for_two_stream(super_operator, pre_sub_operator, sub
                     sync_and_event_code += '// reason3: for continues notify/wait event\n'
                     sync_and_event_code += \
                         "ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n"
-                    sync_and_event_code += "wait_flag_dev(AscendC::SYNC_AIC_FLAG);\n\n"
+                    sync_and_event_code += f"{get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}\n\n"
                 else:
                     sync_and_event_code += '// reason3: for continues notify/wait event\n'
                     sync_and_event_code += \
                         'ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n'
-                    sync_and_event_code += 'wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);\n\n'
+                    sync_and_event_code += f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}\n\n"
     else:
         # pre op send inter-core sync, cur op recv inter-core sync
         sync_and_event_code += \
@@ -748,7 +748,7 @@ if ASCEND_IS_AIC {{
     }}
     AscendC::PipeBarrier<PIPE_ALL>();
     ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
-    wait_flag_dev(AscendC::SYNC_AIC_FLAG);
+    {get_wait_flag_for_chip("AscendC::SYNC_AIC_FLAG")}
 }}
 """
     elif super_operator.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0:
@@ -767,7 +767,7 @@ if ASCEND_IS_AIV {{
     }}
     AscendC::PipeBarrier<PIPE_ALL>();
     ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
-    wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);
+    {get_wait_flag_for_chip("AscendC::SYNC_AIV_ONLY_ALL")}
 }}
 """
     else:
@@ -791,12 +791,12 @@ if ASCEND_IS_AIV {{
     }}
     AscendC::PipeBarrier<PIPE_ALL>();
     ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
-    wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+    {get_wait_flag_for_chip("AscendC::SYNC_AIV_ONLY_ALL")}
     ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
 }}
 
 if ASCEND_IS_AIC {{
-    wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+    {get_wait_flag_for_chip("AscendC::SYNC_AIV_FLAG")}
 }}
 """
         else:
@@ -815,12 +815,12 @@ if ASCEND_IS_AIV {{
     }}
     AscendC::PipeBarrier<PIPE_ALL>();
     ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
-    wait_flag_dev(AscendC::SYNC_AIV_ONLY_ALL);
+    {get_wait_flag_for_chip("AscendC::SYNC_AIV_ONLY_ALL")}
     ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
 }}
 
 if ASCEND_IS_AIC {{
-   wait_flag_dev(AscendC::SYNC_AIV_FLAG);
+   {get_wait_flag_for_chip("AscendC::SYNC_AIV_FLAG")}
 }}
 """
     return gen_code
@@ -847,10 +847,10 @@ def gen_wait_block_extra_sync(super_operator, pre_sub_operator, sub_operator):
         extra_sync += "// extra sync for wait event\n"
         extra_sync += "AscendC::SyncAll<true>();\n\n"
     elif (pre_sub_operator_device_type, sub_operator_device_type) in extra_aic_sync_pairs:
-        extra_sync += """
+        extra_sync += f"""
 // extra sync for wait event
 ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
-wait_flag_dev(AscendC::SYNC_AIC_FLAG);
+{get_wait_flag_for_chip("AscendC::SYNC_AIC_FLAG")}
 """
 
     return extra_sync
