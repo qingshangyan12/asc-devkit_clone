@@ -8972,11 +8972,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33Set0BaseM)
     tiling.SetSingleShape(384, 512, 192);
     tiling.SetBufferSpace(-1, -1, -1); // will use all buffer space if not explicitly specified
     tiling.SetMatmulConfigParams(1, false, ScheduleType::N_BUFFER_33, MatrixTraverse::NOSET, false);
-    tiling.SetFixSplit(0);
-    optiling::TCubeTiling tilingData;
-    tilingData.set_usedCoreNum(1);
-    auto ret = tiling.GetTiling(tilingData);
-
+    auto ret = tiling.SetFixSplit(0);
     EXPECT_EQ(ret, -1);
 }
 
