@@ -776,7 +776,7 @@ def gen_dynamic_shape(tiling_def, struct_tiling_def_base):
 
 class TilingInfo:
     def __init__(self):
-        self.block_dim: int = -1
+        self.block_num: int = -1
         self.task_ration: int = 2  # AscendC only support 1:2
         self.file_content: str = ""
         self.tiling_data: bytes = bytes()
@@ -798,7 +798,7 @@ class TilingInfo:
         return ",".join("{}={}".format(key, getattr(self, key)) for key in self.__dict__.keys())
 
     def init_from_dict(self, info_dict):
-        self.block_dim = info_dict["block_dim"]
+        self.block_num = info_dict["block_num"]
         self.task_ration = info_dict["task_ration"]
         self.file_content = info_dict["file_content"]
         self.tiling_data = bytes.fromhex(info_dict["tiling_data"])
@@ -818,7 +818,7 @@ class TilingInfo:
 
     def dump_to_dict(self):
         info_dict = {}
-        info_dict["block_dim"] = self.block_dim
+        info_dict["block_num"] = self.block_num
         info_dict["task_ration"] = self.task_ration
         info_dict["file_content"] = self.file_content
         info_dict["tiling_data"] = self.tiling_data.hex()
@@ -1393,7 +1393,7 @@ def get_tiling_info_v2(op_info: OpInfo, tiling_key_list: list, default_tiling_st
         tiling_info.tiling_key = run_info['tiling_key']
         if "local_memory_size" in run_info:
             tiling_info.local_memory_size = run_info["local_memory_size"]
-        tiling_info.block_dim = run_info["block_dim"]
+        tiling_info.block_num = run_info["block_dim"]
         tiling_info.clear_atomic = run_info["clear_atomic"]
         tiling_info.schedule_mode = run_info.get("schedule_mode", 0)
         total_workspace_size = sum(run_info["workspaces"])
@@ -1707,7 +1707,7 @@ def generate_static_tiling_struct_file(optype, run_info, tiling_info, tiling_key
     struct_tiling_def_base: dict = {}
     struct_tiling_def_base = get_struct_tiling_info(tiling_def, struct_tiling_def_base)
     run_info["tiling_data"], _ = _decode_tiling_data(tiling_def, run_info["tiling_data"], struct_tiling_def_base)
-    tiling_info.block_dim = run_info["block_dim"]
+    tiling_info.block_num = run_info["block_dim"]
     tiling_info.clear_atomic = run_info["clear_atomic"]
     tiling_info.schedule_mode = run_info.get("schedule_mode", 0)
     # all tiling struct info by dynamic, except the only one top-level struct of static-shape one itself

@@ -63,7 +63,7 @@ class SubOperatorInfos:
         self.called_kernel_name: dict = None
         self.origin_kernel_type_str: str = ""
         self.kernel_type: SuperKernelKernelType = ""
-        self.block_dim: int = 0
+        self.block_num: int = 0
         self.timestamp_option: bool = False
         self.debug_size: int = 0
         self.debug_option: str = ""
@@ -281,7 +281,7 @@ param_offset={self.wait_param_offset + index}\n"
                 self.split_mode_in_json = sub_operater_infos.get("split_mode")
                 self.origin_kernel_type_str: str = sub_operater_infos["sub_operator_kernel_type"]
                 self.kernel_type: SuperKernelKernelType = STR_TO_SK_KERNEL_TYPE[self.origin_kernel_type_str]
-                self.block_dim: int = sub_operater_infos["blockDim"]
+                self.block_num: int = sub_operater_infos["blockDim"]
                 self.timestamp_option: bool = "timestamp" in sub_operater_infos.get("debugOptions", "") \
                             or "printf" in sub_operater_infos.get("debugOptions", "") \
                             or "assert" in sub_operater_infos.get("debugOptions", "")
@@ -327,7 +327,7 @@ operator inherits super kernel opton."))
             aicore_kernel_name = kernel_info_of_tiling_key["AiCore"]
             case_block = f"""
 {self.gen_select_addr_code('aiv_func_addr', aicore_kernel_name)}
-dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
+dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
 """
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
@@ -335,7 +335,7 @@ dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
             aicore_kernel_name = kernel_info_of_tiling_key["AiCore"]
             case_block = f"""
 {self.gen_select_addr_code('aic_func_addr', aicore_kernel_name)}
-dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
+dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
 """
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
@@ -343,7 +343,7 @@ dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
             aicore_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-vec"]
             case_block = f"""
 {self.gen_select_addr_code('aiv_func_addr', aicore_kernel_name)}
-dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
+dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
 """
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
@@ -351,7 +351,7 @@ dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
             aicore_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-cube"]
             case_block = f"""
 {self.gen_select_addr_code('aic_func_addr', aicore_kernel_name)}
-dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
+dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
 """
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
@@ -362,7 +362,7 @@ dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
             case_block = f"""
 {self.gen_select_addr_code('aiv_func_addr', aiv_kernel_name)}
 {self.gen_select_addr_code('aic_func_addr', aic_kernel_name)}
-dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
+dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
 """
             self.sub_kernel_names.append(aiv_kernel_name)
             self.kernel_declare += self._gen_sub_kernel_decare_once(aiv_kernel_name, params_with_type)
@@ -425,9 +425,9 @@ f"""if (*tilingKeyAddr < {input_blocks[total_length//2][1]}) {{
 // begin implement of dynamic op {self.kernel_name}
 static __aicore__ void switch_func_of_{self.kernel_name}(GM_ADDR __ac_dynamic_tiling_key_{self.index}, \
 GM_ADDR __ac_dynamic_block_dim_{self.index}, GM_ADDR __ac_wait_lock_{self.index}, \
-{aiv_func_addr_str}, {aic_func_addr_str}, uint64_t& dy_block_dim) {{
+{aiv_func_addr_str}, {aic_func_addr_str}, uint64_t& dy_block_num) {{
     __gm__ uint64_t* tilingKeyAddr = reinterpret_cast<__gm__ uint64_t*>(__ac_dynamic_tiling_key_{self.index});
-    __gm__ uint64_t* blockDimAddr = reinterpret_cast<__gm__ uint64_t*>(__ac_dynamic_block_dim_{self.index});
+    __gm__ uint64_t* blockNumAddr = reinterpret_cast<__gm__ uint64_t*>(__ac_dynamic_block_dim_{self.index});
     __gm__ volatile uint64_t* lockAddr = reinterpret_cast<__gm__ uint64_t*>(__ac_wait_lock_{self.index});
     dcci(lockAddr, 0, 2);
     while(*lockAddr != 1) {{
@@ -467,7 +467,7 @@ GM_ADDR __ac_dynamic_block_dim_{self.index}, GM_ADDR __ac_wait_lock_{self.index}
         aic_func_addr = self.gen_param_code('aic_func_addr')
         self.kernel_call_block += self.gen_dcci_before_kernel_start_call_block()
         self.kernel_call_block += \
-            f"call_func_of_{self.kernel_name}({self.param_offset}, {aiv_func_addr}, {aic_func_addr}, dy_blockDim);\n"
+            f"call_func_of_{self.kernel_name}({self.param_offset}, {aiv_func_addr}, {aic_func_addr}, dy_blockNum);\n"
         self.kernel_call_block += self.gen_dcci_after_kernel_end_call_block()
         if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, \
                 SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0]:
@@ -495,10 +495,10 @@ GM_ADDR __ac_dynamic_block_dim_{self.index}, GM_ADDR __ac_wait_lock_{self.index}
         dynamic_impl_func_block = ""
         dynamic_impl_func_block += f"""
 __aicore__ inline void call_func_of_{self.kernel_name}(uint64_t args_offset, \
-{dy_aiv_func_ptr}, {dy_aic_func_ptr}, const uint64_t dy_block_dim) {{
-    uint64_t kernelType = dy_block_dim  >> 32;
-    uint64_t blockDim = __placehoder__spk_block_dim__;
-    g_super_kernel_dynamic_block_num = dy_block_dim & 0xFFFFFFFF;
+{dy_aiv_func_ptr}, {dy_aic_func_ptr}, const uint64_t dy_block_num) {{
+    uint64_t kernelType = dy_block_num  >> 32;
+    uint64_t numBlocks = __placehoder__spk_block_dim__;
+    g_super_kernel_dynamic_block_num = dy_block_num & 0xFFFFFFFF;
     {func_type}
     """
         dynamic_impl_func_block += f"""
@@ -514,7 +514,7 @@ __aicore__ inline void call_func_of_{self.kernel_name}(uint64_t args_offset, \
         dynamic_impl_func_block += f"""
     if (kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1.value} || \
 kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2.value}) {{
-        if (get_block_idx() < blockDim) {{
+        if (get_block_idx() < numBlocks) {{
             uint8_t coreid = get_coreid();
             if ASCEND_IS_AIC {{
                 {self.dynamic_gen_split_call_code('aic_ptr', "args_offset")}
@@ -524,7 +524,7 @@ kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2.value}) {{
         }}
     }} else if(kernelType == {SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY.value} || \
 kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0.value}) {{
-        if (AscendC::GetBlockIdx() < blockDim) {{
+        if (AscendC::GetBlockIdx() < numBlocks) {{
             uint8_t coreid = get_coreid();
             if ASCEND_IS_AIV{{
                 {self.dynamic_gen_split_call_code('aiv_ptr', "args_offset")}
@@ -532,7 +532,7 @@ kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0.value}) {{
         }}
     }} else if (kernelType == {SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY.value} || \
 kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0.value}) {{
-        if (get_block_idx() < blockDim) {{
+        if (get_block_idx() < numBlocks) {{
             uint8_t coreid = get_coreid();
             if ASCEND_IS_AIC {{
                 {self.dynamic_gen_split_call_code('aic_ptr', "args_offset")}
@@ -553,17 +553,17 @@ kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0.value}) {{
 
 
     def process_of_dynamic_op(self, enable_double_stream: bool):
-        # set sub_op_task_type to append extra params: block_dim, tiling_key, lock
+        # set sub_op_task_type to append extra params: block_num, tiling_key, lock
         self.sub_op_task_type = SubOperatorType.DYNAMIC_OP
 
         # add bin path to dynamic_bin for link
         self.dynamic_bin = self.bin_path
-        #set block_dim to max
+        #set block_num to max
         if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, \
                 SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0]:
-            self.block_dim = int(get_soc_spec('vector_core_cnt'))
+            self.block_num = int(get_soc_spec('vector_core_cnt'))
         else:
-            self.block_dim = int(get_soc_spec('ai_core_cnt'))
+            self.block_num = int(get_soc_spec('ai_core_cnt'))
         self.extra_kernel_params = [f"__ac_dynamic_tiling_key_{self.index}", f"__ac_dynamic_block_dim_{self.index}", \
                                     f"__ac_wait_lock_{self.index}"]
         aiv_func_addr_str = self.gen_param_code('aiv_func_addr')
@@ -572,7 +572,7 @@ kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0.value}) {{
         self.call_dynamic_switch_func = \
             f"switch_func_of_{self.kernel_name}(param_base[{dynamic_extra_param_offset}], \
 param_base[{dynamic_extra_param_offset + 1}], param_base[{dynamic_extra_param_offset + 2}], \
-{aiv_func_addr_str}, {aic_func_addr_str}, dy_blockDim);\n"
+{aiv_func_addr_str}, {aic_func_addr_str}, dy_blockNum);\n"
 
         self.gen_switch_code_of_dynamic_op()
 
@@ -693,8 +693,8 @@ f"""else {{
     def gen_call_func(self, indent_code, core_type, block_type, is_preload=False):
         vector_call_func_block = f"if {core_type} {{\n"
         split_times = len(indent_code)
-        block_dim = self.block_dim
-        vector_call_func_block += f"  if ({block_type}() < {block_dim}) {{\n"
+        block_num = self.block_num
+        vector_call_func_block += f"  if ({block_type}() < {block_num}) {{\n"
         if not is_preload:
             vector_call_func_block += indent_code_func(self.gen_dcci_before_kernel_start_call_block())
 
@@ -721,8 +721,8 @@ f"""else {{
     def gen_call_func_with_syncall(self, indent_code, core_type, block_type):
         vector_call_func_block = f"if {core_type} {{\n"
         split_times = len(indent_code)
-        block_dim = self.block_dim
-        vector_call_func_block += f"  if ({block_type}() < {block_dim}) {{\n"
+        block_num = self.block_num
+        vector_call_func_block += f"  if ({block_type}() < {block_num}) {{\n"
         vector_call_func_block += indent_code_func(self.gen_dcci_before_kernel_start_call_block())
 
         if split_times > 1:
@@ -838,7 +838,7 @@ f"""else {{
             preload_call_block = self._gen_preload_list(aicore_kernel_name, self.aiv_text_len)
             self.preload_call_block = \
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIV", f"AscendC::GetBlockIdx", is_preload=True)
-            self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"AscendC::GetBlockIdx() >= {self.block_dim}")
+            self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"AscendC::GetBlockIdx() >= {self.block_num}")
             self.set_early_start_complement_blocks("ASCEND_IS_AIC", "true")
         elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY:
             aicore_kernel_name = self.called_kernel_name["AiCore"]["func_name"]
@@ -852,7 +852,7 @@ f"""else {{
             preload_call_block = self._gen_preload_list(aicore_kernel_name, self.aic_text_len)
             self.preload_call_block = \
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIC", "get_block_idx", is_preload=True)
-            self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_dim}")
+            self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_num}")
             self.set_early_start_complement_blocks("ASCEND_IS_AIV", "true")
         elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0:
             aicore_kernel_name = self.called_kernel_name[f"dav-{chip_version}-vec"]["func_name"]
@@ -866,7 +866,7 @@ f"""else {{
             preload_call_block = self._gen_preload_list(aicore_kernel_name, self.aiv_text_len)
             self.preload_call_block = \
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIV", f"AscendC::GetBlockIdx", is_preload=True)
-            self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"AscendC::GetBlockIdx() >= {self.block_dim}")
+            self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"AscendC::GetBlockIdx() >= {self.block_num}")
             self.set_early_start_complement_blocks("ASCEND_IS_AIC", "true")
         elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0:
             aicore_kernel_name = self.called_kernel_name[f"dav-{chip_version}-cube"]["func_name"]
@@ -880,7 +880,7 @@ f"""else {{
             preload_call_block = self._gen_preload_list(aicore_kernel_name, self.aic_text_len)
             self.preload_call_block = \
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIC", "get_block_idx", is_preload=True)
-            self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_dim}")
+            self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_num}")
             self.set_early_start_complement_blocks("ASCEND_IS_AIV", "true")
         elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1:  
             # need check of sub block id
@@ -906,8 +906,8 @@ f"""else {{
             preload_call_block = self._gen_preload_list(aicore_kernel_name, self.aiv_text_len)
             self.preload_call_block += \
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIV", "get_block_idx", is_preload=True)
-            self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_dim}")
-            self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"get_block_idx() >= {self.block_dim}")
+            self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_num}")
+            self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"get_block_idx() >= {self.block_num}")
         elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2:
             aicore_kernel_name = self.called_kernel_name[f"dav-{chip_version}-cube"]["func_name"]
             self.sub_kernel_names.append(aicore_kernel_name)
@@ -931,7 +931,7 @@ f"""else {{
             preload_call_block = self._gen_preload_list(aicore_kernel_name, self.aiv_text_len)
             self.preload_call_block += \
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIV", "get_block_idx", is_preload=True)
-            self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_dim}")
-            self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"get_block_idx() >= {self.block_dim}")
+            self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_num}")
+            self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"get_block_idx() >= {self.block_num}")
         else:
             CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"kernel type {self.kernel_type} do not support!"))

@@ -117,7 +117,7 @@ def _json_except_info(compile_info: CompileInfo):
             sub_operater_infos = json.load(fd)
             sub_dfx_info["func_name"] = sub_operater_infos["kernelName"]
             sub_dfx_info["split_mode"] = sub_operater_infos.get("split_mode")
-            sub_dfx_info["blockDim"] = sub_operater_infos["blockDim"]
+            sub_dfx_info["blockNum"] = sub_operater_infos["blockDim"]
             sub_dfx_info["sub_operator_kernel_type"] = sub_operater_infos["sub_operator_kernel_type"]
             sub_dfx_info["sub_operator_early_start_set_flag"] = \
             sub_operater_infos['sub_operator_early_start_set_flag']
@@ -1380,7 +1380,7 @@ def _compile_ascendc_cce(compile_info: CompileInfo, compile_option_tuple, tiling
 
         CommonUtility.run_cmd_inner(compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path)
         target = "cce_core"
-        tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_dim)
+        tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_num)
     else:
         obj_files = []
         for tiling_key in compile_info.tiling_key_list:
@@ -1400,7 +1400,7 @@ def _compile_ascendc_cce(compile_info: CompileInfo, compile_option_tuple, tiling
             os.path.basename(compile_info.dst_file)[:-2], compile_info.compile_log_path)
         fatbin_objs(obj_files, compile_info.dst_file, compile_info.is_debug, compile_info.compile_log_path)
         target = "cce_core"
-        tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_dim)
+        tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_num)
         _dynamic_kernel_list_to_json(compile_info.kernel_name, compile_info.tiling_key_list, \
             compile_info.enable_deterministic, compile_info.tiling_key_deterministic)
 
@@ -2059,7 +2059,7 @@ def _call_bisheng_regbase(compile_info: CompileInfo, compile_option_tuple, tilin
         target = "cce_core"
         core_type_info = {"core_type": ""}
 
-        tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_dim, \
+        tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_num, \
                                     0, "", None, None, core_type_info, None, None, False, 1, None, None)
     else:
         obj_files = []

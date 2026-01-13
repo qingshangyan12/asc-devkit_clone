@@ -95,7 +95,7 @@ class TestAscendCCompileBase(unittest.TestCase):
 
         compile_option_tuple = CompileOptionTuple([], [])
         tiling_info = TilingInfo()
-        tiling_info.block_dim = 10
+        tiling_info.block_num = 10
         sp_add_sub_op_block_dim_macro(compile_option_tuple, tiling_info)
         self.assertEqual(len(compile_option_tuple.compile_options), 1)
         self.assertIn("-D__SUPER_KERNEL_STATIC_BLOCK_NUM__=10", compile_option_tuple.compile_options)

@@ -421,7 +421,7 @@ auto_gen_{super_operator.kernel_name}_kernel_{arch}(void) {{\n"
     if exits_dynamic_op is True:
         super_kernel_file += "    uint64_t aiv_func_addr = 0;\n"
         super_kernel_file += "    uint64_t aic_func_addr = 0;\n"
-        super_kernel_file += "    uint64_t dy_blockDim = 0;\n"
+        super_kernel_file += "    uint64_t dy_blockNum = 0;\n"
         if super_operator.split_mode > 1:
             for i in range(1, super_operator.split_mode):
                 super_kernel_file += f"    uint64_t aiv_func_addr_split{i} = 0;\n"
@@ -687,21 +687,21 @@ indent_code_func(f'    auto_gen_{super_operator.kernel_name}_kernel_{arch}();\n'
 def judge_need_feed_sync_all(super_operator, sub_op):
     if sub_op.with_sync_all is False:
         return False
-    if super_operator.block_dim == sub_op.block_dim and super_operator.kernel_type == sub_op.kernel_type:
+    if super_operator.block_num == sub_op.block_num and super_operator.kernel_type == sub_op.kernel_type:
         return False
     if super_operator.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, \
         SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1]:
-        if sub_op.block_dim < super_operator.block_dim:
+        if sub_op.block_num < super_operator.block_num:
             return True
     else:
         if sub_op.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, \
             SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, \
             SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY]:
-            if sub_op.block_dim < super_operator.block_dim:
+            if sub_op.block_num < super_operator.block_num:
                 return True
         elif sub_op.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, \
             SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY]:
-            if sub_op.block_dim < super_operator.block_dim * 2:
+            if sub_op.block_num < super_operator.block_num * 2:
                 return True
     return False
 
@@ -946,7 +946,7 @@ auto_gen_{super_operator.kernel_name}_kernel(void) {{\n"
     if exits_dynamic_op is True:
         super_kernel_file += "    uint64_t aiv_func_addr = 0;\n"
         super_kernel_file += "    uint64_t aic_func_addr = 0;\n"
-        super_kernel_file += "    uint64_t dy_blockDim = 0;\n"
+        super_kernel_file += "    uint64_t dy_blockNum = 0;\n"
         if super_operator.split_mode > 1:
             for i in range(1, super_operator.split_mode):
                 super_kernel_file += f"    uint64_t aiv_func_addr_split{i} = 0;\n"

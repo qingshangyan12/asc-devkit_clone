@@ -1025,7 +1025,7 @@ Idx Name                              Size     VMA              Type
                 tmp.early_start_set_flag = False
                 with mock.patch('asc_op_compile_base.common.platform.platform_info.get_soc_spec', {'ai_core_cnt': 10}):
                     tmp.process_of_dynamic_op(True)
-                    self.assertNotEqual(tmp.block_dim, 9999)
+                    self.assertNotEqual(tmp.block_num, 9999)
                 
     def test_extract_sub_bin_file(self):
         op_options = {'split-mode': 1, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable,
@@ -1294,11 +1294,11 @@ Idx Name                              Size     VMA              Type
                         op_options, compile_log_path)
                 sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                 sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-                sub_tmp2.block_dim = 2
-                sub_tmp1.block_dim = 1
+                sub_tmp2.block_num = 2
+                sub_tmp1.block_num = 1
                 tmp.info_base = [sub_tmp1, sub_tmp2]
                 tmp.get_summary_type_and_options()
-                self.assertTrue(tmp.block_dim, 1)
+                self.assertTrue(tmp.block_num, 1)
 
     def test_find_sub_kernel_name(self):
         op_options = {'split-mode': 4, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable}
@@ -1766,11 +1766,11 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                         op_options, compile_log_path)
                     sub_tmp1.kernel_params = ""
                     sub_ops = [sub_tmp1]
-                    tmp.block_dim = 24
+                    tmp.block_num = 24
                     tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                     tmp.profiling_mode = SuperKernelProfilingMode.ProfilingEnable
                     tmp.info_base = [sub_tmp1]
-                    sub_tmp1.block_dim = 20
+                    sub_tmp1.block_num = 20
                     sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                     sub_tmp1.with_sync_all = True
                     tmp.info_base = sub_ops
@@ -1790,27 +1790,25 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     self.assertEqual(flag, False)
                     code, ret = gen_feed_syncall_var_init_code(tmp, sub_tmp1)
                     self.assertEqual(ret, False)
-
                     sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
-                    sub_tmp1.block_dim = 24
+                    sub_tmp1.block_num = 24
                     sub_tmp1.with_sync_all = True
                     flag = judge_need_feed_sync_all(tmp, sub_tmp1)
                     self.assertEqual(flag, False)
-                    sub_tmp1.block_dim = 20
+                    sub_tmp1.block_num = 20
                     tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                     flag = judge_need_feed_sync_all(tmp, sub_tmp1)
                     self.assertEqual(flag, True)
                     code, ret = gen_feed_syncall_var_init_code(tmp, sub_tmp1)
                     self.assertEqual(ret, True)
-
                     tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                     sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY
-                    sub_tmp1.block_dim = 10
-                    tmp.block_dim = 24
+                    sub_tmp1.block_num = 10
+                    tmp.block_num = 24
                     flag = judge_need_feed_sync_all(tmp, sub_tmp1)
                     self.assertEqual(flag, True)
 
-                    sub_tmp1.block_dim = 48
+                    sub_tmp1.block_num = 48
                     flag = judge_need_feed_sync_all(tmp, sub_tmp1)
                     self.assertEqual(flag, False)
 
@@ -1866,7 +1864,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     "super_kernel")
                     tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                     tmp.feed_sync_all_mode = SuperKernelFeedSyncAllMode.FeedSyncAllEnable
-                    tmp.block_dim = 1
+                    tmp.block_num = 1
                     tmp.calc_workspace_size()
                     self.assertEqual(tmp.workspace_size, 512)
                     tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2

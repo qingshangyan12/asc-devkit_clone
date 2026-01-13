@@ -86,9 +86,9 @@ def gen_sub_super_kernel_early_start_compile_options(compile_option_tuple, compi
 
 
 def sp_add_sub_op_block_dim_macro(compile_option_tuple, tiling_info):
-    if tiling_info.block_dim != -1:
+    if tiling_info.block_num != -1:
         # static cases
-        compile_option_tuple.compile_options.append(f"-D__SUPER_KERNEL_STATIC_BLOCK_NUM__={tiling_info.block_dim}")
+        compile_option_tuple.compile_options.append(f"-D__SUPER_KERNEL_STATIC_BLOCK_NUM__={tiling_info.block_num}")
     else:
         # dynamic cases
         compile_option_tuple.compile_options.append(f"-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")

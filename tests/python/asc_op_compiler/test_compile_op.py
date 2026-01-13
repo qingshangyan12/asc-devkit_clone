@@ -3756,7 +3756,7 @@ Contents of section
                     "block_dim": 1, "clear_atomic": 0, "schedule_mode": 0, "workspaces": [], "ret_code": False})
         ):
             tiling_info = get_tiling_info(op_info, ['1'], None, False, {})
-            self.assertEqual(tiling_info.block_dim, 1)
+            self.assertEqual(tiling_info.block_num, 1)
             self.assertEqual(tiling_info.clear_atomic, 0)
             self.assertEqual(tiling_info.schedule_mode, 0)
 
