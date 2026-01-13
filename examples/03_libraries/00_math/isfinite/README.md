@@ -1,6 +1,6 @@
 # IsFinite样例
 ## 概述
-本样例介绍了基于Ascend C异构混合编程模型演示IsFinite融合算子的核函数直调实现，按元素判断输入的浮点数是否非NAN、非INF，输出结果为浮点数或者布尔值。
+本样例介绍了高阶api IsFinite的调用，该api的功能为按元素判断输入的浮点数是否非NAN、非INF，输出结果为浮点数或者布尔值。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT

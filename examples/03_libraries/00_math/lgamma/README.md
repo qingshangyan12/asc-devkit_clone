@@ -1,6 +1,6 @@
 # Lgamma样例
 ## 概述
-本样例介绍了基于Ascend C异构混合编程模型演示Lgamma融合算子的核函数直调实现，按元素计算x的gamma函数的绝对值并求自然对数。
+本样例介绍了高阶api Lgamma的调用，该api的功能为按元素计算x的gamma函数的绝对值并求自然对数。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
