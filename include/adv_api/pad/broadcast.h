@@ -15,8 +15,8 @@
 #ifndef LIB_PAD_BROADCAST_H
 #define LIB_PAD_BROADCAST_H
 
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
 #include "../../../impl/adv_api/detail/pad/broadcast/broadcast_common_impl.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \

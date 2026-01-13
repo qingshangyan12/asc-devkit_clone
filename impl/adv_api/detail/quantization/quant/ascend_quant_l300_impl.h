@@ -17,6 +17,7 @@
 #include "kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "include/adv_api/quantization/ascend_quant_utils.h"
+#include "../../common/check.h"
 
 namespace AscendC {
 constexpr uint32_t ASCENDC_QUANT_B16_VF_LEN = GetVecLen() / sizeof(uint16_t);

@@ -11,6 +11,9 @@
 
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "impl/adv_api/detail/api_check/kernel_check/normalization/deepnorm/deepnorm_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 class DeepNormAPICheck : public testing::Test {

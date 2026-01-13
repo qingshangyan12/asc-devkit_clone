@@ -20,6 +20,9 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "membase/common/logsoftmax_common_impl.h"
 #endif
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/activation/softmax/log_softmax/log_softmax_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {

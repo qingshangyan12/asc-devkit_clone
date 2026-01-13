@@ -15,6 +15,10 @@
 #ifndef IMPL_PAD_PAD_PAD_COMMON_IMPL_H
 #define IMPL_PAD_PAD_PAD_COMMON_IMPL_H
 
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/pad/pad/pad_check.h"
+#include "../../api_check/kernel_check/pad/pad/unpad_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002)
 #include "pad_v200_impl.h"

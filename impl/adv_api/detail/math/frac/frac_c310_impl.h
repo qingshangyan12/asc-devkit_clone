@@ -16,6 +16,7 @@
 #define IMPL_MATH_FRAC_FRAC_C310_IMPL_H
 
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 
 namespace AscendC {
 namespace FRAC {

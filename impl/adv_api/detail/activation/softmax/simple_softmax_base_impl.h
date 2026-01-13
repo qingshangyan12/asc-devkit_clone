@@ -27,6 +27,9 @@
 #include "membase/v200/simple_softmax_impl.h"
 #include "softmax_common/softmax_common_simple.h"
 #endif
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/activation/softmax/simple_softmax/simple_softmax_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {

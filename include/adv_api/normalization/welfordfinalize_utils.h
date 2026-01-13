@@ -15,6 +15,9 @@
 #ifndef LIB_NORMALIZATION_WELFORDFINALIZE_UTILS_H
 #define LIB_NORMALIZATION_WELFORDFINALIZE_UTILS_H
 
+#include <cstdint>
+#include "kernel_basic_intf.h"
+
 namespace AscendC {
 struct WelfordFinalizeConfig {
     __aicore__ constexpr WelfordFinalizeConfig(const bool isCorrectionIn)

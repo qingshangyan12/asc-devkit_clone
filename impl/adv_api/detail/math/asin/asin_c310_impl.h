@@ -15,6 +15,7 @@
 #ifndef IMPL_MATH_ASIN_ASIN_C310_IMPL_H
 #define IMPL_MATH_ASIN_ASIN_C310_IMPL_H
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "../math_constant_util.h"
 #include "../../common/check.h"
 

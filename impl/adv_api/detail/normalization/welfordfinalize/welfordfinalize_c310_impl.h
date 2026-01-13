@@ -16,9 +16,11 @@
 #define IMPL_NORMALIZATION_WELFORDFINALIZE_C310_IMPL_H
 
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "include/adv_api/normalization/welfordfinalize_utils.h"
+#include "../layernorm/layernorm_c310_utils.h"
 
 namespace AscendC {
 namespace Internal {

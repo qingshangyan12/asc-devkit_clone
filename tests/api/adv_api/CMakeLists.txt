@@ -52,6 +52,8 @@ file(GLOB ASCENDC_TEST_ascend610_CASE_SRC_FILES
 
 # ascend310p test cases
 file(GLOB ASCENDC_TEST_ASCEND310P_CASE_SRC_PART_FILES
+    utils/init_global_memory/test_operator_init_global_memory.cpp
+    quantization/antiquant/test_ascend_antiquant_m200.cpp
     activation/sigmoid/test_operator_vec_sigmoid.cpp
     pad/broadcast/test_operator_broadcast_v200.cpp
     math/erf/test_operator_erf.cpp
@@ -115,6 +117,7 @@ file(GLOB ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES
     math/erf/test_operator_erf.cpp
     math/erfc/test_operator_erfc.cpp
     math/exp/test_operator_exp.cpp
+    math/exp/test_operator_exphighprecision.cpp
     math/floor/test_operator_floor.cpp
     math/frac/test_operator_frac.cpp
     # math/lgamma/test_operator_lgamma.cpp
@@ -253,6 +256,8 @@ file(GLOB ASCENDC_TEST_ascend910_9599_AIC_CASE_SRC_FILES
     matmul/lib/test_matmul_client.cpp
 )
 file(GLOB ASCENDC_TEST_ascend910_9599_AIV_CASE_SRC_FILES
+    #utils
+    utils/init_global_memory/test_operator_init_global_memory.cpp
     #activate
     activation/gelu/test_operator_fast_gelu.cpp
     activation/gelu/test_operator_fast_gelu_v2.cpp

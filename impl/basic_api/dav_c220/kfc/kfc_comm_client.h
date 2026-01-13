@@ -15,6 +15,7 @@
 #ifndef __KERNEL_KFC_COMM_CLIENT_H__
 #define __KERNEL_KFC_COMM_CLIENT_H__
 
+#include "kernel_macros.h"
 #include "kfc_comm.h"
 
 namespace AscendC {

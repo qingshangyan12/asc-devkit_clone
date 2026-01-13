@@ -15,8 +15,8 @@
 #ifndef IMPL_QUANTIZATION_ANTIQUANTIZE_C310_IMPL_H
 #define IMPL_QUANTIZATION_ANTIQUANTIZE_C310_IMPL_H
 
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #include "antiquantize_common.h"
 #include "../antiquant/ascend_antiquant_c310_impl.h"

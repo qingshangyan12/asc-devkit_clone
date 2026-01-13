@@ -15,6 +15,8 @@
 #ifndef IMPL_MATH_ATANH_ATANH_C310_IMPL_H
 #define IMPL_MATH_ATANH_ATANH_C310_IMPL_H
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
+#include "../../common/common.h"
 #include "../../common/check.h"
  
 namespace AscendC {

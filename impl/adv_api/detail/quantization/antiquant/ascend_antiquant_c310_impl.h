@@ -16,9 +16,11 @@
 #define IMPL_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_C310_IMPL_H
 
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
+#include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #include "ascend_antiquant_common.h"
+#include "../../quantization/quant/ascend_quant_c310_impl.h"
+#include "../../common/check.h"
 
 namespace AscendC {
 constexpr uint32_t ANTIQUANT_B16_VF_LEN = GetVecLen() / sizeof(uint16_t);

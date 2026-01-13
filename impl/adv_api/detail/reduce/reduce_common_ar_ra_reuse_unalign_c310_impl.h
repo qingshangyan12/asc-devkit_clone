@@ -10,7 +10,7 @@
 #ifndef IMPL_REDUCE_REDUCE_COMMON_AR_RA_REUSE_UNALIGN_C310_IMPL_H
 #define IMPL_REDUCE_REDUCE_COMMON_AR_RA_REUSE_UNALIGN_C310_IMPL_H
 
-#include "kernel_operator_intf.h"
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
 #include "reduce_common_util_impl.h"
 #include "reduce_common_util_c310_impl.h"

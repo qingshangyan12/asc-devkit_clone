@@ -18,6 +18,9 @@
 #include "kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "kernel_pop_stack_buffer.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../../../api_check/kernel_check/normalization/layernormgrad/layernormgrad_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../../../api_check/kernel_api_check.h"
 #include "layernormgrad_c310_utils.h"
 constexpr uint32_t LAYERNORM_GRAD_B32_BYTE_SIZE = 4;

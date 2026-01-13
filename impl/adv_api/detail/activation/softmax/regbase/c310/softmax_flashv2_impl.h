@@ -16,6 +16,8 @@
 #define IMPL_ACTIVATION_SOFTMAX_C310_SOFTMAX_FLASHV2_IMPL_H
 
 #include "softmax_common_impl.h"
+#include "softmax_impl.h"
+#include "../../../../common/common.h"
 
 namespace AscendC {
 

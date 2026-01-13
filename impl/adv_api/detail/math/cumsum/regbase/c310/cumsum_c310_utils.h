@@ -15,8 +15,8 @@
 #ifndef IMPL_MATH_CUMSUM_CUMSUM_C310_UTILS_H
 #define IMPL_MATH_CUMSUM_CUMSUM_C310_UTILS_H
 
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
 
 namespace AscendC {
 

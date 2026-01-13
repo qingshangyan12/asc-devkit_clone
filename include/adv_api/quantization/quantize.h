@@ -20,6 +20,7 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 #include "include/adv_api/quantization/quantize_utils.h"
+#include "../../../impl/adv_api/detail/common/check.h"
 #include "../../../impl/adv_api/detail/quantization/quantize/quantize_impl.h"
 namespace AscendC {
 #pragma begin_pipe(V)

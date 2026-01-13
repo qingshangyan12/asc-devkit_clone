@@ -15,8 +15,8 @@
 #ifndef IMPL_PAD_BROADCAST_BROADCAST_C310_IMPL_H
 #define IMPL_PAD_BROADCAST_BROADCAST_C310_IMPL_H
 
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
 #include "broadcast_gather_c310_impl.h"
 
 namespace AscendC {

@@ -15,6 +15,7 @@
 #ifndef DETAIL_MATH_FLOOR_FLOOR_C310_IMPL_H
 #define DETAIL_MATH_FLOOR_FLOOR_C310_IMPL_H
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../common/check.h"
  

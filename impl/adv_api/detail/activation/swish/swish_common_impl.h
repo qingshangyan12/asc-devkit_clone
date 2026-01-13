@@ -20,7 +20,10 @@
 #include "kernel_log.h"
 #endif
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
+#include "kernel_basic_intf.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/activation/swish/swish_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {

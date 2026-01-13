@@ -28,6 +28,69 @@ asc-devkit:
       - impl/c_api/**/*.h
       - impl/**/dav_l300/*.h
       - impl/**/dav_l311/*.h
+      - impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0_def.h
+      - impl/adv_api/detail/hccl/common/hccl_inner_def.h
+      - impl/adv_api/detail/math/lgamma/lgamma_common_impl.h
+      - impl/adv_api/detail/normalization/layernormgrad/layernormgrad_common_impl.h
+      - impl/adv_api/detail/normalization/rmsnorm/rmsnorm_c310_impl.h
+      - impl/adv_api/detail/math/asinh/asinh_common_impl.h
+      - impl/adv_api/detail/reduce/reduce_mean/reduce_mean_c310_impl.h
+      - impl/adv_api/detail/math/xor/xor_c310_impl.h
+      - impl/adv_api/detail/api_check/kernel_api_check.h
+      - impl/adv_api/detail/normalization/layernormgrad/regbase/c310/layernormgrad_c310_impl.h
+      - impl/adv_api/detail/normalization/batchnorm/batchnorm_c310_impl.h
+      - impl/adv_api/detail/quantization/antiquant/ascend_antiquant_m200_impl.h
+      - impl/adv_api/detail/math/axpy/axpy_c310_impl.h
+      - impl/adv_api/detail/math/floor/floor_v200_impl.h
+      - impl/adv_api/detail/activation/softmax/softmax_flash_base_impl/softmax_flash_basic_block_impl.h
+      - impl/adv_api/detail/pad/pad/pad_v200_impl.h
+      - impl/adv_api/detail/common/common.h
+      - impl/adv_api/detail/normalization/layernormgrad/regbase/c310/layernormgrad_c310_utils.h
+      - impl/adv_api/detail/normalization/rmsnorm/rmsnorm_v220_impl.h
+      - impl/adv_api/detail/filter/dropout/dropout_m300_impl.h
+      - impl/adv_api/detail/conv/conv3d/conv3d_util.h
+      - impl/adv_api/detail/conv/conv3d/conv3d_api_impl.h
+      - impl/adv_api/detail/normalization/rmsnorm/rmsnorm_v200_impl.h
+      - impl/adv_api/detail/conv_backprop/conv3d_backprop_input/conv3d_bp_input_func.h
+      - impl/adv_api/detail/quantization/antiquant/ascend_antiquant_l300_impl.h
+      - impl/adv_api/detail/conv_backprop/conv3d_backprop_filter/conv3d_bp_filter_impl_base.h
+      - impl/adv_api/detail/conv_backprop/conv3d_backprop_input/conv3d_bp_input_impl_base.h
+      - impl/adv_api/detail/conv/conv3d/conv3d_common_init_func.h
+      - impl/adv_api/detail/conv_backprop/conv3d_backprop_input/dav_v220/conv3d_bp_kernel_split.h
+      - impl/adv_api/detail/conv/conv3d/conv3d_common_set_func.h
+      - impl/adv_api/detail/conv_backprop/conv3d_backprop_filter/conv3d_bp_filter_func.h
+      - impl/adv_api/detail/math/asin/asin_c310_impl.h
+      - impl/adv_api/detail/math/cos/cos_v200_impl.h
+      - impl/adv_api/detail/math/trunc/trunc_c310_impl.h
+      - impl/adv_api/detail/math/frac/frac_c310_impl.h
+      - impl/adv_api/detail/math/lgamma/lgamma_v220_impl.h
+      - impl/adv_api/detail/math/floor/floor_c310_impl.h
+      - impl/adv_api/detail/math/lgamma/lgamma_common_basic_impl.h
+      - impl/adv_api/detail/math/acos/acos_c310_impl.h
+      - impl/adv_api/detail/math/math_constant_util.h
+      - impl/adv_api/detail/math/atanh/atanh_c310_impl.h
+      - impl/adv_api/detail/math/digamma/digamma_v200_impl.h
+      - impl/adv_api/detail/math/frac/frac_v200_impl.h
+      - impl/adv_api/detail/math/math_common_impl.h
+      - impl/adv_api/detail/math/tan/tan_v200_impl.h
+      - impl/adv_api/detail/math/cosh/cosh_v200_impl.h
+      - impl/adv_api/detail/normalization/deepnorm/deepnorm_v200_impl.h
+      - impl/adv_api/detail/math/lgamma/lgamma_v200_impl.h
+      - impl/adv_api/detail/math/asinh/asinh_c310_impl.h
+      - impl/adv_api/detail/math/erfc/erfc_c310_impl.h
+      - impl/adv_api/detail/math/acosh/acosh_c310_impl.h
+      - impl/adv_api/detail/math/lgamma/lgamma_common_utils.h
+      - impl/adv_api/detail/math/sin/sin_v200_impl.h
+      - impl/adv_api/detail/math/atan/atan_c310_impl.h
+      - impl/adv_api/detail/normalization/layernormgrad/layernormgradbeta_c310_impl.h
+      - impl/adv_api/detail/math/lgamma/lgamma_c310_impl.h
+      - impl/adv_api/detail/math/round/round_c310_impl.h
+      - impl/adv_api/detail/math/ceil/ceil_v200_impl.h
+      - impl/adv_api/detail/math/ceil/ceil_c310_impl.h
+      - impl/adv_api/detail/math/trunc/trunc_v200_impl.h
+      - impl/adv_api/detail/math/tan/tan_c310_impl.h
+      - impl/adv_api/detail/quantization/quant/ascend_quant_per_group_l300_impl.h
+      - impl/adv_api/detail/quantization/quant/ascend_quant_l300_impl.h
       - impl/adv_api/detail/math/logical_ands/logical_ands_common_impl.h
       - impl/adv_api/detail/math/digamma/digamma_c310_impl.h
       - impl/adv_api/detail/normalization/deepnorm/deepnorm_c310_impl.h

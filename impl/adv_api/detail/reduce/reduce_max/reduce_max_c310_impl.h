@@ -11,7 +11,7 @@
 #define IMPL_REDUCE_REDUCE_MAX_REDUCE_MAX_C310_IMPL_H_
 
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
+#include "kernel_basic_intf.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../common/check.h"
 #include "../../api_check/kernel_api_check.h"

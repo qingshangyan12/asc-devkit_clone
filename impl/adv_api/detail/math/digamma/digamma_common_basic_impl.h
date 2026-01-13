@@ -15,6 +15,9 @@
 #ifndef IMPL_MATH_DIGAMMA_DIGAMMA_COMMOM_BASIC_IMPL_H
 #define IMPL_MATH_DIGAMMA_DIGAMMA_COMMOM_BASIC_IMPL_H
 
+#include <cstdint>
+#include "kernel_basic_intf.h"
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "digamma_c310_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)

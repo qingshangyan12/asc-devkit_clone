@@ -14,6 +14,9 @@
  */
 #ifndef IMPL_MATH_MATH_CONSTANT_UTIL_H
 #define IMPL_MATH_MATH_CONSTANT_UTIL_H
+
+#include <cstdint>
+
 namespace AscendC {
 
 constexpr float NUM_ONE = 1.0;

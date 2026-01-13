@@ -15,10 +15,11 @@
 #ifndef IMPL_QUANTIZATION_ANTIQUANTIZE_IMPL_H
 #define IMPL_QUANTIZATION_ANTIQUANTIZE_IMPL_H
 
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #include "antiquantize_common.h"
+#include "../../common/check.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "../antiquant/ascend_antiquant_c310_impl.h"

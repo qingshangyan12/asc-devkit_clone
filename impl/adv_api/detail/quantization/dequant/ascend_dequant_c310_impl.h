@@ -14,9 +14,12 @@
  */
 #ifndef LIB_ASCEND_DEQUANT_ASCEND_DEQUANT_C310_IMPL_H
 #define LIB_ASCEND_DEQUANT_ASCEND_DEQUANT_C310_IMPL_H
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "ascend_dequant_common.h"
+#include "../../quantization/quant/ascend_quant_c310_impl.h"
+#include "../../common/check.h"
 
 namespace AscendC {
 constexpr uint32_t ASCENDC_DEQUANT_B32_VF_LEN = GetVecLen() / sizeof(uint32_t);

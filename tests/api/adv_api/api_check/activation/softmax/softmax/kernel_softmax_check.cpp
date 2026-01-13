@@ -10,6 +10,9 @@
 
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "impl/adv_api/detail/api_check/kernel_check/activation/softmax/softmax/softmax_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 class SoftMaxAPICheck : public testing::Test {

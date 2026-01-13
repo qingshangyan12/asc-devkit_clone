@@ -54,7 +54,7 @@ private:
         LocalTensor<T> dstLocal = outQueue.AllocTensor<T>();
         LocalTensor<T> src0Local = inQueueX0.DeQue<T>();
         LocalTensor<T> src1Local = inQueueX1.DeQue<T>();
-        BitwiseAnd(dstLocal, src0Local, src1Local, this->dataSize);
+        BitwiseXor(dstLocal, src0Local, src1Local, this->dataSize);
         outQueue.EnQue<T>(dstLocal);
         inQueueX0.FreeTensor(src0Local);
         inQueueX1.FreeTensor(src1Local);

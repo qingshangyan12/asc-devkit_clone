@@ -12,11 +12,14 @@
 #define IMPL_REDUCE_REDUCE_ANY_REDUCE_ANY_C310_IMPL_H_
 
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
+#include "kernel_basic_intf.h"
 #include "../reduce_common_util_c310_impl.h"
 #include "../reduce_common_ar_reuse_align_c310_impl.h"
 #include "../reduce_common_ra_reuse_align_c310_impl.h"
 #include "../../common/check.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/reduce/reduce_any/reduce_any_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {

@@ -15,6 +15,7 @@
 #ifndef IMPL_SORT_SORT_SORT_IMPL_H
 #define IMPL_SORT_SORT_SORT_IMPL_H
 
+#include "kernel_basic_intf.h"
 #include "../sort_common_utils.h"
 #include "include/adv_api/sort/sort_utils_constants.h"
 

@@ -15,8 +15,8 @@
 #ifndef IMPL_ACTIVATION_REGLU_REGLU_IMPL_C310_H
 #define IMPL_ACTIVATION_REGLU_REGLU_IMPL_C310_H
 
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
 #include "../../common/check.h"
 #include "../../common/common.h"
 

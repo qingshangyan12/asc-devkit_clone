@@ -24,6 +24,10 @@
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 #include "membase/v200/softmax_grad_impl.h"
 #endif
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/activation/softmax/softmax_grad/softmax_grad_check.h"
+#include "../../api_check/kernel_check/activation/softmax/softmax_grad_front/softmax_grad_front_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {

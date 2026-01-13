@@ -14,6 +14,7 @@
  */
 #ifndef LIB_QUANTIZATION_ANTIQUANTIZE_H
 #define LIB_QUANTIZATION_ANTIQUANTIZE_H
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/quantization/antiquantize/antiquantize_impl.h"
 namespace AscendC {

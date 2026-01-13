@@ -17,7 +17,7 @@
 #define LIB_MATH_LOGICAL_TEMPLATE_IMPL_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
-
+#include "kernel_basic_intf.h"
 namespace AscendC {
 constexpr uint32_t LOGICAL_TEMPLATE_B64_REPEAT_STRIDE = 2;
 

@@ -16,7 +16,7 @@
 #define IMPL_ACTIVATION_SWIGLU_SWIGLU_IMPL_C310_H
 
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
+#include "kernel_basic_intf.h"
 #include "../../common/check.h"
 #include "../../common/common.h"
 

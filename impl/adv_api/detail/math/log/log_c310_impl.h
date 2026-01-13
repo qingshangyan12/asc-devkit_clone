@@ -15,8 +15,10 @@
 #ifndef IMPL_MATH_LOG_LOG_C310_IMPL_H
 #define IMPL_MATH_LOG_LOG_C310_IMPL_H
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
+#include "../../common/common.h"
 
 namespace AscendC {
 template <typename T> __simd_vf__ inline void LogImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t calCount)

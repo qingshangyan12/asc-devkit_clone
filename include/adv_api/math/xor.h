@@ -16,7 +16,7 @@
 #define LIB_MATH_XOR_H
 
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
+#include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #include "../../../impl/adv_api/detail/math/xor/xor_common_impl.h"
 #if ASCENDC_CPU_DEBUG

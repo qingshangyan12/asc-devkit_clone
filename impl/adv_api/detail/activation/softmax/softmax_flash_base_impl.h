@@ -19,6 +19,9 @@
 #else
 #include "softmax_common/softmax_common_flash.h"
 #endif
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/activation/softmax/softmax_flash/softmax_flash_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {

@@ -15,6 +15,8 @@
 #ifndef IMPL_PAD_PAD_PAD_C310_IMPL_H
 #define IMPL_PAD_PAD_PAD_C310_IMPL_H
 
+#include "kernel_basic_intf.h"
+
 namespace AscendC {
 namespace PadInternal {
 

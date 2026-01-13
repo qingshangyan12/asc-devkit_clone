@@ -15,6 +15,8 @@
 #ifndef LIB_QUANTIZATION_ASCEND_QUANT_UTILS_H
 #define LIB_QUANTIZATION_ASCEND_QUANT_UTILS_H
 
+#include "kernel_basic_intf.h"
+
 namespace AscendC {
 struct AscendQuantConfig {
     __aicore__ constexpr AscendQuantConfig(const uint32_t calcCount, const uint32_t offsetCount,

@@ -19,6 +19,9 @@
 #include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #include "ascend_antiquant_common.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/quantization/antiquant/antiquant_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "ascend_antiquant_c310_impl.h"

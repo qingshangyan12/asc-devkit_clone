@@ -16,6 +16,9 @@
 #define IMPL_NORMALIZATION_LAYERNORM_LAYERNORM_C310_IMPL_H
 
 #include "include/adv_api/normalization/normalize.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/normalization/layernorm/layernorm_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 #include "welford_c310_impl.h"
 #include "layernorm_c310_utils.h"

@@ -25,6 +25,9 @@
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "dropout_c310_impl.h"
 #endif
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/filter/dropout/dropout_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {

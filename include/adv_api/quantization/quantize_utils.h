@@ -15,6 +15,9 @@
 #ifndef LIB_QUANTIZATION_QUANTIZE_UTILS_H
 #define LIB_QUANTIZATION_QUANTIZE_UTILS_H
 
+#include <cstdint>
+#include "kernel_basic_intf.h"
+
 namespace AscendC {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 enum class QuantizePolicy : int32_t {

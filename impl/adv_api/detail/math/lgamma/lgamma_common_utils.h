@@ -15,6 +15,8 @@
 #ifndef IMPL_MATH_LGAMMA_LGAMMA_COMMOM_UTILS_H
 #define IMPL_MATH_LGAMMA_LGAMMA_COMMOM_UTILS_H
 
+#include "kernel_basic_intf.h"
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101 || \
     __NPU_ARCH__ == 5102)
 namespace AscendC {

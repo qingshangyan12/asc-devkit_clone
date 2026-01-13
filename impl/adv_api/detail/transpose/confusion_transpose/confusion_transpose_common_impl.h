@@ -15,6 +15,9 @@
 #ifndef IMPL_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_COMMON_IMPL_H
 #define IMPL_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_COMMON_IMPL_H
 
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/transpose/confusion_transpose/confusion_transpose_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002)
 #include "confusion_transpose_v200_impl.h"

@@ -16,6 +16,7 @@
 #define IMPL_ACTIVATION_SOFTMAX_C310_SOFTMAX_IMPL_H
 
 #include "softmax_common_impl.h"
+#include "../../../../common/common.h"
 
 namespace AscendC {
 template <typename T1, typename T2, bool isLog = false>

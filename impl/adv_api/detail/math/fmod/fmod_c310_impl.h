@@ -15,6 +15,7 @@
 #ifndef IMPL_MATH_FMOD_FMOD_C310_IMPL_H
 #define IMPL_MATH_FMOD_FMOD_C310_IMPL_H
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "../../common/check.h"
  
 namespace AscendC {

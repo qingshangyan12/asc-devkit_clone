@@ -17,6 +17,7 @@
 #define IMPL_MATH_BITWISE_TEMPLATE_BITWISE_TEMPLATE_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 
 namespace AscendC {
 template <auto func, typename T, typename RegT, const MicroAPI::RegTrait& Trait = MicroAPI::RegTraitNumOne>

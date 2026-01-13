@@ -17,7 +17,12 @@
 #define LIB_MATH_LOGICAL_ORS_IMPL_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "../logical_template/logical_template.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/math/logical_ors/logical_ors_check.h"
+#endif // ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {
 struct LogicalOrsConfig {

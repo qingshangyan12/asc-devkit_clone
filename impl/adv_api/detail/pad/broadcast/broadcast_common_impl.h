@@ -15,9 +15,12 @@
 #ifndef IMPL_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H
 #define IMPL_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H
 
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
 #include "broadcast_common_utils.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/pad/broadcast/broadcast_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)

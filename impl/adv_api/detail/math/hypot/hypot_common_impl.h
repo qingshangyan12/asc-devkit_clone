@@ -12,7 +12,7 @@
 #define LIB_MATH_HYPOT_IMPL_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
-
+#include "kernel_basic_intf.h"
 // Implementation Process
 // 1. Use vcmp_ne for comparison to find nan.
 // 2. Use vcmps_eq for comparison to find ±inf.

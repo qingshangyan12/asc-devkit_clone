@@ -15,6 +15,7 @@
 #ifndef IMPL_MATH_POWER_POWER_COMMON_UTILS_H
 #define IMPL_MATH_POWER_POWER_COMMON_UTILS_H
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "kernel_tiling/kernel_tiling.h"
 
 namespace AscendC {

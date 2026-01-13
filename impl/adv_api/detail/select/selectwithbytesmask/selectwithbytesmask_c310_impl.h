@@ -11,6 +11,7 @@
 #ifndef LIB_SELECT_SELECT_WITH_BYTES_MASK_C310_IMPL_H
 #define LIB_SELECT_SELECT_WITH_BYTES_MASK_C310_IMPL_H
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "kernel_utils.h"
 
 namespace AscendC {

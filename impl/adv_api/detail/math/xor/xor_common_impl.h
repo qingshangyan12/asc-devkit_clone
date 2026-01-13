@@ -14,6 +14,7 @@
  */
 #ifndef LIB_XOR_XOR_COMMON_IMPL_H
 #define LIB_XOR_XOR_COMMON_IMPL_H
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
 #include "../../common/check.h"
 

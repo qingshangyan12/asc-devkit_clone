@@ -15,6 +15,8 @@
 #ifndef LIB_MATH_FMOD_UTILS_H
 #define LIB_MATH_FMOD_UTILS_H
 
+#include <cstdint>
+
 namespace AscendC {
 constexpr uint32_t FMOD_ITERATION_NUM_MAX = 11;
 enum class FmodAlgo {

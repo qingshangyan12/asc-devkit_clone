@@ -15,10 +15,12 @@
 #ifndef IMPL_QUANTIZATION_DEQUANTIZE_IMPL_H
 #define IMPL_QUANTIZATION_DEQUANTIZE_IMPL_H
 
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
+#include "../dequant/ascend_dequant_common_impl.h"
 #include "kernel_pop_stack_buffer.h"
 #include "dequantize_common.h"
+#include "../../common/check.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "../dequant/ascend_dequant_c310_impl.h"

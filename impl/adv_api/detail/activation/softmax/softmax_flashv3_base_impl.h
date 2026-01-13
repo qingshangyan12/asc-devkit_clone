@@ -24,6 +24,9 @@
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 #include "membase/v200/softmax_flashv3_impl.h"
 #endif
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/activation/softmax/softmax_flashv3/softmax_flashv3_check.h"
+#endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 
 namespace AscendC {

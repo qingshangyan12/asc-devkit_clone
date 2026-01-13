@@ -16,11 +16,27 @@
 #define IMPL_NORMALIZATION_NORMALIZE_NORMALIZE_C310_IMPL_H
 
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #include "include/adv_api/normalization/normalize_utils.h"
 #include "normalize_config.h"
 
 namespace AscendC {
+
+namespace NormalizeInternal {
+template <typename T>
+__simd_callee__ inline void LoadDataWithT(__ubuf__ T* src, MicroAPI::RegTensor<float>& dstReg,
+                                          MicroAPI::MaskReg& dstPreg, uint32_t srcOffset)
+{
+    if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
+        MicroAPI::RegTensor<T> srcOrigin;
+        DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + srcOffset);
+        Cast<float, T, layoutZMrgZ>(dstReg, srcOrigin, dstPreg);
+    } else { // this branch: only support float
+        DataCopy(dstReg, src + srcOffset);
+    }
+}
+}
 
 template <typename T = MicroAPI::DefaultType, MicroAPI::MaskMergeMode mode = MicroAPI::MaskMergeMode::ZEROING,
     typename RegT>
@@ -150,8 +166,8 @@ __simd_vf__ inline void NormalizeVFImpl(__ubuf__ float *rstdUb, __ubuf__ float *
         DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg2, meanUb2 + j);
         for (uint16_t i = 0; i < repeatTimes; i++) {
             preg = MicroAPI::UpdateMask<float>(count);
-            Internal::LoadDataWithT<T>(inputXUb, inputReg1, preg, j * rLengthWithPadding + i * sregLower);
-            Internal::LoadDataWithT<T>(inputXUb2, inputReg2, preg, j * rLengthWithPadding + i * sregLower);
+            NormalizeInternal::LoadDataWithT<T>(inputXUb, inputReg1, preg, j * rLengthWithPadding + i * sregLower);
+            NormalizeInternal::LoadDataWithT<T>(inputXUb2, inputReg2, preg, j * rLengthWithPadding + i * sregLower);
 
             if constexpr (IsSameType<U, half>::value || IsSameType<U, bfloat16_t>::value) {
                 if constexpr (!config.isNoGamma) {
@@ -221,7 +237,7 @@ __simd_vf__ inline void NormalizeVFImpl(__ubuf__ float *rstdUb, __ubuf__ float *
         count = rLength;
         for (uint16_t i = 0; i < repeatTimes; i++) {
             MicroAPI::MaskReg preg = MicroAPI::UpdateMask<float>(count);
-            Internal::LoadDataWithT<T>(inputXUbTail, inputReg, preg, i * sregLower);
+            NormalizeInternal::LoadDataWithT<T>(inputXUbTail, inputReg, preg, i * sregLower);
 
             if constexpr (IsSameType<U, half>::value || IsSameType<U, bfloat16_t>::value) {
                 if constexpr (!config.isNoGamma) {

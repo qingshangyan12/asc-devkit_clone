@@ -16,7 +16,9 @@
 #define IMPL_MATH_ATAN_ATAN_C310_IMPL_H
 
 #include "kernel_tensor.h"
+#include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
+#include "../../common/common.h"
 
 namespace AscendC {
 enum class AtanAlgo { TAYLOR_EXPANSION = 0, POLYNOMIAL_APPROXIMATION };

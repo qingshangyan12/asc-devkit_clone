@@ -15,8 +15,8 @@
 #ifndef IMPL_PAD_BROADCAST_BROADCAST_V220_IMPL_H
 #define IMPL_PAD_BROADCAST_BROADCAST_V220_IMPL_H
 
+#include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
 
 namespace AscendC {
 constexpr uint32_t BRCB_ONE_SIZE = 8;

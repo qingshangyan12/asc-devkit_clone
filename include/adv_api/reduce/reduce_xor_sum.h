@@ -16,7 +16,7 @@
 #define LIB_REDUCE_REDUCE_XOR_SUM_H
 
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
+#include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/reduce/reduce_xor_sum/reduce_xor_sum_c310_impl.h"

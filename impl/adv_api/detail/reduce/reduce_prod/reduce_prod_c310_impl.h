@@ -12,13 +12,16 @@
 #define IMPL_REDUCE_REDUCE_PROD_REDUCE_PROD_C310_IMPL_H_
 
 #include "kernel_tensor.h"
-#include "kernel_operator_intf.h"
+#include "kernel_basic_intf.h"
 #include "../reduce_common_util_impl.h"
 #include "../reduce_common_util_c310_impl.h"
 #include "../reduce_common_ar_reuse_align_c310_impl.h"
 #include "../reduce_common_ra_reuse_align_c310_impl.h"
+#ifdef ASCENDC_CPU_DEBUG
+#include "../../api_check/kernel_check/reduce/reduce_prod/reduce_prod_check.h"
 #include "../../api_check/kernel_api_check.h"
 #include "../../common/check.h"
+#endif // ASCENDC_CPU_DEBUG
 
 namespace AscendC {
 namespace Internal {
