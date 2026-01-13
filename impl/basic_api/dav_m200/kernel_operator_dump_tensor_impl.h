@@ -1015,8 +1015,8 @@ __aicore__ inline void WriteRingBufTlvHead(
 {
     printTlv->type = static_cast<uint32_t>(printType);
     printTlv->length = tlvLen - sizeof(uint32_t[2]);   // exclude type and length
-    printTlv->resvMem[0] = static_cast<uint32_t>(0U);
-    printTlv->resvMem[1] = static_cast<uint32_t>(0U);
+    printTlv->blockIdx = static_cast<uint32_t>(GetBlockIdxImpl());
+    printTlv->resv = static_cast<uint32_t>(0U);
     printTlv->fmtOffset = (argsNum + 1) * sizeof(uint64_t);      // include fmt offset
     dcci((__gm__ uint64_t*)(printTlv), cache_line_t::ENTIRE_DATA_CACHE);
 }
@@ -1147,7 +1147,7 @@ __aicore__ inline void WriteRingBufTlvHead(const Tensor<T>& src, __gm__ DumpTens
     dumpTensorTlv->desc = desc;
     dumpTensorTlv->bufferId = static_cast<uint32_t>(0U);
     dumpTensorTlv->position = static_cast<uint16_t>(position);
-    dumpTensorTlv->resv0 = static_cast<uint16_t>(0U);
+    dumpTensorTlv->blockIdx = static_cast<uint16_t>(GetBlockIdxImpl());
     dumpTensorTlv->dim = static_cast<uint32_t>(0U);
     for (uint32_t i = 0; i < K_MAX_SHAPE_DIM; ++i) {
         dumpTensorTlv->shape[i] = static_cast<uint32_t>(0U);
