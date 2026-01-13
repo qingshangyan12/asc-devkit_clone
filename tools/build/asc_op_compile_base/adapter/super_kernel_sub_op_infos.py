@@ -19,10 +19,11 @@ import subprocess
 import math
 import threading
 from contextlib import contextmanager
-from .super_kernel_utility import get_soc_spec, KernelMetaType, \
-    CommonUtility, AscendCLogLevel, CompileStage, STR_TO_KERNEL_TYPE_V220
+from .super_kernel_utility import get_soc_spec, \
+    CommonUtility, AscendCLogLevel, CompileStage
 from .super_kernel_constants import SuperKernelEarlyStartMode, SubOperatorType, \
-    STR_TO_SUPER_TASK_TYPE, SuperKernelFeedSyncAllMode, SuperKernelProfilingMode, ERR_CODE
+    STR_TO_SUPER_TASK_TYPE, SuperKernelFeedSyncAllMode, SuperKernelProfilingMode, ERR_CODE, \
+    SuperKernelKernelType, STR_TO_SK_KERNEL_TYPE
 
 
 def indent_code_func(code: str, indent: str = '    '):
@@ -61,7 +62,7 @@ class SubOperatorInfos:
         self.recv_info: dict = {}
         self.called_kernel_name: dict = None
         self.origin_kernel_type_str: str = ""
-        self.kernel_type: KernelMetaType = ""
+        self.kernel_type: SuperKernelKernelType = ""
         self.block_dim: int = 0
         self.timestamp_option: bool = False
         self.debug_size: int = 0
@@ -187,7 +188,8 @@ param_offset={self.notify_param_offset + index}\n"
                 index += 1
             notify_block_aiv += "}\n"
 
-            if self.kernel_type in [KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0]:
+            if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, \
+                    SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0]:
                 if enable_double_stream:
                     self.notify_block['aic'] = notify_block_aic if found_aic else ''
                     self.notify_block['aiv'] = ''
@@ -207,7 +209,8 @@ param_offset={self.notify_param_offset + index}\n"
     def gen_wait_from_outside(self, inner_event_id_set, enable_double_stream):
         if len(self.recv_event_list) != 0:
             found = False
-            if self.kernel_type in [KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0]:
+            if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, \
+                    SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0]:
                 wait_block = "if ASCEND_IS_AIC {\n"
                 index = 0
                 for recv_index in self.recv_event_list:
@@ -277,7 +280,7 @@ param_offset={self.wait_param_offset + index}\n"
                 self.called_kernel_name: dict = sub_operater_infos["sub_operator_kernel_name"]
                 self.split_mode_in_json = sub_operater_infos.get("split_mode")
                 self.origin_kernel_type_str: str = sub_operater_infos["sub_operator_kernel_type"]
-                self.kernel_type: KernelMetaType = STR_TO_KERNEL_TYPE_V220[self.origin_kernel_type_str]
+                self.kernel_type: SuperKernelKernelType = STR_TO_SK_KERNEL_TYPE[self.origin_kernel_type_str]
                 self.block_dim: int = sub_operater_infos["blockDim"]
                 self.timestamp_option: bool = "timestamp" in sub_operater_infos.get("debugOptions", "") \
                             or "printf" in sub_operater_infos.get("debugOptions", "") \
@@ -320,7 +323,7 @@ operator inherits super kernel opton."))
     def gen_switch_case_block_of_dynamic_op(self, kernel_info_of_tiling_key, tiling_key, kernel_type):
         chip_version = CommonUtility.get_chip_version()
         params_with_type = ', '.join([f"GM_ADDR {param}" for param in self.kernel_params])
-        if kernel_type is KernelMetaType.KERNEL_TYPE_AIV_ONLY:
+        if kernel_type is SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY:
             aicore_kernel_name = kernel_info_of_tiling_key["AiCore"]
             case_block = f"""
 {self.gen_select_addr_code('aiv_func_addr', aicore_kernel_name)}
@@ -328,7 +331,7 @@ dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
 """
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
-        elif kernel_type is KernelMetaType.KERNEL_TYPE_AIC_ONLY:
+        elif kernel_type is SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY:
             aicore_kernel_name = kernel_info_of_tiling_key["AiCore"]
             case_block = f"""
 {self.gen_select_addr_code('aic_func_addr', aicore_kernel_name)}
@@ -336,7 +339,7 @@ dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
 """
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
-        elif kernel_type is KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0:
+        elif kernel_type is SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0:
             aicore_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-vec"]
             case_block = f"""
 {self.gen_select_addr_code('aiv_func_addr', aicore_kernel_name)}
@@ -344,7 +347,7 @@ dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
 """
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
-        elif kernel_type is KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0:
+        elif kernel_type is SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0:
             aicore_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-cube"]
             case_block = f"""
 {self.gen_select_addr_code('aic_func_addr', aicore_kernel_name)}
@@ -352,7 +355,8 @@ dy_block_dim = ((uint64_t){kernel_type.value}) << 32 | (*blockDimAddr);
 """
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
-        elif kernel_type in [KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
+        elif kernel_type in [SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2]:
             aiv_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-vec"]
             aic_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-cube"]
             case_block = f"""
@@ -410,7 +414,7 @@ f"""if (*tilingKeyAddr < {input_blocks[total_length//2][1]}) {{
         origin_switch_block = []
         for tiling_key in dynamic_func_names:
             kernel_info_of_tiling_key = dynamic_func_names[tiling_key]
-            kernel_type = STR_TO_KERNEL_TYPE_V220[kernel_info_of_tiling_key["kernel_type"]]
+            kernel_type = STR_TO_SK_KERNEL_TYPE[kernel_info_of_tiling_key["kernel_type"]]
             case_block = self.gen_switch_case_block_of_dynamic_op(kernel_info_of_tiling_key, tiling_key, kernel_type)
             origin_switch_block.append([case_block, tiling_key])
         origin_switch_block.sort(key=lambda x : int(x[1]))
@@ -465,7 +469,8 @@ GM_ADDR __ac_dynamic_block_dim_{self.index}, GM_ADDR __ac_wait_lock_{self.index}
         self.kernel_call_block += \
             f"call_func_of_{self.kernel_name}({self.param_offset}, {aiv_func_addr}, {aic_func_addr}, dy_blockDim);\n"
         self.kernel_call_block += self.gen_dcci_after_kernel_end_call_block()
-        if self.kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0]:
+        if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0]:
             self.kernel_call_block += f"if ASCEND_IS_AIV {{\n"
         else:
             self.kernel_call_block += f"if ASCEND_IS_AIC {{\n"
@@ -507,8 +512,8 @@ __aicore__ inline void call_func_of_{self.kernel_name}(uint64_t args_offset, \
     FuncType aic_ptr_split{i} = (FuncType)(dy_aic_func_ptr_split{i});
     """
         dynamic_impl_func_block += f"""
-    if (kernelType == {KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1.value} || \
-kernelType == {KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2.value}) {{
+    if (kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1.value} || \
+kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2.value}) {{
         if (get_block_idx() < blockDim) {{
             uint8_t coreid = get_coreid();
             if ASCEND_IS_AIC {{
@@ -517,16 +522,16 @@ kernelType == {KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2.value}) {{
                 {self.dynamic_gen_split_call_code('aiv_ptr', "args_offset")}
             }}
         }}
-    }} else if(kernelType == {KernelMetaType.KERNEL_TYPE_AIV_ONLY.value} || \
-kernelType == {KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0.value}) {{
+    }} else if(kernelType == {SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY.value} || \
+kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0.value}) {{
         if (AscendC::GetBlockIdx() < blockDim) {{
             uint8_t coreid = get_coreid();
             if ASCEND_IS_AIV{{
                 {self.dynamic_gen_split_call_code('aiv_ptr', "args_offset")}
             }}
         }}
-    }} else if (kernelType == {KernelMetaType.KERNEL_TYPE_AIC_ONLY.value} || \
-kernelType == {KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0.value}) {{
+    }} else if (kernelType == {SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY.value} || \
+kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0.value}) {{
         if (get_block_idx() < blockDim) {{
             uint8_t coreid = get_coreid();
             if ASCEND_IS_AIC {{
@@ -554,7 +559,8 @@ kernelType == {KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0.value}) {{
         # add bin path to dynamic_bin for link
         self.dynamic_bin = self.bin_path
         #set block_dim to max
-        if self.kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0]:
+        if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0]:
             self.block_dim = int(get_soc_spec('vector_core_cnt'))
         else:
             self.block_dim = int(get_soc_spec('ai_core_cnt'))
@@ -625,7 +631,7 @@ param_base[{dynamic_extra_param_offset + 1}], param_base[{dynamic_extra_param_of
         kernel_meta_dir_with_thread_id = os.path.join(CommonUtility.get_kernel_meta_dir(), str(threading.get_ident()))
         if not os.path.exists(kernel_meta_dir_with_thread_id):
             os.makedirs(kernel_meta_dir_with_thread_id)
-        if self.kernel_type == KernelMetaType.KERNEL_TYPE_AIV_ONLY:
+        if self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY:
             bin_file_name = os.path.basename(self.called_kernel_name["AiCore"]["obj_files"])
             if self.split_mode_in_json is None:
                 self.aiv_bin = self.bin_path
@@ -633,7 +639,7 @@ param_base[{dynamic_extra_param_offset + 1}], param_base[{dynamic_extra_param_of
                 self.extract_sub_bin_file(kernel_meta_dir_with_thread_id, bin_file_name)
                 self.aiv_bin = os.path.join(kernel_meta_dir_with_thread_id, bin_file_name)
             self.aiv_text_len = self.get_text_section_size(self.aiv_bin)
-        elif self.kernel_type == KernelMetaType.KERNEL_TYPE_AIC_ONLY:
+        elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY:
             bin_file_name = os.path.basename(self.called_kernel_name["AiCore"]["obj_files"])
             if self.split_mode_in_json is None:
                 self.aic_bin = self.bin_path
@@ -641,7 +647,7 @@ param_base[{dynamic_extra_param_offset + 1}], param_base[{dynamic_extra_param_of
                 self.extract_sub_bin_file(kernel_meta_dir_with_thread_id, bin_file_name)
                 self.aic_bin = os.path.join(kernel_meta_dir_with_thread_id, bin_file_name)
             self.aic_text_len = self.get_text_section_size(self.aic_bin)
-        elif self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0:
+        elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0:
             aiv_bin_file_name = os.path.basename(self.called_kernel_name[f"dav-{chip_version}-vec"]["obj_files"])
             if self.split_mode_in_json is None:
                 self.aiv_bin = self.bin_path
@@ -649,7 +655,7 @@ param_base[{dynamic_extra_param_offset + 1}], param_base[{dynamic_extra_param_of
                 self.extract_sub_bin_file(kernel_meta_dir_with_thread_id, aiv_bin_file_name)
                 self.aiv_bin = os.path.join(kernel_meta_dir_with_thread_id, aiv_bin_file_name)
             self.aiv_text_len = self.get_text_section_size(self.aiv_bin)
-        elif self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0:
+        elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0:
             aic_bin_file_name = os.path.basename(self.called_kernel_name[f"dav-{chip_version}-cube"]["obj_files"])
             if self.split_mode_in_json is None:
                 self.aic_bin = self.bin_path
@@ -657,8 +663,8 @@ param_base[{dynamic_extra_param_offset + 1}], param_base[{dynamic_extra_param_of
                 self.extract_sub_bin_file(kernel_meta_dir_with_thread_id, aic_bin_file_name)
                 self.aic_bin = os.path.join(kernel_meta_dir_with_thread_id, aic_bin_file_name)
             self.aic_text_len = self.get_text_section_size(self.aic_bin)
-        elif self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1 or\
-            self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2:
+        elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1 or\
+            self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2:
             aiv_bin_file_name = os.path.basename(self.called_kernel_name[f"dav-{chip_version}-vec"]["obj_files"])
             aic_bin_file_name = os.path.basename(self.called_kernel_name[f"dav-{chip_version}-cube"]["obj_files"])
             self.extract_sub_bin_file_of_mix_kernel(\
@@ -748,11 +754,11 @@ f"""else {{
             if self.early_start_mode == SuperKernelEarlyStartMode.EarlyStartEnableV1:
                 vector_call_func_block += f"        AscendC::SetNextTaskStart();\n"
             else:
-                if self.kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0]\
-                    and core_type == "ASCEND_IS_AIC":
+                if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, \
+                    SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0] and core_type == "ASCEND_IS_AIC":
                     vector_call_func_block += f"        // AIV only, no complement early start set flag.\n"
-                elif self.kernel_type in [KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0]\
-                    and core_type == "ASCEND_IS_AIV":
+                elif self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, \
+                    SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0] and core_type == "ASCEND_IS_AIV":
                     vector_call_func_block += f"        // AIC only, no complement early start set flag.\n"
                 else:
                     vector_call_func_block += f"        AscendC::SetNextTaskStart();\n"
@@ -820,7 +826,7 @@ f"""else {{
             self.data_cache_preload_call += f"dc_preload((__gm__ uint64_t *)(param_base), 0); \n"
             self.data_cache_preload_call += f"param_base += {min(8, len_of_param - index)}; \n"
 
-        if self.kernel_type == KernelMetaType.KERNEL_TYPE_AIV_ONLY:
+        if self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY:
             aicore_kernel_name = self.called_kernel_name["AiCore"]["func_name"]
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare = self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
@@ -834,7 +840,7 @@ f"""else {{
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIV", f"AscendC::GetBlockIdx", is_preload=True)
             self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"AscendC::GetBlockIdx() >= {self.block_dim}")
             self.set_early_start_complement_blocks("ASCEND_IS_AIC", "true")
-        elif self.kernel_type == KernelMetaType.KERNEL_TYPE_AIC_ONLY:
+        elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY:
             aicore_kernel_name = self.called_kernel_name["AiCore"]["func_name"]
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare = self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
@@ -848,7 +854,7 @@ f"""else {{
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIC", "get_block_idx", is_preload=True)
             self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_dim}")
             self.set_early_start_complement_blocks("ASCEND_IS_AIV", "true")
-        elif self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0:
+        elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0:
             aicore_kernel_name = self.called_kernel_name[f"dav-{chip_version}-vec"]["func_name"]
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare = self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
@@ -862,7 +868,7 @@ f"""else {{
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIV", f"AscendC::GetBlockIdx", is_preload=True)
             self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"AscendC::GetBlockIdx() >= {self.block_dim}")
             self.set_early_start_complement_blocks("ASCEND_IS_AIC", "true")
-        elif self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0:
+        elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0:
             aicore_kernel_name = self.called_kernel_name[f"dav-{chip_version}-cube"]["func_name"]
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare = self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
@@ -876,7 +882,7 @@ f"""else {{
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIC", "get_block_idx", is_preload=True)
             self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_dim}")
             self.set_early_start_complement_blocks("ASCEND_IS_AIV", "true")
-        elif self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1:  
+        elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1:  
             # need check of sub block id
             aicore_kernel_name = self.called_kernel_name[f"dav-{chip_version}-cube"]["func_name"]
             self.sub_kernel_names.append(aicore_kernel_name)
@@ -902,7 +908,7 @@ f"""else {{
                 self.gen_call_func(preload_call_block, "ASCEND_IS_AIV", "get_block_idx", is_preload=True)
             self.set_early_start_complement_blocks("ASCEND_IS_AIC", f"get_block_idx() >= {self.block_dim}")
             self.set_early_start_complement_blocks("ASCEND_IS_AIV", f"get_block_idx() >= {self.block_dim}")
-        elif self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2:
+        elif self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2:
             aicore_kernel_name = self.called_kernel_name[f"dav-{chip_version}-cube"]["func_name"]
             self.sub_kernel_names.append(aicore_kernel_name)
             self.kernel_declare = self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)

@@ -667,10 +667,10 @@ class TestAscendSuperKernel(unittest.TestCase):
                         tmp = SubOperatorInfos(0, {"bin_path": "./op1.o","json_path": "op1.json","kernel_name": "op1"}, 100,
                             op_options, compile_log_path)
                         tmp.init_of_sub_operator_info()
-                        tmp.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                        tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                         tmp.extract_sub_op_bin_files()
                         self.assertEqual(tmp.aic_text_len, 0)
-                        tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+                        tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                         tmp.extract_sub_op_bin_files()
                         self.assertEqual("test_mix_aic.o" in tmp.aic_bin, True)
 
@@ -688,25 +688,25 @@ class TestAscendSuperKernel(unittest.TestCase):
                         tmp = SubOperatorInfos(0, {"bin_path": "./op1.o","json_path": "op1.json","kernel_name": "op1"}, 100,
                             op_options, compile_log_path)
                         tmp.init_of_sub_operator_info()
-                        tmp.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                        tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                         tmp.gen_sub_kernel_declare_and_call_func()
                         self.assertEqual(tmp.sub_kernel_names, ['test'])
-                        tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+                        tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
                         tmp.gen_sub_kernel_declare_and_call_func()
                         self.assertEqual(tmp.sub_kernel_names, ['test', 'test_mix_aiv'])
                         tmp.sub_kernel_names = []
-                        tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+                        tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                         tmp.gen_sub_kernel_declare_and_call_func()
                         self.assertEqual(tmp.sub_kernel_names, ['test_mix_aic'])
                         tmp.sub_kernel_names = []
-                        tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                        tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                         tmp.gen_sub_kernel_declare_and_call_func()
                         self.assertEqual(tmp.sub_kernel_names, ['test_mix_aic', 'test_mix_aiv'])
                         tmp.sub_kernel_names = []
-                        tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+                        tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                         tmp.gen_sub_kernel_declare_and_call_func()
                         self.assertEqual(tmp.sub_kernel_names, ['test_mix_aic', 'test_mix_aiv'])
-                        tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MAX
+                        tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MAX
                         self.assertRaises(Exception, tmp.gen_sub_kernel_declare_and_call_func)
 
     def test_get_summary_type_and_options(self):
@@ -745,25 +745,25 @@ class TestAscendSuperKernel(unittest.TestCase):
                 self.assertEqual(tmp.debug_option, "printf,assert")
                 self.assertEqual(tmp.debug_size, 78643200)
 
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                 tmp.get_summary_type_and_options()
-                self.assertEqual(tmp.kernel_type, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0)
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0)
 
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
                 tmp.get_summary_type_and_options()
-                self.assertEqual(tmp.kernel_type, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0)
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0)
 
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                 tmp.get_summary_type_and_options()
-                self.assertEqual(tmp.kernel_type, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0)
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0)
 
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 tmp.get_summary_type_and_options()
-                self.assertEqual(tmp.kernel_type, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1)
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1)
 
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                 tmp.get_summary_type_and_options()
-                self.assertEqual(tmp.kernel_type, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1)
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1)
 
     def test_get_text_section_size(self):
         op_options = {'split-mode': 4, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable}
@@ -812,7 +812,7 @@ Idx Name                              Size     VMA              Type
                     op_options, compile_log_path)
                 with mock.patch('subprocess.run') as mock_run:
                     mock_run.side_effect = RuntimeError()
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                     self.assertRaises(Exception, tmp.extract_sub_bin_file_of_mix_kernel, "./", "b", "c")
 
     def test_gen_super_kernel_file(self):
@@ -908,12 +908,12 @@ Idx Name                              Size     VMA              Type
                     "kernel_name": "op1", 'send_event_list': [46, 50], 'recv_event_list': [46, 51], 
                     'stream_id': 15, 'task_type': 'normal'}, 100, op_options, compile_log_path)
                 tmp.init_of_sub_operator_info()
-                tmp.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                 tmp.gen_notify_wait_from_outside([50, 51], True)
                 self.assertEqual(len(tmp.notify_block), 2)
                 tmp.gen_notify_wait_from_outside([50, 51], False)
                 self.assertNotEqual(len(tmp.notify_block), 1)
-                tmp.kernel_type = KernelMetaType.KERNEL_TYPE_AIV_ONLY
+                tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY
                 tmp.gen_notify_wait_from_outside([50, 51], False)
                 self.assertNotEqual(len(tmp.notify_block), 1)
 
@@ -985,15 +985,15 @@ Idx Name                              Size     VMA              Type
                     "kernel_type": "KERNEL_TYPE_AIV_ONLY"
                 }
                 tiling_key = 1
-                kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                 tmp.gen_switch_case_block_of_dynamic_op(kernel_info_of_tiling_key, tiling_key, kernel_type)
-                kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+                kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
                 tmp.gen_switch_case_block_of_dynamic_op(kernel_info_of_tiling_key, tiling_key, kernel_type)
-                kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+                kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                 tmp.gen_switch_case_block_of_dynamic_op(kernel_info_of_tiling_key, tiling_key, kernel_type)             
-                kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 tmp.gen_switch_case_block_of_dynamic_op(kernel_info_of_tiling_key, tiling_key, kernel_type) 
-                kernel_type = KernelMetaType.KERNEL_TYPE_MAX
+                kernel_type = SuperKernelKernelType.KERNEL_TYPE_MAX
                 self.assertRaises(Exception, tmp.gen_switch_case_block_of_dynamic_op, kernel_info_of_tiling_key, tiling_key, kernel_type)
 
     def test_dynamic_gen_split_call_code(self):
@@ -1021,7 +1021,7 @@ Idx Name                              Size     VMA              Type
                 tmp.init_of_sub_operator_info()
                 tmp.early_start_set_flag = True
                 self.assertRaises(Exception, tmp.gen_dynamic_op_call_func)
-                tmp.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                 tmp.early_start_set_flag = False
                 with mock.patch('asc_op_compile_base.common.platform.platform_info.get_soc_spec', {'ai_core_cnt': 10}):
                     tmp.process_of_dynamic_op(True)
@@ -1043,11 +1043,11 @@ Idx Name                              Size     VMA              Type
                 tmp.split_mode_in_json = 1
                 tmp.extract_sub_op_bin_files()
                 self.assertTrue("testF.o" in tmp.aiv_bin, True)
-                tmp.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                 tmp.extract_sub_op_bin_files()
                 self.assertTrue("testF.o" in tmp.aic_bin, True)
 
-                tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+                tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
                 tmp.extract_sub_op_bin_files()
                 self.assertTrue("test_mix_aiv.o" in tmp.aiv_bin, True)
                 tmp.split_mode_in_json = None
@@ -1055,7 +1055,7 @@ Idx Name                              Size     VMA              Type
                 self.assertTrue("op1.o" in tmp.aiv_bin, True)
 
                 tmp.split_mode_in_json = 1
-                tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+                tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                 tmp.extract_sub_op_bin_files()
                 self.assertTrue("test_mix_aic.o" in tmp.aic_bin, True)
                 tmp.split_mode_in_json = None
@@ -1094,19 +1094,19 @@ Idx Name                              Size     VMA              Type
                     op_options, compile_log_path)
                 sub_tmp2 = SubOperatorInfos(0, {"bin_path": "./op1.o","json_path": "op1.json","kernel_name": "op1"}, 100,
                     op_options, compile_log_path)
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                 
                 res = tmp.get_task_type(sub_tmp1)
                 self.assertEqual(res, "cub")
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
-                sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
+                sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 res = tmp.gen_sync_name(sub_tmp1, sub_tmp2)
                 self.assertEqual(res, "cub:vec;vec:cub")
-                sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+                sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                 res = tmp.gen_sync_name(sub_tmp1, sub_tmp2)
                 self.assertEqual(res, "vec:cub")
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
-                sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
+                sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 res = tmp.gen_sync_name(sub_tmp1, sub_tmp2)
                 self.assertEqual(res, "cub:vec")
 
@@ -1292,8 +1292,8 @@ Idx Name                              Size     VMA              Type
                         op_options, compile_log_path)
                 sub_tmp2 = SubOperatorInfos(0, {"bin_path": "./op1.o","json_path": "op1.json","kernel_name": "op1"}, 100,
                         op_options, compile_log_path)
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
-                sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
+                sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 sub_tmp2.block_dim = 2
                 sub_tmp1.block_dim = 1
                 tmp.info_base = [sub_tmp1, sub_tmp2]
@@ -1392,22 +1392,22 @@ Idx Name                              Size     VMA              Type
             sub_tmp2 = SubOperatorInfos(0, {"bin_path": "./op1.o","json_path": "op1.json","kernel_name": "op1"}, 100,
                         op_options, compile_log_path)
             self.assertRaises(Exception, gen_early_start_config, sub_tmp1, sub_tmp2)
-            sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_AIV_ONLY
-            sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+            sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY
+            sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
             res = gen_early_start_config(sub_tmp1, sub_tmp2)
             self.assertIn("g_super_kernel_early_start_config = 5;", res)
 
-            sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
-            sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+            sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
+            sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
             res = gen_early_start_config(sub_tmp1, sub_tmp2)
             self.assertIn("g_super_kernel_early_start_config = 0;", res)
 
-            sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
-            sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+            sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
+            sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
             res = gen_early_start_config(sub_tmp1, sub_tmp2)
             self.assertIn("g_super_kernel_early_start_config = 10;", res)
 
-            sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MAX
+            sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MAX
             self.assertRaises(Exception, gen_early_start_config, sub_tmp1, sub_tmp2)
 
     def test_gen_inter_ops_barrier(self):
@@ -1430,8 +1430,8 @@ Idx Name                              Size     VMA              Type
                                 op_options, compile_log_path)
                     sub_tmp2 = SubOperatorInfos(0, {"bin_path": "./op1.o","json_path": "op1.json","kernel_name": "op1"}, 100,
                                 op_options, compile_log_path)
-                    sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
-                    sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                    sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
+                    sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                     tmp.early_start_mode = SuperKernelEarlyStartMode.EarlyStartDisable
                     res = gen_inter_ops_barrier(tmp, sub_tmp1, sub_tmp2)
                     self.assertIn( \
@@ -1518,9 +1518,9 @@ ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_
                         op_options, compile_log_path)
             sub_tmp2 = SubOperatorInfos(0, {"bin_path": "./op1.o","json_path": "op1.json","kernel_name": "op1"}, 100,
                         op_options, compile_log_path)
-            sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+            sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
             res = tpl_of_gen_switch_case_call(0, sub_tmp2, sub_tmp1)
-            sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_AIV_ONLY
+            sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY
             res = tpl_of_gen_switch_case_call(0, sub_tmp2, sub_tmp1)
             self.assertIn("ASCEND_IS_AIV", res)
 
@@ -1544,7 +1544,7 @@ ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_
                         ]
                     },
                     "super_kernel")
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                     tmp.inner_event_id_set = [0, 1, 2]
                     sub_tmp1 = SubOperatorInfos(0, {"bin_path": "./op1.o","json_path": "op1.json","kernel_name": "op1"}, 100,
                         op_options, compile_log_path)
@@ -1681,9 +1681,9 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     sub_tmp3.wait_block = "wait block"
                     sub_tmp2.notify_block = "notify block"
                     sub_tmp3.notify_block = "notify block"
-                    sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_AIV_ONLY
-                    sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
-                    sub_tmp3.kernel_type = KernelMetaType.KERNEL_TYPE_AIV_ONLY
+                    sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY
+                    sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
+                    sub_tmp3.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY
                     tmp.profiling_mode = SuperKernelProfilingMode.ProfilingEnable
                     gen_super_kernel_file(tmp)
                     tmp.timestamp_option = True
@@ -1724,7 +1724,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                 sub_tmp2.kernel_name = "op_test"
                 sub_tmp2.kernel_name_for_multi_stream = "op_test_1"
                 sub_tmp2.stream_index = 1
-                sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                 tmp.info_base = [sub_tmp1, sub_tmp2]
                 tmp.insert_sync_for_notify()
                 self.assertEqual(sub_tmp2.recv_info, {"op_test_1": "cub:vec"})
@@ -1767,11 +1767,11 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     sub_tmp1.kernel_params = ""
                     sub_ops = [sub_tmp1]
                     tmp.block_dim = 24
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                     tmp.profiling_mode = SuperKernelProfilingMode.ProfilingEnable
                     tmp.info_base = [sub_tmp1]
                     sub_tmp1.block_dim = 20
-                    sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+                    sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                     sub_tmp1.with_sync_all = True
                     tmp.info_base = sub_ops
                     tmp.timestamp_option = False
@@ -1791,20 +1791,20 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     code, ret = gen_feed_syncall_var_init_code(tmp, sub_tmp1)
                     self.assertEqual(ret, False)
 
-                    sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+                    sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                     sub_tmp1.block_dim = 24
                     sub_tmp1.with_sync_all = True
                     flag = judge_need_feed_sync_all(tmp, sub_tmp1)
                     self.assertEqual(flag, False)
                     sub_tmp1.block_dim = 20
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                     flag = judge_need_feed_sync_all(tmp, sub_tmp1)
                     self.assertEqual(flag, True)
                     code, ret = gen_feed_syncall_var_init_code(tmp, sub_tmp1)
                     self.assertEqual(ret, True)
 
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
-                    sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_AIV_ONLY
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
+                    sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY
                     sub_tmp1.block_dim = 10
                     tmp.block_dim = 24
                     flag = judge_need_feed_sync_all(tmp, sub_tmp1)
@@ -1835,16 +1835,16 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     code = gen_clear_syncall_worskspace(tmp)
                     self.assertEqual(code, "")
                     tmp.feed_sync_all_mode = SuperKernelFeedSyncAllMode.FeedSyncAllEnable
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                     code = gen_clear_syncall_worskspace(tmp)
                     self.assertIn("copy_cbuf_to_gm", code)
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
                     code = gen_clear_syncall_worskspace(tmp)
                     self.assertIn("copy_ubuf_to_gm", code)
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                     code = gen_clear_syncall_worskspace(tmp)
                     self.assertIn("copy_ubuf_to_gm", code)
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                     code = gen_clear_syncall_worskspace(tmp)
                     self.assertIn("copy_ubuf_to_gm", code)
     
@@ -1864,12 +1864,12 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                         ]
                     },
                     "super_kernel")
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                     tmp.feed_sync_all_mode = SuperKernelFeedSyncAllMode.FeedSyncAllEnable
                     tmp.block_dim = 1
                     tmp.calc_workspace_size()
                     self.assertEqual(tmp.workspace_size, 512)
-                    tmp.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+                    tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                     tmp.info_base = [1] * 1024
                     tmp.calc_workspace_size()
 
@@ -1916,23 +1916,23 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     op_options, compile_log_path)
                 sub_tmp1.send_event_list = [1]
                 sub_tmp1.recv_event_list = [1]
-                sub_tmp1.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 sub_tmp1.notify_block = "1"
                 sub_tmp2 = SubOperatorInfos(1, {"bin_path": "./op2.o","json_path": "op2.json","kernel_name": "op2"}, 100,
                     op_options, compile_log_path)
                 sub_tmp2.send_event_list = [1]
                 sub_tmp2.recv_event_list = [1]
                 sub_tmp2.wait_block = "2"
-                sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 sync_and_event_code = gen_sync_and_event_code(tmp, sub_tmp1, sub_tmp2)
                 self.assertIn("for continues notify/wait event", sync_and_event_code.strip())
 
                 sub_tmp1.notify_block = {"aiv": "3", "aic": "4"}
-                sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 sync_and_event_code = gen_sync_and_event_code_for_two_stream(tmp, sub_tmp1, sub_tmp2, 'aic')
                 self.assertIn("SyncAll", sync_and_event_code.strip())
 
-                sub_tmp2.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
+                sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                 sync_and_event_code = gen_sync_and_event_code_for_two_stream(tmp, sub_tmp1, sub_tmp2, 'aiv')
                 self.assertIn("SYNC_AIC_FLAG", sync_and_event_code.strip())
 
@@ -1961,10 +1961,10 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
 
                 # wait block extra sync case: aic to aiv, need extra aiv sync
                 wait_block_extra_sync_aic_to_aiv_pairs = \
-                    {(KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0),
-                     (KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_AIV_ONLY),
-                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0),
-                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_AIV_ONLY),
+                    {(SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0),
+                     (SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY),
+                     (SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0),
+                     (SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY),
                     }
 
                 golden_extra_aiv_sync_code = '''    sub_op2 wait block
@@ -1980,10 +1980,10 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
 
                 # wait block extra sync case: aic to mix, need extra aiv sync
                 wait_block_extra_sync_aic_to_mix_pairs = \
-                    {(KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1),
-                     (KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2),
-                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1),
-                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2),
+                    {(SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1),
+                     (SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2),
+                     (SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1),
+                     (SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2),
                     }
 
                 for sub_op1_type, sub_op2_type in wait_block_extra_sync_aic_to_mix_pairs:
@@ -1994,10 +1994,10 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
 
                 # wait block extra sync case: aiv to aic, need extra aic sync
                 wait_block_extra_sync_aiv_to_aic_pairs = \
-                    {(KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0, KernelMetaType.KERNEL_TYPE_AIC_ONLY),
-                     (KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0),
-                     (KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_AIC_ONLY),
-                     (KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0),
+                    {(SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY),
+                     (SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0),
+                     (SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY),
+                     (SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0),
                     }
 
                 golden_extra_aic_sync_code = f'''    sub_op2 wait block
@@ -2015,12 +2015,12 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
 
                 # wait block extra sync case: else, no extra sync
                 wait_block_extra_no_sync_pairs = \
-                    {(KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2),
-                     (KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2, KernelMetaType.KERNEL_TYPE_AIC_ONLY),
-                     (KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2, KernelMetaType.KERNEL_TYPE_AIV_ONLY),
-                     (KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2),
-                     (KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_AIV_ONLY),
-                     (KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_AIC_ONLY),
+                    {(SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2),
+                     (SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY),
+                     (SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY),
+                     (SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2),
+                     (SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY),
+                     (SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY),
                     }
 
                 for sub_op1_type, sub_op2_type in wait_block_extra_no_sync_pairs:
@@ -2034,11 +2034,11 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
 
 
     def test_get_sync_code_by_kernel_type(self):
-        sync_code = get_sync_code_by_kernel_type(KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1)
+        sync_code = get_sync_code_by_kernel_type(SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1)
         self.assertIn("SyncAll", sync_code.strip())
-        sync_code = get_sync_code_by_kernel_type(KernelMetaType.KERNEL_TYPE_AIC_ONLY)
+        sync_code = get_sync_code_by_kernel_type(SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY)
         self.assertIn("SYNC_AIC_FLAG", sync_code.strip())
-        sync_code = get_sync_code_by_kernel_type(KernelMetaType.KERNEL_TYPE_AIV_ONLY)
+        sync_code = get_sync_code_by_kernel_type(SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY)
         self.assertIn("SYNC_AIV_ONLY_ALL", sync_code.strip())
 
 

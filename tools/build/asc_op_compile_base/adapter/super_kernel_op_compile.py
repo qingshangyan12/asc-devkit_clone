@@ -318,6 +318,7 @@ def localize_symbol_of_sk(split_mode, sks, spk_dst_file, compile_log_path):
 
 def compile_super_kernel(kernel_info, compile_log_path, enable_features: dict = None):
     global_var_storage.set_variable("super_kenel_save_sub_op_files", True)
+    kernel_info["kernel_type"] = KernelMetaType(kernel_info["kernel_type"])
     op_info = OpInfo()
     compile_options = kernel_info["compile_option"]
     DFXSectionGenerator().is_support = False
@@ -355,4 +356,5 @@ def compile_super_kernel(kernel_info, compile_log_path, enable_features: dict = 
 
 
 def super_kernel_compile(kernel_info, compile_log_path):
+    kernel_info["kernel_type"] = kernel_info["kernel_type"].value
     compile_super_kernel(kernel_info, compile_log_path)

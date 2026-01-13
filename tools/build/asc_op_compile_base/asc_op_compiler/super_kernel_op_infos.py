@@ -18,12 +18,12 @@ import subprocess
 import math
 import shutil
 
-from .super_kernel_utility import AscendCLogLevel, CompileStage, CommonUtility, get_op_debug_config, \
-    KernelMetaType
+from .super_kernel_utility import AscendCLogLevel, CompileStage, CommonUtility, get_op_debug_config
 from .super_kernel_option_parse import parse_super_kernel_options
 from .super_kernel_constants import SuperKernelLinkMode, SuperKernelPreLoadMode, SuperKernelDataCacheMode, \
     SuperKernelEarlyStartMode, SubOperatorType, SuperKernelStreamFusionMode, SuperKernelDebugDcciAllMode, \
-    SuperKernelDebugSyncAllMode, SuperKernelFeedSyncAllMode, SuperKernelProfilingMode, AI_CORE_STR, ERR_CODE
+    SuperKernelDebugSyncAllMode, SuperKernelFeedSyncAllMode, SuperKernelProfilingMode, AI_CORE_STR, ERR_CODE, \
+    SuperKernelKernelType
 from .super_kernel_sub_op_infos import SubOperatorInfos
 
 
@@ -103,7 +103,7 @@ class SuperOperatorInfos:
             stream_id = get_sub_op_streamid(op_info)
             self.info_base.append(SubOperatorInfos(index, op_info, stream_id, self.op_options, self.compile_log_path))
         self.init_sub_operators()
-        self.kernel_type: KernelMetaType = KernelMetaType.KERNEL_TYPE_MAX
+        self.kernel_type: SuperKernelKernelType = SuperKernelKernelType.KERNEL_TYPE_MAX
         self.timestamp_option: bool = False
         self.debug_size: int = 0
         self.debug_option: str = ""
@@ -163,19 +163,21 @@ class SuperOperatorInfos:
         vec_op_list save all vec ops and mix ops
         """
         for sub_op in self.info_base:
-            if sub_op.kernel_type in [KernelMetaType.KERNEL_TYPE_AIC_ONLY, \
-                KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, \
-                KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
+            if sub_op.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2]:
                 self.cub_op_list.append(sub_op)
-            if sub_op.kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY, \
-                KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, \
-                KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
+            if sub_op.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2]:
                 self.vec_op_list.append(sub_op)
 
     def get_task_type(self, op):
-        if op.kernel_type in [KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0]:
+        if op.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0]:
             return "cub"
-        elif op.kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0]:
+        elif op.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0]:
             return "vec"
         else:
             return "mix"
@@ -582,16 +584,16 @@ f"ERROR: super kernel do not support self send/receive pair within 1 real stream
         if debug_aic_num == 0 and debug_aiv_num == 0:
             return
         if debug_aic_num > 0 and debug_aiv_num == 0:
-            self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+            self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
             self.block_dim = debug_aic_num
         elif debug_aic_num == 0 and debug_aiv_num > 0:
-            self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+            self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
             self.block_dim = debug_aiv_num
         elif debug_aic_num == debug_aiv_num:
-            self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+            self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
             self.block_dim = debug_aic_num
         elif debug_aiv_num == 2 * debug_aic_num:
-            self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+            self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
             self.block_dim = debug_aic_num
         else:
             CommonUtility().ascendc_raise_python_err(ERR_CODE, (\
@@ -601,26 +603,26 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
     def get_finale_type_and_block_dim(self, final_kernel_type, max_aic_num, max_aiv_num):
         # get kernel type of super kernel
         if final_kernel_type == 0b1:
-            self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+            self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
             self.block_dim = max_aiv_num
         elif final_kernel_type == 0b10:
-            self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+            self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
             self.block_dim = max_aic_num
         elif final_kernel_type == 0b100 or final_kernel_type == 0b101:
-            self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0
+            self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
             self.block_dim = max_aiv_num
         elif final_kernel_type == 0b1000 or final_kernel_type == 0b1010:
-            self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0
+            self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
             self.block_dim = max_aic_num
         elif final_kernel_type == 0b10000:
-            self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+            self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
             self.block_dim = max_aic_num
         else:
             if max_aiv_num <= max_aic_num:
-                self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1
+                self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 self.block_dim = max_aic_num
             else:
-                self.kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+                self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                 max_1_2_aiv_block_dim = math.ceil(max_aiv_num / 2)
                 self.block_dim = max_aic_num if max_aic_num >= max_1_2_aiv_block_dim else max_1_2_aiv_block_dim
 
@@ -636,23 +638,23 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
             sub_aiv_num = 0
             sub_aic_num = 0
             # summarize sub kernels kernel type infos
-            if sub_operator.kernel_type == KernelMetaType.KERNEL_TYPE_AIV_ONLY:
+            if sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY:
                 sub_aiv_num = sub_operator.block_dim
                 final_kernel_type = final_kernel_type | 0b1
-            elif sub_operator.kernel_type == KernelMetaType.KERNEL_TYPE_AIC_ONLY:
+            elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY:
                 sub_aic_num = sub_operator.block_dim
                 final_kernel_type = final_kernel_type | 0b10
-            elif sub_operator.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0:
+            elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0:
                 sub_aiv_num = sub_operator.block_dim
                 final_kernel_type = final_kernel_type | 0b100
-            elif sub_operator.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0:
+            elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0:
                 sub_aic_num = sub_operator.block_dim
                 final_kernel_type = final_kernel_type | 0b1000
-            elif sub_operator.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1:
+            elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1:
                 sub_aic_num = sub_operator.block_dim
                 sub_aiv_num = sub_operator.block_dim
                 final_kernel_type = final_kernel_type | 0b10000
-            elif sub_operator.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2:
+            elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2:
                 sub_aic_num = sub_operator.block_dim
                 sub_aiv_num = sub_operator.block_dim * 2
                 final_kernel_type = final_kernel_type | 0b100000
@@ -740,16 +742,16 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
         if self.feed_sync_all_mode.value == SuperKernelFeedSyncAllMode.FeedSyncAllDisable.value:
             self.workspace_size = 0
             return
-        if self.kernel_type in [KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0, \
-            KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, \
-            KernelMetaType.KERNEL_TYPE_AIC_ONLY, KernelMetaType.KERNEL_TYPE_AIV_ONLY]:
+        if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, \
+            SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, \
+            SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY]:
             self.get_ws_size(self.block_dim)
         else:
             self.get_ws_size(self.block_dim * 2)
 
 
     def add_define_options(self, exist_dynamic_sub_ops, options: list):
-        if self.kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1 and \
+        if self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1 and \
                                 (CommonUtility.is_c310() or CommonUtility.is_310r6()):
             options.append("-D__ASCENDC_DAVID_SPLIT_CORE__")
         if exist_dynamic_sub_ops:
@@ -905,7 +907,7 @@ split_dynamic_o_in_super_kernel(orign_bin_path, rename_file_path_list[i-1], i, s
         self.calc_workspace_size()
         self.compile_info = {
             "block_dim": self.block_dim,
-            "kernel_type": self.kernel_type,
+            "kernel_type": self.kernel_type.value,
             "sub_operator": sub_operator_info,
             "kernel_file": self.kernel_file,
             "compile_option": options,
