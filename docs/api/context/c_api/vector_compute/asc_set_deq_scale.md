@@ -13,16 +13,19 @@
 
 ## 函数原型
 
-  ```cpp
-    __aicore__ inline void asc_set_deq_scale(const asc_deq_scale_config config)
-    __aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* config)
-  ```
+```cpp
+  __aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool sign_mode)
+  __aicore__ inline void asc_set_deq_scale(half scale)
+```
 
 ## 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
-|config|输入|量化参数。<br/> - asc_deq_scale_config参数：用于非向量模式的量化。详细说明请参考[asc_deq_scale_config](../struct/asc_deq_scale_config.md)。<br/> - uint64_t*参数：量化系数的地址。|
+|scale（half）|输入|量化参数，half类型。适用于cast_deq等接口的int32_t转化为float的场景。|
+|scale（float）|输入|量化参数，float类型。设置DEQSCALE寄存器的值。|
+|offset|输入|量化参数，int16_t类型，只有前9位有效。|
+|sign_mode|输入|bool类型，表示量化结果是否带符号。|
 
 ## 返回值说明
 
@@ -42,9 +45,8 @@ PIPE_V
 constexpr uint32_t src_size = 256;
 __ubuf__ half src[src_size];
 __ubuf__ half dst[src_size];
-asc_deq_scale_config config;
-config.scale = 1;
-config.offset = 0;
-config.sign_mode = 1;
-asc_set_deq_scale(config);
+float scale = 1.0;
+int16_t offset = 2;
+bool sign_mode = false;
+asc_set_deq_scale(scale, offset, sign_mode);
 ```

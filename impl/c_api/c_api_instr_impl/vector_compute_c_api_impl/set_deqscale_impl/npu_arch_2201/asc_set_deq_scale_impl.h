@@ -20,18 +20,22 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-__aicore__ inline void asc_set_deq_scale_impl(const asc_deq_scale_config config)
+__aicore__ inline void asc_set_deq_scale_impl(float scale, int16_t offset, bool sign_mode)
 {
     if ASC_IS_AIV {
-        set_deqscale(config.val);
+        constexpr uint64_t sign_mode_bit = 46;
+        constexpr uint64_t offset_mask = 0x1ff;
+        constexpr uint64_t offset_bit = 37;
+        uint64_t cfg = ((static_cast<uint64_t>(sign_mode) << sign_mode_bit) | ((offset & offset_mask) << offset_bit) |
+                       *(reinterpret_cast<uint32_t *>(&scale)));
+        set_deqscale(cfg);
     }
 }
 
-__aicore__ inline void asc_set_deq_scale_impl(__ubuf__ uint64_t* config)
+__aicore__ inline void asc_set_deq_scale_impl(half scale)
 {
     if ASC_IS_AIV {
-        constexpr uint64_t deq_addr = 5;
-        set_deqscale((uint64_t)config >> deq_addr);
+        set_deqscale(scale);
     }
 }
 

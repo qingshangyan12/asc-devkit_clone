@@ -42,9 +42,9 @@ __aicore__ inline void asc_set_mask_norm();
 
 __aicore__ inline void asc_set_vector_mask(uint64_t mask1, uint64_t mask0);
 
-__aicore__ inline void asc_set_deq_scale(const asc_deq_scale_config config);
+__aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool sign_mode);
 
-__aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* config);
+__aicore__ inline void asc_set_deq_scale(half scale);
 
 // ==========asc_add(half/float/int16_t/int32_t)==========
 __aicore__ inline void asc_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
