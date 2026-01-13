@@ -25,7 +25,7 @@
 
 namespace __asc_simt_vf {
 template <class... Args>
-__attribute__((noinline)) __simt_callee__ void printf(const __gm__ char* fmt, Args&&... args);
+__attribute__((always_inline)) inline __simt_callee__ void printf(const __gm__ char* fmt, Args&&... args);
 }   // namespase __asc_simt_vf
 
 #endif

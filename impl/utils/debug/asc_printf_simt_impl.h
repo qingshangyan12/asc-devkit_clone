@@ -293,7 +293,7 @@ __simt_callee__ inline void PrintfImpl(const __gm__ char *fmt, Args &&...args)
 
 namespace __asc_simt_vf {
 template <class... Args>
-__attribute__((noinline)) __simt_callee__ void printf(const __gm__ char* fmt, Args&&... args)
+__attribute__((always_inline)) inline __simt_callee__ void printf(const __gm__ char* fmt, Args&&... args)
 {
 #ifndef ASCENDC_CPU_DEBUG
 #ifdef ASCENDC_DUMP

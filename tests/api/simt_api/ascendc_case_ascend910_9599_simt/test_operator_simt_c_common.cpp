@@ -25,4 +25,5 @@ TEST_F(CommoncTestsuite, BlockIdxAndNumTestCase)
     int blockNum = asc_get_block_num();
     EXPECT_EQ(blockIdx, 0);
     EXPECT_EQ(blockNum, 8); // 8: Num of blocks
+    __asc_simt_vf::printf("test");
 }
