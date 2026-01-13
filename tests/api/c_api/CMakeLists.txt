@@ -19,6 +19,7 @@ set(ASCENDC_UT_PRODUCT_TYPE_LIST
 
 set(ASCENDC_UT_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/..
+    ${ASCENDC_DIR}
     ${ASCENDC_DIR}/include
     ${ASCENDC_DIR}/include/c_api
     ${ASCENDC_DIR}/impl/c_api
@@ -48,7 +49,7 @@ file(GLOB ASCENDC_UT_ascend910B1_AIV_CASE_SRC
 
 foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_c_api_${product_type}
-        ${ASCENDC_DIR}/tests/main_global.cpp
+        ${ASCENDC_DIR}/tests/main.cpp
         ${ASCENDC_UT_COMMON_SRC}
         ../common/k3_pvwrap.cpp
         ${ASCENDC_UT_${product_type}_CASE_SRC}

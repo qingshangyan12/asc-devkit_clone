@@ -37,7 +37,7 @@ run_python_llt_test(
     TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/asc_compile_common/
     PRE_TEST_COMMAND
     COVERAGERC_DIR
-    )
+)
 
 add_dependencies(ascendc_pyut_asc_compile_common
     asc_platform_test
@@ -55,7 +55,7 @@ run_python_llt_test(
 
 add_dependencies(ascendc_pyut_asc_op_compiler
     register
-    gen_kernel_tiling
+    kernel_tiling
     install_adapter_api_ut
     generate_hidden_dat_file_ut
     asc_platform_test
@@ -75,11 +75,11 @@ file(MAKE_DIRECTORY ${OPC_BASE}/asc_opc/output)
 file(WRITE ${OPC_BASE}/asc_opc/stub/files/kernel_meta/MatMul_build_res.o "")
 
 run_python_llt_test(
-        TARGET opc_unittest
-        SRC_FILES_DIR ${ASCENDC_DIR}/tools/build/asc_opc/python
-        TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/asc_opc
-        EXPORT_PYTHONPATH  ${ASCENDC_DIR}/tools/build/asc_opc
-        ENV_FILE ${ASCENDC_DIR}/tests/python/asc_opc/common/ci/set_python_env.sh
-        ENV_PARAMS ${ASCENDC_DIR}\ py_ut\ 310
-        COVERAGERC_DIR
+    TARGET opc_unittest
+    SRC_FILES_DIR ${ASCENDC_DIR}/tools/build/asc_opc/python
+    TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/asc_opc
+    EXPORT_PYTHONPATH  ${ASCENDC_DIR}/tools/build/asc_opc
+    ENV_FILE ${ASCENDC_DIR}/tests/python/asc_opc/common/ci/set_python_env.sh
+    ENV_PARAMS ${ASCENDC_DIR}\ py_ut\ 310
+    COVERAGERC_DIR
 )

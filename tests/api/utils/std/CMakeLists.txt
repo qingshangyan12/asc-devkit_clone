@@ -42,7 +42,10 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
 
     target_include_directories(ascendc_ut_std_api_${product_type} PRIVATE
         ${ASCENDC_DIR}
+        ${ASCENDC_DIR}/include
+        ${ASCENDC_DIR}/include/basic_api
         ${ASCENDC_DIR}/impl
+        ${ASCENDC_DIR}/impl/basic_api
         $<$<STREQUAL:${product_type},ascend910_9599>:${ASCENDC_DIR}/impl/simt_api>
     )
 
@@ -63,6 +66,7 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
     target_link_libraries(ascendc_ut_std_api_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         tikicpulib::${product_type}
+        kernel_tiling
         -Wl,--no-as-needed
         error_manager
         mmpa

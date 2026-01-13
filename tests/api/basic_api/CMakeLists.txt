@@ -33,11 +33,11 @@ set(ASCENDC_TEST_HEADER_FILES
     common
     ../common
     ${ASCENDC_DIR}
-    ${ASCENDC_DIR}/include/utils/
-    ${ASCENDC_DIR}/include/
-    ${ASCENDC_DIR}/include/basic_api/
-    ${ASCENDC_DIR}/impl/
-    ${ASCENDC_DIR}/impl/basic_api/
+    ${ASCENDC_DIR}/include
+    ${ASCENDC_DIR}/include/basic_api
+    ${ASCENDC_DIR}/include/utils
+    ${ASCENDC_DIR}/impl
+    ${ASCENDC_DIR}/impl/basic_api
 )
 
 # common ut src files

@@ -19,11 +19,13 @@ set(ASCENDC_TEST_HEADER_FILES
     ../common
     common_simt
     ${ASCENDC_DIR}
-    ${ASCENDC_DIR}/include/
-    ${ASCENDC_DIR}/include/utils/
-    ${ASCENDC_DIR}/include/simt_api/
-    ${ASCENDC_DIR}/impl/
-    ${ASCENDC_DIR}/impl/simt_api/
+    ${ASCENDC_DIR}/include
+    ${ASCENDC_DIR}/include/basic_api
+    ${ASCENDC_DIR}/include/simt_api
+    ${ASCENDC_DIR}/include/utils
+    ${ASCENDC_DIR}/impl
+    ${ASCENDC_DIR}/impl/basic_api
+    ${ASCENDC_DIR}/impl/simt_api
 )
 
 # # ================ simt_api kernel ut ================
@@ -68,6 +70,7 @@ foreach(product_type ${SIMT_PRODUCT_TYPE_LIST})
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         $<$<STREQUAL:${product_type},ascend910_9599>:tikicpulib::ascend910_9599>
         $<$<STREQUAL:${product_type},mc62cm12aa>:tikicpulib::mc62cm12aa>
+        kernel_tiling
         -Wl,--no-as-needed
         error_manager
         mmpa

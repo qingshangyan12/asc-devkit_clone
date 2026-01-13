@@ -91,11 +91,13 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
     target_link_libraries(ascendc_ut_tiling_utils_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         kernel_tiling
-        metadef
+        register
         graph
         graph_base
-        register
         opp_registry
+        platform
+        metadef
+        unified_dlog
         dl
         -Wl,--no-as-needed
         error_manager
