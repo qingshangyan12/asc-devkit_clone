@@ -39,15 +39,17 @@ def gen_golden_data_simple():
     sel_shape = [128]
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
     input_y = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
+    min_val, max_val = get_range_by_dtype(sel_type)
     input_sel = np.random.uniform(min_val, max_val, sel_shape).astype(sel_type)
-    #将mask转为二进制
-    bin_list = [f"{num:08b}" for num in input_sel] #sel_mask是uint8类型
+    # 将mask转为二进制
+    bin_list = [f"{num:08b}" for num in input_sel] # sel_mask是uint8类型
     bin_sel = ""
     for bin_str in bin_list:
-        bin_sel += "".join(reversed(bin_str)) #低位bit在前，所以要翻转字符串
+        bin_sel += "".join(reversed(bin_str)) # 低位bit在前，所以要翻转字符串
     golden = np.ones(output_shape).astype(output_type)
+    mask_num = 64
     for i in range(len(input_x)):
-        if bin_sel[i] == '0':
+        if bin_sel[i % mask_num] == '0':
             golden[i] = input_y[i]
         else:
             golden[i] = input_x[i]
