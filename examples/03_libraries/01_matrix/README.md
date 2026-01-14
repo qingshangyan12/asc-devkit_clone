@@ -41,3 +41,6 @@
 | [matmul_l2cache](./matmul_l2cache) | 本样例介绍调用Matmul API实现L2 Cache切分的功能的Matmul单算子 |
 | [matmul_mixdualmaster](./matmul_mixdualmaster) | 本样例介绍通过配置模板参数中enableMixDualMaster使能Matmul双主模式MixDualMaster的使用方式 |
 | [matmul_nd_align](./matmul_nd_align) | 本样例介绍调用Matmul API在输入矩阵的N方向非对齐场景下，矩阵乘输出时使能N方向对齐的实现方式 |
+| [matmul_sparse](./matmul_sparse) | 本样例介绍使用Matmul API实现左矩阵A为稀疏矩阵，右矩阵B为4:2稠密化后的矩阵的Sparse Matmul场景的矩阵乘计算 |
+| [matmul_l0cache](./matmul_l0cache) | 本样例介绍Matmul API中使能L0缓存的使用方式 |
+| [matmul_tscm](./matmul_tscm) | 本样例介绍Matmul API中用户自定义TSCM输入的使用方式 |

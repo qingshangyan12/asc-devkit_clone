@@ -16,15 +16,15 @@
 ## 算子描述
 - 算子功能： 
 
-  本样例中实现的是Matmul算子。  
-  Matmul算子的数学表达式为：
+  本样例中实现的是Matmul算子，Matmul算子的数学表达式为：
   $$
   C = A * B + Bias
   $$
   其中A的形状为[M, K], B的形状为[K, N], C的形状为[M, N], Bias的形状为[1, N]。
+
 - 算子规格： 
 
-  本样例中，算子实现支持的shape为：M = 31, N = 31, K = 31。
+  本样例默认执行的算子shape为：M = 31, N = 31, K = 31。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
@@ -38,6 +38,7 @@
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
+
 - 算子实现： 
  
   - Kernel实现  

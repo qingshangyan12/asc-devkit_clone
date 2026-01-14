@@ -16,25 +16,24 @@
 ## 算子描述
 - 算子功能： 
 
-  本样例中实现的是[M, K, N]固定为[127, 127, 63]的Matmul算子。       
-  Matmul算子的数学表达式为：
+  本样例中实现的是Matmul算子，Matmul算子的数学表达式为：
   $$
   C = A * B + Bias
   $$
-  其中A的形状为[127, 63]，B的形状为[63, 127]，C的形状为[127, 127]，Bias的形状为[1, 127]。
+  其中A的形状为[M, K], B的形状为[K, N], C的形状为[M, N], Bias的形状为[1, N]。
+
 - 算子规格： 
 
-  在核函数直调样例中，算子实现支持的shape为：M = 127, N = 127， K = 63
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   </tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">int8</td><td align="center">ND</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">int8</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">int32</td><td align="center">ND</td></tr>
+  <tr><td align="center">a</td><td align="center">(127, 63)</td><td align="center">int8</td><td align="center">ND</td></tr>
+  <tr><td align="center">b</td><td align="center">(63, 127)</td><td align="center">int8</td><td align="center">ND</td></tr>
+  <tr><td align="center">bias</td><td align="center">(127, )</td><td align="center">int32</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">int32</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">(127, 127)</td><td align="center">int32</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>

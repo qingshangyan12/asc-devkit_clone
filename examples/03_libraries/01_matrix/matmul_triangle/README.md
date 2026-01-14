@@ -28,17 +28,18 @@
 
   本样例中，算子实现支持的shape为：M = 2558, N = 2045, K = 128。
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a</td><td align="center">(2558, 128)</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">(128, 2045)</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">(2045, )</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td>
+  <td align="center">(2558, 2045)</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
   </table>
 - 算子实现： 
  

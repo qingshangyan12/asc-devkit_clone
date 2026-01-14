@@ -23,20 +23,20 @@
 
 - 算子规格： 
 
-  本样例中，算子实现支持的shape为：M = 2560, N = 128, K = 512。
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
   </tr>
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">a</td><td align="center">M * K</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">b</td><td align="center">K * N</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">1 * N</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a</td><td align="center">(2560, 128)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b</td><td align="center">(128, 512)</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">(512, )</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">(2560, 512)</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
   </table>
+
 - 算子实现： 
   - Kernel实现
     - 计算逻辑：本样例的A矩阵为非连续搬运，每两个基本块需要跳转一次地址（即第一块与第二块连续排布，第二块与第三块间存在地址偏移，第三块与第四块连续排布，后续以此类推）。编写自定义回调函数前，需要确定切分后的SingleM、SingleK、baseM、baseK的大小及base块的分布。本样例中在Tiling侧设置单核计算量SingleShape：SingleM=128、SingleK=512、SingleN=128，然后在调测阶段调用GetBaseM、GetBaseK接口，打印出参数信息baseM=128、baseK=128，由此得知每个单核上有4个base块，用于Kernel侧的地址偏移计算，从而编写回调函数的搬运。变量offsetListGlobal保存单核上A矩阵的第0个base块和第2个base块的首地址，每个单核需要传入2个地址。

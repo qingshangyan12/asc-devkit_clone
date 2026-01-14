@@ -23,24 +23,25 @@
 
 - 算子规格： 
 
-  本样例中，算子实现支持的shape为：M = 7680, N = 480, K = 320。
-    <table>
-    <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
-    </tr>
-    <tr><td rowspan="6" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-    <tr><td align="center">a1</td><td align="center">M * K</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
-    <tr><td align="center">b1</td><td align="center">K * N</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
-    <tr><td align="center">a2</td><td align="center">M * K</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
-    <tr><td align="center">b2</td><td align="center">K * N</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
-    <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-    </tr>
-    </tr>
-    <tr><td rowspan="2" align="center">算子输出</td>
-    <td align="center">c1</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-    <td align="center">c2</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-    </tr>
-    <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
-    </table>
+  本样例默认执行的算子shape为：M = 7680, N = 480, K = 320。
+  <table>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
+  </tr>
+  <tr><td rowspan="6" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
+  <tr><td align="center">a1</td><td align="center">M * K</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b1</td><td align="center">K * N</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">a2</td><td align="center">M * K</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">b2</td><td align="center">K * N</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+  <tr><td align="center">bias</td><td align="center">N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  </tr>
+  </tr>
+  <tr><td rowspan="2" align="center">算子输出</td>
+  <td align="center">c1</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  <td align="center">c2</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
+  </tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
+  </table>
+
 - 算子实现： 
   - Kernel实现
     - 计算逻辑是：Ascend C提供一组Matmul高阶API，方便用户快速实现Matmul矩阵乘法的运算操作。Matmul的计算公式为：C = A * B + Bias。
