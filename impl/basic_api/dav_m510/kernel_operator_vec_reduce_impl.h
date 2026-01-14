@@ -886,18 +886,18 @@ __aicore__ inline void ReduceMaxImpl(
     } else if constexpr (sizeof(T) == 4) {
         if (calIndex) {
             VF_CALL<ReduceIndexTemplate<ReduceMode::REDUCE_MAX, T, uint32_t>>(
-                dstLocal, srcLocal, workLocal, count, 8, initValue);
+                dstLocal, srcLocal, workLocal, count, DEFAULT_BLK_NUM, initValue);
         } else {
             VF_CALL<ReduceNoIndexTemplate<ReduceMode::REDUCE_MAX, T>>(
-                dstLocal, srcLocal, workLocal, count, 8, initValue);
+                dstLocal, srcLocal, workLocal, count, DEFAULT_BLK_NUM, initValue);
         }
     } else {
         if (calIndex) {
             VF_CALL<ReduceIndexTemplate<ReduceMode::REDUCE_MAX, T, uint16_t>>(
-                dstLocal, srcLocal, workLocal, count, 8, initValue);
+                dstLocal, srcLocal, workLocal, count, DEFAULT_BLK_NUM, initValue);
         } else {
             VF_CALL<ReduceNoIndexTemplate<ReduceMode::REDUCE_MAX, T>>(
-                dstLocal, srcLocal, workLocal, count, 8, initValue);
+                dstLocal, srcLocal, workLocal, count, DEFAULT_BLK_NUM, initValue);
         }
     }
 }
@@ -1017,18 +1017,18 @@ __aicore__ inline void ReduceMinImpl(
     } else if constexpr (sizeof(T) == 4) {
         if (calIndex) {
             VF_CALL<ReduceIndexTemplate<ReduceMode::REDUCE_MIN, T, uint32_t>>(
-                dstLocal, srcLocal, workLocal, count, 8, initValue);
+                dstLocal, srcLocal, workLocal, count, DEFAULT_BLK_NUM, initValue);
         } else {
             VF_CALL<ReduceNoIndexTemplate<ReduceMode::REDUCE_MIN, T>>(
-                dstLocal, srcLocal, workLocal, count, 8, initValue);
+                dstLocal, srcLocal, workLocal, count, DEFAULT_BLK_NUM, initValue);
         }
     } else {
         if (calIndex) {
             VF_CALL<ReduceIndexTemplate<ReduceMode::REDUCE_MIN, T, uint16_t>>(
-                dstLocal, srcLocal, workLocal, count, 8, initValue);
+                dstLocal, srcLocal, workLocal, count, DEFAULT_BLK_NUM, initValue);
         } else {
             VF_CALL<ReduceNoIndexTemplate<ReduceMode::REDUCE_MIN, T>>(
-                dstLocal, srcLocal, workLocal, count, 8, initValue);
+                dstLocal, srcLocal, workLocal, count, DEFAULT_BLK_NUM, initValue);
         }
     }
 }

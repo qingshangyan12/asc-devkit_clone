@@ -89,7 +89,7 @@ __simd_vf__ inline void CumSumCopyWithCastVF(__ubuf__ T* src, __ubuf__ U* dst, c
 }
 
 template <typename U, typename T>
-__simd_vf__ inline void CumSumCopyWithCast2VF(__local_mem__ T* src, __local_mem__ U* dst, const uint16_t outter,
+__simd_vf__ inline void CumSumCopyWithCast2VF(__ubuf__ T* src, __ubuf__ U* dst, const uint16_t outter,
                                               const uint16_t inner, uint16_t innerOneRepNum, uint16_t mainRepeatTime,
                                               uint16_t tailRepeatTime, uint32_t tailCount)
 {
