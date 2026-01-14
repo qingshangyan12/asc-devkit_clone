@@ -174,7 +174,7 @@ __aicore__ inline void CCUPrepare(CCUParam &ccuParam, uint64_t *xnData)
                 ccuParam.commParam.strideCount == 0 ? sliceSizeAlltoall : ccuParam.commParam.strideCount * dataSize;
         xnData[CCU_XNDATA_INDEX_THREE] = sliceSizeAlltoall;
         xnData[CCU_XNDATA_INDEX_FOUR] = strideSize;
-        xnData[CCU_XNDATA_INDEX_FIVE] = xnData[CCU_XNDATA_INDEX_SEND_BUFF];
+        xnData[CCU_XNDATA_INDEX_FIVE] = 0;
         xnData[CCU_XNDATA_INDEX_SIX] = strideSize * ccuParam.rankId;
         return;
     }
