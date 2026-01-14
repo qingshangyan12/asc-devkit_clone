@@ -141,7 +141,7 @@ template <typename T>
 __aicore__ inline void DataCopyL12BTImpl(const uint64_t dst, __cbuf__ T* src, const uint16_t isenableConv,
     const DataCopyParams &intriParams)
 {
-    // ISA: unit of 64B    API: unit of 32B
+    // BuiltIn: unit of 64B    API: unit of 32B
     uint16_t burstLength = DivCeil(intriParams.blockLen, 2);
     uint16_t dstStride = DivCeil(intriParams.dstStride, 2);
     if constexpr(std::is_same<T, float>::value || std::is_same<T, int32_t>::value || std::is_same<T, half>::value) {
