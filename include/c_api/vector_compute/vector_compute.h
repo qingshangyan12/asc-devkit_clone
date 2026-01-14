@@ -1927,16 +1927,14 @@ __aicore__ inline void asc_int162half_rnz_sync(__ubuf__ half* dst, __ubuf__ int1
 __aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, 
             uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat);
 
-__aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
-
-__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
+__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset,
+            uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat);
 
 __aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, 
             uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat);
 
-__aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
-
-__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
+__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset,
+            uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat);
 
 // ==========asc_min_scalar(half/float/int16_t/int32_t)==========
 __aicore__ inline void asc_min_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count);

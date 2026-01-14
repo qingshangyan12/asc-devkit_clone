@@ -13,13 +13,6 @@
 
 ### 函数原型
 
-- 前n个数据计算
-
-  ```cpp
-  __aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-  __aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-  ```
-
 - 高维切分计算
 
   ```cpp
@@ -30,8 +23,8 @@
 - 同步计算
 
   ```cpp
-  __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-  __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+  __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
+  __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
   ```
 
 ### 参数说明
@@ -41,7 +34,6 @@
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
 | src_offset | 输入 | 每个Datablock在源操作数中的地址偏移。 |
-| count | 输入 | 参与计算的元素个数。 |
 | dst_repeat_stride |输入| 目的操作数相邻迭代间相同DataBlock的地址步长。 |
 | dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | repeat |输入| 迭代次数。 |
@@ -63,10 +55,10 @@ PIPE_V
 
 ```cpp
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
-__ubuf__ uint32_t src_offset[total_length];
+__ubuf__ uint32_t src_offset[total_length * sizeof(uint32_t) / 32];
 __ubuf__ uint32_t dst[total_length];
 __ubuf__ uint32_t src[total_length];
-asc_gather_datablock(dst, src, src_offset, total_length);
+asc_gather_datablock(dst, src, src_offset, 8, 1, 1);
 // src [1, 2, 3, ..., 126, 127, 128] 128个uint32_t类型数据
 // src_offset [0, 32, 64, ..., 416, 448, 480] 
 // dst [1, 2, 3, ..., 126, 127, 128]

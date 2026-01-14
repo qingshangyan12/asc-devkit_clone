@@ -31,16 +31,10 @@ __aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint16_t* dst, __ubuf_
     }
 }
 
-__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+__aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset,
+        uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
 {
-    asc_set_mask_count_begin(count);
-    asc_gather_datablock_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT.U8);
-    asc_set_mask_count_end();
-}
-
-__aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_gather_datablock_impl(dst, src, src_offset, count);
+    asc_gather_datablock_impl(dst, src, src_offset, dst_repeat_stride, dst_block_stride, repeat);
     asc_sync_post_process();
 }
 
@@ -52,16 +46,10 @@ __aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint32_t* dst, __ubuf_
     }
 }
 
-__aicore__ inline void asc_gather_datablock_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+__aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset,
+            uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
 {
-    asc_set_mask_count_begin(count);
-    asc_gather_datablock_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT.U8);
-    asc_set_mask_count_end();
-}
-
-__aicore__ inline void asc_gather_datablock_sync_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_gather_datablock_impl(dst, src, src_offset, count);
+    asc_gather_datablock_impl(dst, src, src_offset, dst_repeat_stride, dst_block_stride, repeat);
     asc_sync_post_process();
 }
 

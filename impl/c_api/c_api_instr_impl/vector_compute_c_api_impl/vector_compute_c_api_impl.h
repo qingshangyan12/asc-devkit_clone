@@ -4846,14 +4846,11 @@ __aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uin
     asc_gather_datablock_impl(dst, src, src_offset, dst_repeat_stride, dst_block_stride, repeat);
 }
 
-__aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_gather_datablock_impl(dst, src, src_offset, count);
-}
 
-__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset,
+            uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
 {
-    asc_gather_datablock_sync_impl(dst, src, src_offset, count);
+    asc_gather_datablock_sync_impl(dst, src, src_offset, dst_repeat_stride, dst_block_stride, repeat);
 }
 
 __aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, 
@@ -4862,14 +4859,10 @@ __aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uin
     asc_gather_datablock_impl(dst, src, src_offset, dst_repeat_stride, dst_block_stride, repeat);
 }
 
-__aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset,
+            uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
 {
-    asc_gather_datablock_impl(dst, src, src_offset, count);
-}
-
-__aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_gather_datablock_sync_impl(dst, src, src_offset, count);
+    asc_gather_datablock_sync_impl(dst, src, src_offset, dst_repeat_stride, dst_block_stride, repeat);
 }
 
 #endif
