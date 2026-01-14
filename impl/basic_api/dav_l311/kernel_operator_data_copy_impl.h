@@ -169,7 +169,6 @@ template <typename T>
 __aicore__ inline void DataCopyL12BTImpl(const uint64_t dst, __cbuf__ T* src, const uint16_t isenableConv,
     const DataCopyParams &intriParams)
 {
-    // ISA: unit of 32B    API: unit of 32B
     if constexpr(std::is_same<T, float>::value || std::is_same<T, int32_t>::value || std::is_same<T, half>::value) {
         // the burst length, destination gap size must be even.
         uint16_t blockLenAlign = AlignUp(intriParams.blockLen, 2);
