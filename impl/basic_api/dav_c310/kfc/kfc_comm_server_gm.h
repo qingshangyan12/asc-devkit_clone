@@ -68,11 +68,7 @@ public:
         event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_MTE2));
         SetFlag<HardEvent::MTE3_MTE2>(eventID);
         WaitFlag<HardEvent::MTE3_MTE2>(eventID);
-        __cbuf__ uint32_t* dst = (__cbuf__ uint32_t*)(TOTAL_L1_SIZE);
-#if ASCENDC_CPU_DEBUG
-        dst = (uint32_t*)(GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::A1)) + TOTAL_L1_SIZE);
-        *dst = addr;
-#endif
+        
         eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
         SetFlag<HardEvent::S_MTE3>(eventID);
         WaitFlag<HardEvent::S_MTE3>(eventID);
