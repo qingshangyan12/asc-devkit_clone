@@ -111,7 +111,7 @@ class SuperOperatorInfos:
         self.workspace_size = 0
         # superkernel block dim should be greater equal than max of block dim of subops
         self.get_summary_type_and_options()
-        self.adjust_dynamic_op_block_dim()
+        self.adjust_dynamic_op_block_num()
         self.compile_info: json = None
         kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
         file_name_tag = CommonUtility.get_distinct_filename_tag() + "_kernel.cpp"
@@ -600,7 +600,7 @@ f"ERROR: super kernel do not support self send/receive pair within 1 real stream
 f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {debug_aiv_num} is invalid."))
 
 
-    def get_finale_type_and_block_dim(self, final_kernel_type, max_aic_num, max_aiv_num):
+    def get_finale_type_and_block_num(self, final_kernel_type, max_aic_num, max_aiv_num):
         # get kernel type of super kernel
         if final_kernel_type == 0b1:
             self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
@@ -623,8 +623,8 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
                 self.block_num = max_aic_num
             else:
                 self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
-                max_1_2_aiv_block_dim = math.ceil(max_aiv_num / 2)
-                self.block_num = max_aic_num if max_aic_num >= max_1_2_aiv_block_dim else max_1_2_aiv_block_dim
+                max_1_2_aiv_block_num = math.ceil(max_aiv_num / 2)
+                self.block_num = max_aic_num if max_aic_num >= max_1_2_aiv_block_num else max_1_2_aiv_block_num
 
         self.update_superkernel_blocknum_by_debug_options()
 
@@ -676,7 +676,7 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
             max_aic_num = sub_aic_num if sub_aic_num > max_aic_num else max_aic_num
             max_aiv_num = sub_aiv_num if sub_aiv_num > max_aiv_num else max_aiv_num
 
-        self.get_finale_type_and_block_dim(final_kernel_type, max_aic_num, max_aiv_num)
+        self.get_finale_type_and_block_num(final_kernel_type, max_aic_num, max_aiv_num)
 
 
 
@@ -691,7 +691,7 @@ f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {d
         return aiv_kernel_name, aic_kernel_name
 
 
-    def adjust_dynamic_op_block_dim(self):
+    def adjust_dynamic_op_block_num(self):
         for sub_op in self.info_base:
             sub_op.adjust_dynamic_op(self.block_num)
 
@@ -907,6 +907,7 @@ split_dynamic_o_in_super_kernel(orign_bin_path, rename_file_path_list[i-1], i, s
         self.calc_workspace_size()
         self.compile_info = {
             "block_dim": self.block_num,
+            "block_num": self.block_num,
             "kernel_type": self.kernel_type.value,
             "sub_operator": sub_operator_info,
             "kernel_file": self.kernel_file,

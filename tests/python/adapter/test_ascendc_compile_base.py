@@ -27,7 +27,7 @@ from adapter.super_kernel_utility import check_exist_instrinsic_when_super_kerne
 from adapter.super_kernel_op_compile import gen_file_header, split_spk_kernel_objs, \
     localize_symbol_of_sk, localization_sub_op_func_sym
 from adapter.super_kernel_sub_op_compile import gen_sub_kernel_name, split_kernel_arch_str, \
-    sp_add_sub_op_feed_sync_all_macro, sp_add_sub_op_block_dim_macro
+    sp_add_sub_op_feed_sync_all_macro, sp_add_sub_op_block_num_macro
 from adapter.get_op_tiling import TilingInfo
 from adapter.super_kernel_sub_op_compile import split_sub_kernel_objs, \
     gen_sub_super_kernel_early_start_compile_options, gen_sub_super_kernel_compile_options, \
@@ -87,17 +87,17 @@ class TestAscendCCompileBase(unittest.TestCase):
                             self.assertEqual(len(sks), 1)
 
 
-    def test_sp_add_sub_op_block_dim_macro(self):
+    def test_sp_add_sub_op_block_num_macro(self):
         compile_option_tuple = CompileOptionTuple([], [])
         tiling_info = TilingInfo()
-        sp_add_sub_op_block_dim_macro(compile_option_tuple, tiling_info)
+        sp_add_sub_op_block_num_macro(compile_option_tuple, tiling_info)
         self.assertEqual(len(compile_option_tuple.compile_options), 1)
         self.assertIn("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__", compile_option_tuple.compile_options)
 
         compile_option_tuple = CompileOptionTuple([], [])
         tiling_info = TilingInfo()
         tiling_info.block_dim = 10
-        sp_add_sub_op_block_dim_macro(compile_option_tuple, tiling_info)
+        sp_add_sub_op_block_num_macro(compile_option_tuple, tiling_info)
         self.assertEqual(len(compile_option_tuple.compile_options), 1)
         self.assertIn("-D__SUPER_KERNEL_STATIC_BLOCK_NUM__=10", compile_option_tuple.compile_options)
 

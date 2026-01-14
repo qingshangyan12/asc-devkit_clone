@@ -85,7 +85,7 @@ def gen_sub_super_kernel_early_start_compile_options(compile_option_tuple, compi
             ("sub super kernel compile must provide super_kernel_sub_info"))
 
 
-def sp_add_sub_op_block_dim_macro(compile_option_tuple, tiling_info):
+def sp_add_sub_op_block_num_macro(compile_option_tuple, tiling_info):
     if tiling_info.block_num != -1:
         # static cases
         compile_option_tuple.compile_options.append(f"-D__SUPER_KERNEL_STATIC_BLOCK_NUM__={tiling_info.block_num}")
@@ -103,7 +103,7 @@ def sp_add_sub_op_feed_sync_all_macro(compile_info, compile_option_tuple):
 
 def gen_sub_super_kernel_compile_options(compile_option_tuple, tiling_info, compile_info):
     compile_option_tuple.compile_options.append("-D__ASCENDC_ENABLE_SUPER_KERNEL__")
-    sp_add_sub_op_block_dim_macro(compile_option_tuple, tiling_info)
+    sp_add_sub_op_block_num_macro(compile_option_tuple, tiling_info)
     sp_add_sub_op_feed_sync_all_macro(compile_info, compile_option_tuple)
     stream_fusion_mode = compile_info.super_kernel_info["sp_options"].get('stream-fusion', \
         SuperKernelStreamFusionMode.StreamFusionDisable)

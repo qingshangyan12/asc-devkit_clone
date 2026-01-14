@@ -265,10 +265,10 @@ param_offset={self.wait_param_offset + index}\n"
         self.gen_notify_wait_from_outside(inner_event_id_set, enable_double_stream)
 
 
-    def adjust_dynamic_op(self, spk_block_dim):
+    def adjust_dynamic_op(self, spk_block_num):
         if self.sub_op_task_type.value == SubOperatorType.DYNAMIC_OP.value:
             self.dynamic_impl_func_block = self.dynamic_impl_func_block.replace(
-                "__placehoder__spk_block_dim__", f"{spk_block_dim}")
+                "__placehoder__spk_block_num__", f"{spk_block_num}")
 
 
     def init_of_sub_operator_info(self):
@@ -424,10 +424,10 @@ f"""if (*tilingKeyAddr < {input_blocks[total_length//2][1]}) {{
         self.dynamic_impl_func_block = f"""
 // begin implement of dynamic op {self.kernel_name}
 static __aicore__ void switch_func_of_{self.kernel_name}(GM_ADDR __ac_dynamic_tiling_key_{self.index}, \
-GM_ADDR __ac_dynamic_block_dim_{self.index}, GM_ADDR __ac_wait_lock_{self.index}, \
+GM_ADDR __ac_dynamic_block_num_{self.index}, GM_ADDR __ac_wait_lock_{self.index}, \
 {aiv_func_addr_str}, {aic_func_addr_str}, uint64_t& dy_block_num) {{
     __gm__ uint64_t* tilingKeyAddr = reinterpret_cast<__gm__ uint64_t*>(__ac_dynamic_tiling_key_{self.index});
-    __gm__ uint64_t* blockNumAddr = reinterpret_cast<__gm__ uint64_t*>(__ac_dynamic_block_dim_{self.index});
+    __gm__ uint64_t* blockNumAddr = reinterpret_cast<__gm__ uint64_t*>(__ac_dynamic_block_num_{self.index});
     __gm__ volatile uint64_t* lockAddr = reinterpret_cast<__gm__ uint64_t*>(__ac_wait_lock_{self.index});
     dcci(lockAddr, 0, 2);
     while(*lockAddr != 1) {{
@@ -497,7 +497,7 @@ GM_ADDR __ac_dynamic_block_dim_{self.index}, GM_ADDR __ac_wait_lock_{self.index}
 __aicore__ inline void call_func_of_{self.kernel_name}(uint64_t args_offset, \
 {dy_aiv_func_ptr}, {dy_aic_func_ptr}, const uint64_t dy_block_num) {{
     uint64_t kernelType = dy_block_num  >> 32;
-    uint64_t numBlocks = __placehoder__spk_block_dim__;
+    uint64_t numBlocks = __placehoder__spk_block_num__;
     g_super_kernel_dynamic_block_num = dy_block_num & 0xFFFFFFFF;
     {func_type}
     """
@@ -564,7 +564,7 @@ kernelType == {SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0.value}) {{
             self.block_num = int(get_soc_spec('vector_core_cnt'))
         else:
             self.block_num = int(get_soc_spec('ai_core_cnt'))
-        self.extra_kernel_params = [f"__ac_dynamic_tiling_key_{self.index}", f"__ac_dynamic_block_dim_{self.index}", \
+        self.extra_kernel_params = [f"__ac_dynamic_tiling_key_{self.index}", f"__ac_dynamic_block_num_{self.index}", \
                                     f"__ac_wait_lock_{self.index}"]
         aiv_func_addr_str = self.gen_param_code('aiv_func_addr')
         aic_func_addr_str = self.gen_param_code('aic_func_addr')
