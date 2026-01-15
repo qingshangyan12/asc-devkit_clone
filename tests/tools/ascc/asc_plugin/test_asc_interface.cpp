@@ -86,19 +86,24 @@ uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle);
 }
 
 namespace {
-class AscProfRegister {
+class AscRegister {
 public:
-static AscProfRegister& GetInstance() {
-    static AscProfRegister instance;
+static AscRegister& GetInstance() {
+    static AscRegister instance;
     return instance;
 }
+void* binHandle = nullptr;
 private:
-AscProfRegister() {
+AscRegister() {
+    uint32_t ret = AscendDevBinaryLazyRegister(fatbinDataPtr, fatbinDataLength, &binHandle);
+    if (ret != 0) {
+        ::printf("[ERROR] [AscPlugin] Kernel binary register failure! ret %d \n", ret);
+    }
     AscendProfRegister();
 }
-~AscProfRegister() = default;
-AscProfRegister(const AscProfRegister&) = delete;
-AscProfRegister& operator=(const AscProfRegister&) = delete;
+~AscRegister() = default;
+AscRegister(const AscRegister&) = delete;
+AscRegister& operator=(const AscRegister&) = delete;
 };
 
 } // namespace
@@ -109,14 +114,9 @@ __attribute__ ((visibility("hidden"))) int32_t BindKernelRegisterFunc(void (*)(v
 __attribute__ ((visibility("hidden"))) uint32_t LaunchAndProfiling(const char *kernelName, uint32_t blockDim,
     void *stream, void **args, uint32_t size, uint32_t ktype, const uint32_t ubufDynamicSize)
 {
-    static auto& reg = AscProfRegister::GetInstance();
-    void* binHandle = nullptr;
-    int32_t ret = AscendDevBinaryLazyRegister(fatbinDataPtr, fatbinDataLength, &binHandle);
-    if (ret != 0) {
-        ::printf("[ERROR] [AscPlugin] Kernel binary register failure! ret %d \n", ret);
-    }
+    static auto& reg = AscRegister::GetInstance();
     void* funcHandle = nullptr;
-    ret = AscendGetFuncFromBinary(binHandle, kernelName, &funcHandle);
+    uint32_t ret = AscendGetFuncFromBinary(reg.binHandle, kernelName, &funcHandle);
     if (ret != 0) {
         ::printf("[ERROR] [AscPlugin] Get kernel function failure! ret %d \n", ret);
         return 1;
