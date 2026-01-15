@@ -378,6 +378,176 @@ template <typename T, typename U, bool isSetMask = true,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+/* **************************************************************************************************
+ * Subs                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup Subs Level 0
+ * @brief dst[i] = src0 - src1
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] src1 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] mask[]/mask mask array/count
+ * @param [in] repeatTime repeat times
+ * @param [in] intriParams.dstBlkStride dst block stride
+ * @param [in] intriParams.srcBlkStride src block stride
+ * @param [in] intriParams.dstRepStride dst repeat stride
+ * @param [in] intriParams.src0RepStride src repeat stride
+ */
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Subs(const U& dst, const S& src0, const V& src1,
+    uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+/*
+ * @ingroup Subs Level 2
+ * @brief dst = src0 - src1
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] src1 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, const int32_t& count);
+
+/* **************************************************************************************************
+ * Divs                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup Divs Level 0
+ * @brief dst[i] = src0 // src1
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] src1 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] mask[]/mask mask array/count
+ * @param [in] repeatTime repeat times
+ * @param [in] intriParams.dstBlkStride dst block stride
+ * @param [in] intriParams.srcBlkStride src block stride
+ * @param [in] intriParams.dstRepStride dst repeat stride
+ * @param [in] intriParams.src0RepStride src repeat stride
+ */
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Divs(const U& dst, const S& src0, const V& src1,
+    uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+/*
+ * @ingroup Divs Level 2
+ * @brief dst = src0 // src1
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] src1 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, const int32_t& count);
+
+/* **************************************************************************************************
+ * Ands                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup Ands Level 0
+ * @brief dst[i] = src0 & src1
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] src1 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] mask[]/mask mask array/count
+ * @param [in] repeatTime repeat times
+ * @param [in] intriParams.dstBlkStride dst block stride
+ * @param [in] intriParams.srcBlkStride src block stride
+ * @param [in] intriParams.dstRepStride dst repeat stride
+ * @param [in] intriParams.src0RepStride src repeat stride
+ */
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Ands(const U& dst, const S& src0, const V& src1,
+    uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+/*
+ * @ingroup Ands Level 2
+ * @brief dst = src0 & src1
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] src1 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, const int32_t& count);
+
+/* **************************************************************************************************
+ * Ors                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup Ors Level 0
+ * @brief dst[i] = src0 | src1
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] src1 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] mask[]/mask mask array/count
+ * @param [in] repeatTime repeat times
+ * @param [in] intriParams.dstBlkStride dst block stride
+ * @param [in] intriParams.srcBlkStride src block stride
+ * @param [in] intriParams.dstRepStride dst repeat stride
+ * @param [in] intriParams.src0RepStride src repeat stride
+ */
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, uint64_t mask[],
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Ors(const U& dst, const S& src0, const V& src1,
+    uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+/*
+ * @ingroup Ors Level 2
+ * @brief dst = src0 | src1
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] src1 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+          typename U, typename S, typename V>
+__aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, const int32_t& count);
+
+/* **************************************************************************************************
+ * FusedMulsCast                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup FusedMulsCast Level 2
+ * @brief dst = abs(src0 - src1)
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor
+ * @param [in] src1 input LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, 
+    const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+__aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count);
+
+#endif
 } // namespace AscendC
 #pragma end_pipe
 
