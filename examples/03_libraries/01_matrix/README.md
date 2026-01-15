@@ -44,3 +44,8 @@
 | [matmul_sparse](./matmul_sparse) | 本样例介绍使用Matmul API实现左矩阵A为稀疏矩阵，右矩阵B为4:2稠密化后的矩阵的Sparse Matmul场景的矩阵乘计算 |
 | [matmul_l0cache](./matmul_l0cache) | 本样例介绍Matmul API中使能L0缓存的使用方式 |
 | [matmul_tscm](./matmul_tscm) | 本样例介绍Matmul API中用户自定义TSCM输入的使用方式 |
+| [batch_matmul_tscm](./batch_matmul_tscm) | 本样例介绍了调用Matmul高阶API实现左矩阵A为TSCM输入进行BatchMatmul计算的单算子 |
+| [matmul_gemv](./matmul_gemv) | 本样例介绍调用Matmul NORM模板实现矩阵向量乘的单算子 |
+| [matmul_mndb](./matmul_mndb) | 本样例介绍调用Matmul API实现M或N轴方向流水并行的单算子 |
+| [matmul_preload](./matmul_preload) | 本样例介绍调用Matmul MDL模板实现使能M或N方向预加载功能的单算子 |
+| [matmul_constant](./matmul_constant) | 本样例介绍调用Matmul MDL模板使能Tiling常量化的单算子 |
