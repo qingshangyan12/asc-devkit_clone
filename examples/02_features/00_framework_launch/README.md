@@ -5,8 +5,9 @@
 ## 算子开发样例
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| [acl_invocation](./acl_invocation) | 本样例以Add算子为示例，展示了acl入图调用方式。 |
-| [aclnn_invocation](./aclnn_invocation) | 本样例以Add算子为示例，展示了单算子aclnn调用方式。 |
+| [aclop_invocation](./aclop_invocation) | 本样例基于示例自定义算子工程，介绍了aclnn`OpType`单算子API的方式执行固定shape算子。 |
+| [aclnn_invocation](./aclnn_invocation) | 本样例基于示例自定义算子工程，介绍了aclopExecuteV2单算子模型的方式执行固定shape算子。 |
+| [custom_op](./custom_op) | 本样例以简单的自定义算子为示例，展示了其编译、打包成自定义算子包，并部署到CANN包中的流程。 |
 | [add_template](./add_template) | 本样例以Add算子为示例，展示了Tiling模板编程。本样例使用自定义算子工程，编译并部署自定义算子包到自定义算子库中，并调用执行自定义算子 |
 | [msopgen_custom](./msopgen_custom) | 本样例基于AddCustom算子工程，介绍了msOpGen工具生成简易自定义算子工程和单算子调用 |
 | [onnx_plugin](./onnx_plugin) | 本样例介绍通过onnx网络调用的方式调用LeakyReluCustom算子 |

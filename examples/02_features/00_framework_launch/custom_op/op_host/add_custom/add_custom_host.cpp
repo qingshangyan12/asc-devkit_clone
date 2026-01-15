@@ -10,7 +10,6 @@
 
 #include "../../op_kernel/add_custom/add_custom_tiling.h"
 #include "register/op_def_registry.h"
-#include "tiling/tiling_api.h"
 
 namespace optiling {
 const uint32_t BLOCK_DIM = 8;
@@ -22,6 +21,8 @@ static ge::graphStatus TilingFunc(gert::TilingContext *context)
     context->SetBlockDim(BLOCK_DIM);
     tiling->totalLength = totalLength;
     tiling->tileNum = TILE_NUM;
+    size_t *currentWorkspace = context->GetWorkspaceSizes(1);
+    currentWorkspace[0] = 0;
     return ge::GRAPH_SUCCESS;
 }
 } // namespace optiling
@@ -61,12 +62,11 @@ public:
             .DataType({ge::DT_FLOAT16})
             .Format({ge::FORMAT_ND});
 
+        this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
         this->AICore()
             .SetTiling(optiling::TilingFunc)
-            .AddConfig("ascend310p")
-            .AddConfig("ascend310b")
-            .AddConfig("ascend910b")
-            .AddConfig("ascend910_93");
+            // at least one soc version must be configured.
+            .AddConfig("ascend910b");
     }
 };
 OP_ADD(AddCustom);

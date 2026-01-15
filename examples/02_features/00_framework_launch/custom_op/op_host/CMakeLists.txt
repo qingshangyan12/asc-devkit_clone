@@ -27,7 +27,7 @@ npu_op_library(cust_opapi ACLNN
 file(GLOB proto_src ${ASCEND_AUTOGEN_PATH}/op_proto.cc)
 set_source_files_properties(${proto_src} PROPERTIES GENERATED TRUE)
 npu_op_library(cust_op_proto GRAPH
-    ${ops_srcs}
+    ${host_ops_srcs}
     ${proto_src}
 )
 
