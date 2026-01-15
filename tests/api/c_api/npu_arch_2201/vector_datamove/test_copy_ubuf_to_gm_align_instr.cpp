@@ -24,11 +24,11 @@ protected:                                                                      
                                                                                                 \
 namespace {                                                                                     \
                                                                                                 \
-void cce_name##_uint64_t_Stub(__ubuf__ void *dst, __gm__ void *src, uint8_t sid, uint16_t n_burst, uint32_t len_burst,\
+void cce_name##_##data_type##_Stub(__gm__ void *dst, __ubuf__ void *src, uint8_t sid, uint16_t n_burst, uint32_t len_burst,\
         uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap) \
 {                                                                                               \
-    EXPECT_EQ(dst, reinterpret_cast<__ubuf__ void *>(11));                                        \
-    EXPECT_EQ(src, reinterpret_cast<__gm__ void *>(22));                                      \
+    EXPECT_EQ(dst, reinterpret_cast<__gm__ void *>(11));                                        \
+    EXPECT_EQ(src, reinterpret_cast<__ubuf__ void *>(22));                                      \
     EXPECT_EQ(sid, static_cast<uint8_t>(0));                                                    \
     EXPECT_EQ(n_burst, static_cast<uint16_t>(1));                                               \
     EXPECT_EQ(len_burst, static_cast<uint32_t>(1));                                             \
@@ -42,8 +42,8 @@ void cce_name##_uint64_t_Stub(__ubuf__ void *dst, __gm__ void *src, uint8_t sid,
                                                                                                 \
 TEST_F(TestVectorDatamove##class_name, c_api_name##_CopyConfig_Succ)                            \
 {                                                                                               \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                                     \
-    __gm__ data_type *src = reinterpret_cast<__gm__ data_type *>(22);                                 \
+    __gm__ data_type *dst = reinterpret_cast<__gm__ data_type *>(11);                           \
+    __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                       \
                                                                                                 \
     uint8_t sid = static_cast<uint8_t>(0);                                                      \
     uint16_t n_burst = static_cast<uint64_t>(1);                                                \
@@ -53,9 +53,9 @@ TEST_F(TestVectorDatamove##class_name, c_api_name##_CopyConfig_Succ)            
     uint32_t src_gap = static_cast<uint64_t>(0);                                                \
     uint32_t dst_gap = static_cast<uint64_t>(0);                                                \
                                                                                                 \
-    MOCKER_CPP(cce_name, void(__ubuf__ void *, __gm__ void *, uint8_t, uint16_t, uint32_t, uint8_t, uint8_t, uint32_t, uint32_t))\
+    MOCKER_CPP(cce_name, void(__gm__ void *, __ubuf__ void *, uint8_t, uint16_t, uint32_t, uint8_t, uint8_t, uint32_t, uint32_t))\
             .times(1)                                                                           \
-            .will(invoke(cce_name##_uint64_t_Stub));                                            \
+            .will(invoke(cce_name##_##data_type##_Stub));                                       \
                                                                                                 \
     c_api_name(dst, src, sid, n_burst, len_burst, left_padding_num, right_padding_num, src_gap, dst_gap); \
     GlobalMockObject::verify();                                                                 \
@@ -63,13 +63,13 @@ TEST_F(TestVectorDatamove##class_name, c_api_name##_CopyConfig_Succ)            
                                                                                                 \
 TEST_F(TestVectorDatamove##class_name, c_api_name##_size_Succ)                                  \
 {                                                                                               \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                                     \
-    __gm__ data_type *src = reinterpret_cast<__gm__ data_type *>(22);                                 \
-    uint32_t size = static_cast<uint32_t>(44);                                                  \
+    __gm__ data_type *dst = reinterpret_cast<__gm__ data_type *>(11);                           \
+    __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                       \
+    uint32_t size = static_cast<uint32_t>(1);                                                  \
                                                                                                 \
-    MOCKER_CPP(cce_name, void(__ubuf__ void *, __gm__ void *, uint8_t, uint16_t, uint32_t, uint8_t, uint8_t, uint32_t, uint32_t))\
+    MOCKER_CPP(cce_name, void(__gm__ void *, __ubuf__ void *, uint8_t, uint16_t, uint32_t, uint8_t, uint8_t, uint32_t, uint32_t))\
             .times(1)                                                                           \
-            .will(invoke(cce_name##_uint64_t_Stub));                                            \
+            .will(invoke(cce_name##_##data_type##_Stub));                                       \
                                                                                                 \
     c_api_name(dst, src, size);                                                                 \
     GlobalMockObject::verify();                                                                 \
@@ -77,18 +77,26 @@ TEST_F(TestVectorDatamove##class_name, c_api_name##_size_Succ)                  
                                                                                                 \
 TEST_F(TestVectorDatamove##class_name, c_api_name##_sync_Succ)                                  \
 {                                                                                               \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(11);                                     \
-    __gm__ data_type *src = reinterpret_cast<__gm__ data_type *>(22);                                 \
-    uint32_t size = static_cast<uint32_t>(44);                                                  \
+    __gm__ data_type *dst = reinterpret_cast<__gm__ data_type *>(11);                           \
+    __ubuf__ data_type *src = reinterpret_cast<__ubuf__ data_type *>(22);                       \
+    uint32_t size = static_cast<uint32_t>(1);                                                  \
                                                                                                 \
-    MOCKER_CPP(cce_name, void(__ubuf__ void *, __gm__ void *, uint8_t, uint16_t, uint32_t, uint8_t, uint8_t, uint32_t, uint32_t))\
+    MOCKER_CPP(cce_name, void(__gm__ void *, __ubuf__ void *, uint8_t, uint16_t, uint32_t, uint8_t, uint8_t, uint32_t, uint32_t))\
             .times(1)                                                                           \
-            .will(invoke(cce_name##_uint64_t_Stub));                                            \
+            .will(invoke(cce_name##_##data_type##_Stub));                                       \
     c_api_name##_sync(dst, src, size);                                                          \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-// ==========asc_copy_ub2gm_align==========
 TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNB8, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b8, uint8_t);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNInt8, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b8, int8_t);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNHalf, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b8, half);
 TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNB16, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b16, uint16_t);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNInt16, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b16, int16_t);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNBfloat16, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b16, bfloat16_t);
 TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNB32, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, uint32_t);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNFloat, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, float);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNInt32, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, int32_t);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNDouble, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, double);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNInt64, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, int64_t);
+TEST_VECTOR_DATAMOVE_COPY_UBUF_TO_GM_ALIGN(CopyUB2GMALIGNUint64, asc_copy_ub2gm_align, copy_ubuf_to_gm_align_b32, uint64_t);

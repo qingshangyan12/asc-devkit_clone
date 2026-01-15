@@ -37,7 +37,7 @@ __aicore__ inline void asc_vdeqs162b8h_impl(__ubuf__ int8_t* dst, __ubuf__ int16
 {
     asc_set_mask_count_begin(count);
     asc_vdeqs162b8h_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
-        ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
+        ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
@@ -60,7 +60,7 @@ __aicore__ inline void asc_vdeqs162b8h_impl(__ubuf__ uint8_t* dst, __ubuf__ int1
 {
     asc_set_mask_count_begin(count);
     asc_vdeqs162b8h_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
-        ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
+        ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
