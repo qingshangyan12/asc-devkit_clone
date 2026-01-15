@@ -27,5 +27,23 @@ struct AscendQuantConfig {
 };
 
 constexpr AscendQuantConfig ASCEND_QUANT_DEFAULT_CFG = {0, 0, 0, 0};
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+enum class AscendQuantPolicy : int32_t {
+    PER_TENSOR,
+    PER_CHANNEL,
+    PER_TOKEN,
+    PER_GROUP,
+    PER_CHANNEL_PER_GROUP,
+    PER_TOKEN_PER_GROUP
+};
+
+struct AscendQuantParam {
+    uint32_t m;
+    uint32_t n;
+    uint32_t calCount;
+    uint32_t groupSize = 0;
+};
+#endif
 }; // namespace AscendC
 #endif // LIB_QUANTIZATION_ASCEND_QUANT_UTILS_H
