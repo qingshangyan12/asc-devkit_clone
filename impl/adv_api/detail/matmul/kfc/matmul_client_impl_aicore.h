@@ -206,8 +206,8 @@ public:
     }
 
     template <bool sync = true, bool doPad = false>
-    __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic = 0,
-        bool enSequentialWrite = false, uint32_t height = 0, uint32_t width = 0, uint32_t srcGap = 0,
+    __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic,
+        bool enSequentialWrite, uint32_t height, uint32_t width = 0, uint32_t srcGap = 0,
         uint32_t dstGap = 0)
     {
     }
