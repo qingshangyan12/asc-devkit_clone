@@ -31,13 +31,6 @@ using namespace std;
 #ifdef __cplusplus
 extern "C" {
 #endif
-aclError aclrtBinaryGetFunction(const aclrtBinHandle binHandle, const char *kernelName,
-                                                    aclrtFuncHandle *funcHandle) { return 0; }
-aclError aclrtLaunchKernelWithHostArgs(aclrtFuncHandle funcHandle, uint32_t blockDim,
-                                                           aclrtStream stream, aclrtLaunchKernelCfg *cfg,
-                                                           void *hostArgs, size_t argsSize,
-                                                           aclrtPlaceHolderInfo *placeHolderArray,
-                                                           size_t placeHolderNum) { return 0; }
 
 #ifdef __cplusplus
 }
@@ -53,20 +46,20 @@ protected:
 
 TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeProfTest){
     const char *name = "xxx";
-    uint32_t blockDim = 1;
+    uint32_t numBlocks = 1;
     uint32_t taskType = 0;
     const uint64_t startTime = 0;
     MOCKER(ReportAscendProf).expects(once());
-    ReportAscendProf(name, blockDim, taskType, startTime);
+    ReportAscendProf(name, numBlocks, taskType, startTime);
     EXPECT_NO_THROW(GlobalMockObject::verify());
 }
 
 TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeProfFixTest){
     const char *name = "xxx";
-    uint32_t blockDim = 1;
+    uint32_t numBlocks = 1;
     uint32_t taskType = 10;
     const uint64_t startTime = 0;
-    ReportAscendProf(name, blockDim, taskType, startTime);
+    ReportAscendProf(name, numBlocks, taskType, startTime);
     EXPECT_NO_THROW(GlobalMockObject::verify());
 }
 
@@ -102,13 +95,13 @@ TEST_F(TEST_ASCENDC_RUNTIME, ascendcRuntimeDevBinaryRegisterTest) {
     ret = AscendFunctionRegister(handle, stubFunc);
     EXPECT_EQ(ret, 0);
     MOCKER(rtKernelLaunchWithFlagV2).stubs().will(returnValue(0));
-    uint32_t blockDim;
+    uint32_t numBlocks;
     void **args = nullptr;
     uint32_t size;
     rtStream_t stream = nullptr;
-    ret = AscendKernelLaunchWithFlagV2(stubFunc, blockDim, args, size, stream, 0);
+    ret = AscendKernelLaunchWithFlagV2(stubFunc, numBlocks, args, size, stream, 0);
     EXPECT_EQ(ret, 0);
-    ret = AscendKernelLaunchWithFlagV2(stubFunc, blockDim, args, size, stream, 2048);
+    ret = AscendKernelLaunchWithFlagV2(stubFunc, numBlocks, args, size, stream, 2048);
     EXPECT_EQ(ret, 0);
 }
 
@@ -149,10 +142,10 @@ typedef struct {
 } AscendCStreamForVectorCore;
 
 extern "C" uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *handle, const uint64_t key, void **args, uint32_t size,
-    const void *stream, bool enbaleProf, uint32_t aicBlockDim, uint32_t aivBlockDim, uint32_t aivBlockDimOffset);
+    const void *stream, bool enbaleProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks, uint32_t aivNumBlocksOffset);
 extern "C" void AscendCDestroyStreamCallBack(rtStream_t stream, const bool isCreate);
 extern std::unordered_map<const void *, AscendCStreamForVectorCore> g_ascStreamMap;
-extern "C" uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t blockDim, void **args, uint32_t size,
+extern "C" uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t numBlocks, void **args, uint32_t size,
     const rtStream_t stream);
 
 
@@ -205,12 +198,12 @@ TEST_F(TEST_ASCENDC_RUNTIME, LaunchAscendKernelA){
     void * handle = nullptr;
     void *stream = nullptr;
     void **args = nullptr;
-    const uint32_t blockDim = 0;
+    const uint32_t numBlocks = 0;
     uint32_t size = 0;
     const uint64_t key = 0;
     aclrtLaunchKernelCfg *cfg = nullptr;
-    aclrtLaunchKernelWithConfig(handle, blockDim, stream, cfg, nullptr, nullptr);
-    uint32_t ret = LaunchAscendKernel(handle, key, blockDim, args, size, stream);
+    aclrtLaunchKernelWithConfig(handle, numBlocks, stream, cfg, nullptr, nullptr);
+    uint32_t ret = LaunchAscendKernel(handle, key, numBlocks, args, size, stream);
     EXPECT_EQ(ret, 0);
 }
 
@@ -232,14 +225,14 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendGetFuncFromBinary) {
 
 TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs) {
     void* funcHandle = nullptr;
-    uint32_t blockDim = 1;
+    uint32_t numBlocks = 1;
     void* stream = nullptr;
     void* hostArgs = nullptr;
     size_t argsSize = 0;
-    int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, blockDim, stream, hostArgs, argsSize, 0);
+    int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, 0);
     EXPECT_EQ(ret, 0);
     uint32_t ubufDynamicSize = 512;
-    ret = AscendLaunchKernelWithHostArgs(funcHandle, blockDim, stream, hostArgs, argsSize, ubufDynamicSize);
+    ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
     EXPECT_EQ(ret, 0);
 }
 
