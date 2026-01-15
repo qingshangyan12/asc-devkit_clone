@@ -14,7 +14,7 @@ THIS_FILE_NAME = __file__
 FILE_PATH = os.path.dirname(os.path.realpath(THIS_FILE_NAME))
 TOP_PATH = os.path.join(FILE_PATH, "../../../")
 FRAMEWORK_PATH = os.path.join(TOP_PATH, "tools/build/asc_op_compile_base/")
-sys.path.append(FRAMEWORK_PATH)
+sys.path.insert(0, FRAMEWORK_PATH)
 
 from adapter.get_op_tiling import *
 from adapter.ascendc_common_utility import CompileInfo
@@ -1298,6 +1298,253 @@ Idx Name                              Size     VMA              Type
                 tmp.info_base = [sub_tmp1, sub_tmp2]
                 tmp.get_summary_type_and_options()
                 self.assertTrue(tmp.block_dim, 1)
+
+
+    def test_check_dcci_before_after_op_options(self):
+        op_options = {'split-mode': 4, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable}
+        compile_log_path = "./tmp/"
+        with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
+            with mock.patch('json.load', return_value=op_json):
+                super_op = SuperOperatorInfos({
+                    "op_list": [
+                        {
+                            "bin_path": "op1.o",
+                            "json_path": "op1.json",
+                            "kernel_name": "op1"
+                        },
+                    ]
+                },
+                "super_kernel")
+
+                sub_op_dcci_option_list = [
+                    {"sub_op_seq": (False, True, True, True, False), "exp_res": [(1, 2, 3)]},
+                    {"sub_op_seq": (False, True, True, True, False, True, True), "exp_res": [(1, 2, 3), (5, 6)]},
+                    {"sub_op_seq": (False, True, False, True, False), "exp_res": []},
+                    {"sub_op_seq": (True, True, False, False, False), "exp_res": [(0, 1)]},
+                    {"sub_op_seq": (False, True, True, False, False), "exp_res": [(1, 2)]},
+                ]
+                expected_log_level = AscendCLogLevel.LOG_WARNING
+
+                for op_seq in sub_op_dcci_option_list:
+                    with mock.patch('asc_op_compile_base.asc_op_compiler.super_kernel_utility.CommonUtility.print_compile_log') as mock_print_compile_log:
+                        super_op.info_base = []
+                        # create sub op list
+                        for sub_op_idx, call_dcci_disable_on_kernel in enumerate(op_seq["sub_op_seq"]):
+                            sub_op = SubOperatorInfos(0, {"bin_path": "./sub_op.o","json_path": "sub_op.json","kernel_name": "sub_op"}, 100,
+                                op_options, compile_log_path)
+                            sub_op.kernel_name = f"sub_op_{sub_op_idx}"
+                            sub_op.call_dcci_before_kernel_start = False
+                            sub_op.call_dcci_disable_on_kernel = call_dcci_disable_on_kernel
+                            sub_op.call_dcci_after_kernel_end = False
+                            super_op.info_base.append(sub_op)
+
+                        super_op.check_dcci_before_after_op_options()
+
+                        if len(op_seq["exp_res"]) == 0:
+                            mock_print_compile_log.assert_not_called()
+                        else:
+                            mock_print_compile_log.assert_called()
+
+                        mock_log_id = 0
+                        for exp_op_seq in op_seq["exp_res"]:
+                            for expected_sub_op_id in exp_op_seq:
+                                mock_log_id += 1
+                                expected_warning_op_name = f"sub_op_{expected_sub_op_id}"
+                                self.assertIn(expected_warning_op_name, mock_print_compile_log.call_args_list[mock_log_id].args[1])
+                                self.assertEqual(expected_log_level, mock_print_compile_log.call_args_list[mock_log_id].args[2])
+
+
+    def test_check_debug_aic_aiv_num_ratio(self):
+        with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
+            with mock.patch('json.load', return_value=op_json):
+                super_op = SuperOperatorInfos({
+                    "op_list": [
+                        {
+                            "bin_path": "op1.o",
+                            "json_path": "op1.json",
+                            "kernel_name": "op1"
+                        },
+                    ],
+                    'super_kernel_options' : "stream-fusion=1"
+                },
+                "super_kernel")
+
+                pass_debug_aic_aiv_num_pairs = [
+                    (0, 0),
+                    (10, 0),
+                    (12, 12),
+                    (14, 28),
+                    (24, 48),
+                    (0, 20),
+                    (0, 48),
+                ]
+
+                failed_debug_aic_aiv_num_pairs = [
+                    (10, 1),
+                    (10, 11),
+                    (1, 10),
+                    (10, 40),
+                ]
+
+                for test_debug_aic_num, test_debug_aiv_num in pass_debug_aic_aiv_num_pairs:
+                    super_op.debug_aic_num = test_debug_aic_num
+                    super_op.debug_aiv_num = test_debug_aiv_num
+                    super_op.check_debug_aic_aiv_num_ratio()
+
+                for test_debug_aic_num, test_debug_aiv_num in failed_debug_aic_aiv_num_pairs:
+                    super_op.debug_aic_num = test_debug_aic_num
+                    super_op.debug_aiv_num = test_debug_aiv_num
+                    self.assertRaises(Exception, super_op.check_debug_aic_aiv_num_ratio)
+
+
+    def test_check_debug_aic_aiv_num_exceed_platform_num_blocks(self):
+        with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
+            with mock.patch('json.load', return_value=op_json):
+                super_op = SuperOperatorInfos({
+                    "op_list": [
+                        {
+                            "bin_path": "op1.o",
+                            "json_path": "op1.json",
+                            "kernel_name": "op1"
+                        },
+                    ],
+                    'super_kernel_options' : "stream-fusion=1"
+                },
+                "super_kernel")
+
+                pass_debug_aic_aiv_num_pairs = [
+                    (0, 0, 24, 48),
+                    (10, 0, 24, 48),
+                    (10, 24, 24, 48),
+                    (10, 10, 24, 48),
+                    (24, 48, 24, 48),
+                ]
+
+                failed_debug_aic_aiv_num_pairs = [
+                    (100, 1, 24, 48),
+                    (10, 100, 24, 48),
+                    (24, 100, 24, 48),
+                    (10, 100, 24, 0),
+                ]
+
+                for test_debug_aic_num, test_debug_aiv_num, \
+                    platform_aic_num, platform_aiv_num in pass_debug_aic_aiv_num_pairs:
+
+                    def mock_get_soc_spec(input_str: str):
+                        return {"ai_core_cnt": platform_aic_num, "vector_core_cnt": platform_aiv_num}.get(input_str, 0)
+
+                    with mock.patch('asc_op_compile_base.asc_op_compiler.super_kernel_op_infos.get_soc_spec', new=mock_get_soc_spec):
+                        super_op.debug_aic_num = test_debug_aic_num
+                        super_op.debug_aiv_num = test_debug_aiv_num
+                        super_op.check_debug_aic_aiv_num_exceed_platform_num_blocks()
+
+                for test_debug_aic_num, test_debug_aiv_num, \
+                    platform_aic_num, platform_aiv_num in failed_debug_aic_aiv_num_pairs:
+
+                    def mock_get_soc_spec(input_str: str):
+                        return {"ai_core_cnt": platform_aic_num, "vector_core_cnt": platform_aiv_num}.get(input_str, 0)
+
+                    with mock.patch('asc_op_compile_base.asc_op_compiler.super_kernel_op_infos.get_soc_spec', new=mock_get_soc_spec):
+                        super_op.debug_aic_num = test_debug_aic_num
+                        super_op.debug_aiv_num = test_debug_aiv_num
+                        self.assertRaises(Exception, super_op.check_debug_aic_aiv_num_exceed_platform_num_blocks)
+
+
+    def test_check_debug_aic_aiv_num_exceed_sub_op_aic_aiv_num(self):
+        with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
+            with mock.patch('json.load', return_value=op_json):
+                super_op = SuperOperatorInfos({
+                    "op_list": [
+                        {
+                            "bin_path": "op1.o",
+                            "json_path": "op1.json",
+                            "kernel_name": "op1"
+                        },
+                    ],
+                    'super_kernel_options' : "stream-fusion=1"
+                },
+                "super_kernel")
+
+                pass_debug_aic_aiv_num_pairs = [
+                    (0, 0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, 10),
+                    (10, 0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, 10),
+                    (15, 0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, 10),
+                    (0, 0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, 20),
+                    (0, 20, SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, 20),
+                    (0, 40, SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, 20),
+                    (0, 0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, 20),
+                    (20, 20, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, 20),
+                    (20, 40, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, 20),
+                    (0, 0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 20),
+                    (20, 40, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 20),
+                    (24, 48, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 20),
+                ]
+
+                failed_debug_aic_aiv_num_pairs = [
+                    (5, 0, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, 10),
+                    (0, 5, SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0, 10),
+                    (0, 20, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, 20),
+                    (10, 10, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, 20),
+                    (10, 20, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1, 20),
+                    (0, 40, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 20),
+                    (20, 20, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 20),
+                    (20, 38, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 20),
+                ]
+
+                for test_debug_aic_num, test_debug_aiv_num, \
+                    sk_kernel_type, sk_block_num in pass_debug_aic_aiv_num_pairs:
+                    super_op.debug_aic_num = test_debug_aic_num
+                    super_op.debug_aiv_num = test_debug_aiv_num
+                    super_op.kernel_type = sk_kernel_type
+                    super_op.block_num = sk_block_num
+                    super_op.check_debug_aic_aiv_num_exceed_sub_op_aic_aiv_num()
+
+                for test_debug_aic_num, test_debug_aiv_num, \
+                    sk_kernel_type, sk_block_num in failed_debug_aic_aiv_num_pairs:
+                    super_op.debug_aic_num = test_debug_aic_num
+                    super_op.debug_aiv_num = test_debug_aiv_num
+                    super_op.kernel_type = sk_kernel_type
+                    super_op.block_num = sk_block_num
+                    self.assertRaises(Exception, super_op.check_debug_aic_aiv_num_exceed_sub_op_aic_aiv_num)
+
+
+    def test_update_superkernel_blocknum_by_debug_options(self):
+        with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
+            with mock.patch('json.load', return_value=op_json):
+                super_op = SuperOperatorInfos({
+                    "op_list": [
+                        {
+                            "bin_path": "op1.o",
+                            "json_path": "op1.json",
+                            "kernel_name": "op1"
+                        },
+                    ],
+                    'super_kernel_options' : "stream-fusion=1"
+                },
+                "super_kernel")
+
+                failed_debug_aic_aiv_num_pairs = [
+                    (10, 1, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 10),
+                    (10, 11, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 10),
+                    (1, 10, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 10),
+                    (10, 40, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 10),
+                    (5, 10, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 10),
+                    (25, 50, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2, 10),
+                ]
+
+                for test_debug_aic_num, test_debug_aiv_num, \
+                    sk_kernel_type, sk_block_num in failed_debug_aic_aiv_num_pairs:
+
+                    def mock_get_soc_spec(input_str: str):
+                        return {"ai_core_cnt": 24, "vector_core_cnt": 48}.get(input_str, 0)
+
+                    with mock.patch('asc_op_compile_base.asc_op_compiler.super_kernel_op_infos.get_soc_spec', new=mock_get_soc_spec):
+                        super_op.debug_aic_num = test_debug_aic_num
+                        super_op.debug_aiv_num = test_debug_aiv_num
+                        super_op.kernel_type = sk_kernel_type
+                        super_op.block_num = sk_block_num
+                        self.assertRaises(Exception, super_op.update_superkernel_blocknum_by_debug_options)
+
 
     def test_find_sub_kernel_name(self):
         op_options = {'split-mode': 4, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable}

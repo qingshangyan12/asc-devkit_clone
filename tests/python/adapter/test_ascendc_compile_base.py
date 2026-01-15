@@ -113,9 +113,10 @@ class TestAscendCCompileBase(unittest.TestCase):
                     compile_info = CompileInfo()
                     compile_info.super_kernel_info = {"sp_options": {"stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable}}
                     gen_sub_super_kernel_compile_options(compile_option_tuple, tiling_info, compile_info)
-                    self.assertEqual(len(compile_option_tuple.compile_options), 2)
+                    self.assertEqual(len(compile_option_tuple.compile_options), 3)
                     self.assertIn("-D__ASCENDC_ENABLE_SUPER_KERNEL__", compile_option_tuple.compile_options)
                     self.assertIn("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__", compile_option_tuple.compile_options)
+                    self.assertIn("-D__ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__", compile_option_tuple.compile_options)
 
         # StreamFusionDisable, dynamic shape no early start v2
         with tbe.common.context.op_context.OpContext() as ctx:

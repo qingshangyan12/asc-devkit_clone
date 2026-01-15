@@ -18,7 +18,8 @@ import subprocess
 import math
 import shutil
 
-from .super_kernel_utility import AscendCLogLevel, CompileStage, CommonUtility, get_op_debug_config
+from .super_kernel_utility import AscendCLogLevel, CompileStage, CommonUtility, get_op_debug_config, \
+    get_soc_spec
 from .super_kernel_option_parse import parse_super_kernel_options
 from .super_kernel_constants import SuperKernelLinkMode, SuperKernelPreLoadMode, SuperKernelDataCacheMode, \
     SuperKernelEarlyStartMode, SubOperatorType, SuperKernelStreamFusionMode, SuperKernelDebugDcciAllMode, \
@@ -96,6 +97,8 @@ class SuperOperatorInfos:
         self.stream_fusin_mode = self.op_options.get('stream-fusion', SuperKernelStreamFusionMode.StreamFusionDisable)
         self.feed_sync_all_mode = self.op_options.get('feed-sync-all',
             SuperKernelFeedSyncAllMode.FeedSyncAllDisable)
+        self.debug_aic_num: int = self.op_options.get('debug-aic-num', 0)
+        self.debug_aiv_num: int = self.op_options.get('debug-aiv-num', 0)
         self.inner_event_id_set = set()
         for index, op_info in enumerate(self.op_list):
             if "json_path" not in op_info:
@@ -148,6 +151,8 @@ class SuperOperatorInfos:
             self.op_options.get('debug-dcci-all', SuperKernelDebugDcciAllMode.DebugDcciAllDisable)
         self.debug_sync_all_mode: SuperKernelDebugSyncAllMode = \
             self.op_options.get('debug-sync-all', SuperKernelDebugSyncAllMode.DebugSyncAllDisable)
+
+        self.check_dcci_before_after_op_options()
 
 
     def print_send_recv_info(self, stage):
@@ -577,27 +582,143 @@ f"ERROR: super kernel do not support self send/receive pair within 1 real stream
             param_offset += len(sub_op.kernel_params) + len(sub_op.extra_kernel_params)
 
 
-    def update_superkernel_blocknum_by_debug_options(self):
-        debug_aic_num = self.op_options.get('debug-aic-num', 0)
-        debug_aiv_num = self.op_options.get('debug-aiv-num', 0)
-
-        if debug_aic_num == 0 and debug_aiv_num == 0:
+    def warn_op_sequence_with_no_dcci_option(self, op_sequence_with_no_dcci_option):
+        if len(op_sequence_with_no_dcci_option) == 0:
             return
-        if debug_aic_num > 0 and debug_aiv_num == 0:
+
+        CommonUtility.print_compile_log(
+            "",
+            f"[Super Kernel] There are more than 2 consecutive sub-operators with option dcci-disable-on-kernel, "
+            f"may lead to data cache consistency issue.",
+            AscendCLogLevel.LOG_WARNING
+        )
+
+        for seq_id, seq in enumerate(op_sequence_with_no_dcci_option):
+            if len(seq) > 0:
+                for op_id, op_kernel_name in enumerate(seq):
+                    CommonUtility.print_compile_log(
+                        "",
+                        f"[Super Kernel] Operator sequence {seq_id}, op_kernel_name {op_id}: {op_kernel_name}",
+                        AscendCLogLevel.LOG_WARNING
+                    )
+
+
+    def check_dcci_before_after_op_options(self):
+        op_sequence_with_no_dcci_option = []
+        current_sequence = []
+
+        for sub_op in self.info_base:
+            if sub_op.call_dcci_disable_on_kernel:
+                current_sequence.append(sub_op.kernel_name)
+            else:
+                if len(current_sequence) >= 2:
+                    op_sequence_with_no_dcci_option.append(current_sequence)
+                current_sequence = []
+
+        if len(current_sequence) >= 2:
+            op_sequence_with_no_dcci_option.append(current_sequence)
+
+        self.warn_op_sequence_with_no_dcci_option(op_sequence_with_no_dcci_option)
+
+
+    def check_debug_aic_aiv_num_ratio(self):
+        # aic:aiv ratio should be 1:0 or 0:1 or 1:1 or 1:2
+        if self.debug_aic_num == 0 or self.debug_aiv_num == 0:
+            return
+        if self.debug_aic_num == self.debug_aiv_num:
+            return
+        if self.debug_aic_num * 2 == self.debug_aiv_num:
+            return
+        CommonUtility().ascendc_raise_python_err(
+            ERR_CODE,
+            f"[Super Kernel][ERROR]: ratio of super kernel options debug-aic-num {self.debug_aic_num} "
+            f"to debug-aiv-num {self.debug_aiv_num} is invalid. Should be 1:0 or 0:1 or 1:1 or 1:2."
+        )
+
+
+    def check_debug_aic_aiv_num_exceed_platform_num_blocks(self):
+        max_aic_num = int(get_soc_spec('ai_core_cnt'))
+        max_aiv_num = int(get_soc_spec('vector_core_cnt'))
+        if self.debug_aic_num > max_aic_num:
+            CommonUtility().ascendc_raise_python_err(
+                ERR_CODE,
+                f"[Super Kernel][ERROR]: super kernel option debug-aic-num {self.debug_aic_num} "
+                f"exceeds current platform max aic num {max_aic_num}."
+            )
+
+        if self.debug_aiv_num > max_aiv_num:
+            CommonUtility().ascendc_raise_python_err(
+                ERR_CODE,
+                f"[Super Kernel][ERROR]: super kernel option debug-aiv-num {self.debug_aiv_num} "
+                f"exceeds current platform max aiv num {max_aiv_num}."
+            )
+
+
+    def raise_exceed_sub_op_aic_aiv_num_error(self, case_str, aic_or_aiv, debug_block_num, sub_op_block_num):
+        CommonUtility().ascendc_raise_python_err(
+            ERR_CODE,
+            f"[Super Kernel][ERROR]: In super kernel {case_str} case, "
+            f"option debug-{aic_or_aiv}-num {debug_block_num} should not "
+            f"be less than max sub op {aic_or_aiv} num {sub_op_block_num}."
+        )
+
+
+    def check_debug_aic_aiv_num_exceed_sub_op_aic_aiv_num(self):
+        if self.debug_aic_num == 0 and self.debug_aiv_num == 0:
+            return
+
+        if self.kernel_type in [
+            SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY,
+            SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
+        ]:
+            if self.debug_aic_num < self.block_num:
+                self.raise_exceed_sub_op_aic_aiv_num_error("aic", "aic", self.debug_aic_num, self.block_num)
+
+        if self.kernel_type in [
+            SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY,
+            SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
+        ]:
+            if self.debug_aiv_num < self.block_num:
+                self.raise_exceed_sub_op_aic_aiv_num_error("aiv", "aiv", self.debug_aiv_num, self.block_num)
+
+        if self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1:
+            if self.debug_aic_num < self.block_num:
+                self.raise_exceed_sub_op_aic_aiv_num_error("mix 1:1", "aic", self.debug_aic_num, self.block_num)
+            if self.debug_aiv_num < self.block_num:
+                self.raise_exceed_sub_op_aic_aiv_num_error("mix 1:1", "aiv", self.debug_aiv_num, self.block_num)
+
+        if self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2:
+            if self.debug_aic_num < self.block_num:
+                self.raise_exceed_sub_op_aic_aiv_num_error("mix 1:2", "aic", self.debug_aic_num, self.block_num)
+            if self.debug_aiv_num < self.block_num * 2:
+                self.raise_exceed_sub_op_aic_aiv_num_error("mix 1:2", "aiv", self.debug_aiv_num, self.block_num * 2)
+
+
+    def update_superkernel_blocknum_by_debug_options(self):
+        self.check_debug_aic_aiv_num_ratio()
+        self.check_debug_aic_aiv_num_exceed_platform_num_blocks()
+        self.check_debug_aic_aiv_num_exceed_sub_op_aic_aiv_num()
+
+        if self.debug_aic_num == 0 and self.debug_aiv_num == 0:
+            return
+        if self.debug_aic_num > 0 and self.debug_aiv_num == 0:
             self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
-            self.block_num = debug_aic_num
-        elif debug_aic_num == 0 and debug_aiv_num > 0:
+            self.block_num = self.debug_aic_num
+        elif self.debug_aic_num == 0 and self.debug_aiv_num > 0:
             self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
-            self.block_num = debug_aiv_num
-        elif debug_aic_num == debug_aiv_num:
+            self.block_num = self.debug_aiv_num
+        elif self.debug_aic_num == self.debug_aiv_num:
             self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-            self.block_num = debug_aic_num
-        elif debug_aiv_num == 2 * debug_aic_num:
+            self.block_num = self.debug_aic_num
+        elif self.debug_aiv_num == 2 * self.debug_aic_num:
             self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
-            self.block_num = debug_aic_num
+            self.block_num = self.debug_aic_num
         else:
-            CommonUtility().ascendc_raise_python_err(ERR_CODE, (\
-f"ERROR: ratio of super kernel debug-aic-num {debug_aic_num} to debug-aiv-num {debug_aiv_num} is invalid."))
+            CommonUtility().ascendc_raise_python_err(
+                ERR_CODE,
+                f"ERROR: ratio of super kernel debug-aic-num {self.debug_aic_num} to "
+                f"debug-aiv-num {self.debug_aiv_num} is invalid."
+            )
 
 
     def get_finale_type_and_block_num(self, final_kernel_type, max_aic_num, max_aiv_num):

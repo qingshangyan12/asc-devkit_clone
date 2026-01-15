@@ -160,6 +160,7 @@ def setup_super_kernel_option_parsers() -> ParserFactory:
     factory.register(NonEmptyParser('strict-scope-check'))
     factory.register(NonEmptyParser('dcci-before-kernel-start'))
     factory.register(NonEmptyParser('dcci-after-kernel-end'))
+    factory.register(NonEmptyParser('dcci-disable-on-kernel'))
     factory.register(NumberParser('split-mode'))
     factory.register(BlockNumParser('debug-aic-num'))
     factory.register(BlockNumParser('debug-aiv-num'))

@@ -93,6 +93,7 @@ class SubOperatorInfos:
         self.split_mode = op_options.get('split-mode', 4)
         self.call_dcci_before_kernel_start: bool = False
         self.call_dcci_after_kernel_end: bool = False
+        self.call_dcci_disable_on_kernel: bool = False
         # code_gen of dynamic op
         self._gen_code_for_dynamic_op()
 
@@ -119,7 +120,7 @@ class SubOperatorInfos:
 
     def gen_dcci_before_kernel_start_call_block(self):
         dcci_call_block = ""
-        if self.call_dcci_before_kernel_start:
+        if not self.call_dcci_disable_on_kernel and self.call_dcci_before_kernel_start:
             dcci_call_block += "// option: dcci-before-kernel-start\n"
             dcci_call_block += self.gen_dcci_all_block()
         return dcci_call_block
@@ -127,7 +128,7 @@ class SubOperatorInfos:
 
     def gen_dcci_after_kernel_end_call_block(self):
         dcci_call_block = ""
-        if self.call_dcci_after_kernel_end:
+        if not self.call_dcci_disable_on_kernel and self.call_dcci_after_kernel_end:
             dcci_call_block += "// option: dcci-after-kernel-end\n"
             dcci_call_block += self.gen_dcci_all_block()
         return dcci_call_block
@@ -298,6 +299,8 @@ param_offset={self.wait_param_offset + index}\n"
                     sub_operater_infos.get('sub_operator_call_dcci_before_kernel_start', False)
                 self.call_dcci_after_kernel_end = \
                     sub_operater_infos.get('sub_operator_call_dcci_after_kernel_end', False)
+                self.call_dcci_disable_on_kernel = \
+                    sub_operater_infos.get('sub_operator_call_dcci_disable_on_kernel', False)
                 if self.early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartDisable.value \
                     and (self.early_start_set_flag or self.early_start_wait_flag):
                     CommonUtility().ascendc_raise_python_err(ERR_CODE, \
@@ -694,9 +697,9 @@ f"""else {{
         vector_call_func_block = f"if {core_type} {{\n"
         split_times = len(indent_code)
         block_num = self.block_num
-        vector_call_func_block += f"  if ({block_type}() < {block_num}) {{\n"
         if not is_preload:
-            vector_call_func_block += indent_code_func(self.gen_dcci_before_kernel_start_call_block())
+            vector_call_func_block += indent_code_func(self.gen_dcci_before_kernel_start_call_block(), "  ")
+        vector_call_func_block += f"  if ({block_type}() < {block_num}) {{\n"
 
         if split_times > 1:
             vector_call_func_block += "    uint8_t coreid = (uint8_t)get_coreid();\n"
@@ -711,9 +714,9 @@ f"""else {{
         else:
             vector_call_func_block += indent_code_func(indent_code[0], "      ")
 
-        if not is_preload:
-            vector_call_func_block += indent_code_func(self.gen_dcci_after_kernel_end_call_block())
         vector_call_func_block += "  }\n\n"
+        if not is_preload:
+            vector_call_func_block += indent_code_func(self.gen_dcci_after_kernel_end_call_block(), "  ")
         vector_call_func_block += "}\n\n"
         return vector_call_func_block
 
@@ -722,8 +725,8 @@ f"""else {{
         vector_call_func_block = f"if {core_type} {{\n"
         split_times = len(indent_code)
         block_num = self.block_num
+        vector_call_func_block += indent_code_func(self.gen_dcci_before_kernel_start_call_block(), "  ")
         vector_call_func_block += f"  if ({block_type}() < {block_num}) {{\n"
-        vector_call_func_block += indent_code_func(self.gen_dcci_before_kernel_start_call_block())
 
         if split_times > 1:
             vector_call_func_block += "    uint8_t coreid = (uint8_t)get_coreid();\n"
@@ -741,8 +744,8 @@ f"""else {{
         else:
             vector_call_func_block += indent_code_func(indent_code[0], "      ")
 
-        vector_call_func_block += indent_code_func(self.gen_dcci_after_kernel_end_call_block())
         vector_call_func_block += "  } "
+        vector_call_func_block += indent_code_func(self.gen_dcci_after_kernel_end_call_block(), "  ")
         vector_call_func_block += self.sub_op_gen_feed_sync_all_code(True)
         vector_call_func_block += "}\n\n"
         return vector_call_func_block
