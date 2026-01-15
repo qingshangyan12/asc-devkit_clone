@@ -25,13 +25,7 @@
 #include "get_rsvd_cnt_impl/npu_arch_2201/get_rsvd_cnt_impl.h"
 #include "get_vms4_sr_impl/npu_arch_2201/asc_get_vms4_sr_impl.h"
 #include "set_cmp_mask_impl/npu_arch_2201/asc_set_cmp_mask_impl.h"
-#include "set_mask_count_impl/npu_arch_2201/asc_set_mask_count_impl.h"
-#include "set_mask_norm_impl/npu_arch_2201/asc_set_mask_norm_impl.h"
-#include "set_vector_mask_impl/npu_arch_2201/asc_set_vector_mask_impl.h"
-#include "vabs_impl/npu_arch_2201/asc_vabs_impl.h"
 #include "vadd_impl/npu_arch_2201/asc_add_impl.h"
-#include "vadds_impl/npu_arch_2201/asc_add_scalar_impl.h"
-#include "set_deqscale_impl/npu_arch_2201/asc_set_deq_scale_impl.h"
 #include "vaddrelu_impl/npu_arch_2201/asc_add_relu_impl.h"
 #include "vbitsort_impl/npu_arch_2201/bitsort_impl.h"
 #include "vbrcb_impl/npu_arch_2201/asc_brcb_impl.h"
@@ -102,40 +96,25 @@
 #include "vaddreluconv_impl/npu_arch_2201/asc_add_relu_impl.h"
 #include "vdiv_impl/npu_arch_2201/asc_div_impl.h"
 #include "vector_dup_impl/npu_arch_2201/asc_duplicate_impl.h"
-#include "vexp_impl/npu_arch_2201/asc_exp_impl.h"
 #include "vgt_scalar_impl/npu_arch_2201/gt_scalar_impl.h"
-#include "vlog_impl/npu_arch_2201/log_impl.h"
 #include "vmax_impl/npu_arch_2201/asc_max_impl.h"
 #include "vmrgsort4_impl/npu_arch_2201/asc_mrgsort4_impl.h"
 #include "vmin_impl/npu_arch_2201/asc_min_impl.h"
-#include "vmaxs_impl/npu_arch_2201/asc_max_scalar_impl.h"
 #include "vmla_impl/npu_arch_2201/asc_fma_impl.h"
 #include "vmul_impl/npu_arch_2201/asc_mul_impl.h"
-#include "vmuls_impl/npu_arch_2201/asc_mul_scalar_impl.h"
-#include "vor_impl/npu_arch_2201/or_impl.h"
 #include "vmulconv_c_api_impl/mul_cast_half2int8_impl.h/npu_arch_2201/asc_mul_cast_half2int8_impl.h"
 #include "vmulconv_c_api_impl/mul_cast_half2uint8_impl.h/npu_arch_2201/asc_mul_cast_half2uint8_impl.h"
 #include "vsel_impl/npu_arch_2201/asc_select_impl.h"
 #include "vsub_impl/npu_arch_2201/asc_sub_impl.h"
-#include "vsubs_impl/npu_arch_2201/asc_sub_scalar_impl.h"
-#include "vrelu_impl/npu_arch_2201/asc_relu_impl.h"
 #include "vcmp_gt_impl/npu_arch_2201/asc_gt_impl.h"
-#include "vrsqrt_impl/npu_arch_2201/asc_rsqrt_impl.h"
-#include "vmins_impl/npu_arch_2201/asc_min_scalar_impl.h"
 #include "vtranspose_impl/npu_arch_2201/asc_transpose_impl.h"
-#include "vrec_impl/npu_arch_2201/asc_rcp_impl.h"
-#include "vshl_impl/npu_arch_2201/asc_shiftleft_impl.h"
-#include "vshr_impl/npu_arch_2201/asc_shiftright_impl.h"
-#include "vshr_impl/npu_arch_2201/asc_shiftright_round_impl.h"
 #include "vmadd_impl/npu_arch_2201/asc_mul_add_impl.h"
 #include "vcmpvs_c_api_impl/vcmpvs_eq_impl/npu_arch_2201/asc_eq_scalar_impl.h"
 #include "vreduce_impl/npu_arch_2201/asc_reduce_impl.h"
-#include "vnot_impl/npu_arch_2201/asc_not_impl.h"
 #include "vmaddrelu_impl/npu_arch_2201/asc_mul_add_relu_impl.h"
 #include "vsubrelu_impl/npu_arch_2201/asc_subrelu_impl.h"
 #include "vcmp_c_api_impl/vcmp_le_impl/npu_arch_2201/asc_le_impl.h"
 #include "vcmpvs_c_api_impl/vcmpvs_le_impl/npu_arch_2201/asc_le_scalar_impl.h"
-#include "vsqrt_impl/npu_arch_2201/asc_sqrt_impl.h"
 #include "vaxpy_impl/npu_arch_2201/asc_axpy_impl.h"
 #include "vcmp_c_api_impl/vcmp_lt_impl/npu_arch_2201/asc_lt_impl.h"
 #include "vcmpvs_c_api_impl/vcmpvs_ne_impl/npu_arch_2201/asc_ne_scalar_impl.h"
@@ -145,9 +124,7 @@
 #include "vconv_c_api_impl/vconv_int162half_impl/npu_arch_2201/asc_int162half_rd_impl.h"
 #include "vconv_c_api_impl/vconv_int162half_impl/npu_arch_2201/asc_int162half_rn_impl.h"
 #include "vconv_c_api_impl/vconv_int162half_impl/npu_arch_2201/asc_int162half_rz_impl.h"
-#include "vlrelu_impl/npu_arch_2201/asc_leakyrelu_impl.h"
 #include "lt_scalar_impl/npu_arch_2201/asc_lt_scalar_impl.h"
-#include "and_impl/npu_arch_2201/asc_and_impl.h"
 #include "vsubreluconv_impl/npu_arch_2201/asc_sub_relu_impl.h"
 #include "vgather_impl/npu_arch_2201/asc_gather_impl.h"
 #include "vgatherb_impl/npu_arch_2201/asc_gather_datablock_impl.h"
@@ -197,31 +174,6 @@ __aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[4])
 __aicore__ inline void asc_set_cmp_mask(__ubuf__ void* sel_mask)
 {
     asc_set_cmp_mask_impl(sel_mask);
-}
-
-__aicore__ inline void asc_set_mask_count()
-{
-    asc_set_mask_count_impl();
-}
-
-__aicore__ inline void asc_set_mask_norm()
-{
-    asc_set_mask_norm_impl();
-}
-
-__aicore__ inline void asc_set_vector_mask(uint64_t mask1, uint64_t mask0)
-{
-    asc_set_vector_mask_impl(mask1, mask0);
-}
-
-__aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool sign_mode)
-{
-    asc_set_deq_scale_impl(scale, offset, sign_mode);
-}
-
-__aicore__ inline void asc_set_deq_scale(half scale)
-{
-    asc_set_deq_scale_impl(scale);
 }
 
 // ==========asc_add(half/float/int16_t/int32_t)==========
@@ -295,71 +247,6 @@ __aicore__ inline void asc_add(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __
 __aicore__ inline void asc_add_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count)
 {
     asc_add_sync_impl(dst, src0, src1, count);
-}
-
-// ==========asc_add_scalar(half/float/int16_t/int32_t)==========
-__aicore__ inline void asc_add_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_add_scalar_impl (dst, src, value, count);
-}
-
-__aicore__ inline void asc_add_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_add_scalar_impl (dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_add_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_add_scalar_sync_impl (dst, src, value, count);
-}
-
-__aicore__ inline void asc_add_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_add_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_add_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_add_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_add_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_add_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_add_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_add_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_add_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_add_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_add_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_add_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_add_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_add_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_add_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_add_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_add_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_add_scalar_sync_impl(dst, src, value, count);
 }
 
 // ==========asc_bitsort(half/float)==========
@@ -2072,38 +1959,6 @@ __aicore__ inline void asc_duplicate_sync(__ubuf__ uint32_t* dst, uint32_t src, 
     asc_duplicate_sync_impl(dst, src, count);
 }
 
-// ==========asc_exp(half/float)==========
-__aicore__ inline void asc_exp(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_exp_impl (dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_exp(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_exp_impl (dst, src, count);
-}
-
-__aicore__ inline void asc_exp_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_exp_sync_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_exp(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_exp_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_exp(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_exp_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_exp_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_exp_sync_impl(dst, src, count);
-}
 
 // ==========asc_gt_scalar(dst:uint8_t, src:half/float)==========
 __aicore__ inline void asc_gt_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat,
@@ -2128,88 +1983,6 @@ __aicore__ inline void asc_gt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float*
     uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
 {
     asc_gt_scalar_sync_impl_float(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-// ==========asc_log(half/float)==========
-__aicore__ inline void asc_log(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
-{
-    asc_log_impl_half(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_log(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_log_count_impl_half(dst, src, count);
-}
-
-__aicore__ inline void asc_log_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_log_sync_impl_half(dst, src, count);
-}
-
-__aicore__ inline void asc_log(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
-{
-    asc_log_impl_float(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_log(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_log_count_impl_float(dst, src, count);
-}
-
-__aicore__ inline void asc_log_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_log_sync_impl_float(dst, src, count);
-}
-
-// ==========asc_relu(half/float/int32_t)==========
-__aicore__ inline void asc_relu(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_relu_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_relu(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_relu_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_relu_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_relu_sync_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_relu(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_relu_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_relu(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_relu_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_relu_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_relu_sync_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_relu(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_relu_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_relu(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count)
-{
-    asc_relu_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_relu_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count)
-{
-    asc_relu_sync_impl(dst, src, count);
 }
 
 // ==========asc_lt(half/float)==========
@@ -2261,102 +2034,6 @@ __aicore__ inline void asc_lt_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, 
     asc_lt_sync_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 }
 
-// ==========asc_abs(half/float)==========
-__aicore__ inline void asc_abs(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_abs_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_abs(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_abs_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_abs_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_abs_sync_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_abs(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_abs_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_abs(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_abs_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_abs_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_abs_sync_impl(dst, src, count);
-}
-
-// ==========asc_shiftleft(int16_t/uint16_t/int32_t/uint32_t)==========
-__aicore__ inline void asc_shiftleft(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t distance, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_shiftleft_impl(dst, src, distance, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftleft(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t distance, uint32_t count)
-{
-    asc_shiftleft_impl(dst, src, distance, count);
-}
-
-__aicore__ inline void asc_shiftleft_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src,  uint32_t distance, uint32_t count)
-{
-    asc_shiftleft_sync_impl(dst, src, distance, count);
-}
-
-__aicore__ inline void asc_shiftleft(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t distance, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_shiftleft_impl(dst, src, distance, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftleft(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t distance, uint32_t count)
-{
-    asc_shiftleft_impl(dst, src, distance, count);
-}
-
-__aicore__ inline void asc_shiftleft_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src,  uint32_t distance, uint32_t count)
-{
-    asc_shiftleft_sync_impl(dst, src, distance, count);
-}
-__aicore__ inline void asc_shiftleft(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t distance, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_shiftleft_impl(dst, src, distance, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftleft(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t distance, uint32_t count)
-{
-    asc_shiftleft_impl(dst, src, distance, count);
-}
-
-__aicore__ inline void asc_shiftleft_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src,  uint32_t distance, uint32_t count)
-{
-    asc_shiftleft_sync_impl(dst, src, distance, count);
-}
-
-__aicore__ inline void asc_shiftleft(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t distance, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_shiftleft_impl(dst, src, distance, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftleft(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t distance, uint32_t count)
-{
-    asc_shiftleft_impl(dst, src, distance, count);
-}
-
-__aicore__ inline void asc_shiftleft_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src,  uint32_t distance, uint32_t count)
-{
-    asc_shiftleft_sync_impl(dst, src, distance, count);
-}
 
 // ==========asc_mul_cast_half2int8==========
 __aicore__ inline void asc_mul_cast_half2int8(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
@@ -2621,70 +2298,6 @@ __aicore__ inline void asc_max_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src
     asc_max_sync_impl(dst, src0, src1, count);
 }
 
-// ==========asc_max_scalar(half/float/int16_t/int32_t)==========
-__aicore__ inline void asc_max_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_max_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_max_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_max_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_max_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_max_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_max_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_max_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_max_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_max_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_max_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_max_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_max_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_max_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_max_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_max_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_max_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_max_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_max_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_max_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_max_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_max_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_max_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_max_scalar_sync_impl(dst, src, value, count);
-}
 
 // ==========asc_min(half/float/int16_t/int32_t)==========
 __aicore__ inline void asc_min(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
@@ -2881,70 +2494,6 @@ __aicore__ inline void asc_mul_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src
     asc_mul_sync_impl(dst, src0, src1, count);
 }
 
-// ==========asc_mul_scalar(half/float/int16_t/int32_t)==========
-__aicore__ inline void asc_mul_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_mul_scalar_impl (dst, src, value, count);
-}
-
-__aicore__ inline void asc_mul_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_mul_scalar_impl (dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_mul_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_mul_scalar_sync_impl (dst, src, value, count);
-}
-
-__aicore__ inline void asc_mul_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_mul_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_mul_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_mul_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_mul_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_mul_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_mul_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_mul_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_mul_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_mul_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_mul_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_mul_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_mul_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_mul_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_mul_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_mul_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_mul_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_mul_scalar_sync_impl(dst, src, value, count);
-}
 
 // ==========asc_select(half/float)==========
 __aicore__ inline void asc_select(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
@@ -2981,39 +2530,6 @@ __aicore__ inline void asc_select(__ubuf__ float* dst, __ubuf__ float* src0, __u
 __aicore__ inline void asc_select_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
 {
     asc_select_sync_impl(dst, src0, src1, count);
-}
-
-// ==========asc_sqrt(half/float)==========
-__aicore__ inline void asc_sqrt(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride,
-        uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_sqrt_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_sqrt(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_sqrt_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_sqrt_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_sqrt_sync_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_sqrt(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride,
-        uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_sqrt_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_sqrt(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_sqrt_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_sqrt_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_sqrt_sync_impl(dst, src, count);
 }
 
 // ==========asc_sub(half/float/int16_t/int32_t)==========
@@ -3089,70 +2605,6 @@ __aicore__ inline void asc_sub_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src
     asc_sub_sync_impl(dst, src0, src1, count);
 }
 
-// ==========asc_sub_scalar(half)==========
-__aicore__ inline void asc_sub_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_sub_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_sub_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_sub_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_sub_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_sub_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_sub_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_sub_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_sub_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_sub_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_sub_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_sub_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_sub_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_sub_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_sub_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_sub_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_sub_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_sub_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_sub_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_sub_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_sub_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_sub_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_sub_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_sub_scalar_sync_impl(dst, src, value, count);
-}
 
 // ==========asc_gt(half/float)==========
 __aicore__ inline void asc_gt(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, 
@@ -3377,37 +2829,6 @@ __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint1
     asc_transpose_sync_impl(dst, src);
 }
 
-// ==========asc_not(int16_t/uint16_t)==========
-__aicore__ inline void asc_not(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count)
-{
-    asc_not_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_not(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_not_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_not_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count)
-{
-    asc_not_sync_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_not(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count)
-{
-    asc_not_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_not(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_not_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_not_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count)
-{
-    asc_not_sync_impl(dst, src, count);
-}
-
 // ==========asc_mul_add_relu(half/float)==========
 __aicore__ inline void asc_mul_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
 {
@@ -3545,72 +2966,6 @@ __aicore__ inline void asc_le_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src,
 __aicore__ inline void asc_le_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
     asc_le_scalar_sync_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-// ==========asc_or(int16_t/uint16_t)==========
-__aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
-{
-    asc_or_count_impl_int16_t(dst, src0, src1, count);
-}
-
-__aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat,
-    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
-{
-    asc_or_impl_int16_t(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
-}
-
-__aicore__ inline void asc_or_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
-{
-    asc_or_sync_impl_int16_t(dst, src0, src1, count);
-}
-
-__aicore__ inline void asc_or(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
-{
-    asc_or_count_impl_uint16_t(dst, src0, src1, count);
-}
-
-__aicore__ inline void asc_or(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint8_t repeat,
-    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
-{
-    asc_or_impl_uint16_t(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
-}
-
-__aicore__ inline void asc_or_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
-{
-    asc_or_sync_impl_uint16_t(dst, src0, src1, count);
-}
-
-// ==========asc_rsqrt(half/float)==========
-__aicore__ inline void asc_rsqrt(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_rsqrt_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_rsqrt(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride,
-    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_rsqrt_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_rsqrt_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_rsqrt_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_rsqrt(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_rsqrt_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_rsqrt(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride,
-    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_rsqrt_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_rsqrt_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_rsqrt_impl(dst, src, count);
 }
 
 // ==========asc_add_relu(half/float/int16_t)==========
@@ -3915,216 +3270,6 @@ __aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src
 __aicore__ inline void asc_reduce_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count)
 {
     asc_reduce_sync_impl(dst, src0, src1, count);
-}
-
-// ==========asc_min_scalar(half/float/int16_t/int32_t)==========
-__aicore__ inline void asc_min_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_min_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_min_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
-    uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_min_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_min_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_min_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_min_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_min_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_min_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
-    uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_min_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_min_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_min_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_min_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_min_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_min_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
-    uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_min_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_min_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-{
-    asc_min_scalar_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_min_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_min_scalar_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_min_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
-    uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_min_scalar_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_min_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_min_scalar_sync_impl(dst, src, value, count);
-}
-
-// ==========asc_rcp(half/float)==========
-__aicore__ inline void asc_rcp(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_rcp_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_rcp(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride,
-    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_rcp_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_rcp_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-{
-    asc_rcp_sync_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_rcp(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_rcp_impl(dst, src, count);
-}
-
-__aicore__ inline void asc_rcp(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride,
-    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_rcp_impl(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_rcp_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-{
-    asc_rcp_sync_impl(dst, src, count);
-}
-
-// ==========asc_shiftright(int16_t/int32_t/uint16_t/uint32_t)==========
-__aicore__ inline void asc_shiftright(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
-{
-    asc_shiftright_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_shiftright_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride,
-        src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftright_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
-{
-    asc_shiftright_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_shiftright_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_shiftright_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride,
-        src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftright_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-{
-    asc_shiftright_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count)
-{
-    asc_shiftright_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_shiftright_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride,
-        src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftright_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value,
-    uint32_t count)
-{
-    asc_shiftright_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count)
-{
-    asc_shiftright_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_shiftright_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride,
-        src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftright_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value,
-    uint32_t count)
-{
-    asc_shiftright_sync_impl(dst, src, value, count);
-}
-
-// ==========asc_shiftright_round(int16_t/int32_t)==========
-__aicore__ inline void asc_shiftright_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value,
-    uint32_t count)
-{
-    asc_shiftright_round_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value,
-    uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
-    uint16_t src_repeat_stride)
-{
-    asc_shiftright_round_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride,
-        src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftright_round_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value,
-    uint32_t count)
-{
-    asc_shiftright_round_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value,
-    uint32_t count)
-{
-    asc_shiftright_round_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_shiftright_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value,
-    uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
-    uint16_t src_repeat_stride)
-{
-    asc_shiftright_round_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride,
-        src_repeat_stride);
-}
-
-__aicore__ inline void asc_shiftright_round_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value,
-    uint32_t count)
-{
-    asc_shiftright_round_sync_impl(dst, src, value, count);
 }
 
 // ==========asc_mul_add(half/float)==========
@@ -4518,36 +3663,6 @@ __aicore__ inline void asc_int162half_rz_sync(__ubuf__ half* dst, __ubuf__ int16
    asc_int162half_rz_sync_impl(dst, src, count);
 }
 
-// ==========asc_and(int16_t/uint16_t)==========
-__aicore__ inline void asc_and(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
-{
-    asc_and_impl(dst, src0, src1, count);
-}
-
-__aicore__ inline void asc_and(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
-{
-    asc_and_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
-}
-
-__aicore__ inline void asc_and_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
-{
-    and_sync_impl(dst, src0, src1, count);
-}
-__aicore__ inline void asc_and(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
-{
-    asc_and_impl(dst, src0, src1, count);
-}
-
-__aicore__ inline void asc_and(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
-{
-    asc_and_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
-}
-
-__aicore__ inline void asc_and_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
-{
-    and_sync_impl(dst, src0, src1, count);
-}
-
 // ==========asc_sub_relu(f162s8)==========
 __aicore__ inline void asc_sub_relu(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
 {
@@ -4594,35 +3709,6 @@ __aicore__ inline void asc_sub_relu(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0
 __aicore__ inline void asc_sub_relu_sync(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
 {
     asc_sub_relu_impl(dst, src0, src1, count);
-}
-
-// ==========asc_leakyrelu(half/float)==========
-__aicore__ inline void asc_leakyrelu(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_leakyrelu_impl(dst, src, value, count);
-}
-__aicore__ inline void asc_leakyrelu(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_leakyrelu_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_leakyrelu_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-{
-    asc_leakyrelu_sync_impl(dst, src, value, count);
-}
-
-__aicore__ inline void asc_leakyrelu(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_leakyrelu_impl(dst, src, value, count);
-}
-__aicore__ inline void asc_leakyrelu(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-{
-    asc_leakyrelu_impl(dst, src, value, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
-}
-
-__aicore__ inline void asc_leakyrelu_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
-{
-    asc_leakyrelu_sync_impl(dst, src, value, count);
 }
 
 // ==========asc_lt_scalar(half/float)==========

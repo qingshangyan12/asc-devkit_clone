@@ -7,17 +7,16 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
- 
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif     
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
 
 #ifndef INCLUDE_C_API_SCALAR_COMPUTE_H
 #define INCLUDE_C_API_SCALAR_COMPUTE_H
- 
-#include "c_api_instr_impl/scalar_compute_c_api_impl/scalar_compute_c_api_impl.h"
+
+#include "instr_impl/npu_arch_2201/scalar_compute_impl.h"
 
 __aicore__ inline int64_t asc_ffs(uint64_t value);
 
@@ -32,11 +31,10 @@ __aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value);
 __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx);
 
 __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx);
- 
+
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif    
-
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
