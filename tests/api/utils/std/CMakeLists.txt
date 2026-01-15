@@ -20,18 +20,13 @@ set(ASCENDC_UT_PRODUCT_TYPE_LIST
 file(GLOB ASCENDC_UT_ascend910B1_CASE_SRC
     sequence/test_sequence.cpp
     tuple/test_operator_tuple.cpp
-    type_traits/test_operator_conditional.cpp
-    type_traits/test_operator_enable_if.cpp
-    type_traits/test_operator_integral_constant.cpp
-    type_traits/test_operator_is_base_of.cpp
-    type_traits/test_operator_is_convertible.cpp
-    type_traits/test_operator_is_one_of.cpp
-    type_traits/test_operator_is_same.cpp
+    type_traits/*.cpp
 )
 
 file(GLOB ASCENDC_UT_ascend910_9599_CASE_SRC
     cmath/test_abs.cpp
     cmath/test_sqrt.cpp
+    type_traits/*.cpp
 )
 
 foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
