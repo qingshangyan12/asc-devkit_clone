@@ -286,7 +286,7 @@ __aicore__ inline void WaitPreTaskEndTightV2DefaultImpl()
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIC) {
         if ASCEND_IS_AIC {
