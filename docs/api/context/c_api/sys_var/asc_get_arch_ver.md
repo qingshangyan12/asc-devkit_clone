@@ -1,5 +1,5 @@
 
-# asc_get_arch_version
+# asc_get_arch_ver
 
 ## 产品支持情况
 
@@ -41,7 +41,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-constexpr uint32_t coreVersion = 0;// 定义AI处理器版本
-asc_get_arch_version(coreVersion);
-PRINTF("core version is %x", coreVersion);//需用%x将其打印成十六进制的数
+uint32_t coreVersion = 0;// 定义AI处理器版本
+asc_get_arch_ver(coreVersion);
+printf("core version is %x", coreVersion);// 需用%x将其打印成十六进制的数
 ```
