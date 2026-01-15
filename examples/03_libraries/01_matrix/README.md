@@ -5,6 +5,7 @@
 ## 算子开发样例
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
+| [batch_matmul](./batch_matmul) | 本样例介绍了一次完成BatchNum个Matmul矩阵乘法 |
 | [matmul](./matmul) | 本样例介绍调用Matmul API实现matmul单算子 |
 | [matmul_splitm](./matmul_splitm) | 本样例介绍Matmul API使用SplitM模板策略的场景 |
 | [matmul_splitk](./matmul_splitk) | 本样例介绍调用Matmul高阶API实现多核切K场景下的单算子。多核切K的应用场景为矩阵乘的M、N较小，不能在M、N方向开启多核，需要切K满足将切分后的矩阵分配到更多核上并行处理。|
