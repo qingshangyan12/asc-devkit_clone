@@ -1594,7 +1594,11 @@ __aicore__ inline void asc_leakyrelu_sync(__ubuf__ float* dst, __ubuf__ float* s
 // ==========asc_lt_scalar(half/float)==========
 __aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src0, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride);
 
+__aicore__ inline void asc_lt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride);
+
 __aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src0, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride);
+
+__aicore__ inline void asc_lt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src0_block_stride, uint16_t dst_repeat_stride, uint16_t src0_repeat_stride);
 
 // ==========asc_sub_relu==========
 __aicore__ inline void asc_sub_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
@@ -2047,6 +2051,55 @@ __aicore__ inline void asc_gt_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, 
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, 
     uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+// ==========asc_le(half/float)==========
+__aicore__ inline void asc_le(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
+                              uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+                              uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
+__aicore__ inline void asc_le_sync(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
+                                   uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+                                   uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
+__aicore__ inline void asc_le(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
+                              uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+                              uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
+__aicore__ inline void asc_le_sync(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
+                                   uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+                                   uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
+__aicore__ inline void asc_le(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
+                              uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride,
+                              uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
+__aicore__ inline void asc_le_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
+                                   uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride,
+                                   uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
+__aicore__ inline void asc_le(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
+                              uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride,
+                              uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
+__aicore__ inline void asc_le_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
+                                   uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride,
+                                   uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
+// ==========asc_le_scalar(half/float)==========
+__aicore__ inline void asc_le_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat,
+                                     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
+                                     uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_le_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat,
+                                          uint16_t dst_block_stride, uint16_t src_block_stride,
+                                          uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_le_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
+                                     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
+                                     uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_le_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
+                                          uint16_t dst_block_stride, uint16_t src_block_stride,
+                                          uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  

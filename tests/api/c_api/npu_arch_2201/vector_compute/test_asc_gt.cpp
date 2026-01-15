@@ -11,7 +11,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
-#include "c_api/utils_intf.h"
 #include "../utils/test_vcmp_instr_utils.h"
 #include "../utils/test_vcmpv_instr_utils.h"
 
