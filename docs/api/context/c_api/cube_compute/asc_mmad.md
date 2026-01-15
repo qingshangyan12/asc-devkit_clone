@@ -12,7 +12,7 @@
 完成矩阵乘加操作。计算公式如下：
 
 $$
-c_matrix = (a_matrix * b_matrix) + c_matrix
+c_{matrix} = (a_{matrix} * b_{matrix}) + c_{matrix}
 $$
 
 ## 函数原型

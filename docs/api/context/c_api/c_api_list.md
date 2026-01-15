@@ -5,7 +5,6 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 |结构名|说明|
 |-----------------------|-----------------------|
-| [asc_deq_scale_config](struct/asc_deq_scale_config.md) | asc_deq_scale API配置参数 |
 | [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | Load3Dv2接口的repeat参数 |
 | [asc_store_atomic_config](struct/asc_store_atomic_config.md) | 原子操作使能位与原子操作类型的值 |
 
