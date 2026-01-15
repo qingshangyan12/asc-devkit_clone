@@ -17,7 +17,7 @@
 #ifndef INCLUDE_UTILS_DEBUG_ASC_PRINTF_H
 #define INCLUDE_UTILS_DEBUG_ASC_PRINTF_H
 
-#include "c_api_instr_impl/debug_c_api_impl/debug_impl.h"
+#include "instr_impl/npu_arch_2201/debug_impl.h"
 
 /*
 * usage example:

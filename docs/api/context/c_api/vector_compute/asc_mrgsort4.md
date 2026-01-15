@@ -42,13 +42,13 @@ asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，
 | ------------ | ------------ | ------------ |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址的数组，待合并的Region Proposal队列。队列数量ASC_MRGSORT_ELEMENT_LEN值为4。|
-| repeat | 迭代次数，每一次源操作数和目的操作数计算并跳过四个队列总长度。 |
+| repeat | 输入 | 迭代次数，每一次源操作数和目的操作数计算并跳过四个队列总长度。 |
 | element_length_0 | 输入 | 源队列0的长度。 |
 | element_length_1 | 输入 | 源队列1的长度。 |
 | element_length_2 | 输入 | 源队列2的长度。 |
 | element_length_3 | 输入 | 源队列3的长度。 |
-| if_exhausted_suspension | 某条队列耗尽后，指令是否需要停止。 |
-| valid_bit | 有效队列个数。有效取值如下：<br>3：前两条队列有效。<br>7：前三条队列有效。<br>15：四条队列全部有效。  |
+| if_exhausted_suspension | 输入 | 某条队列耗尽后，指令是否需要停止。 |
+| valid_bit | 输入 | 有效队列个数。有效取值如下：<br>3：前两条队列有效。<br>7：前三条队列有效。<br>15：四条队列全部有效。  |
 
 ## 返回值说明
 
@@ -75,26 +75,26 @@ PIPE_V
 uint16_t element_length = 32;
 // 每个元素包含float32的score和4字节的index，占8字节，相当于2个sizeof(float)。
 uint16_t array_length = element_length * 2;
-__ubuf__ float* src_workspace[8 * array_length];
-__ubuf__ float* tmp_workspace[8 * array_length];
-__ubuf__ float* dst_workspace[8 * array_length];
+__ubuf__ float src_workspace[array_length * 8];
+__ubuf__ float tmp_workspace[array_length * 8];
+__ubuf__ float dst_workspace[array_length * 8];
 
 __ubuf__ float* src[ASC_MRGSORT_ELEMENT_LEN];
 __ubuf__ float* dst;
 uint8_t valid_bit;
 
 // 每个迭代可以处理4个队列，共2个迭代。
-src[0] = src_workspace[0];
-src[1] = src_workspace[1 * array_length];
-src[2] = src_workspace[2 * array_length];
-src[3] = src_workspace[3 * array_length];
+src[0] = &src_workspace[0];
+src[1] = &src_workspace[1 * array_length];
+src[2] = &src_workspace[2 * array_length];
+src[3] = &src_workspace[3 * array_length];
 dst = tmp_workspace;
 valid_bit = 15;
 asc_mrgsort4(dst, src, 2, element_length, element_length, element_length, element_length, false, valid_bit);
 
 // 迭代1次，处理2个队列。
-src[0] = tmp_workspace[0];
-src[1] = tmp_workspace[1 * 4 * array_length];
+src[0] = &tmp_workspace[0];
+src[1] = &tmp_workspace[1 * 4 * array_length];
 dst = dst_workspace;
 valid_bit = 3;
 asc_mrgsort4(dst, src, 1, 4 * element_length, 4 * element_length, 0, 0, false, valid_bit);

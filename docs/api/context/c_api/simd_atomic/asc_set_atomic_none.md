@@ -9,13 +9,13 @@
 
 ## 功能说明
 
-清空原子操作的状态。一般和[asc_set_atomic_add](asc_set_atomic_add.md)，[asc_set_atomic_max](asc_set_atomic_max.md)，[asc_set_atomic_min](asc_set_atomic_min.md)配合使用，用于在完成原子操作后关闭原子操作，避免影响后续功能。
+清空原子操作的状态。一般和[asc_set_atomic_add](asc_set_atomic_add.md)，[asc_set_atomic_max](asc_set_atomic_max.md)，[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续功能。
 
 ## 函数原型
 
-    ```c++
-    __aicore__ inline void asc_set_atomic_none()
-    ```
+```c++
+__aicore__ inline void asc_set_atomic_none()
+```
 
 ## 参数说明
 
@@ -35,22 +35,20 @@ PIPE_S
 ## 调用示例
 
 ```c++
-//total_length指参与搬运的数据总长度。
-uint32_t total_length = 256;
-__ubuf__ half src0[total_length];
-__ubuf__ half src1[total_length];
-__gm__ half dst[total_length];
-asc_set_atomic_add();
-asc_set_atomic_f16();
-asc_copy_ub2gm_sync(dst, src0, total_length * sizeof(half));
-asc_copy_ub2gm_sync(dst, src1, total_length * sizeof(half));
+//total_length指参与搬运的数据总长度。dst是外部输入的int16_t类型的GM内存。
+constexpr uint32_t total_length = 256;
+__ubuf__ int16_t src0[total_length];
+__ubuf__ int16_t src1[total_length];
+asc_set_atomic_add_int();
+asc_copy_ub2gm_sync(dst, src0, total_length * sizeof(int16_t));
+asc_copy_ub2gm_sync(dst, src1, total_length * sizeof(int16_t));
 asc_set_atomic_none();
 ```
 
 结果示例：
 
 ```
-输入数据src0：[1 1 1 ... 1]
-输入数据src1：[2 2 2 ... 2]
-输出数据dst：[3 3 3 ... 3]
+输入数据src0：[1, 1, 1, ..., 1]  // int16_t类型
+输入数据src1：[2, 2, 2, ..., 2]  // int16_t类型
+输出数据dst：[3, 3, 3, ..., 3]   // int16_t类型
 ```

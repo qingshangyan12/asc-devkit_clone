@@ -17,7 +17,7 @@
 #ifndef INCLUDE_UTILS_DEBUG_ASC_ASSERT_H
 #define INCLUDE_UTILS_DEBUG_ASC_ASSERT_H
 
-#include "c_api_instr_impl/debug_c_api_impl/debug_impl.h"
+#include "instr_impl/npu_arch_2201/debug_impl.h"
 
 #define assert(expr) asc_assert_impl(expr)
 

@@ -17,7 +17,7 @@
 #ifndef INCLUDE_C_API_UTILS_DEBUG_ASC_DUMP_H
 #define INCLUDE_C_API_UTILS_DEBUG_ASC_DUMP_H
 
-#include "c_api_instr_impl/debug_c_api_impl/debug_impl.h"
+#include "instr_impl/npu_arch_2201/debug_impl.h"
 
 template <typename T>
 __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dump_size);
