@@ -33,7 +33,7 @@ PIPE_S
 
 ## 约束说明
 
-- 需配合[asc_load3d_v2_config.md](../struct/asc_load3d_v2_config.md)接口使用，用于设置Load3Dv2接口的repeat参数。
+- 需配合[asc_load3d_v2_config.md](../struct/asc_load3d_v2_config.md)使用，用于设置Load3Dv2接口的repeat参数。
 
 ## 调用示例
 

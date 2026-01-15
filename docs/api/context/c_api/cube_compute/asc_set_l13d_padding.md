@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。
+设置Pad属性描述，用于在调用[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a.md)接口时配置填充数值。
 
 ## 函数原型
 

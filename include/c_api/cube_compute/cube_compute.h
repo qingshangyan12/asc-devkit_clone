@@ -14,10 +14,10 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
 #endif     
 
-#ifndef INCLUDE_C_API_CUBE_COMPUTE_H
-#define INCLUDE_C_API_CUBE_COMPUTE_H
+#ifndef INCLUDE_C_API_CUBE_COMPUTE_CUBE_COMPUTE_H
+#define INCLUDE_C_API_CUBE_COMPUTE_CUBE_COMPUTE_H
 
-#include "c_api_instr_impl/cube_compute_c_api_impl/cube_compute_c_api_impl.h"
+#include "instr_impl/npu_arch_2201/cube_compute_impl.h"
 
 // asc_mmad(float-bfloat16_t)
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix,
@@ -96,13 +96,22 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t
     uint16_t right_width, uint16_t n_dim, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset,
     bool c_matrix_source, bool c_matrix_init_val);
 
+__aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k,
+                                       uint16_t n, uint8_t unitFlag, bool cmatrixSource, bool cmatrixInitVal);
+
+__aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m,
+                                            uint16_t k, uint16_t n, uint8_t unitFlag, bool cmatrixSource,
+                                            bool cmatrixInitVal);
+
 __aicore__ inline void asc_set_mmad_direction_m();
 
 __aicore__ inline void asc_set_mmad_direction_n();
 
 __aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
 
-__aicore__ inline void asc_enable_hf32_impl();
+__aicore__ inline void asc_enable_hf32();
+
+__aicore__ inline void asc_set_fp32_mode();
 
 __aicore__ inline void asc_set_l0c_copy_config(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag = false);
 

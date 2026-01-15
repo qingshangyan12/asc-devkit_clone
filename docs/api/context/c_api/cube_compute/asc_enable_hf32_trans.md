@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-设置HF32模式取整方式，需要先使用asc_enable_hf32开启HF32取整模式。
+设置HF32模式取整方式，需要先使用[asc_enable_hf32](./asc_enable_hf32.md)开启HF32取整模式。
 
 
 ## 函数原型
@@ -42,5 +42,5 @@ mode仅支持如下2种取值：<br>0：FP32将以最接近偶数的方式四舍
 
 ```cpp
 uint32_t mode = 0;
-aasc_enable_hf32_trans(mode);
+asc_enable_hf32_trans(mode);
 ```
