@@ -1,6 +1,6 @@
 # fixpipe_co12gm_tensor_quantization_s322f16样例
 ## 概述
-本样例介绍基础API Fixpipe将矩阵乘的结果从CO1搬入GM，并使能随路tensor量化将矩阵乘后int32_t类型数据量化为half类型。
+本样例介绍如何使用基础API Fixpipe将矩阵乘的结果从CO1搬入GM，并使能随路量化将矩阵乘结果由int32_t类型数据量化为half类型。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
