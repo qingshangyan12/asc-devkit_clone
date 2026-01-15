@@ -20,6 +20,12 @@
 #include "instr_impl/npu_arch_2201/vector_compute_impl.h"
 #include "utils_intf.h"
 
+#define asc_transto5hd_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)
+
+#define asc_transto5hd_b16(dst, src, repeat, dstStride, srcStride) asc_transto5hd_b16_impl(dst, src, repeat, dstStride, srcStride)
+
+#define asc_transto5hd_b32(dst, src, repeat, dstStride, srcStride) asc_transto5hd_b32_impl(dst, src, repeat, dstStride, srcStride)
+
 __aicore__ inline void asc_get_cmp_mask(__ubuf__ void* dst);
 
 __aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index);

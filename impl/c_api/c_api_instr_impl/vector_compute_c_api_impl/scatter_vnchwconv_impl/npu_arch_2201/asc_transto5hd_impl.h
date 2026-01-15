@@ -20,11 +20,11 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-#define asc_transto5hd_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) scatter_vnchwconv_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)
+#define asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) scatter_vnchwconv_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)
 
-#define asc_transto5hd_b16(dst, src, repeat, dstStride, srcStride) scatter_vnchwconv_b16(dst, src, repeat, dstStride, srcStride)
+#define asc_transto5hd_b16_impl(dst, src, repeat, dstStride, srcStride) scatter_vnchwconv_b16(dst, src, repeat, dstStride, srcStride)
 
-#define asc_transto5hd_b32(dst, src, repeat, dstStride, srcStride) scatter_vnchwconv_b32(dst, src, repeat, dstStride, srcStride)
+#define asc_transto5hd_b32_impl(dst, src, repeat, dstStride, srcStride) scatter_vnchwconv_b32(dst, src, repeat, dstStride, srcStride)
 
 #endif
 
