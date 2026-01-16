@@ -1,6 +1,6 @@
 # Ceil样例
 ## 概述
-本样例介绍了高阶api Ceil的调用，该api的功能为获取大于或等于x的最小的整数值，即向正无穷取整操作。  
+本样例演示了基于Ceil高阶API的算子实现。样例获取大于或等于x的最小的整数值，即向正无穷取整操作。  
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -26,7 +26,7 @@
 
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> AIV </td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

@@ -14,7 +14,7 @@
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── cos.asc      // Ascend C算子实现 & 调用样例
+│   └── cos.asc                 // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
@@ -22,7 +22,7 @@
   CosCustom算子对输入tensor按元素做三角函数余弦运算。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">CosCustom</td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">AIV</td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

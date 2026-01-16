@@ -1,6 +1,6 @@
 # Atanh样例
 ## 概述
-本样例介绍了高阶api Atanh的调用，该api的功能为按元素做反双曲正切余弦函数计算。
+本样例演示了基于Atanh高阶API的算子实现。样例按元素做反双曲正切余弦函数计算。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -21,7 +21,7 @@
   $$Atanh(x) = 0.5 * \ln((1 + x) / (1 - x))$$
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> AIV </td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

@@ -22,7 +22,7 @@
   cumsum单算子，用于对输入张量按行或列进行累加和操作，输出结果中每个元素都是输入张量中对应位置及之前所有行或列的元素累加和。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> AIV </td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
