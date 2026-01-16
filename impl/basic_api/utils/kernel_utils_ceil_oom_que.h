@@ -275,7 +275,7 @@ __aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig* conf)
     };
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
 __aicore__ constexpr bool UseAltBufId(TPosition queDstPos, TPosition dstConsumerPos, uint32_t consumerSize)
 {
     if (consumerSize <= 1) {

@@ -17,8 +17,7 @@
 #include "kernel_tensor.h"
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101))
-    #include "dav_c310/kernel_operator_atomic_impl.h"
-#endif
+#include "dav_c310/kernel_operator_atomic_impl.h"
 
 namespace AscendC {
 template <typename T>
