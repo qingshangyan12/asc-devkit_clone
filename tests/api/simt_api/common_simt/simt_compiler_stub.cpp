@@ -2098,6 +2098,11 @@ half __sqrtf(half x)
     return half(tmp);
 }
 
+float __atanf(float x)
+{
+    return atan(x);
+}
+
 bfloat16_t __max(bfloat16_t x, bfloat16_t y)
 {
     if (x > y) {

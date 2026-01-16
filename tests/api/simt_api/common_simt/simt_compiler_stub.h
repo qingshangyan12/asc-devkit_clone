@@ -78,6 +78,8 @@ half __logf(half x);
 float __sqrtf(float x);
 half __sqrtf(half x);
 
+float __atanf(float x);
+
 namespace bisheng {
 namespace cce {
 namespace simt {

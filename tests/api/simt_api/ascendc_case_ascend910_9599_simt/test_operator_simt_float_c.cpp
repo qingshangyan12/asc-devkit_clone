@@ -122,3 +122,47 @@ TEST_P(MathTestsuite, TranscendentalTestCase)
     KernelMath<float> op;
     op.Process((__gm__ float*)dstGm, (__gm__ float*)src0Gm, (__gm__ float*)src1Gm, mode);
 }
+
+void VerifyFloatNumber1(float x, float xExpected, float epsilon = 1e-4)
+{
+    if (std::isnan(xExpected)) {
+        EXPECT_TRUE(std::isnan(x));
+    } else if (std::isinf(xExpected)) {
+        EXPECT_TRUE(std::isinf(x));
+        if (xExpected > 0.0) {
+            EXPECT_GT(x, 0.0);
+        } else {
+            EXPECT_LT(x, 0.0);
+        }
+    } else {
+        EXPECT_NEAR(x, xExpected, epsilon);
+    }
+}
+
+// ================================ Test atanf start ================================
+struct atanfTestParam {
+    float x;
+    float yExpected;
+};
+ 
+class atanfTestSuite : public ::testing::TestWithParam<atanfTestParam> {
+public:
+    void SetUp() override {}
+    void TearDown() override {}
+};
+
+INSTANTIATE_TEST_CASE_P(atanfTestCaseFloat, atanfTestSuite, ::testing::Values(
+    atanfTestParam {INFINITY, 1.57079632679489661923132169163975144f},
+    atanfTestParam {-INFINITY, -1.57079632679489661923132169163975144f},
+    atanfTestParam {NAN, NAN}
+));
+
+TEST_P(atanfTestSuite, atanfTestCaseFloat)
+{
+    const auto param = this->GetParam();
+    float x = param.x;
+    float yExpected = param.yExpected;
+    float y = __atanf(x);
+    VerifyFloatNumber1(y, yExpected);
+}
+// ================================ Test atanf end ==================================

@@ -749,6 +749,9 @@ __simt_callee__ inline void Sign(float &dst, float &src, float &denominator)
 
 __simt_callee__ inline float atanf(float x)
 {
+    if (isnan(x)) {
+        return x;
+    }
     float clip = fminf(x, 10000.0f); // 10000 : MAX_INPUT_VALUE
     clip = fmaxf(clip, -10000.0f); // -10000 : MIN_INPUT_VALUE
     float abs_v = fabsf(clip);
