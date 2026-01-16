@@ -34,11 +34,10 @@ PIPE_S
 
 ## 约束说明
 
-无
+mem_dsb_t类型的入参必须直接传递枚举值字面量。
 
 ## 调用示例
 
 ```cpp
-mem_dsb_t arg = mem_dsb_t::DSB_ALL;
-asc_sync_data_barrier(arg);
+asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
 ```

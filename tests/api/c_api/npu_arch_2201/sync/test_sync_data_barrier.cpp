@@ -28,11 +28,10 @@ void asc_sync_data_barrier_stub(mem_dsb_t arg)
 
 TEST_F(TestSyncDataBarrierCAPI, c_api_sync_data_barrier_Succ)
 {
-    mem_dsb_t arg = mem_dsb_t::DSB_ALL;
     MOCKER_CPP(dsb, void(mem_dsb_t))
             .times(1)
             .will(invoke(asc_sync_data_barrier_stub));
 
-    asc_sync_data_barrier(arg);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
     GlobalMockObject::verify();
 }
