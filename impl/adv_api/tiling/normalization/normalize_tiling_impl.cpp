@@ -68,8 +68,7 @@ void GetNormalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSiz
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
     if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+        socVersion == platform_ascendc::SocVersion::ASCEND910_55) {
         (void)srcShape;
         minValue = 0;
         maxValue = 0;

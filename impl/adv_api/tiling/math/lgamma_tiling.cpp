@@ -62,8 +62,7 @@ void GetLgammaMaxMinTmpSize(const ge::Shape &srcShape, const uint32_t typeSize, 
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
     if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+        socVersion == platform_ascendc::SocVersion::ASCEND910_55) {
         minValue = inputSize * LGAMMA_FLOAT_SIZE;
         maxValue = minValue;
     } else {

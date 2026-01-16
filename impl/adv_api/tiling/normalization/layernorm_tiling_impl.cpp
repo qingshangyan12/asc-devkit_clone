@@ -229,8 +229,7 @@ void GetWelfordUpdateMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typ
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
     if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+        socVersion == platform_ascendc::SocVersion::ASCEND910_55) {
         (void)typeSizeT;
         (void)isReuseSource;
         minValue = 0;
@@ -263,8 +262,7 @@ void GetLayerNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSiz
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
     if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+        socVersion == platform_ascendc::SocVersion::ASCEND910_55) {
         (void)isReuseSource;
         std::vector<int64_t> shapeDims = srcShape.GetDims();
         const uint32_t rLength = static_cast<uint32_t>(shapeDims.back());
@@ -321,8 +319,7 @@ void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBuf
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
     if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+        socVersion == platform_ascendc::SocVersion::ASCEND910_55) {
         (void)stackBufferSize;
         const uint32_t rLength = static_cast<uint32_t>(shapeDims.back());
         int32_t typeAignSize = 32 / typeSize;

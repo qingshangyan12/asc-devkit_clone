@@ -240,12 +240,10 @@ void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape
     ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910B) ||
         (socVersion == platform_ascendc::SocVersion::ASCEND310P) ||
         (socVersion == platform_ascendc::SocVersion::ASCEND910_95) ||
-        (socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
+        (socVersion == platform_ascendc::SocVersion::ASCEND910_55),
         return, "GetPowerMaxMinTmpSize is not supported on current device!");
     if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+        socVersion == platform_ascendc::SocVersion::ASCEND910_55) {
         maxValue = GetPowerMaxTmpSizeC310(srcShape1, srcShape2, typeIsInt, isReuseSource);
         minValue = maxValue;
     } else {
@@ -263,13 +261,11 @@ void GetPowerTmpBufferFactorSize(const bool baseIsTensor, const bool expIsTensor
     ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910B) ||
         (socVersion == platform_ascendc::SocVersion::ASCEND310P) ||
         (socVersion == platform_ascendc::SocVersion::ASCEND910_95) ||
-        (socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
+        (socVersion == platform_ascendc::SocVersion::ASCEND910_55),
         return, "GetPowerTmpBufferFactorSize is not supported on current device!");
 
     if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+        socVersion == platform_ascendc::SocVersion::ASCEND910_55) {
         GetPowerTmpBufferFactorSizeC310(typeIsInt, typeSize, maxLiveNodeCount, extraBuffer);
     } else {
         GetPowerTmpBufferFactorSize(socVersion, baseIsTensor, expIsTensor, typeIsInt, typeSize,

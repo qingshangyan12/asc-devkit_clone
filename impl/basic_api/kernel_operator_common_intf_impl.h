@@ -46,8 +46,6 @@
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_sync_impl.h"
 #include "dav_l300/kernel_operator_set_atomic_impl.h"
-#elif __NPU_ARCH__ == 3102
-#include "dav_m310/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 3101
 #include "dav_c310/kernel_operator_set_atomic_impl.h"
 #include "dav_c310/kernel_operator_common_impl.h"

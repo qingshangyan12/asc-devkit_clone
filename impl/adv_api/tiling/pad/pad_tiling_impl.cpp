@@ -186,8 +186,7 @@ void GetUnPadMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatf
     platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
     if ((socVersion == platform_ascendc::SocVersion::ASCEND910B) ||
         (socVersion == platform_ascendc::SocVersion::ASCEND910_95) ||
-        (socVersion == platform_ascendc::SocVersion::ASCEND910_55) ||
-        (socVersion == platform_ascendc::SocVersion::MC62CM12A)) {
+        (socVersion == platform_ascendc::SocVersion::ASCEND910_55)) {
         maxValue = 0;
         minValue = 0;
     } else {
