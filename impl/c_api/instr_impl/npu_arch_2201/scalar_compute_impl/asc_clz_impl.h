@@ -22,10 +22,7 @@
 
 __aicore__ inline int64_t asc_clz_impl(uint64_t value_in)
 {
-    if ASC_IS_AIC {
-        return clz(value_in);
-    }
-    return 0;
+    return clz(value_in);
 }
 
 #endif

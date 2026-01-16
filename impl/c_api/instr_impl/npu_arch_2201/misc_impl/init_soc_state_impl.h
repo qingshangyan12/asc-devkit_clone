@@ -18,7 +18,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_MISC_C_API_IMPL_INIT_SOC_STATE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_MISC_C_API_IMPL_INIT_SOC_STATE_IMPL_H
 
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h" //有误
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h" 
 
 __aicore__ inline void asc_init_soc_state_impl()
 {

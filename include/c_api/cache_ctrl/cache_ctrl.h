@@ -17,13 +17,19 @@
 #ifndef INCLUDE_C_API_SIMD_ATOMIC_H
 #define INCLUDE_C_API_SIMD_ATOMIC_H
  
-#include "c_api_instr_impl/cache_ctrl_c_api_impl/cache_ctrl_c_api_impl.h"
+#include "instr_impl/npu_arch_2201/cache_ctrl_impl.h"
 
 __aicore__ inline int64_t asc_get_icache_preload_status();
 
 __aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire);
 
-__aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire, uint64_t type);
+__aicore__ inline void asc_dcci_all(__gm__ void* dst, uint64_t entire);
+
+__aicore__ inline void asc_dcci_ub(__gm__ void* dst, uint64_t entire);
+
+__aicore__ inline void asc_dcci_out(__gm__ void* dst, uint64_t entire);
+
+__aicore__ inline void asc_dcci_atomic(__gm__ void* dst, uint64_t entire);
 
 __aicore__ inline void asc_icache_preload(const void* addr);
 

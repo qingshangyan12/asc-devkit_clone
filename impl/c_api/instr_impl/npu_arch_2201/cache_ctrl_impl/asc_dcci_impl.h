@@ -15,24 +15,39 @@
  
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
-#warning "c_api_instr_impl/cache_ctrl_c_api_impl/dcci_impl/npu_arch_2201/asc_dcci_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#warning "impl/c_api/instr_impl/npu_arch_2201/cache_ctrl_impl/asc_dcci_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif    
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_DCCI_IMPL_NPU_ARCH_2201_ASC_DCCI_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_DCCI_IMPL_NPU_ARCH_2201_ASC_DCCI_IMPL_H
+#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CACHE_CTRL_IMPL_ASC_DCCI_IMPL_H
+#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CACHE_CTRL_IMPL_ASC_DCCI_IMPL_H
  
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h" 
 
 __aicore__ inline void asc_dcci_impl(__gm__ void* dst, uint64_t entire)
 {
     dcci(dst, entire);
 }
 
-__aicore__ inline void asc_dcci_impl(__gm__ void* dst, uint64_t entire, uint64_t type)
+__aicore__ inline void asc_dcci_all_impl(__gm__ void* dst, uint64_t entire)
 {
-    dcci(dst, entire, type);
+    dcci(dst, entire, dcci_dst_t::CACHELINE_ALL);
+}
+
+__aicore__ inline void asc_dcci_ub_impl(__gm__ void* dst, uint64_t entire)
+{
+    dcci(dst, entire, dcci_dst_t::CACHELINE_UB);
+}
+
+__aicore__ inline void asc_dcci_out_impl(__gm__ void* dst, uint64_t entire)
+{
+    dcci(dst, entire, dcci_dst_t::CACHELINE_OUT);
+}
+
+__aicore__ inline void asc_dcci_atomic_impl(__gm__ void* dst, uint64_t entire)
+{
+    dcci(dst, entire, dcci_dst_t::CACHELINE_OUT);
 }
  
 #endif

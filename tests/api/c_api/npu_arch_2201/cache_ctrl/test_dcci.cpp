@@ -40,28 +40,50 @@ TEST_F(TestSimdAtomicDcci, dcci_gm_void_ptr_uint64_t_Succ)
     GlobalMockObject::verify();
 }
 
-class TestSimdAtomicDcci3 : public testing::Test { 
-protected:
-    void SetUp() {}
-    void TearDown() {}
-};
-
-void dcci_3Stub(__gm__ void* dst, uint64_t entire, uint64_t type)
-{
-    EXPECT_EQ((__gm__ void*)1, dst);
-    EXPECT_EQ(2, entire);
-    EXPECT_EQ(3, type);
-}
-
-TEST_F(TestSimdAtomicDcci3, dcci_gm_void_ptr_uint64_t_uint64_t_Succ)
+TEST_F(TestSimdAtomicDcci, dcci_gm_all_void_ptr_uint64_t_Succ)
 {
     __gm__ void* dst = (__gm__ void*)1;
     uint64_t entire = 2;
-    uint64_t type = 3;
     MOCKER(dcci, void(__gm__ void*, uint64_t, uint64_t))
         .times(1)
-        .will(invoke(dcci_3Stub));
+        .will(invoke(dcci_Stub));
     
-    asc_dcci(dst, entire, type);
+    asc_dcci_all(dst, entire);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestSimdAtomicDcci, dcci_gm_ub_void_ptr_uint64_t_Succ)
+{
+    __gm__ void* dst = (__gm__ void*)1;
+    uint64_t entire = 2;
+    MOCKER(dcci, void(__gm__ void*, uint64_t, uint64_t))
+        .times(1)
+        .will(invoke(dcci_Stub));
+    
+    asc_dcci_ub(dst, entire);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestSimdAtomicDcci, dcci_gm_out_void_ptr_uint64_t_Succ)
+{
+    __gm__ void* dst = (__gm__ void*)1;
+    uint64_t entire = 2;
+    MOCKER(dcci, void(__gm__ void*, uint64_t, uint64_t))
+        .times(1)
+        .will(invoke(dcci_Stub));
+    
+    asc_dcci_out(dst, entire);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestSimdAtomicDcci, dcci_gm_atomic_void_ptr_uint64_t_Succ)
+{
+    __gm__ void* dst = (__gm__ void*)1;
+    uint64_t entire = 2;
+    MOCKER(dcci, void(__gm__ void*, uint64_t, uint64_t))
+        .times(1)
+        .will(invoke(dcci_Stub));
+    
+    asc_dcci_atomic(dst, entire);
     GlobalMockObject::verify();
 }

@@ -8,19 +8,32 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+/* !
+ * \file asc_icache_preload_impl.h
+ * \brief
+ */
+
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
-#warning "c_api_instr_impl/sync_c_api_impl/sync_data_barrier_impl/npu_arch_2201/asc_sync_data_barrier_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#warning "impl/c_api/instr_impl/npu_arch_2201/cache_ctrl_impl/asc_icache_preload_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif    
 
-#ifndef IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_SYNC_DATA_BARRIER_IMPL_NPU_ARCH_2201_ASC_SYNC_DATA_BARRIER_IMPL_H
-#define IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_SYNC_DATA_BARRIER_IMPL_NPU_ARCH_2201_ASC_SYNC_DATA_BARRIER_IMPL_H
+#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CACHE_CTRL_IMPL_ASC_ICACHE_PRL_IMPL_H
+#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CACHE_CTRL_IMPL_ASC_ICACHE_PRL_IMPL_H
 
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h" 
 
-#define asc_sync_data_barrier(arg) dsb(arg)
+__aicore__ inline void asc_icache_preload_impl(const void* addr)
+{
+    preload(addr);
+}
+
+__aicore__ inline void asc_icache_preload_impl(const void* addr, int64_t prefetch_len)
+{
+    preload(addr, prefetch_len);
+}
 
 #endif
 
