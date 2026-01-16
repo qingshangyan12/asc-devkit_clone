@@ -1,20 +1,25 @@
-# asc_set_atomic_add_int8
+# asc_set_atomic_add
 
-## 昇腾产品支持情况
+## 产品支持情况
 
-|昇腾产品   | 是否支持 |
+|产品   | 是否支持 |
 | ------------|:----:|
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √    |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √    |
 
 ## 功能说明
 
-设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int8_t。
+设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型支持int8_t/int16_t/int32_t/bfloat16_t/half/float。
 
 ## 函数原型
 
 ```c++
 __aicore__ inline void asc_set_atomic_add_int8()
+__aicore__ inline void asc_set_atomic_add_int16()
+__aicore__ inline void asc_set_atomic_add_int()
+__aicore__ inline void asc_set_atomic_add_bfloat()
+__aicore__ inline void asc_set_atomic_add_float16()
+__aicore__ inline void asc_set_atomic_add_float()
 ```
 
 ## 参数说明
