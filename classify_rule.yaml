@@ -91,6 +91,7 @@ asc-devkit:
       - impl/adv_api/detail/math/tan/tan_c310_impl.h
       - impl/adv_api/detail/quantization/quant/ascend_quant_per_group_l300_impl.h
       - impl/adv_api/detail/quantization/quant/ascend_quant_l300_impl.h
+      - impl/adv_api/detail/quantization/dequant/ascend_dequant_common.h
       - impl/adv_api/detail/math/logical_ands/logical_ands_common_impl.h
       - impl/adv_api/detail/math/digamma/digamma_c310_impl.h
       - impl/adv_api/detail/normalization/deepnorm/deepnorm_c310_impl.h

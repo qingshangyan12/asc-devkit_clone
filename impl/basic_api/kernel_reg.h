@@ -96,7 +96,7 @@ template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
         return;
     }
 #endif
-#if (__NPU_ARCH__ == 3003)
+#if (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     if constexpr (pipe == PIPE_V) {
         return;
     }
