@@ -81,5 +81,5 @@ PIPE_V
 constexpr uint64_t total_length = 128;
 __ubuf__ int64_t src[total_length];
 __ubuf__ float dst[total_length];
-asc_int642float(dst, src, total_length);    // 将src转换为int64_t类型并存放到dst中
+asc_int642float(dst, src, total_length);    // 将src转换为float类型并存放到dst中
 ```
