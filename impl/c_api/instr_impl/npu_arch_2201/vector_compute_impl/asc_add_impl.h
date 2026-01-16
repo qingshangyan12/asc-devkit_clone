@@ -9,114 +9,114 @@
 */
 
 /* !
- * \file max_impl.h
+ * \file add_impl.h
  * \brief
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
-#warning "c_api_instr_impl/vector_compute_c_api_impl/vmax_impl/npu_arch_2201/asc_max_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#warning "c_api/instr_impl/npu_arch_2201/vector_compute_impl/asc_add_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif    
 
-#ifndef IMPL_CAPI_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VMAX_IMPL_NPU_ARCH_2201_ASC_MAX_IMPL_H
-#define IMPL_CAPI_C_API_INSTR_IMPL_VECTOR_COMPUTE_C_API_IMPL_VMAX_IMPL_NPU_ARCH_2201_ASC_MAX_IMPL_H
+#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_IMPL_ASC_ADD_IMPL_H
+#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_IMPL_ASC_ADD_IMPL_H
 
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h" 
 
-__aicore__ inline void asc_max_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, 
+__aicore__ inline void asc_add_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, 
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
     uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {
-        vmax(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
+        vadd(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
             dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
     }
 }
 
-__aicore__ inline void asc_max_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, 
+__aicore__ inline void asc_add_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, 
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
     uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {
-        vmax(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
+        vadd(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
             dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
     }
 }
 
-__aicore__ inline void asc_max_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, 
+__aicore__ inline void asc_add_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, 
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
     uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {
-        vmax(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
+        vadd(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
             dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
     }
 }
 
-__aicore__ inline void asc_max_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint8_t repeat, 
+__aicore__ inline void asc_add_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint8_t repeat, 
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
     uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {
-        vmax(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
+        vadd(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, 
             dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
     }
 }
 
-__aicore__ inline void asc_max_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+__aicore__ inline void asc_add_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_max_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
+    asc_add_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_max_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+__aicore__ inline void asc_add_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_max_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
+    asc_add_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_max_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+__aicore__ inline void asc_add_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_max_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
+    asc_add_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_max_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count)
+__aicore__ inline void asc_add_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_max_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
+    asc_add_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_max_sync_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+__aicore__ inline void asc_add_sync_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
 {
-    asc_max_impl(dst, src0, src1, count);
+    asc_add_impl(dst, src0, src1, count);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_max_sync_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+__aicore__ inline void asc_add_sync_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
 {
-    asc_max_impl(dst, src0, src1, count);
+    asc_add_impl(dst, src0, src1, count);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_max_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+__aicore__ inline void asc_add_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
 {
-    asc_max_impl(dst, src0, src1, count);
+    asc_add_impl(dst, src0, src1, count);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_max_sync_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count)
+__aicore__ inline void asc_add_sync_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count)
 {
-    asc_max_impl(dst, src0, src1, count);
+    asc_add_impl(dst, src0, src1, count);
     asc_sync_post_process();
 }
 
