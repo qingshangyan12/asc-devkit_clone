@@ -36,7 +36,7 @@ namespace AscendC {
  * \param [in] count, length of the sequence
  */
 template <typename T>
-__simd_callee__ inline __in_pipe__(S) __out_pipe__(V, S) void Arange(
+__aicore__ inline __in_pipe__(S) __out_pipe__(V, S) void Arange(
     const LocalTensor<T>& dst, const T firstValue, const T diffValue, const int32_t count)
 {
     ArithProgressionImpl(dst, firstValue, diffValue, count);
