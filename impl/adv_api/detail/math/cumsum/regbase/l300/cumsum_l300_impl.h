@@ -18,7 +18,7 @@
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
 #include "include/adv_api/math/cumsum_utils.h"
-#include "cumsum_c310_utils.h"
+#include "cumsum_l300_utils.h"
 
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../../../api_check/kernel_check/math/cumsum/cumsum_check.h"
