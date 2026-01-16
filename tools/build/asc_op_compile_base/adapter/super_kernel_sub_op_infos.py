@@ -136,7 +136,7 @@ class SubOperatorInfos:
 
     def gen_profiling_for_notify(self, index, end_flag):
         code = ""
-        if self.profiling_mode is SuperKernelProfilingMode.ProfilingDisable:
+        if self.profiling_mode.value == SuperKernelProfilingMode.ProfilingDisable.value:
             return code
         if end_flag is False:
             code = f"RecordProfiling({index}, 0x4, true);\n"
@@ -146,7 +146,7 @@ class SubOperatorInfos:
 
     def gen_profiling_for_wait(self, index, end_flag):
         code = ""
-        if self.profiling_mode is SuperKernelProfilingMode.ProfilingDisable:
+        if self.profiling_mode.value == SuperKernelProfilingMode.ProfilingDisable.value:
             return code
         if end_flag is False:
             code = f"RecordProfiling({index}, 12, true);\n"
@@ -258,7 +258,7 @@ param_offset={self.wait_param_offset + index}\n"
 
 
     def code_gen(self, inner_event_id_set, enable_double_stream):
-        if self.sub_op_task_type is SubOperatorType.DYNAMIC_OP:
+        if self.sub_op_task_type.value == SubOperatorType.DYNAMIC_OP.value:
             self.process_of_dynamic_op(enable_double_stream)
         else:
             self.extract_sub_op_bin_files()
@@ -267,7 +267,7 @@ param_offset={self.wait_param_offset + index}\n"
 
 
     def adjust_dynamic_op(self, spk_block_num):
-        if self.sub_op_task_type is SubOperatorType.DYNAMIC_OP:
+        if self.sub_op_task_type.value == SubOperatorType.DYNAMIC_OP.value:
             self.dynamic_impl_func_block = self.dynamic_impl_func_block.replace(
                 "__placehoder__spk_block_num__", f"{spk_block_num}")
 
@@ -301,7 +301,7 @@ param_offset={self.wait_param_offset + index}\n"
                     sub_operater_infos.get('sub_operator_call_dcci_after_kernel_end', False)
                 self.call_dcci_disable_on_kernel = \
                     sub_operater_infos.get('sub_operator_call_dcci_disable_on_kernel', False)
-                if self.early_start_mode == SuperKernelEarlyStartMode.EarlyStartDisable \
+                if self.early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartDisable.value \
                     and (self.early_start_set_flag or self.early_start_wait_flag):
                     CommonUtility().ascendc_raise_python_err(ERR_CODE, \
 (f"sub operator {self.kernel_name} early-start mode set:{self.early_start_set_flag}, \
@@ -680,7 +680,7 @@ param_base[{dynamic_extra_param_offset + 1}], param_base[{dynamic_extra_param_of
 
     def sub_op_gen_feed_sync_all_code(self, end_flag):
         code = ""
-        if self.feed_sync_all_mode == SuperKernelFeedSyncAllMode.FeedSyncAllDisable:
+        if self.feed_sync_all_mode.value == SuperKernelFeedSyncAllMode.FeedSyncAllDisable.value:
             return code
         if end_flag is False:
             code += f"AscendC::SuperKernelAutoSyncAllEndImpl();\n"
@@ -754,7 +754,7 @@ f"""else {{
         vector_call_func_block = f"if {core_type} {{\n"
         vector_call_func_block += f"    if ({condition_code}) {{\n"
         if gen_set_flag:
-            if self.early_start_mode == SuperKernelEarlyStartMode.EarlyStartEnableV1:
+            if self.early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartEnableV1.value:
                 vector_call_func_block += f"        AscendC::SetNextTaskStart();\n"
             else:
                 if self.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY, \

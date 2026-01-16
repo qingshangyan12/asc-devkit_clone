@@ -73,15 +73,15 @@ def gen_gm_get_set_value_dcci_compile_options(compile_option_tuple, compile_info
 def gen_sub_super_kernel_early_start_compile_options(compile_option_tuple, compile_info):
     early_start_mode = compile_info.super_kernel_info["sp_options"].get('early-start', \
         SuperKernelEarlyStartMode.EarlyStartEnableV2)
-    if early_start_mode == SuperKernelEarlyStartMode.EarlyStartDisable or \
-        early_start_mode == SuperKernelEarlyStartMode.EarlyStartV2DisableSubKernel:
+    if early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartDisable.value or \
+        early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartV2DisableSubKernel.value:
         return
     sp_info = get_context().get_addition("super_kernel_sub_info")
     if len(sp_info) != 0 and "super_kernel_sub_loc" in sp_info:
         super_kernel_sub_loc = sp_info["super_kernel_sub_loc"]
-        if early_start_mode == SuperKernelEarlyStartMode.EarlyStartEnableV1:
+        if early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartEnableV1.value:
             compile_option_tuple.compile_options.append("-D__ASCENDC_SUPERKERNEL_EARLY_START_V1")
-        elif early_start_mode == SuperKernelEarlyStartMode.EarlyStartEnableV2:
+        elif early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartEnableV2.value:
             compile_option_tuple.compile_options.append("-D__ASCENDC_SUPERKERNEL_EARLY_START_V2")
 
         if compile_info.super_kernel_early_start_set_flag and (super_kernel_sub_loc != "end"):
@@ -107,7 +107,7 @@ def sp_add_sub_op_block_num_macro(compile_option_tuple, tiling_info):
 def sp_add_sub_op_feed_sync_all_macro(compile_info, compile_option_tuple):
     feed_sync_all_mode = compile_info.super_kernel_info["sp_options"].get('feed-sync-all', \
         SuperKernelFeedSyncAllMode.FeedSyncAllDisable)
-    if feed_sync_all_mode == SuperKernelFeedSyncAllMode.FeedSyncAllEnable:
+    if feed_sync_all_mode.value == SuperKernelFeedSyncAllMode.FeedSyncAllEnable.value:
         compile_option_tuple.compile_options.append(f"-D__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__")
 
 
