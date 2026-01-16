@@ -34,8 +34,8 @@ $$
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_and_sync(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, uint32_t count)
-    __aicore__ inline void asc_and_sync(_ubuf__ uint16_t* dst, _ubuf__ uint16_t* src0, uint32_t count)
+    __aicore__ inline void asc_and_sync(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, uint32_t count)
+    __aicore__ inline void asc_and_sync(_ubuf__ uint16_t* dst, _ubuf__ uint16_t* src0, _ubuf__ uint16_t* src1, uint32_t count)
     ```
 
 ## 参数说明
@@ -45,7 +45,7 @@ $$
 | 参数名       | 输入/输出 | 描述                |
 | --------- | ----- | ----------------- |
 | dst       | 输出    | 目的操作数。            |
-| src0、src1 | 输入    | 源操作数（矢量）。             |
+| src0、src1 | 输入    | 源操作数（矢量）的起始地址。             |
 | count     | 输入    | 参与计算的元素个数。        |
 | dst_block_stride   | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src0_block_stride  | 输入 | 源操作数0单次迭代内不同DataBlock间地址步长。 |

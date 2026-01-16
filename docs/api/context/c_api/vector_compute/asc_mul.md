@@ -56,8 +56,8 @@ __aicore__ inline void asc_mul_sync(__ubuf__ float* dst, __ubuf__ float* src0, _
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数地址。 |
-| src0、src1 | 输入 | 源操作数地址。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址。 |
+| src0、src1 | 输入 | 源操作数（矢量）的起始地址。 |
 | repeat     | 输入    | 迭代次数。        |
 | dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src0_block_stride |输入| 源操作数0单次迭代内不同DataBlock间地址步长。 |

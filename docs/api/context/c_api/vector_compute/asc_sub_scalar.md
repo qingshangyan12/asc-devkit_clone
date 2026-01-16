@@ -52,9 +52,9 @@ __aicore__ inline void asc_sub_scalar_sync(__ubuf__ float* dst, __ubuf__ float* 
 
 |参数名|输入/输出|描述|
 |------------|------------|-----------|
-| dst     | 输出     | 目的操作数。   |
-| src     | 输入     | 矢量源操作数。|
-| value     | 输入     | 标量源操作数。|
+| dst     | 输出     | 目的操作数（矢量）的起始地址。   |
+| src     | 输入     | 源操作数（矢量）的起始地址。|
+| value     | 输入     | 源操作数（标量）。|
 | repeat     | 输入    | 迭代次数。        |
 | dst_block_stride |输入| 目的操作数单次迭代内不同DataBlock间地址步长。 |
 | src_block_stride |输入| 源操作数单次迭代内不同DataBlock间地址步长。 |
