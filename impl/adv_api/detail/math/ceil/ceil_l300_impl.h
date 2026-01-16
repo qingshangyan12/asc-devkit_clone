@@ -15,7 +15,6 @@
 #ifndef IMPL_MATH_CEIL_CEIL_L300_IMPL_H
 #define IMPL_MATH_CEIL_CEIL_L300_IMPL_H
 #include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
 #include "../../common/check.h"
 namespace AscendC {
 template <typename T, bool isReuseSource = false>
