@@ -21,7 +21,7 @@
 #include "power_common_utils.h"
 
 namespace AscendC {
-namespace PowerC310Impl {
+namespace PowerL300Impl {
 
 constexpr MicroAPI::CastTrait castTraitF16F32 = { MicroAPI::RegLayout::ZERO, MicroAPI::SatMode::NO_SAT,
                                                   MicroAPI::MaskMergeMode::ZEROING };
@@ -1022,7 +1022,7 @@ __simd_vf__ inline void PowIComputeImpl(__ubuf__ T* dst, const T scalarValue, __
 }
 
 } // namespace PowI
-} // namespace PowerC310Impl
+} // namespace PowerL300Impl
 
 template <typename T, const PowerConfig& config = defaultPowerConfig>
 __aicore__ inline void PowCheckType()
@@ -1074,7 +1074,7 @@ __aicore__ inline void PowImpl(const LocalTensor<T>& dstTensor, const LocalTenso
 
     if constexpr (IsFloatNum<T>()) {
         if constexpr (config.algo == PowerAlgo::INTRINSIC) {
-            PowerC310Impl::PowF::PowFInstrinsicImpl(dst, src0, src1, calCount);
+            PowerL300Impl::PowF::PowFInstrinsicImpl(dst, src0, src1, calCount);
         } else {
             __ubuf__ uint32_t* tmpBuffer =  (__ubuf__ uint32_t *)sharedTmpBuffer.GetPhyAddr();
             uint32_t sharedTmpBufferSize = GetPowTmpBufferSize<T>(sharedTmpBuffer);
@@ -1083,16 +1083,16 @@ __aicore__ inline void PowImpl(const LocalTensor<T>& dstTensor, const LocalTenso
             for (uint16_t i = 0; i < repeatTimes; i++) {
                 uint32_t remainCount = count - sharedTmpBufferSize * i;
                 uint32_t oneRepSize = remainCount < sharedTmpBufferSize ? remainCount : sharedTmpBufferSize;
-                PowerC310Impl::PowF::PowFComputeImpl(dst + i * sharedTmpBufferSize, src0 + i * sharedTmpBufferSize,
+                PowerL300Impl::PowF::PowFComputeImpl(dst + i * sharedTmpBufferSize, src0 + i * sharedTmpBufferSize,
                     src1 + i * sharedTmpBufferSize, tmpBuffer, oneRepSize);
             }
         }
     } else if constexpr (IsIntegerNum<T>()) {
-        uint16_t maxLoop = PowerC310Impl::PowI::GetMaxLoop(dstTensor, src1Tensor, calCount);
+        uint16_t maxLoop = PowerL300Impl::PowI::GetMaxLoop(dstTensor, src1Tensor, calCount);
         event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
-        PowerC310Impl::PowI::PowIComputeImpl<T>(dst, src0, src1, calCount, maxLoop);
+        PowerL300Impl::PowI::PowIComputeImpl<T>(dst, src0, src1, calCount, maxLoop);
     }
 }
 
@@ -1106,7 +1106,7 @@ __aicore__ inline void PowImpl(const LocalTensor<T>& dstTensor, const LocalTenso
 
     if constexpr (IsFloatNum<T>()) {
         if constexpr (config.algo == PowerAlgo::INTRINSIC) {
-            PowerC310Impl::PowF::PowFInstrinsicImpl(dst, base, scalarValue, calCount);
+            PowerL300Impl::PowF::PowFInstrinsicImpl(dst, base, scalarValue, calCount);
         } else {
             __ubuf__ uint32_t* tmpBuffer =  (__ubuf__ uint32_t *)sharedTmpBuffer.GetPhyAddr();
             uint32_t sharedTmpBufferSize = GetPowTmpBufferSize<T>(sharedTmpBuffer);
@@ -1115,13 +1115,13 @@ __aicore__ inline void PowImpl(const LocalTensor<T>& dstTensor, const LocalTenso
             for (uint16_t i = 0; i < repeatTimes; i++) {
                 uint32_t remainCount = count - sharedTmpBufferSize * i;
                 uint32_t oneRepSize = remainCount < sharedTmpBufferSize ? remainCount : sharedTmpBufferSize;
-                PowerC310Impl::PowF::PowFComputeImpl(
+                PowerL300Impl::PowF::PowFComputeImpl(
                     dst + i * sharedTmpBufferSize, base + i * sharedTmpBufferSize, scalarValue, tmpBuffer, oneRepSize);
             }
         }
     } else if constexpr (IsIntegerNum<T>()) {
-        uint16_t maxLoop = sizeof(T) * PowerC310Impl::PowI::BITS_PER_BYTE - PowerC310Impl::PowI::CountLeadingZeros(scalarValue);
-        PowerC310Impl::PowI::PowIComputeImpl<T>(dst, base, scalarValue, calCount, maxLoop);
+        uint16_t maxLoop = sizeof(T) * PowerL300Impl::PowI::BITS_PER_BYTE - PowerL300Impl::PowI::CountLeadingZeros(scalarValue);
+        PowerL300Impl::PowI::PowIComputeImpl<T>(dst, base, scalarValue, calCount, maxLoop);
     }
 }
 
@@ -1135,7 +1135,7 @@ __aicore__ inline void PowImpl(const LocalTensor<T>& dstTensor, const T& scalarV
 
     if constexpr (IsFloatNum<T>()) {
         if constexpr (config.algo == PowerAlgo::INTRINSIC) {
-            PowerC310Impl::PowF::PowFInstrinsicImpl(dst, scalarValue, exp, calCount);
+            PowerL300Impl::PowF::PowFInstrinsicImpl(dst, scalarValue, exp, calCount);
         } else {
             __ubuf__ uint32_t* tmpBuffer =  (__ubuf__ uint32_t *)sharedTmpBuffer.GetPhyAddr();
             uint32_t sharedTmpBufferSize = GetPowTmpBufferSize<T>(sharedTmpBuffer);
@@ -1144,16 +1144,16 @@ __aicore__ inline void PowImpl(const LocalTensor<T>& dstTensor, const T& scalarV
             for (uint16_t i = 0; i < repeatTimes; i++) {
                 uint32_t remainCount = count - sharedTmpBufferSize * i;
                 uint32_t oneRepSize = remainCount < sharedTmpBufferSize ? remainCount : sharedTmpBufferSize;
-                PowerC310Impl::PowF::PowFComputeImpl(dst + i * sharedTmpBufferSize, scalarValue,
+                PowerL300Impl::PowF::PowFComputeImpl(dst + i * sharedTmpBufferSize, scalarValue,
                     exp + i * sharedTmpBufferSize, tmpBuffer, oneRepSize);
             }
         }
     } else if constexpr (IsIntegerNum<T>()) {
-        uint16_t maxLoop = PowerC310Impl::PowI::GetMaxLoop(dstTensor, src1Tensor, calCount);
+        uint16_t maxLoop = PowerL300Impl::PowI::GetMaxLoop(dstTensor, src1Tensor, calCount);
         event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
-        PowerC310Impl::PowI::PowIComputeImpl<T>(dst, scalarValue, exp, calCount, maxLoop);
+        PowerL300Impl::PowI::PowIComputeImpl<T>(dst, scalarValue, exp, calCount, maxLoop);
     }
 }
 
@@ -1241,6 +1241,244 @@ __aicore__ inline void PowerCommonImpl(const LocalTensor<T>& dstTensor, const Lo
     ASCENDC_ASSERT((ans),
                    { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
     PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Tensor, src1Scalar, stackTensor, calCount);
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Tensor: base LocalTensor
+ * \param [in] src1Tensor: exponent LocalTensor
+ * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ *             whose required space size should refer to corresponding tiling API, which is defined at
+ *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
+ *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
+ *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
+ * \param [in] calCount: amount of output data to be calculated
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
+    const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+{
+    PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Tensor: base LocalTensor
+ * \param [in] src1Tensor: exponent LocalTensor
+ * \param [in] calCount: amount of output data to be calculated
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
+    const LocalTensor<T>& src1Tensor, uint32_t calCount)
+{
+    PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Tensor, src1Tensor, calCount);
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Tensor: base LocalTensor
+ * \param [in] src1Tensor: exponent LocalTensor
+ * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ *             whose required space size should refer to corresponding tiling API, which is defined at
+ *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
+ *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
+ *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
+    const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+{
+    Power<T, isReuseSource, config>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, src0Tensor.GetSize());
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Tensor: base LocalTensor
+ * \param [in] src1Tensor: exponent LocalTensor
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
+{
+    Power<T, isReuseSource, config>(dstTensor, src0Tensor, src1Tensor, src0Tensor.GetSize());
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Tensor: base LocalTensor
+ * \param [in] src1Scalar: exponent Scalar
+ * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ *             whose required space size should refer to corresponding tiling API, which is defined at
+ *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
+ *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
+ *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
+ * \param [in] calCount: amount of output data to be calculated
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+{
+    PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Tensor, src1Scalar, sharedTmpBuffer, calCount);
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Tensor: base LocalTensor
+ * \param [in] src1Scalar: exponent Scalar
+ * \param [in] calCount: amount of output data to be calculated
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, uint32_t calCount)
+{
+    PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Tensor, src1Scalar, calCount);
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Tensor: base LocalTensor
+ * \param [in] src1Scalar: exponent Scalar
+ * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ *             whose required space size should refer to corresponding tiling API, which is defined at
+ *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
+ *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
+ *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar,
+    const LocalTensor<uint8_t>& sharedTmpBuffer)
+{
+    Power<T, isReuseSource, config>(dstTensor, src0Tensor, src1Scalar, sharedTmpBuffer, src0Tensor.GetSize());
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Tensor: base LocalTensor
+ * \param [in] src1Scalar: exponent Scalar
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar)
+{
+    Power<T, isReuseSource, config>(dstTensor, src0Tensor, src1Scalar, src0Tensor.GetSize());;
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Scalar: base Scalar
+ * \param [in] src1Tensor: exponent LocalTensor
+ * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ *             whose required space size should refer to corresponding tiling API, which is defined at
+ *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
+ *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
+ *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
+ * \param [in] calCount: amount of output data to be calculated
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+{
+    PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Scalar, src1Tensor, sharedTmpBuffer, calCount);
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Scalar: input Scalar
+ * \param [in] src1Tensor: exponent LocalTensor
+ * \param [in] calCount: amount of output data to be calculated
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(
+    const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, uint32_t calCount)
+{
+    PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Scalar, src1Tensor, calCount);
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Scalar: base Scalar
+ * \param [in] src1Tensor: exponent LocalTensor
+ * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ *             whose required space size should refer to corresponding tiling API, which is defined at
+ *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
+ *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
+ *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer)
+{
+    PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Scalar, src1Tensor, sharedTmpBuffer, src1Tensor.GetSize());
+}
+
+/*!
+ * \ingroup Power
+ * \brief compute Power elementwisely.
+ * \tparam T: input dataType, support half/float
+ * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason,
+ *         not enabled currently.
+ * \param [out] dstTensor: output LocalTensor
+ * \param [in] src0Scalar: base Scalar
+ * \param [in] src1Tensor: exponent LocalTensor
+ */
+template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
+__aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor)
+{
+    PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Scalar, src1Tensor, src1Tensor.GetSize());
 }
 } //namesapce AscendC
 #endif
