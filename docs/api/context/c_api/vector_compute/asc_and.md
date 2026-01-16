@@ -20,8 +20,8 @@ $$
 - 前n个数据计算
 
     ```c++
-    __aicore__ inline void asc_and(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, uint32_t count)
-    __aicore__ inline void asc_and(_ubuf__ uint16_t* dst, _ubuf__ uint16_t* src0, uint32_t count)
+    __aicore__ inline void asc_and(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, uint32_t count)
+    __aicore__ inline void asc_and(_ubuf__ uint16_t* dst, _ubuf__ uint16_t* src0, _ubuf__ uint16_t* src1, uint32_t count)
     ```
 
 - 高维切分计算
