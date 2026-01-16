@@ -159,18 +159,12 @@ SocVersion PlatformAscendC::GetSocVersion(void) const
         {"Ascend310B", SocVersion::ASCEND310B},
         {"Ascend910_95", SocVersion::ASCEND910_95},
         {"Ascend910_55", SocVersion::ASCEND910_55},
-        {"AS31XM1", SocVersion::AS31XM1},
         {"Ascend031", SocVersion::ASCEND031},
         {"Ascend035", SocVersion::ASCEND035},
         {"Ascend310", SocVersion::ASCEND310},
         {"Ascend610", SocVersion::ASCEND610},
-        {"Ascend610Lite", SocVersion::ASCEND610Lite},
-        {"BS9SX1A", SocVersion::BS9SX1A},
-        {"BS9SX2A", SocVersion::BS9SX2A},
         {"Hi3796CV300CS", SocVersion::HI3796CV300CS},
         {"Hi3796CV300ES", SocVersion::HI3796CV300ES},
-        {"MC61AM21A", SocVersion::MC61AM21A},
-        {"MC62CM12A", SocVersion::MC62CM12A},
         {"SD3403", SocVersion::SD3403},
         {"KirinX90", SocVersion::KIRINX90},
         {"Kirin9030", SocVersion::KIRIN9030}
@@ -260,7 +254,6 @@ SocVersion PlatformAscendCManager::SocVersionMap(const char *socVersionStr)
         {"Ascend310B", SocVersion::ASCEND310B},
         {"Ascend910_95", SocVersion::ASCEND910_95},
         {"Ascend910_55", SocVersion::ASCEND910_55},
-        {"MC62CM12A", SocVersion::MC62CM12A},
         {"KirinX90", SocVersion::KIRINX90},
         {"Kirin9030", SocVersion::KIRIN9030}
     };
@@ -328,7 +321,6 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend910_957d", "Ascend910_95"},
     {"Ascend910_957c", "Ascend910_95"},
     {"Ascend910_9589", "Ascend910_95"}, // ascend910_95_list
-    {"MC62CM12AA", "MC62CM12A"},
     {"KirinX90", "KirinX90"},
     {"Kirin9030", "Kirin9030"}
 };

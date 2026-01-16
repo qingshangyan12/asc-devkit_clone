@@ -113,9 +113,7 @@ __aicore__ inline void LoadDataWithTransposeImpl(const LocalTensor<T>& dst, cons
     }
 #endif
     CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "LoadDataWithTranspose"); // L1 32B align
-#if __NPU_ARCH__ != 3102
     CheckTensorAlign<T>(dst, VALUE_512, "dst", "LoadDataWithTranspose");    // L0A/L0B 512B align
-#endif
     CheckTensorPos<T>(src, Hardware::L1, "src", "A1 / B1", "LoadDataWithTranspose");
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L0A) {
@@ -155,9 +153,7 @@ __aicore__ inline void LoadDataWithTransposeImpl(const LocalTensor<T>& dst, cons
     }
 #endif
     CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "LoadDataWithTranspose"); // L1 32B align
-#if __NPU_ARCH__ != 3102
     CheckTensorAlign<T>(dst, VALUE_512, "dst", "LoadDataWithTranspose");          // L0A/L0B 512B align
-#endif
     CheckTensorPos<T>(src, Hardware::L1, "src", "A1 / B1", "LoadDataWithTranspose");
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L0B) {
@@ -212,7 +208,7 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
     }
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101))
 template <typename T, typename U>
 __aicore__ inline void LoadDataImpl(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const LocalTensor<fp8_e8m0_t>& srcMx, const LoadData2DParamsV2& loadDataParams,
@@ -243,7 +239,7 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(const LocalTensor<T>& d
     }
 #endif
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101))
     const uint8_t cacheMode = ExtractCacheMode(src);
     if (dstScope == Hardware::L0A) {
         LoadData2DGM2L0ACal((__ca__ PrimT<T>*)dst.GetPhyAddr(),

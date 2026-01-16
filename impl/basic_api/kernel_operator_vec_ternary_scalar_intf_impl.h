@@ -27,8 +27,6 @@
 #include "dav_m300/kernel_operator_vec_ternary_scalar_impl.h"
 #elif __NPU_ARCH__ == 3101
 #include "dav_c310/kernel_operator_vec_ternary_scalar_impl.h"
-#elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_vec_ternary_scalar_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_vec_ternary_scalar_impl.h"
 #elif (__NPU_ARCH__ == 3113)

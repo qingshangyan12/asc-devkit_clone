@@ -55,7 +55,7 @@
 #include "core_mng/roc/kernel_operator_group_barrier_intf.h"
 #endif
 
-#if ((__NPU_ARCH__ != 3102) && (__NPU_ARCH__ != 3101)) && (__NPU_ARCH__ != 5102)
+#if ((__NPU_ARCH__ != 3101))
 #include "include/adv_api/filter/dropout.h"
 #include "include/adv_api/activation/sigmoid.h"
 #include "include/adv_api/activation/softmax.h"

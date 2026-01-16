@@ -442,8 +442,6 @@ grep -q \"None of the given tiling keys are in the supported list\"; then\n"
         if plog_stdout is None:
             build_cmd_var += const_var.SET_PLOG_STDOUT
         build_cmd_var += const_var.SRC_ENV
-        if hard_soc == "Ascend610Lite":
-            build_cmd_var += f'export ASCEND_CUSTOM_OPP_PATH={auto_gen_path}:$ASCEND_CUSTOM_OPP_PATH \n'
         build_cmd_var += bin_cmd_str.format(fun=self.op_intf, soc=hard_soc, param=param_file,
                                            impl='high_performance,optional')
         enable_tiling_keys = False

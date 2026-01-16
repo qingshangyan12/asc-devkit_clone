@@ -20,7 +20,7 @@ namespace AscendC {
 namespace Impl {
 namespace Detail {
 
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510)
 const static uint8_t FIX_PIPE_UNIT_FLAG = 3;
 
 template <class A_TYPE, class C_TYPE, const auto& MM_CFG, FixpipeParamsType version>
@@ -28,7 +28,7 @@ struct FixpipeParamsUtil
 {
     using DstT = typename C_TYPE::T;
     using SrcT = typename GetMmDstType<typename A_TYPE::T>::Type;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
     using TYPE = typename AscendC::Conditional<C_TYPE::format == CubeFormat::NZ, FixpipeParamsC310<CO2Layout::NZ>,
         typename AscendC::Conditional<C_TYPE::format == CubeFormat::COLUMN_MAJOR,
             FixpipeParamsC310<CO2Layout::COLUMN_MAJOR>, FixpipeParamsC310<CO2Layout::ROW_MAJOR>>::type>::type;
@@ -69,13 +69,6 @@ public:
         }
 #endif
 
-#if __NPU_ARCH__ == 5102
-        if constexpr (C_TYPE::format == CubeFormat::COLUMN_MAJOR) {
-            params_.params = {1, params_.mSize, params_.mSize, 1};
-        } else if constexpr(C_TYPE::format == CubeFormat::ND || C_TYPE::format == CubeFormat::ND_ALIGN) {
-            params_.params = {1, params_.mSize, params_.mSize};
-        }
-#endif
         if constexpr (IsEnableRelu(MM_CFG)) {
             params_.reluEn = true;
         }
@@ -91,7 +84,7 @@ public:
         params_.deqScalar = scalar;
     }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
     __aicore__ inline void SetMcgShfMode(McgShfMode mode) {
         params_.dualDstCtl = static_cast<uint8_t>(mode);
     }
@@ -104,7 +97,7 @@ public:
     __aicore__ inline void SetNdParams(int32_t ndNum, int32_t baseHeight, int32_t baseWidth, int32_t baseBlockWidth,
         int32_t baseM, int32_t baseN)
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
         params_.params.ndNum = static_cast<uint16_t>(ndNum);
         params_.params.srcNdStride = static_cast<uint16_t>(baseM * baseBlockWidth);
         if constexpr ((C_TYPE::layout == LayoutMode::BSNGD) || (C_TYPE::layout == LayoutMode::SBNGD)) {

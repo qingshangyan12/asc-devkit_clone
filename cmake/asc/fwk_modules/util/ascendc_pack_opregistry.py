@@ -68,16 +68,6 @@ class PackKernel:
         path = vname + "/" + path
         sym = self.get_symbol("_binary_" + in_file)
         out_file = os.path.join(self.out_path, sym + ".o")
-        #ascend610lite only supoort aarch64
-        if path.find("ascend610lite") != -1:
-            try:
-                subprocess.run(['llvm-objcopy', '--input-target', 'binary', '--output-target', 'elf64-littleaarch64',
-                                '--binary-architecture', 'aarch64', in_file, out_file])
-            except Exception as e:
-                LogUtil.print_compile_log("", " ascend610lite execute objcopy fail!",
-                                          AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC)
-                return None
-            return [sym + "_start", sym + "_end"]
 
         uname = os.popen("uname -m").read().strip()
         if self.platform is not None:

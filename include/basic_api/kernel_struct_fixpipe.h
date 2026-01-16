@@ -93,7 +93,6 @@ struct FixpipeParamsV220 {
 };
 
 using FixpipeParamsM300 = FixpipeParamsV220;
-using FixpipeParamsM310 = FixpipeParamsV220;
 } // namespace AscendC
 
 /* **************************************************************************************************

@@ -11,9 +11,9 @@ project(ascendc_devkit_ut)
 cmake_minimum_required(VERSION 3.14.1)
 
 set(PRODUCT_TYPE_LIST
-    ascend910 ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend310B1 ascend610Lite)
+    ascend910 ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend310B1)
 
-set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910 ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend310B1 ascend610Lite)
+set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910 ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend310B1)
 # set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910)
 
 add_compile_definitions(ASCENDC_CPU_DEBUG=1 ASCENDC_DUMP=0)
@@ -132,12 +132,6 @@ file(GLOB ASCENDC_TEST_ascend310B1_CASE_SRC_FILES
     ${LOCAL_DIR}/testcase/matmul_api/tikcpp_case_ascend310b1/*.cpp
 )
 
-# ascend610Lite test cases
-file(GLOB ASCENDC_TEST_ascend610Lite_CASE_SRC_FILES
-    ${LOCAL_DIR}/testcase/tikcpp_case_common/test_kernel_pop_stack_buffer.cpp
-    ${LOCAL_DIR}/testcase/basic_api/tikcpp_case_ascend610lite/*.cpp
-)
-
 file(GLOB ASCENDC_API_CHECK_CASE_SRC_FILES
     ${LOCAL_DIR}/testcase/tikcpp_api_check/*.cpp
 )
@@ -159,7 +153,6 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:${ASCENDC_API_CHECK_CASE_SRC_FILES};${ASCENDC_TEST_ascend910B1_AIV_CAPI_CASE_SRC_FILES}>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend310B1>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},ascend610Lite>:${LOCAL_DIR}/../common/k3_pvwrap.cpp>
         ${ASCENDC_TEST_${product_type}_CASE_SRC_FILES}
     )
 
@@ -244,19 +237,6 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
             ${ASCEND_CANN_PACKAGE_PATH}/tools/tikicpulib/lib/Ascend310B1/
             ${ASCENDC_SYS_DIR}/simulator/Ascend310B1/lib/
         )
-    elseif(${product_type} STREQUAL "ascend610Lite")
-        target_compile_definitions(tikcpp_utest_${product_type} PRIVATE
-            UT_TEST
-            __CCE_AICORE__=310
-            __DAV_M310__
-            __NPU_ARCH__=3102
-            __UT_CHIP_VER__=310
-        )
-        target_link_directories(tikcpp_utest_${product_type} PRIVATE
-            ${ASCEND_DEP_LIB_DIR}
-            ${ASCEND_CANN_PACKAGE_PATH}/tools/tikicpulib/lib/Ascend610Lite/
-            ${ASCENDC_SYS_DIR}/simulator/Ascend610Lite/lib/
-        )
     endif()
 
     target_compile_definitions(tikcpp_utest_${product_type} PRIVATE
@@ -291,7 +271,6 @@ foreach(product_type ${TIKCPP_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:pem_davinci>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:pem_davinci>
         $<$<STREQUAL:${product_type},ascend310B1>:pem_davinci>
-        $<$<STREQUAL:${product_type},ascend610Lite>:pem_davinci>
         c_sec
         mmpa
         error_manager
@@ -365,12 +344,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             UT_TEST
             __CCE_AICORE__=300
             __NPU_ARCH__=3002
-        )
-    elseif(${product_type} STREQUAL "ascend610Lite")
-        target_compile_definitions(tikcpp_tiling_utest_${product_type} PRIVATE
-            UT_TEST
-            __CCE_AICORE__=310
-            __NPU_ARCH__=3102
         )
     endif()
 

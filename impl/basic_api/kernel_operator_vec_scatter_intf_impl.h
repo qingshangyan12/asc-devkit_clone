@@ -27,8 +27,6 @@
 #include "dav_m300/kernel_operator_vec_scatter_impl.h"
 #elif __NPU_ARCH__ == 3101
 #include "dav_c310/kernel_operator_vec_scatter_impl.h"
-#elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_vec_scatter_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_vec_scatter_impl.h"
 #elif (__NPU_ARCH__ == 3113)
@@ -54,11 +52,11 @@ __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& 
     const uint8_t repeatTime, const uint8_t srcRepStride)
 {
     using PrimType = PrimT<T>;
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3101)
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t, uint64_t, int64_t>()),
         {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Scatter, current api support dtype combination is src and "
         "dst both: uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t, uint64_t, int64_t");});
-#elif ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101))
+#elif ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3101))
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
         {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Scatter, current api support dtype combination is src and "
         "dst both: uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t");});
@@ -94,11 +92,11 @@ __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& 
     const uint8_t repeatTime, const uint8_t srcRepStride)
 {
     using PrimType = PrimT<T>;
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3101)
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t, uint64_t, int64_t>()),
         {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Scatter, current api support dtype combination is src and "
         "dst both: uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t, uint64_t, int64_t");});
-#elif ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101))
+#elif ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3101))
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
         {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Scatter, current api support dtype combination is src and "
         "dst both: uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t");});
@@ -131,11 +129,11 @@ __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& 
     const LocalTensor<uint32_t>& dstOffset, const uint32_t dstBaseAddr, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3101)
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t, uint64_t, int64_t>()),
         {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Scatter, current api support dtype combination is src and "
         "dst both: uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t, uint64_t, int64_t");});
-#elif ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101))
+#elif ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3101))
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
         {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Scatter, current api support dtype combination is src and "
         "dst both: uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t");});
@@ -150,7 +148,7 @@ __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& 
     }
 #endif
     uint32_t vectorRegWidth = 256;
-#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3101)
     ScatterImpl((__ubuf__ PrimType *)dst.GetPhyAddr(), (__ubuf__ PrimType *)src.GetPhyAddr(),
         (__ubuf__ uint32_t *)dstOffset.GetPhyAddr(), dstBaseAddr, count);
 #else

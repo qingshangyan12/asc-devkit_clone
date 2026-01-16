@@ -23,8 +23,5 @@
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
 #include "data_copy_wrapper_dn.h"
 #endif
-#if  __NPU_ARCH__ == 5102
-#include "data_copy_wrapper_dn.h"
-#endif
 
 #endif // IMPL_MATMUL_STAGE_COPY_CUBE_IN_COPY_TILE_TO_CUBE_DATA_COPY_WRAPPER_H

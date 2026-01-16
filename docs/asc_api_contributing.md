@@ -88,7 +88,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
     [include/adv_api/kernel_api.h](../include/adv_api/kernel_api.h)文件中包含了所有高阶API头文件，建议在该文件中引入新增API的头文件，这样在调用高阶API时，只需要引入`"kernel_api.h"`。
     ```c++
-    #if defined(__CCE_AICORE__) && (__CCE_AICORE__ < 300) && (__NPU_ARCH__ != 5102)
+    #if defined(__CCE_AICORE__) && (__CCE_AICORE__ < 300)
     // ...
     #include "math/axpy.h"
     // ...

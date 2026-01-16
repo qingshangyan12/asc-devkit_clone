@@ -26,9 +26,6 @@
 #include "dav_m300/kernel_operator_mm_impl.h"
 #elif __NPU_ARCH__ == 3101
 #include "dav_c310/kernel_operator_mm_impl.h"
-#elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_mm_impl.h"
-
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3113)
@@ -190,18 +187,6 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
         KERNEL_LOG(KERNEL_ERROR, "kStartPt * sizeof(T) must be a multiple of 32");});
     ASCENDC_ASSERT(loadDataParams.mStartPt % 16 == 0, {
         KERNEL_LOG(KERNEL_ERROR, "mStartPt should be a multiple of 16");});
-#elif __NPU_ARCH__ == 3102
-    if (dstScope == Hardware::L0A) {
-        ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, uint16_t, int16_t, int4b_t>()),
-            {KERNEL_LOG(KERNEL_ERROR,
-            "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst position is A2, current api support "
-            "dtype combination is src and dst both: uint8_t / int8_t / half / uint16_t / int16_t / int4b_t.");});
-    } else {
-        ASCENDC_ASSERT((SupportType<PrimT<T>, half, int16_t, uint16_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype "
-            "in LoadData with LoadData3DParamsV2 when dst position is B2, current api support dtype combination is src "
-            "and dst both: half / int16_t / uint16_t.");});
-    }
 #endif
 
     CheckTensorPos<T>(src, Hardware::L1, "src", "A1 / B1", "LoadData with LoadData3DParamsV2");
@@ -224,7 +209,7 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
 }
 
 #if ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||            \
-     (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+     (__NPU_ARCH__ == 3101))
 // cce compiler process laod3d bfloat16_t using B8, so use the half dtype instead
 template <const IsResetLoad3dConfig& defaultConfig>
 [[deprecated("NOTICE: LoadData<IsResetLoad3dConfig> has been deprecated and will be removed in the next version."
@@ -236,7 +221,7 @@ __aicore__ inline void LoadData(const LocalTensor<bfloat16_t>& dst, const LocalT
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__)
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(const LocalTensor<T>& dst, const GlobalTensor<U>& src,
     const LoadData2DParamsV2& loadDataParams, const Nd2NzParamsV2& nd2nzParams)

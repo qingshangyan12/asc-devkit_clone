@@ -23,7 +23,7 @@ WFLAGS = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
 WMODES = stat.S_IWUSR | stat.S_IRUSR
 SOC_MAP_EXT = {'ascend310p': 'Ascend310P3', 'ascend310b': 'Ascend310B1',
                'ascend910': 'Ascend910A', 'ascend910b': 'Ascend910B1',
-               'ascend910_93': 'Ascend910_9391', 'ascend610lite': 'Ascend610Lite',
+               'ascend910_93': 'Ascend910_9391',
                'ascend910_95': 'Ascend910_9599', 'kirinx90': 'KirinX90', 'kirin9030': 'Kirin9030'}
 BIN_CMD = 'opc $1 --main_func={fun} --input_param={param} --soc_version={soc} \
 --output=$2 --impl_mode={impl} --simplified_key_mode=0 --op_mode=dynamic\n'

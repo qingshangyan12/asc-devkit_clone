@@ -476,12 +476,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __CCE_AICORE__=300
             __NPU_ARCH__=3002
         )
-    elseif(${product_type} STREQUAL "ascend610Lite")
-        target_compile_definitions(ascendc_utest_${product_type} PRIVATE
-            UT_TEST
-            __CCE_AICORE__=310
-            __NPU_ARCH__=3102
-        )
     endif()
 
     target_include_directories(ascendc_tiling_utest_${product_type} PRIVATE

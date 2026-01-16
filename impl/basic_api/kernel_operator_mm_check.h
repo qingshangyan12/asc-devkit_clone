@@ -63,11 +63,6 @@ __aicore__ static inline void CheckLoadData2dDatatype()
         {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData2DParams, current api "
         "support dtype combination is src and dst both uint8_t / int8_t / uint16_t / int16_t / half / bfloat16_t / "
         "uint32_t / int32_t / float / int4b_t.");});
-#elif __NPU_ARCH__ == 3102
-    ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, uint16_t, int16_t, int4b_t>()),
-        {KERNEL_LOG(KERNEL_ERROR,
-        "Failed to check dtype in LoadData with LoadData2DParamsV2, current api support dtype combination is src and "
-        "dst both: uint8_t / int8_t / half / uint16_t / int16_t / int4b_t.");});
 #endif
 }
 
@@ -107,9 +102,8 @@ __aicore__ static inline void CheckLoadData3dv2ChannelSize(const uint16_t channe
             channelSize);});
     }
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                     \
-      (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||                     \
-      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101))
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+      (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     if constexpr (IsSameType<PrimT<T>, half>::value) {
         uint16_t remainderList[] = {0, 4, 8};
         ASCENDC_ASSERT((ChannelSizeRemainder<PrimT<T>>(channelSize, remainderList, 3)),

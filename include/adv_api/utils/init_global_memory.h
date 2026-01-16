@@ -19,8 +19,6 @@
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v200_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v220_impl.h"
-#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102))
-#include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v310_impl.h"
 #endif
 
 namespace AscendC {
@@ -42,24 +40,6 @@ __aicore__ inline __in_pipe__(V)
 }
 
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-template <typename T>
-__aicore__ inline __in_pipe__(V)
-    __out_pipe__(MTE3) void Fill(GlobalTensor<T> &gmWorkspaceAddr, const uint64_t size, const T value)
-{
-    InitGlobalMemoryImpl<T>(gmWorkspaceAddr, size, value);
-}
-#endif
-
-/* !
- * \brief This function realizes the clear global memory function.
- *
- * \note support data type: uint16_t, int16_t, half, float, uint32_t, int32_t
- *
- * \param [out] GlobalTensor
- * \param [in] size, size of space to be initialized
- * \param [in] value, value to be initialized in global memory
- */
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102)
 template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void Fill(GlobalTensor<T> &gmWorkspaceAddr, const uint64_t size, const T value)

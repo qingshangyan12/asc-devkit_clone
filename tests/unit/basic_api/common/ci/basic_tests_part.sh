@@ -17,7 +17,6 @@ test_one_targets=(
   tikcpp_utest_ascend610
   tikcpp_utest_ascend310p
   tikcpp_utest_ascend310B1
-  tikcpp_utest_ascend610Lite
   tikcpp_tpl_tiling_key_utest_debug
   tikcpp_tpl_tiling_key_utest_release
 )
@@ -36,5 +35,4 @@ test_three_targets=(
   tikcpp_tiling_utest_ascend910B1_AIC
   tikcpp_tiling_utest_ascend910B1_AIV
   tikcpp_tiling_utest_ascend310B1
-  tikcpp_tiling_utest_ascend610Lite
 )

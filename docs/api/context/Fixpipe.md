@@ -173,7 +173,7 @@ constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="10.291029102910292%" headers="mcps1.2.4.1.2 "><p id="p347516327184"><a name="p347516327184"></a><a name="p347516327184"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.52755275527552%" headers="mcps1.2.4.1.3 "><p id="p146208155523"><a name="p146208155523"></a><a name="p146208155523"></a>量化参数，类型为LocalTensor&lt;uint64_t&gt;，支持的TPosition为A1。仅当quantPre为VDEQF16/VQF322B8_PRE/VREQ8时支持，quantPre介绍请参考FixpipeParamsV220/FixpipeParamsM300/FixpipeParamsM310结构体中quantPre部分。</p>
+<td class="cellrowborder" valign="top" width="75.52755275527552%" headers="mcps1.2.4.1.3 "><p id="p146208155523"><a name="p146208155523"></a><a name="p146208155523"></a>量化参数，类型为LocalTensor&lt;uint64_t&gt;，支持的TPosition为A1。仅当quantPre为VDEQF16/VQF322B8_PRE/VREQ8时支持，quantPre介绍请参考FixpipeParamsV220/FixpipeParamsM300结构体中quantPre部分。</p>
 </td>
 </tr>
 </tbody>

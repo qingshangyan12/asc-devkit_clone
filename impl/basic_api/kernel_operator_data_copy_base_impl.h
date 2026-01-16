@@ -33,8 +33,6 @@
 #include "dav_m300/kernel_operator_data_copy_impl.h"
 #elif __NPU_ARCH__ == 3101
 #include "dav_c310/kernel_operator_data_copy_impl.h"
-#elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_data_copy_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_data_copy_impl.h"
 #elif (__NPU_ARCH__ == 3113)
@@ -142,7 +140,7 @@ __aicore__ inline uint32_t DataCopyGetPhyStartIndex(
     return phyStartIndex;
 }
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3101)
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline void DataCopyGM2L1ND2NZ(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
     const Nd2NzParams& intriParams)

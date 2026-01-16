@@ -46,7 +46,7 @@ __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 #endif
 
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
 __BLOCK_LOCAL__ __inline__ uint64_t g_maskCount;
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
 #endif
@@ -80,7 +80,7 @@ namespace AscendC {
 template <typename T, MaskMode mode = MaskMode::NORMAL>
 __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint64_t maskLow)
 {
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102
+#if __NPU_ARCH__ == 3002
     if (mode == MaskMode::COUNTER) {
         g_maskCount = maskLow;
     }
@@ -91,7 +91,7 @@ __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint6
 template <typename T, MaskMode mode = MaskMode::NORMAL>
 __aicore__ static inline void SetVectorMask(int32_t len)
 {
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102
+#if __NPU_ARCH__ == 3002
     g_maskCount = len;
 #endif
     SetVectorMaskImpl<T, mode>(len);
@@ -99,7 +99,7 @@ __aicore__ static inline void SetVectorMask(int32_t len)
 
 __aicore__ inline void ResetMask()
 {
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102
+#if __NPU_ARCH__ == 3002
     g_maskCount = 0;
 #endif
     ResetMaskImpl();

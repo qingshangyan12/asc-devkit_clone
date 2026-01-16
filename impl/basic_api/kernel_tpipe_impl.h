@@ -79,7 +79,7 @@ __aicore__ inline void TPipe::Init()
 
         SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
     }
-#elif __NPU_ARCH__ == 3002 || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#elif __NPU_ARCH__ == 3002 || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     auto enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
     ASCENDC_DEBUG_ASSERT((enQueEvtID == 0), KERNEL_LOG(KERNEL_ERROR, "enQueEvtID should be 0"));
     SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
@@ -501,7 +501,7 @@ __aicore__ inline void TPipe::Destroy()
         WaitFlag<HardEvent::M_MTE1>(2);
         ReleaseEventID<HardEvent::M_MTE1>(2);
     }
-#elif __NPU_ARCH__ == 3002 || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#elif __NPU_ARCH__ == 3002 || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     WaitFlag<HardEvent::M_MTE1>(0);
     ReleaseEventID<HardEvent::M_MTE1>(0);
     WaitFlag<HardEvent::M_MTE1>(1);
@@ -555,7 +555,7 @@ __aicore__ inline void InitShareBufStart(TPipe* tpipe, uint32_t mode, uint32_t* 
         Hardware::L1, subBlockIdx);
     tpipe->AuxShareBufStart(mode, shareLens, static_cast<uint8_t>(TShareBuf::ShareHard::L0C),
         Hardware::L0C, subBlockIdx);
-#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     tpipe->AuxShareBufStart(mode, shareLens, static_cast<uint8_t>(TShareBuf::ShareHard::UB),
         Hardware::UB, subBlockIdx);
 #endif
@@ -574,7 +574,7 @@ __aicore__ inline void InitShareBufEnd(TPipe* tpipe)
         tpipe->g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::L1)];
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0C)].maxAddr =
         tpipe->g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::L0C)];
-#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::UB)].maxAddr =
         tpipe->g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::UB)];
 #endif
@@ -592,7 +592,7 @@ __aicore__ inline void TPipe::InitSpmBuffer(const GlobalTensor<T>& workspace, co
 
 __aicore__ inline void TPipe::InitSpmBuffer(const int32_t bufferSize)
 {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3101)
     (void)(bufferSize);
     ASCENDC_DEBUG_ASSERT((false),
                    KERNEL_LOG(KERNEL_ERROR, "not supported on current device"));

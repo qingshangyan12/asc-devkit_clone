@@ -415,7 +415,7 @@ typedef enum {
     EVENT_ID1,
     EVENT_ID2,
     EVENT_ID3,
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || defined(__DAV_C310__) || defined(__DAV_310R6__) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || defined(__DAV_C310__) || defined(__DAV_310R6__))
     EVENT_ID4,
     EVENT_ID5,
     EVENT_ID6,

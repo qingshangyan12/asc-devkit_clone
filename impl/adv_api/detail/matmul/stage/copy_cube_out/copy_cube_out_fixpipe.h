@@ -103,7 +103,7 @@ private:
                     { KERNEL_LOG(KERNEL_ERROR, "if split N when copy cube out, NZ is not supported"); });
             CopyOutNZ2NZ<enSequentialWrite, T, isIntraBlock>(dst, co1Local, curRow, curCol, baseHeight,
             baseWidth, baseBlockHeight, baseBlockWidth);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
         } else if constexpr (C_TYPE::format == CubeFormat::COLUMN_MAJOR) {
             CopyOutNZ2DN<enSequentialWrite, T, isIntraBlock>(dst, co1Local, curRow, curCol, baseHeight,
                 baseWidth, baseBlockHeight, baseBlockWidth);
@@ -215,7 +215,7 @@ private:
         }
     }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
     template <bool enSequentialWrite, class T, bool isIntraBlock = false>
     __aicore__ inline void CopyOutNZ2NZ(const T& dst, const LocalTensor<SrcT>& co1Local, int32_t curRow, int32_t curCol,
                                         int32_t baseHeight, int32_t baseWidth, int32_t baseBlockHeight,

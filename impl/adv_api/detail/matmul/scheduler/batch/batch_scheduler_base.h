@@ -105,15 +105,6 @@ public:
             MATMUL_MODULE(BiasScheduler)->Init(tiling.GetBatchNum());
         }
 
-#if __NPU_ARCH__ == 5102
-        if constexpr (IsSameTypeV<SrcT, half> && IsSameTypeV<TransBT, half> && IsTypeOneOfV<DstT, half, bfloat16_t>) {
-            constexpr uint64_t quantScalar = 1065353216;
-            MATMUL_MODULE(MatmulQuantProcessor)->SetQuantScalar(quantScalar);
-        } else if (IsSameTypeV<SrcT, int8_t> && IsTypeOneOfV<DstT, int8_t, uint8_t, half, bfloat16_t>) {
-            MATMUL_MODULE(MatmulQuantProcessor)->Init(tiling.GetBaseN());
-        }
-#endif
-
         InitShareBufEnd(var.tpipe_);
     }
 
@@ -399,11 +390,6 @@ public:
         MATMUL_MODULE(BatchCopyCubeInB)->Destroy();
         MATMUL_MODULE(BiasScheduler)->End();
         MATMUL_MODULE(CubeOutBuffer)->Destroy();
-#if __NPU_ARCH__ == 5102
-        if constexpr (IsSameTypeV<SrcT, int8_t> && IsTypeOneOfV<DstT, int8_t, uint8_t, half, bfloat16_t>) {
-            MATMUL_MODULE(MatmulQuantProcessor)->Destroy();
-        }
-#endif
     }
 
     __aicore__ inline void SetNBatchOutNum(int32_t nBatchOutNum)

@@ -17,7 +17,7 @@
 #define USE_ISA_INS 1
 #define GM_ADDR __gm__ uint8_t*
 #define __kfc_workspace__ __attribute__((annotate("kfc_workspace")))
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
 #define UB_ADDR __ubuf__ uint8_t*
 #define SSBUF_ADDR __ssbuf__ uint32_t*
 #endif
@@ -197,7 +197,7 @@ enum class CacheRwMode {
     RW = 3
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
 constexpr uint64_t L2_CACHE_OFFSET = 60;
 constexpr uint64_t L2_CACHE_OFFSET_MASK = (1ul << L2_CACHE_OFFSET) - 1;
 template <class T, CacheRwMode rwMode = CacheRwMode::RW>
@@ -346,7 +346,7 @@ struct int4x2_t {
 #endif
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
 
 #if !defined(ASCENDC_CPU_DEBUG)
 using fp4x2_e2m1_t = float4_e2m1x2_t;
@@ -400,7 +400,7 @@ extern uint64_t g_tilingKey;
 #define TILING_KEY_LIST(...) (TILING_KEY_LIST_INOUT(__VA_ARGS__))
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
 namespace impl_mode {
 #ifdef SUPPORT_OUT_OF_BOUND_INDEX_
 const uint64_t SUPPORT_OUT_OF_BOUND_INDEX = 1;
