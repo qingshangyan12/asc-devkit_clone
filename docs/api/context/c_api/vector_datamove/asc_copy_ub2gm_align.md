@@ -97,8 +97,8 @@ PIPE_MTE2
 ## 调用示例
 
 ```cpp
-//size指参与搬运的数据总长度。dst是外部输入的uint8_t类型的GM内存。
-constexpr uint32_t size = 32;
+//total_length指参与搬运的数据总长度。dst是外部输入的uint8_t类型的GM内存。
+constexpr uint64_t total_length = 128;
 __ubuf__ uint8_t src[total_length];
-asc_copy_ub2gm_align(dst, src, size);
+asc_copy_ub2gm_align(dst, src, total_length * sizeof(uint8_t));
 ```
