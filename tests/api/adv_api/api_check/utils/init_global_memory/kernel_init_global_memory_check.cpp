@@ -30,7 +30,9 @@ protected:
 
 TEST_F(InitGlobalMemoryAPICheck, InitGlobalMemoryAPICheckTestSuccess)
 {
+    __gm__ uint8_t* __restrict__ srcGm;
     AscendC::GlobalTensor<float> dstTensor;
+    dstTensor.SetGlobalBuffer(reinterpret_cast<__gm__ float*>(srcGm), 32);
 
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(InitGlobalMemory, (float), (dstTensor, 8, 1));
@@ -39,7 +41,9 @@ TEST_F(InitGlobalMemoryAPICheck, InitGlobalMemoryAPICheckTestSuccess)
 
 TEST_F(InitGlobalMemoryAPICheck, InitGlobalMemoryAPICheckTestFailure)
 {
+    __gm__ uint8_t* __restrict__ srcGm;
     AscendC::GlobalTensor<uint8_t> dstTensor;
+    dstTensor.SetGlobalBuffer(reinterpret_cast<__gm__ uint8_t*>(srcGm), 32);
 
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(InitGlobalMemory, (uint8_t), (dstTensor, 32, 1));
