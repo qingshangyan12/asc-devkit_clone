@@ -25,8 +25,13 @@
 
 #include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
 
-constexpr uint8_t ASC_DEFAULT_SID_PADDING_GAP = 0;
-constexpr uint16_t ASC_DEFAULT_NBURST = 1;
+#ifndef ASC_C_API_DEFAULT_ZERO_VALUE
+#define ASC_C_API_DEFAULT_ZERO_VALUE 0
+#endif
+
+#ifndef ASC_C_API_DEFAULT_NBURST
+#define ASC_C_API_DEFAULT_NBURST 1
+#endif
 
 // uint8_t
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint8_t sid, uint16_t n_burst, uint32_t len_burst,
@@ -39,8 +44,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ uint8_t* dst, __gm__ u
 
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size, ASC_DEFAULT_SID_PADDING_GAP,
-                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_impl(dst, src, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_NBURST, size, ASC_C_API_DEFAULT_ZERO_VALUE,
+                ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
@@ -60,8 +65,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ int8_t* dst, __gm__ in
 
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size, ASC_DEFAULT_SID_PADDING_GAP,
-                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_impl(dst, src, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_NBURST, size, ASC_C_API_DEFAULT_ZERO_VALUE,
+                ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
@@ -81,8 +86,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ half* dst, __gm__ half
 
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ half* dst, __gm__ half* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size, ASC_DEFAULT_SID_PADDING_GAP,
-                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_impl(dst, src, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_NBURST, size, ASC_C_API_DEFAULT_ZERO_VALUE,
+                ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ half* dst, __gm__ half* src, uint32_t size)
@@ -102,8 +107,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ bfloat16_t* dst, __gm_
 
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size, ASC_DEFAULT_SID_PADDING_GAP,
-                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_impl(dst, src, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_NBURST, size, ASC_C_API_DEFAULT_ZERO_VALUE,
+                ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t size)
@@ -123,8 +128,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ int16_t* dst, __gm__ i
 
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size, ASC_DEFAULT_SID_PADDING_GAP,
-                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_impl(dst, src, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_NBURST, size, ASC_C_API_DEFAULT_ZERO_VALUE,
+                ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t size)
@@ -144,8 +149,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ uint16_t* dst, __gm__ 
 
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size, ASC_DEFAULT_SID_PADDING_GAP,
-                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_impl(dst, src, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_NBURST, size, ASC_C_API_DEFAULT_ZERO_VALUE,
+                ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size)
@@ -165,8 +170,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ uint32_t* dst, __gm__ 
 
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size, ASC_DEFAULT_SID_PADDING_GAP,
-                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_impl(dst, src, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_NBURST, size, ASC_C_API_DEFAULT_ZERO_VALUE,
+                ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
@@ -186,8 +191,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ int32_t* dst, __gm__ i
 
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size, ASC_DEFAULT_SID_PADDING_GAP,
-                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_impl(dst, src, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_NBURST, size, ASC_C_API_DEFAULT_ZERO_VALUE,
+                ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t size)
@@ -207,8 +212,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ float* dst, __gm__ flo
 
 __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ float* dst, __gm__ float* src, uint32_t size)
 {
-    asc_copy_gm2ub_align_impl(dst, src, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_NBURST, size, ASC_DEFAULT_SID_PADDING_GAP,
-                ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP, ASC_DEFAULT_SID_PADDING_GAP);
+    asc_copy_gm2ub_align_impl(dst, src, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_NBURST, size, ASC_C_API_DEFAULT_ZERO_VALUE,
+                ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE, ASC_C_API_DEFAULT_ZERO_VALUE);
 }
 
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ float* dst, __gm__ float* src, uint32_t size)
@@ -216,6 +221,9 @@ __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ float* dst, __gm_
     asc_copy_gm2ub_align_impl(dst, src, size);
     asc_sync_post_process();
 }
+
+#undef ASC_C_API_DEFAULT_ZERO_VALUE
+#undef ASC_C_API_DEFAULT_NBURST
 
 #endif
 
