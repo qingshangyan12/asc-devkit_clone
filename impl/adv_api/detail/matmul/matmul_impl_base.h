@@ -15,6 +15,10 @@
 #ifndef IMPL_MATMUL_MATMUL_IMPL_BASE_H
 #define IMPL_MATMUL_MATMUL_IMPL_BASE_H
 
+#include "kernel_tensor.h"
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#include "../../../../include/adv_api/quantization/ascend_antiquant.h"
+#endif
 #include "policy/matmul_policy.h"
 #include "policy/matmul_private_modules.h"
 #include "utils/matmul_module.h"
