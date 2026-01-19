@@ -140,7 +140,7 @@ DumpTensor介绍：
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  cube test pass!
   ```
   执行vector.asc样例的命令如下所示：
   ```bash
@@ -150,5 +150,5 @@ DumpTensor介绍：
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  vector test pass!
   ```

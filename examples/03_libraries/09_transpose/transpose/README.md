@@ -4,6 +4,8 @@
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 ```
@@ -80,5 +82,5 @@
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  test pass!
   ```

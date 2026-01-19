@@ -55,7 +55,7 @@ if __name__ == '__main__':
         if not (res1 and res2):
             raise ValueError("[ERROR] result error")
         else:
-            print("test pass")
+            print("test pass!")
     except Exception as e:
         print(e)
         sys.exit(1)

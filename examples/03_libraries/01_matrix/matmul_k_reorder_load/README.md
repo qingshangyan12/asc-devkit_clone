@@ -108,5 +108,5 @@ enableKdimReorderLoad用于配置是否使能K轴错峰加载数据。基于相�
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  test pass!
   ```

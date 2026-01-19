@@ -104,5 +104,5 @@ L0缓存没有对外开关，由Matmul API内部根据用户配置的shape信息
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  test pass!
   ```

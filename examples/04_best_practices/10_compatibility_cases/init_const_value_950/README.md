@@ -62,5 +62,5 @@ L0A Buffer和L0B Buffer初始化值的端到端用例。
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  test pass!
   ```

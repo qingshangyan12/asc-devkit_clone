@@ -58,5 +58,5 @@
 
   执行结果如下，说明执行成功。
   ```log
-  test pass
+  test pass!
   ```

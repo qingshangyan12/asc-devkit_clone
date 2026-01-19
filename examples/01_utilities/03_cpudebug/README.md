@@ -96,7 +96,7 @@ CPU Debug介绍
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  test pass!
   ```
   
 - 进入gdb模式调试

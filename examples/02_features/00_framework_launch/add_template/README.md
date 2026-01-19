@@ -115,5 +115,5 @@ Add算子实现了两个数据相加，返回相加结果的功能。本样例�
   -v 可选择tiling模板，可选参数有float16和float
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  test pass!
   ```

@@ -41,7 +41,7 @@ if __name__ == '__main__':
         output_file = sys.argv[3]
         cmp_result = data_compare(input1_file, input2_file, output_file)
         if (cmp_result == 0):
-            print("test pass")
+            print("test pass!")
         else:
             raise ValueError("[ERROR] result error")
     except Exception as e:

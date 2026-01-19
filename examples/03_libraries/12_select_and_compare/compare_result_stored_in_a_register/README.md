@@ -78,5 +78,5 @@ LE：小于或等于（less than or equal to）
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  test pass!
   ```
