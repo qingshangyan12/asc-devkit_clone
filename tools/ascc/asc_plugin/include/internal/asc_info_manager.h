@@ -63,6 +63,7 @@ struct PathInfo {
             cannPath + "/asc/impl/micro_api",
             cannPath + "/asc/impl/simt_api",
             cannPath + "/asc/impl/utils",
+            cannPath + "/asc",
 
             cannPath + "/asc/include",
             cannPath + "/asc/include/adv_api",

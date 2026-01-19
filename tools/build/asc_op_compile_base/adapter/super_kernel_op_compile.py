@@ -226,6 +226,7 @@ def gen_spk_kernel_call(super_split_info : SuperSplitInfo, split_mode, kernel_ty
         cmds.append("-I" + os.path.join(asc_path, "include", "utils"))
         cmds.append("-I" + os.path.join(asc_path, "..", "ascendc", "act"))
         cmds.append("-I" + os.path.join(asc_path, "impl"))
+        cmds.append("-I" + asc_path)
         cmds.append("-I" + os.path.join(asc_path, "..", "tikcpp"))
         cmds.append("-I" + os.path.join(asc_path, "..", "..", "include"))
         cmds.append("-I" + os.path.join(asc_path, "..", "..", "include", "ascendc"))

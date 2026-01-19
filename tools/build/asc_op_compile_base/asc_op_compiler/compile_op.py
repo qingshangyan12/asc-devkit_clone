@@ -961,6 +961,7 @@ def _update_compile_option(kernel_name: str, compile_options: list, extend_optio
     compile_options.append("-I" + os.path.join(asc_path, "impl", "micro_api"))
     compile_options.append("-I" + os.path.join(asc_path, "impl", "simt_api"))
     compile_options.append("-I" + os.path.join(asc_path, "impl", "utils"))
+    compile_options.append("-I" + asc_path)
     compile_options.append("-I" + os.path.join(asc_path, "include"))
     compile_options.append("-I" + os.path.join(asc_path, "include", "adv_api"))
     compile_options.append("-I" + os.path.join(asc_path, "include", "basic_api"))

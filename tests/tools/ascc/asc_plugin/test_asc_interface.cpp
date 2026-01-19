@@ -1450,6 +1450,7 @@ TEST_F(TestAscInterFace, asc_PluginPreCompile)
         "-IA" + prefix + "/asc/impl/micro_api",
         "-IA" + prefix + "/asc/impl/simt_api",
         "-IA" + prefix + "/asc/impl/utils",
+        "-IA" + prefix + "/asc",
 
         "-IA" + prefix + "/asc/include",
         "-IA" + prefix + "/asc/include/adv_api",

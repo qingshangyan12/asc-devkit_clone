@@ -33,6 +33,7 @@ target_include_directories(device_intf_pub INTERFACE
     ${ASCENDC_DEVKIT_PATH}/asc/impl/micro_api
     ${ASCENDC_DEVKIT_PATH}/asc/impl/simt_api
     ${ASCENDC_DEVKIT_PATH}/asc/impl/utils
+    ${ASCENDC_DEVKIT_PATH}/asc
     ${ASCENDC_DEVKIT_PATH}/asc/include
     ${ASCENDC_DEVKIT_PATH}/asc/include/adv_api
     ${ASCENDC_DEVKIT_PATH}/asc/include/basic_api

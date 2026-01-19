@@ -938,6 +938,7 @@ f"ERROR: super kernel do not support self send/receive pair within 1 real stream
         options.append("-I" + os.path.join(asc_path, "include", "utils"))
         options.append("-I" + os.path.join(asc_path, "..", "ascendc", "act"))
         options.append("-I" + os.path.join(asc_path, "impl"))
+        options.append("-I" + asc_path)
         options.append("-I" + os.path.join(asc_path, "..", "tikcpp"))
         options.append("-I" + os.path.join(asc_path, "..", "..", "include"))
         options.append("-I" + os.path.join(asc_path, "..", "..", "include", "ascendc"))
