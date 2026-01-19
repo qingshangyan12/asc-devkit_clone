@@ -72,6 +72,20 @@ void MainLoadData(__gm__ uint8_t* __restrict__ dst_gm, __gm__ uint8_t* __restric
     loadDataParams.ifTranspose = false;
     LoadData(src0_l0a, src0_l1, loadDataParams);
 
+    LoadData2DParamsV2 loadDataParamsB;
+    loadDataParamsB.mStartPosition = 0;
+    loadDataParamsB.kStartPosition = 0;
+    loadDataParamsB.mStep = DivCeil(m, 16);;
+    loadDataParamsB.kStep = DivCeil(k * sizeof(src0_T), 32);
+    if (IsSameType<src0_T, int4b_t>::value) {
+        loadDataParams.kStep = DivCeil(loadDataParams.kStep, 2);
+    }
+    loadDataParamsB.srcStride = DivCeil(m, 16);
+    loadDataParamsB.dstStride = DivCeil(m, 16);
+    loadDataParamsB.sid = 0;
+    loadDataParamsB.ifTranspose = false;
+    LoadData(src1_l0b, src1_l1, loadDataParamsB);
+
     uint16_t kStep = DivCeil(k, 16);
     uint16_t nStep = DivCeil(n * sizeof(src1_T), 32);
 

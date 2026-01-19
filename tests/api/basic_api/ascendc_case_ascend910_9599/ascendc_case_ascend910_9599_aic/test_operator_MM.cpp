@@ -68,7 +68,7 @@ void MainCpuCmpMmadBiasDemo(__gm__ uint8_t* __restrict__ featureGm, __gm__ uint8
 
     // feature map: l1 ->l0a load2dv2
     LOCAL_TENSOR_REGISTER(feature_l0a, Src0T, A2, 0, featureDataSize)
-    AscendC::LoadData2DParamsV2 loadDataParamsA = {0, 0, 0, 0, 0, 0, false, 0};
+    AscendC::LoadData2DParamsV2 loadDataParamsA = {0, 0, 0, 0, 0, 0, true, 0};
     LoadData(feature_l0a, feature_l1, loadDataParamsA);
 
     // weight: l1 -> l0b load2dv2 with transpose
