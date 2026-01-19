@@ -34,11 +34,10 @@ void GetWhereMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatf
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<WHERE_GET_MAX_MIN>(srcShape.GetShapeSize(), typeSize);
     HighLevelApiCheck::TypeSizeVerifyingParameters<WHERE_GET_MAX_MIN>(typeSize, SUPPORT_TYPESIZE);
     HighLevelApiCheck::IsReuseSourceVerifyingParameters<WHERE_GET_MAX_MIN>(isReuseSource);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
 
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55),
-        return, "Unsupported SocVersion for Where API.");
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510),
+        return, "Unsupported NpuArch for Where API.");
     (void)srcShape;
     (void)typeSize;
     (void)isReuseSource;
@@ -51,10 +50,9 @@ void GetWhereTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& ascend
     uint32_t& maxLivedNodeCount, uint32_t& extraBuf)
 {
     HighLevelApiCheck::TypeSizeVerifyingParameters<WHERE_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55),
-        return, "Unsupported SocVersion of Where API.");
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510),
+        return, "Unsupported NpuArch of Where API.");
     (void)typeSize;
     extraBuf = 0u;
     maxLivedNodeCount = 0u;

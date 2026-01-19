@@ -68,7 +68,7 @@ __aicore__ inline void Sum(const LocalTensor<T>& dstTensor, const LocalTensor<T>
         return;
     }
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-    __NPU_ARCH__ == 5102)) || defined(__DAV_310R6__)
+    __NPU_ARCH__ == 5102))
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });

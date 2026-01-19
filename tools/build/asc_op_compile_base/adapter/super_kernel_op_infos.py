@@ -873,7 +873,7 @@ f"ERROR: super kernel do not support self send/receive pair within 1 real stream
 
     def add_define_options(self, exist_dynamic_sub_ops, options: list):
         if self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1 and \
-                                (CommonUtility.is_c310() or CommonUtility.is_310r6()):
+                                CommonUtility.is_c310():
             options.append("-D__ASCENDC_DAVID_SPLIT_CORE__")
         if exist_dynamic_sub_ops:
             options.append("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")

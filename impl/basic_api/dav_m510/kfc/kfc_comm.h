@@ -74,9 +74,6 @@ enum class CUBE_WAIT_INTRA_Enum : uint16_t {
 };
 #ifdef __MIX_CORE_AIC_RATION__
 constexpr int32_t MIX_NUM = __MIX_CORE_AIC_RATION__;
-#elif defined(__DAV_310R6__)
-// solomon 1:1
-constexpr int32_t MIX_NUM = 1;
 #else
 constexpr int32_t MIX_NUM = 2; // david 1:2
 #endif

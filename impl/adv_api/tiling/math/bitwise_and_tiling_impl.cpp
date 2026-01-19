@@ -35,11 +35,10 @@ void GetBitwiseAndMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendc
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<BITWISE_AND_GET_MAX_MIN>(srcShape.GetShapeSize(), typeSize);
     HighLevelApiCheck::TypeSizeVerifyingParameters<BITWISE_AND_GET_MAX_MIN>(typeSize, SUPPORT_TYPESIZE);
     HighLevelApiCheck::IsReuseSourceVerifyingParameters<BITWISE_AND_GET_MAX_MIN>(isReuseSource);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
 
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55),
-        return, "Unsupported SocVersion of BitwiseAnd API.");
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510),
+        return, "Unsupported NpuArch of BitwiseAnd API.");
     maxValue = 0u;
     minValue = 0u;
 }
@@ -48,10 +47,9 @@ void GetBitwiseAndTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& a
     uint32_t& maxLivedNodeCount, uint32_t& extraBuf)
 {
     HighLevelApiCheck::TypeSizeVerifyingParameters<BITWISE_AND_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55),
-        return, "Unsupported SocVersion of BitwiseAnd API.");
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510),
+        return, "Unsupported NpuArch of BitwiseAnd API.");
     extraBuf = 0u;
     maxLivedNodeCount = 0u;
 }

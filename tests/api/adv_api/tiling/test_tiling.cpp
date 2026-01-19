@@ -32,7 +32,8 @@ protected:
     virtual void SetUp() {}
     void TearDown() {}
 };
-
+extern void platfrom_stub_set_chip_version(const char *num);
+extern void platfrom_stub_set_npuarch(const char *num);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
 TEST_F(TestTiling, testTransDataTilingUnalignedHw)
@@ -1472,7 +1473,7 @@ TEST_F(TestTiling, testAdvanceSortTilingMergeSortFloat)
     EXPECT_EQ(minValue, 32 * 32 * 8);
 }
 
-extern void platfrom_stub_set_chip_version(const char *num);
+
 TEST_F(TestTiling, TestTopkTiling_TopKModeNomal_isInitIndexTrue_Float_Inner64)
 {
     enum TopKMode topkMode = TopKMode::TOPK_NORMAL;
@@ -2321,7 +2322,6 @@ TEST_F(TestTiling, testReduceSumTiling)
 }
 
 #else
-extern void platfrom_stub_set_chip_version(const char *num);
 TEST_F(TestTiling, MultiCoreSmallMN)
 {
     matmul_tiling::MultiCoreMatmulTiling rnnMatmul3,rnnMatmul4,rnnMatmul5;
@@ -6900,7 +6900,6 @@ TEST_F(TestTiling, TestFracTilingHalf)
 }
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-extern void platfrom_stub_set_chip_version(const char *num);
 TEST_F(TestTiling, TestTopkTiling_TopKModeNomal_isInitIndexTrue_Float_Inner64)
 {
     enum TopKMode topkMode = TopKMode::TOPK_NORMAL;
@@ -6916,6 +6915,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeNomal_isInitIndexTrue_Float_Inner64)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, true, tilingData);
     EXPECT_EQ(tilingData.get_tmpLocalSize(), 256);
     EXPECT_EQ(tilingData.get_allDataSize(), 64);
@@ -6953,6 +6953,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeNomal_isInitIndexFalse_Float_Inner64)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, true, tilingData);
     EXPECT_EQ(tilingData.get_tmpLocalSize(), 320);
     EXPECT_EQ(tilingData.get_allDataSize(), 64);
@@ -6991,6 +6992,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeNomal_isInitIndexTrue_Half_Inner64)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, true, tilingData);
     EXPECT_EQ(tilingData.get_tmpLocalSize(), 512);
     EXPECT_EQ(tilingData.get_allDataSize(), 64);
@@ -7028,6 +7030,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeNomal_isInitIndexFalse_Half_Inner64)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, true, tilingData);
     EXPECT_EQ(tilingData.get_tmpLocalSize(), 640);
     EXPECT_EQ(tilingData.get_allDataSize(), 64);
@@ -7066,6 +7069,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeSmall_isInitIndexTrue_Float_Inner64)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, false, tilingData);
     EXPECT_EQ(tilingData.get_allDataSize(), 32);
     EXPECT_EQ(tilingData.get_kAlignFourBytes(), 16);
@@ -7092,6 +7096,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeSmall_isInitIndexFalse_Float_Inner64)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, true, tilingData);
     EXPECT_EQ(tilingData.get_allDataSize(), 32);
     EXPECT_EQ(tilingData.get_kAlignFourBytes(), 16);
@@ -7120,6 +7125,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeSmall_isInitIndexTrue_Half_Inner64)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, true, tilingData);
     EXPECT_EQ(tilingData.get_allDataSize(), 32);
     EXPECT_EQ(tilingData.get_kAlignFourBytes(), 16);
@@ -7143,7 +7149,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeSmall_isInitIndexFalse_Half_Inner64)
     uint32_t maxValue = 0;
     uint32_t minValue = 0;
     optiling::TopkTiling tilingData;
-    platfrom_stub_set_chip_version("Ascend910B");
+    ("Ascend910B");
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, false, tilingData);
@@ -7171,6 +7177,7 @@ TEST_F(TestTiling, TestTopkTiling_DataTypeSize0_FAILED)
     uint32_t minValue = 0;
     optiling::TopkTiling tilingData;
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     auto res = TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, false, tilingData);
@@ -7192,6 +7199,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeSmall_isInitIndexFalse_Half_k)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, true, tilingData);
     EXPECT_EQ(tilingData.get_allDataSize(), 32);
     EXPECT_EQ(tilingData.get_kAlignFourBytes(), 16);
@@ -7235,6 +7243,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeSmall_isInitIndexFalse_Float_k32)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, true, tilingData);
     EXPECT_EQ(tilingData.get_allDataSize(), 32);
     EXPECT_EQ(tilingData.get_kAlignFourBytes(), 32);
@@ -7250,7 +7259,6 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeSmall_isInitIndexFalse_Float_k32)
 #endif
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
-extern void platfrom_stub_set_chip_version(const char *num);
 TEST_F(TestTiling, TestTopkTiling_TopKModeNormal310P_FLOAT)
 {
     enum TopKMode topkMode = TopKMode::TOPK_NORMAL;
@@ -7266,6 +7274,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeNormal310P_FLOAT)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend310P");
+    platfrom_stub_set_npuarch("2002");
     TopKTilingFunc(plat, inner, outter, k, dataTypeSize, isInitIndex, topkMode, true, tilingData);
     EXPECT_EQ(tilingData.get_tmpLocalSize(), 1088);
     EXPECT_EQ(tilingData.get_srcIndexOffset(), 1024);
@@ -7289,6 +7298,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeNormal310P_HALF)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend310P");
+    platfrom_stub_set_npuarch("2002");
     enum TopKMode topkMode = TopKMode::TOPK_NORMAL;
     bool isInitIndex = false;
     const int32_t outter = 1;
@@ -7322,6 +7332,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeSmall310P_FLOAT)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend310P");
+    platfrom_stub_set_npuarch("2002");
     enum TopKMode topkMode = TopKMode::TOPK_NSMALL;
     bool isInitIndex = false;
     const int32_t outter = 1;
@@ -7354,6 +7365,7 @@ TEST_F(TestTiling, TestTopkTiling_TopKModeSmall310P_HALF)
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     platfrom_stub_set_chip_version("Ascend310P");
+    platfrom_stub_set_npuarch("2002");
     enum TopKMode topkMode = TopKMode::TOPK_NSMALL;
     bool isInitIndex = false;
     const int32_t outter = 1;
@@ -7713,12 +7725,13 @@ TEST_F(TestTiling, TestReGluFloat32)
 }
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-extern void platfrom_stub_set_chip_version(const char *num);
+
 TEST_F(TestTiling, TestBroadCast220)
 {
     fe::PlatFormInfos platform_info;
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     uint32_t firstDim = 32;
     uint32_t lastDim = 32;
     std::vector<int64_t> srcShapeDims = {firstDim, 1};
@@ -7784,6 +7797,7 @@ TEST_F(TestTiling, TestBroadCast220)
 TEST_F(TestTiling, TestPowerTiling)
 {
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     auto platformPtr = platform_ascendc::PlatformAscendCManager::GetInstance("Ascend910B");
     std::vector<int64_t> shapeDims = { 512 };
     auto powerShape = ge::Shape(shapeDims);
@@ -7835,6 +7849,7 @@ TEST_F(TestTiling, TestPowerTiling)
 TEST_F(TestTiling, TestPowerTilingFactorSize)
 {
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     auto platformPtr = platform_ascendc::PlatformAscendCManager::GetInstance("Ascend910B");
     uint32_t maxLiveNodeCnt = 0xffff;
     uint32_t extraBuf = 0xffff;
@@ -7860,10 +7875,11 @@ TEST_F(TestTiling, TestPowerTilingFactorSize)
 #endif
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
-extern void platfrom_stub_set_chip_version(const char *num);
+
 TEST_F(TestTiling, TestPowerTilingV200)
 {
     platfrom_stub_set_chip_version("Ascend310P");
+    platfrom_stub_set_npuarch("2002");
     auto platformPtr = platform_ascendc::PlatformAscendCManager::GetInstance("Ascend310P");
     std::vector<int64_t> shapeDims = { 512 };
     auto powerShape = ge::Shape(shapeDims);
@@ -7915,6 +7931,7 @@ TEST_F(TestTiling, TestPowerTilingV200)
 TEST_F(TestTiling, TestPowerTilingFactorSizeV200)
 {
     platfrom_stub_set_chip_version("Ascend310P");
+    platfrom_stub_set_npuarch("2002");
     auto platformPtr = platform_ascendc::PlatformAscendCManager::GetInstance("Ascend310P");
     uint32_t maxLiveNodeCnt = 0xffff;
     uint32_t extraBuf = 0xffff;
@@ -7943,6 +7960,7 @@ TEST_F(TestTiling, TestLastBroadCast200)
     fe::PlatFormInfos platform_info;
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
     platfrom_stub_set_chip_version("Ascend310P");
+    platfrom_stub_set_npuarch("2002");
     uint32_t firstDim = 32;
     uint32_t lastDim = 32;
     std::vector<int64_t> srcShapeDims = {firstDim, 1};
@@ -7979,6 +7997,7 @@ TEST_F(TestTiling, TestFirstBroadCast200)
     fe::PlatFormInfos platform_info;
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
     platfrom_stub_set_chip_version("Ascend310P");
+    platfrom_stub_set_npuarch("2002");
     uint32_t firstDim = 32;
     uint32_t lastDim = 32;
     std::vector<int64_t> srcShapeDims = {1, lastDim};
@@ -8009,6 +8028,7 @@ TEST_F(TestTiling, TestOneElementBroadCast200)
     fe::PlatFormInfos platform_info;
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
     platfrom_stub_set_chip_version("Ascend310P");
+    platfrom_stub_set_npuarch("2002");
     uint32_t srcDim = 1;
     uint32_t dstDim = 32;
     std::vector<int64_t> srcShapeDims = {srcDim};
@@ -8037,6 +8057,7 @@ TEST_F(TestTiling, TestOneElementBroadCast200)
 TEST_F(TestTiling, testTransDataTilingUnalignedHw)
 {
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     uint32_t maxSize;
     uint32_t minSize;
     int32_t n = 16;
@@ -8087,6 +8108,7 @@ TEST_F(TestTiling, testTransDataTilingUnalignedHw)
 TEST_F(TestTiling, testTransDataTilingAlignedHw)
 {
     platfrom_stub_set_chip_version("Ascend910B");
+    platfrom_stub_set_npuarch("2201");
     uint32_t maxSize;
     uint32_t minSize;
     int32_t n = 5;

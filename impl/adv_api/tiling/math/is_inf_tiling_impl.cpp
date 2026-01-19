@@ -33,12 +33,11 @@ void GetIsInfMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatf
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<ISINF_GET_MAX_MIN>(srcShape.GetShapeSize(), typeSize);
     HighLevelApiCheck::TypeSizeVerifyingParameters<ISINF_GET_MAX_MIN>(typeSize, SUPPORT_TYPESIZE);
     HighLevelApiCheck::IsReuseSourceVerifyingParameters<ISINF_GET_MAX_MIN>(isReuseSource);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
 
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
-        return, "Unsupported SocVersion of IsInf API.");
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_5102),
+        return, "Unsupported NpuArch of IsInf API.");
     maxValue = 0u;
     minValue = 0u;
 }
@@ -47,11 +46,10 @@ void GetIsInfTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& ascend
     uint32_t& maxLivedNodeCount, uint32_t& extraBuf)
 {
     HighLevelApiCheck::TypeSizeVerifyingParameters<ISINF_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
-        return, "Unsupported SocVersion of IsInf API.");
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_5102),
+        return, "Unsupported NpuArch of IsInf API.");
     extraBuf = 0u;
     maxLivedNodeCount = 0u;
 }

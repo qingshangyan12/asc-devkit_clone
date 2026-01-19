@@ -2011,7 +2011,7 @@ def generate_kernel_auto_gen_func_impl(func_group: FuncSignGroupWithModeBase,
     if not RUN_MODE == "cpu":
         source += ("#if defined(ASCENDC_DUMP) && defined(ASCENDC_DEBUG)\n"
                 "    AscendC::WriteBackOverflow(overflow_status);\n#endif\n")
-    source += '#if defined(__DAV_C310__) || defined(__DAV_310R6__)\n'
+    source += '#if defined(__DAV_C310__)\n'
     source += '    pipe_barrier(PIPE_ALL);\n'
     source += '    dsb(mem_dsb_t::DSB_ALL);\n'
     source += '    dci();\n'

@@ -116,15 +116,15 @@ inline uint32_t GetPowerMaxTmpSizeC310(const ge::Shape& srcShape1, const ge::Sha
     return maxTmpSize;
 }
 
-inline uint32_t GetPowerMinTmpSize(const platform_ascendc::SocVersion& soc,
+inline uint32_t GetPowerMinTmpSize(const NpuArch npuArch,
     const ge::Shape& srcShape1, const ge::Shape& srcShape2, const bool typeIsInt,
     const uint32_t typeSize, const bool isReuseSource)
 {
     (void)(isReuseSource);
     struct PowTiling param(0, 0, 0, 0, 0, 0);
-    if (soc == platform_ascendc::SocVersion::ASCEND910B) {
+    if (npuArch == NpuArch::DAV_2201) {
         param = POW_TILING_PARAM_V220;
-    } else if (soc == platform_ascendc::SocVersion::ASCEND310P) {
+    } else if (npuArch == NpuArch::DAV_2002) {
         param = POW_TILING_PARAM_V200;
     }
     const bool src1IsTensor = ShapeIsTensor(srcShape1);
@@ -146,15 +146,15 @@ inline uint32_t GetPowerMinTmpSize(const platform_ascendc::SocVersion& soc,
     return minTmpSize;
 }
 
-inline uint32_t GetPowerMaxTmpSize(const platform_ascendc::SocVersion& soc, const ge::Shape& srcShape1,
+inline uint32_t GetPowerMaxTmpSize(const NpuArch npuArch, const ge::Shape& srcShape1,
     const ge::Shape& srcShape2, const bool typeIsInt,
     const uint32_t typeSize, const bool isReuseSource)
 {
     (void)(isReuseSource);
     struct PowTiling param(0, 0, 0, 0, 0, 0);
-    if (soc == platform_ascendc::SocVersion::ASCEND910B) {
+    if (npuArch == NpuArch::DAV_2201) {
         param = POW_TILING_PARAM_V220;
-    } else if (soc == platform_ascendc::SocVersion::ASCEND310P) {
+    } else if (npuArch == NpuArch::DAV_2002) {
         param = POW_TILING_PARAM_V200;
     }
     std::vector<int64_t> shapeDims1 = srcShape1.GetDims();
@@ -196,14 +196,14 @@ inline uint32_t GetPowerMaxTmpSize(const platform_ascendc::SocVersion& soc, cons
 Determine the power interface type based on the two input bool values of the interface.
 Return the number of required nodes or buffer size based on the interface type and typeSize.
 */
-void GetPowerTmpBufferFactorSize(const platform_ascendc::SocVersion& soc,
+void GetPowerTmpBufferFactorSize(const NpuArch npuArch,
     const bool baseIsTensor, const bool expIsTensor, const bool typeIsInt,
     const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuffer)
 {
     struct PowTiling param(0, 0, 0, 0, 0, 0);
-    if (soc == platform_ascendc::SocVersion::ASCEND910B) {
+    if (npuArch == NpuArch::DAV_2201) {
         param = POW_TILING_PARAM_V220;
-    } else if (soc == platform_ascendc::SocVersion::ASCEND310P) {
+    } else if (npuArch == NpuArch::DAV_2002) {
         param = POW_TILING_PARAM_V200;
     }
     bool isPowTensorTensor = baseIsTensor && expIsTensor;
@@ -237,21 +237,16 @@ void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape
 {
     ASCENDC_HOST_ASSERT(platform_ascendc::PlatformAscendCManager::GetInstance() != nullptr,
         return, "PlatformAscendCManager gets instance failed!");
-    platform_ascendc::SocVersion socVersion = platform_ascendc::PlatformAscendCManager::GetInstance()->GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910B) ||
-        (socVersion == platform_ascendc::SocVersion::ASCEND310P) ||
-        (socVersion == platform_ascendc::SocVersion::ASCEND910_95) ||
-        (socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
+    auto npuArch = platform_ascendc::PlatformAscendCManager::GetInstance()->GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_2002 ||
+                         npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102),
         return, "GetPowerMaxMinTmpSize is not supported on current device!");
-    if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102) {
         maxValue = GetPowerMaxTmpSizeC310(srcShape1, srcShape2, typeIsInt, isReuseSource);
         minValue = maxValue;
     } else {
-        maxValue = GetPowerMaxTmpSize(socVersion, srcShape1, srcShape2, typeIsInt, typeSize, isReuseSource);
-        minValue = GetPowerMinTmpSize(socVersion, srcShape1, srcShape2, typeIsInt, typeSize, isReuseSource);
+        maxValue = GetPowerMaxTmpSize(npuArch, srcShape1, srcShape2, typeIsInt, typeSize, isReuseSource);
+        minValue = GetPowerMinTmpSize(npuArch, srcShape1, srcShape2, typeIsInt, typeSize, isReuseSource);
     }
 }
 
@@ -260,20 +255,15 @@ void GetPowerTmpBufferFactorSize(const bool baseIsTensor, const bool expIsTensor
 {
     ASCENDC_HOST_ASSERT(platform_ascendc::PlatformAscendCManager::GetInstance() != nullptr,
         return, "PlatformAscendCManager gets instance failed!");
-    platform_ascendc::SocVersion socVersion = platform_ascendc::PlatformAscendCManager::GetInstance()->GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910B) ||
-        (socVersion == platform_ascendc::SocVersion::ASCEND310P) ||
-        (socVersion == platform_ascendc::SocVersion::ASCEND910_95) ||
-        (socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
+    const auto npuArch = platform_ascendc::PlatformAscendCManager::GetInstance()->GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_2002 ||
+                         npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102),
         return, "GetPowerTmpBufferFactorSize is not supported on current device!");
 
-    if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102) {
         GetPowerTmpBufferFactorSizeC310(typeIsInt, typeSize, maxLiveNodeCount, extraBuffer);
     } else {
-        GetPowerTmpBufferFactorSize(socVersion, baseIsTensor, expIsTensor, typeIsInt, typeSize,
+        GetPowerTmpBufferFactorSize(npuArch, baseIsTensor, expIsTensor, typeIsInt, typeSize,
             maxLiveNodeCount, extraBuffer);
     }
 }

@@ -61,7 +61,7 @@ __inline__ __attribute__((always_inline)) __aicore__ void InitTilingData(const _
 #else
     __ubuf__ uint8_t *tilingdata_in_ub = (__ubuf__ uint8_t *)get_imm(0);
     constexpr uint32_t len_burst = (all_bytes + 31) / 32;
-#if defined(__DAV_C310__) || defined(__DAV_310R6__)
+#if defined(__DAV_C310__)
     copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t *)tilingdata_in_ub, (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, 0, 0, 0);
 #else
     copy_gm_to_ubuf(((__ubuf__ uint8_t *)tilingdata_in_ub), p_tilingdata, 0, 1, len_burst, 0, 0);

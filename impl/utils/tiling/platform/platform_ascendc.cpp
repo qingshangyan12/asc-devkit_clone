@@ -20,14 +20,12 @@
 #include "platform/platform_info.h"
 #include "platform_ascendc_log.h"
 #include "platform/platform_infos_def.h"
-#include "platform/soc_spec.h"
 #include "platform_ascendc.h"
 
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
 const static uint32_t WORK_SPACE_SIZE_910B = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_910_95 = 16 * 1024 * 1024;
-const static uint32_t WORK_SPACE_SIZE_910_55 = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE = 2 * 1024 * 1024;
 const static uint32_t MIX_AIC_AIV_RATION_910B1 = 2;
 const static uint32_t CUBE_GROUP_WORK_SPACE_SIZE_910B = 1 * 1024 * 1024;
@@ -52,7 +50,6 @@ SocVersion SocVersionStrMap(const char *socVersionStr)
         {"Ascend910_93", SocVersion::ASCEND910B},
         {"Ascend310B", SocVersion::ASCEND310B},
         {"Ascend910_95", SocVersion::ASCEND910_95},
-        {"Ascend910_55", SocVersion::ASCEND910_55},
         {"AS31XM1", SocVersion::AS31XM1},
         {"Ascend031", SocVersion::ASCEND031},
         {"Ascend035", SocVersion::ASCEND035},

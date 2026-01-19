@@ -306,7 +306,7 @@ class CommonUtility:
                 _trans_compile_cmds_to_precompile(cmds_i)
                 CommonUtility.dump_compile_log(cmds_i, CompileStage.DEBUG_PRECOMPILE, compile_log_path)
                 CommonUtility.run_cmd_ascendc(cmds_i, "compile")
-                if CommonUtility.is_c310() or CommonUtility.is_310r6():
+                if CommonUtility.is_c310():
                     # common compile .o cmds -> .s cmds
                     cmds_s = copy.deepcopy(cmds)
                     _trans_compile_cmds_to_assemble(cmds_s)
@@ -492,18 +492,6 @@ class CommonUtility:
 
 
     @staticmethod
-    def is_310r6():
-        """return if current soc version is 310r6
-
-        Returns:
-            res: True means 310r6
-        """
-        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend910_55"]:
-            return True
-        return False
-
-    @staticmethod
     def is_m510():
         """return if current soc version is m510
 
@@ -541,7 +529,7 @@ class CommonUtility:
 
     @staticmethod
     def get_chip_version():
-        """get chip version for (c220/c310/310r6/510r2)
+        """get chip version for (c220/c310/510r2)
 
         Returns:
             chip_version: chip version
@@ -549,8 +537,6 @@ class CommonUtility:
         chip_version = "c220"
         if CommonUtility.is_c310():
             chip_version = "c310"
-        elif CommonUtility.is_310r6():
-            chip_version = "310r6"
         elif CommonUtility.is_m510():
             chip_version = "510r2"
         return chip_version
@@ -682,7 +668,7 @@ format(str(stage), output))
     
     @staticmethod
     def get_dump_core_num():
-        if CommonUtility.is_c310() or CommonUtility.is_310r6():	 
+        if CommonUtility.is_c310():	 
             return 108 
         return 75
 

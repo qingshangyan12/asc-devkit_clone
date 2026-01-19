@@ -44,10 +44,9 @@ void GetSortMaxMinTmpSize(const ge::Shape& srcShape, ge::DataType valueType, ge:
 {
     platform_ascendc::PlatformAscendC *platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT(platform != nullptr, return, "Failed to get PlatformAscendC");
-    platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
-    ASCENDC_HOST_ASSERT(socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 || socVersion == platform_ascendc::SocVersion::MC62CM12A, return,
-        "Unsupported SocVersion for Sort API.");
+    auto npuArch = platform->GetCurNpuArch();
+    ASCENDC_HOST_ASSERT(npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102, return,
+        "Unsupported NpuArch for Sort API.");
     std::set<ge::DataType> supportValueType = { ge::DT_INT8, ge::DT_UINT8, ge::DT_FLOAT, ge::DT_FLOAT16, ge::DT_BF16,  ge::DT_INT16,
         ge::DT_INT32, ge::DT_UINT16,  ge::DT_UINT32, ge::DT_UINT64, ge::DT_INT64 };
     std::set<ge::DataType> supportIndexType = { ge::DT_INT32, ge::DT_UINT32, ge::DT_INT64, ge::DT_UINT64 };
@@ -119,11 +118,10 @@ uint32_t GetConcatTmpSize(const platform_ascendc::PlatformAscendC &ascendcPlatfo
     const uint32_t dataTypeSize)
 {
     CheckSortHostCommon("Sort", "GetConcatTmpSize", ascendcPlatform, elemCount, dataTypeSize);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
-    if (socVersion == platform_ascendc::SocVersion::ASCEND910B ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::KIRINX90) {
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
+    if (npuArch == NpuArch::DAV_2201 ||
+        npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_3003) {
         return 0;
     } else {
         return elemCount * REGION_PROPOSAL_DATA_SIZE_V200 * dataTypeSize;
@@ -134,11 +132,10 @@ uint32_t GetSortTmpSize(const platform_ascendc::PlatformAscendC &ascendcPlatform
     const uint32_t dataTypeSize)
 {
     CheckSortHostCommon("Sort", "GetSortTmpSize", ascendcPlatform, elemCount, dataTypeSize);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
-    if (socVersion == platform_ascendc::SocVersion::ASCEND910B ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::KIRINX90) {
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
+    if (npuArch == NpuArch::DAV_2201 ||
+        npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_3003) {
         if (dataTypeSize == sizeof(float)) {
             return elemCount * REGION_PROPOSAL_DATA_SIZE_FLOAT_V220 * dataTypeSize;
         } else {

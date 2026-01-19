@@ -24,18 +24,18 @@ static const std::set<uint32_t> SUPPORT_TYPESIZE = {1, 2, 4, 8};
 static constexpr const char BITWISE_XOR_GET_MAX_MIN[] = "GetBitwiseXorMaxMinTmpSize";
 static constexpr const char BITWISE_XOR_GET_TMP_BUFFER[] = "GetBitwiseXorTmpBufferFactorSize";
 
-uint32_t GetBitwiseXorMaxTmpSize(const platform_ascendc::SocVersion& socVersion, const uint32_t inputSize,
+uint32_t GetBitwiseXorMaxTmpSize(const NpuArch npuArch, const uint32_t inputSize,
                                  const uint32_t typeSize)
 {
-    (void)socVersion;
+    (void)npuArch;
     (void)typeSize;
     (void)inputSize;
     return 0;
 }
 
-uint32_t GetBitwiseXorMinTmpSize(const platform_ascendc::SocVersion& socVersion, const uint32_t typeSize)
+uint32_t GetBitwiseXorMinTmpSize(const NpuArch npuArch, const uint32_t typeSize)
 {
-    (void)socVersion;
+    (void)npuArch;
     (void)typeSize;
     return 0;
 }
@@ -47,26 +47,24 @@ void GetBitwiseXorMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendc
     (void)isReuseSource;
 
     const uint32_t inputSize = srcShape.GetShapeSize();
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95
-                         || socVersion == platform_ascendc::SocVersion::ASCEND910_55),
-                        return, "Unsupported SocVersion of BitwiseXor API.");
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510),
+                        return, "Unsupported NpuArch of BitwiseXor API.");
 
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<BITWISE_XOR_GET_MAX_MIN>(inputSize, typeSize);
     HighLevelApiCheck::TypeSizeVerifyingParameters<BITWISE_XOR_GET_MAX_MIN>(typeSize, SUPPORT_TYPESIZE);
     HighLevelApiCheck::IsReuseSourceVerifyingParameters<BITWISE_XOR_GET_MAX_MIN>(isReuseSource);
 
-    maxValue = GetBitwiseXorMaxTmpSize(socVersion, inputSize, typeSize);
-    minValue = GetBitwiseXorMinTmpSize(socVersion, typeSize);
+    maxValue = GetBitwiseXorMaxTmpSize(npuArch, inputSize, typeSize);
+    minValue = GetBitwiseXorMinTmpSize(npuArch, typeSize);
 }
 
 void GetBitwiseXorTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t typeSize,
                                       uint32_t& maxLivedNodeCount, uint32_t& extraBuf)
 {
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95
-                         || socVersion == platform_ascendc::SocVersion::ASCEND910_55),
-                        return, "Unsupported SocVersion of BitwiseXor API.");
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510),
+                        return, "Unsupported NpuArch of BitwiseXor API.");
     HighLevelApiCheck::TypeSizeVerifyingParameters<BITWISE_XOR_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
 
     extraBuf = 0u;

@@ -27,9 +27,9 @@ inline uint32_t GetHypotMaxTmpSize(const uint32_t inputSize, const uint32_t type
     (void)inputSize;
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return 0, "Failed to get PlatformAscendC");
-    const platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
-    if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+    const auto npuArch = platform->GetCurNpuArch();
+    if (npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_5102) {
         return 0;
     }
     return 0;
@@ -40,9 +40,9 @@ inline uint32_t GetHypotMinTmpSize(const uint32_t typeSize)
     (void)typeSize;
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return 0, "Failed to get PlatformAscendC");
-    const platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
-    if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+    const auto npuArch = platform->GetCurNpuArch();
+    if (npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_5102) {
         return 0;
     }
     return 0;
@@ -66,9 +66,9 @@ void GetHypotTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeC
     extraBuf = 0;
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC");
-    const platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
-    if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+    const auto npuArch = platform->GetCurNpuArch();
+    if (npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_5102) {
         maxLiveNodeCount = 0;
     }   
 }

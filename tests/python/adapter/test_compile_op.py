@@ -325,21 +325,20 @@ class TestCompileOp(unittest.TestCase):
                         with mock.patch.object(CommonUtility, 'is_c310', return_value=False):
                             with mock.patch.object(CommonUtility, 'is_m510', return_value=True):
                                 with mock.patch.object(CommonUtility, 'is_v220', return_value=False):
-                                    with mock.patch.object(CommonUtility, 'is_310r6', return_value=False):
-                                        with mock.patch.object(compile_op_module, '_compile_ascendc_cce_m510', return_value=None):
-                                            with mock.patch.object(compile_op_module, 'link_relocatable', return_value=None):
-                                                with mock.patch.object(compile_op_module, '_json_post_process', return_value=None):
-                                                    with mock.patch.object(CommonUtility, 'run_cmd_inner', return_value=None):
-                                                        def custom_search(pattern, string, *args, **kwargs):
-                                                            if r'cce_simt_entry' in pattern:
-                                                                return MockMatch(string, (string,))
-                                                            return original_search(pattern, string, *args, **kwargs)
-                                                        mock_search.side_effect = custom_search
-                                                        # currently build/bin/toolchain/x86/ubuntu/ccec_libs/
-                                                        # ccec_x86_ubuntu_20_04_adk/bin/bisheng 
-                                                        # not support dav-510r2 -cce-aicore-stack-size
-                                                        self.assertRaises(Exception, compile_op, cce_file, origin_func_name, \
-                                                            op_info, compile_options, code_channel, op_compile_option)
+                                    with mock.patch.object(compile_op_module, '_compile_ascendc_cce_m510', return_value=None):
+                                        with mock.patch.object(compile_op_module, 'link_relocatable', return_value=None):
+                                            with mock.patch.object(compile_op_module, '_json_post_process', return_value=None):
+                                                with mock.patch.object(CommonUtility, 'run_cmd_inner', return_value=None):
+                                                    def custom_search(pattern, string, *args, **kwargs):
+                                                        if r'cce_simt_entry' in pattern:
+                                                            return MockMatch(string, (string,))
+                                                        return original_search(pattern, string, *args, **kwargs)
+                                                    mock_search.side_effect = custom_search
+                                                    # currently build/bin/toolchain/x86/ubuntu/ccec_libs/
+                                                    # ccec_x86_ubuntu_20_04_adk/bin/bisheng 
+                                                    # not support dav-510r2 -cce-aicore-stack-size
+                                                    self.assertRaises(Exception, compile_op, cce_file, origin_func_name, \
+                                                        op_info, compile_options, code_channel, op_compile_option)
 
 
     def test_compile_op_dynamic_no_tiling_register(self):
@@ -408,7 +407,6 @@ class TestCompileOp(unittest.TestCase):
             mock.patch.object(CommonUtility, 'is_m510', return_value=False),
             mock.patch.object(compile_op_module, '_compile_ascendc_cce', return_value=None),
             mock.patch.object(CommonUtility, 'is_v220', return_value=False),
-            mock.patch.object(CommonUtility, 'is_310r6', return_value=False),
             mock.patch.object(CommonUtility, 'get_tiling_info_by_tiling', return_value=TilingInfo()),
             mock.patch.object(compile_op_module, '_compile_ascendc_cce_m510', return_value=None),
             mock.patch.object(KernelInfoInfer, 'get_tiling_key_list_and_simple_infer_code_channel', return_value=InferChannelParamsFromIFile(tiling_key_list, code_channel, \

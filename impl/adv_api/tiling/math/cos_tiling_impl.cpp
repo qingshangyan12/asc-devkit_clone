@@ -80,11 +80,10 @@ void GetCosMaxMinTmpSize(const CosConfig& config, const ge::Shape& srcShape, con
     platform_ascendc::PlatformAscendC *platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC");
 
-    platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
-        return, "Unsupported SocVersion of Cos API.");
+    auto npuArch = platform->GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_5102),
+        return, "Unsupported NpuArch of Cos API.");
 
     if (config.algo == CosAlgo::POLYNOMIAL_APPROXIMATION) {
         maxValue = 0;
@@ -107,11 +106,10 @@ void GetCosTmpBufferFactorSize(
     platform_ascendc::PlatformAscendC *platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC");
 
-    platform_ascendc::SocVersion socVersion = platform->GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
-        return, "Unsupported SocVersion of Cos API.");
+    auto npuArch = platform->GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_5102),
+        return, "Unsupported NpuArch of Cos API.");
     if (config.algo == CosAlgo::POLYNOMIAL_APPROXIMATION) {
         extraBuf = 0;
         maxLiveNodeCount = 0;

@@ -114,7 +114,7 @@ class DFXSectionGenerator:
 
     def is_support_dfx(self) -> bool:
         return CommonUtility.is_v200() or CommonUtility.is_v220() \
-                or CommonUtility.is_c310() or CommonUtility.is_310r6() or CommonUtility.is_v300()
+                or CommonUtility.is_c310() or CommonUtility.is_v300()
 
 
     def insert_param(self, parameter: DFXArgInfo):
@@ -272,7 +272,7 @@ class DFXSectionGenerator:
 
     def generate_kernel_type_section(self, compile_info: CompileInfo, kernel_name: str):
         section_var = f""
-        if CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_310r6():
+        if CommonUtility.is_v220() or CommonUtility.is_c310():
             short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
             if compile_info.code_channel == CORE_TYPE_MIX:
                 section_var += \
@@ -375,7 +375,7 @@ class DFXSectionGenerator:
                 section_content += f"{binary}, "
             section_content += "} "
             section_content += "};\n"
-        if CommonUtility.is_c310() or CommonUtility.is_310r6():
+        if CommonUtility.is_c310():
             section_content += self.generate_meta_info_func_section(tiling_key, compile_info, kernel_name)
         return section_content
 
@@ -388,7 +388,7 @@ class DFXSectionGenerator:
             self._generate_binary_for_tiling(tiling_key, tiling_info, compile_info)
 
         section_content = f"// generate dfx section for tiling_key:{tiling_key}"
-        if CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_310r6():
+        if CommonUtility.is_v220() or CommonUtility.is_c310():
             if CommonUtility.is_v220():
                 cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)"
                 vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)"

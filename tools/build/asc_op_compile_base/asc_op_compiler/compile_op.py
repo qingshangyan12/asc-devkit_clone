@@ -317,8 +317,8 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
     dfx_generator = DFXSectionGenerator()
     func_params = []
     super_kernel_params = []
-    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (CommonUtility.is_c310() or
-        CommonUtility.is_310r6() or CommonUtility.is_m510())
+    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (CommonUtility.is_c310() or 
+                                                                    CommonUtility.is_m510())
     workspace_idx = 0
     if needs_ffts:
         func_params.append("GM_ADDR ffts_addr")
@@ -396,8 +396,7 @@ def _gen_set_workspace_codes(is_mix: bool, is_single_and_using_hard_sync: bool, 
     if "oom" in get_current_build_config("tir.op_debug_config"):
         source = add_op_param_to_workspace(opinfo, tiling_info, source, dump_size, compile_options, compile_info)
 
-    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (CommonUtility.is_c310() or
-        CommonUtility.is_310r6())
+    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not CommonUtility.is_c310()
     # set ffts_addr for ascend910b mix op or is_single_and_using_hard_sync scene
     if needs_ffts:
         source += "    icache_preload(1);\n"
@@ -537,7 +536,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
     ascendc_dump_on = "-DASCENDC_DUMP=0" not in compile_options
     dump_info = compile_info.dump_info["dump_type"] != "" and ascendc_dump_on
 
-    if (CommonUtility.is_c310() or CommonUtility.is_310r6()) and dump_info:
+    if (CommonUtility.is_c310()) and dump_info:
         source += "#if defined(RAW_AIC_ONLY_DUMP_TENSOR)\n"  # dump L1
         source += "#include \"include/adv_api/matmul/matmul_intf.h\"\n"  # maybe cube only no matmul::clearWorkspace
         source += "#endif\n"
@@ -585,7 +584,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
     source_declare_pub_fun = f"ascendc_{auto_gen_kernel_func}(" + called_func_params + ");"
 
 
-    if (CommonUtility.is_c310() or CommonUtility.is_310r6()) and dump_info:
+    if (CommonUtility.is_c310()) and dump_info:
         source += "#if defined(ASCENDC_DUMP) && defined(RAW_AIC_ONLY_DUMP_TENSOR)\n"
         source += "    if ASCEND_IS_AIV {\n"
         source += "        AscendC::EnableL1Dump();\n"
@@ -691,7 +690,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
     if get_current_build_config(status_check) and (CommonUtility.is_v200() or CommonUtility.is_v100()):
         source += "    AscendC::WriteBackOverflow(overflowStatus);\n"
 
-    if (CommonUtility.is_c310() or CommonUtility.is_310r6()) and dump_info:
+    if (CommonUtility.is_c310()) and dump_info:
         source += "#if defined(ASCENDC_DUMP) && defined(RAW_AIC_ONLY_DUMP_TENSOR)\n"
         source += "    if ASCEND_IS_AIC {\n"
         source += "        pipe_barrier(PIPE_ALL);\n"
@@ -700,7 +699,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
         source += "#endif\n"
 
     if not global_var_storage.get_variable("ascendc_enable_super_kernel") and \
-                    (CommonUtility.is_c310() or CommonUtility.is_310r6() or CommonUtility.is_m510()):
+                    (CommonUtility.is_c310() or CommonUtility.is_m510()):
         check_custom_dcci_end_false(compile_option_tuple)
 
     source += "}\n\n"
@@ -728,7 +727,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
 def gen_kernel_fun_with_tiling_key_slave(compile_info: CompileInfo, tiling_key: int, source_declare_pub_fun: str, \
     gen_func_attributes: str, source_declare: str):
     source = ""
-    if CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_310r6():
+    if CommonUtility.is_v220() or CommonUtility.is_c310():
         chip_version = CommonUtility.get_chip_version().upper()
         cube_core_type = f"__DAV_{chip_version}_CUBE__"
         vec_core_type = f"__DAV_{chip_version}_VEC__"
@@ -1128,7 +1127,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         (global_var_storage.get_variable("ascendc_recognize_simtvf") is True)
     global_var_storage.set_variable("ascendc_enable_dump_workspace", ascendc_enable_dump_workspace)
 
-    if CommonUtility.is_c310() or CommonUtility.is_310r6():
+    if CommonUtility.is_c310():
         gen_meta_info_section(compile_info, op_info)
     workspace_idx = gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, compile_option_tuple)
     # no dump and no superkernel
@@ -1162,7 +1161,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
 
     DFXSectionGenerator().generate_dfx_binary(compile_info, op_info, tiling_info)
 
-    if CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_310r6():
+    if CommonUtility.is_v220() or CommonUtility.is_c310():
         if compile_info.no_set_kernel_type is True:
             _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
         else:
@@ -1444,7 +1443,7 @@ def _get_compile_cmd_and_section_content(compile_info: CompileInfo, arch: str, \
     compile_cmd = gen_compile_cmd_v220(compile_info.gen_kernel_func_file, compile_info.dst_file, \
         compile_option_tuple, arch, tiling_info.tiling_data_file_path)
 
-    if CommonUtility.is_c310() or CommonUtility.is_310r6():
+    if CommonUtility.is_c310():
         if compile_info.raw_tiling_key_kernel_type.get(str(tiling_key)) == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2:
             compile_cmd += [f"-D__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__"]
         if compile_info.raw_tiling_key_kernel_type.get(str(tiling_key)) == KernelMetaType.KERNEL_TYPE_AIC_ONLY:

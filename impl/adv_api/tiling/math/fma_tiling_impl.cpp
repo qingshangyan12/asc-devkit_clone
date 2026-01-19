@@ -33,12 +33,11 @@ void GetFmaMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatfor
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<FMA_GET_MAX_MIN>(srcShape.GetShapeSize(), typeSize);
     HighLevelApiCheck::TypeSizeVerifyingParameters<FMA_GET_MAX_MIN>(typeSize, SUPPORT_TYPESIZE);
     HighLevelApiCheck::IsReuseSourceVerifyingParameters<FMA_GET_MAX_MIN>(isReuseSource);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
     
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
-        return, "Unsupported SocVersion of Fma API.");
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_5102),
+        return, "Unsupported NpuArch of Fma API.");
     maxValue = 0u;
     minValue = 0u;
 }
@@ -47,11 +46,10 @@ void GetFmaTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& ascendcP
     uint32_t& maxLivedNodeCount, uint32_t& extraBuf)
 {
     HighLevelApiCheck::TypeSizeVerifyingParameters<FMA_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
-    platform_ascendc::SocVersion socVersion = ascendcPlatform.GetSocVersion();
-    ASCENDC_HOST_ASSERT((socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
-        socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
-        return, "Unsupported SocVersion of Fma API.");
+    auto npuArch = ascendcPlatform.GetCurNpuArch();
+    ASCENDC_HOST_ASSERT((npuArch == NpuArch::DAV_3510 ||
+        npuArch == NpuArch::DAV_5102),
+        return, "Unsupported NpuArch of Fma API.");
     extraBuf = 0u;
     maxLivedNodeCount = 0u;
 }
