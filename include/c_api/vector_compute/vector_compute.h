@@ -16,15 +16,15 @@
 #ifndef INCLUDE_C_API_VECTOR_COMPUTE_H
 #define INCLUDE_C_API_VECTOR_COMPUTE_H
 
-#include "c_api_instr_impl/vector_compute_c_api_impl/vector_compute_c_api_impl.h"
 #include "instr_impl/npu_arch_2201/vector_compute_impl.h"
-#include "utils_intf.h"
 
 #define asc_transto5hd_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)
 
 #define asc_transto5hd_b16(dst, src, repeat, dstStride, srcStride) asc_transto5hd_b16_impl(dst, src, repeat, dstStride, srcStride)
 
 #define asc_transto5hd_b32(dst, src, repeat, dstStride, srcStride) asc_transto5hd_b32_impl(dst, src, repeat, dstStride, srcStride)
+
+#define asc_set_va_reg(addr, src_array) set_va_reg_sb(addr, src_array)
 
 __aicore__ inline void asc_get_cmp_mask(__ubuf__ void* dst);
 

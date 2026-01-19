@@ -22,7 +22,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_SET_L1_3D_SIZE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_SET_L1_3D_SIZE_IMPL_H
 
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 __aicore__ inline void asc_set_l1_3d_size_impl(uint64_t value)
 {

@@ -18,7 +18,7 @@
 #ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_IMPL_ASC_SET_DEQSCALE_IMPL_H
 #define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_IMPL_ASC_SET_DEQSCALE_IMPL_H
 
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 __aicore__ inline void asc_set_deq_scale_impl(float scale, int16_t offset, bool sign_mode)
 {

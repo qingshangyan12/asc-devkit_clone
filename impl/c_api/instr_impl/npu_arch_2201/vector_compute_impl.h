@@ -151,6 +151,8 @@
 #include "instr_impl/npu_arch_2201/vector_compute_impl/asc_duplicate_impl.h"
 #include "instr_impl/npu_arch_2201/vector_compute_impl/asc_brcb_impl.h"
 #include "instr_impl/npu_arch_2201/vector_compute_impl/asc_transto5hd_impl.h"
+#include "instr_impl/npu_arch_2201/vector_compute_impl/asc_get_rsvd_cnt_impl.h"
+#include "instr_impl/npu_arch_2201/vector_compute_impl/asc_set_va_reg_impl.h"
 
 // ==========asc_add(half/float/int16_t/int32_t)==========
 __aicore__ inline void asc_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
@@ -5053,6 +5055,13 @@ __aicore__ inline void asc_brcb_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* 
 {
     asc_brcb_sync_impl(dst, src, dst_block_stride, dst_repeat_stride, repeat);
 }
+
+// ==========asc_get_rsvd_count==========
+__aicore__ inline int64_t asc_get_rsvd_count()
+{
+    return asc_get_rsvd_count_impl();
+}
+
 
 #endif
 

@@ -18,7 +18,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_ASC_TRANSTO5HD_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_ASC_TRANSTO5HD_IMPL_H
 
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 #define asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) scatter_vnchwconv_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)
 

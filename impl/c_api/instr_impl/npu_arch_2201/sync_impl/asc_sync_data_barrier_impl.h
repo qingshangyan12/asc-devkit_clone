@@ -18,7 +18,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_SYNC_IMPL_ASC_SYNC_DATA_BARRIER_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_SYNC_IMPL_ASC_SYNC_DATA_BARRIER_IMPL_H
 
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h" 
+#include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h" 
 
 #define asc_sync_data_barrier(arg) dsb(arg)
 

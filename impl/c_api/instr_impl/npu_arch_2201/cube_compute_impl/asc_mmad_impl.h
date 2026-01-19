@@ -17,7 +17,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_COMPUTE_IMPL_ASC_MMAD_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_COMPUTE_IMPL_ASC_MMAD_IMPL_H
 
-#include "c_api_instr_impl/utils_c_api_impl/utils_c_api_impl.h"
+#include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 // asc_mmad_impl(float-bfloat16_t)
 __aicore__ inline void asc_mmad_impl(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix,
