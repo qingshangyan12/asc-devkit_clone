@@ -1,6 +1,6 @@
-# SelectWithBytesMask样例
+# Select样例
 ## 概述
-本样例基于Kernel直调算子工程，介绍了调用SelectWithBytesMask高阶API实现SelectWithBytesMaskCustom单算子，给定两个源操作数src0和src1，根据maskTensor相应位置的值（非bit位）选取元素，得到目的操作数dst。
+本样例基于Kernel直调算子工程，介绍了调用Select高阶API实现SelectCustom单算子，给定两个源操作数src0和src1，根据maskTensor相应位置的值（非bit位）选取元素，得到目的操作数dst。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -9,17 +9,17 @@
 
 ## 目录结构介绍
 ```
-├── selectwithbytesmask
+├── select
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── selectwithbytesmask.asc      // Ascend C算子实现 & 调用样例
+│   └── select.asc      // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
 - 算子功能：  
-  SelectWithBytesMaskCustom单算子，对输入src0Tensor和src1Scalar，根据maskTensor相应位置的值(非bit位)从二者中选取元素得到dstTensor。
+  SelectCustom单算子，对输入src0Tensor和src1Scalar，根据maskTensor相应位置的值(非bit位)从二者中选取元素得到dstTensor。
 - 算子规格：  
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
@@ -38,17 +38,17 @@
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape，输入src[2, 32]，mask[2, 32]，输出dst[2, 32]的SelectWithBytesMaskCustom算子。
+  本样例中实现的是固定shape，输入src[2, 32]，mask[2, 32]，输出dst[2, 32]的SelectCustom算子。
 
   - kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用SelectWithBytesMask高阶API接口完成计算，得到最终结果，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Select高阶API接口完成计算，得到最终结果，再搬出到外部存储上。
 
-    SelectWithBytesMaskCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行SelectWithBytesMask计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    SelectCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行Select计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
   - tiling实现
 
-    SelectWithBytesMaskCustom算子的tiling实现流程如下：首先获取SelectWithBytesMask接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据SrcTensor和maskTensor的shape信息，确定其余tiling参数，最后将scalar类型的源操作数也包含在tiling中传递到kernel侧。
+    SelectCustom算子的tiling实现流程如下：首先获取Select接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据SrcTensor和maskTensor的shape信息，确定其余tiling参数，最后将scalar类型的源操作数也包含在tiling中传递到kernel侧。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

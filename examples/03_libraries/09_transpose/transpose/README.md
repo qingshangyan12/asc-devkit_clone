@@ -1,26 +1,26 @@
-# ConfusionTranspose样例
+# Transpose样例
 ## 概述
-本样例介绍了调用ConfusionTranspose高阶API实现confusionTranspose算子，并按照核函数直调的方式分别给出了对应的端到端实现。
+本样例介绍了调用Transpose高阶API实现Transpose算子，并按照核函数直调的方式分别给出了对应的端到端实现。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
 ```
-├── confusion_transpose
+├── transpose
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── confusion_transpose.asc      // Ascend C算子实现 & 调用样例
+│   └── transpose.asc      // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
 - 算子功能：  
-  ConfusionTransposeCustom算子，对输入数据进行数据排布及Reshape操作。
+  TransposeCustom算子，对输入数据进行数据排布及Reshape操作。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">ConfusionTransposeCustom</td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">TransposeCustom</td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -28,11 +28,11 @@
   <tr><td rowspan="2" align="center">算子输出</td></tr>
   <tr><td align="center">y</td><td align="center">1*64*2*32</td><td align="center">half</td><td align="center">ND</td></tr>
 
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">confusion_transpose_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">transpose_custom</td></tr>
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape为输入x[1, 2, 2, 4, 16, 16]，输出y[1, 64, 2, 32]的ConfusionTransposeCustom算子，针对NZ2ND场景，实现1、2轴互换。
+  本样例中实现的是固定shape为输入x[1, 2, 2, 4, 16, 16]，输出y[1, 64, 2, 32]的TransposeCustom算子，针对NZ2ND场景，实现1、2轴互换。
 
   输入Tensor { shape:[B, N, H/N/16, S/16, 16, 16], origin_shape:[B, N, S, H/N], format:"NZ", origin_format:"ND"}
 
@@ -40,13 +40,13 @@
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用ConfusionTranspose高阶API接口完成confusionTranspose计算，得到最终结果，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Transpose高阶API接口完成Transpose计算，得到最终结果，再搬出到外部存储上。
 
-    ConfusionTransposeCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行confusionTranspose计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    TransposeCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行Transpose计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
   - Tiling实现
 
-    使用Ascend C提供的GetConfusionTransposeTilingInfo接口，获取所需的Tiling参数，并调用GetConfusionTransposeMaxMinTmpSize接口获取ConfusionTranspose接口计算所需的临时空间大小。
+    使用Ascend C提供的GetTransposeTilingInfo接口，获取所需的Tiling参数，并调用GetTransposeMaxMinTmpSize接口获取Transpose接口计算所需的临时空间大小。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

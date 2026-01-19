@@ -1,6 +1,6 @@
-# ArithProgression样例
+# Arange样例
 ## 概述
-本样例基于Kernel直调算子工程，介绍了调用ArithProgression高阶API实现arithprogression单算子，给定起始值，等差值和长度，返回一个等差数列。
+本样例基于Kernel直调算子工程，介绍了调用Arange高阶API实现arange单算子，给定起始值，等差值和长度，返回一个等差数列。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -9,17 +9,17 @@
 
 ## 目录结构介绍
 ```
-├── arithprogression
+├── arange
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── arithprogression.asc      // Ascend C算子实现 & 调用样例
+│   └── arange.asc      // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
 - 算子功能：  
-  arithprogression单算子，给定起始值，等差值和长度，返回一个等差数列。
+  arange单算子，给定起始值，等差值和长度，返回一个等差数列。
 - 算子规格：  
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
@@ -36,17 +36,17 @@
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape，输入firstGm[1]，diffGm[1]，输出outputGm[128]的arithprogression算子。
+  本样例中实现的是固定shape，输入firstGm[1]，diffGm[1]，输出outputGm[128]的arange算子。
 
   - kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用ArithProgression高阶API接口完成arithprogression计算，得到最终结果，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Arange高阶API接口完成arange计算，得到最终结果，再搬出到外部存储上。
 
-    arithprogression算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入搬运至LocalMemory，Compute任务负责根据输入信息执行arithprogression计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dst_global中。
+    arange算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入搬运至LocalMemory，Compute任务负责根据输入信息执行arange计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dst_global中。
 
   - tiling实现
 
-    arithprogression算子的tiling实现流程如下：设置输出shape信息。
+    arange算子的tiling实现流程如下：设置输出shape信息。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
