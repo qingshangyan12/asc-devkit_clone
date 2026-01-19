@@ -14,6 +14,11 @@
 ```
 ├── custom_op
 │   ├── CMakeLists.txt
+│   ├── framework
+│   │   ├── tf_plugin
+│   │   │   ├── tensorflow_add_custom_plugin.cc
+│   │   │   └── CMakeLists.txt
+│   │   └── CMakeLists.txt
 │   ├── op_host
 │   │   ├── add_custom
 │   │   │   └── add_custom_host.cpp     // host侧编译源码文件

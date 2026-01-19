@@ -21,5 +21,6 @@ npu_op_package(${package_name}
         INSTALL_PATH ${CMAKE_BINARY_DIR}
 )
 
+add_subdirectory(framework)
 add_subdirectory(op_host)
 add_subdirectory(op_kernel)
