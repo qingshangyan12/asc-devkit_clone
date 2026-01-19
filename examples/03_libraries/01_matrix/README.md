@@ -52,3 +52,7 @@
 | [mmad](./mmad) | 本样例介绍基于基础API Mmad实现矩阵乘 |
 | [mmad_with_bias](./mmad_with_bias) | 本样例介绍基于基础API Mmad实现带Bias的矩阵乘 |
 | [mmad_with_sparse](./mmad_with_sparse) | 本样例介绍基础API MmadWithSparse调用 |
+| [bare_mix](./bare_mix) | 本样例介绍分核计算实现的CV融合算子bare_mix |
+| [matmul_ibshareAB](./matmul_ibshareAB) | 本样例介绍了调用Matmul高阶API实现开启IBShare功能的单算子。IBShare的功能是复用L1 Buffer上相同的A矩阵或者B矩阵数据，减少数据搬运开销。本样例为A矩阵和B矩阵同时复用场景 |
+| [matmul_leaky_relu_async](./matmul_leaky_relu_async) | 本样例介绍MatmulLeakyRelu算子实现及核函数直调方法 |
+| [matmul_no_ibshareAB](./matmul_no_ibshareAB) | 本样例介绍了调用Matmul高阶API实现不开启IBShare功能的单算子。IBShare的功能是复用L1 Buffer上相同的A矩阵或者B矩阵数据，减少数据搬运开销。本样例为A矩阵和B矩阵同时不复用场景 |
