@@ -77,6 +77,37 @@ __aicore__ inline void SetFixpipePreQuantFlagImpl(uint64_t config)
 /* **************************************************************************************************
  * Fixpipe                                             *
  * ************************************************************************************************* */
+ // L0C->L1
+template <typename T, typename U>
+__aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
+    const FixpipeParams<U>& intriParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Fixpipe is not support on this version!"); })
+}
+// L0C->L1 deq tensor quant
+template <typename T, typename U>
+__aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
+    const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParams<U>& intriParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Fixpipe is not support on this version!"); })
+}
+
+// L0C->GM
+template <typename T, typename U>
+__aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
+    const FixpipeParams<U>& intriParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Fixpipe is not support on this version!"); })
+}
+
+// L0C->GM deq tensor quant
+template <typename T, typename U>
+__aicore__ inline void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
+    const LocalTensor<uint64_t> &cbufWorkspace, const FixpipeParams<U> &intriParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Fixpipe is not support on this version!"); })
+}
+
 template <CO2Layout format>
 struct TransformParamsL311 {};
 
