@@ -11,26 +11,26 @@
 │       └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── fixpipe_custom.asc              // Ascend C算子实现 & 调用样例
+│   └── fixpipe.asc              // Ascend C算子实现 & 调用样例
 ```
 ## 算子描述
 - 算子功能： 
 
   本样例中实现对矩阵进行Mmad操作后，通过基础Api的fixpipe接口将计算结果从C1搬出到GM，并进行ReLU激活、F322F16量化并附带NZ2DN分形转换操作。
-  其中输入的矩阵A和B的形状为分别为[16, 128], [128, 128], 通过fixpipe接口搬运后输出矩阵的形状为[2, 2, 128]。
+  其中输入的矩阵A和B的形状为分别为[4, 128], [128, 128], 通过fixpipe接口搬运后输出矩阵C的形状为[4, 128]。
 - 算子规格： 
-  在核函数直调样例中，算子实现支持的shape为：M = 127, N = 127, K = 63。
+  在核函数直调样例中，算子实现支持的shape为：M = 4, N = 128, K = 128。
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">FixpipeCustom</td></tr>
   </tr>
-  <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">fm_data</td><td align="center">C1 * H * W * C0</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">we_data</td><td align="center">C1 * Kh * Kw * Cout * C0</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">A</td><td align="center">M * K </td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">B</td><td align="center">K * N</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">output_data</td><td align="center">ho * wo * Cout</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">C</td><td align="center">M * N</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">fixpipe_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">fixpipe</td></tr>
   </table>
 - 算子实现： 
  
