@@ -45,9 +45,10 @@ PIPE_S
 constexpr uint32_t total_length = 256;
 __ubuf__ int8_t src0[total_length];
 __ubuf__ int8_t src1[total_length];
-asc_set_atomic_add_int();
-asc_copy_ub2gm_sync(dst, src0, total_length * sizeof(int8_t));
-asc_copy_ub2gm_sync(dst, src1, total_length * sizeof(int8_t));
+asc_copy_ub2gm(dst, src0, total_length * sizeof(int8_t));
+asc_sync_pipe(PIPE_MTE3);
+asc_set_atomic_add_int8();
+asc_copy_ub2gm(dst, src1, total_length * sizeof(int8_t));
 asc_set_atomic_none();
 ```
 
