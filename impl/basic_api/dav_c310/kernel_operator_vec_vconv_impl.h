@@ -354,15 +354,19 @@ __simd_callee__ inline void TruncateForDoubleToFloat(MicroAPI::MaskReg &maskNan,
     constexpr int16_t shiftScalar4 = 0xc;//12
     constexpr int16_t shiftScalar5 = 0x29;//41
     constexpr int16_t shiftScalar6 = 0x17;//23
-    MicroAPI::RegTensor<uint64_t> tmpSrcSign0, tmpSrcExponent0, tmpSrcMantissa0;
+    constexpr uint64_t zero = 0x0;
+    MicroAPI::MaskReg mask0, mask1, maskPositive;
+    MicroAPI::RegTensor<uint64_t> tmpSrcSign0, tmpSrcExponent0, tmpSrcMantissa0, tmpReg;
     MicroAPI::ShiftLefts(tmpSrcExponent0, src, shiftScalar0, preg);
     MicroAPI::ShiftRights(tmpSrcExponent0, tmpSrcExponent0, shiftScalar2, preg);
     MicroAPI::ShiftRights(tmpSrcSign0, src, shiftScalar1, preg);
     MicroAPI::ShiftLefts(tmpSrcSign0, tmpSrcSign0, shiftScalar3, preg);
+    MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(maskPositive, tmpSrcSign0, zero, preg);
     constexpr uint64_t double0 = 0x380;
     constexpr uint64_t double1 = 0x47f;
     constexpr uint64_t exponentMax = 0x7ff;
-    MicroAPI::MaskReg mask0, mask1;
+    constexpr uint64_t negative = 0x80000000;
+    constexpr uint64_t positive = 0x7fffffff;
     MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(mask0, tmpSrcExponent0, exponentMax, preg);
     MicroAPI::CompareScalar<uint64_t, CMPMODE::LT>(mask1, tmpSrcExponent0, exponentMax, preg);
     MicroAPI::CompareScalar<uint64_t, CMPMODE::LT>(maskZero, tmpSrcExponent0, double0, mask1);
@@ -377,7 +381,13 @@ __simd_callee__ inline void TruncateForDoubleToFloat(MicroAPI::MaskReg &maskNan,
     MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(maskInf, tmpSrcMantissa0, double2, mask0);
     MicroAPI::ShiftLefts(tmpSrcExponent0, tmpSrcExponent0, shiftScalar6, preg);
     MicroAPI::Add(tmpSrcExponent0, tmpSrcExponent0, tmpSrcMantissa0, preg);
-    MicroAPI::Add(dst, tmpSrcExponent0, tmpSrcSign0, preg);
+    MicroAPI::Duplicate(tmpReg, positive, preg);
+    MicroAPI::And(tmpSrcMantissa0, tmpSrcExponent0, tmpReg, maskPositive);
+    MicroAPI::Select(tmpSrcExponent0, tmpSrcMantissa0, tmpSrcExponent0, maskPositive);
+    MicroAPI::Duplicate(tmpReg, negative, preg);
+    MicroAPI::CompareScalar<uint64_t, CMPMODE::NE>(maskPositive, tmpSrcSign0, zero, preg);
+    MicroAPI::Or(tmpSrcMantissa0, tmpSrcExponent0, tmpReg, maskPositive);
+    MicroAPI::Select(dst, tmpSrcMantissa0, tmpSrcExponent0, maskPositive);
 }
 
 __simd_callee__ inline void SelectNanInfZero0(MicroAPI::MaskReg &preg, MicroAPI::MaskReg &maskNan, MicroAPI::MaskReg &maskInf, MicroAPI::MaskReg &maskZero,
@@ -561,11 +571,14 @@ __simd_callee__ inline void TruncateForDoubleToBf16(MicroAPI::MaskReg &maskNan, 
     constexpr int16_t shiftScalar4 = 0xc;//12
     constexpr int16_t shiftScalar5 = 0x39;//57..
     constexpr int16_t shiftScalar6 = 0x7;//7..
-    MicroAPI::RegTensor<uint64_t> tmpSrcSign0, tmpSrcExponent0, tmpSrcMantissa0;
+    constexpr uint64_t zero = 0x0;
+    MicroAPI::MaskReg maskPositive;
+    MicroAPI::RegTensor<uint64_t> tmpSrcSign0, tmpSrcExponent0, tmpSrcMantissa0, tmpReg;
     MicroAPI::ShiftLefts(tmpSrcExponent0, src, shiftScalar0, preg);
     MicroAPI::ShiftRights(tmpSrcExponent0, tmpSrcExponent0, shiftScalar2, preg);
     MicroAPI::ShiftRights(tmpSrcSign0, src, shiftScalar1, preg);
     MicroAPI::ShiftLefts(tmpSrcSign0, tmpSrcSign0, shiftScalar3, preg);
+    MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(maskPositive, tmpSrcSign0, zero, preg);
     constexpr uint64_t double0 = 0x380;
     constexpr uint64_t double1 = 0x47f;
     constexpr uint64_t exponentMax = 0x7ff;
@@ -573,18 +586,26 @@ __simd_callee__ inline void TruncateForDoubleToBf16(MicroAPI::MaskReg &maskNan, 
     MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(mask0, tmpSrcExponent0, exponentMax, preg);
     MicroAPI::CompareScalar<uint64_t, CMPMODE::LT>(mask1, tmpSrcExponent0, exponentMax, preg);
     MicroAPI::CompareScalar<uint64_t, CMPMODE::LT>(maskZero, tmpSrcExponent0, double0, mask1);
-    MicroAPI::CompareScalar<uint64_t, CMPMODE::GT>(maskMax, tmpSrcExponent0, double1, mask1);
+    MicroAPI::CompareScalar<uint64_t, CMPMODE::GE>(maskMax, tmpSrcExponent0, double1, mask1);
     MicroAPI::RegTensor<uint64_t> dstExponent;
     MicroAPI::Duplicate(dstExponent, double0, preg);
     MicroAPI::Sub(tmpSrcExponent0, tmpSrcExponent0, dstExponent, preg);
     MicroAPI::ShiftLefts(tmpSrcMantissa0, src, shiftScalar4, preg);
-    MicroAPI::ShiftRights(tmpSrcMantissa0, tmpSrcMantissa0, shiftScalar5, preg);
     constexpr uint64_t double2 = 0x0;
+    constexpr uint64_t negative = 0x8000;
+    constexpr uint64_t positive = 0x7fff;
     MicroAPI::CompareScalar<uint64_t, CMPMODE::GT>(maskNan, tmpSrcMantissa0, double2, mask0);
     MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(maskInf, tmpSrcMantissa0, double2, mask0);
+    MicroAPI::ShiftRights(tmpSrcMantissa0, tmpSrcMantissa0, shiftScalar5, preg);
     MicroAPI::ShiftLefts(tmpSrcExponent0, tmpSrcExponent0, shiftScalar6, preg);
     MicroAPI::Add(tmpSrcExponent0, tmpSrcExponent0, tmpSrcMantissa0, preg);
-    MicroAPI::Add(dst, tmpSrcExponent0, tmpSrcSign0, preg);
+    MicroAPI::Duplicate(tmpReg, positive, preg);
+    MicroAPI::And(tmpSrcMantissa0, tmpSrcExponent0, tmpReg, maskPositive);
+    MicroAPI::Select(tmpSrcExponent0, tmpSrcMantissa0, tmpSrcExponent0, maskPositive);
+    MicroAPI::Duplicate(tmpReg, negative, preg);
+    MicroAPI::CompareScalar<uint64_t, CMPMODE::NE>(maskPositive, tmpSrcSign0, zero, preg);
+    MicroAPI::Or(tmpSrcMantissa0, tmpSrcExponent0, tmpReg, maskPositive);
+    MicroAPI::Select(dst, tmpSrcMantissa0, tmpSrcExponent0, maskPositive);
 }
 
 __simd_callee__ inline void SelectNanInfZero1(MicroAPI::MaskReg &preg, MicroAPI::MaskReg &maskNan, MicroAPI::MaskReg &maskInf, MicroAPI::MaskReg &maskZero,
