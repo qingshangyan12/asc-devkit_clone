@@ -280,9 +280,6 @@ __aicore__ inline void MmadCal(__cc__ float* c, __ca__ float* a, __cb__ float* b
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const MmadParams& mmadParams)
 {
-    static_assert(SupportType<Tuple<U, S>, Tuple<half, half>, Tuple<int16_t, int8_t>, Tuple<int8_t, int8_t>>(),
-        "Unsupported input data type for mad instruction!");
-
     uint64_t config = 0;
     uint64_t gemvCtrl = 0;
     config |= (((uint64_t)mmadParams.m & 0xfff) << 0);

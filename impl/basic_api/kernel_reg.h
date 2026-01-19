@@ -30,7 +30,8 @@ enum class MaskMode : uint8_t {
 template <typename T, MaskMode mode>
 __aicore__ static inline void SetVectorMaskImpl(const uint64_t maskHigh, const uint64_t maskLow)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) ||   \
+    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if constexpr (sizeof(PrimT<T>) >= sizeof(int32_t)) {
         ASCENDC_ASSERT((maskHigh == 0ULL), { KERNEL_LOG(KERNEL_ERROR, "maskHigh must be 0 for type b32 and b64"); });
@@ -85,15 +86,21 @@ template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
 {
 #if __NPU_ARCH__ == 3102
     return;
-#elif (__NPU_ARCH__ == 3002)
+#endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
+    pipe_barrier(pipe);
+#else
+#if (__NPU_ARCH__ == 3002)
     if constexpr (pipe == PIPE_S || pipe == PIPE_V) {
         return;
     }
-#elif (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#endif
+#if (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     if constexpr (pipe == PIPE_V) {
         return;
     }
-#elif (__NPU_ARCH__ == 2201)
+#endif
+#if (__NPU_ARCH__ == 2201)
     if ASCEND_IS_AIC {
         if constexpr (pipe == PIPE_V) {
             return;
@@ -101,6 +108,7 @@ template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
     }
 #endif
     pipe_barrier(pipe);
+#endif
 }
 #endif
 
@@ -118,8 +126,7 @@ enum class DcciDst : uint64_t {
 
 #if defined(__NPU_ARCH__) &&                                                \
      ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                   \
-      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) ||                   \
-      (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DcciGMImpl(__gm__ T* dst)
 {
@@ -135,8 +142,7 @@ __aicore__ inline void DcciUBImpl(__ubuf__ T* dst)
 
 #if defined(__NPU_ARCH__ ) &&                                                           \
      ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) ||     \
-      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) ||                               \
-      (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <typename T, CacheLine entireType>
 __aicore__ inline void DcciGMImpl(__gm__ T* dst)
 {
@@ -146,12 +152,22 @@ __aicore__ inline void DcciGMImpl(__gm__ T* dst)
 
 __aicore__ inline void SetMaskCountImpl()
 {
+#if defined (__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
+    constexpr uint32_t CTRL_COUNTER = 56;
+    set_ctrl(sbitset1(get_ctrl()), CTRL_COUNTER);
+#else
     set_mask_count();
+#endif
 }
 
 __aicore__ inline void SetMaskNormImpl()
 {
+#if defined (__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
+    constexpr uint32_t CTRL_COUNTER = 56;
+    set_ctrl(sbitset0(get_ctrl()), CTRL_COUNTER);
+#else
     set_mask_norm();
+#endif
 }
 
 __aicore__ inline void SetLreluMode(bool lreluMode)
