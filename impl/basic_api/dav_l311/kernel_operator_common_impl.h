@@ -1084,13 +1084,13 @@ __aicore__ inline void PredicateSel(MaskReg &dstMask, MaskReg &srcMask0, MaskReg
     psel(dstMask, srcMask0, srcMask1, mask);
 }
 
-template <HiloPart part = HiloPart::Lower> __aicore__ __simd_callee__ void PredicatePack(MaskReg &dstMask, MaskReg &srcMask)
+template <HiloPart part = HiloPart::Lower> __simd_callee__ inline void PredicatePack(MaskReg &dstMask, MaskReg &srcMask)
 {
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     ppack(dstMask, srcMask, partValue);
 }
 
-template <HiloPart part = HiloPart::Lower> __aicore__ __simd_callee__ void PredicateUnPack(MaskReg &dstMask, MaskReg &srcMask)
+template <HiloPart part = HiloPart::Lower> __simd_callee__ inline void PredicateUnPack(MaskReg &dstMask, MaskReg &srcMask)
 {
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     punpack(dstMask, srcMask, partValue);
