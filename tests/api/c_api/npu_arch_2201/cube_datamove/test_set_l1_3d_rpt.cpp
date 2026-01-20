@@ -27,7 +27,7 @@ protected:
 TEST_F(TestCubeDmamoveSetL13DRpt, set_l1_3d_rpt_uint32_t_Succ)
 {
     asc_load3d_v2_config config;
-    asc_set_l1_3d_rpt(config);
+    asc_set_l13d_rpt(config);
     EXPECT_EQ(config.rpt_stride, 0);
     EXPECT_EQ(config.rpt_time, 1);
     EXPECT_EQ(config.rpt_mode, 0);

@@ -8,26 +8,26 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+/* !
+ * \file asc_set_l1_3d_size_impl.h
+ * \brief
+ */
+
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "impl/c_api/instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c_copy_config_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#warning "impl/c_api/instr_impl/npu_arch_2201/npu_arch_2201/cube_datamove_impl/asc_set_l13d_size_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_COMPUTE_IMPL_ASC_SET_L0C_COPY_CONFIG_IMPL_H
-#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_COMPUTE_IMPL_ASC_SET_L0C_COPY_CONFIG_IMPL_H
+#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_SET_L13D_SIZE_IMPL_H
+#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_SET_L13D_SIZE_IMPL_H
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_set_l0c_copy_config_impl(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag)
+__aicore__ inline void asc_set_l13d_size_impl(uint64_t value)
 {
     if ASC_IS_AIC {
-        asc_capi_fpc_reg_config config;
-        config.config = 0;
-        config.relu_units = reluPre;
-        config.quant_units = quantPre;
-        config.unit_flag = isUnitFlag;
-        set_fpc(config.config);
+        set_l1_3d_size(value);
     }
 }
 

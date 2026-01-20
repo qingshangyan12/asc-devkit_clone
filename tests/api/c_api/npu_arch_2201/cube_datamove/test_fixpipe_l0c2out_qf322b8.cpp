@@ -8,14 +8,14 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#include "../utils/test_fixpipe_instr_utils.h"
+#include "../utils/test_copy_instr_utils.h"
 
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2out_qf32b8_pre_sync, qf322b8_pre_pre, copy_matrix_cc_to_gm, half, float);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2out_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, half, int32_t);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2out_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, float, float);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2out_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, int8_t, float);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2out_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, int8_t, int32_t);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2out_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, uint8_t, float);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2out_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, uint8_t, int32_t);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2out_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, int16_t, int32_t);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2out_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, int32_t, int32_t);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2gm_qf32b8_pre_sync, qf322b8_pre_pre, copy_matrix_cc_to_gm, half, float);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2gm_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, half, int32_t);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2gm_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, float, float);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2gm_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, int8_t, float);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2gm_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, int8_t, int32_t);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2gm_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, uint8_t, float);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2gm_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, uint8_t, int32_t);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2gm_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, int16_t, int32_t);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2gm_qf32b8_pre_sync, qf322b8_pre, copy_matrix_cc_to_gm, int32_t, int32_t);

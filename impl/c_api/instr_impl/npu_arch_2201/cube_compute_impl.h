@@ -20,8 +20,10 @@
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_mmad_sparse_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_fp32_mode_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_mmad_impl.h"
-#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c_copy_config_impl.h"
-#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l13d_padding_impl.h"
+#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_mmad_impl.h"
+#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_quant_impl.h"
+#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_relu_impl.h"
+#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_unitflag_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_mmad_direction_m_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_mmad_direction_n_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_enable_hf32_impl.h"
@@ -240,30 +242,22 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t
                           unit_flag, k_direction_align, is_weight_offset, c_matrix_source, c_matrix_init_val);
 }
 
-__aicore__ inline void asc_set_l0c_copy_config(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag)
+__aicore__ inline void asc_set_l0c2gm_quant(uint64_t quant)
 {
-    asc_set_l0c_copy_config_impl(reluPre, quantPre, isUnitFlag);
+    asc_set_l0c2gm_quant_impl(quant);
 }
 
-__aicore__ inline void asc_set_l13d_padding(uint64_t config)
+__aicore__ inline void asc_set_l0c2gm_relu(uint64_t relu)
 {
-    asc_set_l13d_padding_impl(config);
+    asc_set_l0c2gm_relu_impl(relu);
 }
 
-__aicore__ inline void asc_set_l13d_padding(half config)
+__aicore__ inline void asc_set_l0c2gm_unitflag(uint64_t unitflag)
 {
-    asc_set_l13d_padding_impl(config);
+    asc_set_l0c2gm_unitflag_impl(unitflag);
 }
 
-__aicore__ inline void asc_set_l13d_padding(int16_t config)
-{
-    asc_set_l13d_padding_impl(config);
-}
 
-__aicore__ inline void asc_set_l13d_padding(uint16_t config)
-{
-    asc_set_l13d_padding_impl(config);
-}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

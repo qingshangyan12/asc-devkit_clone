@@ -76,17 +76,17 @@ TEST_F(TestCubeDmamove##class_name##data_type##val_type, c_api_name##_sync_Succ)
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-// ==========asc_fill_l1_value(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, half, half);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, half, uint32_t);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, float, half);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, float, uint32_t);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, int16_t, half);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, int16_t, uint32_t);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, int32_t, half);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, int32_t, uint32_t);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, uint16_t, half);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, uint16_t, uint32_t);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, uint32_t, half);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix, uint32_t, uint32_t);
-TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1_value, create_cbuf_matrix_bf16, bfloat16_t, bfloat16_t);
+// ==========asc_fill_l1(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, half, half);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, half, uint32_t);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, float, half);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, float, uint32_t);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, int16_t, half);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, int16_t, uint32_t);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, int32_t, half);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, int32_t, uint32_t);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, uint16_t, half);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, uint16_t, uint32_t);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, uint32_t, half);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix, uint32_t, uint32_t);
+TEST_CUBE_DMAMOVE_FILL_L1_VALUE(FillL1Value, asc_fill_l1, create_cbuf_matrix_bf16, bfloat16_t, bfloat16_t);

@@ -790,9 +790,17 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint8_t* dst, __cbuf__ 
                                                   uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
                                                   bool addrmode, uint64_t dst_frac_stride);
 
-__aicore__ inline void asc_set_l1_3d_size(uint64_t value);
+__aicore__ inline void asc_set_l13d_size(uint64_t value);
 
-__aicore__ inline void asc_set_l1_3d_rpt(asc_load3d_v2_config& config);
+__aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config);
+
+__aicore__ inline void asc_set_l13d_padding(uint64_t config);
+
+__aicore__ inline void asc_set_l13d_padding(half config);
+
+__aicore__ inline void asc_set_l13d_padding(int16_t config);
+
+__aicore__ inline void asc_set_l13d_padding(uint16_t config);
 
 // ==========asc_load_image_to_cbuf(half/int8_t)==========
 __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size,
@@ -811,164 +819,164 @@ __aicore__ inline void asc_load_image_to_cbuf_sync(__cbuf__ int8_t* dst, uint16_
     uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size, uint8_t sid);
 
-// ==========asc_fill_l0a_value(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
-__aicore__ inline void asc_fill_l0a_value(__ca__ half* dst, half value, const asc_fill_value_config& config);
+// ==========asc_fill_l0a(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
+__aicore__ inline void asc_fill_l0a(__ca__ half* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ half* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ half* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ half* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ half* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ half* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ half* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ float* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ float* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ float* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ float* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ float* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ float* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ float* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ float* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ int16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ int16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ int16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ int16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ int32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ int32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ int32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ int32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ uint16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ uint16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ uint16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ uint16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ uint32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ uint32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ uint32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ uint32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value(__ca__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a(__ca__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0a_value_sync(__ca__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0a_sync(__ca__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
-// ==========asc_fill_l0b_value(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
-__aicore__ inline void asc_fill_l0b_value(__cb__ half* dst, half value, const asc_fill_value_config& config);
+// ==========asc_fill_l0b(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
+__aicore__ inline void asc_fill_l0b(__cb__ half* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ half* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ half* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ half* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ half* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ half* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ half* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ float* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ float* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ float* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ float* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ float* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ float* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ float* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ float* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ int16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ int16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ int16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ int16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ int32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ int32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ int32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ int32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ uint16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ uint16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ uint16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ uint16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ uint32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ uint32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ uint32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ uint32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value(__cb__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b(__cb__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l0b_value_sync(__cb__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
-// ==========asc_fill_l1_value(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
-__aicore__ inline void asc_fill_l1_value(__cbuf__ half* dst, half value, const asc_fill_value_config& config);
+// ==========asc_fill_l1(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
+__aicore__ inline void asc_fill_l1(__cbuf__ half* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ half* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ float* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ float* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ float* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_fill_l1_value_sync(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);

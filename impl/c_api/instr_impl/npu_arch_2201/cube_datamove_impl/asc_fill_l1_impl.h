@@ -9,93 +9,93 @@
  */
 
 /* !
- * \file asc_fill_l1_value_impl.h
+ * \file asc_fill_l1_impl.h
  * \brief
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "impl/c_api/instr_impl/npu_arch_2201/npu_arch_2201/cube_datamove_impl/asc_fill_l1_value_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#warning "impl/c_api/instr_impl/npu_arch_2201/npu_arch_2201/cube_datamove_impl/asc_fill_l1_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_FILL_L1_VALUE_IMPL_H
-#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_FILL_L1_VALUE_IMPL_H
+#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_FILL_L1_IMPL_H
+#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_FILL_L1_IMPL_H
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 // asc_fill_l1_value half
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ half* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ half* dst, uint32_t value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
 // asc_fill_l1_value float
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ float* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ float* dst, uint32_t value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
 // asc_fill_l1_value int16_t
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ int16_t* dst, half value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ int16_t* dst, half value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ int16_t* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ int16_t* dst, uint32_t value,
                                               const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -103,29 +103,29 @@ __aicore__ inline void asc_fill_l1_value_impl(__cbuf__ int16_t* dst, uint32_t va
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ int16_t* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ int16_t* dst, uint32_t value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
 // asc_fill_l1_value int32_t
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ int32_t* dst, half value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ int32_t* dst, half value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ int32_t* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ int32_t* dst, uint32_t value,
                                               const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -133,29 +133,29 @@ __aicore__ inline void asc_fill_l1_value_impl(__cbuf__ int32_t* dst, uint32_t va
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ int32_t* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ int32_t* dst, uint32_t value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
 // asc_fill_l1_value uint16_t
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ uint16_t* dst, half value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ uint16_t* dst, half value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ uint16_t* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ uint16_t* dst, uint32_t value,
                                               const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -163,29 +163,29 @@ __aicore__ inline void asc_fill_l1_value_impl(__cbuf__ uint16_t* dst, uint32_t v
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ uint16_t* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ uint16_t* dst, uint32_t value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
 // asc_fill_l1_value uint32_t
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config)
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ uint32_t* dst, half value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ uint32_t* dst, half value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ uint32_t* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ uint32_t* dst, uint32_t value,
                                               const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -193,15 +193,15 @@ __aicore__ inline void asc_fill_l1_value_impl(__cbuf__ uint32_t* dst, uint32_t v
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ uint32_t* dst, uint32_t value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ uint32_t* dst, uint32_t value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 
 // asc_fill_l1_value bfloat16_t
-__aicore__ inline void asc_fill_l1_value_impl(__cbuf__ bfloat16_t* dst, bfloat16_t value,
+__aicore__ inline void asc_fill_l1_impl(__cbuf__ bfloat16_t* dst, bfloat16_t value,
                                               const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -209,10 +209,10 @@ __aicore__ inline void asc_fill_l1_value_impl(__cbuf__ bfloat16_t* dst, bfloat16
     }
 }
 
-__aicore__ inline void asc_fill_l1_value_sync_impl(__cbuf__ bfloat16_t* dst, bfloat16_t value,
+__aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ bfloat16_t* dst, bfloat16_t value,
                                                    const asc_fill_value_config& config)
 {
-    asc_fill_l1_value_impl(dst, value, config);
+    asc_fill_l1_impl(dst, value, config);
     asc_sync_post_process();
 }
 

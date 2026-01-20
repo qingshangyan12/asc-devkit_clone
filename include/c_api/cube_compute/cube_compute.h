@@ -115,14 +115,6 @@ __aicore__ inline void asc_set_fp32_mode();
 
 __aicore__ inline void asc_set_l0c_copy_config(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag = false);
 
-__aicore__ inline void asc_set_l13d_padding(uint64_t config);
-
-__aicore__ inline void asc_set_l13d_padding(half config);
-
-__aicore__ inline void asc_set_l13d_padding(int16_t config);
-
-__aicore__ inline void asc_set_l13d_padding(uint16_t config);
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  

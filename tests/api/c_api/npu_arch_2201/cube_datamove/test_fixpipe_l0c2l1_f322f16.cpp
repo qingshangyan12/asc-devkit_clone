@@ -8,11 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#include "../utils/test_fixpipe_l0c2l1_instr_utils.h"
+#include "../utils/test_copy_l0c2l1_instr_utils.h"
 
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, half, float);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, int8_t, float);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, half, int32_t);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, int16_t, int32_t);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, int8_t, int32_t);
-TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_fixpipe_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, uint8_t, int32_t);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, half, float);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, int8_t, float);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, half, int32_t);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, int16_t, int32_t);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, int8_t, int32_t);
+TEST_CUBE_COMPUTE_FIXPIPE_INSTR(FixPipe, asc_copy_l0c2l1_f322f16_sync, F322F16, copy_matrix_cc_to_cbuf, uint8_t, int32_t);

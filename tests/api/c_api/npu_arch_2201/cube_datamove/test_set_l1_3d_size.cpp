@@ -37,6 +37,6 @@ TEST_F(TestCubeDmamoveSetL13DSize, set_l1_3d_size_uint32_t_Succ)
         .times(1)
         .will(invoke(set_l1_3d_size_Stub));
 
-    asc_set_l1_3d_size(value);
+    asc_set_l13d_size(value);
     GlobalMockObject::verify();
 }
