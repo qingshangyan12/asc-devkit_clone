@@ -1785,7 +1785,7 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>
     const LocalTensor<T>& sharedTmpBuffer, const int32_t count, bool calIndex)
 {
     using PrimType = PrimT<T>;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
     if (calIndex) {
         ReduceMinWithIndexImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
             (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), count);
