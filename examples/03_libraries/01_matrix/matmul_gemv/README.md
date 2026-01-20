@@ -3,7 +3,9 @@
 本样例介绍了矩阵向量乘（General Matrix-Vector multiplication），即GEMV的实现方式。在Matmul计算中M=1，形状为（1，K）的左矩阵A与形状为（K, N）的右矩阵B进行矩阵乘运算的场景，通过在Tiling侧与Kernel侧设置A矩阵的数据格式为VECTOR，开启GEMV模式。
 
 ## 支持的产品
-- Atlas A2训练系列产品/Atlas 800I A2推理产品
+- Ascend 950PR/Ascend 950DT
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构
 ```

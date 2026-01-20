@@ -3,8 +3,9 @@
 本样例介绍了调用Matmul高阶API实现Matmul支持M/N轴方向的流水并行单算子。该功能的应用场景为输入矩阵的K很小，但M或N很大的场景，即singleCoreK<=baseK，但singleCoreM远大于baseM或singleCoreN远大于baseN。使能M/N方向流水并行功能可能会带来性能收益。
 
 ## 支持的产品
-- Atlas A2训练系列产品/Atlas 800I A2推理产品
-
+- Ascend 950PR/Ascend 950DT
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构
 ```
