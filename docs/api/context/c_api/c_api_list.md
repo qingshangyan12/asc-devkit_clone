@@ -42,7 +42,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_duplicate](vector_compute/asc_duplicate.md) | 将一个变量或立即数填充到一个矢量中。 |
 | [asc_select](vector_compute/asc_select.md) | 根据掩码，从两个源操作数中选取元素，输出到目的操作数。 |
 | [asc_bfloat162float](vector_compute/asc_bfloat162float.md) | 数据类型转换。将bfloat16_t类型的数据转换为float类型。 |
-| [asc_bfloat16162int32](vector_compute/asc_bf162int32.md) | 数据类型转换。将bfloat16_t类型的数据转换为int32_t类型。 |
+| [asc_bfloat162int32](vector_compute/asc_bfloat162int32.md) | 数据类型转换。将bfloat16_t类型的数据转换为int32_t类型。 |
 | [asc_float2bfloat16](vector_compute/asc_float2bf16.md) | 数据类型转换。将float类型的数据转换为bfloat16_t类型。 |
 | [asc_float2float](vector_compute/asc_float2float.md) | 数据类型转换。将float类型的数据转换为float类型。 |
 | [asc_float2half](vector_compute/asc_float2half.md) | 数据类型转换。将float类型的数据转换为half类型。 |
@@ -119,7 +119,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 |   API名称   |   说明   |
 |----------|-----------|
-| [asc_fixpipe_l0c2out](cube_datamove/asc_fixpipe_l0c2out.md) | 将L0C中的数据搬运到GM中。 |
+| [asc_copy_l0c2gm](cube_datamove/asc_fixpipe_l0c2out.md) | 将L0C中的数据搬运到GM中。 |
 | [asc_set_l1_3d_rpt](cube_datamove/asc_set_l1_3d_rpt.md) | 用于设置Load3Dv2接口的repeat参数。 |
 | [asc_fill_l0a_value](cube_datamove/asc_fill_l0a_value.md) | 将L0A Buffer的Local Memory初始化为某一具体数值。 |
 | [asc_fill_l0b_value](cube_datamove/asc_fill_l0b_value.md) | 将L0B Buffer的Local Memory初始化为某一具体数值。 |
