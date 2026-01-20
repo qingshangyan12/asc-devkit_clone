@@ -17,6 +17,7 @@
 #endif
 
 #include "utils/debug/asc_printf.h"
+#include "simt_api/device_types.h"
 
 #ifndef __aicore__
 #define __aicore__ [aicore]
@@ -28,6 +29,7 @@
 #endif
 #endif
 
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 using dim3 = cce::dim3;
 
 template <auto funcPtr, typename... Args>
@@ -37,10 +39,11 @@ __aicore__ inline void asc_vf_call(dim3 threadNums, Args &&...args)
     cce::async_invoke<funcPtr>(threadNums, args...);
 #endif
 }
+#endif
 
-__simt_callee__ inline int32_t asc_get_block_idx();
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_get_block_idx();
 
-__simt_callee__ inline int32_t asc_get_block_num();
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_get_block_num();
 
 #include "impl/simt_api/common_functions_impl.h"
 

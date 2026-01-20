@@ -17,132 +17,133 @@
 #endif
 
 #include "simt_api/math_constants.h"
+#include "simt_api/device_types.h"
 
-__simt_callee__ inline long int lroundf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lroundf(float x);
 
-__simt_callee__ inline long long int llroundf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llroundf(float x);
 
-__simt_callee__ inline long int lrintf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lrintf(float x);
 
-__simt_callee__ inline long long int llrintf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llrintf(float x);
 
-__simt_callee__ inline float truncf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float truncf(float x);
 
-__simt_callee__ inline float roundf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float roundf(float x);
 
-__simt_callee__ inline float rintf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rintf(float x);
 
-__simt_callee__ inline float floorf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float floorf(float x);
 
-__simt_callee__ inline float ceilf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float ceilf(float x);
 
-__simt_callee__ inline float sqrtf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x);
 
-__simt_callee__ inline float rsqrtf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rsqrtf(float x);
 
-__simt_callee__ inline float log2f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x);
 
-__simt_callee__ inline float logf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x);
 
-__simt_callee__ inline float expf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expf(float x);
 
-__simt_callee__ inline float fmaf(float x, float y, float z);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmaf(float x, float y, float z);
 
-__simt_callee__ inline float fabsf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fabsf(float x);
 
-__simt_callee__ inline float normcdfinvf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdfinvf(float x);
 
-__simt_callee__ inline float modff(float x, float &n);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float modff(float x, float &n);
 
-__simt_callee__ inline bool isfinite(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isfinite(float x);
 
-__simt_callee__ inline bool isnan(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isnan(float x);
 
-__simt_callee__ inline bool isinf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isinf(float x);
 
-__simt_callee__ inline float fdimf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdimf(float x, float y);
 
-__simt_callee__ inline float remquof(float x, float y, int *quo);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, int *quo);
 
-__simt_callee__ inline float fmodf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y);
 
-__simt_callee__ inline float remainderf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y);
 
-__simt_callee__ inline float copysignf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float copysignf(float x, float y);
 
-__simt_callee__ inline float nearbyintf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nearbyintf(float x);
 
-__simt_callee__ inline float nextafterf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nextafterf(float x, float y);
 
-__simt_callee__ inline float scalbnf(float x, int32_t n);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float scalbnf(float x, int32_t n);
 
-__simt_callee__ inline float scalblnf(float x, int64_t n);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float scalblnf(float x, int64_t n);
 
-__simt_callee__ inline float fmaxf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmaxf(float x, float y);
 
-__simt_callee__ inline float fminf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fminf(float x, float y);
 
 /**
  * The trigonometric tangent of an angle
  * @param x an angle, in radians.
  * @return the tangent of the x.
  */
-__simt_callee__ inline float tanf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanf(float x);
 
-__simt_callee__ inline float tanhf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanhf(float x);
 
 /**
  * The trigonometric tangent of an angle*pi
  * @param x an angle, in radians.
  * @return the tangent of the x*PI.
  */
-__simt_callee__ inline float tanpif(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanpif(float x);
 
-__simt_callee__ inline float atanf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x);
 
-__simt_callee__ inline float atan2f(float y, float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x);
 
-__simt_callee__ inline float atanhf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanhf(float x);
 
 /**
  * The trigonometric cosine of an angle
  * @param x an angle, in radians.
  * @return the cosine of the x.
  */
-__simt_callee__ inline float cosf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cosf(float x);
 
-__simt_callee__ inline float coshf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float coshf(float x);
 
 /**
  * The trigonometric cosine of an angle*pi
  * @param x an angle, in radians.
  * @return the cosine of the x*pi.
  */
-__simt_callee__ inline float cospif(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cospif(float x);
 
-__simt_callee__ inline float asinf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x);
 
-__simt_callee__ inline float acosf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float acosf(float x);
 
-__simt_callee__ inline float acoshf(float x);
-
-/**
- * The trigonometric sine of an angle
- * @param x an angle, in radians.
- * @return the sine of the x.
- */
-__simt_callee__ inline float sinf(float x);
-
-__simt_callee__ inline float sinhf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x);
 
 /**
  * The trigonometric sine of an angle
  * @param x an angle, in radians.
  * @return the sine of the x.
  */
-__simt_callee__ inline float sinpif(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinf(float x);
 
-__simt_callee__ inline float asinhf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinhf(float x);
+
+/**
+ * The trigonometric sine of an angle
+ * @param x an angle, in radians.
+ * @return the sine of the x.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x);
 
 /**
  * The trigonometric sine,cossine of an angle
@@ -150,7 +151,7 @@ __simt_callee__ inline float asinhf(float x);
  * @return s the sine of the x.
  *         c the cossin of the x.
  */
-__simt_callee__ inline void sincosf(float x, float &s, float &c);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float &s, float &c);
 
 /**
  * The trigonometric sine,cossine of an angle*pi
@@ -158,13 +159,13 @@ __simt_callee__ inline void sincosf(float x, float &s, float &c);
  * @return s the sine of the x*pi.
  *         c the cossin of the x*pi.
  */
-__simt_callee__ inline void sincospif(float x, float &s, float &c);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, float &s, float &c);
 
-__simt_callee__ inline float exp2f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x);
 
-__simt_callee__ inline float exp10f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x);
 
-__simt_callee__ inline float expm1f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x);
 
 /**
  * The mantissa,exponent of x
@@ -172,7 +173,7 @@ __simt_callee__ inline float expm1f(float x);
  * @return   the mantissa of the x
  *         exp: the exponent of the x
  */
-__simt_callee__ inline float frexpf(float x, int &exp);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, int &exp);
 
 /**
  * The value of x multiplied by 2 exp.
@@ -180,7 +181,7 @@ __simt_callee__ inline float frexpf(float x, int &exp);
  *        exp a int value.
  * @return  x * 2^exp
  */
-__simt_callee__ inline float ldexpf(float x, int exp);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp);
 
 /**
  * The square root of (x^2+y^2)
@@ -188,7 +189,7 @@ __simt_callee__ inline float ldexpf(float x, int exp);
  *          y  a float value.
  * @return square root of (x^2+y^2)
  */
-__simt_callee__ inline float hypotf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float hypotf(float x, float y);
 
  /**
   * The reciprocal of square root of (x^2+y^2)
@@ -196,7 +197,7 @@ __simt_callee__ inline float hypotf(float x, float y);
   *          y  a float value.
   * @return The reciprocal of square root of (x^2+y^2)
   */
-__simt_callee__ inline float rhypotf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rhypotf(float x, float y);
 
 /**
  * The square root of (a^2+b^2+c^2)
@@ -210,7 +211,7 @@ __simt_callee__ inline float rhypotf(float x, float y);
  *      If all of a,b,c is 0, return 0.
  *      If sqrt(a^2 + b^2 + c^2) overflows, return INF.
  */
-__simt_callee__ inline float norm3df(float a, float b, float c);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm3df(float a, float b, float c);
 
 /**
  * The reciprocal of square root of (a^2+b^2+c^2)
@@ -224,7 +225,7 @@ __simt_callee__ inline float norm3df(float a, float b, float c);
  *      If all of a,b,c is 0, return INF.
  *      If sqrt(a^2 + b^2 + c^2) overflows, return INF.
  */
-__simt_callee__ inline float rnorm3df(float a, float b, float c);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm3df(float a, float b, float c);
 
 /**
  * The square root of (a^2+b^2+c^2+d^2)
@@ -239,7 +240,7 @@ __simt_callee__ inline float rnorm3df(float a, float b, float c);
  *      If all of a,b,c,d is 0, return 0.
  *      If sqrt(a^2 + b^2 + c^2+ d^2) overflows, return INF.
  */
-__simt_callee__ inline float norm4df(float a, float b, float c, float d);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, float d);
 
 /**
  * The reciprocal of square root of (a^2+b^2+c^2+d^2)
@@ -254,7 +255,7 @@ __simt_callee__ inline float norm4df(float a, float b, float c, float d);
  *      If all of a,b,c,d is 0, return INF.
  *      If sqrt(a^2 + b^2 + c^2 + d^2) overflows,return 0.
  */
-__simt_callee__ inline float rnorm4df(float a, float b, float c, float d);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, float d);
 
 /**
  * The square root of sum of squares of the first N elements in array a
@@ -268,7 +269,11 @@ __simt_callee__ inline float rnorm4df(float a, float b, float c, float d);
  *      If sqrt(a[0]^2 +... + a[n-1]^2) overflows, return INF.
  *      If n is less than 1, return |a[0]|.
  */
-__simt_callee__ inline float normf(int n, __gm__ float* a);
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, __gm__ float* a);
+#else
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, float* a);
+#endif
 
 /**
  * The reciprocal of square root of sum of squares of the first N elements in array a
@@ -282,17 +287,20 @@ __simt_callee__ inline float normf(int n, __gm__ float* a);
  *      If sqrt(a[0]^2 +... + a[n-1]^2) overflows, return 0.
  *      If n is less than 1, return 1/|a[0]|.
  */
-__simt_callee__ inline float rnormf(int n, __gm__ float* a);
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, __gm__ float* a);
+#else
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, float* a);
+#endif
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y);
 
-__simt_callee__ inline float powf(float x, float y);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log10f(float x);
 
-__simt_callee__ inline float log10f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x);
 
-__simt_callee__ inline float log1pf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float logbf(float x);
 
-__simt_callee__ inline float logbf(float x);
-
-__simt_callee__ inline int ilogbf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int ilogbf(float x);
 
 /**
  * calculates a cube root by input x.
@@ -304,7 +312,7 @@ __simt_callee__ inline int ilogbf(float x);
  *      if x is Inf, return Inf;
  *      if x is -Inf, return -Inf;
  */
-__simt_callee__ inline float cbrtf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x);
 
 /**
  * calculates reciprocal of the cube root by input x.
@@ -316,7 +324,7 @@ __simt_callee__ inline float cbrtf(float x);
  *      if x is Inf, return 0;
  *      if x is -Inf, return 0;
  */
-__simt_callee__ inline float rcbrtf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rcbrtf(float x);
 
 /**
  * Calculate the error function of the input x.
@@ -328,7 +336,7 @@ __simt_callee__ inline float rcbrtf(float x);
  *      if x is -Inf, return -1;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erff(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erff(float x);
 
 /**
  * Calculate the complementary error function of the input x.
@@ -339,7 +347,7 @@ __simt_callee__ inline float erff(float x);
  *      if x is -Inf, return +0;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erfcf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcf(float x);
 
 /**
  * Calculate the inverse error function of the input x.
@@ -352,7 +360,7 @@ __simt_callee__ inline float erfcf(float x);
  *      if x outside [-1, 1], return Nan;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erfinvf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfinvf(float x);
 
 /**
  * Calculate the inverse complementary error function of the input x.
@@ -364,7 +372,7 @@ __simt_callee__ inline float erfinvf(float x);
  *      if x outside [0, 2], return Nan;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erfcinvf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcinvf(float x);
 
 
 /**
@@ -376,7 +384,7 @@ __simt_callee__ inline float erfcinvf(float x);
  *      if x is Inf, return +0;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erfcxf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcxf(float x);
 
 /**
  * Calculates gamma value by input x.
@@ -388,7 +396,7 @@ __simt_callee__ inline float erfcxf(float x);
  *      if x is Inf, return Inf;
  *      if x is -Inf, return Nan;
  */
-__simt_callee__ inline float tgammaf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x);
 
 /**
  * Calculates lgamma value by input x.
@@ -400,7 +408,7 @@ __simt_callee__ inline float tgammaf(float x);
  *      if x is Inf, return Inf;
  *      if x is -Inf, return Inf;
  */
-__simt_callee__ inline float lgammaf(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float lgammaf(float x);
 
 /**
  * Calculates CylBesselI0 value by input x.
@@ -412,7 +420,7 @@ __simt_callee__ inline float lgammaf(float x);
  *      if x is Inf, return Inf;
  *      if x is -Inf, return Inf;
  */
-__simt_callee__ inline float cyl_bessel_i0f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cyl_bessel_i0f(float x);
 
 /**
  * Calculates CylBesselI1 value by input x.
@@ -424,7 +432,7 @@ __simt_callee__ inline float cyl_bessel_i0f(float x);
  *      if x is Inf, return Inf;
  *      if x is -Inf, return -Inf;
  */
-__simt_callee__ inline float cyl_bessel_i1f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cyl_bessel_i1f(float x);
 
 /**
  * Calculate the standard normal cumulative distribution function for input x.
@@ -435,19 +443,19 @@ __simt_callee__ inline float cyl_bessel_i1f(float x);
  *      if x is Inf, return 1;
  *      if x is -Inf, return 0;
  */
-__simt_callee__ inline float normcdff(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdff(float x);
 
-__simt_callee__ inline float j0f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j0f(float x);
 
-__simt_callee__ inline float j1f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j1f(float x);
 
-__simt_callee__ inline float jnf(int n, float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float jnf(int n, float x);
 
-__simt_callee__ inline float y0f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float y0f(float x);
 
-__simt_callee__ inline float y1f(float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float y1f(float x);
 
-__simt_callee__ inline float ynf(int n, float x);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float ynf(int n, float x);
 
 #include "impl/simt_api/math_functions_impl.h"
 

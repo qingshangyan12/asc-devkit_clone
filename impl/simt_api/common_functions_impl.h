@@ -22,12 +22,12 @@
 #warning "common_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "common_functions.h" and use public functions or variables defined in interface header files."
 #endif
 
-__simt_callee__ inline int32_t asc_get_block_idx()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_get_block_idx()
 {
     return bisheng::cce::simt::get_block_idx();
 }
 
-__simt_callee__ inline int32_t asc_get_block_num()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_get_block_num()
 {
     return bisheng::cce::simt::get_block_num();
 }

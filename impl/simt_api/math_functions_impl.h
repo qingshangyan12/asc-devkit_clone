@@ -23,31 +23,31 @@
 
 #define ASCRT_FOUR_BYTE_LEN_U       32U
 
-__simt_callee__ inline long int lroundf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lroundf(float x)
 {
     float tmp = bisheng::cce::simt::__roundf(x);
     return bisheng::cce::simt::__cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
-__simt_callee__ inline long long int llroundf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llroundf(float x)
 {
     float tmp = bisheng::cce::simt::__roundf(x);
     return bisheng::cce::simt::__cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
-__simt_callee__ inline long int lrintf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lrintf(float x)
 {
     float tmp = bisheng::cce::simt::__rintf(x);
     return bisheng::cce::simt::__cvt_int64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
-__simt_callee__ inline long long int llrintf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llrintf(float x)
 {
     float tmp = bisheng::cce::simt::__rintf(x);
     return bisheng::cce::simt::__cvt_int64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
-__simt_callee__ inline float truncf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float truncf(float x)
 {
     if (x > 0.0f) {
         return bisheng::cce::simt::__floorf(x);
@@ -56,27 +56,27 @@ __simt_callee__ inline float truncf(float x)
     }
 }
 
-__simt_callee__ inline float roundf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float roundf(float x)
 {
     return bisheng::cce::simt::__roundf(x);
 }
 
-__simt_callee__ inline float rintf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rintf(float x)
 {
     return bisheng::cce::simt::__rintf(x);
 }
 
-__simt_callee__ inline float floorf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float floorf(float x)
 {
     return bisheng::cce::simt::__floorf(x);
 }
 
-__simt_callee__ inline float ceilf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float ceilf(float x)
 {
     return bisheng::cce::simt::__ceilf(x);
 }
 
-__simt_callee__ inline float fabsf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fabsf(float x)
 {
     if (x < 0.0f) {
         return -x;
@@ -85,17 +85,17 @@ __simt_callee__ inline float fabsf(float x)
     }
 }
 
-__simt_callee__ inline float fmaf(float x, float y, float z)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmaf(float x, float y, float z)
 {
     return bisheng::cce::simt::__fma(x, y, z);
 }
 
-__simt_callee__ inline float expf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expf(float x)
 {
     return __expf(x);
 }
 
-__simt_callee__ inline float logf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
 {
     if (x > 0.0f && x < 1.17549435e-38f) { // 1.17549435e-38f: subnormal floating-point number boundary
         return __logf(expf(23.0f) * x) - 23.0f;
@@ -103,22 +103,22 @@ __simt_callee__ inline float logf(float x)
     return __logf(x);
 }
 
-__simt_callee__ inline float log2f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x)
 {
     return logf(x) / logf(2.0f);
 }
 
-__simt_callee__ inline float sqrtf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x)
 {
     return __sqrtf(x);
 }
 
-__simt_callee__ inline float rsqrtf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rsqrtf(float x)
 {
     return 1.0f / sqrtf(x);
 }
 
-__simt_callee__ inline bool is_inf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool is_inf(float x)
 {
     uint32_t* intX = (uint32_t*)&x;
     return (*intX == 0x7F800000) || (*intX == 0xFF800000);
@@ -135,7 +135,7 @@ __simt_callee__ inline bool is_inf(float x)
  *      if x is -Inf, return -Nan;
  *      if x>1 or x < 0, return NaN.
  */
-__simt_callee__ inline float normcdfinvf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdfinvf(float x)
 {
     float double_x = x + x;
     float item = 2.0f - double_x;
@@ -188,7 +188,7 @@ __simt_callee__ inline float normcdfinvf(float x)
  *      if x is Inf, return 0;
  *      if x is -Inf, return 0;
  */
-__simt_callee__ inline float modff(float x, float &n)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float modff(float x, float &n)
 {
     float absX = fabsf(x);
     float result;
@@ -225,22 +225,22 @@ __simt_callee__ inline float modff(float x, float &n)
 
 #ifndef ASCENDC_CPU_DEBUG
 
-__simt_callee__ inline bool isfinite(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isfinite(float x)
 {
     return __isfinite(x);
 }
 
-__simt_callee__ inline bool isnan(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isnan(float x)
 {
     return __isnan(x);
 }
 
-__simt_callee__ inline bool isinf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isinf(float x)
 {
     return __isinf(x);
 }
 
-__simt_callee__ inline float fdimf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdimf(float x, float y)
 {
     if (isnan(x)) {
         return x;
@@ -250,17 +250,17 @@ __simt_callee__ inline float fdimf(float x, float y)
     return (x > y) ? (x - y) : 0;
 }
 
-__simt_callee__ inline float set_neg_x(float abs_x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float set_neg_x(float abs_x)
 {
     return -abs_x;
 }
 
-__simt_callee__ inline float sub_set_res_pos(float abs_x, float abs_y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sub_set_res_pos(float abs_x, float abs_y)
 {
     return (abs_x < abs_y) ? abs_x - abs_y : abs_y - abs_x;
 }
 
-__simt_callee__ inline void set_quo(int32_t *quo, int32_t n_sign)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void set_quo(int32_t *quo, int32_t n_sign)
 {
     int32_t neg_e = -8;
     int32_t max_s32 = 0xffffffff;
@@ -276,7 +276,7 @@ __simt_callee__ inline void set_quo(int32_t *quo, int32_t n_sign)
     }
 }
 
-__simt_callee__ inline float x_le_y(float abs_x, float tmp_val, float abs_y, bool is_x_pos, uint32_t sign_flag, float res,
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float x_le_y(float abs_x, float tmp_val, float abs_y, bool is_x_pos, uint32_t sign_flag, float res,
                              int32_t *quo, int32_t n_sign)
 {
     float double_x = abs_x + abs_x;
@@ -301,7 +301,7 @@ __simt_callee__ inline float x_le_y(float abs_x, float tmp_val, float abs_y, boo
     return sign * sub_set_res_pos(abs_x, abs_y);
 }
 
-__simt_callee__ inline void  cal_remquo(float &abs_x, float &n_x_y_val, uint32_t &sign_flag, float &abs_y, float &tmp_val,
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void  cal_remquo(float &abs_x, float &n_x_y_val, uint32_t &sign_flag, float &abs_y, float &tmp_val,
                              int32_t *quo)
 {
     bool is_x_lt_xy = abs_x < n_x_y_val;
@@ -336,7 +336,7 @@ __simt_callee__ inline void  cal_remquo(float &abs_x, float &n_x_y_val, uint32_t
     *quo = n;
 }
 
-__simt_callee__ inline float remquof(float x, float y, int32_t *quo)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, int32_t *quo)
 {
     bool is_x_pos = x >= 0;
     float abs_x = abs(x);
@@ -388,14 +388,14 @@ __simt_callee__ inline float remquof(float x, float y, int32_t *quo)
     return x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, quo, n_sign);
 }
 
-__simt_callee__ inline float set_res_mod_neg(float mod_res)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float set_res_mod_neg(float mod_res)
 {
     uint32_t *u_mod_res = (uint32_t *)(&mod_res);
     *u_mod_res = (*u_mod_res) | ASCRT_NEG_SIGN_BIT_U;
     return mod_res;
 }
 
-__simt_callee__ inline float fmodf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
 {
     bool is_x_pos = x > 0;
     float abs_x = abs(x);
@@ -451,18 +451,18 @@ __simt_callee__ inline float fmodf(float x, float y)
     return mod_res;
 }
 
-__simt_callee__ inline float remainderf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y)
 {
     int32_t quo = -1;
     return remquof(x, y, &quo);
 }
 
-__simt_callee__ inline float copysignf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float copysignf(float x, float y)
 {
     return (y > 0) ? fabsf(x) : -fabsf(x);
 }
 
-__simt_callee__ inline float nearbyintf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nearbyintf(float x)
 {
     if (isinf(x) || isnan(x)) {
         return x;
@@ -470,7 +470,7 @@ __simt_callee__ inline float nearbyintf(float x)
     return bisheng::cce::simt::__rintf(x);
 }
 
-__simt_callee__ inline float nextafterf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nextafterf(float x, float y)
 {
     uint32_t *f = (uint32_t *)&x;
     if (x > 0) {
@@ -489,7 +489,7 @@ __simt_callee__ inline float nextafterf(float x, float y)
     return x;
 }
 
-__simt_callee__ inline float scalbnf(float x, int32_t n)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float scalbnf(float x, int32_t n)
 {
     if (isinf(x) || isnan(x)) {
         return x;
@@ -517,12 +517,12 @@ __simt_callee__ inline float scalbnf(float x, int32_t n)
     return x * __powf(two, static_cast<float>(n));
 }
 
-__simt_callee__ inline float scalblnf(float x, int64_t n)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float scalblnf(float x, int64_t n)
 {
     return scalbnf(x, static_cast<int32_t>(n));
 }
 
-__simt_callee__ inline float fmaxf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmaxf(float x, float y)
 {
     if (isnan(x)) {
         return y;
@@ -532,7 +532,7 @@ __simt_callee__ inline float fmaxf(float x, float y)
     return __fmaxf(x, y);
 }
 
-__simt_callee__ inline float fminf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fminf(float x, float y)
 {
     if (isnan(x)) {
         return y;
@@ -550,7 +550,7 @@ __simt_callee__ inline float fminf(float x, float y)
  * @param output_quadrant Pointer to store the quadrant information.
  * @return The reduced angle in the range [0, pi/2).
  */
-__simt_callee__ inline float payne_hanek_radian_reduction(float x, int *output_quadrant)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float payne_hanek_radian_reduction(float x, int *output_quadrant)
 {
     // Step 1: Extract raw bits of the input angle
     uint32_t input_bits = reinterpret_cast<uint32_t &>(x);
@@ -624,7 +624,7 @@ __simt_callee__ inline float payne_hanek_radian_reduction(float x, int *output_q
  * @param quadrant Pointer to store the quadrant information.
  * @return The reduced angle in the range [0, pi/2).
  */
-__simt_callee__ inline float cody_waite_radian_reduction(float x, int *quadrant)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cody_waite_radian_reduction(float x, int *quadrant)
 {
     float y = fmaf(x, 0.636619747f, 12582912.0f);    // 0.636619747f: 2/pi
     *quadrant = reinterpret_cast<int &>(y);
@@ -634,7 +634,7 @@ __simt_callee__ inline float cody_waite_radian_reduction(float x, int *quadrant)
     return fmaf(y, -5.39030253e-15f, x);             // 5.39030253e-15f: low of pi/2
 }
 
-__simt_callee__ inline float trig_radian_reduction(float x, float threshold, int *quadrant)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float trig_radian_reduction(float x, float threshold, int *quadrant)
 {
     x = fmaf(x, 0.0f, x);
     if (fabsf(x) > threshold) {
@@ -653,7 +653,7 @@ __simt_callee__ inline float trig_radian_reduction(float x, float threshold, int
  * @param x The input angle in radians.
  * @return The tangent of the input angle.
  */
-__simt_callee__ inline float tan_poly(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tan_poly(float x)
 {
     x = x * x;
     float y = fmaf(x, 4.38117981e-3f, 8.94600598e-5f);  // 4.38117981e-3f: 8.94600598e-5f:
@@ -665,7 +665,7 @@ __simt_callee__ inline float tan_poly(float x)
     return x * y;
 }
 
-__simt_callee__ inline float tanf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanf(float x)
 {
     // Step 1: Reduce the angle to the range [0, pi/2) and determine the quadrant
     int quadrant;
@@ -690,7 +690,7 @@ __simt_callee__ inline float tanf(float x)
     return z;
 }
 
-__simt_callee__ inline float tanhf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanhf(float x)
 {
     return 1.0f - (2.0f / (expf(2.0f * x) + 1.0f));
 }
@@ -700,12 +700,12 @@ __simt_callee__ inline float tanhf(float x)
  * @param x an angle, in radians.
  * @return the tangent of the x*PI.
  */
-__simt_callee__ inline float tanpif(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanpif(float x)
 {
     return tanf(x * ASCRT_PI_F);
 }
 
-__simt_callee__ inline void taylor_expand(float &dst, float &src, float &square_v, uint32_t expand_level, float *factor)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void taylor_expand(float &dst, float &src, float &square_v, uint32_t expand_level, float *factor)
 {
     square_v = src * src;
     dst = src * src;
@@ -718,7 +718,7 @@ __simt_callee__ inline void taylor_expand(float &dst, float &src, float &square_
     dst = dst * src;
 }
 
-__simt_callee__ inline void taylor_expand(float &dst, float &src, float &square_v, uint32_t expand_level)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void taylor_expand(float &dst, float &src, float &square_v, uint32_t expand_level)
 {
     float factor[] = {1,
                       -0.3333333333333333,
@@ -730,7 +730,7 @@ __simt_callee__ inline void taylor_expand(float &dst, float &src, float &square_
     taylor_expand(dst, src, square_v, expand_level, factor);
 }
 
-__simt_callee__ inline void atan_expand(float &dst, float &src, float &tmp, float trans_factor)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void atan_expand(float &dst, float &src, float &tmp, float trans_factor)
 {
     dst = src * trans_factor;
     dst = dst + 1.0f;
@@ -739,7 +739,7 @@ __simt_callee__ inline void atan_expand(float &dst, float &src, float &tmp, floa
     dst = fabsf(dst);
 }
 
-__simt_callee__ inline void Sign(float &dst, float &src, float &denominator)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void Sign(float &dst, float &src, float &denominator)
 {
     dst = src * 4611686018427387904.0f; //4611686018427387904 : ATAN_FP32_MAX
     denominator = fabsf(dst);
@@ -747,7 +747,7 @@ __simt_callee__ inline void Sign(float &dst, float &src, float &denominator)
     dst = dst / denominator;
 }
 
-__simt_callee__ inline float atanf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
 {
     if (isnan(x)) {
         return x;
@@ -790,7 +790,7 @@ __simt_callee__ inline float atanf(float x)
     return dst;
 }
 
-__simt_callee__ inline float atan2f(float y, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
 {
     if (isnan(y)) {
         return y;
@@ -827,7 +827,7 @@ __simt_callee__ inline float atan2f(float y, float x)
     return atanf(y / x) + d * ASCRT_PI_F;
 }
 
-__simt_callee__ inline float atanhf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanhf(float x)
 {
     return logf((1.0f + x) / (1.0f - x)) / 2.0f;
 }
@@ -840,7 +840,7 @@ __simt_callee__ inline float atanhf(float x)
  * @param x The input angle in radians.
  * @return The cosine of the input angle.
  */
-__simt_callee__ inline float cos_poly(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cos_poly(float x)
 {
     x = x * x;
     float y = fmaf(x, 2.44677067e-5f, -1.38877297e-3f); // 2.44677067e-5f: 1/8! -1.38877297e-3f: -1/6!
@@ -857,7 +857,7 @@ __simt_callee__ inline float cos_poly(float x)
  * @param x The input angle in radians.
  * @return The sine of the input angle.
  */
-__simt_callee__ inline float sin_poly(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sin_poly(float x)
 {
     float y = x * x;
     float m = fmaf(x, y, 0.0f);
@@ -874,7 +874,7 @@ __simt_callee__ inline float sin_poly(float x)
  * @param x an angle, in radians.
  * @return the cosine of the x.
  */
-__simt_callee__ inline float cosf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cosf(float x)
 {
     // Step 1: Reduce the angle to the range [0, pi/2) and determine the quadrant
     int quadrant;
@@ -897,7 +897,7 @@ __simt_callee__ inline float cosf(float x)
     return c;
 }
 
-__simt_callee__ inline float coshf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float coshf(float x)
 {
     float y = fabsf(x);
     const float tmp = expf(y - ASCRT_SCALAR_LN2_F);
@@ -909,12 +909,12 @@ __simt_callee__ inline float coshf(float x)
  * @param x an angle, in radians.
  * @return the cosine of the x*pi.
  */
-__simt_callee__ inline float cospif(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cospif(float x)
 {
     return cosf(x * ASCRT_PI_F);
 }
 
-__simt_callee__ inline float asinf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x)
 {
     if (fabsf(x) > 1) {
         return ASCRT_INF_F / ASCRT_INF_F;
@@ -946,12 +946,12 @@ __simt_callee__ inline float asinf(float x)
     }
 }
 
-__simt_callee__ inline float acosf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float acosf(float x)
 {
     return ASCRT_PIO2_F - asinf(x);
 }
 
-__simt_callee__ inline float acoshf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
 {
     if (x < 1) {
         return ASCRT_INF_F / ASCRT_INF_F;
@@ -964,7 +964,7 @@ __simt_callee__ inline float acoshf(float x)
  * @param x an angle, in radians.
  * @return the sine of the x.
  */
-__simt_callee__ inline float sinf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinf(float x)
 {
     int quadrant;
     float y = trig_radian_reduction(x, 71476.0625f, &quadrant);  // 71476.0625f: Threshold for reduction algorithm
@@ -985,7 +985,7 @@ __simt_callee__ inline float sinf(float x)
     return s;
 }
 
-__simt_callee__ inline float sinhf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinhf(float x)
 {
     if (fabsf(x) > 0.1f) {
         return expf(x - ASCRT_SCALAR_LN2_F) - expf(x * (-1.0f) - ASCRT_SCALAR_LN2_F);
@@ -1009,12 +1009,12 @@ __simt_callee__ inline float sinhf(float x)
  * @param x an angle, in radians.
  * @return the sine of the x.
  */
-__simt_callee__ inline float sinpif(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x)
 {
     return sinf(x * ASCRT_PI_F);
 }
 
-__simt_callee__ inline float asinhf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
 {
     if (fabsf(x) > 0.1f) {
         return x > 0 ? logf(x + sqrtf(x * x + 1.0f)) : logf(sqrtf(x * x + 1.0f) - x) * (-1);
@@ -1043,7 +1043,7 @@ __simt_callee__ inline float asinhf(float x)
  * @return s the sine of the x.
  *         c the cossin of the x.
  */
-__simt_callee__ inline void sincosf(float x, float &s, float &c)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float &s, float &c)
 {
     int quadrant;
     float t;
@@ -1069,32 +1069,32 @@ __simt_callee__ inline void sincosf(float x, float &s, float &c)
  * @return s the sine of the x*pi.
  *         c the cossin of the x*pi.
  */
-__simt_callee__ inline void sincospif(float x, float &s, float &c)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, float &s, float &c)
 {
     return sincosf(x * ASCRT_PI_F, s, c);
 }
 
-__simt_callee__ inline float powf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y)
 {
     return __powf(x, y);
 }
 
-__simt_callee__ inline float exp2f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x)
 {
     return powf(2.0f, x);
 }
 
-__simt_callee__ inline float exp10f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x)
 {
     return powf(10.0f, x);
 }
 
-__simt_callee__ inline float expm1f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x)
 {
     return expf(x) - 1.0f;
 }
 
-__simt_callee__ inline bool is_positive_inf_impl(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool is_positive_inf_impl(float x)
 {
     uint32_t* int_x = (uint32_t*)&x;
     return *int_x == ASCRT_INF_U;
@@ -1106,7 +1106,7 @@ __simt_callee__ inline bool is_positive_inf_impl(float x)
  * @return   the mantissa of the x
  *         exp: the exponent of the x
  */
-__simt_callee__ inline float frexpf(float x, int &exp)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, int &exp)
 {
     if (x == 0.0f || is_positive_inf_impl(fabsf(x)) || isnan(x)) {
         exp = 0;
@@ -1138,7 +1138,7 @@ __simt_callee__ inline float frexpf(float x, int &exp)
  *        exp a int value.
  * @return  x * 2^exp
  */
-__simt_callee__ inline float ldexpf(float x, int exp)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp)
 {
     if (x == 0.0f || is_positive_inf_impl(fabsf(x)) || isnan(x) || exp == 0) {
         return x;
@@ -1172,7 +1172,7 @@ __simt_callee__ inline float ldexpf(float x, int exp)
  *          y  a float value.
  * @return square root of (x^2+y^2)
  */
-__simt_callee__ inline float hypotf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float hypotf(float x, float y)
 {
     float abs_x = fabsf(x);
     float abs_y = fabsf(y);
@@ -1200,7 +1200,7 @@ __simt_callee__ inline float hypotf(float x, float y)
   *          y  a float value.
   * @return The reciprocal of square root of (x^2+y^2)
   */
-__simt_callee__ inline float rhypotf(float x, float y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rhypotf(float x, float y)
 {
     return 1.0f / hypotf(x, y);
 }
@@ -1217,7 +1217,7 @@ __simt_callee__ inline float rhypotf(float x, float y)
  *      If all of a,b,c is 0, return 0.
  *      If sqrt(a^2 + b^2 + c^2) overflows, return INF.
  */
-__simt_callee__ inline float norm3df(float a, float b, float c)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm3df(float a, float b, float c)
 {
     if (isinf(a) || isinf(b) || isinf(c)) {
         return ASCRT_INF_F;
@@ -1249,7 +1249,7 @@ __simt_callee__ inline float norm3df(float a, float b, float c)
  *      If all of a,b,c is 0, return INF.
  *      If sqrt(a^2 + b^2 + c^2) overflows, return INF.
  */
-__simt_callee__ inline float rnorm3df(float a, float b, float c)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm3df(float a, float b, float c)
 {
     return 1.0f / norm3df(a, b, c);
 }
@@ -1267,7 +1267,7 @@ __simt_callee__ inline float rnorm3df(float a, float b, float c)
  *      If all of a,b,c,d is 0, return 0.
  *      If sqrt(a^2 + b^2 + c^2+ d^2) overflows, return INF.
  */
-__simt_callee__ inline float norm4df(float a, float b, float c, float d)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, float d)
 {
     if (isinf(a) || isinf(b) || isinf(c) || isinf(d)) {
         return ASCRT_INF_F;
@@ -1302,7 +1302,7 @@ __simt_callee__ inline float norm4df(float a, float b, float c, float d)
  *      If all of a,b,c,d is 0, return INF.
  *      If sqrt(a^2 + b^2 + c^2 + d^2) overflows,return 0.
  */
-__simt_callee__ inline float rnorm4df(float a, float b, float c, float d)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, float d)
 {
     return 1.0f / norm4df(a, b, c, d);
 }
@@ -1319,7 +1319,11 @@ __simt_callee__ inline float rnorm4df(float a, float b, float c, float d)
  *      If sqrt(a[0]^2 +... + a[n-1]^2) overflows, return INF.
  *      If n is less than 1, return |a[0]|.
  */
-__simt_callee__ inline float normf(int n, __gm__ float* a)
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, __gm__ float* a)
+#else
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, float* a)
+#endif
 {
     if (n <= 0) {
         return fabsf(a[0]);
@@ -1360,22 +1364,26 @@ __simt_callee__ inline float normf(int n, __gm__ float* a)
  *      If sqrt(a[0]^2 +... + a[n-1]^2) overflows, return 0.
  *      If n is less than 1, return 1/|a[0]|.
  */
-__simt_callee__ inline float rnormf(int n, __gm__ float* a)
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, __gm__ float* a)
+#else
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, float* a)
+#endif
 {
     return 1.0f / normf(n, a);
 }
 
-__simt_callee__ inline float log10f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log10f(float x)
 {
     return logf(x) / logf(10.0f);
 }
 
-__simt_callee__ inline float log1pf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
 {
     return logf(1.0f + x);
 }
 
-__simt_callee__ inline float logbf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float logbf(float x)
 {
     if (isnan(x)) {
         return x;
@@ -1410,7 +1418,7 @@ __simt_callee__ inline float logbf(float x)
     }
 }
 
-__simt_callee__ inline int32_t ilogbf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
 {
     if (x < 0) {
         x = -x;
@@ -1431,7 +1439,7 @@ __simt_callee__ inline int32_t ilogbf(float x)
  *      if x is Inf, return Inf;
  *      if x is -Inf, return -Inf;
  */
-__simt_callee__ inline float cbrtf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x)
 {
     uint32_t x_bits = *reinterpret_cast<uint32_t *>(&x);
     int32_t exp_bits = (x_bits >> 23) & 0xFF;
@@ -1483,7 +1491,7 @@ __simt_callee__ inline float cbrtf(float x)
  *      if x is Inf, return 0;
  *      if x is -Inf, return 0;
  */
-__simt_callee__ inline float rcbrtf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rcbrtf(float x)
 {
     if (x == 0.0f) {
         return ASCRT_INF_F;
@@ -1531,7 +1539,7 @@ __simt_callee__ inline float rcbrtf(float x)
  *      if x is -Inf, return -1;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erff(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erff(float x)
 {
     float abs_x = fabsf(x);
     float x_squared = x * x;
@@ -1580,7 +1588,7 @@ __simt_callee__ inline float erff(float x)
     }
 }
 
-__simt_callee__ inline float cal_poly(float abs_x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_poly(float abs_x)
 {
     float term1 = abs_x + -4.0f;
     float term2 = abs_x + 4.0f;
@@ -1613,7 +1621,7 @@ __simt_callee__ inline float cal_poly(float abs_x)
  *      if x is -Inf, return +0;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erfcf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcf(float x)
 {
     float abs_x = fabsf(x);
 
@@ -1667,7 +1675,7 @@ __simt_callee__ inline float erfcf(float x)
  *      if x outside [-1, 1], return Nan;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erfinvf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfinvf(float x)
 {
     float opposite_x = -x;
     float temp1 = fmaf(x, opposite_x, 1.0f);
@@ -1710,7 +1718,7 @@ __simt_callee__ inline float erfinvf(float x)
  *      if x outside [0, 2], return Nan;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erfcinvf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcinvf(float x)
 {
     float opposite_x = -x;
     float term = 2.0f + opposite_x;
@@ -1760,7 +1768,7 @@ __simt_callee__ inline float erfcinvf(float x)
  *      if x is Inf, return +0;
  *      if x is Nan, return Nan;
  */
-__simt_callee__ inline float erfcxf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcxf(float x)
 {
     if (x < -9.43f) {
         return ASCRT_INF_F;
@@ -1810,7 +1818,7 @@ __simt_callee__ inline float erfcxf(float x)
     }
 }
 
-__simt_callee__ inline float compute_sinpi(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float compute_sinpi(float x)
 {
     float double_x = x * 2;
 
@@ -1845,7 +1853,7 @@ __simt_callee__ inline float compute_sinpi(float x)
     return y;
 }
 
-__simt_callee__ inline float compute_ln(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float compute_ln(float x)
 {
     float offset = 0;
     // sub-norm - > norm
@@ -1888,7 +1896,7 @@ __simt_callee__ inline float compute_ln(float x)
  * @param x a value
  * @return x's gamma-value
  */
-__simt_callee__ inline float euler_gamma_function(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float euler_gamma_function(float x)
 {
     float frac = x - nearbyintf(x);
     //  1/gamma(x + 1)
@@ -1925,7 +1933,7 @@ __simt_callee__ inline float euler_gamma_function(float x)
     }
 }
 
-__simt_callee__ inline float cal_abs_x(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_abs_x(float x)
 {
     float abs_x= fabsf(x);
     if (abs_x > 41.0999985f) {
@@ -1935,7 +1943,7 @@ __simt_callee__ inline float cal_abs_x(float x)
     return abs_x;
 }
 
-__simt_callee__ inline float cal_y3(float ln_mantissa)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y3(float ln_mantissa)
 {
     float y3 = 0.000656886259f;
     y3 = fmaf(y3, ln_mantissa * ln_mantissa, 0.00321816537f);  // 0.00321816537f : Coefficient of O(3)
@@ -1945,7 +1953,7 @@ __simt_callee__ inline float cal_y3(float ln_mantissa)
     return y3;
 }
 
-__simt_callee__ inline float cal_y6(float abs_x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y6(float abs_x)
 {
     float recabs_x = 1.0f / abs_x;
     float y6 = 0.000068413915f;                         //  0.000068413915f    : Coefficient of O(8)
@@ -1960,7 +1968,7 @@ __simt_callee__ inline float cal_y6(float abs_x)
     return y6;
 }
 
-__simt_callee__ inline float cal_y(float abs_x, float y_diff, float y5, float y7)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y(float abs_x, float y_diff, float y5, float y7)
 {
     //  y5 / [sin(pi*x) * 2 * x * y6]
     float y = fmaf(y5, y7, -y5 * y7 * y_diff * y7);
@@ -1980,7 +1988,7 @@ __simt_callee__ inline float cal_y(float abs_x, float y_diff, float y5, float y7
  * @param x a value
  * @return x's gamma-value
  */
-__simt_callee__ inline float stirling_and_euler_reflection(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float stirling_and_euler_reflection(float x)
 {
     float abs_x = cal_abs_x(x);
 
@@ -2094,7 +2102,7 @@ __simt_callee__ inline float stirling_and_euler_reflection(float x)
  *      if x is Inf, return Inf;
  *      if x is -Inf, return Nan;
  */
-__simt_callee__ inline float tgammaf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x)
 {
     if (x == 0.0f) {
         return 1.0f / x;
@@ -2110,7 +2118,7 @@ __simt_callee__ inline float tgammaf(float x)
     }
 }
 
-__simt_callee__ inline float cal_y0(float abs_x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y0(float abs_x)
 {
     //  1/[gamma(x)] = 1/[gamma(x+1) * x]
     float y0 = 0.0035875155f;                   //  0.0035875155f    :   Coefficient of O(7)
@@ -2125,7 +2133,7 @@ __simt_callee__ inline float cal_y0(float abs_x)
     return y0;
 }
 
-__simt_callee__ inline float cal_result_case1(float abs_x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_result_case1(float abs_x)
 {
     //  log[gamma(x)]
     //  = −γ(x-1) + ∑(n=2 to inf)[(-1)^n*h(n)/n](x-1)^n
@@ -2146,7 +2154,7 @@ __simt_callee__ inline float cal_result_case1(float abs_x)
     return result;
 }
 
-__simt_callee__ inline float cal_result_case2(float abs_x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_result_case2(float abs_x)
 {
     //  log[gamma(x)]
     //  = (1−γ)(x-2) + [(pi^2-6)/12](x-2)^2 + O(3)
@@ -2165,7 +2173,7 @@ __simt_callee__ inline float cal_result_case2(float abs_x)
     return result;
 }
 
-__simt_callee__ inline float cal_result_case3(float abs_x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_result_case3(float abs_x)
 {
     float x_minus_three = abs_x - 3.0f;
     float a0 = -143033.4f, a1 = -48310.664f, a2 = -41061.375f, a3 = -12349.742f, a4 = -748.8903f;
@@ -2194,7 +2202,7 @@ __simt_callee__ inline float cal_result_case3(float abs_x)
  *      if x is Inf, return Inf;
  *      if x is -Inf, return Inf;
  */
-__simt_callee__ inline float lgammaf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float lgammaf(float x)
 {
     float abs_x = fabsf(x);
     float result = 0.0f;
@@ -2293,7 +2301,7 @@ __simt_callee__ inline float lgammaf(float x)
  *      if x is Inf, return Inf;
  *      if x is -Inf, return Inf;
  */
-__simt_callee__ inline float cyl_bessel_i0f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cyl_bessel_i0f(float x)
 {
     float abs_x = fabsf(x);
     if (isinf(abs_x)) {
@@ -2338,7 +2346,7 @@ __simt_callee__ inline float cyl_bessel_i0f(float x)
  *      if x is Inf, return Inf;
  *      if x is -Inf, return -Inf;
  */
-__simt_callee__ inline float cyl_bessel_i1f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cyl_bessel_i1f(float x)
 {
     float abs_x = fabsf(x);
     if (isinf(abs_x)) {
@@ -2385,7 +2393,7 @@ __simt_callee__ inline float cyl_bessel_i1f(float x)
  *      if x is Inf, return 1;
  *      if x is -Inf, return 0;
  */
-__simt_callee__ inline float normcdff(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdff(float x)
 {
     if (fabsf(x) > 14.5f) {
         x = copysignf(14.5f, x);
@@ -2407,7 +2415,7 @@ __simt_callee__ inline float normcdff(float x)
     return 0.5f * erfc_value;
 }
 
-__simt_callee__ inline float trig_red_slowpath_f_fast_mode(float a, int *quadrant)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float trig_red_slowpath_f_fast_mode(float a, int *quadrant)
 {
     uint64_t q, q2;
     q = (uint64_t)(a * ASCRT_2OPI_F);
@@ -2421,7 +2429,7 @@ __simt_callee__ inline float trig_red_slowpath_f_fast_mode(float a, int *quadran
     return a;
 }
 
-__simt_callee__ inline float sinf_poly(float a, float s)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinf_poly(float a, float s)
 {
     float r = 2.86567956e-6f;
     r = fmaf(r, s, -1.98559923e-4f);
@@ -2432,7 +2440,7 @@ __simt_callee__ inline float sinf_poly(float a, float s)
     return r;
 }
 
-__simt_callee__ inline float cosf_poly(float s)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cosf_poly(float s)
 {
     float r = 2.44677067e-5f;
     r = fmaf(r, s, -1.38877297e-3f);
@@ -2442,7 +2450,7 @@ __simt_callee__ inline float cosf_poly(float s)
     return r;
 }
 
-__simt_callee__ inline float sin_cosf_minus_pi_over_four(float a, int index)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sin_cosf_minus_pi_over_four(float a, int index)
 {
     float r;
     int i;
@@ -2469,7 +2477,7 @@ __simt_callee__ inline float sin_cosf_minus_pi_over_four(float a, int index)
     }
 }
 
-__simt_callee__ inline float cal_j0_y0_pre_coeff(float x, float inv_x, float inv_x2)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_j0_y0_pre_coeff(float x, float inv_x, float inv_x2)
 {
     float beta = fmaf(5.848699569702148f, inv_x2, -0.5428466796875f);
     beta = fmaf(beta, inv_x2, 0.103515625f);
@@ -2480,7 +2488,7 @@ __simt_callee__ inline float cal_j0_y0_pre_coeff(float x, float inv_x, float inv
     return beta * theta;
 }
 
-__simt_callee__ inline float cal_j0_y0_alpha(float x, float inv_x, float inv_x2)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_j0_y0_alpha(float x, float inv_x, float inv_x2)
 {
     float alpha = fmaf(1.6380658830915178f, inv_x2, -0.2095703125f);
     alpha = fmaf(alpha, inv_x2, 0.06510416666666666f);
@@ -2489,7 +2497,7 @@ __simt_callee__ inline float cal_j0_y0_alpha(float x, float inv_x, float inv_x2)
     return alpha;
 }
 
-__simt_callee__ inline float cal_j1_y1_pre_coeff(float x, float inv_x, float inv_x2)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_j1_y1_pre_coeff(float x, float inv_x, float inv_x2)
 {
     float beta = fmaf(-7.739953994751f, inv_x2, 0.8052978515625f);
     beta = fmaf(beta, inv_x2, -0.193359375f);
@@ -2500,7 +2508,7 @@ __simt_callee__ inline float cal_j1_y1_pre_coeff(float x, float inv_x, float inv
     return beta * theta;
 }
 
-__simt_callee__ inline float cal_j1_y1_alpha(float x, float inv_x, float inv_x2)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_j1_y1_alpha(float x, float inv_x, float inv_x2)
 {
     float alpha = fmaf(-2.3693978445870534f, inv_x2, 0.3708984375f);
     alpha = fmaf(alpha, inv_x2, -0.1640625f);
@@ -2509,7 +2517,7 @@ __simt_callee__ inline float cal_j1_y1_alpha(float x, float inv_x, float inv_x2)
     return alpha;
 }
 
-__simt_callee__ inline float cal_j0_x_larger8(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_j0_x_larger8(float x)
 {
     if (isinf(x)) {
         return 0.0f;
@@ -2522,7 +2530,7 @@ __simt_callee__ inline float cal_j0_x_larger8(float x)
     return after_coeff * pre_coeff;
 }
 
-__simt_callee__ inline float cal_j1_x_lager8(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_j1_x_lager8(float x)
 {
     if (isinf(x)) {
         return 0.0f;
@@ -2535,7 +2543,7 @@ __simt_callee__ inline float cal_j1_x_lager8(float x)
     return after_coeff * pre_coeff;
 }
 
-__simt_callee__ inline float cal_j0_x_less8(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_j0_x_less8(float x)
 {
     float d1 = x - 2.4048254f;
     d1 = d1 - 1.087059e-7f;
@@ -2562,7 +2570,7 @@ __simt_callee__ inline float cal_j0_x_less8(float x)
     return res;  
 }
 
-__simt_callee__ inline float cal_j1_x_less8(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_j1_x_less8(float x)
 {
     float d1 = x - 3.831706f;
     d1 = d1 + 7.685059e-8f;
@@ -2587,7 +2595,7 @@ __simt_callee__ inline float cal_j1_x_less8(float x)
     return res;  
 }
 
-__simt_callee__ inline float jn_yn_asymptotic_bessel_amplitude(int n, float x, int index)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float jn_yn_asymptotic_bessel_amplitude(int n, float x, int index)
 {
     float s = 1.0f;
     float mu = 4 * n * n;
@@ -2605,7 +2613,7 @@ __simt_callee__ inline float jn_yn_asymptotic_bessel_amplitude(int n, float x, i
     return sqrtf(s * 2 / (ASCRT_PI_F * x)); // 2:Constants in formulas    sqrt(2*s/(π*x))
 }
 
-__simt_callee__ inline float jn_yn_asymptotic_bessel_phase_mx(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float jn_yn_asymptotic_bessel_phase_mx(int n, float x)
 {
     float mu = 4 * n * n;
     float denom = 4 * x;
@@ -2620,7 +2628,7 @@ __simt_callee__ inline float jn_yn_asymptotic_bessel_phase_mx(int n, float x)
     return s;
 }
 
-__simt_callee__ inline float jn_case1(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float jn_case1(int n, float x)
 {
     float ampl = jn_yn_asymptotic_bessel_amplitude(n, x, 0);
     float phase = jn_yn_asymptotic_bessel_phase_mx(n, x);
@@ -2633,7 +2641,7 @@ __simt_callee__ inline float jn_case1(int n, float x)
     return sin_phase * ampl;
 }
 
-__simt_callee__ inline float jn_case2(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float jn_case2(int n, float x)
 {
     float prev = j0f(x);
     float current = j1f(x);
@@ -2645,7 +2653,7 @@ __simt_callee__ inline float jn_case2(int n, float x)
     return current;
 }
 
-__simt_callee__ inline float jn_case3(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float jn_case3(int n, float x)
 {
     float prefix = n * logf(x / 2);
     for (int i = 2; i < n + 1; i++) {
@@ -2664,7 +2672,7 @@ __simt_callee__ inline float jn_case3(int n, float x)
     return prefix * res;
 }
 
-__simt_callee__ inline float jn_case4(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float jn_case4(int n, float x)
 {
     float max_value = powf(2.0f, 60.0f);
     int N = n + 30;
@@ -2696,7 +2704,7 @@ __simt_callee__ inline float jn_case4(int n, float x)
     return res * scale;
 }
 
-__simt_callee__ inline float j0_x_less8(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j0_x_less8(float x)
 {
     float d1 = x - 2.4048254f;
     d1 = d1 - -1.087059e-7f;
@@ -2724,7 +2732,7 @@ __simt_callee__ inline float j0_x_less8(float x)
     return res;
 }
 
-__simt_callee__ inline float cal_y0_x_lessdot5(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y0_x_lessdot5(float x)
 {        
     float part1 = 0.636619772367f * j0_x_less8(x) * logf(x);
     float part2 = fmaf(0.0007977247950890495f, x, -0.016524315326267768f);
@@ -2735,7 +2743,7 @@ __simt_callee__ inline float cal_y0_x_lessdot5(float x)
     return part1 + part2;
 }
 
-__simt_callee__ inline float cal_y0_x_part1(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y0_x_part1(float x)
 {
     float d1 = x - 0.893576980f;
     d1 = d1 + 1.33579787e-8f;
@@ -2757,7 +2765,7 @@ __simt_callee__ inline float cal_y0_x_part1(float x)
     return res;
 }
 
-__simt_callee__ inline float cal_y0_x_part2(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y0_x_part2(float x)
 {
     float d3 = x - 7.08605099f;
     d3 = d3 - 7.30581178e-8f;
@@ -2780,7 +2788,7 @@ __simt_callee__ inline float cal_y0_x_part2(float x)
     return res;
 }
 
-__simt_callee__ inline float cal_y0_x_larger8(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y0_x_larger8(float x)
 {  
     if (isinf(x)) {
         return 0.0f;
@@ -2793,7 +2801,7 @@ __simt_callee__ inline float cal_y0_x_larger8(float x)
     return after_coeff * pre_coeff;
 }
 
-__simt_callee__ inline float cal_y1_x_less1dot2(float x, float minus_two_over_pi_mul_inv_x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y1_x_less1dot2(float x, float minus_two_over_pi_mul_inv_x)
 {        
     float part1 = 0.636619772367f * cal_j1_x_less8(x) * logf(x);
     float part2 = fmaf(0.0002798307076f, x, -0.0034028867918f);
@@ -2806,7 +2814,7 @@ __simt_callee__ inline float cal_y1_x_less1dot2(float x, float minus_two_over_pi
     return part1 + minus_two_over_pi_mul_inv_x + part2;
 }
 
-__simt_callee__ inline float cal_y1_x_part1(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y1_x_part1(float x)
 {
     float d1 = x - 2.19714141f;
     d1 = d1 + 8.28892723e-8f;
@@ -2826,7 +2834,7 @@ __simt_callee__ inline float cal_y1_x_part1(float x)
     return res;
 }
 
-__simt_callee__ inline float cal_y1_x_part2(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y1_x_part2(float x)
 { 
     float d2 = x - 5.42968082f;
     d2 = d2 - 2.16514351e-7f;
@@ -2848,7 +2856,7 @@ __simt_callee__ inline float cal_y1_x_part2(float x)
     return res;
 }
 
-__simt_callee__ inline float cal_y1_x_larger8(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_y1_x_larger8(float x)
 {
     if (isinf(x)) {
         return 0.0f;
@@ -2861,14 +2869,14 @@ __simt_callee__ inline float cal_y1_x_larger8(float x)
     return -after_coeff * pre_coeff;
 }
 
-__simt_callee__ inline float yn_case1(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float yn_case1(int n, float x)
 {
     float lgamma_n = lgammaf(n);
     float gamma_n = expf(lgamma_n);
     return -gamma_n / ASCRT_PI_F * powf(2 / x, (float)n); // 2:Constants in formulas -(n - 1)! * (2 / x)^n / π
 }
 
-__simt_callee__ inline float yn_case2(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float yn_case2(int n, float x)
 {
     float ampl = jn_yn_asymptotic_bessel_amplitude(n, x, 1); // 1: Calculate YnAsymptoticBesselAmplitude
     float phase = jn_yn_asymptotic_bessel_phase_mx(n, x);
@@ -2881,7 +2889,7 @@ __simt_callee__ inline float yn_case2(int n, float x)
     return sin_combined * ampl;
 }
 
-__simt_callee__ inline float yn_case3(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float yn_case3(int n, float x)
 {
     float prev = y0f(x);
     float current = y1f(x);
@@ -2911,7 +2919,7 @@ __simt_callee__ inline float yn_case3(int n, float x)
     return value / scale_factor;
 }
 
-__simt_callee__ inline float j0f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j0f(float x)
 {
     if (isnan(x)) {
         return ASCRT_INF_F / ASCRT_INF_F;
@@ -2927,7 +2935,7 @@ __simt_callee__ inline float j0f(float x)
     }
 }
 
-__simt_callee__ inline float j1f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j1f(float x)
 {
     if (isnan(x)) {
         return ASCRT_INF_F / ASCRT_INF_F;
@@ -2945,7 +2953,7 @@ __simt_callee__ inline float j1f(float x)
     return (x < 0) ? -res : res;
 }
 
-__simt_callee__ inline float jnf(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float jnf(int n, float x)
 {
     if (n == 0) {
         return j0f(x);
@@ -2979,7 +2987,7 @@ __simt_callee__ inline float jnf(int n, float x)
     return res;
 }
 
-__simt_callee__ inline float y0f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float y0f(float x)
 {
     if (x < 0 || isnan(x)) {
         return ASCRT_INF_F / ASCRT_INF_F;
@@ -3001,7 +3009,7 @@ __simt_callee__ inline float y0f(float x)
     return res;
 }
 
-__simt_callee__ inline float y1f(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float y1f(float x)
 {
     if (x < 0 || isnan(x)) {
         return ASCRT_INF_F / ASCRT_INF_F;
@@ -3030,7 +3038,7 @@ __simt_callee__ inline float y1f(float x)
     return res;
 }
 
-__simt_callee__ inline float ynf(int n, float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float ynf(int n, float x)
 {
     if (x == 0) {
         return -ASCRT_INF_F;

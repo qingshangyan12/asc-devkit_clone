@@ -21,12 +21,12 @@
 #warning "device_sync_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "device_sync_functions.h" and use public functions or variables defined in interface header files."
 #endif
 
-__simt_callee__ inline void asc_syncthreads()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_syncthreads()
 {
     __sync_workitems();
 }
 
-__simt_callee__ inline void asc_threadfence()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_threadfence()
 {
     bisheng::cce::simt::__threadfence();
 }

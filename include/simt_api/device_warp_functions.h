@@ -15,72 +15,73 @@
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_WARP_FUNCTIONS_H__
 #endif
+#include "simt_api/device_types.h"
 
-__simt_callee__ inline int32_t asc_all(int32_t predicate);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_all(int32_t predicate);
 
-__simt_callee__ inline int32_t asc_any(int32_t predicate);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_any(int32_t predicate);
 
-__simt_callee__ inline uint32_t asc_ballot(int32_t predicate);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_ballot(int32_t predicate);
 
-__simt_callee__ inline uint32_t asc_activemask();
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_activemask();
 
-__simt_callee__ inline int32_t asc_shfl(int32_t var, int32_t src_lane, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_shfl(int32_t var, int32_t src_lane, int32_t width = warpSize);
 
-__simt_callee__ inline uint32_t asc_shfl(uint32_t var, int32_t src_lane, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_shfl(uint32_t var, int32_t src_lane, int32_t width = warpSize);
 
-__simt_callee__ inline float asc_shfl(float var, int32_t src_lane, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_shfl(float var, int32_t src_lane, int32_t width = warpSize);
 
-__simt_callee__ inline int64_t asc_shfl(int64_t var, int32_t src_lane, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_shfl(int64_t var, int32_t src_lane, int32_t width = warpSize);
 
-__simt_callee__ inline uint64_t asc_shfl(uint64_t var, int32_t src_lane, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_shfl(uint64_t var, int32_t src_lane, int32_t width = warpSize);
 
-__simt_callee__ inline int32_t asc_shfl_up(int32_t var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_shfl_up(int32_t var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline uint32_t asc_shfl_up(uint32_t var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_shfl_up(uint32_t var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline float asc_shfl_up(float var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_shfl_up(float var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline int64_t asc_shfl_up(int64_t var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_shfl_up(int64_t var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline uint64_t asc_shfl_up(uint64_t var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_shfl_up(uint64_t var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline int32_t asc_shfl_down(int32_t var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_shfl_down(int32_t var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline uint32_t asc_shfl_down(uint32_t var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_shfl_down(uint32_t var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline float asc_shfl_down(float var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_shfl_down(float var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline int64_t asc_shfl_down(int64_t var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_shfl_down(int64_t var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline uint64_t asc_shfl_down(uint64_t var, uint32_t delta, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_shfl_down(uint64_t var, uint32_t delta, int32_t width = warpSize);
 
-__simt_callee__ inline int32_t asc_shfl_xor(int32_t var, int32_t lane_mask, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_shfl_xor(int32_t var, int32_t lane_mask, int32_t width = warpSize);
 
-__simt_callee__ inline uint32_t asc_shfl_xor(uint32_t var, int32_t lane_mask, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_shfl_xor(uint32_t var, int32_t lane_mask, int32_t width = warpSize);
 
-__simt_callee__ inline float asc_shfl_xor(float var, int32_t lane_mask, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_shfl_xor(float var, int32_t lane_mask, int32_t width = warpSize);
 
-__simt_callee__ inline int64_t asc_shfl_xor(int64_t var, int32_t lane_mask, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int64_t asc_shfl_xor(int64_t var, int32_t lane_mask, int32_t width = warpSize);
 
-__simt_callee__ inline uint64_t asc_shfl_xor(uint64_t var, int32_t lane_mask, int32_t width = warpSize);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_shfl_xor(uint64_t var, int32_t lane_mask, int32_t width = warpSize);
 
-__simt_callee__ inline int32_t asc_reduce_add(int32_t val);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_reduce_add(int32_t val);
 
-__simt_callee__ inline uint32_t asc_reduce_add(uint32_t val);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_reduce_add(uint32_t val);
 
-__simt_callee__ inline float asc_reduce_add(float val);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_reduce_add(float val);
 
-__simt_callee__ inline int32_t asc_reduce_max(int32_t val);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_reduce_max(int32_t val);
 
-__simt_callee__ inline uint32_t asc_reduce_max(uint32_t val);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_reduce_max(uint32_t val);
 
-__simt_callee__ inline float asc_reduce_max(float val);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_reduce_max(float val);
 
-__simt_callee__ inline int32_t asc_reduce_min(int32_t val);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_reduce_min(int32_t val);
 
-__simt_callee__ inline uint32_t asc_reduce_min(uint32_t val);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_reduce_min(uint32_t val);
 
-__simt_callee__ inline float asc_reduce_min(float val);
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_reduce_min(float val);
 
 #include "impl/simt_api/device_warp_functions_impl.h"
 

@@ -21,11 +21,17 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__
 #endif
 
+#include "simt_api/device_types.h"
+
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 
 namespace __asc_simt_vf {
 template <class... Args>
-__attribute__((always_inline)) inline __simt_callee__ void printf(const __gm__ char* fmt, Args&&... args);
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+__attribute__((always_inline)) inline __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(const __gm__ char* fmt, Args&&... args);
+#else
+__attribute__((always_inline)) inline __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(const char* fmt, Args&&... args);
+#endif
 }   // namespase __asc_simt_vf
 
 #endif
