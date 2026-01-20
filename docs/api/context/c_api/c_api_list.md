@@ -146,7 +146,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | [assert](debug/assert.md) | 在算子Kernel侧实现代码中需要增加断言的地方使用assert检查代码，并格式化输出一些调测信息。 |
-| [dump](debug/dump.md) | 将对应内存上的数据打印出来,同时支持打印自定义的附加信息（仅支持uint32_t类型的信息。 |
+| [dump](debug/dump.md) | 将对应内存上的数据打印出来,同时支持打印自定义的附加信息（仅支持uint32_t类型的信息）。 |
 | [printf](debug/printf.md) | 该接口提供NPU域调试场景下的格式化输出功能。 |
 
 ## 标量操作

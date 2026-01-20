@@ -25,29 +25,54 @@
  
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h" 
 
-__aicore__ inline void asc_dcci_impl(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_single_impl(__gm__ void* dst)
 {
-    dcci(dst, entire);
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE);
 }
 
-__aicore__ inline void asc_dcci_all_impl(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_entire_impl(__gm__ void* dst)
 {
-    dcci(dst, entire, dcci_dst_t::CACHELINE_ALL);
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE);
 }
 
-__aicore__ inline void asc_dcci_ub_impl(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_single_all_impl(__gm__ void* dst)
 {
-    dcci(dst, entire, dcci_dst_t::CACHELINE_UB);
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_ALL);
 }
 
-__aicore__ inline void asc_dcci_out_impl(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_single_ub_impl(__gm__ void* dst)
 {
-    dcci(dst, entire, dcci_dst_t::CACHELINE_OUT);
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_UB);
 }
 
-__aicore__ inline void asc_dcci_atomic_impl(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_single_out_impl(__gm__ void* dst)
 {
-    dcci(dst, entire, dcci_dst_t::CACHELINE_OUT);
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+}
+
+__aicore__ inline void asc_dcci_single_atomic_impl(__gm__ void* dst)
+{
+    dcci(dst, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_ATOMIC);
+}
+
+__aicore__ inline void asc_dcci_entire_all_impl(__gm__ void* dst)
+{
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_ALL);
+}
+
+__aicore__ inline void asc_dcci_entire_ub_impl(__gm__ void* dst)
+{
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_UB);
+}
+
+__aicore__ inline void asc_dcci_entire_out_impl(__gm__ void* dst)
+{
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+}
+
+__aicore__ inline void asc_dcci_entire_atomic_impl(__gm__ void* dst)
+{
+    dcci(dst, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_ATOMIC);
 }
  
 #endif

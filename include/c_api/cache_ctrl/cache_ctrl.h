@@ -21,15 +21,25 @@
 
 __aicore__ inline int64_t asc_get_icache_preload_status();
 
-__aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire);
+__aicore__ inline void asc_dcci_single(__gm__ void* dst);
 
-__aicore__ inline void asc_dcci_all(__gm__ void* dst, uint64_t entire);
+__aicore__ inline void asc_dcci_entire(__gm__ void* dst);
 
-__aicore__ inline void asc_dcci_ub(__gm__ void* dst, uint64_t entire);
+__aicore__ inline void asc_dcci_single_all(__gm__ void* dst);
 
-__aicore__ inline void asc_dcci_out(__gm__ void* dst, uint64_t entire);
+__aicore__ inline void asc_dcci_single_ub(__gm__ void* dst);
 
-__aicore__ inline void asc_dcci_atomic(__gm__ void* dst, uint64_t entire);
+__aicore__ inline void asc_dcci_single_out(__gm__ void* dst);
+
+__aicore__ inline void asc_dcci_single_atomic(__gm__ void* dst);
+
+__aicore__ inline void asc_dcci_entire_all(__gm__ void* dst);
+
+__aicore__ inline void asc_dcci_entire_ub(__gm__ void* dst);
+
+__aicore__ inline void asc_dcci_entire_out(__gm__ void* dst);
+
+__aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst);
 
 __aicore__ inline void asc_icache_preload(const void* addr);
 

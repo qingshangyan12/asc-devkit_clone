@@ -110,7 +110,7 @@ __aicore__ __gm__ inline RingBufWriteInfo* get_ring_buf_write_info(__gm__ BlockR
 __aicore__ inline void skip_ring_buf_directly(__gm__ RingBufWriteInfo* write_info)
 {
     write_info->bufOffset = 0;
-    dcci(reinterpret_cast<__gm__ uint64_t*>(write_info), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(write_info));
     return;
 }
 
@@ -122,8 +122,8 @@ __aicore__ inline void skip_ring_buf_with_info(
     skip_info->length = ring_buf_len - write_info->bufOffset - sizeof(SkipTlvInfo);
     write_info->bufOffset = 0;
     write_info->packIdx += 1;
-    dcci(reinterpret_cast<__gm__ uint64_t*>(skip_info), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-    dcci(reinterpret_cast<__gm__ uint64_t*>(write_info), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(skip_info));
+    asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(write_info));
     return;
 }
 
@@ -136,7 +136,7 @@ __aicore__ inline bool ring_buffer_wait(
         if (spend_time > ASC_TIMEOUT_CYCLE) {
             return false;
         }
-        dcci(reinterpret_cast<__gm__ uint64_t*>(read_info), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+        asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(read_info));
     }
     return true;
 }
@@ -149,7 +149,7 @@ __aicore__ inline bool wait_ring_buf_begin_read(__gm__ RingBufReadInfo* read_inf
         if (spend_time > ASC_TIMEOUT_CYCLE) {
             return false;
         }
-        dcci(reinterpret_cast<__gm__ uint64_t*>(read_info), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+        asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(read_info));
     }
     return true;
 }
@@ -201,7 +201,7 @@ __aicore__ inline void write_ring_buf_tlv_head(
     print_tlv->resvMem[0] = static_cast<uint32_t>(0U);
     print_tlv->resvMem[1] = static_cast<uint32_t>(0U);
     print_tlv->fmtOffset = (args_num + 1) * sizeof(uint64_t); // include fmt offset
-    dcci(reinterpret_cast<__gm__ uint64_t*>(print_tlv), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(print_tlv));
 }
 
 __aicore__ inline void mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, uint32_t len)
@@ -212,7 +212,7 @@ __aicore__ inline void mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8
     for (uint32_t i = 0; i < len; i++) {
         *(dst + i) = *(src + i);
     }
-    dcci((__gm__ uint64_t*)(dst), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    asc_dcci_entire_out((__gm__ uint64_t*)(dst));
 }
 
 __aicore__ inline void write_string(__gm__ uint8_t* param_addr, uint32_t param_idx, __gm__ const char* s, uint32_t& offset)
@@ -222,7 +222,7 @@ __aicore__ inline void write_string(__gm__ uint8_t* param_addr, uint32_t param_i
 
     // write string value offset
     *((__gm__ uint64_t *)string_addr) = static_cast<uint64_t>(offset - ASC_ONE_PARAM_SIZE * param_idx);
-    dcci((__gm__ uint64_t*)string_addr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    asc_dcci_entire_out((__gm__ uint64_t*)string_addr);
 
     // write string content
     __gm__ char *d = (__gm__ char *)(dst_str_addr);
@@ -230,7 +230,7 @@ __aicore__ inline void write_string(__gm__ uint8_t* param_addr, uint32_t param_i
 
     for (uint32_t i = 0; i < str_len; i++) {
         *(d + i) = *(s + i);
-        dcci((__gm__ uint64_t*)d, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+        asc_dcci_entire_out((__gm__ uint64_t*)d);
     }
     offset += str_len;
 }
@@ -257,7 +257,7 @@ __aicore__ inline void write_scalar(__gm__ uint8_t* param_addr, uint32_t param_i
         *((__gm__ uint64_t *)scalar_addr) = static_cast<uint64_t>(scalar);
     }
 
-    dcci((__gm__ uint64_t*)scalar_addr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    asc_dcci_entire_out((__gm__ uint64_t*)scalar_addr);
 }
 
 __aicore__ inline void set_param(__gm__ uint8_t* param_addr, uint32_t param_idx, uint32_t& offset)
@@ -306,7 +306,7 @@ __aicore__ inline void update_write_info(__gm__ RingBufWriteInfo* write_info, ui
 {
     write_info->bufOffset += tlv_len;
     write_info->packIdx += 1;
-    dcci(reinterpret_cast<__gm__ uint64_t*>(write_info), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(write_info));
 }
 
 template <class... Args>

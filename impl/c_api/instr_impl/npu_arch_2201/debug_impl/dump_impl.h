@@ -69,7 +69,7 @@ private:
             if (spend_time > ASC_TIMEOUT_CYCLE) {
                 return false;
             }
-            instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>(reinterpret_cast<__gm__ uint64_t*>(read_info));
+            asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(read_info));
         }
         return true;
     }
@@ -77,7 +77,7 @@ private:
     __aicore__ inline void skip_ring_buf_directly(__gm__ RingBufWriteInfo* write_info)
     {
         write_info->bufOffset = 0;
-            instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>(reinterpret_cast<__gm__ uint64_t*>(write_info));
+            asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(write_info));
         return;
     }
 
@@ -89,8 +89,8 @@ private:
         skipInfo->length = ring_buf_len - write_info->bufOffset - sizeof(SkipTlvInfo);
         write_info->bufOffset = 0;
         write_info->packIdx += 1;
-        instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>(reinterpret_cast<__gm__ uint64_t*>(skipInfo));
-        instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>(reinterpret_cast<__gm__ uint64_t*>(write_info));
+        asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(skipInfo));
+        asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(write_info));
         return;
     }
 
@@ -103,7 +103,7 @@ private:
             if (spend_time > ASC_TIMEOUT_CYCLE) {
                 return false;
             }
-            instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>(reinterpret_cast<__gm__ uint64_t*>(read_info));
+            asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(read_info));
         }
         return true;
     }
@@ -197,7 +197,7 @@ private:
         }
         dump_tensor_tlv->resv1 = static_cast<uint32_t>(0U);
         dump_tensor_tlv->dumpSize = dump_size * sizeof(T);
-        instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>((__gm__ uint64_t*)(__gm__ uint64_t*)(dump_tensor_tlv));
+        asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(dump_tensor_tlv));
     }
 
     template <Hardware hardware, typename T, typename U>
@@ -213,7 +213,7 @@ private:
             for (uint32_t i = 0; i < dump_len; i++) {
                 *(dst + i) = *(src + i);
             }
-            instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>((__gm__ uint64_t*)(dst));
+            asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(dst));
         } else if constexpr (hardware == Hardware::UB) {
             __gm__ T* dump_addr = reinterpret_cast<__gm__ T*>(dump_tensor_tlv + 1);
             uint16_t burst_len = static_cast<uint16_t>(align_dump_len / ASC_C_API_ONE_DATABLOCK_SIZE);
@@ -222,14 +222,14 @@ private:
                 instruction_forward::call_copy_ub2gm(dump_addr, src, 0, 1, burst_len, 0, 0);
             }
             instruction_forward::call_sync();
-            instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>((__gm__ uint64_t*)(dump_addr));
+            asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(dump_addr));
         }
     }
     __aicore__ inline void update_write_info(__gm__ RingBufWriteInfo* write_info, uint32_t tlv_len)
     {
         write_info->bufOffset += tlv_len;
         write_info->packIdx += 1;
-        instruction_forward::call_dcci<cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT>(reinterpret_cast<__gm__ uint64_t*>(write_info));
+        asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(write_info));
     }
 };
 

@@ -23,14 +23,6 @@ extern  __gm__ uint8_t* g_sysPrintFifoSpace;
 class instruction_forward 
 {
 private:
-    template<cache_line_t cache_line, dcci_dst_t dcci_dst>
-    __aicore__ static inline void dcci_impl(__gm__ uint64_t* addr)
-    {
-        if constexpr (CURRENT_ARCH_VERSION == arch_version::v2201) {
-            dcci(addr, cache_line, dcci_dst);
-        }
-    }
-
     __aicore__ static inline void sync_impl() 
     {
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
@@ -98,12 +90,6 @@ private:
 #endif
     }
 public:
-    template<cache_line_t cache_line, dcci_dst_t dcci_dst>
-    __aicore__ static inline void call_dcci(__gm__ uint64_t* addr)
-    {
-        dcci_impl<cache_line, dcci_dst>(addr);
-    }
-
     __aicore__ static inline void call_sync()
     {
         sync_impl();

@@ -23,29 +23,54 @@
 #include "cache_ctrl_impl/asc_dcci_impl.h"
 #include "cache_ctrl_impl/asc_icache_preload_impl.h"
 
-__aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_single(__gm__ void* dst)
 {
-    asc_dcci_impl(dst, entire);
+    asc_dcci_single_impl(dst);
 }
 
-__aicore__ inline void asc_dcci_all(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_entire(__gm__ void* dst)
 {
-    asc_dcci_all_impl(dst, entire);
+    asc_dcci_entire_impl(dst);
 }
 
-__aicore__ inline void asc_dcci_ub(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_single_all(__gm__ void* dst)
 {
-    asc_dcci_ub_impl(dst, entire);
+    asc_dcci_single_all_impl(dst);
 }
 
-__aicore__ inline void asc_dcci_out(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_single_ub(__gm__ void* dst)
 {
-    asc_dcci_out_impl(dst, entire);
+    asc_dcci_single_ub_impl(dst);
 }
 
-__aicore__ inline void asc_dcci_atomic(__gm__ void* dst, uint64_t entire)
+__aicore__ inline void asc_dcci_single_out(__gm__ void* dst)
 {
-    asc_dcci_atomic_impl(dst, entire);
+    asc_dcci_single_out_impl(dst);
+}
+
+__aicore__ inline void asc_dcci_single_atomic(__gm__ void* dst)
+{
+    asc_dcci_single_atomic_impl(dst);
+}
+
+__aicore__ inline void asc_dcci_entire_all(__gm__ void* dst)
+{
+    asc_dcci_entire_all_impl(dst);
+}
+
+__aicore__ inline void asc_dcci_entire_ub(__gm__ void* dst)
+{
+    asc_dcci_entire_ub_impl(dst);
+}
+
+__aicore__ inline void asc_dcci_entire_out(__gm__ void* dst)
+{
+    asc_dcci_entire_out_impl(dst);
+}
+
+__aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst)
+{
+    asc_dcci_entire_atomic_impl(dst);
 }
 
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset)
