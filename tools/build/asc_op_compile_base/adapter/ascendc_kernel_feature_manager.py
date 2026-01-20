@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2025 Huawei Technologies Co., Ltd.
-# This program is free software, you can redistribute it and/or modify it under the terms and contiditions of
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -19,28 +19,42 @@ from typing import Dict, Type, Any, Callable, Optional
 from .log_utils import LogUtil, AscendCLogLevel
 
 
-
 class BaseFeature(ABC):
     """
     base feature class
     """
     def __init__(self, feature_name: str, feature_version: int):
         if not isinstance(feature_name, str):
-            raise TypeError(f"feature_name's type must be str, current tpye is {type(feature_name).__name__}")
+            raise TypeError(f"feature_name's type must be str, current type is {type(feature_name).__name__}")
         if not isinstance(feature_version, int):
-            raise TypeError(f"value's type must be INT, current tpye is {type(feature_version).__name__}")
+            raise TypeError(f"feature_version's type must be int, current type is {type(feature_version).__name__}")
         self.feature_name = feature_name
         self.feature_version = feature_version
 
     def get_intersection_version(self, others_value: int) -> int:
+        """
+        Get the minimum version between current feature version and another version.
+
+        Args:
+            other_version: The version to compare with.
+        
+        Return:
+            The minimum version of the two.
+        """
         return min(self.value, others_value)
 
     @abstractmethod
     def get_feature_version_of_value(self, feature_value: any) -> int:
+        """
+        Abstract method to get feature version from feature value.
+        """
         pass
 
     @abstractmethod
-    def get_feature_value_of_version(self, feature_version: any) -> any:
+    def get_feature_value_of_version(self, feature_version: int) -> any:
+        """
+        Abstract method to get feature value from feature version.
+        """
         pass
 
 
@@ -71,7 +85,7 @@ class AscendCKernelFeatureManager:
         for feature_name in input_features.keys():
             if feature_name not in self._support_features_instances.keys():
                 LogUtil.print_compile_log("AscendC Feature Manager", \
-                    f"{feature_name} do not support in ascendc compile, please upgrade the CANN version", \
+                    f"{feature_name} does not support in ascendc compile, please upgrade the CANN version", \
                     AscendCLogLevel.LOG_INFO)
             else:
                 feature_instance = self._support_features_instances[feature_name]
@@ -104,7 +118,7 @@ class AscendCKernelFeatureManager:
 
     def unregister_feature(self, feature_name: str) -> None:
         if feature_name not in self._support_features_instances:
-            raise KeyError(f"feature {feature_name} not exists")
+            raise KeyError(f"feature {feature_name} does not exists")
         
         self._support_features_instances.pop(feature_name)
 
@@ -116,7 +130,7 @@ class AscendCKernelFeatureManager:
         """
         if feature_name not in self._enable_features_base.keys():
             LogUtil.print_compile_log("AscendC Feature Manager", \
-                    f"{feature_name} do not support in ascendc compile, \
+                    f"{feature_name} does not support in ascendc compile, \
                     please upgrade the related software version, i.e. cann, opp, graph-autofusion.", \
                     AscendCLogLevel.LOG_INFO)
             return
@@ -124,9 +138,8 @@ class AscendCKernelFeatureManager:
             self._enable_features_base[feature_name] = feature_value
         else:
             LogUtil.print_compile_log("AscendC Feature Manager", \
-                f"feature {feature_name} do not support {feature_value}, \
-                currect feature {feature_name} support verison is \
-                {self._available_feature_version_map[feature_name]}, \
+                f"feature {feature_name} does not support {feature_value}, \
+                currect support version is {self._available_feature_version_map[feature_name]}, \
                 please upgrade the related software version, \
                 i.e. cann, opp, graph-autofusion.", AscendCLogLevel.LOG_INFO)
 
@@ -137,14 +150,14 @@ class AscendCKernelFeatureManager:
         """
         if feature_name not in self._enable_features_base.keys():
             LogUtil.print_compile_log("AscendC Feature Manager", \
-                    f"{feature_name} do not support in ascendc compile, \
+                    f"{feature_name} does not support in ascendc compile, \
                     please upgrade the related software version, i.e. cann, opp, graph-autofusion.", \
                     AscendCLogLevel.LOG_INFO)
             return None
         return self._enable_features_base[feature_name]
 
     def get_support_feature_versions(self) -> dict:
-        return self._support_feature_version_map
+        return self._support_feature_version_map.copy()
 
 
 def register_feature(manager: AscendCKernelFeatureManager):
@@ -163,13 +176,13 @@ def register_feature(manager: AscendCKernelFeatureManager):
             else:
                 return 0
 
-        def get_feature_value_of_version(self, version: int) -> int:
-            if version == 1:
+        def get_feature_value_of_version(self, feature_version: int) -> any:
+            if feature_version == 1:
                 return True
-            elif version == 0:
+            elif feature_version == 0:
                 return False
             else:
-                raise ValueError(f"{self.feature_name} do not support {version}")
+                raise ValueError(f"{self.feature_name} does not support {feature_version}")
     """
     def decorator(feature_cls: Type[BaseFeature]) -> Type[BaseFeature]:
         manager.register_feature(feature_cls)
