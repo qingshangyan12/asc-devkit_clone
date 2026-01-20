@@ -24,11 +24,11 @@ template <int InputNum, StoreDist dist> __simd_callee__ inline void CheckStoreDi
             StoreDist::DIST_FIRST_ELEMENT_B8, StoreDist::DIST_FIRST_ELEMENT_B16, StoreDist::DIST_FIRST_ELEMENT_B32,
             StoreDist::DIST_PACK_B16, StoreDist::DIST_PACK_B32, StoreDist::DIST_PACK_B64, StoreDist::DIST_PACK4_B32,
             StoreDist::DIST_NORM>(),
-            "DataCopy not support this dist on current device");
+            "StoreAlign not support this dist on current device");
     } else {
         static_assert(
             SupportEnum<dist, StoreDist::DIST_INTLV_B8, StoreDist::DIST_INTLV_B16, StoreDist::DIST_INTLV_B32>(),
-            "DataCopy not support this dist on current device");
+            "StoreAlign not support this dist on current device");
     }
 }
 
@@ -76,7 +76,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, MaskReg
                  distValue, dstMask1);
         } else {
             static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
-                "DataCopy only support type b8/b16/b32/b64 on current device");
+                "StoreAlign only support type b8/b16/b32/b64 on current device");
             if constexpr (std::is_same_v<T, bool>) {
                 vsts((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, 0, distValue, mask);
             } else if constexpr (SupportBytes<ActualT, 4>()) {
@@ -139,7 +139,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, U& srcReg, int32_
                 postValue);
         } else {
             static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
-                "DataCopy only support type b8/b16/b32/b64 on current device");
+                "StoreAlign only support type b8/b16/b32/b64 on current device");
             if constexpr (std::is_same_v<T, bool>) {
                 vsts((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postUpdateStride, distValue, mask,
                      postValue);
@@ -166,7 +166,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, AddrReg
         vst((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, offset, distValue, mask);
     } else {
         static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
-            "DataCopy only support type b8/b16/b32/b64 on current device");
+            "StoreAlign only support type b8/b16/b32/b64 on current device");
         if constexpr (std::is_same_v<T, bool>) {
             vst((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, offset, distValue, mask);
         } else if constexpr (SupportBytes<T, 4>()) {
@@ -201,7 +201,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
              mask);
     } else {
         static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), 
-                      "DataCopy only support type b8/b16/b32/b64 on current device");
+                      "StoreAlign only support type b8/b16/b32/b64 on current device");
         if constexpr (std::is_same_v<T, bool>) {
             vsts((RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1, (__ubuf__ int8_t*)dstAddr, 0, distValue,
                  mask);
@@ -240,7 +240,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
             distValue, mask);
     } else {
         static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
-                      "DataCopy only support type b8/b16/b32/b64 on current device");
+                      "StoreAlign only support type b8/b16/b32/b64 on current device");
         if constexpr (std::is_same_v<T, bool>) {
             vst((RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1, (__ubuf__ int8_t*)dstAddr,
                 offset, distValue, mask);
@@ -272,7 +272,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, uint32_
     if constexpr (SupportType<ActualT, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int4x2_t>()) {
         vsstb((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, (dataBlockStride << 16u), mask);
     } else {
-        static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+        static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
         if constexpr (std::is_same_v<T, bool>) {
             vsstb((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, (dataBlockStride << 16u), mask);
         } else if constexpr (std::is_same_v<T, complex32>) {
@@ -299,7 +299,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, U& srcReg, uint32
             vsstb((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr,
                   (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);
         } else {
-            static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DataCopy only support type b8/b16/b32 on current device");
+            static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
             constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
             if constexpr (std::is_same_v<T, bool>) {
                 vsstb((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr,
@@ -322,9 +322,11 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, U& srcReg,
     using ActualT = typename U::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
-                  "DataCopyUnAlign only support type b8/b16/b32/b64 on current device");
+                  "StoreUnAlign only support type b8/b16/b32/b64 on current device");
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
-    if constexpr (sizeof(ActualT) == 8) {
+    if constexpr (SupportBytes<T, 1>()) {
+        vstus(ureg, postUpdateStride, (RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr, postValue);
+    } else if constexpr (sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             vstus(ureg, postUpdateStride * 2, (RegTensor<uint32_t>&)srcReg, (__ubuf__ uint32_t*&)dstAddr,
                   postValue);
@@ -365,8 +367,14 @@ __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf__ T*& dstAddr, Unalig
                                                     int32_t postUpdateStride)
 {
     static_assert(SupportBytes<T, 1, 2, 4, 8>(),
-        "DataCopyUnAlignPost only support type b8/b16/b32/b64 on current device");
-    if constexpr (sizeof(T) == 8) {
+        "StoreUnAlignPost only support type b8/b16/b32/b64 on current device");
+    if constexpr (SupportBytes<T, 1>()) {
+        if constexpr (postMode == PostLiteral::POST_MODE_UPDATE) {
+            vstas(ureg, (__ubuf__ uint8_t*&)dstAddr, postUpdateStride, POST_UPDATE);
+        } else {
+            vstas(ureg, (__ubuf__ uint8_t*&)dstAddr, postUpdateStride);
+        }
+    } else if constexpr (sizeof(T) == 8) {
         if constexpr (postMode == PostLiteral::POST_MODE_UPDATE) {
             vstas(ureg, (__ubuf__ uint32_t*&)dstAddr, postUpdateStride * 2, POST_UPDATE);
         } else {
@@ -427,14 +435,18 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, U& srcReg,
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), "only support type b8/b16/b32/b64 on current device");
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
-    if constexpr (std::is_same_v<T, bool>) {
-        vstu(ureg, areg, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postValue);
-    } else if constexpr (SupportBytes<T, 4>()) {
-        vstu(ureg, areg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
-    } else if constexpr (SupportBytes<T, 8>()) {
-        vstu(ureg, areg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
+    if constexpr (SupportBytes<T, 1>()) {
+        vstu(ureg, areg, (RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr, postValue);
     } else {
-        vstu(ureg, areg, srcReg, dstAddr, postValue);
+        if constexpr (std::is_same_v<T, bool>) {
+            vstu(ureg, areg, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postValue);
+        } else if constexpr (SupportBytes<T, 4>()) {
+            vstu(ureg, areg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
+        } else if constexpr (SupportBytes<T, 8>()) {
+            vstu(ureg, areg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
+        } else {
+            vstu(ureg, areg, srcReg, dstAddr, postValue);
+        }        
     }
 }
 
@@ -442,14 +454,18 @@ template <typename T>
 __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf__ T*& dstAddr, UnalignReg& ureg, AddrReg& areg)
 {
     static_assert(SupportBytes<T, 1, 2, 4, 8>(), "only support type b8/b16/b32/b64 on current device");
-    if constexpr (std::is_same_v<T, bool>) {
-        vsta(ureg, (__ubuf__ int8_t*&)dstAddr, areg);
-    } else if constexpr (SupportBytes<T, 4>()) {
-        vsta(ureg, (__ubuf__ int32_t*&)dstAddr, areg);
-    } else if constexpr (SupportBytes<T, 8>()) {
-        vsta(ureg, (__ubuf__ int32_t*&)dstAddr, areg);
+    if constexpr (SupportBytes<T, 1>()) {
+        vsta(ureg, (__ubuf__ uint8_t*&)dstAddr, areg);
     } else {
-        vsta(ureg, dstAddr, areg);
+        if constexpr (std::is_same_v<T, bool>) {
+            vsta(ureg, (__ubuf__ int8_t*&)dstAddr, areg);
+        } else if constexpr (SupportBytes<T, 4>()) {
+            vsta(ureg, (__ubuf__ int32_t*&)dstAddr, areg);
+        } else if constexpr (SupportBytes<T, 8>()) {
+            vsta(ureg, (__ubuf__ int32_t*&)dstAddr, areg);
+        } else {
+            vsta(ureg, dstAddr, areg);
+        }
     }
 }
 
@@ -462,28 +478,36 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T* dstAddr, U& srcReg, 
     static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), "only support type b8/b16/b32/b64 on current device");
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only support RegTraitNumOne on current device!");
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
-    if constexpr (std::is_same_v<T, bool>) {
-        vstur(ureg, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, postValue);
-    } else if constexpr (SupportBytes<T, 4>()) {
-        vstur(ureg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, postValue);
-    } else if constexpr (SupportBytes<T, 8>()) {
-        vstur(ureg, (RegTensor<int64_t>&)srcReg, (__ubuf__ int64_t*)dstAddr, postValue);
+    if constexpr (SupportBytes<T, 1>()) {
+        vstur(ureg, (RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, postValue);
     } else {
-        vstur(ureg, srcReg, dstAddr, postValue);
+        if constexpr (std::is_same_v<T, bool>) {
+            vstur(ureg, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, postValue);
+        } else if constexpr (SupportBytes<T, 4>()) {
+            vstur(ureg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, postValue);
+        } else if constexpr (SupportBytes<T, 8>()) {
+            vstur(ureg, (RegTensor<int64_t>&)srcReg, (__ubuf__ int64_t*)dstAddr, postValue);
+        } else {
+            vstur(ureg, srcReg, dstAddr, postValue);
+        }
     }
 }
 
 template <typename T> __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf__ T* dstAddr, UnalignReg& ureg)
 {
     static_assert(SupportBytes<T, 1, 2, 4, 8>(), "only support type b8/b16/b32/b64 on current device");
-    if constexpr (std::is_same_v<T, bool>) {
-        vstar(ureg, (__ubuf__ int8_t*)dstAddr);
-    } else if constexpr (SupportBytes<T, 4>()) {
-        vstar(ureg, (__ubuf__ int32_t*)dstAddr);
-    } else if constexpr (SupportBytes<T, 8>()) {
-        vstar(ureg, (__ubuf__ int64_t*)dstAddr);
+    if constexpr (SupportBytes<T, 1>()) {
+        vstar(ureg, (__ubuf__ uint8_t*)dstAddr);
     } else {
-        vstar(ureg, dstAddr);
+        if constexpr (std::is_same_v<T, bool>) {
+            vstar(ureg, (__ubuf__ int8_t*)dstAddr);
+        } else if constexpr (SupportBytes<T, 4>()) {
+            vstar(ureg, (__ubuf__ int32_t*)dstAddr);
+        } else if constexpr (SupportBytes<T, 8>()) {
+            vstar(ureg, (__ubuf__ int64_t*)dstAddr);
+        } else {
+            vstar(ureg, dstAddr);
+        }
     }
 }
 } // namespace MicroAPI
