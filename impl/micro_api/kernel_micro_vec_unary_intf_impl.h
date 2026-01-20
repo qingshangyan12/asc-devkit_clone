@@ -15,12 +15,8 @@
 #ifndef ASCENDC_KERNEL_MICRO_VEC_SINGLE_INTERFACE_IMPL_H
 #define ASCENDC_KERNEL_MICRO_VEC_SINGLE_INTERFACE_IMPL_H
 
-#if __NPU_ARCH__ == 2103
-#include "micro_api/dav_l210/kernel_micro_vec_unary_impl.h"
-#elif __NPU_ARCH__ == 3003
+#if __NPU_ARCH__ == 3003
 #include "micro_api/dav_l300/kernel_micro_vec_unary_impl.h"
-#elif __NPU_ARCH__ == 3103
-#include "micro_api/dav_l310/kernel_micro_vec_unary_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "micro_api/dav_l311/kernel_micro_vec_unary_impl.h"
 #elif __NPU_ARCH__ == 5102
@@ -61,7 +57,7 @@ __simd_callee__ inline void Sqrt(U& dstReg, U& srcReg, MaskReg& mask)
     SqrtImpl<T, mode, U>(dstReg, srcReg, mask);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2103 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 template <typename T, MaskMergeMode mode, typename RegT>
 __aicore__ inline void Rsqrt(RegT &dstReg, RegT &srcReg, MaskReg &mask)

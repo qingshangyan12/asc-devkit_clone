@@ -169,7 +169,7 @@ template <typename T>
 __aicore__ inline void LoadL0AForConv2D(uint32_t kBlocks, uint32_t indexK, uint32_t mBlocks, uint32_t indexM,
     Conv2dParams& conv2dParams, Conv2dTilling& tilling, const LocalTensor<T>& src0, const LocalTensor<T>& l0a)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 1001) && (__NPU_ARCH__ != 2002) && (__NPU_ARCH__ != 2103)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 1001) && (__NPU_ARCH__ != 2002)
     LoadL0AForConv2DV2(kBlocks, indexK, mBlocks, indexM, conv2dParams, tilling, src0, l0a);
 #else
     LoadL0AForConv2DV1(kBlocks, indexK, mBlocks, indexM, conv2dParams, tilling, src0, l0a);

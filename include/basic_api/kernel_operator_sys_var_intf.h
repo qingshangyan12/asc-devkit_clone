@@ -51,7 +51,7 @@ __aicore__ inline void ClearSpr();
 #endif
 
 #if defined(__NPU_ARCH__) &&                                                                                    \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) ||    \
+    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101))
 __aicore__ inline constexpr uint32_t GetUBSizeInBytes()
 {

@@ -30,12 +30,8 @@
 #include "dav_c310/kernel_operator_vec_gather_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_gather_impl.h"
-#elif __NPU_ARCH__ == 2103
-#include "dav_l210/kernel_operator_vec_gather_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_gather_impl.h"
-#elif __NPU_ARCH__ == 3103
-#include "dav_l310/kernel_operator_vec_gather_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_gather_impl.h"
 #endif
@@ -65,7 +61,7 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
     }
 #endif
     uint32_t srcLength = src0.GetSize();
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
     GatherImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src0.GetPhyAddr(),
         (__ubuf__ uint32_t*)offset.GetPhyAddr(), srcLength, repeatTime, repeatParams);
@@ -143,19 +139,8 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
     const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2103)
-    if constexpr (sizeof(PrimType) == sizeof(uint16_t)) {
-        uint64_t index_u32 = srcOffset.GetPhyAddr();
-        uint64_t index_u16 = dst.GetPhyAddr();
-        CastIndexU322U16((__ubuf__ uint16_t*)index_u16, (__ubuf__ uint32_t*)index_u32, count);
-        GatherImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-            (__ubuf__ uint16_t*)index_u16, srcBaseAddr, count);
-    } else {
-        GatherImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-            (__ubuf__ uint32_t*)srcOffset.GetPhyAddr(), srcBaseAddr, count);
-    }
-#elif (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
-      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
+      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
         {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination is src and "
         "dst both: uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t");});
@@ -168,7 +153,7 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
     }
 #endif
     uint32_t vectorRegWidth = 256;
-#if (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3103)) || \
+#if (__NPU_ARCH__ == 3003) || \
     ((__NPU_ARCH__ == 3113))
     vectorRegWidth = VECTOR_REG_WIDTH;
 #endif
@@ -178,14 +163,14 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
     } else {
         elementCountSingleRepeat = 64;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113)
     elementCountSingleRepeat = vectorRegWidth / sizeof(T);
     uint32_t repeatStride = vectorRegWidth / ONE_BLK_SIZE;
 #endif
     const uint32_t elementCountTail = count % elementCountSingleRepeat;
     const uint8_t repeatTime = count / elementCountSingleRepeat;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113)
     if (repeatTime > 0) {
         Gather(dst, src, srcOffset, srcBaseAddr, (uint64_t)elementCountSingleRepeat, repeatTime,

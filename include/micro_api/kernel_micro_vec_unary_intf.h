@@ -34,7 +34,7 @@ __simd_callee__ inline void Exp(U& dstReg, U& srcReg, MaskReg& mask);
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void Sqrt(U& dstReg, U& srcReg, MaskReg& mask);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2103 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __aicore__ inline void Rec(RegT& dstReg, RegT& srcReg, MaskReg& mask);
 

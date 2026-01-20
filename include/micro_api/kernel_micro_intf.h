@@ -15,8 +15,7 @@
 #ifndef ASCENDC_MODULE_MICRO_INTERFACE_H
 #define ASCENDC_MODULE_MICRO_INTERFACE_H
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || \
-    (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3103)) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
     ((__NPU_ARCH__ == 3113))) || defined(__ASC_NPU_HOST__)
 #include "kernel_micro_common_intf.h"
 #include "kernel_micro_maskreg_intf.h"

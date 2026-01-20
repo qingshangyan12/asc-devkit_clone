@@ -35,12 +35,8 @@
 #include "dav_c310/kernel_operator_fixpipe_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_fixpipe_impl.h"
-#elif __NPU_ARCH__ == 2103
-#include "dav_l210/kernel_operator_fixpipe_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_fixpipe_impl.h"
-#elif __NPU_ARCH__ == 3103
-#include "dav_l310/kernel_operator_fixpipe_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_fixpipe_impl.h"
 #endif
@@ -76,7 +72,6 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &preData, bool isUn
 {
     SetFixPipeConfigImpl<T, setRelu>(preData, isUnitFlag);
 }
-
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)

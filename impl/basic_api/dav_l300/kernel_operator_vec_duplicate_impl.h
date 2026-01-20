@@ -10,7 +10,7 @@
 
 /*!
  * \file kernel_operator_vec_duplicate_impl.h
- * \brief AscendC l210 support vector duplicate api.
+ * \brief AscendC l300 support vector duplicate api.
  */
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_IMPL_H

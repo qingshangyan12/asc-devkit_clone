@@ -18,7 +18,7 @@
 #include "kernel_micro_common_intf.h"
 namespace AscendC {
 namespace MicroAPI {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
            (__NPU_ARCH__ == 3113))
 template <typename T> __aicore__ inline AddrReg CreateAddrReg(uint16_t index0, uint16_t stride0);
 

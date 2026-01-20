@@ -54,7 +54,7 @@ __simd_callee__ inline void Or(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void Xor(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2103 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || \
             __NPU_ARCH__ == 3113)
 template <typename T = DefaultType, typename IndexT = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
           typename RegT, typename RegIndexT>

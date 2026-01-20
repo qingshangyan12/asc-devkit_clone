@@ -221,7 +221,7 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
             len,
             currentPoolSize));
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
     if constexpr (T::dstPosition == TPosition::C2) {
         len = (len + TWO_BLK_SIZE - MIN_BLOCK_LEN) / TWO_BLK_SIZE * TWO_BLK_SIZE;
@@ -235,7 +235,7 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
     ASCENDC_DEBUG_ASSERT((pool != Hardware::GM), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "buffer pos can not be Hardware::GM"));
     ASCENDC_DEBUG_ASSERT((pool != Hardware::MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "buffer pos can not be Hardware::MAX"));
     auto curPoolAddr = this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
     if constexpr (T::dstPosition == TPosition::C2PIPE2GM) {
         curPoolAddr = 0;
@@ -300,7 +300,7 @@ template <TPosition pos> __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf
 #endif
 
     len = (len + ONE_BLK_SIZE - MIN_BLOCK_LEN) / ONE_BLK_SIZE * ONE_BLK_SIZE;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
     if constexpr (pos == TPosition::C2) {
         len = (len + TWO_BLK_SIZE - MIN_BLOCK_LEN) / TWO_BLK_SIZE * TWO_BLK_SIZE;

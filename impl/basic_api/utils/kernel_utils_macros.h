@@ -48,8 +48,7 @@
         __VA_ARGS__                  \
     }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #define SetBitOn(flag, bit) ((flag) = ((flag) | ((uint64_t)(1) << (bit))))
 
 #define GetBit(flag, bit) (((flag) >> (bit)) & (1))

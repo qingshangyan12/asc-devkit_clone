@@ -30,8 +30,8 @@ enum class MaskMode : uint8_t {
 template <typename T, MaskMode mode>
 __aicore__ static inline void SetVectorMaskImpl(const uint64_t maskHigh, const uint64_t maskLow)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 2103) ||   \
-    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) ||   \
+    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if constexpr (sizeof(PrimT<T>) >= sizeof(int32_t)) {
         ASCENDC_ASSERT((maskHigh == 0ULL), { KERNEL_LOG(KERNEL_ERROR, "maskHigh must be 0 for type b32 and b64"); });
@@ -87,8 +87,7 @@ template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
 #if __NPU_ARCH__ == 3102
     return;
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || \
-    ((__NPU_ARCH__ == 3103)) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
     pipe_barrier(pipe);
 #else
 #if (__NPU_ARCH__ == 3002)
@@ -143,7 +142,7 @@ __aicore__ inline void DcciUBImpl(__ubuf__ T* dst)
 
 #if defined(__NPU_ARCH__ ) &&                                                           \
      ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) ||     \
-      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <typename T, CacheLine entireType>
 __aicore__ inline void DcciGMImpl(__gm__ T* dst)
 {

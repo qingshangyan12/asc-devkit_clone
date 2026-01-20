@@ -61,8 +61,6 @@ install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/basic_api
 )
 install(DIRECTORY ${ASCENDC_IMPL_DIR}/basic_api
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
-  PATTERN "impl/basic_api/dav_l210" EXCLUDE
-  PATTERN "impl/basic_api/dav_l310" EXCLUDE
 )
 
 install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/micro_api

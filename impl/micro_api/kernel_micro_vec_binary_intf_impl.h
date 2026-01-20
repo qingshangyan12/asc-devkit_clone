@@ -18,12 +18,8 @@
 #include "micro_api/kernel_micro_vec_unary_intf.h"
 #include "micro_api/kernel_micro_vec_binary_scalar_intf.h"
 
-#if __NPU_ARCH__ == 2103
-#include "micro_api/dav_l210/kernel_micro_vec_binary_impl.h"
-#elif __NPU_ARCH__ == 3003
+#if __NPU_ARCH__ == 3003
 #include "micro_api/dav_l300/kernel_micro_vec_binary_impl.h"
-#elif __NPU_ARCH__ == 3103
-#include "micro_api/dav_l310/kernel_micro_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "micro_api/dav_l311/kernel_micro_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 5102
@@ -100,7 +96,7 @@ __simd_callee__ inline void Xor(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
     XorImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2103 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 template <typename T, typename IndexT, MaskMergeMode mode, typename RegT, typename RegIndexT>
 __aicore__ inline void Round(RegT &dstReg, RegT &srcReg0, RegIndexT &srcReg1, MaskReg &mask)

@@ -17,12 +17,8 @@
 
 #include "kernel_micro_maskreg_intf_impl.h"
 
-#if __NPU_ARCH__ == 2103
-#include "micro_api/dav_l210/kernel_micro_datacopy_impl.h"
-#elif __NPU_ARCH__ == 3003
+#if __NPU_ARCH__ == 3003
 #include "micro_api/dav_l300/kernel_micro_datacopy_impl.h"
-#elif __NPU_ARCH__ == 3103
-#include "micro_api/dav_l310/kernel_micro_datacopy_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "micro_api/dav_l311/kernel_micro_datacopy_impl.h"
 #elif __NPU_ARCH__ == 5102

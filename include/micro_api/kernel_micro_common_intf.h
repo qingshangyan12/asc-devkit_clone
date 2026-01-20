@@ -20,12 +20,8 @@
 
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || defined(__ASC_NPU_HOST__)
 #include "micro_api/dav_c310/kernel_micro_datatype_impl.h"
-#elif __NPU_ARCH__ == 2103
-#include "micro_api/dav_l210/kernel_micro_datatype_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "micro_api/dav_l300/kernel_micro_datatype_impl.h"
-#elif __NPU_ARCH__ == 3103
-#include "micro_api/dav_l310/kernel_micro_datatype_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "micro_api/dav_l311/kernel_micro_datatype_impl.h"
 #endif

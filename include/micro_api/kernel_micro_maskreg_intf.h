@@ -40,7 +40,7 @@ __simd_callee__ inline void Move(MaskReg& dst, MaskReg& src, MaskReg& mask);
 
 __simd_callee__ inline void Move(MaskReg& dst, MaskReg& src);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2103 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 template <typename T>
 __aicore__ inline void MaskSlide(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, const int16_t slideAmount);

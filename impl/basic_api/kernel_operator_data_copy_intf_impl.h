@@ -766,7 +766,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
 
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
     repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(T));
 #else
@@ -821,7 +821,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst,
         ASCENDC_CHECK_TPOSITION(false, "src", "VECOUT / CO2", "DataCopy with Nz2NdParamsFull",
             ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
 #else
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
         if (srcHWPos == Hardware::L1) {
             DataCopyL12GMNZ2NDImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), intriParams);
@@ -1230,7 +1230,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     if (dstHWPos == Hardware::UB) {
         DataCopyPadGm2UBImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(),
             dataCopyParams, padParams);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
     } else {
         DataCopyPadGm2L1Impl((__cbuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams,
@@ -1266,7 +1266,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T> &d
     if (srcHWPos == Hardware::UB) {
         DataCopyPadUB2GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
             dataCopyParams);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
     } else {
         DataCopyPadL12GMImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), dataCopyParams);
@@ -1346,7 +1346,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
     if (dstHWPos == Hardware::UB) {
         DataCopyPadGm2UBImpl((__ubuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(),
             dataCopyParams, padParams);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
     } else {
         DataCopyPadGm2L1Impl((__cbuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams,
@@ -1429,7 +1429,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T> &d
     if (srcHWPos == Hardware::UB) {
         DataCopyPadUB2GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
             dataCopyParams);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
     } else {
         DataCopyPadL12GMImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), dataCopyParams);
@@ -1468,7 +1468,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T> &dst, const LocalTensor<
 template <typename T, TPosition pos>
 __aicore__ inline void SetPadValue(T paddingValue)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2103 || __NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101)
     if (g_coreType == AIC) {
         return;
     }
