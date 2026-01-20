@@ -1,0 +1,64 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/*!
+* \file tensor_tile_utils.h
+* \brief
+*/
+#ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_UTILS_H
+#define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_UTILS_H
+
+#include <cstdint>
+#include <utility>
+#include <type_traits>
+#include "include/utils/std/tuple.h"
+#include "include/utils/std/type_traits.h"
+#include "include/utils/std/utility.h"
+
+namespace AscendC {
+enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
+namespace TileInternal {
+template <typename... Ts>
+using void_t = void;
+
+template <typename T, typename = void>
+struct IterRef {
+    using type = decltype(*Std::declval<T&>()); // type = T&
+};
+
+template <typename T>
+struct IterRef<T, void_t<typename T::reference>> {
+    using type = typename T::reference; 
+};
+
+template <typename T, typename = void>
+struct IterEle {
+    using type = Std::remove_reference_t<typename IterRef<T>::type>;
+};
+
+template <typename T>
+struct IterEle<T,void_t<typename T::elementType>> {
+    using type = typename T::elementType;
+};
+
+template <typename T, typename = void>
+struct IterVal {
+    using type = Std::remove_cv_t<typename IterEle<T>::type>;
+};
+
+template <typename T>
+struct IterVal<T,void_t<typename T::valueType>> {
+    using type = typename T::valueType;
+};
+
+} // namespace TileInternal
+} // namespace AscendC
+
+#endif // IMPL_TENSOR_API_STRUCT_TENSOR_TILE_UTILS_H
