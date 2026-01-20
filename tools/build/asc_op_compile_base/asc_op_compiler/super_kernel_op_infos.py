@@ -1028,7 +1028,6 @@ split_dynamic_o_in_super_kernel(orign_bin_path, rename_file_path_list[i-1], i, s
         self.add_define_options(exist_dynamic_sub_ops, options)
         self.calc_workspace_size()
         self.compile_info = {
-            "block_dim": self.block_num,
             "block_num": self.block_num,
             "kernel_type": self.kernel_type.value,
             "sub_operator": sub_operator_info,

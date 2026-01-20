@@ -4740,7 +4740,7 @@ void add_custom();
 
     def test_super_kernel_compile(self):
         kernel_info = {"compile_option": ["-g"], "kernel_file": "test.cpp", "kernel_name": "test",\
-            "block_dim": 1, "kernel_type": KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, "sub_operator": "test1", "link_mode": SuperKernelLinkMode.PerVecHerCube,\
+            "block_num": 1, "kernel_type": KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0, "sub_operator": "test1", "link_mode": SuperKernelLinkMode.PerVecHerCube,\
             "timestamp_option" : "True", "op_list":"test", "split_mode":4, "debug_size":75}
         with (asc_op_compile_base.common.context.op_context.OpContext(),\
             mock.patch("asc_op_compile_base.asc_op_compiler.ascendc_compile_base", 'gen_super_kernel_compile_info'),\

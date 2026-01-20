@@ -62,7 +62,7 @@ def gen_super_kernel_compile_info(kernel_info, compile_log_path):
     tiling_info.static_shape_flag = True
     tiling_info.tiling_key = 0
     tiling_info.tiling_data_file_path = ""
-    tiling_info.block_num = kernel_info["block_dim"]
+    tiling_info.block_num = kernel_info["block_num"]
     return compile_info, tiling_info
 
 
