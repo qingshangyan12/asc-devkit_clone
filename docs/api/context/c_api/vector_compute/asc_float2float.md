@@ -1,5 +1,5 @@
 
-# 5.17 asc_float2float
+# asc_float2float
 
 ## 产品支持情况
 
@@ -8,64 +8,64 @@
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √ |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √ |
 
-### 功能说明
+## 功能说明
 
 对float类型数据进行精度转换处理, 支持多种舍入模式：
 
-- Rint舍入模式, 四舍六入五成双舍入
-- Floor舍入模式, 向负无穷舍入
-- Ceil舍入模式, 向正无穷舍入
-- Round舍入模式, 四舍五入舍入
-- Trunc舍入模式, 向零舍入
+- RINT舍入模式：四舍六入五成双舍入
+- ROUND舍入模式：四舍五入舍入
+- FLOOR舍入模式：向负无穷舍入
+- CEIL舍入模式：向正无穷舍入
+- TRUNC舍入模式：向零舍入
 
-### 函数原型
+## 函数原型
 
 - 前n个数据计算
 
     ```cpp
-    // Rint模式
+    // RINT模式
     __aicore__ inline void asc_float2float_rn(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
-    // Floor模式
+    // FLOOR模式
     __aicore__ inline void asc_float2float_rd(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
-    // Ceil模式
+    // CEIL模式
     __aicore__ inline void asc_float2float_ru(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
-    // Round模式
+    // ROUND模式
     __aicore__ inline void asc_float2float_rna(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
-    // Trunc模式
+    // TRUNC模式
     __aicore__ inline void asc_float2float_rz(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
-    // Rint模式
+    // RINT模式
     __aicore__ inline void asc_float2float_rn(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    // Floor模式
+    // FLOOR模式
     __aicore__ inline void asc_float2float_rd(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    // Ceil模式
+    // CEIL模式
     __aicore__ inline void asc_float2float_ru(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    // Round模式
+    // ROUND模式
     __aicore__ inline void asc_float2float_rna(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    // Trunc模式
+    // TRUNC模式
     __aicore__ inline void asc_float2float_rz(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步模式
 
     ```cpp
-    // Rint模式
+    // RINT模式
     __aicore__ inline void asc_float2float_rn_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
-    // Floor模式
+    // FLOOR模式
     __aicore__ inline void asc_float2float_rd_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
-    // Ceil模式
+    // CEIL模式
     __aicore__ inline void asc_float2float_ru_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
-    // Round模式
+    // ROUND模式
     __aicore__ inline void asc_float2float_rna_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
-    // Trunc模式
+    // TRUNC模式
     __aicore__ inline void asc_float2float_rz_sync(__ubuf__ float* dst, __ubuf__ float* src, const uint32_t count)
     ```
 
-### 参数说明
+## 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -78,20 +78,20 @@
 | dst_repeat_stride |输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
 | src_repeat_stride |输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
 
-### 返回值说明
+## 返回值说明
 
 无
 
-### 流水类型
+## 流水类型
 
 PIPE_V
 
-### 约束说明
+## 约束说明
 
 - dst、src的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
-### 调用示例
+## 调用示例
 
 ```cpp
 constexpr uint32_t total_length = 256;

@@ -94,5 +94,5 @@ PIPE_V
 constexpr uint32_t total_length = 256;
 __ubuf__ float src[total_length];
 __ubuf__ bfloat16_t dst[total_length];
-asc_float2bfloat16_rnn(dst, src, total_length);
+asc_float2bfloat16_rn(dst, src, total_length);
 ```
