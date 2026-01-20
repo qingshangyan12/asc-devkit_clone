@@ -50,7 +50,7 @@ TEST_F(TestTiling, MultiCoreSmallMN)
     ret = rnnMatmul3.SetBufferSpace(-1, -1, -1); // will use all buffer space if not explicitly specified
     optiling::TCubeTiling tilingData;
     ret = rnnMatmul3.GetTiling(tilingData);
-    rnnMatmul3.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 63552);
 }
@@ -71,7 +71,7 @@ TEST_F(TestTiling, MatmulApiTilingFP32OverFlow)
     tilingData.set_usedCoreNum(1);
     ret = stft.GetTiling(tilingData);
     tilingData.set_iterateOrder(1);
-    stft.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 407040);
 }
@@ -95,7 +95,7 @@ TEST_F(TestTiling, MatmulApiTilingFP32OverFlowND2NZ)
     tilingData.set_usedCoreNum(1);
     ret = stft.GetTiling(tilingData);
     tilingData.set_iterateOrder(1);
-    stft.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 194560);
     EXPECT_GE(tilingData.get_transLength(), 90112);
@@ -117,7 +117,7 @@ TEST_F(TestTiling, MatmulApiTilingATransFP32OverFlow)
     tilingData.set_usedCoreNum(1);
     ret = stft.GetTiling(tilingData);
     tilingData.set_iterateOrder(1);
-    stft.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 303104);
 }
@@ -138,7 +138,7 @@ TEST_F(TestTiling, MatmulMDLND2NZNoFullLoad)
     rnnMatmul3.socVersion = platform_ascendc::SocVersion::ASCEND310P;
     optiling::TCubeTiling tilingDataA;
     ret = rnnMatmul3.GetTiling(tilingDataA);
-    rnnMatmul3.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingDataA.get_shareL1Size(), 98304);
     EXPECT_GE(tilingDataA.get_transLength(), 65536);
@@ -156,7 +156,7 @@ TEST_F(TestTiling, MatmulMDLND2NZNoFullLoad)
     rnnMatmul4.socVersion = platform_ascendc::SocVersion::ASCEND310P;
     optiling::TCubeTiling tilingDataB;
     ret = rnnMatmul4.GetTiling(tilingDataB);
-    rnnMatmul4.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingDataB.get_shareL1Size(), 163840);
     EXPECT_GE(tilingDataB.get_transLength(), 69632);
@@ -178,7 +178,7 @@ TEST_F(TestTiling, MatmulMDLND2NZFullLoad)
     rnnMatmul3.socVersion = platform_ascendc::SocVersion::ASCEND310P;
     optiling::TCubeTiling tilingDataA;
     ret = rnnMatmul3.GetTiling(tilingDataA);
-    rnnMatmul3.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingDataA.get_shareL1Size(), 18432);
     EXPECT_EQ(tilingDataA.get_transLength(), 16384);
@@ -196,7 +196,7 @@ TEST_F(TestTiling, MatmulMDLND2NZFullLoad)
     rnnMatmul4.socVersion = platform_ascendc::SocVersion::ASCEND310P;
     optiling::TCubeTiling tilingDataB;
     ret = rnnMatmul4.GetTiling(tilingDataB);
-    rnnMatmul4.PrintTilingData();
+
     matmul_tiling::SysTilingTempBufSize bufSize;
     MultiCoreMatmulGetTmpBufSize(tilingDataB, bufSize);
     EXPECT_EQ(ret, 0);
@@ -218,7 +218,7 @@ TEST_F(TestTiling, MatmulApiTilingFP32)
     tilingData.set_usedCoreNum(1);
     ret = stft.GetTiling(tilingData);
     tilingData.set_iterateOrder(1);
-    stft.PrintTilingData();
+
     matmul_tiling::SysTilingTempBufSize bufSize;
     MatmulGetTmpBufSize(tilingData, bufSize);
     EXPECT_EQ(ret, 0);
@@ -259,14 +259,14 @@ TEST_F(TestTiling, PlatformConstructor)
     tiling.SetBufferSpace(256 * 1024, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     tiling.PrintTilingDataInfo(tilingData);
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 66560);
 
     AscendC::tiling::TCubeTiling tilingDataNotOp;
     ret = tiling.GetTiling(tilingDataNotOp);
-    tiling.PrintTilingData();
+
     tiling.PrintTilingDataInfo(tilingDataNotOp);
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingDataNotOp.shareL1Size, 66560);
@@ -288,7 +288,7 @@ TEST_F(TestTiling, TestMatmulApiTilingL0DB)
     tiling.SetMatmulConfigParams({1, false, ScheduleType::OUTER_PRODUCT, MatrixTraverse::FIRSTM});
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 163840);
 
@@ -315,7 +315,7 @@ TEST_F(TestTiling, TestMatmulApiTilingL0DBError)
     tiling.SetMatmulConfigParams({1, false, ScheduleType::OUTER_PRODUCT, MatrixTraverse::FIRSTN});
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 
     AscendC::tiling::TCubeTiling tilingDataNotOp;
@@ -339,7 +339,7 @@ TEST_F(TestTiling, TestMatmulApiTilingNormL0DB)
     tiling.SetMatmulConfigParams({0, false, ScheduleType::OUTER_PRODUCT, MatrixTraverse::FIRSTN});
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 65536);
 }
@@ -362,7 +362,7 @@ TEST_F(TestTiling, TestMatmulApiTilingBmmL0DBError)
     tiling.SetBatchNum(2);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -380,7 +380,7 @@ TEST_F(TestTiling, TestInt4BaseK)
     tiling.SetBufferSpace(256 * 1024, 128 * 1024, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(tilingData.get_baseK() % 64, 0);
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 16384);
@@ -405,7 +405,7 @@ TEST_F(TestTiling, Tiling_310p_NotAligned)
     rnnMatmul3.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTN);
     optiling::TCubeTiling tilingData;
     ret = rnnMatmul3.GetTiling(tilingData);
-    rnnMatmul3.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -414,7 +414,7 @@ TEST_F(TestTiling, Tiling_BatchMatmul)
     matmul_tiling::BatchMatmulTiling bmm;
     optiling::TCubeTiling tilingData;
     int ret = bmm.GetTiling(tilingData);
-    bmm.PrintTilingData();
+
     matmul_tiling::SysTilingTempBufSize bufSize;
     BatchMatmulGetTmpBufSize(tilingData, bufSize);
     EXPECT_EQ(ret, -1);
@@ -472,7 +472,7 @@ TEST_F(TestTiling, Tiling_BatchMatmulWithCppStruct)
     matmul_tiling::BatchMatmulTiling bmm;
     AscendC::tiling::TCubeTiling tilingData;
     int ret = bmm.GetTiling(tilingData);
-    bmm.PrintTilingData();
+
     matmul_tiling::SysTilingTempBufSize bufSize;
     EXPECT_EQ(BatchMatmulGetTmpBufSizeV2(tilingData, bufSize), 0);
     EXPECT_EQ(ret, -1);
@@ -492,7 +492,7 @@ TEST_F(TestTiling, ATscmCase310P)
     tiling.socVersion = platform_ascendc::SocVersion::ASCEND310P;
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 65536);
     EXPECT_GE(tilingData.get_transLength(), 34816);
@@ -512,7 +512,7 @@ TEST_F(TestTiling, ATscmCase910B)
     tiling.socVersion = platform_ascendc::SocVersion::ASCEND910B;
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 66560);
 }
@@ -534,7 +534,7 @@ TEST_F(TestTiling, BmmFailedCase)
     tiling.SetBufferSpace(256 * 1024, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -553,7 +553,7 @@ TEST_F(TestTiling, TestSetBatch)
     tiling.SetBatchInfoForNormal(0, 0, 0, 0, 0);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -569,7 +569,7 @@ TEST_F(TestTiling, BmmNormalFailedCase)
     tiling.SetBufferSpace(256 * 1024, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -586,7 +586,7 @@ TEST_F(TestTiling, BTscmCase)
     tiling.SetBufferSpace(512 * 1024 - 64 - 32 * 512 * 2, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 65664);
 }
@@ -604,7 +604,7 @@ TEST_F(TestTiling, ATscmBTscmCase)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 320);
 }
@@ -624,7 +624,7 @@ TEST_F(TestTiling, ATransBTransmCase)
     tiling.socVersion = platform_ascendc::SocVersion::ASCEND310P;
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_transLength(), 81920);
 }
@@ -643,7 +643,7 @@ TEST_F(TestTiling, L1CacheUBCase01NoCache)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 458752);
     EXPECT_GE(tilingData.get_transLength(), 163840);
@@ -665,7 +665,7 @@ TEST_F(TestTiling, L1CacheUBCase01NoCacheND2NZ)
     tiling.SetMatmulConfigParams(1, true, ScheduleType::INNER_PRODUCT, MatrixTraverse::NOSET, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 458752);
     EXPECT_GE(tilingData.get_transLength(), 131072);
@@ -687,7 +687,7 @@ TEST_F(TestTiling, L1CacheUBCase02NeiABFullLoad)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 491520);
     EXPECT_GE(tilingData.get_transLength(), 163840);
@@ -709,7 +709,7 @@ TEST_F(TestTiling, L1CacheUBCase03BothABFullLoad)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 1088);
     EXPECT_GE(tilingData.get_transLength(), 1024);
@@ -731,7 +731,7 @@ TEST_F(TestTiling, L1CacheUBCase04OnlyAFullLoad)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 393984);
     EXPECT_GE(tilingData.get_transLength(), 393728);
@@ -752,7 +752,7 @@ TEST_F(TestTiling, L1CacheUBCase04OnlyBFullLoad)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 393984);
     EXPECT_GE(tilingData.get_transLength(), 393216);
@@ -774,7 +774,7 @@ TEST_F(TestTiling, L1CacheUBCase05BothCache)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 507904);
     EXPECT_GE(tilingData.get_transLength(), 163840);
@@ -796,7 +796,7 @@ TEST_F(TestTiling, L1CacheUBCase06AMatIsTSCM)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 327680);
     EXPECT_GE(tilingData.get_transLength(), 131584);
@@ -818,7 +818,7 @@ TEST_F(TestTiling, L1CacheUBCase07BMatIsTSCM)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 262144);
     EXPECT_GE(tilingData.get_transLength(), 133120);
@@ -841,7 +841,7 @@ TEST_F(TestTiling, L1CacheUBCase08MultiCore)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 507904);
     EXPECT_GE(tilingData.get_transLength(), 501760);
@@ -860,7 +860,7 @@ TEST_F(TestTiling, ATscmFP32Case)
     tiling.SetBufferSpace(512 * 1024 - 64 - 128 * 16 * 4, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 32832);
 }
@@ -878,7 +878,7 @@ TEST_F(TestTiling, FP32Case)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 286912);
 }
@@ -896,7 +896,7 @@ TEST_F(TestTiling, FP32Case2)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 262336);
 }
@@ -914,7 +914,7 @@ TEST_F(TestTiling, BothFullLoadCase)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 49408);
 }
@@ -932,7 +932,7 @@ TEST_F(TestTiling, AFullLoadCase)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 279552);
 }
@@ -952,7 +952,7 @@ TEST_F(TestTiling, AFullLoadND2NZCase)
     tiling.socVersion = platform_ascendc::SocVersion::ASCEND310P;
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 278528);
     EXPECT_GE(tilingData.get_transLength(), 270336);
@@ -971,7 +971,7 @@ TEST_F(TestTiling, BFullLoadCase)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 270464);
 }
@@ -989,7 +989,7 @@ TEST_F(TestTiling, BothNotFullLoadCase)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 230400);
 }
@@ -1009,7 +1009,7 @@ TEST_F(TestTiling, BothNotFullLoadND2NZCase)
     tiling.socVersion = platform_ascendc::SocVersion::ASCEND310P;
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 196608);
     EXPECT_GE(tilingData.get_transLength(), 131072);
@@ -1033,7 +1033,7 @@ TEST_F(TestTiling, TestMatmulApiTilngCase1)
     tiling.SetFixSplit(16, 16, 16);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 393280);
     EXPECT_EQ(tilingData.get_baseM(), 16);
 }
@@ -1055,7 +1055,7 @@ TEST_F(TestTiling, TestMatmulApiTilngCase2)
 
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 16384);
     EXPECT_EQ(tilingData.get_baseM(), 64);
 }
@@ -1076,7 +1076,7 @@ TEST_F(TestTiling, TestMatmulApiTilngCase3)
 
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 270336);
     EXPECT_EQ(tilingData.get_baseM(), 256);
 }
@@ -1098,7 +1098,7 @@ TEST_F(TestTiling, TestMatmulApiTilngCase4)
 
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 270336);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseM(), 64);
@@ -1122,14 +1122,14 @@ TEST_F(TestTiling, TestMatmulApiTilngCase5)
 
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 394240);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseM(), 64);
 
     tiling.SetFixSplit(-1, 16, -1);
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 393280);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseN(), 16);
@@ -1152,7 +1152,7 @@ TEST_F(TestTiling, TestMatmulApiTilngCase6)
     tiling.SetFixSplit(-1, 64, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 295168);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -1175,7 +1175,7 @@ TEST_F(TestTiling, TestMatmulApiTilngWithCppStruct)
     tiling.SetFixSplit(-1, 64, -1);
     TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.shareL1Size, 295168);
     EXPECT_GE(tilingData.transLength, 0);
@@ -1202,7 +1202,7 @@ TEST_F(TestTiling, TestMatmulApiTilng310B)
     tiling.socVersion = platform_ascendc::SocVersion::ASCEND310B;
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 295168);
     EXPECT_GE(tilingData.get_transLength(), 131072);
@@ -1226,14 +1226,14 @@ TEST_F(TestTiling, TestDiffKaKbMatmulApiTilng)
 
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 394240);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseM(), 64);
 
     tiling.SetFixSplit(-1, 16, -1);
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 393280);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseN(), 16);
@@ -2912,7 +2912,7 @@ TEST_F(TestTiling, TestMatmulApiTilngFactorSplit1)
     tiling.SetBufferSpace(-1, 128 * 1024, -1);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 196608);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseM(), 128);
@@ -2932,7 +2932,7 @@ TEST_F(TestTiling, TestMatmulApiTilngFactorSplit2)
     tiling.SetBufferSpace(-1, 128 * 1024, -1);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 290816);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseM(), 128);
@@ -2952,7 +2952,7 @@ TEST_F(TestTiling, TestMatmulApiTilngDimfactors)
 
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 372736);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseK(), 16);
@@ -2973,7 +2973,7 @@ TEST_F(TestTiling, TestMatmulApiTilngBMatrixTSCM)
     tiling.SetBufferSpace(2048, -1, 9362);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 2048);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseK(), 32);
@@ -2992,7 +2992,7 @@ TEST_F(TestTiling, TestMatmulApiTilngFailed1)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
 }
 
 // single m = 970, upper round is 976 which is 61 times of 16. the value is not good.
@@ -3010,7 +3010,7 @@ TEST_F(TestTiling, TestMatmulApiTilngFailed2)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
 }
 
 // when B matrix is full load, l1Status.nBL1 * l0Status.nL0 is large then coreStatus.n or
@@ -3029,7 +3029,7 @@ TEST_F(TestTiling, TestMatmulApiTilngFailed3)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
 }
 
 // baseM * basek + BIAS are larger then l1size
@@ -3047,7 +3047,7 @@ TEST_F(TestTiling, TestMatmulApiTilngFailed4)
     tiling.SetBufferSpace(4096 * 4 + 64 * 4, -1, -1, 1024);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
 }
 
 TEST_F(TestTiling, TestMatmulApiTilngMultiCoreCase1)
@@ -3064,7 +3064,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreCase1)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 393216);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3084,7 +3084,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreCase2)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 12288);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3104,7 +3104,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreCase3)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 264192);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3124,7 +3124,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreCase4)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 393216);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3144,7 +3144,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreWithCppStruct)
     tiling.SetBufferSpace(-1, -1, -1);
     AscendC::tiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.shareL1Size, 393216);
     EXPECT_GE(tilingData.transLength, 0);
@@ -3170,7 +3170,7 @@ TEST_F(TestTiling, TestMatmulApiTilngKNotAlign)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
+
     EXPECT_EQ(res, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 129024);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3193,7 +3193,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreBTSCM)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
+
     EXPECT_EQ(res, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 262144);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3216,7 +3216,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreBTSCM1)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
+
     EXPECT_EQ(res, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 65536);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3239,7 +3239,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreBTSCM2)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
+
     EXPECT_EQ(res, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 8192);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3262,7 +3262,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreBTSCM3)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
+
     EXPECT_EQ(res, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 16384);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3285,7 +3285,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreBTSCM4)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
+
     EXPECT_EQ(res, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 32768);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3308,7 +3308,7 @@ TEST_F(TestTiling, TestMatmulApiTilngSingleCoreFullLoadCase)
     tilingApi.EnableBias(false);
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
+
     EXPECT_EQ(res, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 458752);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3332,7 +3332,7 @@ TEST_F(TestTiling, TestMatmulApiTilngSingleCoreFullLoadND2NZCase)
     tilingApi.SetMatmulConfigParams(1, false, ScheduleType::INNER_PRODUCT, MatrixTraverse::NOSET, true);
     tilingApi.socVersion = platform_ascendc::SocVersion::ASCEND310P;
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
+
     EXPECT_EQ(res, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 98304);
     EXPECT_GE(tilingData.get_transLength(), 65536);
@@ -3355,7 +3355,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreBTSCM5)
     tilingApi.SetAlignSplit(-1, 64, -1);
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
+
     EXPECT_EQ(res, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 24832);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3545,7 +3545,7 @@ TEST_F(TestTiling, TestMatmulApiTilngL0BNoDB)
     tiling.SetBufferSpace(453632, 131072, -1, 1024);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 266240);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3565,7 +3565,7 @@ TEST_F(TestTiling, TestMatmulApiTilngL0ANoDB)
     tiling.SetBufferSpace(453632, 131072, -1, 1024);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 266240);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3943,7 +3943,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case1)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 99328);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3964,7 +3964,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case2)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 99328);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -3985,7 +3985,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case3)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 2176);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -4006,7 +4006,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case4)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 2560);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -4026,7 +4026,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case5)
     tiling.SetBufferSpace(256 * 1024, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 197632);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -4046,7 +4046,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case6)
     tiling.SetBufferSpace(512 * 1024 - 128 - 32 * 512 * 2, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 262272);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -4065,7 +4065,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case7)
     tiling.SetBufferSpace(-1, 128 * 1024, -1);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 98304);
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseM(), 128);
@@ -4085,7 +4085,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case8)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 98304);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -4268,7 +4268,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case9)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 6144);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -4342,7 +4342,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case10)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 263168);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -4362,7 +4362,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case11)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 393216);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -4388,7 +4388,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case12)
     rnnMatmul3.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTN);
     optiling::TCubeTiling tilingData;
     ret = rnnMatmul3.GetTiling(tilingData);
-    rnnMatmul3.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 67584);
     EXPECT_GE(tilingData.get_transLength(), 2048);
@@ -4408,7 +4408,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8Case13)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 164864);
     EXPECT_GE(tilingData.get_transLength(), 0);
@@ -4430,7 +4430,7 @@ TEST_F(TestTiling, TestMatmulApiTilngInt8ND2NZCase13)
 
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.get_shareL1Size(), 163840);
     EXPECT_GE(tilingData.get_transLength(), 131072);
@@ -6439,7 +6439,7 @@ TEST_F(TestTiling, TestNZFp32UnalignedK)
     tiling.SetBufferSpace(-1, -1, -1);
     optiling::TCubeTiling tilingData;
     tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_GE(tilingData.get_shareL1Size(), 155648);
     EXPECT_GE(tilingData.get_transLength(), 0);
     int32_t baseK = tiling.GetBaseK();
@@ -6462,7 +6462,7 @@ TEST_F(TestTiling, MultiCoreSparse)
     tilingData.set_usedCoreNum(1);
     ret = sparseMatmul.GetTiling(tilingData);
     tilingData.set_iterateOrder(1);
-    sparseMatmul.PrintTilingData();
+
     matmul_tiling::SysTilingTempBufSize bufSize;
     MatmulGetTmpBufSize(tilingData, bufSize);
     EXPECT_EQ(ret, 0);
@@ -6485,7 +6485,7 @@ TEST_F(TestTiling, MultiCoreSparseAlignBaseK)
     tilingData.set_usedCoreNum(1);
     ret = sparseMatmul.GetTiling(tilingData);
     tilingData.set_iterateOrder(1);
-    sparseMatmul.PrintTilingData();
+
     matmul_tiling::SysTilingTempBufSize bufSize;
     MatmulGetTmpBufSize(tilingData, bufSize);
     EXPECT_EQ(ret, 0);
@@ -6509,7 +6509,7 @@ TEST_F(TestTiling, MultiCoreSparseADbOff)
     tilingData.set_usedCoreNum(1);
     ret = sparseMatmul.GetTiling(tilingData);
     tilingData.set_iterateOrder(1);
-    sparseMatmul.PrintTilingData();
+
     matmul_tiling::SysTilingTempBufSize bufSize;
     MatmulGetTmpBufSize(tilingData, bufSize);
     EXPECT_EQ(ret, 0);
@@ -6533,7 +6533,7 @@ TEST_F(TestTiling, MultiCoreSparseBDbOff)
     tilingData.set_usedCoreNum(1);
     ret = sparseMatmul.GetTiling(tilingData);
     tilingData.set_iterateOrder(1);
-    sparseMatmul.PrintTilingData();
+
     matmul_tiling::SysTilingTempBufSize bufSize;
     MatmulGetTmpBufSize(tilingData, bufSize);
     EXPECT_EQ(ret, 0);
@@ -6557,7 +6557,7 @@ TEST_F(TestTiling, TestMatmulApiTilingIsBTransKMisAlign)
 
     AscendC::tiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_GE(tilingData.shareL1Size, 319488);
     EXPECT_GE(tilingData.transLength, 0);
@@ -6585,7 +6585,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33CheckL0ABUpdateBaseMN)
     optiling::TCubeTiling tilingData;
     tilingData.set_usedCoreNum(1);
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_LE(MathUtil::CeilDivision(tilingData.get_singleCoreM(), tilingData.get_baseM()), 3);
     EXPECT_LE(MathUtil::CeilDivision(tilingData.get_singleCoreK(), tilingData.get_baseK()), 3);
@@ -6615,7 +6615,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33CheckL0ACUpdateBaseKN)
     optiling::TCubeTiling tilingData;
     tilingData.set_usedCoreNum(1);
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_LE(MathUtil::CeilDivision(tilingData.get_singleCoreM(), tilingData.get_baseM()), 3);
     EXPECT_LE(MathUtil::CeilDivision(tilingData.get_singleCoreK(), tilingData.get_baseK()), 3);
@@ -6646,7 +6646,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33SetCorrectBase)
     optiling::TCubeTiling tilingData;
     tilingData.set_usedCoreNum(1);
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingData.get_baseM(), 128);
     EXPECT_EQ(tilingData.get_baseN(), 256);
@@ -6672,7 +6672,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33Set0BaseM)
     optiling::TCubeTiling tilingData;
     tilingData.set_usedCoreNum(1);
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -6692,7 +6692,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33SetSmallBaseM)
     optiling::TCubeTiling tilingData;
     tilingData.set_usedCoreNum(1);
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -6711,7 +6711,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33MultiDepthB1)
     optiling::TCubeTiling tilingData;
     tilingData.set_usedCoreNum(1);
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_LE(MathUtil::CeilDivision(tilingData.get_singleCoreM(), tilingData.get_baseM()), 3);
     EXPECT_LE(MathUtil::CeilDivision(tilingData.get_singleCoreK(), tilingData.get_baseK()), 3);
@@ -6743,7 +6743,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33CheckL0AFail)
     optiling::TCubeTiling tilingData;
     tilingData.set_usedCoreNum(1);
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -6762,7 +6762,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33Fp16CheckL0CFail)
     optiling::TCubeTiling tilingData;
     tilingData.set_usedCoreNum(1);
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -6851,7 +6851,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33MultiCoreDisableSplitK)
     tiling.SetMatmulConfigParams(1, false, ScheduleType::N_BUFFER_33, MatrixTraverse::NOSET, false);
     optiling::TCubeTiling tilingData;
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, -1);
 }
 
@@ -6870,7 +6870,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33MultiCoreNormal)
     tiling.SetMatmulConfigParams(1, false, ScheduleType::N_BUFFER_33, MatrixTraverse::NOSET, false);
     optiling::TCubeTiling tilingData;
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingData.get_singleCoreM(), 384);
     EXPECT_EQ(tilingData.get_singleCoreN(), 256);
@@ -6899,7 +6899,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33MultiCoreMExceedsCoreNum)
     tiling.SetMatmulConfigParams(1, false, ScheduleType::N_BUFFER_33, MatrixTraverse::NOSET, false);
     optiling::TCubeTiling tilingData;
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingData.get_usedCoreNum(), 4);
     EXPECT_EQ(tilingData.get_singleCoreM(), 384);
@@ -6925,7 +6925,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33MultiCoreKExceedsCoreNum)
     tiling.SetMatmulConfigParams(1, false, ScheduleType::N_BUFFER_33, MatrixTraverse::NOSET, false);
     optiling::TCubeTiling tilingData;
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingData.get_usedCoreNum(), 4);
     EXPECT_EQ(tilingData.get_singleCoreM(), 384);
@@ -6952,7 +6952,7 @@ TEST_F(TestTiling, MatmulApiTilingNBuffer33MultiCoreCheckUsedCoreNum)
     tiling.SetMatmulConfigParams(1, false, ScheduleType::N_BUFFER_33, MatrixTraverse::NOSET, false);
     optiling::TCubeTiling tilingData;
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingData.get_usedCoreNum(), 4);
 }
@@ -6972,7 +6972,7 @@ TEST_F(TestTiling, MatmulApiTilingCheckUsedCoreNum)
     tiling.SetBufferSpace(-1, -1, -1); // will use all buffer space if not explicitly specified
     optiling::TCubeTiling tilingData;
     auto ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
+
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingData.get_usedCoreNum(), 24);
 }

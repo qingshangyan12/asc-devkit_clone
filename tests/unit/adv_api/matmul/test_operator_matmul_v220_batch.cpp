@@ -104,9 +104,9 @@ __aicore__ inline void main_kernel_matmul_batch(GM_ADDR aGM, GM_ADDR bGM, GM_ADD
     TPipe pipe;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-#ifdef __DAV_C220_CUBE__
+#ifdef __DAV_CUBE__
     g_cubeTPipePtr = &pipe;
-#elif defined(__DAV_C220_VEC__)
+#elif defined(__DAV_VEC__)
     g_vecTPipePtr = &pipe;
 #else
     g_tPipePtr = &pipe;

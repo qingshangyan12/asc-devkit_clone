@@ -47,7 +47,6 @@ TEST_F(TestTiling, MultiCoreSmallMNFP4)
     ret = rnnMatmul3.SetBufferSpace(-1, -1, -1); // will use all buffer space if not explicitly specified
     optiling::TCubeTiling tilingData;
     ret = rnnMatmul3.GetTiling(tilingData);
-    rnnMatmul3.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -67,7 +66,6 @@ TEST_F(TestTiling, MultiCoreSmallMNFP8)
     ret = rnnMatmul3.SetBufferSpace(-1, -1, -1); // will use all buffer space if not explicitly specified
     optiling::TCubeTiling tilingData;
     ret = rnnMatmul3.GetTiling(tilingData);
-    rnnMatmul3.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -93,7 +91,6 @@ TEST_F(TestTiling, TestMatmulTilingEnableL1BankConflictOptimiseFP16)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -118,7 +115,6 @@ TEST_F(TestTiling, TestMatmulTilingEnableL1BankConflictOptimiseFP16TSCM)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -144,7 +140,6 @@ TEST_F(TestTiling, TestMatmulTilingEnableL1BankConflictOptimiseFP16NORM)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }
 
@@ -169,6 +164,5 @@ TEST_F(TestTiling, TestMatmulTilingEnableL1BankConflictOptimiseFP32)
     int ret = tiling.GetTiling(tilingData);
     int ret1 = tiling.EnableL1BankConflictOptimise();
 
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
 }

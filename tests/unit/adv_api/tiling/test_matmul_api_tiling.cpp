@@ -41,7 +41,6 @@ TEST_F(TestMatmulAPITiling, TestMatmulApiTilingMultiCoreNZINOUT)
 
     int64_t res = tilingApi.GetTiling(tilingData);
     EXPECT_EQ(res, 0);
-    tilingApi.PrintTilingData();
 
     int32_t shapeM = 1;
     int32_t shapeN = 1;
@@ -70,7 +69,6 @@ TEST_F(TestMatmulAPITiling, TestMatmulApiTilingMultiCoreBTSCM)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
@@ -91,7 +89,6 @@ TEST_F(TestMatmulAPITiling, TestMatmulApiTilingMultiCoreBTSCM2)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
@@ -112,7 +109,6 @@ TEST_F(TestMatmulAPITiling, TestMatmulApiTilingMultiCoreCase)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
@@ -133,7 +129,6 @@ TEST_F(TestMatmulAPITiling, TestMatmulApiTilingMultiCoreCaseWithTranspose)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
@@ -152,7 +147,6 @@ TEST_F(TestMatmulAPITiling, L1CacheUBCase05BothCache)
     tiling.SetMatmulConfigParams(1, true);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
-    tiling.PrintTilingData();
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(tilingData.get_depthAL1CacheUB(), 1);
     EXPECT_EQ(tilingData.get_depthBL1CacheUB(), 2);
@@ -175,7 +169,6 @@ TEST_F(TestMatmulAPITiling, SmallShapeAlign1)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
@@ -196,7 +189,6 @@ TEST_F(TestMatmulAPITiling, SmallShapeAlign2)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
@@ -217,7 +209,6 @@ TEST_F(TestMatmulAPITiling, SmallShapeAlign3)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
@@ -238,7 +229,6 @@ TEST_F(TestMatmulAPITiling, SmallShapeAlign4)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 
     tilingApi.SetDim(20);
@@ -254,7 +244,6 @@ TEST_F(TestMatmulAPITiling, SmallShapeAlign4)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 
     tilingApi.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_INT8, false);
@@ -268,7 +257,6 @@ TEST_F(TestMatmulAPITiling, SmallShapeAlign4)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 
     tilingApi.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_INT4, false);
@@ -282,7 +270,6 @@ TEST_F(TestMatmulAPITiling, SmallShapeAlign4)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
@@ -303,7 +290,6 @@ TEST_F(TestMatmulAPITiling, SmallShapeNotAlign)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
@@ -324,7 +310,6 @@ TEST_F(TestMatmulAPITiling, SmallShapeNotAlign2)
 
     tilingApi.SetBufferSpace(-1, -1, -1);
     int64_t res = tilingApi.GetTiling(tilingData);
-    tilingApi.PrintTilingData();
     EXPECT_EQ(res, 0);
 }
 
