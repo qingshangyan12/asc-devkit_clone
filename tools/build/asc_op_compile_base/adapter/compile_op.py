@@ -63,6 +63,7 @@ from .super_kernel_constants import SuperKernelStreamFusionMode
 from .super_kernel_option_parse import parse_super_kernel_options
 from .kernel_info_infer import KernelInfoInfer
 from .ascendc_compile_utils import check_custom_dcci_end_false, check_if_gen_placehoder
+from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manager
 
 DEFAULT_TILING_KEY = '0'
 COMPILE_INFO_KEY = 'compileInfo'
@@ -1258,6 +1259,7 @@ def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_op
     LogUtil.detail_log_print(op_info.kernel_name, COMPILE_STAGE_MSG_INFO["preprocess_start"], AscendCLogLevel.LOG_INFO)
     # online compile reuses thread, dfx infos need to be reset.
     global_var_storage.global_storage_reset()
+    global_ascendc_kernel_feature_manager.init_available_and_enable_features()
     if extend_options.get('opp_kernel_hidden_dat_path', None) is None and not os.path.exists(cce_file):
         raise Exception(f"input cce file is not exists, file name: " + cce_file)
 
