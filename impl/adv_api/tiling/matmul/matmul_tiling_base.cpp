@@ -542,12 +542,7 @@ int32_t MatmulApiTilingBase::SetFixSplit(int32_t baseMIn, int32_t baseNIn, int32
 
 int32_t MatmulApiTilingBase::SetDoubleBuffer(bool a, bool b, bool c, bool bias, bool transND2NZ, bool transNZ2ND)
 {
-    this->aType_.isDB = a;
-    this->bType_.isDB = b;
-    this->cType_.isDB = c;
-    this->biasType_.isDB = bias;
-    this->transND2NZ_ = transND2NZ;
-    this->transNZ2ND_ = transNZ2ND;
+    TILING_LOG_INFO("This is a reserved API.");
     return 0;
 }
 
