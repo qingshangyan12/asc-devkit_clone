@@ -51,17 +51,17 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZVFImpl(__ubuf__ T1
             MicroAPI::Max(maxVreg, maxVreg, srcVreg, pregFull);
         }
         MicroAPI::ReduceMaxWithDataBlock(maxVreg, maxVreg, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM>(workUb + i * DEFAULT_BLK_NUM, maxVreg, pregOneBlk);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM>(workUb + i * DEFAULT_BLK_NUM, maxVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 
     for (uint16_t i = 0; i < VcgFoldRepeat; ++i) {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
             maxVreg, tmpVreg, workUb + i * HALF_REPEAT_SIZE);
         MicroAPI::Max(maxVreg, maxVreg, tmpVreg, pregFull);
         StoreIfNeedCast<T2>(tmpUb + i * FLOAT_REPEAT_SIZE, maxVreg, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
             workUb + i * HALF_REPEAT_SIZE, maxVreg, maxVreg, pregFull);
     }
 
@@ -71,7 +71,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZVFImpl(__ubuf__ T1
     for (uint16_t i = 0; i < e2bRep; ++i) {
         pregCnt = MicroAPI::UpdateMask<T2>(sreg);
         LoadE2B<T2>(castReg, tmpUb + i * DEFAULT_BLK_NUM);
-        MicroAPI::DataCopy(maxUb + i * dtypeRepStride, castReg, pregCnt);
+        MicroAPI::StoreAlign(maxUb + i * dtypeRepStride, castReg, pregCnt);
     }
 
     // reducesum
@@ -83,21 +83,21 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZVFImpl(__ubuf__ T1
             LoadIfNeedCast<T1>(srcVreg, srcUb + i * FLOAT_REPEAT_SIZE + j * dataBlock, pregFull);
             MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregFull);
             MicroAPI::Exp(tmpVreg, dstVreg, pregFull);
-            MicroAPI::DataCopy(expUb + i * FLOAT_REPEAT_SIZE + j * dataBlock, tmpVreg, pregFull);
+            MicroAPI::StoreAlign(expUb + i * FLOAT_REPEAT_SIZE + j * dataBlock, tmpVreg, pregFull);
             MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         }
         MicroAPI::ReduceSumWithDataBlock(sumVreg, sumVreg, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM>(workUb + i * DEFAULT_BLK_NUM, sumVreg, pregOneBlk);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM>(workUb + i * DEFAULT_BLK_NUM, sumVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 
     for (uint16_t i = 0; i < VcgFoldRepeat; ++i) {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
             sumVreg, tmpVreg, workUb + i * HALF_REPEAT_SIZE);
         MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         StoreIfNeedCast<T2>(tmpUb + i * FLOAT_REPEAT_SIZE, sumVreg, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
             workUb + i * HALF_REPEAT_SIZE, sumVreg, sumVreg, pregFull);
     }
 
@@ -107,14 +107,14 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZVFImpl(__ubuf__ T1
     for (uint16_t i = 0; i < e2bRep; ++i) {
         pregCnt = MicroAPI::UpdateMask<T2>(sreg);
         LoadE2B<T2>(castReg, tmpUb + i * DEFAULT_BLK_NUM);
-        MicroAPI::DataCopy(sumUb + i * dtypeRepStride, castReg, pregCnt);
+        MicroAPI::StoreAlign(sumUb + i * dtypeRepStride, castReg, pregCnt);
     }
 
     for (uint16_t j = 0; j < kRepeatTimes; ++j) {
         sreg = originM * SOFTMAX_SHAPE_NZ_BASIC_COUNT;
         for (uint16_t i = 0; i < mRepeatTimes; ++i) {
             pregCnt = MicroAPI::UpdateMask<uint32_t>(sreg);
-            MicroAPI::DataCopy(tmpVreg, expUb + i * FLOAT_REPEAT_SIZE + j * dataBlock);
+            MicroAPI::LoadAlign(tmpVreg, expUb + i * FLOAT_REPEAT_SIZE + j * dataBlock);
             LoadE2B<float>(sumVreg, workUb + i * DEFAULT_BLK_NUM);
             MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
             if constexpr (isLog) {
@@ -186,17 +186,17 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZWithTailVFImpl(__u
         MicroAPI::Max(maxVreg, maxVreg, srcVreg, pregFull);
 
         MicroAPI::ReduceMaxWithDataBlock(maxVreg, maxVreg, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM>(workUb + i * DEFAULT_BLK_NUM, maxVreg, pregOneBlk);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM>(workUb + i * DEFAULT_BLK_NUM, maxVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 
     for (uint16_t i = 0; i < VcgFoldRepeat; ++i) {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
             maxVreg, tmpVreg, workUb + i * HALF_REPEAT_SIZE);
         MicroAPI::Max(maxVreg, maxVreg, tmpVreg, pregFull);
         StoreIfNeedCast<T2>(tmpUb + i * FLOAT_REPEAT_SIZE, maxVreg, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
             workUb + i * HALF_REPEAT_SIZE, maxVreg, maxVreg, pregFull);
     }
 
@@ -206,7 +206,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZWithTailVFImpl(__u
     for (uint16_t i = 0; i < e2bRep; ++i) {
         pregCnt = MicroAPI::UpdateMask<T2>(sreg);
         LoadE2B<T2>(castReg, tmpUb + i * DEFAULT_BLK_NUM);
-        MicroAPI::DataCopy(maxUb + i * dtypeRepStride, castReg, pregCnt);
+        MicroAPI::StoreAlign(maxUb + i * dtypeRepStride, castReg, pregCnt);
     }
 
     // reducesum
@@ -218,27 +218,27 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZWithTailVFImpl(__u
             LoadIfNeedCast<T1>(srcVreg, srcUb + i * FLOAT_REPEAT_SIZE + j * dataBlock, pregFull);
             MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregFull);
             MicroAPI::Exp(tmpVreg, dstVreg, pregFull);
-            MicroAPI::DataCopy(expUb + i * FLOAT_REPEAT_SIZE + j * dataBlock, tmpVreg, pregFull);
+            MicroAPI::StoreAlign(expUb + i * FLOAT_REPEAT_SIZE + j * dataBlock, tmpVreg, pregFull);
             MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         }
         LoadIfNeedCast<T1>(srcVreg, srcUb + i * FLOAT_REPEAT_SIZE + kRepeatTimes * dataBlock, pregFull);
         MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregkTail);
         MicroAPI::Exp(tmpVreg, dstVreg, pregkTail);
-        MicroAPI::DataCopy(expUb + i * FLOAT_REPEAT_SIZE + kRepeatTimes * dataBlock, tmpVreg, pregkTail);
+        MicroAPI::StoreAlign(expUb + i * FLOAT_REPEAT_SIZE + kRepeatTimes * dataBlock, tmpVreg, pregkTail);
         MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
 
         MicroAPI::ReduceSumWithDataBlock(sumVreg, sumVreg, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM>(workUb + i * DEFAULT_BLK_NUM, sumVreg, pregOneBlk);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM>(workUb + i * DEFAULT_BLK_NUM, sumVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 
     for (uint16_t i = 0; i < VcgFoldRepeat; ++i) {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
             sumVreg, tmpVreg, workUb + i * HALF_REPEAT_SIZE);
         MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         StoreIfNeedCast<T2>(tmpUb + i * FLOAT_REPEAT_SIZE, sumVreg, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
             workUb + i * HALF_REPEAT_SIZE, sumVreg, sumVreg, pregFull);
     }
 
@@ -248,14 +248,14 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZWithTailVFImpl(__u
     for (uint16_t i = 0; i < e2bRep; ++i) {
         pregCnt = MicroAPI::UpdateMask<T2>(sreg);
         LoadE2B<T2>(castReg, tmpUb + i * DEFAULT_BLK_NUM);
-        MicroAPI::DataCopy(sumUb + i * dtypeRepStride, castReg, pregCnt);
+        MicroAPI::StoreAlign(sumUb + i * dtypeRepStride, castReg, pregCnt);
     }
 
     for (uint16_t j = 0; j < kRepeatTimes; ++j) {
         sreg = originM * SOFTMAX_SHAPE_NZ_BASIC_COUNT;
         for (uint16_t i = 0; i < mRepeatTimes; ++i) {
             pregCnt = MicroAPI::UpdateMask<uint32_t>(sreg);
-            MicroAPI::DataCopy(tmpVreg, expUb + i * FLOAT_REPEAT_SIZE + j * dataBlock);
+            MicroAPI::LoadAlign(tmpVreg, expUb + i * FLOAT_REPEAT_SIZE + j * dataBlock);
             LoadE2B<float>(sumVreg, workUb + i * DEFAULT_BLK_NUM);
             MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
             if constexpr (isLog) {
@@ -267,7 +267,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZWithTailVFImpl(__u
     sreg = originM * SOFTMAX_SHAPE_NZ_BASIC_COUNT;
     for (uint16_t i = 0; i < mRepeatTimes; ++i) {
         pregCnt = MicroAPI::UpdateMask<uint32_t>(sreg);
-        MicroAPI::DataCopy(tmpVreg, expUb + i * FLOAT_REPEAT_SIZE + kRepeatTimes * dataBlock);
+        MicroAPI::LoadAlign(tmpVreg, expUb + i * FLOAT_REPEAT_SIZE + kRepeatTimes * dataBlock);
         LoadE2B<float>(sumVreg, workUb + i * DEFAULT_BLK_NUM);
         MicroAPI::MaskAnd(pregOneBlk, pregkTail, pregCnt, pregFull);
         MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregOneBlk);
@@ -367,7 +367,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDVFImpl(__ubuf__ T1
             MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregFull);
             MicroAPI::Exp(tmpVreg, dstVreg, pregFull);
             if constexpr (!isFlashV2) {
-                MicroAPI::DataCopy(workUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg, pregFull);
+                MicroAPI::StoreAlign(workUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg, pregFull);
             } else {
                 StoreIfNeedCast<T1>(dstUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg, pregFull);
             }
@@ -381,7 +381,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDVFImpl(__ubuf__ T1
             StoreIfNeedCastM1<T2>(sumUb + i, sumVreg, pregOnePt);
         }
         if constexpr (!isFlashV2 && sizeof(T2) == sizeof(half)) {
-            MicroAPI::DataCopy(tmpUb + i * blockStride, sumVreg, pregOneBlk);
+            MicroAPI::StoreAlign(tmpUb + i * blockStride, sumVreg, pregOneBlk);
         }
     }
 
@@ -389,13 +389,13 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDVFImpl(__ubuf__ T1
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
         for (uint16_t i = 0; i < srcM; ++i) {
             if constexpr (sizeof(T2) == sizeof(half)) {
-                MicroAPI::DataCopy(sumVreg, tmpUb + i * blockStride);
+                MicroAPI::LoadAlign(sumVreg, tmpUb + i * blockStride);
             } else {
-                MicroAPI::DataCopy(sumVreg, sumUb + i * blockStride);
+                MicroAPI::LoadAlign(sumVreg, sumUb + i * blockStride);
             }
             Duplicate(sumVreg, sumVreg, pregFull);
             for (uint16_t j = 0; j < repeatTimes; ++j) {
-                MicroAPI::DataCopy(tmpVreg, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
+                MicroAPI::LoadAlign(tmpVreg, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
                 MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregFull);
                 if constexpr (isLog) {
                     MicroAPI::Log10(dstVreg, dstVreg, pregFull);
@@ -484,7 +484,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDWithTailVFImpl(__u
             MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregCnt);
             MicroAPI::Exp(tmpVreg, dstVreg, pregCnt);
             if constexpr (!isFlashV2) {
-                MicroAPI::DataCopy(workUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg, pregCnt);
+                MicroAPI::StoreAlign(workUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg, pregCnt);
             } else {
                 StoreIfNeedCast<T1>(dstUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg, pregCnt);
             }
@@ -498,7 +498,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDWithTailVFImpl(__u
             StoreIfNeedCastM1<T2>(sumUb + i, sumVreg, pregOnePt);
         }
         if constexpr (!isFlashV2 && sizeof(T2) == sizeof(half)) {
-            MicroAPI::DataCopy(tmpUb + i * blockStride, sumVreg, pregOneBlk);
+            MicroAPI::StoreAlign(tmpUb + i * blockStride, sumVreg, pregOneBlk);
         }
     }
 
@@ -506,15 +506,15 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDWithTailVFImpl(__u
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
         for (uint16_t i = 0; i < srcM; ++i) {
             if constexpr (sizeof(T2) == sizeof(half)) {
-                MicroAPI::DataCopy(sumVreg, tmpUb + i * blockStride);
+                MicroAPI::LoadAlign(sumVreg, tmpUb + i * blockStride);
             } else {
-                MicroAPI::DataCopy(sumVreg, sumUb + i * blockStride);
+                MicroAPI::LoadAlign(sumVreg, sumUb + i * blockStride);
             }
             Duplicate(sumVreg, sumVreg, pregFull);
             uint32_t sreg = originK;
             for (uint16_t j = 0; j < repeatTimes; ++j) {
                 pregCnt = MicroAPI::UpdateMask<uint32_t>(sreg);
-                MicroAPI::DataCopy(tmpVreg, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
+                MicroAPI::LoadAlign(tmpVreg, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
                 MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
                 if constexpr (isLog) {
                     MicroAPI::Log10(dstVreg, dstVreg, pregCnt);
@@ -570,17 +570,17 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDForBlkVFImpl
         LoadIfNeedCast<T1>(srcVreg, srcUb + i * srcK * factorRow, pregFull);
 
         MicroAPI::ReduceMaxWithDataBlock(maxVreg, srcVreg, pregCnt);
-        MicroAPI::DataCopy(tmpUb0 + i * factorRow, maxVreg, pregOneBlk);
+        MicroAPI::StoreAlign(tmpUb0 + i * factorRow, maxVreg, pregOneBlk);
         if constexpr (!outputBrc) {
             if constexpr (SupportType<T2, half>()) {
                 MicroAPI::RegTensor<T2> castVreg;
                 MicroAPI::Cast<T2, float, Internal::castTraitB32ToB16>(castVreg, maxVreg, pregOneBlk);
                 MicroAPI::Pack<uint16_t, uint32_t>(
                     (MicroAPI::RegTensor<uint16_t>&)castVreg, (MicroAPI::RegTensor<uint32_t>&)castVreg);
-                MicroAPI::DataCopyUnAlign(maxUb, castVreg, ureg0, factorRow);
-                MicroAPI::DataCopyUnAlignPost(maxUb, ureg0, 0);
+                MicroAPI::StoreUnAlign(maxUb, castVreg, ureg0, factorRow);
+                MicroAPI::StoreUnAlignPost(maxUb, ureg0, 0);
             } else {
-                MicroAPI::DataCopy<float>(maxUb + i * factorRow, maxVreg, pregOneBlk);
+                MicroAPI::StoreAlign<float>(maxUb + i * factorRow, maxVreg, pregOneBlk);
             }
         }
     }
@@ -598,24 +598,24 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDForBlkVFImpl
         MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregFull);
         MicroAPI::Exp(tmpVreg, dstVreg, pregFull);
         if constexpr (!isFlashV2) {
-            MicroAPI::DataCopy(workUb + i * srcK * factorRow, tmpVreg, pregOut);
+            MicroAPI::StoreAlign(workUb + i * srcK * factorRow, tmpVreg, pregOut);
         } else {
             MicroAPI::MaskAnd(pregDst, pregCnt, pregOut, pregFull);
             StoreIfNeedCast<T1>(dstUb + i * srcK * factorRow, tmpVreg, pregDst);
         }
 
         MicroAPI::ReduceSumWithDataBlock(sumVreg, tmpVreg, pregCnt);
-        MicroAPI::DataCopy(tmpUb1 + i * factorRow, sumVreg, pregOneBlk);
+        MicroAPI::StoreAlign(tmpUb1 + i * factorRow, sumVreg, pregOneBlk);
         if constexpr (!outputBrc) {
             if constexpr (SupportType<T2, half>()) {
                 MicroAPI::RegTensor<T2> castVreg;
                 MicroAPI::Cast<T2, float, Internal::castTraitB32ToB16>(castVreg, sumVreg, pregOneBlk);
                 MicroAPI::Pack<uint16_t, uint32_t>(
                     (MicroAPI::RegTensor<uint16_t>&)castVreg, (MicroAPI::RegTensor<uint32_t>&)castVreg);
-                MicroAPI::DataCopyUnAlign(sumUb, castVreg, ureg0, factorRow);
-                MicroAPI::DataCopyUnAlignPost(sumUb, ureg0, 0);
+                MicroAPI::StoreUnAlign(sumUb, castVreg, ureg0, factorRow);
+                MicroAPI::StoreUnAlignPost(sumUb, ureg0, 0);
             } else {
-                MicroAPI::DataCopy<float>(sumUb + i * factorRow, sumVreg, pregOneBlk);
+                MicroAPI::StoreAlign<float>(sumUb + i * factorRow, sumVreg, pregOneBlk);
             }
         }
     }
@@ -637,7 +637,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDForBlkVFImpl
             pregOut = MicroAPI::UpdateMask<uint32_t>(sreg);
             LoadE2B<float>(sumVreg, tmpUb1 + i * factorRow);
             StoreIfNeedCast<T2>(sumUb + i * blockStride * factorRow, sumVreg, pregOut);
-            MicroAPI::DataCopy(tmpVreg, workUb + i * srcK * factorRow);
+            MicroAPI::LoadAlign(tmpVreg, workUb + i * srcK * factorRow);
             MicroAPI::MaskAnd(pregDst, pregCnt, pregOut, pregFull);
             MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregDst);
             if constexpr (isLog) {
@@ -716,21 +716,21 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
                 MicroAPI::Cast<T2, float, Internal::castTraitB32ToB16>(castVreg, maxVreg, pregOneBlk);
                 MicroAPI::Pack<uint16_t, uint32_t>(
                     (MicroAPI::RegTensor<uint16_t>&)castVreg, (MicroAPI::RegTensor<uint32_t>&)castVreg);
-                MicroAPI::DataCopyUnAlign(maxUb, castVreg, ureg2, factorRow);
+                MicroAPI::StoreUnAlign(maxUb, castVreg, ureg2, factorRow);
             } else {
-                MicroAPI::DataCopyUnAlign(maxUb, maxVreg, ureg2, factorRow);
+                MicroAPI::StoreUnAlign(maxUb, maxVreg, ureg2, factorRow);
             }
         }
         if constexpr (sizeof(T2) == sizeof(float) && outputBrc) {
-            MicroAPI::DataCopyUnAlign(tmpUb0Tmp0, maxVreg, ureg0, factorRow);
+            MicroAPI::StoreUnAlign(tmpUb0Tmp0, maxVreg, ureg0, factorRow);
         }
         MicroAPI::Interleave(maxVreg, tmpVreg, maxVreg, maxVreg);
-        MicroAPI::DataCopy(tmpUb1 + i * 2 * factorRow, maxVreg, pregOneBlk);
+        MicroAPI::StoreAlign(tmpUb1 + i * 2 * factorRow, maxVreg, pregOneBlk);
     }
     if constexpr (sizeof(T2) == sizeof(float) && outputBrc) {
-        MicroAPI::DataCopyUnAlignPost(tmpUb0Tmp0, ureg0, 0);
+        MicroAPI::StoreUnAlignPost(tmpUb0Tmp0, ureg0, 0);
     } else if constexpr (!outputBrc) {
-        MicroAPI::DataCopyUnAlignPost(maxUb, ureg2, 0);
+        MicroAPI::StoreUnAlignPost(maxUb, ureg2, 0);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -755,7 +755,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
         MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregFull);
         MicroAPI::Exp(tmpVreg, dstVreg, pregFull);
         if constexpr (!isFlashV2) {
-            MicroAPI::DataCopy(workUb + i * srcK * factorRow, tmpVreg, pregOut);
+            MicroAPI::StoreAlign(workUb + i * srcK * factorRow, tmpVreg, pregOut);
         } else {
             MicroAPI::MaskAnd(pregDst, pregCnt, pregOut, pregFull);
             StoreIfNeedCast<T1>(dstUb + i * srcK * factorRow, tmpVreg, pregDst);
@@ -772,21 +772,21 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
                 MicroAPI::Cast<T2, float, Internal::castTraitB32ToB16>(castVreg, sumVreg, pregOneBlk);
                 MicroAPI::Pack<uint16_t, uint32_t>(
                     (MicroAPI::RegTensor<uint16_t>&)castVreg, (MicroAPI::RegTensor<uint32_t>&)castVreg);
-                MicroAPI::DataCopyUnAlign(sumUb, castVreg, ureg2, factorRow);
+                MicroAPI::StoreUnAlign(sumUb, castVreg, ureg2, factorRow);
             } else {
-                MicroAPI::DataCopyUnAlign(sumUb, sumVreg, ureg2, factorRow);
+                MicroAPI::StoreUnAlign(sumUb, sumVreg, ureg2, factorRow);
             }
         }
         if constexpr (sizeof(T2) == sizeof(float) && outputBrc) {
-            MicroAPI::DataCopyUnAlign(tmpUb0Tmp1, sumVreg, ureg1, factorRow);
+            MicroAPI::StoreUnAlign(tmpUb0Tmp1, sumVreg, ureg1, factorRow);
         }
         MicroAPI::Interleave(sumVreg, tmpVreg, sumVreg, sumVreg);
-        MicroAPI::DataCopy(tmpUb + i * 2 * factorRow, sumVreg, pregOneBlk);
+        MicroAPI::StoreAlign(tmpUb + i * 2 * factorRow, sumVreg, pregOneBlk);
     }
     if constexpr (sizeof(T2) == sizeof(float) && outputBrc) {
-        MicroAPI::DataCopyUnAlignPost(tmpUb0Tmp1, ureg1, 0);
+        MicroAPI::StoreUnAlignPost(tmpUb0Tmp1, ureg1, 0);
     } else if (!outputBrc) {
-        MicroAPI::DataCopyUnAlignPost(sumUb, ureg2, 0);
+        MicroAPI::StoreUnAlignPost(sumUb, ureg2, 0);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -814,7 +814,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
         for (uint16_t i = 0; i < factor; ++i) {
             pregOut = MicroAPI::UpdateMask<uint32_t>(sreg);
             LoadE2B<float>(sumVreg, tmpUb + i * DEFAULT_BLK_NUM);
-            MicroAPI::DataCopy(tmpVreg, workUb + i * srcK * factorRow);
+            MicroAPI::LoadAlign(tmpVreg, workUb + i * srcK * factorRow);
             MicroAPI::MaskAnd(pregDst, pregCnt, pregOut, pregFull);
             MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregDst);
             if constexpr (isLog) {
@@ -895,7 +895,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDVFImpl(__ubu
         MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregCnt);
         MicroAPI::Exp(tmpVreg, dstVreg, pregCnt);
         if constexpr (!isFlashV2) {
-            MicroAPI::DataCopy(workUb + i * srcK, tmpVreg, pregCnt);
+            MicroAPI::StoreAlign(workUb + i * srcK, tmpVreg, pregCnt);
         } else {
             StoreIfNeedCast<T1>(dstUb + i * srcK, tmpVreg, pregCnt);
         }
@@ -907,7 +907,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDVFImpl(__ubu
             StoreIfNeedCast<T2>(sumUb + i * blockStride, sumVreg, pregOneBlk);
         }
         if constexpr (!isFlashV2 && sizeof(T2) == sizeof(half)) {
-            MicroAPI::DataCopy(tmpUb + i * blockStride, sumVreg, pregOneBlk);
+            MicroAPI::StoreAlign(tmpUb + i * blockStride, sumVreg, pregOneBlk);
         }
     }
 
@@ -915,12 +915,12 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDVFImpl(__ubu
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
         for (uint16_t i = 0; i < srcM; ++i) {
             if constexpr (sizeof(T2) == sizeof(half)) {
-                MicroAPI::DataCopy(sumVreg, tmpUb + i * blockStride);
+                MicroAPI::LoadAlign(sumVreg, tmpUb + i * blockStride);
             } else {
-                MicroAPI::DataCopy(sumVreg, sumUb + i * blockStride);
+                MicroAPI::LoadAlign(sumVreg, sumUb + i * blockStride);
             }
             Duplicate(sumVreg, sumVreg, pregFull);
-            MicroAPI::DataCopy(tmpVreg, workUb + i * srcK);
+            MicroAPI::LoadAlign(tmpVreg, workUb + i * srcK);
             MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
             if constexpr (isLog) {
                 MicroAPI::Log10(dstVreg, dstVreg, pregCnt);
@@ -1021,22 +1021,22 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDWithTailVFImpl(__u
             LoadIfNeedCast<T>(srcVreg, srcUb + i * srcK + j * FLOAT_REPEAT_SIZE, pregFull);
             MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregCnt);
             MicroAPI::Exp(tmpVreg, dstVreg, pregCnt);
-            MicroAPI::DataCopy(workUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg, pregCnt);
+            MicroAPI::StoreAlign(workUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg, pregCnt);
             MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         }
         MicroAPI::ReduceSum(sumVreg, sumVreg, pregFull);
-        MicroAPI::DataCopyUnAlign(sumUb, sumVreg, ureg0, 1);
+        MicroAPI::StoreUnAlign(sumUb, sumVreg, ureg0, 1);
     }
-    MicroAPI::DataCopyUnAlignPost(sumUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(sumUb, ureg0, 0);
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 
     for (uint16_t i = 0; i < srcM; ++i) {
-        MicroAPI::DataCopy<float, MicroAPI::PostLiteral::POST_MODE_UPDATE, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg, tmpUb, 1);
+        MicroAPI::LoadAlign<float, MicroAPI::PostLiteral::POST_MODE_UPDATE, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg, tmpUb, 1);
         uint32_t sreg = originK;
         for (uint16_t j = 0; j < repeatTimes; ++j) {
             pregCnt = MicroAPI::UpdateMask<uint32_t>(sreg);
-            MicroAPI::DataCopy(tmpVreg, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
+            MicroAPI::LoadAlign(tmpVreg, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
             MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
             StoreIfNeedCast<T>(dstUb + i * srcK + j * FLOAT_REPEAT_SIZE, dstVreg, pregCnt);
         }
@@ -1098,8 +1098,8 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDVFImpl(__ubuf__ T*
         }
         MicroAPI::ReduceMax(maxVreg0, maxVreg0, pregFull);
         MicroAPI::ReduceMax(maxVreg1, maxVreg1, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((maxUb + i), maxVreg0, pregOne);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((maxUb + i + halfM), maxVreg1, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((maxUb + i), maxVreg0, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((maxUb + i + halfM), maxVreg1, pregOne);
     }
     for (uint16_t i = 0; i < tailM; ++i) {
         Duplicate(maxVreg0, notNum.f);
@@ -1108,12 +1108,12 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDVFImpl(__ubuf__ T*
             MicroAPI::Max(maxVreg0, maxVreg0, srcVreg0, pregFull);
         }
         MicroAPI::ReduceMax(maxVreg0, maxVreg0, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((maxUb + mainM), maxVreg0, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((maxUb + mainM), maxVreg0, pregOne);
     }
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     for (uint16_t i = 0; i < halfM; i++) {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg0, maxUb + i);
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg1, maxUb + (i + halfM));
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg0, maxUb + i);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg1, maxUb + (i + halfM));
         Duplicate(sumVreg0, 0);
         Duplicate(sumVreg1, 0);
         for (uint16_t j = 0; j < repeatTimes; ++j) {
@@ -1121,38 +1121,38 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDVFImpl(__ubuf__ T*
             LoadIfNeedCast<T>(srcVreg1, srcUb + (i + halfM) * srcK + j * FLOAT_REPEAT_SIZE, pregFull);
             MicroAPI::FusedExpSub(tmpVreg0, srcVreg0, maxVreg0, pregFull);
             MicroAPI::FusedExpSub(tmpVreg1, srcVreg1, maxVreg1, pregFull);
-            MicroAPI::DataCopy(workUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg0, pregFull);
-            MicroAPI::DataCopy(workUb + (i + halfM) * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg1, pregFull);
+            MicroAPI::StoreAlign(workUb + i * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg0, pregFull);
+            MicroAPI::StoreAlign(workUb + (i + halfM) * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg1, pregFull);
             MicroAPI::Add(sumVreg0, sumVreg0, tmpVreg0, pregFull);
             MicroAPI::Add(sumVreg1, sumVreg1, tmpVreg1, pregFull);
         }
         MicroAPI::ReduceSum(sumVreg0, sumVreg0, pregFull);
         MicroAPI::ReduceSum(sumVreg1, sumVreg1, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((sumUb0 + i), sumVreg0, pregOne);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((sumUb1 + i), sumVreg1, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((sumUb0 + i), sumVreg0, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((sumUb1 + i), sumVreg1, pregOne);
     }
 
     for (uint16_t i = 0; i < tailM; ++i) {
         Duplicate(sumVreg0, 0);
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg0, maxUb + mainM);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg0, maxUb + mainM);
         for (uint16_t j = 0; j < repeatTimes; ++j) {
             LoadIfNeedCast<T>(srcVreg0, srcUb + mainM * srcK + j * FLOAT_REPEAT_SIZE, pregFull);
             MicroAPI::FusedExpSub(tmpVreg0, srcVreg0, maxVreg0, pregFull);
-            MicroAPI::DataCopy(workUb + mainM * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg0, pregFull);
+            MicroAPI::StoreAlign(workUb + mainM * srcK + j * FLOAT_REPEAT_SIZE, tmpVreg0, pregFull);
             MicroAPI::Add(sumVreg0, sumVreg0, tmpVreg0, pregFull);
         }
         MicroAPI::ReduceSum(sumVreg0, sumVreg0, pregFull);
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((sumUb + mainM), sumVreg0, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((sumUb + mainM), sumVreg0, pregOne);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 
     for (uint16_t i = 0; i < halfM; ++i) {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg0, sumUb + i);
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg1, sumUb + (i + halfM));
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg0, sumUb + i);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg1, sumUb + (i + halfM));
         for (uint16_t j = 0; j < repeatTimes; ++j) {
-            MicroAPI::DataCopy(tmpVreg0, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
-            MicroAPI::DataCopy(tmpVreg1, workUb + (i + halfM) * srcK + j * FLOAT_REPEAT_SIZE);
+            MicroAPI::LoadAlign(tmpVreg0, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
+            MicroAPI::LoadAlign(tmpVreg1, workUb + (i + halfM) * srcK + j * FLOAT_REPEAT_SIZE);
             MicroAPI::Div(dstVreg0, tmpVreg0, sumVreg0, pregFull);
             MicroAPI::Div(dstVreg1, tmpVreg1, sumVreg1, pregFull);
             StoreIfNeedCast<T>(dstUb + i * srcK + j * FLOAT_REPEAT_SIZE, dstVreg0, pregFull);
@@ -1160,9 +1160,9 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDVFImpl(__ubuf__ T*
         }
     }
     for (uint16_t i = 0; i < tailM; ++i) {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg0, sumUb + mainM);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg0, sumUb + mainM);
         for (uint16_t j = 0; j < repeatTimes; ++j) {
-            MicroAPI::DataCopy(tmpVreg0, workUb + mainM * srcK + j * FLOAT_REPEAT_SIZE);
+            MicroAPI::LoadAlign(tmpVreg0, workUb + mainM * srcK + j * FLOAT_REPEAT_SIZE);
             MicroAPI::Div(dstVreg0, tmpVreg0, sumVreg0, pregFull);
             StoreIfNeedCast<T>(dstUb + mainM * srcK + j * FLOAT_REPEAT_SIZE, dstVreg0, pregFull);
         }
@@ -1219,7 +1219,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDForBlkVFImpl
         LoadIfNeedCast<T>(srcVreg, srcUb + i * srcK * factorRow, pregFull);
 
         MicroAPI::ReduceMaxWithDataBlock(maxVreg, srcVreg, pregCnt);
-        MicroAPI::DataCopy(tmpUb + i * factorRow, maxVreg, pregOneBlk);
+        MicroAPI::StoreAlign(tmpUb + i * factorRow, maxVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -1230,10 +1230,10 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDForBlkVFImpl
         LoadIfNeedCast<T>(srcVreg, srcUb + i * srcK * factorRow, pregFull);
         MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregFull);
         MicroAPI::Exp(tmpVreg, dstVreg, pregFull);
-        MicroAPI::DataCopy(workUb + i * srcK * factorRow, tmpVreg, pregFull);
+        MicroAPI::StoreAlign(workUb + i * srcK * factorRow, tmpVreg, pregFull);
 
         MicroAPI::ReduceSumWithDataBlock(sumVreg, tmpVreg, pregCnt);
-        MicroAPI::DataCopy(sumUb + i * factorRow, sumVreg, pregOneBlk);
+        MicroAPI::StoreAlign(sumUb + i * factorRow, sumVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -1241,7 +1241,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDForBlkVFImpl
     for (uint16_t i = 0; i < factor; ++i) {
         pregOut = MicroAPI::UpdateMask<uint32_t>(sreg);
         LoadE2B<float>(sumVreg, sumUb + i * factorRow);
-        MicroAPI::DataCopy(tmpVreg, workUb + i * srcK * factorRow);
+        MicroAPI::LoadAlign(tmpVreg, workUb + i * srcK * factorRow);
         MicroAPI::MaskAnd(pregOneBlk, pregCnt, pregOut, pregFull);
         MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregOneBlk);
         StoreIfNeedCast<T>(dstUb + i * srcK * factorRow, dstVreg, pregOneBlk);
@@ -1299,7 +1299,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
         MicroAPI::DeInterleave(maxVreg, tmpVreg, maxVreg, tmpVreg);
         MicroAPI::Max(maxVreg, maxVreg, tmpVreg, pregFull);
         MicroAPI::Interleave(maxVreg, tmpVreg, maxVreg, maxVreg);
-        MicroAPI::DataCopy(tmpUb + i * 2 * factorRow, maxVreg, pregOneBlk);
+        MicroAPI::StoreAlign(tmpUb + i * 2 * factorRow, maxVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -1310,7 +1310,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
         LoadIfNeedCast<T>(srcVreg, srcUb + i * srcK * factorRow, pregFull);
         MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregFull);
         MicroAPI::Exp(tmpVreg, dstVreg, pregFull);
-        MicroAPI::DataCopy(workUb + i * srcK * factorRow, tmpVreg, pregFull);
+        MicroAPI::StoreAlign(workUb + i * srcK * factorRow, tmpVreg, pregFull);
 
         MicroAPI::ReduceSumWithDataBlock(sumVreg, tmpVreg, pregCnt);
 
@@ -1318,7 +1318,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
         MicroAPI::DeInterleave(sumVreg, tmpVreg, sumVreg, tmpVreg);
         MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         MicroAPI::Interleave(sumVreg, tmpVreg, sumVreg, sumVreg);
-        MicroAPI::DataCopy(sumUb + i * 2 * factorRow, sumVreg, pregOneBlk);
+        MicroAPI::StoreAlign(sumUb + i * 2 * factorRow, sumVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -1326,7 +1326,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
     for (uint16_t i = 0; i < factor; ++i) {
         pregOut = MicroAPI::UpdateMask<uint32_t>(sreg);
         LoadE2B<float>(sumVreg, sumUb + i * DEFAULT_BLK_NUM);
-        MicroAPI::DataCopy(tmpVreg, workUb + i * srcK * factorRow);
+        MicroAPI::LoadAlign(tmpVreg, workUb + i * srcK * factorRow);
         MicroAPI::MaskAnd(pregOneBlk, pregCnt, pregOut, pregFull);
         MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregOneBlk);
         StoreIfNeedCast<T>(dstUb + i * srcK * factorRow, dstVreg, pregOneBlk);
@@ -1385,18 +1385,18 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDVFImpl(__ubu
 
         MicroAPI::Sub(dstVreg, srcVreg, maxVreg, pregCnt);
         MicroAPI::Exp(tmpVreg, dstVreg, pregCnt);
-        MicroAPI::DataCopy(workUb + i * srcK, tmpVreg, pregCnt);
+        MicroAPI::StoreAlign(workUb + i * srcK, tmpVreg, pregCnt);
 
         MicroAPI::ReduceSum(sumVreg, tmpVreg, pregCnt);
-        MicroAPI::DataCopyUnAlign(sumUb, sumVreg, ureg0, 1);
+        MicroAPI::StoreUnAlign(sumUb, sumVreg, ureg0, 1);
     }
-    MicroAPI::DataCopyUnAlignPost(sumUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(sumUb, ureg0, 0);
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 
     for (uint16_t i = 0; i < srcM; ++i) {
-        MicroAPI::DataCopy<float, MicroAPI::PostLiteral::POST_MODE_UPDATE, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg, tmpUb, 1);
-        MicroAPI::DataCopy(tmpVreg, workUb + i * srcK);
+        MicroAPI::LoadAlign<float, MicroAPI::PostLiteral::POST_MODE_UPDATE, MicroAPI::LoadDist::DIST_BRC_B32>(sumVreg, tmpUb, 1);
+        MicroAPI::LoadAlign(tmpVreg, workUb + i * srcK);
         MicroAPI::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
         StoreIfNeedCast<T>(dstUb + i * srcK, dstVreg, pregCnt);
     }
@@ -1465,11 +1465,11 @@ __simd_vf__ inline void AdjustSoftMaxResNZImpl(__ubuf__ T1* resUb, __ubuf__ T2* 
     bool isUpdateNeedCheck = false;
     for (uint16_t i = 0; i < mRepeatTimes; ++i) {
         if constexpr (sizeof(T2) == sizeof(float)) {
-            MicroAPI::DataCopy<T2, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg, maxUb + i * stepSize);
+            MicroAPI::LoadAlign<T2, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg, maxUb + i * stepSize);
             // either full mask or zero mask
             MicroAPI::CompareScalar(cmpMaskReg, (MicroAPI::RegTensor<uint32_t>&)maxVreg, from, maskFull);
         } else if constexpr (sizeof(T2) == sizeof(half)) {
-            MicroAPI::DataCopy<T2, MicroAPI::LoadDist::DIST_BRC_B16>(maxVreg, maxUb + i * stepSize);
+            MicroAPI::LoadAlign<T2, MicroAPI::LoadDist::DIST_BRC_B16>(maxVreg, maxUb + i * stepSize);
             // either full mask or zero mask
             MicroAPI::CompareScalar(cmpMaskReg, (MicroAPI::RegTensor<uint16_t>&)maxVreg, (uint16_t)from, maskFull);
         }
@@ -1481,12 +1481,12 @@ __simd_vf__ inline void AdjustSoftMaxResNZImpl(__ubuf__ T1* resUb, __ubuf__ T2* 
         MicroAPI::MaskOr(dstMask, dstMask, cmpMaskReg, maskFull);
         MicroAPI::Duplicate(tmpVreg, to, maskFull);
         for (uint16_t j = 0; j < kRepeatTimes; ++j) {
-            MicroAPI::DataCopy(srcVreg, resUb + i * stride + j * dataBlock);
+            MicroAPI::LoadAlign(srcVreg, resUb + i * stride + j * dataBlock);
             MicroAPI::Select(dstVreg, tmpVreg, srcVreg, cmpMaskReg);
-            MicroAPI::DataCopy(resUb + i * stride + j * dataBlock, dstVreg, maskFull);
+            MicroAPI::StoreAlign(resUb + i * stride + j * dataBlock, dstVreg, maskFull);
         }
     }
-    MicroAPI::DataCopy((__ubuf__ uint8_t*)maskUb, dstMask);
+    MicroAPI::StoreAlign((__ubuf__ uint8_t*)maskUb, dstMask);
 }
 
 template <typename T1, typename T2, uint32_t stepSize, uint32_t stride>
@@ -1507,11 +1507,11 @@ __simd_vf__ inline void AdjustSoftMaxResNDImpl(__ubuf__ T1* resUb, __ubuf__ T2* 
 
     for (uint16_t i = 0; i < srcM; i++) {
         if constexpr (sizeof(T2) == sizeof(float)) {
-            MicroAPI::DataCopy<T2, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg, maxUb + i * stepSize);
+            MicroAPI::LoadAlign<T2, MicroAPI::LoadDist::DIST_BRC_B32>(maxVreg, maxUb + i * stepSize);
             // either full mask or zero mask
             MicroAPI::CompareScalar(cmpMaskReg, (MicroAPI::RegTensor<uint32_t>&)maxVreg, from, maskFull);
         } else if constexpr (sizeof(T2) == sizeof(half)) {
-            MicroAPI::DataCopy<T2, MicroAPI::LoadDist::DIST_BRC_B16>(maxVreg, maxUb + i * stepSize);
+            MicroAPI::LoadAlign<T2, MicroAPI::LoadDist::DIST_BRC_B16>(maxVreg, maxUb + i * stepSize);
             // either full mask or zero mask
             MicroAPI::CompareScalar(cmpMaskReg, (MicroAPI::RegTensor<uint16_t>&)maxVreg, (uint16_t)from, maskFull);
         }
@@ -1525,12 +1525,12 @@ __simd_vf__ inline void AdjustSoftMaxResNDImpl(__ubuf__ T1* resUb, __ubuf__ T2* 
         uint32_t sreg = srcK;
         for (uint16_t j = 0; j < repeatTimes; j++) {
             maskReg = MicroAPI::UpdateMask<T1>(sreg);
-            MicroAPI::DataCopy(srcVreg, resUb + i * srcK + j * stride);
+            MicroAPI::LoadAlign(srcVreg, resUb + i * srcK + j * stride);
             MicroAPI::Select(dstVreg, tmpVreg, srcVreg, cmpMaskReg);
-            MicroAPI::DataCopy(resUb + i * srcK + j * stride, dstVreg, maskReg);
+            MicroAPI::StoreAlign(resUb + i * srcK + j * stride, dstVreg, maskReg);
         }
     }
-    MicroAPI::DataCopy((__ubuf__ uint8_t*)maskUb, dstMask);
+    MicroAPI::StoreAlign((__ubuf__ uint8_t*)maskUb, dstMask);
 }
 
 template <typename T1, typename T2, bool isDataFormatNZ = false, uint8_t stepSizeMode = 0>

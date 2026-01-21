@@ -42,8 +42,8 @@ __simd_vf__ inline void VfGatherApi0B16(__ubuf__ T *dst, __ubuf__ T *src, __ubuf
         if constexpr (!isNormalMode) {
             dstMask = MicroAPI::UpdateMask<T>(sregPlt);
         }
-        DataCopy(offsetReg0, srcOffsetLocal + (2 * i) * u32OffsetRepeatCount);
-        DataCopy(offsetReg1, srcOffsetLocal + (2 * i + 1) * u32OffsetRepeatCount);
+        MicroAPI::LoadAlign(offsetReg0, srcOffsetLocal + (2 * i) * u32OffsetRepeatCount);
+        MicroAPI::LoadAlign(offsetReg1, srcOffsetLocal + (2 * i + 1) * u32OffsetRepeatCount);
         // convert addr offset into B16 element index: divide by 2 (implemented by ShiftRight 1 bit)
         ShiftRights(offsetReg0, offsetReg0, (int16_t)1, indexMask);
         ShiftRights(offsetReg1, offsetReg1, (int16_t)1, indexMask);
@@ -60,8 +60,8 @@ __simd_vf__ inline void VfGatherApi0B16(__ubuf__ T *dst, __ubuf__ T *src, __ubuf
         // indexReg：0xFFFEFD...111213...
         Select(indexReg, (MicroAPI::RegTensor<uint16_t> &)offsetReg0, (MicroAPI::RegTensor<uint16_t> &)offsetReg1,
             selectMask);
-        DataCopyGather(dstReg, (__ubuf__ uint16_t *)src + srcBaseIndex, indexReg, dstMask);
-        DataCopy((__ubuf__ uint16_t *)dst + i * dstRepStride * blkCount, dstReg, dstMask);
+        MicroAPI::Gather(dstReg, (__ubuf__ uint16_t *)src + srcBaseIndex, indexReg, dstMask);
+        MicroAPI::StoreAlign((__ubuf__ uint16_t *)dst + i * dstRepStride * blkCount, dstReg, dstMask);
     }
 }
 
@@ -95,11 +95,11 @@ __simd_vf__ inline void VfGatherApi0B32(__ubuf__ T *dst, __ubuf__ T *src, __ubuf
         if constexpr (!isNormalMode) {
             dstMask = MicroAPI::UpdateMask<T>(sregPlt);
         }
-        DataCopy(offsetReg, srcOffsetLocal + i * u32OffsetRepeatCount);
+        MicroAPI::LoadAlign(offsetReg, srcOffsetLocal + i * u32OffsetRepeatCount);
         // convert addr offset into B32 element index: divide by 4 (implemented by ShiftRight 2 bit)
         ShiftRights(indexReg, offsetReg, (int16_t)2, indexMask);
-        DataCopyGather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexReg, dstMask);
-        DataCopy((__ubuf__ uint32_t *)dst + i * dstRepStride * blkCount, dstReg, dstMask);
+        MicroAPI::Gather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexReg, dstMask);
+        MicroAPI::StoreAlign((__ubuf__ uint32_t *)dst + i * dstRepStride * blkCount, dstReg, dstMask);
     }
 }
 
@@ -135,7 +135,7 @@ __simd_vf__ inline void VfGatherApi0B64Normal(__ubuf__ T *dst, __ubuf__ T *src, 
         if constexpr (!isNormalMode) {
             dstMask = MicroAPI::UpdateMask<uint32_t>(sregPlt);
         }
-        DataCopy(offsetReg, srcOffsetLocal + i * u64OffsetRepeatCount);
+        MicroAPI::LoadAlign(offsetReg, srcOffsetLocal + i * u64OffsetRepeatCount);
         // convert addr offset into B64 element index: divide by 8 (implemented by ShiftRight 3 bit)
         ShiftRights(indexReg, offsetReg, (int16_t)3, indexMask);
         // Consider every B64 element as two B32 elements
@@ -144,8 +144,8 @@ __simd_vf__ inline void VfGatherApi0B64Normal(__ubuf__ T *dst, __ubuf__ T *src, 
         Adds(oddIndexReg, indexReg, 1, indexMask);
         // Interleave the seperately calculated indices of the lower and higher 32-bit of every B64 element
         Interleave(indexU32Reg, tmpReg, indexReg, oddIndexReg);
-        DataCopyGather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexU32Reg, dstMask);
-        DataCopy((__ubuf__ uint32_t *)dst + i * dstRepStride * u32BlkCount, dstReg, dstMask);
+        MicroAPI::Gather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexU32Reg, dstMask);
+        MicroAPI::StoreAlign((__ubuf__ uint32_t *)dst + i * dstRepStride * u32BlkCount, dstReg, dstMask);
     }
 }
 
@@ -187,7 +187,7 @@ __simd_vf__ inline void VfGatherApi0B64Bits(__ubuf__ T *dst, __ubuf__ T *src, __
         if constexpr (!isNormalMode) {
             dstMask = MicroAPI::UpdateMask<uint32_t>(sregPlt);
         }
-        DataCopy(offsetReg, srcOffsetLocal + i * u64OffsetRepeatCount);
+        MicroAPI::LoadAlign(offsetReg, srcOffsetLocal + i * u64OffsetRepeatCount);
         // convert addr offset into B64 element index: divide by 8 (implemented by ShiftRight 3 bit)
         ShiftRights(bitsIndexReg, offsetReg, (int16_t)3, indexMask);
         // Consider every B64 element as two B32 elements
@@ -196,8 +196,8 @@ __simd_vf__ inline void VfGatherApi0B64Bits(__ubuf__ T *dst, __ubuf__ T *src, __
         Adds(bitsOddIndexReg, bitsIndexReg, 1, indexMask);
         // Interleave the seperately calculated indices of the lower and higher 32-bit of every B64 element
         Interleave(indexU32Reg, tmpReg, bitsIndexReg, bitsOddIndexReg);
-        DataCopyGather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexU32Reg, dstMask);
-        DataCopy((__ubuf__ uint32_t *)dst + i * dstRepStride * u32BlkCount, dstReg, dstMask);
+        MicroAPI::Gather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexU32Reg, dstMask);
+        MicroAPI::StoreAlign((__ubuf__ uint32_t *)dst + i * dstRepStride * u32BlkCount, dstReg, dstMask);
     }
 }
 
@@ -227,8 +227,8 @@ __simd_vf__ inline void VfGatherApi2B8(__ubuf__ T *dst, __ubuf__ T *src, __ubuf_
     MicroAPI::MaskReg selectMask = MicroAPI::CreateMask<uint16_t, MicroAPI::MaskPattern::H>();
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
         dstMask = MicroAPI::UpdateMask<uint16_t>(sreg);
-        DataCopy(offsetReg0, srcOffsetLocal + (2 * i) * u32OffsetRepeatCount);
-        DataCopy(offsetReg1, srcOffsetLocal + (2 * i + 1) * u32OffsetRepeatCount);
+        MicroAPI::LoadAlign(offsetReg0, srcOffsetLocal + (2 * i) * u32OffsetRepeatCount);
+        MicroAPI::LoadAlign(offsetReg1, srcOffsetLocal + (2 * i + 1) * u32OffsetRepeatCount);
         // extract the lower 16-bit of uint32_t offset data into uint16_t index data:
         // for offsetReg0，pack every lower 16-bit into the lower half of the vreg：
         // 0x00FF00FE00FD... -> 0xFFFEFD...000000...
@@ -242,13 +242,13 @@ __simd_vf__ inline void VfGatherApi2B8(__ubuf__ T *dst, __ubuf__ T *src, __ubuf_
         // 0xFFFEFD...111213...
         Select(indexReg, (MicroAPI::RegTensor<uint16_t> &)offsetReg0, (MicroAPI::RegTensor<uint16_t> &)offsetReg1,
             selectMask);
-        DataCopyGather(dstReg, (__ubuf__ uint8_t *)src + srcBaseIndex, indexReg, dstMask);
+        MicroAPI::Gather(dstReg, (__ubuf__ uint8_t *)src + srcBaseIndex, indexReg, dstMask);
         // remove the higher zeros of the uint16_t data gathered by the Micro Gather instr, and pack into continuous B8
         // data: 0x010203... -> 0x123...000... (only the lower 128 elements are effective)
         MicroAPI::Pack((MicroAPI::RegTensor<uint8_t> &)dstReg, dstReg);
         // convert uint16_t type preg to B8 type preg：0b010101... -> 0b111...000... (lower 128-bit effective)
         MicroAPI::MaskPack(dstMask, dstMask);
-        DataCopy((__ubuf__ uint8_t *)dst + i * u8GatherRepeatCount, (MicroAPI::RegTensor<uint8_t> &)dstReg, dstMask);
+        MicroAPI::StoreAlign((__ubuf__ uint8_t *)dst + i * u8GatherRepeatCount, (MicroAPI::RegTensor<uint8_t> &)dstReg, dstMask);
     }
 }
 
@@ -277,8 +277,8 @@ __simd_vf__ inline void VfGatherApi2B16(__ubuf__ T *dst, __ubuf__ T *src, __ubuf
     uint32_t sreg = static_cast<uint32_t>(count);
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
         dstMask = MicroAPI::UpdateMask<uint16_t>(sreg);
-        DataCopy(api2OffsetReg0, srcOffsetLocal + (2 * i) * u32OffsetRepeatCount);
-        DataCopy(api2OffsetReg1, srcOffsetLocal + (2 * i + 1) * u32OffsetRepeatCount);
+        MicroAPI::LoadAlign(api2OffsetReg0, srcOffsetLocal + (2 * i) * u32OffsetRepeatCount);
+        MicroAPI::LoadAlign(api2OffsetReg1, srcOffsetLocal + (2 * i + 1) * u32OffsetRepeatCount);
         // convert addr offset into B32 element index: divide by 4 (implemented by ShiftRight 2 bit)
         ShiftRights(api2OffsetReg0, api2OffsetReg0, (int16_t)1, indexMask);
         ShiftRights(api2OffsetReg1, api2OffsetReg1, (int16_t)1, indexMask);
@@ -295,8 +295,8 @@ __simd_vf__ inline void VfGatherApi2B16(__ubuf__ T *dst, __ubuf__ T *src, __ubuf
         // indexReg：0xFFFEFD...111213...
         Select(indexReg, (MicroAPI::RegTensor<uint16_t> &)api2OffsetReg0, (MicroAPI::RegTensor<uint16_t> &)api2OffsetReg1,
             selectMask);
-        DataCopyGather(dstReg, (__ubuf__ uint16_t *)src + srcBaseIndex, indexReg, dstMask);
-        DataCopy((__ubuf__ uint16_t *)dst + i * dstRepeatCount, dstReg, dstMask);
+        MicroAPI::Gather(dstReg, (__ubuf__ uint16_t *)src + srcBaseIndex, indexReg, dstMask);
+        MicroAPI::StoreAlign((__ubuf__ uint16_t *)dst + i * dstRepeatCount, dstReg, dstMask);
     }
 }
 
@@ -324,11 +324,11 @@ __simd_vf__ inline void VfGatherApi2B32(__ubuf__ T *dst, __ubuf__ T *src, __ubuf
     uint32_t sreg = static_cast<uint32_t>(count);
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
         dstMask = MicroAPI::UpdateMask<uint32_t>(sreg);
-        DataCopy(offsetReg, srcOffsetLocal + i * u32OffsetRepeatCount);
+        MicroAPI::LoadAlign(offsetReg, srcOffsetLocal + i * u32OffsetRepeatCount);
         // convert addr offset into B32 element index: divide by 4 (implemented by ShiftRight 2 bit)
         ShiftRights(indexReg, offsetReg, (int16_t)2, indexMask);
-        DataCopyGather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexReg, dstMask);
-        DataCopy((__ubuf__ uint32_t *)dst + i * dstRepeatCount, dstReg, dstMask);
+        MicroAPI::Gather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexReg, dstMask);
+        MicroAPI::StoreAlign((__ubuf__ uint32_t *)dst + i * dstRepeatCount, dstReg, dstMask);
     }
 }
 
@@ -359,7 +359,7 @@ __simd_vf__ inline void VfGatherApi2B64(__ubuf__ T *dst, __ubuf__ T *src, __ubuf
     uint32_t sreg = static_cast<uint32_t>(u32Count);
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
         dstMask = MicroAPI::UpdateMask<uint32_t>(sreg);
-        DataCopy(offsetReg, srcOffsetLocal + i * u64OffsetRepeatCount);
+        MicroAPI::LoadAlign(offsetReg, srcOffsetLocal + i * u64OffsetRepeatCount);
         // convert addr offset into B64 element index: divide by 8 (implemented by ShiftRight 3 bit)
         ShiftRights(indexReg, offsetReg, (int16_t)3, indexMask);
         // Consider every B64 element as two B32 elements
@@ -368,8 +368,8 @@ __simd_vf__ inline void VfGatherApi2B64(__ubuf__ T *dst, __ubuf__ T *src, __ubuf
         Adds(oddIndexReg, indexReg, 1, indexMask);
         // Interleave the seperately calculated indices of the lower and higher 32-bit of every B64 element
         Interleave(indexU32Reg, tmpReg, indexReg, oddIndexReg);
-        DataCopyGather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexU32Reg, dstMask);
-        DataCopy((__ubuf__ uint32_t *)dst + i * u32RepeatCount, dstReg, dstMask);
+        MicroAPI::Gather(dstReg, (__ubuf__ uint32_t *)src + srcBaseIndex, indexU32Reg, dstMask);
+        MicroAPI::StoreAlign((__ubuf__ uint32_t *)dst + i * u32RepeatCount, dstReg, dstMask);
     }
 }
 
@@ -523,18 +523,18 @@ __simd_vf__ inline void GatherbImpl(__ubuf__ T *dst, __ubuf__ T *src, __ubuf__ u
 
     constexpr uint32_t sregLower = static_cast<uint32_t>(GetVecLen() / sizeof(T));
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-        MicroAPI::DataCopy(indexReg, srcOffsetLocal + i * DEFAULT_BLK_NUM);
+        MicroAPI::LoadAlign(indexReg, srcOffsetLocal + i * DEFAULT_BLK_NUM);
         if constexpr (sizeof(T) == 8) {
             // pg is the predicate for block index, and regarded as B32 format.
             // For convinience, we use fullPreg format to represent it.
-            MicroAPI::DataCopyGatherB(dstReg, src, indexReg, fullPreg);
-            MicroAPI::DataCopy<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY,
+            MicroAPI::GatherB(dstReg, src, indexReg, fullPreg);
+            MicroAPI::StoreAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY,
                 MicroAPI::PostLiteral::POST_MODE_UPDATE>((__ubuf__ uint32_t *&)dst,
                 (MicroAPI::RegTensor<uint32_t> &)dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride),
                 static_cast<uint32_t>(repeatParams.dstRepStride), fullPreg);
         } else {
-            MicroAPI::DataCopyGatherB(dstReg, src, indexReg, fullPreg);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::GatherB(dstReg, src, indexReg, fullPreg);
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + i * repeatParams.dstRepStride * oneBlkNum, dstReg, repeatParams.dstBlkStride, fullPreg);
         }
     }

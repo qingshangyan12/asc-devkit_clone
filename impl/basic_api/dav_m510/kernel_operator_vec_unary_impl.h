@@ -25,9 +25,9 @@ __aicore__ inline void VecUnaryLevel2VFImpl(__ubuf__ T *dst, __ubuf__ T *src, co
     uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(sreg, repeatStride));
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<T, RegType::trait>(sreg);
-        MicroAPI::DataCopy(srcReg, src + i * repeatStride);
+        MicroAPI::LoadAlign(srcReg, src + i * repeatStride);
         func(dstReg, srcReg, mask);
-        MicroAPI::DataCopy(dst + i * repeatStride, dstReg, mask);
+        MicroAPI::StoreAlign(dst + i * repeatStride, dstReg, mask);
     }
 }
 
@@ -106,7 +106,7 @@ __simd_vf__ inline void VecUnaryLevel2ImplFloat(__ubuf__ T *dst, __ubuf__ T *src
     MicroAPI::Duplicate(negInfReg, notNum1.f, maskFull);
     for (uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy(srcReg, src + i * sregLower);
+        MicroAPI::LoadAlign(srcReg, src + i * sregLower);
 
         MicroAPI::Duplicate(regOne, 1.0f, maskFull);
         MicroAPI::Duplicate(regOneHalf, oneHalf, maskFull);
@@ -142,7 +142,7 @@ __simd_vf__ inline void VecUnaryLevel2ImplFloat(__ubuf__ T *dst, __ubuf__ T *src
         MicroAPI::CompareScalar(isNegZeroMask, (MicroAPI::RegTensor<uint32_t> &)srcReg, negZero, mask);
         MicroAPI::Select(dstReg, negInfReg, dstReg, isNegZeroMask);
 
-        MicroAPI::DataCopy(dst + i * sregLower, dstReg, mask);
+        MicroAPI::StoreAlign(dst + i * sregLower, dstReg, mask);
     }
 }
 
@@ -160,7 +160,7 @@ __simd_vf__ inline void VecUnaryLevel2ImplB64(__ubuf__ T *dst, __ubuf__ T *src, 
         MicroAPI::Duplicate(vRegOne, T(1), preg);
         MicroAPI::Duplicate(vRegZero, T(0), preg);
         MicroAPI::Duplicate(vRegF, static_cast<T>(0xffffffffffffffff), preg);
-        MicroAPI::DataCopy(vSrcReg0, src + i * sregLower);
+        MicroAPI::LoadAlign(vSrcReg0, src + i * sregLower);
         MicroAPI::CompareScalar(maskZero, vSrcReg0, T(0), preg);
         MicroAPI::Select(vDstReg0, vRegF, vRegZero, maskZero);
         MicroAPI::CompareScalar(maskOne, vSrcReg0, T(1), preg);
@@ -170,7 +170,7 @@ __simd_vf__ inline void VecUnaryLevel2ImplB64(__ubuf__ T *dst, __ubuf__ T *src, 
             MicroAPI::CompareScalar(maskNegOne, vSrcReg0, T(-1), preg);
             MicroAPI::Select(vDstReg0, vRegNegOne, vDstReg0, maskNegOne);
         }
-        MicroAPI::DataCopy(dst + i * sregLower, vDstReg0, preg);
+        MicroAPI::StoreAlign(dst + i * sregLower, vDstReg0, preg);
     }
 }
 
@@ -196,10 +196,10 @@ __aicore__ inline void VecUnaryLevel0VFImpl(__ubuf__ T *dst, __ubuf__ T *src, co
 #ifndef NO_OVERLAP_IN_MULTI_REPEAT
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 #endif
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcVreg,
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcVreg,
             src + index * repeatParams.srcRepStride * ElePerBlkT, repeatParams.srcBlkStride, maskReg);
         func(dstVreg, srcVreg, maskReg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskReg);
     }
 }
@@ -575,10 +575,10 @@ __aicore__ inline void AbsImpl(__ubuf__ T *dst, __ubuf__ U *src, const uint32_t 
         uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(count, repeatStride));
         for (uint16_t i = 0; i < repeatTime; ++i) {
             preg = MicroAPI::UpdateMask<U, MicroAPI::RegTraitNumTwo>(sreg);
-            MicroAPI::DataCopy(vSrcReg0, src + i * repeatStride);
+            MicroAPI::LoadAlign(vSrcReg0, src + i * repeatStride);
             MicroAPI::Abs<T, U, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T, MicroAPI::RegTraitNumOne>,
                 MicroAPI::RegTensor<U, MicroAPI::RegTraitNumTwo>>(vDstReg0, vSrcReg0, preg);
-            MicroAPI::DataCopy(dst + i * repeatStride, vDstReg0, preg);
+            MicroAPI::StoreAlign(dst + i * repeatStride, vDstReg0, preg);
         }
     }
 }

@@ -37,10 +37,10 @@ __simd_vf__ inline void SigmoidImplVF(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         preg = MicroAPI::UpdateMask<float>(sreg);
         if constexpr (sizeof(T) == sizeof(half)) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
             MicroAPI::Cast<float, T, castTraitB16ToB32>(castReg, srcReg, preg);
         } else {
-            MicroAPI::DataCopy(castReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign(castReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
         }
         MicroAPI::Muls(tmpReg, castReg, -1.0f, preg);
         MicroAPI::Exp(tmpReg, tmpReg, preg);
@@ -50,9 +50,9 @@ __simd_vf__ inline void SigmoidImplVF(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint
         MicroAPI::Div(dstReg, dstReg, tmpReg, preg);
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<T, float, castTraitB32ToB16>(srcReg, dstReg, preg);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * B32_DATA_NUM_PER_REPEAT, srcReg, preg);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * B32_DATA_NUM_PER_REPEAT, srcReg, preg);
         } else {
-            MicroAPI::DataCopy(dstUb + i * B32_DATA_NUM_PER_REPEAT, dstReg, preg);
+            MicroAPI::StoreAlign(dstUb + i * B32_DATA_NUM_PER_REPEAT, dstReg, preg);
         }
     }
 }

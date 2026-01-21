@@ -30,24 +30,24 @@ __simd_callee__ inline void ReduceRAReuseSourceUnAlignedFoldOne(__ubuf__ T *dstA
     for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(loopANum - 1); loopA++) {
         newSrc = src + static_cast<uint64_t>(loopA * vlSize * dtypeSize);
         // L0
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
         // L1
         Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-        DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+        StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
     }
     newSrc = src + static_cast<uint64_t>((loopANum - 1) * vlSize * dtypeSize);
     // L0
-    MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-    MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-    MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-    MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+    MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+    MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+    MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+    MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
     // L1
     Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-    DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
-    MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+    StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
+    MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
 }
 
 template <class T, const MicroAPI::RegTrait &Trait, auto Binaryfunc>
@@ -65,38 +65,38 @@ __simd_callee__ inline void ReduceRAReuseSourceUnAlignedFoldTwo(__ubuf__ T *dstA
     for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(loopANum - 1); loopA++) {
         newSrc = src + static_cast<uint64_t>(loopA * vlSize * dtypeSize);
         // L0
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), dimA);
         // L1
         Binaryfunc(vreg0, vreg0, vreg2, maskMain);
         Binaryfunc(vreg1, vreg1, vreg3, maskMain);
         // L2
         Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-        DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+        StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
     }
     newSrc = src + static_cast<uint64_t>((loopANum - 1) * vlSize * dtypeSize);
     // L0
-    MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-    MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-    MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-    MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-    MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-    MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-    MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-    MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+    MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+    MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+    MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+    MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+    MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+    MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+    MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+    MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), dimA);
     // L1
     Binaryfunc(vreg0, vreg0, vreg2, maskTail);
     Binaryfunc(vreg1, vreg1, vreg3, maskTail);
     // L2
     Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-    DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
-    MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+    StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
+    MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
 }
 template <class T, const MicroAPI::RegTrait &Trait, auto Binaryfunc>
 __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr, uint32_t dimA,
@@ -128,22 +128,22 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(__ubuf__ T *dstAddr, _
             uint64_t hoistMainAddr = (uint64_t)srcAddr + static_cast<uint64_t>(loopR * dimA * dtypeSize);
             uint64_t hoistTailAddr = hoistMainAddr + static_cast<uint64_t>(mainR * dimA * dtypeSize);
             uint64_t hoistMainReuseAddr = hoistMainAddr;
-            MicroAPI::DataCopyUnAlignPre(vUregMain, ((__ubuf__ T *&)hoistMainAddr));
-            MicroAPI::DataCopyUnAlignPre(vUregTail, ((__ubuf__ T *&)hoistTailAddr));
+            MicroAPI::LoadUnAlignPre(vUregMain, ((__ubuf__ T *&)hoistMainAddr));
+            MicroAPI::LoadUnAlignPre(vUregTail, ((__ubuf__ T *&)hoistTailAddr));
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(loopANum - 1); loopA++) {
-                MicroAPI::DataCopyUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr),
+                MicroAPI::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr),
                     postUpdateStrideMain);
-                MicroAPI::DataCopyUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr),
+                MicroAPI::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr),
                     postUpdateStrideMain);
                 Binaryfunc(vregMain, vregMain, vregTail, maskMain);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst,
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst,
                     postUpdateStrideMain);
             }
-            MicroAPI::DataCopyUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), postUpdateStrideTail);
-            MicroAPI::DataCopyUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), postUpdateStrideTail);
+            MicroAPI::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), postUpdateStrideTail);
+            MicroAPI::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), postUpdateStrideTail);
             Binaryfunc(vregMain, vregMain, vregTail, maskTail);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideTail);
-            MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
+            MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideTail);
+            MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     }
@@ -175,22 +175,22 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(__ubuf__ T *dstAddr, _
                 newSrc = src + static_cast<uint64_t>(loopA * vlSize * dtypeSize);
                 dst = newSrc;
                 // L0
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
                 // L1
                 Binaryfunc(vreg0, vreg0, vreg4, maskMain);
                 Binaryfunc(vreg1, vreg1, vreg5, maskMain);
@@ -201,26 +201,26 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(__ubuf__ T *dstAddr, _
                 Binaryfunc(vreg1, vreg1, vreg3, maskMain);
                 // L3
                 Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-                DataCopyUnAlign((__ubuf__ T *&)dst, vreg0, uDst, postUpdateStrideMain);
+                StoreUnAlign((__ubuf__ T *&)dst, vreg0, uDst, postUpdateStrideMain);
             }
             dst = newSrcTail;
             // L0
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
             // L1
             Binaryfunc(vreg0, vreg0, vreg4, maskTail);
             Binaryfunc(vreg1, vreg1, vreg5, maskTail);
@@ -231,8 +231,8 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(__ubuf__ T *dstAddr, _
             Binaryfunc(vreg1, vreg1, vreg3, maskTail);
             // L3
             Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-            DataCopyUnAlign((__ubuf__ T *&)dst, vreg0, uDst, postUpdateStrideTail);
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dst, uDst, 0);
+            StoreUnAlign((__ubuf__ T *&)dst, vreg0, uDst, postUpdateStrideTail);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dst, uDst, 0);
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     }
@@ -252,14 +252,14 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(__ubuf__ T *dstAddr, _
     // Reduce to 1
     for (uint16_t i = 0; i < foldZero; ++i) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(loopANum - 1); loopA++) {
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), postUpdateStrideMain);
-            MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), postUpdateStrideMain);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
         }
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
-        MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), postUpdateStrideTail);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
+        MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), postUpdateStrideTail);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 }
 
@@ -312,22 +312,22 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(__ubuf__ T *dstAddr, __ub
             uint64_t hoistMainAddr = (uint64_t)srcAddr + static_cast<uint64_t>(loopR * dimA * dtypeSize);
             uint64_t hoistTailAddr = hoistMainAddr + static_cast<uint64_t>(mainR * dimA * dtypeSize);
             uint64_t hoistMainReuseAddr = hoistMainAddr;
-            MicroAPI::DataCopyUnAlignPre(vUregMain, ((__ubuf__ T *&)hoistMainAddr));
-            MicroAPI::DataCopyUnAlignPre(vUregTail, ((__ubuf__ T *&)hoistTailAddr));
+            MicroAPI::LoadUnAlignPre(vUregMain, ((__ubuf__ T *&)hoistMainAddr));
+            MicroAPI::LoadUnAlignPre(vUregTail, ((__ubuf__ T *&)hoistTailAddr));
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(loopANum - 1); loopA++) {
-                MicroAPI::DataCopyUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr),
+                MicroAPI::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr),
                     postUpdateStrideMain);
-                MicroAPI::DataCopyUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr),
+                MicroAPI::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr),
                     postUpdateStrideMain);
                 Binaryfunc(vregMain, vregMain, vregTail, maskMain);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst,
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst,
                     postUpdateStrideMain);
             }
-            MicroAPI::DataCopyUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), postUpdateStrideTail);
-            MicroAPI::DataCopyUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), postUpdateStrideTail);
+            MicroAPI::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), postUpdateStrideTail);
+            MicroAPI::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), postUpdateStrideTail);
             Binaryfunc(vregMain, vregMain, vregTail, maskTail);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideTail);
-            MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
+            MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideTail);
+            MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     }
@@ -367,38 +367,38 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(__ubuf__ T *dstAddr, __ub
                 newSrc = src + static_cast<uint64_t>(loopA * vlSize * dtypeSize);
                 dst = newSrc;
                 // L0
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg8, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg9, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg10, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg11, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg12, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg13, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg14, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg15, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg8, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg9, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg10, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg11, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg12, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg13, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg14, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg15, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
                 // L1
                 Binaryfunc(vreg0, vreg0, vreg8, maskMain);
                 Binaryfunc(vreg1, vreg1, vreg9, maskMain);
@@ -418,42 +418,42 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(__ubuf__ T *dstAddr, __ub
                 Binaryfunc(vreg1, vreg1, vreg3, maskMain);
                 // L4
                 Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-                DataCopyUnAlign((__ubuf__ T *&)dst, vreg0, uDst, postUpdateStrideMain);
+                StoreUnAlign((__ubuf__ T *&)dst, vreg0, uDst, postUpdateStrideMain);
             }
             dst = newSrcTail;
             // L0
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg8, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg9, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg10, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg11, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg12, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg13, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg14, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
-            MicroAPI::DataCopyUnAlign(vreg15, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg8, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg9, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg10, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg11, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg12, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg13, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg14, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrcTail));
+            MicroAPI::LoadUnAlign(vreg15, uSrc, ((__ubuf__ T *&)newSrcTail), offsetR);
             // L1
             Binaryfunc(vreg0, vreg0, vreg8, maskTail);
             Binaryfunc(vreg1, vreg1, vreg9, maskTail);
@@ -473,8 +473,8 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(__ubuf__ T *dstAddr, __ub
             Binaryfunc(vreg1, vreg1, vreg3, maskTail);
             // L4
             Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-            DataCopyUnAlign((__ubuf__ T *&)dst, vreg0, uDst, postUpdateStrideTail);
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dst, uDst, 0);
+            StoreUnAlign((__ubuf__ T *&)dst, vreg0, uDst, postUpdateStrideTail);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dst, uDst, 0);
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     }
@@ -495,22 +495,22 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(__ubuf__ T *dstAddr, __ub
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(loopANum - 1); loopA++) {
             newSrc = src + static_cast<uint64_t>(loopA * vlSize * dtypeSize);
             // L0
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), dimA);
             // L1
             Binaryfunc(vreg0, vreg0, vreg4, maskMain);
             Binaryfunc(vreg1, vreg1, vreg5, maskMain);
@@ -521,26 +521,26 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(__ubuf__ T *dstAddr, __ub
             Binaryfunc(vreg1, vreg1, vreg3, maskMain);
             // L3
             Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+            StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
         }
         newSrc = src + static_cast<uint64_t>((loopANum - 1) * vlSize * dtypeSize);
         // L0
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), dimA);
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), dimA);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), dimA);
         // L1
         Binaryfunc(vreg0, vreg0, vreg4, maskTail);
         Binaryfunc(vreg1, vreg1, vreg5, maskTail);
@@ -551,21 +551,21 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(__ubuf__ T *dstAddr, __ub
         Binaryfunc(vreg1, vreg1, vreg3, maskTail);
         // L3
         Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-        DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     // Reduce to 1
     for (uint16_t i = 0; i < foldZero; ++i) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(loopANum - 1); loopA++) {
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), postUpdateStrideMain);
-            MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), postUpdateStrideMain);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideMain);
         }
-        MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
-        MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), postUpdateStrideTail);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
+        MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), postUpdateStrideTail);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg0, uDst, postUpdateStrideTail);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 }
 
@@ -602,10 +602,10 @@ __simd_callee__ inline void ReduceARCastfoldZeroUnAligned(__ubuf__ T *dstAddr, _
     MicroAPI::UnalignReg uDst;
     for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
         uint64_t newSrc = (uint64_t)srcAddr + vlSize / 2 * sizeof(T);
-        MicroAPI::DataCopyUnAlignPre(uSrc0, ((__ubuf__ T *&)srcAddr));
-        MicroAPI::DataCopyUnAlignPre(uSrc1, ((__ubuf__ T *&)newSrc));
-        MicroAPI::DataCopyUnAlign(vreg0, uSrc0, ((__ubuf__ T *&)srcAddr), dimR);
-        MicroAPI::DataCopyUnAlign(vreg1, uSrc1, ((__ubuf__ T *&)newSrc), dimR);
+        MicroAPI::LoadUnAlignPre(uSrc0, ((__ubuf__ T *&)srcAddr));
+        MicroAPI::LoadUnAlignPre(uSrc1, ((__ubuf__ T *&)newSrc));
+        MicroAPI::LoadUnAlign(vreg0, uSrc0, ((__ubuf__ T *&)srcAddr), dimR);
+        MicroAPI::LoadUnAlign(vreg1, uSrc1, ((__ubuf__ T *&)newSrc), dimR);
         Binaryfunc(vreg0, vreg0, vreg1, fullMask);
         if constexpr (IsSameType<T, bfloat16_t>::value) {
             MicroAPI::UnPack((MicroAPI::RegTensor<uint32_t, Trait> &)vreg0,
@@ -623,9 +623,9 @@ __simd_callee__ inline void ReduceARCastfoldZeroUnAligned(__ubuf__ T *dstAddr, _
             Reducefunc(vreg1Cast, vreg0Cast, fullMask);
             MicroAPI::Cast<T, U, ReduceOpInternal::CastTraitF16B8>(vreg1, vreg1Cast, fullMask);
         }
-        DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+        StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
     }
-    MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+    MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
 }
 
 template <class T, const MicroAPI::RegTrait &Trait, auto Binaryfunc, auto Reducefunc>
@@ -653,21 +653,21 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(__ubuf__ T *dstA
             uint64_t hoistMainAddr = (uint64_t)srcAddr + static_cast<uint64_t>(loopA * dimR * dtypeSize);
             uint64_t hoistTailAddr = hoistMainAddr + static_cast<uint64_t>(mainR * dtypeSize);
             uint64_t hoistMainReuseAddr = hoistMainAddr;
-            MicroAPI::DataCopyUnAlignPre(vUregMain, ((__ubuf__ T *&)hoistMainAddr));
-            MicroAPI::DataCopyUnAlignPre(vUregTail, ((__ubuf__ T *&)hoistTailAddr));
+            MicroAPI::LoadUnAlignPre(vUregMain, ((__ubuf__ T *&)hoistMainAddr));
+            MicroAPI::LoadUnAlignPre(vUregTail, ((__ubuf__ T *&)hoistTailAddr));
             for (uint16_t loopR = 0; loopR < static_cast<uint16_t>(inplaceRepeats - 1); loopR++) {
-                MicroAPI::DataCopyUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), vlSize);
-                MicroAPI::DataCopyUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), vlSize);
+                MicroAPI::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), vlSize);
+                MicroAPI::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), vlSize);
                 Binaryfunc(vregMain, vregMain, vregTail, fullMask);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst,
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst,
                     postUpdateStrideMain);
-                MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
+                MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
             }
-            MicroAPI::DataCopyUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), vlSize);
-            MicroAPI::DataCopyUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), vlSize);
+            MicroAPI::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), vlSize);
+            MicroAPI::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), vlSize);
             Binaryfunc(vregMain, vregMain, vregTail, maskTail);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideTail);
-            MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
+            MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideTail);
+            MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     }
@@ -698,22 +698,22 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(__ubuf__ T *dstA
             for (uint16_t loopR = 0; loopR < loopRNum; loopR++) {
                 newSrc = src + static_cast<uint64_t>(loopR * vlSize * dtypeSize);
                 // L0
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
                 // L1
                 Binaryfunc(vreg0, vreg0, vreg4, fullMask);
                 Binaryfunc(vreg1, vreg1, vreg5, fullMask);
@@ -724,9 +724,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(__ubuf__ T *dstA
                 Binaryfunc(vreg1, vreg1, vreg3, fullMask);
                 // L3
                 Binaryfunc(vreg0, vreg0, vreg1, fullMask);
-                DataCopyUnAlign((__ubuf__ T *&)dst, vreg0, uDst, vlSize);
+                StoreUnAlign((__ubuf__ T *&)dst, vreg0, uDst, vlSize);
             }
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dst, uDst, 0);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dst, uDst, 0);
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     }
@@ -737,9 +737,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(__ubuf__ T *dstA
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             newSrc = src + static_cast<uint64_t>(loopA * dimR * dtypeSize);
             // L0
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
             // L1
             Binaryfunc(vreg0, vreg0, vreg1, fullMask);
             if constexpr (IsSameType<T, bfloat16_t>::value) {
@@ -751,20 +751,20 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(__ubuf__ T *dstA
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
+            StoreUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     for (uint16_t i = 0; i < foldTwo; i++) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             newSrc = src + static_cast<uint64_t>(loopA * dimR * dtypeSize);
             // L0
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
             // L1
             Binaryfunc(vreg0, vreg0, vreg2, fullMask);
             Binaryfunc(vreg1, vreg1, vreg3, fullMask);
@@ -779,9 +779,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(__ubuf__ T *dstA
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
+            StoreUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     // Reduce to 1
@@ -799,12 +799,12 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(__ubuf__ T *dstA
             MicroAPI::MaskReg mask = MicroAPI::UpdateMask<T, Trait>(sreg1);
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
                 newSrc = src + static_cast<uint64_t>(loopA * dimR * dtypeSize);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
                 Reducefunc(vreg1, vreg0, mask);
-                MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+                MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
             }
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
         }
     }
 }
@@ -853,21 +853,21 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(__ubuf__ T *dstAddr
             uint64_t hoistMainAddr = (uint64_t)srcAddr + static_cast<uint64_t>(loopA * dimR * dtypeSize);
             uint64_t hoistTailAddr = hoistMainAddr + static_cast<uint64_t>(mainR * dtypeSize);
             uint64_t hoistMainReuseAddr = hoistMainAddr;
-            MicroAPI::DataCopyUnAlignPre(vUregMain, ((__ubuf__ T *&)hoistMainAddr));
-            MicroAPI::DataCopyUnAlignPre(vUregTail, ((__ubuf__ T *&)hoistTailAddr));
+            MicroAPI::LoadUnAlignPre(vUregMain, ((__ubuf__ T *&)hoistMainAddr));
+            MicroAPI::LoadUnAlignPre(vUregTail, ((__ubuf__ T *&)hoistTailAddr));
             for (uint16_t loopR = 0; loopR < static_cast<uint16_t>(inplaceRepeats - 1); loopR++) {
-                MicroAPI::DataCopyUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), vlSize);
-                MicroAPI::DataCopyUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), vlSize);
+                MicroAPI::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), vlSize);
+                MicroAPI::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), vlSize);
                 Binaryfunc(vregMain, vregMain, vregTail, fullMask);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst,
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst,
                     postUpdateStrideMain);
-                MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
+                MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
             }
-            MicroAPI::DataCopyUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), vlSize);
-            MicroAPI::DataCopyUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), vlSize);
+            MicroAPI::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T *&)hoistMainAddr), vlSize);
+            MicroAPI::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T *&)hoistTailAddr), vlSize);
             Binaryfunc(vregMain, vregMain, vregTail, maskTail);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideTail);
-            MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
+            MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideTail);
+            MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistMainReuseAddr), uDst, 0);
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     }
@@ -906,38 +906,38 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(__ubuf__ T *dstAddr
             for (uint16_t loopR = 0; loopR < loopRNum; loopR++) {
                 newSrc = src + static_cast<uint64_t>(loopR * vlSize * dtypeSize);
                 // L0
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg8, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg9, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg10, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg11, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg12, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg13, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg14, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg15, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg8, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg9, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg10, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg11, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg12, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg13, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg14, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg15, uSrc, ((__ubuf__ T *&)newSrc), offsetR);
                 // L1
                 Binaryfunc(vreg0, vreg0, vreg8, fullMask);
                 Binaryfunc(vreg1, vreg1, vreg9, fullMask);
@@ -957,9 +957,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(__ubuf__ T *dstAddr
                 Binaryfunc(vreg1, vreg1, vreg3, fullMask);
                 // L3
                 Binaryfunc(vreg0, vreg0, vreg1, fullMask);
-                DataCopyUnAlign((__ubuf__ T *&)dst, vreg0, uDst, vlSize);
+                StoreUnAlign((__ubuf__ T *&)dst, vreg0, uDst, vlSize);
             }
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dst, uDst, 0);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dst, uDst, 0);
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     }
@@ -970,9 +970,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(__ubuf__ T *dstAddr
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             newSrc = src + static_cast<uint64_t>(loopA * dimR * dtypeSize);
             // L0
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
             // L1
             Binaryfunc(vreg0, vreg0, vreg1, fullMask);
             if constexpr (IsSameType<T, bfloat16_t>::value) {
@@ -984,20 +984,20 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(__ubuf__ T *dstAddr
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
+            StoreUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     for (uint16_t i = 0; i < foldTwo; i++) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             newSrc = src + static_cast<uint64_t>(loopA * dimR * dtypeSize);
             // L0
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
             // L1
             Binaryfunc(vreg0, vreg0, vreg2, fullMask);
             Binaryfunc(vreg1, vreg1, vreg3, fullMask);
@@ -1012,24 +1012,24 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(__ubuf__ T *dstAddr
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
+            StoreUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     for (uint16_t i = 0; i < foldThree; i++) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             newSrc = src + static_cast<uint64_t>(loopA * dimR * dtypeSize);
             // L0
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-            MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
-            MicroAPI::DataCopyUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+            MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg2, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg3, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg4, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg5, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg6, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+            MicroAPI::LoadUnAlign(vreg7, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
             // L1
             Binaryfunc(vreg0, vreg0, vreg4, fullMask);
             Binaryfunc(vreg1, vreg1, vreg5, fullMask);
@@ -1049,9 +1049,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(__ubuf__ T *dstAddr
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
+            StoreUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     // Reduce to 1
@@ -1067,12 +1067,12 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(__ubuf__ T *dstAddr
         } else {
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
                 newSrc = src + static_cast<uint64_t>(loopA * dimR * dtypeSize);
-                MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
+                MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)newSrc), vlSize);
                 Reducefunc(vreg1, vreg0, fullMask);
-                MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+                MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
             }
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
         }
     }
 }
@@ -1112,17 +1112,17 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T *dstAddr, __ubuf__ T *s
             MicroAPI::UnalignReg uDst;
             uint32_t sreg1 = dimR;
             MicroAPI::MaskReg mask = MicroAPI::UpdateMask<U>(sreg1);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), dimR);
+                MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), dimR);
                 MicroAPI::UnPack((MicroAPI::RegTensor<uint32_t, Trait> &)vreg0,
                     (MicroAPI::RegTensor<uint16_t, Trait> &)vreg0);
                 MicroAPI::Cast<U, T, CastTraitUppper>(vreg0CastB32, vreg0, mask);
                 Reducefunc(vreg1CastB32, vreg0CastB32, mask);
                 MicroAPI::Cast<T, U, CastTraitLower>(vreg1, vreg1CastB32, mask);
-                DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+                StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
             }
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
         } else if constexpr (SupportBytes<T, 1>()) {
             MicroAPI::RegTensor<T, Trait> vreg0;
             MicroAPI::RegTensor<T, Trait> vreg1;
@@ -1132,17 +1132,17 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T *dstAddr, __ubuf__ T *s
             MicroAPI::UnalignReg uDst;
             uint32_t sreg1 = dimR;
             MicroAPI::MaskReg mask = MicroAPI::UpdateMask<U>(sreg1);
-            MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
+            MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), dimR);
+                MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), dimR);
                 MicroAPI::UnPack((MicroAPI::RegTensor<uint16_t, Trait> &)vreg0,
                     (MicroAPI::RegTensor<uint8_t, Trait> &)vreg0);
                 MicroAPI::Cast<U, T, CastTraitUppper>(vreg0CastB16, vreg0, mask);
                 Reducefunc(vreg1CastB16, vreg0CastB16, mask);
                 MicroAPI::Cast<T, U, CastTraitLower>(vreg1, vreg1CastB16, mask);
-                DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+                StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
             }
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
         }
     } else {
         if constexpr (SupportBytes<T, 2>()) {
@@ -1161,10 +1161,10 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T *dstAddr, __ubuf__ T *s
             MicroAPI::MaskPack(mask, mask);
             uint64_t newSrc = (uint64_t)srcAddr + vlSize / 2 * dtypeSize;
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-                MicroAPI::DataCopyUnAlignPre(uSrc0, ((__ubuf__ T *&)srcAddr));
-                MicroAPI::DataCopyUnAlignPre(uSrc1, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc0, ((__ubuf__ T *&)srcAddr), dimR);
-                MicroAPI::DataCopyUnAlign(vreg1, uSrc1, ((__ubuf__ T *&)newSrc), dimR);
+                MicroAPI::LoadUnAlignPre(uSrc0, ((__ubuf__ T *&)srcAddr));
+                MicroAPI::LoadUnAlignPre(uSrc1, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg0, uSrc0, ((__ubuf__ T *&)srcAddr), dimR);
+                MicroAPI::LoadUnAlign(vreg1, uSrc1, ((__ubuf__ T *&)newSrc), dimR);
                 Binaryfunc(vreg2, vreg0, vreg1, mask);
                 Select(vreg2, vreg2, vreg0, mask);
                 MicroAPI::UnPack((MicroAPI::RegTensor<uint32_t, Trait> &)vreg2,
@@ -1172,9 +1172,9 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T *dstAddr, __ubuf__ T *s
                 MicroAPI::Cast<U, T, CastTraitUppper>(vreg0CastB32, vreg2, fullMask);
                 Reducefunc(vreg1CastB32, vreg0CastB32, fullMask);
                 MicroAPI::Cast<T, U, CastTraitLower>(vreg1, vreg1CastB32, fullMask);
-                DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+                StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
             }
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
         } else if constexpr (SupportBytes<T, 1>()) {
             MicroAPI::RegTensor<T, Trait> vreg0;
             MicroAPI::RegTensor<T, Trait> vreg1;
@@ -1191,10 +1191,10 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T *dstAddr, __ubuf__ T *s
             MicroAPI::MaskPack(mask, mask);
             uint64_t newSrc = (uint64_t)srcAddr + vlSize / 2 * dtypeSize;
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-                MicroAPI::DataCopyUnAlignPre(uSrc0, ((__ubuf__ T *&)srcAddr));
-                MicroAPI::DataCopyUnAlignPre(uSrc1, ((__ubuf__ T *&)newSrc));
-                MicroAPI::DataCopyUnAlign(vreg0, uSrc0, ((__ubuf__ T *&)srcAddr), dimR);
-                MicroAPI::DataCopyUnAlign(vreg1, uSrc1, ((__ubuf__ T *&)newSrc), dimR);
+                MicroAPI::LoadUnAlignPre(uSrc0, ((__ubuf__ T *&)srcAddr));
+                MicroAPI::LoadUnAlignPre(uSrc1, ((__ubuf__ T *&)newSrc));
+                MicroAPI::LoadUnAlign(vreg0, uSrc0, ((__ubuf__ T *&)srcAddr), dimR);
+                MicroAPI::LoadUnAlign(vreg1, uSrc1, ((__ubuf__ T *&)newSrc), dimR);
                 Binaryfunc(vreg2, vreg0, vreg1, mask);
                 Select(vreg2, vreg2, vreg0, mask);
                 MicroAPI::UnPack((MicroAPI::RegTensor<uint16_t, Trait> &)vreg2,
@@ -1202,9 +1202,9 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T *dstAddr, __ubuf__ T *s
                 MicroAPI::Cast<U, T, CastTraitUppper>(vreg0CastB16, vreg2, fullMask);
                 Reducefunc(vreg1CastB16, vreg0CastB16, fullMask);
                 MicroAPI::Cast<T, U, CastTraitLower>(vreg1, vreg1CastB16, fullMask);
-                DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+                StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
             }
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
         }
     }
 }
@@ -1219,13 +1219,13 @@ __simd_vf__ inline void ReduceARReuseSourceUnAlignedVF(__ubuf__ T *dstAddr, __ub
     MicroAPI::UnalignReg uDst;
     uint32_t sreg1 = dimR;
     MicroAPI::MaskReg mask = MicroAPI::UpdateMask<T, Trait>(sreg1);
-    MicroAPI::DataCopyUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
+    MicroAPI::LoadUnAlignPre(uSrc, ((__ubuf__ T *&)srcAddr));
     for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-        MicroAPI::DataCopyUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), dimR);
+        MicroAPI::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T *&)srcAddr), dimR);
         Reducefunc(vreg1, vreg0, mask);
-        DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+        StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
     }
-    MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+    MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
 }
 
 template <class T, const MicroAPI::RegTrait &Trait, auto Binaryfunc, auto Reducefunc>

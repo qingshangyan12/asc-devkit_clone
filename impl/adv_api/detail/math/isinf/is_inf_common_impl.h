@@ -56,7 +56,7 @@ __simd_vf__ inline void IsInfImplVF(__ubuf__ T* dst, __ubuf__ U* src, uint32_t c
     }
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<U>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         if constexpr (Std::is_same_v<U, float>) {
             MicroAPI::CompareScalar<uint32_t, CMPMODE::EQ>(cmpInfMask, (MicroAPI::RegTensor<uint32_t>&)srcVreg, floatInf, mask);
             MicroAPI::CompareScalar<uint32_t, CMPMODE::EQ>(cmpNInfMask, (MicroAPI::RegTensor<uint32_t>&)srcVreg, floatNInf, mask);
@@ -80,7 +80,7 @@ __simd_vf__ inline void IsInfImplVF(__ubuf__ T* dst, __ubuf__ U* src, uint32_t c
         } else {
             MicroAPI::Select(dstVreg, vReg1, vReg0, cmpMaskReg);
         }
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 

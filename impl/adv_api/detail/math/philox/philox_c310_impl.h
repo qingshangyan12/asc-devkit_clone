@@ -144,10 +144,10 @@ __simd_callee__ inline void SpNetworkFull(__ubuf__ uint32_t *dstUbTail, uint16_t
         // column % 4 = 0, scatter pgTail is tailCount / 4
         uint32_t sreg = static_cast<uint32_t>(tailCount / PhiloxInternal::PHILOX_ONCE_COUNTER_NUM);
         MicroAPI::MaskReg pgTail = MicroAPI::UpdateMask<T>(sreg);
-        DataCopyScatter(dstUbTail, tmpCtr0, reorderIndex, pgTail);
-        DataCopyScatter(dstUbTail + 1, tmpCtr1, reorderIndex, pgTail);
-        DataCopyScatter(dstUbTail + 2, tmpCtr2, reorderIndex, pgTail);
-        DataCopyScatter(dstUbTail + 3, tmpCtr3, reorderIndex, pgTail);
+        MicroAPI::Scatter(dstUbTail, tmpCtr0, reorderIndex, pgTail);
+        MicroAPI::Scatter(dstUbTail + 1, tmpCtr1, reorderIndex, pgTail);
+        MicroAPI::Scatter(dstUbTail + 2, tmpCtr2, reorderIndex, pgTail);
+        MicroAPI::Scatter(dstUbTail + 3, tmpCtr3, reorderIndex, pgTail);
     } else {
         Interleave(tmpCtr0, tmpCtr2, tmpCtr0, tmpCtr2);
         Interleave(tmpCtr1, tmpCtr3, tmpCtr1, tmpCtr3);
@@ -155,16 +155,16 @@ __simd_callee__ inline void SpNetworkFull(__ubuf__ uint32_t *dstUbTail, uint16_t
         Interleave(tmpCtr2, tmpCtr3, tmpCtr2, tmpCtr3);
         uint32_t sreg = static_cast<uint32_t>(tailCount);
         MicroAPI::MaskReg pgTail = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbTail, tmpCtr0,
+        MicroAPI::StoreAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbTail, tmpCtr0,
             PhiloxInternal::ELE_CNT_B32_ONCE, pgTail);
         pgTail = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbTail, tmpCtr1,
+        MicroAPI::StoreAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbTail, tmpCtr1,
             PhiloxInternal::ELE_CNT_B32_ONCE, pgTail);
         pgTail = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbTail, tmpCtr2,
+        MicroAPI::StoreAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbTail, tmpCtr2,
             PhiloxInternal::ELE_CNT_B32_ONCE, pgTail);
         pgTail = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbTail, tmpCtr3,
+        MicroAPI::StoreAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbTail, tmpCtr3,
             PhiloxInternal::ELE_CNT_B32_ONCE, pgTail);
     }
 }
@@ -176,23 +176,23 @@ __simd_callee__ inline void PhiloxUnrollStoreTmpCtrl(__ubuf__ uint32_t *&dstUbT,
 {
     if constexpr (DstUnalign) {
         MicroAPI::UnalignReg ureg;
-        MicroAPI::DataCopyUnAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr0, ureg,
+        MicroAPI::StoreUnAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr0, ureg,
             PhiloxInternal::ELE_CNT_B32_ONCE);
-        MicroAPI::DataCopyUnAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr1, ureg,
+        MicroAPI::StoreUnAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr1, ureg,
             PhiloxInternal::ELE_CNT_B32_ONCE);
-        MicroAPI::DataCopyUnAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr2, ureg,
+        MicroAPI::StoreUnAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr2, ureg,
             PhiloxInternal::ELE_CNT_B32_ONCE);
-        MicroAPI::DataCopyUnAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr3, ureg,
+        MicroAPI::StoreUnAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr3, ureg,
             PhiloxInternal::ELE_CNT_B32_ONCE);
-        MicroAPI::DataCopyUnAlignPost<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, ureg, 0);
+        MicroAPI::StoreUnAlignPost<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, ureg, 0);
     } else {
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr0,
+        MicroAPI::StoreAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr0,
             PhiloxInternal::ELE_CNT_B32_ONCE, pg);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr1,
+        MicroAPI::StoreAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr1,
             PhiloxInternal::ELE_CNT_B32_ONCE, pg);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr2,
+        MicroAPI::StoreAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr2,
             PhiloxInternal::ELE_CNT_B32_ONCE, pg);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr3,
+        MicroAPI::StoreAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUbT, tmpCtr3,
             PhiloxInternal::ELE_CNT_B32_ONCE, pg);
     }
 }
@@ -205,26 +205,26 @@ __simd_callee__ inline void PhiloxUnrollLoadTmpCtrl(__ubuf__ uint32_t *&dstUbTT0
 {
     if constexpr (DstUnalign) {
         MicroAPI::UnalignReg ureg;
-        MicroAPI::DataCopyUnAlignPre(ureg, dstUbTT0);
-        MicroAPI::DataCopyUnAlign(tmpCtr0, ureg, dstUbTT0,
+        MicroAPI::LoadUnAlignPre(ureg, dstUbTT0);
+        MicroAPI::LoadUnAlign(tmpCtr0, ureg, dstUbTT0,
             PhiloxInternal::ELE_CNT_B32_ONCE * PhiloxInternal::PHILOX_ONCE_COUNTER_NUM);
-        MicroAPI::DataCopyUnAlignPre(ureg, dstUbTT1);
-        MicroAPI::DataCopyUnAlign(tmpCtr1, ureg, dstUbTT1,
+        MicroAPI::LoadUnAlignPre(ureg, dstUbTT1);
+        MicroAPI::LoadUnAlign(tmpCtr1, ureg, dstUbTT1,
             PhiloxInternal::ELE_CNT_B32_ONCE * PhiloxInternal::PHILOX_ONCE_COUNTER_NUM);
-        MicroAPI::DataCopyUnAlignPre(ureg, dstUbTT2);
-        MicroAPI::DataCopyUnAlign(tmpCtr2, ureg, dstUbTT2,
+        MicroAPI::LoadUnAlignPre(ureg, dstUbTT2);
+        MicroAPI::LoadUnAlign(tmpCtr2, ureg, dstUbTT2,
             PhiloxInternal::ELE_CNT_B32_ONCE * PhiloxInternal::PHILOX_ONCE_COUNTER_NUM);
-        MicroAPI::DataCopyUnAlignPre(ureg, dstUbTT3);
-        MicroAPI::DataCopyUnAlign(tmpCtr3, ureg, dstUbTT3,
+        MicroAPI::LoadUnAlignPre(ureg, dstUbTT3);
+        MicroAPI::LoadUnAlign(tmpCtr3, ureg, dstUbTT3,
             PhiloxInternal::ELE_CNT_B32_ONCE * PhiloxInternal::PHILOX_ONCE_COUNTER_NUM);
     } else {
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(tmpCtr0, dstUbTT0,
+        MicroAPI::LoadAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(tmpCtr0, dstUbTT0,
             PhiloxInternal::ELE_CNT_B32_ONCE * PhiloxInternal::PHILOX_ONCE_COUNTER_NUM);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(tmpCtr1, dstUbTT1,
+        MicroAPI::LoadAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(tmpCtr1, dstUbTT1,
             PhiloxInternal::ELE_CNT_B32_ONCE * PhiloxInternal::PHILOX_ONCE_COUNTER_NUM);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(tmpCtr2, dstUbTT2,
+        MicroAPI::LoadAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(tmpCtr2, dstUbTT2,
             PhiloxInternal::ELE_CNT_B32_ONCE * PhiloxInternal::PHILOX_ONCE_COUNTER_NUM);
-        MicroAPI::DataCopy<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(tmpCtr3, dstUbTT3,
+        MicroAPI::LoadAlign<uint32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(tmpCtr3, dstUbTT3,
             PhiloxInternal::ELE_CNT_B32_ONCE * PhiloxInternal::PHILOX_ONCE_COUNTER_NUM);
     }
 }
@@ -437,10 +437,10 @@ __simd_callee__ inline void PhiloxRound10MainBlockUnroll442(__ubuf__ uint32_t *d
             UInt2Float(tmpCtr0, tmpCtr1, tmpCtr2, tmpCtr3, pg);
         }
 
-        DataCopyScatter(dstUb, tmpCtr0, reorderIndex, pg);
-        DataCopyScatter(dstUb + 1, tmpCtr1, reorderIndex, pg);
-        DataCopyScatter(dstUb + 2, tmpCtr2, reorderIndex, pg);
-        DataCopyScatter(dstUb + 3, tmpCtr3, reorderIndex, pg);
+        MicroAPI::Scatter(dstUb, tmpCtr0, reorderIndex, pg);
+        MicroAPI::Scatter(dstUb + 1, tmpCtr1, reorderIndex, pg);
+        MicroAPI::Scatter(dstUb + 2, tmpCtr2, reorderIndex, pg);
+        MicroAPI::Scatter(dstUb + 3, tmpCtr3, reorderIndex, pg);
         Adds(reorderIndex, reorderIndex, PhiloxInternal::PHILOX_ONCE_REPEAT_NUM, pg);
     }
 }
@@ -578,10 +578,10 @@ __simd_callee__ inline void PhiloxRound7MainBlockUnroll43(__ubuf__ uint32_t *dst
             UInt2Float(tmpCtr0, tmpCtr1, tmpCtr2, tmpCtr3, pg);
         }
 
-        DataCopyScatter(dstUb, tmpCtr0, reorderIndex, pg);
-        DataCopyScatter(dstUb + 1, tmpCtr1, reorderIndex, pg);
-        DataCopyScatter(dstUb + 2, tmpCtr2, reorderIndex, pg);
-        DataCopyScatter(dstUb + 3, tmpCtr3, reorderIndex, pg);
+        MicroAPI::Scatter(dstUb, tmpCtr0, reorderIndex, pg);
+        MicroAPI::Scatter(dstUb + 1, tmpCtr1, reorderIndex, pg);
+        MicroAPI::Scatter(dstUb + 2, tmpCtr2, reorderIndex, pg);
+        MicroAPI::Scatter(dstUb + 3, tmpCtr3, reorderIndex, pg);
         Adds(reorderIndex, reorderIndex, PhiloxInternal::PHILOX_ONCE_REPEAT_NUM, pg);
     }
 }
@@ -691,9 +691,9 @@ __simd_callee__ inline void PhiloxRandomIndexCal(__ubuf__ int32_t *indexUb, cons
         MicroAPI::Muls(index, index, stride, pg);
         MicroAPI::Arange(incIdx, 0);
         MicroAPI::Add(index, index, incIdx, pg);
-        MicroAPI::DataCopyUnAlign<int32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(indexUbT, index, ureg, elementNum);
+        MicroAPI::StoreUnAlign<int32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(indexUbT, index, ureg, elementNum);
     }
-    MicroAPI::DataCopyUnAlignPost<int32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(indexUbT, ureg, 0);
+    MicroAPI::StoreUnAlignPost<int32_t, MicroAPI::PostLiteral::POST_MODE_UPDATE>(indexUbT, ureg, 0);
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 }
 
@@ -707,7 +707,7 @@ __simd_vf__ inline void PhiloxRandomMultiRowWithFuse(__ubuf__ uint32_t *dstUbSta
 
     MicroAPI::MaskReg pg = MicroAPI::CreateMask<uint32_t>();
     MicroAPI::RegTensor<int32_t> incIdx;
-    MicroAPI::DataCopy(incIdx, indexUb);
+    MicroAPI::LoadAlign(incIdx, indexUb);
     PhiloxCounterInit(philox.philoxCounter, ctr0, ctr1, ctr2, ctr3, incIdx, pg);
 
     MicroAPI::RegTensor<uint32_t> key1, key0;

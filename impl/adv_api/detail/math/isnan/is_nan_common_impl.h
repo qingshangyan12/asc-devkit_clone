@@ -48,7 +48,7 @@ __simd_vf__ inline void IsNanImplVF(__ubuf__ T* dst, __ubuf__ U* src, uint32_t c
     }
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<U>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         MicroAPI::Compare<U, CMPMODE::NE>(cmpMaskReg, srcVreg, srcVreg, mask);
         if constexpr (Std::is_same_v<T, bool>) {
             if constexpr (Std::is_same_v<U, float>) {
@@ -65,7 +65,7 @@ __simd_vf__ inline void IsNanImplVF(__ubuf__ T* dst, __ubuf__ U* src, uint32_t c
         } else {
             MicroAPI::Select(dstVreg, vReg1, vReg0, cmpMaskReg);
         }
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 

@@ -312,6 +312,7 @@ file(GLOB ASCENDC_TEST_ascend910_9599_AIV_CASE_SRC_FILES
     # normalization
     normalization/welfordfinalize/test_operator_welfordfinalize.cpp
     normalization/normalize/test_operator_normalize_c310.cpp
+    normalization/layernorm/test_operator_layernorm.cpp
     normalization/layernormV2/test_operator_layernormV2_c310.cpp
     normalization/welfordupdate/test_operator_welfordupdate.cpp
     normalization/groupnorm/test_operator_groupnorm.cpp

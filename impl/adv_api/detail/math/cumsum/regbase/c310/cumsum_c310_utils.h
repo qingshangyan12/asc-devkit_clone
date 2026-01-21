@@ -27,10 +27,10 @@ __simd_callee__ inline void LoadDataWithT(__ubuf__ T* src, MicroAPI::RegTensor<f
 {
     if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
         MicroAPI::RegTensor<T> srcOrigin;
-        DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + srcOffset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + srcOffset);
         Cast<float, T, layoutZMrgZ>(dstReg, srcOrigin, dstPreg);
     } else { // this branch: only support float
-        DataCopy(dstReg, src + srcOffset);
+        MicroAPI::LoadAlign(dstReg, src + srcOffset);
     }
 }
 
@@ -41,9 +41,9 @@ __simd_callee__ inline void SaveDataWithT(__ubuf__ T* dst, MicroAPI::RegTensor<f
     if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
         MicroAPI::RegTensor<T> regT;
         Cast<T, float, LayoutZMrgZRndRSatNS>(regT, srcReg, dstPreg);
-        DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + dstOffset, regT, dstPreg);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + dstOffset, regT, dstPreg);
     } else {
-        DataCopy(dst + dstOffset, srcReg, dstPreg);
+        MicroAPI::StoreAlign(dst + dstOffset, srcReg, dstPreg);
     }
 }
 
@@ -140,15 +140,15 @@ __simd_vf__ inline void CumSumCopyOutWithBlockVF(__ubuf__ T* src, __ubuf__ T* ds
 
     for (uint16_t i = 0; i < outter; ++i) {
         for (uint16_t j = 0; j < mainRepeatTime; ++j) {
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg, src + i * inner + j * innerOneRepNum,
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg, src + i * inner + j * innerOneRepNum,
                                                                            1, fullMask);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(dst + i * inner + j * innerOneRepNum, srcReg,
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(dst + i * inner + j * innerOneRepNum, srcReg,
                                                                            1, fullMask);
         }
         for (uint16_t j = 0; j < tailRepeatTime; ++j) {
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 srcReg, src + i * inner + mainRepeatTime * innerOneRepNum, 1, tailMask);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + i * inner + mainRepeatTime * innerOneRepNum, srcReg, 1, tailMask);
         }
     }
@@ -166,27 +166,27 @@ __simd_vf__ inline void CumSumCopyOutVF(__ubuf__ T* src, __ubuf__ T* dst, uint16
 
     for (uint16_t j = 0; j < halfOutter; ++j) {
         for (uint16_t i = 0; i < mainRepeatTime; ++i) {
-            MicroAPI::DataCopy(srcReg, src + (j * 2) * inner + i * innerOneRepNum);
-            MicroAPI::DataCopy(dst + (j * 2) * inner + i * innerOneRepNum, srcReg, fullMask);
-            MicroAPI::DataCopy(srcReg1, src + (j * 2 + 1) * inner + i * innerOneRepNum);
-            MicroAPI::DataCopy(dst + (j * 2 + 1) * inner + i * innerOneRepNum, srcReg1, fullMask);
+            MicroAPI::LoadAlign(srcReg, src + (j * 2) * inner + i * innerOneRepNum);
+            MicroAPI::StoreAlign(dst + (j * 2) * inner + i * innerOneRepNum, srcReg, fullMask);
+            MicroAPI::LoadAlign(srcReg1, src + (j * 2 + 1) * inner + i * innerOneRepNum);
+            MicroAPI::StoreAlign(dst + (j * 2 + 1) * inner + i * innerOneRepNum, srcReg1, fullMask);
         }
         for (uint16_t i = 0; i < tailRepeatTime; ++i) {
-            MicroAPI::DataCopy(srcReg, src + (j * 2) * inner + (i + mainRepeatTime) * innerOneRepNum);
-            MicroAPI::DataCopy(dst + (j * 2) * inner + (i + mainRepeatTime) * innerOneRepNum, srcReg, tailMask);
-            MicroAPI::DataCopy(srcReg1, src + (j * 2 + 1) * inner + (i + mainRepeatTime) * innerOneRepNum);
-            MicroAPI::DataCopy(dst + (j * 2 + 1) * inner + (i + mainRepeatTime) * innerOneRepNum, srcReg1, tailMask);
+            MicroAPI::LoadAlign(srcReg, src + (j * 2) * inner + (i + mainRepeatTime) * innerOneRepNum);
+            MicroAPI::StoreAlign(dst + (j * 2) * inner + (i + mainRepeatTime) * innerOneRepNum, srcReg, tailMask);
+            MicroAPI::LoadAlign(srcReg1, src + (j * 2 + 1) * inner + (i + mainRepeatTime) * innerOneRepNum);
+            MicroAPI::StoreAlign(dst + (j * 2 + 1) * inner + (i + mainRepeatTime) * innerOneRepNum, srcReg1, tailMask);
         }
     }
 
     for (uint16_t j = 0; j < tailOutter; ++j) {
         for (uint16_t i = 0; i < mainRepeatTime; ++i) {
-            MicroAPI::DataCopy(srcReg, src + (j + 2 * halfOutter) * inner + i * innerOneRepNum);
-            MicroAPI::DataCopy(dst + (j + 2 * halfOutter) * inner + i * innerOneRepNum, srcReg, fullMask);
+            MicroAPI::LoadAlign(srcReg, src + (j + 2 * halfOutter) * inner + i * innerOneRepNum);
+            MicroAPI::StoreAlign(dst + (j + 2 * halfOutter) * inner + i * innerOneRepNum, srcReg, fullMask);
         }
         for (uint16_t i = 0; i < tailRepeatTime; ++i) {
-            MicroAPI::DataCopy(srcReg, src + (j + 2 * halfOutter) * inner + (i + mainRepeatTime) * innerOneRepNum);
-            MicroAPI::DataCopy(dst + (j + 2 * halfOutter) * inner + (i + mainRepeatTime) * innerOneRepNum, srcReg,
+            MicroAPI::LoadAlign(srcReg, src + (j + 2 * halfOutter) * inner + (i + mainRepeatTime) * innerOneRepNum);
+            MicroAPI::StoreAlign(dst + (j + 2 * halfOutter) * inner + (i + mainRepeatTime) * innerOneRepNum, srcReg,
                                tailMask);
         }
     }
@@ -235,14 +235,14 @@ __simd_vf__ inline void TransposeCommonGatherVFFF(__ubuf__ float* dstAddr, __ubu
     for (uint16_t j = 0; j < static_cast<uint16_t>(forLoop1); j++) {
         uint64_t hoistDstAddr = (uint64_t)dstAddr + (uint64_t)(j * forLoop2 * dtypeSize);
         for (uint16_t k = 0; k < static_cast<uint16_t>(mainLoop); k++) {
-            DataCopyGather(srcReg, srcAddr + j * srcStride1 + k * vlSize * srcStride2, indexReg, mainMask);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ float*&)hoistDstAddr), srcReg, ureg0, vlSize);
+            MicroAPI::Gather(srcReg, srcAddr + j * srcStride1 + k * vlSize * srcStride2, indexReg, mainMask);
+            MicroAPI::StoreUnAlign(((__ubuf__ float*&)hoistDstAddr), srcReg, ureg0, vlSize);
         }
         for (uint16_t k = 0; k < static_cast<uint16_t>(tailLoop); k++) {
-            DataCopyGather(srcReg, srcAddr + j * srcStride1 + mainLoop * vlSize * srcStride2, indexReg, tailMask);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ float*&)hoistDstAddr), srcReg, ureg0, tail);
+            MicroAPI::Gather(srcReg, srcAddr + j * srcStride1 + mainLoop * vlSize * srcStride2, indexReg, tailMask);
+            MicroAPI::StoreUnAlign(((__ubuf__ float*&)hoistDstAddr), srcReg, ureg0, tail);
         }
-        MicroAPI::DataCopyUnAlignPost(((__ubuf__ float*&)hoistDstAddr), ureg0, 0);
+        MicroAPI::StoreUnAlignPost(((__ubuf__ float*&)hoistDstAddr), ureg0, 0);
     }
 }
 
@@ -283,20 +283,20 @@ __simd_vf__ inline void TransposeCommonGatherVFFH(__ubuf__ float* dstAddr, __ubu
     for (uint16_t j = 0; j < static_cast<uint16_t>(forLoop1); j++) {
         uint64_t hoistDstAddr = (uint64_t)dstAddr + (uint64_t)(j * forLoop2 * dtypeSize);
         for (uint16_t k = 0; k < static_cast<uint16_t>(mainLoop); k++) {
-            DataCopyGather(srcReg, srcAddr + j * srcStride1 + k * vlSize * srcStride2, indexReg, mainMask);
+            MicroAPI::Gather(srcReg, srcAddr + j * srcStride1 + k * vlSize * srcStride2, indexReg, mainMask);
             MicroAPI::Interleave((MicroAPI::RegTensor<uint16_t>&)castReg, (MicroAPI::RegTensor<uint16_t>&)tmpReg,
                                  (MicroAPI::RegTensor<uint16_t>&)srcReg, (MicroAPI::RegTensor<uint16_t>&)zeroReg);
             Cast<float, half, layoutZMrgZ>(vreg, castReg, mainMask);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ float*&)hoistDstAddr), vreg, ureg0, vlSize);
+            MicroAPI::StoreUnAlign(((__ubuf__ float*&)hoistDstAddr), vreg, ureg0, vlSize);
         }
         for (uint16_t k = 0; k < static_cast<uint16_t>(tailLoop); k++) {
-            DataCopyGather(srcReg, srcAddr + j * srcStride1 + mainLoop * vlSize * srcStride2, indexReg, tailMask);
+            MicroAPI::Gather(srcReg, srcAddr + j * srcStride1 + mainLoop * vlSize * srcStride2, indexReg, tailMask);
             MicroAPI::Interleave((MicroAPI::RegTensor<uint16_t>&)castReg, (MicroAPI::RegTensor<uint16_t>&)tmpReg,
                                  (MicroAPI::RegTensor<uint16_t>&)srcReg, (MicroAPI::RegTensor<uint16_t>&)zeroReg);
             Cast<float, half, layoutZMrgZ>(vreg, castReg, mainMask);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ float*&)hoistDstAddr), vreg, ureg0, tail);
+            MicroAPI::StoreUnAlign(((__ubuf__ float*&)hoistDstAddr), vreg, ureg0, tail);
         }
-        MicroAPI::DataCopyUnAlignPost(((__ubuf__ float*&)hoistDstAddr), ureg0, 0);
+        MicroAPI::StoreUnAlignPost(((__ubuf__ float*&)hoistDstAddr), ureg0, 0);
     }
 }
 
@@ -337,20 +337,20 @@ __simd_vf__ inline void TransposeCommonGatherVHF(__ubuf__ half* dstAddr, __ubuf_
     for (uint16_t j = 0; j < static_cast<uint16_t>(forLoop1); j++) {
         uint64_t hoistDstAddr = (uint64_t)dstAddr + (uint64_t)(j * forLoop2 * dtypeSize);
         for (uint16_t k = 0; k < static_cast<uint16_t>(mainLoop); k++) {
-            DataCopyGather(srcReg, srcAddr + j * srcStride1 + k * vlSize * srcStride2, indexReg, mainMask);
+            MicroAPI::Gather(srcReg, srcAddr + j * srcStride1 + k * vlSize * srcStride2, indexReg, mainMask);
             Cast<half, float, LayoutZMrgZRndRSatNS>(vreg, srcReg, fullMask);
             MicroAPI::DeInterleave((MicroAPI::RegTensor<uint16_t>&)castReg, (MicroAPI::RegTensor<uint16_t>&)tmpReg,
                                    (MicroAPI::RegTensor<uint16_t>&)vreg, (MicroAPI::RegTensor<uint16_t>&)zeroReg);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ half*&)hoistDstAddr), castReg, ureg0, vlSize);
+            MicroAPI::StoreUnAlign(((__ubuf__ half*&)hoistDstAddr), castReg, ureg0, vlSize);
         }
         for (uint16_t k = 0; k < static_cast<uint16_t>(tailLoop); k++) {
-            DataCopyGather(srcReg, srcAddr + j * srcStride1 + mainLoop * vlSize * srcStride2, indexReg, tailMask);
+            MicroAPI::Gather(srcReg, srcAddr + j * srcStride1 + mainLoop * vlSize * srcStride2, indexReg, tailMask);
             Cast<half, float, LayoutZMrgZRndRSatNS>(vreg, srcReg, fullMask);
             MicroAPI::DeInterleave((MicroAPI::RegTensor<uint16_t>&)castReg, (MicroAPI::RegTensor<uint16_t>&)tmpReg,
                                    (MicroAPI::RegTensor<uint16_t>&)vreg, (MicroAPI::RegTensor<uint16_t>&)zeroReg);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ half*&)hoistDstAddr), castReg, ureg0, tail);
+            MicroAPI::StoreUnAlign(((__ubuf__ half*&)hoistDstAddr), castReg, ureg0, tail);
         }
-        MicroAPI::DataCopyUnAlignPost(((__ubuf__ half*&)hoistDstAddr), ureg0, 0);
+        MicroAPI::StoreUnAlignPost(((__ubuf__ half*&)hoistDstAddr), ureg0, 0);
     }
 }
 
@@ -410,10 +410,10 @@ __simd_vf__ inline void CumSumFirstDimSklanskyVF(__ubuf__ float* dst, uint32_t o
                 uint32_t count = inner;
                 for (uint16_t i = 0; i < repeatTimes; i++) {
                     preg = MicroAPI::UpdateMask<float>(count);
-                    MicroAPI::DataCopy(src0Reg, dst + line0 * inner + i * sregLower);
-                    MicroAPI::DataCopy(src1Reg, dst + line1 * inner + i * sregLower);
+                    MicroAPI::LoadAlign(src0Reg, dst + line0 * inner + i * sregLower);
+                    MicroAPI::LoadAlign(src1Reg, dst + line1 * inner + i * sregLower);
                     MicroAPI::Add(dstReg, src0Reg, src1Reg, preg);
-                    MicroAPI::DataCopy(dst + line1 * inner + i * sregLower, dstReg, preg);
+                    MicroAPI::StoreAlign(dst + line1 * inner + i * sregLower, dstReg, preg);
                 }
             }
         }
@@ -468,31 +468,31 @@ __simd_vf__ inline void CumSumFirstDimBasicVF(__ubuf__ float* dst, uint16_t oute
     MicroAPI::RegTensor<float> dstRightReg;
 
     for (uint16_t j = 0; j < halfMainRepeatTime; ++j) {
-        MicroAPI::DataCopy(dstLeftReg, dst + j * innerOneRepNum);
-        MicroAPI::DataCopy(dstRightReg, dst + (j + halfMainRepeatTime) * innerOneRepNum);
+        MicroAPI::LoadAlign(dstLeftReg, dst + j * innerOneRepNum);
+        MicroAPI::LoadAlign(dstRightReg, dst + (j + halfMainRepeatTime) * innerOneRepNum);
         for (uint16_t i = 0; i < outerRepeatTime; ++i) {
-            MicroAPI::DataCopy(srcLeftReg, dst + (i + 1) * inner + j * innerOneRepNum);
-            MicroAPI::DataCopy(srcRightReg, dst + (i + 1) * inner + (j + halfMainRepeatTime) * innerOneRepNum);
+            MicroAPI::LoadAlign(srcLeftReg, dst + (i + 1) * inner + j * innerOneRepNum);
+            MicroAPI::LoadAlign(srcRightReg, dst + (i + 1) * inner + (j + halfMainRepeatTime) * innerOneRepNum);
             MicroAPI::Add(dstLeftReg, srcLeftReg, dstLeftReg, pregFull);
             MicroAPI::Add(dstRightReg, srcRightReg, dstRightReg, pregFull);
-            MicroAPI::DataCopy(dst + (i + 1) * inner + j * innerOneRepNum, dstLeftReg, pregFull);
-            MicroAPI::DataCopy(dst + (i + 1) * inner + (j + halfMainRepeatTime) * innerOneRepNum, dstRightReg,
+            MicroAPI::StoreAlign(dst + (i + 1) * inner + j * innerOneRepNum, dstLeftReg, pregFull);
+            MicroAPI::StoreAlign(dst + (i + 1) * inner + (j + halfMainRepeatTime) * innerOneRepNum, dstRightReg,
                                pregFull);
         }
     }
 
-    MicroAPI::DataCopy(dstLeftReg, dst + innerTailOffset1);
-    MicroAPI::DataCopy(dstRightReg, dst + innerTailOffset2);
+    MicroAPI::LoadAlign(dstLeftReg, dst + innerTailOffset1);
+    MicroAPI::LoadAlign(dstRightReg, dst + innerTailOffset2);
     for (uint16_t i = 0; i < outerRepeatTime; ++i) {
         for (uint16_t j = 0; j < mainTailRepeatTime; ++j) {
-            MicroAPI::DataCopy(srcLeftReg, dst + (i + 1) * inner + innerTailOffset1);
+            MicroAPI::LoadAlign(srcLeftReg, dst + (i + 1) * inner + innerTailOffset1);
             MicroAPI::Add(dstLeftReg, srcLeftReg, dstLeftReg, pregFull);
-            MicroAPI::DataCopy(dst + (i + 1) * inner + innerTailOffset1, dstLeftReg, pregFull);
+            MicroAPI::StoreAlign(dst + (i + 1) * inner + innerTailOffset1, dstLeftReg, pregFull);
         }
         for (uint16_t j = 0; j < tailTime; ++j) {
-            MicroAPI::DataCopy(srcRightReg, dst + (i + 1) * inner + innerTailOffset2);
+            MicroAPI::LoadAlign(srcRightReg, dst + (i + 1) * inner + innerTailOffset2);
             MicroAPI::Add(dstRightReg, srcRightReg, dstRightReg, pregTail);
-            MicroAPI::DataCopy(dst + (i + 1) * inner + innerTailOffset2, dstRightReg, pregTail);
+            MicroAPI::StoreAlign(dst + (i + 1) * inner + innerTailOffset2, dstRightReg, pregTail);
         }
     }
 }
@@ -509,20 +509,20 @@ __simd_vf__ inline void CumSumFirstDimBasic2VF(__ubuf__ float* dst, uint16_t out
     MicroAPI::RegTensor<float> dstLeftReg;
 
     for (uint16_t j = 0; j < mainRepeatTime; ++j) {
-        MicroAPI::DataCopy(dstLeftReg, dst + j * innerOneRepNum);
+        MicroAPI::LoadAlign(dstLeftReg, dst + j * innerOneRepNum);
         for (uint16_t i = 0; i < outerRepeatTime; ++i) {
-            MicroAPI::DataCopy(srcLeftReg, dst + (i + 1) * inner + j * innerOneRepNum);
+            MicroAPI::LoadAlign(srcLeftReg, dst + (i + 1) * inner + j * innerOneRepNum);
             MicroAPI::Add(dstLeftReg, srcLeftReg, dstLeftReg, pregFull);
-            MicroAPI::DataCopy(dst + (i + 1) * inner + j * innerOneRepNum, dstLeftReg, pregFull);
+            MicroAPI::StoreAlign(dst + (i + 1) * inner + j * innerOneRepNum, dstLeftReg, pregFull);
         }
     }
 
-    MicroAPI::DataCopy(dstLeftReg, dst + innerTailOffset2);
+    MicroAPI::LoadAlign(dstLeftReg, dst + innerTailOffset2);
     for (uint16_t i = 0; i < outerRepeatTime; ++i) {
         for (uint16_t j = 0; j < tailTime; ++j) {
-            MicroAPI::DataCopy(srcLeftReg, dst + (i + 1) * inner + innerTailOffset2);
+            MicroAPI::LoadAlign(srcLeftReg, dst + (i + 1) * inner + innerTailOffset2);
             MicroAPI::Add(dstLeftReg, srcLeftReg, dstLeftReg, pregTail);
-            MicroAPI::DataCopy(dst + (i + 1) * inner + innerTailOffset2, dstLeftReg, pregTail);
+            MicroAPI::StoreAlign(dst + (i + 1) * inner + innerTailOffset2, dstLeftReg, pregTail);
         }
     }
 }

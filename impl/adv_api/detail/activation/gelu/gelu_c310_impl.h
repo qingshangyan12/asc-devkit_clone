@@ -39,11 +39,11 @@ __simd_vf__ inline void GeluImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t co
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<T>(count);
         if constexpr (highPrecision) {
-            MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(
+            MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(
                 (MicroAPI::RegTensor<half>&)srcVreg, (__ubuf__ half*)src + i * oneRepElm);
             MicroAPI::Cast<float, half, castTraitB16ToB32>(srcVreg, (MicroAPI::RegTensor<half>&)srcVreg, mask);
         } else {
-            MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+            MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         }
         // y = (input_x + 0.044715 * input_x ^ 3) * 1.5957691
         MicroAPI::Mul(tmpReg0, srcVreg, srcVreg, mask);
@@ -64,10 +64,10 @@ __simd_vf__ inline void GeluImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t co
         MicroAPI::Mul(dstVreg, tmpReg1, tmpReg3, mask);
         if constexpr (highPrecision) {
             MicroAPI::Cast<half, float, castTraitB32ToB16>((MicroAPI::RegTensor<half>&)dstVreg, dstVreg, mask);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_PACK_B32>(
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_PACK_B32>(
                 (__ubuf__ half*)dst + i * oneRepElm, (MicroAPI::RegTensor<half>&)dstVreg, mask);
         } else {
-            MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
         }
     }
 }
@@ -103,13 +103,13 @@ __simd_vf__ inline void FastGeluHighPrecisionAlgVF(__ubuf__ T* dst, __ubuf__ T* 
     uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(dataSize, stackSize));
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<float>(sreg);
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * stackSize);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * stackSize);
         MicroAPI::Cast<float, half, castTraitB16ToB32>(srcVregFloat, srcVreg, mask);
 
         FastGeluCoreAlg<float>(dstVregFloat, srcVregFloat, mask, stackVregFloat);
 
         MicroAPI::Cast<half, float, castTraitB32ToB16>(dstVreg, dstVregFloat, mask);
-        MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * stackSize, dstVreg, mask);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * stackSize, dstVreg, mask);
     }
 }
 
@@ -136,9 +136,9 @@ __simd_vf__ inline void FastGeluAlgVF(__ubuf__ T* dst, __ubuf__ T* src,
     uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(dataSize, stackSize));
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy<T>(srcVreg, src + i * stackSize);
+        MicroAPI::LoadAlign<T>(srcVreg, src + i * stackSize);
         FastGeluCoreAlg<T>(dstVreg, srcVreg, mask, stackVreg);
-        MicroAPI::DataCopy<T>(dst + i * stackSize, dstVreg, mask);
+        MicroAPI::StoreAlign<T>(dst + i * stackSize, dstVreg, mask);
     }
 }
 
@@ -205,13 +205,13 @@ __simd_vf__ inline void FastGeluV2HighPrecisionAlgVF(__ubuf__ T* dst, __ubuf__ T
     uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(dataSize, stackSize));
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<float>(sreg);
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * stackSize);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * stackSize);
         MicroAPI::Cast<float, half, castTraitB16ToB32>(srcVregFloat, srcVreg, mask);
 
         FastGeluV2CoreAlg<float>(dstVregFloat, srcVregFloat, mask, stackVregA, stackVregB, stackVregC);
 
         MicroAPI::Cast<half, float, castTraitB32ToB16>(dstVreg, dstVregFloat, mask);
-        MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * stackSize, dstVreg, mask);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * stackSize, dstVreg, mask);
     }
 }
 
@@ -241,9 +241,9 @@ __simd_vf__ inline void FastGeluV2AlgVF(__ubuf__ T* dst, __ubuf__ T* src,
     uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(dataSize, stackSize));
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy<T>(srcVreg, src + i * stackSize);
+        MicroAPI::LoadAlign<T>(srcVreg, src + i * stackSize);
         FastGeluV2CoreAlg<T>(dstVreg, srcVreg, mask, stackVregA, stackVregB, stackVregC);
-        MicroAPI::DataCopy<T>(dst + i * stackSize, dstVreg, mask);
+        MicroAPI::StoreAlign<T>(dst + i * stackSize, dstVreg, mask);
     }
 }
 

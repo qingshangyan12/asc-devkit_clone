@@ -38,13 +38,13 @@ __simd_vf__ inline void SwiGLUImplVF(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<float>(count);
         if constexpr (sizeof(T) == sizeof(half)) {
-            MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin0, src0 + i * oneRepElm);
+            MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin0, src0 + i * oneRepElm);
             MicroAPI::Cast<float, half, castTraitB16ToB32>(srcVreg0, srcOrigin0, mask);
-            MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin1, src1 + i * oneRepElm);
+            MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin1, src1 + i * oneRepElm);
             MicroAPI::Cast<float, half, castTraitB16ToB32>(srcVreg1, srcOrigin1, mask);
         } else {
-            MicroAPI::DataCopy(srcVreg0, src0 + i * oneRepElm);
-            MicroAPI::DataCopy(srcVreg1, src1 + i * oneRepElm);
+            MicroAPI::LoadAlign(srcVreg0, src0 + i * oneRepElm);
+            MicroAPI::LoadAlign(srcVreg1, src1 + i * oneRepElm);
         }
         MicroAPI::Muls(tmpReg0, srcVreg1, scalarValue, mask);
         MicroAPI::Exp(tmpReg1, tmpReg0, mask);
@@ -53,9 +53,9 @@ __simd_vf__ inline void SwiGLUImplVF(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__
         MicroAPI::Mul(dstVreg, srcVreg0, tmpReg1, mask);
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<half, float, castTraitB32ToB16>((MicroAPI::RegTensor<half>&)dstVreg, dstVreg, mask);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * oneRepElm, (MicroAPI::RegTensor<half>&)dstVreg, mask);
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * oneRepElm, (MicroAPI::RegTensor<half>&)dstVreg, mask);
         } else {
-            MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
         }
     }
 }

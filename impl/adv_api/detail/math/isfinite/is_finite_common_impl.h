@@ -60,7 +60,7 @@ __simd_vf__ inline void IsFiniteVFImpl(__ubuf__ U *dstUb, __ubuf__ T *srcUb, uin
     uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         preg = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumOne>(sreg);
-        MicroAPI::DataCopy(vSrcReg0, srcUb + i * sregLower);
+        MicroAPI::LoadAlign(vSrcReg0, srcUb + i * sregLower);
         MicroAPI::Compare<T, CMPMODE::NE>(cmpMaskNAN, vSrcReg0, vSrcReg0, preg);
         if constexpr (IsSameType<T, float>::value) {
             MicroAPI::CompareScalar<uint32_t, CMPMODE::EQ>(cmpMaskPINF, (MicroAPI::RegTensor<uint32_t> &)vSrcReg0, INF, preg);
@@ -92,7 +92,7 @@ __simd_vf__ inline void IsFiniteVFImpl(__ubuf__ U *dstUb, __ubuf__ T *srcUb, uin
         } else {
             MicroAPI::Select(vDstReg0, vReg0, vReg1, cmpMaskReg);
         }
-        MicroAPI::DataCopy(dstUb + i * sregLower, vDstReg0, preg);
+        MicroAPI::StoreAlign(dstUb + i * sregLower, vDstReg0, preg);
     }
 }
 

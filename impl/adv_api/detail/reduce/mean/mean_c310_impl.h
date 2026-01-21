@@ -39,10 +39,10 @@ __simd_callee__ inline void LoadSrcData(
 {
     MicroAPI::RegTensor<T> srcTmpReg;
     if constexpr (std::is_same<T, half>::value && std::is_same<ConvType, float>::value) {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcTmpReg, src + index * offset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcTmpReg, src + index * offset);
         MicroAPI::Cast<float, T, castTraitB16ToB32>(srcReg, srcTmpReg, mask);
     } else {
-        MicroAPI::DataCopy(srcReg, src + index * offset);
+        MicroAPI::LoadAlign(srcReg, src + index * offset);
     }
 }
 
@@ -70,9 +70,9 @@ __simd_vf__ inline void MeanForOneRepeatTime(
         } else {
             dstReg = dstTmpReg;
         }
-        MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUb, dstReg, uregOut, 1);
+        MicroAPI::StoreUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUb, dstReg, uregOut, 1);
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, uregOut, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, uregOut, 0);
 }
 
 template <typename T, typename ConvType, bool isFirstRepeat>
@@ -96,9 +96,9 @@ __simd_vf__ inline void ReduceSumNextN(__ubuf__ ConvType* dstUb, __ubuf__ T* src
                 LoadSrcData(srcReg, srcUb + i * offset, j, eleCountPerVL, mask);
             }
             MicroAPI::ReduceSum(dstReg, srcReg, mask);
-            MicroAPI::DataCopyUnAlign<ConvType, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstTmpUb, dstReg, uregIn, 1);
+            MicroAPI::StoreUnAlign<ConvType, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstTmpUb, dstReg, uregIn, 1);
         }
-        MicroAPI::DataCopyUnAlignPost(dstTmpUb, uregIn, 0);
+        MicroAPI::StoreUnAlignPost(dstTmpUb, uregIn, 0);
     }
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 }

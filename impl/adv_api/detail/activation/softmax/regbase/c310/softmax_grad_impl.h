@@ -58,19 +58,19 @@ __simd_vf__ inline void SoftmaxGradGenericNZWithTailVFImpl(__ubuf__ T *dstUb, __
         MicroAPI::Mul(tmpVreg, gradVreg, srcVreg, pregkTail);
         MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         MicroAPI::ReduceSumWithDataBlock(sumVreg, sumVreg, pregFull);
-        MicroAPI::DataCopy(workUb + i * DEFAULT_BLK_NUM, sumVreg, pregOneBlk);
+        MicroAPI::StoreAlign(workUb + i * DEFAULT_BLK_NUM, sumVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 
     for (uint16_t i = 0; i < VcgFoldRepeat; i++) {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
             sumVreg, tmpVreg, workUb + i * HALF_REPEAT_SIZE);
         MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         if constexpr (isFront) {
             StoreIfNeedCast<T>(workUbFront + i * FLOAT_REPEAT_SIZE, sumVreg, pregFull);
         } else {
-            MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
                 workUb + i * HALF_REPEAT_SIZE, sumVreg, sumVreg, pregFull);
         }
     }
@@ -82,7 +82,7 @@ __simd_vf__ inline void SoftmaxGradGenericNZWithTailVFImpl(__ubuf__ T *dstUb, __
         for (uint16_t i = 0; i < e2bRep; ++i) {
             pregCnt = MicroAPI::UpdateMask<T>(sreg);
             LoadE2B<T>(castReg, workUbFront + i * DEFAULT_BLK_NUM);
-            MicroAPI::DataCopy(dstUb + i * dtypeRepStride, castReg, pregCnt);
+            MicroAPI::StoreAlign(dstUb + i * dtypeRepStride, castReg, pregCnt);
         }
     } else {
         for (uint16_t j = 0; j < kOuter; ++j) {
@@ -169,19 +169,19 @@ __simd_vf__ inline void SoftmaxGradGenericNZVFImpl(__ubuf__ T *dstUb, __ubuf__ T
             MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         }
         MicroAPI::ReduceSumWithDataBlock(sumVreg, sumVreg, pregFull);
-        MicroAPI::DataCopy(workUb + i * DEFAULT_BLK_NUM, sumVreg, pregOneBlk);
+        MicroAPI::StoreAlign(workUb + i * DEFAULT_BLK_NUM, sumVreg, pregOneBlk);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 
     for (uint16_t i = 0; i < VcgFoldRepeat; i++) {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_DINTLV_B32>(
             sumVreg, tmpVreg, workUb + i * HALF_REPEAT_SIZE);
         MicroAPI::Add(sumVreg, sumVreg, tmpVreg, pregFull);
         if constexpr (isFront) {
             StoreIfNeedCast<T>(workUbFront + i * FLOAT_REPEAT_SIZE, sumVreg, pregFull);
         } else {
-            MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_INTLV_B32>(
                 workUb + i * HALF_REPEAT_SIZE, sumVreg, sumVreg, pregFull);
         }
     }
@@ -193,7 +193,7 @@ __simd_vf__ inline void SoftmaxGradGenericNZVFImpl(__ubuf__ T *dstUb, __ubuf__ T
         for (uint16_t i = 0; i < e2bRep; ++i) {
             pregCnt = MicroAPI::UpdateMask<T>(sreg);
             LoadE2B<T>(castReg, workUbFront + i * DEFAULT_BLK_NUM);
-            MicroAPI::DataCopy(dstUb + i * dtypeRepStride, castReg, pregCnt);
+            MicroAPI::StoreAlign(dstUb + i * dtypeRepStride, castReg, pregCnt);
         }
     } else {
         for (uint16_t j = 0; j < kOuter; ++j) {

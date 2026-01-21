@@ -54,7 +54,7 @@ __simd_vf__ inline void VecCreateVecIndexLevel0VFImpl(__ubuf__ T *dst, const T f
         if constexpr (!isNormalMode) {
             maskReg = VecMicroGetMaskReg<T, true, isNormalMode, isMaskBitMode>(maskBuf, count);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * dstRepStride * ElePerBlkT, dstVreg, dstBlkStride, maskReg);
         MicroAPI::Adds(dstVreg, dstVreg, sreg, maskReg);
     }
@@ -116,7 +116,7 @@ __simd_vf__ inline void CreateVecIndexCalcVci2(__ubuf__ T* dstLocalAddr, const T
     MicroAPI::Arange(vreg0, firstValue);
     for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {
         preg = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy(dstLocalAddr + i * sregLower, vreg0, preg);
+        MicroAPI::StoreAlign(dstLocalAddr + i * sregLower, vreg0, preg);
         vadds(vreg0, vreg0, sregLower, preg, MODE_ZEROING);
     }
 }
@@ -145,7 +145,7 @@ __simd_vf__ inline void CreateVecIndexCalcVic(__ubuf__ int64_t* dstLocalAddr, co
         preg = MicroAPI::UpdateMask<int64_t, MicroAPI::RegTraitNumTwo>(sreg);
         int64_t offset = static_cast<int64_t>(firstValue + i * sregLower);
         MicroAPI::Arange(vreg0, offset);
-        MicroAPI::DataCopy(dstLocalAddr + i * sregLower, vreg0, preg);
+        MicroAPI::StoreAlign(dstLocalAddr + i * sregLower, vreg0, preg);
     }
 }
 

@@ -32,12 +32,12 @@ __simd_vf__ inline void SwishComputeVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_
     MicroAPI::MaskReg mask;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<T>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         MicroAPI::Muls(vreg0, srcVreg, scalarValue, mask);
         MicroAPI::Exp(vreg0, vreg0, mask);
         MicroAPI::Adds(vreg0, vreg0, 1.0f, mask);
         MicroAPI::Div(dstVreg, srcVreg, vreg0, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     } 
 }
 } // namespace Internal

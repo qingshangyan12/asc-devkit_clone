@@ -37,8 +37,8 @@ __simd_vf__ inline void CumSumCopyLastRowVF(__ubuf__ T* dst, __ubuf__ T* src, ui
     MicroAPI::MaskReg preg;
     for (uint16_t i = 0; i < repeatTimes; i++) {
         preg = MicroAPI::UpdateMask<T>(count);
-        MicroAPI::DataCopy(srcReg, src + i * sregLower);
-        MicroAPI::DataCopy(dst + i * sregLower, srcReg, preg);
+        MicroAPI::LoadAlign(srcReg, src + i * sregLower);
+        MicroAPI::StoreAlign(dst + i * sregLower, srcReg, preg);
     }
 }
 

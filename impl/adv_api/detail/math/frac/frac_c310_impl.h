@@ -43,17 +43,17 @@ __simd_vf__ inline void FracCoreImpl(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint3
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         MicroAPI::MaskReg mask = MicroAPI::UpdateMask<float>(calCount);
         if constexpr (sizeof(T) == sizeof(half)) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
             MicroAPI::Cast<float, T, castTraitF162F32>(castReg, srcReg, mask);
         } else {
-            MicroAPI::DataCopy(castReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign(castReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
         }
         FracCompute(dstReg, castReg, mask);
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<T, float, castTraitF322F16>(srcReg, dstReg, mask);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * B32_DATA_NUM_PER_REPEAT, srcReg, mask);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * B32_DATA_NUM_PER_REPEAT, srcReg, mask);
         } else {
-            MicroAPI::DataCopy(dstUb + i * B32_DATA_NUM_PER_REPEAT, dstReg, mask);
+            MicroAPI::StoreAlign(dstUb + i * B32_DATA_NUM_PER_REPEAT, dstReg, mask);
         }
     }
 }

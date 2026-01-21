@@ -30,10 +30,10 @@ __aicore__ inline void VecAxpyLevel2VFImpl(__ubuf__ T *dst, __ubuf__ U *src, U s
     uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, repeatStride));
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<T, RegT::trait>(count);
-        MicroAPI::DataCopy(srcReg, src + i * repeatStride);
-        MicroAPI::DataCopy(dstReg, dst + i * repeatStride);
+        MicroAPI::LoadAlign(srcReg, src + i * repeatStride);
+        MicroAPI::LoadAlign(dstReg, dst + i * repeatStride);
         func(dstReg, srcReg, scalarValue, mask);
-        MicroAPI::DataCopy(dst + i * repeatStride, dstReg, mask);
+        MicroAPI::StoreAlign(dst + i * repeatStride, dstReg, mask);
     }
 }
 
@@ -98,13 +98,13 @@ __aicore__ inline void VecAxpyVFImpl(__ubuf__ T *dst, __ubuf__ U *src, U scalarV
 #ifndef NO_OVERLAP_IN_MULTI_REPEAT
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 #endif
-        MicroAPI::DataCopy<U, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcVreg,
+        MicroAPI::LoadAlign<U, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcVreg,
             src + index * repeatParams.srcRepStride * ElePerBlkU, repeatParams.srcBlkStride, maskRegSrc);
 
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(dstVreg,
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(dstVreg,
             dst + index * repeatParams.dstRepStride * ElePerBlkT, repeatParams.dstBlkStride, maskRegDst);
         func(dstVreg, srcVreg, scalarValue, maskReg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskRegDst);
     }
 }

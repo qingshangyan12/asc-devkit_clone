@@ -51,10 +51,10 @@ __simd_vf__ inline void TanhIntrinsicImpl(__ubuf__ T *dstUb, __ubuf__ T *srcUb,
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         preg = MicroAPI::UpdateMask<float>(sreg);
         if constexpr (sizeof(T) == sizeof(half)) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
             MicroAPI::Cast<float, T, TanhInternal::tanhCastTraitF162F32>(castReg, srcReg, preg);
         } else {
-            MicroAPI::DataCopy(castReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign(castReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
         }
         MicroAPI::Mins(castReg, castReg, TanhInternal::FP32_MAX_EXP, preg);
         MicroAPI::Maxs(castReg, castReg, TanhInternal::FP32_MIN_EXP, preg);
@@ -66,9 +66,9 @@ __simd_vf__ inline void TanhIntrinsicImpl(__ubuf__ T *dstUb, __ubuf__ T *srcUb,
         MicroAPI::Div(dstReg, dstReg, tmpReg, preg);
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<T, float, TanhInternal::tanhCastTraitF322F16>(srcReg, dstReg, preg);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * B32_DATA_NUM_PER_REPEAT, srcReg, preg);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * B32_DATA_NUM_PER_REPEAT, srcReg, preg);
         } else {
-            MicroAPI::DataCopy(dstUb + i * B32_DATA_NUM_PER_REPEAT, dstReg, preg);
+            MicroAPI::StoreAlign(dstUb + i * B32_DATA_NUM_PER_REPEAT, dstReg, preg);
         }
     }
 }
@@ -90,10 +90,10 @@ __simd_vf__ inline void TanhCompensationImpl(__ubuf__ T *dstUb, __ubuf__ T *srcU
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         preg = MicroAPI::UpdateMask<float>(sreg);
         if constexpr (sizeof(T) == sizeof(half)) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
             MicroAPI::Cast<float, T, TanhInternal::tanhCastTraitF162F32>(vregInput, srcReg, preg);
         } else {
-            MicroAPI::DataCopy(vregInput, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign(vregInput, srcUb + i * B32_DATA_NUM_PER_REPEAT);
         }
         MicroAPI::Mul(vregInputSqr, vregInput, vregInput, preg);
         MicroAPI::Muls(vregOutput, vregInputSqr, TanhInternal::FP32_ZERO_015, preg);
@@ -116,9 +116,9 @@ __simd_vf__ inline void TanhCompensationImpl(__ubuf__ T *dstUb, __ubuf__ T *srcU
 
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<T, float, TanhInternal::tanhCastTraitF322F16>(srcReg, vregOutput, preg);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * B32_DATA_NUM_PER_REPEAT, srcReg, preg);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * B32_DATA_NUM_PER_REPEAT, srcReg, preg);
         } else {
-            MicroAPI::DataCopy(dstUb + i * B32_DATA_NUM_PER_REPEAT, vregOutput, preg);
+            MicroAPI::StoreAlign(dstUb + i * B32_DATA_NUM_PER_REPEAT, vregOutput, preg);
         }
     }
 }

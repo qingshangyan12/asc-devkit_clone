@@ -643,7 +643,7 @@ __simd_vf__ inline void LgammaComputeImpl(__ubuf__ T *dstUb, __ubuf__ T *srcUb,
         LgammaLoadData<T>(castReg, srcReg, srcUb + i * stride, mask);
         MicroAPI::Abs(absReg, castReg, mask);
         LgammaCompute1(dstReg, absReg, resReg, tmpReg, cmpMaskReg1, cmpMaskReg2, cmpMaskReg, mask);
-        MicroAPI::DataCopy(workUb + i * stride, dstReg, mask);
+        MicroAPI::StoreAlign(workUb + i * stride, dstReg, mask);
     }
 
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -651,13 +651,13 @@ __simd_vf__ inline void LgammaComputeImpl(__ubuf__ T *dstUb, __ubuf__ T *srcUb,
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<float>(sreg1);
         LgammaLoadData<T>(castReg, srcReg, srcUb + i * stride, mask);
-        MicroAPI::DataCopy(dstReg, workUb + i * stride);
+        MicroAPI::LoadAlign(dstReg, workUb + i * stride);
         LgammaCompute2(dstReg, castReg, resReg, tmpReg, infReg, nanReg, scalar0, scalar1, cmpMaskReg, mask);
         if constexpr (IsSameType<T, half>::value) {
             MicroAPI::Cast<T, float, LGAMMA_CAST_TRAIT_F322F16>(srcReg, dstReg, mask);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * stride, srcReg, mask);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * stride, srcReg, mask);
         } else {
-            MicroAPI::DataCopy(dstUb + i * stride, dstReg, mask);
+            MicroAPI::StoreAlign(dstUb + i * stride, dstReg, mask);
         }
     }
 }

@@ -30,12 +30,12 @@ __simd_vf__ inline void SiluComputeVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t
     MicroAPI::MaskReg mask;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<T>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         MicroAPI::Muls(tmpReg0, srcVreg, -1.0f, mask);
         MicroAPI::Exp(tmpReg0, tmpReg0, mask);
         MicroAPI::Adds(tmpReg0, tmpReg0, 1.0f, mask);
         MicroAPI::Div(dstVreg, srcVreg, tmpReg0, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }   
 }
 } // namespace Internal

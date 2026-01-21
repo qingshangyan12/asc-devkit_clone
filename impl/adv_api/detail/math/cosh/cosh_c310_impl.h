@@ -42,10 +42,10 @@ __simd_vf__ inline void CoshCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint32
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         coshMask = MicroAPI::UpdateMask<float>(calCount);
         if constexpr (SupportBytes<T, 2>()) {
-            MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * vlSize);
+            MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * vlSize);
             MicroAPI::Cast<float, half, castTraitB16ToB32>(castReg, srcReg, coshMask);
         } else {
-            MicroAPI::DataCopy(castReg, srcUb + i * vlSize);
+            MicroAPI::LoadAlign(castReg, srcUb + i * vlSize);
         }
         MicroAPI::Adds(castReg, castReg, scalarNegLnTwo, coshMask);
         MicroAPI::Exp(computeReg0, castReg, coshMask);
@@ -53,9 +53,9 @@ __simd_vf__ inline void CoshCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint32
         MicroAPI::Add(resReg, computeReg0, computeReg1, coshMask);
         if constexpr (SupportBytes<T, 2>()) {
             MicroAPI::Cast<half, float, castTraitB32ToB16>(dstReg, resReg, coshMask);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * vlSize, dstReg, coshMask);
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * vlSize, dstReg, coshMask);
         } else {
-            MicroAPI::DataCopy(dstUb + i * vlSize, resReg, coshMask);
+            MicroAPI::StoreAlign(dstUb + i * vlSize, resReg, coshMask);
         }
     }
 }

@@ -37,17 +37,17 @@ __aicore__ inline void BilinearInterpolationRepeatModeLevel0VFImpl(__ubuf__ T* d
     for (uint16_t i = 0; i < static_cast<uint16_t>(vRepeat); ++i) {
         MicroAPI::Duplicate(dstReg, static_cast<T>(0), maskFull);
         for (uint16_t j = 0; j < static_cast<uint16_t>(hRepeat); ++j) {
-            MicroAPI::DataCopy(indexReg, src0Offset + i * hRepeat * DEFAULT_REPEAT_STRIDE +
+            MicroAPI::LoadAlign(indexReg, src0Offset + i * hRepeat * DEFAULT_REPEAT_STRIDE +
                                 j * DEFAULT_REPEAT_STRIDE);
-            MicroAPI::DataCopyGatherB(srcReg0, src0, indexReg, maskFull);
+            MicroAPI::GatherB(srcReg0, src0, indexReg, maskFull);
             
-            MicroAPI::DataCopy<T,  MicroAPI::LoadDist::DIST_E2B_B16>(srcReg1, src1 +
+            MicroAPI::LoadAlign<T,  MicroAPI::LoadDist::DIST_E2B_B16>(srcReg1, src1 +
                                 i * hRepeat * DEFAULT_BLK_NUM + j * DEFAULT_BLK_NUM);
 
             MicroAPI::Mul(tmpReg, srcReg0, srcReg1, maskReg);
             MicroAPI::Add(dstReg, tmpReg, dstReg, maskReg);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + i * vROffset, dstReg, dstBlkStride, maskReg);
     }
 }
@@ -69,15 +69,15 @@ __aicore__ inline void BilinearInterpolationNoRepeatModeLevel0VFImpl(__ubuf__ T*
     for (uint16_t i = 0; i < static_cast<uint16_t>(vRepeat); ++i) {
         MicroAPI::Duplicate(dstReg, static_cast<T>(0), maskFull);
         for (uint16_t j = 0; j < static_cast<uint16_t>(hRepeat); ++j) {
-            MicroAPI::DataCopy(indexReg, src0Offset + i * hRepeat * DEFAULT_REPEAT_STRIDE +
+            MicroAPI::LoadAlign(indexReg, src0Offset + i * hRepeat * DEFAULT_REPEAT_STRIDE +
                                 j * DEFAULT_REPEAT_STRIDE);
-            MicroAPI::DataCopyGatherB(srcReg0, src0, indexReg, maskFull);
+            MicroAPI::GatherB(srcReg0, src0, indexReg, maskFull);
             
-            MicroAPI::DataCopy<T,  MicroAPI::LoadDist::DIST_BRC_B16>(srcReg1, src1 + i * hRepeat + j);
+            MicroAPI::LoadAlign<T,  MicroAPI::LoadDist::DIST_BRC_B16>(srcReg1, src1 + i * hRepeat + j);
             MicroAPI::Mul(tmpReg, srcReg0, srcReg1, maskReg);
             MicroAPI::Add(dstReg, tmpReg, dstReg, maskReg);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + i * vROffset, dstReg, dstBlkStride, maskReg);
     }
 }

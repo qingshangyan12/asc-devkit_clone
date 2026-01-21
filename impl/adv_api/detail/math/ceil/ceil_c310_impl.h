@@ -28,9 +28,9 @@ __simd_vf__ inline void CeilCompute(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint32
     MicroAPI::MaskReg maskReg;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         maskReg = MicroAPI::UpdateMask<T>(calCount);
-        MicroAPI::DataCopy<T>(srcReg, srcUb + i * repeatElm);
+        MicroAPI::LoadAlign<T>(srcReg, srcUb + i * repeatElm);
         MicroAPI::Truncate<T, RoundMode::CAST_CEIL>(dstReg, srcReg, maskReg);
-        MicroAPI::DataCopy<T>(dstUb + i * repeatElm, dstReg, maskReg);
+        MicroAPI::StoreAlign<T>(dstUb + i * repeatElm, dstReg, maskReg);
     }
 }
 

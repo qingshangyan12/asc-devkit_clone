@@ -43,10 +43,10 @@ __simd_callee__ inline void LoadDataWithT(__ubuf__ T* src, MicroAPI::RegTensor<f
 {
     if constexpr (IsSameType<T, half>::value) {
         MicroAPI::RegTensor<T> srcOrigin;
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + offset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + offset);
         MicroAPI::Cast<float, T, layoutZMrgZ>(dstReg, srcOrigin, mask);
     } else {
-        MicroAPI::DataCopy(dstReg, src + offset);
+        MicroAPI::LoadAlign(dstReg, src + offset);
     }
 }
 
@@ -57,9 +57,9 @@ __simd_callee__ inline void SaveDataWithT(__ubuf__ T* dst, MicroAPI::RegTensor<f
     if constexpr (IsSameType<T, half>::value) {
         MicroAPI::RegTensor<T> regT;
         MicroAPI::Cast<T, float, LayoutZMrgZRndRSatNS>(regT, srcReg, mask);
-        MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + offset, regT, mask);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + offset, regT, mask);
     } else {
-        MicroAPI::DataCopy(dst + offset, srcReg, mask);
+        MicroAPI::StoreAlign(dst + offset, srcReg, mask);
     }
 }
 
@@ -79,7 +79,7 @@ __simd_callee__ inline void ReduceSumOrMean(__ubuf__ T* dstLocal, __ubuf__ U* sr
         if constexpr (IsMean) {
             Muls(dstReg, dstReg, factor, mask);
         }
-        DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(dstLocal + i, dstReg, mask);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(dstLocal + i, dstReg, mask);
     }
 }
 
@@ -120,14 +120,14 @@ __simd_callee__ inline void CalcVariance(__ubuf__ float* outputVarianceTmp, __ub
     MicroAPI::RegTensor<float> dstReg;
 
     __ubuf__ T* curInputX = inputX + dhwAlignSize * index;
-    DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, outputMeanTmp + index);
+    MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, outputMeanTmp + index);
     for (uint16_t di = 0; di < d; di++) {
         if constexpr (IsHwSizeAlignOneRepeat) {
             for (uint16_t j = 0; j < hwRepeat; j++) {
                 LoadDataWithT(curInputX, srcReg, fullMask, di * hwAlignSize + j * oneRepSize);
                 Sub(dstReg, srcReg, meanReg, fullMask);
                 Mul(dstReg, dstReg, dstReg, fullMask);
-                DataCopy(tmpLocal + di * hwAlignSize + j * oneRepSize, dstReg, fullMask);
+                MicroAPI::StoreAlign(tmpLocal + di * hwAlignSize + j * oneRepSize, dstReg, fullMask);
             }
         } else {
             uint32_t hwCount = hw;
@@ -138,7 +138,7 @@ __simd_callee__ inline void CalcVariance(__ubuf__ float* outputVarianceTmp, __ub
                 LoadDataWithT(curInputX, srcReg, hwMask, di * hwAlignSize + j * oneRepSize);
                 Sub(dstReg, srcReg, meanReg, hwMask);
                 Mul(dstReg, dstReg, dstReg, hwMask);
-                DataCopy(tmpLocal + di * hwAlignSize + j * oneRepSize, dstReg, hwAlignMask);
+                MicroAPI::StoreAlign(tmpLocal + di * hwAlignSize + j * oneRepSize, dstReg, hwAlignMask);
             }
         }
     }
@@ -160,17 +160,17 @@ __simd_callee__ inline void CalcTmpOutput(__ubuf__ float* outputTmp, __ubuf__ fl
     uint32_t count = meanVarSize;
     for (uint16_t index = 0; index < ngRepeat; index++) {
         MicroAPI::MaskReg mask = MicroAPI::UpdateMask<float>(count);
-        DataCopy(varReg, outputVarianceTmp + index * oneRepSize);
+        MicroAPI::LoadAlign(varReg, outputVarianceTmp + index * oneRepSize);
         if constexpr (IsSameType<T, half>::value) {
             SaveDataWithT(outputVariance, varReg, mask, index * oneRepSize);
-            DataCopy(meanReg, outputMeanTmp + index * oneRepSize);
+            MicroAPI::LoadAlign(meanReg, outputMeanTmp + index * oneRepSize);
             SaveDataWithT(outputMean, meanReg, mask, index * oneRepSize);
         }
         Adds(varReg, varReg, epsilon, mask);
         Sqrt(varReg, varReg, mask);
         Duplicate(tmpReg, 1.0f, mask);
         Div(dstReg, tmpReg, varReg, mask);
-        DataCopy(outputTmp + index * oneRepSize, dstReg, mask);
+        MicroAPI::StoreAlign(outputTmp + index * oneRepSize, dstReg, mask);
     }
 }
 
@@ -191,19 +191,19 @@ __simd_callee__ inline void CalcOutput(__ubuf__ T* output, __ubuf__ T* inputX, _
     for (uint16_t ni = 0; ni < n; ni++) {
         for (uint16_t gi = 0; gi < g; gi++) {
             uint16_t ngi = ni * g + gi;
-            DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, outputMeanTmp + ngi);
-            DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(tmpReg, outputTmp + ngi);
+            MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, outputMeanTmp + ngi);
+            MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(tmpReg, outputTmp + ngi);
             for (uint16_t di = 0; di < d; di++) {
                 if constexpr (IsSameType<T, half>::value) {
                     MicroAPI::RegTensor<T> betaOri;
                     MicroAPI::RegTensor<T> gammaOri;
-                    DataCopy<T, MicroAPI::LoadDist::DIST_BRC_B16>(betaOri, beta + gi * d + di);
-                    DataCopy<T, MicroAPI::LoadDist::DIST_BRC_B16>(gammaOri, gamma + gi * d + di);
+                    MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_BRC_B16>(betaOri, beta + gi * d + di);
+                    MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_BRC_B16>(gammaOri, gamma + gi * d + di);
                     Cast<float, T, layoutZMrgZ>(betaReg, betaOri, fullMask);
                     Cast<float, T, layoutZMrgZ>(gammaReg, gammaOri, fullMask);
                 } else {
-                    DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(betaReg, beta + gi * d + di);
-                    DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(gammaReg, gamma + gi * d + di);
+                    MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(betaReg, beta + gi * d + di);
+                    MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(gammaReg, gamma + gi * d + di);
                 }
                 uint32_t count = hwAlignSize;
                 for (uint16_t j = 0; j < hwRepeat; j++) {

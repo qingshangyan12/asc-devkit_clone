@@ -38,12 +38,12 @@ __simd_vf__ inline void SignCoreCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, ui
     MicroAPI::Duplicate(brcNegOneReg, -1);
     for (uint16_t i = 0; i < repeatTime; ++i) {
         signMask = MicroAPI::UpdateMask<T, trait>(calCount);
-        MicroAPI::DataCopy(srcReg, srcUb + i * vlSize);
+        MicroAPI::LoadAlign(srcReg, srcUb + i * vlSize);
         MicroAPI::CompareScalar<T, CMPMODE::LT>(cmpMask0, srcReg, 0, signMask);
         MicroAPI::CompareScalar<T, CMPMODE::GT>(cmpMask1, srcReg, 0, signMask);
         MicroAPI::Select(selReg0, brcNegOneReg, brcZeroReg, cmpMask0);
         MicroAPI::Select(selReg1, brcOneReg, selReg0, cmpMask1);
-        MicroAPI::DataCopy(dstUb + i * vlSize, selReg1, signMask);
+        MicroAPI::StoreAlign(dstUb + i * vlSize, selReg1, signMask);
     }
 }
 } // namespace SignInternal

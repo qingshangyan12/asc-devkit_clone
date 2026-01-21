@@ -33,16 +33,16 @@ __simd_vf__ inline void ConfusionTransposeCommonGatherVF(__ubuf__ T *dstAddr, __
         for (uint16_t j = 0; j < static_cast<uint16_t>(forLoop1); j++) {
             uint64_t hoistDstAddr = (uint64_t)dstAddr + (uint64_t)((i * forLoop1 + j) * forLoop2 * dtypeSize);
             for (uint16_t k = 0; k < static_cast<uint16_t>(mainLoop); k++) {
-                DataCopyGather(MainVreg, srcAddr + i * srcStride0 + j * srcStride1 + k * vlSize * srcStride2,
+                MicroAPI::Gather(MainVreg, srcAddr + i * srcStride0 + j * srcStride1 + k * vlSize * srcStride2,
                     indexReg, mainMask);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, ureg0, vlSize);
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, ureg0, vlSize);
             }
             for (uint16_t k = 0; k < static_cast<uint16_t>(tailLoop); k++) {
-                DataCopyGather(MainVreg, srcAddr + i * srcStride0 + j * srcStride1 + mainLoop * vlSize * srcStride2,
+                MicroAPI::Gather(MainVreg, srcAddr + i * srcStride0 + j * srcStride1 + mainLoop * vlSize * srcStride2,
                     indexReg, tailMask);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, ureg0, tail);
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, ureg0, tail);
             }
-            MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistDstAddr), ureg0, 0);
+            MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistDstAddr), ureg0, 0);
         }
     }
 }
@@ -81,26 +81,26 @@ __simd_vf__ inline void ConfusionTransposeCommonGatherB8VF(__ubuf__ T *dstAddr, 
         for (uint16_t j = 0; j < static_cast<uint16_t>(forLoop1); j++) {
             uint64_t hoistDstAddr = (uint64_t)dstAddr + (uint64_t)((i * forLoop1 + j) * forLoop2 * dtypeSize);
             for (uint16_t k = 0; k < static_cast<uint16_t>(mainLoop); k++) {
-                DataCopyGather((MicroAPI::RegTensor<U, Trait> &)vreg0,
+                MicroAPI::Gather((MicroAPI::RegTensor<U, Trait> &)vreg0,
                     srcAddr + i * srcStride0 + j * srcStride1 + k * vlSize * srcStride2, indexReg, mainMask);
-                DataCopyGather((MicroAPI::RegTensor<U, Trait> &)vreg1,
+                MicroAPI::Gather((MicroAPI::RegTensor<U, Trait> &)vreg1,
                     srcAddr + i * srcStride0 + j * srcStride1 + k * vlSize * srcStride2 + vlSize / 2 * srcStride2,
                     indexReg, mainMask);
                 DeInterleave(vreg2, vreg3, vreg0, vreg1);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), vreg2, ureg0, vlSize);
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), vreg2, ureg0, vlSize);
             }
             for (uint16_t k = 0; k < static_cast<uint16_t>(tailLoop); k++) {
-                DataCopyGather((MicroAPI::RegTensor<U, Trait> &)vreg0,
+                MicroAPI::Gather((MicroAPI::RegTensor<U, Trait> &)vreg0,
                     srcAddr + i * srcStride0 + j * srcStride1 + mainLoop * vlSize * srcStride2, indexReg,
                     tailMask0);
-                DataCopyGather((MicroAPI::RegTensor<U, Trait> &)vreg1,
+                MicroAPI::Gather((MicroAPI::RegTensor<U, Trait> &)vreg1,
                     srcAddr + i * srcStride0 + j * srcStride1 + mainLoop * vlSize * srcStride2 +
                     vlSize / 2 * srcStride2,
                     indexReg, tailMask1);
                 DeInterleave(vreg2, vreg3, vreg0, vreg1);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), vreg2, ureg0, tail);
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), vreg2, ureg0, tail);
             }
-            MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistDstAddr), ureg0, 0);
+            MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistDstAddr), ureg0, 0);
         }
     }
 }
@@ -147,15 +147,15 @@ __simd_vf__ inline void ConfusionTransposeComplexGatherVF(__ubuf__ T *dstAddr, _
     for (uint16_t i = 0; i < static_cast<uint16_t>(forLoop0); i++) {
         uint64_t hoistDstAddr = (uint64_t)dstAddr + (uint64_t)(i * forLoop1 * forLoop2 * dtypeSize);
         for (uint16_t j = 0; j < static_cast<uint16_t>(mainLoop); j++) {
-            DataCopyGather(MainVreg, srcAddr + i * srcStride0 + j * srcStride1 * factor, indexReg5, mainMask);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, ureg0, mainSize);
+            MicroAPI::Gather(MainVreg, srcAddr + i * srcStride0 + j * srcStride1 * factor, indexReg5, mainMask);
+            MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, ureg0, mainSize);
         }
         for (uint16_t k = 0; k < static_cast<uint16_t>(tailLoop); k++) {
-            DataCopyGather(MainVreg, srcAddr + i * srcStride0 + mainLoop * srcStride1 * factor, indexReg5,
+            MicroAPI::Gather(MainVreg, srcAddr + i * srcStride0 + mainLoop * srcStride1 * factor, indexReg5,
                 tailMask);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, ureg0, tail);
+            MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, ureg0, tail);
         }
-        MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistDstAddr), ureg0, 0);
+        MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistDstAddr), ureg0, 0);
     }
 }
 
@@ -227,22 +227,22 @@ __simd_vf__ inline void ConfusionTransposeComplexGatherB8VF(__ubuf__ T *dstAddr,
     for (uint16_t i = 0; i < static_cast<uint16_t>(forLoop0); i++) {
         uint64_t hoistDstAddr = (uint64_t)dstAddr + (uint64_t)(i * forLoop1 * forLoop2 * dtypeSize);
         for (uint16_t j = 0; j < static_cast<uint16_t>(mainLoop); j++) {
-            DataCopyGather((MicroAPI::RegTensor<U, Trait> &)vreg0,
+            MicroAPI::Gather((MicroAPI::RegTensor<U, Trait> &)vreg0,
                 srcAddr + i * srcStride0 + j * srcStride1 * factor, indexReg5, mainMask0);
-            DataCopyGather((MicroAPI::RegTensor<U, Trait> &)vreg1,
+            MicroAPI::Gather((MicroAPI::RegTensor<U, Trait> &)vreg1,
                 srcAddr + i * srcStride0 + j * srcStride1 * factor, indexReg10, mainMask1);
             DeInterleave(vreg2, vreg3, vreg0, vreg1);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), vreg2, ureg0, mainSize);
+            MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), vreg2, ureg0, mainSize);
         }
         for (uint16_t k = 0; k < static_cast<uint16_t>(tailLoop); k++) {
-            DataCopyGather((MicroAPI::RegTensor<U, Trait> &)vreg0,
+            MicroAPI::Gather((MicroAPI::RegTensor<U, Trait> &)vreg0,
                 srcAddr + i * srcStride0 + mainLoop * srcStride1 * factor, indexReg5, tailMask0);
-            DataCopyGather((MicroAPI::RegTensor<U, Trait> &)vreg1,
+            MicroAPI::Gather((MicroAPI::RegTensor<U, Trait> &)vreg1,
                 srcAddr + i * srcStride0 + mainLoop * srcStride1 * factor, indexReg10, tailMask1);
             DeInterleave(vreg2, vreg3, vreg0, vreg1);
-            MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), vreg2, ureg0, tail);
+            MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), vreg2, ureg0, tail);
         }
-        MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistDstAddr), ureg0, 0);
+        MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistDstAddr), ureg0, 0);
     }
 }
 
@@ -274,8 +274,8 @@ __simd_vf__ inline void ConfusionTransposeCopySrcToDst(__ubuf__ T *dstAddr, __ub
     MicroAPI::MaskReg mainMask;
     for (uint16_t i = 0; i < static_cast<uint16_t>(forLoop); i++) {
         mainMask = MicroAPI::UpdateMask<T, Trait>(count);
-        DataCopy(vreg0, srcAddr + i * vlSize);
-        DataCopy(dstAddr + i * vlSize, vreg0, mainMask);
+        MicroAPI::LoadAlign(vreg0, srcAddr + i * vlSize);
+        MicroAPI::StoreAlign(dstAddr + i * vlSize, vreg0, mainMask);
     }
 }
 
@@ -292,16 +292,16 @@ __simd_vf__ inline void ConfusionTransposeCommonDataCopyVF(__ubuf__ T *dstAddr, 
             uint64_t hoistSrcAddr = (uint64_t)srcAddr + (uint64_t)((i * srcStride0 + j * srcStride1) * dtypeSize);
             uint64_t hoistDstAddr = (uint64_t)dstAddr + (uint64_t)((i * forLoop1 + j) * forLoop2 * dtypeSize);
             for (uint16_t k = 0; k < static_cast<uint16_t>(mainLoop); k++) {
-                MicroAPI::DataCopyUnAlignPre(SrcUreg, ((__ubuf__ T *&)hoistSrcAddr));
-                MicroAPI::DataCopyUnAlign(MainVreg, SrcUreg, ((__ubuf__ T *&)hoistSrcAddr), vlSize);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, DstUreg, vlSize);
+                MicroAPI::LoadUnAlignPre(SrcUreg, ((__ubuf__ T *&)hoistSrcAddr));
+                MicroAPI::LoadUnAlign(MainVreg, SrcUreg, ((__ubuf__ T *&)hoistSrcAddr), vlSize);
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, DstUreg, vlSize);
             }
             for (uint16_t k = 0; k < static_cast<uint16_t>(tailLoop); k++) {
-                MicroAPI::DataCopyUnAlignPre(SrcUreg, ((__ubuf__ T *&)hoistSrcAddr));
-                MicroAPI::DataCopyUnAlign(MainVreg, SrcUreg, ((__ubuf__ T *&)hoistSrcAddr), tail);
-                MicroAPI::DataCopyUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, DstUreg, tail);
+                MicroAPI::LoadUnAlignPre(SrcUreg, ((__ubuf__ T *&)hoistSrcAddr));
+                MicroAPI::LoadUnAlign(MainVreg, SrcUreg, ((__ubuf__ T *&)hoistSrcAddr), tail);
+                MicroAPI::StoreUnAlign(((__ubuf__ T *&)hoistDstAddr), MainVreg, DstUreg, tail);
             }
-            MicroAPI::DataCopyUnAlignPost(((__ubuf__ T *&)hoistDstAddr), DstUreg, 0);
+            MicroAPI::StoreUnAlignPost(((__ubuf__ T *&)hoistDstAddr), DstUreg, 0);
         }
     }
 }
@@ -488,18 +488,18 @@ __simd_vf__ inline void ConfusionTransposeND2NZWithInlvVFImpl(__ubuf__ T* dstAdd
             uint64_t rowStrideAddr = uint64_t(srcAddr + srcOffset + factor * j * width);
             uint64_t nerborStrideAddr = uint64_t(srcAddr + srcOffset + (factor * j + 1) * width);
 
-            AscendC::MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
+            AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg0, (__ubuf__ T*&)rowStrideAddr, 1, 0, mask);
-            AscendC::MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
+            AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg1, (__ubuf__ T*&)nerborStrideAddr, 1, 0, mask);
             AscendC::MicroAPI::Interleave<T>(vDstReg0, vDstReg1, vSrcReg0, vSrcReg1);
 
             uint64_t dstRowStrideAddr = uint64_t(dstAddr + dstOffset + j * c0Size);
-            AscendC::MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
+            AscendC::MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                 (__ubuf__ T*&)dstRowStrideAddr, vDstReg0, heightLoopNum, 0, mask);
 
             uint64_t dstNerborStrideAddr = uint64_t(dstAddr + dstOffset + regWidth * heightLoopNum + j * c0Size);
-            AscendC::MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
+            AscendC::MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                 (__ubuf__ T*&)dstNerborStrideAddr, vDstReg1, heightLoopNum, 0, mask);
         }
     }
@@ -518,21 +518,21 @@ __simd_vf__ inline void ConfusionTransposeND2NZWithInlvVFImpl(__ubuf__ T* dstAdd
                 mask_size = regWidth;
             }
             AscendC::MicroAPI::MaskReg mask = AscendC::MicroAPI::UpdateMask<T>(mask_size);
-            AscendC::MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
+            AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg0, (__ubuf__ T*&)rowStrideAddr, 1, 0, mask);
-            AscendC::MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
+            AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg1, (__ubuf__ T*&)nerborStrideAddr, 1, 0, mask);
             AscendC::MicroAPI::Interleave<T>(vDstReg0, vDstReg1, vSrcReg0, vSrcReg1);
 
             uint64_t dstRowStrideAddr = uint64_t(dstAddr + dstOffset + j * c0Size);
-            AscendC::MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
+            AscendC::MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                 (__ubuf__ T*&)dstRowStrideAddr, vDstReg0, heightLoopNum, 0, mask);
 
             if (tailWidth > regWidthHalf) {
                 mask_size = tailWidth * factor - regWidth;
                 AscendC::MicroAPI::MaskReg mask1 = AscendC::MicroAPI::UpdateMask<T>(mask_size);
                 uint64_t dstNerborStrideAddr = uint64_t(dstAddr + dstOffset + regWidth * heightLoopNum + j * c0Size);
-                AscendC::MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
+                AscendC::MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                     (__ubuf__ T*&)dstNerborStrideAddr, vDstReg1, heightLoopNum, 0, mask1);
             }
         }

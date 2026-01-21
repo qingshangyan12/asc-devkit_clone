@@ -53,23 +53,23 @@ __simd_vf__ inline void SelectWithBytesMaskPerAxisImpl(__ubuf__ T *dstUb, __ubuf
         sreg = srcLastAxis;
         for (uint16_t i = 0; i < repeatTimes; ++i) {
             maskReg0 = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(vSrcReg0, src0Ub + loopH * srcLastAxis + i * sregLower);
+            MicroAPI::LoadAlign<T>(vSrcReg0, src0Ub + loopH * srcLastAxis + i * sregLower);
             if constexpr (sizeof(T) == 2 && sizeof(U) == 1) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(
                     (MicroAPI::RegTensor<uint8_t> &)vMaskReg0,
                     (__ubuf__ uint8_t *)maskUb + loopH * maskLastAxis + i * sregLower);
             } else if constexpr (sizeof(T) == 2 && sizeof(U) == 4) {
-                MicroAPI::DataCopy<U>(vMaskReg0, maskUb + loopH * maskLastAxis + i * sregLower);
-                MicroAPI::DataCopy<U>(vMaskReg1, maskUb + loopH * maskLastAxis + i * sregLower + sregLower / 2);
+                MicroAPI::LoadAlign<U>(vMaskReg0, maskUb + loopH * maskLastAxis + i * sregLower);
+                MicroAPI::LoadAlign<U>(vMaskReg1, maskUb + loopH * maskLastAxis + i * sregLower + sregLower / 2);
             } else if constexpr (sizeof(T) == 4 && sizeof(U) == 1) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
                     (MicroAPI::RegTensor<uint8_t> &)vMaskReg0,
                     (__ubuf__ uint8_t *)maskUb + loopH * maskLastAxis + i * sregLower);
             } else if constexpr (sizeof(T) == 4 && sizeof(U) == 2) {
-                MicroAPI::DataCopy<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(vMaskReg0,
+                MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(vMaskReg0,
                     maskUb + loopH * maskLastAxis + i * sregLower);
             } else if constexpr (sizeof(T) == sizeof(U)) {
-                MicroAPI::DataCopy<U>(vMaskReg0, maskUb + loopH * maskLastAxis + i * sregLower);
+                MicroAPI::LoadAlign<U>(vMaskReg0, maskUb + loopH * maskLastAxis + i * sregLower);
             }
 
             if constexpr (!reverse) {
@@ -79,7 +79,7 @@ __simd_vf__ inline void SelectWithBytesMaskPerAxisImpl(__ubuf__ T *dstUb, __ubuf
             }
 
             MicroAPI::Select(vDstReg, vSrcReg0, vSrcReg1, localMask0);
-            MicroAPI::DataCopy<T>(dstUb + loopH * srcLastAxis + i * sregLower, vDstReg, maskReg0);
+            MicroAPI::StoreAlign<T>(dstUb + loopH * srcLastAxis + i * sregLower, vDstReg, maskReg0);
         }
     }
 }

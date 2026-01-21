@@ -39,53 +39,53 @@ __simd_vf__ inline void AxpyCompute(__ubuf__ T* dst, __ubuf__ U* src, U scalarVa
     if constexpr (IsSameType<U, half>::value && IsSameType<T, float>::value) {
         MicroAPI::RegTensor<float> tempSrcVreg;
         for (uint16_t i = 0; i < repeatTimes; ++i) {
-            MicroAPI::DataCopy<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * oneRepSize);
+            MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * oneRepSize);
             MicroAPI::Cast<float, U, castTraitF162F32>(tempSrcVreg, srcVreg, mask);
-            MicroAPI::DataCopy(dstVreg, dst + i * oneRepSize);
+            MicroAPI::LoadAlign(dstVreg, dst + i * oneRepSize);
             MicroAPI::Axpy(dstVreg, tempSrcVreg, scalarValue, mask);
-            MicroAPI::DataCopy(dst + i * oneRepSize, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
             // unroll
-            MicroAPI::DataCopy<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * oneRepSize + offset);
+            MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * oneRepSize + offset);
             MicroAPI::Cast<float, U, castTraitF162F32>(tempSrcVreg, srcVreg, mask);
-            MicroAPI::DataCopy(dstVreg, dst + i * oneRepSize + offset);
+            MicroAPI::LoadAlign(dstVreg, dst + i * oneRepSize + offset);
             MicroAPI::Axpy(dstVreg, tempSrcVreg, scalarValue, mask);
-            MicroAPI::DataCopy(dst + i * oneRepSize + offset, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepSize + offset, dstVreg, mask);
         }
         for (uint16_t j = 0; j < singleMainBlockCtrl; ++j) {
-            MicroAPI::DataCopy<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + repeatTimes * oneRepSize * 2);
+            MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + repeatTimes * oneRepSize * 2);
             MicroAPI::Cast<float, U, castTraitF162F32>(tempSrcVreg, srcVreg, mask);
-            MicroAPI::DataCopy(dstVreg, dst + repeatTimes * oneRepSize * 2);
+            MicroAPI::LoadAlign(dstVreg, dst + repeatTimes * oneRepSize * 2);
             MicroAPI::Axpy(dstVreg, tempSrcVreg, scalarValue, mask);
-            MicroAPI::DataCopy(dst + repeatTimes * oneRepSize * 2, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + repeatTimes * oneRepSize * 2, dstVreg, mask);
         }
-        MicroAPI::DataCopy<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(
+        MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(
             srcVreg, src + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize);
         MicroAPI::Cast<float, U, castTraitF162F32>(tempSrcVreg, srcVreg, maskTail);
-        MicroAPI::DataCopy(dstVreg, dst + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize);
+        MicroAPI::LoadAlign(dstVreg, dst + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize);
         MicroAPI::Axpy(dstVreg, tempSrcVreg, scalarValue, maskTail);
-        MicroAPI::DataCopy(dst + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize, dstVreg, maskTail);
+        MicroAPI::StoreAlign(dst + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize, dstVreg, maskTail);
     } else {
         for (uint16_t i = 0; i < repeatTimes; ++i) {
-            MicroAPI::DataCopy(srcVreg, src + i * oneRepSize);
-            MicroAPI::DataCopy(dstVreg, dst + i * oneRepSize);
+            MicroAPI::LoadAlign(srcVreg, src + i * oneRepSize);
+            MicroAPI::LoadAlign(dstVreg, dst + i * oneRepSize);
             MicroAPI::Axpy(dstVreg, srcVreg, scalarValue, mask);
-            MicroAPI::DataCopy(dst + i * oneRepSize, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
             // unroll
-            MicroAPI::DataCopy(srcVreg, src + i * oneRepSize + offset);
-            MicroAPI::DataCopy(dstVreg, dst + i * oneRepSize + offset);
+            MicroAPI::LoadAlign(srcVreg, src + i * oneRepSize + offset);
+            MicroAPI::LoadAlign(dstVreg, dst + i * oneRepSize + offset);
             MicroAPI::Axpy(dstVreg, srcVreg, scalarValue, mask);
-            MicroAPI::DataCopy(dst + i * oneRepSize + offset, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepSize + offset, dstVreg, mask);
         }
         for (uint16_t j = 0; j < singleMainBlockCtrl; ++j) {
-            MicroAPI::DataCopy(srcVreg, src + repeatTimes * oneRepSize * 2);
-            MicroAPI::DataCopy(dstVreg, dst + repeatTimes * oneRepSize * 2);
+            MicroAPI::LoadAlign(srcVreg, src + repeatTimes * oneRepSize * 2);
+            MicroAPI::LoadAlign(dstVreg, dst + repeatTimes * oneRepSize * 2);
             MicroAPI::Axpy(dstVreg, srcVreg, scalarValue, mask);
-            MicroAPI::DataCopy(dst + repeatTimes * oneRepSize * 2, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + repeatTimes * oneRepSize * 2, dstVreg, mask);
         }
-        MicroAPI::DataCopy(srcVreg, src + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize);
-        MicroAPI::DataCopy(dstVreg, dst + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize);
+        MicroAPI::LoadAlign(srcVreg, src + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize);
+        MicroAPI::LoadAlign(dstVreg, dst + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize);
         MicroAPI::Axpy(dstVreg, srcVreg, scalarValue, maskTail);
-        MicroAPI::DataCopy(dst + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize, dstVreg, maskTail);
+        MicroAPI::StoreAlign(dst + repeatTimes * oneRepSize * 2 + singleMainBlockCtrl * oneRepSize, dstVreg, maskTail);
     }
 }
 }//namespace AxpyAPI

@@ -268,9 +268,9 @@ __simd_vf__ inline void DigammaImpl(__ubuf__ float *dstUb, __ubuf__ float *srcUb
     MicroAPI::MaskReg mask;
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<float>(calCount);
-        MicroAPI::DataCopy(srcReg, srcUb + i * sregLower);
+        MicroAPI::LoadAlign(srcReg, srcUb + i * sregLower);
         DigammaComputeImpl(dstReg, srcReg, fullMask);
-        MicroAPI::DataCopy(dstUb + i * sregLower, dstReg, mask);
+        MicroAPI::StoreAlign(dstUb + i * sregLower, dstReg, mask);
     }
 }
 } // namespace DigammaInternel

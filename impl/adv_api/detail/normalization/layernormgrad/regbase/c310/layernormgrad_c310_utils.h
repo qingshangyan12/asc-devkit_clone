@@ -38,10 +38,10 @@ __simd_callee__ inline void LoadDataWithT(
 {
     if constexpr (IsSameType<T, half>::value) {
         MicroAPI::RegTensor<T> srcTmpReg;
-        DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcTmpReg, src + offset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcTmpReg, src + offset);
         Cast<float, T, castTraitHalfToFloat>(dstReg, srcTmpReg, dstPreg);
     } else { // this branch: only support float
-        DataCopy(dstReg, src + offset);
+        MicroAPI::LoadAlign(dstReg, src + offset);
     }
 }
 
@@ -52,10 +52,10 @@ __simd_callee__ inline void FillDataWithT(
 {
     if constexpr (IsSameType<T, half>::value) {
         MicroAPI::RegTensor<T> srcTmpReg;
-        DataCopy<T, MicroAPI::LoadDist::DIST_BRC_B16>(srcTmpReg, src + offset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_BRC_B16>(srcTmpReg, src + offset);
         Cast<float, T, castTraitHalfToFloat>(dstReg, srcTmpReg, dstPreg);
     } else { // this branch: only support float
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(dstReg, src + offset);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(dstReg, src + offset);
     }
 }
 
@@ -71,9 +71,9 @@ __simd_callee__ inline void StoreDataWithT(
         MicroAPI::Pack<uint16_t, uint32_t, MicroAPI::HighLowPart::LOWEST>(
             (MicroAPI::RegTensor<uint16_t>&)dstTmpReg, (MicroAPI::RegTensor<uint32_t>&)dstTmpReg);
         MicroAPI::MaskPack(srcPreg, srcPreg);
-        MicroAPI::DataCopy(dst + offset, dstTmpReg, srcPreg);
+        MicroAPI::StoreAlign(dst + offset, dstTmpReg, srcPreg);
     } else { // this branch: only support float
-        DataCopy(dst + offset, srcReg, srcPreg);
+        MicroAPI::StoreAlign(dst + offset, srcReg, srcPreg);
     }
 }
 } // namespace LayernormGrad

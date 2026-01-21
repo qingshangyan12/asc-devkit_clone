@@ -72,7 +72,7 @@ __simd_vf__ inline void ReduceProdARLessThanVLVF(__ubuf__ T *dstAddr, __ubuf__ T
     uint32_t sreg1 = dimR;
     MicroAPI::MaskReg mask = MicroAPI::UpdateMask<T, Trait>(sreg1);
     for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-        DataCopy(vreg0, srcAddr + loopA * dimR);
+        MicroAPI::LoadAlign(vreg0, srcAddr + loopA * dimR);
         MicroAPI::Select(vreg0, vreg0, tempOne, mask);
         if constexpr(sizeof(T) == 1) {
             // fold to 128
@@ -91,9 +91,9 @@ __simd_vf__ inline void ReduceProdARLessThanVLVF(__ubuf__ T *dstAddr, __ubuf__ T
         // fold to 1
         MicroAPI::DeInterleave(vreg1, vreg0, vreg0, tempOne);
         MicroAPI::Mul(vreg1, vreg1, vreg0, mask);
-        DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
     }
-    MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+    MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
 }
 
 template <class T, bool isReuseSource = false>

@@ -35,14 +35,14 @@ __simd_vf__ inline void BrcbB64Impl(
         sreg0 = (int32_t)repeatParams.dstRepStride * i * ONE_BLK_FLOAT_NUM;
         for (uint16_t j = 0; j < static_cast<uint16_t>(BRCB_BROADCAST_NUMBER); ++j) {
             dstRepOffset = sreg0 + dstBlkStride * j * ONE_BLK_FLOAT_NUM;
-            MicroAPI::DataCopy<uint32_t, MicroAPI::LoadDist::DIST_BRC_B32>(
+            MicroAPI::LoadAlign<uint32_t, MicroAPI::LoadDist::DIST_BRC_B32>(
                 srcRegLow, (__ubuf__ uint32_t *)src + (i * BRCB_BROADCAST_NUMBER + j) * 2);
-            MicroAPI::DataCopy<uint32_t, MicroAPI::LoadDist::DIST_BRC_B32>(
+            MicroAPI::LoadAlign<uint32_t, MicroAPI::LoadDist::DIST_BRC_B32>(
                 srcRegHigh, (__ubuf__ uint32_t *)src + (i * BRCB_BROADCAST_NUMBER + j) * 2 + 1);
             MicroAPI::Duplicate(srcRegLow, srcRegLow, preg);
             MicroAPI::Duplicate(srcRegHigh, srcRegHigh, preg);
             MicroAPI::Interleave(dstReg, tmpReg, srcRegLow, srcRegHigh);
-            MicroAPI::DataCopy((__ubuf__ uint32_t *)dst + dstRepOffset, dstReg, preg);
+            MicroAPI::StoreAlign((__ubuf__ uint32_t *)dst + dstRepOffset, dstReg, preg);
         }
     }
 }
@@ -61,9 +61,9 @@ __simd_vf__ inline void BrcbB8Impl(
         sreg0 = (int32_t)repeatParams.dstRepStride * i * oneBlkSize;
         for (uint16_t j = 0; j < static_cast<uint16_t>(BRCB_BROADCAST_NUMBER); ++j) {
             dstRepOffset = sreg0 + dstBlkStride * j * oneBlkSize;
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_BRC_B8>(srcReg, src + i * BRCB_BROADCAST_NUMBER + j);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_BRC_B8>(srcReg, src + i * BRCB_BROADCAST_NUMBER + j);
             MicroAPI::Duplicate(srcReg, srcReg, preg);
-            MicroAPI::DataCopy(dst + dstRepOffset, srcReg, preg);
+            MicroAPI::StoreAlign(dst + dstRepOffset, srcReg, preg);
         }
     }
 }
@@ -78,11 +78,11 @@ __simd_vf__ inline void BrcbCommonImpl(
     MicroAPI::MaskReg fullMask = MicroAPI::CreateMask<T, MicroAPI::MaskPattern::ALL>();
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
         if constexpr (sizeof(T) == 2) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_E2B_B16>(srcReg, src + i * BRCB_BROADCAST_NUMBER);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_E2B_B16>(srcReg, src + i * BRCB_BROADCAST_NUMBER);
         } else {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_E2B_B32>(srcReg, src + i * BRCB_BROADCAST_NUMBER);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_E2B_B32>(srcReg, src + i * BRCB_BROADCAST_NUMBER);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + i * repeatParams.dstRepStride * oneBlkSize, srcReg, dstBlkStride, fullMask);
     }
 }

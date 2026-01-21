@@ -115,8 +115,8 @@ __simd_vf__ inline void ReduceCopyOutImpl(__ubuf__ T *dst, __ubuf__ T *src, cons
     MicroAPI::RegTensor<uint8_t> srcReg;
     for (uint16_t i = 0; i < repeatTime; ++i) {
         preg = MicroAPI::UpdateMask<uint8_t>(sreg);
-        MicroAPI::DataCopy(srcReg, (__ubuf__ uint8_t *)src + i * repeatElm);
-        MicroAPI::DataCopy((__ubuf__ uint8_t *)dst + i * repeatElm, srcReg, preg);
+        MicroAPI::LoadAlign(srcReg, (__ubuf__ uint8_t *)src + i * repeatElm);
+        MicroAPI::StoreAlign((__ubuf__ uint8_t *)dst + i * repeatElm, srcReg, preg);
     }
 }
 

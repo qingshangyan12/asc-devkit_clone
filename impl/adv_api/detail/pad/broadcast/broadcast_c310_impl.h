@@ -25,9 +25,9 @@ template <typename T>
 __simd_callee__ inline void E2bLoad(MicroAPI::RegTensor<T> &dstReg, __ubuf__ T *srcUb)
 {
     if constexpr (sizeof(T) == 2) {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_E2B_B16>(dstReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_E2B_B16>(dstReg, srcUb);
     } else {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_E2B_B32>(dstReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_E2B_B32>(dstReg, srcUb);
     }
 }
 
@@ -35,11 +35,11 @@ template <typename T>
 __simd_callee__ inline void BrcLoad(MicroAPI::RegTensor<T> &dstReg, __ubuf__ T *srcUb)
 {
     if constexpr (sizeof(T) == 2) {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_BRC_B16>(dstReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_BRC_B16>(dstReg, srcUb);
     } else if constexpr (sizeof(T) == 4) {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_BRC_B32>(dstReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_BRC_B32>(dstReg, srcUb);
     } else {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_BRC_B8>(dstReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_BRC_B8>(dstReg, srcUb);
     }
 }
 
@@ -55,7 +55,7 @@ __simd_vf__ inline void BrcDuplicate(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint3
     BrcLoad<T>(srcReg, srcUb);
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         pregCnt = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy(dstUb + i * VF_LEN, srcReg, pregCnt);
+        MicroAPI::StoreAlign(dstUb + i * VF_LEN, srcReg, pregCnt);
     }
 }
 
@@ -70,7 +70,7 @@ __simd_vf__ inline void GenLastGatherIndex(__ubuf__ T *indexUb, uint32_t size1, 
     MicroAPI::Arange(tmpReg, (T)offset);
     MicroAPI::Div(indexReg, tmpReg, indexReg, pregFull);
 
-    MicroAPI::DataCopy(indexUb, indexReg, pregFull);
+    MicroAPI::StoreAlign(indexUb, indexReg, pregFull);
 }
 
 template <typename T>
@@ -87,7 +87,7 @@ __simd_vf__ inline void GenNlastGatherIndex(__ubuf__ T *indexUb, uint32_t size1,
     MicroAPI::Mul(dstReg, indexReg, dstReg, pregFull);
     MicroAPI::Sub(indexReg, tmpReg, dstReg, pregFull);
 
-    MicroAPI::DataCopy(indexUb, indexReg, pregFull);
+    MicroAPI::StoreAlign(indexUb, indexReg, pregFull);
 }
 
 template <typename T, typename IndexT>
@@ -106,21 +106,21 @@ __simd_vf__ inline void BrcLastGatherOne(
     MicroAPI::RegTensor<IndexT> indexReg1;
     MicroAPI::RegTensor<IndexT> indexReg2;
 
-    MicroAPI::DataCopy(indexReg1, indexUb);
+    MicroAPI::LoadAlign(indexReg1, indexUb);
     if constexpr (sizeof(T) == sizeof(uint8_t)) {
-        MicroAPI::DataCopy(indexReg2, indexUb + VF_LEN_HALF);
+        MicroAPI::LoadAlign(indexReg2, indexUb + VF_LEN_HALF);
     }
     uint32_t sreg = main;
     pregCnt = MicroAPI::UpdateMask<T>(sreg);
     if constexpr (sizeof(T) == sizeof(uint8_t)) {
-        MicroAPI::DataCopyGather(srcReg1, srcUb, indexReg1, pregFull);
-        MicroAPI::DataCopyGather(srcReg2, srcUb, indexReg2, pregFull);
+        MicroAPI::Gather(srcReg1, srcUb, indexReg1, pregFull);
+        MicroAPI::Gather(srcReg2, srcUb, indexReg2, pregFull);
         MicroAPI::DeInterleave(
             srcReg, dummyReg, (MicroAPI::RegTensor<T> &)srcReg1, (MicroAPI::RegTensor<T> &)srcReg2);
     } else {
-        MicroAPI::DataCopyGather(srcReg, srcUb, indexReg1, pregCnt);
+        MicroAPI::Gather(srcReg, srcUb, indexReg1, pregCnt);
     }
-    MicroAPI::DataCopy(dstUb, srcReg, pregCnt);
+    MicroAPI::StoreAlign(dstUb, srcReg, pregCnt);
 }
 
 template <typename T, typename IndexT>
@@ -149,36 +149,36 @@ __simd_vf__ inline void BrcLastGatherTwo(
     MicroAPI::UnalignReg ureg0;
 
     MicroAPI::Duplicate(factorReg, (IndexT)factor, pregFull);
-    MicroAPI::DataCopy(indexReg1, indexUb);
+    MicroAPI::LoadAlign(indexReg1, indexUb);
     if constexpr (sizeof(T) == sizeof(uint8_t)) {
-        MicroAPI::DataCopy(indexReg2, indexUb + VF_LEN_HALF);
+        MicroAPI::LoadAlign(indexReg2, indexUb + VF_LEN_HALF);
     }
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         MicroAPI::Muls(tmpReg, factorReg, (IndexT)i, pregFull);
         MicroAPI::Add(dstReg, tmpReg, indexReg1, pregFull);
         if constexpr (sizeof(T) == sizeof(uint8_t)) {
-            MicroAPI::DataCopyGather(srcReg1, srcUb, dstReg, pregFull);
+            MicroAPI::Gather(srcReg1, srcUb, dstReg, pregFull);
             MicroAPI::Add(dstReg, tmpReg, indexReg2, pregFull);
-            MicroAPI::DataCopyGather(srcReg2, srcUb, dstReg, pregFull);
+            MicroAPI::Gather(srcReg2, srcUb, dstReg, pregFull);
             MicroAPI::DeInterleave(
                 srcReg, dummyReg, (MicroAPI::RegTensor<T> &)srcReg1, (MicroAPI::RegTensor<T> &)srcReg2);
         } else {
-            MicroAPI::DataCopyGather(srcReg, srcUb, dstReg, pregFull);
+            MicroAPI::Gather(srcReg, srcUb, dstReg, pregFull);
         }
-        MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, main);
+        MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, main);
     }
     MicroAPI::Adds(dstReg, indexReg1, (IndexT)offset, pregFull);
     if constexpr (sizeof(T) == sizeof(uint8_t)) {
-        MicroAPI::DataCopyGather(srcReg1, srcUb, dstReg, pregFull);
+        MicroAPI::Gather(srcReg1, srcUb, dstReg, pregFull);
         MicroAPI::Adds(dstReg, indexReg2, (IndexT)offset, pregFull);
-        MicroAPI::DataCopyGather(srcReg2, srcUb, dstReg, pregFull);
+        MicroAPI::Gather(srcReg2, srcUb, dstReg, pregFull);
         MicroAPI::DeInterleave(
             srcReg, dummyReg, (MicroAPI::RegTensor<T> &)srcReg1, (MicroAPI::RegTensor<T> &)srcReg2);
     } else {
-        MicroAPI::DataCopyGather(srcReg, srcUb, dstReg, pregFull);
+        MicroAPI::Gather(srcReg, srcUb, dstReg, pregFull);
     }
-    MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, tail);
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, tail);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T, typename IndexT>
@@ -200,17 +200,17 @@ __simd_vf__ inline void BrcNlastGatherOne(
 
     uint32_t sreg = main;
     pregCnt = MicroAPI::UpdateMask<T>(sreg);
-    MicroAPI::DataCopy(indexReg1, indexUb);
+    MicroAPI::LoadAlign(indexReg1, indexUb);
     if constexpr (sizeof(T) == sizeof(uint8_t)) {
-        MicroAPI::DataCopy(indexReg2, indexUb + VF_LEN_HALF);
-        MicroAPI::DataCopyGather(srcReg1, srcUb, indexReg1, pregFull);
-        MicroAPI::DataCopyGather(srcReg2, srcUb, indexReg2, pregFull);
+        MicroAPI::LoadAlign(indexReg2, indexUb + VF_LEN_HALF);
+        MicroAPI::Gather(srcReg1, srcUb, indexReg1, pregFull);
+        MicroAPI::Gather(srcReg2, srcUb, indexReg2, pregFull);
         MicroAPI::DeInterleave(
             srcReg, dummyReg, (MicroAPI::RegTensor<T> &)srcReg1, (MicroAPI::RegTensor<T> &)srcReg2);
     } else {
-        MicroAPI::DataCopyGather(srcReg, srcUb, indexReg1, pregCnt);
+        MicroAPI::Gather(srcReg, srcUb, indexReg1, pregCnt);
     }
-    MicroAPI::DataCopy(dstUb, srcReg, pregCnt);
+    MicroAPI::StoreAlign(dstUb, srcReg, pregCnt);
 }
 
 template <typename T, typename IndexT>
@@ -234,21 +234,21 @@ __simd_vf__ inline void BrcNlastGatherTwo(
     MicroAPI::RegTensor<T> dummyReg;
     MicroAPI::UnalignReg ureg0;
 
-    MicroAPI::DataCopy(indexReg1, indexUb);
+    MicroAPI::LoadAlign(indexReg1, indexUb);
     if constexpr (sizeof(T) == sizeof(uint8_t)) {
-        MicroAPI::DataCopy(indexReg2, indexUb + VF_LEN_HALF);
-        MicroAPI::DataCopyGather(srcReg1, srcUb, indexReg1, pregFull);
-        MicroAPI::DataCopyGather(srcReg2, srcUb, indexReg2, pregFull);
+        MicroAPI::LoadAlign(indexReg2, indexUb + VF_LEN_HALF);
+        MicroAPI::Gather(srcReg1, srcUb, indexReg1, pregFull);
+        MicroAPI::Gather(srcReg2, srcUb, indexReg2, pregFull);
         MicroAPI::DeInterleave(
             srcReg, dummyReg, (MicroAPI::RegTensor<T> &)srcReg1, (MicroAPI::RegTensor<T> &)srcReg2);
     } else {
-        MicroAPI::DataCopyGather(srcReg, srcUb, indexReg1, pregFull);
+        MicroAPI::Gather(srcReg, srcUb, indexReg1, pregFull);
     }
     for (uint16_t i = 0; i < repeatTimes; ++i) {
-        MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, main);
+        MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, main);
     }
-    MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, tail);
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, tail);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T>
@@ -265,7 +265,7 @@ __simd_vf__ inline void BrcLastE2B(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint16_
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         pregCnt = MicroAPI::UpdateMask<T>(sreg);
         E2bLoad<T>(srcReg, srcUb + i * DEFAULT_BLK_NUM);
-        MicroAPI::DataCopy(dstUb + i * VF_LEN, srcReg, pregCnt);
+        MicroAPI::StoreAlign(dstUb + i * VF_LEN, srcReg, pregCnt);
     }
 }
 
@@ -286,7 +286,7 @@ __simd_vf__ inline void BrcLastE2BLargerThanVL(
         for (uint16_t j = 0; j < repeatTimes; ++j) {
             pregCnt = MicroAPI::UpdateMask<T>(sreg);
             E2bLoad<T>(srcReg, srcUb + j * DEFAULT_BLK_NUM + i * srcStride0);
-            MicroAPI::DataCopy(dstUb + i * size1 * size2 + j * VF_LEN, srcReg, pregCnt);
+            MicroAPI::StoreAlign(dstUb + i * size1 * size2 + j * VF_LEN, srcReg, pregCnt);
         }
     }
 }
@@ -304,7 +304,7 @@ __simd_vf__ inline void BrcLastE2BLessThanVL(
     pregCnt = MicroAPI::UpdateMask<T>(sreg);
     for (uint16_t i = 0; i < size0; ++i) {
         E2bLoad<T>(srcReg, srcUb + i * srcStride0);
-        MicroAPI::DataCopy(dstUb + i * size1 * size2, srcReg, pregCnt);
+        MicroAPI::StoreAlign(dstUb + i * size1 * size2, srcReg, pregCnt);
     }
 }
 
@@ -325,7 +325,7 @@ __simd_vf__ inline void BrcLastE2B(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint16_
             for (uint16_t k = 0; k < repeatTimes; ++k) {
                 pregCnt = MicroAPI::UpdateMask<T>(sreg);
                 E2bLoad<T>(srcReg, srcUb + i * srcStride0 + j * srcStride1 + k * DEFAULT_BLK_NUM);
-                MicroAPI::DataCopy(
+                MicroAPI::StoreAlign(
                     dstUb + i * size1 * size2 * size3 + j * size2 * size3 + k * VF_LEN, srcReg, pregCnt);
             }
         }
@@ -344,11 +344,11 @@ __simd_vf__ inline void BrcNlastGatherBOne(
     MicroAPI::RegTensor<T> srcReg;
     MicroAPI::RegTensor<uint32_t> indexReg;
 
-    MicroAPI::DataCopy(indexReg, indexUb);
-    MicroAPI::DataCopyGatherB(srcReg, srcUb, indexReg, pregFull);
+    MicroAPI::LoadAlign(indexReg, indexUb);
+    MicroAPI::GatherB(srcReg, srcUb, indexReg, pregFull);
     uint32_t sreg = main;
     pregCnt = MicroAPI::UpdateMask<T>(sreg);
-    MicroAPI::DataCopy(dstUb, srcReg, pregCnt);
+    MicroAPI::StoreAlign(dstUb, srcReg, pregCnt);
 }
 
 template <typename T>
@@ -368,16 +368,16 @@ __simd_vf__ inline void BrcNlastGatherBTwo(
     MicroAPI::RegTensor<T> srcReg;
     MicroAPI::RegTensor<uint32_t> indexReg;
 
-    MicroAPI::DataCopy(indexReg, indexUb);
-    MicroAPI::DataCopyGatherB(srcReg, srcUb, indexReg, pregFull);
+    MicroAPI::LoadAlign(indexReg, indexUb);
+    MicroAPI::GatherB(srcReg, srcUb, indexReg, pregFull);
     uint32_t sreg = main;
     pregCnt = MicroAPI::UpdateMask<T>(sreg);
     for (uint16_t i = 0; i < repeatTimes; ++i) {
-        MicroAPI::DataCopy(dstUb + i * main, srcReg, pregCnt);
+        MicroAPI::StoreAlign(dstUb + i * main, srcReg, pregCnt);
     }
     sreg = tail;
     pregCnt = MicroAPI::UpdateMask<T>(sreg);
-    MicroAPI::DataCopy(dstUb + mainBlock, srcReg, pregCnt);
+    MicroAPI::StoreAlign(dstUb + mainBlock, srcReg, pregCnt);
 }
 
 template <typename T>
@@ -392,7 +392,7 @@ __simd_vf__ inline void BrcLastLessThanVLAligned(__ubuf__ T *dstUb, __ubuf__ T *
     for (uint16_t i = 0; i < size1; ++i) {
         for (uint16_t j = 0; j < size0; ++j) {
             BrcLoad<T>(srcReg, srcUb + j * srcStride0 + i * srcStride1);
-            MicroAPI::DataCopy(dstUb + j * size1 * size2 + i * size2, srcReg, pregCnt);
+            MicroAPI::StoreAlign(dstUb + j * size1 * size2 + i * size2, srcReg, pregCnt);
         }
     }
 }
@@ -410,7 +410,7 @@ __simd_vf__ inline void BrcLastLessThanVLAligned(__ubuf__ T *dstUb, __ubuf__ T *
         for (uint16_t j = 0; j < size2; ++j) {
             for (uint16_t k = 0; k < size1; ++k) {
                 BrcLoad<T>(srcReg, srcUb + i * srcStride0 + j * srcStride2 + k * srcStride1);
-                MicroAPI::DataCopy(
+                MicroAPI::StoreAlign(
                     dstUb + i * size1 * size2 * size3 + k * size2 * size3 + j * size3, srcReg, pregCnt);
             }
         }
@@ -429,8 +429,8 @@ __simd_vf__ inline void BrcNlastLessThanVLAligned(__ubuf__ T *dstUb, __ubuf__ T 
     for (uint16_t i = 0; i < size1; ++i) {
         for (uint16_t j = 0; j < size0; ++j) {
             for (uint16_t k = 0; k < size2; ++k) {
-                MicroAPI::DataCopy(srcReg, srcUb + i * srcStride1 + j * srcStride0 + k * srcStride2);
-                MicroAPI::DataCopy(
+                MicroAPI::LoadAlign(srcReg, srcUb + i * srcStride1 + j * srcStride0 + k * srcStride2);
+                MicroAPI::StoreAlign(
                     dstUb + j * size1 * size2 * size3 + i * size2 * size3 + k * size3, srcReg, pregCnt);
             }
         }
@@ -446,9 +446,9 @@ __simd_vf__ inline void BrcLastLessThanVLUnaligned(
 
     for (uint16_t i = 0; i < size0; ++i) {
         BrcLoad<T>(srcReg, srcUb + i);
-        MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size1);
+        MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, size1);
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T>
@@ -461,10 +461,10 @@ __simd_vf__ inline void BrcLastLessThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__ T
     for (uint16_t i = 0; i < size0; ++i) {
         for (uint16_t j = 0; j < size1; ++j) {
             BrcLoad<T>(srcReg, srcUb + j * srcStride1 + i * srcStride0);
-            MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size2);
+            MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, size2);
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T>
@@ -478,11 +478,11 @@ __simd_vf__ inline void BrcLastLessThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__ T
         for (uint16_t j = 0; j < size1; ++j) {
             for (uint16_t k = 0; k < size2; ++k) {
                 BrcLoad<T>(srcReg, srcUb + i * srcStride0 + j * srcStride1 + k * srcStride2);
-                MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size3);
+                MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, size3);
             }
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T>
@@ -495,11 +495,11 @@ __simd_vf__ inline void BrcNlastLessThanVLUnaligned(
 
     uint32_t sreg = size1;
     pregCnt = MicroAPI::UpdateMask<T>(sreg);
-    MicroAPI::DataCopy(srcReg, srcUb);
+    MicroAPI::LoadAlign(srcReg, srcUb);
     for (uint16_t i = 0; i < size0; ++i) {
-        MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size1);
+        MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, size1);
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T>
@@ -515,12 +515,12 @@ __simd_vf__ inline void BrcNlastLessThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__ 
     for (uint16_t i = 0; i < size0; ++i) {
         for (uint16_t j = 0; j < size1; ++j) {
             auto srcUbT = srcUb + i * srcStride0 + j * srcStride1;
-            MicroAPI::DataCopyUnAlignPre(ureg0, srcUbT);
-            MicroAPI::DataCopyUnAlign(srcReg, ureg0, srcUbT, size2);
-            MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg1, size2);
+            MicroAPI::LoadUnAlignPre(ureg0, srcUbT);
+            MicroAPI::LoadUnAlign(srcReg, ureg0, srcUbT, size2);
+            MicroAPI::StoreUnAlign(dstUb, srcReg, ureg1, size2);
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg1, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg1, 0);
 }
 
 template <typename T>
@@ -537,13 +537,13 @@ __simd_vf__ inline void BrcNlastLessThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__ 
         for (uint16_t j = 0; j < size1; ++j) {
             for (uint16_t k = 0; k < size2; ++k) {
                 __ubuf__ T *srcUbTmp = srcUb + i * srcStride0 + j * srcStride1 + k * srcStride2;
-                MicroAPI::DataCopyUnAlignPre(ureg0, srcUbTmp);
-                MicroAPI::DataCopyUnAlign(srcReg, ureg0, srcUbTmp, size3);
-                MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg1, size3);
+                MicroAPI::LoadUnAlignPre(ureg0, srcUbTmp);
+                MicroAPI::LoadUnAlign(srcReg, ureg0, srcUbTmp, size3);
+                MicroAPI::StoreUnAlign(dstUb, srcReg, ureg1, size3);
             }
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg1, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg1, 0);
 }
 
 template <typename T>
@@ -562,7 +562,7 @@ __simd_vf__ inline void BrcLastLargerThanVLAligned(
         uint32_t sreg = size1;
         for (uint16_t j = 0; j < factor; ++j) {
             pregCnt = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy(dstUb + i * size1 + j * VF_LEN, srcReg, pregCnt);
+            MicroAPI::StoreAlign(dstUb + i * size1 + j * VF_LEN, srcReg, pregCnt);
         }
     }
 }
@@ -584,7 +584,7 @@ __simd_vf__ inline void BrcLastLargerThanVLAligned(__ubuf__ T *dstUb, __ubuf__ T
             uint32_t sreg = size2;
             for (uint16_t k = 0; k < factor; ++k) {
                 pregCnt = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy(dstUb + j * size1 * size2 + i * size2 + k * VF_LEN, srcReg, pregCnt);
+                MicroAPI::StoreAlign(dstUb + j * size1 * size2 + i * size2 + k * VF_LEN, srcReg, pregCnt);
             }
         }
     }
@@ -607,7 +607,7 @@ __simd_vf__ inline void BrcLastLargerThanVLAligned(__ubuf__ T *dstUb, __ubuf__ T
                 pregCnt = MicroAPI::UpdateMask<T>(sreg);
                 for (uint16_t t = 0; t < size1; ++t) {
                     BrcLoad<T>(srcReg, srcUb + i * srcStride0 + j * srcStride2 + t * srcStride1);
-                    MicroAPI::DataCopy(
+                    MicroAPI::StoreAlign(
                         dstUb + i * size1 * size2 * size3 + t * size2 * size3 + j * size3 + k * VF_LEN,
                         srcReg,
                         pregCnt);
@@ -632,8 +632,8 @@ __simd_vf__ inline void BrcNlastLargerThanVLAlignedWithBlock(
         uint32_t sreg = size1;
         for (uint16_t j = 0; j < factor; ++j) {
             pregCnt = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy(srcReg, srcUb + j * VF_LEN);
-            MicroAPI::DataCopy(dstUb + i * size1 + j * VF_LEN, srcReg, pregCnt);
+            MicroAPI::LoadAlign(srcReg, srcUb + j * VF_LEN);
+            MicroAPI::StoreAlign(dstUb + i * size1 + j * VF_LEN, srcReg, pregCnt);
         }
     }
 }
@@ -655,8 +655,8 @@ __simd_vf__ inline void BrcNlastLargerThanVLAlignedWithBlock(__ubuf__ T *dstUb, 
         for (uint16_t j = 0; j < factor; ++j) {
             pregCnt = MicroAPI::UpdateMask<T>(sreg);
             for (uint16_t k = 0; k < size1; ++k) {
-                MicroAPI::DataCopy(srcReg, srcUb + k * srcStride1 + i * srcStride0 + j * VF_LEN);
-                MicroAPI::DataCopy(dstUb + i * size1 * size2 + k * size2 + j * VF_LEN, srcReg, pregCnt);
+                MicroAPI::LoadAlign(srcReg, srcUb + k * srcStride1 + i * srcStride0 + j * VF_LEN);
+                MicroAPI::StoreAlign(dstUb + i * size1 * size2 + k * size2 + j * VF_LEN, srcReg, pregCnt);
             }
         }
     }
@@ -679,9 +679,9 @@ __simd_vf__ inline void BrcNlastLargerThanVLAlignedWithBlock(__ubuf__ T *dstUb, 
             pregCnt = MicroAPI::UpdateMask<T>(sreg);
             for (uint16_t k = 0; k < size0; ++k) {
                 for (uint16_t t = 0; t < size2; ++t) {
-                    MicroAPI::DataCopy(srcReg, srcUb + j * VF_LEN +
+                    MicroAPI::LoadAlign(srcReg, srcUb + j * VF_LEN +
                         i * srcStride1 + k * srcStride0 + t * srcStride2);
-                    MicroAPI::DataCopy(dstUb + k * size1 * size2 * size3 +
+                    MicroAPI::StoreAlign(dstUb + k * size1 * size2 * size3 +
                         i * size2 * size3 + t * size3 + j * VF_LEN, srcReg, pregCnt);
                 }
             }
@@ -700,9 +700,9 @@ __simd_vf__ inline void BrcNlastLargerThanVLAlignedWithVL(
     MicroAPI::RegTensor<T> srcReg;
 
     for (uint16_t i = 0; i < factor; ++i) {
-        MicroAPI::DataCopy(srcReg, srcUb + i * VF_LEN);
+        MicroAPI::LoadAlign(srcReg, srcUb + i * VF_LEN);
         for (uint16_t j = 0; j < size0; ++j) {
-            MicroAPI::DataCopy(dstUb + i * VF_LEN + j * size1, srcReg, pregFull);
+            MicroAPI::StoreAlign(dstUb + i * VF_LEN + j * size1, srcReg, pregFull);
         }
     }
 }
@@ -720,8 +720,8 @@ __simd_vf__ inline void BrcNlastLargerThanVLAlignedWithVL(__ubuf__ T *dstUb, __u
     for (uint16_t i = 0; i < size0; ++i) {
         for (uint16_t j = 0; j < factor; ++j) {
             for (uint16_t k = 0; k < size1; ++k) {
-                MicroAPI::DataCopy(srcReg, srcUb + i * srcStride0 + j * VF_LEN + k * srcStride1);
-                MicroAPI::DataCopy(dstUb + j * VF_LEN + k * size2 + i * size1 * size2, srcReg, pregFull);
+                MicroAPI::LoadAlign(srcReg, srcUb + i * srcStride0 + j * VF_LEN + k * srcStride1);
+                MicroAPI::StoreAlign(dstUb + j * VF_LEN + k * size2 + i * size1 * size2, srcReg, pregFull);
             }
         }
     }
@@ -741,9 +741,9 @@ __simd_vf__ inline void BrcNlastLargerThanVLAlignedWithVL(__ubuf__ T *dstUb, __u
         for (uint16_t j = 0; j < factor; ++j) {
             for (uint16_t k = 0; k < size0; ++k) {
                 for (uint16_t t = 0; t < size2; ++t) {
-                    MicroAPI::DataCopy(srcReg, srcUb + i * srcStride1 +
+                    MicroAPI::LoadAlign(srcReg, srcUb + i * srcStride1 +
                         j * VF_LEN + k * srcStride0 + t * srcStride2);
-                    MicroAPI::DataCopy(dstUb + j * VF_LEN + t * size3 +
+                    MicroAPI::StoreAlign(dstUb + j * VF_LEN + t * size3 +
                         i * size2 * size3 + k * size1 * size2 * size3, srcReg, pregFull);
                 }
             }
@@ -765,11 +765,11 @@ __simd_vf__ inline void BrcLastLargerThanVLUnaligned(
     for (uint16_t i = 0; i < size0; ++i) {
         BrcLoad<T>(srcReg, srcUb + i);
         for (uint16_t j = 0; j < factor; ++j) {
-            MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, VF_LEN);
+            MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, VF_LEN);
         }
-        MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size1tail);
+        MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, size1tail);
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T>
@@ -787,12 +787,12 @@ __simd_vf__ inline void BrcLastLargerThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__
         for (uint16_t j = 0; j < size1; ++j) {
             BrcLoad<T>(srcReg, srcUb + j * srcStride1 + i * srcStride0);
             for (uint16_t k = 0; k < factor; ++k) {
-                MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, VF_LEN);
+                MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, VF_LEN);
             }
-            MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size2tail);
+            MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, size2tail);
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T>
@@ -811,13 +811,13 @@ __simd_vf__ inline void BrcLastLargerThanVLUnaligned(__ubuf__ T *dstUb, __ubuf__
             for (uint16_t k = 0; k < size2; ++k) {
                 BrcLoad<T>(srcReg, srcUb + i * srcStride0 + j * srcStride1 + k * srcStride2);
                 for (uint16_t t = 0; t < factor; ++t) {
-                    MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, VF_LEN);
+                    MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, VF_LEN);
                 }
-                MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, size3tail);
+                MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, size3tail);
             }
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T>
@@ -833,15 +833,15 @@ __simd_vf__ inline void BrcNlastLargerThanVLUnaligned(
     MicroAPI::UnalignReg ureg0;
 
     uint32_t sreg = size1tail;
-    MicroAPI::DataCopy(tmpReg, srcUb + factor * VF_LEN);
+    MicroAPI::LoadAlign(tmpReg, srcUb + factor * VF_LEN);
     for (uint16_t i = 0; i < size0; ++i) {
         for (uint16_t j = 0; j < factor; ++j) {
-            MicroAPI::DataCopy(srcReg, srcUb + j * VF_LEN);
-            MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg0, VF_LEN);
+            MicroAPI::LoadAlign(srcReg, srcUb + j * VF_LEN);
+            MicroAPI::StoreUnAlign(dstUb, srcReg, ureg0, VF_LEN);
         }
-        MicroAPI::DataCopyUnAlign(dstUb, tmpReg, ureg0, size1tail);
+        MicroAPI::StoreUnAlign(dstUb, tmpReg, ureg0, size1tail);
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg0, 0);
 }
 
 template <typename T>
@@ -859,16 +859,16 @@ __simd_vf__ inline void BrcNlastLargerThanVLUnaligned(__ubuf__ T *dstUb, __ubuf_
     for (uint16_t i = 0; i < size0; ++i) {
         for (uint16_t j = 0; j < size1; ++j) {
             __ubuf__ T *tmpSrcUb = srcUb + i * srcStride0 + j * srcStride1;
-            MicroAPI::DataCopyUnAlignPre(ureg0, tmpSrcUb);
+            MicroAPI::LoadUnAlignPre(ureg0, tmpSrcUb);
             for (uint16_t k = 0; k < factor; ++k) {
-                MicroAPI::DataCopyUnAlign(srcReg, ureg0, tmpSrcUb, VF_LEN);
-                MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg1, VF_LEN);
+                MicroAPI::LoadUnAlign(srcReg, ureg0, tmpSrcUb, VF_LEN);
+                MicroAPI::StoreUnAlign(dstUb, srcReg, ureg1, VF_LEN);
             }
-            MicroAPI::DataCopyUnAlign(srcReg, ureg0, tmpSrcUb, sreg);
-            MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg1, sreg);
+            MicroAPI::LoadUnAlign(srcReg, ureg0, tmpSrcUb, sreg);
+            MicroAPI::StoreUnAlign(dstUb, srcReg, ureg1, sreg);
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg1, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg1, 0);
 }
 
 template <typename T>
@@ -887,17 +887,17 @@ __simd_vf__ inline void BrcNlastLargerThanVLUnaligned(__ubuf__ T *dstUb, __ubuf_
         for (uint16_t j = 0; j < size1; ++j) {
             for (uint16_t k = 0; k < size2; ++k) {
                 __ubuf__ T *tmpSrcUb = srcUb + i * srcStride0 + j * srcStride1 + k * srcStride2;
-                MicroAPI::DataCopyUnAlignPre(ureg0, tmpSrcUb);
+                MicroAPI::LoadUnAlignPre(ureg0, tmpSrcUb);
                 for (uint16_t t = 0; t < factor; ++t) {
-                    MicroAPI::DataCopyUnAlign(srcReg, ureg0, tmpSrcUb, VF_LEN);
-                    MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg1, VF_LEN);
+                    MicroAPI::LoadUnAlign(srcReg, ureg0, tmpSrcUb, VF_LEN);
+                    MicroAPI::StoreUnAlign(dstUb, srcReg, ureg1, VF_LEN);
                 }
-                MicroAPI::DataCopyUnAlign(srcReg, ureg0, tmpSrcUb, sreg);
-                MicroAPI::DataCopyUnAlign(dstUb, srcReg, ureg1, sreg);
+                MicroAPI::LoadUnAlign(srcReg, ureg0, tmpSrcUb, sreg);
+                MicroAPI::StoreUnAlign(dstUb, srcReg, ureg1, sreg);
             }
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg1, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg1, 0);
 }
 
 template <typename T, int32_t constRank = -1>

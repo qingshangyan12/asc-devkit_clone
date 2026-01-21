@@ -73,7 +73,7 @@ __simd_vf__ inline void VfGenIndex(__ubuf__ T *indexUb, uint32_t sizeI0, uint32_
     MicroAPI::Duplicate(voffset, (T)offset, p0);
     MicroAPI::Add(vr0, vr0, voffset, p0);
 
-    MicroAPI::DataCopy(indexUb, vr0, p0);
+    MicroAPI::StoreAlign(indexUb, vr0, p0);
 }
 
 template <typename T>
@@ -140,7 +140,7 @@ __simd_vf__ inline void VfGenIndexForFourDim(__ubuf__ T *indexUb, uint32_t sizeI
     MicroAPI::Duplicate(voffset, (T)offset, p0);
     MicroAPI::Add(vr0, vr0, voffset, p0);
 
-    MicroAPI::DataCopy(indexUb, vr0, p0);
+    MicroAPI::StoreAlign(indexUb, vr0, p0);
 }
 
 template <typename T>
@@ -174,7 +174,7 @@ __simd_vf__ inline void VfGatherBrc(__ubuf__ T *dstUb, __ubuf__ T *srcUb, __ubuf
     MicroAPI::Duplicate(vstride0, (T)srcStride0, pa);
     MicroAPI::Duplicate(vstride1, (T)srcStride1, pa);
     MicroAPI::Duplicate(vstride2, (T)srcStride2, pa);
-    MicroAPI::DataCopy(vindex0, indexUb);
+    MicroAPI::LoadAlign(vindex0, indexUb);
     for (uint16_t i0 = 0; i0 < size0; ++i0) {
         MicroAPI::Muls(voffset0, vstride0, (T)i0, p0);
         MicroAPI::Add(vbase0, voffset0, vindex0, p0);
@@ -184,16 +184,16 @@ __simd_vf__ inline void VfGatherBrc(__ubuf__ T *dstUb, __ubuf__ T *srcUb, __ubuf
             for (uint16_t i2 = 0; i2 < size2; ++i2) {
                 MicroAPI::Muls(voffset2, vstride2, (T)i2, p0);
                 MicroAPI::Add(vindex, vbase1, voffset2, p0);
-                MicroAPI::DataCopyGather(vd0, srcUb, vindex, p0);
-                MicroAPI::DataCopyUnAlign(dstUb, vd0, u0, main1);
+                MicroAPI::Gather(vd0, srcUb, vindex, p0);
+                MicroAPI::StoreUnAlign(dstUb, vd0, u0, main1);
             }
             MicroAPI::Muls(voffset2, vstride2, (T)size2, p1);
             MicroAPI::Add(vindex, vbase1, voffset2, p1);
-            MicroAPI::DataCopyGather(vd1, srcUb, vindex, p1);
-            MicroAPI::DataCopyUnAlign(dstUb, vd1, u0, tail1);
+            MicroAPI::Gather(vd1, srcUb, vindex, p1);
+            MicroAPI::StoreUnAlign(dstUb, vd1, u0, tail1);
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, u0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, u0, 0);
 }
 
 template <typename T>
@@ -231,7 +231,7 @@ __simd_vf__ inline void VfGatherBrcForFourDim(__ubuf__ T *dstUb, __ubuf__ T *src
     MicroAPI::Duplicate(vstride1, (T)srcStride1, pa);
     MicroAPI::Duplicate(vstride2, (T)srcStride2, pa);
     MicroAPI::Duplicate(vstride3, (T)srcStride3, pa);
-    MicroAPI::DataCopy(vindex0, indexUb);
+    MicroAPI::LoadAlign(vindex0, indexUb);
     for (uint16_t i0 = 0; i0 < size0; ++i0) {
         MicroAPI::Muls(voffset0, vstride0, (T)i0, p0);
         MicroAPI::Add(vbase0, voffset0, vindex0, p0);
@@ -244,17 +244,17 @@ __simd_vf__ inline void VfGatherBrcForFourDim(__ubuf__ T *dstUb, __ubuf__ T *src
                 for (uint16_t i3 = 0; i3 < size3; ++i3) {
                     MicroAPI::Muls(voffset3, vstride3, (T)i3, p0);
                     MicroAPI::Add(vindex, vbase2, voffset3, p0);
-                    MicroAPI::DataCopyGather(vd0, srcUb, vindex, p0);
-                    MicroAPI::DataCopyUnAlign(dstUb, vd0, u0, main1);
+                    MicroAPI::Gather(vd0, srcUb, vindex, p0);
+                    MicroAPI::StoreUnAlign(dstUb, vd0, u0, main1);
                 }
                 MicroAPI::Muls(voffset3, vstride3, (T)size3, p1);
                 MicroAPI::Add(vindex, vbase2, voffset3, p1);
-                MicroAPI::DataCopyGather(vd1, srcUb, vindex, p1);
-                MicroAPI::DataCopyUnAlign(dstUb, vd1, u0, tail1);
+                MicroAPI::Gather(vd1, srcUb, vindex, p1);
+                MicroAPI::StoreUnAlign(dstUb, vd1, u0, tail1);
             }
         }
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, u0, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, u0, 0);
 }
 
 template <typename T> __aicore__ inline void GenGatherIndex(__ubuf__ T *indexUb, uint32_t *size, uint32_t *srcStride)

@@ -28,10 +28,10 @@ __simd_callee__ inline void LoadDataWithT(
 {
     if constexpr (IsSameType<T, half>::value) {
         MicroAPI::RegTensor<T> srcOrigin;
-        DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + offset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + offset);
         Cast<float, T, layoutZMrgZ>(dstReg, srcOrigin, mask);
     } else {
-        DataCopy(dstReg, src + offset);
+        MicroAPI::LoadAlign(dstReg, src + offset);
     }
 }
 
@@ -42,9 +42,9 @@ __simd_callee__ inline void SaveDataWithT(
     if constexpr (IsSameType<T, half>::value) {
         MicroAPI::RegTensor<T> regT;
         MicroAPI::Cast<T, float, LayoutZMrgZRndRSatNS>(regT, srcReg, mask);
-        MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + offset, regT, mask);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + offset, regT, mask);
     } else {
-        MicroAPI::DataCopy(dst + offset, srcReg, mask);
+        MicroAPI::StoreAlign(dst + offset, srcReg, mask);
     }
 }
 
@@ -79,7 +79,7 @@ __simd_callee__ inline void ComputeSum(__ubuf__ float* dstLocal, __ubuf__ T* src
             MicroAPI::Select(dstReg, dstTailReg, dstReg, maskReg);
         }
         MicroAPI::ReduceSum(dstReg, dstReg, maskFull);
-        DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(dstLocal + bsIdx, dstReg, maskOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(dstLocal + bsIdx, dstReg, maskOne);
     }
 }
 template <typename T>
@@ -106,7 +106,7 @@ __simd_callee__ inline void ComputeY(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal,
         for (uint16_t i = 0; i < mainRepeatTime; i++) {
             LoadDataWithT(srcLocal, srcReg, maskFull, bsIdx * hLength + i * oneRepSize);
             LoadDataWithT(gammaLocal, gammaReg, maskFull, i * oneRepSize);
-            DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(src2Reg, tmpLocal + bsIdx);
+            MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(src2Reg, tmpLocal + bsIdx);
             // step 3: rms = 1/n*∑
             MicroAPI::Muls(src2Reg, src2Reg, reciprocalOfHLength, maskFull);
             // step 4: rms + e
@@ -125,7 +125,7 @@ __simd_callee__ inline void ComputeY(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal,
         for (uint16_t i = 0; i < tailRepeatTime; i++) {
             LoadDataWithT(srcLocal, srcReg, maskReg, bsIdx * hLength + mainRepeatTime * oneRepSize);
             LoadDataWithT(gammaLocal, gammaReg, maskReg, mainRepeatTime * oneRepSize);
-            DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(src2Reg, tmpLocal + bsIdx);
+            MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(src2Reg, tmpLocal + bsIdx);
             // step 3: rms = 1/n*∑
             MicroAPI::Muls(src2Reg, src2Reg, reciprocalOfHLength, maskReg);
             // step 4: rms + e

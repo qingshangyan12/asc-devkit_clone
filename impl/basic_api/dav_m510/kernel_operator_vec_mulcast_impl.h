@@ -77,11 +77,11 @@ __aicore__ inline void MulCastImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U
             MicroAPI::MaskReg mask;
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 mask = MicroAPI::UpdateMask<U, MicroAPI::RegTraitNumTwo>(sreg);
-                MicroAPI::DataCopy(vSrcReg0, src0 + i * sregLower);
-                MicroAPI::DataCopy(vSrcReg1, src1 + i * sregLower);
+                MicroAPI::LoadAlign(vSrcReg0, src0 + i * sregLower);
+                MicroAPI::LoadAlign(vSrcReg1, src1 + i * sregLower);
                 MicroAPI::Mul(vDstReg1, vSrcReg0, vSrcReg1, mask);
                 MicroAPI::Cast<T, U, CastParam::MulCastTrait>(vDstReg0, vDstReg1, mask);
-                MicroAPI::DataCopy(dst + i * sregLower, vDstReg0, mask);
+                MicroAPI::StoreAlign(dst + i * sregLower, vDstReg0, mask);
             }
         }
     } else {
@@ -96,11 +96,11 @@ __aicore__ inline void MulCastImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U
             MicroAPI::MaskReg preg;
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 preg = MicroAPI::UpdateMask<U>(calCount);
-                MicroAPI::DataCopy<U>(src0Reg, src0 + i * sregLower);
-                MicroAPI::DataCopy<U>(src1Reg, src1 + i * sregLower);
+                MicroAPI::LoadAlign<U>(src0Reg, src0 + i * sregLower);
+                MicroAPI::LoadAlign<U>(src1Reg, src1 + i * sregLower);
                 MicroAPI::Mul<U>(dst1Reg, src0Reg, src1Reg, preg);
                 MicroAPI::Cast<T, U, CastParam::MulCastTrait>(dst0Reg, dst1Reg, preg);
-                MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B16>(dst + i * sregLower, dst0Reg, preg);
+                MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B16>(dst + i * sregLower, dst0Reg, preg);
             }
         }
     }

@@ -71,7 +71,7 @@ __simd_vf__ inline void CastScale(__ubuf__ OutputDataType* dst, __ubuf__ fp8_e8m
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatScale); ++i) {
         preg = MicroAPI::UpdateMask<uint16_t>(sreg);
-        MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, scale + i * sregLower);
+        MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, scale + i * sregLower);
         MicroAPI::ShiftLefts<uint16_t, int16_t>((MicroAPI::RegTensor<uint16_t>&)b16vreg,
             (MicroAPI::RegTensor<uint16_t>&)vreg, ANTIQUANT_BF16_MAN_LEN, preg);
 
@@ -80,9 +80,9 @@ __simd_vf__ inline void CastScale(__ubuf__ OutputDataType* dst, __ubuf__ fp8_e8m
 
         if constexpr (SupportType<OutputDataType, half>()) {
             MicroAPI::Cast<half, bfloat16_t, MrgZRndRSatS>(halfvreg, b16vreg, preg);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * sregLower, halfvreg, preg);
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * sregLower, halfvreg, preg);
         } else {
-            MicroAPI::DataCopy<bfloat16_t, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * sregLower, b16vreg, preg);
+            MicroAPI::StoreAlign<bfloat16_t, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * sregLower, b16vreg, preg);
         }
     }
 }
@@ -107,24 +107,24 @@ __simd_callee__ inline void AntiQuantProcessByLine(__ubuf__ OutputDataType* dstU
     uint16_t repeatTimes = CeilDivision(calCount, sregLower);
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
         preg = MicroAPI::UpdateMask<uint16_t>(sreg);
-        MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg1, scaleUb + i * sregLower);
+        MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg1, scaleUb + i * sregLower);
         MicroAPI::ShiftLefts<uint16_t, int16_t>((MicroAPI::RegTensor<uint16_t>&)b16vreg1,
             (MicroAPI::RegTensor<uint16_t>&)vreg1, ANTIQUANT_BF16_MAN_LEN, preg);
 
         // 00000000 and 11111111 need special process
         SelectZeroNan(b16vreg1, bf16Zero, bf16Nan, e8m0Zero, e8m0Nan, selPreg, preg);
 
-        MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>((MicroAPI::RegTensor<uint8_t>&)fp4vreg0,
+        MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>((MicroAPI::RegTensor<uint8_t>&)fp4vreg0,
             (__ubuf__ uint8_t*)srcUb + (i * sregLower / HALF_FACTOR));
         MicroAPI::Cast<bfloat16_t, SrcType, layoutZMrgZ>(b16vreg2, fp4vreg0, preg);
         if constexpr (SupportType<OutputDataType, half>()) {
             MicroAPI::Cast<half, bfloat16_t, MrgZRndRSatS>(halfvreg2, b16vreg2, preg);
             MicroAPI::Cast<half, bfloat16_t, MrgZRndRSatS>(halfvreg1, b16vreg1, preg);
             MicroAPI::Mul<half>(halfvreg2, halfvreg1, halfvreg2, preg);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + i * sregLower, halfvreg2, preg);
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + i * sregLower, halfvreg2, preg);
         } else {
             MicroAPI::Mul<bfloat16_t>(b16vreg2, b16vreg1, b16vreg2, preg);
-            MicroAPI::DataCopy<bfloat16_t, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + i * sregLower, b16vreg2, preg);
+            MicroAPI::StoreAlign<bfloat16_t, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + i * sregLower, b16vreg2, preg);
         }
     }
 }
@@ -144,37 +144,37 @@ __simd_vf__ inline void AntiQuantProcessByNum(__ubuf__ OutputDataType* dst, __ub
     uint32_t sreg1 = static_cast<uint32_t>(srcCalCount);
     for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTime); i++) {
         preg1 = MicroAPI::UpdateMask<uint16_t>(sreg1);
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_E2B_B16>(tmpReg, scale + i * DEFAULT_BLK_NUM);
+        MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_E2B_B16>(tmpReg, scale + i * DEFAULT_BLK_NUM);
         MicroAPI::Interleave<uint16_t>((MicroAPI::RegTensor<uint16_t>&)scaleReg1,
             (MicroAPI::RegTensor<uint16_t>&)scaleReg2, (MicroAPI::RegTensor<uint16_t>&)tmpReg,
             (MicroAPI::RegTensor<uint16_t>&)tmpReg);
 
-        MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>((MicroAPI::RegTensor<uint8_t>&)fp4vreg0,
+        MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>((MicroAPI::RegTensor<uint8_t>&)fp4vreg0,
             (__ubuf__ uint8_t*)src + (2 * i) * sregLower / HALF_FACTOR); // once process half of sregLower num
         MicroAPI::Cast<bfloat16_t, SrcType, layoutZMrgZ>(b16vreg2, fp4vreg0, preg1);
         if constexpr (SupportType<OutputDataType, half>()) {
             MicroAPI::Cast<half, bfloat16_t, MrgZRndRSatS>(halfvreg2, b16vreg2, preg1);
             MicroAPI::Mul<half>(halfvreg2, scaleReg1, halfvreg2, preg1);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + (2 * i) * sregLower, halfvreg2, preg1);
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + (2 * i) * sregLower, halfvreg2, preg1);
         } else {
             MicroAPI::Mul<bfloat16_t>(b16vreg2, scaleReg1, b16vreg2, preg1);
-            MicroAPI::DataCopy<bfloat16_t, MicroAPI::StoreDist::DIST_NORM_B16>(dst + (2 * i) * sregLower, b16vreg2,
+            MicroAPI::StoreAlign<bfloat16_t, MicroAPI::StoreDist::DIST_NORM_B16>(dst + (2 * i) * sregLower, b16vreg2,
                 preg1);
         }
 
         preg1 = MicroAPI::UpdateMask<uint16_t>(sreg1);
-        MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>((MicroAPI::RegTensor<uint8_t>&)fp4vreg0,
+        MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>((MicroAPI::RegTensor<uint8_t>&)fp4vreg0,
             (__ubuf__ uint8_t*)src + (2 * i + 1) * sregLower / HALF_FACTOR); // once process half of sregLower num
         MicroAPI::Cast<bfloat16_t, SrcType, layoutZMrgZ>(b16vreg2, fp4vreg0, preg1);
 
         if constexpr (SupportType<OutputDataType, half>()) {
             MicroAPI::Cast<half, bfloat16_t, MrgZRndRSatS>(halfvreg2, b16vreg2, preg1);
             MicroAPI::Mul<half>(halfvreg2, scaleReg2, halfvreg2, preg1);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + (2 * i + 1) * sregLower, halfvreg2,
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + (2 * i + 1) * sregLower, halfvreg2,
                 preg1);
         } else {
             MicroAPI::Mul<bfloat16_t>(b16vreg2, scaleReg2, b16vreg2, preg1);
-            MicroAPI::DataCopy<bfloat16_t, MicroAPI::StoreDist::DIST_NORM_B16>(dst + (2 * i + 1) * sregLower, b16vreg2,
+            MicroAPI::StoreAlign<bfloat16_t, MicroAPI::StoreDist::DIST_NORM_B16>(dst + (2 * i + 1) * sregLower, b16vreg2,
                 preg1);
         }
     }
@@ -299,7 +299,7 @@ __simd_vf__ inline void PerTensorProcessForFp8(__ubuf__ OutputDataType* dst, __u
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeat); ++i) {
         preg = MicroAPI::UpdateMask<uint32_t>(sreg);
-        MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vreg, src + i * sregLower);
+        MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vreg, src + i * sregLower);
         MicroAPI::Cast<float, SrcType, layoutZMrgZ>(f32vreg, vreg, preg);
 
         if constexpr (SupportType<OutputDataType, bfloat16_t>()) {
@@ -311,7 +311,7 @@ __simd_vf__ inline void PerTensorProcessForFp8(__ubuf__ OutputDataType* dst, __u
         }
 
         MicroAPI::Cast<OutputDataType, float, LayoutZMrgZRndRSatS>(outReg, f32vreg, preg);
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * sregLower, outReg, preg);
+        MicroAPI::StoreAlign<OutputDataType, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * sregLower, outReg, preg);
     }
 }
 template <typename SrcType>
@@ -329,12 +329,12 @@ __simd_vf__ inline void PerTensorProcessForB8(__ubuf__ half* dst, __ubuf__ SrcTy
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeat); ++i) {
         preg = MicroAPI::UpdateMask<uint16_t>(sreg);
-        MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, src + i * sregLower);
+        MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, src + i * sregLower);
         MicroAPI::Cast<half, SrcType, layoutZMrgZ>(f16vreg, vreg, preg); // hif8->f16 or int8->f16
 
         MicroAPI::Adds<half, half, MicroAPI::MaskMergeMode::ZEROING>(f16vreg, f16vreg, offset, preg);
         MicroAPI::Muls<half, half, MicroAPI::MaskMergeMode::ZEROING>(f16vreg, f16vreg, scale, preg);
-        MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * sregLower, f16vreg, preg);
+        MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * sregLower, f16vreg, preg);
     }
 }
 
@@ -358,7 +358,7 @@ __simd_vf__ inline void PerTensorProcessForB8(__ubuf__ bfloat16_t* dst, __ubuf__
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeat); ++i) {
         preg = MicroAPI::UpdateMask<uint32_t>(sreg);
-        MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, src + i * sregLower);
+        MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, src + i * sregLower);
         MicroAPI::Cast<half, SrcType, layoutZMrgZ>(f16vreg, vreg, f16preg); // hif8->f16 or int8->f16
 
         MicroAPI::Interleave(f16vreg, vregTmp, f16vreg, vregTmp);
@@ -367,7 +367,7 @@ __simd_vf__ inline void PerTensorProcessForB8(__ubuf__ bfloat16_t* dst, __ubuf__
         MicroAPI::Adds<float, float, MicroAPI::MaskMergeMode::ZEROING>(f32vreg, f32vreg, ToFloat(offset), preg);
         MicroAPI::Muls<float, float, MicroAPI::MaskMergeMode::ZEROING>(f32vreg, f32vreg, ToFloat(scale), preg);
         MicroAPI::Cast<bfloat16_t, float, LayoutZMrgZRndRSatS>(b16vreg, f32vreg, preg);
-        MicroAPI::DataCopy<bfloat16_t, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * sregLower, b16vreg, preg);
+        MicroAPI::StoreAlign<bfloat16_t, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * sregLower, b16vreg, preg);
     }
 }
 
@@ -417,20 +417,20 @@ __simd_vf__ inline void PerchannelNoTransposeForFp8(__ubuf__ OutputDataType* dst
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = MicroAPI::UpdateMask<uint32_t>(sreg);
         // load offset and scale ,then cast to float to add &&mul
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_UNPACK_B16>(offsetB16Vreg, offset + i * sregLower);
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_UNPACK_B16>(scaleB16Vreg, scale + i * sregLower);
+        MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_UNPACK_B16>(offsetB16Vreg, offset + i * sregLower);
+        MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_UNPACK_B16>(scaleB16Vreg, scale + i * sregLower);
         MicroAPI::Cast<float, OutputDataType, layoutZMrgZ>(offsetB32Vreg, offsetB16Vreg, preg); // b16->fp32
         MicroAPI::Cast<float, OutputDataType, layoutZMrgZ>(scaleB32Vreg, scaleB16Vreg, preg);   // b16->fp32
 
         for (uint16_t j = 0; j < static_cast<uint16_t>(K); ++j) {
-            MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vreg, src + j * N + i * sregLower);
+            MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vreg, src + j * N + i * sregLower);
             MicroAPI::Cast<float, SrcType, layoutZMrgZ>(f32vreg, vreg, preg);
 
             MicroAPI::Add(f32vreg, f32vreg, offsetB32Vreg, preg);
             MicroAPI::Mul(f32vreg, f32vreg, scaleB32Vreg, preg);
 
             MicroAPI::Cast<OutputDataType, float, LayoutZMrgZRndRSatS>(outReg, f32vreg, preg);
-            MicroAPI::DataCopy<OutputDataType, MicroAPI::StoreDist::DIST_PACK_B32>(dst + j * N + i * sregLower, outReg,
+            MicroAPI::StoreAlign<OutputDataType, MicroAPI::StoreDist::DIST_PACK_B32>(dst + j * N + i * sregLower, outReg,
                 preg);
         }
     }
@@ -453,11 +453,11 @@ __simd_vf__ inline void PerchannelNoTransposeForB8(__ubuf__ OutputDataType* dst,
 
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = MicroAPI::UpdateMask<uint16_t>(sreg);
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_NORM>(offsetB16Vreg, offset + i * sregLower);
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_NORM>(scaleB16Vreg, scale + i * sregLower);
+        MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_NORM>(offsetB16Vreg, offset + i * sregLower);
+        MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_NORM>(scaleB16Vreg, scale + i * sregLower);
 
         for (uint16_t j = 0; j < static_cast<uint16_t>(K); ++j) {
-            MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, src + j * N + i * sregLower);
+            MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, src + j * N + i * sregLower);
             if constexpr (SupportType<OutputDataType, bfloat16_t>()) {
                 MicroAPI::Cast<half, SrcType, layoutZMrgZ>(f16vreg, vreg, preg); // hif8->f16 or int8->f16
                 MicroAPI::Cast<bfloat16_t, half, MrgZRndR>(b16vreg, f16vreg, preg);    // f16->bf16
@@ -467,7 +467,7 @@ __simd_vf__ inline void PerchannelNoTransposeForB8(__ubuf__ OutputDataType* dst,
 
             MicroAPI::Add(b16vreg, b16vreg, offsetB16Vreg, preg);
             MicroAPI::Mul(b16vreg, b16vreg, scaleB16Vreg, preg);
-            MicroAPI::DataCopy<OutputDataType, MicroAPI::StoreDist::DIST_NORM_B16>(dst + j * N + i * sregLower, b16vreg,
+            MicroAPI::StoreAlign<OutputDataType, MicroAPI::StoreDist::DIST_NORM_B16>(dst + j * N + i * sregLower, b16vreg,
                 preg);
         }
     }
@@ -513,8 +513,8 @@ __simd_vf__ inline void PerchannelUnlignedForFp8(__ubuf__ OutputDataType* dst, _
 
     uint32_t scaleLen = static_cast<uint32_t>(ANTIQUANT_B32_VF_LEN);
     MicroAPI::MaskReg b16Preg = MicroAPI::UpdateMask<uint32_t>(scaleLen);
-    MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_BLK>(offsetB16Vreg, offset);
-    MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_BLK>(scaleB16Vreg, scale);
+    MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_BLK>(offsetB16Vreg, offset);
+    MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_BLK>(scaleB16Vreg, scale);
     MicroAPI::Interleave<half>((MicroAPI::RegTensor<half>&)offsetB16Vreg1, (MicroAPI::RegTensor<half>&)offsetB16Vreg2,
         (MicroAPI::RegTensor<half>&)offsetB16Vreg, (MicroAPI::RegTensor<half>&)offsetB16Vreg);
     MicroAPI::Interleave<half>((MicroAPI::RegTensor<half>&)scaleB16Vreg1, (MicroAPI::RegTensor<half>&)scaleB16Vreg2,
@@ -524,14 +524,14 @@ __simd_vf__ inline void PerchannelUnlignedForFp8(__ubuf__ OutputDataType* dst, _
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeat); ++i) {
         preg = MicroAPI::UpdateMask<uint32_t>(sreg);
-        MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vreg, src + i * sregLower);
+        MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vreg, src + i * sregLower);
         MicroAPI::Cast<float, SrcType, layoutZMrgZ>(f32vreg, vreg, preg);
 
         MicroAPI::Add<float, MicroAPI::MaskMergeMode::ZEROING>(f32vreg, f32vreg, offsetB32Vreg, preg);
         MicroAPI::Mul<float, MicroAPI::MaskMergeMode::ZEROING>(f32vreg, f32vreg, scaleB32Vreg, preg);
 
         MicroAPI::Cast<OutputDataType, float, LayoutZMrgZRndRSatS>(outReg, f32vreg, preg);
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * sregLower, outReg, preg);
+        MicroAPI::StoreAlign<OutputDataType, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * sregLower, outReg, preg);
     }
 }
 
@@ -550,12 +550,12 @@ __simd_vf__ inline void PerchannelUnlignedForB8(__ubuf__ OutputDataType* dst, __
     uint32_t sreg = static_cast<uint32_t>(srcCalCount);
     uint16_t repeat = CeilDivision(srcCalCount, sregLower);
 
-    MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_BLK>(offsetB16Vreg, offset);
-    MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_BLK>(scaleB16Vreg, scale);
+    MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_BLK>(offsetB16Vreg, offset);
+    MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_BLK>(scaleB16Vreg, scale);
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeat); ++i) {
         preg = MicroAPI::UpdateMask<uint16_t>(sreg);
-        MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, src + i * sregLower);
+        MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, src + i * sregLower);
 
         if constexpr (SupportType<OutputDataType, bfloat16_t>()) {
             MicroAPI::Cast<half, SrcType, layoutZMrgZ>(f16vreg, vreg, preg); // hif8->f16 or int8->f16
@@ -565,7 +565,7 @@ __simd_vf__ inline void PerchannelUnlignedForB8(__ubuf__ OutputDataType* dst, __
         }
         MicroAPI::Add<OutputDataType, MicroAPI::MaskMergeMode::ZEROING>(b16vreg, b16vreg, offsetB16Vreg, preg);
         MicroAPI::Mul<OutputDataType, MicroAPI::MaskMergeMode::ZEROING>(b16vreg, b16vreg, scaleB16Vreg, preg);
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * sregLower, b16vreg, preg);
+        MicroAPI::StoreAlign<OutputDataType, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * sregLower, b16vreg, preg);
     }
 }
 
@@ -601,20 +601,20 @@ __simd_vf__ inline void PerchannelTransposeForB8(__ubuf__ half* dst, __ubuf__ Sr
     uint16_t repeat = CeilDivision(K, sregLower);
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(N); i++) {
-        MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_BRC_B16>(scaleB16Vreg, scale + i);
-        MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_BRC_B16>(offsetB16Vreg, offset + i);
+        MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_BRC_B16>(scaleB16Vreg, scale + i);
+        MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_BRC_B16>(offsetB16Vreg, offset + i);
 
         uint32_t sreg = static_cast<uint32_t>(K);
         for (uint16_t j = 0; j < static_cast<uint16_t>(repeat); ++j) {
             preg = MicroAPI::UpdateMask<uint16_t>(sreg);
-            MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg,
+            MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg,
                 src + i * K + j * sregLower);
             MicroAPI::Cast<half, SrcType, layoutZMrgZ>(f16vreg, vreg, preg); // hif8->f16 or int8->f16
 
             MicroAPI::Add<half, MicroAPI::MaskMergeMode::ZEROING>(f16vreg, f16vreg, offsetB16Vreg, preg);
             MicroAPI::Mul<half, MicroAPI::MaskMergeMode::ZEROING>(f16vreg, f16vreg, scaleB16Vreg, preg);
 
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * K + j * sregLower, f16vreg,
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_NORM_B16>(dst + i * K + j * sregLower, f16vreg,
                 preg);
         }
     }
@@ -642,8 +642,8 @@ __simd_vf__ inline void PerchannelTransposeForB8(__ubuf__ bfloat16_t* dst, __ubu
     MicroAPI::RegTensor<half> vregTmp;
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(N); i++) {
-        MicroAPI::DataCopy<bfloat16_t, MicroAPI::LoadDist::DIST_BRC_B16>(scaleB16Vreg, scale + i);
-        MicroAPI::DataCopy<bfloat16_t, MicroAPI::LoadDist::DIST_BRC_B16>(offsetB16Vreg, offset + i);
+        MicroAPI::LoadAlign<bfloat16_t, MicroAPI::LoadDist::DIST_BRC_B16>(scaleB16Vreg, scale + i);
+        MicroAPI::LoadAlign<bfloat16_t, MicroAPI::LoadDist::DIST_BRC_B16>(offsetB16Vreg, offset + i);
 
         MicroAPI::Cast<float, bfloat16_t, layoutZMrgZ>(offsetB32Vreg, offsetB16Vreg, f16preg);
         MicroAPI::Cast<float, bfloat16_t, layoutZMrgZ>(scaleB32Vreg, scaleB16Vreg, f16preg);
@@ -651,7 +651,7 @@ __simd_vf__ inline void PerchannelTransposeForB8(__ubuf__ bfloat16_t* dst, __ubu
         uint32_t sreg = static_cast<uint32_t>(K);
         for (uint16_t j = 0; j < repeat; ++j) { // process single line
             preg = MicroAPI::UpdateMask<uint32_t>(sreg);
-            MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg,
+            MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg,
                 src + i * K + j * sregLower);
             MicroAPI::Cast<half, SrcType, layoutZMrgZ>(f16vreg, vreg,
                 f16preg); // hif8->f16 or int8->f16
@@ -661,7 +661,7 @@ __simd_vf__ inline void PerchannelTransposeForB8(__ubuf__ bfloat16_t* dst, __ubu
             MicroAPI::Add<float, MicroAPI::MaskMergeMode::ZEROING>(f32vreg, f32vreg, offsetB32Vreg, preg);
             MicroAPI::Mul<float, MicroAPI::MaskMergeMode::ZEROING>(f32vreg, f32vreg, scaleB32Vreg, preg);
             MicroAPI::Cast<bfloat16_t, float, LayoutZMrgZRndRSatS>(b16vreg, f32vreg, preg);
-            MicroAPI::DataCopy<bfloat16_t, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * K + j * sregLower, b16vreg,
+            MicroAPI::StoreAlign<bfloat16_t, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * K + j * sregLower, b16vreg,
                 preg);
         }
     }
@@ -685,8 +685,8 @@ __simd_vf__ inline void PerchannelTransposeForFp8(__ubuf__ OutputDataType* dst, 
     uint16_t repeat = CeilDivision(K, sregLower);
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(N); i++) {
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_BRC_B16>(scaleB16Vreg, scale + i);
-        MicroAPI::DataCopy<OutputDataType, MicroAPI::LoadDist::DIST_BRC_B16>(offsetB16Vreg, offset + i);
+        MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_BRC_B16>(scaleB16Vreg, scale + i);
+        MicroAPI::LoadAlign<OutputDataType, MicroAPI::LoadDist::DIST_BRC_B16>(offsetB16Vreg, offset + i);
 
         MicroAPI::Cast<float, OutputDataType, layoutZMrgZ>(offsetB32Vreg, offsetB16Vreg, f16preg);
         MicroAPI::Cast<float, OutputDataType, layoutZMrgZ>(scaleB32Vreg, scaleB16Vreg, f16preg);
@@ -694,7 +694,7 @@ __simd_vf__ inline void PerchannelTransposeForFp8(__ubuf__ OutputDataType* dst, 
         uint32_t sreg = static_cast<uint32_t>(K);
         for (uint16_t j = 0; j < static_cast<uint16_t>(repeat); ++j) {
             preg = MicroAPI::UpdateMask<uint32_t>(sreg);
-            MicroAPI::DataCopy<SrcType, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vreg,
+            MicroAPI::LoadAlign<SrcType, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vreg,
                 src + i * K + j * sregLower);
             MicroAPI::Cast<float, SrcType, layoutZMrgZ>(f32vreg, vreg, preg);
 
@@ -702,7 +702,7 @@ __simd_vf__ inline void PerchannelTransposeForFp8(__ubuf__ OutputDataType* dst, 
             MicroAPI::Mul<float, MicroAPI::MaskMergeMode::ZEROING>(f32vreg, f32vreg, scaleB32Vreg, preg);
 
             MicroAPI::Cast<OutputDataType, float, LayoutZMrgZRndRSatS>(outReg, f32vreg, preg);
-            MicroAPI::DataCopy<OutputDataType, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * K + j * sregLower,
+            MicroAPI::StoreAlign<OutputDataType, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * K + j * sregLower,
                 outReg, preg);
         }
     }
@@ -1238,14 +1238,14 @@ __simd_callee__ inline void LoadPerTokenScaleAndOffset(__ubuf__ scaleT* scaleUb,
                                                   MicroAPI::RegTensor<scaleT>& offsetVreg)
 {
     if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
-        MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_BRC_B16>(scaleVreg, scaleUb);
+        MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_BRC_B16>(scaleVreg, scaleUb);
         if constexpr (config.hasOffset) {
-            MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_BRC_B16>(offsetVreg, offsetUb);
+            MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_BRC_B16>(offsetVreg, offsetUb);
         }
     } else {
-        MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_BRC_B32>(scaleVreg, scaleUb);
+        MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_BRC_B32>(scaleVreg, scaleUb);
         if constexpr (config.hasOffset) {
-            MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_BRC_B32>(offsetVreg, offsetUb);
+            MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_BRC_B32>(offsetVreg, offsetUb);
         }
     }
 }
@@ -1257,14 +1257,14 @@ __simd_callee__ inline void LoadPerTokenTransposeScaleAndOffset(__ubuf__ scaleT*
                                                            MicroAPI::RegTensor<scaleT>& offsetVreg)
 {
     if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
-        MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_NORM>(scaleVreg, scaleUb);
+        MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_NORM>(scaleVreg, scaleUb);
         if constexpr (config.hasOffset) {
-            MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_NORM>(offsetVreg, offsetUb);
+            MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_NORM>(offsetVreg, offsetUb);
         }
     } else {
-        MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_NORM>(scaleVreg, scaleUb);
+        MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_NORM>(scaleVreg, scaleUb);
         if constexpr (config.hasOffset) {
-            MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_NORM>(offsetVreg, offsetUb);
+            MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_NORM>(offsetVreg, offsetUb);
         }
     }
 }
@@ -1286,9 +1286,9 @@ __simd_callee__ inline void GetPerGroupScaleAndOffset(__ubuf__ T* scaleUb,
         MicroAPI::Duplicate(gsize_vreg, static_cast<uint16_t>(groupSize));
         MicroAPI::Arange(vci_vreg, static_cast<int16_t>(start));
         MicroAPI::Div(index_vreg, (MicroAPI::RegTensor<uint16_t>&)vci_vreg, gsize_vreg, preg);
-        MicroAPI::DataCopyGather(scaleReg, scaleUb, index_vreg, preg);
+        MicroAPI::Gather(scaleReg, scaleUb, index_vreg, preg);
         if constexpr (config.hasOffset) {
-            MicroAPI::DataCopyGather(offsetReg, offsetUb, index_vreg, preg);
+            MicroAPI::Gather(offsetReg, offsetUb, index_vreg, preg);
         }
     } else {
         MicroAPI::MaskReg preg = MicroAPI::CreateMask<uint32_t, MicroAPI::MaskPattern::ALL>();
@@ -1298,9 +1298,9 @@ __simd_callee__ inline void GetPerGroupScaleAndOffset(__ubuf__ T* scaleUb,
         MicroAPI::Duplicate(gsize_vreg, static_cast<uint32_t>(groupSize));
         MicroAPI::Arange(vci_vreg, static_cast<int32_t>(start));
         MicroAPI::Div(index_vreg, (MicroAPI::RegTensor<uint32_t>&)vci_vreg, gsize_vreg, preg);
-        MicroAPI::DataCopyGather(scaleReg, scaleUb, index_vreg, preg);
+        MicroAPI::Gather(scaleReg, scaleUb, index_vreg, preg);
         if constexpr (config.hasOffset) {
-            MicroAPI::DataCopyGather(offsetReg, offsetUb, index_vreg, preg);
+            MicroAPI::Gather(offsetReg, offsetUb, index_vreg, preg);
         }
     }
 }
@@ -1310,11 +1310,11 @@ __simd_callee__ inline void StoreF32Res(__ubuf__ dstT* dstAddr, MicroAPI::RegTen
                                    MicroAPI::MaskReg& preg)
 {
     if constexpr (SupportType<dstT, float>()) {
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(dstAddr, vreg, preg);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(dstAddr, vreg, preg);
     } else {
         MicroAPI::RegTensor<dstT> tempVreg;
         MicroAPI::Cast<dstT, float, LayoutZMrgZRndRSatS>(tempVreg, vreg, preg);
-        MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(dstAddr, tempVreg, preg);
+        MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(dstAddr, tempVreg, preg);
     }
 }
 
@@ -1322,9 +1322,9 @@ template <typename scaleT, typename srcT>
 __simd_callee__ inline void LoadSrc(__ubuf__ srcT* srcAddr, MicroAPI::RegTensor<srcT>& srcVreg)
 {
     if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
-        MicroAPI::DataCopy<srcT, MicroAPI::LoadDist::DIST_UNPACK_B8>(srcVreg, srcAddr);
+        MicroAPI::LoadAlign<srcT, MicroAPI::LoadDist::DIST_UNPACK_B8>(srcVreg, srcAddr);
     } else {
-        MicroAPI::DataCopy<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(srcVreg, srcAddr);
+        MicroAPI::LoadAlign<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(srcVreg, srcAddr);
     }
 }
 
@@ -1398,9 +1398,9 @@ __simd_callee__ inline void LoadNormScaleAndOffset(__ubuf__ scaleT* scaleAddr,
                                               MicroAPI::RegTensor<scaleT>& scaleVreg,
                                               MicroAPI::RegTensor<scaleT>& offsetVreg)
 {
-    MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_NORM>(scaleVreg, scaleAddr);
+    MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_NORM>(scaleVreg, scaleAddr);
     if constexpr (config.hasOffset) {
-        MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_NORM>(offsetVreg, offsetAddr);
+        MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_NORM>(offsetVreg, offsetAddr);
     }
 }
 
@@ -1428,16 +1428,16 @@ __simd_vf__ inline void AntiQuantPerTokenForB8VF(__ubuf__ dstT* dstUb, __ubuf__ 
             AddOffsetIfExist<scaleT, config>(vreg, offsetVreg, preg);
             MicroAPI::Mul<scaleT, MicroAPI::MaskMergeMode::ZEROING>(vreg, vreg, scaleVreg, preg);
             if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
-                MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(
+                MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(
                     dstUb + i * para.n + j * vecLen, vreg, preg);
             } else {
                 if constexpr (SupportType<dstT, float>()) {
-                    MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(
+                    MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(
                         dstUb + i * para.n + j * vecLen, vreg, preg);
                 } else {
                     MicroAPI::RegTensor<dstT> tempVreg;
                     MicroAPI::Cast<dstT, float, LayoutZMrgZRndRSatS>(tempVreg, vreg, preg);
-                    MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(
+                    MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(
                         dstUb + i * para.n + j * vecLen, tempVreg, preg);
                 }
             }
@@ -1484,16 +1484,16 @@ __simd_vf__ inline void AntiQuantPerTokenTransposeForB8VF(__ubuf__ dstT* dstUb, 
             AddOffsetIfExist<scaleT, config>(vreg, offsetVreg, preg);
             MicroAPI::Mul<scaleT, MicroAPI::MaskMergeMode::ZEROING>(vreg, vreg, scaleVreg, preg);
             if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
-                MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(
+                MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(
                     dstUb + i * para.n + j * vecLen, vreg, preg);
             } else {
                 if constexpr (SupportType<dstT, float>()) {
-                    MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(
+                    MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(
                         dstUb + i * para.n + j * vecLen, vreg, preg);
                 } else {
                     MicroAPI::RegTensor<dstT> tempVreg;
                     MicroAPI::Cast<dstT, float, LayoutZMrgZRndRSatS>(tempVreg, vreg, preg);
-                    MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(
+                    MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(
                         dstUb + i * para.n + j * vecLen, tempVreg, preg);
                 }
             }
@@ -1536,7 +1536,7 @@ __simd_vf__ inline void AntiQuantPerTokenForFp8VF(__ubuf__ dstT* dstUb, __ubuf__
         sreg = para.n;
         for (uint16_t j = 0; j < repeat; ++j) {
             preg = MicroAPI::UpdateMask<uint32_t>(sreg);
-            MicroAPI::DataCopy<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
+            MicroAPI::LoadAlign<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
                 srcVreg, srcUb + i * para.n + j * vecLen);
             MicroAPI::Cast<float, srcT, layoutZMrgZ>(f32Vreg, srcVreg, preg);
             if constexpr (SupportType<scaleT, float>()) {
@@ -1589,7 +1589,7 @@ __simd_vf__ inline void AntiQuantPerTokenTransposeForFp8VF(__ubuf__ dstT* dstUb,
             preg = MicroAPI::UpdateMask<uint32_t>(sreg);
             LoadPerTokenTransposeScaleAndOffset<scaleT, config>(scaleUb + j * vecLen,
                 offsetUb + j * vecLen, scaleVreg, offsetVreg);
-            MicroAPI::DataCopy<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
+            MicroAPI::LoadAlign<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
                 srcVreg, srcUb + i * para.n + j * vecLen);
             MicroAPI::Cast<float, srcT, layoutZMrgZ>(f32Vreg, srcVreg, preg);
             if constexpr (SupportType<scaleT, float>()) {
@@ -1654,15 +1654,15 @@ __simd_vf__ inline void AntiQuantPerGroupForColB8VF(__ubuf__ dstT* dstUb, __ubuf
             AddOffsetIfExist<scaleT, config>(vreg, offsetVreg, preg);
             MicroAPI::Mul<scaleT, MicroAPI::MaskMergeMode::ZEROING>(vreg, vreg, scaleVreg, preg);
             if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
-                MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + i * para.n + j * vecLen, vreg, preg);
+                MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + i * para.n + j * vecLen, vreg, preg);
             } else {
                 if constexpr (SupportType<dstT, float>()) {
-                    MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(
+                    MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(
                         dstUb + i * para.n + j * vecLen, vreg, preg);
                 } else {
                     MicroAPI::RegTensor<dstT> tempVreg;
                     MicroAPI::Cast<dstT, float, LayoutZMrgZRndRSatS>(tempVreg, vreg, preg);
-                    MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(
+                    MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(
                         dstUb + i * para.n + j * vecLen, tempVreg, preg);
                 }
             }
@@ -1713,7 +1713,7 @@ __simd_vf__ inline void AntiQuantPerGroupForColFp4VF(__ubuf__ dstT* dstUb, __ubu
             MicroAPI::Duplicate(gsizeVreg, static_cast<uint16_t>(para.groupSize));
             MicroAPI::Arange((MicroAPI::RegTensor<int16_t> &)indexVreg, static_cast<int16_t>(j * vecLen));
             MicroAPI::Div(indexVreg, indexVreg, gsizeVreg, pregFull);
-            MicroAPI::DataCopyGather<uint16_t, uint8_t, uint16_t>((MicroAPI::RegTensor<uint16_t> &)scaleVreg,
+            MicroAPI::Gather<uint16_t, uint8_t, uint16_t>((MicroAPI::RegTensor<uint16_t> &)scaleVreg,
                 (__ubuf__ uint8_t *)scaleUb + i * scaleK, indexVreg, pregFull);
             // fp8_e8m0x128 -> bf16x128
             MicroAPI::ShiftLefts<uint16_t, int16_t>((MicroAPI::RegTensor<uint16_t> &)dstScaleVreg,
@@ -1724,7 +1724,7 @@ __simd_vf__ inline void AntiQuantPerGroupForColFp4VF(__ubuf__ dstT* dstUb, __ubu
             // step2. load src procedure
             // 1. using UNPACK4_B8 to load 64xb8 and store as 64xb32
             // 2. using cast fp4->bf16, to cast 64xb32 to 128xbf16
-            MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
                 (MicroAPI::RegTensor<uint8_t> &)srcVreg,
                 (__ubuf__ uint8_t *)srcUb + (i * para.n + j * vecLen) / 2);
             MicroAPI::Cast<bfloat16_t, srcT, layoutZMrgZ>(
@@ -1738,7 +1738,7 @@ __simd_vf__ inline void AntiQuantPerGroupForColFp4VF(__ubuf__ dstT* dstUb, __ubu
                     dstVreg, (MicroAPI::RegTensor<bfloat16_t> &)dstVreg, preg);
             }
             // step5. store dst->ub
-            MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(
+            MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(
                 dstUb + i * para.n + j * vecLen, dstVreg, preg);
         }
     }
@@ -1769,7 +1769,7 @@ __simd_callee__ inline void AntiQuantPerGroupForRowFp4OneRow(__ubuf__ dstT *dstA
     for (uint16_t j = 0; j < repeat; ++j) {
         preg = MicroAPI::UpdateMask<dstT>(n);
         // step1: load scale procedure
-        MicroAPI::DataCopy<scaleT, MicroAPI::LoadDist::DIST_UNPACK_B8>(scaleVreg, scaleAddr + j * vecLen);
+        MicroAPI::LoadAlign<scaleT, MicroAPI::LoadDist::DIST_UNPACK_B8>(scaleVreg, scaleAddr + j * vecLen);
         MicroAPI::ShiftLefts<uint16_t, int16_t>((MicroAPI::RegTensor<uint16_t> &)dstScaleVreg,
             (MicroAPI::RegTensor<uint16_t> &)scaleVreg,
             ANTIQUANT_BF16_MAN_LEN,
@@ -1778,7 +1778,7 @@ __simd_callee__ inline void AntiQuantPerGroupForRowFp4OneRow(__ubuf__ dstT *dstA
         SelectZeroNan(
             (MicroAPI::RegTensor<bfloat16_t> &)dstScaleVreg, bf16Zero, bf16Nan, e8m0Zero, e8m0Nan, selPreg, preg);
         // step2: load src
-        MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
+        MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
             (MicroAPI::RegTensor<uint8_t> &)srcVreg, (__ubuf__ uint8_t *)srcAddr + (j * vecLen) / 2);
         MicroAPI::Cast<bfloat16_t, srcT, layoutZMrgZ>((MicroAPI::RegTensor<bfloat16_t> &)dstSrcVreg, srcVreg, preg);
         // step3. dst = src * scale
@@ -1790,7 +1790,7 @@ __simd_callee__ inline void AntiQuantPerGroupForRowFp4OneRow(__ubuf__ dstT *dstA
                 dstVreg, (MicroAPI::RegTensor<bfloat16_t> &)dstVreg, preg);
         }
         // step5. store dst->ub
-        MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(dstAddr + j * vecLen, dstVreg, preg);
+        MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(dstAddr + j * vecLen, dstVreg, preg);
     }
 }
 
@@ -1874,7 +1874,7 @@ __simd_vf__ inline void AntiQuantPerGroupForColFp8VF(__ubuf__ dstT* dstUb, __ubu
             preg = MicroAPI::UpdateMask<uint32_t>(sreg);
             GetPerGroupScaleAndOffset<scaleT, config>(scaleUb + i * scaleK, offsetUb + i * scaleK,
                 j * vecLen, para, scaleVreg, offsetVreg);
-            MicroAPI::DataCopy<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(srcVreg, srcUb + i * para.n + j * vecLen);
+            MicroAPI::LoadAlign<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(srcVreg, srcUb + i * para.n + j * vecLen);
             MicroAPI::Cast<float, srcT, layoutZMrgZ>(f32SrcVreg, srcVreg, preg);
             ConvertToF32ScaleAndOffset<scaleT, config>(scaleVreg, offsetVreg, preg, f32ScaleVreg, f32OffsetVreg);
             if constexpr (config.hasOffset) {
@@ -1927,14 +1927,14 @@ __simd_callee__ inline void AntiQuantPerGroupForRowB8TailBlock(__ubuf__ dstT* ds
             AddOffsetIfExist<scaleT, config>(vreg, offsetVreg, preg);
             MicroAPI::Mul<scaleT, MicroAPI::MaskMergeMode::ZEROING>(vreg, vreg, scaleVreg, preg);
             if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
-                MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + i * n + j * vecLen, vreg, preg);
+                MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + i * n + j * vecLen, vreg, preg);
             } else {
                 if constexpr (SupportType<dstT, float>()) {
-                    MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(dstUb + i * n + j * vecLen, vreg, preg);
+                    MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(dstUb + i * n + j * vecLen, vreg, preg);
                 } else {
                     MicroAPI::RegTensor<dstT> tempVreg;
                     MicroAPI::Cast<dstT, float, LayoutZMrgZRndRSatS>(tempVreg, vreg, preg);
-                    MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * n + j * vecLen, tempVreg, preg);
+                    MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * n + j * vecLen, tempVreg, preg);
                 }
             }
         }
@@ -1967,14 +1967,14 @@ __simd_vf__ inline void AntiQuantPerGroupForRowB8VF(__ubuf__ dstT* dstUb, __ubuf
                 AddOffsetIfExist<scaleT, config>(vreg, offsetVreg, preg);
                 MicroAPI::Mul<scaleT, MicroAPI::MaskMergeMode::ZEROING>(vreg, vreg, scaleVreg, preg);
                 if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
-                    MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + (i * para.groupSize + j) * para.n + k * vecLen, vreg, preg);
+                    MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_NORM_B16>(dstUb + (i * para.groupSize + j) * para.n + k * vecLen, vreg, preg);
                 } else {
                     if constexpr (SupportType<dstT, float>()) {
-                        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(dstUb + (i * para.groupSize + j) * para.n + k * vecLen, vreg, preg);
+                        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(dstUb + (i * para.groupSize + j) * para.n + k * vecLen, vreg, preg);
                     } else {
                         MicroAPI::RegTensor<dstT> tempVreg;
                         MicroAPI::Cast<dstT, float, LayoutZMrgZRndRSatS>(tempVreg, vreg, preg);
-                        MicroAPI::DataCopy<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + (i * para.groupSize + j) * para.n + k * vecLen, tempVreg, preg);
+                        MicroAPI::StoreAlign<dstT, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + (i * para.groupSize + j) * para.n + k * vecLen, tempVreg, preg);
                     }
                 }
             }
@@ -2017,7 +2017,7 @@ __simd_callee__ inline void AntiQuantPerGroupForRowFp8TailBlock(__ubuf__ dstT* d
             LoadNormScaleAndOffset<scaleT, config>((scaleUb + j * vecLen),
                 (offsetUb + j * vecLen), scaleVreg, offsetVreg);
             preg = MicroAPI::UpdateMask<uint32_t>(sreg);
-            MicroAPI::DataCopy<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
+            MicroAPI::LoadAlign<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
                 srcVreg, srcUb + i * n + j * vecLen);
             MicroAPI::Cast<float, srcT, layoutZMrgZ>(f32SrcVreg, srcVreg, preg);
             if constexpr (SupportType<scaleT, float>()) {
@@ -2057,7 +2057,7 @@ __simd_vf__ inline void AntiQuantPerGroupForRowFp8VF(__ubuf__ dstT* dstUb, __ubu
                 preg = MicroAPI::UpdateMask<uint32_t>(sreg);
                 LoadNormScaleAndOffset<scaleT, config>((scaleUb + i * para.n + k * vecLen),
                     (offsetUb + i * para.n + k * vecLen), scaleVreg, offsetVreg);
-                MicroAPI::DataCopy<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
+                MicroAPI::LoadAlign<srcT, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
                     srcVreg, (srcUb + (i * para.groupSize + j) * para.n + k * vecLen));
                 MicroAPI::Cast<float, srcT, layoutZMrgZ>(f32SrcVreg, srcVreg, preg);
                 if constexpr (SupportType<scaleT, float>()) {

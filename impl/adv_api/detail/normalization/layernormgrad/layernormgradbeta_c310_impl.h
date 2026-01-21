@@ -34,10 +34,10 @@ __simd_callee__ inline void LoadSrcData(MicroAPI::RegTensor<float>& srcReg, __ub
     MicroAPI::RegTensor<T> srcTmpReg;
     constexpr uint16_t eleCountPerVL = GetVecLen() / sizeof(float);
     if constexpr (std::is_same<T, half>::value) {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcTmpReg, src0 + index * eleCountPerVL);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcTmpReg, src0 + index * eleCountPerVL);
         MicroAPI::Cast<float, T, castTraitF16F32>(srcReg, srcTmpReg, mask);
     } else {
-        MicroAPI::DataCopy(srcReg, src0 + index * eleCountPerVL);
+        MicroAPI::LoadAlign(srcReg, src0 + index * eleCountPerVL);
     }
 }
 
@@ -54,9 +54,9 @@ __simd_callee__ inline void StoreDstData(__ubuf__ T* dst, MicroAPI::RegTensor<fl
         MicroAPI::Pack<uint16_t, uint32_t, MicroAPI::HighLowPart::LOWEST>((MicroAPI::RegTensor<uint16_t>&)dstTmpReg,
                                                                           (MicroAPI::RegTensor<uint32_t>&)dstTmpReg);
         MicroAPI::MaskPack(tmpMask, tmpMask);
-        MicroAPI::DataCopy(dst + index * eleCountPerVL, dstTmpReg, tmpMask);
+        MicroAPI::StoreAlign(dst + index * eleCountPerVL, dstTmpReg, tmpMask);
     } else {
-        MicroAPI::DataCopy(dst + index * eleCountPerVL, dstReg, tmpMask);
+        MicroAPI::StoreAlign(dst + index * eleCountPerVL, dstReg, tmpMask);
     }
 }
 

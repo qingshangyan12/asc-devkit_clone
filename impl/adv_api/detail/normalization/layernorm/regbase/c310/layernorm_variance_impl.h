@@ -56,10 +56,10 @@ __simd_callee__ inline void CopyInFloatData(MicroAPI::RegTensor<float>& reg, __u
 {
     if constexpr (SupportType<T, half>()) {
         MicroAPI::RegTensor<T> oriInputH;
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_US_B16>(oriInputH, ub);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_US_B16>(oriInputH, ub);
         MicroAPI::Cast<float, T, layoutZMrgZ>(reg, oriInputH, hFloatAllMask);
     } else {
-        MicroAPI::DataCopy(reg, ub);
+        MicroAPI::LoadAlign(reg, ub);
     }
 }
 }
@@ -172,7 +172,7 @@ __simd_callee__ inline void CalcHSingleBlockOutPut(__ubuf__ T* output, MicroAPI:
 
     if constexpr (SupportType<T, half>()) {
         MicroAPI::RegTensor<T> oriInputH;
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_US_B16>(oriInputH, inputX);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_US_B16>(oriInputH, inputX);
         MicroAPI::Cast<float, T, layoutZMrgZ>(resultH, oriInputH, hFloatMask);
 
         // Calc x - mean in first block.
@@ -182,39 +182,39 @@ __simd_callee__ inline void CalcHSingleBlockOutPut(__ubuf__ T* output, MicroAPI:
 
         MicroAPI::RegTensor<T> oriGamaH;
         MicroAPI::RegTensor<float> gammaReg;
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_US_B16>(oriGamaH, gamma);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_US_B16>(oriGamaH, gamma);
         MicroAPI::Cast<float, T, layoutZMrgZ>(gammaReg, oriGamaH, hFloatMask);
         // Calc (x - mean) / sdReg * gamma in first block.
         MicroAPI::Mul(resultH, resultH, gammaReg, hFloatMask);
 
         MicroAPI::RegTensor<T> oriBataH;
         MicroAPI::RegTensor<float> betaReg;
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_US_B16>(oriBataH, beta);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_US_B16>(oriBataH, beta);
         MicroAPI::Cast<float, T, layoutZMrgZ>(betaReg, oriBataH, hFloatMask);
         // Calc (x - mean) * sdReg * gamma + in first block.
         MicroAPI::Add(resultH, resultH, betaReg, hFloatMask);
 
         MicroAPI::RegTensor<T> oriOutputH;
         MicroAPI::Cast<T, float, Internal::float2HalfCastTrait>(oriOutputH, resultH, hFloatMask);
-        MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(output, oriOutputH, hFloatMask);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(output, oriOutputH, hFloatMask);
     } else {
-        MicroAPI::DataCopy(resultH, inputX);
+        MicroAPI::LoadAlign(resultH, inputX);
         // Calc x - mean in first block.
         MicroAPI::Sub(resultH, resultH, meanReg, hFloatMask);
         // Calc (x - mean) / sdReg in first block.
         MicroAPI::Div(resultH, resultH, sdReg, hFloatMask);
 
         MicroAPI::RegTensor<float> gammaReg;
-        MicroAPI::DataCopy(gammaReg, gamma);
+        MicroAPI::LoadAlign(gammaReg, gamma);
         // Calc (x - mean) * sdReg * gamma in first block.
         MicroAPI::Mul(resultH, resultH, gammaReg, hFloatMask);
 
         MicroAPI::RegTensor<float> betaReg;
-        MicroAPI::DataCopy(betaReg, beta);
+        MicroAPI::LoadAlign(betaReg, beta);
         // Calc (x - mean) * sdReg * gamma + in first block.
         MicroAPI::Add(resultH, resultH, betaReg, hFloatMask);
 
-        MicroAPI::DataCopy(output, resultH, hFloatMask);
+        MicroAPI::StoreAlign(output, resultH, hFloatMask);
     }
 }
 
@@ -269,10 +269,10 @@ __simd_vf__ inline void LayerNormImplVf(__ubuf__ T* output, __ubuf__ T* outputMe
             if constexpr (SupportType<T, half>()) {
                 MicroAPI::RegTensor<T> oriTypeOutputMean;
                 MicroAPI::Cast<T, float, Internal::float2HalfCastTrait>(oriTypeOutputMean, outputMeanReg, floatLowestMask);
-                MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B16>(
+                MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B16>(
                     outputMean + bIdx * sLength + sIdx, oriTypeOutputMean, srcLowestMask);
             } else {
-                MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
+                MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
                     outputMean + bIdx * sLength + sIdx, outputMeanReg, floatLowestMask);
             }
 
@@ -284,10 +284,10 @@ __simd_vf__ inline void LayerNormImplVf(__ubuf__ T* output, __ubuf__ T* outputMe
             if constexpr (SupportType<T, half>()) {
                 MicroAPI::RegTensor<T> oriTypeOutputVariance;
                 MicroAPI::Cast<T, float, Internal::float2HalfCastTrait>(oriTypeOutputVariance, outputVarianceReg, floatLowestMask);
-                MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B16>(
+                MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B16>(
                     outputVariance + bIdx * sLength + sIdx, oriTypeOutputVariance, srcLowestMask);
             } else {
-                MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
+                MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
                     outputVariance + bIdx * sLength + sIdx, outputVarianceReg, floatLowestMask);
             }
 

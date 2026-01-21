@@ -34,13 +34,13 @@ __simd_vf__ inline void ClampCompute(__ubuf__ T* dstUb, __ubuf__ T* srcUb,
     MicroAPI::MaskReg maskReg;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         maskReg = MicroAPI::UpdateMask<T>(calCount);
-        MicroAPI::DataCopy<T>(srcReg, srcUb + i * repeatElm);
+        MicroAPI::LoadAlign<T>(srcReg, srcUb + i * repeatElm);
         if constexpr (selMode == CLAMPMODE::CLAMP_MAX) {
             MicroAPI::Mins(dstReg, srcReg, scalar, maskReg);
         } else {
             MicroAPI::Maxs(dstReg, srcReg, scalar, maskReg);
         }
-        MicroAPI::DataCopy<T>(dstUb + i * repeatElm, dstReg, maskReg);
+        MicroAPI::StoreAlign<T>(dstUb + i * repeatElm, dstReg, maskReg);
     }
 }
 /* **************************************************************************************************
@@ -118,11 +118,11 @@ __simd_vf__ inline void ClampImplTensorScalarVF(__ubuf__ T* dst, __ubuf__ T* src
     MicroAPI::MaskReg mask;
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<T, Trait>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
-        MicroAPI::DataCopy(minVreg, min + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(minVreg, min + i * oneRepElm);
         MicroAPI::Max(dstVreg, srcVreg, minVreg, mask);
         MicroAPI::Mins(dstVreg, dstVreg, max, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 
@@ -136,11 +136,11 @@ __simd_vf__ inline void ClampImplScalarTensorVF(__ubuf__ T* dst, __ubuf__ T* src
     MicroAPI::MaskReg mask;
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<T, Trait>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
-        MicroAPI::DataCopy(maxVreg, max + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(maxVreg, max + i * oneRepElm);
         MicroAPI::Maxs(dstVreg, srcVreg, min, mask);
         MicroAPI::Min(dstVreg, dstVreg, maxVreg, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 
@@ -155,12 +155,12 @@ __simd_vf__ inline void ClampImplBothTensorVF(__ubuf__ T* dst, __ubuf__ T* src, 
     MicroAPI::MaskReg mask;
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<T, Trait>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
-        MicroAPI::DataCopy(minVreg, min + i * oneRepElm);
-        MicroAPI::DataCopy(maxVreg, max + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(minVreg, min + i * oneRepElm);
+        MicroAPI::LoadAlign(maxVreg, max + i * oneRepElm);
         MicroAPI::Max(dstVreg, srcVreg, minVreg, mask);
         MicroAPI::Min(dstVreg, dstVreg, maxVreg, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 
@@ -173,10 +173,10 @@ __simd_vf__ inline void ClampImplBothScalarVF(__ubuf__ T* dst, __ubuf__ T* src, 
     MicroAPI::MaskReg mask;
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<T, Trait>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         MicroAPI::Maxs(dstVreg, srcVreg, min, mask);
         MicroAPI::Mins(dstVreg, dstVreg, max, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 

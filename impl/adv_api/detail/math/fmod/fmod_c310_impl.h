@@ -61,10 +61,10 @@ __simd_callee__ inline void LoadDataWithT(
 {
     if constexpr (IsSameType<T, half>::value) {
         MicroAPI::RegTensor<T> srcOrigin;
-        DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + offset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + offset);
         Cast<float, T, layoutZMrgZ>(dstReg, srcOrigin, mask);
     } else {
-        DataCopy(dstReg, src + offset);
+        MicroAPI::LoadAlign(dstReg, src + offset);
     }
 }
 
@@ -75,9 +75,9 @@ __simd_callee__ inline void SaveDataWithT(
     if constexpr (IsSameType<T, half>::value) {
         MicroAPI::RegTensor<T> regT;
         MicroAPI::Cast<T, float, LayoutZMrgZRndRSatNS>(regT, srcReg, mask);
-        MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + offset, regT, mask);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + offset, regT, mask);
     } else {
-        MicroAPI::DataCopy(dst + offset, srcReg, mask);
+        MicroAPI::StoreAlign(dst + offset, srcReg, mask);
     }
 }
 
@@ -160,11 +160,11 @@ __simd_callee__ inline void SolveScale(__ubuf__ float* dst, __ubuf__ float* src,
     MicroAPI::RegTensor<float> src1Reg;
     MicroAPI::RegTensor<float> dstReg;
     for (uint16_t i = 0; i < unitRepTimes; i++) {
-        MicroAPI::DataCopy(src1OriginReg, src + i * FmodInternal::oneRepSize);
-        MicroAPI::DataCopy(dstReg, dst + i * FmodInternal::oneRepSize);
+        MicroAPI::LoadAlign(src1OriginReg, src + i * FmodInternal::oneRepSize);
+        MicroAPI::LoadAlign(dstReg, dst + i * FmodInternal::oneRepSize);
         MicroAPI::Abs(src1Reg, src1OriginReg, mask);
         SolveScale<iterationNum>(dstReg, src1Reg, scale1, scale2, mask);
-        MicroAPI::DataCopy(dst + i * FmodInternal::oneRepSize, dstReg, mask);
+        MicroAPI::StoreAlign(dst + i * FmodInternal::oneRepSize, dstReg, mask);
     }
 }
 
@@ -177,12 +177,12 @@ __simd_callee__ inline void SolveScaleInit(__ubuf__ float* dst, __ubuf__ float* 
     MicroAPI::RegTensor<float> src1Reg;
     MicroAPI::RegTensor<float> dstReg;
     for (uint16_t i = 0; i < unitRepTimes; i++) {
-        MicroAPI::DataCopy(src0OriginReg, src0 + i * FmodInternal::oneRepSize);
-        MicroAPI::DataCopy(src1OriginReg, src1 + i * FmodInternal::oneRepSize);
+        MicroAPI::LoadAlign(src0OriginReg, src0 + i * FmodInternal::oneRepSize);
+        MicroAPI::LoadAlign(src1OriginReg, src1 + i * FmodInternal::oneRepSize);
         MicroAPI::Abs(dstReg, src0OriginReg, mask);
         MicroAPI::Abs(src1Reg, src1OriginReg, mask);
         SolveScale<iterationNum>(dstReg, src1Reg, scale1, scale2, mask);
-        MicroAPI::DataCopy(dst + i * FmodInternal::oneRepSize, dstReg, mask);
+        MicroAPI::StoreAlign(dst + i * FmodInternal::oneRepSize, dstReg, mask);
     }
 }
 
@@ -294,7 +294,7 @@ __simd_vf__ inline void FmodComputeIterationF32(__ubuf__ float* dstTensor, __ubu
         FmodInternal::LoadDataWithT(src0Tensor, src0OriginReg, maskFull, i * FmodInternal::oneRepSize);
         FmodInternal::LoadDataWithT(src1Tensor, src1OriginReg, maskFull, i * FmodInternal::oneRepSize);
         MicroAPI::Abs(src1Reg, src1OriginReg, maskFull);
-        MicroAPI::DataCopy(dstReg, dstTensor + i * FmodInternal::oneRepSize);
+        MicroAPI::LoadAlign(dstReg, dstTensor + i * FmodInternal::oneRepSize);
 
         // res = res*(np.float32(asignbit)*np.float32(-2.0) + np.float32(1))
         FmodInternal::GetSignBit(src0SignBitReg, src0OriginReg, maskFull);

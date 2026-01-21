@@ -347,10 +347,10 @@ __simd_callee__ inline void LoadSrcData(MicroAPI::RegTensor<float>& srcReg, __ub
 {
     MicroAPI::RegTensor<T> srcTmpReg;
     if constexpr (std::is_same<T, half>::value || std::is_same<T, bfloat16_t>::value) {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcTmpReg, src0 + index * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcTmpReg, src0 + index * B32_DATA_NUM_PER_REPEAT);
         MicroAPI::Cast<float, T, castTraitF16F32>(srcReg, srcTmpReg, mask);
     } else {
-        MicroAPI::DataCopy(srcReg, src0 + index * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(srcReg, src0 + index * B32_DATA_NUM_PER_REPEAT);
     }
 }
 
@@ -376,9 +376,9 @@ __simd_callee__ inline void StoreDstData(__ubuf__ T* dst, MicroAPI::RegTensor<fl
         MicroAPI::Pack<uint16_t, uint32_t, MicroAPI::HighLowPart::LOWEST>(
             (MicroAPI::RegTensor<uint16_t>&)dstTmpReg, (MicroAPI::RegTensor<uint32_t>&)dstTmpReg);
         MicroAPI::MaskPack(mask, mask);
-        MicroAPI::DataCopy(dst + index * B32_DATA_NUM_PER_REPEAT, dstTmpReg, mask);
+        MicroAPI::StoreAlign(dst + index * B32_DATA_NUM_PER_REPEAT, dstTmpReg, mask);
     } else {
-        MicroAPI::DataCopy(dst + index * B32_DATA_NUM_PER_REPEAT, dstReg, mask);
+        MicroAPI::StoreAlign(dst + index * B32_DATA_NUM_PER_REPEAT, dstReg, mask);
     }
 }
 
@@ -400,9 +400,9 @@ __simd_vf__ inline void ComputePowFBaseLogStepOneImpl(__ubuf__ float* tmpLHIBuff
         MicroAPI::Abs(tmpDstReg, tmpBaseReg, mask);
         GetLogFExtStepOne(tmpLHIReg, tmpLLOReg, tmpRReg, tmpDstReg, params, mask);
 
-        MicroAPI::DataCopy(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
-        MicroAPI::DataCopy(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
-        MicroAPI::DataCopy(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
+        MicroAPI::StoreAlign(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
+        MicroAPI::StoreAlign(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
+        MicroAPI::StoreAlign(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
     }
 }
 
@@ -424,9 +424,9 @@ __simd_vf__ inline void ComputePowFBaseLogStepOneImpl(__ubuf__ float* tmpLHIBuff
 
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
-        MicroAPI::DataCopy(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
-        MicroAPI::DataCopy(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
-        MicroAPI::DataCopy(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
+        MicroAPI::StoreAlign(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
+        MicroAPI::StoreAlign(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
+        MicroAPI::StoreAlign(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
     }
 }
 
@@ -449,9 +449,9 @@ __simd_vf__ inline void ComputePowFBaseLogStepTwoImpl(__ubuf__ float* tmpLHIBuff
 
         GetLogFExtStepTwo(tmpLHIReg, tmpLLOReg, tmpIReg, tmpMReg, tmpRReg, params, mask);
 
-        MicroAPI::DataCopy(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
-        MicroAPI::DataCopy(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
-        MicroAPI::DataCopy(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
+        MicroAPI::StoreAlign(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
+        MicroAPI::StoreAlign(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
+        MicroAPI::StoreAlign(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
     }
 }
 
@@ -475,9 +475,9 @@ __simd_vf__ inline void ComputePowFBaseLogStepTwoImpl(__ubuf__ float* tmpLHIBuff
 
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
-        MicroAPI::DataCopy(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
-        MicroAPI::DataCopy(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
-        MicroAPI::DataCopy(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
+        MicroAPI::StoreAlign(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
+        MicroAPI::StoreAlign(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
+        MicroAPI::StoreAlign(tmpLogBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpRReg, mask);
     }
 }
 
@@ -494,7 +494,7 @@ __simd_vf__ inline void ComputePowFExpImpl(__ubuf__ float* tmpExpBuffer, __ubuf_
         LoadSrcData(tmpLLOReg, tmpLogLowBuffer, i, mask);
         LoadSrcData(tmpExpReg, src1, i, mask);
         GetExpCore(tmpDstReg, tmpLHIReg, tmpLLOReg, tmpExpReg, mask);
-        MicroAPI::DataCopy(tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpDstReg, mask);
+        MicroAPI::StoreAlign(tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpDstReg, mask);
     }
 }
 
@@ -511,7 +511,7 @@ __simd_vf__ inline void ComputePowFExpImpl(__ubuf__ float* tmpExpBuffer, __ubuf_
         LoadSrcData(tmpLHIReg, tmpLogHighBuffer, i, mask);
         LoadSrcData(tmpLLOReg, tmpLogLowBuffer, i, mask);
         GetExpCore(tmpDstReg, tmpLHIReg, tmpLLOReg, tmpExpReg, mask);
-        MicroAPI::DataCopy(tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpDstReg, mask);
+        MicroAPI::StoreAlign(tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpDstReg, mask);
     }
 }
 
@@ -529,7 +529,7 @@ __simd_vf__ inline void ComputePowFSpecialCaseImpl(__ubuf__ T* dst, __ubuf__ T* 
         mask = MicroAPI::UpdateMask<float>(calCount);
         LoadSrcData(tmpBaseReg, src0, i, mask);
         LoadSrcData(tmpExpReg, src1, i, mask);
-        MicroAPI::DataCopy(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
         ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, mask);
         StoreDstData(dst, castDstReg, i, mask);
     }
@@ -549,7 +549,7 @@ __simd_vf__ inline void ComputePowFSpecialCaseImpl(__ubuf__ T* dst, __ubuf__ T* 
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         LoadSrcData(tmpBaseReg, src0, i, mask);
-        MicroAPI::DataCopy(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
         ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, mask);
         StoreDstData(dst, castDstReg, i, mask);
     }
@@ -569,7 +569,7 @@ __simd_vf__ inline void ComputePowFSpecialCaseImpl(__ubuf__ T* dst, const T scal
     for(uint16_t i = 0; i < repeatTime; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         LoadSrcData(tmpExpReg, src1, i, mask);
-        MicroAPI::DataCopy(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(castDstReg, tmpExpBuffer + i * B32_DATA_NUM_PER_REPEAT);
         ProcessSpecialCaseForPowF(castDstReg, tmpBaseReg, tmpExpReg, tmpR10Reg, tmpR12Reg, twoReg, mask);
         StoreDstData(dst, castDstReg, i, mask);
     }
@@ -853,10 +853,10 @@ __simd_callee__ inline void LoadSrcData(MicroAPI::RegTensor<ConvType>& dstReg, _
     constexpr uint16_t eleCountPerVL = GetVecLen() / sizeof(ConvType);
     MicroAPI::RegTensor<T> srcTmpReg;
     if constexpr (sizeof(T) == 1) {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B8>(srcTmpReg, src + index * eleCountPerVL);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B8>(srcTmpReg, src + index * eleCountPerVL);
         MicroAPI::Cast<ConvType, T, castTraitI8I16>(dstReg, srcTmpReg, mask);
     } else {
-        MicroAPI::DataCopy(dstReg, src + index * eleCountPerVL);
+        MicroAPI::LoadAlign(dstReg, src + index * eleCountPerVL);
     }
 }
 
@@ -870,9 +870,9 @@ __simd_callee__ inline void StoreDstData(__ubuf__ T* dst, MicroAPI::RegTensor<Co
         MicroAPI::Pack<uint8_t, uint16_t, MicroAPI::HighLowPart::LOWEST>(
             (MicroAPI::RegTensor<uint8_t>&)dstTmpReg, (MicroAPI::RegTensor<uint16_t>&)dstReg);
         MicroAPI::MaskPack(mask, mask);
-        MicroAPI::DataCopy(dst + index * eleCountPerVL, dstTmpReg, mask);
+        MicroAPI::StoreAlign(dst + index * eleCountPerVL, dstTmpReg, mask);
     } else {
-        MicroAPI::DataCopy(dst + index * eleCountPerVL, dstReg, mask);
+        MicroAPI::StoreAlign(dst + index * eleCountPerVL, dstReg, mask);
     }
 }
 

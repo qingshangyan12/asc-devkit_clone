@@ -38,29 +38,29 @@ __aicore__ inline void CompareLevel2(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__
             MicroAPI::RegTensor<T, MicroAPI::RegTraitNumTwo> src0Reg, src1Reg;
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 mask = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumTwo>(sreg);
-                MicroAPI::DataCopy(src0Reg, src0 + i * repeatElm);
-                MicroAPI::DataCopy(src1Reg, src1 + i * repeatElm);
+                MicroAPI::LoadAlign(src0Reg, src0 + i * repeatElm);
+                MicroAPI::LoadAlign(src1Reg, src1 + i * repeatElm);
                 MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, mask);
-                MicroAPI::DataCopyUnAlign(dstT, dstReg, uReg);
+                MicroAPI::StoreUnAlign(dstT, dstReg, uReg);
             }
-            MicroAPI::DataCopyUnAlignPost<uint32_t, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dstT, uReg, 0);
+            MicroAPI::StoreUnAlignPost<uint32_t, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dstT, uReg, 0);
         } else {
             MicroAPI::RegTensor<T> src0Reg, src1Reg;
             uint32_t offset = GetVecLen() / sizeof(T) / 8;
             __ubuf__ T *dstT = reinterpret_cast<__ubuf__ T*>(dst);
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 mask = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy(src0Reg, src0 + i * repeatElm);
-                MicroAPI::DataCopy(src1Reg, src1 + i * repeatElm);
+                MicroAPI::LoadAlign(src0Reg, src0 + i * repeatElm);
+                MicroAPI::LoadAlign(src1Reg, src1 + i * repeatElm);
                 MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, mask);
                 if constexpr (sizeof(T) == 1) {
-                    MicroAPI::DataCopy(dst + i * offset, dstReg);
+                    MicroAPI::StoreAlign(dst + i * offset, dstReg);
                 } else {
-                    MicroAPI::DataCopyUnAlign(dstT, dstReg, uReg);
+                    MicroAPI::StoreUnAlign(dstT, dstReg, uReg);
                 }
             }
             if constexpr (sizeof(T) > 1) {
-                MicroAPI::DataCopyUnAlignPost<T, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dstT, uReg, 0);
+                MicroAPI::StoreUnAlignPost<T, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dstT, uReg, 0);
             }
         }
     }

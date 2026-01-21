@@ -33,8 +33,8 @@ __simd_callee__ inline void LoadSrcDataAndXor(MicroAPI::RegTensor<float>& srcReg
 {
     constexpr uint16_t eleCountPerVL = GetVecLen() / sizeof(float);
     MicroAPI::RegTensor<T> src0TmpReg, src1TmpReg;
-    MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(src0TmpReg, src0 + index * eleCountPerVL);
-    MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(src1TmpReg, src1 + index * eleCountPerVL);
+    MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(src0TmpReg, src0 + index * eleCountPerVL);
+    MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(src1TmpReg, src1 + index * eleCountPerVL);
     MicroAPI::Xor(src0TmpReg, src0TmpReg, src1TmpReg, mask);
     MicroAPI::Cast<float, T, castTraitF16F32>(srcReg, src0TmpReg, mask);
 }
@@ -60,8 +60,8 @@ __simd_vf__ inline void ReduceXorSumCoreImpl(__ubuf__ T* dstUb, __ubuf__ T* src0
     MicroAPI::Cast<T, float, castTraitF32F16>(dstReg, zeroReg, fullMask);
     MicroAPI::Pack<uint16_t, uint32_t, MicroAPI::HighLowPart::LOWEST>(
         (MicroAPI::RegTensor<uint16_t>&)dstReg, (MicroAPI::RegTensor<uint32_t>&)dstReg);
-    MicroAPI::DataCopyUnAlign(dstUb, dstReg, ureg, 1);
-    MicroAPI::DataCopyUnAlignPost(dstUb, ureg, 0);
+    MicroAPI::StoreUnAlign(dstUb, dstReg, ureg, 1);
+    MicroAPI::StoreUnAlignPost(dstUb, ureg, 0);
 }
 } // namespace ReduceXorSumAPI
 

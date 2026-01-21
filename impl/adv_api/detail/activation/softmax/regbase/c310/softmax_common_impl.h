@@ -24,10 +24,10 @@ __simd_callee__ inline void LoadIfNeedCast(
 {
     if constexpr (sizeof(T) == 2) {
         MicroAPI::RegTensor<T> tmpReg;
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(tmpReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(tmpReg, srcUb);
         MicroAPI::Cast<float, T, Internal::castTraitB16ToB32>(dstReg, tmpReg, preg);
     } else {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_NORM>(dstReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_NORM>(dstReg, srcUb);
     }
 }
 
@@ -37,12 +37,12 @@ __simd_callee__ inline void LoadIfNeedCastM1(
 {
     if constexpr (sizeof(T) == 2) {
         MicroAPI::RegTensor<T> castVreg;
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_BRC_B16>(castVreg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_BRC_B16>(castVreg, srcUb);
         MicroAPI::UnPack<uint32_t, uint16_t>(
             (MicroAPI::RegTensor<uint32_t>&)castVreg, (MicroAPI::RegTensor<uint16_t>&)castVreg);
         MicroAPI::Cast<float, T, Internal::castTraitB16ToB32>(dstReg, castVreg, preg);
     } else {
-        MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(dstReg, srcUb);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(dstReg, srcUb);
     }
 }
 
@@ -55,9 +55,9 @@ __simd_callee__ inline void StoreIfNeedCastM1(
         MicroAPI::Cast<T, float, Internal::castTraitB32ToB16>(castVreg, srcReg, preg);
         MicroAPI::Pack<uint16_t, uint32_t>(
             (MicroAPI::RegTensor<uint16_t>&)castVreg, (MicroAPI::RegTensor<uint32_t>&)castVreg);
-        MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B16>(dstUb, castVreg, preg);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B16>(dstUb, castVreg, preg);
     } else {
-        MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(dstUb, srcReg, preg);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(dstUb, srcReg, preg);
     }
 }
 
@@ -68,9 +68,9 @@ __simd_callee__ inline void StoreIfNeedCast(
     if constexpr (sizeof(T) == 2) {
         MicroAPI::RegTensor<T> tmpReg;
         MicroAPI::Cast<T, float, Internal::castTraitB32ToB16>(tmpReg, srcReg, preg);
-        MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb, tmpReg, preg);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb, tmpReg, preg);
     } else {
-        MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_NORM>(dstUb, srcReg, preg);
+        MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_NORM>(dstUb, srcReg, preg);
     }
 }
 
@@ -78,9 +78,9 @@ template <typename T>
 __simd_callee__ inline void LoadE2B(MicroAPI::RegTensor<T>& dstReg, __ubuf__ T* srcUb)
 {
     if constexpr (sizeof(T) == 2) {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_E2B_B16>(dstReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_E2B_B16>(dstReg, srcUb);
     } else {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_E2B_B32>(dstReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_E2B_B32>(dstReg, srcUb);
     }
 }
 } // namespace AscendC

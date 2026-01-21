@@ -40,13 +40,13 @@ __simd_vf__ inline void GeGLUImplVF(
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<float>(count);
         if constexpr (sizeof(T) == sizeof(half)) {
-            MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin0, src0 + i * oneRepElm);
+            MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin0, src0 + i * oneRepElm);
             MicroAPI::Cast<float, half, castTraitB16ToB32>(srcVreg0, srcOrigin0, mask);
-            MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin1, src1 + i * oneRepElm);
+            MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin1, src1 + i * oneRepElm);
             MicroAPI::Cast<float, half, castTraitB16ToB32>(srcVreg1, srcOrigin1, mask);
         } else {
-            MicroAPI::DataCopy(srcVreg0, src0 + i * oneRepElm);
-            MicroAPI::DataCopy(srcVreg1, src1 + i * oneRepElm);
+            MicroAPI::LoadAlign(srcVreg0, src0 + i * oneRepElm);
+            MicroAPI::LoadAlign(srcVreg1, src1 + i * oneRepElm);
         }
         MicroAPI::Mul(tmpReg0, srcVreg1, srcVreg1, mask);
         MicroAPI::Adds(tmpReg0, tmpReg0, gegluConstantA, mask);
@@ -58,10 +58,10 @@ __simd_vf__ inline void GeGLUImplVF(
         MicroAPI::Mul(dstVreg, srcVreg0, tmpReg1, mask);
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<half, float, castTraitB32ToB16>((MicroAPI::RegTensor<half>&)dstVreg, dstVreg, mask);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_PACK_B32>(
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_PACK_B32>(
                 dst + i * oneRepElm, (MicroAPI::RegTensor<half>&)dstVreg, mask);
         } else {
-            MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
         }
     }
 }

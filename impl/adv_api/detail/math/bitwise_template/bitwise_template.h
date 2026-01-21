@@ -30,21 +30,21 @@ __simd_vf__ inline void BitwiseTemplateImplVF(__ubuf__ T* dst, __ubuf__ T* src0,
     MicroAPI::MaskReg mask;
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<T, Trait>(count);
-        MicroAPI::DataCopy(src0Vreg, src0 + i * oneRepElm);
-        MicroAPI::DataCopy(src1Vreg, src1 + i * oneRepElm);
+        MicroAPI::LoadAlign(src0Vreg, src0 + i * oneRepElm);
+        MicroAPI::LoadAlign(src1Vreg, src1 + i * oneRepElm);
         func(dstVreg, src0Vreg, src1Vreg, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
         mask = MicroAPI::UpdateMask<T, Trait>(count);
-        MicroAPI::DataCopy(src0Vreg, src0 + i * oneRepElm + offset);
-        MicroAPI::DataCopy(src1Vreg, src1 + i * oneRepElm + offset);
+        MicroAPI::LoadAlign(src0Vreg, src0 + i * oneRepElm + offset);
+        MicroAPI::LoadAlign(src1Vreg, src1 + i * oneRepElm + offset);
         func(dstVreg, src0Vreg, src1Vreg, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm + offset, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm + offset, dstVreg, mask);
     }
     mask = MicroAPI::UpdateMask<T, Trait>(count);
-    MicroAPI::DataCopy(src0Vreg, src0 + repeatTime * 2 * oneRepElm);
-    MicroAPI::DataCopy(src1Vreg, src1 + repeatTime * 2 * oneRepElm);
+    MicroAPI::LoadAlign(src0Vreg, src0 + repeatTime * 2 * oneRepElm);
+    MicroAPI::LoadAlign(src1Vreg, src1 + repeatTime * 2 * oneRepElm);
     func(dstVreg, src0Vreg, src1Vreg, mask);
-    MicroAPI::DataCopy(dst + repeatTime * 2 * oneRepElm, dstVreg, mask);
+    MicroAPI::StoreAlign(dst + repeatTime * 2 * oneRepElm, dstVreg, mask);
 }
 
 template <auto func, typename T>

@@ -137,7 +137,7 @@ __simd_vf__ inline void AsinComputeVFF32(__ubuf__ T* dstUb, __ubuf__ T* srcUb, u
     MicroAPI::RegTensor<T> tmpReg;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<T>(calSize);
-        MicroAPI::DataCopy(srcReg, srcUb + i * stride);
+        MicroAPI::LoadAlign(srcReg, srcUb + i * stride);
         // Calculate res2 = PI*0.5 - taylor_compute(sqrt(1 - x^2)) -> resReg2.
         CalRes2<T>(resReg2, srcReg, mask);
         // Calculate res1 = taylor_compute(abs(x)) -> dst, abs(x) -> resReg1.
@@ -163,7 +163,7 @@ __simd_vf__ inline void AsinComputeVFF32(__ubuf__ T* dstUb, __ubuf__ T* srcUb, u
             MicroAPI::Adds(dstReg, dstReg, static_cast<T>(-HALF_PI), mask);
             MicroAPI::Muls(dstReg, dstReg, static_cast<T>(NEG_ONE), mask);
         }
-        MicroAPI::DataCopy(dstUb + i * stride, dstReg, mask);
+        MicroAPI::StoreAlign(dstUb + i * stride, dstReg, mask);
     }
 }
 
@@ -184,7 +184,7 @@ __simd_vf__ inline void AsinComputeVFF16(__ubuf__ T* dstUb, __ubuf__ T* srcUb, u
         mask = MicroAPI::UpdateMask<float>(calSize);
         // Cast src from half to float type for getting more precise results, but only computes by finishing
         // taylor expansion computation as it's the majority reason of precision loss.
-        MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * stride);
+        MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * stride);
         MicroAPI::Cast<float, half, ASIN_CAST_TRAIT_NONE>(floatReg2, srcReg, mask);
         // Calculate res2 = PI*0.5 - taylor_compute(sqrt(1 - x^2)).
         MicroAPI::Mul(floatReg2, floatReg2, floatReg2, mask);
@@ -231,7 +231,7 @@ __simd_vf__ inline void AsinComputeVFF16(__ubuf__ T* dstUb, __ubuf__ T* srcUb, u
             MicroAPI::Muls(floatReg1, floatReg1, NEG_ONE, mask);
         }
         MicroAPI::Cast<half, float, ASIN_CAST_TRAIT_RINT>(dstReg, floatReg1, mask);
-        MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * stride, dstReg, mask);
+        MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * stride, dstReg, mask);
     }
 }
 } // namespace Internal

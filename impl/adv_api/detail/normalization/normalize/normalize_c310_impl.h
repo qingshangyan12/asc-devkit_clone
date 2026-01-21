@@ -148,22 +148,22 @@ __simd_vf__ inline void NormalizeVFImpl(__ubuf__ float *rstdUb, __ubuf__ float *
     MicroAPI::MaskReg pregOne = MicroAPI::CreateMask<float, MicroAPI::MaskPattern::VL1>();
 
     for (uint16_t j = 0; j < static_cast<uint16_t>(halfA); j++) {
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(varianceReg1, varianceUb + j);
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(varianceReg2, varianceUb2 + j);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(varianceReg1, varianceUb + j);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(varianceReg2, varianceUb2 + j);
         Adds(varianceReg1, varianceReg1, epsilon, pregFull);
         Adds(varianceReg2, varianceReg2, epsilon, pregFull);
         RsqrtUtil<float>(rstdReg1, varianceReg1, pregFull);
         RsqrtUtil<float>(rstdReg2, varianceReg2, pregFull);
-        DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(rstdUb + j, rstdReg1, pregOne);
-        DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(rstdUb2 + j, rstdReg2, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(rstdUb + j, rstdReg1, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(rstdUb2 + j, rstdReg2, pregOne);
     }
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     for (uint16_t j = 0; j < static_cast<uint16_t>(halfA); j++) {
         count = rLength;
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(rstdReg1, rstdUb + j);
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(rstdReg2, rstdUb2 + j);
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg1, meanUb + j);
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg2, meanUb2 + j);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(rstdReg1, rstdUb + j);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(rstdReg2, rstdUb2 + j);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg1, meanUb + j);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg2, meanUb2 + j);
         for (uint16_t i = 0; i < repeatTimes; i++) {
             preg = MicroAPI::UpdateMask<float>(count);
             NormalizeInternal::LoadDataWithT<T>(inputXUb, inputReg1, preg, j * rLengthWithPadding + i * sregLower);
@@ -172,20 +172,20 @@ __simd_vf__ inline void NormalizeVFImpl(__ubuf__ float *rstdUb, __ubuf__ float *
             if constexpr (IsSameType<U, half>::value || IsSameType<U, bfloat16_t>::value) {
                 if constexpr (!config.isNoGamma) {
                     MicroAPI::RegTensor<U> gammaRegOrigin;
-                    DataCopy<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(gammaRegOrigin, gammaUb + i * sregLower);
+                    MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(gammaRegOrigin, gammaUb + i * sregLower);
                     Cast<float, U, layoutZMrgZ>(gammaReg, gammaRegOrigin, preg);
                 }
                 if constexpr (!config.isNoBeta) {
                     MicroAPI::RegTensor<U> betaRegOrigin;
-                    DataCopy<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(betaRegOrigin, betaUb + i * sregLower);
+                    MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(betaRegOrigin, betaUb + i * sregLower);
                     Cast<float, U, layoutZMrgZ>(betaReg, betaRegOrigin, preg);
                 }
             } else {
                 if constexpr (!config.isNoGamma) {
-                    DataCopy(gammaReg, gammaUb + i * sregLower);
+                    MicroAPI::LoadAlign(gammaReg, gammaUb + i * sregLower);
                 }
                 if constexpr (!config.isNoBeta) {
-                    DataCopy(betaReg, betaUb + i * sregLower);
+                    MicroAPI::LoadAlign(betaReg, betaUb + i * sregLower);
                 }
             }
             Sub<float, MicroAPI::MaskMergeMode::ZEROING>(dstReg1, inputReg1, meanReg1, preg);
@@ -209,31 +209,31 @@ __simd_vf__ inline void NormalizeVFImpl(__ubuf__ float *rstdUb, __ubuf__ float *
             if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
                 MicroAPI::RegTensor<T> yRegOrigin;
                 Cast<T, float, LayoutZMrgZRndRSatNS>(yRegOrigin, dstReg1, preg);
-                DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(outputUb + j * rLengthWithPadding + i * sregLower,
+                MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(outputUb + j * rLengthWithPadding + i * sregLower,
                     yRegOrigin, preg);
             } else {
-                DataCopy(outputUb + j * rLengthWithPadding + i * sregLower, dstReg1, preg);
+                MicroAPI::StoreAlign(outputUb + j * rLengthWithPadding + i * sregLower, dstReg1, preg);
             }
             if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
                 MicroAPI::RegTensor<T> yRegOrigin;
                 Cast<T, float, LayoutZMrgZRndRSatNS>(yRegOrigin, dstReg2, preg);
-                DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(outputUb2 + j * rLengthWithPadding + i * sregLower,
+                MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(outputUb2 + j * rLengthWithPadding + i * sregLower,
                     yRegOrigin, preg);
             } else {
-                DataCopy(outputUb2 + j * rLengthWithPadding + i * sregLower, dstReg2, preg);
+                MicroAPI::StoreAlign(outputUb2 + j * rLengthWithPadding + i * sregLower, dstReg2, preg);
             }
         }
     }
     for (uint16_t j = 0; j < tailARepeatTimes; j++) {
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(varianceReg, varianceUbTail);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(varianceReg, varianceUbTail);
         Adds(varianceReg, varianceReg, epsilon, pregFull);
         RsqrtUtil<float>(rstdReg, varianceReg, pregFull);
-        DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(rstdUbTail, rstdReg, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(rstdUbTail, rstdReg, pregOne);
     }
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     for (uint16_t j = 0; j < tailARepeatTimes; j++) {
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, meanUbTail);
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(rstdReg, rstdUbTail);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, meanUbTail);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(rstdReg, rstdUbTail);
         count = rLength;
         for (uint16_t i = 0; i < repeatTimes; i++) {
             MicroAPI::MaskReg preg = MicroAPI::UpdateMask<float>(count);
@@ -242,20 +242,20 @@ __simd_vf__ inline void NormalizeVFImpl(__ubuf__ float *rstdUb, __ubuf__ float *
             if constexpr (IsSameType<U, half>::value || IsSameType<U, bfloat16_t>::value) {
                 if constexpr (!config.isNoGamma) {
                     MicroAPI::RegTensor<U> gammaRegOrigin;
-                    DataCopy<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(gammaRegOrigin, gammaUb + i * sregLower);
+                    MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(gammaRegOrigin, gammaUb + i * sregLower);
                     Cast<float, U, layoutZMrgZ>(gammaReg, gammaRegOrigin, preg);
                 }
                 if constexpr (!config.isNoBeta) {
                     MicroAPI::RegTensor<U> betaRegOrigin;
-                    DataCopy<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(betaRegOrigin, betaUb + i * sregLower);
+                    MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_UNPACK_B16>(betaRegOrigin, betaUb + i * sregLower);
                     Cast<float, U, layoutZMrgZ>(betaReg, betaRegOrigin, preg);
                 }
             } else {
                 if constexpr (!config.isNoGamma) {
-                    DataCopy(gammaReg, gammaUb + i * sregLower);
+                    MicroAPI::LoadAlign(gammaReg, gammaUb + i * sregLower);
                 }
                 if constexpr (!config.isNoBeta) {
-                    DataCopy(betaReg, betaUb + i * sregLower);
+                    MicroAPI::LoadAlign(betaReg, betaUb + i * sregLower);
                 }
             }
             Sub<float, MicroAPI::MaskMergeMode::ZEROING>(dstReg, inputReg, meanReg, preg);
@@ -274,9 +274,9 @@ __simd_vf__ inline void NormalizeVFImpl(__ubuf__ float *rstdUb, __ubuf__ float *
             if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
                 MicroAPI::RegTensor<T> yRegOrigin;
                 Cast<T, float, LayoutZMrgZRndRSatNS>(yRegOrigin, dstReg, preg);
-                DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(outputUbTail + i * sregLower, yRegOrigin, preg);
+                MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(outputUbTail + i * sregLower, yRegOrigin, preg);
             } else {
-                DataCopy(outputUbTail + i * sregLower, dstReg, preg);
+                MicroAPI::StoreAlign(outputUbTail + i * sregLower, dstReg, preg);
             }
         }
     }

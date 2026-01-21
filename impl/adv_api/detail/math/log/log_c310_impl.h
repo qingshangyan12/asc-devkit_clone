@@ -33,9 +33,9 @@ template <typename T> __simd_vf__ inline void LogImpl(__ubuf__ T *dst, __ubuf__ 
     MicroAPI::MaskReg preg;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         preg = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy(vreg0, src + i * sregLower);
+        MicroAPI::LoadAlign(vreg0, src + i * sregLower);
         MicroAPI::Log(vreg1, vreg0, preg);
-        MicroAPI::DataCopy(dst + i * sregLower, vreg1, preg);
+        MicroAPI::StoreAlign(dst + i * sregLower, vreg1, preg);
     }
 }
 
@@ -57,10 +57,10 @@ __simd_vf__ inline void LogXImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_
         MicroAPI::MaskReg mask;
         for (uint16_t i = 0; i < repeatTimes; ++i) {
             mask = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy(vreg0, src + i * sregLower);
+            MicroAPI::LoadAlign(vreg0, src + i * sregLower);
             MicroAPI::Log(vreg1, vreg0, mask);
             MicroAPI::Muls(vreg1, vreg1, LnXRec, mask);
-            MicroAPI::DataCopy(dst + i * sregLower, vreg1, mask);
+            MicroAPI::StoreAlign(dst + i * sregLower, vreg1, mask);
         }
     } else if constexpr (std::is_same_v<T, half>) {
         MicroAPI::RegTensor<T> vreg0;
@@ -71,12 +71,12 @@ __simd_vf__ inline void LogXImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_
         MicroAPI::MaskReg mask;
         for (uint16_t i = 0; i < repeatTimes; ++i) {
             mask = MicroAPI::UpdateMask<float>(sreg);
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(vreg0, src + i * sregLower);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(vreg0, src + i * sregLower);
             MicroAPI::Cast<float, half, castTraitB16ToB32>(vreg1, vreg0, mask);
             MicroAPI::Log(vreg1, vreg1, mask);
             MicroAPI::Muls(vreg1, vreg1, LnXRec, mask);
             MicroAPI::Cast<half, float, castTraitB32ToB16>(dst0, vreg1, mask);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * sregLower, dst0, mask);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * sregLower, dst0, mask);
         }
     }
 }

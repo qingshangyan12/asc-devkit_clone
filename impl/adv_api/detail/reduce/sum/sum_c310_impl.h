@@ -33,11 +33,11 @@ __simd_vf__ inline void SumForOneRepeatTime(
     for (int i = 0; i < sumParams.outter; i++) {
         calCount = count;
         mask = MicroAPI::UpdateMask<T>(calCount);
-        MicroAPI::DataCopy(srcReg, srcUb + i * offset);
+        MicroAPI::LoadAlign(srcReg, srcUb + i * offset);
         MicroAPI::ReduceSum(dstReg, srcReg, mask);
-        MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUb, dstReg, uregOut, 1);
+        MicroAPI::StoreUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstUb, dstReg, uregOut, 1);
     }
-    MicroAPI::DataCopyUnAlignPost(dstUb, uregOut, 0);
+    MicroAPI::StoreUnAlignPost(dstUb, uregOut, 0);
 }
 
 template <typename T, bool isFirstRepeat>
@@ -55,14 +55,14 @@ __simd_vf__ inline void ReduceSumNextN(__ubuf__ T* dstUb, __ubuf__ T* srcUb, con
         for (uint16_t j = 0; j < repeatTimes; j++) {
             mask = MicroAPI::UpdateMask<T>(count);
             if constexpr (isFirstRepeat) {
-                MicroAPI::DataCopy(srcReg, srcUb + i * sumParams.inner + j * eleCountPerVL);
+                MicroAPI::LoadAlign(srcReg, srcUb + i * sumParams.inner + j * eleCountPerVL);
             } else {
-                MicroAPI::DataCopy(srcReg, srcUb + i * offset + j * eleCountPerVL);
+                MicroAPI::LoadAlign(srcReg, srcUb + i * offset + j * eleCountPerVL);
             }
             MicroAPI::ReduceSum(dstReg, srcReg, mask);
-            MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstTmpUb, dstReg, uregIn, 1);
+            MicroAPI::StoreUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstTmpUb, dstReg, uregIn, 1);
         }
-        MicroAPI::DataCopyUnAlignPost(dstTmpUb, uregIn, 0);
+        MicroAPI::StoreUnAlignPost(dstTmpUb, uregIn, 0);
     }
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 }

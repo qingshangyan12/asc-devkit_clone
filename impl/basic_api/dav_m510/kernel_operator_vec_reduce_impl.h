@@ -32,7 +32,7 @@ __aicore__ inline void ReduceCommonCall(MicroAPI::MaskReg& mask, uint16_t& newRe
         if constexpr (!isSetMask) {
             // get SPR.MASK in VF
             MicroAPI::MaskReg sprLoadMaskReg = MicroAPI::MoveMask<uint16_t>();
-            MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
+            MicroAPI::StoreAlign<uint64_t, MicroAPI::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
             // insert membar(vec store operation) before load maskBuf[0](scalar load operation)
             MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
             countSreg = static_cast<uint32_t>(maskBuf[0]);
@@ -67,10 +67,10 @@ __aicore__ inline void ReduceAlignCall(__ubuf__ T *dst, __ubuf__ T *src, int32_t
         if constexpr (isCounterMode) {
             mask = MicroAPI::UpdateMask<T>(countSreg);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             srcVreg, src, srcBlkStride, srcRepStride, mask);
         func(dstVreg, srcVreg, mask);
-        MicroAPI::DataCopy(dst + i * dstRepOffset, dstVreg, stMask);
+        MicroAPI::StoreAlign(dst + i * dstRepOffset, dstVreg, stMask);
     }
 }
 
@@ -89,16 +89,16 @@ __aicore__ inline void ReduceUnalignCall(__ubuf__ U *dst, __ubuf__ T *src, int32
         if constexpr (isCounterMode) {
             mask = MicroAPI::UpdateMask<T>(countSreg);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             srcVreg, src, srcBlkStride, srcRepStride, mask);
         func(dstVreg, srcVreg, mask);
-        MicroAPI::DataCopyUnAlign(dst, dstVreg, ureg, oneRepOffset);
+        MicroAPI::StoreUnAlign(dst, dstVreg, ureg, oneRepOffset);
         if constexpr (withStride) {
-            MicroAPI::DataCopyUnAlignPost(dst, ureg, dstRepOffsetPost);
+            MicroAPI::StoreUnAlignPost(dst, ureg, dstRepOffsetPost);
         }
     }
     if constexpr (!withStride) {
-        MicroAPI::DataCopyUnAlignPost(dst, ureg, dstRepOffsetPost);
+        MicroAPI::StoreUnAlignPost(dst, ureg, dstRepOffsetPost);
     }
 }
 
@@ -388,11 +388,11 @@ __aicore__ inline void ReduceSumCount(
     MicroAPI::UnalignReg ureg;
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeat); ++i) {
         preg = MicroAPI::UpdateMask<T>(count);
-        MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
+        MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
         MicroAPI::ReduceSum(dstVreg, srcVreg, preg);
-        MicroAPI::DataCopyUnAlign(dstLocal, dstVreg, ureg, 1);
+        MicroAPI::StoreUnAlign(dstLocal, dstVreg, ureg, 1);
     }
-    MicroAPI::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    MicroAPI::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <typename T, bool isBitMask>
@@ -406,11 +406,11 @@ __aicore__ inline void ReduceSumMask(
     MicroAPI::RegTensor<T> dstVreg;
     MicroAPI::UnalignReg ureg;
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeat); ++i) {
-        MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
+        MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
         MicroAPI::ReduceSum(dstVreg, srcVreg, preg);
-        MicroAPI::DataCopyUnAlign(dstLocal, dstVreg, ureg, 1);
+        MicroAPI::StoreUnAlign(dstLocal, dstVreg, ureg, 1);
     }
-    MicroAPI::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    MicroAPI::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <typename T, int shapeScope>
@@ -528,13 +528,13 @@ __aicore__ inline void ReduceB64SumImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLoc
 
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumTwo>(sreg);
-        MicroAPI::DataCopy(vreg0, srcLocal + i * oneRepSize);
+        MicroAPI::LoadAlign(vreg0, srcLocal + i * oneRepSize);
         MicroAPI::Add(vregTmp, vregDup, vreg0, mask);
         MicroAPI::Select(vregDup, vregTmp, vregDup, mask);
     }
     MicroAPI::ReduceSum(vreg1, vregDup, fullMask);
     MicroAPI::MaskReg maskFirstVal = MicroAPI::CreateMask<T, MicroAPI::MaskPattern::VL1, MicroAPI::RegTraitNumTwo>();
-    MicroAPI::DataCopy(dstLocal, vreg1, maskFirstVal);
+    MicroAPI::StoreAlign(dstLocal, vreg1, maskFirstVal);
 }
 
 template <typename T>
@@ -614,7 +614,7 @@ __aicore__ inline void ReduceNoIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *s
     MicroAPI::Duplicate(dstVreg, initValue);
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = MicroAPI::UpdateMask<T>(count);
-        MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
+        MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             MicroAPI::Max(tmpVreg, dstVreg, srcVreg, preg);
         } else {
@@ -628,8 +628,8 @@ __aicore__ inline void ReduceNoIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *s
     } else {
         MicroAPI::ReduceMin(dstVreg, dstVreg, pregFull);
     }
-    MicroAPI::DataCopyUnAlign(dstLocal, dstVreg, ureg, 1);
-    MicroAPI::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    MicroAPI::StoreUnAlign(dstLocal, dstVreg, ureg, 1);
+    MicroAPI::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, typename T>
@@ -645,7 +645,7 @@ __aicore__ inline void ReduceB64NoIndexTemplate(
     MicroAPI::Duplicate(b64DstVreg, initValue, pregFull);
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumTwo>(count);
-        MicroAPI::DataCopy(b64SrcVreg, srcLocal + i * oneRepSize);
+        MicroAPI::LoadAlign(b64SrcVreg, srcLocal + i * oneRepSize);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             MicroAPI::Max(b64TmpVreg, b64DstVreg, b64SrcVreg, preg);
         } else {
@@ -659,8 +659,8 @@ __aicore__ inline void ReduceB64NoIndexTemplate(
     } else {
         MicroAPI::ReduceMin(b64DstVreg, b64DstVreg, pregFull);
     }
-    MicroAPI::DataCopyUnAlign(dstLocal, b64DstVreg, ureg, 1);
-    MicroAPI::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    MicroAPI::StoreUnAlign(dstLocal, b64DstVreg, ureg, 1);
+    MicroAPI::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, bool isBitMask, typename T>
@@ -674,7 +674,7 @@ __aicore__ inline void ReduceNoIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *s
     MicroAPI::Duplicate(dstVreg, initValue);
     int32_t postUpdateStride = srcRepStride * GetDataBlockSizeInBytes() / sizeof(T);
     for (uint16_t i = 0; i < repeat; ++i) {
-        MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, postUpdateStride);
+        MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, postUpdateStride);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             MicroAPI::Max(dstVreg, dstVreg, srcVreg, preg);
         } else {
@@ -686,8 +686,8 @@ __aicore__ inline void ReduceNoIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *s
     } else {
         MicroAPI::ReduceMin(dstVreg, dstVreg, preg);
     }
-    MicroAPI::DataCopyUnAlign(dstLocal, dstVreg, ureg, 1);
-    MicroAPI::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    MicroAPI::StoreUnAlign(dstLocal, dstVreg, ureg, 1);
+    MicroAPI::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, typename T, typename IndexT>
@@ -715,7 +715,7 @@ __aicore__ inline void ReduceIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *src
     // step1: from [count] to [oneRepSize] value index pair
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = MicroAPI::UpdateMask<T>(count);
-        MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
+        MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, srcRepOffset);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             MicroAPI::Max(tmpValueVreg, dstValueVreg, srcVreg, preg);
         } else {
@@ -738,7 +738,7 @@ __aicore__ inline void ReduceIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *src
     } else {
         MicroAPI::ReduceMin(tmpValueVreg, dstValueVreg, pregFull);
     }
-    MicroAPI::DataCopyUnAlign(dstLocal, tmpValueVreg, ureg, 1);  // store value
+    MicroAPI::StoreUnAlign(dstLocal, tmpValueVreg, ureg, 1);  // store value
     // get dst value mask and squeeze dst index
     MicroAPI::Duplicate(tmpValueVreg, tmpValueVreg, pregFull);
     MicroAPI::Compare<T, CMPMODE::EQ>(pregCond, dstValueVreg, tmpValueVreg, pregFull);
@@ -747,8 +747,8 @@ __aicore__ inline void ReduceIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *src
     MicroAPI::Compare<IndexT, CMPMODE::NE>(pregCond, tmpIndexVreg, maskIndexVreg, pregIndexFull);
     MicroAPI::ReduceMin(tmpIndexVreg, tmpIndexVreg, pregCond);
     MicroAPI::Sub(tmpIndexVreg, tmpIndexVreg, subIndexVreg, pregIndexFull);
-    MicroAPI::DataCopyUnAlign((__ubuf__ IndexT *&)dstLocal, tmpIndexVreg, ureg, 1);
-    MicroAPI::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    MicroAPI::StoreUnAlign((__ubuf__ IndexT *&)dstLocal, tmpIndexVreg, ureg, 1);
+    MicroAPI::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, typename T, typename IndexT>
@@ -772,7 +772,7 @@ __aicore__ inline void ReduceB64IndexTemplate(
     // step1: from [count] to [oneRepSize] value index pair
     for (uint16_t i = 0; i < repeat; ++i) {
         preg = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumTwo>(count);
-        MicroAPI::DataCopy(b64SrcVreg, srcLocal + i * oneRepSize);
+        MicroAPI::LoadAlign(b64SrcVreg, srcLocal + i * oneRepSize);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             MicroAPI::Max(b64TmpValueVreg, b64DstValueVreg, b64SrcVreg, preg);
         } else {
@@ -795,7 +795,7 @@ __aicore__ inline void ReduceB64IndexTemplate(
     } else {
         MicroAPI::ReduceMin(b64TmpValueVreg, b64DstValueVreg, pregFull);
     }
-    MicroAPI::DataCopyUnAlign(dstLocal, b64TmpValueVreg, ureg, 1);  // store value
+    MicroAPI::StoreUnAlign(dstLocal, b64TmpValueVreg, ureg, 1);  // store value
     // get dst value mask and squeeze dst index
     MicroAPI::Duplicate(b64TmpValueVreg, b64TmpValueVreg, pregFull);
     MicroAPI::Compare<T, CMPMODE::EQ>(pregCond, b64DstValueVreg, b64TmpValueVreg, pregFull);
@@ -805,10 +805,10 @@ __aicore__ inline void ReduceB64IndexTemplate(
     MicroAPI::Compare<IndexT, CMPMODE::NE>(pregCond, tmpIndexVreg, maskIndexVreg, pregIndexFull);
     MicroAPI::ReduceMin(tmpIndexVreg, tmpIndexVreg, pregCond);
     MicroAPI::Sub(tmpIndexVreg, tmpIndexVreg, subIndexVreg, pregIndexFull);
-    MicroAPI::DataCopyUnAlign((__ubuf__ IndexT *&)dstLocal, tmpIndexVreg, ureg, 1);
+    MicroAPI::StoreUnAlign((__ubuf__ IndexT *&)dstLocal, tmpIndexVreg, ureg, 1);
     // for b64 type, pad 0 to b64 bytes, which is 4 bytes
-    MicroAPI::DataCopyUnAlign((__ubuf__ IndexT *&)dstLocal, maskIndexVreg, ureg, 1);
-    MicroAPI::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    MicroAPI::StoreUnAlign((__ubuf__ IndexT *&)dstLocal, maskIndexVreg, ureg, 1);
+    MicroAPI::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <ReduceMode mode, bool isBitMask, typename T, typename IndexT>
@@ -833,7 +833,7 @@ __aicore__ inline void ReduceIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *src
     int32_t postUpdateStride = srcRepStride * GetDataBlockSizeInBytes() / sizeof(T);
     // step1: from [count] to [oneRepSize] value index pair
     for (uint16_t i = 0; i < repeat; ++i) {
-        MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, postUpdateStride);
+        MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcVreg, srcLocal, postUpdateStride);
         if constexpr (mode == ReduceMode::REDUCE_MAX) {
             MicroAPI::Max(tmpValueVreg, dstValueVreg, srcVreg, preg);
         } else {
@@ -854,7 +854,7 @@ __aicore__ inline void ReduceIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *src
     } else {
         MicroAPI::ReduceMin(tmpValueVreg, dstValueVreg, preg);
     }
-    MicroAPI::DataCopyUnAlign(dstLocal, tmpValueVreg, ureg, 1);  // store value
+    MicroAPI::StoreUnAlign(dstLocal, tmpValueVreg, ureg, 1);  // store value
     // get dst value mask and squeeze dst index
     MicroAPI::Duplicate(tmpValueVreg, tmpValueVreg, preg);
     MicroAPI::Compare<T, CMPMODE::EQ>(pregCond, dstValueVreg, tmpValueVreg, preg);
@@ -864,8 +864,8 @@ __aicore__ inline void ReduceIndexTemplate(__ubuf__ T *dstLocal, __ubuf__ T *src
     MicroAPI::Compare<IndexT, CMPMODE::NE>(pregCond, tmpIndexVreg, maskIndexVreg, pregIndexFull);
     MicroAPI::ReduceMin(tmpIndexVreg, tmpIndexVreg, pregCond);
     MicroAPI::Sub(tmpIndexVreg, tmpIndexVreg, subIndexVreg, pregIndexFull);
-    MicroAPI::DataCopyUnAlign((__ubuf__ IndexT *&)dstLocal, tmpIndexVreg, ureg, 1);
-    MicroAPI::DataCopyUnAlignPost(dstLocal, ureg, 0);
+    MicroAPI::StoreUnAlign((__ubuf__ IndexT *&)dstLocal, tmpIndexVreg, ureg, 1);
+    MicroAPI::StoreUnAlignPost(dstLocal, ureg, 0);
 }
 
 template <typename T>

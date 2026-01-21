@@ -30,16 +30,16 @@ __simd_vf__ inline void ReduceARCastLessThanVL(__ubuf__ T *dstAddr, __ubuf__ T *
         MicroAPI::MaskReg mask = MicroAPI::UpdateMask<U>(sreg1);
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             if constexpr (IsSameType<T, bfloat16_t>::value) {
-                DataCopy<T, MicroAPI::LoadDist::DIST_US_B16>(vreg0, srcAddr + loopA * dimR);
+                MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_US_B16>(vreg0, srcAddr + loopA * dimR);
             } else {
-                DataCopy<T, MicroAPI::LoadDist::DIST_US_B8>(vreg0, srcAddr + loopA * dimR);
+                MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_US_B8>(vreg0, srcAddr + loopA * dimR);
             }
             MicroAPI::Cast<U, T, CastTraitUppper>(vreg0CastUpper, vreg0, mask);
             Reducefunc(vreg1CastUpper, vreg0CastUpper, mask);
             MicroAPI::Cast<T, U, CastTraitLower>(vreg1, vreg1CastUpper, mask);
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     } else {
         MicroAPI::RegTensor<T, Trait> vreg0;
         MicroAPI::RegTensor<T, Trait> vreg1;
@@ -53,8 +53,8 @@ __simd_vf__ inline void ReduceARCastLessThanVL(__ubuf__ T *dstAddr, __ubuf__ T *
         mask = MicroAPI::UpdateMask<U>(sreg1);
         MicroAPI::MaskPack(mask, mask);
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-            DataCopy(vreg0, srcAddr + loopA * dimR);
-            DataCopy(vreg1, srcAddr + vlSize / 2 + loopA * dimR);
+            MicroAPI::LoadAlign(vreg0, srcAddr + loopA * dimR);
+            MicroAPI::LoadAlign(vreg1, srcAddr + vlSize / 2 + loopA * dimR);
             Binaryfunc(vreg2, vreg0, vreg1, mask);
             Select(vreg2, vreg2, vreg0, mask);
             if constexpr (IsSameType<T, bfloat16_t>::value) {
@@ -67,9 +67,9 @@ __simd_vf__ inline void ReduceARCastLessThanVL(__ubuf__ T *dstAddr, __ubuf__ T *
             MicroAPI::Cast<U, T, CastTraitUppper>(vreg0CastB32, vreg2, fullMask);
             Reducefunc(vreg1CastB32, vreg0CastB32, fullMask);
             MicroAPI::Cast<T, U, CastTraitLower>(vreg1, vreg1CastB32, fullMask);
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 }
 
@@ -83,11 +83,11 @@ __simd_vf__ inline void ReduceARLessThanVL(__ubuf__ T *dstAddr, __ubuf__ T *srcA
     uint32_t sreg1 = dimR;
     MicroAPI::MaskReg mask = MicroAPI::UpdateMask<T, Trait>(sreg1);
     for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-        DataCopy(vreg0, srcAddr + loopA * dimR);
+        MicroAPI::LoadAlign(vreg0, srcAddr + loopA * dimR);
         Reducefunc(vreg1, vreg0, mask);
-        DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
     }
-    MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+    MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
 }
 
 enum class ReduceType {
@@ -127,20 +127,20 @@ __simd_vf__ inline void GroupReduceVf(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, 
         mask = MicroAPI::UpdateMask<T, Trait>(outerRepElement);
         if constexpr (NeedFoldR) {
             auto srcAddrFold = srcAddr + blockDataLen;
-            DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 vreg0, srcAddr, innerFoldNum, strideA, mask);
             for (uint16_t loopR = 0; loopR < innerFoldBinaryNum; ++loopR) {
-                DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                     vreg1, srcAddrFold, innerFoldNum, 1, mask);
                 Binaryfunc(vreg0, vreg1, vreg0, mask);
             }
         } else {
-            DataCopy(vreg0, srcAddr + vlSize * loopA);
+            MicroAPI::LoadAlign(vreg0, srcAddr + vlSize * loopA);
         }
         GroupReduce<T, Trait, GroupReduceType>(vreg1, vreg0, mask);
-        DataCopyUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, blockNumInVl);
+        MicroAPI::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, blockNumInVl);
     }
-    MicroAPI::DataCopyUnAlignPost((__ubuf__ T*&)dstAddr, uDst, blockNumInVl);
+    MicroAPI::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, blockNumInVl);
 }
 
 template <class T, const MicroAPI::RegTrait &Trait, const uint16_t vlSize, auto Binaryfunc,

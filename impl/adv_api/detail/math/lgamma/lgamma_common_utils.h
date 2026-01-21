@@ -283,10 +283,10 @@ __simd_callee__ inline void LgammaLoadData(MicroAPI::RegTensor<float>& dstReg,
     MicroAPI::RegTensor<T> srcReg, __ubuf__ T* srcUb, MicroAPI::MaskReg& mask)
 {
     if constexpr (IsSameType<T, half>::value) {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb);
         MicroAPI::Cast<float, T, LGAMMA_CAST_TRAIT_F162F32>(dstReg, srcReg, mask);
     } else {
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_NORM>(dstReg, srcUb);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_NORM>(dstReg, srcUb);
     }
 }
 }  // LgammaInternal

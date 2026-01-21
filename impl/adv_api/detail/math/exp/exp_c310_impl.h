@@ -49,16 +49,16 @@ __simd_vf__ inline void ExpCompute(__ubuf__ T* dst, __ubuf__ T* src, uint32_t ca
     MicroAPI::Duplicate<float>(tmpReg, 1.0f);
     MicroAPI::Arange<float>(factorialReg, dupConstant);
     MicroAPI::Div(factorialReg, tmpReg, factorialReg, mask);
-    MicroAPI::DataCopy(taylorExpandTmpBuffer, factorialReg, mask);
+    MicroAPI::StoreAlign(taylorExpandTmpBuffer, factorialReg, mask);
     MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(float);
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         if constexpr (IsSameType<T, half>::value) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(tempSrcVreg, src + i * oneRepSize);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(tempSrcVreg, src + i * oneRepSize);
             MicroAPI::Cast<float, T, castTraitF162F32>(srcVreg, tempSrcVreg, mask);
         } else {
-            MicroAPI::DataCopy(srcVreg, src + i * oneRepSize);
+            MicroAPI::LoadAlign(srcVreg, src + i * oneRepSize);
         }
         MicroAPI::CompareScalar<uint32_t, CMPMODE::EQ>(cmpInfMask, (MicroAPI::RegTensor<uint32_t>&)srcVreg, floatInf, mask);
         MicroAPI::CompareScalar<uint32_t, CMPMODE::EQ>(cmpNInfMask, (MicroAPI::RegTensor<uint32_t>&)srcVreg, floatNInf, mask);
@@ -74,7 +74,7 @@ __simd_vf__ inline void ExpCompute(__ubuf__ T* dst, __ubuf__ T* src, uint32_t ca
             powVreg = decimalVreg;
             constexpr uint16_t vloopEnd = taylorExpandLevel - 1;
             for (uint16_t j = 0; j < vloopEnd; ++j) {
-                MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(denominatorVreg, taylorExpandTmpBuffer + j);
+                MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(denominatorVreg, taylorExpandTmpBuffer + j);
                 MicroAPI::Mul(powVreg, powVreg, decimalVreg, mask);
                 MicroAPI::Mul(powVreg, powVreg, denominatorVreg, mask);
                 MicroAPI::Add(expDecimalVreg, expDecimalVreg, powVreg, mask);
@@ -86,9 +86,9 @@ __simd_vf__ inline void ExpCompute(__ubuf__ T* dst, __ubuf__ T* src, uint32_t ca
         MicroAPI::Select(tempDstVreg, vReg1, tempDstVreg, cmpInfMask);
         if constexpr (IsSameType<T, half>::value) {
             MicroAPI::Cast<T, float, castTraitF322F16>(dstVreg, tempDstVreg, mask);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * oneRepSize, dstVreg, mask);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * oneRepSize, dstVreg, mask);
         } else {
-            MicroAPI::DataCopy(dst + i * oneRepSize, tempDstVreg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepSize, tempDstVreg, mask);
         }
     }
 }

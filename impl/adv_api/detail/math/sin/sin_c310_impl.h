@@ -123,15 +123,15 @@ __simd_vf__ inline void SinPolynomial(__ubuf__ T *dst, __ubuf__ T *src, uint32_t
     for (uint16_t i = 0; i < (uint16_t)repeat; i++) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         if constexpr (std::is_same<T, half>::value) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, src + i * oneRepSize);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, src + i * oneRepSize);
             MicroAPI::Cast<float, half, sinCastTraitF16F32>(srcTmp, srcReg, mask);
             SinPolynomialApproximation(dstTmp, srcTmp, xTmp, round, kpi, mask);
             MicroAPI::Cast<half, float, sinCastTraitF32F16>(dstReg, dstTmp, mask);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * oneRepSize, dstReg, mask);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * oneRepSize, dstReg, mask);
         } else {
-            MicroAPI::DataCopy(srcReg, src + i * oneRepSize);
+            MicroAPI::LoadAlign(srcReg, src + i * oneRepSize);
             SinPolynomialApproximation(dstReg, srcReg, xTmp, round, kpi, mask);
-            MicroAPI::DataCopy(dst + i * oneRepSize, dstReg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepSize, dstReg, mask);
         }
     }
 }

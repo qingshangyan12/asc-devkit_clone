@@ -167,18 +167,18 @@ __simd_vf__ inline void AtanTaylorVFImpl(
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         preg = MicroAPI::UpdateMask<float>(sreg);
         if constexpr (sizeof(T) == sizeof(half)) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
             MicroAPI::Cast<float, T, castTraitB16ToB32>(castReg, srcReg, preg);
         } else {
-            MicroAPI::DataCopy(castReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
+            MicroAPI::LoadAlign(castReg, srcUb + i * B32_DATA_NUM_PER_REPEAT);
         }
         AtanCompute(dstReg, castReg, preg);
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<T, float, castTraitB32ToB16>(srcReg, dstReg, preg);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(
                 dstUb + i * B32_DATA_NUM_PER_REPEAT, srcReg, preg);
         } else {
-            MicroAPI::DataCopy(dstUb + i * B32_DATA_NUM_PER_REPEAT, dstReg, preg);
+            MicroAPI::StoreAlign(dstUb + i * B32_DATA_NUM_PER_REPEAT, dstReg, preg);
         }
     }
 }
@@ -247,7 +247,7 @@ __simd_vf__ inline void AtanPolynomialVFImpl(
 
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         preg0 = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy(vreg0, srcUb + i * vlSize);
+        MicroAPI::LoadAlign(vreg0, srcUb + i * vlSize);
         // x_con = (if x_abs > 1.0 ? 1.0 / x_abs : x_abs)
         MicroAPI::Abs(vreg9, vreg0, preg0);
         MicroAPI::Div(vreg11, vreg10, vreg9, preg0);
@@ -282,7 +282,7 @@ __simd_vf__ inline void AtanPolynomialVFImpl(
         // y_temp = y_s32 | x_s32_temp
         MicroAPI::Or(vreg15, (MicroAPI::RegTensor<int32_t>&)vreg13, vreg15, preg0);
         // y = s32_to_f32(y_temp)
-        MicroAPI::DataCopy(dstUb + i * vlSize, (MicroAPI::RegTensor<T>&)vreg15, preg0);
+        MicroAPI::StoreAlign(dstUb + i * vlSize, (MicroAPI::RegTensor<T>&)vreg15, preg0);
     }
 }
 

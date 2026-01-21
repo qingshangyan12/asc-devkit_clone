@@ -538,12 +538,12 @@ __simd_vf__ inline void TrigRedFPreProcessImpl(__ubuf__ float *tmpBufferR, __ubu
 
     for (uint16_t i = 0; i < repeatTimes; i++) {
         MicroAPI::MaskReg mask = MicroAPI::UpdateMask<float>(calCount);
-        MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, src + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, src + i * B32_DATA_NUM_PER_REPEAT);
         MicroAPI::Cast<float, T, SinCosImpl::castTraitF16F32>(castReg, srcReg, mask);
         TrigRedFPreporcessForHalf(regR, regI, castReg, mask);
 
-        MicroAPI::DataCopy(tmpBufferR + i * B32_DATA_NUM_PER_REPEAT, regR, mask);
-        MicroAPI::DataCopy(tmpBufferI + i * B32_DATA_NUM_PER_REPEAT, regI, mask);
+        MicroAPI::StoreAlign(tmpBufferR + i * B32_DATA_NUM_PER_REPEAT, regR, mask);
+        MicroAPI::StoreAlign(tmpBufferI + i * B32_DATA_NUM_PER_REPEAT, regI, mask);
     }
 }
 
@@ -557,11 +557,11 @@ __simd_vf__ inline void TrigRedFComputePImpl(__ubuf__ uint32_t *tmpBufferRegPHig
     MicroAPI::MaskReg selectMask;
 
     // Load the array of one_over_pi_f
-    MicroAPI::DataCopy(oneOverPiFReg, tmpBuffer);
+    MicroAPI::LoadAlign(oneOverPiFReg, tmpBuffer);
 
     for (uint16_t i = 0; i < repeatTimes; i++) {
         MicroAPI::MaskReg mask = MicroAPI::UpdateMask<float>(calCount);
-        MicroAPI::DataCopy(castReg, src + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(castReg, src + i * B32_DATA_NUM_PER_REPEAT);
         // a = a * 0.0f + a
         MicroAPI::Duplicate(tmpF32Reg, 0.0f, mask);
         MicroAPI::FusedMulDstAdd(castReg, tmpF32Reg, castReg, mask);
@@ -569,13 +569,13 @@ __simd_vf__ inline void TrigRedFComputePImpl(__ubuf__ uint32_t *tmpBufferRegPHig
         MicroAPI::Duplicate(regI, 0, mask);
         regR = castReg;
         // store the origin q and r in ub
-        MicroAPI::DataCopy((__ubuf__ float *)tmpBufferRegPHigh + i * B32_DATA_NUM_PER_REPEAT, regR, mask);
-        MicroAPI::DataCopy(tmpBufferRegPLow + i * B32_DATA_NUM_PER_REPEAT, regI, mask);
+        MicroAPI::StoreAlign((__ubuf__ float *)tmpBufferRegPHigh + i * B32_DATA_NUM_PER_REPEAT, regR, mask);
+        MicroAPI::StoreAlign(tmpBufferRegPLow + i * B32_DATA_NUM_PER_REPEAT, regI, mask);
 
         TrigRedFComputeP(selectMask, regPHigh, regPLow, castReg, oneOverPiFReg, mask);
 
-        MicroAPI::DataCopy(tmpBufferRegPHigh + i * B32_DATA_NUM_PER_REPEAT, regPHigh, selectMask);
-        MicroAPI::DataCopy(tmpBufferRegPLow + i * B32_DATA_NUM_PER_REPEAT, regPLow, selectMask);
+        MicroAPI::StoreAlign(tmpBufferRegPHigh + i * B32_DATA_NUM_PER_REPEAT, regPHigh, selectMask);
+        MicroAPI::StoreAlign(tmpBufferRegPLow + i * B32_DATA_NUM_PER_REPEAT, regPLow, selectMask);
     }
 }
 
@@ -591,17 +591,17 @@ __simd_vf__ inline void TrigRedFComputeRIImpl(__ubuf__ uint32_t *tmpBufferRegPHi
 
     for (uint16_t i = 0; i < repeatTimes; i++) {
         MicroAPI::MaskReg mask = MicroAPI::UpdateMask<float>(calCount);
-        MicroAPI::DataCopy(castReg, src + i * B32_DATA_NUM_PER_REPEAT);
-        MicroAPI::DataCopy(regPHigh, tmpBufferRegPHigh + i * B32_DATA_NUM_PER_REPEAT);
-        MicroAPI::DataCopy(regPLow, tmpBufferRegPLow + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(castReg, src + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(regPHigh, tmpBufferRegPHigh + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(regPLow, tmpBufferRegPLow + i * B32_DATA_NUM_PER_REPEAT);
         // a = a * 0.0f + a
         MicroAPI::Duplicate(tmpF32Reg, 0.0f, mask);
         MicroAPI::FusedMulDstAdd(castReg, tmpF32Reg, castReg, mask);
 
         TrigRedFComputeRI(selectMask, regR, regI, regPHigh, regPLow, castReg, mask);
 
-        MicroAPI::DataCopy((__ubuf__ float *)tmpBufferRegPHigh + i * B32_DATA_NUM_PER_REPEAT, regR, selectMask);
-        MicroAPI::DataCopy((__ubuf__ int32_t *)tmpBufferRegPLow + i * B32_DATA_NUM_PER_REPEAT, regI, selectMask);
+        MicroAPI::StoreAlign((__ubuf__ float *)tmpBufferRegPHigh + i * B32_DATA_NUM_PER_REPEAT, regR, selectMask);
+        MicroAPI::StoreAlign((__ubuf__ int32_t *)tmpBufferRegPLow + i * B32_DATA_NUM_PER_REPEAT, regI, selectMask);
     }
 }
 
@@ -616,8 +616,8 @@ __simd_vf__ inline void SCFCoreImpl(__ubuf__ T *dst, __ubuf__ float *tmpBufferR,
 
     for (uint16_t i = 0; i < repeatTimes; i++) {
         MicroAPI::MaskReg mask = MicroAPI::UpdateMask<float>(calCount);
-        MicroAPI::DataCopy(regR, tmpBufferR + i * B32_DATA_NUM_PER_REPEAT);
-        MicroAPI::DataCopy(regI, tmpBufferI + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(regR, tmpBufferR + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(regI, tmpBufferI + i * B32_DATA_NUM_PER_REPEAT);
 
         SCFCore(dstRegSin, dstRegCos, regI, regR, mask);
 
@@ -629,9 +629,9 @@ __simd_vf__ inline void SCFCoreImpl(__ubuf__ T *dst, __ubuf__ float *tmpBufferR,
 
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<T, float, SinCosImpl::castTraitF32F16>(srcReg, dstReg, mask);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * B32_DATA_NUM_PER_REPEAT, srcReg, mask);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * B32_DATA_NUM_PER_REPEAT, srcReg, mask);
         } else {
-            MicroAPI::DataCopy(dst + i * B32_DATA_NUM_PER_REPEAT, dstReg, mask);
+            MicroAPI::StoreAlign(dst + i * B32_DATA_NUM_PER_REPEAT, dstReg, mask);
         }
     }
 }
@@ -647,19 +647,19 @@ __simd_vf__ inline void BSCFCoreImpl(__ubuf__ T *dstSin, __ubuf__ T *dstCos, __u
 
     for (uint16_t i = 0; i < repeatTimes; i++) {
         MicroAPI::MaskReg mask = MicroAPI::UpdateMask<float>(calCount);
-        MicroAPI::DataCopy(regR, tmpBufferR + i * B32_DATA_NUM_PER_REPEAT);
-        MicroAPI::DataCopy(regI, tmpBufferI + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(regR, tmpBufferR + i * B32_DATA_NUM_PER_REPEAT);
+        MicroAPI::LoadAlign(regI, tmpBufferI + i * B32_DATA_NUM_PER_REPEAT);
 
         SCFCore(dstRegSin, dstRegCos, regI, regR, mask);
 
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<T, float, SinCosImpl::castTraitF32F16>(srcReg, dstRegSin, mask);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstSin + i * B32_DATA_NUM_PER_REPEAT, srcReg, mask);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstSin + i * B32_DATA_NUM_PER_REPEAT, srcReg, mask);
             MicroAPI::Cast<T, float, SinCosImpl::castTraitF32F16>(srcReg, dstRegCos, mask);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstCos + i * B32_DATA_NUM_PER_REPEAT, srcReg, mask);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstCos + i * B32_DATA_NUM_PER_REPEAT, srcReg, mask);
         } else {
-            MicroAPI::DataCopy(dstSin + i * B32_DATA_NUM_PER_REPEAT, dstRegSin, mask);
-            MicroAPI::DataCopy(dstCos + i * B32_DATA_NUM_PER_REPEAT, dstRegCos, mask);
+            MicroAPI::StoreAlign(dstSin + i * B32_DATA_NUM_PER_REPEAT, dstRegSin, mask);
+            MicroAPI::StoreAlign(dstCos + i * B32_DATA_NUM_PER_REPEAT, dstRegCos, mask);
         }
     }
 }

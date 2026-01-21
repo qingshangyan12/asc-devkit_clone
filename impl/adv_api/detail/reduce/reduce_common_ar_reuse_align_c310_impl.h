@@ -30,17 +30,17 @@ __simd_callee__ inline void ReduceARCastfoldZero(__ubuf__ T *dstAddr, __ubuf__ T
     MicroAPI::RegTensor<T, Trait> vreg1;
     MicroAPI::UnalignReg uDst;
     for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-        DataCopy(vreg0, srcAddr + loopA * dimR);
-        DataCopy(vreg1, srcAddr + vlSize / 2 + loopA * dimR);
+        MicroAPI::LoadAlign(vreg0, srcAddr + loopA * dimR);
+        MicroAPI::LoadAlign(vreg1, srcAddr + vlSize / 2 + loopA * dimR);
         Binaryfunc(vreg0, vreg0, vreg1, fullMask);
         MicroAPI::UnPack((MicroAPI::RegTensor<UnpackDstT, Trait> &)vreg0,
             (MicroAPI::RegTensor<UnpackSrcT, Trait> &)vreg0);
         MicroAPI::Cast<U, T, ReduceOpInternal::CastTraitBF16F32>(vreg0CastB32, vreg0, fullMask);
         Reducefunc(vreg1CastB32, vreg0CastB32, fullMask);
         MicroAPI::Cast<T, U, ReduceOpInternal::CastTraitF32BF16>(vreg1, vreg1CastB32, fullMask);
-        DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
     }
-    MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+    MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
 }
 
 template <class T, const MicroAPI::RegTrait &Trait, auto Binaryfunc, auto Reducefunc>
@@ -78,10 +78,10 @@ __simd_vf__ inline void ReduceARB64OverVLVF(__ubuf__ T *dstAddr, __ubuf__ T *src
             for (uint16_t loopR = 0; loopR < inplaceRepeats; loopR++) {
                 mask = MicroAPI::UpdateMask<T, Trait>(sreg0);
                 for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-                    DataCopy(b64VregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
-                    DataCopy(b64VregTail, srcAddr + loopA * dimRAxis + mainR + loopR * vlSize);
+                    MicroAPI::LoadAlign(b64VregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
+                    MicroAPI::LoadAlign(b64VregTail, srcAddr + loopA * dimRAxis + mainR + loopR * vlSize);
                     Binaryfunc(b64VregMain, b64VregMain, b64VregTail, mask);
-                    DataCopy(addr + loopA * dimRAxis + loopR * vlSize, b64VregMain, mask);
+                    MicroAPI::StoreAlign(addr + loopA * dimRAxis + loopR * vlSize, b64VregMain, mask);
                 }
             }
             MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -94,15 +94,15 @@ __simd_vf__ inline void ReduceARB64OverVLVF(__ubuf__ T *dstAddr, __ubuf__ T *src
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             // do inplace add tail with main
             for (uint16_t loopR = 0; loopR < inplaceRepeats; loopR++) {
-                DataCopy(b64VregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
-                DataCopy(b64VregTail, srcAddr + loopA * dimRAxis + mainR + loopR * vlSize);
+                MicroAPI::LoadAlign(b64VregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
+                MicroAPI::LoadAlign(b64VregTail, srcAddr + loopA * dimRAxis + mainR + loopR * vlSize);
                 Binaryfunc(b64VregMain, b64VregMain, b64VregTail, fullMask);
-                DataCopy(addr + loopA * dimRTmp + loopR * vlSize, b64VregMain, fullMask);
+                MicroAPI::StoreAlign(addr + loopA * dimRTmp + loopR * vlSize, b64VregMain, fullMask);
             }
             // do copy main if tail < main
             for (uint16_t loopR = inplaceRepeats; loopR < copyRepeats; loopR++) {
-                DataCopy(b64VregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
-                DataCopy(addr + loopA * dimRTmp + loopR * vlSize, b64VregMain, fullMask);
+                MicroAPI::LoadAlign(b64VregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
+                MicroAPI::StoreAlign(addr + loopA * dimRTmp + loopR * vlSize, b64VregMain, fullMask);
             }
         }
         // add remainer in tail with first element for each R axis
@@ -111,10 +111,10 @@ __simd_vf__ inline void ReduceARB64OverVLVF(__ubuf__ T *dstAddr, __ubuf__ T *src
             mask = MicroAPI::UpdateMask<T, Trait>(inplaceTail);
             MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-                DataCopy(b64VregTail, srcAddr + loopA * dimRAxis + mainR + inplaceRepeats * vlSize);
-                DataCopy(b64VregMain, addr + loopA * dimRTmp);
+                MicroAPI::LoadAlign(b64VregTail, srcAddr + loopA * dimRAxis + mainR + inplaceRepeats * vlSize);
+                MicroAPI::LoadAlign(b64VregMain, addr + loopA * dimRTmp);
                 Binaryfunc(b64VregMain, b64VregMain, b64VregTail, mask);
-                DataCopy(addr + loopA * dimRTmp, b64VregMain, mask);
+                MicroAPI::StoreAlign(addr + loopA * dimRTmp, b64VregMain, mask);
             }
         }
         dimR = mainR;
@@ -140,14 +140,14 @@ __simd_vf__ inline void ReduceARB64OverVLVF(__ubuf__ T *dstAddr, __ubuf__ T *src
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             for (uint16_t loopR = 0; loopR < loopRNum; loopR++) {
                 // L0
-                DataCopy(b64Vreg0, addr + loopA * dimR + loopR * vlSize);
-                DataCopy(b64Vreg1, addr + offsetR + loopA * dimR + loopR * vlSize);
-                DataCopy(b64Vreg2, addr + 2 * offsetR + loopA * dimR + loopR * vlSize);
-                DataCopy(b64Vreg3, addr + 3 * offsetR + loopA * dimR + loopR * vlSize);
-                DataCopy(b64Vreg4, addr + 4 * offsetR + loopA * dimR + loopR * vlSize);
-                DataCopy(b64Vreg5, addr + 5 * offsetR + loopA * dimR + loopR * vlSize);
-                DataCopy(b64Vreg6, addr + 6 * offsetR + loopA * dimR + loopR * vlSize);
-                DataCopy(b64Vreg7, addr + 7 * offsetR + loopA * dimR + loopR * vlSize);
+                MicroAPI::LoadAlign(b64Vreg0, addr + loopA * dimR + loopR * vlSize);
+                MicroAPI::LoadAlign(b64Vreg1, addr + offsetR + loopA * dimR + loopR * vlSize);
+                MicroAPI::LoadAlign(b64Vreg2, addr + 2 * offsetR + loopA * dimR + loopR * vlSize);
+                MicroAPI::LoadAlign(b64Vreg3, addr + 3 * offsetR + loopA * dimR + loopR * vlSize);
+                MicroAPI::LoadAlign(b64Vreg4, addr + 4 * offsetR + loopA * dimR + loopR * vlSize);
+                MicroAPI::LoadAlign(b64Vreg5, addr + 5 * offsetR + loopA * dimR + loopR * vlSize);
+                MicroAPI::LoadAlign(b64Vreg6, addr + 6 * offsetR + loopA * dimR + loopR * vlSize);
+                MicroAPI::LoadAlign(b64Vreg7, addr + 7 * offsetR + loopA * dimR + loopR * vlSize);
                 // L1
                 Binaryfunc(b64Vreg0, b64Vreg0, b64Vreg4, fullMask);
                 Binaryfunc(b64Vreg1, b64Vreg1, b64Vreg5, fullMask);
@@ -158,7 +158,7 @@ __simd_vf__ inline void ReduceARB64OverVLVF(__ubuf__ T *dstAddr, __ubuf__ T *src
                 Binaryfunc(b64Vreg1, b64Vreg1, b64Vreg3, fullMask);
                 // L3
                 Binaryfunc(b64Vreg0, b64Vreg0, b64Vreg1, fullMask);
-                DataCopy(addr + loopA * dimR + loopR * vlSize, b64Vreg0, fullMask);
+                MicroAPI::StoreAlign(addr + loopA * dimR + loopR * vlSize, b64Vreg0, fullMask);
             }
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -167,31 +167,31 @@ __simd_vf__ inline void ReduceARB64OverVLVF(__ubuf__ T *dstAddr, __ubuf__ T *src
     // Process tail folds
     for (uint16_t i = 0; i < foldOne; i++) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-            DataCopy(b64Vreg0, addr + loopA * dimR);
-            DataCopy(b64Vreg1, addr + vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(b64Vreg0, addr + loopA * dimR);
+            MicroAPI::LoadAlign(b64Vreg1, addr + vlSize + loopA * dimR);
             Binaryfunc(b64Vreg0, b64Vreg0, b64Vreg1, fullMask);
             Reducefunc(b64Vreg2, b64Vreg0, fullMask);
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, b64Vreg2, uDst, 1);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, b64Vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     for (uint16_t i = 0; i < foldTwo; i++) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             // L0
-            DataCopy(b64Vreg0, addr + loopA * dimR);
-            DataCopy(b64Vreg1, addr + vlSize + loopA * dimR);
-            DataCopy(b64Vreg2, addr + 2 * vlSize + loopA * dimR);
-            DataCopy(b64Vreg3, addr + 3 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(b64Vreg0, addr + loopA * dimR);
+            MicroAPI::LoadAlign(b64Vreg1, addr + vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(b64Vreg2, addr + 2 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(b64Vreg3, addr + 3 * vlSize + loopA * dimR);
             // L1
             Binaryfunc(b64Vreg0, b64Vreg0, b64Vreg2, fullMask);
             Binaryfunc(b64Vreg1, b64Vreg1, b64Vreg3, fullMask);
             // L2
             Binaryfunc(b64Vreg0, b64Vreg0, b64Vreg1, fullMask);
             Reducefunc(b64Vreg2, b64Vreg0, fullMask);
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, b64Vreg2, uDst, 1);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, b64Vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     // Reduce to 1
@@ -199,11 +199,11 @@ __simd_vf__ inline void ReduceARB64OverVLVF(__ubuf__ T *dstAddr, __ubuf__ T *src
     for (uint16_t i = 0; i < foldZero; i++) {
         mask = MicroAPI::UpdateMask<T, Trait>(sreg);
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-            DataCopy(b64Vreg0, addr + loopA * dimR);
+            MicroAPI::LoadAlign(b64Vreg0, addr + loopA * dimR);
             Reducefunc(b64Vreg1, b64Vreg0, mask);
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, b64Vreg1, uDst, 1);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, b64Vreg1, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 }
 template <class T, const MicroAPI::RegTrait &Trait, const uint16_t vlSize, auto Binaryfunc, auto Reducefunc, bool isReuseSource>
@@ -270,10 +270,10 @@ __simd_vf__ inline void ReduceAROverVLVFImpl(__ubuf__ T *dstAddr, __ubuf__ T *sr
             for (uint16_t loopR = 0; loopR < inplaceRepeats; loopR++) {
                 mask = MicroAPI::UpdateMask<T, Trait>(sreg0);
                 for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-                    DataCopy(vregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
-                    DataCopy(vregTail, srcAddr + loopA * dimRAxis + mainR + loopR * vlSize);
+                    MicroAPI::LoadAlign(vregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
+                    MicroAPI::LoadAlign(vregTail, srcAddr + loopA * dimRAxis + mainR + loopR * vlSize);
                     Binaryfunc(vregMain, vregMain, vregTail, mask);
-                    DataCopy(addr + loopA * dimRAxis + loopR * vlSize, vregMain, mask);
+                    MicroAPI::StoreAlign(addr + loopA * dimRAxis + loopR * vlSize, vregMain, mask);
                 }
             }
             MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -286,15 +286,15 @@ __simd_vf__ inline void ReduceAROverVLVFImpl(__ubuf__ T *dstAddr, __ubuf__ T *sr
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             // do inplace add tail with main
             for (uint16_t loopR = 0; loopR < inplaceRepeats; loopR++) {
-                DataCopy(vregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
-                DataCopy(vregTail, srcAddr + loopA * dimRAxis + mainR + loopR * vlSize);
+                MicroAPI::LoadAlign(vregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
+                MicroAPI::LoadAlign(vregTail, srcAddr + loopA * dimRAxis + mainR + loopR * vlSize);
                 Binaryfunc(vregMain, vregMain, vregTail, fullMask);
-                DataCopy(addr + loopA * dimRTmp + loopR * vlSize, vregMain, fullMask);
+                MicroAPI::StoreAlign(addr + loopA * dimRTmp + loopR * vlSize, vregMain, fullMask);
             }
             // do copy main if tail < main
             for (uint16_t loopR = inplaceRepeats; loopR < copyRepeats; loopR++) {
-                DataCopy(vregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
-                DataCopy(addr + loopA * dimRTmp + loopR * vlSize, vregMain, fullMask);
+                MicroAPI::LoadAlign(vregMain, srcAddr + loopA * dimRAxis + loopR * vlSize);
+                MicroAPI::StoreAlign(addr + loopA * dimRTmp + loopR * vlSize, vregMain, fullMask);
             }
         }
         // add remainer in tail with first element for each R axis
@@ -303,10 +303,10 @@ __simd_vf__ inline void ReduceAROverVLVFImpl(__ubuf__ T *dstAddr, __ubuf__ T *sr
             mask = MicroAPI::UpdateMask<T, Trait>(inplaceTail);
             MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-                DataCopy(vregTail, srcAddr + loopA * dimRAxis + mainR + inplaceRepeats * vlSize);
-                DataCopy(vregMain, addr + loopA * dimRTmp);
+                MicroAPI::LoadAlign(vregTail, srcAddr + loopA * dimRAxis + mainR + inplaceRepeats * vlSize);
+                MicroAPI::LoadAlign(vregMain, addr + loopA * dimRTmp);
                 Binaryfunc(vregMain, vregMain, vregTail, mask);
-                DataCopy(addr + loopA * dimRTmp, vregMain, mask);
+                MicroAPI::StoreAlign(addr + loopA * dimRTmp, vregMain, mask);
             }
         }
         dimR = mainR;
@@ -339,22 +339,22 @@ __simd_vf__ inline void ReduceAROverVLVFImpl(__ubuf__ T *dstAddr, __ubuf__ T *sr
             auto tmpSrcAddr = addr + loopA * dimR;
             for (uint16_t loopR = 0; loopR < loopRNum; loopR++) {
                 // L0
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg0, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg1, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg2, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg3, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg4, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg5, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg6, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg7, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg8, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg9, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg10, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg11, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg12, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg13, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg14, tmpSrcAddr, vlSize);
-                DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg15, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg0, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg1, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg2, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg3, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg4, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg5, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg6, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg7, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg8, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg9, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg10, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg11, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg12, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg13, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg14, tmpSrcAddr, vlSize);
+                MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(vreg15, tmpSrcAddr, vlSize);
                 // L1
                 Binaryfunc(vreg0, vreg0, vreg8, fullMask);
                 Binaryfunc(vreg1, vreg1, vreg9, fullMask);
@@ -374,7 +374,7 @@ __simd_vf__ inline void ReduceAROverVLVFImpl(__ubuf__ T *dstAddr, __ubuf__ T *sr
                 Binaryfunc(vreg1, vreg1, vreg3, fullMask);
                 // L4
                 Binaryfunc(vreg0, vreg0, vreg1, fullMask);
-                DataCopy(addr + loopA * dimR + loopR * vlSize, vreg0, fullMask);
+                MicroAPI::StoreAlign(addr + loopA * dimR + loopR * vlSize, vreg0, fullMask);
             }
         }
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
@@ -383,44 +383,44 @@ __simd_vf__ inline void ReduceAROverVLVFImpl(__ubuf__ T *dstAddr, __ubuf__ T *sr
     // Process tail folds
     for (uint16_t i = 0; i < foldOne; i++) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-            DataCopy(vreg0, addr + loopA * dimR);
-            DataCopy(vreg1, addr + vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg0, addr + loopA * dimR);
+            MicroAPI::LoadAlign(vreg1, addr + vlSize + loopA * dimR);
             Binaryfunc(vreg0, vreg0, vreg1, fullMask);
             ReduceARfoldOneToThree<T, Trait, Binaryfunc, Reducefunc>(vreg0, vreg2, fullMask);
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     for (uint16_t i = 0; i < foldTwo; i++) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             // L0
-            DataCopy(vreg0, addr + loopA * dimR);
-            DataCopy(vreg1, addr + vlSize + loopA * dimR);
-            DataCopy(vreg2, addr + 2 * vlSize + loopA * dimR);
-            DataCopy(vreg3, addr + 3 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg0, addr + loopA * dimR);
+            MicroAPI::LoadAlign(vreg1, addr + vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg2, addr + 2 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg3, addr + 3 * vlSize + loopA * dimR);
             // L1
             Binaryfunc(vreg0, vreg0, vreg2, fullMask);
             Binaryfunc(vreg1, vreg1, vreg3, fullMask);
             // L2
             Binaryfunc(vreg0, vreg0, vreg1, fullMask);
             ReduceARfoldOneToThree<T, Trait, Binaryfunc, Reducefunc>(vreg0, vreg2, fullMask);
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     for (uint16_t i = 0; i < foldThree; i++) {
         for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
             // L0
-            DataCopy(vreg0, addr + loopA * dimR);
-            DataCopy(vreg1, addr + vlSize + loopA * dimR);
-            DataCopy(vreg2, addr + 2 * vlSize + loopA * dimR);
-            DataCopy(vreg3, addr + 3 * vlSize + loopA * dimR);
-            DataCopy(vreg4, addr + 4 * vlSize + loopA * dimR);
-            DataCopy(vreg5, addr + 5 * vlSize + loopA * dimR);
-            DataCopy(vreg6, addr + 6 * vlSize + loopA * dimR);
-            DataCopy(vreg7, addr + 7 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg0, addr + loopA * dimR);
+            MicroAPI::LoadAlign(vreg1, addr + vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg2, addr + 2 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg3, addr + 3 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg4, addr + 4 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg5, addr + 5 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg6, addr + 6 * vlSize + loopA * dimR);
+            MicroAPI::LoadAlign(vreg7, addr + 7 * vlSize + loopA * dimR);
             // L1
             Binaryfunc(vreg0, vreg0, vreg4, fullMask);
             Binaryfunc(vreg1, vreg1, vreg5, fullMask);
@@ -432,9 +432,9 @@ __simd_vf__ inline void ReduceAROverVLVFImpl(__ubuf__ T *dstAddr, __ubuf__ T *sr
             // L3
             Binaryfunc(vreg0, vreg0, vreg1, fullMask);
             ReduceARfoldOneToThree<T, Trait, Binaryfunc, Reducefunc>(vreg0, vreg2, fullMask);
-            DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg2, uDst, 1);
         }
-        MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+        MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
     }
 
     // Reduce to 1
@@ -450,11 +450,11 @@ __simd_vf__ inline void ReduceAROverVLVFImpl(__ubuf__ T *dstAddr, __ubuf__ T *sr
             uint32_t sreg = mainR;
             mask = MicroAPI::UpdateMask<T, Trait>(sreg);
             for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
-                DataCopy(vreg0, addr + loopA * dimR);
+                MicroAPI::LoadAlign(vreg0, addr + loopA * dimR);
                 Reducefunc(vreg1, vreg0, mask);
-                DataCopyUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
+                MicroAPI::StoreUnAlign((__ubuf__ T *&)dstAddr, vreg1, uDst, 1);
             }
-            MicroAPI::DataCopyUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
+            MicroAPI::StoreUnAlignPost((__ubuf__ T *&)dstAddr, uDst, 0);
         }
     }
 }

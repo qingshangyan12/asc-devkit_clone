@@ -35,16 +35,16 @@ __simd_vf__ inline void CompareWithoutDstCounterModeImplVF(
     uint32_t sreg = static_cast<uint32_t>(mask);
     if constexpr (!isSetMask) {
         maskReg = MicroAPI::MoveMask<uint16_t>();
-        MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        MicroAPI::StoreAlign<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
     }
     maskReg = MicroAPI::UpdateMask<T>(sreg);
-    MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg0, src0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-    MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg1, src1, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+    MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg0, src0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+    MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg1, src1, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
     MicroAPI::Compare<T, cmpMode>(dstReg, srcReg0, srcReg1, maskReg);
-    MicroAPI::DataCopyUnAlign((__ubuf__ T *&)tempBuf, dstReg, uReg);
-    MicroAPI::DataCopyUnAlignPost<uint64_t, MicroAPI::PostLiteral::POST_MODE_NORMAL>(tempBuf, uReg, 0);
+    MicroAPI::StoreUnAlign((__ubuf__ T *&)tempBuf, dstReg, uReg);
+    MicroAPI::StoreUnAlignPost<uint64_t, MicroAPI::PostLiteral::POST_MODE_NORMAL>(tempBuf, uReg, 0);
 }
 
 template <typename T, bool isSetMask, bool isBitMap, CMPMODE cmpMode>
@@ -64,11 +64,11 @@ __simd_vf__ inline void CompareWithoutDstNormalModeImplVF(
             maskReg = MicroAPI::MoveMask<T>();
         }
     }
-    MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg0, src0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-    MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg1, src1, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+    MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg0, src0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+    MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg1, src1, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
     MicroAPI::Compare<T, cmpMode>(dstReg, srcReg0, srcReg1, maskReg);
-    MicroAPI::DataCopyUnAlign((__ubuf__ T *&)tempBuf, dstReg, uReg);
-    MicroAPI::DataCopyUnAlignPost<uint64_t, MicroAPI::PostLiteral::POST_MODE_NORMAL>(tempBuf, uReg, 0);
+    MicroAPI::StoreUnAlign((__ubuf__ T *&)tempBuf, dstReg, uReg);
+    MicroAPI::StoreUnAlignPost<uint64_t, MicroAPI::PostLiteral::POST_MODE_NORMAL>(tempBuf, uReg, 0);
 }
 
 template <typename T, bool isSetMask = true>
@@ -252,14 +252,14 @@ __simd_vf__ inline void CompareLevel0CounterMode(__ubuf__ U *dst, __ubuf__ T *sr
     uint16_t newRepeatTimes = CeilDivision(sreg, oneRepSize);
     for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
         maskReg = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             src0Reg, src0, static_cast<uint32_t>(repeatParams.src0BlkStride), static_cast<uint32_t>(repeatParams.src0RepStride), maskReg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             src1Reg, src1, static_cast<uint32_t>(repeatParams.src1BlkStride), static_cast<uint32_t>(repeatParams.src1RepStride), maskReg);
         MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
     }
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 // Compare::Level 0 - bit mode / Continious mode support b8/b16/b32
@@ -278,14 +278,14 @@ __simd_vf__ inline void CompareLevel0NormalMode(__ubuf__ U *dst, __ubuf__ T *src
         maskReg = MicroAPI::UpdateMask<T>(sreg);
     }
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             src0Reg, src0, static_cast<uint32_t>(repeatParams.src0BlkStride), static_cast<uint32_t>(repeatParams.src0RepStride), maskReg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             src1Reg, src1, static_cast<uint32_t>(repeatParams.src1BlkStride), static_cast<uint32_t>(repeatParams.src1RepStride), maskReg);
         MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
     }
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 template <typename T, typename U, bool isSetMask = true>
@@ -457,19 +457,19 @@ __simd_vf__ inline void CompareScalarLevel0CounterMode(__ubuf__ U *dst, __ubuf__
     constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
     if constexpr (!isSetMask) {
         maskReg = MicroAPI::MoveMask<uint16_t>();
-        MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        MicroAPI::StoreAlign<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
     }
     uint16_t newRepeatTimes = CeilDivision(sreg, oneRepSize);
     for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
         maskReg = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             src0Reg, src0, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
         MicroAPI::CompareScalar<T, cmpMode>(dstReg, src0Reg, src1, maskReg);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
     }
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 template <typename T, typename U, CMPMODE cmpMode, bool isBitMapMode, bool isSetMask>
@@ -491,12 +491,12 @@ __simd_vf__ inline void CompareScalarLevel0NormalMode(__ubuf__ U *dst, __ubuf__ 
         }
     }
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             src0Reg, src0, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
         MicroAPI::CompareScalar<T, cmpMode>(dstReg, src0Reg, src1, maskReg);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
     }
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 template <typename T, typename U, bool isSetMask = true>
@@ -686,35 +686,35 @@ __simd_vf__ inline void CompareScalarLevel2(__ubuf__ U *dst, __ubuf__ T *src0, c
             MicroAPI::Duplicate(src1Reg, GetScalarBitcodeValue<double, uint64_t>(src1)); 
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 maskReg = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumTwo>(sreg);
-                MicroAPI::DataCopy(src0Reg, src0 + i * repeatElm);
+                MicroAPI::LoadAlign(src0Reg, src0 + i * repeatElm);
                 CompareEqualDouble<uint64_t>(dstReg, (MicroAPI::RegTensor<uint64_t, MicroAPI::RegTraitNumTwo>&)src0Reg, src1Reg, maskReg);  
-                MicroAPI::DataCopyUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
+                MicroAPI::StoreUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
             }
         } else {        
             MicroAPI::RegTensor<T, MicroAPI::RegTraitNumTwo> src0Reg;
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 maskReg = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumTwo>(sreg);
-                MicroAPI::DataCopy(src0Reg, src0 + i * repeatElm);
+                MicroAPI::LoadAlign(src0Reg, src0 + i * repeatElm);
                 MicroAPI::CompareScalar<T, cmpMode>(dstReg, src0Reg, src1, maskReg);
-                MicroAPI::DataCopyUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
+                MicroAPI::StoreUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
             }
         }
-        MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+        MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
     } else {
         MicroAPI::RegTensor<T> src0Reg;
         constexpr uint32_t offset = GetVecLen() / sizeof(T) / CmpInternal::maskBitToByte;
         for (uint16_t i = 0; i < repeatTime; ++i) {
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign(src0Reg, src0 + i * repeatElm);
             MicroAPI::CompareScalar<T, cmpMode>(dstReg, src0Reg, src1, maskReg);
             if constexpr (sizeof(T) == 1) {
-                MicroAPI::DataCopy(dst + i * offset, dstReg);
+                MicroAPI::StoreAlign(dst + i * offset, dstReg);
             } else {
-                MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+                MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
             }
         }
         if constexpr (sizeof(T) > 1) {
-            MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+            MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
         }
     }
 }
@@ -773,19 +773,19 @@ __simd_vf__ inline void CompareSrc0ScalarLevel0CounterMode(__ubuf__ U *dst, cons
     MicroAPI::Duplicate(src0Reg, src0);
     if constexpr (!isSetMask) {
         maskReg = MicroAPI::MoveMask<uint16_t>();
-        MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        MicroAPI::StoreAlign<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
     }
     uint16_t newRepeatTimes = CeilDivision(sreg, oneRepSize);
     for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
         maskReg = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             src1Reg, src1, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
         MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
     }
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 template <typename T, typename U, CMPMODE cmpMode, bool isBitMapMode, bool isSetMask>
@@ -808,12 +808,12 @@ __simd_vf__ inline void CompareSrc0ScalarLevel0NormalMode(__ubuf__ U *dst, const
     }
     MicroAPI::Duplicate(src0Reg, src0);
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             src1Reg, src1, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
         MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
     }
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 template <typename T, typename U, bool isSetMask = true>
@@ -1004,37 +1004,37 @@ __simd_vf__ inline void CompareSrc0ScalarLevel2(__ubuf__ U *dst, const T src0, _
             MicroAPI::Duplicate(src0Reg, GetScalarBitcodeValue<double, uint64_t>(src0));
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 maskReg = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumTwo>(sreg);
-                MicroAPI::DataCopy(src1Reg, src1 + i * repeatElm);
+                MicroAPI::LoadAlign(src1Reg, src1 + i * repeatElm);
                 CompareEqualDouble<uint64_t>(dstReg, (MicroAPI::RegTensor<uint64_t, MicroAPI::RegTraitNumTwo>&)src1Reg, src0Reg, maskReg);
-                MicroAPI::DataCopyUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
+                MicroAPI::StoreUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
             }        
         } else {
             MicroAPI::RegTensor<T, MicroAPI::RegTraitNumTwo> src0Reg, src1Reg;
             MicroAPI::Duplicate(src0Reg, src0);
             for (uint16_t i = 0; i < repeatTime; ++i) {
                 maskReg = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumTwo>(sreg);
-                MicroAPI::DataCopy(src1Reg, src1 + i * repeatElm);
+                MicroAPI::LoadAlign(src1Reg, src1 + i * repeatElm);
                 MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
-                MicroAPI::DataCopyUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
+                MicroAPI::StoreUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
             }
         }
-        MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+        MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
     } else {
         MicroAPI::RegTensor<T> src0Reg, src1Reg;
         constexpr uint32_t offset = GetVecLen() / sizeof(T) / CmpInternal::maskBitToByte;
         MicroAPI::Duplicate(src0Reg, src0);
         for (uint16_t i = 0; i < repeatTime; ++i) {
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign(src1Reg, src1 + i * repeatElm);
             MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
             if constexpr (sizeof(T) == 1) {
-                MicroAPI::DataCopy(dst + i * offset, dstReg);
+                MicroAPI::StoreAlign(dst + i * offset, dstReg);
             } else {
-                MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+                MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
             }
         }
         if constexpr (sizeof(T) > 1) {
-            MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+            MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
         }
     }
 }
@@ -1092,26 +1092,26 @@ __simd_vf__ inline void CompareScalarBothTensorLevel2(
     MicroAPI::RegTensor<T> src0Reg, src1Reg;
     constexpr uint32_t offset = GetVecLen() / sizeof(T) / CmpInternal::maskBitToByte;
     if constexpr (scalarIdx == 0) {
-        MicroAPI::DataCopy<T, pattern>(src0Reg, src0);
+        MicroAPI::LoadAlign<T, pattern>(src0Reg, src0);
     } else {
-        MicroAPI::DataCopy<T, pattern>(src1Reg, src1);
+        MicroAPI::LoadAlign<T, pattern>(src1Reg, src1);
     }
     for (uint16_t i = 0; i < repeatTime; ++i) {
         maskReg = MicroAPI::UpdateMask<T>(sreg);
         if constexpr (scalarIdx == 0) {
-            MicroAPI::DataCopy(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign(src1Reg, src1 + i * repeatElm);
         } else {
-            MicroAPI::DataCopy(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign(src0Reg, src0 + i * repeatElm);
         }
         MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
         if constexpr (sizeof(T) == 1) {
-            MicroAPI::DataCopy(dst + i * offset, dstReg);
+            MicroAPI::StoreAlign(dst + i * offset, dstReg);
         } else {
-            MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+            MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
         }
     }
     if constexpr (sizeof(T) > 1) {
-        MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+        MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
     }
 }
 
@@ -1164,15 +1164,15 @@ __simd_vf__ inline void CompareScalarLevel2B64(
     MicroAPI::MaskReg maskFull = MicroAPI::CreateMask<uint32_t, MicroAPI::MaskPattern::ALL>();
     MicroAPI::Duplicate(zeroReg, 0, maskFull);
     if constexpr (scalarIdx == 0) {
-        MicroAPI::DataCopyUnAlignPre(dupuReg, (__ubuf__ T *)src0);
-        MicroAPI::DataCopyUnAlign(preReg, dupuReg, (__ubuf__ T *)src0);
+        MicroAPI::LoadUnAlignPre(dupuReg, (__ubuf__ T *)src0);
+        MicroAPI::LoadUnAlign(preReg, dupuReg, (__ubuf__ T *)src0);
         MicroAPI::DeInterleave((MicroAPI::RegTensor<uint32_t> &)dupReg.reg[0],
             (MicroAPI::RegTensor<uint32_t> &)dupReg.reg[1],
             (MicroAPI::RegTensor<uint32_t> &)preReg, zeroReg);
         MicroAPI::Duplicate(src0Reg, dupReg, maskFull);
     } else {
-        MicroAPI::DataCopyUnAlignPre(dupuReg, (__ubuf__ T *)src1);
-        MicroAPI::DataCopyUnAlign(preReg, dupuReg, (__ubuf__ T *)src1);
+        MicroAPI::LoadUnAlignPre(dupuReg, (__ubuf__ T *)src1);
+        MicroAPI::LoadUnAlign(preReg, dupuReg, (__ubuf__ T *)src1);
         MicroAPI::DeInterleave((MicroAPI::RegTensor<uint32_t> &)dupReg.reg[0],
             (MicroAPI::RegTensor<uint32_t> &)dupReg.reg[1],
             (MicroAPI::RegTensor<uint32_t> &)preReg, zeroReg);
@@ -1181,14 +1181,14 @@ __simd_vf__ inline void CompareScalarLevel2B64(
     for (uint16_t i = 0; i < repeatTime; ++i) {
         maskReg = MicroAPI::UpdateMask<T, MicroAPI::RegTraitNumTwo>(sreg);
         if constexpr (scalarIdx == 0) {
-            MicroAPI::DataCopy(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign(src1Reg, src1 + i * repeatElm);
         } else {
-            MicroAPI::DataCopy(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign(src0Reg, src0 + i * repeatElm);
         }
         MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
-        MicroAPI::DataCopyUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
+        MicroAPI::StoreUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
     }
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 template <typename T, typename U, CMPMODE cmpMode, uint8_t scalarIdx, typename Std::enable_if<Std::is_same<PrimT<T>, double>::value, bool>::type = true>
@@ -1207,35 +1207,35 @@ __simd_vf__ inline void CompareScalarLevel2B64(
     if constexpr (scalarIdx == 0) {
         MicroAPI::RegTensor<double, MicroAPI::RegTraitNumTwo> src1Reg, dupReg;
         MicroAPI::RegTensor<uint64_t, MicroAPI::RegTraitNumTwo> src0Reg;
-        MicroAPI::DataCopyUnAlignPre(dupuReg, (__ubuf__ double *)src0);
-        MicroAPI::DataCopyUnAlign(preReg, dupuReg, (__ubuf__ double *)src0);
+        MicroAPI::LoadUnAlignPre(dupuReg, (__ubuf__ double *)src0);
+        MicroAPI::LoadUnAlign(preReg, dupuReg, (__ubuf__ double *)src0);
         MicroAPI::DeInterleave((MicroAPI::RegTensor<uint32_t> &)dupReg.reg[0],
             (MicroAPI::RegTensor<uint32_t> &)dupReg.reg[1],
             (MicroAPI::RegTensor<uint32_t> &)preReg, zeroReg);
         MicroAPI::Duplicate(src0Reg, (MicroAPI::RegTensor<uint64_t, MicroAPI::RegTraitNumTwo>&)dupReg, maskFull);
         for (uint16_t i = 0; i < repeatTime; ++i) {
             maskReg = MicroAPI::UpdateMask<double, MicroAPI::RegTraitNumTwo>(sreg);
-            MicroAPI::DataCopy(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign(src1Reg, src1 + i * repeatElm);
             CompareEqualDouble<uint64_t>(dstReg, src0Reg, (MicroAPI::RegTensor<uint64_t, MicroAPI::RegTraitNumTwo>&)src1Reg, maskReg);   
-            MicroAPI::DataCopyUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
+            MicroAPI::StoreUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
         }
     } else {
         MicroAPI::RegTensor<double, MicroAPI::RegTraitNumTwo> src0Reg, dupReg;
         MicroAPI::RegTensor<uint64_t, MicroAPI::RegTraitNumTwo> src1Reg;
-        MicroAPI::DataCopyUnAlignPre(dupuReg, (__ubuf__ double *)src1);
-        MicroAPI::DataCopyUnAlign(preReg, dupuReg, (__ubuf__ double *)src1);
+        MicroAPI::LoadUnAlignPre(dupuReg, (__ubuf__ double *)src1);
+        MicroAPI::LoadUnAlign(preReg, dupuReg, (__ubuf__ double *)src1);
         MicroAPI::DeInterleave((MicroAPI::RegTensor<uint32_t> &)dupReg.reg[0],
             (MicroAPI::RegTensor<uint32_t> &)dupReg.reg[1],
             (MicroAPI::RegTensor<uint32_t> &)preReg, zeroReg);
         MicroAPI::Duplicate(src1Reg, (MicroAPI::RegTensor<uint64_t, MicroAPI::RegTraitNumTwo>&)dupReg, maskFull);
         for (uint16_t i = 0; i < repeatTime; ++i) {
             maskReg = MicroAPI::UpdateMask<double, MicroAPI::RegTraitNumTwo>(sreg);
-            MicroAPI::DataCopy(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign(src0Reg, src0 + i * repeatElm);
             CompareEqualDouble<uint64_t>(dstReg, (MicroAPI::RegTensor<uint64_t, MicroAPI::RegTraitNumTwo>&)src0Reg, src1Reg, maskReg);   
-            MicroAPI::DataCopyUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
+            MicroAPI::StoreUnAlign((__ubuf__ uint32_t *&)dst, dstReg, uReg);
         }
     }        
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 template <typename T, typename U, bool isSetMask = true, uint8_t scalarIdx = 1>
@@ -1299,7 +1299,7 @@ __simd_vf__ inline void CompareScalarBothTensorLevel0CounterMode(__ubuf__ U *dst
     uint32_t countSreg = static_cast<uint32_t>(mask);
     if constexpr (!isSetMask) {
         maskReg = MicroAPI::MoveMask<uint16_t>();
-        MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        MicroAPI::StoreAlign<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
         countSreg = static_cast<uint32_t>(tempBuf[0]);
     }
@@ -1309,23 +1309,23 @@ __simd_vf__ inline void CompareScalarBothTensorLevel0CounterMode(__ubuf__ U *dst
     MicroAPI::MaskReg dstReg;
     MicroAPI::UnalignReg uReg;
     if constexpr (scalarIdx == 0) {
-        MicroAPI::DataCopy<T, pattern>(src0Reg, src0);
+        MicroAPI::LoadAlign<T, pattern>(src0Reg, src0);
     } else {
-        MicroAPI::DataCopy<T, pattern>(src1Reg, src1);
+        MicroAPI::LoadAlign<T, pattern>(src1Reg, src1);
     }
     for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
         maskReg = MicroAPI::UpdateMask<T>(countSreg);
         if constexpr (scalarIdx == 0) {
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 src1Reg, src1, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
         } else {
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 src0Reg, src0, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
         }
         MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
     }
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 template <typename T, typename U, CMPMODE cmpMode, bool isBitMapMode, uint8_t scalarIdx, MicroAPI::LoadDist pattern, bool isSetMask>
@@ -1347,22 +1347,22 @@ __simd_vf__ inline void CompareScalarBothTensorLevel0NormalMode(__ubuf__ U *dst,
         }
     }
     if constexpr (scalarIdx == 0) {
-        MicroAPI::DataCopy<T, pattern>(src0Reg, src0);
+        MicroAPI::LoadAlign<T, pattern>(src0Reg, src0);
     } else {
-        MicroAPI::DataCopy<T, pattern>(src1Reg, src1);
+        MicroAPI::LoadAlign<T, pattern>(src1Reg, src1);
     }
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
         if constexpr (scalarIdx == 0) {
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 src1Reg, src1, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
         } else {
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 src0Reg, src0, static_cast<uint32_t>(repeatParams.srcBlkStride), static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
         }
         MicroAPI::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
-        MicroAPI::DataCopyUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
+        MicroAPI::StoreUnAlign((__ubuf__ T *&)dst, dstReg, uReg);
     }
-    MicroAPI::DataCopyUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
 template <typename T, typename U, bool isSetMask = true, bool isBitMapMode, uint8_t scalarIdx, MicroAPI::LoadDist pattern>

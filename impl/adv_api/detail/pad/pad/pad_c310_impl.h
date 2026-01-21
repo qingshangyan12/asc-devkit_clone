@@ -65,27 +65,27 @@ __simd_vf__ inline void UnAlignedPad(__ubuf__ T* dstUb, __ubuf__ T* srcUb,
         MicroAPI::UnalignReg unalignRegCpyOut;
 
         MicroAPI::Duplicate<T, MicroAPI::MaskMergeMode::MERGING>(regT, static_cast<T>(padParams.padValue), leftPadask);
-        MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::StoreUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             dstStartPerBlock, regT, unalignRegCpyOut, padParams.leftPad);
 
         for (uint32_t j = 0; j < regBlockCntPerRow; ++j) {
-            MicroAPI::DataCopyUnAlignPre(unalignRegCpyIn, srcStartPerBlock);
-            MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::LoadUnAlignPre(unalignRegCpyIn, srcStartPerBlock);
+            MicroAPI::LoadUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 regT, unalignRegCpyIn, srcStartPerBlock, regBlockElementCnt);
 
-            MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::StoreUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 dstStartPerBlock, regT, unalignRegCpyOut, regBlockElementCnt);
         }
 
-        MicroAPI::DataCopyUnAlignPre(unalignRegCpyIn, srcStartPerBlock);
-        MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadUnAlignPre(unalignRegCpyIn, srcStartPerBlock);
+        MicroAPI::LoadUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             regT, unalignRegCpyIn, srcStartPerBlock, lastRegBlockPerRowElementCnt);
 
         MicroAPI::Duplicate<T, MicroAPI::MaskMergeMode::MERGING>(regT, static_cast<T>(padParams.padValue), rightPadask);
 
-        MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::StoreUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             dstStartPerBlock, regT, unalignRegCpyOut, lastRegBlockPerRowCopyOutCnt);
-        MicroAPI::DataCopyUnAlignPost(dstStartPerBlock, unalignRegCpyOut, 0);
+        MicroAPI::StoreUnAlignPost(dstStartPerBlock, unalignRegCpyOut, 0);
     }
 }
 
@@ -115,16 +115,16 @@ __simd_vf__ inline void AlignedPad(__ubuf__ T* dstUb, __ubuf__ T* srcUb,
 
     for (uint32_t i = 0; i < tiling.srcHeight; i++) {
         for (uint32_t j = 0; j < regBlockCntPerRow; j++) {
-            MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 regT, srcStartPerBlock, regBlockElementCnt);
-            MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::StoreAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 dstStartPerBlock, regT, regBlockElementCnt, regBlockPerRowCopyOutMask);
         }
 
-        MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             regT, srcStartPerBlock, lastRegBlockPerRowElementCnt);
         MicroAPI::Duplicate<T, MicroAPI::MaskMergeMode::MERGING>(regT, static_cast<T>(padParams.padValue), rightPadask);
-        MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::StoreAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             dstStartPerBlock, regT, lastRegBlockPerRowElementCnt, lastRegBlockPerRowCopyOutMask);
     }
 }
@@ -147,18 +147,18 @@ __simd_vf__ inline void UnPad(__ubuf__ T* dstUb, __ubuf__ T* srcUb, UnPadParams 
     __ubuf__ T* dstStartPerBlock = dstUb;
     for (uint32_t i = 0; i < tiling.srcHeight; i++) {
         for (uint32_t j = 0; j < regBlockCntPerRow; ++j) {
-            MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 regT, srcStartPerBlock, regBlockElementCnt);
 
-            MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+            MicroAPI::StoreUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                 dstStartPerBlock, regT, unalignRegCpyOut, regBlockElementCnt);
         }
 
-        MicroAPI::DataCopy<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::LoadAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             regT, srcStartPerBlock, lastRegBlockPerRowElementCnt);
-        MicroAPI::DataCopyUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+        MicroAPI::StoreUnAlign<T, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
             dstStartPerBlock, regT, unalignRegCpyOut, lastRegBlockPerRowElementCnt - padParams.rightPad);
-        MicroAPI::DataCopyUnAlignPost(dstStartPerBlock, unalignRegCpyOut, 0);
+        MicroAPI::StoreUnAlignPost(dstStartPerBlock, unalignRegCpyOut, 0);
     }
 }
 

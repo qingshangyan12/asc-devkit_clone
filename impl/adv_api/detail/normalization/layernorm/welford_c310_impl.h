@@ -36,17 +36,17 @@ __simd_callee__ inline void WelfordUpdateImplForVFCommon(MicroAPI::MaskReg& preg
     __ubuf__ float* const outMean, __ubuf__ float* const outVar, __ubuf__ float* const inMean,
     __ubuf__ float* const inVar, uint32_t offset, float nRec, uint32_t sreg)
 {
-    MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_NORM>(meanVreg, inMean + offset);
-    MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_NORM>(varVreg, inVar + offset);
+    MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_NORM>(meanVreg, inMean + offset);
+    MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_NORM>(varVreg, inVar + offset);
     MicroAPI::Sub(tmpVreg, srcVreg, meanVreg, preg);
     MicroAPI::Muls(outMeanreg, tmpVreg, nRec, preg);
     MicroAPI::Add(outMeanreg, outMeanreg, meanVreg, preg);
-    MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(outMean + offset, outMeanreg, preg);
+    MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(outMean + offset, outMeanreg, preg);
 
     MicroAPI::Sub(f32vreg, srcVreg, outMeanreg, preg);
     MicroAPI::Mul(f32vreg, tmpVreg, f32vreg, preg);
     MicroAPI::Add(outVarreg, f32vreg, varVreg, preg);
-    MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(outVar + offset, outVarreg, preg);
+    MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(outVar + offset, outVarreg, preg);
 }
 
 // Helper for in-place copy logic in B16/B32
@@ -61,11 +61,11 @@ __simd_callee__ inline void WelfordUpdateImplInplaceCopy(MicroAPI::MaskReg& preg
         for (uint16_t j = 0; j < repeatInplace; ++j) {
             preg = MicroAPI::UpdateMask<uint32_t>(sreg);
             uint32_t srcOffset = rowOffset + j * sregLower;
-            MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_NORM>(meanVreg, inMean + dstOffset + srcOffset);
-            MicroAPI::DataCopy<float, MicroAPI::LoadDist::DIST_NORM>(varVreg, inVar + dstOffset + srcOffset);
-            MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(
+            MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_NORM>(meanVreg, inMean + dstOffset + srcOffset);
+            MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_NORM>(varVreg, inVar + dstOffset + srcOffset);
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(
                 outMean + dstOffset + srcOffset, meanVreg, preg);
-            MicroAPI::DataCopy<float, MicroAPI::StoreDist::DIST_NORM_B32>(
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_NORM_B32>(
                 outVar + dstOffset + srcOffset, varVreg, preg);
         }
     }
@@ -97,7 +97,7 @@ __simd_vf__ inline void WelfordUpdateImplForB16VF(__ubuf__ float* const outMean,
         uint32_t rowOffset = i * para.abLength;
         uint32_t sreg = static_cast<uint32_t>(K);
         for (uint16_t j = 0; j < static_cast<uint16_t>(repeat); ++j) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_NORM>(b16vreg, src + rowOffset + j * sregLower);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_NORM>(b16vreg, src + rowOffset + j * sregLower);
             MicroAPI::Interleave<uint16_t>((MicroAPI::RegTensor<uint16_t>&)vreg1, (MicroAPI::RegTensor<uint16_t>&)vreg2,
                 (MicroAPI::RegTensor<uint16_t>&)b16vreg, (MicroAPI::RegTensor<uint16_t>&)zeroReg);
 
@@ -149,7 +149,7 @@ __simd_vf__ inline void WelfordUpdateImplForB32VF(__ubuf__ float* const outMean,
         for (uint16_t j = 0; j < static_cast<uint16_t>(repeat); ++j) {
             preg = MicroAPI::UpdateMask<uint32_t>(sreg);
             uint32_t offset = rowOffset + j * sregLower;
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_NORM>(srcVreg, src + offset);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_NORM>(srcVreg, src + offset);
             WelfordUpdateImplForVFCommon<T, false>(preg, meanVreg, varVreg, tmpVreg, srcVreg, outMeanreg, outVarreg,
                 f32vreg, outMean, outVar, inMean, inVar, offset, static_cast<float>(para.nRec), sreg);
         }

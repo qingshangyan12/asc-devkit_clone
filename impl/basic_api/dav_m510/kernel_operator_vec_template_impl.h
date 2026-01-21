@@ -46,7 +46,7 @@ __aicore__ inline uint32_t VecMicroGetCount(const uint64_t maskArray[], const ui
     if constexpr (!isSetMask) {
         // get SPR.MASK in VF
         MicroAPI::MaskReg sprLoadMaskReg = MicroAPI::MoveMask<uint16_t>();
-        MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
+        MicroAPI::StoreAlign<uint64_t, MicroAPI::MaskDist::DIST_PACK>(maskBuf, sprLoadMaskReg);
         // insert membar(vec store operation) before load maskBuf[0](scalar load operation)
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
         count = static_cast<uint32_t>(maskBuf[0]);
@@ -79,7 +79,7 @@ __aicore__ inline MicroAPI::MaskReg VecMicroGetMaskReg(__ubuf__ uint64_t *maskBu
         }
     } else if constexpr (isNormalMode && isMaskBitMode) {
         if constexpr (SupportBytes<T, 1>()) {
-            MicroAPI::DataCopy(maskReg, (__ubuf__ uint32_t *)maskBuf);
+            MicroAPI::LoadAlign(maskReg, (__ubuf__ uint32_t *)maskBuf);
         } else {
             maskReg = MicroAPI::MoveMask<T>();
         }
@@ -142,16 +142,16 @@ __aicore__ inline void VecBinaryVFImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf
 #ifndef NO_OVERLAP_IN_MULTI_REPEAT
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 #endif
-        MicroAPI::DataCopy<U, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcVreg0,
+        MicroAPI::LoadAlign<U, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcVreg0,
             src0 + index * repeatParams.src0RepStride * ElePerBlkU, repeatParams.src0BlkStride, maskRegSrc);
-        MicroAPI::DataCopy<U, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcVreg1,
+        MicroAPI::LoadAlign<U, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcVreg1,
             src1 + index * repeatParams.src1RepStride * ElePerBlkU, repeatParams.src1BlkStride, maskRegSrc);
         if constexpr (funcMode == BinaryFuncMode::DST_SRC_INPUT) {
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(dstVreg,
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(dstVreg,
                 dst + index * repeatParams.dstRepStride * ElePerBlkT, repeatParams.dstBlkStride, maskRegDst);
         }
         func(dstVreg, srcVreg0, srcVreg1, maskReg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskRegDst);
     }
 }

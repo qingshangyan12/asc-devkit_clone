@@ -49,7 +49,7 @@ __simd_vf__ inline void VfCallArithProgression(__ubuf__ T *dstLocalAddr, const T
     MicroAPI::Muls(stepReg, stepReg, diffValue, fullMask);
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         preg = MicroAPI::UpdateMask<T, regTrait>(sreg);
-        MicroAPI::DataCopy(dstLocalAddr + i * sregLower, tmpReg, preg);
+        MicroAPI::StoreAlign(dstLocalAddr + i * sregLower, tmpReg, preg);
         MicroAPI::Add(tmpReg, tmpReg, stepReg, fullMask);
     }
 }

@@ -59,7 +59,7 @@ __simd_vf__ inline void WhereCompute(__ubuf__ T* dstUb, __ubuf__ T* src0Ub,
     }
     for (uint16_t i = 0; i < repeatTime; ++i) {
         maskReg = MicroAPI::UpdateMask<T, regTrait>(count);
-        MicroAPI::DataCopy(selReg, (__ubuf__ uint8_t*)conditionUb + i * repeatElm);
+        MicroAPI::LoadAlign(selReg, (__ubuf__ uint8_t*)conditionUb + i * repeatElm);
         MicroAPI::CompareScalar<uint8_t, CMPMODE::NE>(selMask, selReg, static_cast<uint8_t>(0), maskFull);
         if constexpr (sizeof(T) == 2) {
             MicroAPI::MaskUnPack(selMask, selMask);
@@ -69,13 +69,13 @@ __simd_vf__ inline void WhereCompute(__ubuf__ T* dstUb, __ubuf__ T* src0Ub,
         }
 
         if constexpr (!src0Val) {
-            MicroAPI::DataCopy(src0Reg, src0Ub + i * repeatElm);
+            MicroAPI::LoadAlign(src0Reg, src0Ub + i * repeatElm);
         }
         if constexpr (!src1Val) {
-            MicroAPI::DataCopy(src1Reg, src1Ub + i * repeatElm);
+            MicroAPI::LoadAlign(src1Reg, src1Ub + i * repeatElm);
         }
         MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-        MicroAPI::DataCopy(dstUb + i * repeatElm, dstReg, maskReg);
+        MicroAPI::StoreAlign(dstUb + i * repeatElm, dstReg, maskReg);
     }
 }
 

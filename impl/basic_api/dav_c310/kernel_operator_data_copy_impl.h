@@ -859,9 +859,9 @@ __simd_vf__ inline void VecCopyLevel0VFImpl(__ubuf__ T* dst, __ubuf__ T* src, co
 #ifndef NO_OVERLAP_IN_MULTI_REPEAT
             MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 #endif
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 srcVreg, src + index * repeatParams.srcRepeatSize * ElePerBlkT, repeatParams.srcStride, maskReg);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + index * repeatParams.dstRepeatSize * ElePerBlkT, srcVreg, repeatParams.dstStride, maskReg);
         }
     } else {
@@ -882,9 +882,9 @@ __simd_vf__ inline void VecCopyLevel0VFImpl(__ubuf__ T* dst, __ubuf__ T* src, co
 #ifndef NO_OVERLAP_IN_MULTI_REPEAT
                 MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
 #endif
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                     srcReg, src, repeatParams.srcStride, srcRepeatStride, maskReg);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+                MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
                     dst, srcReg, repeatParams.dstStride, dstRepeatStride, maskReg);
             }
             src = srcTmp + repeatParams.srcRepeatSize * oneBlockElm;
@@ -959,8 +959,8 @@ __simd_vf__ inline void CopyImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint32_
         MicroAPI::MaskReg preg;
         for (uint16_t i = 0; i < repeatTime; ++i) {
             preg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy(vreg, src + i * repeatElm);
-            MicroAPI::DataCopy(dst + i * repeatElm, vreg, preg);
+            MicroAPI::LoadAlign(vreg, src + i * repeatElm);
+            MicroAPI::StoreAlign(dst + i * repeatElm, vreg, preg);
         }
     } else if constexpr (sizeof(T) == B64_BYTE_SIZE) {
         uint32_t sreg = calCount * 2;
@@ -970,8 +970,8 @@ __simd_vf__ inline void CopyImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint32_
         MicroAPI::RegTensor<uint32_t> srcReg;
         for (uint16_t i = 0; i < repeatTime; ++i) {
             preg = MicroAPI::UpdateMask<uint32_t>(sreg);
-            MicroAPI::DataCopy(srcReg, (__ubuf__ uint32_t*)src + i * oneRepSize);
-            MicroAPI::DataCopy((__ubuf__ uint32_t*)dst + i * oneRepSize, srcReg, preg);
+            MicroAPI::LoadAlign(srcReg, (__ubuf__ uint32_t*)src + i * oneRepSize);
+            MicroAPI::StoreAlign((__ubuf__ uint32_t*)dst + i * oneRepSize, srcReg, preg);
         }
     }
 }

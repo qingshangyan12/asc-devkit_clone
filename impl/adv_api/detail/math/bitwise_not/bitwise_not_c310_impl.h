@@ -37,18 +37,18 @@ __simd_vf__ inline void BitwiseNotCompute(__ubuf__ T* dst, __ubuf__ T* src, uint
 
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<T, Trait>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         MicroAPI::Not(dstVreg, srcVreg, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
         mask = MicroAPI::UpdateMask<T, Trait>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm + offset);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm + offset);
         MicroAPI::Not(dstVreg, srcVreg, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm + offset, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm + offset, dstVreg, mask);
     }
     mask = MicroAPI::UpdateMask<T, Trait>(count);
-    MicroAPI::DataCopy(srcVreg, src + repeatTime * oneRepElm * 2);
+    MicroAPI::LoadAlign(srcVreg, src + repeatTime * oneRepElm * 2);
     MicroAPI::Not(dstVreg, srcVreg, mask);
-    MicroAPI::DataCopy(dst + repeatTime * oneRepElm * 2, dstVreg, mask);
+    MicroAPI::StoreAlign(dst + repeatTime * oneRepElm * 2, dstVreg, mask);
 }
 
 template <const BitwiseNotConfig& config, typename T>

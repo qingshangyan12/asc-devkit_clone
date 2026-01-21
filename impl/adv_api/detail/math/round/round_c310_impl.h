@@ -29,9 +29,9 @@ __simd_vf__ inline void RoundCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint3
     MicroAPI::MaskReg maskReg;
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
         maskReg = MicroAPI::UpdateMask<T>(calCount);
-        MicroAPI::DataCopy<T>(srcReg, srcUb + i * repeatElm);
+        MicroAPI::LoadAlign<T>(srcReg, srcUb + i * repeatElm);
         MicroAPI::Truncate<T, RoundMode::CAST_RINT>(dstReg, srcReg, maskReg);
-        MicroAPI::DataCopy<T>(dstUb + i * repeatElm, dstReg, maskReg);
+        MicroAPI::StoreAlign<T>(dstUb + i * repeatElm, dstReg, maskReg);
     }
 }
 

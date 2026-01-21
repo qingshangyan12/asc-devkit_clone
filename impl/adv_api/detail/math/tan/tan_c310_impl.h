@@ -177,10 +177,10 @@ __simd_vf__ inline void TanCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint32_
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<float>(sreg);
         if constexpr (sizeof(T) == sizeof(half)) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * stride);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * stride);
             MicroAPI::Cast<float, T, TAN_CAST_TRAIT_F162F32>(castReg, srcReg, mask);
         } else {
-            MicroAPI::DataCopy(castReg, srcUb + i * stride);
+            MicroAPI::LoadAlign(castReg, srcUb + i * stride);
         }
         // the input is normalized to (-pi/2,pi/2)
         TanRound(castReg, tmpReg, roundReg, resReg, downReg1, downReg2, mask);
@@ -188,9 +188,9 @@ __simd_vf__ inline void TanCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint32_
 
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<T, float, TAN_CAST_TRAIT_F322F16>(srcReg, dstReg, mask);
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * stride, srcReg, mask);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * stride, srcReg, mask);
         } else {
-            MicroAPI::DataCopy(dstUb + i * stride, dstReg, mask);
+            MicroAPI::StoreAlign(dstUb + i * stride, dstReg, mask);
         }
     }
 }

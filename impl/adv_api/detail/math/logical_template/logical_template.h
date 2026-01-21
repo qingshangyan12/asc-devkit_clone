@@ -39,8 +39,8 @@ __simd_vf__ inline void LogicalTemplateVF(__ubuf__ T* dst, __ubuf__ U* src0, __u
     MicroAPI::Duplicate(brcZeroReg, 0u);
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<U, Trait>(count);
-        MicroAPI::DataCopy(src0Vreg, src0 + i * oneRepElm);
-        MicroAPI::DataCopy(src1Vreg, src1 + i * oneRepElm);
+        MicroAPI::LoadAlign(src0Vreg, src0 + i * oneRepElm);
+        MicroAPI::LoadAlign(src1Vreg, src1 + i * oneRepElm);
         MicroAPI::CompareScalar<U, CMPMODE::NE>(cmpMask0, src0Vreg, static_cast<U>(0), mask);
         MicroAPI::CompareScalar<U, CMPMODE::NE>(cmpMask1, src1Vreg, static_cast<U>(0), mask);
         func(cmpMask2, cmpMask0, cmpMask1, mask);
@@ -54,7 +54,7 @@ __simd_vf__ inline void LogicalTemplateVF(__ubuf__ T* dst, __ubuf__ U* src0, __u
             MicroAPI::MaskPack(mask, mask);
         }
         MicroAPI::Select(dstVreg, brcOneReg, brcZeroReg, cmpMask2);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 
@@ -109,19 +109,19 @@ __simd_vf__ inline void LogicalTemplateBothTensorVF(__ubuf__ T* dst, __ubuf__ U*
     MicroAPI::Duplicate(brcZeroReg, 0u);
     fullMask = MicroAPI::CreateMask<U, MicroAPI::MaskPattern::ALL, Trait>();
     if constexpr (sizeof(U) == 1) {
-        MicroAPI::DataCopy<U, MicroAPI::LoadDist::DIST_BRC_B8>(dupVreg, scalar);
+        MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_BRC_B8>(dupVreg, scalar);
     } else if constexpr (sizeof(U) == 2) {
-        MicroAPI::DataCopy<U, MicroAPI::LoadDist::DIST_BRC_B16>(dupVreg, scalar);
+        MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_BRC_B16>(dupVreg, scalar);
     } else if constexpr (sizeof(U) == 4) {
-        MicroAPI::DataCopy<U, MicroAPI::LoadDist::DIST_BRC_B32>(dupVreg, scalar);
+        MicroAPI::LoadAlign<U, MicroAPI::LoadDist::DIST_BRC_B32>(dupVreg, scalar);
     } else if constexpr (sizeof(U) == 8) {
-        MicroAPI::DataCopy(dupVreg, scalar);
+        MicroAPI::LoadAlign(dupVreg, scalar);
         MicroAPI::Duplicate(dupVreg, dupVreg, fullMask);
     }        
     MicroAPI::CompareScalar<U, CMPMODE::NE>(cmpMask1, dupVreg, static_cast<U>(0), fullMask);
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<U, Trait>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         MicroAPI::CompareScalar<U, CMPMODE::NE>(cmpMask0, srcVreg, static_cast<U>(0), mask);
         func(cmpMask2, cmpMask0, cmpMask1, mask);
         if constexpr (sizeof(U) == 2) {
@@ -134,7 +134,7 @@ __simd_vf__ inline void LogicalTemplateBothTensorVF(__ubuf__ T* dst, __ubuf__ U*
             MicroAPI::MaskPack(mask, mask);
         }
         MicroAPI::Select(dstVreg, brcOneReg, brcZeroReg, cmpMask2);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 
@@ -160,7 +160,7 @@ __simd_vf__ inline void LogicalTemplateSingleScalarVF(__ubuf__ T* dst, __ubuf__ 
     MicroAPI::CompareScalar<U, CMPMODE::NE>(cmpMask0, dupVreg, static_cast<U>(0), fullMask);
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<U, Trait>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         MicroAPI::CompareScalar<U, CMPMODE::NE>(cmpMask1, srcVreg, static_cast<U>(0), mask);
         func(cmpMask2, cmpMask0, cmpMask1, mask);
         if constexpr (sizeof(U) == 2) {
@@ -173,7 +173,7 @@ __simd_vf__ inline void LogicalTemplateSingleScalarVF(__ubuf__ T* dst, __ubuf__ 
             MicroAPI::MaskPack(mask, mask);
         }
         MicroAPI::Select(dstVreg, brcOneReg, brcZeroReg, cmpMask2);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 

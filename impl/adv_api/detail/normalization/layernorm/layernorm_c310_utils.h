@@ -34,13 +34,13 @@ __simd_callee__ inline void LoadDataWithT(__ubuf__ T* src0, __ubuf__ T* src1, Mi
     if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
         MicroAPI::RegTensor<T> src0Origin;
         MicroAPI::RegTensor<T> src1Origin;
-        DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(src0Origin, src0 + src0Offset);
-        DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(src1Origin, src1 + src1Offset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(src0Origin, src0 + src0Offset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(src1Origin, src1 + src1Offset);
         Cast<float, T, layoutZMrgZ>(dstReg0, src0Origin, dst0Preg);
         Cast<float, T, layoutZMrgZ>(dstReg1, src1Origin, dst1Preg);
     } else { // this branch: only support float
-        DataCopy(dstReg0, src0 + src0Offset);
-        DataCopy(dstReg1, src1 + src1Offset);
+        MicroAPI::LoadAlign(dstReg0, src0 + src0Offset);
+        MicroAPI::LoadAlign(dstReg1, src1 + src1Offset);
     }
 }
 
@@ -50,10 +50,10 @@ __simd_callee__ inline void LoadDataWithT(
 {
     if constexpr (IsSameType<T, half>::value || IsSameType<T, bfloat16_t>::value) {
         MicroAPI::RegTensor<T> srcOrigin;
-        DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + srcOffset);
+        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcOrigin, src + srcOffset);
         Cast<float, T, layoutZMrgZ>(dstReg, srcOrigin, dstPreg);
     } else { // this branch: only support float
-        DataCopy(dstReg, src + srcOffset);
+        MicroAPI::LoadAlign(dstReg, src + srcOffset);
     }
 }
 
@@ -98,7 +98,7 @@ __simd_callee__ inline void ComputeMeanLoop1(__ubuf__ T* const srcUb, __ubuf__ T
             Axpy(dstReg1, src0Reg1, k2Rec, pregFull);
             Add(dstReg, dstReg0, dstReg1, pregFull);
             ReduceSum(dstReg, dstReg, pregFull);
-            DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((workUbOrigin + i), dstReg, pregOne);
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((workUbOrigin + i), dstReg, pregOne);
         }
     }
 }
@@ -127,7 +127,7 @@ __simd_callee__ inline void ComputeMeanLoop2(__ubuf__ T* const srcUb, __ubuf__ T
 
             Add(dstReg, dstReg0, dstReg1, pregFull);
             ReduceSum(dstReg, dstReg, pregFull);
-            DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
                 (workUbOrigin + repeatTimes1 + i), dstReg, pregOne);
         }
     }
@@ -152,7 +152,7 @@ __simd_callee__ inline void ComputeMeanLoop3(__ubuf__ T* const srcUb, __ubuf__ T
             Muls(dstReg1, src0Reg1, k2Rec, pregFull);
             Add(dstReg, dstReg0, dstReg1, pregFull);
             ReduceSum(dstReg, dstReg, pregFull);
-            DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
                 (workUbOrigin + repeatTimes1 + repeatTimes2 + i), dstReg, pregOne);
         }
     }
@@ -194,7 +194,7 @@ __simd_callee__ inline void ComputeVarianceLoop1(__ubuf__ T* const srcUb, __ubuf
     for (uint16_t j = 0; j < static_cast<uint16_t>(aLength); j++) {
         uint32_t mTmp = m;
         __ubuf__ float* workUbOrigin = (__ubuf__ float*)(workUbYOrigin + j * rLengthWithPadding);
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, meanUb + j);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, meanUb + j);
         // tail block add to main block
         for (uint16_t i = 0; i < repeatTimes1; i++) {
             MicroAPI::MaskReg preg = MicroAPI::UpdateMask<float>(mTmp);
@@ -225,7 +225,7 @@ __simd_callee__ inline void ComputeVarianceLoop1(__ubuf__ T* const srcUb, __ubuf
 
             Add(dstReg, dstReg0, dstReg1, pregFull);
             ReduceSum(dstReg, dstReg, pregFull);
-            DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((workUbOrigin + i), dstReg, pregOne);
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((workUbOrigin + i), dstReg, pregOne);
         }
     }
 }
@@ -242,7 +242,7 @@ __simd_callee__ inline void ComputeVarianceLoop2(__ubuf__ T* const srcUb, __ubuf
 {
     for (uint16_t j = 0; j < static_cast<uint16_t>(aLength); j++) {
         __ubuf__ float* workUbOrigin = (__ubuf__ float*)(workUbYOrigin + j * rLengthWithPadding);
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, meanUb + j);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, meanUb + j);
         for (uint16_t i = 0; i < repeatTimes2; i++) {
             LoadDataWithT<T>(srcUb, srcUb, src0Reg0, src1Reg0, pregFull, preg2,
                 j * rLengthWithPadding + repeatTimes1 * 2 * sregLower,
@@ -267,7 +267,7 @@ __simd_callee__ inline void ComputeVarianceLoop2(__ubuf__ T* const srcUb, __ubuf
 
             Add(dstReg, dstReg0, dstReg1, pregFull);
             ReduceSum(dstReg, dstReg, pregFull);
-            DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
                 (workUbOrigin + repeatTimes1 + i), dstReg, pregOne);
         }
     }
@@ -284,7 +284,7 @@ __simd_callee__ inline void ComputeVarianceLoop3(__ubuf__ T* const srcUb, __ubuf
 {
     for (uint16_t j = 0; j < static_cast<uint16_t>(aLength); j++) {
         __ubuf__ float* workUbOrigin = (__ubuf__ float*)(workUbYOrigin + j * rLengthWithPadding);
-        DataCopy<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, meanUb + j);
+        MicroAPI::LoadAlign<float, MicroAPI::LoadDist::DIST_BRC_B32>(meanReg, meanUb + j);
         // Processes the remaining data of the entire block.
         for (uint16_t i = 0; i < repeatTimes3; i++) {
             LoadDataWithT<T>(srcUb, src0Reg0, pregFull, j * rLengthWithPadding + mVL + (2 * i) * sregLower);
@@ -300,7 +300,7 @@ __simd_callee__ inline void ComputeVarianceLoop3(__ubuf__ T* const srcUb, __ubuf
             Add(dstReg, dstReg0, dstReg1, pregFull);
 
             ReduceSum(dstReg, dstReg, pregFull);
-            DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>(
                 (workUbOrigin + repeatTimes1 + repeatTimes2 + i), dstReg, pregOne);
         }
     }
@@ -347,18 +347,18 @@ __simd_callee__ inline void ReduceWorkBufferAndStore(__ubuf__ T* const workUbYOr
         __ubuf__ float* workUb = (__ubuf__ float*)(workUbYOrigin + j * rLengthWithPadding);
 
         if constexpr (HalfAddTimes == 1) {
-            DataCopy(v0, workUb);
+            MicroAPI::LoadAlign(v0, workUb);
             ReduceSum(tmp, v0, pregLastCount);
         } else if constexpr (HalfAddTimes == 2) {
-            DataCopy(v0, workUb);
-            DataCopy(v1, workUb + sregLower);
+            MicroAPI::LoadAlign(v0, workUb);
+            MicroAPI::LoadAlign(v1, workUb + sregLower);
             Add(v0, v0, v1, pregFull);
             ReduceSum(tmp, v0, pregLastCount);
         } else if constexpr (HalfAddTimes == 4) {
-            DataCopy(v0, workUb);
-            DataCopy(v1, workUb + sregLower * 1);
-            DataCopy(v2, workUb + sregLower * 2);
-            DataCopy(v3, workUb + sregLower * 3);
+            MicroAPI::LoadAlign(v0, workUb);
+            MicroAPI::LoadAlign(v1, workUb + sregLower * 1);
+            MicroAPI::LoadAlign(v2, workUb + sregLower * 2);
+            MicroAPI::LoadAlign(v3, workUb + sregLower * 3);
             Add(v0, v0, v2, pregFull);
             Add(v1, v1, v3, pregFull);
             Add(v0, v0, v1, pregFull);
@@ -368,19 +368,19 @@ __simd_callee__ inline void ReduceWorkBufferAndStore(__ubuf__ T* const workUbYOr
             for (uint16_t k = 0; k < halfAddRepeatTimes; ++k) {
                 cur = cur / Internal::kLayernormFoldNum; // Fold
                 for (uint16_t i = 0; i < cur; ++i) {
-                    DataCopy(s0, workUb + i * sregLower);
-                    DataCopy(s1, workUb + (cur + i) * sregLower);
+                    MicroAPI::LoadAlign(s0, workUb + i * sregLower);
+                    MicroAPI::LoadAlign(s1, workUb + (cur + i) * sregLower);
                     Add(tmp, s0, s1, pregFull);
-                    DataCopy(workUb + i * sregLower, tmp, pregFull);
+                    MicroAPI::StoreAlign(workUb + i * sregLower, tmp, pregFull);
                 }
                 MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
             }
-            DataCopy(s0, workUb);
+            MicroAPI::LoadAlign(s0, workUb);
             ReduceSum(tmp, s0, pregLastCount);
         }
 
         Muls(outReg, tmp, k2RRec, pregOne);
-        DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((dstUb + j), outReg, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((dstUb + j), outReg, pregOne);
     }
 }
 

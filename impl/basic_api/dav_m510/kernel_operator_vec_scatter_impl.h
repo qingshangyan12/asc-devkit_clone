@@ -57,13 +57,13 @@ __aicore__ inline void ScatterImplB64(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal
         uint16_t repeatTime = CeilDivision(count, b64RepElems);
         for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {
             preg = MicroAPI::UpdateMask<uint32_t>(sregPlt);
-            MicroAPI::DataCopy<uint32_t>(indexReg, dstOffsetLocal + i * b64RepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + i * b64RepElems);
             MicroAPI::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b64ShiftVal, indexMask);
             MicroAPI::Muls<uint32_t, uint32_t>(indexReg, indexReg, mulsScalar, indexMask);
             MicroAPI::Adds<uint32_t, uint32_t>(oddIndexReg, indexReg, addsScalar, indexMask);
             MicroAPI::Interleave(indexU32Reg, tmpReg, indexReg, oddIndexReg);
-            MicroAPI::DataCopy<uint32_t>(srcReg, (__ubuf__ uint32_t *)srcLocal + i * srcRepElems);
-            MicroAPI::DataCopyScatter<uint32_t, uint32_t>((__ubuf__ uint32_t *)dstLocal + dstBaseOffset, srcReg,
+            MicroAPI::LoadAlign<uint32_t>(srcReg, (__ubuf__ uint32_t *)srcLocal + i * srcRepElems);
+            MicroAPI::Scatter<uint32_t, uint32_t>((__ubuf__ uint32_t *)dstLocal + dstBaseOffset, srcReg,
                 indexU32Reg, preg);
         }
     }
@@ -98,13 +98,13 @@ __aicore__ inline void ScatterImplB64(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal
             if constexpr (!isNormalMode) {
                 srcMask = MicroAPI::UpdateMask<uint32_t>(evenMask);
             }
-            MicroAPI::DataCopy<uint32_t>(indexReg, dstOffsetLocal + i * b64RepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + i * b64RepElems);
             MicroAPI::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b64ShiftVal, indexMask);
             MicroAPI::Muls<uint32_t, uint32_t>(indexReg, indexReg, mulsScalar, indexMask);
             MicroAPI::Adds<uint32_t, uint32_t>(oddIndexReg, indexReg, addsScalar, indexMask);
             MicroAPI::Interleave(indexU32Reg, tmpReg, indexReg, oddIndexReg);
-            MicroAPI::DataCopy<uint32_t>(srcReg, (__ubuf__ uint32_t *)srcLocal + i * srcRepStride * b32BlkElems);
-            MicroAPI::DataCopyScatter<uint32_t, uint32_t>((__ubuf__ uint32_t *)dstLocal + dstBaseOffset, srcReg,
+            MicroAPI::LoadAlign<uint32_t>(srcReg, (__ubuf__ uint32_t *)srcLocal + i * srcRepStride * b32BlkElems);
+            MicroAPI::Scatter<uint32_t, uint32_t>((__ubuf__ uint32_t *)dstLocal + dstBaseOffset, srcReg,
                 indexU32Reg, srcMask);
         }
     }
@@ -129,16 +129,16 @@ __aicore__ inline void ScatterImplB16(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal
         uint16_t repeatTime = CeilDivision(count, srcRep128);
         for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {
             preg = MicroAPI::UpdateMask<T>(sregPlt);
-            MicroAPI::DataCopy<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
-            MicroAPI::DataCopy<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
             MicroAPI::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b16ShiftVal, indexMask);
             MicroAPI::ShiftRights<uint32_t, int16_t>(indexRegSec, indexRegSec, b16ShiftVal, indexMask);
             MicroAPI::Cast<uint16_t, uint32_t, castTraitEven>(lowerU16Reg, indexReg, indexMask);
             MicroAPI::Cast<uint16_t, uint32_t, castTraitOdd>(highU16Reg, indexRegSec, indexMask);
             MicroAPI::DeInterleave(lowerU16Reg, highU16Reg, lowerU16Reg, highU16Reg);
             MicroAPI::Select(indexU16, lowerU16Reg, highU16Reg, selectMask);
-            MicroAPI::DataCopy<T>(srcReg, srcLocal + i * srcRep128);
-            MicroAPI::DataCopyScatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, preg);
+            MicroAPI::LoadAlign<T>(srcReg, srcLocal + i * srcRep128);
+            MicroAPI::Scatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, preg);
         }
     }
 }
@@ -173,16 +173,16 @@ __aicore__ inline void ScatterImplB16(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal
             if constexpr (!isNormalMode) {
                 b16SrcMask = MicroAPI::UpdateMask<T>(maskV);
             }
-            MicroAPI::DataCopy<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
-            MicroAPI::DataCopy<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
             MicroAPI::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b16ShiftVal, indexMask);
             MicroAPI::ShiftRights<uint32_t, int16_t>(indexRegSec, indexRegSec, b16ShiftVal, indexMask);
             MicroAPI::Cast<uint16_t, uint32_t, castTraitEven>(lowerU16, indexReg, indexMask);
             MicroAPI::Cast<uint16_t, uint32_t, castTraitOdd>(highU16, indexRegSec, indexMask);
             MicroAPI::DeInterleave(lowerU16, highU16, lowerU16, highU16);
             MicroAPI::Select(indexU16, lowerU16, highU16, selectMask);
-            MicroAPI::DataCopy<T>(srcReg, srcLocal + i * srcRepStride * b16BlkElems);
-            MicroAPI::DataCopyScatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, b16SrcMask);
+            MicroAPI::LoadAlign<T>(srcReg, srcLocal + i * srcRepStride * b16BlkElems);
+            MicroAPI::Scatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, b16SrcMask);
         }
     }
 }
@@ -202,10 +202,10 @@ __aicore__ inline void ScatterImplB32(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal
 
         for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {
             preg = MicroAPI::UpdateMask<T>(sregPlt);
-            MicroAPI::DataCopy<uint32_t>(indexReg, dstOffsetLocal + i * srcRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + i * srcRepElems);
             MicroAPI::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b32ShiftVal, indexMask);
-            MicroAPI::DataCopy<T>(srcReg, srcLocal + i * srcRepElems);
-            MicroAPI::DataCopyScatter<T, uint32_t>(dstLocal + dstBaseOffset, srcReg, indexReg, preg);
+            MicroAPI::LoadAlign<T>(srcReg, srcLocal + i * srcRepElems);
+            MicroAPI::Scatter<T, uint32_t>(dstLocal + dstBaseOffset, srcReg, indexReg, preg);
         }
     }
 }
@@ -235,10 +235,10 @@ __aicore__ inline void ScatterImplB32(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal
             if constexpr (!isNormalMode) {
                 b32SrcMask = MicroAPI::UpdateMask<T>(maskV);
             }
-            MicroAPI::DataCopy<uint32_t>(indexReg, dstOffsetLocal + i * srcRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + i * srcRepElems);
             MicroAPI::ShiftRights<uint32_t, int16_t>(indexReg, indexReg, b32ShiftVal, indexMask);
-            MicroAPI::DataCopy<T>(srcReg, srcLocal + i * srcRepStride * b32BlkElems);
-            MicroAPI::DataCopyScatter<T, uint32_t>(dstLocal + dstBaseOffset, srcReg, indexReg, b32SrcMask);
+            MicroAPI::LoadAlign<T>(srcReg, srcLocal + i * srcRepStride * b32BlkElems);
+            MicroAPI::Scatter<T, uint32_t>(dstLocal + dstBaseOffset, srcReg, indexReg, b32SrcMask);
         }
     }
 }
@@ -264,15 +264,15 @@ __aicore__ inline void ScatterImplB8(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal,
 
         for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {
             preg = MicroAPI::UpdateMask<uint16_t>(sregPlt);
-            MicroAPI::DataCopy<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
-            MicroAPI::DataCopy<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
             MicroAPI::Cast<uint16_t, uint32_t, castTraitEven>(lowerU16, indexReg, indexMask);
             MicroAPI::Cast<uint16_t, uint32_t, castTraitOdd>(highU16, indexRegSec, indexMask);
             MicroAPI::DeInterleave(lowerU16, highU16, lowerU16, highU16);
             MicroAPI::Select(indexU16, lowerU16, highU16, selectMask);
-            MicroAPI::DataCopy<T>(srcReg, srcLocal + i * srcRep128);
+            MicroAPI::LoadAlign<T>(srcReg, srcLocal + i * srcRep128);
             MicroAPI::Interleave(srcReg, tmpReg, srcReg, tmpReg);
-            MicroAPI::DataCopyScatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, preg);
+            MicroAPI::Scatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, preg);
         }
     }
 }
@@ -311,15 +311,15 @@ __aicore__ inline void ScatterImplB8(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal,
             if constexpr (!isNormalMode) {
                 srcPreg = MicroAPI::UpdateMask<uint16_t>(srcMask);
             }
-            MicroAPI::DataCopy<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
-            MicroAPI::DataCopy<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexReg, dstOffsetLocal + 2 * i * indexRepElems);
+            MicroAPI::LoadAlign<uint32_t>(indexRegSec, dstOffsetLocal + (2 * i + 1) * indexRepElems);
             MicroAPI::Cast<uint16_t, uint32_t, castTraitEven>(lowerU16, indexReg, indexMask);
             MicroAPI::Cast<uint16_t, uint32_t, castTraitOdd>(highU16, indexRegSec, indexMask);
             MicroAPI::DeInterleave(lowerU16, highU16, lowerU16, highU16);
             MicroAPI::Select(indexU16, lowerU16, highU16, selectMask);
-            MicroAPI::DataCopy<T>(srcReg, srcLocal + i * srcRepStride * b8BlkElems);
+            MicroAPI::LoadAlign<T>(srcReg, srcLocal + i * srcRepStride * b8BlkElems);
             MicroAPI::Interleave(srcReg, tmpReg, srcReg, tmpReg);
-            MicroAPI::DataCopyScatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, srcPreg);
+            MicroAPI::Scatter<T, uint16_t>(dstLocal + dstBaseOffset, srcReg, indexU16, srcPreg);
         }
     }
 }

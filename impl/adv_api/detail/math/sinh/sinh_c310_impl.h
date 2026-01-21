@@ -44,10 +44,10 @@ __simd_vf__ inline void SinhCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint32
     for (uint16_t i = 0; i < repeatTimes; i++) {
         sinhMask = MicroAPI::UpdateMask<float>(calCount);
         if constexpr (SupportBytes<T, 2>()) {
-            MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * vlSize);
+            MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * vlSize);
             MicroAPI::Cast<float, half, sinhCastTraitUpper>(castUpperReg, srcReg, sinhMask);
         } else {
-            MicroAPI::DataCopy(castUpperReg, srcUb + i * vlSize);
+            MicroAPI::LoadAlign(castUpperReg, srcUb + i * vlSize);
         }
         MicroAPI::Adds(castUpperReg, castUpperReg, scalarNegLnTwo, sinhMask);
         MicroAPI::Exp(computeReg0, castUpperReg, sinhMask);
@@ -55,9 +55,9 @@ __simd_vf__ inline void SinhCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint32
         MicroAPI::Sub(resReg, computeReg0, computeReg1, sinhMask);
         if constexpr (SupportBytes<T, 2>()) {
             MicroAPI::Cast<half, float, sinhCastTraitLower>(dstReg, resReg, sinhMask);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * vlSize, dstReg, sinhMask);
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * vlSize, dstReg, sinhMask);
         } else {
-            MicroAPI::DataCopy(dstUb + i * vlSize, resReg, sinhMask);
+            MicroAPI::StoreAlign(dstUb + i * vlSize, resReg, sinhMask);
         }
     }
 }

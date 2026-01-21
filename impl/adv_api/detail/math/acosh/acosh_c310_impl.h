@@ -37,11 +37,11 @@ __simd_vf__ inline void AcoshImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t c
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<float>(calCount);
         if constexpr (sizeof(T) == sizeof(half)) {
-            MicroAPI::DataCopy<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * oneRepElm);
+            MicroAPI::LoadAlign<half, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * oneRepElm);
             MicroAPI::Cast<float, half, castTraitB16ToB32>(
                 (MicroAPI::RegTensor<float>&)srcVreg, srcVreg, mask);
         } else {
-            MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+            MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         }
         MicroAPI::Mul(tmpReg, (MicroAPI::RegTensor<float>&)srcVreg, (MicroAPI::RegTensor<float>&)srcVreg, mask);
         MicroAPI::Adds(tmpReg, tmpReg, ACOSH_NEG_ONE, mask);
@@ -51,9 +51,9 @@ __simd_vf__ inline void AcoshImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t c
         if constexpr (sizeof(T) == sizeof(half)) {
             MicroAPI::Cast<half, float, castTraitB32ToB16>(
                 dstVreg, (MicroAPI::RegTensor<float>&)dstVreg, mask);
-            MicroAPI::DataCopy<half, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * oneRepElm, dstVreg, mask);
+            MicroAPI::StoreAlign<half, MicroAPI::StoreDist::DIST_PACK_B32>(dst + i * oneRepElm, dstVreg, mask);
         } else {
-            MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+            MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
         }
     }
 }

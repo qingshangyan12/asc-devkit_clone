@@ -45,7 +45,7 @@ __simd_vf__ inline void ComputeMeanVariance64VF(__ubuf__ float* const meanUb, __
         Muls(src1Reg, src0Reg, k2Rec, preg);
         ReduceSum(dstReg, src1Reg, preg);
         Muls(meanReg, dstReg, k2RRec, pregOne);
-        DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((meanUb + i), meanReg, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((meanUb + i), meanReg, pregOne);
         if constexpr (isOutputVariance) {
             Duplicate(meanReg, meanReg, pregFull);
             Sub(src0Reg, src0Reg, meanReg, pregFull);
@@ -57,7 +57,7 @@ __simd_vf__ inline void ComputeMeanVariance64VF(__ubuf__ float* const meanUb, __
             } else {
                 Muls(varianceReg, dstReg, k2RRec, pregOne);
             }
-            DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((varianceUb + i), varianceReg, pregOne);
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((varianceUb + i), varianceReg, pregOne);
         }
     }
 }
@@ -99,7 +99,7 @@ __simd_vf__ inline void ComputeMeanVariance128VF(__ubuf__ float* const meanUb,
         Add(dstReg, src0CalReg, src1CalReg, pregFull);
         ReduceSum(dstReg, dstReg, pregFull);
         Muls(meanReg, dstReg, k2RRec, pregOne);
-        DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((meanUb + i), meanReg, pregOne);
+        MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((meanUb + i), meanReg, pregOne);
         if constexpr (isOutputVariance) {
             Duplicate(meanReg, meanReg, pregFull);
             Sub(src0CalReg, src0Reg, meanReg, pregFull);
@@ -114,7 +114,7 @@ __simd_vf__ inline void ComputeMeanVariance128VF(__ubuf__ float* const meanUb,
 
             ReduceSum(dstReg, dstReg, pregFull);
             Muls(varianceReg, dstReg, k2RRec, pregOne);
-            DataCopy<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((varianceUb + i), varianceReg, pregOne);
+            MicroAPI::StoreAlign<float, MicroAPI::StoreDist::DIST_FIRST_ELEMENT_B32>((varianceUb + i), varianceReg, pregOne);
         }
     }
 }

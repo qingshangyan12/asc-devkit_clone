@@ -37,15 +37,15 @@ __simd_vf__ inline void SelectWithoutMaskMode0ImplVF(
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
     constexpr uint32_t blockElm = GetDataBlockSizeInBytes() / sizeof(T);
     if constexpr (sizeof(T) == 2) {
-        MicroAPI::DataCopy<uint32_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint32_t *)tempBuf);
+        MicroAPI::LoadAlign<uint32_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint32_t *)tempBuf);
     } else if constexpr (sizeof(T) == 4) {
-        MicroAPI::DataCopyUnAlignPre(ureg, (__ubuf__ uint32_t *)tempBuf);
-        MicroAPI::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint32_t *)tempBuf);
+        MicroAPI::LoadUnAlignPre(ureg, (__ubuf__ uint32_t *)tempBuf);
+        MicroAPI::LoadUnAlign(selReg, ureg, (__ubuf__ uint32_t *)tempBuf);
         MicroAPI::MaskGenWithRegTensor<uint32_t, 0>(selMask, selReg);
     }
     if constexpr (isCounterMode) {
         maskReg = MicroAPI::MoveMask<uint16_t>();
-        MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        MicroAPI::StoreAlign<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
         newRepeatTimes = CeilDivision(sreg, oneRepSize);
@@ -56,12 +56,12 @@ __simd_vf__ inline void SelectWithoutMaskMode0ImplVF(
         if constexpr (isCounterMode) {
             maskReg = MicroAPI::UpdateMask<T>(sreg);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg0,
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg0,
             src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg1,
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcReg1,
             src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
         MicroAPI::Select(dstReg, srcReg0, srcReg1, selMask);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(dst + i * blockElm * repeatParams.dstRepStride,
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(dst + i * blockElm * repeatParams.dstRepStride,
             dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
     }
 }
@@ -81,7 +81,7 @@ __simd_vf__ inline void SelectWithoutMaskMode2ImplVF(
     uint32_t sreg;
     if constexpr (isCounterMode) {
         maskReg = MicroAPI::MoveMask<uint16_t>();
-        MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        MicroAPI::StoreAlign<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
         newRepeatTimes = CeilDivision(sreg, oneRepSize);
@@ -93,18 +93,18 @@ __simd_vf__ inline void SelectWithoutMaskMode2ImplVF(
             maskReg = MicroAPI::UpdateMask<T>(sreg);
         }
         if constexpr (sizeof(T) == 2) {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)selAddr + i * selOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)selAddr + i * selOffset);
         } else if constexpr (sizeof(T) == 4) {
-            MicroAPI::DataCopyUnAlignPre(ureg, (__ubuf__ uint8_t *)selAddr + i * selOffset);
-            MicroAPI::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t *)selAddr + i * selOffset);
+            MicroAPI::LoadUnAlignPre(ureg, (__ubuf__ uint8_t *)selAddr + i * selOffset);
+            MicroAPI::LoadUnAlign(selReg, ureg, (__ubuf__ uint8_t *)selAddr + i * selOffset);
             MicroAPI::MaskGenWithRegTensor<uint32_t, 0>(selMask, (MicroAPI::RegTensor<uint32_t> &)selReg);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             srcReg0, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             srcReg1, src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
         MicroAPI::Select(dstReg, srcReg0, srcReg1, selMask);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
     }
 }
@@ -165,7 +165,7 @@ __simd_vf__ inline void SelectWithoutMaskMode1ImplVF(
     constexpr uint32_t selOffset = GetVecLen() / SelInternal::maskBitToByte / sizeof(T);
     if constexpr (isCounterMode) {
         maskReg = MicroAPI::MoveMask<uint16_t>();
-        MicroAPI::DataCopy<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        MicroAPI::StoreAlign<uint64_t, MicroAPI::MaskDist::DIST_PACK>(tempBuf, maskReg);
         MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::SCALAR_LOAD>();
         sreg = static_cast<uint32_t>(tempBuf[0]);
         newRepeatTimes = CeilDivision(sreg, oneRepSize);
@@ -178,16 +178,16 @@ __simd_vf__ inline void SelectWithoutMaskMode1ImplVF(
             maskReg = MicroAPI::UpdateMask<T>(sreg);
         }
         if constexpr (sizeof(T) == 2) {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
         } else if constexpr (sizeof(T) == 4) {
-            MicroAPI::DataCopyUnAlignPre(ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
-            MicroAPI::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadUnAlignPre(ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskGenWithRegTensor<uint32_t, 0>(selMask, (MicroAPI::RegTensor<uint32_t> &)selReg);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             srcReg0, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
         MicroAPI::Select(dstReg, srcReg0, srcReg1, selMask);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
     }
 }
@@ -236,7 +236,7 @@ __simd_vf__ inline void SelectMode0Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ub
         }
     }
     MicroAPI::MaskReg selMask;
-    MicroAPI::DataCopy<U, MicroAPI::MaskDist::DIST_US>(selMask, sel);
+    MicroAPI::LoadAlign<U, MicroAPI::MaskDist::DIST_US>(selMask, sel);
     if constexpr (sizeof(T) == 4) {
         MicroAPI::MaskUnPack(selMask, selMask);
     }
@@ -244,12 +244,12 @@ __simd_vf__ inline void SelectMode0Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ub
         if constexpr (isCounterMode) {
             maskReg = MicroAPI::UpdateMask<T>(sreg);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             src0Reg, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             src1Reg, src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
         MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
             dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
     }
 }
@@ -286,24 +286,24 @@ __simd_vf__ inline void SelectMode2Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ub
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
             }
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src0Reg, src0 + i * unRollConstant * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src1Reg, src1 + i * unRollConstant * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             MicroAPI::Select(dst0Reg, src0Reg, src1Reg, selMask0);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
             }
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src2Reg, src0 + (i * unRollConstant + 1) * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src3Reg, src1 + (i * unRollConstant + 1) * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             MicroAPI::Select(dst1Reg, src2Reg, src3Reg, selMask1);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
         MicroAPI::RegTensor<T> src4Reg, src5Reg, dst2Reg;
@@ -317,14 +317,14 @@ __simd_vf__ inline void SelectMode2Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ub
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(tailSreg);
             }
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
             MicroAPI::MaskUnPack(selMask2, selMask2);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src4Reg, src0 + offset0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src5Reg, src1 + offset1, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             MicroAPI::Select(dst2Reg, src4Reg, src5Reg, selMask2);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + offset2, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     } else {
@@ -347,13 +347,13 @@ __simd_vf__ inline void SelectMode2Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ub
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
             }
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src0Reg, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src1Reg, src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     }
@@ -436,11 +436,11 @@ __simd_vf__ inline void SelectMode1Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ub
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
             }
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src0Reg, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     } else {
@@ -468,20 +468,20 @@ __simd_vf__ inline void SelectMode1Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ub
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
             }
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src0Reg, src0 + i * unRollConstant * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
             MicroAPI::Select(dst0Reg, src0Reg, scalarReg, selMask0);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
             }
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src1Reg, src0 + (i * unRollConstant + 1) * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
             MicroAPI::Select(dst1Reg, src1Reg, scalarReg, selMask1);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
         MicroAPI::RegTensor<T> src2Reg, dst2Reg;
@@ -494,12 +494,12 @@ __simd_vf__ inline void SelectMode1Level0(__ubuf__ T* dst, __ubuf__ U* sel, __ub
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(tailSreg);
             }
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
             MicroAPI::MaskUnPack(selMask2, selMask2);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src2Reg, src0 + offset0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
             MicroAPI::Select(dst2Reg, src2Reg, scalarReg, selMask2);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + offset1, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     }
@@ -564,11 +564,11 @@ __simd_vf__ inline void SelectSrc0ScalarMode1Level0(__ubuf__ T* dst, __ubuf__ U*
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
             }
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src1Reg, src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     } else {
@@ -584,20 +584,20 @@ __simd_vf__ inline void SelectSrc0ScalarMode1Level0(__ubuf__ T* dst, __ubuf__ U*
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
             }
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src0Reg, src1 + i * unRollConstant * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             MicroAPI::Select(dst0Reg, scalarReg, src0Reg, selMask0);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
             }
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src1Reg, src1 + (i * unRollConstant + 1) * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             MicroAPI::Select(dst1Reg, scalarReg, src1Reg, selMask1);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
         MicroAPI::RegTensor<T> src2Reg, dst2Reg;
@@ -610,12 +610,12 @@ __simd_vf__ inline void SelectSrc0ScalarMode1Level0(__ubuf__ T* dst, __ubuf__ U*
             if constexpr (isCounterMode) {
                 maskReg = MicroAPI::UpdateMask<T>(tailSreg);
             }
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
             MicroAPI::MaskUnPack(selMask2, selMask2);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 src2Reg, src1 + offset0, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
             MicroAPI::Select(dst2Reg, scalarReg, src2Reg, selMask2);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + offset1, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
         }
     }
@@ -676,16 +676,16 @@ __simd_vf__ inline void SelectBothTensorMode1Level0(__ubuf__ T* dst, __ubuf__ U*
         if constexpr (sizeof(T) == 2) {
             constexpr uint32_t selOffset = GetVecLen() / SelInternal::maskBitToByte / sizeof(T);
             MicroAPI::RegTensor<T> src0Reg, src1Reg, dstReg;
-            MicroAPI::DataCopy<T, pattern>(src0Reg, src0);
+            MicroAPI::LoadAlign<T, pattern>(src0Reg, src0);
             for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
                 if constexpr (isCounterMode) {
                     maskReg = MicroAPI::UpdateMask<T>(sreg);
                 }
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     src1Reg, src1 + i * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
                 MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             }
         } else {
@@ -696,25 +696,25 @@ __simd_vf__ inline void SelectBothTensorMode1Level0(__ubuf__ T* dst, __ubuf__ U*
             MicroAPI::MaskReg tmpMask1 = MicroAPI::CreateMask<uint8_t, MicroAPI::MaskPattern::ALL>();
             uint16_t tail = newRepeatTimes % unRollConstant;
             newRepeatTimes = newRepeatTimes / unRollConstant;
-            MicroAPI::DataCopy<T, pattern>(scalarReg, src0);
+            MicroAPI::LoadAlign<T, pattern>(scalarReg, src0);
             for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
                 if constexpr (isCounterMode) {
                     maskReg = MicroAPI::UpdateMask<T>(sreg);
                 }
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
                 MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     src0Reg, src1 + i * unRollConstant * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
                 MicroAPI::Select(dst0Reg, scalarReg, src0Reg, selMask0);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
                 if constexpr (isCounterMode) {
                     maskReg = MicroAPI::UpdateMask<T>(sreg);
                 }
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     src1Reg, src1 + (i * unRollConstant + 1) * blockElm * repeatParams.src1RepStride, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
                 MicroAPI::Select(dst1Reg, scalarReg, src1Reg, selMask1);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             }
             MicroAPI::RegTensor<T> src2Reg, dst2Reg;
@@ -727,12 +727,12 @@ __simd_vf__ inline void SelectBothTensorMode1Level0(__ubuf__ T* dst, __ubuf__ U*
                 if constexpr (isCounterMode) {
                     maskReg = MicroAPI::UpdateMask<T>(tailSreg);
                 }
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
                 MicroAPI::MaskUnPack(selMask2, selMask2);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     src2Reg, src1 + offset0, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
                 MicroAPI::Select(dst2Reg, scalarReg, src2Reg, selMask2);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     dst + offset1, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             }
         }
@@ -740,16 +740,16 @@ __simd_vf__ inline void SelectBothTensorMode1Level0(__ubuf__ T* dst, __ubuf__ U*
         if constexpr (sizeof(T) == 2) {
             constexpr uint32_t selOffset = GetVecLen() / SelInternal::maskBitToByte / sizeof(T);
             MicroAPI::RegTensor<T> src0Reg, src1Reg, dstReg;
-            MicroAPI::DataCopy<T, pattern>(src1Reg, src1);
+            MicroAPI::LoadAlign<T, pattern>(src1Reg, src1);
             for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
                 if constexpr (isCounterMode) {
                     maskReg = MicroAPI::UpdateMask<T>(sreg);
                 }
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     src0Reg, src0 + i * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
                 MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     dst + i * blockElm * repeatParams.dstRepStride, dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             }
         } else {
@@ -760,25 +760,25 @@ __simd_vf__ inline void SelectBothTensorMode1Level0(__ubuf__ T* dst, __ubuf__ U*
             MicroAPI::MaskReg tmpMask1 = MicroAPI::CreateMask<uint8_t, MicroAPI::MaskPattern::ALL>();
             uint16_t tail = newRepeatTimes % unRollConstant;
             newRepeatTimes = newRepeatTimes / unRollConstant;
-            MicroAPI::DataCopy<T, pattern>(scalarReg, src1);
+            MicroAPI::LoadAlign<T, pattern>(scalarReg, src1);
             for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
                 if constexpr (isCounterMode) {
                     maskReg = MicroAPI::UpdateMask<T>(sreg);
                 }
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
                 MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     src0Reg, src0 + i * unRollConstant * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
                 MicroAPI::Select(dst0Reg, src0Reg, scalarReg, selMask0);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
                 if constexpr (isCounterMode) {
                     maskReg = MicroAPI::UpdateMask<T>(sreg);
                 }
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     src1Reg, src0 + (i * unRollConstant + 1) * blockElm * repeatParams.src0RepStride, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
                 MicroAPI::Select(dst1Reg, src1Reg, scalarReg, selMask1);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             }
             MicroAPI::RegTensor<T> src2Reg, dst2Reg;
@@ -791,12 +791,12 @@ __simd_vf__ inline void SelectBothTensorMode1Level0(__ubuf__ T* dst, __ubuf__ U*
                 if constexpr (isCounterMode) {
                     maskReg = MicroAPI::UpdateMask<T>(tailSreg);
                 }
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
                 MicroAPI::MaskUnPack(selMask2, selMask2);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     src2Reg, src0 + offset0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
                 MicroAPI::Select(dst2Reg, src2Reg, scalarReg, selMask2);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+                MicroAPI::StoreAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
                     dst + offset1, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
             }
         }
@@ -865,35 +865,35 @@ __simd_vf__ inline void SelectMode0Level2(__ubuf__ T* dst, __ubuf__ U* sel, __ub
         MicroAPI::MaskReg selMask, maskReg, tmpMask;
         MicroAPI::RegTensor<uint32_t> selReg;
         MicroAPI::UnalignReg ureg;
-        MicroAPI::DataCopyUnAlignPre(ureg, (__ubuf__ uint32_t *)sel);
-        MicroAPI::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint32_t *)sel);
+        MicroAPI::LoadUnAlignPre(ureg, (__ubuf__ uint32_t *)sel);
+        MicroAPI::LoadUnAlign(selReg, ureg, (__ubuf__ uint32_t *)sel);
         MicroAPI::MaskGenWithRegTensor<uint32_t, 0>(selMask, selReg);
         MicroAPI::MaskInterleave<uint32_t>(selMask, tmpMask, selMask, selMask);
         MicroAPI::MaskDeInterleave<uint32_t>(selMask, tmpMask, selMask, selMask);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
             maskReg = MicroAPI::UpdateMask<T, RegT::trait>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, src0 + i * repeatElm);
-            MicroAPI::DataCopy<T>(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
         }
     } else {
         RegT src0Reg, src1Reg, dstReg;
         MicroAPI::MaskReg maskReg, selMask;
         if constexpr (sizeof(T) == 1) {
-            MicroAPI::DataCopy<U>(selMask, sel);
+            MicroAPI::LoadAlign<U>(selMask, sel);
         } else {
-            MicroAPI::DataCopy<U, MicroAPI::MaskDist::DIST_US>(selMask, sel);
+            MicroAPI::LoadAlign<U, MicroAPI::MaskDist::DIST_US>(selMask, sel);
             if constexpr (sizeof(T) == 4) {
                 MicroAPI::MaskUnPack(selMask, selMask);
             }
         }
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, src0 + i * repeatElm);
-            MicroAPI::DataCopy<T>(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
         }
     }
 }
@@ -911,15 +911,15 @@ __simd_vf__ inline void SelectMode2Level2(__ubuf__ T* dst, __ubuf__ U* sel, __ub
         MicroAPI::MaskReg selMask, maskReg;
         MicroAPI::RegTensor<uint8_t> selReg;
         MicroAPI::UnalignReg ureg;
-        MicroAPI::DataCopyUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
+        MicroAPI::LoadUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-            MicroAPI::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskGenWithRegTensor<uint32_t, 0>(selMask, (MicroAPI::RegTensor<uint32_t> &)selReg);
             maskReg = MicroAPI::UpdateMask<T, RegT::trait>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, src0 + i * repeatElm);
-            MicroAPI::DataCopy<T>(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
         }
     } else if constexpr (sizeof(T) == 4) {
         constexpr uint32_t unRollConstant = 2;
@@ -931,31 +931,31 @@ __simd_vf__ inline void SelectMode2Level2(__ubuf__ T* dst, __ubuf__ U* sel, __ub
         uint16_t tail = repeatTime % unRollConstant;
         uint16_t newRepeatTimes = repeatTime / unRollConstant;
         for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, src0 + i * unRollConstant * repeatElm);
-            MicroAPI::DataCopy<T>(src1Reg, src1 + i * unRollConstant * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, src0 + i * unRollConstant * repeatElm);
+            MicroAPI::LoadAlign<T>(src1Reg, src1 + i * unRollConstant * repeatElm);
             MicroAPI::Select(dst0Reg, src0Reg, src1Reg, selMask0);
-            MicroAPI::DataCopy<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src2Reg, src0 + (i * unRollConstant + 1) * repeatElm);
-            MicroAPI::DataCopy<T>(src3Reg, src1 + (i * unRollConstant + 1) * repeatElm);
+            MicroAPI::LoadAlign<T>(src2Reg, src0 + (i * unRollConstant + 1) * repeatElm);
+            MicroAPI::LoadAlign<T>(src3Reg, src1 + (i * unRollConstant + 1) * repeatElm);
             MicroAPI::Select(dst1Reg, src2Reg, src3Reg, selMask1);
-            MicroAPI::DataCopy<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
         }
         RegT src4Reg, src5Reg, dst2Reg;
         MicroAPI::MaskReg selMask2;
         uint32_t offset = newRepeatTimes * unRollConstant * repeatElm;
         uint32_t newSelOffset = newRepeatTimes * selOffset;
         for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
             MicroAPI::MaskUnPack(selMask2, selMask2);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src4Reg, src0 + offset);
-            MicroAPI::DataCopy<T>(src5Reg, src1 + offset);
+            MicroAPI::LoadAlign<T>(src4Reg, src0 + offset);
+            MicroAPI::LoadAlign<T>(src5Reg, src1 + offset);
             MicroAPI::Select(dst2Reg, src4Reg, src5Reg, selMask2);
-            MicroAPI::DataCopy<T>(dst + offset, dst2Reg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + offset, dst2Reg, maskReg);
         }
     } else {
         constexpr uint32_t selOffset = GetVecLen() / SelInternal::maskBitToByte / sizeof(T);
@@ -963,15 +963,15 @@ __simd_vf__ inline void SelectMode2Level2(__ubuf__ T* dst, __ubuf__ U* sel, __ub
         MicroAPI::MaskReg maskReg, selMask;
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
             if constexpr (sizeof(T) == 2) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
             } else {
-                MicroAPI::DataCopy<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
             }
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, src0 + i * repeatElm);
-            MicroAPI::DataCopy<T>(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
         }
     }
 }
@@ -1014,14 +1014,14 @@ __simd_vf__ inline void SelectMode1Level2(__ubuf__ T* dst, __ubuf__ U* sel, __ub
         MicroAPI::RegTensor<uint8_t> selReg;
         MicroAPI::Duplicate(src1Reg, (const T &)src1);
         MicroAPI::UnalignReg ureg;
-        MicroAPI::DataCopyUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
+        MicroAPI::LoadUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-            MicroAPI::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskGenWithRegTensor<uint32_t, 0>(selMask, (MicroAPI::RegTensor<uint32_t> &)selReg);
             maskReg = MicroAPI::UpdateMask<T, RegT::trait>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
         }
     } else if constexpr (sizeof(T) == 4) {
         constexpr uint32_t unRollConstant = 2;
@@ -1034,28 +1034,28 @@ __simd_vf__ inline void SelectMode1Level2(__ubuf__ T* dst, __ubuf__ U* sel, __ub
         uint16_t newRepeatTimes = repeatTime / unRollConstant;
         MicroAPI::Duplicate(scalarReg, (const T &)src1);
         for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, src0 + i * unRollConstant * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, src0 + i * unRollConstant * repeatElm);
             MicroAPI::Select(dst0Reg, src0Reg, scalarReg, selMask0);
-            MicroAPI::DataCopy<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src1Reg, src0 + (i * unRollConstant + 1) * repeatElm);
+            MicroAPI::LoadAlign<T>(src1Reg, src0 + (i * unRollConstant + 1) * repeatElm);
             MicroAPI::Select(dst1Reg, src1Reg, scalarReg, selMask1);
-            MicroAPI::DataCopy<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
         }
         RegT src2Reg, dst2Reg;
         MicroAPI::MaskReg selMask2;
         uint32_t offset = newRepeatTimes * unRollConstant * repeatElm;
         uint32_t newSelOffset = newRepeatTimes * selOffset;
         for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
             MicroAPI::MaskUnPack(selMask2, selMask2);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src2Reg, src0 + offset);
+            MicroAPI::LoadAlign<T>(src2Reg, src0 + offset);
             MicroAPI::Select(dst2Reg, src2Reg, scalarReg, selMask2);
-            MicroAPI::DataCopy<T>(dst + offset, dst2Reg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + offset, dst2Reg, maskReg);
         }
     } else {
         constexpr uint32_t selOffset = GetVecLen() / SelInternal::maskBitToByte / sizeof(T);
@@ -1065,14 +1065,14 @@ __simd_vf__ inline void SelectMode1Level2(__ubuf__ T* dst, __ubuf__ U* sel, __ub
         MicroAPI::Duplicate(src1Reg, (const T &)src1);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
             if constexpr (sizeof(T) == 2) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
             } else {
-                MicroAPI::DataCopy<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
             }
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, src0 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
         }
     }
 }
@@ -1105,14 +1105,14 @@ __simd_vf__ inline void SelectSrc0ScalarMode1Level2(__ubuf__ T* dst, __ubuf__ U*
         MicroAPI::RegTensor<uint8_t> selReg;
         MicroAPI::Duplicate(src0Reg, (const T &)src0);
         MicroAPI::UnalignReg ureg;
-        MicroAPI::DataCopyUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
+        MicroAPI::LoadUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-            MicroAPI::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskGenWithRegTensor<uint32_t, 0>(selMask, (MicroAPI::RegTensor<uint32_t> &)selReg);
             maskReg = MicroAPI::UpdateMask<T, RegT::trait>(sreg);
-            MicroAPI::DataCopy<T>(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
         }
     } else if constexpr (sizeof(T) == 4) {
         constexpr uint32_t unRollConstant = 2;
@@ -1125,28 +1125,28 @@ __simd_vf__ inline void SelectSrc0ScalarMode1Level2(__ubuf__ T* dst, __ubuf__ U*
         uint16_t newRepeatTimes = repeatTime / unRollConstant;
         MicroAPI::Duplicate(scalarReg, (const T &)src0);
         for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
             MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, src1 + i * unRollConstant * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, src1 + i * unRollConstant * repeatElm);
             MicroAPI::Select(dst0Reg, scalarReg, src0Reg, selMask0);
-            MicroAPI::DataCopy<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src1Reg, src1 + (i * unRollConstant + 1) * repeatElm);
+            MicroAPI::LoadAlign<T>(src1Reg, src1 + (i * unRollConstant + 1) * repeatElm);
             MicroAPI::Select(dst1Reg, scalarReg, src1Reg, selMask1);
-            MicroAPI::DataCopy<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
         }
         RegT src2Reg, dst2Reg;
         MicroAPI::MaskReg selMask2;
         uint32_t offset = newRepeatTimes * unRollConstant * repeatElm;
         uint32_t newSelOffset = newRepeatTimes * selOffset;
         for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
             MicroAPI::MaskUnPack(selMask2, selMask2);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src2Reg, src1 + offset);
+            MicroAPI::LoadAlign<T>(src2Reg, src1 + offset);
             MicroAPI::Select(dst2Reg, scalarReg, src2Reg, selMask2);
-            MicroAPI::DataCopy<T>(dst + offset, dst2Reg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + offset, dst2Reg, maskReg);
         }
     } else {
         constexpr uint32_t selOffset = GetVecLen() / SelInternal::maskBitToByte / sizeof(T);
@@ -1155,14 +1155,14 @@ __simd_vf__ inline void SelectSrc0ScalarMode1Level2(__ubuf__ T* dst, __ubuf__ U*
         MicroAPI::Duplicate(src0Reg, (const T &)src0);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
             if constexpr (sizeof(T) == 2) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
             } else {
-                MicroAPI::DataCopy<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
             }
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src1Reg, src1 + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-            MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+            MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
         }
     }
 }
@@ -1196,20 +1196,20 @@ __simd_vf__ inline void SelectBothTensorMode1Level2(__ubuf__ T* dst, __ubuf__ U*
             MicroAPI::RegTensor<uint8_t> selReg;
             MicroAPI::UnalignReg ureg, uregDup;
             // Unalign DataCopy do not support TraitNumTwo right now
-            MicroAPI::DataCopyUnAlignPre(uregDup, (__ubuf__ T *)src0);
-            MicroAPI::DataCopyUnAlign(tmpReg, uregDup, (__ubuf__ T *)src0);
+            MicroAPI::LoadUnAlignPre(uregDup, (__ubuf__ T *)src0);
+            MicroAPI::LoadUnAlign(tmpReg, uregDup, (__ubuf__ T *)src0);
             MicroAPI::DeInterleave<uint32_t>((MicroAPI::RegTensor<uint32_t>&)tmpReg.reg[0], (MicroAPI::RegTensor<uint32_t>&)tmpReg.reg[1], 
                 (MicroAPI::RegTensor<uint32_t>&)tmpReg.reg[0], (MicroAPI::RegTensor<uint32_t>&)tmpReg.reg[0]);
             MicroAPI::MaskReg maskFull = MicroAPI::CreateMask<uint32_t, MicroAPI::MaskPattern::ALL>();
             MicroAPI::Duplicate(src0Reg, tmpReg, maskFull);
-            MicroAPI::DataCopyUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
+            MicroAPI::LoadUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
             for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-                MicroAPI::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
                 MicroAPI::MaskGenWithRegTensor<uint32_t, 0>(selMask, (MicroAPI::RegTensor<uint32_t> &)selReg);
                 maskReg = MicroAPI::UpdateMask<T, RegT::trait>(sreg);
-                MicroAPI::DataCopy<T>(src1Reg, src1 + i * repeatElm);
+                MicroAPI::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
                 MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-                MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
             }
         } else if constexpr (sizeof(T) == 4) {
             constexpr uint32_t unRollConstant = 2;
@@ -1220,46 +1220,46 @@ __simd_vf__ inline void SelectBothTensorMode1Level2(__ubuf__ T* dst, __ubuf__ U*
             MicroAPI::MaskReg tmpMask1 = MicroAPI::CreateMask<uint8_t, MicroAPI::MaskPattern::ALL>();
             uint16_t tail = repeatTime % unRollConstant;
             uint16_t newRepeatTimes = repeatTime / unRollConstant;
-            MicroAPI::DataCopy<T, pattern>(scalarReg, src0);
+            MicroAPI::LoadAlign<T, pattern>(scalarReg, src0);
             for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
                 MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy<T>(src0Reg, src1 + i * unRollConstant * repeatElm);
+                MicroAPI::LoadAlign<T>(src0Reg, src1 + i * unRollConstant * repeatElm);
                 MicroAPI::Select(dst0Reg, scalarReg, src0Reg, selMask0);
-                MicroAPI::DataCopy<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy<T>(src1Reg, src1 + (i * unRollConstant + 1) * repeatElm);
+                MicroAPI::LoadAlign<T>(src1Reg, src1 + (i * unRollConstant + 1) * repeatElm);
                 MicroAPI::Select(dst1Reg, scalarReg, src1Reg, selMask1);
-                MicroAPI::DataCopy<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
             }
             RegT src2Reg, dst2Reg;
             MicroAPI::MaskReg selMask2;
             uint32_t offset = newRepeatTimes * unRollConstant * repeatElm;
             uint32_t newSelOffset = newRepeatTimes * selOffset;
             for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
                 MicroAPI::MaskUnPack(selMask2, selMask2);
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy<T>(src2Reg, src1 + offset);
+                MicroAPI::LoadAlign<T>(src2Reg, src1 + offset);
                 MicroAPI::Select(dst2Reg, scalarReg, src2Reg, selMask2);
-                MicroAPI::DataCopy<T>(dst + offset, dst2Reg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + offset, dst2Reg, maskReg);
             }
         } else {
             constexpr uint32_t selOffset = GetVecLen() / SelInternal::maskBitToByte / sizeof(T);
             RegT src0Reg, src1Reg, dstReg;
             MicroAPI::MaskReg maskReg, selMask;
-            MicroAPI::DataCopy<T, pattern>(src0Reg, src0);
+            MicroAPI::LoadAlign<T, pattern>(src0Reg, src0);
             for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
                 if constexpr (sizeof(T) == 2) {
-                    MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                    MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
                 } else {
-                    MicroAPI::DataCopy<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                    MicroAPI::LoadAlign<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
                 }
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy<T>(src1Reg, src1 + i * repeatElm);
+                MicroAPI::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
                 MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-                MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
             }
         }
     } else if constexpr (scalarIdx == 1) {
@@ -1269,20 +1269,20 @@ __simd_vf__ inline void SelectBothTensorMode1Level2(__ubuf__ T* dst, __ubuf__ U*
             MicroAPI::MaskReg selMask, maskReg;
             MicroAPI::RegTensor<uint8_t> selReg;
             MicroAPI::UnalignReg ureg, uregDup;
-            MicroAPI::DataCopyUnAlignPre(uregDup, (__ubuf__ T *)src1);
-            MicroAPI::DataCopyUnAlign(tmpReg, uregDup, (__ubuf__ T *)src1);
+            MicroAPI::LoadUnAlignPre(uregDup, (__ubuf__ T *)src1);
+            MicroAPI::LoadUnAlign(tmpReg, uregDup, (__ubuf__ T *)src1);
             MicroAPI::MaskReg maskFull = MicroAPI::CreateMask<uint32_t, MicroAPI::MaskPattern::ALL>();
             MicroAPI::DeInterleave<uint32_t>((MicroAPI::RegTensor<uint32_t>&)tmpReg.reg[0], (MicroAPI::RegTensor<uint32_t>&)tmpReg.reg[1], 
                 (MicroAPI::RegTensor<uint32_t>&)tmpReg.reg[0], (MicroAPI::RegTensor<uint32_t>&)tmpReg.reg[0]);
             MicroAPI::Duplicate(src1Reg, tmpReg, maskFull);
-            MicroAPI::DataCopyUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
+            MicroAPI::LoadUnAlignPre(ureg, (__ubuf__ uint8_t *)sel);
             for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
-                MicroAPI::DataCopyUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadUnAlign(selReg, ureg, (__ubuf__ uint8_t *)sel + i * selOffset);
                 MicroAPI::MaskGenWithRegTensor<uint32_t, 0>(selMask, (MicroAPI::RegTensor<uint32_t> &)selReg);
                 maskReg = MicroAPI::UpdateMask<T, RegT::trait>(sreg);
-                MicroAPI::DataCopy<T>(src0Reg, src0 + i * repeatElm);
+                MicroAPI::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
                 MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-                MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
             }
         } else if constexpr (sizeof(T) == 4) {
             constexpr uint32_t unRollConstant = 2;
@@ -1293,46 +1293,46 @@ __simd_vf__ inline void SelectBothTensorMode1Level2(__ubuf__ T* dst, __ubuf__ U*
             MicroAPI::MaskReg tmpMask1 = MicroAPI::CreateMask<uint8_t, MicroAPI::MaskPattern::ALL>();
             uint16_t tail = repeatTime % unRollConstant;
             uint16_t newRepeatTimes = repeatTime / unRollConstant;
-            MicroAPI::DataCopy<T, pattern>(scalarReg, src1);
+            MicroAPI::LoadAlign<T, pattern>(scalarReg, src1);
             for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t *)sel + i * selOffset);
                 MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy<T>(src0Reg, src0 + i * unRollConstant * repeatElm);
+                MicroAPI::LoadAlign<T>(src0Reg, src0 + i * unRollConstant * repeatElm);
                 MicroAPI::Select(dst0Reg, src0Reg, scalarReg, selMask0);
-                MicroAPI::DataCopy<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy<T>(src1Reg, src0 + (i * unRollConstant + 1) * repeatElm);
+                MicroAPI::LoadAlign<T>(src1Reg, src0 + (i * unRollConstant + 1) * repeatElm);
                 MicroAPI::Select(dst1Reg, src1Reg, scalarReg, selMask1);
-                MicroAPI::DataCopy<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
             }
             RegT src2Reg, dst2Reg;
             MicroAPI::MaskReg selMask2;
             uint32_t offset = newRepeatTimes * unRollConstant * repeatElm;
             uint32_t newSelOffset = newRepeatTimes * selOffset;
             for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t *)sel + newSelOffset);
                 MicroAPI::MaskUnPack(selMask2, selMask2);
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy<T>(src2Reg, src0 + offset);
+                MicroAPI::LoadAlign<T>(src2Reg, src0 + offset);
                 MicroAPI::Select(dst2Reg, src2Reg, scalarReg, selMask2);
-                MicroAPI::DataCopy<T>(dst + offset, dst2Reg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + offset, dst2Reg, maskReg);
             }
         } else {
             constexpr uint32_t selOffset = GetVecLen() / SelInternal::maskBitToByte / sizeof(T);
             RegT src0Reg, src1Reg, dstReg;
             MicroAPI::MaskReg maskReg, selMask;
-            MicroAPI::DataCopy<T, pattern>(src1Reg, src1);
+            MicroAPI::LoadAlign<T, pattern>(src1Reg, src1);
             for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
                 if constexpr (sizeof(T) == 2) {
-                    MicroAPI::DataCopy<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                    MicroAPI::LoadAlign<uint8_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
                 } else {
-                    MicroAPI::DataCopy<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
+                    MicroAPI::LoadAlign<uint8_t>(selMask, (__ubuf__ uint8_t *)sel + i * selOffset);
                 }
                 maskReg = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::DataCopy<T>(src0Reg, src0 + i * repeatElm);
+                MicroAPI::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
                 MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
-                MicroAPI::DataCopy<T>(dst + i * repeatElm, dstReg, maskReg);
+                MicroAPI::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
             }
         }
     }

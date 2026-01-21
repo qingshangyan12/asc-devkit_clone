@@ -161,12 +161,12 @@ __simd_vf__ inline void VfHypotImpl(__ubuf__ T *dstUb, __ubuf__ T *src0Ub, __ubu
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         maskReg = MicroAPI::UpdateMask<T>(sreg);
         if constexpr ((IsSameType<T, bfloat16_t>::value) || (IsSameType<T, half>::value)) {
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(vSrcReg0, src0Ub + i * sregLower);
-            MicroAPI::DataCopy<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(vSrcReg1, src1Ub + i * sregLower);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(vSrcReg0, src0Ub + i * sregLower);
+            MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(vSrcReg1, src1Ub + i * sregLower);
             MicroAPI::MaskUnPack(maskReg, maskReg);
         } else {
-            MicroAPI::DataCopy<T>(vSrcReg0, src0Ub + i * sregLower);
-            MicroAPI::DataCopy<T>(vSrcReg1, src1Ub + i * sregLower);
+            MicroAPI::LoadAlign<T>(vSrcReg0, src0Ub + i * sregLower);
+            MicroAPI::LoadAlign<T>(vSrcReg1, src1Ub + i * sregLower);
         }
 
         MicroAPI::Compare<T, CMPMODE::NE>(cmpMaskSrc0NAN, vSrcReg0, vSrcReg0, maskReg);
@@ -191,9 +191,9 @@ __simd_vf__ inline void VfHypotImpl(__ubuf__ T *dstUb, __ubuf__ T *src0Ub, __ubu
         MicroAPI::Select(vDstReg0, vSrcReg1, vDstReg0, cmpMaskSrc1NAN);
         MicroAPI::Select(vDstReg0, vRegInf, vDstReg0, cmpMaskSrcInf);
         if constexpr ((IsSameType<T, bfloat16_t>::value) || (IsSameType<T, half>::value)) {
-            MicroAPI::DataCopy<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * sregLower, vDstReg0, maskReg);
+            MicroAPI::StoreAlign<T, MicroAPI::StoreDist::DIST_PACK_B32>(dstUb + i * sregLower, vDstReg0, maskReg);
         } else {
-            MicroAPI::DataCopy<T>(dstUb + i * sregLower, vDstReg0, maskReg);
+            MicroAPI::StoreAlign<T>(dstUb + i * sregLower, vDstReg0, maskReg);
         }
     }
 }

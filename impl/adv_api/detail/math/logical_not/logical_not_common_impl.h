@@ -43,7 +43,7 @@ __simd_vf__ inline void LogicalNotVF(__ubuf__ T* dst, __ubuf__ U* src, uint16_t 
     MicroAPI::Duplicate(brcZeroReg, 0u);
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = MicroAPI::UpdateMask<U, Trait>(count);
-        MicroAPI::DataCopy(srcVreg, src + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg, src + i * oneRepElm);
         MicroAPI::CompareScalar<U, CMPMODE::EQ>(cmpMask, srcVreg, static_cast<U>(0), mask);
         if constexpr (sizeof(U) == 2) {
             MicroAPI::MaskPack(cmpMask, cmpMask);
@@ -55,7 +55,7 @@ __simd_vf__ inline void LogicalNotVF(__ubuf__ T* dst, __ubuf__ U* src, uint16_t 
             MicroAPI::MaskPack(mask, mask);
         }
         MicroAPI::Select(dstVreg, brcOneReg, brcZeroReg, cmpMask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
     }
 }
 

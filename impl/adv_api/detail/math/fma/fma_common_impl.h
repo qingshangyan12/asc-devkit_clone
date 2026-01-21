@@ -40,11 +40,11 @@ __simd_vf__ inline void FmaImplVF(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T*
     MicroAPI::MaskReg mask;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<T>(count);
-        MicroAPI::DataCopy(srcVreg0, src0 + i * oneRepElm);
-        MicroAPI::DataCopy(srcVreg1, src1 + i * oneRepElm);
-        MicroAPI::DataCopy(srcVreg2, src2 + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg0, src0 + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg1, src1 + i * oneRepElm);
+        MicroAPI::LoadAlign(srcVreg2, src2 + i * oneRepElm);
         MicroAPI::FusedMulDstAdd(srcVreg0, srcVreg1, srcVreg2, mask);
-        MicroAPI::DataCopy(dst + i * oneRepElm, srcVreg0, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepElm, srcVreg0, mask);
     }
 }
 

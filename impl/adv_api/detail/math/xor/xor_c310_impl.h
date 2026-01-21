@@ -33,10 +33,10 @@ __simd_vf__ inline void XorCompute(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = MicroAPI::UpdateMask<T>(calCount);
-        MicroAPI::DataCopy(src0Vreg, src0 + i * oneRepSize);
-        MicroAPI::DataCopy(src1Vreg, src1 + i * oneRepSize);
+        MicroAPI::LoadAlign(src0Vreg, src0 + i * oneRepSize);
+        MicroAPI::LoadAlign(src1Vreg, src1 + i * oneRepSize);
         MicroAPI::Xor(dstVreg, src0Vreg, src1Vreg, mask);
-        MicroAPI::DataCopy(dst + i * oneRepSize, dstVreg, mask);
+        MicroAPI::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
     }
 }
 } // namespace XorAPI

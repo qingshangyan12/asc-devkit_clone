@@ -42,19 +42,19 @@ __simd_callee__ inline void DropOutBitModeFP32Main(__ubuf__ float* dstUb, __ubuf
     MicroAPI::MaskReg tmpMask1 = MicroAPI::CreateMask<uint8_t, MicroAPI::MaskPattern::ALL>();
     MicroAPI::Duplicate(scalarReg, (const float&)0);
     for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
-        MicroAPI::DataCopy<uint32_t, MicroAPI::MaskDist::DIST_US>(
+        MicroAPI::LoadAlign<uint32_t, MicroAPI::MaskDist::DIST_US>(
             tmpMask0, (__ubuf__ uint32_t*)maskUb + loopH * (maskLastAxis >> 2) + i * selOffset);
         MicroAPI::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
         maskReg = MicroAPI::UpdateMask<float>(sreg);
-        MicroAPI::DataCopy<float>(src0Reg, srcUb + loopH * srcLastAxis + i * unRollConstant * repeatElm);
+        MicroAPI::LoadAlign<float>(src0Reg, srcUb + loopH * srcLastAxis + i * unRollConstant * repeatElm);
         MicroAPI::Select(dst0Reg, src0Reg, scalarReg, selMask0);
         MicroAPI::Mul(dst0Reg, dst0Reg, vDivValueReg, selMask0);
-        MicroAPI::DataCopy<float>(dstUb + loopH * srcLastAxis + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+        MicroAPI::StoreAlign<float>(dstUb + loopH * srcLastAxis + i * unRollConstant * repeatElm, dst0Reg, maskReg);
         maskReg = MicroAPI::UpdateMask<float>(sreg);
-        MicroAPI::DataCopy<float>(src1Reg, srcUb + loopH * srcLastAxis + (i * unRollConstant + 1) * repeatElm);
+        MicroAPI::LoadAlign<float>(src1Reg, srcUb + loopH * srcLastAxis + (i * unRollConstant + 1) * repeatElm);
         MicroAPI::Select(dst1Reg, src1Reg, scalarReg, selMask1);
         MicroAPI::Mul(dst1Reg, dst1Reg, vDivValueReg, selMask1);
-        MicroAPI::DataCopy<float>(dstUb + loopH * srcLastAxis + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+        MicroAPI::StoreAlign<float>(dstUb + loopH * srcLastAxis + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
     }
 }
 
@@ -80,13 +80,13 @@ __simd_vf__ inline void VFDropOutBitModeCalc(__ubuf__ T* dstUb, __ubuf__ T* srcU
         uint32_t offset = newRepeatTimes * 2 * repeatElm;
         uint32_t selOffset = newRepeatTimes * 4;
         for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
-            MicroAPI::DataCopy<uint32_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint32_t*)maskUb + selOffset);
+            MicroAPI::LoadAlign<uint32_t, MicroAPI::MaskDist::DIST_US>(selMask2, (__ubuf__ uint32_t*)maskUb + selOffset);
             MicroAPI::MaskUnPack(selMask2, selMask2);
             maskReg = MicroAPI::UpdateMask<float>(sreg);
-            MicroAPI::DataCopy<float>(src2Reg, srcUb + offset);
+            MicroAPI::LoadAlign<float>(src2Reg, srcUb + offset);
             MicroAPI::Select(dst2Reg, src2Reg, scalarReg, selMask2);
             MicroAPI::Mul(dst2Reg, dst2Reg, vDivValueReg, selMask2);
-            MicroAPI::DataCopy<float>(dstUb + offset, dst2Reg, maskReg);
+            MicroAPI::StoreAlign<float>(dstUb + offset, dst2Reg, maskReg);
         }
     } else {
         MicroAPI::RegTensor<T> src0Reg;
@@ -96,12 +96,12 @@ __simd_vf__ inline void VFDropOutBitModeCalc(__ubuf__ T* dstUb, __ubuf__ T* srcU
         MicroAPI::MaskReg selMask;
         MicroAPI::Duplicate(src1Reg, (const T&)0);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
-            MicroAPI::DataCopy<uint32_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint32_t*)maskUb + i * 4);
+            MicroAPI::LoadAlign<uint32_t, MicroAPI::MaskDist::DIST_US>(selMask, (__ubuf__ uint32_t*)maskUb + i * 4);
             maskReg = MicroAPI::UpdateMask<T>(sreg);
-            MicroAPI::DataCopy<T>(src0Reg, srcUb + i * repeatElm);
+            MicroAPI::LoadAlign<T>(src0Reg, srcUb + i * repeatElm);
             MicroAPI::Select(dstReg, src0Reg, src1Reg, selMask);
             MicroAPI::Mul(dstReg, dstReg, vDivValueReg, selMask);
-            MicroAPI::DataCopy<T>(dstUb + i * repeatElm, dstReg, maskReg);
+            MicroAPI::StoreAlign<T>(dstUb + i * repeatElm, dstReg, maskReg);
         }
     }
 }
@@ -129,13 +129,13 @@ __simd_vf__ inline void VFDropOutBitModeCalcInfo(__ubuf__ T* dstUb, __ubuf__ T* 
             MicroAPI::MaskReg selMask;
             MicroAPI::Duplicate(scalarReg, (const T&)0);
             for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
-                MicroAPI::DataCopy<uint32_t, MicroAPI::MaskDist::DIST_US>(
+                MicroAPI::LoadAlign<uint32_t, MicroAPI::MaskDist::DIST_US>(
                     selMask, (__ubuf__ uint32_t*)maskUb + loopH * (info.maskLastAxis >> 2) + i * 4);
                 maskReg = MicroAPI::UpdateMask<T>(width);
-                MicroAPI::DataCopy<T>(src0Reg, srcUb + loopH * info.srcLastAxis + i * repeatElm);
+                MicroAPI::LoadAlign<T>(src0Reg, srcUb + loopH * info.srcLastAxis + i * repeatElm);
                 MicroAPI::Select(dstReg, src0Reg, scalarReg, selMask);
                 MicroAPI::Mul(dstReg, dstReg, vDivValueReg, selMask);
-                MicroAPI::DataCopy<T>(dstUb + loopH * info.srcLastAxis + i * repeatElm, dstReg, maskReg);
+                MicroAPI::StoreAlign<T>(dstUb + loopH * info.srcLastAxis + i * repeatElm, dstReg, maskReg);
             }
         }
     }
@@ -151,14 +151,14 @@ __simd_vf__ inline void VFDropOutBitModeCalcInfo(__ubuf__ T* dstUb, __ubuf__ T* 
                 MicroAPI::RegTensor<float> dst2Reg;
                 MicroAPI::RegTensor<float> scalarReg;
                 MicroAPI::Duplicate(scalarReg, (const T&)0);
-                MicroAPI::DataCopy<uint32_t, MicroAPI::MaskDist::DIST_US>(
+                MicroAPI::LoadAlign<uint32_t, MicroAPI::MaskDist::DIST_US>(
                     selMask2, (__ubuf__ uint32_t*)maskUb + selOffset + loopH * (info.maskLastAxis >> 2));
                 MicroAPI::MaskUnPack(selMask2, selMask2);
                 maskReg = MicroAPI::UpdateMask<float>(sreg);
-                MicroAPI::DataCopy<float>(src2Reg, srcUb + offset + loopH * info.srcLastAxis);
+                MicroAPI::LoadAlign<float>(src2Reg, srcUb + offset + loopH * info.srcLastAxis);
                 MicroAPI::Select(dst2Reg, src2Reg, scalarReg, selMask2);
                 MicroAPI::Mul(dst2Reg, dst2Reg, vDivValueReg, selMask2);
-                MicroAPI::DataCopy<float>(dstUb + offset + loopH * info.srcLastAxis, dst2Reg, maskReg);
+                MicroAPI::StoreAlign<float>(dstUb + offset + loopH * info.srcLastAxis, dst2Reg, maskReg);
             }
         }
     }
@@ -184,9 +184,9 @@ __simd_vf__ inline void VFDropOutByteModeCalc(__ubuf__ T* dstUb, __ubuf__ T* src
     MicroAPI::Duplicate(vDivValueReg, divValue);
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
         maskReg = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::DataCopy(vSrcReg, srcUb + i * repeatElm);
+        MicroAPI::LoadAlign(vSrcReg, srcUb + i * repeatElm);
         if constexpr (sizeof(T) == 2) {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vMaskReg, maskUb + i * repeatElm);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vMaskReg, maskUb + i * repeatElm);
             MicroAPI::Cast<half, uint8_t, layoutZMrgZ>(vFP16Reg, vMaskReg, maskReg);
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
             if constexpr (SupportType<T, half>()) {
@@ -199,13 +199,13 @@ __simd_vf__ inline void VFDropOutByteModeCalc(__ubuf__ T* dstUb, __ubuf__ T* src
             MicroAPI::Mul(vDstReg, vFP16Reg, vSrcReg, maskReg);
 #endif
         } else {
-            MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vMaskReg, maskUb + i * repeatElm);
+            MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(vMaskReg, maskUb + i * repeatElm);
             MicroAPI::Cast<half, uint8_t, layoutZMrgZ>(vFP16Reg, vMaskReg, maskReg);
             MicroAPI::Cast<float, half, layoutZMrgZ>(vFP32Reg, vFP16Reg, maskReg);
             MicroAPI::Mul(vDstReg, vFP32Reg, vSrcReg, maskReg);
         }
         MicroAPI::Mul(vDstReg, vDivValueReg, vDstReg, maskReg);
-        MicroAPI::DataCopy(dstUb + i * repeatElm, vDstReg, maskReg);
+        MicroAPI::StoreAlign(dstUb + i * repeatElm, vDstReg, maskReg);
     }
 }
 
@@ -230,9 +230,9 @@ __simd_vf__ inline void VFDropOutByteModeCalcInfo(__ubuf__ T* dstUb, __ubuf__ T*
         uint32_t width = info.srcLastAxis;
         for (uint16_t loopW = 0; loopW < static_cast<uint16_t>(loopWNum); ++loopW) {
             maskReg = MicroAPI::UpdateMask<T>(width);
-            MicroAPI::DataCopy<T>(vSrcReg, srcUb + loopH * info.srcLastAxis + loopW * repeatElm);
+            MicroAPI::LoadAlign<T>(vSrcReg, srcUb + loopH * info.srcLastAxis + loopW * repeatElm);
             if constexpr (sizeof(T) == 2) {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(
                     vMaskReg, maskUb + loopH * info.maskLastAxis + loopW * repeatElm);
                 MicroAPI::Cast<half, uint8_t, layoutZMrgZ>(vFP16Reg, vMaskReg, maskReg);
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
@@ -246,14 +246,14 @@ __simd_vf__ inline void VFDropOutByteModeCalcInfo(__ubuf__ T* dstUb, __ubuf__ T*
                 MicroAPI::Mul(vDstReg, vFP16Reg, vSrcReg, maskReg);
 #endif
             } else {
-                MicroAPI::DataCopy<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
+                MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK4_B8>(
                     vMaskReg, maskUb + loopH * info.maskLastAxis + loopW * repeatElm);
                 MicroAPI::Cast<half, uint8_t, layoutZMrgZ>(vFP16Reg, vMaskReg, maskReg);
                 MicroAPI::Cast<float, half, layoutZMrgZ>(vFP32Reg, vFP16Reg, maskReg);
                 MicroAPI::Mul(vDstReg, vFP32Reg, vSrcReg, maskReg);
             }
             MicroAPI::Mul(vDstReg, vDivValueReg, vDstReg, maskReg);
-            MicroAPI::DataCopy(dstUb + loopH * info.srcLastAxis + loopW * repeatElm, vDstReg, maskReg);
+            MicroAPI::StoreAlign(dstUb + loopH * info.srcLastAxis + loopW * repeatElm, vDstReg, maskReg);
         }
     }
 }
