@@ -229,7 +229,7 @@ struct ParamStruct {
     {
         uint8_t uiFlag = static_cast<uint8_t>(this->vals[0]);
         if (uiFlag == ASCENDC_TPL_UI_LIST) {
-            this->vals.erase(this->vals.begin(), this->vals.begin() + 1);
+            this->vals.erase(this->vals.begin());
             return;
         }
         std::vector<uint64_t> extendVal;
