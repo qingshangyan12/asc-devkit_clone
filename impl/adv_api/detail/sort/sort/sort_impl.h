@@ -127,47 +127,6 @@ __simd_callee__ inline void ConvertRegToWithShift(
     MicroAPI::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(dst, input, eleCountPerVL);
 }
 
-template <typename T, typename U, bool isDescend = false>
-__simd_vf__ inline void PreProcess(__ubuf__ U *src, __ubuf__ U *dst, uint32_t count)
-{
-    uint16_t repeatTime = DivCeil(count, GetVecLen() / sizeof(T));
-    uint32_t currCount = count;
-    constexpr uint32_t postUpdateSize = GetVecLen() / sizeof(U);
-    for (uint16_t i = 0; i < repeatTime; i++) {
-        MaskReg maskReg = UpdateMask<U>(currCount);
-
-        RegTensor<U> local;
-        MicroAPI::LoadAlign<U, PostLiteral::POST_MODE_UPDATE>(local, (__ubuf__ U *&)src, postUpdateSize);
-        if constexpr (SupportType<T, int8_t, int16_t, int32_t, float, half, bfloat16_t, int64_t>()) {
-            AscendC::MicroAPI::Internal::TwiddleIn<T>(local, local, maskReg);
-        }
-        if constexpr (isDescend) {
-            Not(local, local, maskReg);
-        }
-        MicroAPI::StoreAlign<U, PostLiteral::POST_MODE_UPDATE>((__ubuf__ U *&)dst, local, postUpdateSize, maskReg);
-    }
-}
-
-template <typename T, typename U, bool isDescend = false>
-__simd_vf__ inline void PostProcess(__ubuf__ U *src, __ubuf__ U *dst, uint32_t count)
-{
-    uint16_t repeatTime = DivCeil(count, GetVecLen() / sizeof(T));
-    constexpr uint32_t postUpdateSize = GetVecLen() / sizeof(U);
-    for (uint16_t i = 0; i < repeatTime; i++) {
-        MaskReg maskReg = UpdateMask<U>(count);
-
-        RegTensor<U> local;
-        MicroAPI::LoadAlign<U, PostLiteral::POST_MODE_UPDATE>(local, (__ubuf__ U *&)src, postUpdateSize);
-        if constexpr (isDescend) {
-            Not(local, local, maskReg);
-        }
-        if constexpr (SupportType<T, int8_t, int16_t, int32_t, float, half, bfloat16_t, int64_t>()) {
-            AscendC::MicroAPI::Internal::TwiddleOut<T>(local, local, maskReg);
-        }
-        MicroAPI::StoreAlign<U, PostLiteral::POST_MODE_UPDATE>((__ubuf__ U *&)dst, local, postUpdateSize, maskReg);
-    }
-}
-
 template <typename T>
 __simd_vf__ inline void GetExclusiveSum(__ubuf__ T *srcValue, __ubuf__ uint8_t *tmpSrc,
     __ubuf__ uint8_t *tmpSrcCopy, __ubuf__ uint16_t *exclusiveSum, const uint32_t count, const int32_t round)
@@ -871,11 +830,11 @@ __aicore__ inline void SortImpl(LocalTensor<T> &dstLocal, const LocalTensor<T> &
         __ubuf__ ConvType *initSrcValue = src;
 
         if constexpr (sizeof(T) == 1 && needProcess) {
-            PreProcess<T, ConvType, isDescend>(src, dst, count);
+            Internal::TwiddleInData<T, ConvType, isDescend>(src, dst, count);
             initSrcValue = dst;
         } else {
             if constexpr (needProcess) {
-                PreProcess<T, ConvType, isDescend>(src, dst, count);
+                Internal::TwiddleInData<T, ConvType, isDescend>(src, dst, count);
                 initSrcValue = dst;
                 if constexpr (isReuseSource) {
                     currSortedValue = src;
@@ -943,7 +902,7 @@ __aicore__ inline void SortImpl(LocalTensor<T> &dstLocal, const LocalTensor<T> &
             }
 
             if constexpr (needProcess) {
-                PostProcess<T, ConvType, isDescend>(dst, dst, count);
+                Internal::TwiddleOutData<T, ConvType, isDescend>(dst, dst, count);
             }
         }
     }
@@ -1028,11 +987,11 @@ __aicore__ inline void SortImpl(LocalTensor<T> &dstLocal, LocalTensor<uint32_t> 
         __ubuf__ ConvType *initSrcValue = src;
 
         if constexpr (sizeof(T) == 1 && needProcess) {
-            PreProcess<T, ConvType, isDescend>(src, dst, count);
+            Internal::TwiddleInData<T, ConvType, isDescend>(src, dst, count);
             initSrcValue = dst;
         } else {
             if constexpr (needProcess) {
-                PreProcess<T, ConvType, isDescend>(src, dst, count);
+                Internal::TwiddleInData<T, ConvType, isDescend>(src, dst, count);
                 initSrcValue = dst;
                 if constexpr (isReuseSource) {
                     currSortedValue = src;
@@ -1114,7 +1073,7 @@ __aicore__ inline void SortImpl(LocalTensor<T> &dstLocal, LocalTensor<uint32_t> 
             }
 
             if constexpr (needProcess) {
-                PostProcess<T, ConvType, isDescend>(dst, dst, count);
+                Internal::TwiddleOutData<T, ConvType, isDescend>(dst, dst, count);
             }
         }
     }
@@ -1194,11 +1153,11 @@ __aicore__ inline void SortImpl(const LocalTensor<T> &dstLocal, const LocalTenso
         __ubuf__ ConvTypeU *initSrcValueIndex = srcIndex;
 
         if constexpr (sizeof(T) == 1 && needProcess) {
-            PreProcess<T, ConvTypeT, isDescend>(src, dst, count);
+            Internal::TwiddleInData<T, ConvTypeT, isDescend>(src, dst, count);
             initSrcValue = dst;
         } else {
             if constexpr (needProcess) {
-                PreProcess<T, ConvTypeT, isDescend>(src, dst, count);
+                Internal::TwiddleInData<T, ConvTypeT, isDescend>(src, dst, count);
                 initSrcValue = dst;
                 if constexpr (isReuseSource) {
                     SaveBufferTo(srcIndex, dstIndex, count);
@@ -1287,7 +1246,7 @@ __aicore__ inline void SortImpl(const LocalTensor<T> &dstLocal, const LocalTenso
             }
 
             if constexpr (needProcess) {
-                PostProcess<T, ConvTypeT, isDescend>(dst, dst, count);
+                Internal::TwiddleOutData<T, ConvTypeT, isDescend>(dst, dst, count);
             }
         }
     }

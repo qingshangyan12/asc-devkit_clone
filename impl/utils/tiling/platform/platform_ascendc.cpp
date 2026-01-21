@@ -41,7 +41,7 @@ const static std::string LABEL_CORE_CNT_AICORE = "ai_core_cnt";
 const static std::string NPU_ARCH = "NpuArch";
 
 
-SocVersion SocVersionStrMap(const char *socVersionStr)
+static inline SocVersion SocVersionStrMap(const char *socVersionStr)
 {
     static std::map<std::string, SocVersion> convertMap = {
         {"Ascend310P", SocVersion::ASCEND310P},

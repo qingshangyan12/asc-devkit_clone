@@ -175,12 +175,6 @@ __aicore__ inline constexpr bool IsFloatNum()
     return SupportType<T, float, half, bfloat16_t>();
 }
 
-template <typename T>
-__aicore__ inline constexpr bool NeedTwiddle()
-{
-    return SupportType<T, int8_t, int16_t, int32_t, int64_t, float, half, bfloat16_t>();
-}
-
 __aicore__ inline constexpr bool NeedReverse(bool isLargest)
 {
     return !isLargest;
@@ -195,96 +189,15 @@ __aicore__ inline constexpr bool NeedReverse()
 template <typename T>
 __aicore__ inline constexpr bool NeedPreProcess(bool isLargest)
 {
-    return NeedReverse(isLargest) || NeedTwiddle<T>();
+    return NeedReverse(isLargest) || Internal::IsNeedTwiddleType<T>();
 }
 
 template <typename T, bool isLargest>
 __aicore__ inline constexpr bool NeedPreProcess()
 {
-    return NeedReverse<isLargest>() || NeedTwiddle<T>();
+    return NeedReverse<isLargest>() || Internal::IsNeedTwiddleType<T>();
 }
 
-template <typename T, typename U, bool isLargest>
-__simd_vf__ inline void Preprocess(__ubuf__ T *src, __ubuf__ U *dst, uint32_t count)
-{
-    uint16_t repeatTime = DivCeil(count, GetVecLen() / sizeof(T));
-    uint32_t currCount = count;
-    constexpr uint32_t postUpdateSize = GetVecLen() / sizeof(U);
-    for (uint16_t i = 0; i < repeatTime; i++) {
-        MaskReg maskReg = UpdateMask<U>(currCount);
-
-        RegTensor<U> local;
-        MicroAPI::LoadAlign<U, PostLiteral::POST_MODE_UPDATE>(local, (__ubuf__ U *&)src, postUpdateSize);
-        if constexpr (NeedTwiddle<T>()) {
-            AscendC::MicroAPI::Internal::TwiddleIn<T>(local, local, maskReg);
-        }
-        if constexpr (NeedReverse<isLargest>()) {
-            Not(local, local, maskReg);
-        }
-        MicroAPI::StoreAlign<U, PostLiteral::POST_MODE_UPDATE>((__ubuf__ U *&)dst, local, postUpdateSize, maskReg);
-    }
-}
-
-template <typename T, typename U, bool isLargest>
-__simd_vf__ inline void PostProcess(__ubuf__ U *src, __ubuf__ U *dst, uint32_t count)
-{
-    uint16_t repeatTime = DivCeil(count, GetVecLen() / sizeof(T));
-    constexpr uint32_t postUpdateSize = GetVecLen() / sizeof(U);
-    for (uint16_t i = 0; i < repeatTime; i++) {
-        MaskReg maskReg = UpdateMask<U>(count);
-
-        RegTensor<U> local;
-        MicroAPI::LoadAlign<U, PostLiteral::POST_MODE_UPDATE>(local, (__ubuf__ U *&)src, postUpdateSize);
-        if constexpr (NeedReverse<isLargest>()) {
-            Not(local, local, maskReg);
-        }
-        if constexpr (NeedTwiddle<T>()) {
-            AscendC::MicroAPI::Internal::TwiddleOut<T>(local, local, maskReg);
-        }
-        MicroAPI::StoreAlign<U, PostLiteral::POST_MODE_UPDATE>((__ubuf__ U *&)dst, local, postUpdateSize, maskReg);
-    }
-}
-
-template <typename T, typename U>
-__simd_vf__ inline void Preprocess(__ubuf__ T *src, __ubuf__ U *dst, bool isLargest, uint32_t count)
-{
-    uint16_t repeatTime = DivCeil(count, GetVecLen() / sizeof(T));
-    uint32_t currCount = count;
-    constexpr uint32_t postUpdateSize = GetVecLen() / sizeof(U);
-    for (uint16_t i = 0; i < repeatTime; i++) {
-        MaskReg maskReg = UpdateMask<U>(currCount);
-
-        RegTensor<U> local;
-        MicroAPI::LoadAlign<U, PostLiteral::POST_MODE_UPDATE>(local, (__ubuf__ U *&)src, postUpdateSize);
-        if constexpr (NeedTwiddle<T>()) {
-            AscendC::MicroAPI::Internal::TwiddleIn<T>(local, local, maskReg);
-        }
-        if (NeedReverse(isLargest)) {                
-            Not(local, local, maskReg);
-        }
-        MicroAPI::StoreAlign<U, PostLiteral::POST_MODE_UPDATE>((__ubuf__ U *&)dst, local, postUpdateSize, maskReg);
-    }
-}
-
-template <typename T, typename U>
-__simd_vf__ inline void PostProcess(__ubuf__ U *src, __ubuf__ U *dst, bool isLargest, uint32_t count)
-{
-    uint16_t repeatTime = DivCeil(count, GetVecLen() / sizeof(T));
-    constexpr uint32_t postUpdateSize = GetVecLen() / sizeof(U);
-    for (uint16_t i = 0; i < repeatTime; i++) {
-        MaskReg maskReg = UpdateMask<U>(count);
-
-        RegTensor<U> local;
-        MicroAPI::LoadAlign<U, PostLiteral::POST_MODE_UPDATE>(local, (__ubuf__ U *&)src, postUpdateSize);
-        if (NeedReverse(isLargest)) {
-            Not(local, local, maskReg);
-        }
-        if constexpr (NeedTwiddle<T>()) {
-            AscendC::MicroAPI::Internal::TwiddleOut<T>(local, local, maskReg);
-        }
-        MicroAPI::StoreAlign<U, PostLiteral::POST_MODE_UPDATE>((__ubuf__ U *&)dst, local, postUpdateSize, maskReg);
-    }
-}
 
 template<typename T, bool isReuseSrc, bool isLargest>
 __aicore__ inline void InitializeTempBuffer(const LocalTensor<T> &tempBuffer, const uint32_t alignCount, __ubuf__ T *&tmpSrcData, 
@@ -1244,14 +1157,18 @@ __aicore__ inline void TopKRaidxSelect(const LocalTensor<T> &dstValueLocal, cons
             tmpSrcIndex, tmpHistData, (__ubuf__ T*&)realWorkData, (__ubuf__ T*&)sortTmpBuffer);
 
         if constexpr (NeedPreProcess<T, isLargestInTemplate>()) {
-            Preprocess<T, ConvType, isLargestInTemplate>((__ubuf__ T*)src, realWorkData, count);
+            Internal::TwiddleInData<T, ConvType, !isLargestInTemplate>(src, realWorkData, count);
         }
     } else {
         InitializeTempBuffer<T, isReuseSrc>(tempBuffer, isLargest, count, (__ubuf__ T*&)tmpSrcData, tmpSrcIndex, 
             tmpHistData, (__ubuf__ T*&)realWorkData, (__ubuf__ T*&)sortTmpBuffer);
 
         if (NeedPreProcess<T>(isLargest)) {
-            Preprocess<T, ConvType>((__ubuf__ T*)src, realWorkData, isLargest, count);
+            if (isLargest) {
+                Internal::TwiddleInData<T, ConvType, false>(src, realWorkData, count);
+            } else {
+                Internal::TwiddleInData<T, ConvType, true>(src, realWorkData, count);
+            }
         }
     }
 
@@ -1317,11 +1234,15 @@ __aicore__ inline void TopKRaidxSelect(const LocalTensor<T> &dstValueLocal, cons
 
     if constexpr (isOrderFromTemplate) {
         if constexpr (NeedPreProcess<T, isLargestInTemplate>()) {
-            PostProcess<T, ConvType, isLargestInTemplate>(dst, dst, k);   
+            Internal::TwiddleOutData<T, ConvType, !isLargestInTemplate>(dst, dst, k);   
         }
     } else {
         if (NeedPreProcess<T>(isLargest)) {
-            PostProcess<T, ConvType>(dst, dst, isLargest, k);
+            if (isLargest) {
+                Internal::TwiddleOutData<T, ConvType, false>(dst, dst, k);
+            } else {
+                Internal::TwiddleOutData<T, ConvType, true>(dst, dst, k);
+            }
         }
     }
 }
