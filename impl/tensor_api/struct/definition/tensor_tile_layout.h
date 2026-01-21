@@ -15,6 +15,8 @@
 #ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_LAYOUT_H
 #define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_LAYOUT_H
 
+#include "impl/tensor_api/utils/tensor_tile_utils.h"
+
 namespace AscendC {
 
 template <typename T, typename U, typename S>

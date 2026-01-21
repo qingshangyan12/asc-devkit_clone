@@ -102,14 +102,16 @@ asc-devkit:
       - impl/basic_api/dav_l311/kernel_operator_mm_impl.h
       - impl/basic_api/kernel_operator_list_tensor_intf_impl.h
       - impl/micro_api/kernel_micro_intf_impl.h
-      - impl/tensor_api/utils/tensor_tile_constant.h
-      - impl/tensor_api/utils/tensor_tile_macro.h
+      - impl/tensor_api/utils/tensor_tile_utils.h
       - impl/tensor_api/algorithm/tensor_tile_algorithm.h
       - impl/tensor_api/arch/tensor_tile_arch.h
       - impl/tensor_api/struct/tensor_tile_struct.h
-      - impl/tensor_api/struct/definition/tensor_tile_utils.h
-      - impl/tensor_api/struct/definition/tensor_tile_hw_ptr.h
+      - impl/tensor_api/atom/tensor_tile_atom.h
       - impl/tensor_api/tensor_api_impl.h
+      - impl/tensor_api/utils/tensor_tile_constant.h
+      - impl/tensor_api/utils/tensor_tile_macro.h
+      - impl/tensor_api/utils/tensor_tile_extra.h
+      - impl/tensor_api/struct/definition/tensor_tile_hw_ptr.h
   llt:
     ut_check: true
     st_check: false

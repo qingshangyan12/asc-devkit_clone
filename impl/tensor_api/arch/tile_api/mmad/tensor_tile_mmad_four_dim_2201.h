@@ -14,7 +14,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_FOUR_DIM_2201_H
 #define IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_FOUR_DIM_2201_H
 
-#include "../tensor_tile_utils.h"
+#include "impl/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/tensor_api/struct/tensor_tile_struct.h"
 
 namespace AscendC {
 namespace TileInternal {

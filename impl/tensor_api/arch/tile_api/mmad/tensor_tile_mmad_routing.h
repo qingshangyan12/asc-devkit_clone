@@ -15,7 +15,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_ROUTING_H
 #define IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_ROUTING_H
 
-#include "tensor_tile_mmad_four_dim_2201.h"
+#include "impl/tensor_api/arch/tile_api/mmad/tensor_tile_mmad_four_dim_2201.h"
 
 namespace AscendC {
 namespace TileInternal {

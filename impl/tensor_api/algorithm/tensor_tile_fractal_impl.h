@@ -9,75 +9,16 @@
 */
 
 /*!
- * \file tensor_tile_basic_impl.h
+ * \file tensor_tile_fractal_impl.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_TENSOR_TILE_BASIC_IMPL_H
-#define IMPL_TENSOR_API_TENSOR_TILE_BASIC_IMPL_H
+#ifndef IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_FRACTAL_IMPL_H
+#define IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_FRACTAL_IMPL_H
+
+#include "impl/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/tensor_api/struct/tensor_tile_struct.h"
+
 namespace AscendC {
-template <typename... Ts>
-__aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
-{
-    return TileInternal::MakeShapeImpl<Ts...>(t...);
-}
-
-template <typename... Ts>
-__aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t)
-{
-    return TileInternal::MakeStrideImpl<Ts...>(t...);
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride)
-{
-    return TileInternal::MakeLayoutImpl(shape, stride);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::GM, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeUBmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::UB, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeL1memPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::L1, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeL0AmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::L0A, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeL0BmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::L0B, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeL0CmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::L0C, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeBiasmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::BIAS, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::FIXBUF, Iterator>(iter);
-}
-
-template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
-{
-    return TileInternal::MakeTensorImpl<Iterator, Args...>(iter, args...);
-}
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column) {
@@ -135,4 +76,4 @@ using ZZLayoutFormat = Layout<TileInternal::ZZShapeFormat<T, row, column>, TileI
 
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_TENSOR_TILE_BASIC_IMPL_H
+#endif // IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_FRACTAL_IMPL_H

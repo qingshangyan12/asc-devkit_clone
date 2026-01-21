@@ -9,11 +9,14 @@
 */
 
 /*!
- * \file tensor_tile_utils.h
+ * \file tensor_tile_format.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_UTILS_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_UTILS_H
+#ifndef IMPL_TENSOR_API_UTILS_TENSOR_TILE_FORMAT_H
+#define IMPL_TENSOR_API_UTILS_TENSOR_TILE_FORMAT_H
+
+#include "impl/tensor_api/utils/tensor_tile_constant.h"
+#include "impl/tensor_api/struct/tensor_tile_struct.h"
 
 namespace AscendC {
 template <typename T, typename U, typename S>
@@ -221,4 +224,4 @@ __aicore__ inline constexpr auto GetHardPos()
 } // namespace TileInternal
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_UTILS_H
+#endif // IMPL_TENSOR_API_UTILS_TENSOR_TILE_FORMAT_H

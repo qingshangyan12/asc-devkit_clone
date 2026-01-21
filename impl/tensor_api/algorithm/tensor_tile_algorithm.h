@@ -15,10 +15,9 @@
 #ifndef IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_ALGORITHM_H
 #define IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_ALGORITHM_H
 
-#include "../utils/tensor_tile_constant.h"
-#include "../utils/tensor_tile_macro.h"
-#include "../arch/tensor_tile_arch.h"
-#include "../struct/tensor_tile_struct.h"
-#include "tensor_tile_basic_impl.h"
+#include "impl/tensor_api/algorithm/tensor_tile_fractal_impl.h"
+#include "impl/tensor_api/algorithm/tensor_tile_layout_impl.h"
+#include "impl/tensor_api/algorithm/tensor_tile_ptr_impl.h"
+#include "impl/tensor_api/algorithm/tensor_tile_tensor_impl.h"
 
 #endif // IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_ALGORITHM_H

@@ -15,12 +15,9 @@
 #ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_COORD_H
 #define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_COORD_H
 
-#include "tensor_tile_layout.h"
+#include "impl/tensor_api/struct/definition/tensor_tile_layout.h"
 
 namespace AscendC {
-namespace CoordImpl {
-using IntZero = Std::Int<0>;
-}
 
 template <typename... Coords>
 using Coord = Std::tuple<Coords...>;
@@ -91,8 +88,8 @@ __aicore__ inline constexpr auto Crd2IdxITT(const T& coord, const U& shape, cons
     if constexpr (sizeof...(Is) == 0) {  // Avoid recursion and mod on single/last iter
         return Crd2Idx(coord, Std::get<I0>(shape), Std::get<I0>(stride));
     } else if constexpr (Std::is_constant<0, T>::value) {
-        return Crd2Idx(CoordImpl::IntZero{}, Std::get<I0>(shape), Std::get<I0>(stride)) +
-            (CoordImpl::IntZero{} + ... + Crd2Idx(CoordImpl::IntZero{}, Std::get<Is>(shape), Std::get<Is>(stride)));
+        return Crd2Idx(Std::Int<0>{}, Std::get<I0>(shape), Std::get<I0>(stride)) +
+            (Std::Int<0>{} + ... + Crd2Idx(Std::Int<0>{}, Std::get<Is>(shape), Std::get<Is>(stride)));
     } else { // General case
         auto prod = Product{}(Std::get<I0>(shape));
         auto div = coord / prod;

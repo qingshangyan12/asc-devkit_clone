@@ -15,10 +15,6 @@
 #ifndef IMPL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H
 #define IMPL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H
 
-#include "../utils/tensor_tile_constant.h"
-#include "../utils/tensor_tile_macro.h"
-#include "../struct/tensor_tile_struct.h"
-#include "tile_api/tensor_tile_utils.h"
-#include "tile_api/tensor_tile_mmad_impl.h"
+#include "impl/tensor_api/arch/tile_api/tensor_tile_mmad_impl.h"
 
 #endif // IMPL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H

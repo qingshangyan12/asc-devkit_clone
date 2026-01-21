@@ -9,21 +9,15 @@
 */
 
 /*!
-* \file tensor_tile_utils.h
+* \file tensor_tile_extra.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_UTILS_H
-#define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_UTILS_H
+#ifndef IMPL_TENSOR_API_UTILS_TENSOR_TILE_EXTRA_H
+#define IMPL_TENSOR_API_UTILS_TENSOR_TILE_EXTRA_H
 
-#include <cstdint>
-#include <utility>
-#include <type_traits>
-#include "include/utils/std/tuple.h"
-#include "include/utils/std/type_traits.h"
-#include "include/utils/std/utility.h"
+#include "impl/tensor_api/utils/tensor_tile_constant.h"
 
 namespace AscendC {
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
 namespace TileInternal {
 template <typename... Ts>
 using void_t = void;
@@ -61,4 +55,4 @@ struct IterVal<T,void_t<typename T::valueType>> {
 } // namespace TileInternal
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_STRUCT_TENSOR_TILE_UTILS_H
+#endif // IMPL_TENSOR_API_UTILS_TENSOR_TILE_EXTRA_H

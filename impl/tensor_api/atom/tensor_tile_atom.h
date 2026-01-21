@@ -9,28 +9,10 @@
 */
 
 /*!
-* \file make_ptr.h
+* \file tensor_tile_atom.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_STRUCT_CONSTRUCTOR_MAKE_PTR_H
-#define IMPL_TENSOR_API_STRUCT_CONSTRUCTOR_MAKE_PTR_H
+#ifndef IMPL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H
+#define IMPL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H
 
-#include "../definition/tensor_tile_hw_ptr.h"
-
-namespace AscendC {
-namespace TileInternal
-{
-template <Hardware hardPos, typename Iterator>
-__aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
-{
-    if constexpr (IsHardwareMem<hardPos, Iterator>::value) {
-        return iter;
-    } else {
-        return HardwareMemPtr<hardPos, Iterator>{iter};
-    }
-}
-}
-
-} // namespace AscendC
-
-#endif // IMPL_TENSOR_API_STRUCT_CONSTRUCTOR_MAKE_PTR_H
+#endif // IMPL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H

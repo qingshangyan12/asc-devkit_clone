@@ -15,9 +15,10 @@
 #ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_POINTER_H
 #define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_POINTER_H
 
-#include "tensor_tile_utils.h"
+#include "impl/tensor_api/utils/tensor_tile_utils.h"
 
 namespace AscendC {
+namespace TileInternal{
 
 template <typename Iterator, typename DerivedType>
 struct IterAdaptor
@@ -74,6 +75,7 @@ private:
     iterator ptr; // u8*
 };
 
+}
 } // namespace AscendC
 
 #endif // IMPL_TENSOR_API_STRUCT_TENSOR_TILE_POINTER_H

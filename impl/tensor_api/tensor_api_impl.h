@@ -9,16 +9,16 @@
 */
 
 /*!
-* \file tensor_api.h
+* \file tensor_api_impl.h
 * \brief
 */
 #ifndef IMPL_TENSOR_API_TENSOR_API_IMPL_H
 #define IMPL_TENSOR_API_TENSOR_API_IMPL_H
 
-#include "utils/tensor_tile_macro.h"
-#include "utils/tensor_tile_constant.h"
-#include "struct/tensor_tile_struct.h"
-#include "arch/tensor_tile_arch.h"
-#include "algorithm/tensor_tile_algorithm.h"
+#include "impl/tensor_api/algorithm/tensor_tile_algorithm.h"
+#include "impl/tensor_api/arch/tensor_tile_arch.h"
+#include "impl/tensor_api/atom/tensor_tile_atom.h"
+#include "impl/tensor_api/struct/tensor_tile_struct.h"
+#include "impl/tensor_api/utils/tensor_tile_utils.h"
 
 #endif // IMPL_TENSOR_API_TENSOR_API_IMPL_H

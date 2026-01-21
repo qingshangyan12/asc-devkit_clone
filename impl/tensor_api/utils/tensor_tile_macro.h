@@ -9,11 +9,11 @@
 */
 
 /*!
-* \file tensor_api_macro.h
+* \file tensor_tile_macro.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_UTILS_TENSOR_API_MACRO_H
-#define IMPL_TENSOR_API_UTILS_TENSOR_API_MACRO_H
+#ifndef IMPL_TENSOR_API_UTILS_TENSOR_TILE_MACRO_H
+#define IMPL_TENSOR_API_UTILS_TENSOR_TILE_MACRO_H
 
 #define GM_ADDR __gm__ uint8_t*
 
@@ -175,4 +175,4 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define ASCEND_IS_NOT_AIC constexpr(g_coreType != AscendC::AIC)
 #endif
 
-#endif //IMPL_TENSOR_API_UTILS_TENSOR_API_MACRO_H
+#endif //IMPL_TENSOR_API_UTILS_TENSOR_TILE_MACRO_H

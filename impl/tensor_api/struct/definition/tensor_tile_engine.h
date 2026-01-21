@@ -15,8 +15,7 @@
 #ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
 #define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
 
-#include "tensor_tile_utils.h"
-#include "tensor_tile_hw_ptr.h"
+#include "impl/tensor_api/struct/definition/tensor_tile_hw_ptr.h"
 
 namespace AscendC {
 

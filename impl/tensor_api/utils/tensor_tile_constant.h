@@ -9,13 +9,23 @@
 */
 
 /*!
-* \file tensor_api_constant.h
+* \file tensor_tile_constant.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_UTILS_TENSOR_API_CONSTANT_H
-#define IMPL_TENSOR_API_UTILS_TENSOR_API_CONSTANT_H
+#ifndef IMPL_TENSOR_API_UTILS_TENSOR_TILE_CONSTANT_H
+#define IMPL_TENSOR_API_UTILS_TENSOR_TILE_CONSTANT_H
+
+#include <cstdint>
+#include <utility>
+#include <type_traits>
+#include "include/utils/std/tuple.h"
+#include "include/utils/std/type_traits.h"
+#include "include/utils/std/utility.h"
 
 namespace AscendC{
+
+enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
+
 namespace TileInternal{
 constexpr size_t TWO_DIM_DATA = 2;
 constexpr size_t FOUR_DIM_DATA = 4;
@@ -24,4 +34,4 @@ constexpr size_t FRACTAL_FIXED = 16;
 }
 }
 
-#endif // IMPL_TENSOR_API_UTILS_TENSOR_API_CONSTANT_H
+#endif // IMPL_TENSOR_API_UTILS_TENSORTILE_CONSTANT_H

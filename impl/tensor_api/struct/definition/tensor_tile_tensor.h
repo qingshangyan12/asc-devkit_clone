@@ -15,9 +15,9 @@
 #ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_TENSOR_H
 #define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_TENSOR_H
 
-#include "tensor_tile_engine.h"
-#include "tensor_tile_layout.h"
-#include "tensor_tile_coord.h"
+#include "impl/tensor_api/struct/definition/tensor_tile_engine.h"
+#include "impl/tensor_api/struct/definition/tensor_tile_layout.h"
+#include "impl/tensor_api/struct/definition/tensor_tile_coord.h"
 
 namespace AscendC {
 

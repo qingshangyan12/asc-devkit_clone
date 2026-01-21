@@ -20,6 +20,7 @@ set(ASCENDC_UT_PRODUCT_TYPE_LIST
 set(ASCENDC_UT_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/..
     ${ASCENDC_DIR}/include
+    ${ASCENDC_DIR}/
     ${ASCENDC_DIR}/impl/tensor_api
 )
 

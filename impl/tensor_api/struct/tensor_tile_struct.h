@@ -15,11 +15,8 @@
 #ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
 #define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
 
-#include "../utils/tensor_tile_constant.h"
-#include "../utils/tensor_tile_macro.h"
-#include "definition/tensor_tile_tensor.h"
-#include "constructor/make_layout.h"
-#include "constructor/make_ptr.h"
-#include "constructor/make_tensor.h"
+#include "impl/tensor_api/struct/constructor/tensor_tile_make_layout.h"
+#include "impl/tensor_api/struct/constructor/tensor_tile_make_ptr.h"
+#include "impl/tensor_api/struct/constructor/tensor_tile_make_tensor.h"
 
 #endif //IMPL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
