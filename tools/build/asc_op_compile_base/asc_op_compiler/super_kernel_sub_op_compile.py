@@ -28,11 +28,10 @@ from .super_kernel_constants import FUNC_STR, OBJ_FILES_STR, AI_CORE_STR, \
 def gen_gm_get_set_value_dcci_compile_options(compile_option_tuple, compile_info, is_static_shape):
     if not is_static_shape:
         # dynamic op runs offline compilation, dcci-before-kernel-start can not modify offline compilation
-        # so call dcci in gm get set value by default
-        global_var_storage.set_variable("ascendc_sub_super_kernel_call_dcci_before_kernel_start", False)
-        global_var_storage.set_variable("ascendc_sub_super_kernel_call_dcci_after_kernel_end", False)
+        # so call dcci before and after kernel by default, remove dcci in gm Get/SetValue
+        global_var_storage.set_variable("ascendc_sub_super_kernel_call_dcci_before_kernel_start", True)
+        global_var_storage.set_variable("ascendc_sub_super_kernel_call_dcci_after_kernel_end", True)
         global_var_storage.set_variable("ascendc_sub_super_kernel_call_dcci_disable_on_kernel", False)
-        compile_option_tuple.compile_options.append("-D__ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__")
         return
 
     dcci_before_kernel_start_op_list = [
