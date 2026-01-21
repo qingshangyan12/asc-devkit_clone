@@ -1,6 +1,7 @@
 # 自定义算子工程编译、打包和部署样例
+
 ## 概述
-本样例以简单的自定义算子为示例，展示了其编译、打包成自定义算子包，并部署到CANN包中的流程。
+本样例以简单的自定义算子为示例，展示了其编译、打包成自定义算子包，并部署到CANN环境中的流程。
 
 ## 支持的产品
 本样例支持如下产品型号：
@@ -10,24 +11,38 @@
 - Atlas 200I/500 A2 推理产品
 - Atlas 推理系列产品
 
+> 注意: 本样例中涉及多个算子示例，请以各个算子示例实际支持的产品型号为准。
+
 ## 目录结构介绍
 ```
 ├── custom_op
 │   ├── CMakeLists.txt
 │   ├── framework
-│   │   ├── tf_plugin
-│   │   │   ├── tensorflow_add_custom_plugin.cc
-│   │   │   └── CMakeLists.txt
-│   │   └── CMakeLists.txt
+│   │   ├── CMakeLists.txt
+│   │   └── tf_plugin
+│   │       ├── CMakeLists.txt
+│   │       └── tensorflow_add_custom_plugin.cc
 │   ├── op_host
 │   │   ├── add_custom
-│   │   │   └── add_custom_host.cpp     // host侧编译源码文件
+│   │   │   └── add_custom_host.cpp
+│   │   ├── add_template_custom
+│   │   │   └── add_template_custom.cpp
+│   │   ├── add_custom_tiling_sink
+│   │   │   ├── add_custom_tiling_sink.cpp
+│   │   │   └── add_custom_tiling_sink_tiling.cpp
 │   │   └── CMakeLists.txt
-│   └──op_kernel
-│       ├── add_custom
-│       │   ├── add_custom_kernel.cpp   // kernel侧编译源码文件
-│       │   └── add_custom_tiling.h     // host侧编译tiling头文件
-│       └── CMakeLists.txt
+│   ├── op_kernel
+│   │   ├── add_custom
+│   │   │   ├── add_custom_kernel.cpp
+│   │   │   └── add_custom_tiling.h
+│   │   ├── add_template_custom
+│   │   │   ├── add_template_custom.cpp
+│   │   │   ├── add_template_custom_tiling.h
+│   │   │   └── tiling_key_add_template_custom.h
+│   │   ├── add_custom_tiling_sink
+│   │   │   ├── add_custom_tiling_sink_kernel.cpp
+│   │   │   └── add_custom_tiling_sink_tiling.h
+│   │   └── CMakeLists.txt
 ```
 
 ## 算子描述
@@ -59,25 +74,27 @@ z = x + y
 
 
 ## 编译运行
-在本样例根目录下执行如下步骤，编译并部署自定义算子包。
-- 配置环境变量</br>
-  请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+在本样例根目录下执行如下步骤，编译、打包并部署自定义算子包。
+
+- 配置环境变量
+
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
-    source /usr/local/Ascend/ascend-toolkit/set_env.sh
+    source /usr/local/Ascend/cann/set_env.sh
     ```
 
   - 默认路径，非root用户安装CANN软件包
     ```bash
-    source $HOME/Ascend/ascend-toolkit/set_env.sh
+    source $HOME/Ascend/cann/set_env.sh
     ```
 
   - 指定路径install_path，安装CANN软件包
     ```bash
-    source ${install_path}/ascend-toolkit/set_env.sh
+    source ${install_path}/cann/set_env.sh
     ```
 
-- 编译算子并部署
+- 编译、打包算子并部署
   ```bash
   mkdir -p build && cd build
   cmake .. && make -j binary package

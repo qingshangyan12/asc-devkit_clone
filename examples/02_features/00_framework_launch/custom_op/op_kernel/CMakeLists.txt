@@ -14,6 +14,18 @@ npu_op_kernel_sources(ascendc_kernels
     KERNEL_FILE add_custom_kernel.cpp
 )
 
+npu_op_kernel_sources(ascendc_kernels
+    OP_TYPE AddCustomTilingSink
+    KERNEL_DIR add_custom_tiling_sink
+    KERNEL_FILE add_custom_tiling_sink_kernel.cpp
+)
+
+npu_op_kernel_sources(ascendc_kernels
+    OP_TYPE AddTemplateCustom
+    KERNEL_DIR add_template_custom
+    KERNEL_FILE add_template_custom.cpp
+)
+
 npu_op_kernel_library(ascendc_kernels
     SRC_BASE ${CMAKE_CURRENT_SOURCE_DIR}
     TILING_LIBRARY cust_optiling

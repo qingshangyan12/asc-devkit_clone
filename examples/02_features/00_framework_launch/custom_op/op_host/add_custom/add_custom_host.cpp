@@ -66,7 +66,11 @@ public:
         this->AICore()
             .SetTiling(optiling::TilingFunc)
             // at least one soc version must be configured.
-            .AddConfig("ascend910b");
+            .AddConfig("ascend310p")
+            .AddConfig("ascend310b")
+            .AddConfig("ascend910b")
+            .AddConfig("ascend910_93")
+            .AddConfig("ascend910_95");
     }
 };
 OP_ADD(AddCustom);

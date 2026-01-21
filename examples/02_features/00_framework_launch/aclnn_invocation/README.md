@@ -1,4 +1,5 @@
 # 自定义算子工程+aclnn单算子API调用样例
+
 ## 概述
 本样例基于示例自定义算子工程，介绍了aclnn`OpType`单算子API的方式执行固定shape算子。
 
@@ -28,11 +29,12 @@
 3. 调用`aclnnAddCustom`执行计算，同步流`aclrtSynchronizeStream`，并将结果拷回Host侧进行验证。
 
 ## 编译运行
-在本样例根目录下执行如下步骤，编译并执行算子。
 - 编译、打包和部署自定义算子工程
+
   运行此样例前，请参考[自定义算子工程样例](../custom_op/README.md)完成前期准备。
 
-- 配置环境变量  
+- 配置环境变量
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -50,6 +52,8 @@
     ```
 
 - 样例执行
+
+  在本样例根目录下执行如下步骤，运行该样例。
   ```bash
   mkdir -p build; cd build
   cmake .. && make -j
@@ -58,5 +62,5 @@
 
   执行结果如下，说明执行成功。
   ```log
-  test pass!
+  test pass
   ```

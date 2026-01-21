@@ -8,7 +8,12 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-file(GLOB host_ops_srcs add_custom/add_custom_host.cpp)
+file(GLOB host_ops_srcs
+    add_custom/add_custom_host.cpp
+    add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp
+    add_custom_tiling_sink/add_custom_tiling_sink.cpp
+    add_template_custom/add_template_custom.cpp
+)
 npu_op_code_gen(
     SRC ${host_ops_srcs}
     PACKAGE ${package_name}
@@ -16,6 +21,9 @@ npu_op_code_gen(
 )
 npu_op_library(cust_optiling TILING
     ${host_ops_srcs}
+)
+npu_op_device_tiling_library(cust_opmaster SHARED
+    add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp
 )
 
 file(GLOB autogen_aclnn_src ${ASCEND_AUTOGEN_PATH}/aclnn_*.cpp)
@@ -36,4 +44,5 @@ npu_op_package_add(${package_name}
         cust_optiling
         cust_opapi
         cust_op_proto
+        cust_opmaster  # for tiling sink
 )

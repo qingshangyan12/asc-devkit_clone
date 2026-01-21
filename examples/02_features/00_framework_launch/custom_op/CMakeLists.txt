@@ -12,7 +12,8 @@ cmake_minimum_required(VERSION 3.16.0)
 project(custom_op_prj)
 find_package(ASC REQUIRED)
 
-set(ASCEND_COMPUTE_UNIT ascend310p ascend310b ascend910b ascend910_93)
+# set(ASCEND_COMPUTE_UNIT ascend310p ascend310b ascend910b ascend910_93 ascend910_95)
+set(ASCEND_COMPUTE_UNIT ascend910b)
 set(package_name customize)
 
 npu_op_package(${package_name}

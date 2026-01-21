@@ -68,14 +68,15 @@
 ## 编译运行
 - 安装PyTorch以及Ascend Extension for PyTorch插件
 
-  请参考[pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch)开源代码仓或[Ascend Extension for PyTorch昇腾社区](https://hiascend.com/document/redirect/Pytorch-index)的安装说明，选取支持的`Python`版本配套发行版，完成`torch`和`torch-npu`的安装
+  请参考[pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch)开源代码仓或[Ascend Extension for PyTorch昇腾社区](https://hiascend.com/document/redirect/Pytorch-index)的安装说明，选取支持的`Python`版本配套发行版，完成`torch`和`torch-npu`的安装。
 
 - 安装pybind11
   ```bash
   pip3 install pybind11
   ```
 
-- 配置环境变量  
+- 配置环境变量
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
@@ -93,6 +94,8 @@
     ```
 
 - 样例执行
+
+  在本样例根目录下执行如下步骤，运行该样例。
   ```bash
   mkdir -p build; cd build
   cmake ..; make -j
