@@ -45,8 +45,5 @@ npu_op_package_add(${package_name}
         cust_optiling
         cust_opapi
         cust_op_proto
-<<<<<<< HEAD
         cust_opmaster  # for tiling sink
-=======
->>>>>>> delete unnecessary files
 )
