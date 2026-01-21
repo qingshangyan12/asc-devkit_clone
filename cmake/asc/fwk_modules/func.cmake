@@ -598,7 +598,7 @@ endfunction()
 
 function(npu_op_library target_name target_type)
   string(TOUPPER ${target_type} _upper_target_type)
-  set(support_types ACLNN TILING GRAPH TF_PLUGIN)
+  set(support_types ACLNN TILING GRAPH TF_PLUGIN ONNX_PLUGIN)
   if(NOT _upper_target_type IN_LIST support_types)
       message(FATAL_ERROR "target_type ${target_type} does not support, the support list is ${support_types}")
   endif()
@@ -705,6 +705,27 @@ function(npu_op_library target_name target_type)
     list(APPEND tmp_tf_plugin_target ${target_name})
     set_property(GLOBAL PROPERTY ASCENDC_TF_PLUGIN_TARGET ${tmp_tf_plugin_target})
     set_property(GLOBAL PROPERTY _ASC_TGT_${target_name}_TYPE "TF_PLUGIN")
+  elseif("${target_type}x" STREQUAL "ONNX_PLUGINx")
+    add_library(${target_name} SHARED
+      ${SOURCES}
+    )
+    if(ENABLE_CROSS_COMPILE)
+      target_link_directories(${target_name} PUBLIC
+                              ${ASCENDC_CMAKE_COMPILE_COMPILER_LIBRARY}
+                              ${ASCENDC_CMAKE_COMPILE_RUNTIME_LIBRARY}
+      )
+    endif()
+    target_compile_definitions(${target_name} PRIVATE google=ascend_private)
+    target_link_libraries(${target_name} PRIVATE
+        intf_pub
+        $<IF:$<TARGET_EXISTS:cust_intf_pub>,cust_intf_pub,>
+        graph)
+    set_target_properties(${target_name} PROPERTIES OUTPUT_NAME cust_onnx_parsers)
+
+    get_property(tmp_onnx_plugin_target GLOBAL PROPERTY ASCENDC_ONNX_PLUGIN_TARGET)
+    list(APPEND tmp_onnx_plugin_target ${target_name})
+    set_property(GLOBAL PROPERTY ASCENDC_ONNX_PLUGIN_TARGET ${tmp_onnx_plugin_target})
+    set_property(GLOBAL PROPERTY _ASC_TGT_${target_name}_TYPE "ONNX_PLUGIN")
   endif()
 endfunction()
 
@@ -714,6 +735,7 @@ function(get_current_pack_target sub_target output_var)
   get_property(package_graph_target GLOBAL PROPERTY ASCENDC_GRAPH_TARGET)
   get_property(package_kernel_target GLOBAL PROPERTY ASCENDC_KERNEL_TARGET)
   get_property(package_tf_plugin_target GLOBAL PROPERTY ASCENDC_TF_PLUGIN_TARGET)
+  get_property(package_onnx_plugin_target GLOBAL PROPERTY ASCENDC_ONNX_PLUGIN_TARGET)
   get_property(package_device_sink_target GLOBAL PROPERTY ASCENDC_DEVICE_SINK_TARGET)
   if(sub_target IN_LIST package_aclnn_target)
     set(${output_var} "ACLNN" PARENT_SCOPE)
@@ -725,6 +747,8 @@ function(get_current_pack_target sub_target output_var)
     set(${output_var} "KERNEL" PARENT_SCOPE)
   elseif(sub_target IN_LIST package_tf_plugin_target)
     set(${output_var} "TF_PLUGIN" PARENT_SCOPE)
+  elseif(sub_target IN_LIST package_onnx_plugin_target)
+    set(${output_var} "ONNX_PLUGIN" PARENT_SCOPE)
   elseif(sub_target IN_LIST package_device_sink_target)
     set(${output_var} "DEVICE_SINK" PARENT_SCOPE)
   else()
@@ -781,6 +805,7 @@ function(npu_op_package_add target_package_name)
   set(_ascendc_graph_target "")
   set(_ascendc_kernel_target "")
   set(_ascendc_tf_plugin_target "")
+  set(_ascendc_onnx_plugin_target "")
   set(_ascendc_device_sink_target "")
   foreach(_ascendc_sub_target ${ADD_TARGET_LIBRARY})
     set(_ascendc_enable_target)
@@ -800,6 +825,9 @@ function(npu_op_package_add target_package_name)
     elseif("${_ascendc_enable_target}" STREQUAL "TF_PLUGIN")
       set(_ascendc_tf_plugin_target ${_ascendc_sub_target})
       message(INFO " target name: ${_ascendc_tf_plugin_target}")
+    elseif("${_ascendc_enable_target}" STREQUAL "ONNX_PLUGIN")
+      set(_ascendc_onnx_plugin_target ${_ascendc_sub_target})
+      message(INFO " target name: ${_ascendc_onnx_plugin_target}")
     elseif("${_ascendc_enable_target}" STREQUAL "DEVICE_SINK")
       set(_ascendc_device_sink_target ${_ascendc_sub_target})
       message(INFO " target name: ${_ascendc_device_sink_target}")
@@ -983,6 +1011,19 @@ function(npu_op_package_add target_package_name)
 
       install(TARGETS ${_ascendc_tf_plugin_target}
         LIBRARY DESTINATION ${tf_plugin_package_path}
+      )
+    endif()
+
+    if(_ascendc_onnx_plugin_target)
+      if(DEFINED ADD_TARGET_PACKAGE_PATH)
+        set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ONNX_PLUGIN_PATH ${ADD_TARGET_PACKAGE_PATH})
+      else()
+        set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ONNX_PLUGIN_PATH "packages/vendors/${current_target_vendor_name}/framework/onnx")
+      endif()
+      get_property(onnx_plugin_package_path GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ONNX_PLUGIN_PATH)
+
+      install(TARGETS ${_ascendc_onnx_plugin_target}
+        LIBRARY DESTINATION ${onnx_plugin_package_path}
       )
     endif()
 
@@ -1205,6 +1246,9 @@ function(npu_op_package_add target_package_name)
 
         if(_ascendc_tf_plugin_target)
           add_dependencies(${_ascendc_kernel_target}_op_registry_pack ${_ascendc_tf_plugin_target})
+        endif()
+        if(_ascendc_onnx_plugin_target)
+          add_dependencies(${_ascendc_kernel_target}_op_registry_pack ${_ascendc_onnx_plugin_target})
         endif()
       endif()
 

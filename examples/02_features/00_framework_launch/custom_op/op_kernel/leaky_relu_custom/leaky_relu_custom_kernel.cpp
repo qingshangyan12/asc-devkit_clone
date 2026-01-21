@@ -8,12 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-/* !
- * \file leaky_relu_custom.cpp
- * \brief
- */
-
 #include "kernel_operator.h"
+#include "leaky_relu_custom_tiling.h"
 constexpr int32_t BUFFER_NUM = 2; // tensor num for each queue
 
 class KernelLeakyRelu {
@@ -21,6 +17,7 @@ public:
     __aicore__ inline KernelLeakyRelu() {}
     __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, uint32_t totalLength, uint32_t tileNum, float negativeSlope)
     {
+        ascendc_assert(tileNum != 0, "tileNum can not be zero.\n");
         this->blockLength = totalLength / AscendC::GetBlockNum();
         this->tileNum = tileNum;
         this->negativeSlope = static_cast<float>(negativeSlope);
@@ -64,7 +61,7 @@ private:
         AscendC::LocalTensor<float> yLocal = outQueueY.AllocTensor<float>();
         AscendC::LocalTensor<float> tmpTensor1 = tmpBuffer1.Get<float>();
         AscendC::LocalTensor<float> tmpTensor2 = tmpBuffer2.Get<float>();
-        float inputVal = 0.0;
+        float inputVal = 0.0f;
         AscendC::Maxs(tmpTensor1, xLocal, inputVal, this->tileLength);
         AscendC::Mins(tmpTensor2, xLocal, inputVal, this->tileLength);
         AscendC::Muls(tmpTensor2, tmpTensor2, this->negativeSlope, this->tileLength);
@@ -100,17 +97,9 @@ private:
 
 extern "C" __global__ __aicore__ void leaky_relu_custom(GM_ADDR x, GM_ADDR y, GM_ADDR workspace, GM_ADDR tiling)
 {
+    REGISTER_TILING_DEFAULT(LeakyReluCustomTilingData);
     GET_TILING_DATA(tiling_data, tiling);
     KernelLeakyRelu op;
     op.Init(x, y, tiling_data.totalLength, tiling_data.tileNum, tiling_data.negativeSlope);
     op.Process();
 }
-
-#ifndef ASCENDC_CPU_DEBUG
-// call of kernel function
-void leaky_relu_custom_do(uint32_t blockDim, void *l2ctrl, void *stream, uint8_t *x, uint8_t *y, uint8_t *workspace,
-                          uint8_t *tiling)
-{
-    leaky_relu_custom<<<blockDim, l2ctrl, stream>>>(x, y, workspace, tiling);
-}
-#endif

@@ -19,6 +19,10 @@
 │   ├── CMakeLists.txt
 │   ├── framework
 │   │   ├── CMakeLists.txt
+│   │   ├── onnx_plugin
+│   │   │   ├── CMakeLists.txt
+│   │   │   ├── json.hpp
+│   │   │   └── leaky_relu_custom_plugin.cc
 │   │   └── tf_plugin
 │   │       ├── CMakeLists.txt
 │   │       └── tensorflow_add_custom_plugin.cc
@@ -30,6 +34,8 @@
 │   │   ├── add_custom_tiling_sink
 │   │   │   ├── add_custom_tiling_sink.cpp
 │   │   │   └── add_custom_tiling_sink_tiling.cpp
+│   │   ├── leaky_relu_custom
+│   │   │   └── leaky_relu_custom_host.cpp
 │   │   └── CMakeLists.txt
 │   ├── op_kernel
 │   │   ├── add_custom
@@ -42,6 +48,8 @@
 │   │   ├── add_custom_tiling_sink
 │   │   │   ├── add_custom_tiling_sink_kernel.cpp
 │   │   │   └── add_custom_tiling_sink_tiling.h
+│   │   ├── leaky_relu_custom
+│   │   │   └── leaky_relu_custom_kernel.cpp
 │   │   └── CMakeLists.txt
 ```
 
@@ -50,6 +58,17 @@ Add算子实现了两个数据相加，返回相加结果的功能。对应的�
 ```
 z = x + y
 ```
+LeakyRelu算子实现了将数据按element做带泄露线性整流，返回处理结果的功能。
+对应的数学表达式为：
+
+$$
+y=
+\begin{cases}
+x, \quad x\geq 0\\
+a*x, \quad x<0
+\end{cases}
+$$
+其中a为scalar值。
 ## 算子规格描述
 <table>
 <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
@@ -64,13 +83,35 @@ z = x + y
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
 </table>
 
-## 代码实现介绍
-- kernel实现：</br>
-  Ascend C提供的矢量计算接口`Add`的操作元素都为`LocalTensor`，输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。</br>
-  Add算子的实现流程分为3个基本任务：`CopyIn`，`Compute`，`CopyOut`。`CopyIn`任务负责将Global Memory上的输入Tensor `xGm`和`yGm`搬运到Local Memory，分别存储在`xLocal`、`yLocal`，`Compute`任务负责对`xLocal`、`yLocal`执行加法操作，计算结果存储在`zLocal`中，`CopyOut`任务负责将输出数据从`zLocal`搬运至Global Memory上的输出Tensor zGm中。
+<table>
+<tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">LeakyRelu</td></tr>
+</tr>
+<tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">8 * 200 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">negative_slope</td><td align="center">0.0</td><td align="center">float</td><td align="center">ND</td></tr>
+</tr>
+</tr>
+<tr><td rowspan="1" align="center">算子输出</td><td align="center">y</td><td align="center">8 * 200 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
+</tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">leaky_relu_custom</td></tr>
+</table>
 
-- tiling实现：</br>
-  TilingData参数设计，`AddCustomTilingData`参数本质上是和并行数据切分相关的参数，本示例算子使用了2个tiling参数：`totalLength`、`tileNum`。`totalLength`是指需要计算的数据量大小，`tileNum`是指每个核上总计算数据分块个数。比如，`totalLength`这个参数传递到kernel侧后，可以通过除以参与计算的核数，得到每个核上的计算量，这样就完成了多核数据的切分。
+## 代码实现介绍
+- Add</br>
+  - kernel实现：</br>
+    Ascend C提供的矢量计算接口`Add`的操作元素都为`LocalTensor`，输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。</br>
+    Add算子的实现流程分为3个基本任务：`CopyIn`，`Compute`，`CopyOut`。`CopyIn`任务负责将Global Memory上的输入Tensor `xGm`和`yGm`搬运到Local Memory，分别存储在`xLocal`、`yLocal`，`Compute`任务负责对`xLocal`、`yLocal`执行加法操作，计算结果存储在`zLocal`中，`CopyOut`任务负责将输出数据从`zLocal`搬运至Global Memory上的输出Tensor `zGm`中。
+
+  - tiling实现：</br>
+    TilingData参数设计，`AddCustomTilingData`参数本质上是和并行数据切分相关的参数，本示例算子使用了2个tiling参数：`totalLength`、`tileNum`。`totalLength`是指需要计算的数据量大小，`tileNum`是指每个核上总计算数据分块个数。比如，`totalLength`这个参数传递到kernel侧后，可以通过除以参与计算的核数，得到每个核上的计算量，这样就完成了多核数据的切分。
+
+- LeakyRelu</br>
+  - kernel实现：</br>
+    Ascend C提供的矢量计算接口`LeakyRelu`的操作元素为`LocalTensor`，输入数据需要先搬运进片上存储，然后根据LeakyReLU的计算规则处理，最终结果搬出到外部存储上。</br>
+    LeakyReluCustom算子的实现流程分为3个基本任务：`CopyIn`，`Compute`，`CopyOut`。`CopyIn`任务负责将Global Memory上的输入Tensor `xGm`搬运到Local Memory，存储在`xLocal`，`Compute`任务负责对`xLocal`执行LeakyRelu操作，计算结果存储在`yLocal`中，`CopyOut`任务负责将输出数据从`yLocal`搬运至Global Memory上的输出Tensor `yGm`中。
+
+  - tiling实现：</br>
+    TilingData参数设计，`LeakyReluCustomTilingData`参数本质上是和并行数据切分相关的参数，本示例算子使用了3个tiling参数：`totalLength`、`tileNum`、`negativeSlope`。`totalLength`、`tileNum`与Add算子类似，`negativeSlope`表示LeakyRelu的负半轴斜率系数，作为计算参数传递给kernel侧。
 
 
 ## 编译运行

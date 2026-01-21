@@ -13,6 +13,7 @@ file(GLOB host_ops_srcs
     add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp
     add_custom_tiling_sink/add_custom_tiling_sink.cpp
     add_template_custom/add_template_custom.cpp
+    leaky_relu_custom/leaky_relu_custom_host.cpp
 )
 npu_op_code_gen(
     SRC ${host_ops_srcs}
@@ -44,5 +45,8 @@ npu_op_package_add(${package_name}
         cust_optiling
         cust_opapi
         cust_op_proto
+<<<<<<< HEAD
         cust_opmaster  # for tiling sink
+=======
+>>>>>>> delete unnecessary files
 )

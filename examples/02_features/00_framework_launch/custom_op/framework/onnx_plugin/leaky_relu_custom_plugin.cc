@@ -8,11 +8,6 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-/* !
- * \file leaky_relu_custom_plugin.cc
- * \brief
- */
-
 #include "graph/operator.h"
 #include "register/register.h"
 #include "json.hpp"

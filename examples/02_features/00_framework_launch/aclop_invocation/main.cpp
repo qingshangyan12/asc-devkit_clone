@@ -55,26 +55,21 @@ int32_t main(int32_t argc, char** argv)
     aclopAttr* opAttr = nullptr;
     opAttr = aclopCreateAttr();
 
-    std::vector<void*> deviceInputs;
-    std::vector<void*> deviceOutputs;
     std::vector<aclDataBuffer*> inputBuffers;
     std::vector<aclDataBuffer*> outputBuffers;
 
     void* input0DeviceMem = nullptr;
     CHECK_ACL(aclrtMalloc(&input0DeviceMem, bufferSize, ACL_MEM_MALLOC_HUGE_FIRST));
-    deviceInputs.push_back(input0DeviceMem);
     auto* input0Buffer = aclCreateDataBuffer(input0DeviceMem, bufferSize);
     inputBuffers.push_back(input0Buffer);
 
     void* input1DeviceMem = nullptr;
     CHECK_ACL(aclrtMalloc(&input1DeviceMem, bufferSize, ACL_MEM_MALLOC_HUGE_FIRST));
-    deviceInputs.push_back(input1DeviceMem);
     auto* input1Buffer = aclCreateDataBuffer(input1DeviceMem, bufferSize);
     inputBuffers.push_back(input1Buffer);
 
     void* output0DeviceMem = nullptr;
     CHECK_ACL(aclrtMalloc(&output0DeviceMem, bufferSize, ACL_MEM_MALLOC_HUGE_FIRST));
-    deviceOutputs.push_back(output0DeviceMem);
     auto* output0Buffer = aclCreateDataBuffer(output0DeviceMem, bufferSize);
     outputBuffers.push_back(output0Buffer);
 
