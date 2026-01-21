@@ -146,7 +146,7 @@ private:
                 } else if constexpr (MD == 22) {
                     if constexpr (std::is_same<SRC_T, bfloat16_t>::value) {
                         Cast<DST_T, SRC_T, castTrait>(f8e8m0TmpReg, vSrcReg, maskReg);
-                        DataCopy(dstPtr + i * dst_rep_size, (RegTensor<uint8_t> &)f8e8m0TmpReg, dstMaskReg);
+                        DataCopy(dstPtr + i * dst_rep_size, (RegTensor<fp8_e8m0_t> &)f8e8m0TmpReg, dstMaskReg);
                     } else {
                         Cast<DST_T, SRC_T, castTrait>(vDstReg, (RegTensor<fp8_e8m0_t> &)vSrcReg, maskReg);
                         DataCopy(dstPtr + i * dst_rep_size, vDstReg, dstMaskReg);

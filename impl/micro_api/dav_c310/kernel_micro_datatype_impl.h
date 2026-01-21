@@ -177,6 +177,15 @@ struct TypeGet<fp8_e5m2_t> {
 };
  
 template <>
+struct TypeGet<fp8_e8m0_t> {
+#if defined(__ASC_NPU_HOST__)
+    using T = int;
+#else
+    using T = vector_f8e8m0;
+#endif
+};
+
+template <>
 struct TypeGet<fp4x2_e2m1_t> {
 #if defined(__ASC_NPU_HOST__)
     using T = int;

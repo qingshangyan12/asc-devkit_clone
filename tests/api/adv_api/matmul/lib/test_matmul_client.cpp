@@ -89,8 +89,8 @@ TEST_F(TestMatmulClient, test_mx_matmul_client_fp8) {
     int32_t c0Size_ = 32;
     int32_t scaleK = Ceil(tiling.Ka, AscendC::Impl::MX_BASEK_FACTOR) * 2;
     int32_t offset = 0;
-    mm0.ND2ScaleZZ(l1Matrix, bufferMxLeft, tiling.M, Ceil(scaleK, c0Size_) * c0Size_, scaleK, offset);
-    mm0.CopyUbNZ2NZForScale(l1Matrix, bufferMxLeft, scaleK, Ceil(tiling.M, BLOCK_CUBE) * BLOCK_CUBE, offset);
+    mm0.ND2ScaleZZ(reinterpret_cast<LocalTensor<uint8_t>&>(l1Matrix), reinterpret_cast<LocalTensor<uint8_t>&>(bufferMxLeft), tiling.M, Ceil(scaleK, c0Size_) * c0Size_, scaleK, offset);
+    mm0.CopyUbNZ2NZForScale(reinterpret_cast<LocalTensor<uint8_t>&>(l1Matrix), reinterpret_cast<LocalTensor<uint8_t>&>(bufferMxLeft), scaleK, Ceil(tiling.M, BLOCK_CUBE) * BLOCK_CUBE, offset);
 }
 
 TEST_F(TestMatmulClient, test_mx_matmul_client_fp8_ab) {
@@ -176,7 +176,7 @@ TEST_F(TestMatmulClient, test_mx_matmul_client_fp4) {
     int32_t offset = 0;
     mm1.c0Size_ = fp4C0Size_;
     int32_t scaleK = Ceil(tiling.Ka, AscendC::Impl::MX_BASEK_FACTOR) * 2;
-    mm1.ND2ScaleZZ(l1Matrix, bufferMxLeft, tiling.N, Ceil(scaleK, fp4C0Size_) * fp4C0Size_, scaleK, offset);
-    mm1.CopyUbNZ2NZForScale(l1Matrix, bufferMxLeft, scaleK, Ceil(tiling.N, BLOCK_CUBE) * BLOCK_CUBE, offset);
+    mm1.ND2ScaleZZ(reinterpret_cast<LocalTensor<uint8_t>&>(l1Matrix), reinterpret_cast<LocalTensor<uint8_t>&>(bufferMxLeft), tiling.N, Ceil(scaleK, fp4C0Size_) * fp4C0Size_, scaleK, offset);
+    mm1.CopyUbNZ2NZForScale(reinterpret_cast<LocalTensor<uint8_t>&>(l1Matrix), reinterpret_cast<LocalTensor<uint8_t>&>(bufferMxLeft), scaleK, Ceil(tiling.N, BLOCK_CUBE) * BLOCK_CUBE, offset);
 }
 }

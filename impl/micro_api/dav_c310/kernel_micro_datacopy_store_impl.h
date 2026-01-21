@@ -42,7 +42,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, MaskReg
                   "RegTensor only suppoort RegTraitNumOne or RegTraitNumTwo on current device!");
     CheckStoreDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
-    if constexpr (SupportType<ActualT, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int4x2_t>()) {
+    if constexpr (SupportBytes<ActualT, 1>()) {
         vsts((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, 0, distValue, mask);
     } else if constexpr (SupportBytes<ActualT, 8>()) {
         MaskReg dstMask0;
@@ -98,7 +98,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, U& srcReg, int32_
     CheckStoreDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
-    if constexpr (SupportType<ActualT, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int4x2_t>()) {
+    if constexpr (SupportBytes<ActualT, 1>()) {
         vsts((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr, postUpdateStride, distValue, mask, postValue);
     } else if constexpr (SupportBytes<ActualT, 8>()) {
         MaskReg dstMask0, dstMask1;
@@ -162,7 +162,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, AddrReg
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     CheckStoreDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
-    if constexpr (SupportType<ActualT, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int4x2_t>()) {
+    if constexpr (SupportBytes<ActualT, 1>()) {
         vst((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, offset, distValue, mask);
     } else {
         static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
@@ -193,7 +193,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     CheckStoreDist<2, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
-    if constexpr (SupportType<ActualT, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int4x2_t>()) {
+    if constexpr (SupportBytes<ActualT, 1>()) {
         vsts((RegTensor<uint8_t>&)srcReg0, (RegTensor<uint8_t>&)srcReg1, (__ubuf__ uint8_t*)dstAddr, 0, distValue,
              mask);
     } else if constexpr (SupportType<ActualT, float>()) { // ccec no float signature
@@ -232,7 +232,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     CheckStoreDist<2, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
-    if constexpr (SupportType<ActualT, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int4x2_t>()) {
+    if constexpr (SupportBytes<ActualT, 1>()) {
         vst((RegTensor<uint8_t>&)srcReg0, (RegTensor<uint8_t>&)srcReg1, (__ubuf__ uint8_t*)dstAddr, offset,
             distValue, mask);
     } else if constexpr (SupportType<ActualT, float>()) { // ccec no float signature
@@ -269,7 +269,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, uint32_
     using ActualT = typename U::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
-    if constexpr (SupportType<ActualT, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int4x2_t>()) {
+    if constexpr (SupportBytes<ActualT, 1>()) {
         vsstb((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, (dataBlockStride << 16u), mask);
     } else {
         static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
@@ -293,8 +293,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, U& srcReg, uint32
         using ActualT = typename U::ActualT;
         static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
         static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
-        if constexpr (SupportType<ActualT, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t,
-                      int4x2_t>()) {
+        if constexpr (SupportBytes<ActualT, 1>()) {
             constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
             vsstb((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr,
                   (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);

@@ -52,7 +52,7 @@ __simd_vf__ inline void CastScale(__ubuf__ OutputDataType* dst, __ubuf__ fp8_e8m
     const uint32_t srcCalCount)
 {
     MicroAPI::MaskReg preg;
-    MicroAPI::RegTensor<uint8_t> vreg;
+    MicroAPI::RegTensor<fp8_e8m0_t> vreg;
     MicroAPI::RegTensor<bfloat16_t> b16vreg;
     MicroAPI::RegTensor<half> halfvreg;
     MicroAPI::MaskReg selPreg;
@@ -71,7 +71,7 @@ __simd_vf__ inline void CastScale(__ubuf__ OutputDataType* dst, __ubuf__ fp8_e8m
 
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatScale); ++i) {
         preg = MicroAPI::UpdateMask<uint16_t>(sreg);
-        MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, scale + i * sregLower);
+        MicroAPI::LoadAlign<fp8_e8m0_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg, scale + i * sregLower);
         MicroAPI::ShiftLefts<uint16_t, int16_t>((MicroAPI::RegTensor<uint16_t>&)b16vreg,
             (MicroAPI::RegTensor<uint16_t>&)vreg, ANTIQUANT_BF16_MAN_LEN, preg);
 
@@ -93,7 +93,7 @@ __simd_callee__ inline void AntiQuantProcessByLine(__ubuf__ OutputDataType* dstU
     MicroAPI::RegTensor<uint16_t>& bf16Nan, MicroAPI::RegTensor<uint16_t>& e8m0Zero,
     MicroAPI::RegTensor<uint16_t>& e8m0Nan)
 {
-    MicroAPI::RegTensor<uint8_t> vreg1;
+    MicroAPI::RegTensor<fp8_e8m0_t> vreg1;
     MicroAPI::RegTensor<bfloat16_t> b16vreg1;
     MicroAPI::RegTensor<bfloat16_t> b16vreg2;
     MicroAPI::RegTensor<SrcType> fp4vreg0;
@@ -107,7 +107,7 @@ __simd_callee__ inline void AntiQuantProcessByLine(__ubuf__ OutputDataType* dstU
     uint16_t repeatTimes = CeilDivision(calCount, sregLower);
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
         preg = MicroAPI::UpdateMask<uint16_t>(sreg);
-        MicroAPI::LoadAlign<uint8_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg1, scaleUb + i * sregLower);
+        MicroAPI::LoadAlign<fp8_e8m0_t, MicroAPI::LoadDist::DIST_UNPACK_B8>(vreg1, scaleUb + i * sregLower);
         MicroAPI::ShiftLefts<uint16_t, int16_t>((MicroAPI::RegTensor<uint16_t>&)b16vreg1,
             (MicroAPI::RegTensor<uint16_t>&)vreg1, ANTIQUANT_BF16_MAN_LEN, preg);
 

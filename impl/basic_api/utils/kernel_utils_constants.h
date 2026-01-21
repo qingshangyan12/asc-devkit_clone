@@ -476,6 +476,10 @@ template <> struct GetPadValueType<fp8_e4m3fn_t> {
     using Type = uint8_t;
 };
 
+template <> struct GetPadValueType<fp8_e8m0_t> {
+    using Type = uint8_t;
+};
+
 template <> struct GetPadValueType<hifloat8_t> {
     using Type = uint8_t;
 };
@@ -586,10 +590,15 @@ using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
 using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
 #endif
+#if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)))
 using fp8_e8m0_t = uint8_t;
+#elif !defined(ASCENDC_CPU_DEBUG)
+using fp8_e8m0_t = float8_e8m0_t;
+#endif
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 using mx_fp8_e5m2_t = struct {};
 using mx_fp8_e4m3_t = struct {};
+using mx_fp8_e8m0_t = struct {};
 
 template <typename T>
 struct GetDstType {
@@ -602,6 +611,10 @@ template <> struct GetDstType<mx_fp8_e5m2_t> {
 
 template <> struct GetDstType<mx_fp8_e4m3_t> {
     using Type = fp8_e4m3fn_t;
+};
+
+template <> struct GetDstType<mx_fp8_e8m0_t> {
+    using Type = fp8_e8m0_t;
 };
 #endif
 

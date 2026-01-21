@@ -397,7 +397,7 @@ namespace TypeUtils {
 template <typename T> __aicore__ constexpr bool IsInnerDefaultType()
 {
     return SupportType<T, bool, uint8_t, int8_t, half, bfloat16_t, int16_t, uint16_t, float, int32_t, uint32_t,
-        int64_t, uint64_t, complex32, complex64, double>();
+        fp8_e5m2_t, fp8_e4m3fn_t, fp8_e8m0_t, int64_t, uint64_t, complex32, complex64, double>();
 }
 
 template <typename T, typename U>
@@ -414,7 +414,7 @@ template <typename T> __aicore__ constexpr bool IsLocalTensorType()
 {
     if constexpr (IsLocalTensor<T>::value) {
         return SupportType<typename T::PrimType, bool, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, float, 
-            int32_t, uint32_t, int64_t, uint64_t, complex32, complex64, double>();
+            fp8_e5m2_t, fp8_e4m3fn_t, fp8_e8m0_t, int32_t, uint32_t, int64_t, uint64_t, complex32, complex64, double>();
     } else {
         return false;
     }

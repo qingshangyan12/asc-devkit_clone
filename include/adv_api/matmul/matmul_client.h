@@ -2729,11 +2729,25 @@ private:
                 DataCopy(leftMatrix, srcTensor,
                     {1, static_cast<uint16_t>(Ceil(singleCoreK_ / NUM_THIRTYTWO, c0Size_)), 0, 0});
             } else if constexpr (A_TYPE::scaleFormat == CubeFormat::ND) {
-                ScaleAUbSizeCheck(srcTensor, scaleK);
-                if (isTrans) {
-                    CopyUbNZ2NZForScale(leftMatrix, srcTensor, scaleK, Ceil(singleCoreM_, BLOCK_CUBE) * BLOCK_CUBE, scaleTmpBufSize_);
+                if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                    ScaleAUbSizeCheck(reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor), scaleK);
                 } else {
-                    ND2ScaleZZ(leftMatrix, srcTensor, singleCoreM_, Ceil(scaleK, c0Size_) * c0Size_, scaleK, scaleTmpBufSize_);
+                    ScaleAUbSizeCheck(srcTensor, scaleK);
+                }
+                if (isTrans) {
+                    if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                        CopyUbNZ2NZForScale(reinterpret_cast<LocalTensor<uint8_t>&>(leftMatrix), reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor),
+                            scaleK, Ceil(singleCoreM_, BLOCK_CUBE) * BLOCK_CUBE, scaleTmpBufSize_);
+                    } else {
+                        CopyUbNZ2NZForScale(leftMatrix, srcTensor, scaleK, Ceil(singleCoreM_, BLOCK_CUBE) * BLOCK_CUBE, scaleTmpBufSize_);
+                    }
+                } else {
+                    if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                        ND2ScaleZZ(reinterpret_cast<LocalTensor<uint8_t>&>(leftMatrix), reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor),
+                            singleCoreM_, Ceil(scaleK, c0Size_) * c0Size_, scaleK, scaleTmpBufSize_);
+                    } else {
+                        ND2ScaleZZ(leftMatrix, srcTensor, singleCoreM_, Ceil(scaleK, c0Size_) * c0Size_, scaleK, scaleTmpBufSize_);
+                    }
                 }
                 scaleTmpBufSize_ += isTrans ? (Ceil(singleCoreM_, c0Size_) * c0Size_ * scaleK) : (Ceil(scaleK, c0Size_) * c0Size_ * singleCoreM_);
             }
@@ -2776,11 +2790,25 @@ private:
                     CopyUB2L1NZ2NZ(rightMatrix, srcTensor, singleCoreK_ / NUM_THIRTYTWO, singleCoreN_);
                 }
             } else if constexpr (B_TYPE::scaleFormat == CubeFormat::ND) {
-                ScaleBUbSizeCheck(srcTensor, scaleK);
-                if (isBTrans) {
-                    ND2ScaleZZ(rightMatrix, srcTensor, singleCoreN_, Ceil(scaleK, c0Size_) * c0Size_, scaleK, scaleTmpBufSize_);
+                if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                    ScaleBUbSizeCheck(reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor), scaleK);
                 } else {
-                    CopyUbNZ2NZForScale(rightMatrix, srcTensor, scaleK, Ceil(singleCoreN_, BLOCK_CUBE) * BLOCK_CUBE, scaleTmpBufSize_);
+                    ScaleBUbSizeCheck(srcTensor, scaleK);
+                }
+                if (isBTrans) {
+                    if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                        ND2ScaleZZ(reinterpret_cast<LocalTensor<uint8_t>&>(rightMatrix), reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor),
+                            singleCoreN_, Ceil(scaleK, c0Size_) * c0Size_, scaleK, scaleTmpBufSize_);
+                    } else {
+                        ND2ScaleZZ(rightMatrix, srcTensor, singleCoreN_, Ceil(scaleK, c0Size_) * c0Size_, scaleK, scaleTmpBufSize_);
+                    }
+                } else {
+                    if constexpr (SupportType<ScaleT, fp8_e8m0_t>()) {
+                        CopyUbNZ2NZForScale(reinterpret_cast<LocalTensor<uint8_t>&>(rightMatrix), reinterpret_cast<LocalTensor<uint8_t>&>(srcTensor),
+                            scaleK, Ceil(singleCoreN_, BLOCK_CUBE) * BLOCK_CUBE, scaleTmpBufSize_);
+                    } else {
+                        CopyUbNZ2NZForScale(rightMatrix, srcTensor, scaleK, Ceil(singleCoreN_, BLOCK_CUBE) * BLOCK_CUBE, scaleTmpBufSize_);
+                    }
                 }
                 scaleTmpBufSize_ += isBTrans ? (Ceil(singleCoreN_, BLOCK_CUBE) * BLOCK_CUBE * Ceil(scaleK, c0Size_) * c0Size_) : (scaleK * Ceil(singleCoreN_, c0Size_) * c0Size_);
             }
