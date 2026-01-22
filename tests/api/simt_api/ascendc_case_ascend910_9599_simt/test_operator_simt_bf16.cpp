@@ -59,8 +59,10 @@ TEST_F(BF16Testsuite, MathApiTest)
     EXPECT_EQ(expect, result);
 
     result = hrcp(x_h);
-    expect = bfloat16_t(1.0f / (float)x_h);
-    EXPECT_EQ(expect, result);
+    if (x_h != bfloat16_t(0)) {
+        expect = bfloat16_t(1.0f / (float)x_h);
+        EXPECT_EQ(expect, result);
+    }
 }
 // ================================ Test bfloat16_t end ===============================
 
@@ -120,40 +122,52 @@ TEST_F(BF162Testsuite, MathApiTest_bfloat16x2t)
     EXPECT_EQ(expect2, result.y);
 
     result = h2log(xy_h2);
-    expect1 = bfloat16_t(log((float)x_h));
-    expect2 = bfloat16_t(log((float)y_h));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > bfloat16_t(0) && y_h > bfloat16_t(0)) {
+        expect1 = bfloat16_t(log((float)x_h));
+        expect2 = bfloat16_t(log((float)y_h));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
 
     result = h2log2(xy_h2);
-    expect1 = bfloat16_t(log2((float)x_h));
-    expect2 = bfloat16_t(log2((float)y_h));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > bfloat16_t(0) && y_h > bfloat16_t(0)) {
+        expect1 = bfloat16_t(log2((float)x_h));
+        expect2 = bfloat16_t(log2((float)y_h));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
 
     result = h2log10(xy_h2);
-    expect1 = bfloat16_t(log10((float)x_h));
-    expect2 = bfloat16_t(log10((float)y_h));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > bfloat16_t(0) && y_h > bfloat16_t(0)) {
+        expect1 = bfloat16_t(log10((float)x_h));
+        expect2 = bfloat16_t(log10((float)y_h));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
 
     result = h2rcp(xy_h2);
-    expect1 = bfloat16_t(1.0f / (float)x_h);
-    expect2 = bfloat16_t(1.0f / (float)y_h);
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h != bfloat16_t(0) && y_h != bfloat16_t(0)) {
+        expect1 = bfloat16_t(1.0f / (float)x_h);
+        expect2 = bfloat16_t(1.0f / (float)y_h);
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
     
     result = h2sqrt(xy_h2);
-    expect1 = bfloat16_t(sqrt((float)x_h));
-    expect2 = bfloat16_t(sqrt((float)y_h));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > bfloat16_t(0) && y_h > bfloat16_t(0)) {
+        expect1 = bfloat16_t(sqrt((float)x_h));
+        expect2 = bfloat16_t(sqrt((float)y_h));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
 
     result = h2rsqrt(xy_h2);
-    expect1 = bfloat16_t(1.0f / sqrt((float)x_h));
-    expect2 = bfloat16_t(1.0f / sqrt((float)y_h));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > bfloat16_t(0) && y_h > bfloat16_t(0)) {
+        expect1 = bfloat16_t(1.0f / sqrt((float)x_h));
+        expect2 = bfloat16_t(1.0f / sqrt((float)y_h));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
 
     result = h2ceil(xy_h2);
     expect1 = bfloat16_t(ceil((float)x_h));

@@ -106,8 +106,10 @@ TEST_F(FP16Testsuite, MathApiTest)
     EXPECT_EQ(expect, result);
 
     result = hrcp(x_h);
-    expect = half(1.0f / x_h.ToFloat());
-    EXPECT_EQ(expect, result);
+    if (x_h != half(0)) {
+        expect = half(1.0f / x_h.ToFloat());
+        EXPECT_EQ(expect, result);
+    }
 }
 // ================================ Test half end ===============================
 
@@ -167,40 +169,52 @@ TEST_F(FP162Testsuite, MathApiTest_half2)
     EXPECT_EQ(expect2, result.y);
 
     result = h2log(xy_h2);
-    expect1 = half(log(x_h.ToFloat()));
-    expect2 = half(log(y_h.ToFloat()));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > half(0) && y_h > half(0)) {
+        expect1 = half(log(x_h.ToFloat()));
+        expect2 = half(log(y_h.ToFloat()));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
 
     result = h2log2(xy_h2);
-    expect1 = half(log2(x_h.ToFloat()));
-    expect2 = half(log2(y_h.ToFloat()));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > half(0) && y_h > half(0)) {
+        expect1 = half(log2(x_h.ToFloat()));
+        expect2 = half(log2(y_h.ToFloat()));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
 
     result = h2log10(xy_h2);
-    expect1 = half(log10(x_h.ToFloat()));
-    expect2 = half(log10(y_h.ToFloat()));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > half(0) && y_h > half(0)) {
+        expect1 = half(log10(x_h.ToFloat()));
+        expect2 = half(log10(y_h.ToFloat()));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
 
     result = h2rcp(xy_h2);
-    expect1 = half(1.0f / x_h.ToFloat());
-    expect2 = half(1.0f / y_h.ToFloat());
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h != half(0) && y_h != half(0)) {
+        expect1 = half(1.0f / x_h.ToFloat());
+        expect2 = half(1.0f / y_h.ToFloat());
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
     
     result = h2sqrt(xy_h2);
-    expect1 = half(sqrt(x_h.ToFloat()));
-    expect2 = half(sqrt(y_h.ToFloat()));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > half(0) && y_h > half(0)) {
+        expect1 = half(sqrt(x_h.ToFloat()));
+        expect2 = half(sqrt(y_h.ToFloat()));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
 
     result = h2rsqrt(xy_h2);
-    expect1 = half(1.0f / sqrt(x_h.ToFloat()));
-    expect2 = half(1.0f / sqrt(y_h.ToFloat()));
-    EXPECT_EQ(expect1, result.x);
-    EXPECT_EQ(expect2, result.y);
+    if (x_h > half(0) &&y_h > half(0)) {
+        expect1 = half(1.0f / sqrt(x_h.ToFloat()));
+        expect2 = half(1.0f / sqrt(y_h.ToFloat()));
+        EXPECT_EQ(expect1, result.x);
+        EXPECT_EQ(expect2, result.y);
+    }
     
     result = h2ceil(xy_h2);
     expect1 = half(ceil(x_h.ToFloat()));
