@@ -13,8 +13,10 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(tikicpulib REQUIRED)
 
 set(ASCENDC_UT_PRODUCT_TYPE_LIST
-    ascend910B1_AIC
-    ascend910B1_AIV
+    NPU_ARCH_2201_AIC
+    NPU_ARCH_2201_AIV
+    NPU_ARCH_3510_AIC
+    NPU_ARCH_3510_AIV
 )
 
 set(ASCENDC_UT_HEADER
@@ -30,8 +32,24 @@ file(GLOB ASCENDC_UT_COMMON_SRC
     ../common/dlog_stub.cpp
 )
 
-file(GLOB ASCENDC_UT_ascend910B1_AIC_CASE_SRC
-    npu_arch_2201/*.cpp
+file(GLOB ASCENDC_UT_STRUCT_CASE_SRC
+    struct/*.cpp
+)
+
+file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIC_CASE_SRC
+    npu_arch_2201/aic/*.cpp
+)
+
+file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIV_CASE_SRC
+    npu_arch_2201/aiv/*.cpp
+)
+
+file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIC_CASE_SRC
+    npu_arch_3510/aic/*.cpp
+)
+
+file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIV_CASE_SRC
+    npu_arch_3510/aiv/*.cpp
 )
 
 foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
@@ -39,6 +57,7 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         ${ASCENDC_DIR}/tests/main_global.cpp
         ${ASCENDC_UT_COMMON_SRC}
         ../common/k3_pvwrap.cpp
+        ${ASCENDC_UT_STRUCT_CASE_SRC}
         ${ASCENDC_UT_${product_type}_CASE_SRC}
     )
 
@@ -46,8 +65,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         UT_TEST
         ASCENDC_OOM=1
         ASCENDC_DUMP=0
-        $<$<STREQUAL:${product_type},ascend910B1_AIC>:__NPU_ARCH__=2201>
-        $<$<STREQUAL:${product_type},ascend910B1_AIV>:__NPU_ARCH__=2201>
+        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:__NPU_ARCH__=2201>
+        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:__NPU_ARCH__=2201>
         __disable_kernel_type_autoinfer__=
     )
 
@@ -64,8 +83,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
 
     target_link_libraries(ascendc_ut_tensor_api_${product_type} PRIVATE
         $<BUILD_INTERFACE:intf_llt_pub_basic>
-        $<$<STREQUAL:${product_type},ascend910B1_AIC>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},ascend910B1_AIV>:tikicpulib::ascend910B1>
+        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:tikicpulib::ascend910B1>
+        $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:tikicpulib::ascend910B1>
         -Wl,--no-as-needed
         error_manager
         mmpa

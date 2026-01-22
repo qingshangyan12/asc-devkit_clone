@@ -12,7 +12,7 @@
 #include "tensor_api_impl.h"
 
 
-class TensorTileCoordTest : public testing::Test {
+class Tensor_Api_Coord : public testing::Test {
 protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
@@ -23,7 +23,7 @@ protected:
 template <size_t v>
 using Int = AscendC::Std::integral_constant<size_t, v>; 
 
-TEST_F(TensorTileCoordTest, MakeCoordOperation)
+TEST_F(Tensor_Api_Coord, MakeCoordOperation)
 {
     constexpr int M = 11;
     constexpr int N = 12;
@@ -42,7 +42,7 @@ TEST_F(TensorTileCoordTest, MakeCoordOperation)
     EXPECT_EQ(index, 590);
 }
 
-TEST_F(TensorTileCoordTest, Crd2IdxOperation)
+TEST_F(Tensor_Api_Coord, Crd2IdxOperation)
 {
     auto blockCoordM    = Int<11>{};
     auto blockCoordN    = Int<12>{};
@@ -59,7 +59,7 @@ TEST_F(TensorTileCoordTest, Crd2IdxOperation)
     EXPECT_EQ(index, 357);
 }
 
-TEST_F(TensorTileCoordTest, Crd2IdxIntZeroOperation)
+TEST_F(Tensor_Api_Coord, Crd2IdxIntZeroOperation)
 {
     auto blockCoordM    = Int<11>{};
     auto blockCoordN    = Int<12>{};
@@ -76,7 +76,7 @@ TEST_F(TensorTileCoordTest, Crd2IdxIntZeroOperation)
     EXPECT_EQ(index, 0);
 }
 
-TEST_F(TensorTileCoordTest, Crd2IdxCoordSingleZeroOperation)
+TEST_F(Tensor_Api_Coord, Crd2IdxCoordSingleZeroOperation)
 {
     auto blockCoordM    = Int<11>{};
     auto blockCoordN    = Int<12>{};

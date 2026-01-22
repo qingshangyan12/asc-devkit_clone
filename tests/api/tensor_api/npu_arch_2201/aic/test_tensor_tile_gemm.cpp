@@ -11,7 +11,7 @@
 #include "tensor_api/stub/cce_stub.h"
 #include "tensor_api_impl.h"
 
-class TEST_TENSOR_TILE_GEMM : public testing::Test {
+class Tensor_Api_GEMM : public testing::Test {
 protected:
     void SetUp()
     {
@@ -197,7 +197,7 @@ __aicore__ inline void E2eKernel(GM_ADDR aGM, GM_ADDR bGM, GM_ADDR cGM, GM_ADDR 
 }
 
 #define KERNEL_TENSOR_TILE_GEMM_E2E(coreNum, M, N, K, A_Format, B_Format, C_Format, BIAS_Format, A_DType, B_DType, C_DType, BIAS_DType, HAS_BIAS) \
-    TEST_F(TEST_TENSOR_TILE_GEMM, kernel_tensor_tile_gemm_##coreNum##_##M##_##N##_##K##_##A_Format##_##B_Format##_##C_Format##_##BIAS_Format##_##A_DType##_##B_DType##_##C_DType##_##BIAS_DType##_##HAS_BIAS) \
+    TEST_F(Tensor_Api_GEMM, kernel_tensor_tile_gemm_##coreNum##_##M##_##N##_##K##_##A_Format##_##B_Format##_##C_Format##_##BIAS_Format##_##A_DType##_##B_DType##_##C_DType##_##BIAS_DType##_##HAS_BIAS) \
     { \
         uint8_t aGM[M * K * sizeof(A_DType)] = {0}; \
         uint8_t bGM[K * M * sizeof(B_DType)] = {0}; \

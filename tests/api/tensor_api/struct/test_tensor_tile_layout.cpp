@@ -12,7 +12,7 @@
 #include "tensor_api_impl.h"
 
 
-class TensorTileLayoutTest : public testing::Test {
+class Tensor_Api_Layout : public testing::Test {
 protected:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
@@ -23,7 +23,7 @@ protected:
 template <size_t v>
 using Int = AscendC::Std::integral_constant<size_t, v>; 
 
-TEST_F(TensorTileLayoutTest, ShapeAndStrideOperation)
+TEST_F(Tensor_Api_Layout, ShapeAndStrideOperation)
 {
     AscendC::Shape<int, int, int> shapeInit{11, 22, 33};
     AscendC::Stride<int, int, int> strideInit{44, 55, 66};
@@ -59,7 +59,7 @@ TEST_F(TensorTileLayoutTest, ShapeAndStrideOperation)
     EXPECT_EQ(AscendC::Std::get<2>(strideMakeInt).value, 666);
 }
 
-TEST_F(TensorTileLayoutTest, IsTupleOperation)
+TEST_F(Tensor_Api_Layout, IsTupleOperation)
 {
     AscendC::Shape<int, int, int> shapeInit{11, 22, 33};
     AscendC::Stride<int, int, int> strideInit{44, 55, 66};
@@ -85,7 +85,7 @@ TEST_F(TensorTileLayoutTest, IsTupleOperation)
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(strideMakeInt)>, true);
 }
 
-TEST_F(TensorTileLayoutTest, LayoutOperation)
+TEST_F(Tensor_Api_Layout, LayoutOperation)
 {
     AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
     AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
@@ -112,7 +112,7 @@ TEST_F(TensorTileLayoutTest, LayoutOperation)
     EXPECT_EQ(AscendC::Std::get<2>(layoutInit.GetStride()), 200);
 }
 
-TEST_F(TensorTileLayoutTest, IsLayoutOperation)
+TEST_F(Tensor_Api_Layout, IsLayoutOperation)
 {
     AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
     AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
