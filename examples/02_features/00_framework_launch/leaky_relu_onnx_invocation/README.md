@@ -10,7 +10,7 @@
 
 ## 目录结构介绍
 ```
-├── onnx_invocation
+├── leaky_relu_onnx_invocation
 │   ├── CMakeLists.txt
 │   ├── leaky_relu.py
 │   └── main.cpp
@@ -57,7 +57,7 @@
   ```bash
   mkdir -p build; cd build
   python3 ../leaky_relu.py
-  # 使用atc模型转换工具生成单算子离线模型
+  # 使用atc模型转换工具将*.onnx格式的模型转换成*.om格式的模型
   atc --model=./leaky_relu.onnx --framework=5 --soc_version=${soc_version} --output=./leaky_relu_custom --input_shape="X:8,16,1024" --input_format=ND
   cmake .. && make -j
   ./execute_leaky_relu_op

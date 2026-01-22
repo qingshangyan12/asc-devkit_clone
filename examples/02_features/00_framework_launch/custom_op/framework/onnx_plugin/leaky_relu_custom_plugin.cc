@@ -10,7 +10,7 @@
 
 #include "graph/operator.h"
 #include "register/register.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 
 using namespace ge;
 using json = nlohmann::json;
