@@ -27,6 +27,7 @@
 | [exp](./exp) | 本样例演示了基于Exp高阶API的算子实现。样例按元素取自然指数，用户可以选择是否使用泰勒展开公式进行计算 |
 | [floor](./floor) | 本样例演示了基于Floor高阶API的算子实现。样例获取小于或等于x的最小的整数值，即向负无穷取整操作 |
 | [fma](./fma) | 本样例演示了基于Fma高阶API的算子实现。样例按元素计算两个输入相乘后与第三个输入相加的结果 |
+| [fmod](./fmod) | 本样例演示了基于Fmod高阶API的算子实现。样例按元素计算两个浮点数a, b相除后的余数 |
 | [frac](./frac) | 本样例演示了基于Frac高阶API的算子实现。样例按元素做取小数计算 |
 | [isfinite](./isfinite) | 本样例演示了基于IsFinite高阶API的算子实现。样例按元素判断输入的浮点数是否非NAN、非INF，输出结果为浮点数或者布尔值 |
 | [isinf](./isinf) | 本样例演示了基于IsInf高阶API的算子实现。样例按元素判断输入的浮点数是否为 $\pm$ inf，输出结果为浮点数或布尔值 |
@@ -34,6 +35,13 @@
 | [leaky_relu](./leaky_relu) | 本样例基于LeakyRelu实现激活函数，可用于对输入tensor按元素执行Leaky Relu（Leaky Rectified Liner Unit）操作。本样例通过Ascend C编程语言实现了LeakyRelu算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。 |
 | [lgamma](./lgamma) | 本样例演示了基于Lgamma高阶API的算子实现。样例按元素计算x的gamma函数的绝对值并求自然对数 |
 | [log](./log) | 本样例演示了基于Log高阶API的算子实现。样例按元素以e、2、10为底做对数运算 |
+| [logicaland](./logicaland) | 本样例演示了基于LogicalAnd高阶API的算子实现。样例按元素进行与操作，输入数据类型不是bool时，零被视为False，非零数据被视为True |
+| [logicalands](./logicalands) | 本样例演示了基于LogicalAnds高阶API的算子实现。样例对输入矢量内的每个元素和标量进行与操作 |
+| [logicalnot](./logicalnot) | 本样例演示了基于LogicalNot高阶API的算子实现。样例按元素进行取反操作，输入数据类型不是bool时，零被是被Flase，非零数据被视为True |
+| [logicalor](./logicalor) | 本样例演示了基于LogicalOr高阶API的算子实现。样例按元素进行或操作功能，输入数据类型不是bool时，零被视为False，非零数据被视为True |
+| [logicalors](./logicalors) | 本样例演示了基于LogicalOrs高阶API的算子实现。样例对输入矢量内的每个元素和标量进行或操作 |
+| [logicalxor](./logicalxor) | 本样例演示了基于LogicalXor高阶API的算子实现。样例按元素进行异或操作功能，输入数据类型不是bool时，零被视为False，非零数据被视为True |
+| [power](./power) | 本样例演示了基于Power高阶API的算子实现。样例实现按元素做幂运算功能，支持三种功能：指数和底数分别为张量对张量、张量对标量、标量对张量的幂运算 |
 | [rint](./rint) | 本样例演示了基于Rint高阶API的算子实现。样例获取与输入数据最接近的整数，若存在两个相同接近的整数，则获取其中的偶数 |
 | [round](./round) | 本样例演示了基于Round高阶API的算子实现。样例将输入的元素四舍五入到最接近的整数 |
 | [sign](./sign) | 本样例演示了基于Sign高阶API的算子实现。样例按元素执行Sign操作，返回输入数据的符号 |
