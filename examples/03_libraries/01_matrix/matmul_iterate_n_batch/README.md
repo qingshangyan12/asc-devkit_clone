@@ -3,7 +3,8 @@
 本样例介绍了调用Matmul高阶API实现NBatchMatmul单算子，算子实现nNum次批量处理Matmul计算。
 
 ## 支持的产品
-- Atlas A2训练系列产品/Atlas 800I A2推理产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 

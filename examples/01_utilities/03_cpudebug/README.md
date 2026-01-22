@@ -65,24 +65,22 @@ CPU Debug介绍
   请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
-    export ASCEND_INSTALL_PATH=/usr/local/Ascend/cann
+    source /usr/local/Ascend/cann/set_env.sh
     ```
 
   - 默认路径，非root用户安装CANN软件包
     ```bash
-    export ASCEND_INSTALL_PATH=$HOME/Ascend/cann
+    source $HOME/Ascend/cann/set_env.sh
     ```
 
   - 指定路径install_path，安装CANN软件包
     ```bash
-    export ASCEND_INSTALL_PATH=${install_path}/cann
+    source ${install_path}/cann/set_env.sh
     ```
 
   ```bash
   # 选择芯片型号
   SOC_VERSION=${1:-SOC_VERSION}
-  # 配置CANN环境变量
-  source ${ASCEND_INSTALL_PATH}/set_env.sh
   ```
   - SOC_VERSION：昇腾AI处理器型号，如果无法确定具体的SOC_VERSION，则在安装昇腾AI处理器的服务器执行npu-smi info命令进行查询，在查询到的“Name”前增加Ascend信息，例如“Name”对应取值为xxxyy，实际配置的SOC_VERSION值为Ascendxxxyy。
 

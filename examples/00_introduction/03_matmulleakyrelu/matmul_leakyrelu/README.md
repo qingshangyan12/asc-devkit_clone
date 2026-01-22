@@ -3,8 +3,6 @@
 本样例基于Ascend C异构混合编程模型演示MatmulLeakyRelu融合算子的核函数直调实现。通过将矩阵乘加（Matmul）与LeakyRelu激活函数融合计算，实现计算步骤在硬件层面的高效协同执行，降低内存访问开销与计算延时。
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
 ├── 03_matmulleakyrelu
