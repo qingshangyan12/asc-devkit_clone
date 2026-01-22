@@ -159,14 +159,14 @@ __aicore__ inline void SyncAllImpl()
                 "SyncAllConfig waitPipe only supports PIPE_MTE2, PIPE_MTE3, PIPE_ALL on current device!");
             PipeBarrier<triggerPipe>();
             if constexpr (triggerPipe == PIPE_ALL) {
-                ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x0, SYNC_AIV_ONLY_ALL));
+                ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
             } else {
-                ffts_cross_core_sync(triggerPipe, GetffstMsg(0x0, SYNC_AIV_ONLY_ALL));
+                ffts_cross_core_sync(triggerPipe, GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
             }
             if constexpr (waitPipe == PIPE_ALL) {
-                wait_flag_dev(PIPE_S, SYNC_AIV_ONLY_ALL);
+                wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
             } else {
-                wait_flag_dev(waitPipe, SYNC_AIV_ONLY_ALL);
+                wait_flag_dev(waitPipe, AscendC::SYNC_AIV_ONLY_ALL);
             }
         }
         return;
@@ -176,31 +176,31 @@ __aicore__ inline void SyncAllImpl()
     // handle MIX 1:1 specifically due to loose coupled mode in david.
 #if defined(__MIX_CORE_AIC_RATION__) && __MIX_CORE_AIC_RATION__ == 1
     if ASCEND_IS_AIC {
-        wait_flag_dev(PIPE_S, SYNC_AIV_FLAG);
-        ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, SYNC_AIC_FLAG));
-        wait_flag_dev(PIPE_S, SYNC_AIC_FLAG);
-        ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x02, SYNC_AIC_AIV_FLAG));
+        wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+        ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
+        wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+        ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
         return;
     }
     if ASCEND_IS_AIV {
-        ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x02, SYNC_AIV_FLAG));
-        wait_flag_dev(PIPE_S, SYNC_AIC_AIV_FLAG);
+        ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+        wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         return;
     }
 #else
     // trans software sync to hardware sync
     if ASCEND_IS_AIC {
-        wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-        wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
-        ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, SYNC_AIC_FLAG));
-        wait_flag_dev(PIPE_S, SYNC_AIC_FLAG);
-        set_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG);
-        set_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+        ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
+        wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+        set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+        set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         return;
     }
     if ASCEND_IS_AIV {
-        set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
-        wait_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG);
+        set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+        wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         return;
     }
 #endif
@@ -224,15 +224,15 @@ __aicore__ inline void WaitPreTaskEndV1Impl()
     if constexpr(enableTightSync){
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else {
         if ASCEND_IS_AIC {
@@ -263,26 +263,26 @@ __aicore__ inline void WaitPreTaskEndTightV2DefaultImpl()
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIV) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIV) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
@@ -291,43 +291,43 @@ __aicore__ inline void WaitPreTaskEndTightV2DefaultImpl()
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIC) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_MIX) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     }
     return;
@@ -351,26 +351,26 @@ __aicore__ inline void WaitPreTaskEndTightV2Impl()
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIV) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIV) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
@@ -379,43 +379,43 @@ __aicore__ inline void WaitPreTaskEndTightV2Impl()
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIC) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_MIX) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG);
+            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     }
     return;
@@ -618,8 +618,8 @@ template <bool isAIVOnly = true> __aicore__ inline void SuperKernelAutoSyncAllIm
     if constexpr (isAIVOnly) {
         if ASCEND_IS_AIV {
             PipeBarrier<PIPE_ALL>();
-            ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x0, SYNC_AIV_ONLY_ALL));
-            wait_flag_dev(PIPE_S, SYNC_AIV_ONLY_ALL);
+            ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
+            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
         }
         return;
     }
@@ -627,18 +627,18 @@ template <bool isAIVOnly = true> __aicore__ inline void SuperKernelAutoSyncAllIm
     PipeBarrier<PIPE_ALL>();
 
     if ASCEND_IS_AIC {
-        wait_intra_block(PIPE_S, SYNC_AIV_FLAG);
-        wait_intra_block(PIPE_S, SYNC_AIV_FLAG + SYNC_FLAG_ID_MAX);
-        ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, SYNC_AIC_FLAG));
-        wait_flag_dev(PIPE_S, SYNC_AIC_FLAG);
-        set_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG);
-        set_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG + SYNC_FLAG_ID_MAX);
+        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+        ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
+        wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+        set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+        set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         return;
     }
     
     if ASCEND_IS_AIV {
-        set_intra_block(PIPE_MTE3, SYNC_AIV_FLAG);
-        wait_intra_block(PIPE_S, SYNC_AIC_AIV_FLAG);
+        set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+        wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         return;
     }
 }

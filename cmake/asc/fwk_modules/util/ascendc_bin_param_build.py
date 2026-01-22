@@ -557,6 +557,19 @@ def parse_op_debug_confg(opc_config_file: str, soc: str) -> Dict:
     return tiling_key_info, op_debug_config, kernel_json_file
 
 
+def gen_option_config(debug_config, super_config, op_debug_config):
+    for _op_type, _op_option in op_debug_config.items():
+        for _option in _op_option:
+            if (_option.startswith("--op_relocatable_kernel_binary") 
+                and ("false" in _option or "False" in _option)):
+                continue
+            elif (_option.startswith("--op_relocatable_kernel_binary")
+                or _option.startswith("--op_super_kernel_options")):
+                super_config[_op_type].add(_option)
+            else:
+                debug_config[_op_type].add(_option)
+
+
 def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str,
                         opc_config_file: str = '', ops: list = None):
     if not os.path.exists(cfgfile):
@@ -567,13 +580,7 @@ def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str,
     super_config = defaultdict(set)
     op_descs = opdesc_parser.get_op_desc(cfgfile, [], [], BinParamBuilder, ops)
     tiling_key_info, op_debug_config, kernel_json_file = parse_op_debug_confg(opc_config_file, soc)
-    for _op_type, _op_option in op_debug_config.items():
-        for _option in _op_option:
-            if (_option.startswith("--op_relocatable_kernel_binary")
-                or _option.startswith("--op_super_kernel_options")):
-                super_config[_op_type].add(_option)
-            else:
-                debug_config[_op_type].add(_option)
+    gen_option_config(debug_config, super_config, op_debug_config)
 
     auto_gen_path_dir = os.path.dirname(cfgfile)
     all_soc_key = "ALL"
@@ -586,6 +593,8 @@ def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str,
             op_desc.set_op_debug_config(debug_config[all_soc_key])
         if op_desc.op_type in super_config:
             op_desc.set_op_super_config(super_config[op_desc.op_type])
+        if all_soc_key in super_config:
+            op_desc.set_op_super_config(super_config[all_soc_key])
         if op_desc.op_type in tiling_key_info:
             op_desc.set_tiling_key(tiling_key_info[op_desc.op_type])
         if all_soc_key in tiling_key_info:
