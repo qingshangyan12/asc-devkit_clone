@@ -62,7 +62,9 @@ PIPE_V
 
 ```cpp
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
-__ubuf__ int4b_t src[total_length];
-__ubuf__ half dst[total_length];
+uint64_t offset = 0;
+__ubuf__ int4b_t* src = (__ubuf__ int4b_t*)asc_get_phy_buf_addr(offset);
+offset += total_length / 2;    // int4b_t的一个元素占半个字节
+__ubuf__ half* dst = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
 asc_int42half(dst, src, total_length);    // 将src转换为half类型并存放到dst中
 ```
