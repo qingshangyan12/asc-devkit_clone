@@ -32,10 +32,10 @@ constexpr size_t workSpaceSize = sizeof(HcclMsgArea);
 
 HcclCombineOpParam GetHcclCombineOpParam(const vector<uint8_t> &workSpace) {
 
-    uint64_t buffer[8];
+    uint64_t buffer[64];
     GM_ADDR ckeOffset = reinterpret_cast<GM_ADDR>(buffer);
 
-    uint64_t buffer1[16 * 8 * 8];
+    uint64_t buffer1[64 * 64 * 8];
     GM_ADDR xnOffset = reinterpret_cast<GM_ADDR>(buffer1);
 
     HcclCombineOpParam hcclCombineOpParam{
@@ -282,5 +282,76 @@ TEST_F(HcclSuiteAIC, AllToAll_prepareWithCommitTrue)
     EXPECT_EQ(handleId, 0);
     EXPECT_EQ(hccl.Wait(handleId), HCCL_SUCCESS);
 }
+
+// alltoallvWrite repeat_prepare_commit Repeat = 1 Call the Prepare interface Expected handleId = 0
+TEST_F(HcclSuiteAIC, AllToAllVWrite_prepareWithCommitTrue)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024 * 100 * 1024);
+    HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+
+    HcclHandle handleId = hccl.AlltoAllvWrite<true>(reinterpret_cast<__gm__ uint8_t *>(0x1234),
+                                              reinterpret_cast<__gm__ uint8_t *>(0x4321),
+                                              reinterpret_cast<__gm__ uint8_t *>(0x432a),
+                                              10,
+                                              10);
+
+    EXPECT_EQ(handleId, 0);
+    EXPECT_EQ(hccl.Wait(handleId), HCCL_SUCCESS);
+}
+
+
+// allReduce repeat_prepare_commit Repeat = 128 Call the Prepare interface Expected handleId = 0
+TEST_F(HcclSuiteAIC, AllReduce_prepareWithCommitTrue)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024 * 100 * 1024);
+    HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+
+    HcclHandle handleId = hccl.AllReduce<true>(reinterpret_cast<__gm__ uint8_t *>(0x1234),
+                                              reinterpret_cast<__gm__ uint8_t *>(0x4321),
+                                              10,
+                                              HcclDataType::HCCL_DATA_TYPE_INT8,
+                                              HcclReduceOp::HCCL_REDUCE_SUM,
+                                              128);
+
+    EXPECT_EQ(handleId, 0);
+    for (uint32_t i = 0; i < 128; i++) {
+        EXPECT_EQ(hccl.Wait(handleId), HCCL_SUCCESS);
+    }
+}
+
+// ReduceScatter repeat_prepare_commit Repeat = 80 Call the Prepare interface Expected handleId = 0
+TEST_F(HcclSuiteAIC, AllReduce_prepareWithCommitFalse)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024 * 100 * 1024);
+    HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+    
+    HcclHandle handleId = hccl.ReduceScatter(reinterpret_cast<__gm__ uint8_t *>(0x1234),
+                                              reinterpret_cast<__gm__ uint8_t *>(0x4321),
+                                              10,
+                                              HcclDataType::HCCL_DATA_TYPE_INT8,
+                                              HcclReduceOp::HCCL_REDUCE_SUM,
+                                              0,
+                                              80);
+    for (uint8_t i = 0; i < 80; i++) {
+        hccl.Commit(handleId);
+    }
+
+    for (uint32_t i = 0; i < 80; i++) {
+        EXPECT_EQ(hccl.Wait(handleId), HCCL_SUCCESS);
+    }
+}
+
 
 }

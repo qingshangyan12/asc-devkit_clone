@@ -115,6 +115,8 @@ asc-devkit:
       - impl/micro_api/dav_c310/kernel_micro_datatype_impl.h
       - impl/micro_api/dav_m510/kernel_micro_datatype_impl.h
       - impl/adv_api/detail/matmul/stage/split/load_to_l0_utils.h
+      - impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0_def.h
+      - impl/adv_api/detail/hccl/common/hccl_inner_def.h
   llt:
     ut_check: true
     st_check: false
