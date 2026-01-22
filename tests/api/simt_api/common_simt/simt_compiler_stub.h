@@ -74,9 +74,11 @@ half __powf(half x);
 
 float __logf(float x);
 half __logf(half x);
+half2 __logf(half2 x);
 
 float __sqrtf(float x);
 half __sqrtf(half x);
+half2 __sqrtf(half2 x);
 
 float __atanf(float x);
 
@@ -277,79 +279,407 @@ float __ceilf(float x);
 float __fma(float x, float y, float z);
 
 template<ROUND rnd, RoundingSaturation rst>
-int32_t __cvt_int32_t(float x);
+int32_t __cvt_int32_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-int32_t __cvt_int32_t(half x);
+int32_t __cvt_int32_t(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-int32_t __cvt_int32_t(bfloat16_t x);
+int32_t __cvt_int32_t(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-uint32_t __cvt_uint32_t(float x);
+uint32_t __cvt_uint32_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-uint32_t __cvt_uint32_t(half x);
+uint32_t __cvt_uint32_t(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-uint32_t __cvt_uint32_t(bfloat16_t x);
+uint32_t __cvt_uint32_t(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-int64_t __cvt_int64_t(float x);
+int64_t __cvt_int64_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-uint64_t __cvt_uint64_t(float x);
+uint64_t __cvt_uint64_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-half __cvt_half(int32_t x);
+half __cvt_half(int32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-half __cvt_half(uint32_t x);
+half __cvt_half(uint32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-float __cvt_float(int32_t x);
+float __cvt_float(int32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-float __cvt_float(uint32_t x);
+float __cvt_float(uint32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-float __cvt_float(int64_t x);
+float __cvt_float(int64_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-float __cvt_float(uint64_t x);
+float __cvt_float(uint64_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-bfloat16_t __cvt_bfloat16_t(int32_t x);
+bfloat16_t __cvt_bfloat16_t(int32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-bfloat16_t __cvt_bfloat16_t(uint32_t x);
+bfloat16_t __cvt_bfloat16_t(uint32_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-half __cvt_half(half x);
+half __cvt_half(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-half __cvt_half(float x);
+half __cvt_half(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    } else if (rnd == ROUND::O) {
+        bool sign = (x < 0);
+        x = fabsf(x);
+        float int_part;
+        float frac_part = modff(x, &int_part);
+        if (frac_part == 0.0f) {
+            int32_t i = static_cast<int32_t>(int_part);
+            if (sign) {
+                i = -i;
+            }
+            return half(i);
+        }
+        if (frac_part == 0.5f) {
+            int32_t lower = static_cast<int32_t>(int_part);
+            int32_t upper = lower + 1;
+            if ((lower & 1) != 0) {
+                x = static_cast<float>(lower);
+            } else {
+                x = static_cast<float>(upper);
+            }
+        } else {
+            x = round(x);
+        }
+        int32_t result = static_cast<int32_t>(x);
+        if (sign) {
+            result = -result;
+        }
+        return half(result);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-half __cvt_half(bfloat16_t x);
+half __cvt_half(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-bfloat16_t __cvt_bfloat16_t(bfloat16_t x);
+bfloat16_t __cvt_bfloat16_t(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-bfloat16_t __cvt_bfloat16_t(half x);
+bfloat16_t __cvt_bfloat16_t(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-bfloat16_t __cvt_bfloat16_t(float x);
+bfloat16_t __cvt_bfloat16_t(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-float __cvt_float(bfloat16_t x);
+float __cvt_float(bfloat16_t x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-float __cvt_float(half x);
+float __cvt_float(half x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 template<ROUND rnd, RoundingSaturation rst>
-float __cvt_float(float x);
+float __cvt_float(float x) {
+    if (rnd == ROUND::R) {
+        return rint(x);
+    } else if (rnd == ROUND::Z) {
+        return trunc(x);
+    } else if (rnd == ROUND::F) {
+        return floor(x);
+    } else if (rnd == ROUND::C) {
+        return ceil(x);
+    } else if (rnd == ROUND::A) {
+        return round(x);
+    }
+}
 
 int32_t get_block_idx();
 

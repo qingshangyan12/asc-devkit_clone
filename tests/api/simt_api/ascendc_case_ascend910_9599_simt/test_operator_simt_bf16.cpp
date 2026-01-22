@@ -18,6 +18,7 @@ using namespace std;
 using namespace AscendC;
 using namespace AscendC::Simt;
 
+// ================================ Test bfloat16_t start ===============================
 struct BF16Params {
     int32_t mode;
 };
@@ -61,3 +62,121 @@ TEST_F(BF16Testsuite, MathApiTest)
     expect = bfloat16_t(1.0f / (float)x_h);
     EXPECT_EQ(expect, result);
 }
+// ================================ Test bfloat16_t end ===============================
+
+// ================================ Test bfloat16x2_t start ===============================
+struct BF162Params {
+    int32_t mode;
+};
+
+class BF162Testsuite : public testing::Test, public testing::WithParamInterface<BF162Params> {
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
+
+TEST_F(BF162Testsuite, MathApiTest_bfloat16x2t)
+{
+    float x = static_cast<float>(rand()) / RAND_MAX;
+    float y = static_cast<float>(rand()) / RAND_MAX;
+    bfloat16_t x_h = bfloat16_t(x);
+    bfloat16_t y_h = bfloat16_t(y);
+    bfloat16x2_t xy_h2 = {x_h, y_h};
+
+    bfloat16x2_t result = h2cos(xy_h2);
+    bfloat16_t expect1 = bfloat16_t(cosf((float)x_h));
+    bfloat16_t expect2 = bfloat16_t(cosf((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+    
+    result = h2sin(xy_h2);
+    expect1 = bfloat16_t(sinf((float)x_h));
+    expect2 = bfloat16_t(sinf((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2tanh(xy_h2);
+    expect1 = bfloat16_t(tanhf((float)x_h));
+    expect2 = bfloat16_t(tanhf((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2exp(xy_h2);
+    expect1 = bfloat16_t(expf((float)x_h));
+    expect2 = bfloat16_t(expf((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2exp2(xy_h2);
+    expect1 = bfloat16_t(exp2f((float)x_h));
+    expect2 = bfloat16_t(exp2f((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+    
+    result = h2exp10(xy_h2);
+    expect1 = bfloat16_t(powf(10.0f, (float)x_h));
+    expect2 = bfloat16_t(powf(10.0f, (float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2log(xy_h2);
+    expect1 = bfloat16_t(log((float)x_h));
+    expect2 = bfloat16_t(log((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2log2(xy_h2);
+    expect1 = bfloat16_t(log2((float)x_h));
+    expect2 = bfloat16_t(log2((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2log10(xy_h2);
+    expect1 = bfloat16_t(log10((float)x_h));
+    expect2 = bfloat16_t(log10((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2rcp(xy_h2);
+    expect1 = bfloat16_t(1.0f / (float)x_h);
+    expect2 = bfloat16_t(1.0f / (float)y_h);
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+    
+    result = h2sqrt(xy_h2);
+    expect1 = bfloat16_t(sqrt((float)x_h));
+    expect2 = bfloat16_t(sqrt((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2rsqrt(xy_h2);
+    expect1 = bfloat16_t(1.0f / sqrt((float)x_h));
+    expect2 = bfloat16_t(1.0f / sqrt((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2ceil(xy_h2);
+    expect1 = bfloat16_t(ceil((float)x_h));
+    expect2 = bfloat16_t(ceil((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2floor(xy_h2);
+    expect1 = bfloat16_t(floor((float)x_h));
+    expect2 = bfloat16_t(floor((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2rint(xy_h2);
+    expect1 = bfloat16_t(rint((float)x_h));
+    expect2 = bfloat16_t(rint((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2trunc(xy_h2);
+    expect1 = bfloat16_t(trunc((float)x_h));
+    expect2 = bfloat16_t(trunc((float)y_h));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+}
+// ================================ Test bfloat16_t end ===============================

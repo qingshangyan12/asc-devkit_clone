@@ -65,8 +65,7 @@ __aicore__ inline void KernelFP16<T>::Process(__gm__ T* dst, int32_t mode)
     AscendC::Simt::VF_CALL<KernelFP16Compute<T>>(AscendC::Simt::Dim3(THREAD_DIM, 1, 1), dst, mode);
 }
 
-
-
+// ================================ Test half start ===============================
 struct FP16Params {
     int32_t mode;
 };
@@ -110,3 +109,121 @@ TEST_F(FP16Testsuite, MathApiTest)
     expect = half(1.0f / x_h.ToFloat());
     EXPECT_EQ(expect, result);
 }
+// ================================ Test half end ===============================
+
+// ================================ Test half2 start ===============================
+struct FP162Params {
+    int32_t mode;
+};
+
+class FP162Testsuite : public testing::Test, public testing::WithParamInterface<FP162Params> {
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
+
+TEST_F(FP162Testsuite, MathApiTest_half2)
+{
+    float x = static_cast<float>(rand()) / RAND_MAX + 0.1f;
+    float y = static_cast<float>(rand()) / RAND_MAX + 0.1f;
+    half x_h = half(x);
+    half y_h = half(y);
+    half2 xy_h2 = {x_h, y_h};
+
+    half2 result = h2cos(xy_h2);
+    half expect1 = half(cosf(x_h.ToFloat()));
+    half expect2 = half(cosf(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+    
+    result = h2sin(xy_h2);
+    expect1 = half(sinf(x_h.ToFloat()));
+    expect2 = half(sinf(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2tanh(xy_h2);
+    expect1 = half(tanhf(x_h.ToFloat()));
+    expect2 = half(tanhf(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2exp(xy_h2);
+    expect1 = half(expf(x_h.ToFloat()));
+    expect2 = half(expf(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2exp2(xy_h2);
+    expect1 = half(exp2f(x_h.ToFloat()));
+    expect2 = half(exp2f(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+    
+    result = h2exp10(xy_h2);
+    expect1 = half(powf(10.0, x_h.ToFloat()));
+    expect2 = half(powf(10.0, y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2log(xy_h2);
+    expect1 = half(log(x_h.ToFloat()));
+    expect2 = half(log(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2log2(xy_h2);
+    expect1 = half(log2(x_h.ToFloat()));
+    expect2 = half(log2(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2log10(xy_h2);
+    expect1 = half(log10(x_h.ToFloat()));
+    expect2 = half(log10(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2rcp(xy_h2);
+    expect1 = half(1.0f / x_h.ToFloat());
+    expect2 = half(1.0f / y_h.ToFloat());
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+    
+    result = h2sqrt(xy_h2);
+    expect1 = half(sqrt(x_h.ToFloat()));
+    expect2 = half(sqrt(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2rsqrt(xy_h2);
+    expect1 = half(1.0f / sqrt(x_h.ToFloat()));
+    expect2 = half(1.0f / sqrt(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+    
+    result = h2ceil(xy_h2);
+    expect1 = half(ceil(x_h.ToFloat()));
+    expect2 = half(ceil(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2floor(xy_h2);
+    expect1 = half(floor(x_h.ToFloat()));
+    expect2 = half(floor(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2rint(xy_h2);
+    expect1 = half(rint(x_h.ToFloat()));
+    expect2 = half(rint(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+
+    result = h2trunc(xy_h2);
+    expect1 = half(trunc(x_h.ToFloat()));
+    expect2 = half(trunc(y_h.ToFloat()));
+    EXPECT_EQ(expect1, result.x);
+    EXPECT_EQ(expect2, result.y);
+}
+// ================================ Test half2 end ===============================

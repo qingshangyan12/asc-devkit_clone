@@ -37,6 +37,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_ru(const float x
     return bisheng::cce::simt::__cvt_uint32_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_rna(const float x) {
+    return bisheng::cce::simt::__cvt_uint32_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __float2int_rn(const float x) {
     return bisheng::cce::simt::__cvt_int32_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
@@ -51,6 +55,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __float2int_rd(const float x) {
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __float2int_ru(const float x) {
     return bisheng::cce::simt::__cvt_int32_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int __float2int_rna(const float x) {
+    return bisheng::cce::simt::__cvt_int32_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int __float2ull_rn(const float x) {
@@ -69,6 +77,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int __float2ull_ru(cons
     return bisheng::cce::simt::__cvt_uint64_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int __float2ull_rna(const float x) {
+    return bisheng::cce::simt::__cvt_uint64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __float2ll_rn(const float x) {
     return bisheng::cce::simt::__cvt_int64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
@@ -83,6 +95,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __float2ll_rd(const float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __float2ll_ru(const float x) {
     return bisheng::cce::simt::__cvt_int64_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __float2ll_rna(const float x) {
+    return bisheng::cce::simt::__cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __uint2float_rn(const unsigned int x) {
@@ -101,6 +117,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __uint2float_ru(const unsigned int x
     return bisheng::cce::simt::__cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __uint2float_rna(const unsigned int x) {
+    return bisheng::cce::simt::__cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int2float_rn(const int x) {
     return bisheng::cce::simt::__cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
@@ -115,6 +135,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int2float_rd(const int x) {
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int2float_ru(const int x) {
     return bisheng::cce::simt::__cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int2float_rna(const int x) {
+    return bisheng::cce::simt::__cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ull2float_rn(const unsigned long long int x) {
@@ -137,6 +161,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ull2float_ru(const unsigned long l
     return bisheng::cce::simt::__cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ull2float_rna(const unsigned long long int x) {
+    uint64_t y = x;
+    return bisheng::cce::simt::__cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(y);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ll2float_rn(const long long int x) {
     int64_t y = x;
     return bisheng::cce::simt::__cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(y);
@@ -155,6 +184,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ll2float_rd(const long long int x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ll2float_ru(const long long int x) {
     int64_t y = x;
     return bisheng::cce::simt::__cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ll2float_rna(const long long int x) {
+    int64_t y = x;
+    return bisheng::cce::simt::__cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int_as_float(const int x) {
