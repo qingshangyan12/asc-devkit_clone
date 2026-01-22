@@ -526,9 +526,11 @@ __simd_vf__ inline void CastDoubleToFloat0(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_
 }
 
 template <RoundMode roundMode>
-__simd_callee__ inline void DealMantissa1(MicroAPI::MaskReg &dstMask, MicroAPI::RegTensor<uint64_t> &src, MicroAPI::MaskReg &mask)
+__simd_callee__ inline void DealMantissa1(MicroAPI::MaskReg &dstMask, MicroAPI::RegTensor<uint64_t> &src, MicroAPI::MaskReg &mask, MicroAPI::MaskReg &maskInf, MicroAPI::MaskReg &maskMax)
 {
-    MicroAPI::MaskReg mask0, mask1;
+    MicroAPI::MaskReg mask0, mask1, mask2;
+    MicroAPI::Xor(mask2, maskInf, mask, mask);
+    MicroAPI::Xor(mask2, maskMax, mask2, mask);
     MicroAPI::RegTensor<uint64_t> dst0, dst1;
     constexpr uint64_t scalar3 = 0x8000000000000000;
     constexpr uint64_t scalar0 = 0x0;
@@ -537,27 +539,27 @@ __simd_callee__ inline void DealMantissa1(MicroAPI::MaskReg &dstMask, MicroAPI::
     constexpr int16_t shiftScalar1 = 0x3f;//63
     constexpr int16_t shiftScalar3 = 0x12;//18..
     if constexpr (roundMode == RoundMode::CAST_RINT) {
-        MicroAPI::ShiftLefts(dst0, src, shiftScalar0, mask);
-        MicroAPI::CompareScalar<uint64_t, CMPMODE::GT>(mask0, dst0, scalar3, mask);
-        MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(mask1, dst0, scalar3, mask);
-        MicroAPI::ShiftLefts(dst1, src, shiftScalar3, mask);
+        MicroAPI::ShiftLefts(dst0, src, shiftScalar0, mask2);
+        MicroAPI::CompareScalar<uint64_t, CMPMODE::GT>(mask0, dst0, scalar3, mask2);
+        MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(mask1, dst0, scalar3, mask2);
+        MicroAPI::ShiftLefts(dst1, src, shiftScalar3, mask2);
         MicroAPI::CompareScalar<uint64_t, CMPMODE::GT>(mask1, dst1, scalar3, mask1);
-        MicroAPI::MaskOr(dstMask, mask1, mask0, mask);
+        MicroAPI::MaskOr(dstMask, mask1, mask0, mask2);
     } else if constexpr (roundMode == RoundMode::CAST_FLOOR) {
-        MicroAPI::ShiftLefts(dst0, src, shiftScalar0, mask);
-        MicroAPI::ShiftRights(dst1, src, shiftScalar1, mask);
-        MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(mask0, dst1, scalar1, mask);
+        MicroAPI::ShiftLefts(dst0, src, shiftScalar0, mask2);
+        MicroAPI::ShiftRights(dst1, src, shiftScalar1, mask2);
+        MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(mask0, dst1, scalar1, mask2);
         MicroAPI::CompareScalar<uint64_t, CMPMODE::GT>(dstMask, dst0, scalar0, mask0);
     } else if constexpr (roundMode == RoundMode::CAST_CEIL) {
-        MicroAPI::ShiftLefts(dst0, src, shiftScalar0, mask);
-        MicroAPI::ShiftRights(dst1, src, shiftScalar1, mask);
-        MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(mask0, dst1, scalar0, mask);
+        MicroAPI::ShiftLefts(dst0, src, shiftScalar0, mask2);
+        MicroAPI::ShiftRights(dst1, src, shiftScalar1, mask2);
+        MicroAPI::CompareScalar<uint64_t, CMPMODE::EQ>(mask0, dst1, scalar0, mask2);
         MicroAPI::CompareScalar<uint64_t, CMPMODE::GT>(dstMask, dst0, scalar0, mask0);
     } else if constexpr (roundMode == RoundMode::CAST_ROUND) {
-        MicroAPI::ShiftLefts(dst0, src, shiftScalar0, mask);
-        MicroAPI::CompareScalar<uint64_t, CMPMODE::GE>(dstMask, dst0, scalar3, mask);
+        MicroAPI::ShiftLefts(dst0, src, shiftScalar0, mask2);
+        MicroAPI::CompareScalar<uint64_t, CMPMODE::GE>(dstMask, dst0, scalar3, mask2);
     } else if constexpr (roundMode == RoundMode::CAST_TRUNC) {
-        MicroAPI::CompareScalar<uint64_t, CMPMODE::LT>(dstMask, src, scalar0, mask);
+        MicroAPI::CompareScalar<uint64_t, CMPMODE::LT>(dstMask, src, scalar0, mask2);
     }
 }
 
@@ -691,7 +693,7 @@ __simd_vf__ inline void CastDoubleToBf16(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TY
         preg = MicroAPI::UpdateMask<int64_t, MicroAPI::RegTraitNumOne>(sreg);
         MicroAPI::LoadAlign(tmpSrcReg0, (__ubuf__ uint64_t*&)src + i * oneRepSize);
         TruncateForDoubleToBf16(maskNan0, maskInf0, maskZero0, maskMax0, srvVreg0, tmpSrcReg0, preg);
-        DealMantissa1<roundMode>(mask0, tmpSrcReg0, preg);
+        DealMantissa1<roundMode>(mask0, tmpSrcReg0, preg, maskInf0, maskMax0);
         MicroAPI::DeInterleave(dstVreg0, dstZero, (MicroAPI::RegTensor<uint16_t> &)srvVreg0,
             (MicroAPI::RegTensor<uint16_t> &)dstZero);
         MicroAPI::DeInterleave(dstVreg, dstZero, (MicroAPI::RegTensor<uint16_t> &)dstVreg0,
@@ -744,7 +746,7 @@ __simd_vf__ inline void CastDoubleToBf160(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_T
         preg = MicroAPI::UpdateMask<int64_t, MicroAPI::RegTraitNumOne>(sreg);
         MicroAPI::LoadAlign(tmpSrcReg0, (__ubuf__ uint64_t*&)src + i * oneRepSize);
         TruncateForDoubleToBf16(maskNan0, maskInf0, maskZero0, maskMax0, srvVreg0, tmpSrcReg0, preg);
-        DealMantissa1<roundMode>(mask0, tmpSrcReg0, preg);
+        DealMantissa1<roundMode>(mask0, tmpSrcReg0, preg, maskInf0, maskMax0);
         MicroAPI::DeInterleave(dstVreg0, dstZero, (MicroAPI::RegTensor<uint16_t> &)srvVreg0,
             (MicroAPI::RegTensor<uint16_t> &)dstZero);
         MicroAPI::DeInterleave(dstVreg, dstZero, (MicroAPI::RegTensor<uint16_t> &)dstVreg0,
