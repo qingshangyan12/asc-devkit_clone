@@ -52,12 +52,11 @@ if(PRODUCT_SIDE STREQUAL "device" AND BUILD_OPEN_PROJECT)
     message(FATAL_ERROR "Cannot find library tilingdata_base")
   endif()
 
-  execute_process(
-    COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs
-    COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs/*
-    COMMAND ${CMAKE_AR} -x ${METADEF_TILINGDATA_BASE_STATIC_LIB_DIR} --output=${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs
-    RESULT_VARIABLE ar_result
-  )
+  execute_process(COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs)
+  execute_process(COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs/*)
+  execute_process(COMMAND ${CMAKE_AR} -x ${METADEF_TILINGDATA_BASE_STATIC_LIB_DIR} --output=${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs
+    RESULT_VARIABLE ar_result)
+
   if(ar_result EQUAL 0)
     file(GLOB METADEF_TILINGDATA_BASE_OBJ_FILES
       ${CMAKE_CURRENT_BINARY_DIR}/metadef_tilingdata_base_objs/*.o
