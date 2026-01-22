@@ -28,7 +28,6 @@ public:
     using CubeInBufferB = Impl::Detail::CubeInBuffer<IMPL, MatmulInputBType<B_TYPE, typename A_TYPE::T>, MM_CFG>;
 };
 
-constexpr MatmulConfig CFG_SPECIAL_BASIC = GetSpecialBasicConfig(32, 32, 32, 32, 32, 32, 2, 2);
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const MatmulConfig& MM_CFG, class MM_CB,
 MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
 class MatmulImpl
@@ -107,7 +106,6 @@ private:
     using BIAS_TYPE = MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>;
 
     MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM, void, CustomMatmulPolicy> mm;
-    MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_SPECIAL_BASIC, void, CustomMatmulPolicy> mm2;
 };
 
 TEST_F(test_cube_in_buffer_normal, DISABLED_get_iter_index) {
@@ -273,34 +271,5 @@ TEST_F(test_cube_in_buffer_normal, DISABLED_all_interface_normal_hit) {
         mm.Reset();
     }
     mm.Destroy();
-    ASSERT_EQ(hitCnt, 2);
-}
-
-TEST_F(test_cube_in_buffer_normal, DISABLED_step_from_cfg_normal) {
-    int32_t mIter = 2;
-    int32_t kIter = 1;
-    int32_t nIter = 2;
-    int32_t hitCnt = 0;
-    mm2.SetInitParamsNorm(2, 2, 32, 32, kIter);
-    mm2.Init(1024, 3);
-    LocalTensor<half> fakeTensor;
-    for (int32_t m = 0; m < mIter; m++) {
-        for (int32_t n = 0; n < nIter; n++) {
-            for (int32_t k = 0; k < kIter; k++) {
-                int32_t iterIndex = 0;
-                if (mm2.Hit(iterIndex)) {
-                    fakeTensor = mm2.GetBuffer(iterIndex);
-                    hitCnt++;
-                } else {
-                    fakeTensor = mm2.AllocTensor(iterIndex);
-                    mm2.EnQue(fakeTensor);
-                    mm2.DeQue();
-                }
-                mm2.FreeTensor(iterIndex, fakeTensor);
-            }
-        }
-        mm2.Reset();
-    }
-    mm2.Destroy();
     ASSERT_EQ(hitCnt, 2);
 }

@@ -32,7 +32,6 @@ using namespace AscendC;
 
 namespace {
 static constexpr MatmulConfig CFG_BASIC = GetBasicConfig(16, 32, 64);
-static constexpr MatmulConfig CFG_SPECIAL_BASIC = GetSpecialBasicConfig(64, 64, 64, 128, 256 , 64, 1, 1);
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const MatmulConfig& MM_CFG,
           class MM_CB, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
 class MatmulImpl :
@@ -92,7 +91,6 @@ private:
     using BIAS_TYPE = MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>;
 
     MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_BASIC, void> mm;
-    MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_SPECIAL_BASIC, void> mm2;
 };
 
 TEST_F(TestMLoopBasic, first_iter) {
@@ -139,47 +137,4 @@ TEST_F(TestMLoopBasic, outer_end) {
     mm.OuterNext();
     EXPECT_EQ(mm.GetOuterIdx(), 2);
     EXPECT_TRUE(mm.OuterEnd());
-}
-
-TEST_F(TestMLoopBasic, first_iter_spec) {
-    mm2.SetInitParams(128, 64, 1);
-    mm2.Init(mm2.GetSingleShape());           // SetSingleShape
-    mm2.OuterStart();
-    mm2.InnerStart();
-    // Outer
-    EXPECT_EQ(mm2.GetTotalIter(), 2);       // totalIter
-    EXPECT_EQ(mm2.GetOuterIdx(), 0);
-    EXPECT_EQ(mm2.GetOuterIter(), 2);        // outerIter
-    EXPECT_EQ(mm2.GetTileShape(), 64);      // mainTileShape
-    EXPECT_EQ(mm2.GetTileBlockShape(), 4);   // Ceil(mainTileShape, BLOCK_CUBE)
-    // Inner
-    EXPECT_EQ(mm2.GetInnerIdx(), 0);
-    EXPECT_EQ(mm2.GetInnerIter(), 1);        // stepM
-    EXPECT_EQ(mm2.GetBaseShape(), 64);      // baseShape
-    EXPECT_EQ(mm2.GetBaseBlockShape(), 4);   // Ceil(baseShape, BLOCK_CUBE)
-}
-
-TEST_F(TestMLoopBasic, inner_end_spec) {
-    mm2.SetInitParams(128, 64, 1);
-    mm2.Init(mm2.GetSingleShape());
-    mm2.OuterStart();
-    mm2.InnerStart();
-
-    EXPECT_EQ(mm2.GetInnerIdx(), 0);
-    mm2.InnerNext();
-    EXPECT_TRUE(mm2.InnerEnd());
-}
-
-TEST_F(TestMLoopBasic, outer_end_spec) {
-    mm2.SetInitParams(128, 64, 1);
-    mm2.Init(mm2.GetSingleShape());
-    mm2.OuterStart();
-    mm2.InnerStart();
-    mm2.InnerNext();
-
-    EXPECT_EQ(mm2.GetOuterIdx(), 0);
-    mm2.OuterNext();
-    EXPECT_EQ(mm2.GetOuterIdx(), 1);
-    mm2.OuterNext();
-    EXPECT_TRUE(mm2.OuterEnd());
 }
