@@ -230,12 +230,21 @@ __aicore__ inline void FixpipeL0cToL1(__cbuf__ DstT* dst, __cc__ SrcT* src,
         dstOffset = cburstNum * nIterIndex * intriParams.dstStride * DEFAULT_C0_SIZE / sizeof(DstT);
     }
     // LOC -> L1 only n direction need fixpipeTiling, m no need fixpipeTiling
-    return copy_matrix_cc_to_cbuf((__cbuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
-        0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, 0,
-        static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
-        static_cast<uint8_t>(intriParams.preReluMode), false, nz2ndEn,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
-        false, false, nz2dnEn);
+    if (intriParams.reluEn == true && intriParams.preReluMode == ReluMode::NO_RELU) {
+        return copy_matrix_cc_to_cbuf((__cbuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
+            0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, 0,
+            static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
+            static_cast<uint8_t>(intriParams.reluEn), false, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
+            false, false, nz2dnEn);
+    } else {
+        return copy_matrix_cc_to_cbuf((__cbuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
+            0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, 0,
+            static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
+            static_cast<uint8_t>(intriParams.preReluMode), false, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
+            false, false, nz2dnEn);
+    }
 }
 
 // contains loop info and cal n size for each loop
@@ -281,13 +290,23 @@ __aicore__ inline void FixpipeL0cToUB(__ubuf__ DstT* dst, __cc__ SrcT* src,
         dstOffset = cburstNum * nIterIndex * intriParams.dstStride * DEFAULT_C0_SIZE / sizeof(DstT);
     }
     // LOC -> UB only n direction need fixpipeTiling, m no need fixpipeTiling
-    return copy_matrix_cc_to_ub((__ubuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
-        calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, intriParams.dualDstCtl,
-        intriParams.subBlockId, static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag,
-        static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.preReluMode),
-        false, nz2ndEn,
-        static_cast<uint64_t>(QuantMode_post::NoConv),
-        0, false, false, 0, false, false, false, false, false, nz2dnEn);
+    if (intriParams.reluEn == true && intriParams.preReluMode == ReluMode::NO_RELU) {
+        return copy_matrix_cc_to_ub((__ubuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
+            calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, intriParams.dualDstCtl,
+            intriParams.subBlockId, static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag,
+            static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
+            false, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv),
+            0, false, false, 0, false, false, false, false, false, nz2dnEn);
+    } else {
+        return copy_matrix_cc_to_ub((__ubuf__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
+            calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, intriParams.dualDstCtl,
+            intriParams.subBlockId, static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag,
+            static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.preReluMode),
+            false, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv),
+            0, false, false, 0, false, false, false, false, false, nz2dnEn);
+    }
 }
 
 template <const FixpipeConfig& config>
@@ -345,12 +364,21 @@ __aicore__ inline void FixpipeL0cToOut(__gm__ DstT* dst, __cc__ SrcT* src,
         AscendCUtils::CheckGmMemOverflow((__gm__ DstT*)(dst + dstOffset), isSrc, gmLen);
     }
     // LOC -> GM only n direction need fixpipeTiling, m no need fixpipeTiling
-    return copy_matrix_cc_to_gm((__gm__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
-        0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, cacheMode,
-        static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
-        static_cast<uint8_t>(intriParams.preReluMode), intriParams.isChannelSplit, nz2ndEn,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
-        false, false, nz2dnEn);
+    if (intriParams.reluEn == true && intriParams.preReluMode == ReluMode::NO_RELU) {
+        return copy_matrix_cc_to_gm((__gm__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
+            0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, cacheMode,
+            static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
+            static_cast<uint8_t>(intriParams.reluEn), intriParams.isChannelSplit, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
+            false, false, nz2dnEn);
+    } else {
+        return copy_matrix_cc_to_gm((__gm__ DstT *)(dst + dstOffset), (__cc__ SrcT *)(src + srcOffset),
+            0, calNSize, intriParams.mSize, intriParams.dstStride, intriParams.srcStride, cacheMode,
+            static_cast<uint8_t>(intriParams.preClipReluMode), intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
+            static_cast<uint8_t>(intriParams.preReluMode), intriParams.isChannelSplit, nz2ndEn,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
+            false, false, nz2dnEn);
+    }
 }
 
 template <typename DstT, typename SrcT, const FixpipeConfig& config>

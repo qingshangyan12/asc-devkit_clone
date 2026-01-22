@@ -98,6 +98,9 @@ void main_cpu_cmp_mmad_bias_demo(__gm__ uint8_t* __restrict__ feature_gm, __gm__
     // in 910_9599 l0c to ub nz
     AscendC::FixpipeParamsC310<AscendC::CO2Layout::NZ> fixpipeParams(mmad_params.n, mmad_params.m, mmad_params.m, mmad_params.m * AscendC::BLOCK_CUBE);
     fixpipeParams.reluEn = true;
+    if (isBias == true) {
+        fixpipeParams.reluEn = false;
+    }
     fixpipeParams.quantPre = GetQuantMode<dst_T, l1out_T>();
     AscendC::Fixpipe<dst_T, l1out_T, CFG_NZ_UB>(output_local, l0c_out, fixpipeParams);
 
