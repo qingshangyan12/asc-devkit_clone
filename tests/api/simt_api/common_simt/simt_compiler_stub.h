@@ -16,6 +16,8 @@
 #include "stub_def.h"
 #include "stub_fun.h"
 
+#include <cstdint>
+
 #define R CAST_RINT
 #define A CAST_ROUND
 #define F CAST_FLOOR
@@ -809,5 +811,22 @@ void async_invoke(const dim3 &dim, Args &&...args)
 }
 }  // namespace cce
 #endif
+
+enum L1CacheType : uint32_t { NON_CACHEABLE = 0, CACHEABLE = 1 };
+enum class LD_L2CacheType : uint32_t { L2_CACHE_HINT_NORMAL_FV = 0 };
+enum class ST_L2CacheType : uint32_t { L2_CACHE_HINT_NORMAL_FV = 0 };
+
+template <LD_L2CacheType L2Cache = LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV,
+          L1CacheType L1CacheType = L1CacheType::NON_CACHEABLE, typename T>
+T __ldg(__gm__ T* address)
+{
+    return *address;
+}
+template <ST_L2CacheType L2Cache = ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV,
+          L1CacheType L1CacheType = L1CacheType::NON_CACHEABLE, typename T>
+void __stg(__gm__ T* address, T val)
+{
+    *address = val;
+}
 
 #endif

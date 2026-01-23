@@ -229,6 +229,22 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_min(__gm__ half2 *address
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_cas(__ubuf__ half2 *address, half2 compare, half2 val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_cas(__gm__ half2 *address, half2 compare, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldcg(__gm__ half* address);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_ldcg(__gm__ half2* address);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldca(__gm__ half* address);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_ldca(__gm__ half2* address);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ half* address, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ half2* address, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ half* address, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ half2* address, half2 val);
 #else
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(half *address, half val);
@@ -248,6 +264,22 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_min(half *address, half va
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_min(half2 *address, half2 val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_cas(half2 *address, half2 compare, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldcg(half* address);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_ldcg(half2* address);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldca(half* address);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_ldca(half2* address);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(half* address, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(half2* address, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(half* address, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(half2* address, half2 val);
 #endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_shfl(half var, int32_t src_lane, int32_t width = warpSize);
