@@ -80,8 +80,8 @@ constexpr int32_t MIX_NUM = 2;
 constexpr int32_t MAX_BLOCK_AIV_NUM = 2;
 constexpr int32_t MIX_COEFFICIENT = 1;
 constexpr int32_t MAX_MATMUL_OBJ = 8;
-constexpr int MAX_AIV_NUM = 50;
-constexpr int MAX_AIC_NUM = 25;
+constexpr int MAX_AIV_NUM = 72;
+constexpr int MAX_AIC_NUM = 36;
 constexpr int ALIGN_SIZE = 32;
 constexpr int BIDIRECTION_NUM = 2;
 constexpr bool KFC_APPLY_MSG = true;
@@ -381,7 +381,8 @@ __aicore__ inline void ClearWorkspaceImpl(__gm__ uint8_t* workspace)
     WaitFlag<HardEvent::S_MTE3>(EVENT_ID0);
  
     for (size_t i = 0; i < block; i++) {
-        copy_ubuf_to_gm_align_v2((__gm__ void *)msgStartAddr, (__ubuf__ void *)ubMsg, 0, 16, 128, 0, 0, 0);
+        // 第四参数：blockCount: 16 ; 第五参数： burstLength: 128; 第七参数: dstStride: 128
+        copy_ubuf_to_gm_align_v2((__gm__ void *)msgStartAddr, (__ubuf__ void *)ubMsg, 0, 16, 128, 0, 128, 0);
         msgStartAddr += 2048;
     }
     
