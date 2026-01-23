@@ -3,6 +3,7 @@
 本样例介绍Matmul API中用户自定义TSCM输入的使用方式。TSCM即Temp Swap Cache Memory，用于临时把数据交换到额外空间，需开发者自行管理以高效利用硬件资源。该场景由用户自行管理L1 Buffer，再将对应数据地址作为Matmul的输入。
 
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍

@@ -2,7 +2,6 @@
 ## 概述
 本样例介绍Matmul API实现int4数据类型输入，int32数据类型输出的单算子。
 ## 支持的产品
-- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍

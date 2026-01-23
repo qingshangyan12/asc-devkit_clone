@@ -3,7 +3,6 @@
 本样例介绍调用Matmul API实现开启A2和B2全局管理的单算子。其中A2和B2的全局管理为，算子中所有Matmul对象共享A2和B2。
 
 ## 支持的产品
-- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍

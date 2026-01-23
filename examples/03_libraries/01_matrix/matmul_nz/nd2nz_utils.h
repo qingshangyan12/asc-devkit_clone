@@ -18,8 +18,6 @@
 
 #include "kernel_operator.h"
 
-using namespace AscendC;
-
 namespace MatmulNzCustom {
 constexpr uint32_t BLOCK_COUNT_MAX = 4095;
 constexpr uint64_t SINGLE_COPY_SIZE = 256;
@@ -43,11 +41,11 @@ __aicore__ inline uint64_t MMDivCeil(uint64_t a, uint64_t b)
 }
 
 template <class T>
-__aicore__ inline void Copy(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, uint32_t count)
+__aicore__ inline void Copy(const AscendC::LocalTensor<T>& dstLocal, const AscendC::LocalTensor<T>& srcLocal, uint32_t count)
 {
     constexpr uint32_t copyLen = SINGLE_COPY_SIZE / sizeof(T);
     // vnchw parameters, which is used to decide stride, burstlength of Copy
-    const CopyRepeatParams para(DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE);
+    const AscendC::CopyRepeatParams para(AscendC::DEFAULT_BLK_STRIDE, AscendC::DEFAULT_BLK_STRIDE, AscendC::DEFAULT_REPEAT_STRIDE, AscendC::DEFAULT_REPEAT_STRIDE);
     uint32_t repeatTimes = count / copyLen;
     uint32_t tail = count % copyLen;
     uint32_t offset = repeatTimes * copyLen;
@@ -58,11 +56,11 @@ __aicore__ inline void Copy(const LocalTensor<T>& dstLocal, const LocalTensor<T>
 }
 
 template <class T>
-__aicore__ inline void CopyPadGm2Ub(const LocalTensor<T>& ubLocal1, const GlobalTensor<T>& srcGlobal,
+__aicore__ inline void CopyPadGm2Ub(const AscendC::LocalTensor<T>& ubLocal1, const AscendC::GlobalTensor<T>& srcGlobal,
                                     uint32_t baseH, uint32_t baseW, uint32_t orgHeight, uint32_t orgWidth,
                                     uint8_t padH, uint8_t padW)
 {
-    uint64_t c0Size = AscendCUtils::GetC0Count(sizeof(T));
+    uint64_t c0Size = AscendC::AscendCUtils::GetC0Count(sizeof(T));
     uint32_t width = baseW - padW;
     uint32_t height = baseH - padH;
     // Process gm->ub
@@ -82,23 +80,23 @@ __aicore__ inline void CopyPadGm2Ub(const LocalTensor<T>& ubLocal1, const Global
                     {blockCountTail, blockLen, srcStride, 0, 0}, {false, 0, padW, 0});
     }
 
-    SetFlag<HardEvent::MTE2_V>(static_cast<event_t>(EVENT_ID_0));
-    WaitFlag<HardEvent::MTE2_V>(static_cast<event_t>(EVENT_ID_0));
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(static_cast<event_t>(EVENT_ID_0));
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(static_cast<event_t>(EVENT_ID_0));
 
     // padding
     if (padH) {
-        Duplicate(ubLocal1[height * baseW], (T)0, padH * baseW);
-        PipeBarrier<PIPE_V>();
+        AscendC::Duplicate(ubLocal1[height * baseW], (T)0, padH * baseW);
+        AscendC::PipeBarrier<PIPE_V>();
     }
 }
 
 template <class T>
-__aicore__ inline void CopyPadNd2Nz(const GlobalTensor<T>& dstGlobal, const GlobalTensor<T>& srcGlobal,
+__aicore__ inline void CopyPadNd2Nz(const AscendC::GlobalTensor<T>& dstGlobal, const AscendC::GlobalTensor<T>& srcGlobal,
                                     uint32_t baseH, uint32_t baseW, uint32_t orgHeight, uint32_t orgWidth,
-                                    const LocalTensor<T>& ubLocal1, const LocalTensor<T>& ubLocal2,
+                                    const AscendC::LocalTensor<T>& ubLocal1, const AscendC::LocalTensor<T>& ubLocal2,
                                     uint8_t padH, uint8_t padW)
 {
-    uint64_t c0Size = AscendCUtils::GetC0Count(sizeof(T));
+    uint64_t c0Size = AscendC::AscendCUtils::GetC0Count(sizeof(T));
 
     // Process gm->ub
     CopyPadGm2Ub<T>(ubLocal1, srcGlobal, baseH, baseW, orgHeight, orgWidth,  padH, padW);
@@ -133,8 +131,8 @@ __aicore__ inline void CopyPadNd2Nz(const GlobalTensor<T>& dstGlobal, const Glob
              ubLocal1[nRepeat * numIterJ + numIterI * REPEAT_TIMES_MAX * baseW], widthTail, heightTail,
              {static_cast<uint16_t>(baseH), 1, 1, nRowBlock});
     }
-    SetFlag<HardEvent::V_MTE3>(static_cast<event_t>(EVENT_ID_0));
-    WaitFlag<HardEvent::V_MTE3>(static_cast<event_t>(EVENT_ID_0));
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(static_cast<event_t>(EVENT_ID_0));
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(static_cast<event_t>(EVENT_ID_0));
     uint64_t orgHeightRound = MMDivCeil(orgHeight, ALIGNED_H) * ALIGNED_H;
     // Process ub->gm
     if (orgHeightRound - baseH <= UINT16_MAX) {
@@ -148,14 +146,14 @@ __aicore__ inline void CopyPadNd2Nz(const GlobalTensor<T>& dstGlobal, const Glob
 }
 
 template <>
-__aicore__ inline void CopyPadNd2Nz<bfloat16_t>(const GlobalTensor<bfloat16_t>& dstGlobal,
-                                                const GlobalTensor<bfloat16_t>& srcGlobal, uint32_t baseH,
+__aicore__ inline void CopyPadNd2Nz<bfloat16_t>(const AscendC::GlobalTensor<bfloat16_t>& dstGlobal,
+                                                const AscendC::GlobalTensor<bfloat16_t>& srcGlobal, uint32_t baseH,
                                                 uint32_t baseW, uint32_t orgHeight, uint32_t orgWidth,
-                                                const LocalTensor<bfloat16_t>& ubLocal1,
-                                                const LocalTensor<bfloat16_t>& ubLocal2, uint8_t padH, uint8_t padW)
+                                                const AscendC::LocalTensor<bfloat16_t>& ubLocal1,
+                                                const AscendC::LocalTensor<bfloat16_t>& ubLocal2, uint8_t padH, uint8_t padW)
 {
-    GlobalTensor<half> dstGlobalTrans;
-    GlobalTensor<half> srcGlobalTrans;
+    AscendC::GlobalTensor<half> dstGlobalTrans;
+    AscendC::GlobalTensor<half> srcGlobalTrans;
     dstGlobalTrans.SetGlobalBuffer((__gm__ half*)dstGlobal.GetPhyAddr(0));
     srcGlobalTrans.SetGlobalBuffer((__gm__ half*)srcGlobal.GetPhyAddr(0));
     CopyPadNd2Nz<half>(dstGlobalTrans, srcGlobalTrans, baseH, baseW, orgHeight, orgWidth,
@@ -177,12 +175,12 @@ __aicore__ inline void CopyPadNd2Nz<bfloat16_t>(const GlobalTensor<bfloat16_t>& 
  */
 template <class T>
 __aicore__ inline void MatrixtoNZ(uint64_t oriN, uint64_t oriD, uint64_t nValue, uint64_t dValue, uint32_t baseN,
-                                  uint32_t baseD, uint32_t usedCoreNum, const GlobalTensor<T>& srcGlobal,
-                                  const GlobalTensor<T>& dstGlobal, TBuf<TPosition::VECCALC>& calcBuf)
+                                  uint32_t baseD, uint32_t usedCoreNum, const AscendC::GlobalTensor<T>& srcGlobal,
+                                  const AscendC::GlobalTensor<T>& dstGlobal, AscendC::TBuf<AscendC::TPosition::VECCALC>& calcBuf)
 {
-    uint32_t vBlockIndex = GetBlockIdx();
-    LocalTensor<T> tempUb = calcBuf.Get<T>();
-    LocalTensor<T> transBuf = tempUb[(TOTAL_UB_SIZE / 2) / sizeof(T)];
+    uint32_t vBlockIndex = AscendC::GetBlockIdx();
+    AscendC::LocalTensor<T> tempUb = calcBuf.Get<T>();
+    AscendC::LocalTensor<T> transBuf = tempUb[(AscendC::TOTAL_UB_SIZE / 2) / sizeof(T)];
     uint64_t nCnt = MMDivCeil(oriN, baseN);            // Total number of base blocks in nValue
     uint64_t dCnt = MMDivCeil(dValue, baseD);          // Total number of base blocks in dValue
     uint64_t tailN = nValue - (nCnt - 1) * baseN;      // Tail base blocks in nValue
@@ -217,11 +215,11 @@ __aicore__ inline void MatrixtoNZ(uint64_t oriN, uint64_t oriD, uint64_t nValue,
         const uint8_t padN = (nIndx == nCnt - 1) ? nValue - oriN : 0; // The pad value of n Dims
         const uint8_t padD = (dIndx == dCnt - 1) ? dValue - oriD : 0; // The pad value of d Dims
         auto srcGmIdx = (dIndx * baseD + nIndx * baseN * oriD);
-        auto dstGmIdx = (dIndx * nValue * baseD + nIndx * baseN * AscendCUtils::GetC0Count(sizeof(T)));
+        auto dstGmIdx = (dIndx * nValue * baseD + nIndx * baseN * AscendC::AscendCUtils::GetC0Count(sizeof(T)));
         CopyPadNd2Nz(dstGlobal[dstGmIdx], srcGlobal[srcGmIdx], nCalcLen, dCalcLen, oriN, oriD, tempUb, transBuf,
                      padN, padD);
-        SetFlag<HardEvent::MTE3_MTE2>(static_cast<event_t>(EVENT_ID_0));
-        WaitFlag<HardEvent::MTE3_MTE2>(static_cast<event_t>(EVENT_ID_0));
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_MTE2>(static_cast<event_t>(EVENT_ID_0));
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_MTE2>(static_cast<event_t>(EVENT_ID_0));
         index += 1;
     }
 }
@@ -239,10 +237,10 @@ __aicore__ inline void MatrixtoNZ(uint64_t oriN, uint64_t oriD, uint64_t nValue,
  */
 template <class T>
 __aicore__ inline void MatrixBtoNZ(GM_ADDR dst, GM_ADDR src, const TCubeTiling& tiling, bool isTransposeB,
-                                   TBuf<TPosition::VECCALC>& calcBuf, uint32_t baseBN, uint32_t baseBD)
+                                   AscendC::TBuf<AscendC::TPosition::VECCALC>& calcBuf, uint32_t baseBN, uint32_t baseBD)
 {
-    uint64_t c0Size = AscendCUtils::GetC0Count(sizeof(T));
-    uint32_t usedCoreNum = tiling.usedCoreNum * GetTaskRation(); // use max core nums
+    uint64_t c0Size = AscendC::AscendCUtils::GetC0Count(sizeof(T));
+    uint32_t usedCoreNum = tiling.usedCoreNum * AscendC::GetTaskRation(); // use max core nums
     uint64_t alignedNSize = 0;
     uint64_t alignedKSize = 0;
     alignedNSize = isTransposeB ? MMDivCeil(tiling.N, ALIGNED_H) * ALIGNED_H : MMDivCeil(tiling.N, c0Size) * c0Size;
@@ -251,8 +249,8 @@ __aicore__ inline void MatrixBtoNZ(GM_ADDR dst, GM_ADDR src, const TCubeTiling& 
     uint64_t oriD = isTransposeB ? tiling.Kb : tiling.N;
     uint64_t nValue = isTransposeB ? alignedNSize : alignedKSize;
     uint64_t dValue = isTransposeB ? alignedKSize : alignedNSize;
-    GlobalTensor<T> srcGlobal;
-    GlobalTensor<T> dstGlobal;
+    AscendC::GlobalTensor<T> srcGlobal;
+    AscendC::GlobalTensor<T> dstGlobal;
     dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(dst), alignedNSize * alignedKSize);
     srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(src), oriD * oriN);
     MatrixtoNZ(oriN, oriD, nValue, dValue, baseBN, baseBD, usedCoreNum, srcGlobal, dstGlobal, calcBuf);

@@ -7,6 +7,7 @@ L0缓存没有对外开关，由Matmul API内部根据用户配置的shape信息
 - singleCoreM=baseM同时singleCoreK=baseK。  
 
 ## 支持的产品
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
