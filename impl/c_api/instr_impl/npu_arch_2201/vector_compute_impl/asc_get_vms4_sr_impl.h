@@ -24,15 +24,10 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_get_vms4_sr_impl(uint16_t sorted_num[4])
+__aicore__ inline void asc_get_vms4_sr_impl(uint16_t sorted_num[ASC_C_API_MRGSORT_ELEMENT_LEN])
 {
     if ASC_IS_AIV {
-        uint8_t offset_step = 16;
-        uint64_t vms4_sr = (uint64_t)get_vms4_sr();
-        sorted_num[0] = 0xffff & vms4_sr;
-        sorted_num[1] = 0xffff & (vms4_sr >> offset_step); // >> 16
-        sorted_num[2] = 0xffff & (vms4_sr >> (offset_step * 2)); // >> 32
-        sorted_num[3] = 0xffff & (vms4_sr >> (offset_step * 3)); // >> 48
+        *(reinterpret_cast<uint64_t*>(sorted_num)) = (uint64_t)get_vms4_sr();
     }
 }
 

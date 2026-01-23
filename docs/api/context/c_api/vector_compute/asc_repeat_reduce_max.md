@@ -16,6 +16,8 @@ value_index 接口：表示value位于低半部，返回结果存储顺序为[va
 only_value  接口：表示只返回最值，返回结果存储顺序为[value]。
 only_index  接口：表示只返回最值索引，返回结果存储顺序为[index]。index数据类型固定为uint32
 
+执行此接口后，可以继续执行[asc_get_reduce_max_cnt](./asc_get_reduce_max_cnt.md)获取全部repeat内的最大值，以及第一个最大值时的索引。
+
 ## 函数原型
 
 - 前n个数据计算
@@ -81,7 +83,7 @@ PIPE_V
 
 ## 约束说明
 
-- 输出中的索引index的数据是按照dst的数据类型进行存储，比如float输出的index数据应该为uint32，则读取时需要使用reinterpret_cast<uint32_t>的方法转换。
+- 输出中的索引index的数据是按照dst的数据类型进行存储，比如float输出的index数据应该为uint32，则读取时需要将float重新解释为uint32。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 - dst的起始地址，输入类型为half时需要4字节对齐，输入类型为float时需要8字节对齐。
 - src的起始地址需要32字节对齐。
@@ -109,5 +111,5 @@ asc_repeat_reduce_max_value_index(dst, src, repeat, dst_repeat_stride, src_block
 ```
 输入数据src：[1, 2, 3, ..., 128, 129, ..., 256]
 输出数据dst：[128, 7.6e-6, 256, 7.6e-6]
-输出说明：half类型7.6e-6的二进制是0x007F，reinterpret_cast<uint16>(7.6e-6) = 127
+输出说明：half类型7.6e-6的二进制是0x007F，重新解释为uint32后即为最大值索引127
 ```

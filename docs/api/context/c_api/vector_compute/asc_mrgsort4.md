@@ -11,7 +11,7 @@
 
 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。
 
-asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，也就是asc_bitsort指令的输出，队列的结构如下所示：
+asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，也就是asc_bitsort指令的输出，队列的结构Region Proposal如下所示：
 - 数据类型为float，每个结构占据8 Bytes。
 
 ![ ](../figures/mrgsort4_01.png)
@@ -25,15 +25,15 @@ asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，
 - 计算
 
     ```cpp
-    __aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src[ASC_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
-    __aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src[ASC_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    __aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    __aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_mrgsort4_sync(__ubuf__ half* dst, __ubuf__ half* src[ASC_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
-    __aicore__ inline void asc_mrgsort4_sync(__ubuf__ float* dst, __ubuf__ float* src[ASC_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    __aicore__ inline void asc_mrgsort4_sync(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    __aicore__ inline void asc_mrgsort4_sync(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
     ```
 
 ## 参数说明
@@ -41,7 +41,7 @@ asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
-| src | 输入 | 源操作数（矢量）的起始地址的数组，待合并的Region Proposal队列。队列数量ASC_MRGSORT_ELEMENT_LEN值为4。|
+| src | 输入 | 源操作数（矢量）的起始地址的数组，待合并的Region Proposal队列。队列数量ASC_C_API_MRGSORT_ELEMENT_LEN值为4。|
 | repeat | 输入 | 迭代次数，每一次源操作数和目的操作数计算并跳过四个队列总长度。 |
 | element_length_0 | 输入 | 源队列0的长度。 |
 | element_length_1 | 输入 | 源队列1的长度。 |
@@ -72,14 +72,14 @@ PIPE_V
 // 第一步，每次排序4个32元素队列src，共repeat两次，得到两个排序好的128元素的新队列tmp。
 // 第二步，将两个排序好的128元素新队列tmp再进行归并排序，得到最终的256元素队列dst。
 
-uint16_t element_length = 32;
+constexpr uint16_t element_length = 32;
 // 每个元素包含float32的score和4字节的index，占8字节，相当于2个sizeof(float)。
-uint16_t array_length = element_length * 2;
+constexpr uint16_t array_length = element_length * 2;
 __ubuf__ float src_workspace[array_length * 8];
 __ubuf__ float tmp_workspace[array_length * 8];
 __ubuf__ float dst_workspace[array_length * 8];
 
-__ubuf__ float* src[ASC_MRGSORT_ELEMENT_LEN];
+__ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN];
 __ubuf__ float* dst;
 uint8_t valid_bit;
 
