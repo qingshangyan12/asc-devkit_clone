@@ -1087,7 +1087,7 @@ __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
     for (uint32_t i = 0; i < K_MAX_SHAPE_DIM; ++i) {
         shapeTlv->shape[i] = shapeInfo.shape[i];
     }
-    shapeTlv->resv = static_cast<uint32_t>(0U);;
+    shapeTlv->resv = static_cast<uint32_t>(0U);
     dcci((__gm__ uint64_t*)shapeTlv, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 
     __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);

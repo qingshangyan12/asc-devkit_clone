@@ -146,30 +146,11 @@ TEST_F(TEST_ASC_DEV_SECTION_GENERATE, asc_get_device_code_template_success)
 TEST_F(TEST_ASC_DEV_SECTION_GENERATE, asc_dev_stub_generator)
 {
     std::string golden = R"(namespace Foo1::Foo2 {
-extern "C" __global__ __aicore__ void __device_stub__add_mangling_int_float(__attribute__((cce_global)) uint8_t * __ascendc_dump_addr, int i, __attribute__((annotate("kfc_workspace"))) uint8_t* workspace)
+extern "C" __global__ __aicore__ void __device_stub__add_mangling_int_float(int i, __attribute__((annotate("kfc_workspace"))) uint8_t* workspace)
 {
-    AscendC::InitDump(true, __ascendc_dump_addr, ONE_CORE_DUMP_SIZE);
-    icache_preload(1);
-    if (g_sysFftsAddr != nullptr) {
-        set_ffts_base_addr((uint64_t)g_sysFftsAddr);
-    }
-    uint64_t __ascendc_timestamp = 0;
-    uint64_t __ascendc_version = 0;
-     __gm__ char* __ascendc_version_str = nullptr;
-    GetCannVersion(__ascendc_version_str, __ascendc_version, __ascendc_timestamp);
-    if (__ascendc_timestamp == 0) {
-        AscendC::printf("[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_timestamp);
-    } else {
-        AscendC::printf("CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_version_str), __ascendc_timestamp);
-    }
-    GM_ADDR ascendc_workspace_param;
-    GM_ADDR ascendc_workspace_usr;
-    ascendc_workspace_param = workspace;
-    if (ascendc_workspace_param == nullptr) {
-        return;
-    }
+    GM_ADDR ascendc_workspace_param = workspace;
     AscendC::SetSysWorkspaceForce(ascendc_workspace_param);
-    ascendc_workspace_usr = AscendC::GetUserWorkspace(ascendc_workspace_param);
+    GM_ADDR ascendc_workspace_usr = AscendC::GetUserWorkspace(ascendc_workspace_param);
     if constexpr (g_coreType == AscendC::AIC) {
         matmul::clearWorkspace(ascendc_workspace_param);
     }
@@ -206,8 +187,6 @@ extern "C" __global__ __aicore__ void __device_stub__add_mangling_int_float(__at
     info.isTemplate = true;
     AscPlugin::AscDevStubGenerator devStubGen = AscPlugin::AscDevStubGenerator(
         info, {AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_1}, AscPlugin::KfcScene::Open);
-    devStubGen.dumpIsNeedInit_ = true;
-    devStubGen.dumpIsNeedPrintVersion_ = true;
     devStubGen.socVersion_ = AscPlugin::ShortSocVersion::ASCEND910B;
     auto deviceStub = devStubGen.GenCode();
     EXPECT_EQ(deviceStub, golden);
@@ -227,41 +206,6 @@ TEST_F(TEST_ASC_DEV_SECTION_GENERATE, asc_dev_stub_workspace_arg)
         info, {AscPlugin::KernelMetaType::KERNEL_TYPE_AIV_ONLY}, AscPlugin::KfcScene::Close);
     devStubGen.socVersion_ = AscPlugin::ShortSocVersion::ASCEND910B;
     EXPECT_EQ(devStubGen.GetWorkspaceArgName(), std::string("workspace"));
-}
-
-TEST_F(TEST_ASC_DEV_SECTION_GENERATE, asc_dev_stub_UpdateParams)
-{
-    using namespace AscPlugin;
-    AscPlugin::KernelInfo info;
-    info.kernelName = "add";
-    info.kernelMangledName = "add_mangling";
-    info.kernelParameters = {
-        {"int", "i", false, "", ""},
-        {"uint8_t*", "workspace", false, "", "__attribute__((annotate(\"kfc_workspace\")))"}
-    };
-    info.ratio = {false, 0, 0};
-    info.templateParameters = {
-        {"typename", "T", false, "", ""},
-        {"typename", "U", false, "", ""}
-    };
-    info.namespaces = {"Foo1", "Foo2"};
-    info.templateInstances = {
-        {
-            {"int", "float"},
-            {
-                {"int", "i", false, "", ""},
-                {"uint8_t*", "workspace", false, "", "__attribute__((annotate(\"kfc_workspace\")))"}
-            },
-            "add_mangling_int_float",
-            "prefix_add_mangling_int_float",
-            {true, 1, 1}
-        }
-    };
-    info.isTemplate = true;
-    AscDevStubGenerator devStubGen = AscDevStubGenerator(
-        info, {KernelMetaType::KERNEL_TYPE_AIV_ONLY}, KfcScene::Close);
-    devStubGen.dumpIsNeedInit_ = true;
-    EXPECT_NO_THROW(devStubGen.UpdateParams());
 }
 
 #define TEST_DEV_META_GEN(goldenContent, kernelType, isTemplateFunc)                                     \

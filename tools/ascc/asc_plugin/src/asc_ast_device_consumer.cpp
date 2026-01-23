@@ -27,15 +27,6 @@
 #include "asc_log.h"
 
 namespace AscPlugin {
-
-namespace {
-bool IsPrintfRelated(const std::string &funcName)
-{
-    return (funcName == "printf" || funcName == "PRINTF" || funcName == "DumpTensor" || funcName == "DumpAccChkPoint" ||
-            funcName == "AssertImpl");
-}
-}  // namespace
-
 ASTDeviceVisitor::ASTDeviceVisitor(clang::ASTContext &context, clang::CompilerInstance &compiler)
     : context_(context), compiler_(compiler), srcManager_(context.getSourceManager())
 {}
@@ -82,70 +73,6 @@ bool ASTDeviceVisitor::VisitFunctionDecl(const clang::FunctionDecl *funcDecl)
 
         kernelFuncsKernelType_[kernelKey] = "";
         g_kernelFuncType[kernelKey] = {{KernelMetaType::KERNEL_TYPE_MAX}, KfcScene::Close};
-    }
-    return true;
-}
-
-bool ASTDeviceVisitor::VisitCallExpr(clang::CallExpr *exprCall)
-{
-    if (!exprCall) {
-        ASC_LOGD("Null CallExpr: Possible AST corruption or invalid code");
-        return true;
-    }
-
-    clang::FunctionDecl *funcDecl = exprCall->getDirectCallee();
-    clang::UnresolvedLookupExpr *ule = clang::dyn_cast<clang::UnresolvedLookupExpr>(exprCall->getCallee());
-    if ((!funcDecl) && (!ule)) {
-        return true;
-    }
-
-    auto& manager = InfoManager::GetInstance();
-    clang::SourceLocation startLoc = exprCall->getBeginLoc();
-    // get source code location from macro expansion
-    clang::SourceLocation expansionLoc = srcManager_.getExpansionLoc(startLoc);
-    clang::PresumedLoc pLoc = srcManager_.getPresumedLoc(expansionLoc);
-    const char* fname = pLoc.getFilename();
-    std::string filename = fname ? fname : "<unknown file>";
-    // Need to find printf / assert from users files instead of cann package files
-    if (filename.find(manager.GetPathInfo().cannPath) != std::string::npos) {
-        return true;
-    }
-
-    if (funcDecl) {
-        std::string qualifiedName = funcDecl->getQualifiedNameAsString();
-        if (qualifiedName.find("AscendC::printf") != std::string::npos ||
-            qualifiedName.find("AscendC::PRINTF") != std::string::npos ||
-            qualifiedName.find("AscendC::DumpTensor") != std::string::npos ||
-            qualifiedName.find("AscendC::DumpAccChkPoint") != std::string::npos) {
-            manager.SetHasPrintf(true);
-            ASC_LOGD("Found %s call at line: %u, file: %s", qualifiedName.c_str(), pLoc.getLine(), fname);
-        } else if (qualifiedName.find("AscendC::AssertImpl") != std::string::npos ||
-                   qualifiedName.find("AscendC::AssertFail") != std::string::npos ||
-                   qualifiedName.find("AscendC::AssertPrint") != std::string::npos) {
-            manager.SetHasAssert(true);
-            ASC_LOGD("Found %s call at line: %u, file: %s", qualifiedName.c_str(), pLoc.getLine(), fname);
-        } else if (manager.GetShortSocVersion() == ShortSocVersion::ASCEND910_95 &&
-                    (qualifiedName.find("AscendC::Simt::printf") != std::string::npos ||
-                     qualifiedName == "printf")) {
-            manager.SetHasSimtPrintf(true);
-            ASC_LOGD("Found %s call at line: %u, file: %s", qualifiedName.c_str(), pLoc.getLine(), fname);
-        }
-    } else if (ule) {
-        std::string funcName = ule->getName().getAsString();
-        if (IsPrintfRelated(funcName)) {
-            ASC_LOGD("Found unresolved %s at line: %u, file: %s", funcName.c_str(), GetLineNumber(exprCall), fname);
-            if (const clang::NestedNameSpecifier *nns = ule->getQualifier()) {
-                if (const clang::NamespaceDecl *ns = clang::dyn_cast<clang::NamespaceDecl>(nns->getAsNamespace())) {
-                    if (ns->getName() == "AscendC") {
-                        ASC_LOGD("Confirmed AscendC::%s at line: %u, file: %s", funcName.c_str(),
-                            GetLineNumber(exprCall), fname);
-                        (funcName == "AssertImpl" || funcName == "AssertFail" || funcName == "AssertPrint")
-                            ? manager.SetHasAssert(true)
-                            : manager.SetHasPrintf(true);
-                    }
-                }
-            }
-        }
     }
     return true;
 }

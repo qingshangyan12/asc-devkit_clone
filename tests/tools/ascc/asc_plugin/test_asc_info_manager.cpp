@@ -55,18 +55,10 @@ TEST_F(TEST_ASC_INFO_MANAGER, asc_set_method)
 {
     auto& manager = AscPlugin::InfoManager::GetInstance();
     manager.SetOptimizeLevel("-O2");
-    manager.SetUserDumpStatus(true);
-    manager.SetHasPrintf(false);
-    manager.SetHasAssert(true);
     manager.SetSourceFile("test.cpp");
 
     EXPECT_EQ(manager.GetOptimizeLevel(), "-O2");
-    EXPECT_EQ(manager.UserDumpRequested(), true);
-    EXPECT_EQ(manager.HasPrintf(), false);
-    EXPECT_EQ(manager.HasAssert(), true);
     EXPECT_EQ(manager.GetSourceFile(), "test.cpp");
-
-    manager.SetHasAssert(false);
 }
 
 TEST_F(TEST_ASC_INFO_MANAGER, asc_set_global_symbol_info)
@@ -139,24 +131,6 @@ TEST_F(TEST_ASC_INFO_MANAGER, asc_SetCompileArgs_Undef_Def)
     EXPECT_EQ(info.definitions, expectDef);
 }
 
-// -D dump = false => -U DUMP = true
-TEST_F(TEST_ASC_INFO_MANAGER, asc_SetCompileArgs_Undef_Def_dump)
-{
-    AscPlugin::CompileArgs a;
-
-    auto& manager = AscPlugin::InfoManager::GetInstance();
-
-    std::vector<std::string> compileArgs = {"-DASCENDC_DUMP=0"};
-    manager.compileArgs_ = a;   // clean up
-    manager.SetCompileArgs(compileArgs);
-    EXPECT_EQ(manager.UserDumpRequested(), false);
-
-    compileArgs = {"-DASCENDC_DUMP=0", "-U", "ASCENDC_DUMP"};
-    manager.compileArgs_ = a;   // clean up
-    manager.SetCompileArgs(compileArgs);
-    EXPECT_EQ(manager.UserDumpRequested(), true);
-}
-
 TEST_F(TEST_ASC_INFO_MANAGER, asc_SetCompileArgs_Undef)
 {
     AscPlugin::CompileArgs a;
@@ -166,27 +140,10 @@ TEST_F(TEST_ASC_INFO_MANAGER, asc_SetCompileArgs_Undef)
         "-DASCENDC_TIME_STAMP_ON", "-DASCENDC_DEBUG"};
     manager.compileArgs_ = a;   // clean up
     manager.SetCompileArgs(compileArgs);
-    EXPECT_EQ(manager.UserDumpRequested(), false);
-    EXPECT_EQ(manager.HasTimeStamp(), true);
     EXPECT_EQ(manager.IsL2CacheEnabled(), false);
 
     compileArgs = { "-UASCENDC_DUMP", "-UHAVE_WORKSPACE", "-UHAVE_TILING",
         "-UASCENDC_TIME_STAMP_ON", "-UASCENDC_DEBUG"};
     manager.SetCompileArgs(compileArgs);
-    EXPECT_EQ(manager.UserDumpRequested(), true);
-    EXPECT_EQ(manager.HasTimeStamp(), false);
     EXPECT_EQ(manager.IsL2CacheEnabled(), true);
-}
-
-// for -DASCENDC_TIME_STAMP_ON
-TEST_F(TEST_ASC_INFO_MANAGER, asc_timestamp_on)
-{
-    AscPlugin::CompileArgs a;
-    auto& manager = AscPlugin::InfoManager::GetInstance();
-    manager.compileArgs_ = a;   // clean up
-    EXPECT_EQ(manager.HasTimeStamp(), false);
-
-    std::vector<std::string> compileArgs = {"-DASCENDC_TIME_STAMP_ON"};
-    manager.SetCompileArgs(compileArgs);
-    EXPECT_EQ(manager.HasTimeStamp(), true);
 }

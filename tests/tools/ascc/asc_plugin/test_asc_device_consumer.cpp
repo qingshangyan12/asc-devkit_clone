@@ -33,103 +33,6 @@ protected:
     }
 };
 
-// Note: should be the first testcase in this .cpp
-TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_nullptr)
-{
-    clang::ASTContext context = clang::ASTContext();
-    clang::CompilerInstance compiler = clang::CompilerInstance();
-    AscPlugin::ASTDeviceVisitor visitor(context, compiler);
-    clang::CallExpr *callExpr = nullptr;
-    EXPECT_EQ(visitor.VisitCallExpr(callExpr), true);
-}
-
-TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_FunctionDecl_printf)
-{
-    clang::ASTContext context = clang::ASTContext();
-    clang::CompilerInstance compiler = clang::CompilerInstance();
-    AscPlugin::ASTDeviceVisitor visitor(context, compiler);
-    clang::CallExpr CE;
-    clang::CallExpr *callExpr = &CE;
-    clang::FunctionDecl FD(context);
-    clang::FunctionDecl *funcDecl = &FD;
-    MOCKER(&clang::CallExpr::getDirectCallee).stubs().will(returnValue(funcDecl));
-    auto& manager = AscPlugin::InfoManager::GetInstance();
-    manager.pathInfo_.cannPath = "llt_cann_stub_path";
-    EXPECT_EQ(manager.hasPrintf_, false);
-    MOCKER(&clang::FunctionDecl::getQualifiedNameAsString).stubs()
-        .will(returnValue(std::string("AscendC::printf")));
-    EXPECT_EQ(visitor.VisitCallExpr(callExpr), true);
-    EXPECT_EQ(manager.hasPrintf_, true);
-    manager.hasPrintf_ = false;
-}
-
-TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_FunctionDecl_simt_printf)
-{
-    clang::ASTContext context = clang::ASTContext();
-    clang::CompilerInstance compiler = clang::CompilerInstance();
-    AscPlugin::ASTDeviceVisitor visitor(context, compiler);
-    clang::CallExpr CE;
-    clang::CallExpr *callExpr = &CE;
-    clang::FunctionDecl FD(context);
-    clang::FunctionDecl *funcDecl = &FD;
-    MOCKER(&clang::CallExpr::getDirectCallee).stubs().will(returnValue(funcDecl));
-    auto& manager = AscPlugin::InfoManager::GetInstance();
-    manager.pathInfo_.cannPath = "llt_cann_stub_path";
-    manager.SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910_95);
-    EXPECT_EQ(manager.hasSimtPrintf_, false);
-    MOCKER(&clang::FunctionDecl::getQualifiedNameAsString).stubs()
-        .will(returnValue(std::string("printf")));
-    EXPECT_EQ(visitor.VisitCallExpr(callExpr), true);
-    EXPECT_EQ(manager.hasSimtPrintf_, true);
-    manager.hasSimtPrintf_ = false;
-    manager.SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910B);
-}
-
-TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_FunctionDecl_assert)
-{
-    clang::ASTContext context = clang::ASTContext();
-    clang::CompilerInstance compiler = clang::CompilerInstance();
-    AscPlugin::ASTDeviceVisitor visitor(context, compiler);
-    clang::CallExpr CE;
-    clang::CallExpr *callExpr = &CE;
-    clang::FunctionDecl FD(context);
-    clang::FunctionDecl *funcDecl = &FD;
-    MOCKER(&clang::CallExpr::getDirectCallee).stubs().will(returnValue(funcDecl));
-    auto& manager = AscPlugin::InfoManager::GetInstance();
-    manager.pathInfo_.cannPath = "llt_cann_stub_path";
-    EXPECT_EQ(manager.hasAssert_, false);
-    MOCKER(&clang::FunctionDecl::getQualifiedNameAsString).stubs()
-        .will(returnValue(std::string("AscendC::AssertImpl")));
-    EXPECT_EQ(visitor.VisitCallExpr(callExpr), true);
-    EXPECT_EQ(manager.hasAssert_, true);
-    manager.hasAssert_ = false;
-}
-
-TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_UnresolvedLookupExpr_printf)
-{
-    clang::ASTContext context = clang::ASTContext();
-    clang::CompilerInstance compiler = clang::CompilerInstance();
-    AscPlugin::ASTDeviceVisitor visitor(context, compiler);
-    clang::CallExpr CE;
-    clang::CallExpr *callExpr = &CE;
-    clang::UnresolvedLookupExpr ULE;
-    clang::UnresolvedLookupExpr *ule = &ULE;
-    auto& manager = AscPlugin::InfoManager::GetInstance();
-    EXPECT_EQ(manager.hasPrintf_, false);
-    MOCKER(&clang::dyn_cast<clang::UnresolvedLookupExpr>, clang::UnresolvedLookupExpr *(clang::Expr*))
-        .stubs()
-        .will(returnValue(ule));
-    MOCKER(&clang::DeclarationName::getAsString).stubs().will(returnValue(std::string("printf")));
-    clang::NamespaceDecl ND;
-    clang::NamespaceDecl *decl = &ND;
-    MOCKER(&clang::dyn_cast<clang::NamespaceDecl>, clang::NamespaceDecl *(clang::NamespaceDecl*))
-        .stubs()
-        .will(returnValue(decl));
-    MOCKER(&clang::NamespaceDecl::getName).stubs().will(returnValue(std::string("AscendC")));
-    EXPECT_EQ(visitor.VisitCallExpr(callExpr), true);
-    EXPECT_EQ(manager.hasPrintf_, true);
-}
-
 TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_GetLineNumber)
 {
     clang::ASTContext context = clang::ASTContext();
@@ -138,22 +41,6 @@ TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_GetLineNumber)
     clang::Stmt S;
     clang::Stmt *stmt = &S;
     EXPECT_EQ(visitor.GetLineNumber(stmt), 0u);
-}
-
-TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitCallExpr_FunctionDecl_assertPrint)
-{
-    clang::ASTContext context = clang::ASTContext();
-    clang::CompilerInstance compiler = clang::CompilerInstance();
-    AscPlugin::ASTDeviceVisitor visitor(context, compiler);
-    clang::CallExpr CE;
-    clang::CallExpr *callExpr = &CE;
-    clang::FunctionDecl FD(context);
-    clang::FunctionDecl *funcDecl = &FD;
-    MOCKER(&clang::CallExpr::getDirectCallee).stubs().will(returnValue(funcDecl));
-    MOCKER(&clang::FunctionDecl::getQualifiedNameAsString)
-        .stubs()
-        .will(returnValue(std::string("AscendC::AssertPrint")));
-    EXPECT_EQ(visitor.VisitCallExpr(callExpr), true);
 }
 
 TEST_F(TEST_ASC_DEVICE_CONSUMER, asc_VisitFunctionDecl)

@@ -42,41 +42,29 @@ TEST_F(TEST_ASC_COMPILE_OPTIONS, asc_CompileOptionManager)
     std::vector<std::string> expDeviceCubeExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "--cce-aicore-arch=dav-c220-cube",
         "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
-        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT"
     };
 
     std::vector<std::string> expDeviceVecExtraCompileOptions = {
         // compile options
         "-std=c++17", "-O3", "-D__NPU_DEVICE__", "-DTILING_KEY_VAR=0",
+        "-D__ENABLE_ASCENDC_PRINTF__",
         "--cce-aicore-arch=dav-c220-vec",
         "--cce-auto-sync",
         "-mllvm", "-cce-aicore-stack-size=0x8000",
         "-mllvm", "-cce-aicore-function-stack-size=0x8000",
         "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false",
-        "-D__ENABLE_ASCENDC_PRINTF__",
         "-DL2_CACHE_HINT"
     };
     EXPECT_EQ(deviceCubeExtraCompileOptions, expDeviceCubeExtraCompileOptions);
     EXPECT_EQ(deviceVecExtraCompileOptions, expDeviceVecExtraCompileOptions);
     EXPECT_EQ(hostExtraCompileOptions, expHostExtraCompileOptions);
-}
-
-
-TEST_F(TEST_ASC_COMPILE_OPTIONS, asc_SetOldPrintOptions)
-{
-    using namespace AscPlugin;
-    CompileOptionManager mng = CompileOptionManager();
-    mng.userDumpStatus_ = true;
-    mng.isDumpOn_ = true;
-    mng.cannVersionHeader_ = std::string("Ascend310B1");
-    std::vector<std::string> opts;
-    EXPECT_NO_THROW(mng.SetOldPrintOptions(opts));
 }
 
 TEST_F(TEST_ASC_COMPILE_OPTIONS, asc_GetDeviceCompileOptionsWithSoc_91095_onttoone_onetotwo)

@@ -114,14 +114,9 @@ public:
     void SetShortSocVersion(const AscPlugin::ShortSocVersion socVersion);
     void SetOptimizeLevel(const std::string& optLevel);
     void SetSaveTempRequested(const bool saveTemp);
-    void SetUserDumpStatus(const bool dumpStatus);
-    void SetHasPrintf(const bool hasPrintf);
-    void SetHasSimtPrintf(const bool hasSimtPrintf);
-    void SetHasAssert(const bool hasAssert);
     void SetOpSystemCfg(const bool hasOpSystemCfg);
     void AddGlobalSymbolInfo(const std::string &mangling, const KernelMetaType &type, const std::string &fileName,
         const uint32_t lineNo, const uint32_t colNo, const KfcScene kfcScene);
-    void UpdateOneCoreDumpSize();                       // must be called after hasPrintf_ and hasAssert_ is updated
     void ReportCompileArgs();
     uint32_t SetKernelFuncFlag();
 
@@ -136,22 +131,10 @@ public:
     const std::string& GetOptimizeLevel() const;
     const std::string& GetSourceFile() const;
     const std::unordered_map<std::string, GlobalFuncInfo>& GetGlobalSymbolInfo() const;
-    uint32_t GetMaxCoreNum(const ShortSocVersion& socVersion) const;
-    uint32_t GetMaxCoreNum() const;
     bool SaveTempRequested() const;
-    bool UserDumpRequested() const;
-    bool HasTimeStamp() const;
-    bool HasPrintf() const;
-    bool HasSimtPrintf() const;
-    bool HasAssert() const;
-    bool HasUbufDynamicSize() const;                    // simt: <<<blockDim, nullptr, stream, ubufDynamicSize>>>
-    bool IsDumpOn() const;   // when user not pass -DASCENDC_DUMP=0, and uses printf/ assert
-    uint32_t GetOneCoreDumpSize() const;                // for -DONE_CORE_DUMP_SIZE=xxx
     bool IsL2CacheEnabled() const;
     bool HasOpSystemCfg() const;
     bool IsAutoSyncOn() const;
-    bool IsSupportFifoDump() const;
-    bool IsFifoDumpOn() const;
     bool HasKernelFunc() const;
 
 private:
@@ -173,15 +156,8 @@ private:
     std::string optimizeLevel_ = "-O3";
     std::string sourceFile_;
     bool saveTempRequested_ = false;
-    bool userDumpStatus_ = true;                // if user passed -DASCENDC_DUMP, then update. True means = 1
-    bool hasTimeStamp_ = false;                 // for -DASCENDC_TIME_STAMP_ON
-    bool hasPrintf_ = false;
-    bool hasSimtPrintf_ = false;                // only for 910_95 simt
-    bool hasAssert_ = false;
-    bool hasUbufDynamicSize_ = true;
     bool enableL2Cache_ = true;                 // default enable
     bool hasOpSystemCfg_ =false;
-    uint32_t oneCoreDumpSize_ = 1048576;        // 1024 K
     bool isAutoSyncOn_ = true;
     bool hasKernelFunc_ = false;
 

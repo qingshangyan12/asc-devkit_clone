@@ -23,46 +23,12 @@
 
 namespace AscendC {
 template <typename T>
+__aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType();
+
+template <typename T>
 constexpr __aicore__ inline uint32_t GetDataType()
 {
-    if (IsSameType<T, bool>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_BOOL);
-    } else if (IsSameType<T, uint8_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_UINT8);
-    } else if (IsSameType<T, int8_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_INT8);
-    } else if (IsSameType<T, int16_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_INT16);
-    } else if (IsSameType<T, uint16_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_UINT16);
-    } else if (IsSameType<T, int32_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_INT32);
-    } else if (IsSameType<T, uint32_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_UINT32);
-    } else if (IsSameType<T, uint64_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_UINT64);
-    } else if (IsSameType<T, int64_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_INT64);
-    } else if (IsSameType<T, float>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_FLOAT);
-    } else if (IsSameType<T, half>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_FLOAT16);
-    } else if (IsSameType<T, bfloat16_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_BF16);
-    } else if (IsSameType<T, hifloat8_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_HIFLOAT8);
-    } else if (IsSameType<T, fp8_e5m2_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_FLOAT8_E5M2);
-    } else if (IsSameType<T, fp8_e4m3fn_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_FLOAT8_E4M3FN);
-    } else if (IsSameType<T, fp8_e8m0_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_FLOAT8_E8M0);
-    } else if (IsSameType<T, fp4x2_e2m1_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_FLOAT4_E2M1);
-    } else if (IsSameType<T, fp4x2_e1m2_t>::value) {
-        return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_FLOAT4_E1M2);
-    }
-    return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_MAX);
+    return static_cast<uint32_t>(GetTensorDataType<T>());
 }
 
 template <typename T>
@@ -176,7 +142,7 @@ __aicore__ inline void UpdateBlockInfo(__gm__ BlockInfo* ptr, uint32_t offset)
     bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
 }
 
-__aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
+__aicore__ inline void WriteDumpShapeInfo(const ShapeInfo &shapeInfo)
 {
     uint8_t core = GetDumpBlockIdx();
     if (core >= DUMP_CORE_COUNT) {
@@ -203,6 +169,18 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
     *((__gm__ uint32_t*)ptr->dumpAddr + DUMP_SHAPE_MESSAGE_HEAD_RSV_POS) = 0;
     // update block info
     UpdateBlockInfo(ptr, tlvSize);
+}
+
+__aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo);
+
+__aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
+{
+    bisheng::cce::dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    if (g_sysPrintFifoSpace != nullptr) {
+        WriteRingBufShapeInfo(shapeInfo);
+    } else {
+        WriteDumpShapeInfo(shapeInfo);
+    }
 }
 
 __aicore__ inline __ssbuf__ L12UBDumpCtrlMessage* GetDumpCtrlMsg()
@@ -309,7 +287,7 @@ __aicore__ inline void DumpTensorL0C2GMImpl(const LocalTensor<T>& tensor, __gm__
 }
 
 template <typename T>
-__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize)
+__aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize)
 {
     using PrimType = PrimT<T>;
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved);
@@ -382,6 +360,24 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& tensor, uint
     }
 }
 
+template <template <typename> class Tensor, typename T>
+__aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc,
+                                                                uint32_t dumpSize)
+{
+    uint64_t ctrlValue = get_ctrl();
+    set_atomic_none();
+    bisheng::cce::dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    if (g_sysPrintFifoSpace != nullptr) {
+        DumpTensorRingBufImpl(src, desc, dumpSize);
+    } else {
+        DumpTensorLocal2GMEntityImpl(src, desc, dumpSize);
+    }
+    set_ctrl(ctrlValue);
+}
+
 template <typename T>
 __aicore__ inline void InitTmpTensor(LocalTensor<T>& tmpLocal, uint8_t quePos)
 {
@@ -449,7 +445,7 @@ __aicore__ inline void DumpAivGMTailImpl(LocalTensor<T>& tmpLocal, uint32_t alig
     PipeBarrier<PIPE_ALL>();
 }
 template <typename T>
-__aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize)
+__aicore__ inline void DumpTensorGM2GMEntityImpl(const GlobalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize)
 {
     using PrimType = PrimT<T>;
     uint32_t position =  static_cast<uint32_t>(AscendC::Hardware::GM);
@@ -510,7 +506,21 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& tensor, uint32
     UpdateBlockInfo(ptr, padOffset);
 }
 
-__aicore__ inline void DumpTimeStampImpl(uint32_t descId)
+template <typename T>
+__aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
+{
+    uint64_t ctrlValue = get_ctrl();
+    set_atomic_none();
+    bisheng::cce::dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    if (g_sysPrintFifoSpace != nullptr) {
+        DumpTensorRingBufImpl(src, desc, dumpSize);
+    } else {
+        DumpTensorGM2GMEntityImpl(src, desc, dumpSize);
+    }
+    set_ctrl(ctrlValue);
+}
+
+__aicore__ inline void WriteTimeStampInfo(uint32_t descId)
 {
 #ifdef ASCENDC_TIME_STAMP_ON
     __gm__ BlockInfo *blockInfo = GetBlockInfo();
@@ -527,6 +537,18 @@ __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
     *((__gm__ uint32_t*)blockInfo + BLOCK_INFO_DUMPOFFSET_POS) = blockInfo->dumpOffset - DUMP_TIME_STAMP_TOTAL_LEN;
     bisheng::cce::dcci((__gm__ uint64_t*)blockInfo, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
 #endif
+}
+
+__aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId);
+
+__aicore__ inline void DumpTimeStampImpl(uint32_t descId)
+{
+    bisheng::cce::dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    if (g_sysPrintFifoSpace != nullptr) {
+        WriteRingBufTimeStampInfo(descId);
+    } else {
+        WriteTimeStampInfo(descId);
+    }
 }
 
 __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
@@ -623,5 +645,257 @@ __aicore__ inline void FinalizeL1TensorDump()
 {
     DisableL1Dump();
 }
+
+template <typename T>
+__aicore__ inline Hardware CheckDumpTensorPosition(const LocalTensor<T>& src)
+{
+    Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
+    if (position != Hardware::UB && position != Hardware::L1 && position != Hardware::L0C) {
+        return Hardware::MAX;
+    }
+    return position;
+}
+
+template <typename T>
+__aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType()
+{
+    if constexpr (IsSameType<T, bool>::value) {
+        return Internal::DumpTensorDataType::ACL_BOOL;
+    } else if (IsSameType<T, uint8_t>::value) {
+        return Internal::DumpTensorDataType::ACL_UINT8;
+    } else if (IsSameType<T, int8_t>::value) {
+        return Internal::DumpTensorDataType::ACL_INT8;
+    } else if (IsSameType<T, int16_t>::value) {
+        return Internal::DumpTensorDataType::ACL_INT16;
+    } else if (IsSameType<T, uint16_t>::value) {
+        return Internal::DumpTensorDataType::ACL_UINT16;
+    } else if (IsSameType<T, int32_t>::value) {
+        return Internal::DumpTensorDataType::ACL_INT32;
+    } else if (IsSameType<T, uint32_t>::value) {
+        return Internal::DumpTensorDataType::ACL_UINT32;
+    } else if (IsSameType<T, uint64_t>::value) {
+        return Internal::DumpTensorDataType::ACL_UINT64;
+    } else if (IsSameType<T, int64_t>::value) {
+        return Internal::DumpTensorDataType::ACL_INT64;
+    } else if (IsSameType<T, float>::value) {
+        return Internal::DumpTensorDataType::ACL_FLOAT;
+    } else if (IsSameType<T, half>::value) {
+        return Internal::DumpTensorDataType::ACL_FLOAT16;
+    } else if (IsSameType<T, bfloat16_t>::value) {
+        return Internal::DumpTensorDataType::ACL_BF16;
+    } else if (IsSameType<T, hifloat8_t>::value) {
+        return Internal::DumpTensorDataType::ACL_HIFLOAT8;
+    } else if (IsSameType<T, fp8_e5m2_t>::value) {
+        return Internal::DumpTensorDataType::ACL_FLOAT8_E5M2;
+    } else if (IsSameType<T, fp8_e4m3fn_t>::value) {
+        return Internal::DumpTensorDataType::ACL_FLOAT8_E4M3FN;
+    } else if (IsSameType<T, fp8_e8m0_t>::value) {
+        return Internal::DumpTensorDataType::ACL_FLOAT8_E8M0;
+    } else if (IsSameType<T, fp4x2_e2m1_t>::value) {
+        return Internal::DumpTensorDataType::ACL_FLOAT4_E2M1;
+    } else if (IsSameType<T, fp4x2_e1m2_t>::value) {
+        return Internal::DumpTensorDataType::ACL_FLOAT4_E1M2;
+    } else {
+        return Internal::DumpTensorDataType::ACL_MAX;
+    }
+}
+
+
+template <template<typename> class Tensor, typename T>
+__aicore__ inline void WriteRingBufTlvHead(const Tensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv,
+    const uint32_t& alignDumpDataLen, const uint32_t& desc, const uint32_t& dumpSize)
+{
+    Hardware position;
+    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
+        position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
+    } else if (IsSameType<Tensor<T>, GlobalTensor<T>>::value) {
+        position = Hardware::GM;
+    }
+    dumpTensorTlv->type = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
+    dumpTensorTlv->length = sizeof(DumpTensorTlvInfoHead) - sizeof(uint32_t[2]) + alignDumpDataLen;
+    dumpTensorTlv->tensorAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr()));
+    dumpTensorTlv->dataType = static_cast<uint32_t>(GetTensorDataType<T>());
+    dumpTensorTlv->desc = desc;
+    dumpTensorTlv->bufferId = static_cast<uint32_t>(0U);
+    dumpTensorTlv->position = static_cast<uint16_t>(position);
+    dumpTensorTlv->blockIdx = static_cast<uint16_t>(GetBlockIdxImpl());
+    dumpTensorTlv->dim = static_cast<uint32_t>(0U);
+    for (uint32_t i = 0; i < K_MAX_SHAPE_DIM; ++i) {
+        dumpTensorTlv->shape[i] = static_cast<uint32_t>(0U);
+    }
+    dumpTensorTlv->resv1 = static_cast<uint32_t>(0U);
+    dumpTensorTlv->dumpSize = dumpSize * sizeof(T);
+    bisheng::cce::dcci((__gm__ uint64_t*)dumpTensorTlv, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+}
+
+template <typename T>
+__aicore__ inline void SetDumpDataL0C2GM(__gm__ uint8_t* dst, const LocalTensor<T>& src, uint32_t dumpSize)
+{
+    if ASCEND_IS_NOT_AIC {
+        return;
+    }
+    // L0C to GM
+    uint16_t align = (dumpSize % DEFAULT_BLOCK_SIZE == 0) ? 0 : 1;
+    uint16_t countBlks = align + dumpSize / DEFAULT_BLOCK_SIZE;
+
+    uint16_t burstLen = static_cast<uint16_t>(SRC_BURST_LEN_SIZE_ELE * SRC_BURST_LEN_SIZE_ELE
+        * sizeof(float) / ONE_BLK_SIZE);
+    uint16_t n = countBlks * BLOCK_CUBE;
+    uint16_t m = (burstLen * ONE_BLK_SIZE / B32_BYTE_SIZE) / BLOCK_CUBE;
+    bisheng::cce::copy_matrix_cc_to_gm((__gm__ float *)(dst), (__cc__ float *)(src.GetPhyAddr()),
+        0, n, m, m * BLOCK_CUBE, m, 0,
+        0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant),
+        static_cast<uint8_t>(false), false, false,
+        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true,
+        false, false, false);
+}
+
+template <typename T>
+__aicore__ inline void WriteRingBufTlvData(const LocalTensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv,
+    const uint32_t& alignDumpDataLen, const uint32_t& dumpSize)
+{
+    __gm__ T* dumpDataAddr = reinterpret_cast<__gm__ T*>(dumpTensorTlv + 1);
+    DataCopyParams copyParams = {1, static_cast<uint16_t>(alignDumpDataLen / ONE_BLK_SIZE), 0, 0};
+
+    PipeBarrier<PIPE_ALL>();
+
+    if (dumpTensorTlv->position == static_cast<uint16_t>(Hardware::UB)) {
+        DataCopyUB2GMImpl(dumpDataAddr, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()), copyParams); // UB to GM
+    } else if (dumpTensorTlv->position == static_cast<uint16_t>(Hardware::L0C)) {
+        SetDumpDataL0C2GM(reinterpret_cast<__gm__ uint8_t*>(dumpDataAddr), src, dumpSize); // L0C to GM
+    }
+
+    PipeBarrier<PIPE_ALL>();
+
+    bisheng::cce::dcci((__gm__ uint64_t*)dumpDataAddr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+}
+
+template <typename T>
+__aicore__ inline void WriteRingBufTlvData(
+    const GlobalTensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv, const uint32_t& dumpSize)
+{
+    PipeBarrier<PIPE_ALL>();
+    __gm__ uint8_t* dst = reinterpret_cast<__gm__ uint8_t*>(dumpTensorTlv + 1);
+    MemCopyGm2Gm(dst, reinterpret_cast<__gm__ const uint8_t*>(src.GetPhyAddr()), dumpSize * sizeof(T));
+}
+
+template <template <typename> class Tensor, typename T>
+__aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize)
+{
+#ifdef ASCENDC_DUMP
+    EnablePrintf();
+    if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
+        ASCENDC_ASSERT((false),
+                   { KERNEL_LOG(KERNEL_ERROR, "dump tensor not support this data type"); });
+        return;
+    }
+
+    if (dumpSize == 0) {
+        return;
+    }
+
+    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
+        Hardware position = CheckDumpTensorPosition(src);
+        // set the head struct value
+        if (position == Hardware::MAX) {
+            ASCENDC_ASSERT((false),
+                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+            return;
+        } else if (position == Hardware::L0C) {
+            if ASCEND_IS_NOT_AIC {
+                return;
+            }
+        } else if (position == Hardware::L1) {
+            return; // L1 to GM dump not support
+        }
+    }
+
+    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
+    if (blockRingBufInfo == nullptr) {
+        return;
+    }
+    uint32_t alignDumpDataLen = AlignUp(dumpSize * sizeof(T), ONE_BLK_SIZE);
+    uint32_t tlvLen = sizeof(DumpTensorTlvInfoHead) + alignDumpDataLen;
+    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
+        return;
+    }
+
+    __gm__ DumpTensorTlvInfoHead* dumpTensorTlv =
+        reinterpret_cast<__gm__ DumpTensorTlvInfoHead*>(GetRingBufTlv(blockRingBufInfo));
+
+    WriteRingBufTlvHead(src, dumpTensorTlv, alignDumpDataLen, desc, dumpSize);
+    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
+        WriteRingBufTlvData(src, dumpTensorTlv, alignDumpDataLen, dumpSize);
+    } else if (IsSameType<Tensor<T>, GlobalTensor<T>>::value) {
+        WriteRingBufTlvData(src, dumpTensorTlv, dumpSize);
+    }
+
+    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
+
+    UpdateWriteInfo(writeInfo, tlvLen);
+#endif // ASCENDC_DUMP
+}
+
+__aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
+{
+    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
+    if (blockRingBufInfo == nullptr) {
+        return;
+    }
+    uint32_t tlvLen = sizeof(DumpShapeTlvInfo);
+    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
+        return;
+    }
+    __gm__ DumpShapeTlvInfo* shapeTlv =
+        reinterpret_cast<__gm__ DumpShapeTlvInfo*>(GetRingBufTlv(blockRingBufInfo));
+    shapeTlv->type = static_cast<uint32_t>(DumpType::DUMP_SHAPE);
+    shapeTlv->length = tlvLen - sizeof(uint32_t[2]);
+    shapeTlv->dim = shapeInfo.shapeDim;
+    for (uint32_t i = 0; i < K_MAX_SHAPE_DIM; ++i) {
+        shapeTlv->shape[i] = shapeInfo.shape[i];
+    }
+    shapeTlv->resv = static_cast<uint32_t>(0U);
+
+    bisheng::cce::dcci((__gm__ uint64_t*)shapeTlv, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+
+    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
+
+    UpdateWriteInfo(writeInfo, tlvLen);
+}
+
+__aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId)
+{
+#if defined(ASCENDC_TIME_STAMP_ON) && !defined(ASCENDC_CPU_DEBUG)
+    EnablePrintf();
+    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
+    if (blockRingBufInfo == nullptr) {
+        return;
+    }
+    uint32_t tlvLen = sizeof(TimeStampTlvInfo);
+    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
+        return;
+    }
+
+    __gm__ TimeStampTlvInfo* timeStampTlv =
+        reinterpret_cast<__gm__ TimeStampTlvInfo*>(GetRingBufTlv(blockRingBufInfo));
+    timeStampTlv->type = static_cast<uint32_t>(DumpType::DUMP_TIME_STAMP);
+    timeStampTlv->length = tlvLen - sizeof(uint32_t[2]);
+    timeStampTlv->descId = descId;
+    timeStampTlv->blockIdx = static_cast<uint16_t>(GetBlockIdxImpl());
+    timeStampTlv->resv = static_cast<uint16_t>(0U);
+    timeStampTlv->cycle = static_cast<uint64_t>(GetSystemCycle());
+    timeStampTlv->pc = static_cast<uint64_t>(get_pc());
+    timeStampTlv->entry = static_cast<uint64_t>(__get_entry_sys_cnt());
+    timeStampTlv->resvMem[0] = static_cast<uint32_t>(0U);
+    timeStampTlv->resvMem[1] = static_cast<uint32_t>(0U);
+
+    bisheng::cce::dcci((__gm__ uint64_t*)timeStampTlv, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+
+    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
+
+    UpdateWriteInfo(writeInfo, tlvLen);
+#endif // ASCENDC_TIME_STAMP_ON
+}
+
 }  // namespace AscendC
 #endif

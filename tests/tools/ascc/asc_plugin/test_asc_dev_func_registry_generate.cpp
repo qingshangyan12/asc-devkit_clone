@@ -32,22 +32,12 @@ TEST_F(TestAscDevFuncRegistryGenerate, asc_FunctionRegistryImpl)
     std::string res = AscPlugin::FunctionRegistryImpl();
     std::string expectRes = R"(#include <stdio.h>
 #include <cstdint>
-extern "C" {
-uint32_t AllocAscendMemDevice(void **devMem, uint64_t size);
-uint32_t FreeAscendMemDevice(void *devMem);
-}
-namespace Adx {
-void AdumpPrintWorkSpace(const void *workSpaceAddr, const size_t dumpWorkSpaceSize,
-    void *stream, const char *opType);
-} // namespace Adx
 namespace AscPluginGenerator {
 int32_t BindKernelRegisterFunc(void (*)(void*));
 uint32_t LaunchAndProfiling(const char *kernelName, uint32_t blockDim, void *stream, void **args, uint32_t size,
                             uint32_t ktype, const uint32_t ubufDynamicSize);
-uint32_t ascendc_set_exception_dump_info(uint32_t dumpSize);
 } // namespace AscPluginGenerator
 static const int32_t g_ascend_plugin_register = AscPluginGenerator::BindKernelRegisterFunc(nullptr);
-
 #define ASC_PLUGIN_LAUNCH_LOGE(kernelName, stream, blockDim, fmt, ...)                      \
     ::printf("[ERROR] [AscPlugin] Kernel: [%s] Stream: [%p] BlockDim: [%u] " fmt "\n",      \
         kernelName,                                                                         \
