@@ -78,9 +78,9 @@ struct PathInfo {
             cannPath + "/asc/include/utils"
         };
 
-        std::string expectedCannVersionHeader = cannPath + "/include/ascendc/asc_devkit_version.h";
+        std::string expectedCannVersionHeader = cannPath + "/include/version/asc_devkit_version.h";
         if (PathCheck(expectedCannVersionHeader.c_str(), false) != PathStatus::NOT_EXIST) {
-            cannVersionHeader = cannPath + "/include/ascendc/asc_devkit_version.h";
+            cannVersionHeader = cannPath + "/include/version/asc_devkit_version.h";
         }
         ascendClangIncludePath = cannPath + "/ccec_compiler/lib/clang/15.0.5/include";
         bishengPath = cannPath + "/ccec_compiler/bin/bisheng";

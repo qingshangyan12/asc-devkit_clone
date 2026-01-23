@@ -954,7 +954,7 @@ def _update_compile_option(kernel_name: str, compile_options: list, extend_optio
     if asc_path is None:
         asc_path = os.path.realpath(os.path.join(ascend_home_path, "compiler", "asc"))
     cann_version_file_path = os.path.join(asc_path, "..", "..",
-                                          "include", "ascendc", "asc_devkit_version.h")
+                                          "include", "version", "asc_devkit_version.h")
     compile_options.append("-I" + os.path.join(asc_path, "impl", "adv_api"))
     compile_options.append("-I" + os.path.join(asc_path, "impl", "basic_api"))
     compile_options.append("-I" + os.path.join(asc_path, "impl", "c_api"))

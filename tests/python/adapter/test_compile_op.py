@@ -3821,7 +3821,7 @@ Contents of section
         extend_options = {'opp_kernel_hidden_dat_path': os.path.join(TOP_PATH, 'tmp')}
         
         def custom_exists(path):
-            if path == '/usr/local/Ascend/cann/compiler/tikcpp/../../include/ascendc/asc_devkit_version.h':
+            if path == '/usr/local/Ascend/cann/compiler/tikcpp/../../include/version/asc_devkit_version.h':
                 return True
             else:
                 return mock.DEFAULT
