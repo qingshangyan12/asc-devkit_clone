@@ -7,122 +7,64 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── transformer_custom                        // 使用框架调用的方式调用Add算子
-│   ├── add_custom                            // AddCustom算子工程
-│   ├── ascend_custom_to_tensorflow_custom    // 通过tensorflow调用的方式调用AddCustom算子
-│   ├── AddCustom.json                        // AddCustom算子的原型定义json文件
-│   └── install.sh                            // 脚本，调用msOpGen生成自定义算子工程，并编译
+├── tensorflow_custom
+│   ├── CMakeLists.txt
+│   ├── custom_assign_add_custom.cc
+│   └── run_add_custom_tf.py
 ```
 
-## 算子描述
-Add算子实现了两个数据相加，返回相加结果的功能。对应的数学表达式为：
-```
-z = x + y
-```
-## 算子规格描述
-<table>
-<tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
-</tr>
-<tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">x</td><td align="center">8 * 2048</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td align="center">y</td><td align="center">8 * 2048</td><td align="center">float</td><td align="center">ND</td></tr>
-</tr>
-</tr>
-<tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">8 * 2048</td><td align="center">float</td><td align="center">ND</td></tr>
-</tr>
-<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
-</table>
+## 代码实现介绍
+完成算子工程创建后，会在算子工程目录下生成framework/tf_plugin目录，用于存放TensorFlow框架适配插件实现文件。
 
-## 算子工程介绍
-其中，算子工程目录AddCustom包含算子的实现文件，如下所示：
-```
-├── add_custom               // AddCustom自定义算子工程
-│   ├── framework           // 算子插件实现文件目录
-│   ├── op_host             // host侧实现文件
-│   └── op_kernel           // kernel侧实现文件
-```
-CANN软件包中提供了工程创建工具msOpGen，AddCustom算子工程可通过AddCustom.json自动创建，自定义算子工程具体请参考[Ascend C算子开发](https://hiascend.com/document/redirect/CannCommunityOpdevAscendC)>工程化算子开发>创建算子工程 章节。
+本样例以自定义算子AddCustom为例，将该算子映射到TensorFlow自定义算子AddCustom上，核心流程如下：
+1. 通过 `tf.load_op_library` 加载 自定义算子库文件，获取自定义算子接口 `add_custom`。
+2. 构造输入数据，使用 `tf.compat.v1.placeholder` 定义输入张量，分别计算 `tf.math.add` 与 `add_custom` 的结果。
+3. 配置 `ConfigProto`，启用 `NpuOptimizer`，并关闭重映射与内存优化，确保算子按预期执行。
+4. 调用`np.allclose`对比标准TensorFlow加法算子和自定义算子的结果，验证计算正确性。
 
-创建完自定义算子工程后，开发者重点需要完成算子host和kernel文件的功能开发。为简化样例运行流程，本样例已在AddCustom目录中准备好了必要的算子实现，install.sh脚本会创建一个CustomOp目录，并将算子实现文件复制到对应目录下，再编译算子。
+## 编译运行
+  在本样例根目录下执行如下步骤，编译并执行算子。
+  - 编译、打包和部署自定义算子工程
+  
+    运行此样例前，请参考[自定义算子工程样例](../custom_op/README.md)完成前期准备。
 
-备注：CustomOp目录为生成目录，每次执行install.sh脚本都会删除该目录并重新生成，切勿在该目录下编码算子，会存在丢失风险。
-
-## 编译运行样例算子
-针对自定义算子工程，编译运行包含如下步骤：
-- 调用msOpGen工具生成自定义算子工程；
-- 完成算子host和kernel实现；
-- 编译自定义算子工程生成自定义算子包；
-- 安装自定义算子包到自定义算子库中；
-- 调用执行自定义算子；
-
-详细操作如下所示。
-### 1. 获取源码包
-编译运行此样例前，请参考[准备：获取样例代码](../README.md#codeready)获取源码包。
-
-### 2. 生成自定义算子工程，复制host和kernel实现并编译算子<a name="operatorcompile"></a>
-  - 切换到msOpGen脚本install.sh所在目录
-    ```bash
-    # 若开发者以git命令行方式clone了master分支代码，并切换目录
-    cd ${git_clone_path}/examples/02_features/00_framework_launch/transformer_custom
+    需注意插件代码适配，路径为： `examples/02_features/00_framework_launch/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddCustom"，如下所示：
+    ```cc
+    REGISTER_CUSTOM_OP("AddCustom")
+      .FrameworkType(TENSORFLOW)      // type: CAFFE, TENSORFLOW
+      .OriginOpType("AddCustom")      // name in tf module
+      .ParseParamsByOperatorFn(AutoMappingByOpFn);
     ```
-
-  - 调用脚本，生成自定义算子工程，复制host和kernel实现并编译算子
-    - 方式一：配置环境变量运行脚本
-      请根据当前环境上CANN开发套件包的[安装方式](https://hiascend.com/document/redirect/CannCommunityInstSoftware)，选择对应配置环境变量命令。
-      - 默认路径，root用户安装CANN软件包
-        ```bash
-        export ASCEND_INSTALL_PATH=/usr/local/Ascend/ascend-toolkit/latest
-        ```
-
-      - 默认路径，非root用户安装CANN软件包
-        ```bash
-        export ASCEND_INSTALL_PATH=$HOME/Ascend/ascend-toolkit/latest
-        ```
-
-      - 指定路径install_path，安装CANN软件包
-        ```bash
-        export ASCEND_INSTALL_PATH=${install_path}/ascend-toolkit/latest
-        ```
-        
-        运行install.sh脚本
-        ```bash
-        bash install.sh -v [SOC_VERSION]
-        ```
-    - 方式二：指定命令行安装路径来运行脚本
+  
+  - 安装TensorFlow插件包
+  
+    请参考[《TensorFlow 2.6.5模型迁移》](https://www.hiascend.com/document/redirect/canncommercial-tfmigr26)中的“安装框架插件包”章节，获取详细的安装指南和步骤。
+  
+  - 配置环境变量
+  
+    请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+    - 默认路径，root用户安装CANN软件包
       ```bash
-      bash install.sh -v [SOC_VERSION] -i [ASCEND_INSTALL_PATH]
+      source /usr/local/Ascend/cann/set_env.sh
       ```
-    参数说明：
-    - SOC_VERSION：昇腾AI处理器型号，如果无法确定具体的[SOC_VERSION]，则在安装昇腾AI处理器的服务器执行npu-smi info命令进行查询，在查询到的“Name”前增加Ascend信息，例如“Name”对应取值为xxxyy，实际配置的[SOC_VERSION]值为Ascendxxxyy。支持以下产品型号：
-        - Atlas 训练系列产品
-        - Atlas 推理系列产品AI Core
-        - Atlas A2训练系列产品/Atlas 800I A2推理产品
-        - Atlas 200/500 A2推理产品
-    - ASCEND_INSTALL_PATH：CANN软件包安装路径
+  
+    - 默认路径，非root用户安装CANN软件包
+      ```bash
+      source $HOME/Ascend/cann/set_env.sh
+      ```
+  
+    - 指定路径install_path，安装CANN软件包
+      ```bash
+      source ${install_path}/cann/set_env.sh
+      ```
 
-    脚本运行成功后，会在当前目录下创建CustomOp目录，编译完成后，会在CustomOp/build_out中，生成自定义算子安装包custom_opp_\<target os>_\<target architecture>.run，例如“custom_opp_ubuntu_x86_64.run”。
-
-    备注：如果要使用dump调试功能，需要移除op_host内的Atlas 训练系列产品、Atlas 200/500 A2 推理产品的配置项。
-
-### 3. 部署自定义算子包
-- 部署自定义算子包前，请确保存在自定义算子包默认部署路径环境变量ASCEND_OPP_PATH
+  - 样例执行
     ```bash
-    echo $ASCEND_OPP_PATH
-    # 输出示例 /usr/local/Ascend/ascend-toolkit/latest/opp
-
-    # 若没有，则需导出CANN环境变量
-    source [ASCEND_INSTALL_PATH]/bin/setenv.bash
-    # 例如 source /usr/local/Ascend/ascend-toolkit/latest/bin/setenv.bash
+    mkdir -p build; cd build
+    cmake .. && make -j
+    python3 ../run_add_custom_tf.py
     ```
-    参数说明：
-    - ASCEND_INSTALL_PATH：CANN软件包安装路径，一般和上一步中指定的路径保持一致
-
-- 在自定义算子安装包所在路径下，执行如下命令安装自定义算子包
-    ```bash
-    cd CustomOp/build_out
-    ./custom_opp_<target os>_<target architecture>.run
+    执行结果如下，说明执行成功。
+    ```log
+    test pass
     ```
-  命令执行成功后，自定义算子包中的相关文件将部署至opp算子库环境变量ASCEND_OPP_PATH指向的的vendors/customize目录中。
-
-### 4. 调用执行算子工程
-- [tensorflow调用AddCustom算子工程](./ascend_custom_to_tensorflow_custom)

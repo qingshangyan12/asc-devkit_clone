@@ -1,29 +1,32 @@
-#!/usr/bin/python3
-# coding=utf-8
-
-# This program is free software, you can redistribute it and/or modify it.
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2025 Huawei Technologies Co., Ltd.
-# This file is a part of the CANN Open Software.
-# Licensed under CANN Open Software License Agreement Version 2.0 (the "License").
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
 
 import os
 import tensorflow as tf
 import numpy as np
-from npu_bridge.npu_init import *
-tf.enable_resource_variables()
+import npu_device
+from npu_device.compat.v1.npu_init import *
+npu_device.compat.enable_v1()
+tf.compat.v1.enable_resource_variables()
 
-#np.allclose比较函数的相对公差参数
-atol = 0.001
-#np.allclose比较函数的绝对公差参数
-rtol = 0.001
+
+ATOL = 0.001
+RTOL = 0.001
+
 
 def main(unused_argv):
-    custom_op_lib = tf.load_op_library(os.path.join("./outputs/libcustom_ops.so")) # 加载自定义算子库
-    # 定义输入数据
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    custom_op_lib = tf.load_op_library(os.path.join(base_dir, "outputs", "libcustom_ops.so"))
+    
     shape_params = (8, 2048)
     dtype_params = np.float16
 
@@ -34,31 +37,30 @@ def main(unused_argv):
     y = tf.compat.v1.placeholder(dtype_params, shape=shape_params)
 
     tf_z = tf.math.add(x, y)
-    ac_z = custom_op_lib.add_custom(x, y)    # 调用Ascend C AddCustom自定义算子
+    ac_z = custom_op_lib.add_custom(x, y)
 
-    config = tf.ConfigProto()
+    config = tf.compat.v1.ConfigProto()
     custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
     custom_op.name = "NpuOptimizer"
     config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
     config.graph_options.rewrite_options.memory_optimization = RewriterConfig.OFF
 
-    with tf.Session(config=config) as sess:
+    with tf.compat.v1.Session(config=config) as sess:
         sess.run(tf.global_variables_initializer())
         tf_golden = sess.run(tf_z, feed_dict={x: x_data, y: y_data})
 
-    with tf.Session(config=config) as sess:
+    with tf.compat.v1.Session(config=config) as sess:
         sess.run(tf.global_variables_initializer())
         ac_golden = sess.run(ac_z, feed_dict={x: x_data, y: y_data})
 
-    # 通过np.allclose函数比较TensorFlow和Ascend C的输出是否一致
     np.array(tf_golden).astype(dtype_params)
     np.array(ac_golden).astype(dtype_params)
 
-    cmp_result = np.allclose(tf_golden, ac_golden, atol=atol, rtol=rtol)
+    cmp_result = np.allclose(tf_golden, ac_golden, ATOL, RTOL)
     if cmp_result:
-        print("The result of tf and ac is the same.")
+        print("test pass")
     else:
-        print("The result of tf and ac is different.")
+        print("test failed")
 
 
 if __name__ == '__main__':

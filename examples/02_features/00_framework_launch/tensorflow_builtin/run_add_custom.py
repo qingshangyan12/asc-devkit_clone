@@ -23,8 +23,8 @@ import numpy as np
 tf.compat.v1.disable_v2_behavior()
 tf.compat.v1.flags.DEFINE_string("local_log_dir", "output/train_logs.txt", "Log file path")
 FLAGS = tf.compat.v1.flags.FLAGS
-atol = 0.001
-rtol = 0.001
+ATOL = 0.001
+RTOL = 0.001
 
 
 def config(excute_type):
@@ -61,10 +61,11 @@ def main(unused_argv):
     np.array(result_ai_core).astype(dtype_params)
     np.array(result_cpu).astype(dtype_params)
 
-    print('====================================')
-    cmp_result = np.allclose(result_ai_core, result_cpu, atol, rtol)
-    print(cmp_result)
-    print('====================================')
+    cmp_result = np.allclose(result_ai_core, result_cpu, ATOL, RTOL)
+    if cmp_result:
+        print("test pass")
+    else:
+        print("test failed")
 
 
 if __name__ == "__main__":

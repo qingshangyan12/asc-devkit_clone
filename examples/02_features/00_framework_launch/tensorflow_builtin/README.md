@@ -7,11 +7,13 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── transformer_builtin
+├── tensorflow_builtin
 │   └── run_add_custom.py
 ```
 ## 代码实现介绍
-本样例中通过TensorFlow NPU插件执行单算子模型，核心流程如下：
+完成算子工程创建后，会在算子工程目录下生成framework/tf_plugin目录，用于存放TensorFlow框架适配插件实现文件。
+
+本样例以自定义算子AddCustom为例，将该算子映射到TensorFlow内置算子Add上，核心流程如下：
 1. 使用`np.random.uniform`生成随机输入数据，并通过`tf.compat.v1.placeholder`定义输入节点。
 2. 构建计算图：使用`tf.math.add`实现张量加法运算。
 3. 分别创建CPU和NPU会话，通过`session.run`执行计算图并传入输入数据。
@@ -22,6 +24,15 @@
 - 编译、打包和部署自定义算子工程
 
   运行此样例前，请参考[自定义算子工程样例](../custom_op/README.md)完成前期准备。
+
+  需注意插件代码适配，路径为： `examples/02_features/00_framework_launch/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，
+  需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddV2"，如下所示：
+  ```cc
+  REGISTER_CUSTOM_OP("AddCustom")
+    .FrameworkType(TENSORFLOW)      // type: TENSORFLOW
+    .OriginOpType("AddV2")      // name in tf module
+    .ParseParamsByOperatorFn(AutoMappingByOpFn);
+  ```
 
 - 安装TensorFlow插件包
 
@@ -50,7 +61,5 @@
   ```
   执行结果如下，说明执行成功。
   ```log
-  ====================================
-  True
-  ====================================
+  test pass
   ```
