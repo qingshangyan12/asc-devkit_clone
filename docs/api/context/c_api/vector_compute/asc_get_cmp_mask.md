@@ -38,7 +38,7 @@ PIPE_V
 ## 调用示例
 
 ```
-__ubuf__ void* dst = asc_get_phy_buf_addr(0);
+__ubuf__ int8_t dst[total_length];
 ...     // 进行Compare操作
 asc_get_cmp_mask(dst);
 ```
