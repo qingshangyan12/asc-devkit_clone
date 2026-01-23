@@ -1,13 +1,15 @@
 /**
- * @file add_custom.cpp
- *
- * Copyright (C) 2025-2025. Huawei Technologies Co., Ltd. All rights reserved.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
 #include "kernel_operator.h"
+#include "add_custom_tiling.h"
 constexpr int32_t BUFFER_NUM = 2; // tensor num for each queue
 
 class KernelAdd {
@@ -15,6 +17,7 @@ public:
     __aicore__ inline KernelAdd() {}
     __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength, uint32_t tileNum)
     {
+        ascendc_assert(tileNum != 0, "tileNum can not be zero.\n");
         this->blockLength = totalLength / AscendC::GetBlockNum();
         this->tileNum = tileNum;
         this->tileLength = this->blockLength / tileNum / BUFFER_NUM;
@@ -77,17 +80,9 @@ private:
 
 extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
 {
-    GET_TILING_DATA(tiling_data, tiling);
+    REGISTER_TILING_DEFAULT(AddCustomTilingData);
+    GET_TILING_DATA(tilingData, tiling);
     KernelAdd op;
-    op.Init(x, y, z, tiling_data.totalLength, tiling_data.tileNum);
+    op.Init(x, y, z, tilingData.totalLength, tilingData.tileNum);
     op.Process();
 }
-
-#ifndef ASCENDC_CPU_DEBUG
-// call of kernel function
-void add_custom_do(uint32_t blockDim, void *l2ctrl, void *stream, uint8_t *x, uint8_t *y, uint8_t *z,
-                   uint8_t *workspace, uint8_t *tiling)
-{
-    add_custom<<<blockDim, l2ctrl, stream>>>(x, y, z, workspace, tiling);
-}
-#endif
