@@ -9,7 +9,7 @@
 */
 
 #include "kernel_operator.h"
-#include "add_custom_tiling_sink_tiling.h"
+#include "add_custom_tiling_sink_tiling_struct.h"
 #include "lib/matmul_intf.h"
 namespace AscendC {
 constexpr int32_t BUFFER_NUM = 2; // tensor num for each queue

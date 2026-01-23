@@ -8,7 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#include "../../op_kernel/add_custom_tiling_sink/add_custom_tiling_sink_tiling.h"
+#include "../../op_kernel/add_custom_tiling_sink/add_custom_tiling_sink_tiling_struct.h"
+#include "add_custom_tiling_sink_tiling.h"
 #include "register/device_op_impl_registry.h"	 
 #include "tiling/platform/platform_ascendc.h"
 

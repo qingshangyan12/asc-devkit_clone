@@ -9,10 +9,7 @@
 */
 
 #include "register/op_def_registry.h"
-
-namespace optiling {
-    extern ge::graphStatus AddCustomSinkTilingFunc(gert::TilingContext* context);
-} // namespace optiling
+#include "add_custom_tiling_sink_tiling.h"
 
 namespace ge {
 static graphStatus InferShape(gert::InferShapeContext *context)

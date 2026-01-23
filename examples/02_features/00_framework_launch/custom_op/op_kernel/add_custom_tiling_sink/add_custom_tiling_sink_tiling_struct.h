@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef ADD_CUSTOM_TILING_SINK_TILING_H
-#define ADD_CUSTOM_TILING_SINK_TILING_H
+#ifndef ADD_CUSTOM_TILING_SINK_TILING_STRUCT_H
+#define ADD_CUSTOM_TILING_SINK_TILING_STRUCT_H
 #include <cstdint>
 
 struct TilingSinkTilingData {
@@ -17,4 +17,4 @@ struct TilingSinkTilingData {
     uint32_t tileNum;
 };
 
-#endif // ADD_CUSTOM_TILING_SINK_TILING_H
+#endif // ADD_CUSTOM_TILING_SINK_TILING_STRUCT_H
