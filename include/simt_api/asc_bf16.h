@@ -16,6 +16,8 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_BF16_H__
 #endif
 
+#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+
 #include "simt_api/asc_fp16.h"
 #include "simt_api/device_types.h"
 
@@ -266,7 +268,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_min(bfloat16x2_t *
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_cas(bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val);
 #endif
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t make_bfloat162(bfloat16_t x, bfloat16_t y);
+
 #include "impl/simt_api/asc_bf16_impl.h"
+
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_BF16_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

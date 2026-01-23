@@ -17,6 +17,8 @@
 #endif
 #include "simt_api/device_types.h"
 
+#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_all(int32_t predicate);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_any(int32_t predicate);
@@ -84,6 +86,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_reduce_min(uint32_t val);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asc_reduce_min(float val);
 
 #include "impl/simt_api/device_warp_functions_impl.h"
+
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_WARP_FUNCTIONS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

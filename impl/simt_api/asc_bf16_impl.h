@@ -21,6 +21,8 @@
 #warning "asc_bf16_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "asc_bf16.h" and use public functions or variables defined in interface header files."
 #endif
 
+#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hisnan(bfloat16_t x)
 {
     return __isnan(x);
@@ -767,6 +769,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_cas(bfloat16x2_t *
 {
     return bisheng::cce::simt::atomicCAS(address, compare, val);
 }
+#endif
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t make_bfloat162(bfloat16_t x, bfloat16_t y)
+{
+    bfloat16x2_t tmp;
+    tmp.x = x;
+    tmp.y = y;
+    return tmp;
+}
+
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_BF16_IMPL__)

@@ -18,6 +18,8 @@
 
 #include "simt_api/device_types.h"
 
+#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_atomic_add(__ubuf__ int32_t *address, int32_t val);
 
@@ -259,6 +261,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_atomic_xor(uint64_t *address,
 #endif
 
 #include "impl/simt_api/device_atomic_functions_impl.h"
+
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_ATOMIC_FUNCTIONS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
