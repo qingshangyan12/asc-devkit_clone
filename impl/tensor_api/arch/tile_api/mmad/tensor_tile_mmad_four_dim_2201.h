@@ -32,52 +32,51 @@ private:
     template<typename T>
     __aicore__ inline constexpr void CheckZZTemplate()
     {
-        using type = typename T::elementType;
+        using dataType = typename T::elementType;
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "MmadFourDim2201 Layout->Shape->Column->ZeroDim is not Std::Int<C0Size/Type> type!");
+        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<C0_SIZE / sizeof(dataType)>>,
+            "Fm Layout->Shape->Column->ZeroDim is not Std::Int<C0Size/Type> type!");
         static_assert(Std::is_same_v<ShapeRow0, Std::Int<FRACTAL_FIXED>>,
-            "MmadFourDim2201 Layout->Shape->Row->ZeroDim is not Std::Int<16> type!"); 
+            "Fm Layout->Shape->Row->ZeroDim is not Std::Int<16> type!"); 
 
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
         static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>,
-            "MmadFourDim2201 Layout->Stride->Column-ZeroDim is not Std::Int<1> type!");
-        static_assert(Std::is_same_v<StrideRow0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "MmadFourDim2201 Layout->Stride->Row->ZeroDim is not Std::Int<C0Size/Type> type!");
+            "Fm Layout->Stride->Column-ZeroDim is not Std::Int<1> type!");
+        static_assert(Std::is_same_v<StrideRow0, Std::Int<C0_SIZE / sizeof(dataType)>>,
+            "Fm Layout->Stride->Row->ZeroDim is not Std::Int<C0Size/Type> type!");
     }
     template<typename T>
     __aicore__ inline constexpr void CheckZNTemplate()
     {
-        using type = typename T::elementType;
+        using dataType = typename T::elementType;
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
         static_assert(Std::is_same_v<ShapeColumn0, Std::Int<FRACTAL_FIXED>>,
-            "MmadFourDim2201 Layout->Shape->Column->ZeroDim is not Std::Int<16> type!");
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "MmadFourDim2201 Layout->Shape->Row->ZeroDim is not Std::Int<C0Size/Type> type!"); 
+            "Filter Layout->Shape->Column->ZeroDim is not Std::Int<16> type!");
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<C0_SIZE / sizeof(dataType)>>,
+            "Filter Layout->Shape->Row->ZeroDim is not Std::Int<C0Size/Type> type!"); 
 
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "MmadFourDim2201 Layout->Stride->Column-ZeroDim is not Std::Int<C0Size/Type> type!");
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_SIZE / sizeof(dataType)>>,
+            "Filter Layout->Stride->Column-ZeroDim is not Std::Int<C0Size/Type> type!");
         static_assert(Std::is_same_v<StrideRow0, Std::Int<1>>,
-            "MmadFourDim2201 Layout->Stride->Row->ZeroDim is not Std::Int<1> type!");
+            "Filter Layout->Stride->Row->ZeroDim is not Std::Int<1> type!");
     }
     template <typename T>
     __aicore__ inline constexpr void CheckL0CNZTemplate()
     {
-        using type = typename T::elementType;
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<FRACTAL_FIXED>>, "Mmad Layout->Shape->Row->ZeroDim, is not Std::Int<16> type!");
-        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<FRACTAL_FIXED>>, "Mmad Layout->Shape->Column->ZeroDim, is not Std::Int<16> type!");
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<FRACTAL_FIXED>>, "Dst Layout->Shape->Row->ZeroDim, is not Std::Int<16> type!");
+        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<FRACTAL_FIXED>>, "Dst Layout->Shape->Column->ZeroDim, is not Std::Int<16> type!");
 
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<StrideRow0, Std::Int<FRACTAL_FIXED>>, "Mmad Layout->Stride->Row->ZeroDim, is not Std::Int<16> type!");
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>, "Mmad Layout->Stride->Column->ZeroDim, is not Std::Int<1> type!");
+        static_assert(Std::is_same_v<StrideRow0, Std::Int<FRACTAL_FIXED>>, "Dst Layout->Stride->Row->ZeroDim, is not Std::Int<16> type!");
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>, "Dst Layout->Stride->Column->ZeroDim, is not Std::Int<1> type!");
     }
 
     template <typename T, typename U, typename S, const MmadTrait& trait>
@@ -89,11 +88,11 @@ private:
         CheckL0CNZTemplate<T>();
         CheckZZTemplate<U>();
         CheckZNTemplate<S>();
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
         static_assert(Std::is_one_of_v<Std::tuple<dstDataType, fmDataType, filterDataType>,
-            Std::tuple<__cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, Std::tuple<__cc__ half, __ca__ half, __cb__ half>, 
-            Std::tuple<__cc__ float, __ca__ half, __cb__ half>, Std::tuple<__cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, 
-            Std::tuple<__cc__ float, __ca__ float, __cb__ float>>, "The data type is not supported.");
+            Std::tuple<__cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, Std::tuple<__cc__ float, __ca__ half, __cb__ half>, 
+            Std::tuple<__cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, Std::tuple<__cc__ float, __ca__ float, __cb__ float>>, 
+            "The data type is not supported.");
 #endif
     }
 
@@ -121,17 +120,16 @@ public:
     __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& tupleParams, Std::index_sequence<Is...>)
     {
         // MTE2
-        MmadImpl(dst.Engine().Begin().Get(), fm.Engine().Begin().Get(), 
-            filter.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
+        MmadImpl(dst.Engine().Begin().Get(), fm.Engine().Begin().Get(), filter.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
     }
 private:
     template <typename T, typename U, typename S>
-    __aicore__ inline void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t n, uint16_t k,
+    __aicore__ inline void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t k, uint16_t n,
         int8_t unitFlag, bool kDirectionAlign, bool cmatrixSource, bool cmatrixInitVal) {
         if ASCEND_IS_AIV {
             return;
         }
-        if constexpr (__NPU_ARCH__ == ArchVersion::V2201) {
+        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V2201) {
             mad(dst, fm, filter, m, k, n, unitFlag, kDirectionAlign, cmatrixSource, cmatrixInitVal);
         }
     }

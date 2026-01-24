@@ -9,6 +9,9 @@
 */
 #ifndef __TESTS_TENSOR_API_STUB__
 #define __TESTS_TENSOR_API_STUB__
+#ifndef __biasbuf__
+#define __biasbuf__
+#endif
 #include <cstdint>
 #include "stub_fun.h"
 

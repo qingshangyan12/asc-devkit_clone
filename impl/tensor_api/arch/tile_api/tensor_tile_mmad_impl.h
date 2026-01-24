@@ -24,7 +24,7 @@ struct MmadTrait {
     int8_t unitFlag = 0;
     bool kDirectionAlign = false;
     bool cmatrixSource = false;
-    bool cmatrixInitVal = false;
+    bool cmatrixInitVal = true;
 };
 constexpr MmadTrait DEFAULT_MMAD_TRAIT; 
 }
@@ -45,5 +45,17 @@ Mmad(const T& dst, const U& fm, const S& filter)
    Tensor2Tensor{}.template Run<T, U, S, trait>(dst, fm, filter);
 }
 
+template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V>
+__aicore__ inline typename Std::enable_if<VerifyingMmadWithBiasTemplate<T, U, S, V>, void>::type 
+Mmad(const T& dst, const U& fm, const S& filter, const V& bias)
+{
+   constexpr Hardware dstPos = TileInternal::GetHardPos<T>();
+   constexpr Hardware fmPos = TileInternal::GetHardPos<U>();
+   constexpr Hardware filterPos = TileInternal::GetHardPos<S>();
+   constexpr Hardware biasPos = TileInternal::GetHardPos<V>();
+   using Tensor2Tensor = typename TileInternal::MmadWithBiasTensor2Tensor<dstPos, fmPos, filterPos, biasPos, 
+      TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
+   Tensor2Tensor{}.template Run<T, U, S, V, trait>(dst, fm, filter, bias);
+}
 } // namespace AscendC
 #endif // IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_MMAD_IMPL_H

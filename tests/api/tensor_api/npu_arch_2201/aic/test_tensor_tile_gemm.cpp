@@ -123,7 +123,6 @@ public:
         );
 
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(fbTensor, a1Tensor, coord);
-        DataCopy<DEFAULT_DATA_COPY_TRAIT>(fbTensor, fbTensor);
     }
 
     __aicore__ inline void CopyA1ToBT()
@@ -160,7 +159,6 @@ public:
         );
 
         LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0aTensor, a1Tensor, coord);
-        LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0aTensor, l0aTensor);
     }
 
     __aicore__ inline void Load2DA1ToL0B()
@@ -181,6 +179,27 @@ public:
         LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0bTensor, b1Tensor, coord);
     }
         
+    __aicore__ inline void ComputeBt()
+    {
+        auto l0aIterator = MakeL0AmemPtr(l0aAddr);
+        auto l0aMatrixLayout = MakeZZLayout<SrcT>(mLength, kLength);
+        auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
+
+        auto l0bIterator = MakeL0BmemPtr(l0bAddr);
+        auto l0bMatrixLayout = MakeZNLayout<Src1T>(kLength, nLength);
+        auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
+
+        auto l0cIterator = MakeL0CmemPtr(l0cAddr);
+        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
+
+        auto biasIterator = MakeL0CmemPtr(btAddr);
+        auto biasMatrixLayout = MakeRowMajorLayout<BiasT>(1, nLength);
+        auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout); 
+
+        Mmad(l0cTensor, l0aTensor, l0bTensor, biasTensor);
+    }
+        
     __aicore__ inline void Compute()
     {
         auto l0aIterator = MakeL0AmemPtr(l0aAddr);
@@ -195,7 +214,6 @@ public:
         auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
         Mmad(l0cTensor, l0aTensor, l0bTensor);
-        Mmad(l0aTensor, l0aTensor, l0bTensor);
     }
 
     __aicore__ inline void CopyL0CToGm()
@@ -218,7 +236,11 @@ public:
         CopyA1ToBT();
         Load2DA1ToL0A();
         Load2DA1ToL0B();
-        Compute();
+        if constexpr (HAS_BIAS) {
+            ComputeBt();
+        } else {
+            Compute();
+        }
         CopyL0CToGm();
     }
 
@@ -301,6 +323,20 @@ __aicore__ inline void E2eKernel(GM_ADDR aGM, GM_ADDR bGM, GM_ADDR cGM, GM_ADDR 
             EXPECT_EQ(cGM[i], 0x00); \
         } \
     }
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, ND, ND, DN, ND, bfloat16_t, bfloat16_t, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, ND, ND, ND, ND, bfloat16_t, bfloat16_t, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, NZ, NZ, NZ, ND, bfloat16_t, bfloat16_t, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, ND, ND, DN, ND, half, half, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, ND, ND, ND, ND, half, half, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, NZ, NZ, NZ, ND, half, half, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, ND, ND, ND, ND, float, float, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, ND, ND, DN, ND, float, float, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 32, 32, ND, ND, ND, ND, int8_t, int8_t, int32_t, int32_t, 0) // LOAD L1 TO L0B 3Dv2 not support
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 128, 64, 128, ND, ND, ND, ND, half, half, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 32, ND, ND, ND, ND, half, half, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 128, 64, 128, ND, ND, ND, ND, float, float, float, float, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 128, 128, 128, ND, ND, ND, ND, int8_t, int8_t, int32_t, int32_t, 0)
+KERNEL_TENSOR_TILE_GEMM_E2E(1, 32, 64, 64, ND, ND, ND, ND, int8_t, int8_t, int32_t, int32_t, 0)
 
 KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, ND, ND, DN, ND, bfloat16_t, bfloat16_t, float, float, 1)
 KERNEL_TENSOR_TILE_GEMM_E2E(1, 16, 16, 16, ND, ND, ND, ND, bfloat16_t, bfloat16_t, float, float, 1)
