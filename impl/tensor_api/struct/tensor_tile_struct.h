@@ -18,5 +18,7 @@
 #include "impl/tensor_api/struct/constructor/tensor_tile_make_layout.h"
 #include "impl/tensor_api/struct/constructor/tensor_tile_make_ptr.h"
 #include "impl/tensor_api/struct/constructor/tensor_tile_make_tensor.h"
+#include "impl/tensor_api/struct/constructor/tensor_tile_make_tuple.h"
+#include "impl/tensor_api/struct/constructor/tensor_tile_make_coord.h"
 
 #endif //IMPL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H

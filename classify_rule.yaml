@@ -113,6 +113,7 @@ asc-devkit:
       - impl/tensor_api/utils/tensor_tile_macro.h
       - impl/tensor_api/utils/tensor_tile_extra.h
       - impl/tensor_api/struct/definition/tensor_tile_hw_ptr.h
+      - impl/tensor_api/struct/definition/tensor_tile_StaticLayoutSize.h
       - impl/micro_api/dav_c310/kernel_micro_datatype_impl.h
       - impl/micro_api/dav_m510/kernel_micro_datatype_impl.h
       - impl/adv_api/detail/matmul/stage/split/load_to_l0_utils.h

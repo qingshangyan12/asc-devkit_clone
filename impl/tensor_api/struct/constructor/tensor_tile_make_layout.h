@@ -63,11 +63,122 @@ __aicore__ inline constexpr Stride<Ts...> MakeStrideImpl(const Ts&... t)
     return {t...};
 }
 
+template <typename... Ts>
+__aicore__ inline constexpr Tile<Ts...> MakeTileImpl(const Ts&... t)
+{
+    return {t...};
+}
+
+template <typename... Ts>
+__aicore__ inline constexpr Coord<Ts...> MakeCoordImpl(const Ts&... t)
+{
+    return {t...};
+}
+
 template <typename T, typename U>
 __aicore__ inline constexpr auto MakeLayoutImpl(const T& shape, const U& stride)
 {
     static_assert(Std::is_tuple_v<T> && Std::is_tuple_v<U>, "Shape or Stride is not tuple!");
     return Layout<T, U>(shape, stride);
+}
+
+template <typename Shape>
+__aicore__ inline constexpr auto MakeLayoutImpl(const Shape& shape)
+{
+    static_assert(Std::is_tuple_v<Shape>, "Shape  is not tuple!");
+    return MakeLayoutImpl(shape, CompactMajor<LayoutLeft>(shape));
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto RankImpl(const Layout<Shape, Stride>& layout)
+{
+    return layout.template Rank<Is...>();
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto GetShapeImpl(Layout<Shape, Stride>& layout)
+{
+    static_assert(
+        Std::is_same_v<Layout<Shape, Stride>, Std::remove_cvref_t<decltype(layout)>>,
+        "GetShape() called with a  layout of wrong type!"
+    );
+    return layout.template GetShape<Is...>();
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto GetShapeImpl(const Layout<Shape, Stride>& layout)
+{
+    static_assert(
+        Std::is_same_v<Layout<Shape, Stride>, Std::remove_cvref_t<decltype(layout)>>,
+        "GetShape() called with a  layout of wrong type!"
+    );
+    return layout.template GetShape<Is...>();
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto GetStrideImpl(Layout<Shape, Stride>& layout)
+{
+    static_assert(
+        Std::is_same_v<Layout<Shape, Stride>, Std::remove_cvref_t<decltype(layout)>>,
+        "GetStride() called with a  layout of wrong type!"
+    );
+    return layout.template GetStride<Is...>();
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto GetStrideImpl(const Layout<Shape, Stride>& layout)
+{
+    static_assert(
+        Std::is_same_v<Layout<Shape, Stride>, Std::remove_cvref_t<decltype(layout)>>,
+        "GetStride() called with a  layout of wrong type!"
+    );
+    return layout.template GetStride<Is...>();
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto SelectImpl(const Layout<Shape, Stride>& layout)
+{
+    static_assert(
+        Std::is_same_v<Layout<Shape, Stride>, Std::remove_cvref_t<decltype(layout)>>,
+        "Select() called with a  layout of wrong type!"
+    );
+    return MakeLayoutImpl(SelectTuple<Is...>(layout.GetShape()),
+                            SelectTuple<Is...>(layout.GetStride()));
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto ShapeSizeImpl(const Layout<Shape, Stride>& layout)
+{
+    static_assert(
+        Std::is_same_v<Layout<Shape, Stride>, Std::remove_cvref_t<decltype(layout)>>,
+        "Size() called with a  layout of wrong type!"
+    );
+    return layout.template ShapeSize<Is...>();
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto CapicityImpl(const Layout<Shape, Stride>& layout)
+{
+    static_assert(
+        Std::is_same_v<Layout<Shape, Stride>, Std::remove_cvref_t<decltype(layout)>>,
+        "Capicity() called with a  layout of wrong type!"
+    );
+    return layout.template GetSize<Is...>();
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto CoshapeImpl(const Layout<Shape, Stride>& layout)
+{
+    auto m1Shapes = TransformLeaf(GetShapeImpl<Is...>(layout), [](auto s) { return s - Std::Int<1>{};});
+    auto absStrides = TransformLeaf(GetStrideImpl<Is...>(layout), [](auto s) { return s < 0 ? -s : s;});
+    auto coCoord = InnerProduct(m1Shapes, absStrides);
+    return TransformLeaf(coCoord, [](auto c) { return c + Std::Int<1>{}; });
+}
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto CosizeImpl(const Layout<Shape, Stride>& layout)
+{
+    return TupleSize(CoshapeImpl<Is...>(layout));
 }
 
 // NZ

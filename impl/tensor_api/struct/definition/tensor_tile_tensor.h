@@ -17,7 +17,6 @@
 
 #include "impl/tensor_api/struct/definition/tensor_tile_engine.h"
 #include "impl/tensor_api/struct/definition/tensor_tile_layout.h"
-#include "impl/tensor_api/struct/definition/tensor_tile_coord.h"
 
 namespace AscendC {
 

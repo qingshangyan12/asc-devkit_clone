@@ -110,6 +110,18 @@ TEST_F(Tensor_Api_Layout, LayoutOperation)
     EXPECT_EQ(AscendC::Std::get<0>(layoutInit.GetStride()), 1);
     EXPECT_EQ(AscendC::Std::get<1>(layoutInit.GetStride()), 100);
     EXPECT_EQ(AscendC::Std::get<2>(layoutInit.GetStride()), 200);
+
+    EXPECT_EQ(layoutMake.Rank(), 3);
+    EXPECT_EQ(layoutMake.Rank<0>(), 1);
+    EXPECT_EQ(Rank(layoutMake), 3);
+
+    auto shapeTuple = GetShape(AscendC::Select<1,2>(layoutMake));
+    EXPECT_EQ(AscendC::Std::get<0>(shapeTuple), 20);
+    EXPECT_EQ(Size(layoutMake), 6000);
+    EXPECT_EQ(layoutMake.GetSize(), 6000);
+    EXPECT_EQ(layoutMake.GetSize(), 6000);
+    EXPECT_EQ(AscendC::Coshape(layoutMake), 7710);
+    EXPECT_EQ(AscendC::Cosize(layoutMake), 7710);
 }
 
 TEST_F(Tensor_Api_Layout, IsLayoutOperation)
@@ -132,3 +144,47 @@ TEST_F(Tensor_Api_Layout, IsLayoutOperation)
     EXPECT_EQ(AscendC::is_layout_v<decltype(layoutInit)>, true);
 }
 
+TEST_F(Tensor_Api_Layout, MakeLayoutByShapeOperation)
+{
+    AscendC::Shape<int,int,int> shape = AscendC::MakeShape(2, 3, 4);
+    AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 2, 6);
+
+    auto layoutMake1 = AscendC::MakeLayout(shape, stride);
+    auto layoutMake2 = AscendC::MakeLayout(shape);
+
+    EXPECT_EQ(AscendC::Std::get<1>(layoutMake1.GetStride()), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(layoutMake2.GetStride()), 2);
+    EXPECT_EQ(AscendC::Size(layoutMake1), 24);
+    EXPECT_EQ(AscendC::Size(layoutMake2), 24);
+    EXPECT_EQ(layoutMake1.ShapeSize(), 24);
+    EXPECT_EQ(layoutMake2.ShapeSize(), 24);
+}
+
+TEST_F(Tensor_Api_Layout, LayoutSizeOperation)
+{
+    using shape = AscendC::Shape<AscendC::Std::Int<16>, AscendC::Std::Int<16>>;
+    using stride = AscendC::Stride<AscendC::Std::Int<1>, AscendC::Std::Int<16>>;
+    AscendC::Layout<shape, stride> layoutMake;
+    AscendC::Tile<int, int> tile = AscendC::MakeTile(1,2);
+    AscendC::Coord<int, int> coord = AscendC::MakeCoord(1,2);
+
+    EXPECT_EQ(layoutMake.size, 256);
+    EXPECT_EQ(AscendC::Std::get<0>(layoutMake.GetShape()), 16);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape(layoutMake)), 16);
+    EXPECT_EQ(AscendC::Std::get<0>(layoutMake.GetStride()), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride(layoutMake)), 1);
+    EXPECT_EQ(layoutMake.ShapeSize(), 256);
+}
+
+TEST_F(Tensor_Api_Layout, StaticLayoutOperation)
+{
+    using TwoDimT = AscendC::Std::tuple<AscendC::Std::Int<3>, AscendC::Std::Int<4>>;
+    using TwoDimU = AscendC::Std::tuple<AscendC::Std::Int<2>, AscendC::Std::Int<1>>;
+    EXPECT_EQ((AscendC::TileInternal::StaticLayoutSize<TwoDimT, TwoDimU>::size), 6);
+
+    using FourDimT = AscendC::Std::tuple<AscendC::Std::tuple<AscendC::Std::Int<3>, AscendC::Std::Int<4>>,
+                                        AscendC::Std::tuple<AscendC::Std::Int<1>, AscendC::Std::Int<2>>>;
+    using FourDimU = AscendC::Std::tuple<AscendC::Std::tuple<AscendC::Std::Int<4>, AscendC::Std::Int<5>>,
+                                        AscendC::Std::tuple<AscendC::Std::Int<2>, AscendC::Std::Int<3>>>;
+    EXPECT_EQ((AscendC::TileInternal::StaticLayoutSize<FourDimT, FourDimU>::size), 20);
+}
