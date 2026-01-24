@@ -193,7 +193,7 @@ __global__ __aicore__ void add_custom(GM_ADDR x) {*x = 3 + MY_CONST;}
 // extern "C" __global__ __aicore__ void add_custom(GM_ADDR x) {*x = 3 + MY_CONST;}
 )"""";
     asrtcDestroyProgramPtr = mockFunc;
-
+    MOCKER(LoadExtraLib).stubs().will(returnValue(ACL_SUCCESS));
     aclrtcProg prog = nullptr;
     aclrtcCreateProg(&prog, src, "test_kernel", 0, nullptr, nullptr);
     aclError result = aclrtcDestroyProg(&prog);
