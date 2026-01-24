@@ -21,8 +21,10 @@ set(ASCENDC_UT_PRODUCT_TYPE_LIST
 
 set(ASCENDC_UT_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/..
-    ${ASCENDC_DIR}/include
     ${ASCENDC_DIR}/
+    ${ASCENDC_DIR}/include
+    ${ASCENDC_DIR}/include/utils
+    ${ASCENDC_DIR}/impl
     ${ASCENDC_DIR}/impl/tensor_api
 )
 
@@ -30,6 +32,7 @@ file(GLOB ASCENDC_UT_COMMON_SRC
     ../common/common.cpp
     ../common/alog_stub.cpp
     ../common/dlog_stub.cpp
+    ../common/k3_pvwrap.cpp
 )
 
 file(GLOB ASCENDC_UT_STRUCT_CASE_SRC
@@ -56,7 +59,6 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_tensor_api_${product_type}
         ${ASCENDC_DIR}/tests/main_global.cpp
         ${ASCENDC_UT_COMMON_SRC}
-        ../common/k3_pvwrap.cpp
         ${ASCENDC_UT_STRUCT_CASE_SRC}
         ${ASCENDC_UT_${product_type}_CASE_SRC}
     )
@@ -67,6 +69,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         ASCENDC_DUMP=0
         $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:__NPU_ARCH__=2201>
         $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:__NPU_ARCH__=2201>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:__NPU_ARCH__=3101>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:__NPU_ARCH__=3101>
         __disable_kernel_type_autoinfer__=
     )
 
@@ -85,6 +89,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:tikicpulib::ascend910B1>
         $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:tikicpulib::ascend910B1>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:tikicpulib::ascend910_9599>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:tikicpulib::ascend910_9599>
         -Wl,--no-as-needed
         error_manager
         mmpa
