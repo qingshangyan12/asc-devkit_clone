@@ -13,6 +13,7 @@ npu_op_kernel_sources(ascendc_kernels
     KERNEL_DIR add_custom
     KERNEL_FILE add_custom_kernel.cpp
 )
+
 npu_op_kernel_sources(ascendc_kernels
     OP_TYPE LeakyReluCustom
     KERNEL_DIR leaky_relu_custom

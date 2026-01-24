@@ -14,7 +14,7 @@ import os
 import tensorflow as tf
 import numpy as np
 import npu_device
-from npu_device.compat.v1.npu_init import *
+from npu_device.compat.v1.npu_init import RewriterConfig
 npu_device.compat.enable_v1()
 tf.compat.v1.enable_resource_variables()
 
@@ -46,11 +46,11 @@ def main(unused_argv):
     config.graph_options.rewrite_options.memory_optimization = RewriterConfig.OFF
 
     with tf.compat.v1.Session(config=config) as sess:
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         tf_golden = sess.run(tf_z, feed_dict={x: x_data, y: y_data})
 
     with tf.compat.v1.Session(config=config) as sess:
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         ac_golden = sess.run(ac_z, feed_dict={x: x_data, y: y_data})
 
     np.array(tf_golden).astype(dtype_params)
@@ -64,4 +64,4 @@ def main(unused_argv):
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    tf.compat.v1.app.run()

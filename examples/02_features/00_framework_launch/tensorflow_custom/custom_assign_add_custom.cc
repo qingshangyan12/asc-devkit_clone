@@ -8,11 +8,6 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-/* !
- * \file custom_assign_add_custom.cc
- * \brief
- */
-
 #include "tensorflow/core/framework/op.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/shape_inference.h"
