@@ -161,7 +161,7 @@ __aicore__ inline constexpr auto GetMax(const T0& t0, const Ts&... ts)
     } else if constexpr (sizeof...(Ts) == 0) {
         return t0;
     } else {
-        return std::max(t0, GetMax(ts...));
+        return Std::max(t0, GetMax(ts...));
     }
 }
 

@@ -22,6 +22,7 @@
 #include "include/utils/std/tuple.h"
 #include "include/utils/std/type_traits.h"
 #include "include/utils/std/utility.h"
+#include "include/utils/std/algorithm.h"
 
 namespace AscendC{
 
