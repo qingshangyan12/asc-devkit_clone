@@ -19,6 +19,21 @@
 #include "impl/tensor_api/struct/tensor_tile_struct.h"
 
 namespace AscendC {
+template <typename T, typename U>
+constexpr bool VerifyingDataCopyTemplate =
+    ((IsTileTensorV<U> && IsTileTensorV<T>) ||
+    (IsTileTensorV<U> && IsTileTensorV<T>));
+
+template <typename T, typename U, typename Coord>
+constexpr bool VerifyingDataCopyTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingDataCopyTemplate<T, U>;
+
+template <typename T, typename U>
+constexpr bool VerifyingLoadDataTemplate = IsTileTensorV<U> && IsTileTensorV<T>;
+
+template <typename T, typename U, typename Coord>
+constexpr bool VerifyingLoadDataTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingLoadDataTemplate<T, U>;
+
+
 template <typename T, typename U, typename S>
 static constexpr bool VerifyingMmadTemplate = (IsTileTensorV<T> && IsTileTensorV<U> 
     && IsTileTensorV<S>);
@@ -110,10 +125,52 @@ struct GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1> {
 };
 
 template <typename T>
+struct IsZZFormat {
+private:
+    __aicore__ inline static constexpr bool IsFractalZZFormat() {
+        using type = typename T::elementType;
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+
+        constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
+            && Std::is_constant<C0_SIZE / sizeof(type), ShapeColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<C0_SIZE / sizeof(type), StrideRow0>::value 
+            && Std::is_constant<1, StrideColumn0>::value;
+
+        return (isShapeRight && isStrideRight);
+    }
+public:
+    static constexpr bool value = IsFractalZZFormat();
+};
+
+template <typename T>
+struct IsZNFormat {
+private:
+    __aicore__ inline static constexpr bool IsFractalZNFormat() {
+        using type = typename T::elementType;
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+
+        constexpr bool isShapeRight = Std::is_constant<C0_SIZE / sizeof(type), ShapeRow0>::value 
+            && Std::is_constant<FRACTAL_FIXED, ShapeColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<1, StrideRow0>::value 
+            && Std::is_constant<C0_SIZE / sizeof(type), StrideColumn0>::value;
+
+        return (isShapeRight && isStrideRight);
+    }
+public:
+    static constexpr bool value = IsFractalZNFormat();
+};
+
+template <typename T>
 struct IsNZFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalNZFormat() {
-        using type = typename T::LiteType;
+        using type = typename T::elementType;
         // NZ shape (Int<16>, row) , (Int<C0Size>, column))
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
@@ -137,7 +194,7 @@ template <typename T>
 struct IsL0cNZFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalL0cNZFormat() {
-        using type = typename T::LiteType;
+        using type = typename T::elementType;
         // NZ shape (Int<16>, row) , (Int<C0Size>, column))
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;

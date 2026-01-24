@@ -123,10 +123,14 @@ using DNStrideFormat = Stride<Stride<Std::Int<0>, Std::Int<1>>, Stride<Std::Int<
 template <typename T>
 __aicore__ inline decltype(auto) MakeLayoutForZN(size_t row, size_t  column)
 {
-    auto shape = MakeShapeImpl(MakeShapeImpl(Std::Int<C0_SIZE / sizeof(T)>{}, row / (C0_SIZE / sizeof(T))),
-        MakeShapeImpl(Std::Int<FRACTAL_FIXED>{}, column / FRACTAL_FIXED));
-    auto stride = MakeStrideImpl(MakeStrideImpl(Std::Int<1>{}, C0_SIZE / sizeof(T) * column),
-        MakeStrideImpl(Std::Int<C0_SIZE / sizeof(T)>{}, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{}));
+    auto shape = MakeShapeImpl(
+        MakeShapeImpl(Std::Int<C0_SIZE / sizeof(T)>{}, row / (C0_SIZE / sizeof(T))),
+        MakeShapeImpl(Std::Int<FRACTAL_FIXED>{}, column / FRACTAL_FIXED)
+    );
+    auto stride = MakeStrideImpl(
+        MakeStrideImpl(Std::Int<1>{}, C0_SIZE / sizeof(T) * column),
+        MakeStrideImpl(Std::Int<C0_SIZE / sizeof(T)>{}, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{})
+    );
     return MakeLayoutImpl(shape, stride);
 }
 
@@ -135,7 +139,7 @@ __aicore__ inline decltype(auto) MakeLayoutForZZ(size_t row, size_t column) {
     auto shape = MakeShapeImpl(MakeShapeImpl(Std::Int<FRACTAL_FIXED>{}, row / FRACTAL_FIXED),
         MakeShapeImpl(Std::Int<C0_SIZE / sizeof(T)>{}, column / (C0_SIZE / sizeof(T))));
     auto stride = MakeStrideImpl(MakeStrideImpl(Std::Int<C0_SIZE / sizeof(T)>{}, FRACTAL_FIXED * column),
-        MakeStrideImpl(Std::Int<1>{}, C0_SIZE / sizeof(T) * FRACTAL_FIXED));
+        MakeStrideImpl(Std::Int<1>{}, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{}));
     return MakeLayoutImpl(shape, stride);
 }
 }

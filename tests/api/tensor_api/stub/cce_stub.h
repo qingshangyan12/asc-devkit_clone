@@ -12,4 +12,8 @@
 #include <cstdint>
 #include "stub_fun.h"
 
+#ifndef __biasbuf__
+#define __biasbuf__
+#endif
+
 #endif

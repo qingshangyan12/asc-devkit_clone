@@ -24,6 +24,7 @@ protected:
 };
 
 using namespace AscendC;
+
 enum class CubeFormat {
     ND = 0,
     NZ,
@@ -59,33 +60,88 @@ public:
         nLength = n;
         kLength = k;
         enBias = enableBias;
-        a1Addr = reinterpret_cast<__cbuf__ SrcT*>(0);
-        b1Addr = reinterpret_cast<__cbuf__ Src1T*>(m * k * sizeof(SrcT));
-        l0aAddr = reinterpret_cast<__ca__ SrcT*>(0);
-        l0bAddr = reinterpret_cast<__cb__ Src1T*>(0);
-        l0cAddr = reinterpret_cast<__cc__ DstT*>(0);
+        a1Addr = reinterpret_cast<__cbuf__ SrcT*>(A1);
+        b1Addr = reinterpret_cast<__cbuf__ Src1T*>(B1);
+        l0aAddr = reinterpret_cast<__ca__ SrcT*>(A2);
+        l0bAddr = reinterpret_cast<__cb__ Src1T*>(B2);
+        l0cAddr = reinterpret_cast<__cc__ DstT*>(C2);
+
+        fbAddr = reinterpret_cast<__fbuf__ SrcT*>(FB);
+        l1Addr = reinterpret_cast<__cbuf__ DstT*>(L1BT);
+        btAddr = reinterpret_cast<__biasbuf__ DstT*>(BT);
     }
 
     __aicore__ inline void CopyGmToA1()
     {
         auto gmIterator = MakeGMmemPtr(gmA);
-        auto gmMatrixLayout = MakeNZLayout<SrcT>(mLength, kLength);
+        auto gmMatrixLayout = MakeRowMajorLayout<SrcT>(mLength, kLength);
         auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
         auto aIterator = MakeL1memPtr(a1Addr);
         auto aMatrixLayout = MakeNZLayout<SrcT>(mLength, kLength);
         auto aTensor = MakeTensor(aIterator, aMatrixLayout);
+
+        auto coord = MakeCoord(
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
+        );
+
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(aTensor, gmTensor, coord);
     }
 
     __aicore__ inline void CopyGmToB1()
     {
         auto gmIterator = MakeGMmemPtr(gmB);
-        auto gmMatrixLayout = MakeNZLayout<Src1T>(mLength, kLength);
+        auto gmMatrixLayout = MakeRowMajorLayout<Src1T>(kLength, nLength);
         auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
         auto bIterator = MakeL1memPtr(b1Addr);
         auto bMatrixLayout = MakeNZLayout<Src1T>(kLength, nLength);
         auto bTensor = MakeTensor(bIterator, bMatrixLayout);
+
+        auto coord = MakeCoord(
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
+        );
+
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(bTensor, gmTensor, coord);
+    }
+
+    __aicore__ inline void CopyA1ToFB()
+    {
+        auto a1Iterator = MakeL1memPtr(a1Addr);
+        auto a1MatrixLayout = MakeRowMajorLayout<SrcT>(mLength, kLength);
+        auto a1Tensor = MakeTensor(a1Iterator, a1MatrixLayout);
+
+        auto fbIterator = MakeFixbufmemPtr(fbAddr);
+        auto fbMatrixLayout = MakeRowMajorLayout<SrcT>(mLength, kLength);
+        auto fbTensor = MakeTensor(fbIterator, fbMatrixLayout); 
+
+        auto coord = MakeCoord(
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
+        );
+
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(fbTensor, a1Tensor, coord);
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(fbTensor, fbTensor);
+    }
+
+    __aicore__ inline void CopyA1ToBT()
+    {
+        auto l1Iterator = MakeL1memPtr(l1Addr);
+        auto l1MatrixLayout = MakeRowMajorLayout<DstT>(mLength, kLength);
+        auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout);
+
+        auto btIterator = MakeBiasmemPtr(btAddr);
+        auto btMatrixLayout = MakeRowMajorLayout<DstT>(mLength, kLength);
+        auto btTensor = MakeTensor(btIterator, btMatrixLayout); 
+
+        auto coord = MakeCoord(
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
+        );
+
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(btTensor, l1Tensor, coord);
     }
 
     __aicore__ inline void Load2DA1ToL0A()
@@ -97,6 +153,14 @@ public:
         auto l0aIterator = MakeL0AmemPtr(l0aAddr);
         auto l0aMatrixLayout = MakeZZLayout<SrcT>(mLength, kLength);
         auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
+
+        auto coord = MakeCoord(
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
+        );
+
+        LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0aTensor, a1Tensor, coord);
+        LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0aTensor, l0aTensor);
     }
 
     __aicore__ inline void Load2DA1ToL0B()
@@ -108,6 +172,13 @@ public:
         auto l0bIterator = MakeL0BmemPtr(l0bAddr);
         auto l0bMatrixLayout = MakeZNLayout<Src1T>(kLength, nLength);
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
+
+        auto coord = MakeCoord(
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
+            MakeCoord(Std::Int<0>{}, Std::Int<0>{})
+        );
+
+        LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0bTensor, b1Tensor, coord);
     }
         
     __aicore__ inline void Compute()
@@ -143,6 +214,8 @@ public:
     {
         CopyGmToA1();
         CopyGmToB1();
+        CopyA1ToFB();
+        CopyA1ToBT();
         Load2DA1ToL0A();
         Load2DA1ToL0B();
         Compute();
@@ -163,6 +236,20 @@ private:
     __ca__ SrcT* l0aAddr;
     __cb__ Src1T* l0bAddr;
     __cc__ DstT* l0cAddr;
+    __fbuf__ SrcT* fbAddr;
+
+    __cbuf__ DstT* l1Addr;
+    __biasbuf__ DstT* btAddr;
+
+    uint8_t A1[256 * 256 * sizeof(SrcT)] = {0};
+    uint8_t B1[256 * 256 * sizeof(SrcT)] = {0};
+    uint8_t A2[256 * 256 * sizeof(SrcT)] = {0};
+    uint8_t B2[256 * 256 * sizeof(SrcT)] = {0};
+    uint8_t C2[256 * 256 * sizeof(SrcT)] = {0};
+    uint8_t FB[256 * 256 * sizeof(SrcT)] = {0};
+
+    uint8_t L1BT[256 * 256 * sizeof(DstT)] = {0};
+    uint8_t BT[256 * 256 * sizeof(DstT)] = {0};
 
 };
 
@@ -200,7 +287,7 @@ __aicore__ inline void E2eKernel(GM_ADDR aGM, GM_ADDR bGM, GM_ADDR cGM, GM_ADDR 
     TEST_F(Tensor_Api_GEMM, kernel_tensor_tile_gemm_##coreNum##_##M##_##N##_##K##_##A_Format##_##B_Format##_##C_Format##_##BIAS_Format##_##A_DType##_##B_DType##_##C_DType##_##BIAS_DType##_##HAS_BIAS) \
     { \
         uint8_t aGM[M * K * sizeof(A_DType)] = {0}; \
-        uint8_t bGM[K * M * sizeof(B_DType)] = {0}; \
+        uint8_t bGM[K * N * sizeof(B_DType)] = {0}; \
         uint8_t cGM[M * N * sizeof(C_DType)] = {0}; \
         uint8_t biasGM[N * sizeof(BIAS_DType)] = {0}; \
         uint8_t quantGM[N * sizeof(C_DType)] = {0}; \
