@@ -10,37 +10,21 @@
 
 cmake_minimum_required(VERSION 3.16.0)
 project(static_aclnn_execute_add_app)
-
-find_package(customize REQUIRED)
+find_package(${package_name} REQUIRED)
 
 add_executable(execute_add_op
     main.cpp
 )
 
-target_include_directories(execute_add_op PRIVATE
-    $ENV{ASCEND_HOME_PATH}/include
-)
-
-target_link_directories(execute_add_op PRIVATE
-    $ENV{ASCEND_HOME_PATH}/lib64
-)
-
 target_link_libraries(execute_add_op PRIVATE
-    customize::customize
-    acl_rt
     nnopbase
-    register
-    graph
-    graph_base
-    opp_registry
-    platform
-    -Wl,--no-as-needed
-    metadef
-    unified_dlog
-    mmpa
-    c_sec
-    -Wl,--as-needed
-    dl
+    acl_rt
+    ${package_name}::${package_name}
+)
+
+set_target_properties(execute_add_op PROPERTIES
+    BUILD_RPATH ${CMAKE_PREFIX_PATH}/lib
+    INSTALL_RPATH ${CMAKE_PREFIX_PATH}/lib
 )
 
 install(TARGETS execute_add_op

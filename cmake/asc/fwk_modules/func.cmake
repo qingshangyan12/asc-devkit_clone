@@ -407,15 +407,24 @@ function(npu_op_package target_package_name)
     target_sources(${target_package_name} PRIVATE ${ascendc_static_file})
     add_dependencies(${target_package_name} ${target_package_name}_ascendc_static_file_target)
     target_link_libraries(${target_package_name} PUBLIC
+      nnopbase
       $<$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>:acl_rt>
       $<$<NOT:$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>>:ascendcl>
-      nnopbase
       exe_graph
       register
+      graph
+      graph_base
       tiling_api
+      -Wl,--no-as-needed
+      metadef
+      unified_dlog
+      mmpa
+      c_sec
+      -Wl,--as-needed
       -Wl,--whole-archive
       rt2_registry
       -Wl,--no-whole-archive
+      dl
     )
     if(ENABLE_CROSS_COMPILE)
       target_link_directories(${target_package_name} PRIVATE
@@ -445,9 +454,9 @@ function(npu_op_package target_package_name)
     target_link_libraries(${target_package_name} PRIVATE
       intf_pub
       $<IF:$<TARGET_EXISTS:cust_intf_pub>,cust_intf_pub,>
+      nnopbase
       $<$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>:acl_rt>
       $<$<NOT:$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>>:ascendcl>
-      nnopbase
       exe_graph
       register
       tiling_api
@@ -459,12 +468,6 @@ function(npu_op_package target_package_name)
       )
     endif()
     set_target_properties(${target_package_name} PROPERTIES OUTPUT_NAME cust_opapi)
-    if(ENABLE_CROSS_COMPILE)
-      target_link_directories(${target_package_name} PRIVATE
-        ${ASCENDC_CMAKE_COMPILE_COMPILER_LIBRARY}
-        ${ASCENDC_CMAKE_COMPILE_RUNTIME_LIBRARY}
-      )
-    endif()
     install(TARGETS ${target_package_name} EXPORT ${target_package_name}-targets INCLUDES DESTINATION include)
     install(EXPORT ${target_package_name}-targets FILE ${target_package_name}-targets.cmake NAMESPACE ${target_package_name}:: DESTINATION lib/cmake/${target_package_name})
 
@@ -696,9 +699,10 @@ function(npu_op_library target_name target_type)
     endif()
     target_compile_definitions(${target_name} PRIVATE google=ascend_private)
     target_link_libraries(${target_name} PRIVATE
-        intf_pub
-        $<IF:$<TARGET_EXISTS:cust_intf_pub>,cust_intf_pub,>
-        graph)
+      intf_pub
+      $<IF:$<TARGET_EXISTS:cust_intf_pub>,cust_intf_pub,>
+      graph
+    )
     set_target_properties(${target_name} PROPERTIES OUTPUT_NAME cust_tf_parsers)
 
     get_property(tmp_tf_plugin_target GLOBAL PROPERTY ASCENDC_TF_PLUGIN_TARGET)
@@ -717,9 +721,10 @@ function(npu_op_library target_name target_type)
     endif()
     target_compile_definitions(${target_name} PRIVATE google=ascend_private)
     target_link_libraries(${target_name} PRIVATE
-        intf_pub
-        $<IF:$<TARGET_EXISTS:cust_intf_pub>,cust_intf_pub,>
-        graph)
+      intf_pub
+      $<IF:$<TARGET_EXISTS:cust_intf_pub>,cust_intf_pub,>
+      graph
+    )
     set_target_properties(${target_name} PROPERTIES OUTPUT_NAME cust_onnx_parsers)
 
     get_property(tmp_onnx_plugin_target GLOBAL PROPERTY ASCENDC_ONNX_PLUGIN_TARGET)

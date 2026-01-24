@@ -10,25 +10,25 @@
 
 cmake_minimum_required(VERSION 3.16.0)
 project(static_aclnn_invocation_superbuild)
+set(CUSTOMIZE_INSTALL_DIR ${CMAKE_BINARY_DIR}/customize-install)
+set(CUSTOMIZE_OPS_NAME my_ops)
 
 include(ExternalProject)
-
-set(CUSTOMIZE_INSTALL_DIR ${CMAKE_BINARY_DIR}/customize-install)
-
 ExternalProject_Add(customize_op
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/op
     BINARY_DIR ${CMAKE_BINARY_DIR}/op-build
     INSTALL_DIR ${CUSTOMIZE_INSTALL_DIR}
     CMAKE_ARGS
+        -Dpackage_name=${CUSTOMIZE_OPS_NAME}
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 )
 
 ExternalProject_Add(execute_add_app
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/app
     BINARY_DIR ${CMAKE_BINARY_DIR}/app-build
-    INSTALL_DIR ${CUSTOMIZE_INSTALL_DIR}
     CMAKE_ARGS
-        -Dcustomize_DIR=<INSTALL_DIR>/lib/cmake/customize
+        -Dpackage_name=${CUSTOMIZE_OPS_NAME}
+        -DCMAKE_PREFIX_PATH=${CUSTOMIZE_INSTALL_DIR}
         -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
     DEPENDS customize_op
 )
