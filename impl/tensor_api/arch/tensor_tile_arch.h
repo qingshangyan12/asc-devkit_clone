@@ -18,5 +18,6 @@
 #include "impl/tensor_api/arch/tile_api/tensor_tile_mmad_impl.h"
 #include "impl/tensor_api/arch/tile_api/tensor_tile_load_data_impl.h"
 #include "impl/tensor_api/arch/tile_api/tensor_tile_data_copy_impl.h"
+#include "impl/tensor_api/arch/tile_api/tensor_tile_fixpipe_impl.h"
 
 #endif // IMPL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H

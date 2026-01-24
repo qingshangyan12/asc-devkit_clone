@@ -152,6 +152,44 @@ constexpr int32_t CAST_MODE_BIT = 59;
 constexpr int32_t MIX = 0;
 constexpr int32_t AIC = 1;
 constexpr int32_t AIV = 2;
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || \
+    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
+__aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
+{
+    if (num2 == 0) {
+        return 0;
+    }
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 || !defined(SPLIT_CORE_VEC)
+    return (num1 + num2 - 1) / num2;
+#else
+    return get_repeat_ceiling(num1, num2);
+#endif
+}
+#else
+__aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
+{
+    if (num2 == 0) {
+        return 0;
+    }
+    return (num1 + num2 - 1) / num2;
+}
+#endif
+
+#if !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
+
+#ifndef ASCC_PARAM_BLOCK_CUBE
+#define ASCC_PARAM_BLOCK_CUBE
+const int32_t BLOCK_CUBE = 16;
+#endif
+
+#else // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
+
+#ifndef ASCC_PARAM_BLOCK_CUBE
+#define ASCC_PARAM_BLOCK_CUBE
+constexpr uint32_t BLOCK_CUBE = 16;
+#endif
+#endif // !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
 } // namespace AscendC
 
 #if defined(ASCENDC_CPU_DEBUG)
