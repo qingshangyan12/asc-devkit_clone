@@ -10,7 +10,7 @@
 
 ## 功能说明
 
-执行矢量与标量的比较运算，如果值相等则输出1，否则输出0。
+按元素判断src = value是否成立，若成立则输出结果的对应比特位为1，否则为0。
 
 ## 函数原型
 
@@ -55,6 +55,7 @@ PIPE_V
 
 - dst、src的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
+- dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
 
 ## 调用示例
 
@@ -71,5 +72,7 @@ uint8_t dst_repeat_stride = 8;
 uint8_t src_repeat_stride = 8;
 …… // 数据搬运及同步操作
 asc_eq_scalar(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+// src [1, 2, 3, ..., 128], scalar = 20, src[19] = scalar
+// dst [0, 0, 8, ..., 0], dst[2] = 0b00001000
 …… // 同步操作
 ```
