@@ -1,13 +1,17 @@
 # DropOut样例
+
 ## 概述
+
 本样例介绍了调用DropOut高阶API实现dropout算子，提供根据MaskTensor对SrcTensor（源操作数，输入Tensor）进行过滤的功能，得到DstTensor（目的操作数、输出Tensor）。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── dropout
 │   ├── scripts
@@ -18,6 +22,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   DropOutCustom算子根据输入MaskTensor对输入SrcTensor进行过滤得到输出DstTensor，本算子仅支持输入shape为ND格式。DropOut API支持的过滤功能包括两种模式，字节模式和比特模式，本算子样例使用DropOut的字节模式。
 - 算子规格：  
