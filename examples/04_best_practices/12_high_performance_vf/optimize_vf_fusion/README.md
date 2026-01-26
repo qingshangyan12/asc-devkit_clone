@@ -1,19 +1,22 @@
 # optimize_vf_fusion样例
+
 ## 概述
 本样例演示了SIMD场景下，基于RegBase编程范式，通过VF融合优化算子代码实现。样例中定义了两个vf函数，其中，
 DivVF函数实现对输入向量中的每个数取倒数操作，AddVF函数实现对输入向量的加一操作，
 DivVF和AddVF会被编译器融合为一个VF函数。
+
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
+
 ## 目录结构介绍
 ```
 ├── optimize_vf_fusion
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py           // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   └── optimize_vf_fusion.asc         // AscendC算子实现 & 调用样例
 ```
+
 ## 算子描述
 - 算子功能：  
   输入向量长度为1024，算子对输入向量中的每个数进行取倒数并且加一，编译器通过VF融合将算子代码中的多个VF融合为一个VF。
@@ -34,6 +37,7 @@ DivVF和AddVF会被编译器融合为一个VF函数。
   
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
+    
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  

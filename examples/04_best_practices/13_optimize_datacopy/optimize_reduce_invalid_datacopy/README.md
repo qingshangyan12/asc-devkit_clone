@@ -1,8 +1,11 @@
-# pattern_transformation样例
+# optimize_reduce_invalid_datacopy样例
+
 ## 概述
 在使用DataCopyPad接口时，通过设置Compact模式减少无效数据的搬运
+
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
+
 ## 目录结构介绍
 ```
 ├── optimize_reduce_invalid_datacopy
@@ -12,6 +15,7 @@
 │   ├── CMakeLists.txt                               // 编译工程文件
 │   └── optimize_reduce_invalid_datacopy.asc         // AscendC算子实现 & 调用样例
 ```
+
 ## 算子描述
 - 算子功能：  
   在使用DataCopyPad接口时，通过设置Compact模式减少无效数据的搬运

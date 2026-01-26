@@ -1,8 +1,11 @@
-# pattern_transformation样例
+# optimize_datacopy_loop_mode样例
+
 ## 概述
 在使用DataCopyPad接口时，使用loop模式减少DataCopyPad指令的条数
+
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
+
 ## 目录结构介绍
 ```
 ├── optimize_datacopy_loop_mode
@@ -12,6 +15,7 @@
 │   ├── CMakeLists.txt                          // 编译工程文件
 │   └── optimize_datacopy_loop_mode.asc         // AscendC算子实现 & 调用样例
 ```
+
 ## 算子描述
 - 算子功能：  
   在使用DataCopyPad接口时，使用loop模式减少DataCopyPad指令的条数
@@ -32,6 +36,7 @@
   
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
+    
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  

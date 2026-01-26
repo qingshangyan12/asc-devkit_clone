@@ -1,8 +1,11 @@
-# pattern_transformation样例
+# optimize_reduce_invalid_datacopy样例
+
 ## 概述
 在进行非对齐数据搬运时，使用nddma搬运减少搬运指令的条数
+
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
+
 ## 目录结构介绍
 ```
 ├── optimize_datacopy_nddma
@@ -12,6 +15,7 @@
 │   ├── CMakeLists.txt                      // 编译工程文件
 │   └── optimize_datacopy_nddma.asc         // AscendC算子实现 & 调用样例
 ```
+
 ## 算子描述
 - 算子功能：  
   在进行非对齐数据搬运时，使用nddma搬运减少搬运指令的条数
