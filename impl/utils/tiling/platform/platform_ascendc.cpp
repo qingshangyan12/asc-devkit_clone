@@ -340,6 +340,17 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"KirinX90", "KirinX90"},
     {"Kirin9030", "Kirin9030"}
 };
+
+const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = {
+    {"Ascend910B", "2201"}, // ascend910b_list
+    {"Ascend910", "1001"},
+    {"Ascend310B", "3002"},
+    {"Ascend910_95", "3510"}, // ascend910_95_list
+    {"MC62CM12A", "5102"},
+    {"KirinX90", "3003"},
+    {"Kirin9030", "3113"}
+};
+
 bool SwitchIntoShortSocVersion(const char *socVersionStr, std::string &shortSocVersion)
 {
     const auto &iter = convertMapInAicpu.find(socVersionStr);
@@ -429,9 +440,17 @@ fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char *custo
             return nullptr;
         }
     }
-
+    auto iter = AICPUshortVersionToNpuArchMap.find(shortSocVersion);
+    std::string curNpuArch;
+    if (iter == AICPUshortVersionToNpuArchMap.end()) {
+        PF_LOGE("Failed to PlatformAscendCInit in aicpu, "
+                "cannot switch into NPUARCH, shortSocVersion = [%s]", shortSocVersion.c_str());
+        return nullptr;
+    }
+    curNpuArch = iter->second;
     std::map<std::string, std::string> shortSocVersionMap;
     shortSocVersionMap[LABEL_SHORT_SOC_VERSION] = shortSocVersion;
+    shortSocVersionMap[NPU_ARCH] = curNpuArch;
     static fe::PlatFormInfos gPlatformInfo;
     gPlatformInfo.Init();
     gPlatformInfo.SetPlatformResWithLock(LABEL_VERSION, shortSocVersionMap);
