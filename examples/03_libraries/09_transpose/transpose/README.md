@@ -1,28 +1,33 @@
 # Transpose样例
+
 ## 概述
+
 本样例介绍了调用Transpose高阶API实现Transpose算子，并按照核函数直调的方式分别给出了对应的端到端实现。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── transpose
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── transpose.asc      // Ascend C算子实现 & 调用样例
+│   └── transpose.asc           // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
+
 - 算子功能：  
   TransposeCustom算子，对输入数据进行数据排布及Reshape操作。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">TransposeCustom</td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">transpose</td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

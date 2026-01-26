@@ -1,5 +1,7 @@
 # BatchNorm样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用BatchNorm高阶API实现batchnorm单算子，BatchNorm是对于每一层的输入做规范化处理，使得每一层的分布尽可能的相同，从而加速训练过程和提高模型的泛化能力（有效减少梯度消失和梯度爆炸问题）。
 
 ## 支持的产品
@@ -8,6 +10,7 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── batchnorm
 │   ├── scripts
@@ -18,6 +21,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   batchnorm单算子，BatchNorm是对于每一层的输入做规范化处理，使得每一层的分布尽可能的相同,基本思想是对于每个batch中的样本，对其输入的每个特征在batch的维度上进行归一化。具体来说，对于输入特征x，BatchNorm的计算过程可以表示为：  
   对输入特征x，在batch维度上计算均值μ和方差σ：  
@@ -37,7 +41,7 @@
 
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"></td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> batchnorm </td></tr>
 
   <tr><td rowspan="5" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

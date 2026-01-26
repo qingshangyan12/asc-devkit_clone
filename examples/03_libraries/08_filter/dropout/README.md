@@ -27,7 +27,7 @@
   DropOutCustom算子根据输入MaskTensor对输入SrcTensor进行过滤得到输出DstTensor，本算子仅支持输入shape为ND格式。DropOut API支持的过滤功能包括两种模式，字节模式和比特模式，本算子样例使用DropOut的字节模式。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"></td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> dropout </td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

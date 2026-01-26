@@ -1,10 +1,16 @@
 # Reduce算子直调样例
+
 ## 概述
+
 本样例介绍了调用Sum高阶API实现reduce算子，算子对输入张量沿最后一个维度进行求和，采用<<<>>>直调的方式，规避框架调度开销，实现高效的归约计算。
+
 ## 支持的产品
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
 ## 目录结构介绍
+
 ```
 ├── 06_reduce    
 │   ├── scripts
@@ -14,7 +20,9 @@
 │   ├── data_utils.h            // 数据读入写出函数
 │   └── reduce_custom.asc       // Ascend C算子实现 & 调用样例
 ```
+
 ## 算子描述
+
 - 算子功能：  
   reduce算子，获取输入数据最后一个维度的元素总和。如果输入是向量，则对向量中各元素进行累加；如果输入是矩阵，则沿最后一个维度对每行中元素求和。
 - 算子规格：
@@ -25,7 +33,7 @@
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">7*2023</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">y</td><td align="center">8*1</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">8</td><td align="center">float</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">sum_custom</td></tr>
   </table>
@@ -37,6 +45,7 @@
   reduce算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal执行sum计算，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
   根据输入数据的内轴长度、内轴实际长度、外轴长度确定所需tiling参数，例如输出内轴补齐后长度等。调用GetSumMaxMinTmpSize接口获取Sum接口完成计算所需的临时空间大小。
+
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  

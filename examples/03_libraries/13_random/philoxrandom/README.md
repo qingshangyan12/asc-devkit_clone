@@ -1,11 +1,15 @@
 # PhiloxRandom样例
+
 ## 概述
+
 本样例介绍了基于Ascend C异构混合编程模型演示PhiloxRandom融合算子的核函数直调实现，基于Philox随机数生成算法，给定随机数种，生成若干的随机数。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
+
 ```
 ├── philoxrandom
 │   ├── scripts
@@ -16,12 +20,13 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   根据最后一轴的方向对各元素求平均值。  
   如果输入是向量，则在向量中对各元素相加求平均；如果输入是矩阵，则沿最后一个维度对元素求平均。本接口最多支持输入为二维数据，不支持更高维度的输入。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"></td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> philoxrandom </td></tr>
 
   <tr><td rowspan="2" align="center">算子输出</td></tr>
   <tr><td align="center">dst</td><td align="center">1280</td><td align="center">float</td><td align="center">ND</td></tr>

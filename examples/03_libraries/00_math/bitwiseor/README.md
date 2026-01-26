@@ -1,11 +1,15 @@
 # BitwiseOr样例
+
 ## 概述
+
 本样例演示了基于BitwiseOr高阶API的算子实现。样例逐比特对两个输入进行或操作。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
+
 ```
 ├── bitwiseor
 │   ├── scripts
@@ -16,6 +20,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   逐比特对两个输入进行或操作。
 
@@ -26,7 +31,7 @@
 
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> AIV </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> bitwiseor </td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

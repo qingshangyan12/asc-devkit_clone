@@ -1,11 +1,15 @@
 # LogicalOrs样例
+
 ## 概述
+
 本样例演示了基于LogicalOrs高阶API的算子实现。样例对输入矢量内的每个元素和标量进行或操作。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
+
 ```
 ├── logicalors
 │   ├── scripts
@@ -16,6 +20,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   输入矢量内的每个元素和标量进行与操作。当输入矢量、标量的数据类型不是bool时，零被视为False，非零数据被视为True。接口中矢量与标量的顺序支持标量在前和变量在后两种场景，其中，标量支持配置LocalTensor的单点元素。
   
@@ -35,7 +40,7 @@
 
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> AIV </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> logicalors </td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

@@ -1,13 +1,17 @@
 # ReduceMin样例
+
 ## 概述
+
 本样例演示了调用ReduceMin高阶API实现reducemin算子。样例对一个多维向量在指定的维度求最小值。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── reducemin
 │   ├── scripts
@@ -18,6 +22,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   定义指定计算的维度（Reduce轴）为R轴，非指定维度（Normal轴）为A轴。对一个多维向量在指定的维度求最小值。
 - 算子规格：  

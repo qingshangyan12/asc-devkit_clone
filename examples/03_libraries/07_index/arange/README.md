@@ -1,13 +1,17 @@
 # Arange样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用Arange高阶API实现arange单算子，给定起始值，等差值和长度，返回一个等差数列。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── arange
 │   ├── scripts
@@ -18,11 +22,12 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   arange单算子，给定起始值，等差值和长度，返回一个等差数列。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> arange </td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

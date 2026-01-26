@@ -1,13 +1,17 @@
 # Sort样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用Sort高阶API实现sort单算子，排序函数，按照数值大小进行降序排序。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── sort
 │   ├── scripts
@@ -18,11 +22,12 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   sort单算子，对输入tensor做Sort计算，实现按照数值大小进行降序排序。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> sort </td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

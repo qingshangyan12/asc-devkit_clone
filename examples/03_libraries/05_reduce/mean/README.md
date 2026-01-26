@@ -1,13 +1,17 @@
 # Mean样例
+
 ## 概述
+
 本样例介绍了基于Ascend C异构混合编程模型演示Mean融合算子的核函数直调实现，根据最后一轴的方向对各元素求平均值。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── mean
 │   ├── scripts
@@ -18,12 +22,13 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   根据最后一轴的方向对各元素求平均值。  
   如果输入是向量，则在向量中对各元素相加求平均；如果输入是矩阵，则沿最后一个维度对元素求平均。本接口最多支持输入为二维数据，不支持更高维度的输入。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> mean </td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

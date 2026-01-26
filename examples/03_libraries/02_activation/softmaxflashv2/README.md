@@ -1,16 +1,20 @@
 # SoftmaxFlashV2样例
 
+
 ## 概述
+
 
 本样例基于Kernel直调算子工程，介绍了调用SoftmaxFlashV2高阶api实现softmaxflashv2单算子，SoftmaxFlash增强版本，对应FlashAttention-2算法。
 
 ## 支持的产品
+
 
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 
 ```
 ├── softmaxflashv2
@@ -22,6 +26,7 @@
 ```
 
 ## 算子描述
+
 
 - 算子功能：  
   softmaxflashv2单算子，将输入tensor[m0, m1, ...mt, n]（t大于等于0）的非尾轴长度相乘的结果看作m，则输入tensor的shape看作[m, n]。对输入tensor[m, n]按行做如下计算，不同的update值对应不同的计算公式，其中x、inmax和insum为输入，M、S、E均为输出。

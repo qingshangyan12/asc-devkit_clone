@@ -1,13 +1,17 @@
 # AdjustSoftmaxres样例
+
 ## 概述
+
 本样例介绍了调用AdjustSoftMaxRes高阶API实现AdjustSoftMaxRes算子，并按照核函数直调的方式分别给出了对应的端到端实现。本样例以直调的方式调用算子核函数。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── adjustsoftmaxres
 │   ├── scripts
@@ -18,11 +22,12 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   AdjustSoftMaxResCustom单算子，用于对SoftMax相关计算结果做后处理。当输入的max中存在指定的值，调整x中对应位置的数据为自定义的值。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> adjustsoftmaxres </td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

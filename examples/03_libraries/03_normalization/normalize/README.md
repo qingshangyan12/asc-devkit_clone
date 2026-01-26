@@ -1,5 +1,7 @@
 # Normalize样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用Normalize高阶API实现normalize单算子，LayerNorm中，已知均值和方差，计算shape为[A，R]的输入数据的标准差的倒数rstd和y。
 
 ## 支持的产品
@@ -8,21 +10,23 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── normalize
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── normalize.asc      // Ascend C算子实现 & 调用样例
+│   └── normalize.asc           // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
+
 - 算子功能：  
   normalize单算子，对输入的均值Normalize和方差Variance做Normalize计算，得到Rstd和最后的归一化结果。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> normalize </td></tr>
 
   <tr><td rowspan="7" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

@@ -1,13 +1,17 @@
 # FasterGelu样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用FasterGelu高阶API实现fastergelu单算子，本样例输入src为固定shape[1024]，主要演示FasterGelu高阶API在Kernel直调工程中的调用。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── fastergelu
 │   ├── scripts
@@ -18,6 +22,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   FasterGeluCustom单算子，对输入tensor做FasterGelu计算。
 - 算子规格：  

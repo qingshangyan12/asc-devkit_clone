@@ -1,13 +1,17 @@
 # Dequant样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用Dequant高阶API实现Dequant单算子，按元素做反量化计算，比如将int32_t数据类型反量化为half/float等数据类型。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── dequant
 │   ├── scripts
@@ -18,11 +22,12 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   DequantCustom单算子，对输入tensor按元素做反量化计算，将int32_t数据类型反量化为half/float等数据类型。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> dequant </td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

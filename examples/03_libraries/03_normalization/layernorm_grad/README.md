@@ -1,5 +1,7 @@
 # LayerNormGrad样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用LayerNormGrad高阶API实现LayernormGradCustom单算子，本样例为固定shape，x[2, 32, 16], dy[2, 32, 16], variance[2, 32], mean[2, 32], gamma[16]，主要演示LayerNormGrad高阶API在Kernel直调工程中的调用。
 
 ## 支持的产品
@@ -8,6 +10,7 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── layernorm_grad
 │   ├── scripts
@@ -18,11 +21,12 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   LayernormGradCustom单算子，对输入tensor按行做LayerNormGrad计算。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> layernorm_grad </td></tr>
 
   <tr><td rowspan="7" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

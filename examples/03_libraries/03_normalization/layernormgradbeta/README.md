@@ -1,5 +1,7 @@
 # LayerNormGradBeta样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用LayerNormGradBeta高阶API实现layernormgradbeta单算子，LayerNormGradBeta是对于每一层的输入做规范化处理，使得每一层的分布尽可能的相同，从而加速训练过程和提高模型的泛化能力（有效减少梯度消失和梯度爆炸问题）。
 
 ## 支持的产品
@@ -8,16 +10,18 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── layernormgradbeta
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── layernormgradbeta.asc      // Ascend C算子实现 & 调用样例
+│   └── layernormgradbeta.asc   // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
+
 - 算子功能：  
   layernormgradbeta单算子，LayerNormGradBeta是对于每一层的输入做规范化处理，使得每一层的分布尽可能的相同,基本思想是对于每个batch中的样本，对其输入的每个特征在batch的维度上进行归一化。具体来说，对于输入特征x，LayerNormGradBeta的计算过程可以表示为：  
   对输入特征x，在batch维度上计算均值μ和方差σ：  
@@ -37,7 +41,7 @@
 
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> layernormgradbeta </td></tr>
 
   <tr><td rowspan="5" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

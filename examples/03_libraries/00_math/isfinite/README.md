@@ -1,11 +1,15 @@
 # IsFinite样例
+
 ## 概述
+
 本样例演示了基于IsFinite高阶API的算子实现。样例按元素判断输入的浮点数是否非NAN、非INF，输出结果为浮点数或者布尔值。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
+
 ```
 ├── isfinite
 │   ├── scripts
@@ -16,6 +20,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   按元素判断输入的浮点数是否非NAN、非INF，输出结果为浮点数或者布尔值。对于非NAN或者非INF的输入数据，当输出为浮点类型时，对应位置的结果为该浮点类型的1，反之为0；当输出为bool类型时，对应位置的结果为true，反之false。  
   计算公式如下：  
@@ -38,7 +43,7 @@
   $$
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> AIV </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> isfinite </td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

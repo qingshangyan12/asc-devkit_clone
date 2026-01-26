@@ -1,13 +1,17 @@
 # Sum样例
+
 ## 概述
+
 本样例介绍了调用Sum高阶API实现sum算子，获取输入数据最后一个维度的元素总和。如果输入是向量，则对向量中各元素进行累加；如果输入是矩阵，则沿最后一个维度对每行中元素求和。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── sum
 │   ├── scripts
@@ -18,11 +22,12 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   SumCustom算子，获取输入数据最后一个维度的元素总和。如果输入是向量，则对向量中各元素进行累加；如果输入是矩阵，则沿最后一个维度对每行中元素求和。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> sum </td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

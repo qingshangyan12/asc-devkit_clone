@@ -1,5 +1,7 @@
 # RmsNorm样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用RmsNorm高阶API实现rmsnorm单算子，实现对shape大小为[B，S，H]的输入数据的RmsNorm归一化。
 
 ## 支持的产品
@@ -8,16 +10,18 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── rmsnorm
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── rmsnorm.asc      // Ascend C算子实现 & 调用样例
+│   └── rmsnorm.asc             // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
+
 - 算子功能：  
   实现对shape大小为[B，S，H]的输入数据的RmsNorm归一化，其计算公式如下：    
   $$
@@ -28,7 +32,7 @@
 
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> rmsnorm </td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

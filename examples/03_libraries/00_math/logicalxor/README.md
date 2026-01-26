@@ -1,11 +1,15 @@
 # LogicalXor样例
+
 ## 概述
+
 本样例演示了基于LogicalXor高阶API的算子实现。样例按元素进行异或操作功能，当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
+
 ```
 ├── logicalxor
 │   ├── scripts
@@ -16,6 +20,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   按元素进行异或操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。  
   计算公式如下：
@@ -25,7 +30,7 @@
 
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> AIV </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> logicalxor </td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

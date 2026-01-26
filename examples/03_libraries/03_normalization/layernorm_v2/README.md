@@ -1,5 +1,7 @@
 # LayerNormV2样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用LayerNorm高阶API实现layernorm单算子，对输入tensor按行做Layernorm计算，得到Mean，Rstd和最后的归一化结果。
 
 ## 支持的产品
@@ -7,7 +9,8 @@
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
-## 目录结构介绍 
+## 目录结构介绍
+ 
 ```
 ├── layernorm_v2
 │   ├── scripts
@@ -18,11 +21,12 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   layernormv2单算子，对输入tensor按行做Layernorm计算，得到Mean，Rstd和最后的归一化结果。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> layernorm_v2 </td></tr>
 
   <tr><td rowspan="5" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

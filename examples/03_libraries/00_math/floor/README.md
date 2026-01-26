@@ -1,13 +1,17 @@
 # Floor样例
+
 ## 概述
+
 本样例演示了基于Floor高阶API的算子实现。样例获取小于或等于x的最小的整数值，即向负无穷取整操作。  
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── floor
 │   ├── scripts
@@ -18,6 +22,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   获取小于或等于x的最小的整数值，即向负无穷取整操作。计算公式如下：  
   $$
@@ -26,7 +31,7 @@
 
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> AIV </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> floor </td></tr>
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

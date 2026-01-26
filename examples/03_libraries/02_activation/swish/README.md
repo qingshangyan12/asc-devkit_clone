@@ -1,13 +1,17 @@
 # Swish样例
+
 ## 概述
+
 本样例演示了基于Swish高阶API的算子实现。在神经网络中，Swish是一个重要的激活函数。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── swish
 │   ├── scripts
@@ -18,6 +22,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   在神经网络中，Swish是一个重要的激活函数。
 

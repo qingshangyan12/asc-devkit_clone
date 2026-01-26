@@ -1,28 +1,33 @@
 # TopK样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用TopK高阶API实现topk单算子，获取最后一个维度的前k个最大值或最小值及其对应的索引。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── topk
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── topk.asc      // Ascend C算子实现 & 调用样例
+│   └── topk.asc                // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
+
 - 算子功能：  
   topk单算子，对输入tensor做TopK计算，用于获取最后一个维度的前k个最大值或最小值及其对应的索引。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> topk </td></tr>
 
   <tr><td rowspan="5" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>

@@ -1,5 +1,7 @@
 # WelfordFinalize样例
+
 ## 概述
+
 本样例基于Kernel直调算子工程，介绍了调用WelfordFinalize高阶API实现welford_finalize单算子，Welford计算是一种在线计算均值和方差的方法。
 
 ## 支持的产品
@@ -8,21 +10,23 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── welford_finalize
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── welford_finalize.asc      // Ascend C算子实现 & 调用样例
+│   └── welford_finalize.asc    // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
+
 - 算子功能：  
   welford_finalize单算子，对输入tensor做WelfordFinalize计算。Welford是一种在线计算均值和方差的方法。一方面，它可以在不存储所有样本的情况下，逐步计算所有样本的均值和方差，更适合处理海量数据；另一方面，它只需要对数据进行一次遍历，能减少访存次数，提高计算性能。WelfordFinalize接口为Welford算法的后处理。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">  </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> welford_finalize </td></tr>
 
   <tr><td rowspan="5" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
