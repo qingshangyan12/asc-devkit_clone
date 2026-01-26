@@ -24,8 +24,18 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
 ## 函数原型
 
    ```cpp
-   __aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire)
-    __aicore__ inline void asc_dcci(__gm__ void* dst, uint64_t entire, uint64_t type)
+   // 刷新传入地址所在的单个Cache Line
+   __aicore__ inline void asc_dcci_single(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_single_all(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_single_ub(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_single_out(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_single_atomic(__gm__ void* dst)
+   // 刷新所有Cache Line
+   __aicore__ inline void asc_dcci_entire(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_entire_all(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_entire_ub(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_entire_out(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst)
    ```
 
 ## 参数说明
@@ -33,8 +43,6 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | dst | 输入 | 需要刷新缓存的向量的起始地址。 |
-| entire | 输入 | 指令操作模式，类型为cache_line_t枚举类型。<br> SINGLE_CACHE_LINE：只刷新传入地址所在的Cache Line，注意如果该地址非64B对齐，只会操作传入地址到64B对齐的部分。<br> ENTIRE_DATA_CACHE：此时传入的地址无效，核内会刷新整个Data Cache，但是耗时较大，性能敏感的场景慎用。  |
-| type | 输入 | 表示使用该接口来保证Data Cache与哪一种存储保持一致性，类型为dcci_dst_t枚举类。<br> CACHELINE_ALL：与CACHELINE_OUT效果一致。<br> CACHELINE_UB：预留参数，暂未支持。<br> CACHELINE_OUT：表示通过该接口来保证Data Cache与Global Memory的一致性。 <br> CACHELINE_ATOMIC：预留参数，暂未支持。 |
 
 ## 返回值说明
 
@@ -60,7 +68,5 @@ for( int i = 0; i < total_length; i++) {
    src[i] = i;
 }
 // 由于首地址64B对齐，调用asc_dcci指令后，会立刻刷新前32个数
-asc_dcci(src, SINGLE_CACHE_LINE, CACHELINE_ALL)
-
-
+asc_dcci_single_out(reinterpret_cast<__gm__ uint64_t*>(src))
 ```

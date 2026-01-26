@@ -40,9 +40,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-// total_length 指参与计算的数据长度
-constexpr uint64_t total_length = 32;
-uint64_t src[total_length];
-int16_t len = 16; 
-asc_icache_preload(src, len);
+int64_t prefetch_length = 32;
+int64_t pc = asc_get_program_counter_impl() & 0xFFFFFFFFFFFF;
+asc_icache_preload(reinterpret_cast<void *>(pc), prefetch_length);
 ```

@@ -55,9 +55,9 @@ PIPE_MTE1
 ## 调用示例
 
 ```cpp
-__ubuf__ int8_t dst[256];
-__ubuf__ int8_t src[256];
-__ubuf__ int8_t index[64];
+__cb__ int8_t dst[256];
+__cbuf__ int8_t src[256];
+__cbuf__ int8_t index[64];
 uint16_t start_index = 1;
 uint8_t repeat = 8;
 asc_copy_l12l0b_sparse(dst, src, index, start_index, repeat);
