@@ -16,8 +16,9 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_H__
 #endif
 
-#include "utils/debug/asc_printf.h"
 #include "simt_api/device_types.h"
+#include "utils/debug/asc_printf.h"
+#include "utils/debug/asc_assert.h"
 
 #ifndef __aicore__
 #define __aicore__ [aicore]

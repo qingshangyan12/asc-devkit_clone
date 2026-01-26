@@ -26,4 +26,6 @@ TEST_F(CommoncTestsuite, BlockIdxAndNumTestCase)
     EXPECT_EQ(blockIdx, 0);
     EXPECT_EQ(blockNum, 8); // 8: Num of blocks
     __asc_simt_vf::printf("test");
+    assert(true);
+    __asc_simt_vf::__assert_fail("test", __FILE__, __LINE__, "");
 }

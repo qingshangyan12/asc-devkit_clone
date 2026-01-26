@@ -266,7 +266,21 @@ inline std::string GenBlockStr()
 namespace AscendC {
 template <class... Args>
 __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args);
+}
 
+#if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
+namespace __asc_aicore {
+__host_aicore__ static __attribute__ ((noinline)) void __assert_fail(const __gm__ char* __assertion,
+    const __gm__ char* __file, unsigned int __line, const __gm__ char* __function)
+{
+    (void)__function;
+    AscendC::AssertImpl("[ASSERT] %s:%u: Assertion `%s' " "\n", __file, __line, __assertion);
+    trap();
+}
+}
+#endif
+
+namespace AscendC {
 template <class... Args>
 __aicore__ static __attribute__ ((noinline)) void AssertPrint(__gm__ const char* fmt, Args&&... args)
 {
@@ -295,10 +309,8 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
 #if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
 #define NPU_ASSERT_MSG(expr)                                                                                      \
     do {                                                                                                          \
-        ENABLE_ASSERT();                                                                                          \
-        ENABLE_ASSERT_DUMP_SIZE();                                                                                \
         if (!(expr)) {                                                                                            \
-            AscendC::AssertFail(#expr, __FILE__, __LINE__);                                                       \
+            __assert_fail(#expr, __FILE__, __LINE__, "");                                                         \
         }                                                                                                         \
     } while (0)
 #endif
@@ -320,7 +332,7 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
             fprintf(stderr, "%s[ASSERT] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
             abort();                                                                                                    \
         }                                                                                                               \
-    } while (0)   
+    } while (0)
 #else
 #if defined(ASC_DEVKIT_VERSION_STR) && defined(ASC_DEVKIT_TIMESTAMP)
 #define ASSERT_MSG(expr, fmt, ...)  \
