@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_set_mm_transform_n()
+__aicore__ inline void asc_set_mmad_direction_n()
 ```
 
 ## 参数说明
@@ -36,5 +36,5 @@ PIPE_S
 ## 调用示例
 
 ```c++
-asc_set_mm_transform_n();
+asc_set_mmad_direction_n();
 ```
