@@ -1,5 +1,4 @@
-# asc_set_l0c_copy_config
-
+# asc_set_l0c2gm_quant
 ## AI处理器支持情况
 
 |AI处理器类型   | 是否支持 |
@@ -14,17 +13,14 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_set_l0c_copy_config(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag = false)
+__aicore__ inline void asc_set_l0c2gm_quant(uint64_t quant)
 ```
 
 ## 参数说明
 
 |参数名|输入/输出|描述|
 |------------|------------|-----------|
-| reluPre | 输入     | ReLU激活函数前张量的矢量起始地址，预留参数，暂未启用，为后续的功能扩展做保留，传入一个空地址即可。|
-| quantPre| 输入     | 量化操作前张量的矢量起始地址。|
-| isUnitFlag     | 输入     | UnitFlag配置项，类型为bool。预留参数，暂未启用，为后续的功能扩展做保留，可保持默认值false即可。|
-
+| quant | 输入     | 量化操作前张量的矢量起始地址。|
 ## 返回值说明
 
 无

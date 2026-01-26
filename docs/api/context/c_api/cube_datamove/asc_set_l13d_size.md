@@ -1,4 +1,4 @@
-# asc_set_l1_3d_size
+# asc_set_l13d_size
 
 ## 产品支持情况
 
@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_set_l1_3d_size(uint64_t value)
+__aicore__ inline void asc_set_l13d_size(uint64_t value)
 ```
 
 ## 参数说明
@@ -34,7 +34,7 @@ PIPE_S
 ## 约束说明
 
 - 需配合asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口使用。
-- 如果使用asc_set_l1_3d_size接口设置了边界值，asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口的L1 Buffer初始地址要在设置的边界内（value）。
+- 如果使用asc_set_l13d_size接口设置了边界值，asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口的L1 Buffer初始地址要在设置的边界内（value）。
 - 如果asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口的源操作数在L1 Buffer上的地址超出设置的边界值（value），则会从L1 Buffer起始地址开始读取数据。
 - 操作数地址对齐约束请参考[通用地址对齐约束](../general_instruction.md#通用地址对齐约束)。
 
@@ -44,5 +44,5 @@ PIPE_S
 
 ```c++
 uint64_t value = 1024;
-asc_set_l1_3d_size(value);    // 设置L1 Buffer的边界值为1024（单位：字节）
+asc_set_l13d_size(value);    // 设置L1 Buffer的边界值为1024（单位：字节）
 ```

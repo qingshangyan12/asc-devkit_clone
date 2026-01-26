@@ -1,4 +1,4 @@
-# asc_set_l1_3d_rpt
+# asc_set_l13d_rpt
 
 ## 产品支持情况
 
@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_set_l1_3d_rpt(asc_load3d_v2_config& config)
+__aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config)
 ```
 
 ## 参数说明
@@ -39,5 +39,5 @@ PIPE_S
 
 ```c++
 asc_load3d_v2_config config;
-asc_set_l1_3d_rpt(config); // 设置Load3D的repeat相关参数为默认值rpt_stride：0，rpt_time：1，rpt_mode：0
+asc_set_l13d_rpt(config); // 设置Load3D的repeat相关参数为默认值rpt_stride：0，rpt_time：1，rpt_mode：0
 ```
