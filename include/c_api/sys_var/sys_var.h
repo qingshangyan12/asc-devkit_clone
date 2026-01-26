@@ -39,6 +39,8 @@ __aicore__ inline int64_t asc_get_sub_block_id();
 
 __aicore__ inline int64_t asc_get_system_cycle();
 
+__aicore__ inline void asc_get_arch_ver(uint32_t& core_version);
+
 __aicore__ inline int64_t asc_get_program_counter();
 
 #endif

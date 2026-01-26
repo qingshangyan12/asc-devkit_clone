@@ -252,9 +252,9 @@ __aicore__ inline void asc_set_l0c2gm_relu(uint64_t relu)
     asc_set_l0c2gm_relu_impl(relu);
 }
 
-__aicore__ inline void asc_set_l0c2gm_unitflag(uint64_t unitflag)
+__aicore__ inline void asc_set_l0c2gm_unitflag(uint64_t unit_flag)
 {
-    asc_set_l0c2gm_unitflag_impl(unitflag);
+    asc_set_l0c2gm_unitflag_impl(unit_flag);
 }
 
 

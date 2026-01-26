@@ -32,6 +32,8 @@ __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx);
 
 __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx);
 
+__aicore__ inline int64_t asc_popc(uint64_t value);
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)

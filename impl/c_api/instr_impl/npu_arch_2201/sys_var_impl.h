@@ -81,9 +81,9 @@ __aicore__ inline void asc_set_ctrl(uint64_t config)
     asc_set_ctrl_impl(config);
 }
 
-__aicore__ inline void asc_get_arch_ver(uint32_t& coreVersion)
+__aicore__ inline void asc_get_arch_ver(uint32_t& core_version)
 {
-    asc_get_arch_ver_impl(coreVersion);
+    asc_get_arch_ver_impl(core_version);
 }
 
 __aicore__ inline int64_t asc_get_program_counter()

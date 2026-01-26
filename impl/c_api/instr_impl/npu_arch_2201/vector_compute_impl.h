@@ -360,7 +360,7 @@ __aicore__ inline void asc_mul(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __
     asc_mul_impl(dst, src0, src1, count);
 }
 
-__aicore__ inline void asc_mul(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, const uint8_t repeat,
+__aicore__ inline void asc_mul(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint8_t repeat,
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
     uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
@@ -2614,10 +2614,9 @@ __aicore__ inline void asc_select_sync(__ubuf__ float* dst, __ubuf__ float* src0
 
 // ==========asc_reduce(uint16_t/uint32_t)==========
 __aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1,
-                                  uint16_t dst_repeat_stride, uint8_t src_block_stride, uint8_t src_repeat_stride,
-                                  uint16_t reserved, uint8_t repeat)
+    uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
-    asc_reduce_impl(dst, src0, src1, dst_repeat_stride, src_block_stride, src_repeat_stride, reserved, repeat);
+    asc_reduce_impl(dst, src0, src1, repeat, src0_block_stride, pattern_mode, src0_repeat_stride, src1_repeat_stride);
 }
 
 __aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1,
@@ -2633,10 +2632,9 @@ __aicore__ inline void asc_reduce_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t
 }
 
 __aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1,
-                                  uint16_t dst_repeat_stride, uint8_t src_block_stride, uint8_t src_repeat_stride,
-                                  uint16_t reserved, uint8_t repeat)
+    uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
-    asc_reduce_impl(dst, src0, src1, dst_repeat_stride, src_block_stride, src_repeat_stride, reserved, repeat);
+    asc_reduce_impl(dst, src0, src1, repeat, src0_block_stride, pattern_mode, src0_repeat_stride, src1_repeat_stride);
 }
 
 __aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1,

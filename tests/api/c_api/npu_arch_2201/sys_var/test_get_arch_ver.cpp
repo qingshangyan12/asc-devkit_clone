@@ -26,9 +26,9 @@ TEST_F(TestVectorComputeGetArchVer, get_arch_ver_Succ)
         .times(1)
         .will(returnValue(int64_t(0x123456789ABCDEF0)));
     
-    uint32_t coreVersion = 0;
-    asc_get_arch_ver(coreVersion);
+    uint32_t core_version = 0;
+    asc_get_arch_ver(core_version);
     
     uint32_t expectedValue = 0x678; // (0x12345678 & 0xFFF)
-    EXPECT_EQ(expectedValue, coreVersion);
+    EXPECT_EQ(expectedValue, core_version);
 }

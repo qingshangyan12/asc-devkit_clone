@@ -20,11 +20,11 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_get_arch_ver_impl(uint32_t& coreVersion)
+__aicore__ inline void asc_get_arch_ver_impl(uint32_t& core_version)
 {
     asc_capi_arch_version ver;
     ver.full = get_arch_ver();
-    coreVersion = static_cast<uint32_t>(ver.core_ver);
+    core_version = static_cast<uint32_t>(ver.core_ver);
 }
 
 #endif

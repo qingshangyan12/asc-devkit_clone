@@ -20,12 +20,12 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_set_l0c2gm_unitflag_impl(uint64_t unitflag)
+__aicore__ inline void asc_set_l0c2gm_unitflag_impl(uint64_t unit_flag)
 {
     if ASC_IS_AIC {
         asc_capi_fpc_reg_config config;
         config.config = 0;
-        config.unit_flag = unitflag;
+        config.unit_flag = unit_flag;
         set_fpc(config.config);
     }
 }
