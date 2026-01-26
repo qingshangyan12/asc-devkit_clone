@@ -13,7 +13,7 @@
 #include "register/op_def_registry.h"
 
 namespace optiling {
-    extern ge::graphStatus AddCustomSinkTilingFunc(gert::TilingContext* context);
+    ge::graphStatus AddCustomSinkTilingFunc(gert::TilingContext* context);
 } // namespace optiling
 
 #endif // ADD_CUSTOM_TILING_SINK_TILING_H

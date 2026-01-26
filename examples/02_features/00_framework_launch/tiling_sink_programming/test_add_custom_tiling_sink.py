@@ -65,6 +65,7 @@ class SingleOpModel(torch.nn.Module):
 class TestCustomAdd(TestCase):
     def test_add_custom_ops(self):
         config = torchair.CompilerConfig()
+        config.experimental_config.tiling_schedule_optimize = True
         npu_backend = torchair.get_npu_backend(compiler_config=config)
         model = torch.compile(
             SingleOpModel().npu(), fullgraph=True, backend=npu_backend, dynamic=False
