@@ -31,6 +31,28 @@ extern "C" {
 #endif
 
 enum class ElfType { ELF_TYPE_ELF = 0, ELF_TYPE_AIVEC, ELF_TYPE_AICUBE, ELF_TYPE_MAX };
+enum class SocVersion { UNKNOWN, ASCEND310P, ASCEND910B, ASCEND910_95 };
+
+typedef enum KernelType : unsigned int {
+    K_TYPE_AICORE = 1,
+    K_TYPE_AIC = 2,
+    K_TYPE_AIV = 3,
+    K_TYPE_MIX_AIC_MAIN = 4,
+    K_TYPE_MIX_AIV_MAIN = 5,
+    K_TYPE_AIC_ROLLBACK = 6,
+    K_TYPE_AIV_ROLLBACK = 7,
+    K_TYPE_MAX
+} KernelTypeAsc;
+
+enum KernelMetaTypeAsc {
+    KERNEL_TYPE_AIV_ONLY = 0,
+    KERNEL_TYPE_AIC_ONLY = 1,
+    KERNEL_TYPE_MIX_AIV_1_0 = 2,
+    KERNEL_TYPE_MIX_AIC_1_0 = 3,
+    KERNEL_TYPE_MIX_AIC_1_1 = 4,
+    KERNEL_TYPE_MIX_AIC_1_2 = 5,
+    KERNEL_TYPE_AICORE = 6
+};
 
 static const std::unordered_set<char> ASCEND_SUPPORT_FORMAT = {'d', 'i', 'f', 'F', 'u', 'p', 'x', 'X', 's'};
 
@@ -234,20 +256,55 @@ int32_t AscendGetFuncFromBinary(void* const binHandle, const char* kernelName, v
     return aclrtBinaryGetFunction(binHandle, kernelName, funcHandle);
 }
 
+static SocVersion GetSocVersion() {
+    const char* socName = aclrtGetSocName();
+    if (!socName) {
+        ASCENDLOGE("aclrtGetSocName failed\n");
+        return SocVersion::UNKNOWN;
+    }
+    if (std::strncmp(socName, "Ascend310P", 10) == 0) {
+        return SocVersion::ASCEND310P;
+    }
+    if (std::strncmp(socName, "Ascend910B", 10) == 0) {
+        return SocVersion::ASCEND910B;
+    }
+    if (std::strncmp(socName, "Ascend910_95", 12) == 0) {
+        return SocVersion::ASCEND910_95;
+    }
+    ASCENDLOGE("unsupport soc name: %s\n", socName);
+    return SocVersion::UNKNOWN;
+}
+
 int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
     uint32_t numBlocks, void* stream, void* hostArgs, size_t argsSize, uint32_t ubufDynamicSize)
 {
-    if (ubufDynamicSize == 0) {
+    static SocVersion currentSoc = GetSocVersion();
+    if (currentSoc == SocVersion::ASCEND310P) {
+        unsigned int curKernelType;
+        ASCENDC_ASSERT_RTOK_RETVAL(AscendCFunctionGetMetaInfoKtype(funcHandle, &curKernelType));
+        if (curKernelType == K_TYPE_AICORE) {
+            return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, hostArgs, argsSize, nullptr,
+                0);
+        }
+        if (curKernelType == K_TYPE_AIV) {
+            ASCENDLOGE("Current soc only support KERNEL_TYPE_AICORE!\n");
+            return 1;
+        }
+    }
+    if (currentSoc == SocVersion::ASCEND910B || (currentSoc == SocVersion::ASCEND910_95 && ubufDynamicSize == 0)) {
         return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, hostArgs, argsSize, nullptr, 0);
     }
-    constexpr uint32_t attrLen = 1;
-    aclrtLaunchKernelAttrValue attrValue = {0};
-    attrValue.localMemorySize = ubufDynamicSize;
-    aclrtLaunchKernelAttr attrList[attrLen] = {
-        {static_cast<aclrtLaunchKernelAttrId>(2)/* ACL_RT_LAUNCH_KERNEL_ATTR_LOCAL_MEMORY_SIZE */, attrValue},
-    };
-    aclrtLaunchKernelCfg cfg = {attrList, attrLen};
-    return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, &cfg, hostArgs, argsSize, nullptr, 0);
+    if (currentSoc == SocVersion::ASCEND910_95 && ubufDynamicSize !=0) {
+        constexpr uint32_t attrLen = 1;
+        aclrtLaunchKernelAttrValue attrValue{};
+        attrValue.localMemorySize = ubufDynamicSize;
+        aclrtLaunchKernelAttr attrList[attrLen] = {
+            {static_cast<aclrtLaunchKernelAttrId>(2)/* ACL_RT_LAUNCH_KERNEL_ATTR_LOCAL_MEMORY_SIZE */, attrValue},
+        };
+        aclrtLaunchKernelCfg cfg = {attrList, attrLen};
+        return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, &cfg, hostArgs, argsSize, nullptr, 0);
+    }
+    return 1;
 }
 
 uint32_t RegisterAscendBinary(const char *fileBuf, size_t fileSize, uint32_t type, void **handle)
@@ -752,27 +809,6 @@ uint32_t AscendCFunctionGetMetaInfoCoreRation(const rtFuncHandle funcHandle, uns
     *aivRation = mixration->taskRation1;
     return 0;
 }
-
-typedef enum KernelType : unsigned int {
-    K_TYPE_AICORE = 1,
-    K_TYPE_AIC = 2,
-    K_TYPE_AIV = 3,
-    K_TYPE_MIX_AIC_MAIN = 4,
-    K_TYPE_MIX_AIV_MAIN = 5,
-    K_TYPE_AIC_ROLLBACK = 6,
-    K_TYPE_AIV_ROLLBACK = 7,
-    K_TYPE_MAX
-} KernelTypeAsc;
-
-enum KernelMetaTypeAsc {
-    KERNEL_TYPE_AIV_ONLY = 0,
-    KERNEL_TYPE_AIC_ONLY = 1,
-    KERNEL_TYPE_MIX_AIV_1_0 = 2,
-    KERNEL_TYPE_MIX_AIC_1_0 = 3,
-    KERNEL_TYPE_MIX_AIC_1_1 = 4,
-    KERNEL_TYPE_MIX_AIC_1_2 = 5,
-    KERNEL_TYPE_AICORE = 6
-};
 
 uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle)
 {

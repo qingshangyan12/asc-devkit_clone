@@ -223,51 +223,6 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendGetFuncFromBinary) {
     EXPECT_EQ(ret, 0);
 }
 
-TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs) {
-    void* funcHandle = nullptr;
-    uint32_t numBlocks = 1;
-    void* stream = nullptr;
-    void* hostArgs = nullptr;
-    size_t argsSize = 0;
-    int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, 0);
-    EXPECT_EQ(ret, 0);
-    uint32_t ubufDynamicSize = 512;
-    ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
-    EXPECT_EQ(ret, 0);
-}
-
-TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtype) {
-    void* funcHandle = nullptr;
-    unsigned int kernelType = 5;
-    uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &kernelType);
-    EXPECT_EQ(ret, 0);
-}
-
-TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoCoreRation) {
-    void* funcHandle = nullptr;
-    unsigned short aicRation;
-    unsigned short aivRation;
-    uint32_t ret = AscendCFunctionGetMetaInfoCoreRation(funcHandle, &aicRation, &aivRation);
-    EXPECT_EQ(ret, 0);
-}
-
-TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtypeFailed) {
-    void* funcHandle = nullptr;
-    unsigned int kernelType = 5;
-    MOCKER(rtFunctionGetMetaInfo).stubs().will(returnValue(1));
-    uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &kernelType);
-    EXPECT_EQ(ret, 1);
-}
-
-TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoCoreRationFailed) {
-    void* funcHandle = nullptr;
-    unsigned short aicRation;
-    unsigned short aivRation;
-    MOCKER(rtFunctionGetMetaInfo).stubs().will(returnValue(1));
-    uint32_t ret = AscendCFunctionGetMetaInfoCoreRation(funcHandle, &aicRation, &aivRation);
-    EXPECT_EQ(ret, 1);
-}
-
 typedef enum KernelType : unsigned int {
     K_TYPE_AICORE = 1,
     K_TYPE_AIC = 2,
@@ -345,6 +300,124 @@ uint32_t AscendCFunctionGetMetaInfoKCoreRation1_2(void *funcHandle, unsigned sho
     *coreAicRation = 1;
     *coreAivRation = 2;
     return 0;
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_unknown_soc) {
+    void* funcHandle = nullptr;
+    uint32_t numBlocks = 1;
+    void* stream = nullptr;
+    void* hostArgs = nullptr;
+    size_t argsSize = 0;
+    uint32_t ubufDynamicSize = 0;
+    EXPECT_EXIT({
+        MOCKER(aclrtGetSocName).stubs().will(returnValue(static_cast<char const*>(nullptr)));
+        int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
+        exit(ret == 0 ? 0 : 1);
+    }, ::testing::ExitedWithCode(1), "");
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_unsupport_soc) {
+    void* funcHandle = nullptr;
+    uint32_t numBlocks = 1;
+    void* stream = nullptr;
+    void* hostArgs = nullptr;
+    size_t argsSize = 0;
+    uint32_t ubufDynamicSize = 0;
+    EXPECT_EXIT({
+        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend910D"));
+        int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
+        exit(ret == 0 ? 0 : 1);
+    }, ::testing::ExitedWithCode(1), "");
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_910B) {
+    void* funcHandle = nullptr;
+    uint32_t numBlocks = 1;
+    void* stream = nullptr;
+    void* hostArgs = nullptr;
+    size_t argsSize = 0;
+    uint32_t ubufDynamicSize = 0;
+    EXPECT_EXIT({
+        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend910B"));
+        int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, 0);
+        exit(ret == 0 ? 0 : 1);
+    }, ::testing::ExitedWithCode(0), "");
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_310P_aicore) {
+    void* funcHandle = nullptr;
+    uint32_t numBlocks = 1;
+    void* stream = nullptr;
+    void* hostArgs = nullptr;
+    size_t argsSize = 0;
+    uint32_t ubufDynamicSize = 0;
+    EXPECT_EXIT({
+        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend310P"));
+        MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubAicore));
+        int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
+        exit(ret == 0 ? 0 : 1);
+    }, ::testing::ExitedWithCode(0), "");
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_310P_mix_vector_core) {
+    void* funcHandle = nullptr;
+    uint32_t numBlocks = 1;
+    void* stream = nullptr;
+    void* hostArgs = nullptr;
+    size_t argsSize = 0;
+    uint32_t ubufDynamicSize = 0;
+    EXPECT_EXIT({
+        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend310P"));
+        MOCKER(AscendCFunctionGetMetaInfoKtype).stubs().will(invoke(AscendCFunctionGetMetaInfoKtypeStubAiv));
+        int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
+        exit(ret == 0 ? 0 : 1);
+    }, ::testing::ExitedWithCode(1), "");
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_910_95) {
+    void* funcHandle = nullptr;
+    uint32_t numBlocks = 1;
+    void* stream = nullptr;
+    void* hostArgs = nullptr;
+    size_t argsSize = 0;
+    uint32_t ubufDynamicSize = 512;
+    EXPECT_EXIT({
+        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend910_95"));
+        int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
+        exit(ret == 0 ? 0 : 1);
+    }, ::testing::ExitedWithCode(0), "");
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtype) {
+    void* funcHandle = nullptr;
+    unsigned int kernelType = 5;
+    uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &kernelType);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoCoreRation) {
+    void* funcHandle = nullptr;
+    unsigned short aicRation;
+    unsigned short aivRation;
+    uint32_t ret = AscendCFunctionGetMetaInfoCoreRation(funcHandle, &aicRation, &aivRation);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoKtypeFailed) {
+    void* funcHandle = nullptr;
+    unsigned int kernelType = 5;
+    MOCKER(rtFunctionGetMetaInfo).stubs().will(returnValue(1));
+    uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &kernelType);
+    EXPECT_EQ(ret, 1);
+}
+
+TEST_F(TEST_ASCENDC_RUNTIME, AscendCFunctionGetMetaInfoCoreRationFailed) {
+    void* funcHandle = nullptr;
+    unsigned short aicRation;
+    unsigned short aivRation;
+    MOCKER(rtFunctionGetMetaInfo).stubs().will(returnValue(1));
+    uint32_t ret = AscendCFunctionGetMetaInfoCoreRation(funcHandle, &aicRation, &aivRation);
+    EXPECT_EQ(ret, 1);
 }
 
 TEST_F(TEST_ASCENDC_RUNTIME, AscendCGetProfkTypeImplGetKtypeFailed) {
