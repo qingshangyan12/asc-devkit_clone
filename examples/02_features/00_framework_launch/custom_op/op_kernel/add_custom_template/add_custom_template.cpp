@@ -9,9 +9,9 @@
 */
 
 #include "kernel_operator.h"
-#include "add_template_custom_tiling.h"
+#include "add_custom_template_tiling.h"
 #include "kernel_operator_dump_tensor_intf_impl.h"
-#include "tiling_key_add_template_custom.h"
+#include "tiling_key_add_custom_template.h"
 constexpr int32_t BUFFER_NUM = 2;  // tensor num for each queue
 
 template <class dtypeX, class dtypeY, class dtypeZ>
@@ -92,30 +92,18 @@ private:
 };
 
 template <typename D_T_X, typename D_T_Y, typename D_T_Z, int TILE_NUM, int IS_SPLIT>
- __global__ __aicore__ void add_template_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
+ __global__ __aicore__ void add_custom_template(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
 {
     REGISTER_TILING_DEFAULT(TilingDataTemplate);
     GET_TILING_DATA_WITH_STRUCT(TilingDataTemplate, tiling_data, tiling);
+    KernelAdd<D_T_X, D_T_Y, D_T_Z> op;
+    op.Init(x, y, z, tiling_data.totalLength, TILE_NUM);
 
-    if constexpr (std::is_same_v<D_T_X, float> && std::is_same_v<D_T_Z, float> && std::is_same_v<D_T_Z, float>) {
-        KernelAdd<float, float, float> op;
-        op.Init(x, y, z, tiling_data.totalLength, TILE_NUM);
-        if constexpr (IS_SPLIT == 0) {
-            AscendC::printf("Kernel launched with dtype=float and IS_SPLIT=0, total length is %u.\n", tiling_data.totalLength);
-            op.Process1();
-        } else if constexpr (IS_SPLIT == 1) {
-            AscendC::printf("Kernel launched with dtype=float and IS_SPLIT=1, total length is %u.\n", tiling_data.totalLength);
-            op.Process2();
-        }
-    } else if constexpr (std::is_same_v<D_T_X, half> && std::is_same_v<D_T_Z, half> && std::is_same_v<D_T_Z, half>) {
-        KernelAdd<half, half, half> op;
-        op.Init(x, y, z, tiling_data.totalLength, TILE_NUM);
-        if constexpr (IS_SPLIT == 0) {
-            AscendC::printf("Kernel launched with dtype=half and IS_SPLIT=0, total length is %u.\n", tiling_data.totalLength);
-            op.Process1();
-        } else if constexpr (IS_SPLIT == 1) {
-            AscendC::printf("Kernel launched with dtype=half and IS_SPLIT=1, total length is %u.\n", tiling_data.totalLength);
-            op.Process2();
-        }
+    if constexpr (IS_SPLIT == 0) {
+        AscendC::printf("Kernel launched with dtype=float and IS_SPLIT=0, total length is %u.\n", tiling_data.totalLength);
+        op.Process1();
+    } else if constexpr (IS_SPLIT == 1) {
+        AscendC::printf("Kernel launched with dtype=float and IS_SPLIT=1, total length is %u.\n", tiling_data.totalLength);
+        op.Process2();
     }
 }

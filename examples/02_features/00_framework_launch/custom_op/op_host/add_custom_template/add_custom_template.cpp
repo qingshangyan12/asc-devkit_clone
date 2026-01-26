@@ -9,8 +9,8 @@
 */
 
 #include "register/op_def_registry.h"
-#include "../../op_kernel/add_template_custom/add_template_custom_tiling.h"
-#include "../../op_kernel/add_template_custom/tiling_key_add_template_custom.h"
+#include "../../op_kernel/add_custom_template/add_custom_template_tiling.h"
+#include "../../op_kernel/add_custom_template/tiling_key_add_custom_template.h"
 
 namespace optiling {
 const uint32_t BLOCK_DIM = 8;
@@ -19,29 +19,13 @@ constexpr uint32_t MIN_LENGTH_FOR_SPLIT = 2048;
 
 static ge::graphStatus TilingFunc(gert::TilingContext *context)
 {
+    uint32_t totalLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
     ge::DataType dtype_x = context->GetInputDesc(0)->GetDataType();
     ge::DataType dtype_y = context->GetInputDesc(1)->GetDataType();
     ge::DataType dtype_z = context->GetOutputDesc(0)->GetDataType();
-    uint32_t D_T_X = C_DataType::C_DT_FLOAT;
-    uint32_t D_T_Y = C_DataType::C_DT_FLOAT;
-    uint32_t D_T_Z = C_DataType::C_DT_FLOAT;
-    if (dtype_x == ge::DataType::DT_FLOAT) {
-        D_T_X = C_DataType::C_DT_FLOAT;
-    } else if (dtype_x == ge::DataType::DT_FLOAT16) {
-        D_T_X = C_DataType::C_DT_FLOAT16;
-    }
-    if (dtype_y == ge::DataType::DT_FLOAT) {
-        D_T_Y = C_DataType::C_DT_FLOAT;
-    } else if (dtype_y == ge::DataType::DT_FLOAT16) {
-        D_T_Y = C_DataType::C_DT_FLOAT16;
-    }
-    if (dtype_z == ge::DataType::DT_FLOAT) {
-        D_T_Z = C_DataType::C_DT_FLOAT;
-    } else if (dtype_z == ge::DataType::DT_FLOAT16) {
-        D_T_Z = C_DataType::C_DT_FLOAT16;
-    }
-
-    uint32_t totalLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
+    uint32_t D_T_X = static_cast<uint32_t>(dtype_x);
+    uint32_t D_T_Y = static_cast<uint32_t>(dtype_y);
+    uint32_t D_T_Z = static_cast<uint32_t>(dtype_z);
     uint32_t TILE_NUM = 1;
     uint32_t IS_SPLIT = 0;
     if (totalLength < MIN_LENGTH_FOR_SPLIT) {
@@ -55,8 +39,6 @@ static ge::graphStatus TilingFunc(gert::TilingContext *context)
     TilingDataTemplate *tiling = context->GetTilingData<TilingDataTemplate>();
     tiling->totalLength = totalLength;
     // 模板参数tilingkey配置
-    const uint64_t tilingKey = GET_TPL_TILING_KEY(D_T_X, D_T_Y, D_T_Z, TILE_NUM, IS_SPLIT);
-    context->SetTilingKey(tilingKey);
     ASCENDC_TPL_SEL_PARAM(context, D_T_X, D_T_Y, D_T_Z, TILE_NUM, IS_SPLIT);
     size_t *currentWorkspace = context->GetWorkspaceSizes(1);
     currentWorkspace[0] = 0;
@@ -81,9 +63,9 @@ static graphStatus InferDataType(gert::InferDataTypeContext *context)
 }  // namespace ge
 
 namespace ops {
-class AddTemplateCustom : public OpDef {
+class AddCustomTemplate : public OpDef {
 public:
-    explicit AddTemplateCustom(const char *name) : OpDef(name)
+    explicit AddCustomTemplate(const char *name) : OpDef(name)
     {
         this->Input("x")
             .ParamType(REQUIRED)
@@ -104,5 +86,5 @@ public:
             .AddConfig("ascend910b");
     }
 };
-OP_ADD(AddTemplateCustom);
+OP_ADD(AddCustomTemplate);
 }  // namespace ops

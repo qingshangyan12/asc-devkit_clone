@@ -12,7 +12,7 @@ file(GLOB host_ops_srcs
     add_custom/add_custom_host.cpp
     add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp
     add_custom_tiling_sink/add_custom_tiling_sink.cpp
-    add_template_custom/add_template_custom.cpp
+    add_custom_template/add_custom_template.cpp
     leaky_relu_custom/leaky_relu_custom_host.cpp
 )
 npu_op_code_gen(

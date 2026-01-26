@@ -8,11 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef ADD_TEMPLATE_CUSTOM_TILING_H
-#define ADD_TEMPLATE_CUSTOM_TILING_H
+#ifndef ADD_CUSTOM_TEMPLATE_TILING_H
+#define ADD_CUSTOM_TEMPLATE_TILING_H
 #include <cstdint>
 
 struct TilingDataTemplate {
     uint32_t totalLength;
 };
-#endif // ADD_TEMPLATE_CUSTOM_TILING_H
+#endif // ADD_CUSTOM_TEMPLATE_TILING_H

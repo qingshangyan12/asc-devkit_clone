@@ -17,7 +17,7 @@
 #include "aclnn/aclnn_base.h"
 #include "aclnn/acl_meta.h"
 #include "acl/acl_rt.h"
-#include "aclnn_add_template_custom.h"
+#include "aclnn_add_custom_template.h"
 
 #define CHECK_ACL(expr)                                                                                 \
     do {                                                                                                \
@@ -84,12 +84,12 @@ int32_t RunOnce(const std::vector<int64_t>& shape)
 
     uint64_t workspaceSize = 0;
     aclOpExecutor* executor = nullptr;
-    CHECK_ACL(aclnnAddTemplateCustomGetWorkspaceSize(input0, input1, output0, &workspaceSize, &executor));
+    CHECK_ACL(aclnnAddCustomTemplateGetWorkspaceSize(input0, input1, output0, &workspaceSize, &executor));
     void* workspaceDeviceMem = nullptr;
     if (workspaceSize > 0) {
         CHECK_ACL(aclrtMalloc(&workspaceDeviceMem, workspaceSize, ACL_MEM_MALLOC_HUGE_FIRST));
     }
-    CHECK_ACL(aclnnAddTemplateCustom(workspaceDeviceMem, workspaceSize, executor, stream));
+    CHECK_ACL(aclnnAddCustomTemplate(workspaceDeviceMem, workspaceSize, executor, stream));
     CHECK_ACL(aclrtSynchronizeStream(stream));
     CHECK_ACL(aclrtMemcpy(output0HostData.data(), bufferSize, output0DeviceMem,
                           bufferSize, ACL_MEMCPY_DEVICE_TO_HOST));

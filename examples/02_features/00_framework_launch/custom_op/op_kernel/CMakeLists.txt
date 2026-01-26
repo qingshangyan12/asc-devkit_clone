@@ -27,9 +27,9 @@ npu_op_kernel_sources(ascendc_kernels
 )
 
 npu_op_kernel_sources(ascendc_kernels
-    OP_TYPE AddTemplateCustom
-    KERNEL_DIR add_template_custom
-    KERNEL_FILE add_template_custom.cpp
+    OP_TYPE AddCustomTemplate
+    KERNEL_DIR add_custom_template
+    KERNEL_FILE add_custom_template.cpp
 )
 
 npu_op_kernel_library(ascendc_kernels
