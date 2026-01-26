@@ -187,11 +187,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hexp(half x)
     return __expf(x);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2exp(half2 x)
-{
-    return __expf(x);
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hexp2(half x)
 {
     float tmp = __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
@@ -231,11 +226,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2exp10(half2 x)
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hlog(half x)
-{
-    return __logf(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2log(half2 x)
 {
     return __logf(x);
 }
@@ -283,14 +273,26 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hsqrt(half x)
     return __sqrtf(x);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2sqrt(half2 x)
-{
-    return __sqrtf(x);
-}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hrsqrt(half x)
 {
     return (half)1.0 / hsqrt(x);
+}
+
+#ifndef ASCENDC_CPU_DEBUG
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2exp(half2 x)
+{
+    return __expf(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2log(half2 x)
+{
+    return __logf(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2sqrt(half2 x)
+{
+    return __sqrtf(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2rsqrt(half2 x)
@@ -299,6 +301,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2rsqrt(half2 x)
     half tmp2 = (half)1.0 / __sqrtf(x.y);
     return {tmp1, tmp2};
 }
+#endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hrcp(half x)
 {
@@ -734,6 +737,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_cas(__gm__ half2 *address
     return bisheng::cce::simt::atomicCAS(address, compare, val);
 }
 
+#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldcg(__gm__ half* address)
 {
     return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address);
@@ -775,6 +779,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ half2* address, half2
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((__gm__ int32_t*)address, (int32_t&)val);
 }
+#endif
+
 #else
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(half *address, half val)
 {
@@ -824,6 +830,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_cas(half2 *address, half2
     return bisheng::cce::simt::atomicCAS(address, compare, val);
 }
 
+#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldcg(half* address)
 {
     return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address);
@@ -865,6 +872,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(half2* address, half2 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int32_t*)address, (int32_t&)val);
 }
+#endif
 #endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_shfl(half var, int32_t src_lane, int32_t width)

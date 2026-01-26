@@ -41,12 +41,6 @@ __aicore__ inline void asc_vf_call(dim3 threadNums, Args &&...args)
 }
 #endif
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_get_block_idx();
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t asc_get_block_num();
-
-#include "impl/simt_api/common_functions_impl.h"
-
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_FUNCTIONS_H__
