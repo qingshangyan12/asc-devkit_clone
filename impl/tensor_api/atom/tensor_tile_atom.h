@@ -15,4 +15,6 @@
 #ifndef IMPL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H
 #define IMPL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H
 
+#include "impl/tensor_api/atom/tensor_tile_copy_atom.h"
+
 #endif // IMPL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H

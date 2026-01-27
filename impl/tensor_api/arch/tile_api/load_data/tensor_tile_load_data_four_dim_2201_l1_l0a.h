@@ -333,8 +333,7 @@ public:
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
         if constexpr (IsNZFormat<U>::value && IsZZFormat<T>::value) {
             LoadDataFourDim2201L12L0ANZ2ZZ::Run<T, U, trait, Coord>(dst, src, coord);
-        } else if constexpr (IsZNFormat<U>::value && IsZZFormat<T>::value &&
-                             (sizeof(U::elementType) == 1)) {
+        } else if constexpr (IsZNFormat<U>::value && IsZZFormat<T>::value && (sizeof(typename U::elementType) == 1)) {
             LoadDataFourDim2201L12L0AZN2ZZB8::Run<T, U, trait, Coord>(dst, src, coord);
         } else if constexpr (IsZNFormat<U>::value && IsZZFormat<T>::value) {
             LoadDataFourDim2201L12L0AZN2ZZ::Run<T, U, trait, Coord>(dst, src, coord);
