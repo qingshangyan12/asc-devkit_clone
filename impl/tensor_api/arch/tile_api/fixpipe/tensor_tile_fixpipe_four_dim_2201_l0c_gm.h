@@ -28,6 +28,24 @@ public:
         DataCopy<T, U, decltype(params), trait>(dst, src, params);
     }
 
+    template <typename T, typename U, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        auto params = GenFixpipeParams<T, U, trait>(dst, src);
+        auto dstLayout = dst.Layout();
+        auto index = Crd2Idx(coord, dstLayout);
+        using dstType = typename T::elementType;
+        auto dstNew = reinterpret_cast<dstType *>(dst.Engine().Begin().Get() + index);
+        uint32_t dstN = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+        uint32_t dstM = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+        auto dstIterator = MakeGMmemPtr(dstNew);
+        auto dstMatrixLayout = MakeNZLayout<Std::ignore_t>(dstM, dstN);
+        auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout); 
+
+        DataCopy<T, U, decltype(params), trait>(dstTensor, src, params);
+    }
+
 private:
     template <typename T>
     __aicore__ inline constexpr void CheckL0CNZTemplate()
@@ -50,7 +68,8 @@ private:
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ float, __cc__ float>,
+            Std::tuple<__gm__ int32_t, __cc__ int32_t>>, "The data type is not supported.");
         static_assert((Std::is_one_of_v<srcType, __cc__ int32_t, __cc__ float>), "The source data type is not supported.");
 #endif
         CheckL0CNZTemplate<T>();
@@ -88,6 +107,26 @@ public:
         SetRegister<decltype(ndParams)>(ndParams);
         auto params = GenFixpipeParams<T, U, trait>(dst, src);
         DataCopy<T, U, decltype(params), trait>(dst, src, params);
+    }
+
+    template <typename T, typename U, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        auto ndParams = GenRegisterParams<T, U, trait>(dst, src);
+        SetRegister<decltype(ndParams)>(ndParams);
+        auto params = GenFixpipeParams<T, U, trait>(dst, src);
+        auto dstLayout = dst.Layout();
+        auto index = Crd2Idx(coord, dstLayout);
+        using dstType = typename T::elementType;
+        auto dstNew = reinterpret_cast<dstType *>(dst.Engine().Begin().Get() + index);
+        uint32_t dstN = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+        uint32_t dstM = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+        auto dstIterator = MakeGMmemPtr(dstNew);
+        auto dstMatrixLayout = MakeRowMajorLayout<dstType>(dstM, dstN);
+        auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout); 
+
+        DataCopy<T, U, decltype(params), trait>(dstTensor, src, params);
     }
 
 private:
@@ -128,7 +167,8 @@ private:
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ float, __cc__ float>,
+            Std::tuple<__gm__ int32_t, __cc__ int32_t>>, "The data type is not supported.");
         static_assert((Std::is_one_of_v<srcType, __cc__ int32_t, __cc__ float>), "The source data type is not supported.");
 #endif
         CheckNDTemplate<T>();
@@ -175,6 +215,17 @@ public:
             FixpipetNz2Nz2201Base::Run<T, U, trait>(dst, src);
         } else if constexpr (IsL0cNZFormat<U>::value && IsNDFormat<T>::value) {
             FixpipetNz2Nd2201Base::Run<T, U, trait>(dst, src);
+        }
+    }
+
+    template <typename T, typename U, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        if constexpr (IsL0cNZFormat<U>::value && IsL0cNZFormat<T>::value) {
+            // CheckNzCoord
+            FixpipetNz2Nz2201Base::Run<T, U, trait, Coord>(dst, src, coord);
+        } else if constexpr (IsL0cNZFormat<U>::value && IsNDFormat<T>::value) {
+            // CheckNdCoord
+            FixpipetNz2Nd2201Base::Run<T, U, trait, Coord>(dst, src, coord);
         }
     }
 };

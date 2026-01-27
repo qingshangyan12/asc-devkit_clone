@@ -17,6 +17,24 @@
 
 namespace AscendC {
 struct FixpipeTrait {
+    __aicore__ constexpr FixpipeTrait() {}
+
+    __aicore__ constexpr FixpipeTrait(const QuantMode_t quantPreIn) : quantPre(quantPreIn) {}
+
+    __aicore__ constexpr FixpipeTrait(
+        const QuantMode_t quantPreIn,
+        const bool enableReluIn,
+        const bool enableChannleSplitIn,
+        const uint8_t unitFlagIn,
+        const uint8_t dualDstCtlIn
+    ) :
+        quantPre(quantPreIn),
+        enableRelu(enableReluIn),
+        enableChannleSplit(enableChannleSplitIn),
+        unitFlag(unitFlagIn),
+        dualDstCtl(dualDstCtlIn)
+    {}
+
     QuantMode_t quantPre = QuantMode_t::NoQuant;
     bool enableRelu = false;
     bool enableChannleSplit = false;
@@ -37,7 +55,7 @@ Fixpipe(const T& dst, const U& src)
     constexpr Hardware dstTPos = TileInternal::GetHardPos<T>();
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename TileInternal::FixpipeTensor2Tensor<dstTPos, srcTPos,
-        TileInternal::CURRENT_ARCH_VERSION,TileInternal::FOUR_DIM_DATA, TileInternal::DISABLE_COORD>::type;
+        TileInternal::CURRENT_ARCH_VERSION,TileInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, trait>(dst, src);
 }
 
@@ -48,7 +66,7 @@ Fixpipe(const T& dst, const U& src, const V& quant)
     constexpr Hardware dstTPos = TileInternal::GetHardPos<T>();
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename TileInternal::FixpipeQuantTensor2Tensor<dstTPos, srcTPos,
-        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA, TileInternal::DISABLE_COORD>::type;
+        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, V, trait>(dst, src, quant);
 }
 
@@ -59,7 +77,7 @@ Fixpipe(const T& dst, const U& src, const Coord& coord)
     constexpr Hardware dstTPos = TileInternal::GetHardPos<T>();
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename TileInternal::FixpipeTensor2Tensor<dstTPos, srcTPos,
-        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA, TileInternal::ENABLE_COORD>::type;
+        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, trait, Coord>(dst, src, coord);
 }
 
@@ -70,7 +88,7 @@ Fixpipe(const T& dst, const U& src, const V& quant, const Coord& coord)
     constexpr Hardware dstTPos = TileInternal::GetHardPos<T>();
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename TileInternal::FixpipeQuantTensor2Tensor<dstTPos, srcTPos,
-        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA, TileInternal::ENABLE_COORD>::type;
+        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, V, trait, Coord>(dst, src, quant, coord);
 }
 } // namespace AscendC

@@ -405,3 +405,7 @@ KERNEL_TENSOR_TILE_FIXPIPE_E2E(1, 16, 16, 16, ND, ND, ND, ND, int8_t, int8_t, in
 KERNEL_TENSOR_TILE_FIXPIPE_E2E(1, 16, 16, 16, ND, ND, NZ, ND, int8_t, int8_t, int32_t, half, float, 4)
 KERNEL_TENSOR_TILE_FIXPIPE_E2E(1, 16, 16, 16, ND, ND, ND, ND, int8_t, int8_t, int32_t, half, float, 5)
 KERNEL_TENSOR_TILE_FIXPIPE_E2E(1, 16, 16, 16, ND, ND, NZ, ND, int8_t, int8_t, int32_t, half, float, 5)
+KERNEL_TENSOR_TILE_FIXPIPE_E2E(1, 528, 528, 528, ND, ND, ND, ND, int8_t, int8_t, int32_t, half, float, 6)
+KERNEL_TENSOR_TILE_FIXPIPE_E2E(1, 528, 528, 528, ND, ND, NZ, ND, int8_t, int8_t, int32_t, half, float, 6)
+KERNEL_TENSOR_TILE_FIXPIPE_E2E(1, 528, 528, 528, ND, ND, ND, ND, int8_t, int8_t, int32_t, half, float, 7)
+KERNEL_TENSOR_TILE_FIXPIPE_E2E(1, 528, 528, 528, ND, ND, NZ, ND, int8_t, int8_t, int32_t, half, float, 7)

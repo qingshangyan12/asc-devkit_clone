@@ -16,7 +16,6 @@
 #define IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_ROUTING_H
 
 #include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_four_dim_2201_l0c_gm.h"
-#include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_coord_four_dim_2201_l0c_gm.h"
 #include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_quant_four_dim_2201_l0c_gm.h"
 
 namespace AscendC {
@@ -26,44 +25,39 @@ class FixpipeIgnore {
 public:
     template <typename T, typename U, const FixpipeTrait& trait>
     __aicore__ inline void Run(const T& dst, const U& src) {}
+
+    template <typename T, typename U, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {}
 };
 
-template <Hardware dstTPos, Hardware srcTpos, uint32_t Version, size_t dimension, size_t enCoord>
+template <Hardware dstTPos, Hardware srcTpos, uint32_t Version, size_t dimension>
 struct FixpipeTensor2Tensor {
     using type = FixpipeIgnore;
 };
 
 template <>
-struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201, FOUR_DIM_DATA, DISABLE_COORD> {
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201, FOUR_DIM_DATA> {
     using type = FixpipeFourDim2201L0C2GM;
-};
-
-template <>
-struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201, FOUR_DIM_DATA, ENABLE_COORD> {
-    using type = FixpipeCoordFourDim2201L0C2GM;
 };
 
 class FixpipeQuantIgnore {
 public:
     template <typename T, typename U, typename V, const FixpipeTrait& trait>
     __aicore__ inline void Run(const T& dst, const U& src, const V& quant) {}
+
+    template <typename T, typename U, typename V, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord) {}
 };
 
-template <Hardware dstTPos, Hardware srcTpos, uint32_t Version, size_t dimension, size_t enCoord>
+template <Hardware dstTPos, Hardware srcTpos, uint32_t Version, size_t dimension>
 struct FixpipeQuantTensor2Tensor {
     using type = FixpipeQuantIgnore;
 };
 
 template <>
-struct FixpipeQuantTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201, FOUR_DIM_DATA, DISABLE_COORD> {
+struct FixpipeQuantTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201, FOUR_DIM_DATA> {
     using type = FixpipeQuantFourDim2201L0C2GM;
 };
-
-template <>
-struct FixpipeQuantTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201, FOUR_DIM_DATA, ENABLE_COORD> {
-    using type = FixpipeQuantCoordFourDim2201L0C2GM;
-};
-
 } // namespace TileInternal
 } // namespace AscendC
 

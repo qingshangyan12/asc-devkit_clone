@@ -31,6 +31,27 @@ public:
         DataCopy<T, U, decltype(copyParams), trait>(dst, src, copyParams);
     }
 
+    template <typename T, typename U, typename V, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord)
+    {
+        auto nzParams = GenRegisterParams<T, U, trait>(dst, src);
+        SetRegister<V, decltype(nzParams)>(quant, nzParams);
+        auto copyParams = GenFixpipeQuantParams<T, U, trait>(dst, src);
+        auto dstLayout = dst.Layout();
+        auto index = Crd2Idx(coord, dstLayout);
+        using dstType = typename T::elementType;
+        auto dstNew = reinterpret_cast<dstType *>(dst.Engine().Begin().Get() + index);
+        uint32_t dstN = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+        uint32_t dstM = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+        auto dstIterator = MakeGMmemPtr(dstNew);
+        auto dstMatrixLayout = MakeNZLayout<dstType>(dstM, dstN);
+        auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout); 
+
+        DataCopy<T, U, decltype(copyParams), trait>(dstTensor, src, copyParams);
+    }
+
 private:
     template <typename T>
     __aicore__ inline constexpr void CheckL0CNZTemplate()
@@ -98,12 +119,25 @@ public:
         FixpipeNZ2NZVectorImpl<T, U, V, S, trait>(dst, src, quant, params, tuple_sequence<decltype(params)>{});
     }
 
+    template <typename T, typename U, typename V, typename S, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void FixpipeNZ2NZVectorEntrance(const T& dst, const U& src, const V& quant, const Coord& coord, const S& params)
+    {
+        FixpipeNZ2NZVectorImpl<T, U, V, S, trait, Coord>(dst, src, quant, coord, params, tuple_sequence<decltype(params)>{});
+    }
+
 private:
     template <typename T, typename U, typename V, typename S, const FixpipeTrait& trait, size_t... Is>
     __aicore__ inline void FixpipeNZ2NZVectorImpl(
         const T& dst, const U& src, const V& quant, const S& tupleParams, Std::index_sequence<Is...>)
     {
         FixpipeNZ2NZVectorCompute<T, U, V, trait>(dst, src, quant, Std::get<Is>(tupleParams)...);
+    }
+
+    template <typename T, typename U, typename V, typename S, const FixpipeTrait& trait, typename Coord, size_t... Is>
+    __aicore__ inline void FixpipeNZ2NZVectorImpl(
+        const T& dst, const U& src, const V& quant, const Coord& coord, const S& tupleParams, Std::index_sequence<Is...>)
+    {
+        FixpipeNZ2NZVectorCompute<T, U, V, trait, Coord>(dst, src, quant, coord, Std::get<Is>(tupleParams)...);
     }
 
     template <typename T, typename U, const FixpipeTrait& trait, bool isTail>
@@ -139,16 +173,97 @@ private:
         uint32_t calNSize, uint32_t tailNSize, uint32_t dstOffset, uint32_t srcOffset)
     {
         auto mainLoopParam = GenParams<T, U, trait, false>(dst, src);
+        auto srcLayout = src.Layout();
+        using srcType = typename U::elementType;
+        uint32_t srcN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout) *
+                        GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+        uint32_t srcM = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout) *
+                        GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+        auto dstLayout = dst.Layout();
+        using dstType = typename T::elementType;
+        uint32_t dstN = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+        uint32_t dstM = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+        
         for (uint16_t i = 0; i < nIterNum; ++i) {
             CopyDeqTensorToFbufImpl(quant, calNSize, i);
             InsertSync();
-            DataCopy<T, U, decltype(mainLoopParam), trait>(dst, src, mainLoopParam);
+            auto srcNew = reinterpret_cast<srcType *>(src.Engine().Begin().Get() + srcOffset * i);
+            auto srcIterator = MakeL0CmemPtr(srcNew);
+            auto srcMatrixLayout = MakeNZLayout<Std::ignore_t>(srcM, srcN);
+            auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout);
+            auto dstNew = reinterpret_cast<dstType *>(dst.Engine().Begin().Get() + dstOffset * i);
+            auto dstIterator = MakeGMmemPtr(dstNew);
+            auto dstMatrixLayout = MakeNZLayout<dstType>(dstM, dstN);
+            auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout);
+
+            DataCopy<T, U, decltype(mainLoopParam), trait>(dstTensor, srcTensor, mainLoopParam);
         }
         auto tailParam = GenParams<T, U, trait, true>(dst, src);
         if (tailNSize) {
             CopyDeqTensorToFbufImpl(quant, tailNSize, nIterNum);
             InsertSync();
-            DataCopy<T, U, decltype(tailParam), trait>(dst, src, tailParam);
+            auto srcNew = reinterpret_cast<srcType *>(src.Engine().Begin().Get() + srcOffset * nIterNum);
+            auto srcIterator = MakeL0CmemPtr(srcNew);
+            auto srcMatrixLayout = MakeNZLayout<Std::ignore_t>(srcM, srcN);
+            auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout);
+            auto dstNew = reinterpret_cast<dstType *>(dst.Engine().Begin().Get() + dstOffset * nIterNum);
+            auto dstIterator = MakeGMmemPtr(dstNew);
+            auto dstMatrixLayout = MakeNZLayout<dstType>(dstM, dstN);
+            auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout);
+
+            DataCopy<T, U, decltype(tailParam), trait>(dstTensor, srcTensor, tailParam);
+        }
+    }
+
+    template <typename T, typename U, typename V, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void FixpipeNZ2NZVectorCompute(const T& dst, const U& src, const V& quant, const Coord& coord,
+        uint32_t nIterNum, uint32_t calNSize, uint32_t tailNSize, uint32_t dstOffset, uint32_t srcOffset)
+    {
+        auto mainLoopParam = GenParams<T, U, trait, false>(dst, src);
+        auto srcLayout = src.Layout();
+        using srcType = typename U::elementType;
+        uint32_t srcN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout) *
+                        GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+        uint32_t srcM = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout) *
+                        GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+        auto dstLayout = dst.Layout();
+        using dstType = typename T::elementType;
+        uint32_t dstN = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+        uint32_t dstM = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
+                        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+        auto index = Crd2Idx(coord, dstLayout);
+
+        for (uint16_t i = 0; i < nIterNum; ++i) {
+            CopyDeqTensorToFbufImpl(quant, calNSize, i);
+            InsertSync();
+            auto srcNew = reinterpret_cast<srcType *>(src.Engine().Begin().Get() + srcOffset * i);
+            auto srcIterator = MakeL0CmemPtr(srcNew);
+            auto srcMatrixLayout = MakeNZLayout<Std::ignore_t>(srcM, srcN);
+            auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout);
+            auto dstNew = reinterpret_cast<dstType *>(dst.Engine().Begin().Get() + dstOffset * i + index);
+            auto dstIterator = MakeGMmemPtr(dstNew);
+            auto dstMatrixLayout = MakeNZLayout<dstType>(dstM, dstN);
+            auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout);
+
+            DataCopy<T, U, decltype(mainLoopParam), trait>(dstTensor, srcTensor, mainLoopParam);
+        }
+        auto tailParam = GenParams<T, U, trait, true>(dst, src);
+        if (tailNSize) {
+            CopyDeqTensorToFbufImpl(quant, tailNSize, nIterNum);
+            InsertSync();
+            auto srcNew = reinterpret_cast<srcType *>(src.Engine().Begin().Get() + srcOffset * nIterNum);
+            auto srcIterator = MakeL0CmemPtr(srcNew);
+            auto srcMatrixLayout = MakeNZLayout<Std::ignore_t>(srcM, srcN);
+            auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout);
+            auto dstNew = reinterpret_cast<dstType *>(dst.Engine().Begin().Get() + dstOffset * nIterNum + index);
+            auto dstIterator = MakeGMmemPtr(dstNew);
+            auto dstMatrixLayout = MakeNZLayout<dstType>(dstM, dstN);
+            auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout);
+
+            DataCopy<T, U, decltype(tailParam), trait>(dstTensor, srcTensor, tailParam);
         }
     }
 };
@@ -160,6 +275,13 @@ public:
     {
         auto params = GenParams<T, U, trait>(dst, src);
         FixpipeNZ2NZVectorEntrance<T, U, V, decltype(params), trait>(dst, src, quant, params);
+    }
+
+    template <typename T, typename U, typename V, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord)
+    {
+        auto params = GenParams<T, U, trait>(dst, src);
+        FixpipeNZ2NZVectorEntrance<T, U, V, decltype(params), trait, Coord>(dst, src, quant, coord, params);
     }
 
 private:

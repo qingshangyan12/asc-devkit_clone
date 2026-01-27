@@ -17,8 +17,6 @@
 
 #include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_quant_nz2nd_four_dim_2201_l0c_gm.h"
 #include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_quant_nz2nz_four_dim_2201_l0c_gm.h"
-#include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_quant_nz2nd_coord_four_dim_2201_l0c_gm.h"
-#include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_quant_nz2nz_coord_four_dim_2201_l0c_gm.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -50,11 +48,13 @@ __aicore__ inline constexpr QuantMode2201 GetQuantMode2201()
     return QuantMode2201::None;
 }
 
-// Disable Coordinate
 class Format2201RegistorIgnore {
 public:
     template <typename T, typename U, typename V, const FixpipeTrait& trait>
     __aicore__ inline void Run(const T& dst, const U& src, const V& quant) {}
+
+    template <typename T, typename U, typename V, const FixpipeTrait& trait, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord) {}
 };
 
 template <Format2201 dstFormat, Format2201 srcFormat, QuantMode2201 quantMode>
@@ -90,48 +90,6 @@ struct Format2201Registor<Format2201::NZ, Format2201::NZ, QuantMode2201::Vector>
 template <>
 struct Format2201Registor<Format2201::ND, Format2201::NZ, QuantMode2201::Vector> {
     using type = FixpipeNZ2ND2201VectorQuant;
-};
-
-// Enable Coordinate
-class FormatCoord2201RegistorIgnore {
-public:
-    template <typename T, typename U, typename V, const FixpipeTrait& trait, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord) {}
-};
-
-template <Format2201 dstFormat, Format2201 srcFormat, QuantMode2201 quantMode>
-struct FormatCoord2201Registor {
-    using type = FormatCoord2201RegistorIgnore;
-};
-
-template <>
-struct FormatCoord2201Registor<Format2201::NZ, Format2201::NZ, QuantMode2201::Direct> {
-    using type = FixpipeCoordNZ2NZ2201SimpleQuant;
-};
-
-template <>
-struct FormatCoord2201Registor<Format2201::ND, Format2201::NZ, QuantMode2201::Direct> {
-    using type = FixpipeCoordNZ2ND2201SimpleQuant;
-};
-
-template <>
-struct FormatCoord2201Registor<Format2201::NZ, Format2201::NZ, QuantMode2201::Scalar> {
-    using type = FixpipeCoordNZ2NZ2201SimpleQuant;
-};
-
-template <>
-struct FormatCoord2201Registor<Format2201::ND, Format2201::NZ, QuantMode2201::Scalar> {
-    using type = FixpipeCoordNZ2ND2201SimpleQuant;
-};
-
-template <>
-struct FormatCoord2201Registor<Format2201::NZ, Format2201::NZ, QuantMode2201::Vector> {
-    using type = FixpipeCoordNZ2NZ2201VectorQuant;
-};
-
-template <>
-struct FormatCoord2201Registor<Format2201::ND, Format2201::NZ, QuantMode2201::Vector> {
-    using type = FixpipeCoordNZ2ND2201VectorQuant;
 };
 
 template <typename T, typename U, const FixpipeTrait& trait>
@@ -182,20 +140,16 @@ public:
             typename Format2201Registor<GetDataFormat2201<T>(), GetDataFormat2201<U>(), GetQuantMode2201<trait>()>::type;
         FixpipeQuantL0C2GM{}.template Run<T, U, V, trait>(dst, src, quant);
     }
-};
 
-class FixpipeQuantCoordFourDim2201L0C2GM {
-public:
     template <typename T, typename U, typename V, const FixpipeTrait& trait, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord)
     {
         CheckFixpipe2201QuantParams<T, U, trait>();
         using FixpipeQuantCoordL0C2GM =
-            typename FormatCoord2201Registor<GetDataFormat2201<T>(), GetDataFormat2201<U>(), GetQuantMode2201<trait>()>::type;
+            typename Format2201Registor<GetDataFormat2201<T>(), GetDataFormat2201<U>(), GetQuantMode2201<trait>()>::type;
         FixpipeQuantCoordL0C2GM{}.template Run<T, U, V, trait, Coord>(dst, src, quant, coord);
     }
 };
-
 }  // namespace TileInternal
 }  // namespace AscendC
 
