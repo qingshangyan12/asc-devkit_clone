@@ -267,7 +267,7 @@ __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam &che
 }
 
 template <typename T>
-__aicore__ inline auto CreateAddrReg(uint16_t stride0)
+__simd_callee__ inline auto CreateAddrReg(uint16_t stride0)
 {
     static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4, "CreateAddrReg only support type b8/b16/b32");
     if constexpr (sizeof(T) == 1) {
@@ -279,7 +279,7 @@ __aicore__ inline auto CreateAddrReg(uint16_t stride0)
 }
 
 template <typename T>
-__aicore__ inline auto CreateAddrReg(uint16_t stride0, uint16_t stride1)
+__simd_callee__ inline auto CreateAddrReg(uint16_t stride0, uint16_t stride1)
 {
     static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4, "CreateAddrReg only support type b8/b16/b32");
     if constexpr (sizeof(T) == 1) {
@@ -291,7 +291,7 @@ __aicore__ inline auto CreateAddrReg(uint16_t stride0, uint16_t stride1)
 }
 
 template <typename T>
-__aicore__ inline auto CreateAddrReg(uint16_t stride0, uint16_t stride1, uint16_t stride2)
+__simd_callee__ inline auto CreateAddrReg(uint16_t stride0, uint16_t stride1, uint16_t stride2)
 {
     static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4, "CreateAddrReg only support type b8/b16/b32");
     if constexpr (sizeof(T) == 1) {
@@ -303,7 +303,7 @@ __aicore__ inline auto CreateAddrReg(uint16_t stride0, uint16_t stride1, uint16_
 }
 
 template <typename T>
-__aicore__ inline auto CreateAddrReg(uint16_t stride0, uint16_t stride1, uint16_t stride2, uint16_t stride3)
+__simd_callee__ inline auto CreateAddrReg(uint16_t stride0, uint16_t stride1, uint16_t stride2, uint16_t stride3)
 {
     static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4, "CreateAddrReg only support type b8/b16/b32");
     if constexpr (sizeof(T) == 1) {
@@ -347,38 +347,38 @@ __simd_callee__ inline MaskReg CreatePredicate()
     return reg;
 }
 
-__aicore__ inline void PredicateNot(MaskReg &dstMask, MaskReg &srcMask, MaskReg &mask)
+__simd_callee__ inline void PredicateNot(MaskReg &dstMask, MaskReg &srcMask, MaskReg &mask)
 {
     pnot(dstMask, srcMask, mask);
 }
 
-__aicore__ inline void PredicateAnd(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, MaskReg &mask)
+__simd_callee__ inline void PredicateAnd(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, MaskReg &mask)
 {
     pand(dstMask, srcMask0, srcMask1, mask);
 }
 
-__aicore__ inline void PredicateOr(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, MaskReg &mask)
+__simd_callee__ inline void PredicateOr(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, MaskReg &mask)
 {
     por(dstMask, srcMask0, srcMask1, mask);
 }
 
-__aicore__ inline void PredicateXor(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, MaskReg &mask)
+__simd_callee__ inline void PredicateXor(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, MaskReg &mask)
 {
     pxor(dstMask, srcMask0, srcMask1, mask);
 }
 
-__aicore__ inline void PredicateMov(MaskReg &dstMask, MaskReg &srcMask, MaskReg &mask)
+__simd_callee__ inline void PredicateMov(MaskReg &dstMask, MaskReg &srcMask, MaskReg &mask)
 {
     pmov(dstMask, srcMask, mask);
 }
 
-__aicore__ inline void PredicateMov(MaskReg &dstMask, MaskReg &srcMask)
+__simd_callee__ inline void PredicateMov(MaskReg &dstMask, MaskReg &srcMask)
 {
     pmov(dstMask, srcMask);
 }
 
 template <typename T>
-__aicore__ inline void PredicateSlide(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, const int16_t slideAmount)
+__simd_callee__ inline void PredicateSlide(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, const int16_t slideAmount)
 {
     static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4, "PredicateSlide only support type b8/b16/b32 ");
     if constexpr (sizeof(T) == 1) {
@@ -418,7 +418,7 @@ __simd_callee__ inline void PredicateDeInterleave(MaskReg &dstMask0, MaskReg &ds
     }
 }
 
-__aicore__ inline void PredicateSel(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, MaskReg &mask)
+__simd_callee__ inline void PredicateSel(MaskReg &dstMask, MaskReg &srcMask0, MaskReg &srcMask1, MaskReg &mask)
 {
     psel(dstMask, srcMask0, srcMask1, mask);
 }
@@ -438,7 +438,7 @@ __simd_callee__ inline void PredicateUnPack(MaskReg &dstMask, MaskReg &srcMask)
 }
 
 template <typename T>
-__aicore__ inline MaskReg MovePredicate()
+__simd_callee__ inline MaskReg MovePredicate()
 {
     static_assert(SupportBytes<T, 2, 4>(), "MovePredicate only support type b16/b32");
     if constexpr (sizeof(T) == 2) {
@@ -448,10 +448,10 @@ __aicore__ inline MaskReg MovePredicate()
     }
 }
 template <Mode mode>
-__aicore__ inline constexpr auto GetMaskMergeMode()
+__simd_callee__ inline constexpr auto GetMaskMergeMode()
 {
 // To avoid naming conflicts of mode struct in cpu debug.
-#if defined(__CCE_KT_TEST__) && __CCE_KT_TEST__ == 1
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return std::integral_constant<::CpuMode, static_cast<::CpuMode>(mode)>();
 #else
     return std::integral_constant<::Mode, static_cast<::Mode>(mode)>();
@@ -459,7 +459,7 @@ __aicore__ inline constexpr auto GetMaskMergeMode()
 }
 
 template <typename T, typename U, HiloPart part = HiloPart::Lower>
-__aicore__ inline void Pack(RegTensor<T> &dstReg, RegTensor<U> &srcReg)
+__simd_callee__ inline void Pack(RegTensor<T> &dstReg, RegTensor<U> &srcReg)
 {
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     constexpr auto modeValue = GetMaskMergeMode<Mode::ZEROING>();
@@ -468,7 +468,7 @@ __aicore__ inline void Pack(RegTensor<T> &dstReg, RegTensor<U> &srcReg)
 }
 
 template <typename T, typename U, HiloPart part = HiloPart::Lower>
-__aicore__ inline void UnPack(RegTensor<T> &dstReg, RegTensor<U> &srcReg)
+__simd_callee__ inline void UnPack(RegTensor<T> &dstReg, RegTensor<U> &srcReg)
 {
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     vunpack(dstReg, srcReg, partValue);
@@ -1040,7 +1040,7 @@ __aicore__ inline void LeakyRelu(RegTensor<T> &dstReg, RegTensor<T> &srcReg0, T 
 }
 
 template <typename T, CMPMODE mode = CMPMODE::EQ>
-__aicore__ inline void Compare(MaskReg &dstReg, RegTensor<T> &srcReg0, RegTensor<T> &srcReg1, MaskReg &mask)
+__simd_callee__ inline void Compare(MaskReg &dstReg, RegTensor<T> &srcReg0, RegTensor<T> &srcReg1, MaskReg &mask)
 {
     if constexpr (mode == CMPMODE::EQ) {
         vcmp_eq(dstReg, srcReg0, srcReg1, mask);
@@ -1058,7 +1058,7 @@ __aicore__ inline void Compare(MaskReg &dstReg, RegTensor<T> &srcReg0, RegTensor
 }
 
 template <typename T, CMPMODE mode = CMPMODE::EQ>
-__aicore__ inline void CompareScalar(MaskReg &dstReg, RegTensor<T> &srcReg0, T scalar, MaskReg &mask)
+__simd_callee__ inline void CompareScalar(MaskReg &dstReg, RegTensor<T> &srcReg0, T scalar, MaskReg &mask)
 {
     if constexpr (mode == CMPMODE::EQ) {
         vcmps_eq(dstReg, srcReg0, scalar, mask);
@@ -1475,5 +1475,83 @@ __aicore__ inline void Barrier()
 #endif
 }
 
+template <SpecialPurposeReg spr>
+__aicore__ inline int64_t GetSprImpl()
+{
+    static_assert(SupportEnum<spr, SpecialPurposeReg::AR>(),
+        "current GetSpr api only support SpecialPurposeReg AR on current device!");
+    return get_ar();
+}
+
+__simd_vf__ inline void ClearARImpl()
+{
+    constexpr uint8_t SPR_AR_VALUE = 74;
+    constexpr auto sprValue = std::integral_constant<::Spr, static_cast<::Spr>(SPR_AR_VALUE)>();
+    sprclr(sprValue);
+}
+
+template <SpecialPurposeReg spr>
+__aicore__ inline void ClearSprImpl()
+{
+    static_assert(SupportEnum<spr, SpecialPurposeReg::AR>(),
+        "current ClearSpr api only support SpecialPurposeReg AR on current device!");
+
+    if constexpr (spr == SpecialPurposeReg::AR) {
+        ClearARImpl();
+    }
+}
+
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline void SetCtrlSprImpl(int64_t value)
+{
+    static_assert((startBit <= endBit && startBit >= 0 && endBit < 64), "Invalid bit range on current device!");
+    static_assert((6 <= startBit && startBit <= 10 && 6 <= endBit && endBit <= 10) ||
+                      (startBit == endBit && (startBit == 45 || startBit == 48 || startBit == 50 || startBit == 53 ||
+                                              startBit == 59 || startBit == 60)),
+                  "Invalid startBit/endBit on current device!");
+    if (endBit - startBit == 63) {
+        set_ctrl(value);
+        return;
+    }
+    uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
+    mask = ~mask;
+    int64_t setValue = get_ctrl() & mask;
+    setValue |= (value << startBit);
+    set_ctrl(setValue);
+}
+
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline int64_t GetCtrlSprImpl()
+{
+    static_assert((startBit <= endBit && startBit >= 0 && endBit < 64), "Invalid bit range on current device!");
+    int64_t value = get_ctrl();
+    if (endBit - startBit == 63) {
+        return value;
+    }
+    value = value >> startBit;
+    value &= ((uint64_t(1) << (endBit - startBit + 1)) - 1);
+    return value;
+}
+
+template <int8_t startBit, int8_t endBit>
+__aicore__ static inline void ResetCtrlSprImpl()
+{
+    static_assert((startBit <= endBit && startBit >= 0 && endBit < 64), "Invalid bit range on current device!");
+    static_assert((6 <= startBit && startBit <= 10 && 6 <= endBit && endBit <= 10) ||
+                      (startBit == endBit && (startBit == 45 || startBit == 48 || startBit == 50 || startBit == 53 ||
+                                              startBit == 59 || startBit == 60)),
+                  "Invalid startBit/endBit on current device!");
+    int64_t defaultCtrl = 0x1000000000000008; // default value of ctrl
+    if (endBit - startBit == 63) {
+        set_ctrl(defaultCtrl);
+        return;
+    }
+    uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
+    defaultCtrl = defaultCtrl & mask;
+    mask = ~mask;
+    int64_t value = get_ctrl() & mask;
+    value = value | defaultCtrl;
+    set_ctrl(value);
+}
 }  // namespace AscendC
 #endif  // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
