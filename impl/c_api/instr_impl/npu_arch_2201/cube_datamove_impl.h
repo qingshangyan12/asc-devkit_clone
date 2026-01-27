@@ -2208,6 +2208,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uin
     asc_copy_l12bt_sync_impl(dst, src, size);
 }
 
+//=============asc_copy_l12fb===============
 __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_num, uint16_t burst_len,
                                       uint16_t src_gap_size, uint16_t dst_gap_size)
 {
