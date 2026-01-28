@@ -160,7 +160,7 @@ __aicore__ inline float TrigRadianReduction(float x, float threshold, int *quadr
 
 /**
  * Computes the cosine of an angle using a polynomial approximation.
- * According formula: cos(x) = 1-(1/2!)x^2+(1/4!)x^4+...+((-1)^n/(2n)!)x^2n+O(x^{2n+2})
+ * Formula: cos(x) = 1-(1/2!)x^2+(1/4!)x^4+...+((-1)^n/(2n)!)x^2n+O(x^{2n+2})
  * The input angle should be in the range [-pi/2, pi/2].
  *
  * @param x The input angle in radians.
@@ -177,7 +177,7 @@ __aicore__ inline float CosPoly(float x)
  
 /**
  * Computes the sine of an angle using a polynomial approximation.
- * According formula: sin(x) = x-(1/3!)x^3+(1/5!)x^5+...+((-1)^n/(2n+1)!)x^{2n+1}+O(x^{2n+3})
+ * Formula: sin(x) = x-(1/3!)x^3+(1/5!)x^5+...+((-1)^n/(2n+1)!)x^{2n+1}+O(x^{2n+3})
  * The input angle should be in the range [-pi/2, pi/2].
  *
  * @param x The input angle in radians.
@@ -300,7 +300,7 @@ __aicore__ inline void SinCosImpl(T x, T &s, T &c)
 /**
  * Computes the tangent of an angle using a polynomial approximation.
  * The input angle should be in the range [-pi/2, pi/2].
- * According formula: tanx=x+(1/3)*x^3+(2/15)*x^5+(17/315)*x^7+(62/2835)*x^9+(1382/155925)*x^11+
+ * Formula: tanx=x+(1/3)*x^3+(2/15)*x^5+(17/315)*x^7+(62/2835)*x^9+(1382/155925)*x^11+
  *           +(21844/6081075)*x^13+(929569/638512875)*x^15+...+O(...)
  *
  * @param x The input angle in radians.
@@ -552,7 +552,7 @@ __aicore__ inline float AtanhImpl(float x)
 
 /**
  * Rquare root of X
- * According formula:Sqrt(x) = sqrt(x)
+ * Formula:Sqrt(x) = sqrt(x)
  * @param x a value
  * @return SqrtImpl(x)
  * Special cases:
@@ -573,7 +573,7 @@ __aicore__ inline T SqrtImpl(T x)
 
 /**
  * Reciprocal of Sqrt(x)
- * According formula:Rsqrt(x) = 1 / sqrt(x)
+ * Formula:Rsqrt(x) = 1 / sqrt(x)
  * @param x a value
  * @return RsqrtImpl(x)
  * Special cases:
@@ -590,7 +590,7 @@ __aicore__ inline T RsqrtImpl(T x)
 
 /**
  * * Computes cosh values based on input.
- * * According formula: cosh(x) = (e^x+e^(-x))/2 = e^(x-ln2) + 0.25/(e^(x-ln2)).
+ * * Formula: cosh(x) = (e^x+e^(-x))/2 = e^(x-ln2) + 0.25/(e^(x-ln2)).
  * *
  * * @param x
  * * @return Cosh(x)
@@ -612,7 +612,7 @@ __aicore__ inline T CoshImpl(T x)
 
 /**
  * Computes cospi values based on input.
- * According formula: cospi(x) = cos(x*PI)
+ * Formula: cospi(x) = cos(x*PI)
  *
  * @param x
  * @return Cospi(x)
@@ -629,7 +629,7 @@ __aicore__ inline T CospiImpl(T x)
 
 /**
  * Computes cos values based on input.
- * According formula:
+ * Formula:
  * asin(x) = asin(sqrt(1-x^2)) - pi/2, x belongs to (-1, -2^(-0.5))
  * asin(x) = the  taylor expansion, x belongs to (-2^(-0.5), 2^(-0.5))
  * asin(x) = pi/2 -asin(sqrt(1-x^2)), x belongs to (2^(-0.5), 1)
@@ -682,7 +682,7 @@ __aicore__ inline T AsinImpl(T x)
 
 /**
  * Computes Acos values based on input.
- * According formula: Acos(x) = pi/2-Asin(x).
+ * Formula: Acos(x) = pi/2-Asin(x).
  *
  * @param x
  * @return Acos(x)
@@ -700,7 +700,7 @@ __aicore__ inline T AcosImpl(T x)
 
 /**
  * Computes Acosh values based on input.
- * According formula:acosh(x) = ln(x + sqrt(x^2 - 1))
+ * Formula:acosh(x) = ln(x + sqrt(x^2 - 1))
  *
  * @param x
  * @return Acosh(x)
@@ -720,7 +720,7 @@ __aicore__ inline T AcoshImpl(T x)
 
 /**
  * Computes Sinh values based on input.
- * According formula: sinh(x) = (e^x-e^(-x))/2 = e^(x-ln2) - 0.25/(e^(x-ln2)).
+ * Formula: sinh(x) = (e^x-e^(-x))/2 = e^(x-ln2) - 0.25/(e^(x-ln2)).
  *
  * @param x
  * @return Sinh(x)
@@ -750,7 +750,7 @@ __aicore__ inline T SinhImpl(T x)
 
 /**
  * Computes Sinpi values based on input.
- * According formula: sinpi(x) = sin(x*PI)
+ * Formula: sinpi(x) = sin(x*PI)
  *
  * @param x
  * @return Sinpi(x)
@@ -767,7 +767,7 @@ __aicore__ inline T SinpiImpl(T x)
 
 /**
  * Computes Asinh values based on input.
- * According formula:asinh(x) = ln(x + sqrt(x^2 + 1))
+ * Formula:asinh(x) = ln(x + sqrt(x^2 + 1))
  * asinh(x) = -asinh(-x)
  *
  * @param x
@@ -810,7 +810,7 @@ __aicore__ inline void SinCospiImpl(T x, T &s, T &c)
 
 /**
  * Computes Hypot values based on input.
- * According formula:HypotImpl(x, y) = sqrt(x^2 + y^2)
+ * Formula:HypotImpl(x, y) = sqrt(x^2 + y^2)
  *
  * @param x, y
  * @return HypotImpl(x, y)
@@ -844,7 +844,7 @@ __aicore__ inline T HypotImpl(T x, T y)
 
 /**
  * Computes Rhypot values based on input.
- * According formula:RhypotImpl(x, y) = 1 / sqrt(x^2 + y^2) = 1 / HypotImpl(x, y)
+ * Formula:RhypotImpl(x, y) = 1 / sqrt(x^2 + y^2) = 1 / HypotImpl(x, y)
  *
  * @param x a value
  * @param y a value
@@ -862,7 +862,7 @@ __aicore__ inline T RhypotImpl(T x, T y)
 
 /**
  * Break VALUE into a normalized fraction and an integral power of 2.
- * According formula:x = Frexp(x, exp) * 2^exp
+ * Formula:x = Frexp(x, exp) * 2^exp
  *
  * @param x a value
  * @param &exp a value
@@ -903,7 +903,7 @@ __aicore__ inline T1 FrexpImpl(T1 x, T2 &exp)
 
 /**
  * X times (two to the EXP power).
- * According formula:Ldexp(x, exp) = x * 2^exp
+ * Formula:Ldexp(x, exp) = x * 2^exp
  * @param x a value
  * @param exp  a value
  * @return LdexpImpl(x, &exp)
@@ -946,7 +946,7 @@ __aicore__ inline T1 LdexpImpl(T1 x, T2 exp)
 
 /**
  * Calculate the square root of the sum of squares of 3D coordinates.
- * According formula:Norm3dImpl(a, b, c) = sqrt(a^2 + b^2 + c^2)
+ * Formula:Norm3dImpl(a, b, c) = sqrt(a^2 + b^2 + c^2)
  *                                       = max(a,b,c)*sqrt({a/max}^2 + {b/max}^2 + {c/max}^2)
  *
  * @param a  float value
@@ -984,7 +984,7 @@ __aicore__ inline T Norm3dImpl(T a, T b, T c)
 
 /**
  * Calculate the reciprocal of the square root of the sum of squares of 3D coordinates.
- * According formula:Rnorm3dImpl(a, b, c) = 1 / sqrt(a^2 + b^2 + c^2)
+ * Formula:Rnorm3dImpl(a, b, c) = 1 / sqrt(a^2 + b^2 + c^2)
  *                                       = 1 / Norm3dImpl(a, b, c)
  *
  * @param a  float value
@@ -1007,7 +1007,7 @@ __aicore__ inline T Rnorm3dImpl(T a, T b, T c)
 
 /**
  * Calculate the square root of the sum of squares of 4D coordinates.
- * According formula:Norm4dImpl(a, b, c, d) = sqrt(a^2 + b^2 + c^2 + d^2)
+ * Formula:Norm4dImpl(a, b, c, d) = sqrt(a^2 + b^2 + c^2 + d^2)
  *                                       = max(a,b,c,d)*sqrt({a/max}^2 + {b/max}^2 + {c/max}^2+ {d/max}^2)
  *
  * @param a  float value
@@ -1048,7 +1048,7 @@ __aicore__ inline T Norm4dImpl(T a, T b, T c, T d)
 
 /**
  * Calculate the reciprocal of the square root of the sum of squares of 4D coordinates.
- * According formula:Rnorm4dImpl(a, b, c, d) = 1 / sqrt(a^2 + b^2 + c^2 + d^2)
+ * Formula:Rnorm4dImpl(a, b, c, d) = 1 / sqrt(a^2 + b^2 + c^2 + d^2)
  *                                           = 1 / Norm4dImpl(a, b, c, d)
  *
  * @param a  float value
@@ -1072,7 +1072,7 @@ __aicore__ inline T Rnorm4dImpl(T a, T b, T c, T d)
 
 /**
  * Calculate the square root of the sum of squares of N coordinates.
- * According formula:NormImpl(n, a) =  sqrt(a[0]^2 +... + a[n-1]^2)
+ * Formula:NormImpl(n, a) =  sqrt(a[0]^2 +... + a[n-1]^2)
  *                                           = max(a[i]) * sqrt({a[0]/max}^2+...+{a[n-i]/max}^2)
  *
  * @param n int value, computes dimension of a
@@ -1117,7 +1117,7 @@ __aicore__ inline T2 NormImpl(T1 n, T2* a)
 
 /**
  * Calculate the reciprocal of the square root of the sum of squares of N coordinates.
- * According formula:RnormImpl(n, a) = 1 / sqrt(a[0]^2 +... + a[n-1]^2)
+ * Formula:RnormImpl(n, a) = 1 / sqrt(a[0]^2 +... + a[n-1]^2)
  *                                           = 1 / NormImpl(n, a)
  *
  * @param n int value, computes dimension of a
@@ -1825,7 +1825,7 @@ __aicore__ inline float EulerGammaFunction(float x)
 /**
  * Calculates gamma value by input x, x in (-inf, -1.5] or [1.5, inf).
  *
- * According formula:
+ * Formula:
  *      f(x) = (x-1)! = sqrt(2*pi*x) * [(x/e)^x] * [1 + 1/(12*x) + 1/(288*x^2) + O(3)] / x, x >= 1.5
  *      f(x) = pi / [sin(pi*x) * f(1-x)], x <= -1.5
  * @param x a value

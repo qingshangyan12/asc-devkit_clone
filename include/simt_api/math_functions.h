@@ -146,7 +146,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x);
 
 /**
- * The trigonometric sine,cossine of an angle
+ * The trigonometric sine,cosine of an angle
  * @param x an angle, in radians.
  * @return s the sine of the x.
  *         c the cossin of the x.
@@ -154,7 +154,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float &s, float &c);
 
 /**
- * The trigonometric sine,cossine of an angle*pi
+ * The trigonometric sine,cosine of an angle*pi
  * @param x an angle, in radians.
  * @return s the sine of the x*pi.
  *         c the cossin of the x*pi.
