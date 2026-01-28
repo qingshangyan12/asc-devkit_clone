@@ -48,25 +48,9 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_float src0, vector_f
 ## 调用示例
 
 ```cpp
-// 输入固定为128个元素
-constexpr uint32_t total_length = 128;
-__ubuf__ uint8_t dst[total_length / 8];
-__ubuf__ half src0[total_length];
-__ubuf__ half src1[total_length];
-uint8_t repeat = 1;
-uint8_t dst_block_stride = 1;
-uint8_t src0_block_stride = 1;
-uint8_t src1_block_stride = 1;
-uint8_t dst_repeat_stride = 8;
-uint8_t src0_repeat_stride = 8;
-uint8_t src1_repeat_stride = 8;
-…… // 数据搬运及同步操作
-
-// 结果存入寄存器，通过寄存器获取比较结果
-asc_ne(src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
-…… // 同步操作
-asc_get_cmp_mask(dst); // 读取结果
-
-// 结果输出到目标地址中
-asc_ne(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
+vector_bool dst;
+vector_uint8_t src0;
+vector_uint8_t src1;
+vector_bool mask;
+asc_ne(dst, src0, src1, mask);
 ```

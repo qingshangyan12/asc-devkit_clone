@@ -43,9 +43,8 @@ __simd_callee__ inline void asc_ln(vector_float &dst, vector_float src, vector_b
 ## 调用示例
 
 ```cpp
-//total_length 指参与计算的数据长度
-constexpr uint32_t total_length = 128;
-__ubuf__ half src[total_length];
-__ubuf__ half dst[total_length];
-asc_abs(dst, src, total_length);
+vector_half dst;
+vector_half src;
+vector_bool mask;
+asc_ln(dst, src, mask);
 ```

@@ -43,10 +43,9 @@ __simd_callee__ inline void asc_div(vector_float &dst, vector_float src0, vector
 ## 调用示例
 
 ```cpp
-//total_length 指参与计算的数据长度
-constexpr uint64_t total_length = 64;
-__ubuf__ half src0[total_length];
-__ubuf__ half src1[total_length];
-__ubuf__ half dst[total_length];
-asc_div(dst, src0, src1, total_length);
+vector_half dst;
+vector_half src0;
+vector_half src1;
+vector_bool mask;
+asc_div(dst, src0, src1, mask);
 ```

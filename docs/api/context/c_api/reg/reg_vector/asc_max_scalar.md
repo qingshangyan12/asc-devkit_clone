@@ -49,11 +49,12 @@ __simd_callee__ inline void asc_max_scalar(vector_bfloat16_t& dst, vector_bfloat
 ## 调用示例
 
 ```cpp
-constexpr int total_length = 256; //total_length 指参与计算的数据长度
-half value = 10;
-__ubuf__ half src[total_length];
-__ubuf__ half dst[total_length];
-asc_max_scalar(dst, src, value, total_length);
+vector_int8_t dst;
+vector_int8_t src;
+int8_t value;
+vector_bool mask;
+asc_max_scalar(dst, src, value, mask);
+
 // src : [1, 2, 3, 4, ... , 256]
 // value : 3 
 // dst : [3, 3, 3, 5, ... , 256]

@@ -1,0 +1,53 @@
+
+# asc_unpack
+
+## 产品支持情况
+
+| 产品         | 是否支持 |
+| :-----------------------| :-----:|
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √ |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √ |
+
+## 功能说明
+
+矢量解包操作。对于无符号整型，将源操作数中低半部分或高半部分的元素以高位填0扩充位宽的方式写入目标操作数，对于有符号整型，将源操作数中低半部分或高半部分元素以保持符号位扩展位宽的方式写入目标操作数，对于布尔矢量，将源操作数中低半部分或高半部分的元素，保持其真值并维持原有的顺序，写入目标操作数。
+
+## 函数原型
+
+```cpp
+__simd_callee__ inline void asc_unpack_upper(vector_uint16_t &dst, vector_uint8_t src)
+__simd_callee__ inline void asc_unpack_lower(vector_uint16_t &dst, vector_uint8_t src)
+__simd_callee__ inline void asc_unpack_upper(vector_int16_t &dst, vector_int8_t src)
+__simd_callee__ inline void asc_unpack_lower(vector_int16_t &dst, vector_int8_t src)
+__simd_callee__ inline void asc_unpack_upper(vector_uint32_t &dst, vector_uint16_t src)
+__simd_callee__ inline void asc_unpack_lower(vector_uint32_t &dst, vector_uint16_t src)
+__simd_callee__ inline void asc_unpack_upper(vector_int32_t &dst, vector_int16_t src)
+__simd_callee__ inline void asc_unpack_lower(vector_int32_t &dst, vector_int16_t src)
+__simd_callee__ inline void asc_unpack_upper(vector_bool &dst, vector_bool src)
+__simd_callee__ inline void asc_unpack_lower(vector_bool &dst, vector_bool src)
+
+```
+
+## 参数说明
+
+| 参数名  | 输入/输出 | 描述 |
+| :----- | :------- | :------- |
+| dst | 输出 | 目的操作数（矢量）的起始地址。 |
+| src | 输入 | 源操作数（矢量）的起始地址。 |
+
+## 返回值说明
+
+无
+
+## 约束说明
+
+- 操作数地址对齐要求请参考
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
+
+## 调用示例
+
+```cpp
+vector_uint16_t dst;
+vector_uint8_t src;
+asc_unpack_upper(dst, src, mask);
+```
