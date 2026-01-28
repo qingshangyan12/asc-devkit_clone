@@ -2392,7 +2392,10 @@ Contents of section
         from asc_op_compile_base.asc_op_compiler.compile_op import _compile_ascendc_cce_v220_with_kernel_type
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config() as cfg:
-                with mock.patch.object(CommonUtility, 'run_cmd_inner', return_value=""):
+                with (mock.patch.object(CommonUtility, 'run_cmd_inner', return_value=""),
+                      mock.patch('os.system', return_value=0),
+                      mock.patch('os.remove', return_value=0)
+                ):
                     DFXSectionGenerator().dfx_info_reset(op_info)
                     gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple([], []))
                     os.system(
@@ -4148,7 +4151,10 @@ Contents of section
         CommonUtility.get_ascendc_compiler_path()
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
-                with mock.patch.object(CommonUtility, 'run_cmd_inner', return_value=""):
+                with (mock.patch.object(CommonUtility, 'run_cmd_inner', return_value=""),
+                      mock.patch('os.system', return_value=0),
+                      mock.patch('os.remove', return_value=0)
+                ):
                     with mock.patch.object(DFXSectionGenerator(), 'generate_dfx_section', return_value=""):
                         CommonUtility.get_kernel_meta_dir()
                         DFXSectionGenerator().dfx_info_reset(op_info)
