@@ -84,6 +84,7 @@ struct IbVerbsData {
 };
 
 constexpr uint32_t HCCL_MAX_RANK_NUM = 32U;
+constexpr uint32_t HCCL_MAX_RANK_NUM_V310 = 64U;
 struct HcclCombineOpParam {
     uint64_t workSpace;                         // Address for communication between client and server,
                                                 // hccl requests and clears
@@ -91,17 +92,15 @@ struct HcclCombineOpParam {
     uint32_t rankId;                            // id of this rank
     uint32_t rankNum;                           // num of ranks in this comm group
     uint64_t winSize;                           // size of each windows memory
-    uint64_t windowsIn[HCCL_MAX_RANK_NUM];      // windows address for input, windowsIn[rankId] corresponds
-                                                // to the local card address,
-                                                // and others are cross-card mapping addresses.
-    uint64_t windowsOut[HCCL_MAX_RANK_NUM];     // windows address for output, windowsOut[rankId] corresponds
-                                                // to the local card address,
-                                                // and others are cross-card mapping addresses.
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+    uint64_t windowsIn[HCCL_MAX_RANK_NUM_V310];
+    uint64_t windowsOut[HCCL_MAX_RANK_NUM_V310];
     GM_ADDR xnOffset;
     GM_ADDR ckeOffset;
-    uint8_t res[8312];
+    uint8_t res[7800];
 #else
+    uint64_t windowsIn[HCCL_MAX_RANK_NUM];
+    uint64_t windowsOut[HCCL_MAX_RANK_NUM];
     uint8_t res[8328];
 #endif
     uint8_t multiFlag;
