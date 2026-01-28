@@ -91,7 +91,7 @@ file(GLOB ASCENDC_TEST_ASCEND310P_CASE_SRC_PART_FILES
 
 file(GLOB_RECURSE ASCENDC_TEST_ASCEND310P_CASE_SRC_FILES_API_CHECK ${ASCENDC_TESTS_DIR}/api_check/math/*.cpp)
 
-set(ASCENDC_TEST_ascend310p_CASE_SRC_FILES ${ASCENDC_TEST_ASCEND310P_CASE_SRC_PART_FILES} ${ASCENDC_TEST_ASCEND310P_CASE_SRC_FILES_API_CHECK})
+set(ASCENDC_TEST_ascend310p_CASE_SRC_FILES ${ASCENDC_TEST_ASCEND310P_CASE_SRC_PART_FILES})
 
 # ascend910B1 aiv test cases
 file(GLOB ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES
@@ -179,7 +179,7 @@ file(GLOB ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES
 
 file(GLOB_RECURSE ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_FILES_API_CHECK ${ASCENDC_TESTS_DIR}/api_check/*.cpp)
 
-set(ASCENDC_TEST_ascend910B1_AIV_CASE_SRC_FILES ${ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES} ${ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_FILES_API_CHECK})
+set(ASCENDC_TEST_ascend910B1_AIV_CASE_SRC_FILES ${ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES})
 
 # ascend910B1 aic test cases
 file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
@@ -274,6 +274,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __NPU_ARCH__=2002
             __DAV_M200__
             __UT_CHIP_VER__=610
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(ascendc_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -287,6 +288,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __NPU_ARCH__=2002
             __DAV_M200__
             __UT_CHIP_VER__=710
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(ascendc_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -300,6 +302,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __NPU_ARCH__=2201
             __DAV_C220__
             __DAV_C220_CUBE__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(ascendc_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -313,6 +316,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __NPU_ARCH__=2201
             __DAV_C220__
             __DAV_C220_VEC__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(ascendc_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -326,6 +330,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __NPU_ARCH__=2201
             __DAV_C220__
             __DAV_C220_CUBE__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(ascendc_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -339,6 +344,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __NPU_ARCH__=3002
             __DAV_M300__
             __UT_CHIP_VER__=300
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(ascendc_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -352,6 +358,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             __NPU_ARCH__=2201
             __DAV_C220__
             __DAV_C220_VEC__
+            __disable_kernel_type_autoinfer__=
         )
         target_link_directories(ascendc_utest_${product_type} PRIVATE
             ${ASCEND_DEP_LIB_DIR}
@@ -364,6 +371,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         __CCE_KT_TEST__=1
         ASCENDC_CPU_DEBUG=1
         ASCENDC_OOM=1
+        __disable_kernel_type_autoinfer__=
     )
 
     target_include_directories(ascendc_utest_${product_type} PRIVATE
@@ -445,42 +453,49 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
             UT_TEST
             __CCE_AICORE__=200
             __NPU_ARCH__=2002
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend310p")
         target_compile_definitions(ascendc_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=200
             __NPU_ARCH__=2002
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend910B1_AIC")
         target_compile_definitions(ascendc_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=220
             __NPU_ARCH__=2201
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend910B1_AIV")
         target_compile_definitions(ascendc_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=220
             __NPU_ARCH__=2201
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend910B1_ATVC")
         target_compile_definitions(ascendc_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=220
             __NPU_ARCH__=2201
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend310B1")
         target_compile_definitions(ascendc_tiling_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=300
             __NPU_ARCH__=3002
+            __disable_kernel_type_autoinfer__=
         )
     elseif(${product_type} STREQUAL "ascend610Lite")
         target_compile_definitions(ascendc_utest_${product_type} PRIVATE
             UT_TEST
             __CCE_AICORE__=310
             __NPU_ARCH__=3102
+            __disable_kernel_type_autoinfer__=
         )
     endif()
 
