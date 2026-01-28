@@ -241,11 +241,15 @@ void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape
         (socVersion == platform_ascendc::SocVersion::ASCEND310P) ||
         (socVersion == platform_ascendc::SocVersion::ASCEND910_95) ||
         (socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
+        socVersion == platform_ascendc::SocVersion::MC62CM12A) ||
+        (socVersion == platform_ascendc::SocVersion::KIRINX90) ||
+        (socVersion == platform_ascendc::SocVersion::KIRIN9030),
         return, "GetPowerMaxMinTmpSize is not supported on current device!");
     if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
         socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+        socVersion == platform_ascendc::SocVersion::MC62CM12A ||
+        socVersion == platform_ascendc::SocVersion::KIRINX90 ||
+        socVersion == platform_ascendc::SocVersion::KIRIN9030) {
         maxValue = GetPowerMaxTmpSizeC310(srcShape1, srcShape2, typeIsInt, isReuseSource);
         minValue = maxValue;
     } else {
@@ -264,12 +268,16 @@ void GetPowerTmpBufferFactorSize(const bool baseIsTensor, const bool expIsTensor
         (socVersion == platform_ascendc::SocVersion::ASCEND310P) ||
         (socVersion == platform_ascendc::SocVersion::ASCEND910_95) ||
         (socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A),
+        socVersion == platform_ascendc::SocVersion::MC62CM12A) ||
+        (socVersion == platform_ascendc::SocVersion::KIRINX90) ||
+        (socVersion == platform_ascendc::SocVersion::KIRIN9030),
         return, "GetPowerTmpBufferFactorSize is not supported on current device!");
 
     if (socVersion == platform_ascendc::SocVersion::ASCEND910_95 ||
         socVersion == platform_ascendc::SocVersion::ASCEND910_55 ||
-        socVersion == platform_ascendc::SocVersion::MC62CM12A) {
+        socVersion == platform_ascendc::SocVersion::MC62CM12A ||
+        socVersion == platform_ascendc::SocVersion::KIRINX90 ||
+        socVersion == platform_ascendc::SocVersion::KIRIN9030) {
         GetPowerTmpBufferFactorSizeC310(typeIsInt, typeSize, maxLiveNodeCount, extraBuffer);
     } else {
         GetPowerTmpBufferFactorSize(socVersion, baseIsTensor, expIsTensor, typeIsInt, typeSize,
