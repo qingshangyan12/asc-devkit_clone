@@ -224,7 +224,7 @@ def tpl_of_gen_switch_case_call(block_idx, dynamic_operator, super_operator):
 def gen_switch_case_call_block_of_dynamic_op(super_operator, next_sub_operator, sub_operator, pre_sub_operator):
     switch_case_call_block = ""
 
-    # if can not find free core before dynamic, wait for get tilingkey and block dim
+    # if can not find free core before dynamic, wait for get tilingkey and block num
     if sub_operator.sub_op_task_type.value == SubOperatorType.DYNAMIC_OP.value \
                         and sub_operator.switch_func_called_flag is False:
         switch_case_call_block += \

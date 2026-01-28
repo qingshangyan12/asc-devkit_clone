@@ -334,7 +334,7 @@ class DFXSectionGenerator:
             f"static const struct FuncMetaBlockDim "
         section_var += f"{kernel_name}_kernel_metainfo_blockdim_section __attribute__ "
         section_var += f"((used, section (\".ascend.meta.{kernel_name}\"))) = "
-        section_var += f"{{{{F_TYPE_BLOCK_DIM_INFO, 4}}, 0xFFFFFFFF}};\n"
+        section_var += f"{{{{F_TYPE_BLOCK_NUM_INFO, 4}}, 0xFFFFFFFF}};\n"
 
         #functionentry
         section_var += \

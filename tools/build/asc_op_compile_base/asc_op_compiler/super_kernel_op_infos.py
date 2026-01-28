@@ -112,7 +112,7 @@ class SuperOperatorInfos:
         self.debug_option: str = ""
         self.block_num: int = 0
         self.workspace_size = 0
-        # superkernel block dim should be greater equal than max of block dim of subops
+        # superkernel block num should be greater equal than max of block num of subops
         self.get_summary_type_and_options()
         self.adjust_dynamic_op_block_num()
         self.compile_info: json = None
@@ -751,7 +751,7 @@ f"ERROR: super kernel do not support self send/receive pair within 1 real stream
 
 
     def get_summary_type_and_options(self):
-        """set superkernel kernel type and block dim."""
+        """set superkernel kernel type and block num."""
         final_kernel_type = 0
         max_aic_num = 0
         max_aiv_num = 0
