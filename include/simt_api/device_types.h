@@ -16,6 +16,10 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_TYPES_H__
 #endif
 
+#if defined(ASCENDC_CPU_DEBUG)
+#include "simt_stub.h"
+#endif
+
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
 #else

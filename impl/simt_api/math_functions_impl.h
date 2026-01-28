@@ -223,8 +223,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float modff(float x, float &n)
     return result;
 }
 
-#ifndef ASCENDC_CPU_DEBUG
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isfinite(float x)
 {
     return __isfinite(x);
@@ -3068,8 +3066,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ynf(int n, float x)
 
     return yn_case3(n, x);
 }
-
-#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
