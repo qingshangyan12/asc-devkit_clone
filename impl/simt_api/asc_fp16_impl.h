@@ -49,14 +49,14 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __habs(half x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool ispositiveinf(half x)
 {
-    uint16_t* intX = (uint16_t*)&x;
-    return *intX == HALF_INF;
+    uint16_t* int_x = (uint16_t*)&x;
+    return *int_x == HALF_INF;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isnegativeinf(half x)
 {
-    uint16_t* intX = (uint16_t*)&x;
-    return *intX == HALF_NEG_INF;
+    uint16_t* int_x = (uint16_t*)&x;
+    return *int_x == HALF_NEG_INF;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hmax(half x, half y)

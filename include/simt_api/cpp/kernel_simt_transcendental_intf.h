@@ -93,19 +93,19 @@ template <typename T>
 __aicore__ inline T Asinh(T x);
 
 /**
- * The trigonometric sine,cossine of an angle
+ * The trigonometric sine,cosine of an angle
  * @param x an angle, in radians.
  * @return s the sine of the x.
- *         c the cossin of the x.
+ *         c the cosine of the x.
  */
 template <typename T>
 __aicore__ inline void Sincos(T x, T &s, T &c);
 
 /**
- * The trigonometric sine,cossine of an angle*pi
+ * The trigonometric sine,cosine of an angle*pi
  * @param x an angle, in radians.
  * @return s the sine of the x*pi.
- *         c the cossin of the x*pi.
+ *         c the cosine of the x*pi.
  */
 template <typename T>
 __aicore__ inline void Sincospi(T x, T &s, T &c);

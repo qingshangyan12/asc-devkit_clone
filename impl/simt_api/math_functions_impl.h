@@ -190,13 +190,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdfinvf(float x)
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float modff(float x, float &n)
 {
-    float absX = fabsf(x);
+    float abs_x = fabsf(x);
     float result;
     union Data {
         float f;
         unsigned int i;
     };
-    if (__isfinite(absX)) {
+    if (__isfinite(abs_x)) {
         float integral_x = truncf(x);
         n = integral_x;
         float decimal = x - integral_x;
@@ -208,7 +208,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float modff(float x, float &n)
         union Data dataY{.i = y_bits};
         result = dataY.f;
     } else {
-        if (is_inf(absX)) {
+        if (is_inf(abs_x)) {
             union Data data {.f = x};
             uint32_t u32 = data.i;
             uint32_t y_bits = u32 & 0x80000000;
@@ -263,14 +263,14 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void set_quo(int32_t *quo, int32_t n_sign)
     int32_t neg_e = -8;
     int32_t max_s32 = 0xffffffff;
     int32_t one = 1;
-    int32_t low3bit = 0x7;
+    int32_t low_3bit = 0x7;
 
     if (n_sign < 0) {
         *quo = *quo ^ max_s32;
         *quo = *quo | neg_e;
         *quo = *quo + one;
     } else {
-        *quo = *quo & low3bit;
+        *quo = *quo & low_3bit;
     }
 }
 
@@ -1036,10 +1036,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
 }
 
 /**
- * The trigonometric sine,cossine of an angle
+ * The trigonometric sine,cosine of an angle
  * @param x an angle, in radians.
  * @return s the sine of the x.
- *         c the cossin of the x.
+ *         c the cosine of the x.
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float &s, float &c)
 {
@@ -1062,10 +1062,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float &s, float &c)
 }
 
 /**
- * The trigonometric sine,cossine of an angle*pi
+ * The trigonometric sine,cosine of an angle*pi
  * @param x an angle, in radians.
  * @return s the sine of the x*pi.
- *         c the cossin of the x*pi.
+ *         c the cosine of the x*pi.
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, float &s, float &c)
 {
