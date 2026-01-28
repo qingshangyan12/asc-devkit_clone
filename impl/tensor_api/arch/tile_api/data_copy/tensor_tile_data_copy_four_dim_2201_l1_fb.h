@@ -29,14 +29,6 @@ public:
     }
 
 private:
-    __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
-    {
-        if (num2 == 0) {
-            return 0;
-        }
-        return (num1 + num2 - 1) / num2;
-    }
-
     template <typename T>
     __aicore__ inline constexpr void CheckNDTemplate()
     {
@@ -57,21 +49,25 @@ private:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
 
         CheckNDTemplate<T>();
         CheckNDTemplate<U>();
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_one_of_v<srcType, int8_t, uint8_t, int16_t, uint16_t, 
-            int32_t, uint32_t, int64_t, uint64_t, half, bfloat16_t, float, double>, "The source data type is not supported.");
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
+            Std::tuple<__fbuf__ bfloat16_t, __cbuf__ bfloat16_t>, Std::tuple<__fbuf__ half, __cbuf__ half>, 
+            Std::tuple<__fbuf__ float, __cbuf__ float>, Std::tuple<__fbuf__ int16_t, __cbuf__ int16_t>, 
+            Std::tuple<__fbuf__ int32_t, __cbuf__ int32_t>, Std::tuple<__fbuf__ int8_t, __cbuf__ int8_t>,
+            Std::tuple<__fbuf__ uint16_t, __cbuf__ uint16_t>, Std::tuple<__fbuf__ uint32_t, __cbuf__ uint32_t>, 
+            Std::tuple<__fbuf__ uint8_t, __cbuf__ uint8_t>, Std::tuple<__fbuf__ uint64_t, __cbuf__ uint64_t>, 
+            Std::tuple<__fbuf__ int64_t, __cbuf__ int64_t>, Std::tuple<__fbuf__ double, __cbuf__ double>>, 
+            "The data type is not supported.");
 #endif
     }
 
     template <typename T, typename U, const DataCopyTrait& trait>
     __aicore__ inline auto GenDataCopyParams(const T& dst, const U& src)
     {
-        constexpr uint32_t ONE_BLK_SIZE = 32;
-        constexpr uint32_t C2PIPE2GM_UNIT = ONE_BLK_SIZE * 4;
+        constexpr uint32_t C2PIPE2GM_UNIT = TileInternal::C0_SIZE * 4;
         CheckTemplate<T, U, trait>();
 
         auto dstLayout = dst.Layout();
@@ -86,7 +82,7 @@ private:
 
         uint16_t blockCount = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
         uint16_t blockLen = CeilDivision(dstCol * sizeof(srcType), C2PIPE2GM_UNIT);
-        uint16_t srcStride = CeilDivision(srcRow * sizeof(srcType), ONE_BLK_SIZE);
+        uint16_t srcStride = CeilDivision(srcRow * sizeof(srcType), TileInternal::C0_SIZE);
         uint16_t dstStride = CeilDivision(dstRow * sizeof(dstType), C2PIPE2GM_UNIT);
 
         return Std::make_tuple(blockCount, blockLen, srcStride, dstStride);
@@ -97,7 +93,7 @@ private:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        CopyCbufToFb<dstType, srcType>((uint64_t)dst.Engine().Begin().Get(), (__cbuf__ srcType*)src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
+        CopyCbufToFb<dstType, srcType>(reinterpret_cast<uint64_t>(dst.Engine().Begin().Get()), (__cbuf__ srcType*)src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
     }
 
     template <typename T, typename U>
@@ -109,7 +105,7 @@ private:
         }
 
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-            copy_cbuf_to_fbuf((__fbuf__ T*)dst, (__cbuf__ U*)src, blockCount, blockLen, srcStride, dstStride);
+            copy_cbuf_to_fbuf((__fbuf__ T*)dst, src, blockCount, blockLen, srcStride, dstStride);
         }
     }
 };

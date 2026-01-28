@@ -51,21 +51,20 @@ private:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
 
         CheckNDTemplate<T>();
         CheckNDTemplate<U>();
 
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_one_of_v<srcType, float, int32_t>, "The source data type is not supported.");
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
+            Std::tuple<__biasbuf__ float, __cbuf__ float>, Std::tuple<__biasbuf__ int32_t, __cbuf__ int32_t>>, "The data type is not supported.");
 #endif
     }
 
     template <typename T, typename U, const DataCopyTrait& trait>
     __aicore__ inline auto GenDataCopyParams(const T& dst, const U& src)
     {
-        constexpr uint32_t ONE_BLK_SIZE = 32;
-        constexpr auto L12BT_UNIT = ONE_BLK_SIZE * 2;
+        constexpr auto L12BT_UNIT = TileInternal::C0_SIZE * 2;
         CheckTemplate<T, U, trait>();
 
         auto dstLayout = dst.Layout();
@@ -81,7 +80,7 @@ private:
         bool convControl = false;
         uint16_t blockCount = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
         uint16_t blockLen = dstCol * sizeof(dstType) / L12BT_UNIT;
-        uint16_t srcStride = (srcRow - dstCol) * sizeof(srcType) / ONE_BLK_SIZE;
+        uint16_t srcStride = (srcRow - dstCol) * sizeof(srcType) / TileInternal::C0_SIZE;
         uint16_t dstStride = (dstRow - dstCol) * sizeof(dstType) / L12BT_UNIT;
 
         return Std::make_tuple(convControl, blockCount, blockLen, srcStride, dstStride);
@@ -90,8 +89,7 @@ private:
     template <typename T, typename U, typename V, const DataCopyTrait& trait, size_t... Is>
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-        using srcType = typename U::elementType;
-        CopyCbufToBt((uint64_t)dst.Engine().Begin().Get(), (__cbuf__ srcType*)src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
+        CopyCbufToBt(reinterpret_cast<uint64_t>(dst.Engine().Begin().Get()), src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
     }
 
     template <typename T>

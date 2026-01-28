@@ -25,6 +25,21 @@ struct MmadTrait {
     bool kDirectionAlign = false;
     bool cmatrixSource = false;
     bool cmatrixInitVal = true;
+
+   __aicore__ constexpr MmadTrait () {};
+
+   __aicore__ constexpr MmadTrait (int32_t fmOffsetIn, bool enSsparseIn, bool enWinogradAIn, bool enWinogradBIn, 
+      int8_t unitFlagIn, bool kDirectionAlignIn, bool cmatrixSourceIn, bool cmatrixInitValIn) 
+   {
+      fmOffset = fmOffsetIn;
+      enSsparse = enSsparseIn;
+      enWinogradA = enWinogradAIn;
+      enWinogradB = enWinogradBIn;
+      unitFlag = unitFlagIn;
+      kDirectionAlign = kDirectionAlignIn;
+      cmatrixSource = cmatrixSourceIn;
+      cmatrixInitVal = cmatrixInitValIn;
+   };
 };
 constexpr MmadTrait DEFAULT_MMAD_TRAIT; 
 }

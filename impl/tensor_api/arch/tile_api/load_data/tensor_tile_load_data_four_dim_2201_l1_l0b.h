@@ -78,7 +78,6 @@ public:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
         if constexpr (trait.transposed) {
             CheckZNTemplate<U>();
         } else {
@@ -86,8 +85,12 @@ public:
         }
         CheckZNTemplate<T>();
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_one_of_v<srcType, uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, 
-            uint32_t, int32_t, float>, "The source data type is not supported.");
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
+            Std::tuple<__cb__ bfloat16_t, __cbuf__ bfloat16_t>, Std::tuple<__cb__ half, __cbuf__ half>, 
+            Std::tuple<__cb__ float, __cbuf__ float>, Std::tuple<__cb__ int16_t, __cbuf__ int16_t>, 
+            Std::tuple<__cb__ int32_t, __cbuf__ int32_t>, Std::tuple<__cb__ int8_t, __cbuf__ int8_t>,
+            Std::tuple<__cb__ uint16_t, __cbuf__ uint16_t>, Std::tuple<__cb__ uint32_t, __cbuf__ uint32_t>, 
+            Std::tuple<__cb__ uint8_t, __cbuf__ uint8_t>>, "The data type is not supported.");
 #endif
     }
 
@@ -185,11 +188,11 @@ private:
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
         using srcType = typename U::elementType;
-        LoadL1ToL0B<srcType, !trait.transposed>((__cb__ srcType*)dst.Engine().Begin().Get(), (__cbuf__ srcType*)src.Engine().Begin().Get(),
+        LoadL1ToL0B<!trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
             Std::get<Is>(tupleParams)...);
     }
 
-        template<typename T, bool needTranspose = true>
+    template<bool needTranspose, typename T>
     __aicore__ inline void LoadL1ToL0B(__cb__ T* dst, __cbuf__ T* src, uint16_t dstRowNum, uint16_t dstColNum,
         uint16_t fracNum, uint16_t startIdx0, uint16_t srcRowNum)
     {
@@ -244,12 +247,11 @@ private:
     template <typename T, typename U, typename V, const LoadDataTrait& trait, size_t... Is>
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-        using srcType = typename U::elementType;
-        LoadL1ToL0B<srcType, !trait.transposed>((__cb__ srcType*)dst.Engine().Begin().Get(), (__cbuf__ srcType*)src.Engine().Begin().Get(),
+        LoadL1ToL0B<!trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
             Std::get<Is>(tupleParams)...);
     }
 
-    template<typename T, bool needTranspose = true>
+    template<bool needTranspose, typename T>
     __aicore__ inline void LoadL1ToL0B(__cb__ T* dst, __cbuf__ T* src, uint16_t dstRow, uint16_t dstCol,
         uint16_t srcRow, uint16_t srcCol, uint16_t indexRow, uint16_t indexCol, uint64_t config)
     {
@@ -307,11 +309,11 @@ private:
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
         using srcType = typename U::elementType;
-        LoadL1ToL0B<srcType, !trait.transposed>((__cb__ srcType*)dst.Engine().Begin().Get(), (__cbuf__ srcType*)src.Engine().Begin().Get(),
+        LoadL1ToL0B<!trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
             Std::get<Is>(tupleParams)...);
     }
 
-    template <typename T, bool needTranspose = false>
+    template <bool needTranspose, typename T>
     __aicore__ inline void LoadL1ToL0B(__cb__ T* dst, __cbuf__ T* src, uint16_t dstCol, uint16_t dstRowNum, uint16_t dstColNum,
         uint16_t startIdx0, uint16_t srcColNum, uint16_t indexRow, uint16_t indexCol, uint16_t blockNum)
     {

@@ -16,14 +16,15 @@
 #define IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_DATA_COPY_IMPL_H
 
 namespace AscendC {
-struct DataCopyTrait {};
+struct DataCopyTrait {
+};
 constexpr DataCopyTrait DEFAULT_DATA_COPY_TRAIT;
 }
 
 #include "impl/tensor_api/arch/tile_api/data_copy/tensor_tile_data_copy_routing.h"
 
 namespace AscendC {
-template <const DataCopyTrait& trait, typename T, typename U>
+template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
 __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplate<T, U>, void>::type
 DataCopy(const T& dst, const U& src)
 {
@@ -34,7 +35,7 @@ DataCopy(const T& dst, const U& src)
     Tensor2Tensor{}.template Run<T, U, trait>(dst, src);
 }
 
-template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
+template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
 __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplateWithCoord<T, U, Coord>, void>::type
 DataCopy(const T& dst, const U& src, const Coord& coord)
 {

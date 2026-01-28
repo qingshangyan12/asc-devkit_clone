@@ -31,20 +31,19 @@ private:
     template <typename T, typename U, typename V, const DataCopyTrait& trait, size_t... Is>
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-        using srcType = typename U::elementType;
-        CopyGmToCbuf((__cbuf__ srcType*) dst.Engine().Begin().Get(), (__gm__ srcType*)src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
+        CopyGmToCbuf(dst.Engine().Begin().Get(), src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
     }
 
     template <typename T>
     __aicore__ inline void CopyGmToCbuf(__cbuf__ T* dst, __gm__ T* src, uint32_t blockCount, uint32_t blockLen,
-                                        int64_t srcStride, int64_t dstStride, uint8_t padMode)
+                                        int64_t srcStride, int64_t dstStride)
     {
         if ASCEND_IS_AIV {
             return;
         }
 
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-            copy_gm_to_cbuf(dst, src, 0, blockCount, blockLen, srcStride, dstStride, (pad_t)padMode);
+            copy_gm_to_cbuf(dst, src, 0, blockCount, blockLen, srcStride, dstStride, static_cast<pad_t>(0));
         }
     }
 };
@@ -79,14 +78,16 @@ private:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
-
         CheckNZTemplate<T>();
         CheckNZTemplate<U>();
 
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_one_of_v<srcType, bfloat16_t, half, float, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t>,
-            "The source data type is not supported.");
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
+            Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ half, __gm__ half>, 
+            Std::tuple<__cbuf__ float, __gm__ float>, Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, 
+            Std::tuple<__cbuf__ int32_t, __gm__ int32_t>, Std::tuple<__cbuf__ int8_t, __gm__ int8_t>,
+            Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>, Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>, 
+            Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>>, "The data type is not supported.");
 #endif
     }
 
@@ -110,8 +111,7 @@ private:
         auto blockLen = dstRow1 * dstRow0 * dstCol0 * sizeof(type);
         auto srcStride = srcStrideSize * sizeof(type);
         auto dstStride = blockLen;
-        uint8_t padMode = 0;
-        return Std::make_tuple(blockCount, blockLen, srcStride, dstStride, padMode);
+        return Std::make_tuple(blockCount, blockLen, srcStride, dstStride);
     }
 };
 
@@ -145,13 +145,14 @@ private:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
 
         CheckNDTemplate<T>();
         CheckNDTemplate<U>();
 
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_one_of_v<srcType, half, bfloat16_t, float, int32_t>, "The source data type is not supported.");
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
+            Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ half, __gm__ half>, 
+            Std::tuple<__cbuf__ float, __gm__ float>, Std::tuple<__cbuf__ int32_t, __gm__ int32_t>>, "The data type is not supported.");
 #endif
     }
 
@@ -168,8 +169,6 @@ private:
         auto dstStrideRows = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         auto srcStrideRows = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
  
-        uint8_t padMode = 0;
- 
         using type = typename U::elementType;
  
         // considering block len is encoded num.
@@ -178,7 +177,7 @@ private:
         auto srcStride = srcStrideRows * sizeof(type);
         auto dstStride = dstStrideRows * sizeof(type);
  
-        return Std::make_tuple(blockCount, blockLen, srcStride, dstStride, padMode);
+        return Std::make_tuple(blockCount, blockLen, srcStride, dstStride);
     }
 };
 
@@ -230,14 +229,16 @@ private:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
         
         CheckNDTemplate<U>();
         CheckNZTemplate<T>();
-
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_one_of_v<srcType, bfloat16_t, half, float, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t>,
-            "The source data type is not supported.");
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
+            Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ half, __gm__ half>, 
+            Std::tuple<__cbuf__ float, __gm__ float>, Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, 
+            Std::tuple<__cbuf__ int32_t, __gm__ int32_t>, Std::tuple<__cbuf__ int8_t, __gm__ int8_t>,
+            Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>, Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>, 
+            Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>>, "The data type is not supported.");
 #endif
     }
 
@@ -271,7 +272,7 @@ private:
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
         using srcType = typename U::elementType;
-        CopyGmToCbufMultiNd2nz((__cbuf__ srcType *)dst.Engine().Begin().Get(), (__gm__ srcType *)src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
+        CopyGmToCbufMultiNd2nz(dst.Engine().Begin().Get(), src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
     }
 
     template <typename T>
@@ -342,14 +343,16 @@ private:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
         
         CheckDNTemplate<U>();
         CheckZNTemplate<T>();
-
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_one_of_v<srcType, bfloat16_t, half, float, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t>,
-            "The source data type is not supported.");
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
+            Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ half, __gm__ half>, 
+            Std::tuple<__cbuf__ float, __gm__ float>, Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, 
+            Std::tuple<__cbuf__ int32_t, __gm__ int32_t>, Std::tuple<__cbuf__ int8_t, __gm__ int8_t>,
+            Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>, Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>, 
+            Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>>, "The data type is not supported.");
 #endif
     }
 
@@ -384,7 +387,7 @@ private:
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
         using srcType = typename U::elementType;
-        CopyGmToCbufMultiNd2nz((__cbuf__ srcType *)dst.Engine().Begin().Get(), (__gm__ srcType *)src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
+        CopyGmToCbufMultiNd2nz(dst.Engine().Begin().Get(), src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
     }
 
     template <typename T>
@@ -413,15 +416,13 @@ class DataCopyFourDim2201GM2L1 : public CopyGmToCbufMultiND2NZBase, public CopyG
 public:
     template <typename T, typename U, const DataCopyTrait& trait>
     __aicore__ inline void Run(const T& dst, const U& src) {
-        using srcTraitType = U;
-        using dstTraitType = T;
-        if constexpr (IsNZFormat<srcTraitType>::value && IsNZFormat<dstTraitType>::value) {
+        if constexpr (IsNZFormat<U>::value && IsNZFormat<T>::value) {
             CopyGmToCbufNZBase::Run<T, U, trait>(dst, src);
-        } else if constexpr (IsNDFormat<srcTraitType>::value && IsNZFormat<dstTraitType>::value) {
+        } else if constexpr (IsNDFormat<U>::value && IsNZFormat<T>::value) {
             CopyGmToCbufMultiND2NZBase::Run<T, U, trait>(dst, src);
-        } else if constexpr (IsDNFormat<srcTraitType>::value && IsZNFormat<dstTraitType>::value) {
+        } else if constexpr (IsDNFormat<U>::value && IsZNFormat<T>::value) {
             CopyGmToCbufMultiDN2ZNBase::Run<T, U, trait>(dst, src);
-        } else if constexpr (IsNDFormat<srcTraitType>::value && IsNDFormat<dstTraitType>::value) {
+        } else if constexpr (IsNDFormat<U>::value && IsNDFormat<T>::value) {
             CopyGmToCbufNDBase::Run<T, U, trait>(dst, src);
         }
     }
