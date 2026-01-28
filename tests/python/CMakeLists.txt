@@ -91,3 +91,21 @@ add_dependencies(asc_opc_unittest
     generate_hidden_dat_file_ut
     asc_platform_test
 )
+
+# clear generated files
+add_custom_target(run_all_tests_and_clean ALL
+    # dependency asc_platform_test
+    COMMAND rm -f ${ASCENDC_DIR}/tools/build/asc_op_compile_base/c_api/libasc_platform.so
+    # dependency generate_hidden_dat_file_ut
+    COMMAND rm -f ${ASCENDC_DIR}/tests/python/adapter/stub_kernels/ascendc_impl.dat
+    # created by tests/python/CMakeLists.txt
+    COMMAND rm -f ${OPC_BASE}/asc_opc/stub/files/kernel_meta/MatMul_build_res.o
+    # created by tests/python/asc_opc/common/ci/set_python_env.sh
+    COMMAND rm -rf ${ASCENDC_DIR}/out/
+    # created by run_python_llt_test
+    COMMAND rm -f ${ASCENDC_DIR}/null
+    DEPENDS ascendc_pyut_asc_compile_common ascendc_pyut_asc_op_compiler asc_opc_unittest ascendc_pyut_compile_trace_log ascendc_pyut_aclrt_launch_kernel 
+    COMMENT "clean generated test files"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+

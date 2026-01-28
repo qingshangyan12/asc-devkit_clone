@@ -825,7 +825,15 @@ class TestOpc02(unittest.TestCase):
         """test test_op_compilation_config_file"""
         logger.debug("Start to execute ============ test_op_compilation_config_file ============")
 
+        def del_files(file_path):
+            for file_ in os.listdir(file_path):
+                to_del_file = "{}/{}".format(file_path, file_)
+                os.remove(to_del_file)
+
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
+        # make stub .o file
+        with open(test_root_dir + "/debug_dir/kernel_meta_matmul_1/kernel_meta/matmul_1.o", "wb") as file_:
+            pass
         input_param_path = test_root_dir + "/stub/files/matmul_1.json"
         opc_compile_args = {
             "input_param" : input_param_path,
@@ -842,6 +850,10 @@ class TestOpc02(unittest.TestCase):
         op_compile = OpCompilation(opc_compile_args)
         ret = op_compile.op_compilation()
         self.assertEqual(ret, True)
+
+        # delete stub .o file and outputs
+        os.remove(test_root_dir + "/debug_dir/kernel_meta_matmul_1/kernel_meta/matmul_1.o")
+        del_files(test_root_dir + "/output")
 
         logger.debug("End to execute ============ test_op_compilation_config_file ============")
 
@@ -916,6 +928,7 @@ class TestOpc02(unittest.TestCase):
         res = opc_api.compile_op(json_data, build_options)
         self.assertEqual(res, True)
 
+        os.remove(test_root_dir + "/debug_dir/kernel_meta_Sqrt/kernel_meta/Sqrt.o")
         logger.debug("End to execute ============ test_compile_op_api ============")
         
     def test_compile_op_api_fail(self):

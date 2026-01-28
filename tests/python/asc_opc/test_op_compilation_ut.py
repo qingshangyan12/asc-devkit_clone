@@ -19,6 +19,7 @@ from pathlib import Path
 import json
 import tempfile
 import sys
+import shutil
 
 THIS_FILE_NAME = __file__
 FILE_PATH = os.path.dirname(os.path.realpath(THIS_FILE_NAME))
@@ -68,6 +69,19 @@ class TestOpCompilationUt(unittest.TestCase):
                 logger.error("Delete file[%s] filed, reason: %s.", to_del_file, str(e))
             finally:
                 pass
+
+    @classmethod
+    def tearDownClass(cls):
+        # it will copy files to debug_dir/kernel_meta_matmul_custom_simplified_key, debug_dir/kernel_meta_matmul_1
+        # and debug_dir/kernel_meta_matmul_2 when use /stub/files/MatMul.json as input_param, and they will be used
+        # in other cases, so delete the files in the end of tests
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
+        if os.path.exists(test_root_dir + "/debug_dir/kernel_meta_matmul_1/kernel_meta/matmul_1.o"):
+            os.remove(test_root_dir + "/debug_dir/kernel_meta_matmul_1/kernel_meta/matmul_1.o")
+        if os.path.exists(test_root_dir + "/debug_dir/kernel_meta_matmul_2/kernel_meta/matmul_2.o"):
+            os.remove(test_root_dir + "/debug_dir/kernel_meta_matmul_2/kernel_meta/matmul_2.o")
+        if os.path.exists(test_root_dir + "/debug_dir/kernel_meta_matmul_custom_simplified_key"):
+            shutil.rmtree(test_root_dir + "/debug_dir/kernel_meta_matmul_custom_simplified_key")
 
     @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
     def test_00_op_compilation_ut(self, mock_set_current_compile_soc_info):
@@ -155,8 +169,9 @@ class TestOpCompilationUt(unittest.TestCase):
         op_compile = OpCompilation(opc_compile_args)
         ret = op_compile.op_compilation()
         self.assertEqual(ret, True)
-        logger.debug("Testcase delete files in output dir")
+        logger.debug("Testcase delete files in output dir and debug dir")
         self.del_files(test_root_dir + "/output")
+        os.remove(test_root_dir + "/debug_dir/kernel_meta_Sqrt/kernel_meta/Sqrt.o")
         logger.debug("End to execute ============ test_01_op_compilation_st ============")
 
     @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
@@ -476,9 +491,10 @@ class TestOpCompilationUt(unittest.TestCase):
         # There will be a runtime error while copying file from kernel meta dir to output dir
         self.assertEqual(ret, True)
 
-        # delete file in output
-        logger.debug("Testcase delete files in output dir")
+        # delete file in output and debug_dir
+        logger.debug("Testcase delete files in output dir and debug dir")
         self.del_files(test_root_dir + "/output")
+        shutil.rmtree(test_root_dir + "/debug_dir/kernel_meta_matmul_3")
 
         logger.debug("End to execute ============ test_04_create_kernel_meta_dir_ut ============")
 
@@ -516,9 +532,10 @@ class TestOpCompilationUt(unittest.TestCase):
         # There will be a runtime error while copying file from kernel meta dir to output dir
         self.assertEqual(ret, True)
 
-        # delete file in output
-        logger.debug("Testcase delete files in output dir")
+        # delete file in output and debug dir
+        logger.debug("Testcase delete files in output dir and debug dir")
         self.del_files(test_root_dir + "/output")
+        shutil.rmtree(test_root_dir + "/debug_dir/kernel_meta_matmul_4")
 
         logger.debug("End to execute ============ test_05_verify_kernel_meta_lock_ut ============")
 
@@ -879,9 +896,10 @@ class TestOpCompilationUt(unittest.TestCase):
         op_compile = OpCompilation(opc_compile_args)
         ret = op_compile.op_compilation()
         self.assertEqual(ret, True)
-        # delete file in output
-        logger.debug("Testcase delete files in output dir")
+        # delete file in output and debug_dir
+        logger.debug("Testcase delete files in output dir and debug dir")
         self.del_files(test_root_dir + "/output")
+        os.remove(test_root_dir + "/debug_dir/kernel_meta_Sqrt/kernel_meta/Sqrt.o")
         logger.debug("End to execute ============ test_implmode_op_compilation_ut_01 ============")
 
     @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
@@ -1014,11 +1032,11 @@ class TestOpCompilationUt(unittest.TestCase):
 
         ret = post_compilation.copy_compile_res_files_to_output(op_path)
 
-        self.assertEqual(os.path.exists(output_dir+"matmul_add_1.json"), True)
-        self.assertEqual(os.path.exists(output_dir+"matmul_add_1_mix_aic.json"), True)
-        self.assertEqual(os.path.exists(output_dir+"matmul_add_1_mix_aic.txt"), True)
-        self.assertEqual(os.path.exists(output_dir+"matmul_add_1_mix_aiv.json"), True)
-        self.assertEqual(os.path.exists(output_dir+"matmul_add_1_mix_aiv.txt"), True)
+        check_file_suffix = ['.json', '_mix_aic.json', '_mix_aic.txt', '_mix_aiv.json', '_mix_aiv.txt']
+        for suffix in check_file_suffix:
+            self.assertEqual(os.path.exists(output_dir + "matmul_add_1{}".format(suffix)), True)
+        for suffix in check_file_suffix:
+            os.remove(output_dir + "matmul_add_1{}".format(suffix))
 
         logger.debug("End to execute ============ test_copy_compile_res_files_to_output_ut ============")
 

@@ -77,6 +77,12 @@ class TestCompileOp(unittest.TestCase):
         print(f"-------------------TearDown-------------")
         self.reset_global_var()
 
+    @classmethod
+    def tearDownClass(cls):
+        generated_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../../kernel_meta")
+        if os.path.isdir(generated_file_path):
+            shutil.rmtree(generated_file_path)
+
     def reset_global_var(self):
         compile_op_module.global_var_storage.set_variable("ascendc_compile_debug_config", False)
         compile_op_module.global_var_storage.set_variable("ascendc_dump_disable_compile_options", False)

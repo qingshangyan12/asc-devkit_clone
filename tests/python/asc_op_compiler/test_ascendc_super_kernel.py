@@ -4,6 +4,7 @@
 import os
 import sys
 import unittest
+import shutil
 from unittest import mock
 
 THIS_FILE_NAME = __file__
@@ -609,6 +610,15 @@ class TestAscendSuperKernel(unittest.TestCase):
         # operator after each testcase
         mock.patch.stopall()
         print(f"-------------------TearDown-------------")
+
+    @classmethod
+    def tearDownClass(cls):
+        # when SuperOperatorInfos inits, dir kernel_meta and follow files/dirs will be created
+        # SuperOperatorInfos.init_sub_operators() create dir "kernel_meta/{threading.get_ident()}"
+        # "super_kernel{tag}_kernel.cpp" and "super_kernel{tag}.log" (tag is CommonUtility.get_kernel_meta_dir())
+        generated_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../../kernel_meta")
+        if os.path.isdir(generated_file_path):
+            shutil.rmtree(generated_file_path)
 
     def test_ascendc_super_kernel_plus(self):
         with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"):
