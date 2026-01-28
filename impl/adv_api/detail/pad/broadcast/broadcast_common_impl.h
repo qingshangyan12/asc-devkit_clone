@@ -318,9 +318,9 @@ __aicore__ inline void TwoDimBroadCastFirstDim(const LocalTensor<T> &dstLocal, c
     const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<T> &tmpBuffer)
 {
     const uint32_t firstDim = dstShape[0];
-    const uint32_t blockDim = dstShape[1];
+    const uint32_t numBlocks = dstShape[1];
     ASCENDC_ASSERT(
-        (blockDim * sizeof(T) % ONE_BLK_SIZE == 0), { KERNEL_LOG(KERNEL_ERROR, "Non-alignment is not supported!"); });
+        (numBlocks * sizeof(T) % ONE_BLK_SIZE == 0), { KERNEL_LOG(KERNEL_ERROR, "Non-alignment is not supported!"); });
 
     constexpr uint32_t oneBlockElementNum = ONE_BLK_SIZE / sizeof(T);
     constexpr uint32_t FIRST_DIM_LOOP_LIMITE = MAX_REPEAT_NUM * oneBlockElementNum;
@@ -329,12 +329,12 @@ __aicore__ inline void TwoDimBroadCastFirstDim(const LocalTensor<T> &dstLocal, c
     Duplicate(zeroTemp.template ReinterpretCast<uint16_t>(), (uint16_t)0, ONE_BLK_SIZE / sizeof(uint16_t));
     PipeBarrier<PIPE_V>();
 
-    if (blockDim >= FIRST_DIM_LOOP_LIMITE) {
-        LoopBroadCast<T>(dstLocal, srcLocal, zeroTemp, blockDim, firstDim);
+    if (numBlocks >= FIRST_DIM_LOOP_LIMITE) {
+        LoopBroadCast<T>(dstLocal, srcLocal, zeroTemp, numBlocks, firstDim);
         return;
     }
 
-    TwoDimBroadCastDimAlign<T, isReuseSource>(dstLocal, srcLocal, zeroTemp, firstDim, blockDim);
+    TwoDimBroadCastDimAlign<T, isReuseSource>(dstLocal, srcLocal, zeroTemp, firstDim, numBlocks);
 }
 
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>

@@ -57,8 +57,6 @@ void DataDumpTensor(__gm__ uint8_t *dstGm, __gm__ uint8_t *srcGm, __gm__ uint8_t
     PrintTimeStamp(0);
     DumpTensor(inputLocal, 0, dataSize);
     PRINTF("AAAA %d", 0x1);
-    AscendC::printf("AAAA %d", 0x1);
-    AscendC::EnablePrintf();
 }
 
 INSTANTIATE_TEST_CASE_P(TEST_DUMP_TENSOR, TestDumpTensorSuite,

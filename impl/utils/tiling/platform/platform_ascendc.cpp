@@ -225,14 +225,14 @@ uint32_t PlatformAscendC::CalcTschBlockDim(uint32_t sliceNum, uint32_t aicCoreNu
         return sliceNum;
     }
     uint32_t ration = aivCoreNum / aicCoreNum;
-    uint32_t blockDim = (sliceNum + (ration - 1)) / ration;
-    // in mix case: 910B1(ration = 2), blockDim should not be greater than physical aic core num
-    if ((ration == MIX_AIC_AIV_RATION_910B1) && (blockDim > aicCoreNum)) {
-        PF_LOGE("CalcTschBlockDim failed, calc blockDim %u should not be greater than aicCoreNum %u", blockDim,
+    uint32_t numBlocks = (sliceNum + (ration - 1)) / ration;
+    // in mix case: 910B1(ration = 2), numBlocks should not be greater than physical aic core num
+    if ((ration == MIX_AIC_AIV_RATION_910B1) && (numBlocks > aicCoreNum)) {
+        PF_LOGE("CalcTschBlockDim failed, calc numBlocks %u should not be greater than aicCoreNum %u", numBlocks,
             aicCoreNum);
         return 0;
     }
-    return blockDim;
+    return numBlocks;
 }
 
 uint32_t PlatformAscendC::GetLibApiWorkSpaceSize(void) const

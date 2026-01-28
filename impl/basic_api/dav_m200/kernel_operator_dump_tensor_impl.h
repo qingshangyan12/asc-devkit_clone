@@ -116,21 +116,21 @@ __aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
     uint32_t blockDumpSize = DUMP_UINTSIZE; // DUMP_UINTSIZE is 1M
 #ifdef __ENABLE_VECTOR_CORE__
 #if defined(__DAV_M200_VEC__)
-    uint32_t blockDim = GetBlockIdxImpl() - get_data_main_base();
+    uint32_t numBlocks = GetBlockIdxImpl() - get_data_main_base();
 #else
-    uint32_t blockDim = GetBlockIdxImpl() - get_data_main_base() + AIV_CORE_NUM;
+    uint32_t numBlocks = GetBlockIdxImpl() - get_data_main_base() + AIV_CORE_NUM;
 #endif
 #else
-    uint32_t blockDim = GetBlockIdxImpl() + AIV_CORE_NUM;
+    uint32_t numBlocks = GetBlockIdxImpl() + AIV_CORE_NUM;
 #endif
-    if (blockDim >= DUMP_CORE_COUNT) {
+    if (numBlocks >= DUMP_CORE_COUNT) {
         return;
     }
     uint32_t blkInfoLen = sizeof(BlockInfo);
-    uint64_t blockInfoStart = dumpWorkspaceStart + blockDim * DUMP_UINTSIZE;
+    uint64_t blockInfoStart = dumpWorkspaceStart + numBlocks * DUMP_UINTSIZE;
     PipeBarrier<PIPE_ALL>();
     *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_LEN_POS) = blockDumpSize;
-    *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_CORE_POS) = blockDim;
+    *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_CORE_POS) = numBlocks;
     *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_BLOCKNUM_POS) = totalBlockNum;
     *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_DUMPOFFSET_POS) = blockDumpSize - blkInfoLen - sizeof(DumpMeta);
     *((__gm__ uint32_t *)blockInfoStart + BLOCK_INFO_MAGIC_POS) = 0x5aa5bccd;
