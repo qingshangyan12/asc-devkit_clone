@@ -81,7 +81,7 @@ private:
         CheckNZTemplate<T>();
         CheckNZTemplate<U>();
 
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
         static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
             Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ half, __gm__ half>, 
             Std::tuple<__cbuf__ float, __gm__ float>, Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, 
@@ -221,7 +221,7 @@ private:
         static_assert(Std::is_same_v<StrideRow0, Std::Int<C0_SIZE / sizeof(type)>>, "Dst Layout->Stride->Row->ZeroDim, is not Std::Int<C0Size/Type> type!");
         static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>, "Dst Layout->Stride->Column->ZeroDim, is not Std::Int<1> type!");
         static_assert(Std::is_same_v<StrideRow1, Std::Int<C0_SIZE / sizeof(type) * FRACTAL_FIXED>>,
-            "Dst Layout->Stride->Column->ZeroDim, is not Std::Int<C0_SIZE / sizeof(type) * FRACTAL_FIXED> type!");
+            "Dst Layout->Stride->Row->OneDim, is not Std::Int<C0_SIZE / sizeof(type) * FRACTAL_FIXED> type!");
     }
 
     template <typename T, typename U, const DataCopyTrait& trait>
@@ -232,7 +232,7 @@ private:
         
         CheckNDTemplate<U>();
         CheckNZTemplate<T>();
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
         static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
             Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ half, __gm__ half>, 
             Std::tuple<__cbuf__ float, __gm__ float>, Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, 
@@ -271,7 +271,6 @@ private:
     template <typename T, typename U, typename V, const DataCopyTrait& trait, size_t... Is>
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-        using srcType = typename U::elementType;
         CopyGmToCbufMultiNd2nz(dst.Engine().Begin().Get(), src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
     }
 
@@ -346,7 +345,7 @@ private:
         
         CheckDNTemplate<U>();
         CheckZNTemplate<T>();
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
         static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
             Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ half, __gm__ half>, 
             Std::tuple<__cbuf__ float, __gm__ float>, Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, 
@@ -386,7 +385,6 @@ private:
     template <typename T, typename U, typename V, const DataCopyTrait& trait, size_t... Is>
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-        using srcType = typename U::elementType;
         CopyGmToCbufMultiNd2nz(dst.Engine().Begin().Get(), src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
     }
 

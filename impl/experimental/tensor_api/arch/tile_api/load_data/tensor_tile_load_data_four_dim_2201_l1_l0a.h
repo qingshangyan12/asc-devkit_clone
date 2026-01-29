@@ -47,7 +47,7 @@ public:
         static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_SIZE / sizeof(type)>>,
             "LoadDataFourDim2201L12L0A Layout->Stride->Column->ZeroDim is not Std::Int<C0Size/Type> type!");
         static_assert(Std::is_same_v<StrideColumn1, Std::Int<FRACTAL_FIXED * C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim2201L12L0A Layout->Stride->Column->ZeroDim is not Std::Int<16*C0Size/Type> type!");
+            "LoadDataFourDim2201L12L0A Layout->Stride->Column->OneDim is not Std::Int<16*C0Size/Type> type!");
     }
 
     template<typename T>
@@ -69,7 +69,7 @@ public:
         static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>,
             "LoadDataFourDim2201L12L0A Layout->Stride->Column->ZeroDim is not Std::Int<1> type!");
         static_assert(Std::is_same_v<StrideColumn1, Std::Int<FRACTAL_FIXED * C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim2201L12L0A Layout->Stride->Column->ZeroDim is not Std::Int<16*C0Size/Type> type!");
+            "LoadDataFourDim2201L12L0A Layout->Stride->Column->OneDim is not Std::Int<16*C0Size/Type> type!");
     }
 
     template<typename T>
@@ -89,7 +89,7 @@ public:
         static_assert(Std::is_same_v<StrideRow0, Std::Int<C0_SIZE / sizeof(type)>>,
             "LoadDataFourDim2201L12L0A Layout->Stride->Row-ZeroDim is not Std::Int<C0Size/Type> type!");
         static_assert(Std::is_same_v<StrideRow1, Std::Int<FRACTAL_FIXED * C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim2201L12L0A Layout->Stride->Row-ZeroDim is not Std::Int<16*C0Size/Type> type!");
+            "LoadDataFourDim2201L12L0A Layout->Stride->Row-OneDim is not Std::Int<16*C0Size/Type> type!");
         static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>,
             "LoadDataFourDim2201L12L0A Layout->Stride->Column->ZeroDim is not Std::Int<1> type!");
     }
@@ -243,7 +243,6 @@ private:
     template <typename T, typename U, typename V, const LoadDataTrait& trait, size_t... Is>
     __aicore__ inline void LoadDataL0AImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-        using srcType = typename U::elementType;
         LoadL1ToL0AImpl<trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
             Std::get<Is>(tupleParams)...);
     }
@@ -305,7 +304,6 @@ private:
     template <typename T, typename U, typename V, const LoadDataTrait& trait, size_t... Is>
     __aicore__ inline void LoadDataL0AImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-        using srcType = typename U::elementType;
         LoadL1ToL0AImpl<trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
             Std::get<Is>(tupleParams)...);
     }
@@ -343,7 +341,7 @@ public:
     }
 };
 
-} // namespace ACTE
+} // namespace TileInternal
 } // namespace AscendC
 
 #endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_FOUR_DIM_2201_L1_L0A_H

@@ -49,6 +49,7 @@ template <typename T>
 __aicore__ inline decltype(auto) MakeZZLayout(size_t row, size_t column) {
     return TileInternal::MakeLayoutForZZ<T>(row, column);
 }
+
 template <typename T, size_t row, size_t column, typename Enable = void>
 struct NZLayoutFormat;
 

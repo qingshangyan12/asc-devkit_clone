@@ -129,4 +129,4 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, con
 }
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_LAYOUT_IMPL_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_TILE_LAYOUT_IMPL_H
