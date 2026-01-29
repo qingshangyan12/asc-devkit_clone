@@ -363,8 +363,10 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceMax");
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
-    (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3101) ||                        \
-    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    (__NPU_ARCH__ == 5102) ||                        \
+    (__NPU_ARCH__ == 3003) ||                        \
+    (__NPU_ARCH__ == 3113) ||                        \
+    (__NPU_ARCH__ == 3101))
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMax");
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMax");
@@ -411,8 +413,10 @@ __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTens
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceMin");
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
-    (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3101) ||                        \
-    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    (__NPU_ARCH__ == 5102) ||                        \
+    (__NPU_ARCH__ == 3003) ||                        \
+    (__NPU_ARCH__ == 3113) ||                        \
+    (__NPU_ARCH__ == 3101))
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMin");
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMin");
@@ -522,8 +526,10 @@ __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTens
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceMin");
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
-    (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3101) ||                        \
-    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    (__NPU_ARCH__ == 5102) ||                        \
+    (__NPU_ARCH__ == 3003) ||                        \
+    (__NPU_ARCH__ == 3113) ||                        \
+    (__NPU_ARCH__ == 3101))
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMin");
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMin");
