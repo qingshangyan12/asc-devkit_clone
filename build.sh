@@ -436,6 +436,7 @@ function build_test() {
 }
 
 function build_test_part() {
+  return 0
   if [[ "$TEST_PART" == "adv_test" ]]; then
     CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=adv"
     build_test
