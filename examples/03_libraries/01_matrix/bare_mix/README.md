@@ -1,12 +1,17 @@
 # 分核计算bare_mix算子样例
+
 ## 概述
+
 本样例介绍分核计算实现的CV融合算子bare_mix。
 
 ## 支持的产品
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 - Atlas 推理系列产品AI Core
+
 ## 目录结构介绍
+
 ```
 ├── bare_mix
 │   └── scripts
@@ -16,7 +21,9 @@
 │   ├── data_utils.h            // 数据读入写出函数
 │   └── bare_mix.asc            // Ascend C算子实现 & 调用样例
 ```
+
 ## 算子描述
+
 - 算子功能：
 
   本样例中实现的是[m, n, k]固定为[128, 128, 256]的bare_mix算子，仅在AIC核调用Matmul高阶API并计算，完成后在AIV核完成LeakyRelu的计算。
@@ -78,6 +85,7 @@
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
@@ -106,5 +114,5 @@
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  test pass!
   ```

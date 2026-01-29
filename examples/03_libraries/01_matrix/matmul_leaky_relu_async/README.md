@@ -1,12 +1,17 @@
 # MatmulLeakyRelu算子样例
+
 ## 概述
+
 本样例介绍MatmulLeakyRelu算子实现及核函数直调方法。
 
 ## 支持的产品
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 - Atlas 推理系列产品AI Core
+
 ## 目录结构介绍
+
 ```
 ├── matmul_leaky_relu_async
 │   └── scripts
@@ -16,7 +21,9 @@
 │   ├── data_utils.h            // 数据读入写出函数
 │   └── matmul.asc            // Ascend C算子实现 & 调用样例
 ```
+
 ## 算子描述
+
 - 算子功能： 
 
   算子使用了MatmulLeakyRelu高阶API，实现了快速的MatmulLeakyRelu矩阵乘法的运算操作。
@@ -50,6 +57,7 @@
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
@@ -78,5 +86,5 @@
   ```
   执行结果如下，说明精度对比成功。
   ```bash
-  test pass
+  test pass!
   ```
