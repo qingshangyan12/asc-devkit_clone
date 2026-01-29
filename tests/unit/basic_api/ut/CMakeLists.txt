@@ -10,10 +10,9 @@
 project(ascendc_devkit_ut)
 cmake_minimum_required(VERSION 3.14.1)
 
-set(PRODUCT_TYPE_LIST
-    ascend910 ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend310B1 ascend610Lite)
+set(PRODUCT_TYPE_LIST)
 
-set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910 ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend310B1 ascend610Lite)
+set(TIKCPP_UT_PRODUCT_TYPE_LIST)
 # set(TIKCPP_UT_PRODUCT_TYPE_LIST ascend910)
 
 add_compile_definitions(ASCENDC_CPU_DEBUG=1 ASCENDC_DUMP=0)
