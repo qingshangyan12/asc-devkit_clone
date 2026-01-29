@@ -30,6 +30,7 @@ from .global_storage import global_var_storage
 from .log_utils import AscendCLogLevel, CompileStage
 from .get_op_tiling import OpInfo
 from .ascendc_constants import KernelMetaType, CORE_TYPE_MIX, CORE_TYPE_CUBE, CORE_TYPE_VEC
+from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manager
 
 
 def compile_pre_process(op_info: OpInfo, compile_options: list):
@@ -61,6 +62,7 @@ def compile_pre_process(op_info: OpInfo, compile_options: list):
         "ascendc_enable_aicore_exception_restart", "-DAICORE_EXCEPTION_RESTART" in compile_options)
     if global_var_storage.get_variable("ascendc_enable_coverage"):
         compile_options.append("-g")
+    global_ascendc_kernel_feature_manager.init_available_and_enable_features()
     return compile_options
 
 

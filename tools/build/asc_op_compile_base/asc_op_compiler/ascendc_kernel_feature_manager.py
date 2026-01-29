@@ -17,7 +17,7 @@ import threading
 from abc import ABC, abstractmethod
 from typing import Dict, Type, Any, Callable, Optional
 from asc_op_compile_base.common.utils.log_utils import LogUtil, AscendCLogLevel
-
+from .global_storage import global_var_storage
 
 
 class BaseFeature(ABC):
@@ -42,7 +42,7 @@ class BaseFeature(ABC):
         Return:
             The minimum version of the two.
         """
-        return min(self.value, others_value)
+        return min(self.feature_version, others_value)
 
     @abstractmethod
     def get_feature_version_of_value(self, feature_value: any) -> int:
@@ -82,7 +82,20 @@ class AscendCKernelFeatureManager:
 
 
     def init_available_and_enable_features(self):
-        input_features = {} # need get from context
+        if global_var_storage.get_variable("ascendc_enable_super_kernel") is False:
+            return
+
+        input_features = {}
+        import asc_op_compile_base.common.context.op_context as op_context
+        input_features = op_context.get_context().get_addition("feature_list")
+        if input_features is None:
+            LogUtil.print_compile_log("AscendC Feature Manager", \
+                f"get feature versions from te_fusion is None", AscendCLogLevel.LOG_INFO)
+            return
+        else:
+            LogUtil.print_compile_log("AscendC Feature Manager", \
+                f"get feature versions from te_fusion is {input_features}", AscendCLogLevel.LOG_INFO)
+
         for feature_name in input_features.keys():
             if feature_name not in self._support_features_instances.keys():
                 LogUtil.print_compile_log("AscendC Feature Manager", \
@@ -144,7 +157,6 @@ class AscendCKernelFeatureManager:
                 please upgrade the related software version, \
                 i.e. cann, opp, graph-autofusion.", AscendCLogLevel.LOG_INFO)
 
-
     def get_feature_value(self, feature_name: str) -> any:
         """
         get feature value according to feature name
@@ -159,6 +171,9 @@ class AscendCKernelFeatureManager:
 
     def get_support_feature_versions(self) -> dict:
         return self._support_feature_version_map.copy()
+
+    def get_available_feature_versions(self) -> dict:
+        return self._available_feature_version_map.copy()
 
 
 def register_feature(manager: AscendCKernelFeatureManager):

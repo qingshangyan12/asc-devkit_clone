@@ -294,6 +294,8 @@ def _json_post_process(compile_info: CompileInfo, op_info: OpInfo, tiling_info: 
 
     if compile_info.super_kernel_info.get("kernel_name") is not None:
         js["SuperkernelInfo"] = _json_except_info(compile_info)
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        js["feature_list"] = global_ascendc_kernel_feature_manager.get_available_feature_versions()
 
     try:
         with open(obj_path, 'rb') as obj_file:
@@ -1259,7 +1261,6 @@ def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_op
     LogUtil.detail_log_print(op_info.kernel_name, COMPILE_STAGE_MSG_INFO["preprocess_start"], AscendCLogLevel.LOG_INFO)
     # online compile reuses thread, dfx infos need to be reset.
     global_var_storage.global_storage_reset()
-    global_ascendc_kernel_feature_manager.init_available_and_enable_features()
     if extend_options.get('opp_kernel_hidden_dat_path', None) is None and not os.path.exists(cce_file):
         raise Exception(f"input cce file is not exists, file name: " + cce_file)
 
