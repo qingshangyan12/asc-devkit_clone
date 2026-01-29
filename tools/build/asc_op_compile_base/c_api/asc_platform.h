@@ -61,7 +61,6 @@ enum class DPLATFORM {
   BS9SX2A,
   MC61AM21A,
   ASCEND_910_95,     // C310
-  ASCEND_910_55,     // 310R6
   KIRINX90,
   KIRIN9030,
   DEFAULT_CURRENT
@@ -146,8 +145,6 @@ constexpr const char* Ascend_910_9577 = "Ascend910_9577";
 constexpr const char* Ascend_910_9578 = "Ascend910_9578";
 constexpr const char* Ascend_910_95A1 = "Ascend910_95A1";
 constexpr const char* Ascend_910_95A2 = "Ascend910_95A2";
-constexpr const char* Ascend_910_55 = "Ascend910_55";
-constexpr const char* Ascend_910_5591 = "Ascend910_5591";
 constexpr const char* Ascend_910ProA = "Ascend910ProA";
 constexpr const char* Ascend_910ProB = "Ascend910ProB";
 constexpr const char* Ascend_910PremiumA = "Ascend910PremiumA";
@@ -612,7 +609,7 @@ class CceConfBase {
       MC61AM21AA,     MC61AM21AB,           Ascend_035,         Ascend_035A,      Ascend_035B,   
       AS31XM1,       AS31XM1X,              Ascend_910_950z,    Ascend_910_957b,  Ascend_910_957c,
       Ascend_910_957d, Ascend_910_9589,    Ascend_910_958a,    Ascend_910_958b,  Ascend_910_9599,
-      Ascend_910_5591, Ascend_910_950y,    Ascend_910_9579,  Ascend_910_9591,    Ascend_910_9592,
+      Ascend_910_950y,    Ascend_910_9579,  Ascend_910_9591,    Ascend_910_9592,
       Ascend_910_9595, Ascend_910_9596,    Ascend_910_9581, Ascend_910_9582,     Ascend_910_9583,
       Ascend_910_9584, Ascend_910_9585,    Ascend_910_9586, Ascend_910_9587,     Ascend_910_9588,
       Ascend_910_9571, Ascend_910_9572,    Ascend_910_9573, Ascend_910_9574,     Ascend_910_9575,

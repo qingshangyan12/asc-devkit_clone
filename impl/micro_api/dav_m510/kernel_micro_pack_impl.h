@@ -26,7 +26,7 @@ __simd_callee__ inline void PackImpl(S& dstReg, V& srcReg)
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(std::is_same_v<U, DefaultType> || std::is_same_v<U, ActualU>, "U type is not correct!");
     static_assert((SupportType<Tuple<ActualT, ActualU>, Tuple<uint8_t, uint16_t>, Tuple<uint8_t, int16_t>,
-                  Tuple<uint16_t, uint32_t>, Tuple<uint16_t, int32_t>, Tuple<uint32_t, uint64_t>, Tuple<uint32_t,
+                  Tuple<uint16_t, uint32_t>, Tuple<uint16_t, int32_t>, Tuple<uint32_t, uint64_t>, Tuple<uint32_t, 
                   int64_t>>()), "unsupport datatype");
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     if constexpr (sizeof(ActualU) != 8) {
@@ -57,7 +57,7 @@ __simd_callee__ inline void UnPackImpl(S& dstReg, V& srcReg)
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(std::is_same_v<U, DefaultType> || std::is_same_v<U, ActualU>, "U type is not correct!");
     static_assert((SupportType<Tuple<ActualT, ActualU>, Tuple<uint32_t, uint16_t>, Tuple<int32_t, int16_t>,
-                  Tuple<uint16_t, uint8_t>, Tuple<int16_t, int8_t>, Tuple<uint64_t, uint32_t>, Tuple<int64_t,
+                  Tuple<uint16_t, uint8_t>, Tuple<int16_t, int8_t>, Tuple<uint64_t, uint32_t>, Tuple<int64_t, 
                   int32_t>>()), "unsupport datatype");
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     if constexpr (sizeof(ActualT) != 8) {

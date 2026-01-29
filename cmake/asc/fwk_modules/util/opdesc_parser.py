@@ -131,7 +131,7 @@ class OpDesc:
         self.op_replay_batch = False
         self.input_idx = -1
         self.output_idx = -1
-        self.max_block_dim = 32
+        self.max_block_num = 32
         self.max_shape_size = 268435456
         self.dynamic_shape = False
         self.op_range_limit = ''

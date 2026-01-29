@@ -19,6 +19,16 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p20751740131216"><a name="p20751740131216"></a><a name="p20751740131216"></a>√</p>
 </td>
 </tr>
+<tr id="row2024235811401"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p4242155874012"><a name="p4242155874012"></a><a name="p4242155874012"></a><span id="ph14879133874118"><a name="ph14879133874118"></a><a name="ph14879133874118"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p824235884010"><a name="p824235884010"></a><a name="p824235884010"></a>x</p>
+</td>
+</tr>
+<tr id="row141206104332"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p142462448111"><a name="p142462448111"></a><a name="p142462448111"></a><span id="ph49484268126"><a name="ph49484268126"></a><a name="ph49484268126"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p9246184415111"><a name="p9246184415111"></a><a name="p9246184415111"></a>x</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -83,4 +93,3 @@ mm.SetHF32(true);
 mm.IterateAll(gm_c);
 mm.SetHF32(false);
 ```
-

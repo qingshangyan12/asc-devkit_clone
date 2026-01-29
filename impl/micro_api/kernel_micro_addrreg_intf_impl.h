@@ -50,7 +50,7 @@ __aicore__ inline AddrReg CreateAddrReg(uint16_t index0, uint16_t stride0, uint1
 }
 
 template <typename T>
-__aicore__ inline AddrReg CreateAddrReg(uint16_t index0, uint16_t stride0, uint16_t index1, uint16_t stride1,
+__aicore__ inline AddrReg CreateAddrReg(uint16_t index0, uint16_t stride0, uint16_t index1, uint16_t stride1, 
                                         uint16_t index2, uint16_t stride2, uint16_t index3, uint16_t stride3)
 {
     return CreateAddrRegImpl<T>(index0, stride0, index1, stride1, index2, stride2, index3, stride3);
