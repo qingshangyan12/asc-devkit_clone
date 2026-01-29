@@ -58,12 +58,12 @@ struct DataCopyParams {
     };
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 enum class DataCopyMVType : uint8_t {
     UB_TO_OUT = 0,
     OUT_TO_UB = 1,
 };
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 struct NdDmaConfig {
     static constexpr uint16_t unsetPad = 0xffff;
     bool isNearestValueMode = false;
@@ -76,6 +76,7 @@ constexpr NdDmaConfig kDefaultNdDmaConfig = { false, NdDmaConfig::unsetPad, NdDm
     false };
 constexpr NdDmaConfig kDefaultMultiCopyConfig = { false, NdDmaConfig::unsetPad, NdDmaConfig::unsetPad,
     false };  // reserve old name
+#endif
 
 template <uint8_t dim>
 struct MultiCopyLoopInfo  {
@@ -100,8 +101,6 @@ struct MultiCopyParams  {
 
 template <typename T, uint8_t dim>  
 using NdDmaParams = MultiCopyParams<T, dim>;
-
-#endif
 
 struct DataCopyEnhancedParams {
     __aicore__ DataCopyEnhancedParams() {}
@@ -362,6 +361,7 @@ struct Dn2NzParams {
     uint16_t dstNzNStride = 0;
     uint32_t dstNzMatrixStride = 0;
 };
+#endif
 
 struct LoopModeParams {
     __aicore__ LoopModeParams()
@@ -392,7 +392,6 @@ struct LoopModeParams {
     uint64_t loop2SrcStride = 0;
     uint64_t loop2DstStride = 0;
 };
-#endif
 
 struct SliceInfo {
     __aicore__ SliceInfo() {}

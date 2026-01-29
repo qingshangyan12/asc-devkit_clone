@@ -364,12 +364,10 @@ struct IntriInfo {
     uint32_t tail{ 0 };
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
 enum class PaddingMode : uint8_t {
     Normal = 0,
     Compact,
 };
-#endif
 
 struct PadParams {
     __aicore__ PadParams()
