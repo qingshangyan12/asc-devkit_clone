@@ -147,13 +147,13 @@ __aicore__ inline float ToFloat(const bfloat16_t& bVal)
 template <typename T>
 __aicore__ constexpr inline float ToFloat(const T& bVal)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "ToFloat is not supported on this device"); });
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport ToFloat"); });
     return 0.0f;
 }
 
 __aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "ToBfloat16 is not supported on this device"); });
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport ToFloat"); });
     bfloat16_t bNum;
     return bNum;
 }
