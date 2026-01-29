@@ -606,6 +606,8 @@ __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG,
     if constexpr (!Impl::Detail::MatmulFeatureTrait<MM_CFG>::IsSupportL0CToUB()) {
         static_assert(!ToMatmulConfig(MM_CFG).isPartialOutput, "PartialOutput not support local postion output");
     }
+    static_assert(ToMatmulConfig(MM_CFG).enableGetTensorC,
+        "GetTensorC not support when enableGetTensorC is unabled");
     if constexpr (PhyPosIsL0C(C_TYPE::pos)) {
         return;
     } else {
@@ -620,6 +622,8 @@ template <bool sync>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::GetTensorC(
     const GlobalTensor<DstT>& gm, uint8_t enAtomic, bool enSequentialWrite)
 {
+    static_assert(ToMatmulConfig(MM_CFG).enableGetTensorC,
+        "GetTensorC not support when enableGetTensorC is unabled");
     MATMUL_MODULE(Scheduler)->GetResult(gm, enAtomic, enSequentialWrite);
 }
 
@@ -631,6 +635,8 @@ template <bool sync>
 __aicore__ inline void MatmulImplBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::GetTensorC(
     const GlobalTensor<DstT> &gm, const LocalTensor<DstT> &co2Local, uint8_t enAtomic, bool enSequentialWrite)
 {
+    static_assert(ToMatmulConfig(MM_CFG).enableGetTensorC,
+        "GetTensorC not support when enableGetTensorC is unabled");
     MATMUL_MODULE(Scheduler)->GetResult(gm, co2Local, enAtomic, enSequentialWrite);
 }
 #endif
