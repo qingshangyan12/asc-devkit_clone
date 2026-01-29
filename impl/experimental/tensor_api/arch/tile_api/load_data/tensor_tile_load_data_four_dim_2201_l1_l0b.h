@@ -12,11 +12,11 @@
  * \file tensor_tile_load_data_four_dim_2201_l1_l0b.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_FOUR_DIM_2201_L1_L0B_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_FOUR_DIM_2201_L1_L0B_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_FOUR_DIM_2201_L1_L0B_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_FOUR_DIM_2201_L1_L0B_H
 
-#include "impl/tensor_api/utils/tensor_tile_utils.h"
-#include "impl/tensor_api/struct/tensor_tile_struct.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/experimental/tensor_api/struct/tensor_tile_struct.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -357,4 +357,4 @@ public:
 } // namespace ACTE
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_FOUR_DIM_2201_L1_L0B_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_FOUR_DIM_2201_L1_L0B_H

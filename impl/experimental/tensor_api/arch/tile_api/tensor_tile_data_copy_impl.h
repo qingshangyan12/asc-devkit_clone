@@ -12,8 +12,8 @@
  * \file tensor_tile_data_copy_impl.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_DATA_COPY_IMPL_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_DATA_COPY_IMPL_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_DATA_COPY_IMPL_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_DATA_COPY_IMPL_H
 
 namespace AscendC {
 struct DataCopyTrait {
@@ -21,7 +21,7 @@ struct DataCopyTrait {
 constexpr DataCopyTrait DEFAULT_DATA_COPY_TRAIT;
 }
 
-#include "impl/tensor_api/arch/tile_api/data_copy/tensor_tile_data_copy_routing.h"
+#include "impl/experimental/tensor_api/arch/tile_api/data_copy/tensor_tile_data_copy_routing.h"
 
 namespace AscendC {
 template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
@@ -44,4 +44,4 @@ DataCopy(const T& dst, const U& src, const Coord& coord)
 
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_DATA_COPY_IMPL_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_DATA_COPY_IMPL_H

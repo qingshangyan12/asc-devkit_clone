@@ -12,9 +12,9 @@
 * \file tensor_tile_atom.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H
-#define IMPL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H
 
-#include "impl/tensor_api/atom/tensor_tile_copy_atom.h"
+#include "impl/experimental/tensor_api/atom/tensor_tile_copy_atom.h"
 
-#endif // IMPL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ATOM_TENSOR_TILE_ATOM_H

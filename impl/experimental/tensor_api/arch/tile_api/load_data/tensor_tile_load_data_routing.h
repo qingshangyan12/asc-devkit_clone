@@ -12,11 +12,11 @@
  * \brief
  */
 
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_ROUTING_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_ROUTING_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_ROUTING_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_ROUTING_H
 
-#include "impl/tensor_api/arch/tile_api/load_data/tensor_tile_load_data_four_dim_2201_l1_l0a.h"
-#include "impl/tensor_api/arch/tile_api/load_data/tensor_tile_load_data_four_dim_2201_l1_l0b.h"
+#include "impl/experimental/tensor_api/arch/tile_api/load_data/tensor_tile_load_data_four_dim_2201_l1_l0a.h"
+#include "impl/experimental/tensor_api/arch/tile_api/load_data/tensor_tile_load_data_four_dim_2201_l1_l0b.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -45,4 +45,4 @@ struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V2201, FO
 };
 } // namespace TileInternal
 } // namespace AscendC
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_ROUTING_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_ROUTING_H

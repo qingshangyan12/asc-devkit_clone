@@ -12,11 +12,11 @@
 * \file tensor_tile_tensor.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_TENSOR_H
-#define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_TENSOR_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_TENSOR_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_TENSOR_H
 
-#include "impl/tensor_api/struct/definition/tensor_tile_engine.h"
-#include "impl/tensor_api/struct/definition/tensor_tile_layout.h"
+#include "impl/experimental/tensor_api/struct/definition/tensor_tile_engine.h"
+#include "impl/experimental/tensor_api/struct/definition/tensor_tile_layout.h"
 
 namespace AscendC {
 
@@ -145,4 +145,4 @@ constexpr bool IsTileTensorV = IsTileTensor<T>::value;
 
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_STRUCT_TENSOR_TILE_TENSOR_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_TENSOR_H

@@ -12,11 +12,11 @@
  * \file tensor_tile_data_copy_four_dim_2201_l1_fb.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_DATA_COPY_TENSOR_TILE_DATA_COPY_FOUR_DIM_2201_GM_FB_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_DATA_COPY_TENSOR_TILE_DATA_COPY_FOUR_DIM_2201_GM_FB_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_DATA_COPY_TENSOR_TILE_DATA_COPY_FOUR_DIM_2201_GM_FB_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_DATA_COPY_TENSOR_TILE_DATA_COPY_FOUR_DIM_2201_GM_FB_H
 
-#include "impl/tensor_api/utils/tensor_tile_utils.h"
-#include "impl/tensor_api/struct/tensor_tile_struct.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/experimental/tensor_api/struct/tensor_tile_struct.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -113,4 +113,4 @@ private:
 } // namespace TileInternal
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_DATA_COPY_TENSOR_TILE_DATA_COPY_FOUR_DIM_2201_GM_FB_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_DATA_COPY_TENSOR_TILE_DATA_COPY_FOUR_DIM_2201_GM_FB_H

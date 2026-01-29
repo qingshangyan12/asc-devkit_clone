@@ -12,12 +12,12 @@
 * \file tensor_tile_arch.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H
-#define IMPL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H
 
-#include "impl/tensor_api/arch/tile_api/tensor_tile_mmad_impl.h"
-#include "impl/tensor_api/arch/tile_api/tensor_tile_load_data_impl.h"
-#include "impl/tensor_api/arch/tile_api/tensor_tile_data_copy_impl.h"
-#include "impl/tensor_api/arch/tile_api/tensor_tile_fixpipe_impl.h"
+#include "impl/experimental/tensor_api/arch/tile_api/tensor_tile_mmad_impl.h"
+#include "impl/experimental/tensor_api/arch/tile_api/tensor_tile_load_data_impl.h"
+#include "impl/experimental/tensor_api/arch/tile_api/tensor_tile_data_copy_impl.h"
+#include "impl/experimental/tensor_api/arch/tile_api/tensor_tile_fixpipe_impl.h"
 
-#endif // IMPL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TENSOR_TILE_ARCH_H

@@ -12,10 +12,10 @@
 * \file tensor_tile_engine.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
-#define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
 
-#include "impl/tensor_api/struct/definition/tensor_tile_hw_ptr.h"
+#include "impl/experimental/tensor_api/struct/definition/tensor_tile_hw_ptr.h"
 
 namespace AscendC {
 
@@ -56,4 +56,4 @@ private:
 
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H

@@ -12,13 +12,13 @@
 * \file tensor_tile_constant.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_UTILS_TENSOR_TILE_CONSTANT_H
-#define IMPL_TENSOR_API_UTILS_TENSOR_TILE_CONSTANT_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_CONSTANT_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_CONSTANT_H
 
 #include <cstdint>
 #include <utility>
 #include <type_traits>
-#include "impl/tensor_api/utils/tensor_tile_macro.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_macro.h"
 #include "include/utils/std/tuple.h"
 #include "include/utils/std/type_traits.h"
 #include "include/utils/std/utility.h"
@@ -85,4 +85,4 @@ using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUAN
 }
 }
 
-#endif // IMPL_TENSOR_API_UTILS_TENSORTILE_CONSTANT_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSORTILE_CONSTANT_H

@@ -11,11 +11,11 @@
  * \file tensor_tile_mmad_with_bias_four_dim_2201.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_WITH_BIAS_FOUR_DIM_2201_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_WITH_BIAS_FOUR_DIM_2201_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_WITH_BIAS_FOUR_DIM_2201_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_WITH_BIAS_FOUR_DIM_2201_H
 
-#include "impl/tensor_api/utils/tensor_tile_utils.h"
-#include "impl/tensor_api/struct/tensor_tile_struct.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/experimental/tensor_api/struct/tensor_tile_struct.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -184,4 +184,4 @@ public:
 } // namespace TileInternal
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_WITH_BIAS_FOUR_DIM_2201_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_WITH_BIAS_FOUR_DIM_2201_H

@@ -12,12 +12,12 @@
 * \file tensor_tile_utils.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_UTILS_TENSOR_TILE_UTILS_H
-#define IMPL_TENSOR_API_UTILS_TENSOR_TILE_UTILS_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_UTILS_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_UTILS_H
 
-#include "impl/tensor_api/utils/tensor_tile_constant.h"
-#include "impl/tensor_api/utils/tensor_tile_extra.h"
-#include "impl/tensor_api/utils/tensor_tile_format.h"
-#include "impl/tensor_api/utils/tensor_tile_macro.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_constant.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_extra.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_format.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_macro.h"
 
-#endif // IMPL_TENSOR_API_UTILS_TENSOR_TILE_UTILS_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_UTILS_H

@@ -12,8 +12,8 @@
  * \file tensor_tile_mmad_impl.h.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_MMAD_IMPL_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_MMAD_IMPL_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_MMAD_IMPL_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_MMAD_IMPL_H
 
 namespace AscendC {
 struct MmadTrait {
@@ -44,7 +44,7 @@ struct MmadTrait {
 constexpr MmadTrait DEFAULT_MMAD_TRAIT; 
 }
 
-#include "impl/tensor_api/arch/tile_api/mmad/tensor_tile_mmad_routing.h"
+#include "impl/experimental/tensor_api/arch/tile_api/mmad/tensor_tile_mmad_routing.h"
 
 namespace AscendC {
 
@@ -73,4 +73,4 @@ Mmad(const T& dst, const U& fm, const S& filter, const V& bias)
    Tensor2Tensor{}.template Run<T, U, S, V, trait>(dst, fm, filter, bias);
 }
 } // namespace AscendC
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_MMAD_IMPL_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_MMAD_IMPL_H

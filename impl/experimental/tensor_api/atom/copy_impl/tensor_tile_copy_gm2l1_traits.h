@@ -12,11 +12,11 @@
 * \file tensor_tile_copy_gm2l1_traits.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ATOM_COPY_IMPL_TENSOR_TILE_COPY_GM2L1_TRAITS_H
-#define IMPL_TENSOR_API_ATOM_COPY_IMPL_TENSOR_TILE_COPY_GM2L1_TRAITS_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_IMPL_TENSOR_TILE_COPY_GM2L1_TRAITS_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_IMPL_TENSOR_TILE_COPY_GM2L1_TRAITS_H
 
-#include "impl/tensor_api/utils/tensor_tile_utils.h"
-#include "impl/tensor_api/arch/tensor_tile_arch.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/experimental/tensor_api/arch/tensor_tile_arch.h"
 
 namespace AscendC {
 
@@ -35,4 +35,4 @@ struct CopyGM2L1 {
 
 }
 
-#endif // IMPL_TENSOR_API_ATOM_COPY_IMPL_TENSOR_TILE_COPY_GM2L1_TRAITS_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_IMPL_TENSOR_TILE_COPY_GM2L1_TRAITS_H

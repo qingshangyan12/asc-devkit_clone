@@ -12,11 +12,11 @@
  * \file tensor_tile_mmad_routing.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_ROUTING_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_ROUTING_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_ROUTING_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_ROUTING_H
 
-#include "impl/tensor_api/arch/tile_api/mmad/tensor_tile_mmad_four_dim_2201.h"
-#include "impl/tensor_api/arch/tile_api/mmad/tensor_tile_mmad_with_bias_four_dim_2201.h"
+#include "impl/experimental/tensor_api/arch/tile_api/mmad/tensor_tile_mmad_four_dim_2201.h"
+#include "impl/experimental/tensor_api/arch/tile_api/mmad/tensor_tile_mmad_with_bias_four_dim_2201.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -69,4 +69,4 @@ struct MmadWithBiasTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Ha
 } // namespace TileInternal
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_ROUTING_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_MMAD_TENSOR_TILE_MMAD_ROUTING_H

@@ -12,11 +12,11 @@
  * \file tensor_tile_fixpipe_routing.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_ROUTING_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_ROUTING_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_ROUTING_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_ROUTING_H
 
-#include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_four_dim_2201_l0c_gm.h"
-#include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_quant_four_dim_2201_l0c_gm.h"
+#include "impl/experimental/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_four_dim_2201_l0c_gm.h"
+#include "impl/experimental/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_quant_four_dim_2201_l0c_gm.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -61,4 +61,4 @@ struct FixpipeQuantTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201
 } // namespace TileInternal
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_ROUTING_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_ROUTING_H

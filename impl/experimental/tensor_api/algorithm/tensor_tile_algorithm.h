@@ -12,12 +12,12 @@
  * \file tensor_tile_algorithm.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_ALGORITHM_H
-#define IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_ALGORITHM_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_TILE_ALGORITHM_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_TILE_ALGORITHM_H
 
-#include "impl/tensor_api/algorithm/tensor_tile_fractal_impl.h"
-#include "impl/tensor_api/algorithm/tensor_tile_layout_impl.h"
-#include "impl/tensor_api/algorithm/tensor_tile_ptr_impl.h"
-#include "impl/tensor_api/algorithm/tensor_tile_tensor_impl.h"
+#include "impl/experimental/tensor_api/algorithm/tensor_tile_fractal_impl.h"
+#include "impl/experimental/tensor_api/algorithm/tensor_tile_layout_impl.h"
+#include "impl/experimental/tensor_api/algorithm/tensor_tile_ptr_impl.h"
+#include "impl/experimental/tensor_api/algorithm/tensor_tile_tensor_impl.h"
 
-#endif // IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_ALGORITHM_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_TILE_ALGORITHM_H

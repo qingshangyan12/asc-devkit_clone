@@ -12,10 +12,10 @@
  * \file tensor_tile_fixpipe_quant_nz2nd_four_dim_2201_l0c_gm.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_QUANT_NZ2ND_FOUR_DIM_2201_L0C_GM_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_QUANT_NZ2ND_FOUR_DIM_2201_L0C_GM_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_QUANT_NZ2ND_FOUR_DIM_2201_L0C_GM_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_QUANT_NZ2ND_FOUR_DIM_2201_L0C_GM_H
 
-#include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_2201_base.h"
+#include "impl/experimental/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_2201_base.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -399,4 +399,4 @@ private:
 }  // namespace TileInternal
 }  // namespace AscendC
 
-#endif  // IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_QUANT_NZ2ND_FOUR_DIM_2201_L0C_GM_H
+#endif  // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_QUANT_NZ2ND_FOUR_DIM_2201_L0C_GM_H

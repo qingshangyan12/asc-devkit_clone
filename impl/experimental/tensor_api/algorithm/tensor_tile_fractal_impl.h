@@ -12,11 +12,11 @@
  * \file tensor_tile_fractal_impl.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_FRACTAL_IMPL_H
-#define IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_FRACTAL_IMPL_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_TILE_FRACTAL_IMPL_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_TILE_FRACTAL_IMPL_H
 
-#include "impl/tensor_api/utils/tensor_tile_utils.h"
-#include "impl/tensor_api/struct/tensor_tile_struct.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/experimental/tensor_api/struct/tensor_tile_struct.h"
 
 namespace AscendC {
 
@@ -76,4 +76,4 @@ using ZZLayoutFormat = Layout<TileInternal::ZZShapeFormat<T, row, column>, TileI
 
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ALGORITHM_TENSOR_TILE_FRACTAL_IMPL_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_TILE_FRACTAL_IMPL_H

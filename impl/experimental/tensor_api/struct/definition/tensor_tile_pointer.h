@@ -12,10 +12,10 @@
 * \file tensor_tile_pointer.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_POINTER_H
-#define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_POINTER_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_POINTER_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_POINTER_H
 
-#include "impl/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
 
 namespace AscendC {
 namespace TileInternal{
@@ -78,4 +78,4 @@ private:
 }
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_STRUCT_TENSOR_TILE_POINTER_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_POINTER_H

@@ -12,8 +12,8 @@
  * \file tensor_tile_fixpipe_impl.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TENSOR_TILE_FIXPIPE_IMPL_H
-#define IMPL_TENSOR_API_ARCH_TENSOR_TILE_FIXPIPE_IMPL_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TENSOR_TILE_FIXPIPE_IMPL_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TENSOR_TILE_FIXPIPE_IMPL_H
 
 namespace AscendC {
 struct FixpipeTrait {
@@ -44,7 +44,7 @@ struct FixpipeTrait {
 constexpr FixpipeTrait DEFAULT_FIXPIPE_TRAIT;
 }
 
-#include "impl/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_routing.h"
+#include "impl/experimental/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_routing.h"
 
 namespace AscendC {
 
@@ -93,4 +93,4 @@ Fixpipe(const T& dst, const U& src, const V& quant, const Coord& coord)
 }
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_TENSOR_TILE_FIXPIPE_IMPL_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TENSOR_TILE_FIXPIPE_IMPL_H

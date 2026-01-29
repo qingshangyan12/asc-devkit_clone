@@ -12,10 +12,10 @@
  * \file tensor_tile_make_layout.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_LAYOUT_H
-#define IMPL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_LAYOUT_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_LAYOUT_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_LAYOUT_H
 
-#include "impl/tensor_api/struct/definition/tensor_tile_tensor.h"
+#include "impl/experimental/tensor_api/struct/definition/tensor_tile_tensor.h"
 
 namespace AscendC {
 namespace TileInternal

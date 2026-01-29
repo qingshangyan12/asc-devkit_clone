@@ -12,10 +12,10 @@
 * \file tensor_tile_extra.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_UTILS_TENSOR_TILE_EXTRA_H
-#define IMPL_TENSOR_API_UTILS_TENSOR_TILE_EXTRA_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_EXTRA_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_EXTRA_H
 
-#include "impl/tensor_api/utils/tensor_tile_constant.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_constant.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -55,4 +55,4 @@ struct IterVal<T,void_t<typename T::valueType>> {
 } // namespace TileInternal
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_UTILS_TENSOR_TILE_EXTRA_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_EXTRA_H

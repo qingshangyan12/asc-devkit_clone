@@ -12,10 +12,10 @@
  * \file tensor_tile_StaticLayoutSize.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_STATICLAYOUTSIZE_H
-#define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_STATICLAYOUTSIZE_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STATICLAYOUTSIZE_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STATICLAYOUTSIZE_H
 
-#include "impl/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
 
 namespace AscendC {
 namespace TileInternal {

@@ -12,11 +12,11 @@
  * \file tensor_tile_fixpipe_2201_base.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_2201_BASE_H
-#define IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_2201_BASE_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_2201_BASE_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_2201_BASE_H
 
-#include "impl/tensor_api/utils/tensor_tile_utils.h"
-#include "impl/tensor_api/struct/tensor_tile_struct.h"
+#include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
+#include "impl/experimental/tensor_api/struct/tensor_tile_struct.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -239,4 +239,4 @@ private:
 }
 }
 
-#endif // IMPL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_2201_BASE_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_TENSOR_TILE_FIXPIPE_2201_BASE_H

@@ -12,12 +12,12 @@
 * \file tensor_tile_copy_traits.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ATOM_TENSOR_TILE_COPY_TRAIT_H
-#define IMPL_TENSOR_API_ATOM_TENSOR_TILE_COPY_TRAIT_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ATOM_TENSOR_TILE_COPY_TRAIT_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ATOM_TENSOR_TILE_COPY_TRAIT_H
 
-#include "impl/tensor_api/atom/copy_impl/tensor_tile_copy_gm2l1_traits.h"
-#include "impl/tensor_api/atom/copy_impl/tensor_tile_copy_l0c2gm_traits.h"
-#include "impl/tensor_api/atom/copy_impl/tensor_tile_copy_l12l0_traits.h"
+#include "impl/experimental/tensor_api/atom/copy_impl/tensor_tile_copy_gm2l1_traits.h"
+#include "impl/experimental/tensor_api/atom/copy_impl/tensor_tile_copy_l0c2gm_traits.h"
+#include "impl/experimental/tensor_api/atom/copy_impl/tensor_tile_copy_l12l0_traits.h"
 
 namespace AscendC {
 
@@ -62,4 +62,4 @@ struct CopyTraits<CopyL12L0, TraitStruct>
 
 }
 
-#endif // IMPL_TENSOR_API_ATOM_TENSOR_TILE_COPY_TRAIT_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ATOM_TENSOR_TILE_COPY_TRAIT_H

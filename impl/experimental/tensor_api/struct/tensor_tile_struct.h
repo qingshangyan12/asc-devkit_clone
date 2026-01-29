@@ -12,13 +12,13 @@
  * \file tensor_tile_struct.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
-#define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
 
-#include "impl/tensor_api/struct/constructor/tensor_tile_make_layout.h"
-#include "impl/tensor_api/struct/constructor/tensor_tile_make_ptr.h"
-#include "impl/tensor_api/struct/constructor/tensor_tile_make_tensor.h"
-#include "impl/tensor_api/struct/constructor/tensor_tile_make_tuple.h"
-#include "impl/tensor_api/struct/constructor/tensor_tile_make_coord.h"
+#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_layout.h"
+#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_ptr.h"
+#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_tensor.h"
+#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_tuple.h"
+#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_coord.h"
 
-#endif //IMPL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
+#endif //IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H

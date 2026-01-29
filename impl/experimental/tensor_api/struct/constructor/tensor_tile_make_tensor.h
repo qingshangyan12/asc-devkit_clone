@@ -12,10 +12,10 @@
 * \file tensor_tile_make_tensor.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TENSOR_H
-#define IMPL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TENSOR_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TENSOR_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TENSOR_H
 
-#include "impl/tensor_api/struct/definition/tensor_tile_tensor.h"
+#include "impl/experimental/tensor_api/struct/definition/tensor_tile_tensor.h"
 
 namespace AscendC {
 namespace TileInternal
@@ -51,4 +51,4 @@ __aicore__ inline constexpr auto MakeTensorImpl(const Iterator& iter, const Args
 }
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TENSOR_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TENSOR_H

@@ -12,11 +12,11 @@
  * \file tensor_tile_layout.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_STRUCT_TENSOR_TILE_LAYOUT_H
-#define IMPL_TENSOR_API_STRUCT_TENSOR_TILE_LAYOUT_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_LAYOUT_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_LAYOUT_H
 
 #include "tensor_tile_StaticLayoutSize.h"
-#include "impl/tensor_api/struct/constructor/tensor_tile_make_stride.h"
+#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_stride.h"
 
 namespace AscendC {
 
