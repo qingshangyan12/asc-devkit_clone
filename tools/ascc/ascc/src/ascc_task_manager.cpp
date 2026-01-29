@@ -50,8 +50,8 @@ const std::vector<std::string> LDLLD_FINAL_PROCESS_ARG = {"-m", "aicorelinux", "
 // Optimize is inserted manually, thus not included here
 const std::vector<std::string> COMMON_COMPILE_OPTIONS = {
     "I",
-    "D",    // current not support define-macro in ascendfe
-    "U",    // current not supported
+    "D",    // currently not support define-macro in ascendfe
+    "U",    // currently not supported
     "g",
 };
 
@@ -112,7 +112,7 @@ void ErrorMsgForProcessFile(const std::string& file)
 std::string ReadJsonFileToString(const std::string& jsonName)
 {
     if (PathCheck(jsonName.c_str(), true) == Ascc::PathStatus::NOT_EXIST) {
-        Ascc::HandleError("Json file " + jsonName + " not exists.");
+        Ascc::HandleError("Json file " + jsonName + " does not exists.");
         return "";
     }
     std::ifstream file(jsonName);

@@ -159,14 +159,14 @@ public:
     template <class T> __aicore__ inline void SetWorkspace(GlobalTensor<T>& addr)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "SetWorkspace not support when enableMixDualMaster is enabled");
+            "SetWorkspace is not supported when enableMixDualMaster is enabled");
         ASSERT(addr.GetSize() > 0);
         SetWorkspace(addr.GetPhyAddr(), addr.GetSize() * sizeof(T));
     }
     template <class T> __aicore__ inline void SetWorkspace(__gm__ const T* addr, int size)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "SetWorkspace not support when enableMixDualMaster is enabled");
+            "SetWorkspace is not supported when enableMixDualMaster is enabled");
         ASSERT(addr != nullptr);
         if constexpr (ToMatmulConfig(MM_CFG).singleCoreM == 0) {
             ASSERT(!this->cubeTiling.IsNull());
@@ -286,7 +286,7 @@ public:
     __aicore__ inline void SetTensorA(const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "SetTensorA localTensor not support when enableMixDualMaster is enabled");
+            "SetTensorA localTensor is not supported when enableMixDualMaster is enabled");
         ASSERT(isTransposeA <= A_TYPE::isTrans &&
             "It is not allowed to do A transpose when matmul A transpose is not defined.");
         kfcMsg_.body.isTransA = static_cast<uint32_t>(isTransposeA);
@@ -314,7 +314,7 @@ public:
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-            ASSERT("SetTensorA localTensor not support when enableMixDualMaster is enabled");
+            ASSERT("SetTensorA localTensor is not supported when enableMixDualMaster is enabled");
 #endif
             return;
         }
@@ -337,7 +337,7 @@ public:
     __aicore__ inline void SetTensorB(const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "SetTensorB localTensor not support when enableMixDualMaster is enabled");
+            "SetTensorB localTensor is not supported when enableMixDualMaster is enabled");
         ASSERT(isTransposeB <= B_TYPE::isTrans &&
             "It is not allowed to do B transpose when matmul B transpose is not defined.");
         kfcMsg_.body.isTransB = static_cast<uint32_t>(isTransposeB);
@@ -365,7 +365,7 @@ public:
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-            ASSERT("SetTensorB localTensor not support when enableMixDualMaster is enabled");
+            ASSERT("SetTensorB localTensor is not supported when enableMixDualMaster is enabled");
 #endif
             return;
         }
@@ -389,7 +389,7 @@ public:
     __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "SetBias localTensor not support when enableMixDualMaster is enabled");
+            "SetBias localTensor is not supported when enableMixDualMaster is enabled");
         kfcMsg_.body.setTensorBias = 1;
         kfcMsg_.body.isFirstIter = 1;
         if constexpr (BIAS_TYPE::pos == TPosition::TSCM) {
@@ -410,7 +410,7 @@ public:
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-            ASSERT("SetBias localTensor not support when enableMixDualMaster is enabled");
+            ASSERT("SetBias localTensor is not supported when enableMixDualMaster is enabled");
 #endif
             return;
         }
@@ -435,7 +435,7 @@ public:
         }
 #if defined(USE_SSBUF)
         static_assert((GetPhyType(A_TYPE::pos) == Hardware::GM),
-            "SetTensorA GlobalTensor not support when A_TYPE position is not GM");
+            "SetTensorA GlobalTensor is not supported when A_TYPE position is not GM");
 #endif
         ASSERT(isTransposeA <= A_TYPE::isTrans &&
             "It is not allowed to do A transpose when matmul A transpose is not defined.");
@@ -463,7 +463,7 @@ public:
         }
 #if defined(USE_SSBUF)
         static_assert((GetPhyType(B_TYPE::pos) == Hardware::GM),
-            "SetTensorB GlobalTensor not support when B_TYPE position is not GM");
+            "SetTensorB GlobalTensor is not supported when B_TYPE position is not GM");
 #endif
         ASSERT(isTransposeB <= B_TYPE::isTrans &&
             "It is not allowed to do B transpose when matmul B transpose is not defined.");
@@ -685,10 +685,10 @@ public:
     template <bool sync = true> __aicore__ inline bool Iterate(bool enPartialSum = false)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-                      "Iterate not support when enableMixDualMaster is enabled.");
+                      "Iterate is not supported when enableMixDualMaster is enabled.");
 #if !defined(USE_SSBUF)
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-            ASSERT(false && "Iterate not support when sameab is enabled");
+            ASSERT(false && "Iterate is not supported when sameab is enabled");
             return false;
         }
 #endif
@@ -776,7 +776,7 @@ public:
     __aicore__ inline void WaitIterateBatch()
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "WaitIterateBatch not support when enableMixDualMaster is enabled");
+            "WaitIterateBatch is not supported when enableMixDualMaster is enabled");
         ASSERT(!isSyncGetC); // Must be asynchronous mode
 #if defined(USE_SSBUF)
         CrossCoreWaitFlag<INTRA_MODE, PIPE_MTE2>(waitFixpId);
@@ -941,7 +941,7 @@ public:
         ASCENDC_ASSERT((!ToMatmulConfig(MM_CFG).isPartialOutput), { KERNEL_LOG(KERNEL_ERROR, "IterateAll is not supported for PartialOutput."); });
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster){
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-            ASSERT("IterateAll localTensor not support when enableMixDualMaster is enabled");
+            ASSERT("IterateAll localTensor is not supported when enableMixDualMaster is enabled");
 #endif
             return;
         }
@@ -950,7 +950,7 @@ public:
         ASSERT(enAtomic == 0);
         ASSERT(kfcMsg_.body.isFirstIter == 1);
         ASSERT((PhyPosIsL1(C_TYPE::pos)) && "IterateAll LocalTensor only support TPosition A1 or B1");
-        ASSERT(!(A_TYPE::ibShare && B_TYPE::ibShare) && "IterateAll LocalTensor not support when sameab"
+        ASSERT(!(A_TYPE::ibShare && B_TYPE::ibShare) && "IterateAll LocalTensor is not supported when sameab"
                                                         " is enabled");
         if (ubCmatrix.GetPosition() == static_cast<int32_t>(TPosition::TSCM)) {
             kfcMsg_.body.cAddr = GetTscmAddr(ubCmatrix);
@@ -979,10 +979,10 @@ public:
         const uint32_t matrixStrideC = 0, const bool enPartialSum = false, const uint8_t enAtomic = 0)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "IterateBatch not support when enableMixDualMaster is enabled");
+            "IterateBatch is not supported when enableMixDualMaster is enabled");
         TRACE_START(TraceId::KFC_CLIENT_POST_MSG);
         ASSERT(kfcMsg_.body.isFirstIter == 1);
-        ASSERT(!(A_TYPE::ibShare && B_TYPE::ibShare) && "IterateBatch not support when when sameab"
+        ASSERT(!(A_TYPE::ibShare && B_TYPE::ibShare) && "IterateBatch is not supported when when sameab"
                                                         " is enabled");
         kfcMsg_.body.cAddr = reinterpret_cast<uint64_t>(gm.GetPhyAddr());
         kfcMsg_.body.enSequentialWrite = enSequentialWrite;
@@ -1019,11 +1019,11 @@ public:
         const uint32_t matrixStrideC = 0, const bool enPartialSum = false, const uint8_t enAtomic = 0)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "IterateBatch not support when enableMixDualMaster is enabled");
+            "IterateBatch is not supported when enableMixDualMaster is enabled");
         TRACE_START(TraceId::KFC_CLIENT_POST_MSG);
         ASSERT(sync == true);
         ASSERT(kfcMsg_.body.isFirstIter == 1);
-        ASSERT(!(A_TYPE::ibShare && B_TYPE::ibShare) && "IterateBatch not support when sameab is enabled");
+        ASSERT(!(A_TYPE::ibShare && B_TYPE::ibShare) && "IterateBatch is not supported when sameab is enabled");
         if (ubCmatrix.GetPosition() == static_cast<int32_t>(TPosition::TSCM)) {
             kfcMsg_.body.cAddr = GetTscmAddr(ubCmatrix);
             kfcMsg_.body.cIsTscm = 1;
@@ -1071,7 +1071,7 @@ public:
         const uint32_t matrixStrideC = 0, const bool enPartialSum = false, const uint8_t enAtomic = 0)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "IterateNBatch not support when enableMixDualMaster is enabled.");
+            "IterateNBatch is not supported when enableMixDualMaster is enabled.");
         static_assert(A_TYPE::layout != LayoutMode::NONE && B_TYPE::layout != LayoutMode::NONE &&
             A_TYPE::layout != LayoutMode::NORMAL && B_TYPE::layout != LayoutMode::NORMAL && C_TYPE::layout != LayoutMode::NORMAL,
             "BMM does not support the layout being NONE or NORMAL");
@@ -1085,7 +1085,7 @@ public:
         curProcess = 0;
         ASSERT(kfcMsg_.body.isFirstIter == 1);
         ASSERT(cacheWorkspaceAddr);
-        ASSERT(!(A_TYPE::ibShare && B_TYPE::ibShare) && "IterateNBatch not support when sameab is enabled");
+        ASSERT(!(A_TYPE::ibShare && B_TYPE::ibShare) && "IterateNBatch is not supported when sameab is enabled");
         kfcMsg_.body.cAddr = reinterpret_cast<uint64_t>(cacheWorkspaceAddr);
         kfcMsg_.body.enSequentialWrite = enSequentialWrite;
         kfcMsg_.body.sync = sync;
@@ -1120,7 +1120,7 @@ public:
         bool enSequentialWrite = false)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "GetTensorC not support when enableMixDualMaster is enabled.");
+            "GetTensorC is not supported when enableMixDualMaster is enabled.");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_GM);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         if (!isSyncGetC) { // Asynchronous
@@ -1164,7 +1164,7 @@ public:
         uint32_t dstGap = 0)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "GetTensorC not support when enableMixDualMaster is enabled.");
+            "GetTensorC is not supported when enableMixDualMaster is enabled.");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_UB);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         uint64_t singleSize;
@@ -1223,9 +1223,9 @@ public:
         bool enSequentialWrite = false)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "GetTensorC not support when enableMixDualMaster is enabled");
+            "GetTensorC is not supported when enableMixDualMaster is enabled");
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
-            ASSERT(false && "GetTensorC not support when sameab is enabled");
+            ASSERT(false && "GetTensorC is not supported when sameab is enabled");
             return;
         }
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_GM);
@@ -1252,7 +1252,7 @@ public:
         uint32_t dstGap = 0)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "GetTensorC not support when enableMixDualMaster is enabled");
+            "GetTensorC is not supported when enableMixDualMaster is enabled");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_UB);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         if (!isSyncGetC) { // Asynchronous
@@ -1309,7 +1309,7 @@ public:
         uint8_t enAtomic = 0, bool enSequentialWrite = false)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "GetTensorC not support when enableMixDualMaster is enabled.");
+            "GetTensorC is not supported when enableMixDualMaster is enabled.");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_GM);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         ASSERT(isSyncGetC); // must synchronization mode
@@ -1337,7 +1337,7 @@ public:
     __aicore__ inline GlobalTensor<DstT> GetTensorC(uint8_t enAtomic = 0, bool enSequentialWrite = false)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "GetTensorC not support when enableMixDualMaster is enabled.");
+            "GetTensorC is not supported when enableMixDualMaster is enabled.");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_GM);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         ASSERT(!isSyncGetC); // Asynchronous only
@@ -1376,7 +1376,7 @@ public:
     __aicore__ inline GlobalTensor<DstT> GetBatchTensorC(uint32_t batchA, uint32_t batchB, bool enSequentialWrite = false)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "GetBatchTensorC not support when enableMixDualMaster is enabled");
+            "GetBatchTensorC is not supported when enableMixDualMaster is enabled");
         GlobalTensor<DstT> global;
         if constexpr (!ToMatmulConfig(MM_CFG).isNBatch) {
             return global;
@@ -1407,7 +1407,7 @@ public:
     __aicore__ inline GlobalTensor<DstT> GetBatchC(uint32_t batchA, uint32_t batchB, bool enSequentialWrite = false)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "GetBatchC not support when enableMixDualMaster is enabled");
+            "GetBatchC is not supported when enableMixDualMaster is enabled");
         return GetBatchTensorC(batchA, batchB, enSequentialWrite);
     }
 
@@ -1417,7 +1417,7 @@ public:
         bool enSequentialWrite = false)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "GetBatchTensorC not support when enableMixDualMaster is enabled");
+            "GetBatchTensorC is not supported when enableMixDualMaster is enabled");
         if constexpr (!ToMatmulConfig(MM_CFG).isNBatch) {
             return;
         }
@@ -1448,14 +1448,14 @@ public:
         bool enSequentialWrite = false)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "GetBatchC not support when enableMixDualMaster is enabled");
+            "GetBatchC is not supported when enableMixDualMaster is enabled");
         GetBatchTensorC(c, batchA, batchB, enSequentialWrite);
     }
 
     __aicore__ inline void AsyncGetTensorC(const LocalTensor<DstT>& c)
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "AsyncGetTensorC not support when enableMixDualMaster is enabled");
+            "AsyncGetTensorC is not supported when enableMixDualMaster is enabled");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_GM);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         ASSERT(cacheWorkspaceAddr);
@@ -1480,7 +1480,7 @@ public:
     __aicore__ inline void WaitGetTensorC()
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
-            "WaitGetTensorC not support when enableMixDualMaster is enabled");
+            "WaitGetTensorC is not supported when enableMixDualMaster is enabled");
         event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_V));
         SetFlag<HardEvent::MTE2_V>(eventID);
         WaitFlag<HardEvent::MTE2_V>(eventID);
@@ -1498,7 +1498,7 @@ public:
     {
 #if defined(USE_SSBUF)
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "SetLocalWorkspace not support when enableMixDualMaster is enabled.");
+            "SetLocalWorkspace is not supported when enableMixDualMaster is enabled.");
         localWorkspace_ = tmpBuffer;
 #if ASCENDC_CPU_DEBUG
         int32_t minUbNd2NzTmpSize = 0;
@@ -1524,7 +1524,7 @@ public:
         }
         ASCENDC_ASSERT((localWorkspace_.GetSize() >= minUbNd2NzTmpSize), {
                  KERNEL_LOG(KERNEL_ERROR, "For mxMatmul ub position input in ND format,"
-                 " scaleA/scaleB requires at latest %d Byte of temporary space.",
+                 " scaleA/scaleB requires at least %d Byte of temporary space.",
                  minUbNd2NzTmpSize);
         });
 #endif
@@ -1537,7 +1537,7 @@ public:
     __aicore__ inline void SetTensorScaleA(const GlobalTensor<ScaleT>& gm, bool isTransposeScaleA = false)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "SetTensorScaleA not support when enableMixDualMaster is enabled.");
+            "SetTensorScaleA is not supported when enableMixDualMaster is enabled.");
         ASSERT(isTransposeScaleA <= A_TYPE::isScaleTrans &&
             "It is not allowed to do scaleA transpose when matmul scaleA transpose is not defined.");
         kfcMsg_.body.quantMode = (kfcMsg_.body.quantMode & 0b10) | (static_cast<uint32_t>(isTransposeScaleA) & 0b01);
@@ -1547,7 +1547,7 @@ public:
     __aicore__ inline void SetTensorScaleA(const LocalTensor<ScaleT>& leftMatrix, bool isTransposeScaleA = false)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "SetTensorScaleA not support when enableMixDualMaster is enabled.");
+            "SetTensorScaleA is not supported when enableMixDualMaster is enabled.");
         ASSERT(isTransposeScaleA <= A_TYPE::isScaleTrans &&
             "It is not allowed to do scaleA transpose when matmul scaleA transpose is not defined.");
         kfcMsg_.body.quantMode = (kfcMsg_.body.quantMode & 0b10) | (static_cast<uint32_t>(isTransposeScaleA) & 0b01);
@@ -1571,7 +1571,7 @@ public:
     __aicore__ inline void SetTensorScaleB(const GlobalTensor<ScaleT>& gm, bool isTransposeScaleB = true)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "SetTensorScaleB not support when enableMixDualMaster is enabled.");
+            "SetTensorScaleB is not supported when enableMixDualMaster is enabled.");
         ASSERT(isTransposeScaleB <= B_TYPE::isScaleTrans &&
             "It is not allowed to do scaleB transpose when matmul scaleB transpose is not defined.");
         kfcMsg_.body.quantMode = (kfcMsg_.body.quantMode & 0b01) | ((static_cast<uint32_t>(isTransposeScaleB) & 0b01) << 1);
@@ -1581,7 +1581,7 @@ public:
     __aicore__ inline void SetTensorScaleB(const LocalTensor<ScaleT>& rightMatrix, bool isTransposeScaleB = true)
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
-            "SetTensorScaleB not support when enableMixDualMaster is enabled.");
+            "SetTensorScaleB is not supported when enableMixDualMaster is enabled.");
         ASSERT(isTransposeScaleB <= B_TYPE::isScaleTrans &&
             "It is not allowed to do scaleB transpose when matmul scaleB transpose is not defined.");
         kfcMsg_.body.quantMode = (kfcMsg_.body.quantMode & 0b01) | ((static_cast<uint32_t>(isTransposeScaleB) & 0b01) << 1);
@@ -1959,7 +1959,7 @@ private:
                 int stride = calcWidth * (c0Size_ * sizeof(T) / DEFAULT_C0_SIZE);
                 int32_t totalRep = Ceil(height, NUM_EIGHT);
                 if (masktail != 0) {
-                    // duplicate framework not support fp8/hif8, SE suggested pad by int8 0.
+                    // duplicate framework is not supported fp8/hif8, SE suggested pad by int8 0.
                     if constexpr (IsSameType<T, hifloat8_t>::value || IsSameType<T, fp8_e5m2_t>::value ||
                         IsSameType<T, fp8_e4m3fn_t>::value) {
                         LocalTensor<int8_t> tmp = dst.template ReinterpretCast<int8_t>();
@@ -1976,7 +1976,7 @@ private:
             auto dstOffset = height * calcWidth * BLOCK_CUBE;
             if constexpr (IsSameType<T, hifloat8_t>::value || IsSameType<T, fp8_e5m2_t>::value ||
                 IsSameType<T, fp8_e4m3fn_t>::value) {
-                // duplicate framework not support fp8/hif8, SE suggested pad by int8 0.
+                // duplicate framework is not supported fp8/hif8, SE suggested pad by int8 0.
                 LocalTensor<int8_t> tmp = dst.template ReinterpretCast<int8_t>();
                 Duplicate(tmp[dstOffset], (int8_t)0, (BLOCK_CUBE - tailHigh) * calcWidth * BLOCK_CUBE);
             } else {
@@ -1986,7 +1986,7 @@ private:
     }
 
     template <class T>
-    __aicore__ inline void NDTrans2NZ(LocalTensor<T> &dst, const LocalTensor<T> &src, const int32_t calcHigh,
+    __aicore__ inline void NDTrans2NZ(LocalTensor<T> &dst, const LocalTensor<T> &src, const int32_t calcHeight,
         const int32_t calcWidth)
     {
         // Use Muls, convert to NZ format
@@ -2007,8 +2007,8 @@ private:
             mask[0] = (1 << BLOCK_CUBE) - 1;
             mask[1] = 0;
             for (int i = 0; i < calcWidth; i++) {
-                for (int j = 0; j < calcHigh * BLOCK_CUBE; ++j) {
-                    dstOffset = i * calcHigh * CUBE_MAX_SIZE + j * BLOCK_CUBE;
+                for (int j = 0; j < calcHeight * BLOCK_CUBE; ++j) {
+                    dstOffset = i * calcHeight * CUBE_MAX_SIZE + j * BLOCK_CUBE;
                     srcOffset = j * calcWidth * BLOCK_CUBE + i * BLOCK_CUBE;
                     Muls(dst[dstOffset], src[srcOffset], (T)1, mask, 1, intriParams);
                     if constexpr (sizeof(T) == sizeof(float)) {
@@ -2018,11 +2018,11 @@ private:
             }
         } else {
             for (int i = 0; i < calcWidth; i++) {
-                dstOffset = i * calcHigh * CUBE_MAX_SIZE;
+                dstOffset = i * calcHeight * CUBE_MAX_SIZE;
                 srcOffset = i * BLOCK_CUBE;
-                Muls(dst[dstOffset], src[srcOffset], (T)1, mask, TWO * calcHigh, intriParams);
+                Muls(dst[dstOffset], src[srcOffset], (T)1, mask, TWO * calcHeight, intriParams);
                 if constexpr (sizeof(T) == sizeof(float)) {
-                    Muls(dst[dstOffset + c0Size_], src[srcOffset + c0Size_], (T)1, mask, TWO * calcHigh,
+                    Muls(dst[dstOffset + c0Size_], src[srcOffset + c0Size_], (T)1, mask, TWO * calcHeight,
                         intriParams);
                 }
             }
@@ -2170,10 +2170,10 @@ private:
         int srcColOffset = Ceil(gCol, c0Size_) * c0Size_;
         // ub->ub
         if constexpr (IsSupportB8<T>()) {
-            // duplicate api not support fp8/hif8, SE suggested pad by int8 0.
+            // duplicate api is not supported fp8/hif8, SE suggested pad by int8 0.
             LocalTensor<int8_t> tmpTrans = trans.template ReinterpretCast<int8_t>();
             Duplicate(tmpTrans, static_cast<int8_t>(0), height * c0Size_);
-            // adds api not support fp8/hif8, trans to int8.
+            // adds api is not supported fp8/hif8, trans to int8.
             LocalTensor<int8_t> tmpSrc = src.template ReinterpretCast<int8_t>();
             for (int i = 0; i < height; i++) {
                 Adds(tmpTrans[i * c0Size_], tmpSrc[tailSrcoffset], static_cast<int8_t>(0), tail);
@@ -2249,10 +2249,10 @@ private:
     __aicore__ inline void CopyUBND2UBNZ(LocalTensor<T>& dst, LocalTensor<T>& src,
         const int32_t row, const int32_t col, const int32_t gCol)
     {
-        int32_t calcHigh = Ceil(row, BLOCK_CUBE);
+        int32_t calcHeight = Ceil(row, BLOCK_CUBE);
         int32_t calcWidth = Ceil(col, c0Size_);
         NDPadZeros(src, row, col, gCol);
-        NDTrans2NZ(dst, src, calcHigh, calcWidth);
+        NDTrans2NZ(dst, src, calcHeight, calcWidth);
         event_t eventIdVToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventIdVToMTE3);
         WaitFlag<HardEvent::V_MTE3>(eventIdVToMTE3);

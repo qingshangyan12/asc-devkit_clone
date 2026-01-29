@@ -105,7 +105,7 @@ def get_unpack_type(data_type):
     elif data_type == DataType.DT_INT32.value:
         return ['i', 'int32_t']
     elif data_type == DataType.DT_UINT32.value:
-        return ['I', 'uin32_t']
+        return ['I', 'uint32_t']
     elif data_type == DataType.DT_FLOAT16.value:
         return ['e', 'half']
     elif data_type == DataType.DT_INT16.value:
@@ -124,7 +124,7 @@ def get_unpack_type(data_type):
         raise Exception('[ERROR]:Invalid Data Type')
 
 
-def get_positon(position, dump_type):
+def get_position(position, dump_type):
     if dump_type == DumpType.SCALAR_TYPE.value:
         if position == CorePosition.MIX.value:
             return 'MIX'
@@ -205,7 +205,7 @@ def process_log(dump_parse_args):
             message_body_len = struct.unpack('I', binfile.read(size_of_u32))[0]
             position = struct.unpack('I', binfile.read(size_of_u32))[0]
             rev = struct.unpack('I', binfile.read(size_of_u32))[0]
-            phy_position = get_positon(position, dump_type)
+            phy_position = get_position(position, dump_type)
             index = index + head_msg_len
             block_dump_index = block_dump_index + head_msg_len
             data_type_info = get_unpack_type(data_type)

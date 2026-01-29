@@ -25,7 +25,7 @@
 namespace AscendC {
 /*!
  * \ingroup SoftmaxFlash
- * \brief softmax calculation in FlashAttention process: you can refet to the paper:
+ * \brief softmax calculation in FlashAttention process: you can refer to the paper:
  *        <Flashattention: Fast and memory-efficient exact attention with io-awareness>
  *        if isUpdate = false:
  *            max = rowmax(x),  y = exp(x-max), sum = rowsum(y), y = y / sum
@@ -65,7 +65,7 @@ template <typename T, bool isReuseSource = false, bool isBasicBlock = false>
 }
 /* !
  * \ingroup SoftmaxFlash
- * \brief softmax calculation in FlashAttention process: you can refet to the paper:
+ * \brief softmax calculation in FlashAttention process: you can refer to the paper:
  *        <Flashattention: Fast and memory-efficient exact attention with io-awareness>
  *        if isUpdate = false:
  *            max = rowmax(x),  y = exp(x-max), sum = rowsum(y), y = y / sum
@@ -104,7 +104,7 @@ __aicore__ inline void SoftmaxFlash(const LocalTensor<half>& dstTensor, const Lo
 }
 /*!
  * \ingroup SoftmaxFlash
- * \brief softmax calculation in FlashAttention process: you can refet to the paper:
+ * \brief softmax calculation in FlashAttention process: you can refer to the paper:
  *        <Flashattention: Fast and memory-efficient exact attention with io-awareness>
  *        if isUpdate = false:
  *            max = rowmax(x),  y = exp(x-max), sum = rowsum(y), y = y / sum

@@ -70,7 +70,7 @@ TEST_F(TEST_ASCC_HOST_STUB, ascc_GenHostStubFileMix)
     storage.AddInfo("../../../../tests/tools/ascc/hello_world/hello_world.cpp",
         Ascc::AscCursorTypes::ASC_CURSOR_NORMAL_FUNCTION, functions);
     storage.AddInfo("../../../../tests/tools/ascc/hello_world/hello_world.cpp",
-        Ascc::AscCursorTypes::ASC_CURSOR_TEMPLATE_FUCNTION, funcTemplates);
+        Ascc::AscCursorTypes::ASC_CURSOR_TEMPLATE_FUNCTION, funcTemplates);
     std::string hostStubFilePath = "../../../../tests/tools/ascc/hello_world/host_stub_tmp.h";
     Ascc::AsccHostStub hostStubGenerator(Ascc::PreTaskType::HOST);
     EXPECT_NO_THROW(hostStubGenerator.GenHostStubFile());
@@ -115,7 +115,7 @@ TEST_F(TEST_ASCC_HOST_STUB, ascc_GenHostStubFileAic)
     storage.AddInfo("../../../../tests/tools/ascc/hello_world/hello_world.cpp",
         Ascc::AscCursorTypes::ASC_CURSOR_NORMAL_FUNCTION, functions);
     storage.AddInfo("../../../../tests/tools/ascc/hello_world/hello_world.cpp",
-        Ascc::AscCursorTypes::ASC_CURSOR_TEMPLATE_FUCNTION, funcTemplates);
+        Ascc::AscCursorTypes::ASC_CURSOR_TEMPLATE_FUNCTION, funcTemplates);
     Ascc::AsccGlobalEnvManager::GetInstance().asccTmpAutoGenPath = "../../../../tests/tools/ascc/hello_world/";
 
     Ascc::AsccHostStub hostStubGenerator(Ascc::PreTaskType::NONE);
@@ -161,7 +161,7 @@ TEST_F(TEST_ASCC_HOST_STUB, ascc_GenHostStubFileAiv)
     storage.AddInfo("../../../../tests/tools/ascc/hello_world/hello_world.cpp",
         Ascc::AscCursorTypes::ASC_CURSOR_NORMAL_FUNCTION, functions);
     storage.AddInfo("../../../../tests/tools/ascc/hello_world/hello_world.cpp",
-        Ascc::AscCursorTypes::ASC_CURSOR_TEMPLATE_FUCNTION, funcTemplates);
+        Ascc::AscCursorTypes::ASC_CURSOR_TEMPLATE_FUNCTION, funcTemplates);
     Ascc::AsccGlobalEnvManager::GetInstance().asccTmpAutoGenPath = "../../../../tests/tools/ascc/hello_world/";
     Ascc::AsccHostStub hostStubGenerator(Ascc::PreTaskType::NONE);
     EXPECT_NO_THROW(hostStubGenerator.GenHostStubFile());

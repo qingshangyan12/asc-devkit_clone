@@ -226,7 +226,7 @@ bool ASTDeviceVisitor::VisitVarDecl(clang::VarDecl *varDecl)
                     loc = srcManager_.getImmediateMacroCallerLoc(loc);
                 }
                 clang::PresumedLoc pLoc = srcManager_.getPresumedLoc(loc);
-                // Init expression anlysis
+                // Init expression analysis
                 clang::Expr *initExpr = varDecl->getInit();
                 if (initExpr && !initExpr->isValueDependent()) {
                     initExpr = initExpr->IgnoreImpCasts()->IgnoreParens();

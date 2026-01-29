@@ -41,7 +41,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_KernelDeclHandlerTemplateTypeParmDecl)
     clang::FunctionDecl *funcDecl = &FD;
     static clang::AnnotateAttr attrA;
     static clang::AnnotateAttr attrB;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     BoundNodes bn;
     MatchFinder::MatchResult res(bn, &context);
     NamedDecl nd;
@@ -68,7 +68,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_KernelDeclHandlerTemplateTypeParmDecl_
     clang::FunctionDecl *funcDecl = &FD;
     static clang::AnnotateAttr attrA;
     static clang::AnnotateAttr attrB;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     BoundNodes bn;
     MatchFinder::MatchResult res(bn, &context);
     NamedDecl nd;
@@ -97,7 +97,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_KernelDeclHandlerNonTypeTemplateParmDe
     clang::FunctionDecl *funcDecl = &FD;
     static clang::AnnotateAttr attrA;
     static clang::AnnotateAttr attrB;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     BoundNodes bn;
     MatchFinder::MatchResult res(bn, &context);
     NamedDecl nd;
@@ -123,7 +123,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_KernelDeclHandlerTemplateTemplateParmD
     clang::FunctionDecl *funcDecl = &FD;
     static clang::AnnotateAttr attrA;
     static clang::AnnotateAttr attrB;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     BoundNodes bn;
     MatchFinder::MatchResult res(bn, &context);
     NamedDecl nd;
@@ -151,7 +151,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_KernelDeclHandlerInst)
     funcDecl->isTemplateInst = true;
     static clang::AnnotateAttr attrA;
     static clang::AnnotateAttr attrB;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     BoundNodes bn;
     MatchFinder::MatchResult res(bn, &context);
     TemplateArgument taType, taInt, taDecl, taTemp;
@@ -186,7 +186,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_KernelDeclHandlerIntEnum)
     clang::FunctionDecl FD(context);
     clang::FunctionDecl *funcDecl = &FD;
     funcDecl->isTemplateInst = true;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     BoundNodes bn;
     MatchFinder::MatchResult res(bn, &context);
     TemplateArgument taType, taInt, taDecl, taTemp;
@@ -210,7 +210,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_KernelDeclHandlerIntEnum)
     MOCKER(&clang::FunctionDecl::getTemplateSpecializationInfo).stubs().will(returnValue(ftslp));
     MOCKER(&clang::TemplateArgument::getAsDecl).stubs().will(returnValue(vdp));
     MOCKER(&clang::NamedDecl::printQualifiedName).stubs().will(ignoreReturnValue());
-    MOCKER(&Ascc::KerenelInfoCollector::GetEnumNameForValue).stubs()
+    MOCKER(&Ascc::KernelInfoCollector::GetEnumNameForValue).stubs()
             .will(returnValue(std::optional<std::string>("test_enum::test")));
     MOCKER(&llvm::StringRef::str).stubs().will(returnValue(fileName));
     EXPECT_NO_THROW(collector.KernelDeclHandle(funcDecl, res));
@@ -223,7 +223,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_GetEnumNameForValue)
     clang::CompilerInstance compiler = clang::CompilerInstance();
     clang::FunctionDecl FD(context);
     clang::FunctionDecl *funcDecl = &FD;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     NamedDecl nd;
     std::vector<NamedDecl *> vnd = {&nd};
     TemplateParameterList tal(vnd);
@@ -295,7 +295,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_KernelCallHandle)
 {
     clang::ASTContext context = clang::ASTContext();
     CUDAKernelCallExpr cudakce;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     BoundNodes bn;
     MatchFinder::MatchResult res(bn, &context);
     clang::FunctionDecl FD(context);
@@ -311,7 +311,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_KernelCallHandleNoDeclName)
 {
     clang::ASTContext context = clang::ASTContext();
     CUDAKernelCallExpr cudakce;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     BoundNodes bn;
     MatchFinder::MatchResult res(bn, &context);
     clang::FunctionDecl FD(context);
@@ -326,7 +326,7 @@ TEST_F(TEST_ASCC_AST_INFO_COLLECTOR, ascc_ASTRun)
 {
     clang::ASTContext context = clang::ASTContext();
     CUDAKernelCallExpr cudakce;
-    Ascc::KerenelInfoCollector collector;
+    Ascc::KernelInfoCollector collector;
     BoundNodes bn;
     MatchFinder::MatchResult res(bn, &context);
     clang::FunctionDecl FD(context);

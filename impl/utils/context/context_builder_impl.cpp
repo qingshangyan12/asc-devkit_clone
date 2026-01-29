@@ -184,7 +184,7 @@ void ContextBuilderImpl::AddInputTd(int32_t index, ge::DataType dtype, ge::Forma
             return;
         }
     } else {
-        CXT_ASCENDC_LOGE("Cannot find set cosnt data function for Input idx :%d, please check dtype.", index);
+        CXT_ASCENDC_LOGE("Cannot find set const data function for Input idx :%d, please check dtype.", index);
         errFlag_ = true;
         return;
     }
@@ -430,13 +430,13 @@ bool ReadBinFile(const std::string& fileName, void *buf, std::size_t bufferLen)
             CXT_ASCENDC_LOGE("Path[%s] is too long.", fileName.c_str());
             return false;
         }
-        char resovedPath[PATH_MAX] = {0};
+        char resolvedPath[PATH_MAX] = {0};
         std::string absFilePath = "";
-        if (realpath(fileName.c_str(), resovedPath) == nullptr) {
+        if (realpath(fileName.c_str(), resolvedPath) == nullptr) {
             CXT_ASCENDC_LOGE("Path[%s] is not exist.", fileName.c_str());
             return false;
         }
-        absFilePath = resovedPath;
+        absFilePath = resolvedPath;
         std::ifstream inFile{ absFilePath };
         if (!inFile.is_open()) {
             CXT_ASCENDC_LOGE("open file: %s failed.", fileName.c_str());

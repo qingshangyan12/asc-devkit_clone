@@ -227,10 +227,10 @@ bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
     }
 
     if (it->second != it1->second) {
-        std::string tmpMsg = "the socversion " + ascendcOriSocVersionMap.at(compileSocVersion) +
+        std::string tmpMsg = "the socVersion " + ascendcOriSocVersionMap.at(compileSocVersion) +
             " of bin package does not match the current device socverison " +
             ascendcOriSocVersionMap.at(lowerCurSocVersion) +
-            ". Please modify default socversion in run.sh or execute run.sh with socversion parameter.";
+            ". Please modify default socVersion in run.sh or execute run.sh with socVersion parameter.";
         errno_t err = strcpy_s(errMsg, 1024, tmpMsg.c_str()); // 1024 is errMsg length
         if (err != EOK) {
             ASCENDLOGE("strcpy_s failed in AscendCheckSoCVersion!");
@@ -707,7 +707,7 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
 }
 
 uint32_t LaunchAscendKernelForVectorCore(const char* opType, void* handle, const uint64_t key, void** args,
-    uint32_t size, const rtStream_t stream, bool enbaleProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks,
+    uint32_t size, const rtStream_t stream, bool enableProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks,
     uint32_t aivNumBlocksOffset)
 {
     ASCENDLOGI("aicNumBlocks is %u, aivNumBlocks is %u, aivNumBlocksOffset is %u.\n", aicNumBlocks, aivNumBlocks,
@@ -724,26 +724,26 @@ uint32_t LaunchAscendKernelForVectorCore(const char* opType, void* handle, const
 
     uint64_t launchMainBeginTime = 0;
     uint64_t launchSubBeginTime = 0;
-    if (enbaleProf) {
+    if (enableProf) {
         launchMainBeginTime = MsprofSysCycleTime();
     }
 
     // aicore kernel launch
     ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorLaunchKernel(handle, key, aicNumBlocks, args, size, stream));
 
-    if (enbaleProf) {
+    if (enableProf) {
         ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorPreportProfiling(
             opType, aicNumBlocks, MSPROF_GE_TASK_TYPE_AI_CORE, launchMainBeginTime));
     }
     ASCENDLOGI("Main stream launch sucess.\n");
 
-    if (enbaleProf) {
+    if (enableProf) {
         launchSubBeginTime = MsprofSysCycleTime();
     }
     // vector core kernel launch
     ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorVectorCoreLaunchKernel(handle, key, aivNumBlocks,
         args, size, ascBaseStream.stream, aivNumBlocksOffset));
-    if (enbaleProf) {
+    if (enableProf) {
         ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorPreportProfiling(
             opType, aivNumBlocks, MSPROF_GE_TASK_TYPE_AIV, launchSubBeginTime));
     }

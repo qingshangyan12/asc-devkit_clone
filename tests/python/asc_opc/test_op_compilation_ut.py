@@ -598,7 +598,7 @@ class TestOpCompilationUt(unittest.TestCase):
         logger.debug("End to execute ============ test_construct_op_kernel_info_ut ============")
 
     def test_get_single_op_operator_ut(self):
-        logger.debug("Start to excute ============ test_get_single_op_operator_ut ============")
+        logger.debug("Start to execute ============ test_get_single_op_operator_ut ============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         ascend_path = test_root_dir + "/stub"
         os.environ["ASCEND_OPP_PATH"] = ascend_path
@@ -628,13 +628,13 @@ class TestOpCompilationUt(unittest.TestCase):
         op_type = "asdsddd"
         res = get_single_op_operator(op_type, "false", True)
         self.assertEqual(res, None)
-        logger.debug("End to excute ============ test_get_single_op_operator_ut ============")
+        logger.debug("End to execute ============ test_get_single_op_operator_ut ============")
 
 
     @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
     def test_get_custom_op_operator_ut(self, mock_set_current_compile_soc_info):
         mock_set_current_compile_soc_info.return_value = "success"
-        logger.debug("Start to excute ============ test_get_custom_op_operator_ut ============")
+        logger.debug("Start to execute ============ test_get_custom_op_operator_ut ============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         custom_path = test_root_dir + "/stub/vendors/custom"
         os.environ["ASCEND_CUSTOM_OPP_PATH"] = custom_path
@@ -674,14 +674,14 @@ class TestOpCompilationUt(unittest.TestCase):
         op_type = "asdsddd"
         res = get_single_op_operator(op_type, "false", True)
         self.assertEqual(res, None)
-        logger.debug("End to excute ============ test_get_custom_op_operator_ut ============")
+        logger.debug("End to execute ============ test_get_custom_op_operator_ut ============")
 
     @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
     @patch('asc_op_compile_base.common.platform.platform_info.get_soc_spec')
     def test_get_vendor_and_custom_path_ut(self, mock_set_current_compile_soc_info, mock_get_soc_spec):
         mock_set_current_compile_soc_info.return_value = "success"
         mock_get_soc_spec.return_value = "Ascend910"
-        logger.debug("Start to excute ============ test_get_vendor_and_custom_path_ut ============")
+        logger.debug("Start to execute ============ test_get_vendor_and_custom_path_ut ============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         ascend_path = test_root_dir + "/stub"
         os.environ["ASCEND_OPP_PATH"] = ascend_path
@@ -697,7 +697,7 @@ class TestOpCompilationUt(unittest.TestCase):
         new_content = content.replace('vendor', 'custom,mdc')
         with open(config_path, 'w', encoding='utf-8') as file:
             file.write(new_content)
-        logger.debug("End to excute ============ test_get_vendor_and_custom_path_ut ============")
+        logger.debug("End to execute ============ test_get_vendor_and_custom_path_ut ============")
 
     def test_get_new_attrs_for_op_compile(self):
         logger.debug("Start to execute ============ test_get_new_attrs_for_op_compile ============")

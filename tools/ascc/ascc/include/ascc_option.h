@@ -468,13 +468,13 @@ void Apply(Opt *opt, const Arg &arg)
 }
 
 template <typename DataType>
-class PaserTrait {
+class ParserTrait {
 public:
     using TraitType = DataType;
 };
 
 template <typename DataType>
-class OptionParser : public PaserTrait<DataType> {
+class OptionParser : public ParserTrait<DataType> {
 public:
     bool Parse(Option &opt, const std::string &argName, const std::string &arg, DataType & /* val */) const
     {
@@ -489,7 +489,7 @@ public:
 };
 
 template <>
-class OptionParser<std::string> : public PaserTrait<std::string> {
+class OptionParser<std::string> : public ParserTrait<std::string> {
 public:
     bool Parse(Option & /* opt */, const std::string & /* argName */, const std::string &arg, std::string &val) const
     {
@@ -499,7 +499,7 @@ public:
 };
 
 template <>
-class OptionParser<bool> : public PaserTrait<bool> {
+class OptionParser<bool> : public ParserTrait<bool> {
 public:
     bool Parse(Option &opt, const std::string &argName, const std::string &arg, bool &val) const
     {
@@ -517,7 +517,7 @@ public:
 };
 
 template <>
-class OptionParser<char> : public PaserTrait<char> {
+class OptionParser<char> : public ParserTrait<char> {
 public:
     bool Parse(Option & /* opt */, const std::string & /* argName */, const std::string &arg, char &val) const
     {
@@ -527,7 +527,7 @@ public:
 };
 
 template <>
-class OptionParser<uint32_t> : public PaserTrait<uint32_t> {
+class OptionParser<uint32_t> : public ParserTrait<uint32_t> {
 public:
     bool Parse(Option &opt, const std::string &argName, const std::string &arg, uint32_t &val) const
     {
@@ -542,7 +542,7 @@ public:
 };
 
 template <>
-class OptionParser<int32_t> : public PaserTrait<int32_t> {
+class OptionParser<int32_t> : public ParserTrait<int32_t> {
 public:
     bool Parse(Option &opt, const std::string &argName, const std::string &arg, int32_t &val) const
     {

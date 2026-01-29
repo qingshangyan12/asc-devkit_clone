@@ -42,13 +42,13 @@ template <TPosition POSITION, CubeFormat FORMAT, typename TYPE> struct InputInfo
     constexpr static CubeFormat format = FORMAT;
     using T = TYPE;
 };
-constexpr int32_t NZ_MASK_VAlUE = 2;
+constexpr int32_t NZ_MASK_VALUE = 2;
 int32_t constexpr GetNdNzMask(CubeFormat dstFormat, CubeFormat srcFormat)
 {
     if ((srcFormat == CubeFormat::ND) && (dstFormat == CubeFormat::NZ)) {
         return 1;
     } else if ((srcFormat == CubeFormat::NZ) && (dstFormat == CubeFormat::ND)) {
-        return NZ_MASK_VAlUE;
+        return NZ_MASK_VALUE;
     }
     return 0;
 }

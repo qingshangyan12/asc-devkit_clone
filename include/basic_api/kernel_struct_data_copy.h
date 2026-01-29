@@ -69,7 +69,7 @@ struct NdDmaConfig {
     bool isNearestValueMode = false;
     uint16_t loopLpSize = unsetPad; // Left padding size of all dimensions, must be less than 256.
     uint16_t loopRpSize = unsetPad; // Right padding size of all dimensions, must be less than 256.
-    bool ascOptimize = false;       // used for AscendC optimization on special senario.
+    bool ascOptimize = false;       // used for AscendC optimization on special scenario.
 };
 using MultiCopyConfig = NdDmaConfig;  // reserve old name
 constexpr NdDmaConfig kDefaultNdDmaConfig = { false, NdDmaConfig::unsetPad, NdDmaConfig::unsetPad,

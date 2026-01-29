@@ -89,8 +89,8 @@ public:
         transposetype = transposetypeIn;
         srcGlobal.SetGlobalBuffer((__gm__ T *)srcGm);
         dstGlobal.SetGlobalBuffer((__gm__ T *)dstGm);
-        constexpr int alginSize = 32 / sizeof(T);
-        pipe.InitBuffer(inQueueSrcVecIn, 1, (srcExtent + alginSize - 1) / alginSize * alginSize * sizeof(T));
+        constexpr int alignSize = 32 / sizeof(T);
+        pipe.InitBuffer(inQueueSrcVecIn, 1, (srcExtent + alignSize - 1) / alignSize * alignSize * sizeof(T));
         pipe.InitBuffer(inQueueSrcVecOut, 1, srcExtent * sizeof(T));        
     }
 
@@ -192,51 +192,51 @@ private:
 }  // namespace testCase
 
 template <typename type, int32_t srcExtent, int32_t dstExtent, uint32_t dim0, uint32_t dim1, uint32_t dim2, uint32_t tranModeIn>
-__aicore__ inline void MainConfusionTranposeTest(GM_ADDR srcGm, GM_ADDR dstGm)
+__aicore__ inline void MainConfusionTransposeTest(GM_ADDR srcGm, GM_ADDR dstGm)
 {
     testCase::KernelConfusionTransposeDavid<type, srcExtent, dstExtent, dim0> op;
     op.Init(srcGm, dstGm, dim0, dim1, dim2, static_cast<TransposeType>(tranModeIn));
     op.Process();
 }
 
-struct ConfusionTranposeParams {
+struct ConfusionTransposeParams {
     void (*cal_func)(uint8_t *, uint8_t *);
 };
 
-class ConfusionTranposeTestsuite : public testing::Test, public testing::WithParamInterface<ConfusionTranposeParams> {};
+class ConfusionTransposeTestsuite : public testing::Test, public testing::WithParamInterface<ConfusionTransposeParams> {};
 
-INSTANTIATE_TEST_CASE_P(TEST_ConfusionTranpose, ConfusionTranposeTestsuite,
+INSTANTIATE_TEST_CASE_P(TEST_ConfusionTranspose, ConfusionTransposeTestsuite,
     ::testing::Values(
-    ConfusionTranposeParams{ MainConfusionTranposeTest<float, 64, 64, 0, 2, 32, 13> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<uint32_t, 64, 64, 0, 2, 32, 13> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<int32_t, 64, 64, 0, 2, 32, 13> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<half, 256, 256, 0, 2, 128, 13> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<int16_t, 256, 256, 0, 2, 128, 13> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<uint16_t, 256, 256, 0, 2, 128, 13> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<bfloat16_t, 256, 256, 0, 2, 128, 13> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<int8_t, 512, 512, 0, 2, 256, 13> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<uint8_t, 512, 512, 0, 2, 256, 13> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<float, 192, 192, 3, 2, 32, 14> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<uint32_t, 192, 192, 3, 2, 32, 14> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<int32_t, 192, 192, 3, 2, 32, 14> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<half, 768, 768, 3, 2, 128, 14> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<int16_t, 768, 768, 3, 2, 128, 14> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<uint16_t, 768, 768, 3, 2, 128, 14> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<bfloat16_t, 768, 768, 3, 2, 128, 14> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<int8_t, 1536, 1536, 3, 2, 256, 14> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<uint8_t, 1536, 1536, 3, 2, 256, 14> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<float, 192, 192, 3, 2, 32, 15> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<uint32_t, 192, 192, 3, 2, 32, 15> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<int32_t, 192, 192, 3, 2, 32, 15> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<half, 768, 768, 3, 2, 128, 15> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<int16_t, 768, 768, 3, 2, 128, 15> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<uint16_t, 768, 768, 3, 2, 128, 15> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<bfloat16_t, 768, 768, 3, 2, 128, 15> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<int8_t, 1536, 1536, 3, 2, 256, 15> },
-    ConfusionTranposeParams{ MainConfusionTranposeTest<uint8_t, 1536, 1536, 3, 2, 256, 15> }));
+    ConfusionTransposeParams{ MainConfusionTransposeTest<float, 64, 64, 0, 2, 32, 13> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<uint32_t, 64, 64, 0, 2, 32, 13> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<int32_t, 64, 64, 0, 2, 32, 13> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<half, 256, 256, 0, 2, 128, 13> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<int16_t, 256, 256, 0, 2, 128, 13> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<uint16_t, 256, 256, 0, 2, 128, 13> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<bfloat16_t, 256, 256, 0, 2, 128, 13> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<int8_t, 512, 512, 0, 2, 256, 13> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<uint8_t, 512, 512, 0, 2, 256, 13> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<float, 192, 192, 3, 2, 32, 14> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<uint32_t, 192, 192, 3, 2, 32, 14> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<int32_t, 192, 192, 3, 2, 32, 14> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<half, 768, 768, 3, 2, 128, 14> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<int16_t, 768, 768, 3, 2, 128, 14> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<uint16_t, 768, 768, 3, 2, 128, 14> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<bfloat16_t, 768, 768, 3, 2, 128, 14> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<int8_t, 1536, 1536, 3, 2, 256, 14> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<uint8_t, 1536, 1536, 3, 2, 256, 14> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<float, 192, 192, 3, 2, 32, 15> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<uint32_t, 192, 192, 3, 2, 32, 15> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<int32_t, 192, 192, 3, 2, 32, 15> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<half, 768, 768, 3, 2, 128, 15> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<int16_t, 768, 768, 3, 2, 128, 15> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<uint16_t, 768, 768, 3, 2, 128, 15> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<bfloat16_t, 768, 768, 3, 2, 128, 15> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<int8_t, 1536, 1536, 3, 2, 256, 15> },
+    ConfusionTransposeParams{ MainConfusionTransposeTest<uint8_t, 1536, 1536, 3, 2, 256, 15> }));
 
 
-TEST_P(ConfusionTranposeTestsuite, ConfusionTranposeTestCase)
+TEST_P(ConfusionTransposeTestsuite, ConfusionTransposeTestCase)
 {
     auto param = GetParam();
     uint8_t x[40960] = {0};

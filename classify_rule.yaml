@@ -119,6 +119,44 @@ asc-devkit:
       - impl/adv_api/detail/matmul/stage/split/load_to_l0_utils.h
       - impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0_def.h
       - impl/adv_api/detail/hccl/common/hccl_inner_def.h
+      - impl/adv_api/detail/conv/conv3d/dav_m220/conv3d_groupopt_sub_api.h
+      - tools/ascc/ascc/src/ascc_option.cpp
+      - impl/adv_api/detail/matmul/stage/copy_cube_out/copy_cube_out_atop.h
+      - tools/ascc/ascendfe/src/ascc_ast_device_consumer.cpp
+      - impl/basic_api/dav_c310/kernel_operator_list_tensor_impl.h
+      - tools/ascc/ascendfe/src/ascc_ast_info_collector.cpp
+      - impl/adv_api/detail/matmul/stage/copy_cube_out/quant/quant_processor_datacopy.h
+      - impl/basic_api/dav_m310/kernel_operator_vec_scatter_impl.h
+      - impl/adv_api/detail/conv_backprop/conv3d_backprop_filter/dav_v220/conv3d_bp_filter_sub_func.h
+      - impl/basic_api/dav_c220/kfc/kfc_comm_server.h
+      - tools/ascc/ascendfe/src/ascc_device_stub.cpp
+      - impl/adv_api/detail/api_check/kernel_check/select/selectwithbytesmask/selectwithbytesmaskcheck_aicore.h
+      - impl/basic_api/dav_c310/core_mng/roc/kernel_operator_cube_group_handle_impl.h
+      - impl/basic_api/dav_c100/kernel_operator_vec_reduce_impl.h
+      - tools/ascc/ascendfe/src/ascc_ast_device_analyzer.cpp
+      - tools/ascc/ascendfe/src/ascc_argument_manager.cpp
+      - impl/basic_api/dav_m310/kernel_operator_vec_bilinearinterpolation_impl.h
+      - impl/basic_api/dav_m510/kernel_operator_list_tensor_impl.h
+      - tools/ascc/ascendfe/src/ascc_host_stub.cpp
+      - impl/adv_api/detail/quantization/quant/ascend_quant_v100_impl.h
+      - impl/basic_api/dav_c310/core_mng/roc/kernel_operator_cube_group_info.h
+      - tools/ascc/ascendfe/src/ascc_info_aicore_function.cpp
+      - impl/basic_api/dav_m310/kernel_operator_vec_mulcast_impl.h
+      - impl/adv_api/detail/conv/conv3d/dav_m220/conv3d_mte1_sub_api.h
+      - impl/basic_api/dav_c220/core_mng/roc/kernel_operator_cube_group_info.h
+      - impl/adv_api/detail/matmul/scheduler/batch/batch_scheduler_intf.h
+      - impl/adv_api/detail/matmul/resource/l0_buffer/tbuf_pool_l0_cache.h
+      - impl/adv_api/detail/matmul/stage/split/load_to_l0b/load_to_l0b_load2d.h
+      - impl/adv_api/detail/api_check/kernel_check/normalization/batchnorm/batchnorm_check_c310.h
+      - impl/adv_api/detail/matmul/stage/copy_cube_in/bias/copy_bias_in_intf.h
+      - tools/ascc/ascc/src/ascc_task_manager.cpp
+      - impl/basic_api/dav_m310/kernel_operator_vec_createvecindex_impl.h
+      - tools/ascc/ascendfe/src/ascc_ast_utils.cpp
+      - impl/adv_api/detail/matmul/stage/copy_cube_out/quant/quant_processor_utils.h
+      - impl/adv_api/detail/matmul/stage/copy_cube_in/base/copy_cube_in_mdl_sparse.h
+      - impl/basic_api/dav_c220/core_mng/roc/kernel_operator_cube_group_handle_impl.h
+      - impl/utils/std/utility/integer_sequence.h
+      - impl/adv_api/detail/matmul/scheduler/iterator/k_loop/k_loop_intf.h
   llt:
     ut_check: true
     st_check: false

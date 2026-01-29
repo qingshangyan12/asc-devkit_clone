@@ -83,7 +83,7 @@ public:
             instance.GetKernelCallLineCode(key, kernelCallLines);
 
             std::vector<std::pair<uint32_t, std::string>> kernelDefLines;
-            instance.GetkernelDefLineCode(key, kernelDefLines);
+            instance.GetKernelDefLineCode(key, kernelDefLines);
 
             size_t innerLastSlash = key.find_last_of('/');
             std::string newFileName = key.substr(innerLastSlash + 1);

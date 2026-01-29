@@ -192,7 +192,7 @@ void AsccHostStub::GenHostStubUsedIntfDecl()
                << "void AscendProfRegister();\n"
                << "uint32_t GetCoreNumForMixVectorCore(uint32_t *aiCoreNum, uint32_t *vectorCoreNum);\n"
                << "uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *handle, const uint64_t key, void **args,\n"
-               << "    uint32_t size, const void *stream, bool enbaleProf, uint32_t aicBlockDim, uint32_t aivBlockDim,\n"
+               << "    uint32_t size, const void *stream, bool enableProf, uint32_t aicBlockDim, uint32_t aivBlockDim,\n"
                << "    uint32_t aivBlockDimOffset);\n";
     if (hasAssert_) {
         codeSource << "int32_t rtSetExceptionExtInfo(const rtArgsSizeInfoAscc_t * const sizeInfo);\n"

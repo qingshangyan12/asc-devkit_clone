@@ -66,7 +66,7 @@ AsccStatus AsccAstDeviceAnalyzer::Process()
     });
     int result = tool.run(clang::tooling::newFrontendActionFactory<DeviceAnalyzeAction>().get());
     if (result != 0) {
-        ASC_LOG_ASC_ERROR(PREPROCESS, "ASCC Device analyzer: ClangTool runnig failed");
+        ASC_LOG_ASC_ERROR(PREPROCESS, "ASCC Device analyzer: ClangTool running failed");
         return AsccStatus::FAILURE;
     }
     return AsccStatus::SUCCESS;

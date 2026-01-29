@@ -26,8 +26,8 @@ class KernelReduceAny {
     } else {
       this->outputWidth = widthIn;
     }
-    const uint32_t alginSize = 32 / sizeof(T);
-    this->outputWidthAlign = (outputWidth + alginSize - 1) / alginSize * alginSize;
+    const uint32_t alignSize = 32 / sizeof(T);
+    this->outputWidthAlign = (outputWidth + alignSize - 1) / alignSize * alignSize;
 
     // get start index for current core, core parallel
     yGm.SetGlobalBuffer((__gm__ T*)y, outputWidthAlign);

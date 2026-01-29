@@ -317,5 +317,5 @@ elif sys.platform.startswith('win32'):
     PATH_DELIMITER = ';'
 else:
     raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE,
-                         ('Platform % is not support now' % sys.platform))
+                         ('Platform % is not supported now' % sys.platform))
 

@@ -29,7 +29,7 @@ static const std::unordered_map<std::string, Ascc::CodeMode> KERNEL_TYPE_MAP_V22
     {"KERNEL_TYPE_MIX_AIC_1_1", Ascc::CodeMode::KERNEL_TYPE_MIX_AIC_1_1},
     {"KERNEL_TYPE_MIX_AIC_1_2", Ascc::CodeMode::KERNEL_TYPE_MIX_AIC_1_2}
 };
-// chech whether variable declaration is in namespace XXX
+// check whether variable declaration is in namespace XXX
 bool IsVarInNamespace(const clang::VarDecl* var, const std::string& namespaceName) {
     const clang::DeclContext* ctx = var->getDeclContext();   // get variable declaration context
     while (ctx != nullptr) {

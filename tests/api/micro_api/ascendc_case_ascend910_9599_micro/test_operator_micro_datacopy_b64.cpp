@@ -23,8 +23,8 @@ public:
     __aicore__ inline KernelMicroDataCopyB64() {}
     __aicore__ inline void Init(GM_ADDR srcGm, GM_ADDR dstGm, uint32_t totalNum)
     {
-        const int alginSize = static_cast<int>(32 / sizeof(T));
-        dstSize = (totalNum + alginSize - 1) / alginSize * alginSize;
+        const int alignSize = static_cast<int>(32 / sizeof(T));
+        dstSize = (totalNum + alignSize - 1) / alignSize * alignSize;
         srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(srcGm), dstSize);
         dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dstGm), dstSize);
         pipe.InitBuffer(inQueue, 1, dstSize * sizeof(T));

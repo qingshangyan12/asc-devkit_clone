@@ -92,7 +92,7 @@ __aicore__ inline void DataSyncBarrier()
  * @ingroup：IBSet, IBWait
  * @brief：Set the flag bit of a core
  * @param [in] gmWorkspace GlobalTensor to store core state
- * @param [in] ubWorkspce LocalTensor for current core
+ * @param [in] ubWorkspace LocalTensor for current core
  * @param [in] blockIdx the idx number waiting for the core
  * @param [in] eventID Set and wait events
  */
@@ -107,7 +107,7 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
  * @ingroup：SyncALL
  * @brief：Set flag bits of all cores
  * @param [in] gmWorkspace GlobalTensor to store core state
- * @param [in] ubWorkspce LocalTensor for current core
+ * @param [in] ubWorkspace LocalTensor for current core
  */
 template <bool isAIVOnly = true>
 __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace,

@@ -59,7 +59,7 @@ int32_t AscAstDeviceAnalyzer::Process()
     });
     int result = tool.run(clang::tooling::newFrontendActionFactory<DeviceAnalyzeAction>().get());
     if (result != 0) {
-        ASC_LOGE("AscPlugin Device analyzer: ClangTool runnig failed");
+        ASC_LOGE("AscPlugin Device analyzer: ClangTool running failed");
         return ASC_FAILURE;
     }
     return ASC_SUCCESS;

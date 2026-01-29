@@ -69,7 +69,7 @@ class PkgFeature(ABC):
         """
         配置文件配置的config_feature和打包选项的pkg_feature是否匹配。
 
-        匹配则返回Ture，表示需要打包该文件。
+        匹配则返回True，表示需要打包该文件。
         不匹配返回False，表示不需要打包该文件。
         """
         if bool(config_features & self.excludes):

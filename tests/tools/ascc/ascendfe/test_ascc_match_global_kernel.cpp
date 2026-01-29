@@ -48,22 +48,22 @@ TEST_F(TEST_ASCC_MATCH_GLOBAL_KERNEL, ascc_MatchAndReplaceGlobalKernel)
     std::vector<std::pair<uint32_t, std::string>> callLines;
     std::vector<std::string> ctx1{"add_custom<float>", "<<<blockDim, nullptr, stream>>>(x);"};
     size_t start = 0;
-    size_t cloumn = 1;
-    Ascc::AsccStatus result = kernel.MatchAndReplaceGlobalKernel(callLines, ctx1, start, cloumn);
+    size_t column = 1;
+    Ascc::AsccStatus result = kernel.MatchAndReplaceGlobalKernel(callLines, ctx1, start, column);
     EXPECT_EQ(result, Ascc::AsccStatus::SUCCESS);
 
     std::vector<std::string> ctx2{"add_custom<float>(x);"};
-    cloumn = 0;
-    result = kernel.MatchAndReplaceGlobalKernel(callLines, ctx2, start, cloumn);
+    column = 0;
+    result = kernel.MatchAndReplaceGlobalKernel(callLines, ctx2, start, column);
     EXPECT_EQ(result, Ascc::AsccStatus::FAILURE);
 
     std::vector<std::string> ctx3{"add_custom<float><<<((blockDim))>>>(x);"};
-    result = kernel.MatchAndReplaceGlobalKernel(callLines, ctx3, start, cloumn);
+    result = kernel.MatchAndReplaceGlobalKernel(callLines, ctx3, start, column);
     EXPECT_EQ(result, Ascc::AsccStatus::SUCCESS);
 
     std::vector<std::string> ctx4{"add_custom<float><<<blockDim>>>();"};
-    cloumn = 0;
-    result = kernel.MatchAndReplaceGlobalKernel(callLines, ctx4, start, cloumn);
+    column = 0;
+    result = kernel.MatchAndReplaceGlobalKernel(callLines, ctx4, start, column);
     EXPECT_EQ(result, Ascc::AsccStatus::SUCCESS);
 }
 

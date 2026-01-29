@@ -10,7 +10,7 @@
 /*!
  * \file trunc.h
  * \brief Defines a series of interface used to do elementwise math Truncation calculation.
- * Get the interger part of float value, towards zero.
+ * Get the integer part of float value, towards zero.
  * e.g. Trunc(3.1) = 3, Trunc(-3.1) = -3, Trunc(3.9) = 3, Trunc(-3.9) = -3
  */
 #ifndef LIB_MATH_TRUNC_H

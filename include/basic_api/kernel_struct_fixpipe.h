@@ -202,7 +202,7 @@ namespace AscendC {
 struct FixpipeTrait {
     QuantMode_t quantPre = QuantMode_t::NoQuant;
     bool enableRelu = false;
-    bool enableChannleSplit = false;
+    bool enableChannelSplit = false;
     uint8_t unitFlag = false;
     uint8_t dualDstCtl = false;
 };

@@ -281,7 +281,7 @@ TEST_F(TEST_ASCC_LINK, ascc_AscendLink_with_function_template)
     const std::string& inputFile = Ascc::AsccArgumentManager::GetInstance().GetInputFile();
 
     storage.AddInfo(inputFile, Ascc::AscCursorTypes::ASC_CURSOR_NORMAL_FUNCTION, functions1);
-    storage.AddInfo(inputFile, Ascc::AscCursorTypes::ASC_CURSOR_TEMPLATE_FUCNTION, functions2);
+    storage.AddInfo(inputFile, Ascc::AscCursorTypes::ASC_CURSOR_TEMPLATE_FUNCTION, functions2);
     int32_t returnCode = 0;
     std::string a = "DEFAULT";
     MOCKER(&Ascc::AsccLink::IsKernelFuncFound).stubs().will(returnValue(true));

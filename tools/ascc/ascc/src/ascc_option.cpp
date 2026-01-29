@@ -434,8 +434,8 @@ void Option::PrintHelpStr()
         }
 
         if (withShort) {
-            const size_t commnadWidth = 48;
-            Outs() << std::setw(commnadWidth - argStr.size() -
+            const size_t commandWidth = 48;
+            Outs() << std::setw(commandWidth - argStr.size() -
                                 (this->valueStr.size() == 0 ? 0 : (this->valueStr.size() + 1)));
             Outs() << "(-" << this->shortArgStr << ")";
         }

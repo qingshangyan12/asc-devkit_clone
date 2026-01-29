@@ -307,7 +307,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void AddsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Adds not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Adds does not support current datatype!");
     constexpr auto func = MicroAPI::Adds<T, T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, true>(dst, src, scalarValue, mask, 0, repeatTime,
         repeatParams);
@@ -317,7 +317,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void AddsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Adds not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Adds does not support current datatype!");
     constexpr auto func = MicroAPI::Adds<T, T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, false>(dst, src, scalarValue, nullptr, mask, repeatTime,
         repeatParams);
@@ -354,7 +354,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void MulsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Muls not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Muls does not support current datatype!");
     constexpr auto func = MicroAPIMuls::Muls<T, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, true>(dst, src, scalarValue, mask, 0, repeatTime,
         repeatParams);
@@ -364,7 +364,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void MulsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Muls not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Muls does not support current datatype!");
     constexpr auto func = MicroAPIMuls::Muls<T, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, false>(dst, src, scalarValue, nullptr, mask, repeatTime,
         repeatParams);
@@ -389,7 +389,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void MaxsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Maxs not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Maxs does not support current datatype!");
     constexpr auto func = MicroAPI::Maxs<T, T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, true>(dst, src, scalarValue, mask, 0, repeatTime,
         repeatParams);
@@ -399,7 +399,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void MaxsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Maxs not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Maxs does not support current datatype!");
     constexpr auto func = MicroAPI::Maxs<T, T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, false>(dst, src, scalarValue, nullptr, mask, repeatTime,
         repeatParams);
@@ -424,7 +424,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void MinsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Mins not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Mins does not support current datatype!");
     constexpr auto func = MicroAPI::Mins<T, T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, true>(dst, src, scalarValue, mask, 0, repeatTime,
         repeatParams);
@@ -434,7 +434,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void MinsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Mins not support current datatype!");
+    static_assert((SupportType<T, half, float, int16_t, int32_t>()), "Mins does not support current datatype!");
     constexpr auto func = MicroAPI::Mins<T, T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, false>(dst, src, scalarValue, nullptr, mask, repeatTime,
         repeatParams);
@@ -477,7 +477,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void ShiftLeftImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), "ShiftLeft not support current datatype!");
+    static_assert((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), "ShiftLeft does not support current datatype!");
     constexpr auto func = MicroAPI::ShiftLefts<T, int16_t, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, true>(dst, src, scalarValue, mask, 0, repeatTime,
         repeatParams);
@@ -487,7 +487,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void ShiftLeftImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    static_assert((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), "ShiftLeft not support current datatype!");
+    static_assert((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), "ShiftLeft does not support current datatype!");
     constexpr auto func = MicroAPI::ShiftLefts<T, int16_t, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, false>(dst, src, scalarValue, nullptr, mask, repeatTime,
         repeatParams);
@@ -510,7 +510,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void ShiftRightImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams, bool roundEn = false)
 {
-    static_assert((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), "ShiftRight not support current datatype!");
+    static_assert((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), "ShiftRight does not support current datatype!");
     constexpr auto func = MicroAPI::ShiftRights<T, int16_t, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, true>(dst, src, scalarValue, mask, 0, repeatTime,
         repeatParams);
@@ -520,7 +520,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void ShiftRightImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams, bool roundEn = false)
 {
-    static_assert((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), "ShiftRight not support current datatype!");
+    static_assert((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), "ShiftRight does not support current datatype!");
     constexpr auto func = MicroAPI::ShiftRights<T, int16_t, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
     Internal::VecBinaryScalarLevel0Template<func, isSetMask, false>(dst, src, scalarValue, nullptr, mask, repeatTime,
         repeatParams);

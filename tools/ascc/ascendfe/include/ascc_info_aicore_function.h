@@ -44,7 +44,7 @@ public:
     AsccStatus GetKernelCallLineCode(
         const std::string &filePath, std::vector<std::pair<uint32_t, std::string>> &outLines) const;
 
-    AsccStatus GetkernelDefLineCode(
+    AsccStatus GetKernelDefLineCode(
         const std::string &filePath, std::vector<std::pair<uint32_t, std::string>> &outLines) const;
 
     std::unordered_set<std::string> GetAllKeys() const;

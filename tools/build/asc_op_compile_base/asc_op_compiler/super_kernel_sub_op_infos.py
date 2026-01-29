@@ -820,7 +820,7 @@ f"""else {{
         params_with_type = ', '.join([f"GM_ADDR {param}" for param in self.kernel_params])
         chip_version = CommonUtility.get_chip_version()
 
-        #generate date cache preload for sub operator
+        #generate data cache preload for sub operator
         self.data_cache_preload_call += f"// begin add dc preload of sub_operator: {self.kernel_name}\n"
         len_of_param = len(self.kernel_params)
         if self.index == 0 and not CommonUtility.is_c310():

@@ -21,7 +21,7 @@ namespace AscendC {
 /*
  * @ingroup GetBroadCastMaxMinTmpSize
  * @brief get broadcast api calculate need max and min temporary local space size
- * @param [in] ascendcPlatform : ascendc platform infomation
+ * @param [in] ascendcPlatform : ascendc platform information
  * @param [in] srcShape : src tensor shape
  * @param [in] dstShape : dst tensor shape
  * @param [in] typeSize : src and dst tensor dtype size

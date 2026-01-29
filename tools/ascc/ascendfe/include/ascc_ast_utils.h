@@ -28,7 +28,7 @@
 namespace Ascc {
 
 /**
- * @brief chech whether variable declaration is in namespace XXX
+ * @brief check whether variable declaration is in namespace XXX
  * @param var variable declaration
  * @param namespaceName namespace where var should be in
  * @return true(is in namespace) / false (not in namespace)

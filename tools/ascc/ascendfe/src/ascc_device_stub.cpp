@@ -392,8 +392,8 @@ std::vector<std::string> AsccDeviceStub::GetAllNestedNameSpace(const std::string
 
 void AsccDeviceStub::GenStubFuncDefinition(std::ofstream &stubCode, const FuncInfo &newFuncInfo)
 {
-    std::string paramsStr = GetStubFuncDefParamsAndWorksapceFlag(newFuncInfo);
-    std::string paramsStrNoFfts = GetStubFuncDefParamsAndWorksapceFlag(newFuncInfo, /*skipFfts*/true);
+    std::string paramsStr = GetStubFuncDefParamsAndWorkspaceFlag(newFuncInfo);
+    std::string paramsStrNoFfts = GetStubFuncDefParamsAndWorkspaceFlag(newFuncInfo, /*skipFfts*/true);
     stubCode << "inline __aicore__ " << newFuncInfo.returnType << " " << newFuncInfo.funcName;
     stubCode << "(" << paramsStr << ")" << std::endl;
     if (kernelCounter_ > 0) { // mix gen code only once
@@ -410,8 +410,8 @@ void AsccDeviceStub::GenStubFuncDefinition(std::ofstream &stubCode, const FuncIn
 void AsccDeviceStub::GenTemplateStubFuncDefinition(
     std::ofstream &stubCode, const FuncInfo &newFuncInfo, std::string &originCallTempParams)
 {
-    std::string paramsStr = GetStubFuncDefParamsAndWorksapceFlag(newFuncInfo);
-    std::string paramsStrNoFfts = GetStubFuncDefParamsAndWorksapceFlag(newFuncInfo, /*skipFfts*/true);
+    std::string paramsStr = GetStubFuncDefParamsAndWorkspaceFlag(newFuncInfo);
+    std::string paramsStrNoFfts = GetStubFuncDefParamsAndWorkspaceFlag(newFuncInfo, /*skipFfts*/true);
     size_t counter = 0;
     std::string templateParamsStr = std::string();
     for (auto &param : newFuncInfo.templateParams) {
@@ -442,7 +442,7 @@ void AsccDeviceStub::GenTemplateStubFuncDefinition(
 void AsccDeviceStub::GenTemplateExpSpecStubFuncDefinition(
     std::ofstream &stubCode, const FuncInfo &newFuncInfo, std::string &originCallTempParams)
 {
-    std::string paramsStr = GetStubFuncDefParamsAndWorksapceFlag(newFuncInfo);
+    std::string paramsStr = GetStubFuncDefParamsAndWorkspaceFlag(newFuncInfo);
     size_t counter = 0;
     std::string templateParamsStr = std::string();
     for (auto &param : newFuncInfo.templateParams) {
@@ -459,7 +459,7 @@ void AsccDeviceStub::GenTemplateExpSpecStubFuncDefinition(
     stubCode << "<" << templateParamsStr << ">(" << paramsStr << ")" << std::endl;
 }
 
-std::string AsccDeviceStub::GetStubFuncDefParamsAndWorksapceFlag(const FuncInfo& newFuncInfo, bool skipFfts)
+std::string AsccDeviceStub::GetStubFuncDefParamsAndWorkspaceFlag(const FuncInfo& newFuncInfo, bool skipFfts)
 {
     std::string paramsStr = std::string();
     size_t counter = 0;

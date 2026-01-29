@@ -181,7 +181,7 @@ __aicore__ inline bfloat16_t F32ToBf16(float f32, RoundMode rnd, bool satMode)
     return bf16;
 }
 
-__aicore__ inline half F32Tof16(float f32, RoundMode rnd)
+__aicore__ inline half F32ToF16(float f32, RoundMode rnd)
 {
     uint32_t *u32Ptr = (uint32_t *)&f32;
     uint32_t u32 = *u32Ptr;
@@ -350,7 +350,7 @@ __aicore__ inline DstType Floor_(SrcType x)
     if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<bfloat16_t, float>>()) {
         return F32ToBf16(x, RoundMode::CAST_FLOOR, false);
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
-        return F32Tof16(x, RoundMode::CAST_FLOOR);
+        return F32ToF16(x, RoundMode::CAST_FLOOR);
     } else {
         if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<int32_t, float>>()) {
             if (x >= static_cast<float>(ConstantsInternal::S32_MAX_VAL)) {
@@ -385,7 +385,7 @@ __aicore__ inline DstType Floor_(SrcType x)
     if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<bfloat16_t, float>>()) {
         return F32ToBf16(x, RoundMode::CAST_FLOOR, false);
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
-        return F32Tof16(x, RoundMode::CAST_FLOOR);
+        return F32ToF16(x, RoundMode::CAST_FLOOR);
     } else {
         SrcType res = FloorIntrinsicsImpl(x);
         return (DstType)(res);
@@ -504,7 +504,7 @@ __aicore__ inline DstType Rint_(SrcType x)
 #endif
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
-        return F32Tof16(x, RoundMode::CAST_EVEN);
+        return F32ToF16(x, RoundMode::CAST_EVEN);
 #endif
     } else {
         if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<int32_t, float>>()) {
@@ -543,7 +543,7 @@ __aicore__ inline DstType Rint_(SrcType x)
 #endif
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
-        return F32Tof16(x, RoundMode::CAST_EVEN);
+        return F32ToF16(x, RoundMode::CAST_EVEN);
 #endif
     } else {
         return static_cast<DstType>(RintIntrinsicsImpl(x));
@@ -593,7 +593,7 @@ __aicore__ inline DstType Ceil_(SrcType x)
     if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<bfloat16_t, float>>()) {
         return F32ToBf16(x, RoundMode::CAST_CEIL, false);
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
-        return F32Tof16(x, RoundMode::CAST_CEIL);
+        return F32ToF16(x, RoundMode::CAST_CEIL);
     } else {
         if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<int32_t, float>>()) {
             if (x >= static_cast<float>(ConstantsInternal::S32_MAX_VAL)) {
@@ -628,7 +628,7 @@ __aicore__ inline DstType Ceil_(SrcType x)
     if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<bfloat16_t, float>>()) {
         return F32ToBf16(x, RoundMode::CAST_CEIL, false);
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
-        return F32Tof16(x, RoundMode::CAST_CEIL);
+        return F32ToF16(x, RoundMode::CAST_CEIL);
     } else {
         SrcType res = CeilIntrinsicsImpl(x);
         return (DstType)(res);
@@ -657,7 +657,7 @@ __aicore__ inline DstType Trunc_(SrcType x)
 #endif
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
-        return F32Tof16(x, RoundMode::CAST_ZERO);
+        return F32ToF16(x, RoundMode::CAST_ZERO);
 #endif
     } else {
         DstType res;

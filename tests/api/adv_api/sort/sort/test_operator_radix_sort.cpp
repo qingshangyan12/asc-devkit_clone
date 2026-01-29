@@ -19,8 +19,8 @@ public:
     __aicore__ inline void Init(GM_ADDR srcGm, GM_ADDR srcIndexGm, GM_ADDR dstGm, GM_ADDR dstIndexGm, uint32_t shape,
         uint32_t cnt)
     {
-        const uint32_t alginSize = 32 / sizeof(T);
-        dataSize = (shape + alginSize - 1) / alginSize * alginSize;
+        const uint32_t alignSize = 32 / sizeof(T);
+        dataSize = (shape + alignSize - 1) / alignSize * alignSize;
         count = cnt;
         srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(srcGm), dataSize);
         srcIndexGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ U *>(srcIndexGm), dataSize);

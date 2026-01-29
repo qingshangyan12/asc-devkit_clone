@@ -187,7 +187,7 @@ AscendCLogLevel.LOG_ERROR)
             else:
                 if kernel_type not in STR_TO_KERNEL_TYPE_V200.keys():
                     CommonUtility.print_compile_log("", \
-                        "current kernel type: {} is not support in current core version".\
+                        "current kernel type: {} is not supported in current core version".\
                         format(kernel_type), AscendCLogLevel.LOG_WARNING)
                 return None
         elif CommonUtility.is_v200():
@@ -196,11 +196,11 @@ AscendCLogLevel.LOG_ERROR)
             else:
                 if kernel_type not in STR_TO_KERNEL_TYPE_V220.keys():
                     CommonUtility.print_compile_log("", \
-                        "current kernel type: {} is not support in current core version".\
+                        "current kernel type: {} is not supported in current core version".\
                         format(kernel_type), AscendCLogLevel.LOG_WARNING)
                 return None
         else:
-            raise Exception("current kernel type: {} is not support in current core version".format(kernel_type))
+            raise Exception("current kernel type: {} is not supported in current core version".format(kernel_type))
         return None
 
     @staticmethod
@@ -211,7 +211,7 @@ AscendCLogLevel.LOG_ERROR)
             elif kernel_type in STR_TO_KERNEL_TYPE_V200.keys():
                 return STR_TO_KERNEL_TYPE_V200[kernel_type]
             else:
-                raise Exception("current kernel type: {} is not support in current core version".format(kernel_type))
+                raise Exception("current kernel type: {} is not supported in current core version".format(kernel_type))
         return None
 
     @staticmethod
@@ -221,10 +221,10 @@ AscendCLogLevel.LOG_ERROR)
         tiling_key_info = "" if tiling_key is None else f"of tiling key {tiling_key} "
         kernel_type_info = str(kernel_type).split('.')[-1]
         if kernel_type not in STR_TO_KERNEL_TYPE_V220.values():
-            raise Exception(f"kernel type: {kernel_type_info} {tiling_key_info}is not support in current \
+            raise Exception(f"kernel type: {kernel_type_info} {tiling_key_info}is not supported in current \
 core version")
         elif kernel_type not in [KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
-            raise Exception(f"kernel type: {kernel_type_info} {tiling_key_info}is not support in \
+            raise Exception(f"kernel type: {kernel_type_info} {tiling_key_info}is not supported in \
 TILING_KEY_LIST, please set to KERNEL_TYPE_MIX_AIC_1_1 or KERNEL_TYPE_MIX_AIC_1_2")
         else:
             return True

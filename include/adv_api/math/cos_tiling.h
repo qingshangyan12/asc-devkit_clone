@@ -72,5 +72,5 @@ void GetCosMaxMinTmpSize(const CosConfig& config, const ge::Shape& srcShape, con
  */
 void GetCosTmpBufferFactorSize(
     const CosConfig& config, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf);
-} // namespace AcsendC
+} // namespace AscendC
 #endif // LIB_MATH_COS_TILING_H

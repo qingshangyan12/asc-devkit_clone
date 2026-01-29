@@ -125,7 +125,7 @@ public:
     uint32_t CalcTschBlockDim(uint32_t sliceNum, uint32_t aicCoreNum, uint32_t aivCoreNum) const;
     /**
      * Get Work Space Size
-     * @return work sapce size by chip type
+     * @return work space size by chip type
      */
     uint32_t GetLibApiWorkSpaceSize(void) const;
     uint32_t GetResCubeGroupWorkSpaceSize(void) const;

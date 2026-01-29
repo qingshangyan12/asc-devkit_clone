@@ -180,7 +180,7 @@ AsccStatus AsccArgumentManager::InfoCollection(const std::vector<std::string> &a
         }
         inputFile_ = Ascc::CheckAndGetFullPath(args[i]);
         if (inputFile_.empty()) {
-            Ascc::HandleError(std::string("Input Path " + args[i] + " not exist!"));
+            Ascc::HandleError(std::string("Input Path " + args[i] + " does not exist!"));
             return AsccStatus::FAILURE;
         }
         std::string inputSuffix = Ascc::GetSuffix(inputFile_);
@@ -200,7 +200,7 @@ AsccStatus AsccArgumentManager::SaveTempsHandle(const std::string& tmpPath) cons
     Ascc::AsccGlobalEnvManager &envVar = Ascc::AsccGlobalEnvManager::GetInstance();
     envVar.asccTmpPath = Ascc::CheckAndGetFullPath(tmpPath);
     if (envVar.asccTmpPath.empty()) {
-        Ascc::HandleError(std::string("Tmp path ") + tmpPath + " not exist!");
+        Ascc::HandleError(std::string("Tmp path ") + tmpPath + " does not exist!");
         return AsccStatus::FAILURE;
     }
     return AsccStatus::SUCCESS;
@@ -252,7 +252,7 @@ AsccStatus AsccArgumentManager::PreprocessTaskHandle(const std::string& argValue
 AsccStatus AsccArgumentManager::ModulePathHandle(const std::string& argValue)
 {
     std::string pathRes = Ascc::CheckAndGetFullPath(argValue);
-    ASCC_CHECK((!pathRes.empty()), {Ascc::HandleError("Module path " + argValue + " not exist!");});
+    ASCC_CHECK((!pathRes.empty()), {Ascc::HandleError("Module path " + argValue + " does not exist!");});
     modulePath_ = pathRes;
     return AsccStatus::SUCCESS;
 }
@@ -286,7 +286,7 @@ AsccStatus AsccArgumentManager::OutputHandle(const std::string& outputPath)
     const std::string& outName = Ascc::GetFileName(outputPath);
     std::string outPath = Ascc::GetFilePath(outputPath);
     if (outPath.empty()) {
-        Ascc::HandleError(std::string("Output Path directory ") + outputPath + " not exist!");
+        Ascc::HandleError(std::string("Output Path directory ") + outputPath + " does not exist!");
         return AsccStatus::FAILURE;
     }
     outputFile_ = outPath + "/" + outName;

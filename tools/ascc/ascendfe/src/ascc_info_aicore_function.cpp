@@ -69,7 +69,7 @@ AsccStatus AsccInfoAicoreFunc::GetKernelCallLineCode(
     return AsccStatus::FAILURE;
 }
 
-AsccStatus AsccInfoAicoreFunc::GetkernelDefLineCode(
+AsccStatus AsccInfoAicoreFunc::GetKernelDefLineCode(
     const std::string &filePath, std::vector<std::pair<uint32_t, std::string>> &outLines) const
 {
     auto it = kernelDefData_.find(filePath);

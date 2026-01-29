@@ -130,9 +130,9 @@ public:
     int32_t SetAlignSplit(int32_t alignM, int32_t alignN, int32_t alignK);
     /**
      * @brief Get the calculated singleCoreM/singleCoreN/singleCoreK.
-     * @param shapeM : Get the singleCoreM value calculated form multi-core tiling.
-     * @param shapeN : Get the singleCoreN value calculated form multi-core tiling.
-     * @param shapeK : Get the singleCoreK value calculated form multi-core tiling.
+     * @param shapeM : Get the singleCoreM value calculated from multi-core tiling.
+     * @param shapeN : Get the singleCoreN value calculated from multi-core tiling.
+     * @param shapeK : Get the singleCoreK value calculated from multi-core tiling.
      */
     int32_t GetSingleShape(int32_t &shapeM, int32_t &shapeN, int32_t &shapeK);
     /**

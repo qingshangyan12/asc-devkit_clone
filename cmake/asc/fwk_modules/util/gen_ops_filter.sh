@@ -62,7 +62,7 @@ line=$(($file_count-1))
 sed -i "${line}{s/,//g}" ${dest_file}
 
 chmod 640 "${dest_file}"
-echo -e "[INFO] Succed generated ${dest_file}"
+echo -e "[INFO] Succeeded generated ${dest_file}"
 
 exit 0
 

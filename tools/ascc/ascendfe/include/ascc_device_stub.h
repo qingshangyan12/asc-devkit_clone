@@ -65,7 +65,7 @@ private:
         std::ofstream &stubCode, const FuncInfo &newFuncInfo, std::string &originCallTempParams);
     void GenTemplateExpSpecStubFuncDefinition(
         std::ofstream &stubCode, const FuncInfo &newFuncInfo, std::string &originCallTempParams);
-    std::string GetStubFuncDefParamsAndWorksapceFlag(const FuncInfo& newFuncInfo, bool skipFfts = false);
+    std::string GetStubFuncDefParamsAndWorkspaceFlag(const FuncInfo& newFuncInfo, bool skipFfts = false);
     void StubFuncDumpAndHardSyncImpl(std::ofstream &stubCode,
         const bool dumpTypeIsNotNone, const bool dumpAscendCStamp, const bool dumpTypeIsPrintf) const;
     void StubFuncWorkSpaceImpl(std::ofstream &stubCode, const bool dumpAscendCStamp, const bool hasKfcServer) const;

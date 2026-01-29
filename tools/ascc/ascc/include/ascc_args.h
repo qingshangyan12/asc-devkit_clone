@@ -71,7 +71,7 @@ inline Opt<bool> debugOpt("debug", ShortDesc("g"), HasArgFlag::NONE,
     HelpDesc("Generate debug information for code.\n"));
 
 inline Opt<bool> sanitizerOpt("sanitizer", ShortDesc("sanitizer"), HasArgFlag::NONE,
-    HelpDesc("Generate saitizer information for code.\n"));
+    HelpDesc("Generate sanitizer information for code.\n"));
 
 inline Opt<std::string> optimizeOpt("optimize", ShortDesc("O"), HasArgFlag::REQUIRED, FormatFlag::PREFIX,
     ValueDesc("<level>"), HelpDesc("Provide optimization reports for the specified kind of optimization.\n"));

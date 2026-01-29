@@ -98,7 +98,7 @@ class SingleOpPostCompile(PostCompilation):
             value_list = attr_val.get(CompileParam.VALUE_LIST)
             if dtype is not None:
                 attr[CompileParam.DTYPE] = dtype
-            # value_range and value_list not take part in compute static_key, set attr.vaule = None
+            # value_range and value_list not take part in compute static_key, set attr.value = None
             if value_range or value_list or value is None:
                 attr[CompileParam.VALUE] = None
                 attrs_list.append(attr)
@@ -216,7 +216,7 @@ class SingleOpPostCompile(PostCompilation):
     def __generate_optional_input_palceholder(op, op_type, inputs):
         inputs_info = op.get("inputs")
         if len(inputs_info) != len(inputs):
-            logger.error("Generate op[Binfilename=%s] support info fail, the lenth of inputs_info[%d] should be \
+            logger.error("Generate op[Binfilename=%s] support info fail, the length of inputs_info[%d] should be \
                          equal to len inputs[%d]", op.get(OpcOptions.BIN_FILENAME), len(inputs_info), len(inputs))
             return
 

@@ -46,7 +46,7 @@ static const std::unordered_map<clang::DiagnosticsEngine::Level, const char*> DI
     {clang::DiagnosticsEngine::Level::Fatal, "Fatal"}
 };
 
-std::optional<std::string> KerenelInfoCollector::GetEnumNameForValue(const FunctionDecl* funcDecl, unsigned index,
+std::optional<std::string> KernelInfoCollector::GetEnumNameForValue(const FunctionDecl* funcDecl, unsigned index,
     int64_t val, const PrintingPolicy& policy) const
 {
     auto funcTemplate = funcDecl->getPrimaryTemplate();
@@ -94,7 +94,7 @@ std::optional<std::string> KerenelInfoCollector::GetEnumNameForValue(const Funct
     return std::nullopt;
 }
 
-void KerenelInfoCollector::KernelDeclHandle(const FunctionDecl *funcDecl, const MatchFinder::MatchResult &result) const
+void KernelInfoCollector::KernelDeclHandle(const FunctionDecl *funcDecl, const MatchFinder::MatchResult &result) const
 {
     ASTContext *context = result.Context;
     auto& srcMgr = context->getSourceManager();
@@ -282,7 +282,7 @@ void KerenelInfoCollector::KernelDeclHandle(const FunctionDecl *funcDecl, const 
         paramsLogStr.str().c_str(), templateParamsLogStr.str().c_str());
 }
 
-void KerenelInfoCollector::KernelCallHandle(
+void KernelInfoCollector::KernelCallHandle(
     const CUDAKernelCallExpr *kernelCall, const MatchFinder::MatchResult &result) const
 {
     ASTContext *context = result.Context;
@@ -314,7 +314,7 @@ void KerenelInfoCollector::KernelCallHandle(
     }
 }
 
-void KerenelInfoCollector::run(const MatchFinder::MatchResult &result)
+void KernelInfoCollector::run(const MatchFinder::MatchResult &result)
 {
     ASC_LOG_ASC_DEBUG(PREPROCESS, "AST match in");
     // 处理函数定义
@@ -329,7 +329,7 @@ void KerenelInfoCollector::run(const MatchFinder::MatchResult &result)
     }
 }
 
-std::string KerenelInfoCollector::GetQualifiedScope(const FunctionDecl *funcDecl) const
+std::string KernelInfoCollector::GetQualifiedScope(const FunctionDecl *funcDecl) const
 {
     std::string qualifiedName;
     const DeclContext *ctx = funcDecl->getDeclContext();
@@ -346,13 +346,13 @@ std::string KerenelInfoCollector::GetQualifiedScope(const FunctionDecl *funcDecl
     return qualifiedName.empty() ? "" : qualifiedName;
 }
 
-bool KerenelInfoCollector::IsTemplate(const FunctionDecl* funcDecl) const
+bool KernelInfoCollector::IsTemplate(const FunctionDecl* funcDecl) const
 {
     return funcDecl->isTemplateInstantiation() || funcDecl->isFunctionTemplateSpecialization() ||
            funcDecl->getDescribedFunctionTemplate() != nullptr;
 }
 
-std::shared_ptr<AsccInfoBase> KerenelInfoCollector::GetStorageInfo(
+std::shared_ptr<AsccInfoBase> KernelInfoCollector::GetStorageInfo(
     const std::string &file, const AscCursorTypes& infoType) const
 {
     const auto& allInfo = AsccInfoStorage::GetInstance().GetAllInfos();

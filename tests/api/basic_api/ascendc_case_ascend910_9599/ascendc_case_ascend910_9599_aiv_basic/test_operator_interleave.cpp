@@ -19,8 +19,8 @@ public:
     __aicore__ inline void Init(GM_ADDR src0Gm, GM_ADDR src1Gm, GM_ADDR dst0Gm, GM_ADDR dst1Gm, uint32_t dstCount)
     {
         count = dstCount;
-        const int alginSize = AscendC::GetDataBlockSizeInBytes() / sizeof(AscendC::PrimT<T>);
-        dstSize = (dstCount + 256 + alginSize - 1) / alginSize * alginSize;
+        const int alignSize = AscendC::GetDataBlockSizeInBytes() / sizeof(AscendC::PrimT<T>);
+        dstSize = (dstCount + 256 + alignSize - 1) / alignSize * alignSize;
         src0Global.SetGlobalBuffer(reinterpret_cast<__gm__ AscendC::PrimT<T> *>(src0Gm), dstSize);
         src1Global.SetGlobalBuffer(reinterpret_cast<__gm__ AscendC::PrimT<T> *>(src1Gm), dstSize);
         dst0Global.SetGlobalBuffer(reinterpret_cast<__gm__ AscendC::PrimT<T> *>(dst0Gm), dstSize);

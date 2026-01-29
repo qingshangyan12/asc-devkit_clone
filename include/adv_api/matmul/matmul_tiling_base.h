@@ -117,7 +117,7 @@ enum class TPosition : int32_t {
 };
 /**
 * @enum class TilingPolicy
-* @brief TilingPolicy inherits from int32_t and includes a set of policys
+* @brief TilingPolicy inherits from int32_t and includes a set of policies
 */
 enum class TilingPolicy : int32_t {
     FIXED_A_TSCM,     ///< Fixed A TSCM policy

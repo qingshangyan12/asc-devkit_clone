@@ -77,7 +77,7 @@ __aicore__ constexpr MatmulApiStaticTiling GetMatmulApiTiling(const MatmulConfig
     tiling.dbL0A = GetL0ADb<A_TYPE>(mmCFG, TOTAL_L0A_SIZE);
     tiling.dbL0B = GetL0BDb<B_TYPE>(mmCFG, TOTAL_L0B_SIZE);
     GetMxMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(tiling, l1Size);
-    // keep the same with runtime tiling, fix l0c db
+    // keep the same as runtime tiling, fix l0c db
     tiling.dbL0C = 1;
     tiling.transLength = GetTransLength<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG, l1Factor);
     tiling.shareMode = 0;
@@ -143,7 +143,7 @@ __aicore__ constexpr MatmulApiStaticTiling GetMatmulApiTiling(const MatmulConfig
     tiling.depthA1 = tiling.stepM * tiling.stepKa * 2; // 2 DoubleBuffer
     tiling.depthB1 = tiling.stepN * tiling.stepKb * 2; // 2 DoubleBuffer
     tiling.iterateOrder = 0;
-    // keep the same with runtime tiling, fix l0c db
+    // keep the same as runtime tiling, fix l0c db
     tiling.dbL0C = 1;
     int32_t biasLength = 0;
     if (mmCFG.enableSetBias) {

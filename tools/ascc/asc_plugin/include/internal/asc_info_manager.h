@@ -157,7 +157,7 @@ private:
     std::string sourceFile_;
     bool saveTempRequested_ = false;
     bool enableL2Cache_ = true;                 // default enable
-    bool hasOpSystemCfg_ =false;
+    bool hasOpSystemCfg_ =  false;
     bool isAutoSyncOn_ = true;
     bool hasKernelFunc_ = false;
 

@@ -112,9 +112,9 @@ __simd_callee__ inline void ShiftRightsImpl(RegT &dstReg, RegT &srcReg, ScalarT 
             MaskPack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-            B64TraitOneToTaitTwo(traitTwoSrcReg0, srcReg);
+            B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg);
             ShiftRightsB64Impl(traitTwoDstReg, traitTwoSrcReg0, scalar, maskTrait2);
-            B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
         }
     }
 }

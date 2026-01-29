@@ -22,7 +22,7 @@ namespace Std {
 
 namespace Impl {
 constexpr size_t MaxIntegerSequenceSize = 64;
-constexpr size_t SpiltSize = 2;
+constexpr size_t SplitSize = 2;
 };
 
 template <class T, T... Ns> struct IntegerSequence {
@@ -42,8 +42,8 @@ struct MergeSeq<T, IntegerSequence<T, Ns0...>, IntegerSequence<T, Ns1...>>
 
 template <class T, size_t N>
 struct MakeIntegerSequence
-    : Impl::MergeSeq<T, typename MakeIntegerSequence<T, N / SpiltSize>::type,
-                     typename MakeIntegerSequence<T, N - N / SpiltSize>::type> {};
+    : Impl::MergeSeq<T, typename MakeIntegerSequence<T, N / SplitSize>::type,
+                     typename MakeIntegerSequence<T, N - N / SplitSize>::type> {};
 
 template <class T> struct MakeIntegerSequence<T, 0> : IntegerSequence<T> {};
 

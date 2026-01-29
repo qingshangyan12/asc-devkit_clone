@@ -68,11 +68,11 @@ TEST_F(TestMatmulQuantProcessorFixPipe, Quant_Processor_Fixpipe){
     LocalTensor<uint64_t> quantTensor2;
     mm.CopyQuantTensor(quantTensor2, NUM_SIXTEEN, NUM_SIXTEEN);
     mm.GetMatmulQuantMode();
-    mm.IsQuantSenario();
+    mm.IsQuantScenario();
     mm.SetQuantScalar(NUM_SIXTEEN);
     mm.GetQuantScalarValue();
     mm.UpdateQuantTensor(NUM_SIXTEEN);
-    mm.IsPerChannelSenario();
+    mm.IsPerChannelScenario();
     mm.FreeQuantTensor(quantTensor2);
     mm.Destroy();
 }

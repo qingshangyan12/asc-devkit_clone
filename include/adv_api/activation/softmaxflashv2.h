@@ -34,9 +34,9 @@ namespace AscendC {
  * \param [in] dataTypeSize1: typesize of input src tensor data
  * \param [in] dataTypeSize2: typesize of input max&&sum tensor data
  * \param [in] localWorkSpaceSize: input local temporary Tensor size, byte unit
- * \param [in] isUpdate: whether to update the sum and expmax, keep the same with SoftmaxFlashV2 api
- * \param [in] isBasicBlock: keep the same with SoftmaxFlashV2 api
- * \param [in] isDataFormatNZ: if the data format of input srcTensor is NZ, keep the same with SoftmaxFlashV2 api
+ * \param [in] isUpdate: whether to update the sum and expmax, keep the same as SoftmaxFlashV2 api
+ * \param [in] isBasicBlock: keep the same as SoftmaxFlashV2 api
+ * \param [in] isDataFormatNZ: if the data format of input srcTensor is NZ, keep the same as SoftmaxFlashV2 api
  */
 __aicore__ inline constexpr SoftMaxTiling SoftMaxFlashV2TilingFunc(const SoftMaxShapeInfo& shapeInfo,
     const uint32_t dataTypeSize1, const uint32_t dataTypeSize2, const uint32_t localWorkSpaceSize,
@@ -48,7 +48,7 @@ __aicore__ inline constexpr SoftMaxTiling SoftMaxFlashV2TilingFunc(const SoftMax
 
 /*!
  * \ingroup SoftmaxFlashV2
- * \brief softmax calculation in FlashAttention-2 process: you can refet to the paper:
+ * \brief softmax calculation in FlashAttention-2 process: you can refer to the paper:
  *        <FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning>
  *        if isUpdate = false:
  *            max = rowmax(x),  y = exp(x-max), sum = rowsum(y)
@@ -89,7 +89,7 @@ __aicore__ inline void SoftmaxFlashV2(const LocalTensor<T>& dstTensor, const Loc
 
 /*!
  * \ingroup SoftmaxFlashV2
- * \brief softmax calculation in FlashAttention-2 process: you can refet to the paper:
+ * \brief softmax calculation in FlashAttention-2 process: you can refer to the paper:
  *        <FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning>
  *        if isUpdate = false:
  *            max = rowmax(x),  y = exp(x-max), sum = rowsum(y)
@@ -129,7 +129,7 @@ __aicore__ inline void SoftmaxFlashV2(const LocalTensor<half>& dstTensor, const 
 
 /*!
  * \ingroup SoftmaxFlashV2
- * \brief softmax calculation in FlashAttention-2 process: you can refet to the paper:
+ * \brief softmax calculation in FlashAttention-2 process: you can refer to the paper:
  *        <FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning>
  *        if isUpdate = false:
  *            max = rowmax(x),  y = exp(x-max), sum = rowsum(y)
@@ -173,7 +173,7 @@ __aicore__ inline void SoftmaxFlashV2(const LocalTensor<T>& dstTensor, const Loc
 
 /*!
  * \ingroup SoftmaxFlashV2
- * \brief softmax calculation in FlashAttention-2 process: you can refet to the paper:
+ * \brief softmax calculation in FlashAttention-2 process: you can refer to the paper:
  *        <FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning>
  *        if isUpdate = false:
  *            max = rowmax(x),  y = exp(x-max), sum = rowsum(y)
@@ -216,7 +216,7 @@ __aicore__ inline void SoftmaxFlashV2(const LocalTensor<half>& dstTensor, const 
 
 /*!
  * \ingroup SoftmaxFlashV2
- * \brief softmax calculation in FlashAttention-2 process: you can refet to the paper:
+ * \brief softmax calculation in FlashAttention-2 process: you can refer to the paper:
  *        <FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning>
  *        if isUpdate = false:
  *            max = rowmax(x),  y = exp(x-max), sum = rowsum(y)
@@ -258,7 +258,7 @@ __aicore__ inline void SoftmaxFlashV2(const LocalTensor<T>& dstTensor, const Loc
 
 /*!
  * \ingroup SoftmaxFlashV2
- * \brief softmax calculation in FlashAttention-2 process: you can refet to the paper:
+ * \brief softmax calculation in FlashAttention-2 process: you can refer to the paper:
  *        <FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning>
  *        if isUpdate = false:
  *            max = rowmax(x),  y = exp(x-max), sum = rowsum(y)

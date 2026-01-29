@@ -30,7 +30,7 @@
 #include "ascc_info_function.h"
 
 namespace Ascc {
-class KerenelInfoCollector : public clang::ast_matchers::MatchFinder::MatchCallback {
+class KernelInfoCollector : public clang::ast_matchers::MatchFinder::MatchCallback {
 public:
     void run(const clang::ast_matchers::MatchFinder::MatchResult &result) override;
 
@@ -65,7 +65,7 @@ public:
 
 private:
     clang::ast_matchers::MatchFinder finder_;
-    KerenelInfoCollector callback_;
+    KernelInfoCollector callback_;
 };
 
 class AsccFrontendAction : public clang::ASTFrontendAction {

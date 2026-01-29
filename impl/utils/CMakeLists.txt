@@ -36,22 +36,22 @@ install(CODE "file(CREATE_LINK ../utils/tiling/template_argument.h ${CMAKE_INSTA
 install(CODE "file(CREATE_LINK ../../../../../asc/include/utils/log/asc_cpu_log.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/highlevel_api/utils/log/asc_cpu_log.h SYMBOLIC)")
 
 set(TEMPLATE_ARG   ${CMAKE_CURRENT_BINARY_DIR})
-set(TEMPLATE_ARG_HAED  ${TEMPLATE_ARG}/ascendc/host_api/tiling/template_argument.h)
-set(ASC_CPU_LOG_HAED  ${CMAKE_CURRENT_BINARY_DIR}/ascendc/host_api/log/asc_cpu_log.h)
+set(TEMPLATE_ARG_HEAD  ${TEMPLATE_ARG}/ascendc/host_api/tiling/template_argument.h)
+set(ASC_CPU_LOG_HEAD  ${CMAKE_CURRENT_BINARY_DIR}/ascendc/host_api/log/asc_cpu_log.h)
 
-add_custom_command(OUTPUT ${TEMPLATE_ARG_HAED}
-    COMMAND ${CMAKE_COMMAND} -E copy ${ASCENDC_DIR}/include/utils/tiling/template_argument.h ${TEMPLATE_ARG_HAED}
+add_custom_command(OUTPUT ${TEMPLATE_ARG_HEAD}
+    COMMAND ${CMAKE_COMMAND} -E copy ${ASCENDC_DIR}/include/utils/tiling/template_argument.h ${TEMPLATE_ARG_HEAD}
     DEPENDS ${ASCENDC_DIR}/include/utils/tiling/template_argument.h)
 
-add_custom_command(OUTPUT ${ASC_CPU_LOG_HAED}
-    COMMAND ${CMAKE_COMMAND} -E copy ${ASCENDC_DIR}/include/utils/log/asc_cpu_log.h ${ASC_CPU_LOG_HAED}
+add_custom_command(OUTPUT ${ASC_CPU_LOG_HEAD}
+    COMMAND ${CMAKE_COMMAND} -E copy ${ASCENDC_DIR}/include/utils/log/asc_cpu_log.h ${ASC_CPU_LOG_HEAD}
     DEPENDS ${ASCENDC_DIR}/include/utils/log/asc_cpu_log.h)
 
 add_custom_target(template_argument ALL
-    DEPENDS ${TEMPLATE_ARG_HAED})
+    DEPENDS ${TEMPLATE_ARG_HEAD})
 
 add_custom_target(tiling_log_target ALL
-    DEPENDS ${ASC_CPU_LOG_HAED})
+    DEPENDS ${ASC_CPU_LOG_HEAD})
 
 add_dependencies(kernel_tiling_headers template_argument tiling_log_target)
 target_include_directories(kernel_tiling_headers INTERFACE

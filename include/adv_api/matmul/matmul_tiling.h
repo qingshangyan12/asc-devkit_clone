@@ -37,14 +37,14 @@ public:
     ~MatmulApiTiling() override = default;
 
     /**
-     * @brief Get caculated tiling information
+     * @brief Get calculated tiling information
      * @param [in] tiling the structure to store the tiling result defined on the Host side
      * @return return 0 if success, else return -1
      */
     int64_t GetTiling(optiling::TCubeTiling &tiling) override;
 
     /**
-     * @brief Get caculated tiling information
+     * @brief Get calculated tiling information
      * @param [in] tiling the structure to store the tiling result defined on the Kernel side
      * @return return 0 if success, else return -1
      */

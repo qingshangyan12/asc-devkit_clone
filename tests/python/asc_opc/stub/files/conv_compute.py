@@ -390,7 +390,7 @@ def check_conv_shape(shape_in, shape_w, pad_top, pad_bottom,
                 wo_upper = get_te_var("wo").get_bound()[1]
                 ho_upper = math.floor(config['mac'][0] / wo_upper) + 2
             else:
-                #caculate ho_num for dynamic range[low, None]
+                #calculate ho_num for dynamic range[low, None]
                 fmap_w_upper = DYNAMIC_FMAP_W_MAX
                 if isinstance(pad_left, tvm.tir.PrimExpr):
                     wo_upper = int_ceil_div(fmap_w_upper, stridew)
@@ -2352,7 +2352,7 @@ def conv(data, weight, para_dict, optim_dict=None, dsl_flag=True):
         -------
         check function
         """
-        def check_c04_vaild():
+        def check_c04_valid():
             c0_value = _fmap_c0_check_value(weight.dtype, optim_dict)
             if not c04_v200_flag and weight.dtype == "int8":
                 return False
@@ -2375,7 +2375,7 @@ def conv(data, weight, para_dict, optim_dict=None, dsl_flag=True):
         if weight.dtype == "int8":
             block_size_k = 32
         if optim_dict["c0_optim_flg"] and not is_support_fixpipe():
-            if check_c04_vaild():
+            if check_c04_valid():
                 pass
             else:
                 err_man.raise_err_specific("conv2d", "Invalid config for c0=4 optimize feature.")
@@ -2586,7 +2586,7 @@ def conv(data, weight, para_dict, optim_dict=None, dsl_flag=True):
 
             if 'wo' in ConvParam.dyn_var_map:
                 ConvParam.w_out = ConvParam.dyn_var_map.get('wo')
-                # nx1 scenario, w_out should add one. Keep same with static scenario.
+                # nx1 scenario, w_out should add one. Keep same as static scenario.
                 if optim_dict.get(BinaryInfoKey.Nx1_FLAG, False):
                     ConvParam.w_out += 1
             else:

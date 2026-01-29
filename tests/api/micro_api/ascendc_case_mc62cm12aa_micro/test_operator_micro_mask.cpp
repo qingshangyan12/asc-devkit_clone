@@ -20,8 +20,8 @@ public:
     {}
     __aicore__ inline void Init(GM_ADDR srcGm, GM_ADDR dstGm, uint32_t count)
     {
-        const int alginSize = 32 / sizeof(T);
-        dstSize = (count + alginSize - 1) / alginSize * alginSize;
+        const int alignSize = 32 / sizeof(T);
+        dstSize = (count + alignSize - 1) / alignSize * alignSize;
         srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(srcGm), dstSize);
         dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dstGm), dstSize);
         pipe.InitBuffer(inQueue, 1, dstSize * sizeof(T));

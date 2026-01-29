@@ -35,7 +35,7 @@ namespace AscendC {
 constexpr CumSumConfig defaultCumSumConfig = {true, false, true};
 
 /* !
- * \brief This function calculates the average based on the orientation of the last axis or fist axis.
+ * \brief This function calculates the average based on the orientation of the last axis or first axis.
  * For details about the interface description, see
  * https://pytorch.org/docs/stable/generated/torch.cumsum.html
  *
@@ -56,7 +56,7 @@ __aicore__ inline void CumSum(LocalTensor<T>& dstTensor, LocalTensor<T>& lastRow
 }
 
 /* !
- * \brief This function calculates the average based on the orientation of the last axis or fist axis.
+ * \brief This function calculates the average based on the orientation of the last axis or first axis.
  * For details about the interface description, see
  * https://pytorch.org/docs/stable/generated/torch.cumsum.html
  *

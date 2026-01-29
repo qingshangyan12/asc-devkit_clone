@@ -407,7 +407,7 @@ public:
      * demo case:
      * GlobalTensor<T> workTensor;
      * tpipe.InitSpmBuffer(workTensor, size);
-     * LocalTensor<T> calcTensor = tpip.Get<T>(size);
+     * LocalTensor<T> calcTensor = tpipe.Get<T>(size);
      * // when local buffer is not enough, spill local to spm buffer;
      * tpipe.WriteSpmBuffer(calcTensor, size);
      * // ...

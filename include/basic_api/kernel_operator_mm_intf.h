@@ -206,8 +206,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
  * @param [in] loadDataParams.startIndex index of the first fractal in the first repeat in the source matrix
  * in unit of frac num
  * @param [in] loadDataParams.repeatTimes the repeat times
- * @param [in] loadDataParams.srcStride source stride between consequent repeat times in unit of frac num
- * @param [in] loadDataParams.dstGap destination gap between consequent repeat times in unit of 512byte
+ * @param [in] loadDataParams.srcStride source stride between consecutive repeat times in unit of frac num
+ * @param [in] loadDataParams.dstGap destination gap between consecutive repeat times in unit of 512byte
  * @param [in] loadDataParams.dstFracGap dst fractal gap in unit of one 512byte fractal
  */
 template <typename T>
@@ -222,8 +222,8 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
  * @param [in] loadDataParams.startIndex index of the first fractal in the first repeat in the source matrix
  * in unit of 512byte fractal
  * @param [in] loadDataParams.repeatTimes the repeat times
- * @param [in] loadDataParams.srcStride source stride between consequent repeat times in unit of 512byte
- * @param [in] loadDataParams.dstGap destination gap between consequent repeat times in unit of 512byte
+ * @param [in] loadDataParams.srcStride source stride between consecutive repeat times in unit of 512byte
+ * @param [in] loadDataParams.dstGap destination gap between consecutive repeat times in unit of 512byte
  * @param [in] loadDataParams.dstFracGap dst fractal gap in unit of one 512byte fractal
  * @param [in] loadDataParams.srcFracGap dst fractal gap in unit of one 512byte fractal
  */

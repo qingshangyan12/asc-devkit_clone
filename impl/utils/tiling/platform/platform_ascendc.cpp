@@ -215,7 +215,7 @@ void PlatformAscendC::GetCoreMemBw(const CoreMemType &memType, uint64_t &bwSize)
 
 fe::PlatFormInfos* PlatformAscendC::GetPlatFormInfo(void) const
 {
-    ASCENDC_ASSERT(this->platformInfo_ != nullptr, PF_LOGE("PlatformInfo cannot be initialized to nulltpr!!"));
+    ASCENDC_ASSERT(this->platformInfo_ != nullptr, PF_LOGE("PlatformInfo cannot be initialized to nullptr!!"));
     return this->platformInfo_;
 }
 

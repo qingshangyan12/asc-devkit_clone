@@ -19,9 +19,9 @@ public:
     {}
     __aicore__ inline void Init(GM_ADDR src_gm, GM_ADDR dst_gm, uint32_t srcSize_, uint32_t dstSize_)
     {
-        const int alginSize = AscendC::GetDataBlockSizeInBytes() / sizeof(srcType);
-        srcSize = (srcSize_ + alginSize - 1) / alginSize * alginSize;
-        dstSize = (dstSize_ + alginSize - 1) / alginSize * alginSize;
+        const int alignSize = AscendC::GetDataBlockSizeInBytes() / sizeof(srcType);
+        srcSize = (srcSize_ + alignSize - 1) / alignSize * alignSize;
+        dstSize = (dstSize_ + alignSize - 1) / alignSize * alignSize;
         srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ srcType *>(src_gm), srcSize);
         dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ srcType *>(dst_gm), dstSize);
         pipe.InitBuffer(inQueue, 1, srcSize * sizeof(srcType));

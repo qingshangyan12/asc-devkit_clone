@@ -387,19 +387,19 @@ def _add_workspace_to_title_dict(title_dict):
             a. use create_block_sync()
             b. sync tensor applied by user
         3. pure TBE: use create_block_sync()
-        add worksapce info in order:
+        add workspace info in order:
             TIK_WORKSPACE_SIZE_LIST
             TBE_WORKSPACE_SIZE_LIST
     """
     # set parameters info
-    tbe_worksapce = hasattr(TBE_WORKSPACE_SIZE_LIST, "local_list") and \
+    tbe_workspace = hasattr(TBE_WORKSPACE_SIZE_LIST, "local_list") and \
                     len(TBE_WORKSPACE_SIZE_LIST.local_list) > 0
     tik_workspace = hasattr(TIK_WORKSPACE_SIZE_LIST, "local_list") and \
                     len(TIK_WORKSPACE_SIZE_LIST.local_list) > 0
 
     from asc_op_compile_base.common.platform.platform_info import get_soc_spec, ASCEND_910B, ASCEND_910_93
     is_c220 = get_soc_spec("SHORT_SOC_VERSION") in [ASCEND_910B, ASCEND_910_93]
-    if tbe_worksapce:  # use create_block_sync()
+    if tbe_workspace:  # use create_block_sync()
         if hasattr(TIK_ATOMIC_ADD_LIST, "local_list") and \
                 len(TIK_ATOMIC_ADD_LIST.local_list) > 0:
             # 2. TIK TBE hybrid: a. use create_block_sync()
@@ -417,7 +417,7 @@ def _add_workspace_to_title_dict(title_dict):
     if tik_workspace:
         _add_workspace_info(title_dict, TIK_WORKSPACE_SIZE_LIST.local_list, True, "tik_")
     # add tbe workspace from block sync
-    if tbe_worksapce:  # use create_block_sync()
+    if tbe_workspace:  # use create_block_sync()
         _add_workspace_info(title_dict, TBE_WORKSPACE_SIZE_LIST.local_list, True, "tbe_")
 
     if hasattr(TBE_ATUO_ATOMIC_IND_LIST, "local_list") and \

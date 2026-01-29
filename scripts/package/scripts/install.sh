@@ -16,7 +16,7 @@ username=$(id -un)
 usergroup=$(id -gn)
 curpath=$(dirname $(readlink -f "$0"))
 common_func_path="${curpath}/common_func.inc"
-version_compat_func_path="${curpath}/version_compatiable.inc"
+version_compat_func_path="${curpath}/version_compatible.inc"
 common_func_v2_path="${curpath}/common_func_v2.inc"
 version_cfg_path="${curpath}/version_cfg.inc"
 asc_devkit_func_path="${curpath}/asc-devkit_func.sh"
@@ -218,7 +218,7 @@ start_install_log() {
     new_echo "INFO" "Start time:${cur_date}"
     log "INFO" "Start time:$cur_date"
     log "INFO" "LogFile:${logfile}"
-    log "INFO" "InputParams:$all_parma"
+    log "INFO" "InputParams:$all_param"
     log "INFO" "OperationLogFile:${operation_logfile}"
 }
 
@@ -228,7 +228,7 @@ start_uninstall_log() {
     new_echo "INFO" "Start time:${cur_date}"
     log "INFO" "Start time:$cur_date"
     log "INFO" "LogFile:${logfile}"
-    log "INFO" "InputParams:$all_parma"
+    log "INFO" "InputParams:$all_param"
     log "INFO" "OperationLogFile:${operation_logfile}"
 }
 
@@ -267,7 +267,7 @@ log_operation() {
         chmod 640 "${operation_logfile}"
     fi
 
-    echo "$1 $level root $cur_date 127.0.0.1 $runfilename $2 installmode=$installmode; cmdlist=$all_parma" >> "$operation_logfile"
+    echo "$1 $level root $cur_date 127.0.0.1 $runfilename $2 installmode=$installmode; cmdlist=$all_param" >> "$operation_logfile"
 }
 
 # 相对路径转化绝对路径
@@ -364,7 +364,7 @@ is_valid_path() {
         if [ ! -d "${pkg_install_path}" ]; then
             local up_dir=$(dirname "${pkg_install_path}")
             if [ ! -d "${up_dir}" ]; then
-                log "ERROR" "ERR_NO:0x0003;ERR_DES:The $up_dir dose not exist, please retry a right path."
+                log "ERROR" "ERR_NO:0x0003;ERR_DES:The $up_dir does not exist, please retry a right path."
                 exit_install_log 1
             fi
         else
@@ -562,7 +562,7 @@ log_base_version() {
 
 update_install_path() {
     if [ ! -d "$pkg_install_path" ]; then
-        log "ERROR" "ERR_NO:0x0003;ERR_DES:The $pkg_install_path dose not exist, please retry a right path."
+        log "ERROR" "ERR_NO:0x0003;ERR_DES:The $pkg_install_path does not exist, please retry a right path."
         exit_install_log 1
     fi
 }
@@ -954,7 +954,7 @@ do
     shift 1
 done
 
-all_parma="$*"
+all_param="$*"
 
 #################################################################################
 while true
@@ -1213,7 +1213,7 @@ if [ "$(get_pkg_toolchain)" != "llvm" ] && [ "$input_install_for_all" = "n" ]; t
             usergroup_base=$(grep -i usergroup= "${install_info_old}" | cut -d"=" -f2-)
             check_group "${usergroup_base}" "${username}"
             if [ $? -ne 0 ]; then
-                log "ERROR" "ERR_NO:0x0093;ERR_DES:User is not belong to the dirver or firmware's installed usergroup! Please add the user (${username}) to the group (${usergroup_base})."
+                log "ERROR" "ERR_NO:0x0093;ERR_DES:User is not belong to the driver or firmware's installed usergroup! Please add the user (${username}) to the group (${usergroup_base})."
                 confirm=y
                 exit_install_log 1
             fi

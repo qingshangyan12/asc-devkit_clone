@@ -68,12 +68,12 @@ bool OpTilingRegistry::LoadTilingLibrary(const char *tilingSoPath) const
         CXT_ASCENDC_LOGE("OpTilingRegistry tiling so path [%s] is too long.", tilingSoPath);
         return false;
     }
-    char resovedPath[PATH_MAX] = {0};
-    if (realpath(tilingSoPath, resovedPath) == nullptr) {
+    char resolvedPath[PATH_MAX] = {0};
+    if (realpath(tilingSoPath, resolvedPath) == nullptr) {
         CXT_ASCENDC_LOGE("OpTilingRegistry Tiling so path [%s] is not exist.", tilingSoPath);
         return false;
     }
-    std::string absFilePath(resovedPath);
+    std::string absFilePath(resolvedPath);
     void *handle = nullptr;
     void (*registryFunc)(const char *);
 

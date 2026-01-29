@@ -87,7 +87,7 @@ __aicore__ inline void Sort32(const LocalTensor<T>& dst, const LocalTensor<T>& s
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] repeatTime repeat times
- * @param [in] modeNumbe Position parameter
+ * @param [in] modeNumber Position parameter
  */
 template <typename T>
 __aicore__ inline void ProposalConcat(const LocalTensor<T>& dst, const LocalTensor<T>& src,
@@ -100,7 +100,7 @@ __aicore__ inline void ProposalConcat(const LocalTensor<T>& dst, const LocalTens
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] repeatTime repeat times
- * @param [in] modeNumbe Position parameter
+ * @param [in] modeNumber Position parameter
  */
 template <typename T>
 __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTensor<T>& src,
@@ -174,7 +174,7 @@ __aicore__ inline uint32_t GetSortOffset(const uint32_t elemOffset);
 /*
  * @ingroup GetSortLen
  * @brief get sort length in the sorted struct
- * @param [in] elemOffset element number ocountffer
+ * @param [in] elemCount element number count
  */
 template <typename T>
 __aicore__ inline uint32_t GetSortLen(const uint32_t elemCount);

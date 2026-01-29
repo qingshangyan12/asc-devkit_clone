@@ -551,7 +551,7 @@ __aicore__ inline float AtanhImpl(float x)
 #endif
 
 /**
- * Rquare root of X
+ * Square root of X
  * Formula:Sqrt(x) = sqrt(x)
  * @param x a value
  * @return SqrtImpl(x)

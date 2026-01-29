@@ -40,7 +40,7 @@ namespace AscendC {
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Tensor: base LocalTensor
  * \param [in] src1Tensor: exponent LocalTensor
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -81,7 +81,7 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Tensor: base LocalTensor
  * \param [in] src1Tensor: exponent LocalTensor
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -120,7 +120,7 @@ __aicore__ inline void Power(
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Tensor: base LocalTensor
  * \param [in] src1Scalar: exponent Scalar
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -161,7 +161,7 @@ __aicore__ inline void Power(
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Tensor: base LocalTensor
  * \param [in] src1Scalar: exponent Scalar
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -199,7 +199,7 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Scalar: base Scalar
  * \param [in] src1Tensor: exponent LocalTensor
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -240,7 +240,7 @@ __aicore__ inline void Power(
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Scalar: base Scalar
  * \param [in] src1Tensor: exponent LocalTensor
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -278,7 +278,7 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scala
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Tensor: base LocalTensor
  * \param [in] src1Tensor: exponent LocalTensor
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -319,7 +319,7 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Tensor: base LocalTensor
  * \param [in] src1Tensor: exponent LocalTensor
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -358,7 +358,7 @@ __aicore__ inline void Power(
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Tensor: base LocalTensor
  * \param [in] src1Scalar: exponent Scalar
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -399,7 +399,7 @@ __aicore__ inline void Power(
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Tensor: base LocalTensor
  * \param [in] src1Scalar: exponent Scalar
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -437,7 +437,7 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Scalar: base Scalar
  * \param [in] src1Tensor: exponent LocalTensor
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -478,7 +478,7 @@ __aicore__ inline void Power(
  * \param [out] dstTensor: output LocalTensor
  * \param [in] src0Scalar: base Scalar
  * \param [in] src1Tensor: exponent LocalTensor
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             power_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it

@@ -46,7 +46,7 @@ public:
         const std::string &input, const std::vector<size_t> &posMap) const;
     std::pair<std::string, std::vector<size_t>> RemoveSpacesAndMapPositions(const std::string &input) const;
     AsccStatus MatchAndReplaceGlobalKernel(std::vector<std::pair<uint32_t, std::string>>& callLines,
-    std::vector<std::string> &ctx, size_t start, size_t cloumn) const;
+    std::vector<std::string> &ctx, size_t start, size_t column) const;
     AsccStatus ReadFileToVector(const std::string &fileName, std::vector<std::string> &results) const;
     void MatchAndGenerateGlobalKernel();
 
@@ -148,9 +148,9 @@ inline bool AsccMatchGlobalKernel::IsFuncParamExist(const std::string &paramList
 
 inline AsccStatus AsccMatchGlobalKernel::MatchAndReplaceGlobalKernel(
     std::vector<std::pair<uint32_t, std::string>> &callLines, std::vector<std::string> &ctx, size_t start,
-    size_t cloumn) const
+    size_t column) const
 {
-    ASC_LOG_ASC_DEBUG(PREPROCESS, "Start: [%zu], cloumn: [%zu].", start, cloumn);
+    ASC_LOG_ASC_DEBUG(PREPROCESS, "Start: [%zu], column: [%zu].", start, column);
     size_t kernelCallRow = start;
     std::string tripleLaunchGlobalKernel;
     while (kernelCallRow < ctx.size() && ctx[kernelCallRow].find(";") == std::string::npos) {
