@@ -1,14 +1,16 @@
 # DumpTensor直调样例说明
 
 ## 概述
+
 本样例通过Ascend C编程语言实现了Add算子和Mmad算子，同时在算子中添加DumpTensor调测，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
 
 ## 支持的产品
-- Ascend 950PR/Ascend 950DT
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── 02_dumptensor
 │   ├── scripts
@@ -21,6 +23,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
 DumpTensor介绍：  
   使用DumpTensor可以Dump指定Tensor的内容，同时支持打印自定义的附加信息。此外，DumpAccChkPoint可以支持指定偏移位置的Tensor打印。

@@ -8,6 +8,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+
 npu_op_kernel_sources(ascendc_kernels
     OP_TYPE AddCustom
     KERNEL_DIR add_custom

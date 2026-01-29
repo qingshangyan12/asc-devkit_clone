@@ -1,13 +1,16 @@
 # abs_duplicate算子直调样例
+
 ## 概述
+
 本样例介绍无DataCopyPad的非对齐abs_duplicate算子实现，采用核函数<<<>>>调用，有效降低调度开销，实现高效的算子执行。
 
 ## 支持的产品
-- Ascend 950PR/Ascend 950DT
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── abs_duplicate  
 │   ├── scripts
@@ -19,6 +22,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   本样例中实现的是固定shape为64*11的非对齐Abs算子。
   Abs算子的数学表达式为：

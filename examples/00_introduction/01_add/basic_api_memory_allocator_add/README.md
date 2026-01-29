@@ -1,12 +1,16 @@
 # Add算子直调样例
+
 ## 概述
+
 本样例演示基于静态Tensor编程模型的Add算子实现，该实现采用LocalMemAllocator内存分配器简化代码逻辑，特别适用于Bank冲突不敏感场景。
 
 ## 支持的产品
-- Ascend 950PR/Ascend 950DT
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
 ## 目录结构介绍
+
 ```
 ├── basic_api_memory_allocator_add
 │   └── scripts
@@ -18,6 +22,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
 
   算子实现的是固定shape为72×4096的Add算子。

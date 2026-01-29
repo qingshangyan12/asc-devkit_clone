@@ -1,12 +1,16 @@
 # HelloWorld算子直调样例
+
 ## 概述
+
 本样例通过使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，核函数内通过printf打印输出结果。
 
 ## 支持的产品
-- Ascend 950PR/Ascend 950DT
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
 ## 目录结构介绍
+
 ```
 ├── 00_helloworld
 │   ├── CMakeLists.txt      // 编译工程文件

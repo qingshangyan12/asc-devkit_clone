@@ -1,11 +1,16 @@
 # VectorAdd算子直调样例
+
 ## 概述
+
 本样例介绍Add算子的核函数直调方法，多核&tiling场景下增加输入Broadcast。
+
 ## 支持的产品
-- Ascend 950PR/Ascend 950DT
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
 ## 目录结构介绍
+
 ```
 ├── add_broadcast
 │   ├── scripts
@@ -15,7 +20,9 @@
 │   ├── data_utils.h             // 数据读入写出函数
 │   └── vector_add_custom.asc    // Ascend C算子实现 & 调用样例
 ```
+
 ## 算子描述
+
 - 算子功能：  
   Add算子实现了两个数据相加，返回相加结果的功能。对应的数学表达式为：
   ```

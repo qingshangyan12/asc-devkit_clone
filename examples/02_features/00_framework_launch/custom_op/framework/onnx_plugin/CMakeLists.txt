@@ -8,6 +8,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} plugin_srcs)
 
 set(NLOHMANN_JSON_URL "https://gitcode.com/cann-src-third-party/json/releases/download/v3.11.3/include.zip")

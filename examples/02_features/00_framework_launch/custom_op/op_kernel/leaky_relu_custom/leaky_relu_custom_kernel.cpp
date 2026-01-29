@@ -8,6 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+
 #include "kernel_operator.h"
 #include "leaky_relu_custom_tiling.h"
 constexpr int32_t BUFFER_NUM = 2; // tensor num for each queue

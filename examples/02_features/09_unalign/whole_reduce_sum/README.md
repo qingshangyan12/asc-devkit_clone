@@ -1,13 +1,16 @@
 # whole_reduce_sum算子直调样例
+
 ## 概述
+
 本样例介绍非对齐whole_reduce_sum算子的核函数直调方法，采用核函数<<<>>>调用，有效降低调度开销，实现高效的算子执行。
 
 ## 支持的产品
-- Ascend 950PR/Ascend 950DT
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── whole_reduce_sum
 │   ├── scripts
@@ -19,6 +22,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
   本非对齐WholeReduceSum算子对二维Tensor输入作行归约求和。其python代码表示如下：
   ```python

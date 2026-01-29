@@ -8,6 +8,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} plugin_srcs)
 
 npu_op_library(cust_tf_parsers TF_PLUGIN
