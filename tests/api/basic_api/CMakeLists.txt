@@ -20,9 +20,9 @@ set(BASIC_UT_PRODUCT_TYPE_LIST_INIT
     ascend910B1_AIV
     ascend310B1
     ascend610Lite
-    ascend910_9599_AIC
-    ascend910_9599_AIV_BASIC
-    ascend910_9599_AIV_FRAMEWORK
+    ascend950pr_9599_AIC
+    ascend950pr_9599_AIV_BASIC
+    ascend950pr_9599_AIV_FRAMEWORK
     mc62cm12aa_AIC
     mc62cm12aa_BASIC
     mc62cm12aa_FRAMEWORK
@@ -91,30 +91,30 @@ file(GLOB ASCENDC_TEST_ascend610Lite_CASE_SRC_FILES
     ascendc_case_ascend610lite/*.cpp
 )
 
-# ascend910_9599 basic test cases
-file(GLOB ASCENDC_TEST_ascend910_9599_AIV_BASIC_CASE_SRC_FILES
+# ascend950pr_9599 basic test cases
+file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_BASIC_CASE_SRC_FILES
     ascendc_case_common/test_kernel_pop_stack_buffer.cpp
     ascendc_case_common/test_kernel_tensor.cpp
     ascendc_case_common/test_type_check.cpp
-    ascendc_case_ascend910_9599/test_pipe_framework.cpp
-    ascendc_case_ascend910_9599/ascendc_case_ascend910_9599_aiv_basic/*.cpp
+    ascendc_case_ascend950pr_9599/test_pipe_framework.cpp
+    ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aiv_basic/*.cpp
 )
 
-# ascend910_9599 framework test cases
-file(GLOB ASCENDC_TEST_ascend910_9599_AIV_FRAMEWORK_CASE_SRC_FILES
+# ascend950pr_9599 framework test cases
+file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_FRAMEWORK_CASE_SRC_FILES
     ascendc_case_common/test_kernel_pop_stack_buffer.cpp
     ascendc_case_common/test_kernel_tensor.cpp
     ascendc_case_common/test_type_check.cpp
-    ascendc_case_ascend910_9599/test_pipe_framework.cpp
-    ascendc_case_ascend910_9599/ascendc_case_ascend910_9599_aiv_framework/*.cpp
+    ascendc_case_ascend950pr_9599/test_pipe_framework.cpp
+    ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aiv_framework/*.cpp
 )
 
-# ascend910_9599 aic test cases
-file(GLOB ASCENDC_TEST_ascend910_9599_AIC_CASE_SRC_FILES
+# ascend950pr_9599 aic test cases
+file(GLOB ASCENDC_TEST_ascend950pr_9599_AIC_CASE_SRC_FILES
     ascendc_case_common/test_kernel_tensor.cpp
     ascendc_case_common/test_type_check.cpp
-    ascendc_case_ascend910_9599/test_pipe_framework.cpp
-    ascendc_case_ascend910_9599/ascendc_case_ascend910_9599_aic/*.cpp
+    ascendc_case_ascend950pr_9599/test_pipe_framework.cpp
+    ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aic/*.cpp
 )
 
 # mc62cm12aa basic test cases
@@ -154,9 +154,9 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend310B1>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend610Lite>:../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_BASIC>:../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_FRAMEWORK>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_BASIC>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_FRAMEWORK>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:../common/k3_pvwrap.cpp>
@@ -174,9 +174,9 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_VEC__;__DAV_VEC__>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002;__DAV_M300__>
         $<$<STREQUAL:${product_type},ascend610Lite>:__NPU_ARCH__=3102;__DAV_M310__>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_CUBE__>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_BASIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_FRAMEWORK>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_CUBE__>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_BASIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_FRAMEWORK>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
         $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:__NPU_ARCH__=5102>
         $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:__NPU_ARCH__=5102>
         $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:__NPU_ARCH__=5102>
@@ -204,9 +204,9 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:tikicpulib::ascend910B1>
         $<$<STREQUAL:${product_type},ascend310B1>:tikicpulib::ascend310B1>
         $<$<STREQUAL:${product_type},ascend610Lite>:tikicpulib::ascend610Lite>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:tikicpulib::ascend910_9599>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_BASIC>:tikicpulib::ascend910_9599>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_FRAMEWORK>:tikicpulib::ascend910_9599>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_BASIC>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_FRAMEWORK>:tikicpulib::ascend950pr_9599>
         $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:tikicpulib::mc62cm12aa>
         $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:tikicpulib::mc62cm12aa>
         $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:tikicpulib::mc62cm12aa>

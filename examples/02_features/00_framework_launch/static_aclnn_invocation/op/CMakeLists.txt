@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 3.16.0)
 project(static_aclnn_custom_op)
 find_package(ASC REQUIRED)
 
-set(ASCEND_COMPUTE_UNIT ascend910b ascend910_93 ascend910_95)
+set(ASCEND_COMPUTE_UNIT ascend910b ascend910_93 ascend950)
 set(package_name customize CACHE STRING "custom op package name")
 
 npu_op_package(${package_name}

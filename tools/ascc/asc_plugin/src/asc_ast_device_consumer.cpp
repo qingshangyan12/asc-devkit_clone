@@ -95,7 +95,7 @@ void StoreFuncKernelType(const AscPlugin::KernelFuncInfo& kernelKey, const std::
             g_kernelFuncType[kernelKey].first = {iter->second};
             kernelTypeValid = true;
         }
-    } else if (shortSoc == ShortSocVersion::ASCEND910_95) {
+    } else if (shortSoc == ShortSocVersion::ASCEND950) {
         auto iter = KERNEL_TYPE_MAP_C310.find(kernelTypeStr);
         if (iter != KERNEL_TYPE_MAP_C310.end()) {
             g_kernelFuncType[kernelKey].first = {iter->second};
@@ -200,8 +200,8 @@ std::pair<std::unordered_set<KernelMetaType>, KfcScene> GetKernelFuncScene(const
                 return {{socDefaultKtype}, kfcFlag};   // Kfc using mix 1:2
             }
             if (g_kernelFuncType.size() == 1) {
-                // 910_95 dont support auto type deduction, use default type "mix 1:2"
-                if (shortSoc == ShortSocVersion::ASCEND910_95) {
+                // 950 dont support auto type deduction, use default type "mix 1:2"
+                if (shortSoc == ShortSocVersion::ASCEND950) {
                     ASC_LOGD("Can not find Kernel type, kernel func mangled name: %s at %s:%u, col:%u, using default "
                         "KERNEL_TYPE_MIX_AIC_1_2", kernelKey.mangledName.c_str(), kernelKey.fileName.c_str(),
                         kernelKey.lineNum, kernelKey.colNum);

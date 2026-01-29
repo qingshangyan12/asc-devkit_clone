@@ -39,7 +39,7 @@ static const char *g_core_num_aic = "24";
 static const char *g_core_num_aiv = "48";
 static const char *g_core_num_cub = "24";
 static const char *g_core_type_list = "AICore,VectorCore";
-static const char *g_chip_version = "Ascend910_95";
+static const char *g_chip_version = "Ascend950";
 static const char *g_npu_arch = "3510";
 static uint32_t g_core_num = 48;
 #else

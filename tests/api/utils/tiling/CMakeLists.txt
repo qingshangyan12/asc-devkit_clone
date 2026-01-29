@@ -19,11 +19,11 @@ set(PRODUCT_TYPE_LIST
     ascend910B1_AIV
     ascend310B1
     ascend610Lite
-    ascend910_9599_AIV_BASIC
-    ascend910_9599_AIV_FRAMEWORK
-    ascend910_9599_AIV_MICRO
-    ascend910_9599_AIV_SIMT
-    ascend910_9599_AIC
+    ascend950pr_9599_AIV_BASIC
+    ascend950pr_9599_AIV_FRAMEWORK
+    ascend950pr_9599_AIV_MICRO
+    ascend950pr_9599_AIV_SIMT
+    ascend950pr_9599_AIC
     mc62cm12aa_AIC
     mc62cm12aa_BASIC
     mc62cm12aa_FRAMEWORK
@@ -61,11 +61,11 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:__NPU_ARCH__=2201>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002>
         $<$<STREQUAL:${product_type},ascend610Lite>:__NPU_ARCH__=3102>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_BASIC>:__NPU_ARCH__=3101>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_FRAMEWORK>:__NPU_ARCH__=3101>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_MICRO>:__NPU_ARCH__=3101>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV_SIMT>:__NPU_ARCH__=3101>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:__NPU_ARCH__=3101>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_BASIC>:__NPU_ARCH__=3101>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_FRAMEWORK>:__NPU_ARCH__=3101>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_MICRO>:__NPU_ARCH__=3101>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_SIMT>:__NPU_ARCH__=3101>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3101>
         $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:__NPU_ARCH__=5102>
         $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:__NPU_ARCH__=5102>
         $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:__NPU_ARCH__=5102>

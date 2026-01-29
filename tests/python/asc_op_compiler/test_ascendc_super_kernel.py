@@ -826,7 +826,7 @@ Idx Name                              Size     VMA              Type
                     self.assertRaises(Exception, tmp.extract_sub_bin_file_of_mix_kernel, "./", "b", "c")
 
     def test_gen_super_kernel_file(self):
-        SetCurrentSocInfo("Ascend910_9599")
+        SetCurrentSocInfo("Ascend950PR_9599")
         with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"):
             with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
                 with mock.patch('json.load', return_value=op_json):
@@ -1899,7 +1899,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     self.assertEqual(res.count(indent_code_func(golden)), 3)
 
     def test_gen_super_kernel_file(self):
-        SetCurrentSocInfo("Ascend910_9599")
+        SetCurrentSocInfo("Ascend950PR_9599")
         op_options = {'split-mode': 4, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable}
         compile_log_path = "./tmp/"
         with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:
@@ -2071,7 +2071,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
 
 
     def test_gen_clear_syncall_worskspace(self):
-        SetCurrentSocInfo("Ascend910_9599")
+        SetCurrentSocInfo("Ascend950PR_9599")
         op_options = {'split-mode': 4, 'stream-fusion': SuperKernelStreamFusionMode.StreamFusionEnable}
         compile_log_path = "./tmp/"
         with mock.patch('builtins.open', new_callable=mock.mock_open, read_data='{}') as mock_open:

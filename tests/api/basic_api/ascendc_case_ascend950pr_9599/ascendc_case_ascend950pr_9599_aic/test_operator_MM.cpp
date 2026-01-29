@@ -68,15 +68,13 @@ void MainCpuCmpMmadBiasDemo(__gm__ uint8_t* __restrict__ featureGm, __gm__ uint8
 
     // feature map: l1 ->l0a load2dv2
     LOCAL_TENSOR_REGISTER(feature_l0a, Src0T, A2, 0, featureDataSize)
-    AscendC::LoadData2DParamsV2 loadDataParamsA = {0, 0, 0, 0, 0, 0, false, 0};
-    AscendC::Load2DBitModeParam loadDataBitModeParamsA(loadDataParamsA);
-    AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1>(feature_l0a, feature_l1, loadDataBitModeParamsA);
+    AscendC::LoadData2DParamsV2 loadDataParamsA = {0, 0, 0, 0, 0, 0, true, 0};
+    LoadData(feature_l0a, feature_l1, loadDataParamsA);
 
     // weight: l1 -> l0b load2dv2 with transpose
     LOCAL_TENSOR_REGISTER(weight_l0b, Src1T, B2, 0, weightDataSize)
     AscendC::LoadData2DParamsV2 loadDataParamsB = {0, 0, 0, 0, 0, 0, true, 0};
-    AscendC::Load2DBitModeParam loadDataBitModeParamsB(loadDataParamsB);
-    AscendC::LoadData<AscendC::TPosition::B2, AscendC::TPosition::B1>(weight_l0b, weight_l1, loadDataBitModeParamsB);
+    LoadData(weight_l0b, weight_l1, loadDataParamsB);
 
     // bias : gm -> l1
     LOCAL_TENSOR_REGISTER(bias_local, BiasT, C1, 0, biasDataSize)
@@ -90,14 +88,13 @@ void MainCpuCmpMmadBiasDemo(__gm__ uint8_t* __restrict__ featureGm, __gm__ uint8
     mmad_params.n = 128;
     mmad_params.cmatrixInitVal = !isBias;
     mmad_params.cmatrixSource = true; // bias in bt
-    AscendC::MmadBitModeParams mmadBitModeParams(mmad_params);
-    AscendC::Mmad<L1OutT, Src0T, Src1T>(l0c_out, feature_l0a, weight_l0b, mmadBitModeParams);
+    AscendC::Mmad<L1OutT, Src0T, Src1T>(l0c_out, feature_l0a, weight_l0b, mmad_params);
 
     // mov l0c to ub
     LOCAL_TENSOR_REGISTER(output_local, DstT, VECIN, 0, outputDataSize)
     uint16_t cburstNum = mmad_params.n / AscendC::BLOCK_CUBE;
     uint16_t burstLen = mmad_params.m * AscendC::BLOCK_CUBE * sizeof(L1OutT) / AscendC::ONE_BLK_SIZE;
-    // in 910_9599 l0c to ub nz
+    // in 950 l0c to ub nz
     AscendC::FixpipeParamsC310<AscendC::CO2Layout::NZ> fixpipeParams(mmad_params.n, mmad_params.m, mmad_params.m, mmad_params.m * AscendC::BLOCK_CUBE);
     fixpipeParams.reluEn = true;
     fixpipeParams.quantPre = GetQuantMode<DstT, L1OutT>();
@@ -107,7 +104,7 @@ void MainCpuCmpMmadBiasDemo(__gm__ uint8_t* __restrict__ featureGm, __gm__ uint8
     LOCAL_TENSOR_REGISTER(output_local_l1, DstT, A1, 0, outputDataSize)
     AscendC::Fixpipe<DstT, L1OutT, AscendC::CFG_NZ>(output_local_l1, l0c_out, fixpipeParams);
 
-    // in 910_9599 l0c to ub row_major
+    // in 950 l0c to ub row_major
     AscendC::FixpipeParamsC310<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams2(mmad_params.n, mmad_params.m, mmad_params.m, mmad_params.n);
     fixpipeParams2.dualDstCtl = 0b01;
     fixpipeParams2.quantPre = GetQuantMode<DstT, L1OutT>();
@@ -121,7 +118,7 @@ void MainCpuCmpMmadBiasDemo(__gm__ uint8_t* __restrict__ featureGm, __gm__ uint8
     SetSysWorkSpacePtr(GetSysWorkSpacePtr());
 }
 
-class TEST_MMAD_BIAS_BITMODE : public testing::Test {
+class TEST_MMAD_BIAS : public testing::Test {
 protected:
     void SetUp()
     {
@@ -133,7 +130,7 @@ protected:
     }
 };
 
-#define VEC_MMAD_BIAS_BITMODE_TESTCASE(testMmadBias, biasOp, dstType, src0Type, src1Type, L1OutT, biasT1)             \
+#define VEC_MMAD_BIAS_TESTCASE(testMmadBias, biasOp, dstType, src0Type, src1Type, L1OutT, biasT1)             \
     TEST_F(testMmadBias, MMAD_Case_Bias_##biasOp##_##dstType##_##src0Type##_##src1Type##_##L1OutT##_##biasT1) \
     {                                                                                                               \
         const int32_t featureDataSize = 3584;                                                                     \
@@ -151,19 +148,19 @@ protected:
             EXPECT_EQ(outputGlobal[i], 0x00);                                                                      \
         }                                                                                                           \
     }
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, int32_t, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, half, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, bfloat16_t, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, true, int8_t, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, uint8_t, int8_t, int8_t, int32_t, int32_t);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, true, float, half, half, float, half);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, true, float, half, half, float, float);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, true, float, float, float, float, half);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, true, float, float, float, float, float);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, true, float, bfloat16_t, bfloat16_t, float, float);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, half, fp8_e5m2_t, fp8_e5m2_t, float, float);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, bfloat16_t, fp8_e4m3fn_t, fp8_e4m3fn_t, float, float);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, int8_t, fp8_e5m2_t, fp8_e4m3fn_t, float, float);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, uint8_t, fp8_e4m3fn_t, fp8_e5m2_t, float, float);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, fp8_e4m3fn_t, fp8_e4m3fn_t, fp8_e4m3fn_t, float, float);
-VEC_MMAD_BIAS_BITMODE_TESTCASE(TEST_MMAD_BIAS_BITMODE, false, hifloat8_t, hifloat8_t, hifloat8_t, float, float);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, int32_t, int8_t, int8_t, int32_t, int32_t);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, half, int8_t, int8_t, int32_t, int32_t);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, bfloat16_t, int8_t, int8_t, int32_t, int32_t);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, true, int8_t, int8_t, int8_t, int32_t, int32_t);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, uint8_t, int8_t, int8_t, int32_t, int32_t);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, true, float, half, half, float, half);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, true, float, half, half, float, float);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, true, float, float, float, float, half);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, true, float, float, float, float, float);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, true, float, bfloat16_t, bfloat16_t, float, float);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, half, fp8_e5m2_t, fp8_e5m2_t, float, float);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, bfloat16_t, fp8_e4m3fn_t, fp8_e4m3fn_t, float, float);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, int8_t, fp8_e5m2_t, fp8_e4m3fn_t, float, float);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, uint8_t, fp8_e4m3fn_t, fp8_e5m2_t, float, float);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, fp8_e4m3fn_t, fp8_e4m3fn_t, fp8_e4m3fn_t, float, float);
+VEC_MMAD_BIAS_TESTCASE(TEST_MMAD_BIAS, false, hifloat8_t, hifloat8_t, hifloat8_t, float, float);

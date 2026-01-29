@@ -179,7 +179,7 @@ TEST_F(TestTiling, TestPlatformAscendC)
     EXPECT_EQ(plat.GetResGroupBarrierWorkSpaceSize(), static_cast<uint32_t>(-1));
     EXPECT_EQ(plat.GetSocVersion(), platform_ascendc::SocVersion::ASCEND910);
     EXPECT_EQ(plat.GetCoreNumVector(), 0);
-    platfrom_stub_set_chip_version("Ascend910_95");
+    platfrom_stub_set_chip_version("Ascend950");
     platfrom_stub_set_npuarch("3510");
     EXPECT_EQ(plat.GetLibApiWorkSpaceSize(), 16 * 1024 * 1024);
     MOCKER_CPP(&fe::PlatFormInfos::GetPlatformResWithLock,

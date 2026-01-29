@@ -374,7 +374,7 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_310P_mix_vector_core
     }, ::testing::ExitedWithCode(1), "");
 }
 
-TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_910_95) {
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_950) {
     void* funcHandle = nullptr;
     uint32_t numBlocks = 1;
     void* stream = nullptr;
@@ -382,7 +382,7 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_910_95) {
     size_t argsSize = 0;
     uint32_t ubufDynamicSize = 512;
     EXPECT_EXIT({
-        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend910_95"));
+        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend950"));
         int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
         exit(ret == 0 ? 0 : 1);
     }, ::testing::ExitedWithCode(0), "");
