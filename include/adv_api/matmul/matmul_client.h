@@ -1424,7 +1424,6 @@ public:
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_GM);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         ASSERT(cacheWorkspaceAddr);
-        ASSERT(enSequentialWrite);
         ASSERT(!isSyncGetC); // only support async
 
         if (curProcess < INC_PROCESS_CHECK) {
