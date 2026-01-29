@@ -13,18 +13,7 @@
 
 #ifndef INT4X2_T_STRUCT
 #define INT4X2_T_STRUCT
-struct int4x2_t {
-    uint8_t data;
 
-    const static uint16_t BIT_NUM = 4u;
-
-    int4x2_t operator+(const int4x2_t &other) const
-    {
-        int4x2_t tmp;
-        tmp.data = ((((data >> BIT_NUM) + (other.data >> BIT_NUM)) & 0xfu) << BIT_NUM) + ((data + other.data) & 0xfu);
-        return tmp;
-    }
-};
 #endif
 
 using vector_uint8_t = vector_u8;
@@ -41,10 +30,11 @@ using vector_float = vector_f32;
 using vector_hifloat8_t = vector_hif8;
 using vector_fp8_e4m3fn_t = vector_f8e4m3;
 using vector_fp8_e5m2_t = vector_f8e5m2;
+using vector_fp8_e8m0_t = vector_f8e8m0;
+using vector_int4x2_t = vector_s4x2;
 using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
 using vector_fp4x2_e1m2_t = vector_f4e1m2x2;
 using vector_store_align = vector_align;
 using vector_load_align = vector_align;
 using iter_reg = vector_address;
-
 #endif

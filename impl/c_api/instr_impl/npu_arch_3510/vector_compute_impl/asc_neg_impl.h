@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -13,43 +13,43 @@
  * \brief
  */
 
-#ifndef IMPL_C_API_INSTR_IMPL_VECTOR_COMPUTE_IMPL_NPU_ARCH_3510_ASC_NEG_IMPL_H
-#define IMPL_C_API_INSTR_IMPL_VECTOR_COMPUTE_IMPL_NPU_ARCH_3510_ASC_NEG_IMPL_H
+#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_ASC_NEG_IMPL_H
+#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_ASC_NEG_IMPL_H
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
 __simd_callee__ inline void asc_neg_impl(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vneg(dst, src, mask, Literal::MODE_ZEROING);
+        vneg(dst, src, mask, MODE_ZEROING);
     }
 }
 
 __simd_callee__ inline void asc_neg_impl(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vneg(dst, src, mask, Literal::MODE_ZEROING);
+        vneg(dst, src, mask, MODE_ZEROING);
     }
 }
 
 __simd_callee__ inline void asc_neg_impl(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vneg(dst, src, mask, Literal::MODE_ZEROING);
+        vneg(dst, src, mask, MODE_ZEROING);
     }
 }
 
 __simd_callee__ inline void asc_neg_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vneg(dst, src, mask, Literal::MODE_ZEROING);
+        vneg(dst, src, mask, MODE_ZEROING);
     }
 }
 
 __simd_callee__ inline void asc_neg_impl(vector_float& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vneg(dst, src, mask, Literal::MODE_ZEROING);
+        vneg(dst, src, mask, MODE_ZEROING);
     }
 }
 
