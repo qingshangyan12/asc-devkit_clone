@@ -112,7 +112,7 @@ public:
         const LocalTensor<U>& inputMean, const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX,
         const WelfordUpdateParam& para)
     {
-        DataTypeCheckFuncBasicClass::DataTypeVerifyingParameters<T, half, float>(
+        DataTypeCheckFuncBasicClass::DataTypeVerifyingParameters<T, half, float, bfloat16_t>(
             "first template parameter (T) is not half or float");
         DataTypeCheckFuncBasicClass::DataTypeVerifyingParameters<U, float>(
             "second template parameter (U) is not float");
