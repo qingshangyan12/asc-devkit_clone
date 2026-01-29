@@ -51,9 +51,17 @@
   cmake ..;make -j;             # 编译工程
   ./demo                        # 执行编译生成的可执行程序，执行样例
   ```
-  观察是否出现如下打屏
+  执行结果如下，说明执行成功。
   ```bash
+  MyAicpuKernel1 inited
+  MyAicpuKernel1 inited type 1 mode 2 len 4 end!
+  MyAicpuKernel2 inited
+  MyAicpuKernel2 inited type 0 mode 1 len 2 end!
   Hello World: int mode 2 len 4.
+  Hello World: float mode 1 len 2.
+  Hello World: int mode 2 len 4.
+  Hello World: int mode 2 len 4.
+  Hello World: float mode 1 len 2.
   Hello World: float mode 1 len 2.
   ```
 
