@@ -31,7 +31,7 @@ protected:
     }
 };
  
-template<typename T>
+template<typename T, bool USE_TOFLOAT = true>
 void MainDataTypeKernel(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __restrict__ dstGm, __gm__ int32_t dataSize)
 {
     TPipe tpipe;
@@ -45,14 +45,22 @@ void MainDataTypeKernel(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __re
         T value;
         value.val = 1;
         float res = static_cast<float>(value);
-        float res1 = value.ToFloat();
+        float res1;
+        if constexpr (USE_TOFLOAT) 
+            res1 = value.ToFloat();
+        else
+            res1 = Cast<T>(value);
         T res2{res1};
     }
     if constexpr(IsSameType<T, hifloat8_t>::value) {
         T value;
         value.val = -1;
         float res = static_cast<float>(value);
-        float res1 = value.ToFloat();
+        float res1;
+        if constexpr (USE_TOFLOAT) 
+            res1 = value.ToFloat();
+        else
+            res1 = Cast<T>(value);
         T res2{res1};
         float x = 0.5f;
         T res3{x};
@@ -89,18 +97,30 @@ void MainDataTypeKernel(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __re
     }
 }
  
-INSTANTIATE_TEST_CASE_P(TEST_DATA_COPY_AIC, TestDataTypeSuite,
+INSTANTIATE_TEST_CASE_P(TEST_DATA_COPY_AIC_TOFLOAT, TestDataTypeSuite,
     ::testing::Values(
-        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp8_e4m3fn_t> },
-        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp8_e5m2_t> },
-        TestDataTypeParams { 64, 4, MainDataTypeKernel<hifloat8_t> },
-        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp4x2_e1m2_t> },
-        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp4x2_e2m1_t> },
-        TestDataTypeParams { 64, 4, MainDataTypeKernel<half> },
-        TestDataTypeParams { 64, 4, MainDataTypeKernel<float> },
-        TestDataTypeParams { 64, 4, MainDataTypeKernel<bfloat16_t> }
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp8_e4m3fn_t, true> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp8_e5m2_t, true> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<hifloat8_t, true> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp4x2_e1m2_t, true> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp4x2_e2m1_t, true> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<half, true> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<float, true> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<bfloat16_t, true> }
     ));
- 
+
+INSTANTIATE_TEST_CASE_P(TEST_DATA_COPY_AIC_CAST, TestDataTypeSuite,
+    ::testing::Values(
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp8_e4m3fn_t, false> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp8_e5m2_t, false> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<hifloat8_t, false> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp4x2_e1m2_t, false> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<fp4x2_e2m1_t, false> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<half, false> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<float, false> },
+        TestDataTypeParams { 64, 4, MainDataTypeKernel<bfloat16_t, false> }
+    ));
+
 TEST_P(TestDataTypeSuite, TestDataCopyPadCases)
 {
     auto param = GetParam();

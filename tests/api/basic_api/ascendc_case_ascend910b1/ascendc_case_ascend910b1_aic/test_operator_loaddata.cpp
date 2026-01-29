@@ -530,7 +530,7 @@ TEST_P(E2eTestsuite, E2eCase1)
 }
 
 namespace AscendC {
-template <typename Src0T> class KernelCreatMartix {
+template <typename Src0T, bool UseFill = false> class KernelCreatMartix {
 public:
     __aicore__ inline void Init()
     {
@@ -572,15 +572,28 @@ private:
         AscendC::LocalTensor<TensorTrait<Src0T>> weightB2 = inQueueWeightB2.AllocTensor<TensorTrait<Src0T>>();
         // set repeat
         set_l3d_rpt(0);
-        // init l1
-        InitConstValue<TensorTrait<Src0T>>(featureMapA1,
-            { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(Src0T) / 32), 0, static_cast<Src0T>(1) });
-        // init l0a
-        InitConstValue<TensorTrait<Src0T>>(featureMapA2,
-            { 1, static_cast<uint16_t>(1), 0, static_cast<Src0T>(1) });
-        // init l0b
-        InitConstValue<TensorTrait<Src0T>>(weightB2,
-            { 1, static_cast<uint16_t>(1), 0, static_cast<Src0T>(1) });
+        if constexpr (UseFill) {
+            // init l1
+            Fill<TensorTrait<Src0T>>(featureMapA1,
+                { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(Src0T) / 32), 0, static_cast<Src0T>(1) });
+            // init l0a
+            Fill<TensorTrait<Src0T>>(featureMapA2,
+                { 1, static_cast<uint16_t>(1), 0, static_cast<Src0T>(1) });
+            // init l0b
+            Fill<TensorTrait<Src0T>>(weightB2,
+                { 1, static_cast<uint16_t>(1), 0, static_cast<Src0T>(1) });
+        }else{
+            // init l1
+            InitConstValue<TensorTrait<Src0T>>(featureMapA1,
+                { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(Src0T) / 32), 0, static_cast<Src0T>(1) });
+            // init l0a
+            InitConstValue<TensorTrait<Src0T>>(featureMapA2,
+                { 1, static_cast<uint16_t>(1), 0, static_cast<Src0T>(1) });
+            // init l0b
+            InitConstValue<TensorTrait<Src0T>>(weightB2,
+                { 1, static_cast<uint16_t>(1), 0, static_cast<Src0T>(1) });
+        }
+
         inQueueFmA1.FreeTensor(featureMapA1);
         inQueueFmA2.FreeTensor(featureMapA2);
         inQueueWeightB2.FreeTensor(weightB2);
@@ -607,7 +620,15 @@ private:
 template <typename Src0T>
 __global__ __aicore__ void CreatMartixAscendC()
 {
-    AscendC::KernelCreatMartix<Src0T> op;
+    AscendC::KernelCreatMartix<Src0T, false> op;
+    op.Init();
+    op.Process();
+}
+
+template <typename Src0T>
+__global__ __aicore__ void FillAscendC()
+{
+    AscendC::KernelCreatMartix<Src0T, true> op;
     op.Init();
     op.Process();
 }
@@ -643,6 +664,16 @@ INSTANTIATE_TEST_CASE_P(SetCreatmartixTest, CreatmartixTestsuite,
     CreatmartixTestParams { 192, 32, 64, CreatMartixAscendC<float>, 4 }
     ));
 
+INSTANTIATE_TEST_CASE_P(SetFillTest, CreatmartixTestsuite,
+    ::testing::Values(CreatmartixTestParams { 192, 32, 64, FillAscendC<half>, 2 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<int16_t>, 2 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<uint16_t>, 2 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<bfloat16_t>, 2 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<int32_t>, 4 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<uint32_t>, 4 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<float>, 4 }
+    ));
+    
 TEST_P(CreatmartixTestsuite, CreatmartixTest)
 {
     auto param = GetParam();

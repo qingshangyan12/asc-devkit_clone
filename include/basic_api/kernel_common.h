@@ -161,19 +161,24 @@ __aicore__ inline void SetMaskNorm()
     SetMaskNormImpl();
 }
 
-__aicore__ inline void SetHF32Mode(bool hf32Mode)
+__aicore__ inline void SetHF32Mode(HF32Mode mode)
 {
-    SetHF32ModeImpl(hf32Mode);
+    SetHF32ModeImpl(mode == HF32Mode::Enable);
 }
 
-__aicore__ inline void SetHF32TransMode(bool hf32TransMode)
+__aicore__ inline void SetHF32TransMode(HF32TransMode mode)
 {
-    SetHF32TransModeImpl(hf32TransMode);
+    SetHF32TransModeImpl(mode == HF32TransMode::Enable);
 }
 
-__aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode)
+__aicore__ inline void SetMMRowMajor()
 {
-    SetMMLayoutTransformImpl(mmLayoutMode);
+    SetMMLayoutTransformImpl(false);
+}
+
+__aicore__ inline void SetMMColumnMajor()
+{
+    SetMMLayoutTransformImpl(true);
 }
 
 template <uint32_t index>

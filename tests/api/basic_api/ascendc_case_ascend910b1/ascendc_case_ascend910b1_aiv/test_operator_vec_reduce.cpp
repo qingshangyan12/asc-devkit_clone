@@ -408,6 +408,68 @@ TEST_F(ReduceSimpleTestsuite, GetMaxMinCntCase)
 
     PipeBarrier<PIPE_ALL>();
 }
+TEST_F(ReduceSimpleTestsuite, GetReduceRepeatMaxMinSprCase)
+{
+    int32_t srcDataSize = 64;
+    int32_t dstDataSize = 16;
+    int32_t dtypeSize = 4;
+
+    uint8_t srcGm[srcDataSize * dtypeSize];
+    uint8_t dstGm[dstDataSize * dtypeSize];
+    TPipe tpipe;
+    int32_t mask = 64;
+    int32_t repStride = 8;
+    int32_t repeat = srcDataSize / mask;
+
+    GlobalTensor<float> inputGlobal;
+    GlobalTensor<float> outputGlobal;
+    inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ float*>(srcGm), srcDataSize);
+    outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ float*>(dstGm), dstDataSize);
+
+    TBuf<TPosition::VECCALC> tbuf1;
+    tpipe.InitBuffer(tbuf1, srcDataSize * sizeof(float));
+    LocalTensor<float> inputLocal = tbuf1.Get<float>();
+
+    TBuf<TPosition::VECCALC> tbuf2;
+    tpipe.InitBuffer(tbuf2, dstDataSize * sizeof(float));
+    LocalTensor<float> outputLocal = tbuf2.Get<float>();
+
+    TBuf<TPosition::VECCALC> tbuf3;
+    tpipe.InitBuffer(tbuf3, repeat * repStride);
+    LocalTensor<float> workLocal = tbuf3.Get<float>();
+
+    DataCopy(inputLocal, inputGlobal, srcDataSize);
+    event_t eventIdMte2ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_V));
+    SetFlag<HardEvent::MTE2_V>(eventIdMte2ToV);
+    WaitFlag<HardEvent::MTE2_V>(eventIdMte2ToV);
+
+    WholeReduceMax<float>(outputLocal, inputLocal, mask, repeat, 1, 1, repStride, ReduceOrder::ORDER_VALUE_INDEX);
+
+    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
+    SetFlag<HardEvent::V_S>(eventIdVToS);
+    WaitFlag<HardEvent::V_S>(eventIdVToS);
+
+    uint32_t maxMinVal = 0;
+    uint32_t maxMinIdx = 0;
+    GetReduceRepeatMaxMinSpr<float>(maxMinVal, maxMinIdx);
+    EXPECT_EQ(maxMinVal, 0x0);
+    EXPECT_EQ(maxMinIdx, 0x0);
+
+    float maxMinFp32Val = 0;
+    float maxMinFp32Idx = 0;
+    GetReduceRepeatMaxMinSpr<float>(maxMinFp32Val, maxMinFp32Idx);
+    EXPECT_EQ(maxMinFp32Val, 0x0);
+    EXPECT_EQ(maxMinFp32Idx, 0x0);
+
+    event_t eventIdSToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
+    SetFlag<HardEvent::S_MTE3>(eventIdSToMte3);
+    WaitFlag<HardEvent::S_MTE3>(eventIdSToMte3);
+
+    DataCopy(outputGlobal, outputLocal, dstDataSize);
+
+    PipeBarrier<PIPE_ALL>();
+}
+
 template <typename T>
 __global__ __aicore__ void MainRepeatReduceSum(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __restrict__ srcGm,
     const int32_t repeat, const int32_t elemsInOneRepeate, const int32_t dstBlkStride, const int32_t srcBlkStride,

@@ -103,6 +103,16 @@ private:
             MulCast(dstLocalX, srcLocalX, srcLocalY, calCount);
         #elif vF == 13
             FusedMulAddRelu(dstLocalX, srcLocalX, srcLocalY, calCount);
+        #elif vF == 14
+            T scalar = srcLocalX.GetValue(0);
+            MulsCast(dstLocalX, scalar, srcLocalY, calCount);
+        #elif vF == 15
+            T scalar = srcLocalY.GetValue(0);
+            MulsCast(dstLocalX, srcLocalX, scalar, calCount);
+        #elif VF == 16
+            AbsSub(dstLocalX, srcLocalX, srcLocalY, calCount);
+        #elif vF == 17
+            MulAddRelu(dstLocalX, srcLocalX, srcLocalY, calCount);
         #endif
         #endif
         outQueueX.EnQue<U>(dstLocalX);
@@ -187,6 +197,12 @@ INSTANTIATE_TEST_CASE_P(MicroVecBinaryTestCases, MicroVecBinaryTestSuite,
                       MicroVecBinaryParams { RunCase<int64_t, int64_t, 12>},
                       MicroVecBinaryParams { RunCase<uint64_t, uint64_t, 13>},
                       MicroVecBinaryParams { RunCase<int64_t, int64_t, 13>},
+                      MicroVecBinaryParams { RunCase<float, half, 14>},
+                      MicroVecBinaryParams { RunCase<float, half, 15>},
+                      MicroVecBinaryParams { RunCase<half, half, 16>},
+                      MicroVecBinaryParams { RunCase<float, float, 16>},
+                      MicroVecBinaryParams { RunCase<uint64_t, uint64_t, 17>},
+                      MicroVecBinaryParams { RunCase<int64_t, int64_t, 17>},
                       // TensorTrait Case
                       MicroVecBinaryParams { RunCase<TensorTrait<half>, TensorTrait<half>, 1>},
                       MicroVecBinaryParams { RunCase<TensorTrait<float>, TensorTrait<float>, 1>},

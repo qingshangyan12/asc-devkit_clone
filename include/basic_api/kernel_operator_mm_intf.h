@@ -297,10 +297,10 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(const LocalTensor<T> &
     const uint8_t dstGap);
 
 /* **************************************************************************************************
- * InitConstValue                                             *
+ * Fill                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup InitConstValue
+ * @ingroup Fill
  * @brief L0A/L0B/L1 value initializing
  * @param [out] dst output LocalTensor
  * @param [in] InitConstValueParams.repeatTimes repeat times
@@ -310,8 +310,9 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(const LocalTensor<T> &
  */
 template <typename T, typename U = PrimT<T>,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-__aicore__ inline void InitConstValue(const LocalTensor<T> &dst,
+__aicore__ inline void Fill(const LocalTensor<T> &dst,
     const InitConstValueParams<U> &initConstValueParams);
+    
 /* **************************************************************************************************
  * SetLoadDataPaddingValue                                             *
  * ************************************************************************************************* */

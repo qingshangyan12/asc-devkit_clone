@@ -37,7 +37,7 @@ protected:
     }
 };
 
-template <typename T>
+template <typename T, bool USE_COMPARES>
 void MainVecCompareLevel2Demo(__gm__ uint8_t* __restrict__ dstGm,
     __gm__ uint8_t* __restrict__ src0Gm, uint32_t dataSize)
 {
@@ -59,16 +59,28 @@ void MainVecCompareLevel2Demo(__gm__ uint8_t* __restrict__ dstGm,
 
     set_flag(PIPE_MTE2, PIPE_V, EVENT_ID0);
     wait_flag(PIPE_MTE2, PIPE_V, EVENT_ID0);
-
-    if constexpr (AscendC::IsSameType<T, int32_t>::value) {
-        CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::EQ, dataSize);
-    } else {
-        CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::EQ, dataSize);
-        CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::NE, dataSize);
-        CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::GT, dataSize);
-        CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::GE, dataSize);
-        CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::LT, dataSize);
-        CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::LE, dataSize);
+    if constexpr (USE_COMPARES){
+        if constexpr (AscendC::IsSameType<T, int32_t>::value) {
+            Compares(outputLocal, input0Local, static_cast<T>(0), CMPMODE::EQ, dataSize);
+        } else {
+            Compares(outputLocal, input0Local, static_cast<T>(0), CMPMODE::EQ, dataSize);
+            Compares(outputLocal, input0Local, static_cast<T>(0), CMPMODE::NE, dataSize);
+            Compares(outputLocal, input0Local, static_cast<T>(0), CMPMODE::GT, dataSize);
+            Compares(outputLocal, input0Local, static_cast<T>(0), CMPMODE::GE, dataSize);
+            Compares(outputLocal, input0Local, static_cast<T>(0), CMPMODE::LT, dataSize);
+            Compares(outputLocal, input0Local, static_cast<T>(0), CMPMODE::LE, dataSize);
+        }
+    }else{
+        if constexpr (AscendC::IsSameType<T, int32_t>::value) {
+            CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::EQ, dataSize);
+        } else {
+            CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::EQ, dataSize);
+            CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::NE, dataSize);
+            CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::GT, dataSize);
+            CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::GE, dataSize);
+            CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::LT, dataSize);
+            CompareScalar(outputLocal, input0Local, static_cast<T>(0), CMPMODE::LE, dataSize);
+        }
     }
 
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
@@ -87,7 +99,20 @@ void MainVecCompareLevel2Demo(__gm__ uint8_t* __restrict__ dstGm,
         uint8_t input0Gm[dataSize * sizeof(dataType)] = {0};                         \
         uint8_t outputGm[dataSize * sizeof(uint8_t)] = {0};                          \
                                                                                      \
-        MainVecCompareLevel2Demo<dataType>(outputGm, input0Gm, dataSize);            \
+        MainVecCompareLevel2Demo<dataType, false>(outputGm, input0Gm, dataSize);     \
+                                                                                     \
+        for (uint32_t i = 0; i < dataSize; i++) {                                    \
+            EXPECT_EQ(outputGm[i], 0x00);                                            \
+        }                                                                            \
+    }                                                                                \
+    TEST_F(TEST_COMPARE, Compares##dataType##Case)                                   \
+    {                                                                                \
+        uint32_t dataSize = 256;                                                     \
+        uint32_t selMaskSize = dataSize / AscendCUtils::GetBitSize(sizeof(uint8_t)); \
+        uint8_t input0Gm[dataSize * sizeof(dataType)] = {0};                         \
+        uint8_t outputGm[dataSize * sizeof(uint8_t)] = {0};                          \
+                                                                                     \
+        MainVecCompareLevel2Demo<dataType, true>(outputGm, input0Gm, dataSize);      \
                                                                                      \
         for (uint32_t i = 0; i < dataSize; i++) {                                    \
             EXPECT_EQ(outputGm[i], 0x00);                                            \

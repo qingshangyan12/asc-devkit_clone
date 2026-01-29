@@ -352,6 +352,61 @@ TEST_F(ReduceSimpleTestsuite, GetMaxMinCntCase)
 
     pipe_barrier(PIPE_ALL);
 }
+TEST_F(ReduceSimpleTestsuite, GetReduceRepeatMaxMinSprCase)
+{
+    int32_t srcDataSize = 64;
+    int32_t dstDataSize = 16;
+    int32_t dtypeSize = 4;
+
+    uint8_t srcGm[srcDataSize * dtypeSize];
+    uint8_t dstGm[dstDataSize * dtypeSize];
+    TPipe tpipe;
+    int32_t mask = 64;
+    int32_t repStride = 8;
+    int32_t repeat = srcDataSize / mask;
+
+    GlobalTensor<float> inputGlobal;
+    GlobalTensor<float> outputGlobal;
+    inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ float*>(srcGm), srcDataSize);
+    outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ float*>(dstGm), dstDataSize);
+
+    TBuf<TPosition::VECCALC> tbuf;
+    tpipe.InitBuffer(tbuf, srcDataSize * sizeof(float));
+    LocalTensor<float> inputLocal = tbuf.Get<float>();
+
+    TBuf<TPosition::VECCALC> tbuf1;
+    tpipe.InitBuffer(tbuf1, dstDataSize * sizeof(float));
+    LocalTensor<float> outputLocal = tbuf1.Get<float>();
+
+    TBuf<TPosition::VECCALC> tbuf2;
+    tpipe.InitBuffer(tbuf2, AlignUp(repeat * 3 * sizeof(float), ONE_BLK_SIZE));
+    LocalTensor<float> workLocal = tbuf2.Get<float>();
+
+    DataCopy(inputLocal, inputGlobal, srcDataSize);
+
+    set_flag(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    wait_flag(PIPE_MTE2, PIPE_V, EVENT_ID0);
+
+    WholeReduceMax<float>(outputLocal, inputLocal, mask, repeat, 1, 1, repStride, ReduceOrder::ORDER_VALUE_INDEX);
+
+    set_flag(PIPE_V, PIPE_S, EVENT_ID0);
+    wait_flag(PIPE_V, PIPE_S, EVENT_ID0);
+
+    uint32_t maxMinVal = 0;
+    GetReduceRepeatMaxMinSpr<float>(maxMinVal);
+    EXPECT_EQ(maxMinVal, 0x0);
+
+    float maxMinFp32Val = 0;
+    GetReduceRepeatMaxMinSpr<float>(maxMinFp32Val);
+    EXPECT_EQ(maxMinFp32Val, 0x0);
+
+    set_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
+    wait_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
+
+    DataCopy(outputGlobal, outputLocal, dstDataSize);
+
+    pipe_barrier(PIPE_ALL);
+}
 template <typename T>
 __global__ __aicore__ void MainRepeatReduceSum(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __restrict__ srcGm,
     const int32_t repeat, const int32_t elemsInOneRepeate, const int32_t dstBlkStride, const int32_t srcBlkStride,

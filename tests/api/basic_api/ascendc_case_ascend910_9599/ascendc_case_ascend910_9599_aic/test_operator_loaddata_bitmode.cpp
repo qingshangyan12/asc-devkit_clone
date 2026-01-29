@@ -568,7 +568,7 @@ INSTANTIATE_TEST_CASE_P(TEST_OPEARATION_DATACOPYGM2L1ND2NZ, DataCopyGm2L1Nd2NzTe
     DataCopyGm2L1Nd2NzTestParams { 4, MainDataCopyGm2L1Nd2Nz<float>, { 2, 2, 13, 48, 16, 11, 2, 40 } }));
 
 namespace AscendC {
-template <typename Src0T> class KernelCreatMartix {
+template <typename Src0T, bool UseFill = false> class KernelCreatMartix {
 public:
     __aicore__ inline void Init()
     {
@@ -605,8 +605,14 @@ private:
         // set repeat
         set_l3d_rpt(0);
         // init l1
-        InitConstValue<Src0T>(featureMapA1,
-            { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(Src0T) / 32), 0, static_cast<Src0T>(1) });
+        if constexpr (UseFill) {
+            Fill<Src0T>(featureMapA1,
+                { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(Src0T) / 32), 0, static_cast<Src0T>(1) });
+        }else{
+            InitConstValue<Src0T>(featureMapA1,
+                { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(Src0T) / 32), 0, static_cast<Src0T>(1) });
+        }
+        
         inQueueFmA1.FreeTensor(featureMapA1);
     }
 
@@ -629,7 +635,15 @@ private:
 template <typename Src0T>
 __global__ __aicore__ void creat_martix_AscendC()
 {
-    KernelCreatMartix<Src0T> op;
+    KernelCreatMartix<Src0T, false> op;
+    op.Init();
+    op.Process();
+}
+
+template <typename Src0T>
+__global__ __aicore__ void FillAscendC()
+{
+    AscendC::KernelCreatMartix<Src0T, true> op;
     op.Init();
     op.Process();
 }
@@ -662,4 +676,14 @@ INSTANTIATE_TEST_CASE_P(SetCreatmartixTest, CreatmartixTestsuite,
     CreatmartixTestParams { 192, 32, 64, creat_martix_AscendC<int32_t>, 4 },
     CreatmartixTestParams { 192, 32, 64, creat_martix_AscendC<uint32_t>, 4 },
     CreatmartixTestParams { 192, 32, 64, creat_martix_AscendC<float>, 4 }
+    ));
+
+INSTANTIATE_TEST_CASE_P(SetFillTest, CreatmartixTestsuite,
+    ::testing::Values(CreatmartixTestParams { 192, 32, 64, FillAscendC<half>, 2 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<int16_t>, 2 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<uint16_t>, 2 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<bfloat16_t>, 2 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<int32_t>, 4 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<uint32_t>, 4 },
+    CreatmartixTestParams { 192, 32, 64, FillAscendC<float>, 4 }
     ));
