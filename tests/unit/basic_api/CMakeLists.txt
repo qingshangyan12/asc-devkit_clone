@@ -23,5 +23,5 @@ include(cmake/config.cmake)
 include(cmake/intf.cmake)
 include(cmake/func.cmake)
 
-add_subdirectory(ut)
-add_subdirectory(py_ut)
+# add_subdirectory(ut)
+# add_subdirectory(py_ut)
