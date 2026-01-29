@@ -22,7 +22,7 @@
 - AI CPU算子与AI Core算子在不同stream上进行launch，样例中分别为stream与stream2，event用于记录stream上已下发的任务。使用aclrtRecordEvent在指定stream中记录event，使用aclrtStreamWaitEvent阻塞指定的stream，直到指定的event完成。
 
 ## 编译运行
-- 配置环境变量  
+- 配置环境变量
   以命令行方式下载样例代码，master分支为例。
   ```bash
   cd ${git_clone_path}/examples/04_best_practices/01_aicpu_device_tiling
@@ -51,9 +51,17 @@
   cmake ..;make -j;             # 编译工程
   ./demo                        # 执行编译生成的可执行程序，执行样例
   ```
-  观察是否出现如下打屏
+  执行结果如下，说明执行成功。
   ```bash
+  MyAicpuKernel1 inited
+  MyAicpuKernel1 inited type 1 mode 2 len 4 end!
+  MyAicpuKernel2 inited
+  MyAicpuKernel2 inited type 0 mode 1 len 2 end!
   Hello World: int mode 2 len 4.
+  Hello World: float mode 1 len 2.
+  Hello World: int mode 2 len 4.
+  Hello World: int mode 2 len 4.
+  Hello World: float mode 1 len 2.
   Hello World: float mode 1 len 2.
   ```
 
