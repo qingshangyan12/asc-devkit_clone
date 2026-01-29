@@ -8,12 +8,12 @@
 | Ascend 950PR/Ascend 950DT | √ |
 ## 功能说明
 
-给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中，解交织排列方式如下图所示，其中每个方格代表1个元素：
-
+给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。操作数为Mask时，不同数据类型的尽快决定了交织的位宽大小，例如int32_t(b32)类型，交织时以4bit为一组。
 
 ## 函数原型
 
 ```cpp
+// 普通模式
 __simd_callee__ inline void asc_deintlv(vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1)
 __simd_callee__ inline void asc_deintlv(vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1)
 __simd_callee__ inline void asc_deintlv(vector_int16_t& dst0, vector_int16_t& dst1, vector_int16_t src0, vector_int16_t src1)
@@ -26,7 +26,10 @@ __simd_callee__ inline void asc_deintlv(vector_fp8_e8m0_t& dst0, vector_fp8_e8m0
 __simd_callee__ inline void asc_deintlv(vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0, vector_bfloat16_t src1)
 __simd_callee__ inline void asc_deintlv(vector_float& dst0, vector_float& dst1, vector_float src0, vector_float src1)
 __simd_callee__ inline void asc_deintlv(vector_half& dst0, vector_half& dst1, vector_half src0, vector_half src1)
-
+// 操作数为Mask
+__simd_callee__ inline void asc_deintlv_b8(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1)
+__simd_callee__ inline void asc_deintlv_b16(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1)
+__simd_callee__ inline void asc_deintlv_b32(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1)
 ```
 
 ## 参数说明
