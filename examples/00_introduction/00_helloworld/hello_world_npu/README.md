@@ -1,20 +1,24 @@
-# Aicpu算子直调样例
+# HelloWorld算子直调样例
+
 ## 概述
-本样例介绍了基于Ascend C的AI CPU算子的核函数直调方法，演示了HelloWorld。
+
+本样例通过使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，核函数内通过printf打印输出结果。
 
 ## 支持的产品
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-## 目录结构介绍
-```
 
-├── 12_aicpu
+## 目录结构介绍
+
+```
+├── hello_world_npu
 │   ├── CMakeLists.txt      // 编译工程文件
-│   ├── hello_world.aicpu   // AI CPU算子实现
-|   └── main.asc            // AI CPU算子调用
+│   └── hello_world.asc     // Ascend C算子实现 & 调用样例
 ```
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
@@ -32,7 +36,7 @@
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
+
 - 样例执行
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
@@ -41,5 +45,12 @@
   ```
   执行结果如下，说明执行成功。
   ```bash
-  Hello World!!!
+  [Block (0/8)]: Hello World!!!
+  [Block (1/8)]: Hello World!!!
+  [Block (2/8)]: Hello World!!!
+  [Block (3/8)]: Hello World!!!
+  [Block (4/8)]: Hello World!!!
+  [Block (5/8)]: Hello World!!!
+  [Block (6/8)]: Hello World!!!
+  [Block (7/8)]: Hello World!!!
   ```

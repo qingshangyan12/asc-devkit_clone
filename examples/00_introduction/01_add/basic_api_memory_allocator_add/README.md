@@ -1,12 +1,16 @@
 # Add算子直调样例
+
 ## 概述
+
 本样例演示基于静态Tensor编程模型的Add算子实现，该实现采用LocalMemAllocator内存分配器简化代码逻辑，特别适用于Bank冲突不敏感场景。
 
 ## 支持的产品
-- Ascend 950PR/Ascend 950DT
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
 ## 目录结构介绍
+
 ```
 ├── basic_api_memory_allocator_add
 │   └── scripts
@@ -18,6 +22,7 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
 
   算子实现的是固定shape为72×4096的Add算子。
@@ -67,8 +72,9 @@
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash

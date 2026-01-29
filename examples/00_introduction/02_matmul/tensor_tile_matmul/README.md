@@ -1,18 +1,26 @@
 # TensorTile直调样例
+
 ## 概述
+
 本样例介绍TensorTile端到端用例的核函数直调方法，算子支持单核运行。
+
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
+
 ## 目录结构介绍
+
 ```
-├── 12_tensortile
+├── tensor_tile_matmul
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   └── tensor_tile_custom.asc  // Ascend C算子实现 & 调用样例
 ```
+
 ## 算子描述
+
 - 算子功能：  
   TensorTile端到端用例，实现一个matmul计算
 - 算子规格：
@@ -41,8 +49,9 @@
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
