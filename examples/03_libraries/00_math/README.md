@@ -22,6 +22,8 @@
 | [axpy_half_half](./axpy_half_half) | 本样例基于Axpy实现源操作数src中每个元素与标量求积后和目的操作数dst中的对应元素相加的功能。Axpy接口的源操作数和目的操作数的数据类型只能取三种组合：(half, half)、(float, float)、(half, float)。本样例中输入tensor、标量、输出tensor数据类型均为half。本样例通过Ascend C编程语言实现了Axpy算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现 | 
 | [ceil](./ceil) | 本样例演示了基于Ceil高阶API的算子实现。样例获取大于或等于x的最小的整数值，即向正无穷取整操作 |
 | [clamp](./clamp) | 本样例演示了基于Clamp高阶API的算子实现。将输入中非nan且超出[min, max]范围的值剪裁至max或min，若min>max，则所有非nan值均置为max |
+| [clampmax](./clampmax) | 本样例演示了基于ClampMax高阶API的算子实现。样例将srcTensor中大于scalar的数替换为scalar，小于等于scalar的数保持不变，作为dstTensor输出 |
+| [clampmin](./clampmin) | 本样例演示了基于ClampMin高阶API的算子实现。样例将srcTensor中小于scalar的数替换为scalar，大于等于scalar的数保持不变，作为dstTensor输出 |
 | [cos](./cos) | 本样例介绍了调用Cos高阶API实现cos算子，并按照核函数直调的方式给出了对应的端到端实现 |
 | [cosh](./cosh) | 本样例演示了基于Cosh高阶API的算子实现。样例按元素做双曲余弦函数计算 |
 | [cumsum](./cumsum) | 本样例介绍了调用CumSum高阶API实现cumsum单算子，用于对输入张量按行或列进行累加和操作 |
@@ -35,7 +37,6 @@
 | [isfinite](./isfinite) | 本样例演示了基于IsFinite高阶API的算子实现。样例按元素判断输入的浮点数是否非NAN、非INF，输出结果为浮点数或者布尔值 |
 | [isinf](./isinf) | 本样例演示了基于IsInf高阶API的算子实现。样例按元素判断输入的浮点数是否为 $\pm$ inf，输出结果为浮点数或布尔值 |
 | [isnan](./isnan) | 本样例演示了基于IsNan高阶API的算子实现。样例按元素判断输入的浮点数是否为nan，输出结果为浮点数或布尔值 |
-| [leaky_relu](./leaky_relu) | 本样例基于LeakyRelu实现激活函数，可用于对输入tensor按元素执行Leaky Relu（Leaky Rectified Liner Unit）操作。本样例通过Ascend C编程语言实现了LeakyRelu算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。 |
 | [lgamma](./lgamma) | 本样例演示了基于Lgamma高阶API的算子实现。样例按元素计算x的gamma函数的绝对值并求自然对数 |
 | [log](./log) | 本样例演示了基于Log高阶API的算子实现。样例按元素以e、2、10为底做对数运算 |
 | [logicaland](./logicaland) | 本样例演示了基于LogicalAnd高阶API的算子实现。样例按元素进行与操作，输入数据类型不是bool时，零被视为False，非零数据被视为True |

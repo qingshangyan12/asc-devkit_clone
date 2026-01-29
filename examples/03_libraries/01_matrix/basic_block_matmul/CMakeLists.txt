@@ -10,12 +10,12 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-find_package(ASC REQUIRED HINTS $ENV{ASCEND_INSTALL_PATH}/compiler/tikcpp/ascendc_kernel_cmake)
+find_package(ASC REQUIRED HINTS $ENV{ASCEND_HOME_PATH}/lib64/cmake)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    leaky_relu.asc
+    matmul.asc
 )
 
 target_link_libraries(demo PRIVATE
