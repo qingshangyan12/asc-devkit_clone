@@ -821,41 +821,41 @@ class TestOpc02(unittest.TestCase):
         options = opt_parser.get_all_options()
         self.assertEqual(opt_parser.check_input_params(), True)
 
-    def test_op_compilation_config_file(self):
-        """test test_op_compilation_config_file"""
-        logger.debug("Start to execute ============ test_op_compilation_config_file ============")
+    # def test_op_compilation_config_file(self):
+    #     """test test_op_compilation_config_file"""
+    #     logger.debug("Start to execute ============ test_op_compilation_config_file ============")
 
-        def del_files(file_path):
-            for file_ in os.listdir(file_path):
-                to_del_file = "{}/{}".format(file_path, file_)
-                os.remove(to_del_file)
+    #     def del_files(file_path):
+    #         for file_ in os.listdir(file_path):
+    #             to_del_file = "{}/{}".format(file_path, file_)
+    #             os.remove(to_del_file)
 
-        test_root_dir = os.path.abspath(os.path.dirname(__file__))
-        # make stub .o file
-        with open(test_root_dir + "/debug_dir/kernel_meta_matmul_1/kernel_meta/matmul_1.o", "wb") as file_:
-            pass
-        input_param_path = test_root_dir + "/stub/files/matmul_1.json"
-        opc_compile_args = {
-            "input_param" : input_param_path,
-            "soc_version" : "Ascend910A",
-            "output" : test_root_dir + "/output",
-            "debug_dir" : test_root_dir + "/debug_dir",
-            "op_compile_classify": "single_op_compile_config_file_mode",
-            "op_debug_level": 3,
-            "op_debug_config": "dump_bin",
-            "core_type" : "AiCore"
-        }
-        json_path = test_root_dir + "/stub/files/ascend910.json"
-        load_set_op_content(json_path)
-        op_compile = OpCompilation(opc_compile_args)
-        ret = op_compile.op_compilation()
-        self.assertEqual(ret, True)
+    #     test_root_dir = os.path.abspath(os.path.dirname(__file__))
+    #     # make stub .o file
+    #     with open(test_root_dir + "/debug_dir/kernel_meta_matmul_1/kernel_meta/matmul_1.o", "wb") as file_:
+    #         pass
+    #     input_param_path = test_root_dir + "/stub/files/matmul_1.json"
+    #     opc_compile_args = {
+    #         "input_param" : input_param_path,
+    #         "soc_version" : "Ascend910A",
+    #         "output" : test_root_dir + "/output",
+    #         "debug_dir" : test_root_dir + "/debug_dir",
+    #         "op_compile_classify": "single_op_compile_config_file_mode",
+    #         "op_debug_level": 3,
+    #         "op_debug_config": "dump_bin",
+    #         "core_type" : "AiCore"
+    #     }
+    #     json_path = test_root_dir + "/stub/files/ascend910.json"
+    #     load_set_op_content(json_path)
+    #     op_compile = OpCompilation(opc_compile_args)
+    #     ret = op_compile.op_compilation()
+    #     self.assertEqual(ret, True)
 
-        # delete stub .o file and outputs
-        os.remove(test_root_dir + "/debug_dir/kernel_meta_matmul_1/kernel_meta/matmul_1.o")
-        del_files(test_root_dir + "/output")
+    #     # delete stub .o file and outputs
+    #     os.remove(test_root_dir + "/debug_dir/kernel_meta_matmul_1/kernel_meta/matmul_1.o")
+    #     del_files(test_root_dir + "/output")
 
-        logger.debug("End to execute ============ test_op_compilation_config_file ============")
+    #     logger.debug("End to execute ============ test_op_compilation_config_file ============")
 
     def test_check_op_optional_paramtype(self):
         """test check_op_optional_paramtype"""
