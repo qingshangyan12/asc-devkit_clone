@@ -24,3 +24,7 @@ endif ()
 if (${TEST_MOD} STREQUAL "all" OR NOT ${TEST_MOD} STREQUAL "adv")
   add_subdirectory(basic_api)
 endif ()
+
+if (${TEST_MOD} STREQUAL "all" OR NOT ${TEST_MOD} STREQUAL "adv")
+  add_subdirectory(simt_api)
+endif ()
