@@ -1,8 +1,8 @@
-# Aicpu算子直调样例
+# AI CPU算子直调样例
 
 ## 概述
 
-本样例介绍了基于Ascend C的AI CPU算子的核函数直调方法，演示了HelloWorld。
+本样例介绍了基于Ascend C的AI CPU算子的核函数直调方法，算子实现简单的HelloWorld打印功能。
 
 ## 支持的产品
 

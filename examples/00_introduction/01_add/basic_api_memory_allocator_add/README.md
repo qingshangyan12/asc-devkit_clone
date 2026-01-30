@@ -51,10 +51,10 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom_v1 / add_custom_v2 / add_custom_v3 / add_custom_v4</td></tr>
   </table>
 
-- 算子实现：
+- 算子实现：  
   本样例中实现的是固定shape为72*4096的Add算子。
   
-  - kernel实现
+  - Kernel实现
   
     Add算子的数学表达式为：
   

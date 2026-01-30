@@ -8,5 +8,5 @@
 
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| [hello_world_aicpu](./hello_world_aicpu) | 本样例介绍了基于Ascend C的AI CPU算子的核函数直调方法，演示了HelloWorld |
+| [hello_world_aicpu](./hello_world_aicpu) | 本样例介绍了基于Ascend C的AI CPU算子的核函数直调方法 |
 | [hello_world_npu](./hello_world_npu) | 本样例通过使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，核函数内通过printf打印输出结果 |
