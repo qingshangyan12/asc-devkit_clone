@@ -1,15 +1,9 @@
 # MicroApiAdd样例
-
 ## 概述
-
 本样例基于Ascend C微指令API编程模型，演示Add算子的底层寄存器级实现。通过直接操作Vector计算单元的寄存器，实现对半精度（half）数据的加法运算，支持单核运行模式。该实现突破了基础API对LocalTensor的依赖限制，允许直接操作RegTensor和MaskReg寄存器，适用于需要极致性能优化的场景。
-
 ## 支持的产品
-
 - Ascend 950PR/Ascend 950DT
-
 ## 目录结构介绍
-
 ```
 ├── micro_api_add
 │   ├── scripts
@@ -19,9 +13,7 @@
 │   ├── data_utils.h                // 数据读入写出函数
 │   └── micro_api_add_custom.asc    // Ascend C算子实现 & 调用样例
 ```
-
 ## 算子描述
-
 - 算子功能：  
   Add算子实现了两个数据相加，返回相加结果的功能。对应的数学表达式为：
   ```
@@ -41,6 +33,10 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
   </table>
 - 算子实现：  
+  Add算子的数学表达式为：
+  ```
+  z = x + y
+  ```
   计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。  
 
   Add算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm和yGm搬运到Local Memory，分别存储在xLocal、yLocal，Compute任务负责对xLocal、yLocal执行加法操作，计算结果存储在zLocal中，CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
@@ -49,9 +45,7 @@
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
-
 ## 编译运行
-
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。

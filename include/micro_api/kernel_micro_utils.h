@@ -161,7 +161,7 @@ enum class HistogramsBinType {
     BIN6,
     BIN7
 };
-
+ 
 enum class HistogramsType {
     FREQUENCY = 0,
     ACCUMULATE

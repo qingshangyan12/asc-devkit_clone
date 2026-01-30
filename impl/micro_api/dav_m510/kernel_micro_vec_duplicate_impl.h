@@ -220,7 +220,7 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
                                fp8_e4m3fn_t, fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float,
                                half, uint64_t, int64_t, complex32, complex64>()),
                   "current data type is not supported on current device!");
-    ASCENDC_ASSERT((mode != MaskMergeMode::UNKNOWN),
+    ASCENDC_ASSERT((mode != MaskMergeMode::UNKNOWN), 
                    {KERNEL_LOG(KERNEL_ERROR, "The MergeMode only support: MODE_MERGING, MODE_ZEROING.");});
     constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
     constexpr auto modeValue = GetMaskMergeMode<mode>();

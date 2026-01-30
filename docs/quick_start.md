@@ -2,7 +2,7 @@
 ## 前提条件
 1. **安装依赖**
 
-   以下所列仅为本开源仓源码编译用到的依赖，其中python、gcc、cmake的安装方法请参见配套版本的[用户手册](https://hiascend.com/document/redirect/CannCommunityInstDepend)，选择安装场景后，参见“安装CANN > 安装依赖”章节进行相关依赖的安装。
+   以下所列仅为本开源仓源码编译用到的依赖，其中python、gcc、cmake的安装方法请参见配套版本的[用户手册](https://www.hiascend.com/document/detail/zh/canncommercial/83RC1/softwareinst/instg/instg_quick.html?Mode=PmIns&InstallType=local&OS=openEuler&Software=cannToolKit)，选择安装场景后，参见“安装CANN > 安装依赖”章节进行相关依赖的安装。
 
    - python >= 3.9.0
 
@@ -58,7 +58,6 @@
      make install                         # root用户安装googletest
      # sudo make install                  # 非root用户安装googletest
      ```
-
 2. **安装驱动与固件（运行态依赖）**
 
    运行算子时必须安装驱动与固件，若仅编译算子，可跳过本操作，安装指导详见《[CANN 软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstSoftware)》。
@@ -82,25 +81,7 @@
     - 缺省--install-path时， 则使用默认路径安装。
     若使用root用户安装，安装完成后相关软件存储在“/usr/local/Ascend/cann”路径下；若使用非root用户安装，安装完成后相关软件存储在“$HOME/Ascend/cann”路径下。
 
-2. **安装社区版CANN legacy包（运行态依赖）**
-
-    运行算子前必须安装本包，若仅编译算子，可跳过本操作。
-
-    根据产品型号和环境架构，下载对应`cann-${soc_name}-ops-legacy_${cann_version}_linux-${arch}.run`包，下载链接如下：
-
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：[legacy x86_64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/x86_64/ops/cann-910b-ops-legacy_8.5.0-beta.1_linux-x86_64.run)、[legacy aarch64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/aarch64/ops/cann-910b-ops-legacy_8.5.0-beta.1_linux-aarch64.run)。
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：[legacy x86_64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/x86_64/ops/cann-910_93-ops-legacy_8.5.0-beta.1_linux-x86_64.run)、[legacy aarch64包](https://ascend.devcloud.huaweicloud.com/cann/run/software/8.5.0-beta.1/aarch64/ops/cann-910_93-ops-legacy_8.5.0-beta.1_linux-aarch64.run)。
-
-    ```bash
-    # 确保安装包具有可执行权限
-    chmod +x cann-${soc_name}-ops-legacy_${cann_version}_linux-${arch}.run
-    # 安装命令
-    ./cann-${soc_name}-ops-legacy_${cann_version}_linux-${arch}.run --full --install-path=${install_path}
-    ```
-    - \$\{soc\_name\}：表示NPU型号名称，即\$\{soc\_version\}删除“ascend”后剩余的内容。
-    - \$\{install\_path\}：表示指定安装路径，需要与toolkit包安装在相同路径，默认安装在`/usr/local/Ascend`目录。
-
-3. **配置环境变量**
+2. **配置环境变量**
 
 - 默认路径，root用户安装
 
@@ -118,12 +99,12 @@
     source ${install_path}/cann/set_env.sh
     ```
 
-4. **下载源码**
+3. **下载源码**
 
     开发者可通过如下命令下载本仓源码：
     ```bash
     # 下载项目源码，以master分支为例
-    git clone https://gitcode.com/cann/asc-devkit.git
+    git clone https://gitcode.com/cann/asc-devkit-dev.git
     ``` 
 
 
@@ -140,7 +121,7 @@
    编译完成后会在`build_out`目录下生成cann-asc-devkit_*<cann_version>*_linux-*\<arch\>*.run软件包。
 2. 安装
 
-   在开源仓根目录下执行下列命令，将编译生成的run包安装到默认路径（/usr/local/Ascend）；或安装到指定的CANN包的装包路径（${install_path}），同时会覆盖原CANN包中的Ascend C内容。
+   在开源仓根目录下执行下列命令，根据设置的环境变量路径，将编译生成的run包安装到CANN包的装包路径，同时会覆盖原CANN包中的Ascend C内容。
 
    ```bash
    # 切换到run包生成路径下
@@ -153,11 +134,14 @@
 
 ## UT验证
 
-在开源仓根目录执行下列命令，将按各模块依次批跑tests目录下的用例，得到结果日志，用于看护编译是否正常。
+在开源仓根目录执行下列命令之一，将依次批跑tests目录下的用例，得到结果日志，用于看护编译是否正常。
 
 ```bash
-bash build.sh --adv_test                         # 批跑tests目录下adv_api里的用例
-bash build.sh --basic_test_one                   # 批跑tests目录下basic_api part-one里的用例
-bash build.sh --basic_test_two                   # 批跑tests目录下basic_api part-two里的用例
-bash build.sh --basic_test_three                 # 批跑tests目录下basic_api part-three里的用例
+bash build.sh -t
+```
+
+或
+
+```bash
+bash build.sh --test
 ```
