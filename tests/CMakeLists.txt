@@ -21,5 +21,5 @@ if (BUILD_OPEN_PROJECT)
 endif()
 
 add_subdirectory(api)
-# add_subdirectory(tools)
+add_subdirectory(tools)
 add_subdirectory(python)
