@@ -12,6 +12,9 @@
 #define INCLUDE_SIMT_API_DEVICE_TYPES_H
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#ifndef __aicore__
+#define __aicore__ [aicore]
+#endif
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_TYPES_H__
 #endif
