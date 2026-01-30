@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
+ 
 /* !
  * \file kernel_micro_histograms_intf_impl.h
  * \brief
@@ -15,7 +15,7 @@
 
 #ifndef ASCENDC_KERNEL_MICRO_HISTOGRAMS_INTERFACE_IMPL_H
 #define ASCENDC_KERNEL_MICRO_HISTOGRAMS_INTERFACE_IMPL_H
-
+ 
 #if __NPU_ARCH__ == 3003
 #include "micro_api/dav_l300/kernel_micro_histograms_impl.h"
 #elif __NPU_ARCH__ == 3113
@@ -34,5 +34,5 @@ __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask)
 }
 } // namespace MicroAPI
 } // namespace AscendC
-
+ 
 #endif // ASCENDC_MODULE_MICRO_HISTOGRAMS_INTERFACE_IMPL_H

@@ -19,7 +19,7 @@
 
 namespace AscendC {
 namespace MicroAPI {
-template <typename T>
+template <typename T> 
 struct TypeGet;
 
 template <>
@@ -41,7 +41,7 @@ struct TypeGet<double> {
 #endif
 };
 
-template <>
+template <> 
 struct TypeGet<complex64> {
     // only for passing compilation, T is actually ineffective here
 #if defined(__ASC_NPU_HOST__)
@@ -50,7 +50,7 @@ struct TypeGet<complex64> {
     using T = vector_u64;
 #endif
 };
-
+ 
 template <>
 struct TypeGet<uint64_t> {
 #if defined(__ASC_NPU_HOST__)
@@ -148,7 +148,7 @@ struct TypeGet<int8_t> {
     using T = vector_s8;
 #endif
 };
-
+ 
 template <>
 struct TypeGet<hifloat8_t> {
 #if defined(__ASC_NPU_HOST__)
@@ -157,7 +157,7 @@ struct TypeGet<hifloat8_t> {
     using T = vector_hif8;
 #endif
 };
-
+ 
 template <>
 struct TypeGet<fp8_e4m3fn_t> {
 #if defined(__ASC_NPU_HOST__)
@@ -166,7 +166,7 @@ struct TypeGet<fp8_e4m3fn_t> {
     using T = vector_f8e4m3;
 #endif
 };
-
+ 
 template <>
 struct TypeGet<fp8_e5m2_t> {
 #if defined(__ASC_NPU_HOST__)
@@ -193,7 +193,7 @@ struct TypeGet<fp4x2_e2m1_t> {
     using T = vector_f4e2m1x2;
 #endif
 };
-
+ 
 template <>
 struct TypeGet<fp4x2_e1m2_t> {
 #if defined(__ASC_NPU_HOST__)
@@ -202,14 +202,14 @@ struct TypeGet<fp4x2_e1m2_t> {
     using T = vector_f4e1m2x2;
 #endif
 };
-
+ 
 #ifndef __ASC_NPU_HOST__
 template <>
 struct TypeGet<int4x2_t> {
     using T = vector_s4x2;
 };
 #endif
-
+ 
 template <>
 struct TypeGet<bool> {
 #if defined(__ASC_NPU_HOST__)

@@ -7,14 +7,14 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
+ 
 /* !
  * \file kernel_micro_histograms_intf.h
  * \brief
  */
 #ifndef ASCENDC_MODULE_MICRO_HISTOGRAMS_INTERFACE_H
 #define ASCENDC_MODULE_MICRO_HISTOGRAMS_INTERFACE_H
-
+ 
 #include "kernel_micro_common_intf.h"
 
 namespace AscendC {

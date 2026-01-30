@@ -11,6 +11,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+
 import sys
 import numpy as np
 
@@ -52,7 +53,7 @@ if __name__ == '__main__':
         if not res:
             raise ValueError("[ERROR] result error")
         else:
-            print("test pass")
+            print("test pass!")
     except Exception as e:
         print(e)
         sys.exit(1)

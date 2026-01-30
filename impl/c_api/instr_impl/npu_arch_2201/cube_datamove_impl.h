@@ -1363,6 +1363,7 @@ __aicore__ inline void asc_set_l13d_padding(uint16_t config)
     asc_set_l13d_padding_impl(config);
 }
 
+
 // ==========asc_copy_l0c2gm==========
 __aicore__ inline void asc_copy_l0c2gm(__gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, 
                                             uint32_t dst_stride_dst_d, uint16_t src_stride, uint8_t unit_flag_mode, 
