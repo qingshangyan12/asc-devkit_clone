@@ -1,8 +1,12 @@
+
 # Mmad unitFlag特性样例
+
 ## 概述
+
 本样例介绍是否使能unitFlag对于Mmad指令执行矩阵乘法性能的影响。
 
 ## 支持的产品
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -19,6 +23,7 @@
 ```
 
 ## 算子描述
+
 unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。取值说明如下：
 0：保留值；
 2：使能unitFlag，硬件执行完指令之后，不会关闭unitFlag功能；
@@ -30,6 +35,7 @@ unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能�
 另外，需要注意当使能unitFlag时，L0C上的LocalTensor不能用[TQue](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0137.html)获取，需要改用[TBuf](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0161.html)。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
