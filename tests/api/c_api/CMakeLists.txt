@@ -15,8 +15,8 @@ find_package(tikicpulib REQUIRED)
 set(ASCENDC_UT_PRODUCT_TYPE_LIST
     ascend910B1_AIC
     ascend910B1_AIV
-    ascend910_9599_AIC
-    ascend910_9599_AIV
+    ascend950pr_9599_AIC
+    ascend950pr_9599_AIV
 )
 
 set(ASCENDC_UT_HEADER
@@ -50,12 +50,12 @@ file(GLOB ASCENDC_UT_ascend910B1_AIV_CASE_SRC
     npu_arch_2201/cache_ctrl/*.cpp
 )
 
-file(GLOB ASCENDC_UT_ascend910_9599_AIC_CASE_SRC
+file(GLOB ASCENDC_UT_ascend950pr_9599_AIC_CASE_SRC
     npu_arch_3510/cube_compute/*.cpp
     npu_arch_3510/cube_datamove/*.cpp
 )
 
-file(GLOB ASCENDC_UT_ascend910_9599_AIV_CASE_SRC
+file(GLOB ASCENDC_UT_ascend950pr_9599_AIV_CASE_SRC
     npu_arch_3510/atomic/*.cpp
     npu_arch_3510/cache_ctrl/*.cpp
     npu_arch_3510/misc/*.cpp
@@ -80,8 +80,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         ASCENDC_DUMP=0
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_CUBE__;__DAV_CUBE__>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_VEC__;__DAV_VEC__>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_CUBE__;__DAV_CUBE__>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__;__DAV_VEC__>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_CUBE__;__DAV_CUBE__>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__;__DAV_VEC__>
         __disable_kernel_type_autoinfer__=
     )
 
@@ -100,8 +100,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:tikicpulib::ascend910B1>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:tikicpulib::ascend910_9599>
-        $<$<STREQUAL:${product_type},ascend910_9599_AIV>:tikicpulib::ascend910_9599>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:tikicpulib::ascend950pr_9599>
         -Wl,--no-as-needed
         error_manager
         mmpa
