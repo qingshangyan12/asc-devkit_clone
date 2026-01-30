@@ -24,11 +24,11 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst,
+__aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                            uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride, pad_t pad_mode)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf(dst, src, sid, n_burst, burst_len, src_stride, dst_stride, pad_mode);
+        copy_gm_to_cbuf(dst, src, 0, n_burst, burst_len, src_stride, dst_stride, pad_mode);
     }
 }
 
