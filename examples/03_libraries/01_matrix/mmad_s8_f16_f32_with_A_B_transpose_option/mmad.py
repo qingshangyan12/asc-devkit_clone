@@ -5,25 +5,25 @@ def gemm_custom_tiled(m, k, n, A, B, C, k0):
     执行分块矩阵乘加运算: C = A * B^T + C
 
     参数：
-    m, k, n: 矩阵的维度参数(显式传入)
-    A   :形状为(m, k)的矩阵
-    B   :形状为(n, k)的矩阵
-    C   :形状为(m, n)的矩阵(包含初始值)
-    k0  :内积方向上的分块大小(Block size)
+    m, k, n : 矩阵的维度参数(显式传入)
+    A       :形状为(m, k)的矩阵
+    B       :形状为(n, k)的矩阵
+    C       :形状为(m, n)的矩阵(包含初始值)
+    k0      :内积方向上的分块大小(Block size)
     """
 
     # 0. 维度校验(虽然传入了m, k, n， 但在Python中最好校验一下实际矩阵是否符合)
     if A.shape != (m, k) or B.shape != (n, k) or C.shape != (m, n):
         raise ValueError(f"矩阵实际尺寸与传入的m = {m}, k = {k}, n = {n} 不匹配")
     
-    print(f"正在计算C: ({m}x{n}) += A({m}x{k}) * B.T({k}x{n}) | 分块 k0={k0}")
+    print(f"正在计算: C({m}x{n}) += A({m}x{k}) * B.T({k}x{n}) | 分块 k0={k0}")
 
     # 1. 外层循环： 遍历行(m)
     for i in range(m):
         # 2. 中层循环：遍历列(n)
         for j in range(n):
             # 【初始化累加器】：直接读取 C 矩阵当前位置的值
-            # 相当于公式中的“ +C ”部分
+            # 相当于公式中的 "+C" 部分
             accumulate_sum = C[i, j]
 
             # 3. 内层循环：在k维度上分块前进
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     C_standard = C_original + np.dot(A_mat, B_mat.T)
 
     if np.allclose(C_mat, C_standard):
-        print("验证通过：结果与 Numpy 标准计算一致")
+        print("验证通过: 结果与 Numpy 标准计算一致")
         print(f"   C[0, 0]最终值: {C_mat[0, 0]:.4f}")
     else:
         print("验证失败")
