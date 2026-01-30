@@ -137,6 +137,7 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 <p id="p14555829193812"><a name="p14555829193812"></a><a name="p14555829193812"></a>针对<span id="ph13555329143813"><a name="ph13555329143813"></a><a name="ph13555329143813"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_2"><a name="zh-cn_topic_0000001312391781_term131434243115_2"></a><a name="zh-cn_topic_0000001312391781_term131434243115_2"></a>Atlas A3 推理系列产品</term></span>支持的数据类型为half、float、bfloat16_t、int32_t、int8_t</p>
 <p id="p596915528172"><a name="p596915528172"></a><a name="p596915528172"></a>针对<span id="ph64580125327"><a name="ph64580125327"></a><a name="ph64580125327"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_2"><a name="zh-cn_topic_0000001312391781_term184716139811_2"></a><a name="zh-cn_topic_0000001312391781_term184716139811_2"></a>Atlas A2 推理系列产品</term></span>支持的数据类型为half、float、bfloat16_t、int32_t、int8_t</p>
 <p id="p1898214319561"><a name="p1898214319561"></a><a name="p1898214319561"></a><span id="ph10819182912570"><a name="ph10819182912570"></a><a name="ph10819182912570"></a>Kirin X90</span>支持的数据类型为half、int8_t、int32_t</p>
+<p id="p117992040194118"><a name="p117992040194118"></a><a name="p117992040194118"></a><span id="ph1535441174118"><a name="ph1535441174118"></a><a name="ph1535441174118"></a>Kirin 9030</span>支持的数据类型为：half</p>
 </td>
 </tr>
 <tr id="row16491543185617"><td class="cellrowborder" valign="top" width="17.41%" headers="mcps1.2.4.1.1 "><p id="p15571138171913"><a name="p15571138171913"></a><a name="p15571138171913"></a>gm</p>
@@ -147,6 +148,7 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 <p id="p1338319673916"><a name="p1338319673916"></a><a name="p1338319673916"></a>针对<span id="ph73832653911"><a name="ph73832653911"></a><a name="ph73832653911"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_3"><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_3"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_3"><a name="zh-cn_topic_0000001312391781_term131434243115_3"></a><a name="zh-cn_topic_0000001312391781_term131434243115_3"></a>Atlas A3 推理系列产品</term></span>支持的数据类型为half、float、bfloat16_t、int32_t、int8_t</p>
 <p id="p19121245143015"><a name="p19121245143015"></a><a name="p19121245143015"></a>针对<span id="ph691214513016"><a name="ph691214513016"></a><a name="ph691214513016"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_3"><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_3"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_3"><a name="zh-cn_topic_0000001312391781_term184716139811_3"></a><a name="zh-cn_topic_0000001312391781_term184716139811_3"></a>Atlas A2 推理系列产品</term></span>支持的数据类型为half、float、bfloat16_t、int32_t、int8_t</p>
 <p id="p1029023813579"><a name="p1029023813579"></a><a name="p1029023813579"></a><span id="ph9974133865712"><a name="ph9974133865712"></a><a name="ph9974133865712"></a>Kirin X90</span>支持的数据类型为half、int8_t、int32_t</p>
+<p id="p117992040194114"><a name="p117992040194114"></a><a name="p117992040194114"></a><span id="ph1535441174112"><a name="ph1535441174112"></a><a name="ph1535441174112"></a>Kirin 9030</span>支持的数据类型为：half</p>
 </td>
 </tr>
 <tr id="row6652117123"><td class="cellrowborder" valign="top" width="17.41%" headers="mcps1.2.4.1.1 "><p id="p1543122095916"><a name="p1543122095916"></a><a name="p1543122095916"></a>enAtomic</p>
@@ -242,4 +244,3 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
         }
     }
     ```
-

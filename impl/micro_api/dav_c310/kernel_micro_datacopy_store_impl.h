@@ -103,7 +103,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, U& srcReg, int32_
     } else if constexpr (SupportBytes<ActualT, 8>()) {
         MaskReg dstMask0, dstMask1;
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-            constexpr auto lowerDist =
+            constexpr auto lowerDist = 
                 std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>();
             MaskReg tmpMask;
             ppack(tmpMask, mask, lowerDist);
@@ -200,7 +200,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
         vsts((RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1, (__ubuf__ uint32_t*)dstAddr, 0, distValue,
              mask);
     } else {
-        static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
+        static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), 
                       "StoreAlign only support type b8/b16/b32/b64 on current device");
         if constexpr (std::is_same_v<T, bool>) {
             vsts((RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1, (__ubuf__ int8_t*)dstAddr, 0, distValue,
@@ -445,7 +445,7 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, U& srcReg,
             vstu(ureg, areg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
         } else {
             vstu(ureg, areg, srcReg, dstAddr, postValue);
-        }
+        }        
     }
 }
 

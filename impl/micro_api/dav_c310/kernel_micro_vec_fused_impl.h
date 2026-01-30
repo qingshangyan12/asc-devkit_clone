@@ -38,7 +38,7 @@ __simd_callee__ inline void FusedAbsSubImpl(U& dstReg, U& srcReg0, U& srcReg1, M
 {
     using ActualT = typename U::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportType<ActualT, half, float, int64_t>(),
+    static_assert(SupportType<ActualT, half, float, int64_t>(), 
                   "current data type is not supported on current device!");
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
                   "current AbsSub api only supported Mode ZEROING on current device!");
