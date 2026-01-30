@@ -24,7 +24,7 @@ __simd_callee__ inline void CheckLoadDist()
         static_assert(SupportEnum<dist, LoadDist::DIST_NORM, LoadDist::DIST_BRC_B8, LoadDist::DIST_BRC_B16,
                       LoadDist::DIST_BRC_B32, LoadDist::DIST_US_B8, LoadDist::DIST_US_B16, LoadDist::DIST_DS_B8,
                       LoadDist::DIST_DS_B16, LoadDist::DIST_UNPACK_B8, LoadDist::DIST_UNPACK_B16, LoadDist::DIST_BLK,
-                      LoadDist::DIST_E2B_B16, LoadDist::DIST_E2B_B32, LoadDist::DIST_UNPACK_B32,
+                      LoadDist::DIST_E2B_B16, LoadDist::DIST_E2B_B32, LoadDist::DIST_UNPACK_B32, 
                       LoadDist::DIST_UNPACK4_B8>(),
                       "LoadAlign not support this dist on current device");
     } else {

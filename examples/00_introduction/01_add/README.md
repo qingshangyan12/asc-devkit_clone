@@ -5,11 +5,6 @@
 ## 算子开发样例
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| [basic_api_memory_allocator_add](./basic_api_memory_allocator_add) | 基于静态Tensor方式编程的场景下Add算子的实现方法 |
-| [basic_api_tque_add](./basic_api_tque_add) | 本样例以Add算子为样例，使用tque管理内存，使用静态Tensor编程方法进行Add算子的编程 |
-
-## 更新说明
-| 时间       | 更新事项     |
-| ---------- | ------------ |
-| 2025/11/28 | 新增add用例 |
-| 2025/11/18 | 样例目录调整，新增本readme |
+| [basic_api_memory_allocator_add](./basic_api_memory_allocator_add) | 样例基于静态Tensor方式编程实现Add样例，展示了LocalMemAllocator进行线性内存分配 |
+| [basic_api_tque_add](./basic_api_tque_add) | 样例基于静态Tensor编程方法实现Add样例，展示了使用tque管理内存 |
+| [micro_api_add](./micro_api_add) | 样例基于微指令API实现Add样例，展示了通过微指令API直接对芯片中涉及Vector计算的寄存器进行操作 |
