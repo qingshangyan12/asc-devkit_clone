@@ -537,6 +537,39 @@ __aicore__ inline void Load3DSetPaddingImpl(const T padValue)
 }
 
 /* **************************************************************************************************
+ * Fill                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup Fill
+ * @brief L0A/L0B value initializing
+ * @param [out] dst output LocalTensor
+ * @param [in] InitConstValueParams.repeatTimes repeat times
+ * @param [in] InitConstValueParams.repeatTimes blockNum block number
+ * @param [in] InitConstValueParams.dstGap interval between the previous tail and the next block head
+ * @param [in] InitConstValueParams.initValue initialize Value
+ */
+template <typename T, typename U = PrimT<T>,
+    typename std::enable_if<IsSameType<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void FillImpl(const LocalTensor<T> &dst,
+    const InitConstValueParams<U> &initConstValueParams)
+{
+    const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
+    if (dstScope == Hardware::L0A) {
+        CheckTensorAlign<T>(dst, VALUE_512, "dst", "Fill when TPosition is A2");
+        InitL0ANzMatrixCal((__ca__ PrimT<T>*)dst.GetPhyAddr(), initConstValueParams);
+    } else if (dstScope == Hardware::L0B) {
+        CheckTensorAlign<T>(dst, VALUE_512, "dst", "Fill when TPosition is B2");
+        InitL0BNzMatrixCal((__cb__ PrimT<T>*)dst.GetPhyAddr(), initConstValueParams);
+    } else if (dstScope == Hardware::L1) {
+        CheckTensorAlign<T>(dst, ONE_BLK_SIZE, "dst", "Fill when TPosition is A1 / B1");
+        InitL1BufferCal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), initConstValueParams);
+    } else {
+        ASCENDC_CHECK_TPOSITION(false, "dst", "A1 / B1 / A2 / B2", "Fill",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+    }
+}
+
+/* **************************************************************************************************
  * InitConstValue                                             *
  * ************************************************************************************************* */
 /*

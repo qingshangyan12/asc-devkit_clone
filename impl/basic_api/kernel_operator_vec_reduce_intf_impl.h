@@ -954,6 +954,7 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
 #endif
 }
 #pragma end_pipe
+
 template <typename T>
 __aicore__ inline void GetReduceMaxMinCount(uint32_t &maxMinValue, uint32_t &maxMinIndex)
 {
@@ -973,7 +974,27 @@ __aicore__ inline void GetReduceMaxMinCount(uint32_t &maxMinValue)
     GetReduceMaxMinCountImpl<PrimType>(maxMinValue);
 }
 
-__aicore__ inline int64_t GetAccVal()
+
+template <typename T>
+__aicore__ inline void GetReduceRepeatMaxMinSpr(uint32_t &maxMinValue, uint32_t &maxMinIndex)
+{
+    using PrimType = PrimT<T>;
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    GetReduceMaxMinCountImpl<PrimType>(maxMinValue, maxMinIndex);
+}
+
+template <typename T>
+__aicore__ inline void GetReduceRepeatMaxMinSpr(uint32_t &maxMinValue)
+{
+    using PrimType = PrimT<T>;
+    GetReduceMaxMinCountImpl<PrimType>(maxMinValue);
+}
+
+__aicore__ inline int64_t GetReduceRepeatSumSpr()
 {
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
@@ -985,6 +1006,11 @@ __aicore__ inline int64_t GetAccVal()
 #else
     return get_acc_val();
 #endif
+}
+
+__aicore__ inline int64_t GetAccVal()
+{
+    return GetReduceRepeatSumSpr();
 }
 
 template <typename T>
@@ -1010,9 +1036,31 @@ __aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue)
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(S) T GetAccVal()
+__aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in GetAccVal, "
+    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
+        "GetReduceRepeatMaxMinSpr, current api support dtype combination is maxMinValue and maxMinIndex both: half / "
+        "float");});
+#if __NPU_ARCH__ == 2201
+    if (g_coreType == AIC) {
+        return;
+    }
+#endif
+    GetReduceMaxMinCountImpl<T>(maxMinValue, maxMinIndex);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T &maxMinValue)
+{
+    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
+        "GetReduceRepeatMaxMinSpr, current api support dtype combination is maxMinValue: half / float");});
+    GetReduceMaxMinCountImpl<T>(maxMinValue);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(S) T GetReduceRepeatSumSpr()
+{
+    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in GetReduceRepeatSumSpr, "
         "current api support dtype combination is half / float");});
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
@@ -1020,6 +1068,14 @@ __aicore__ inline __inout_pipe__(S) T GetAccVal()
     }
 #endif
     return GetAccValImpl<T>();
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(S) T GetAccVal()
+{
+    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in GetAccVal, "
+        "current api support dtype combination is half / float");});
+    return GetReduceRepeatSumSpr<T>();
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
