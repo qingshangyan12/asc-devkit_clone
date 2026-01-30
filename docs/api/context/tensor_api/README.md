@@ -15,7 +15,7 @@ Tensor API提供一套基于AscendC的C++模板抽象库，专为定义和操作
 ## API类型介绍
 
 -  TensorTile基础结构：该类型API定义了Layout、Tensor基础结构，以及创建及相关操作。
-    - [Layout](struct/defenition/Layout和层次化表述法.md)
+    - [Layout](struct/defenition/Layout/README.md)
     - Tensor
 - TensorTile计算接口：该类型API包括搬运接口和矩阵计算接口，支持对数据结构的搬入搬出及矩阵计算操作。
 

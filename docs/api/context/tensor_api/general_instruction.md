@@ -34,6 +34,7 @@ AI Core上的存储单元用于存储矢量计算、矩阵计算的源操作数�
 ## 如何使用高维切分计算API
 
 > [!NOTE]说明 
+>
 > - 本章节对矢量计算API中的高维切分计算接口做解释说明。
 > - 下文中的repeatTime、dataBlockStride、repeatStride为通用描述，其命名不一定与具体指令中的参数命名完全对应。比如，单次迭代内不同DataBlock间地址步长dataBlockStride参数，在单目API中，对应为dst_block_stride，src_block_stride参数；在双目API中，对应为dst_block_stride，src0_block_stride，src1_block_stride参数。您可以在具体接口的参数说明中，找到参数含义的描述。
 > - dataBlockStride、repeatStride参数的单位默认为DataBlock（32Byte）。API中有特殊说明的，以API中的说明为准。
@@ -73,6 +74,7 @@ AI Core上的存储单元用于存储矢量计算、矩阵计算的源操作数�
 ### dataBlockStride
 
 dataBlockStride是指同一迭代内不同DataBlock的地址步长。
+
 - 连续计算，dataBlockStride设置为1，对同一迭代内的8个DataBlock数据连续进行处理。
 - 非连续计算，dataBlockStride值大于1（如取2），同一迭代内不同DataBlock之间在读取数据时出现一个DataBlock的间隔，如下图所示。 <br>
 **图6** dataBlockStride不同取值举例

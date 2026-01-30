@@ -1,4 +1,4 @@
-# Layout简介<a name="ZH-CN_TOPIC_0000002331693889"></a>
+# Layout简介
 
 Layout<Shape, Stride\>数据结构是描述多维张量内存布局的基础模板类，通过编译时的形状（Shape）和步长（Stride）信息，实现逻辑坐标空间到一维内存地址空间的映射，为复杂张量操作和硬件优化提供基础支持。借助模板元编程技术，该类在编译时完成计算和代码生成，从而降低运行时开销。
 
@@ -17,6 +17,7 @@ Layout包含两个核心组成部分：
 **表 1** **线性地址视图**
 
 <a name="table12525201245615"></a>
+
 <table><thead align="left"><tr id="row20525012185616"><th class="cellrowborder" valign="top" width="8.080808080808083%" id="mcps1.2.13.1.1"><p id="p101677148592"><a name="p101677148592"></a><a name="p101677148592"></a>地址</p>
 </th>
 <th class="cellrowborder" valign="top" width="8.500850085008503%" id="mcps1.2.13.1.2"><p id="p2983172525618"><a name="p2983172525618"></a><a name="p2983172525618"></a>0</p>
@@ -71,9 +72,11 @@ Layout包含两个核心组成部分：
 </tbody>
 </table>
 
+
 **表 2** **矩阵逻辑视图**
 
 <a name="table17519406546"></a>
+
 <table><thead align="left"><tr id="row375940195412"><th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.1"><p id="p1337044595410"><a name="p1337044595410"></a><a name="p1337044595410"></a>索引</p>
 </th>
 <th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.2"><p id="p4370194535410"><a name="p4370194535410"></a><a name="p4370194535410"></a>列 0</p>
@@ -113,13 +116,14 @@ Layout包含两个核心组成部分：
 </tbody>
 </table>
 
-## 需要包含的头文件<a name="zh-cn_topic_0000002213064918_section78885814919"></a>
+
+## 需要包含的头文件
 
 ```
 #include "kernel_operator_layout.h"
 ```
 
-## 原型定义<a name="section10580930144614"></a>
+## 原型定义
 
 ```
 template <typename ShapeType, typename StrideType>
@@ -140,11 +144,10 @@ struct Layout : private Std::tuple<ShapeType, StrideType> {
 }
 ```
 
-## 模板参数<a name="section116801320102618"></a>
+## 模板参数
 
 **表 3**  模板参数说明
 
-<a name="table13588175515344"></a>
 <table><thead align="left"><tr id="row1160915519346"><th class="cellrowborder" valign="top" width="21.8%" id="mcps1.2.3.1.1"><p id="p9609105553412"><a name="p9609105553412"></a><a name="p9609105553412"></a>参数名</p>
 </th>
 <th class="cellrowborder" valign="top" width="78.2%" id="mcps1.2.3.1.2"><p id="p156091955143419"><a name="p156091955143419"></a><a name="p156091955143419"></a>描述</p>
