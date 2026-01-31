@@ -485,7 +485,7 @@ __aicore__ inline TBufHandle TQueBind<src, dst, depth, mask>::DeQue()
                             "while Matmul count is %d, buffer count is %d",
                             maxAllowedTscmAndMmCount, g_matmulCount, Internal::TSCM_CROSS_SYNC_ID_MAX - ptr->enQueEvtID + 1);
                     });
-                set_intra_block(PIPE_MTE3, ptr->enQueEvtID);
+                bisheng::cce::set_intra_block(PIPE_MTE3, ptr->enQueEvtID);
             }
 #endif
         }
@@ -752,7 +752,7 @@ __aicore__ inline TBufHandle TQueBind<src, dst, depth, mask>::AllocBuffer()
                                                 maxAllowedTscmAndMmCount, g_matmulCount,
                                                 Internal::TSCM_CROSS_SYNC_ID_MAX - ret->enQueEvtID + 1);
                                         });
-                        wait_intra_block(PIPE_MTE3, ret->enQueEvtID);
+                        bisheng::cce::wait_intra_block(PIPE_MTE3, ret->enQueEvtID);
                     }
                 }
 #endif

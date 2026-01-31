@@ -41,7 +41,7 @@ __aicore__ inline void VbitsortCal(__ubuf__ T* dstLocal, __ubuf__ T* src0Local, 
     if ASCEND_IS_AIV {
         static_assert(SupportType<T, float, half>(), "current data type is not supported on current device");
         uint64_t config = static_cast<uint64_t>(intriParams.repeat) << 56;
-        vbs(dstLocal, src0Local, src1Local, config);
+        bisheng::cce::vbs(dstLocal, src0Local, src1Local, config);
     }
 }
  
@@ -50,7 +50,7 @@ __aicore__ inline void Vmrgsort4Cal(__ubuf__ T* dstLocal, __ubuf__ T* addrArray[
     uint64_t config)
 {
     if ASCEND_IS_AIV {
-        vmrgsort4(dstLocal, addrArray, src1, config);
+        bisheng::cce::vmrgsort4(dstLocal, addrArray, src1, config);
     }
 }
  

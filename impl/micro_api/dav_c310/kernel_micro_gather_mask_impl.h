@@ -25,7 +25,7 @@ __simd_callee__ inline void GatherMaskImpl(U& dstReg, U srcReg, MaskReg& mask)
     static_assert(SupportType<ActualT, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float>(),
                   "current data type is not supported on current device!");
     constexpr auto modeValue = std::integral_constant<::StoreMode, static_cast<::StoreMode>(store)>();
-    vsqz(dstReg, srcReg, mask, modeValue);
+    bisheng::cce::simd::vsqz(dstReg, srcReg, mask, modeValue);
 }
 
 template <typename T = DefaultType, typename U>
@@ -35,7 +35,7 @@ __simd_callee__ inline void PrefixSumImpl(U& dstReg, MaskReg& mask)
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportType<ActualT, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>(),
                   "current data type is not supported on current device!");
-    vusqz(dstReg, mask);
+    bisheng::cce::simd::vusqz(dstReg, mask);
 }
 
 template <SpecialPurposeReg spr = SpecialPurposeReg::AR>
@@ -54,7 +54,7 @@ __simd_callee__ inline void ClearSprImpl()
     static_assert(SupportEnum<spr, SpecialPurposeReg::AR>(),
                   "current ClearSpr api only support SpecialPurposeReg AR on current device!");
     constexpr auto sprValue = std::integral_constant<::Spr, static_cast<::Spr>(SPR_AR_VALUE)>();
-    sprclr(sprValue);
+    bisheng::cce::simd::sprclr(sprValue);
 }
 
 template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
@@ -73,11 +73,11 @@ __simd_callee__ inline void GatherImpl(S& dstReg, S& srcReg, V& indexReg)
                   (sizeof(ActualT) == 4 && sizeof(ActualU) == 4),
                   "Gather does not support current data type combination on current device!");
     if constexpr (sizeof(ActualT) == 1) {
-        vselr((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg, (RegTensor<uint8_t>&)indexReg);
+        bisheng::cce::simd::vselr((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg, (RegTensor<uint8_t>&)indexReg);
     } else if constexpr (sizeof(ActualT) == 2) {
-        vselr((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg, (RegTensor<uint16_t>&)indexReg);
+        bisheng::cce::simd::vselr((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg, (RegTensor<uint16_t>&)indexReg);
     } else if constexpr (sizeof(ActualT) == 4) {
-        vselr((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, (RegTensor<uint32_t>&)indexReg);
+        bisheng::cce::simd::vselr((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, (RegTensor<uint32_t>&)indexReg);
     }
 }
 } // namespace MicroAPI

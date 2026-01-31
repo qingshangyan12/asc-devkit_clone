@@ -46,7 +46,7 @@ public:
     __aicore__ inline void PostMessage(MSG_POS KfcMsg *msg)
     {
         if (enableHardPoll == 1) {
-            set_intra_block(PIPE_S, 15);
+            bisheng::cce::set_intra_block(PIPE_S, 15);
         }
     }
 

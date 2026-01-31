@@ -1357,7 +1357,7 @@ __aicore__ inline __in_pipe__(FIX)
 {
     constexpr uint16_t unitCoeff = 2;
     if ASCEND_IS_AIC {
-        copy_cbuf_to_fbuf((__fbuf__ void*)dst, (__cbuf__ void*)src, intriParams.blockCount,
+        bisheng::cce::copy_cbuf_to_fbuf((__fbuf__ void*)dst, (__cbuf__ void*)src, intriParams.blockCount,
                           intriParams.blockLen * unitCoeff, intriParams.srcStride, intriParams.dstStride * unitCoeff);
     }
 }
@@ -1377,7 +1377,7 @@ __aicore__ inline void ScmDataCopy(MSG_POS void* kfcMsgPtr)
     uint64_t srcStride = scmCopyParams->srcStride * BYTE_32_ALIGN + burstLength; // GM   DataCopy: 32Bytes
     uint32_t dstStride = scmCopyParams->dstStride * BYTE_32_ALIGN + burstLength;
 #if KFC_C310_SSBUF == 1
-    wait_intra_block(PIPE_MTE2,
+    bisheng::cce::wait_intra_block(PIPE_MTE2,
                      static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::GM_L1_UB_GM) + INTRA_NUM * scmCopyParams->subBlockID);
 #endif
     uint8_t cacheMode = ExtractCacheMode((__gm__ uint32_t*)scmCopyParams->src);
@@ -1392,8 +1392,8 @@ __aicore__ inline void ScmDataCopy(MSG_POS void* kfcMsgPtr)
                              scmCopyParams->blockCount, burstLength, 0, 0, false, cacheMode, srcStride, dstStride);
 #endif
     auto eventID = GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1);
-    set_flag(PIPE_MTE2, PIPE_MTE1, (event_t)eventID);
-    wait_flag(PIPE_MTE2, PIPE_MTE1, (event_t)eventID);
+    bisheng::cce::set_flag(PIPE_MTE2, PIPE_MTE1, (event_t)eventID);
+    bisheng::cce::wait_flag(PIPE_MTE2, PIPE_MTE1, (event_t)eventID);
 }
 
 __aicore__ inline void ScmDataCopyND2NZ(MSG_POS void* kfcMsgPtr)
@@ -1411,7 +1411,7 @@ __aicore__ inline void ScmDataCopyND2NZ(MSG_POS void* kfcMsgPtr)
     });
 #endif
 #if KFC_C310_SSBUF == 1
-    wait_intra_block(PIPE_MTE2,
+    bisheng::cce::wait_intra_block(PIPE_MTE2,
                      static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::GM_L1_UB_GM) + INTRA_NUM * scmCopyParams->subBlockID);
 #endif
     uint16_t loop2_dst_stride = scmCopyParams->dstNzNStride;
@@ -1444,8 +1444,8 @@ __aicore__ inline void ScmDataCopyND2NZ(MSG_POS void* kfcMsgPtr)
                                     loop1_src_stride, cacheMode, n_value, d_value, loop4_src_stride, false);
     }
     auto eventID = GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1);
-    set_flag(PIPE_MTE2, PIPE_MTE1, (event_t)eventID);
-    wait_flag(PIPE_MTE2, PIPE_MTE1, (event_t)eventID);
+    bisheng::cce::set_flag(PIPE_MTE2, PIPE_MTE1, (event_t)eventID);
+    bisheng::cce::wait_flag(PIPE_MTE2, PIPE_MTE1, (event_t)eventID);
 }
 
 template <typename T>
@@ -1457,7 +1457,7 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
 
 __aicore__ inline void NdDmaDciImpl() {
 #if ((!defined(ASCENDC_CPU_DEBUG)) || ASCENDC_CPU_DEBUG == 0)
-    nd_dma_dci();
+    bisheng::cce::nd_dma_dci();
 #endif
 }
 
@@ -1563,7 +1563,7 @@ __aicore__ inline void DataCopyWithNDDMAImpl(__ubuf__ T* dst, __gm__ T* src, con
     if constexpr (dim > 4) {
         SetNDDMALoopInfo<dim, config>(params, dim4Idx, padCount, loop4Size, loop4Stride);
     }
-    set_pad_cnt_nddma(padCount);
+    bisheng::cce::set_pad_cnt_nddma(padCount);
 
     bisheng::cce::set_loop0_stride_nddma(loop0Stride);
     bisheng::cce::set_loop1_stride_nddma(loop1Stride);
