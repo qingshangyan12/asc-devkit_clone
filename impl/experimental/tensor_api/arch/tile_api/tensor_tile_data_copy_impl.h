@@ -21,7 +21,7 @@ struct DataCopyTrait {
 constexpr DataCopyTrait DEFAULT_DATA_COPY_TRAIT;
 }
 
-#include "impl/experimental/tensor_api/arch/tile_api/data_copy/tensor_tile_data_copy_routing.h"
+#include "impl/tensor_api/arch/tile_api/data_copy/tensor_tile_data_copy_routing.h"
 
 namespace AscendC {
 template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
@@ -32,7 +32,7 @@ DataCopy(const T& dst, const U& src)
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename
         TileInternal::DataCopyTensor2Tensor<dstTPos, srcTPos, TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
-    Tensor2Tensor{}.template Run<T, U, trait>(dst, src);
+    Tensor2Tensor{}.template Run<trait, T, U>(dst, src);
 }
 
 template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
