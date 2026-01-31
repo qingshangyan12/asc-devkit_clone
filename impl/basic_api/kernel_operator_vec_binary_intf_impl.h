@@ -1193,7 +1193,8 @@ __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T
  * @param [in] intriParams.src0RepStride src0 repeat stride
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
-template <typename T, bool isSetMask = true>
+// FusedMulAddRelu has been updated, please use MulAddRelu instead.
+template <typename T, bool isSetMask>
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
@@ -1215,7 +1216,8 @@ __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTen
         repeatParams);
 }
 
-template <typename T, bool isSetMask = true>
+// FusedMulAddRelu has been updated, please use MulAddRelu instead.
+template <typename T, bool isSetMask>
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
@@ -1244,6 +1246,7 @@ __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTen
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
+// FusedMulAddRelu has been updated, please use MulAddRelu instead.
 template <typename T>
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, const int32_t& count)
@@ -1441,6 +1444,7 @@ __aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &s
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
+// FusedAbsSub has been updated, please use AbsSub instead.
 template <typename T>
 __aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
     const LocalTensor<T> &src1, const uint32_t count)
@@ -1468,6 +1472,7 @@ __aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
+// FusedExpSub has been updated, please use ExpSub instead.
 template <typename T, typename U>
 __aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
     const LocalTensor<U> &src1, const uint32_t count)
@@ -1481,6 +1486,36 @@ __aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<
         KERNEL_LOG(KERNEL_ERROR,
                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
     });
+    FusedExpSubImpl<DstPrimType, SrcPrimType>((__ubuf__ DstPrimType *)dst.GetPhyAddr(), (__ubuf__ SrcPrimType *)src0.GetPhyAddr(), 
+        (__ubuf__ SrcPrimType *)src1.GetPhyAddr(), count);
+}
+
+/* **************************************************************************************************
+ * ExpSub                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup ExpSub Level 2
+ * @brief when T is float : dst = e^(src0 - src1); when T is half : dst = e^(cast_f16_to_f32(src0) - cast_f16_to_f32(src1))
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor
+ * @param [in] src1 input LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+template <typename T, typename U>
+__aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
+    const LocalTensor<U> &src1, const uint32_t count)
+{
+    using DstPrimType = PrimT<T>;
+    using SrcPrimType = PrimT<U>;
+    CheckTensorPos<T>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "ExpSub");
+    CheckTensorPos<U>(src0, Hardware::UB, "src0", "VECIN / VECCALC / VECOUT", "ExpSub");
+    CheckTensorPos<U>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "ExpSub");
+    ASCENDC_ASSERT((count <= src0.GetSize() && count <= src1.GetSize() && count <= dst.GetSize()), {
+        KERNEL_LOG(KERNEL_ERROR,
+                   "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
+    });
+    static_assert(SupportType<Tuple<DstPrimType, SrcPrimType>, Tuple<half, half>, Tuple<float, float>>(), "Failed to check dtype in " 
+        "ExpSub, current api support dtype combination is src and dst both: half / float.");
     FusedExpSubImpl<DstPrimType, SrcPrimType>((__ubuf__ DstPrimType *)dst.GetPhyAddr(), (__ubuf__ SrcPrimType *)src0.GetPhyAddr(), 
         (__ubuf__ SrcPrimType *)src1.GetPhyAddr(), count);
 }
