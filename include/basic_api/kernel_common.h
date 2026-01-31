@@ -173,12 +173,17 @@ __aicore__ inline void SetHF32TransMode(HF32TransMode mode)
 
 __aicore__ inline void SetMMRowMajor()
 {
-    SetMMLayoutTransformImpl(false);
+    SetMMLayoutTransformImpl(true);
 }
 
 __aicore__ inline void SetMMColumnMajor()
 {
-    SetMMLayoutTransformImpl(true);
+    SetMMLayoutTransformImpl(false);
+}
+
+__aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode)	 
+{	 
+    SetMMLayoutTransformImpl(mmLayoutMode);
 }
 
 template <uint32_t index>

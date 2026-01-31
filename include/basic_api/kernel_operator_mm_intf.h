@@ -314,6 +314,23 @@ __aicore__ inline void Fill(const LocalTensor<T> &dst,
     const InitConstValueParams<U> &initConstValueParams);
     
 /* **************************************************************************************************
+ * InitConstValue                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup InitConstValue
+ * @brief L0A/L0B/L1 value initializing
+ * @param [out] dst output LocalTensor
+ * @param [in] InitConstValueParams.repeatTimes repeat times
+ * @param [in] InitConstValueParams.repeatTimes blockNum block number
+ * @param [in] InitConstValueParams.dstGap interval between the previous tail and the next block head
+ * @param [in] InitConstValueParams.initValue initialize Value
+ */
+template <typename T, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(const LocalTensor<T> &dst,
+    const InitConstValueParams<U> &initConstValueParams);
+    
+/* **************************************************************************************************
  * SetLoadDataPaddingValue                                             *
  * ************************************************************************************************* */
 /*
