@@ -33,7 +33,7 @@
   ```
 - 算子规格：  
   <table>  
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> Addcdiv </td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="5" align="center"> Addcdiv </td></tr>
   <tr><td rowspan="4" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">default</td></tr>  
   <tr><td align="center">x</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr>  
   <tr><td align="center">y</td><td align="center">-</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr>  

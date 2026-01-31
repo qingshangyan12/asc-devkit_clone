@@ -48,7 +48,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 - 算子实现：  
-  本样例中实现的是[M, K, N]固定为[512, 512, 1024]的Matmul算子。Matmul的计算公式为：$ C = A * B $  
+  本样例中实现的是[M, K, N]固定为[512, 512, 1024]的Matmul算子。Matmul的计算公式为：C = A * B。  
   A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。  
   C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。  
 
