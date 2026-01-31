@@ -17,6 +17,7 @@
 #include "kernel_tensor.h"
 #include "kernel_check.h"
 #include "kernel_struct_unary.h"
+#include "mstx_local_tensor_info.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_binary_scalar_impl.h"
@@ -65,6 +66,9 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Adds", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     AddsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue, mask,
         repeatTime, repeatParams);
 }
@@ -80,6 +84,9 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Adds", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     AddsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, mask, repeatTime, repeatParams);
 }
@@ -93,6 +100,9 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Adds")) {
         ASCENDC_REPORT_CHECK_ERROR("Adds", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     AddsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue, mask,
         repeatTime, repeatParams);
@@ -108,6 +118,9 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Adds")) {
         ASCENDC_REPORT_CHECK_ERROR("Adds", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     AddsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, mask, repeatTime, repeatParams);
@@ -131,6 +144,9 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Adds", KernelFuncType::CALCOUNT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
+#endif
     AddsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         count);
 }
@@ -145,6 +161,9 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "Adds")) {
         ASCENDC_REPORT_CHECK_ERROR("Adds", KernelFuncType::CALCOUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
 #endif
     AddsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, count);
@@ -176,6 +195,9 @@ __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Muls", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     MulsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue, mask,
         repeatTime, repeatParams);
 }
@@ -191,6 +213,9 @@ __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Muls", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     MulsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, mask, repeatTime, repeatParams);
 }
@@ -204,6 +229,9 @@ __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Muls")) {
         ASCENDC_REPORT_CHECK_ERROR("Muls", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     MulsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue, mask,
         repeatTime, repeatParams);
@@ -219,6 +247,9 @@ __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Muls")) {
         ASCENDC_REPORT_CHECK_ERROR("Muls", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     MulsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, mask,
         repeatTime, repeatParams);
@@ -242,6 +273,9 @@ __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Muls", KernelFuncType::CALCOUNT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
+#endif
     MulsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         count);
 }
@@ -256,6 +290,9 @@ __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "Muls")) {
         ASCENDC_REPORT_CHECK_ERROR("Muls", KernelFuncType::CALCOUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
 #endif
     MulsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, count);
@@ -287,6 +324,9 @@ __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Maxs", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     MaxsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue, mask,
         repeatTime, repeatParams);
 }
@@ -302,6 +342,9 @@ __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Maxs", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     MaxsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, mask, repeatTime, repeatParams);
 }
@@ -315,6 +358,9 @@ __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Maxs")) {
         ASCENDC_REPORT_CHECK_ERROR("Maxs", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     MaxsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue, mask,
         repeatTime, repeatParams);
@@ -330,6 +376,9 @@ __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Maxs")) {
         ASCENDC_REPORT_CHECK_ERROR("Maxs", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     MaxsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, mask, repeatTime, repeatParams);
@@ -353,6 +402,9 @@ __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Maxs", KernelFuncType::CALCOUNT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
+#endif
     MaxsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         count);
 }
@@ -367,6 +419,9 @@ __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "Maxs")) {
         ASCENDC_REPORT_CHECK_ERROR("Maxs", KernelFuncType::CALCOUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
 #endif
     MaxsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, count);
@@ -398,6 +453,9 @@ __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Mins", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     MinsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue, mask,
         repeatTime, repeatParams);
 }
@@ -413,6 +471,9 @@ __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Mins", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     MinsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, mask, repeatTime, repeatParams);
 }
@@ -426,6 +487,9 @@ __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Mins")) {
         ASCENDC_REPORT_CHECK_ERROR("Mins", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     MinsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue, mask,
         repeatTime, repeatParams);
@@ -441,6 +505,9 @@ __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Mins")) {
         ASCENDC_REPORT_CHECK_ERROR("Mins", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     MinsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, mask, repeatTime, repeatParams);
@@ -464,6 +531,9 @@ __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src
         ASCENDC_REPORT_CHECK_ERROR("Mins", KernelFuncType::CALCOUNT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
+#endif
     MinsImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         count);
 }
@@ -478,6 +548,9 @@ __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "Mins")) {
         ASCENDC_REPORT_CHECK_ERROR("Mins", KernelFuncType::CALCOUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
 #endif
     MinsImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         scalarValue, count);
@@ -509,6 +582,9 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("ShiftLeft", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     ShiftLeftImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         mask, repeatTime, repeatParams);
 }
@@ -524,6 +600,9 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("ShiftLeft", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     ShiftLeftImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
 }
@@ -537,6 +616,9 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "ShiftLeft")) {
         ASCENDC_REPORT_CHECK_ERROR("ShiftLeft", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     ShiftLeftImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         mask, repeatTime, repeatParams);
@@ -552,6 +634,9 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "ShiftLeft")) {
         ASCENDC_REPORT_CHECK_ERROR("ShiftLeft", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     ShiftLeftImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
@@ -575,6 +660,9 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("ShiftLeft", KernelFuncType::CALCOUNT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
+#endif
     ShiftLeftImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         count);
 }
@@ -589,6 +677,9 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "ShiftLeft")) {
         ASCENDC_REPORT_CHECK_ERROR("ShiftLeft", KernelFuncType::CALCOUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
 #endif
     ShiftLeftImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, count);
@@ -620,6 +711,9 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
         ASCENDC_REPORT_CHECK_ERROR("ShiftRight", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     ShiftRightImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         mask, repeatTime, repeatParams, roundEn);
 }
@@ -635,6 +729,9 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
         ASCENDC_REPORT_CHECK_ERROR("ShiftRight", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     ShiftRightImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams, roundEn);
 }
@@ -648,6 +745,9 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "ShiftRight")) {
         ASCENDC_REPORT_CHECK_ERROR("ShiftRight", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     ShiftRightImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         mask, repeatTime, repeatParams, roundEn);
@@ -663,6 +763,9 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "ShiftRight")) {
         ASCENDC_REPORT_CHECK_ERROR("ShiftRight", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     ShiftRightImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams, roundEn);
@@ -686,6 +789,9 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
         ASCENDC_REPORT_CHECK_ERROR("ShiftRight", KernelFuncType::CALCOUNT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
+#endif
     ShiftRightImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         count);
 }
@@ -700,6 +806,9 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "ShiftRight")) {
         ASCENDC_REPORT_CHECK_ERROR("ShiftRight", KernelFuncType::CALCOUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
 #endif
     ShiftRightImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, count);
@@ -731,6 +840,9 @@ __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("LeakyRelu", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     LeakyReluImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         mask, repeatTime, repeatParams);
 }
@@ -746,6 +858,9 @@ __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("LeakyRelu", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams);
+#endif
     LeakyReluImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
 }
@@ -759,6 +874,9 @@ __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "LeakyRelu")) {
         ASCENDC_REPORT_CHECK_ERROR("LeakyRelu", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     LeakyReluImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         mask, repeatTime, repeatParams);
@@ -774,6 +892,9 @@ __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "LeakyRelu")) {
         ASCENDC_REPORT_CHECK_ERROR("LeakyRelu", KernelFuncType::MASK_COUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src, mask, mask, repeatTime, repeatParams);
 #endif
     LeakyReluImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, mask, repeatTime, repeatParams);
@@ -797,6 +918,9 @@ __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("LeakyRelu", KernelFuncType::CALCOUNT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
+#endif
     LeakyReluImpl<T, isSetMask>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ T*)src.GetPhyAddr(), scalarValue,
         count);
 }
@@ -811,6 +935,9 @@ __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "LeakyRelu")) {
         ASCENDC_REPORT_CHECK_ERROR("LeakyRelu", KernelFuncType::CALCOUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecUnaryInfo<T, isSetMask>(dst, src);
 #endif
     LeakyReluImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, count);
@@ -1187,6 +1314,13 @@ __aicore__ inline void AndsCommon(const U& dst, const S& src0, const V& src1, Ma
         static_assert(Std::is_same<ActualT, typename S::PrimType>::value);
         static_assert((config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1),
                       "scalarTensorIndex out of range");
+        #ifdef __MSTX_DFX_REPORT__
+            if constexpr (Std::is_same_v<MaskType, uint64_t>) {
+                MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, mask, mask, repeatTime, repeatParams, isSetMask);
+            } else {
+                MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask);
+            }            
+        #endif
         AndsImpl<ActualT, isSetMask, config.scalarTensorIndex>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(),
             mask, repeatTime, repeatParams);
@@ -1245,6 +1379,9 @@ __aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, const in
         static_assert(Std::is_same<ActualT, typename S::PrimType>::value);
         static_assert((config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1),
                       "scalarTensorIndex out of range");
+        #ifdef __MSTX_DFX_REPORT__
+            MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, isSetMask);
+        #endif
         AndsImpl<ActualT, isSetMask, config.scalarTensorIndex>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(), count);
     } else if constexpr(TypeUtils::IsLocalTensorType<V>() && TypeUtils::IsInnerDefaultType<S>()) {
@@ -1274,6 +1411,13 @@ __aicore__ inline void OrsCommon(const U& dst, const S& src0, const V& src1, Mas
         static_assert(Std::is_same<ActualT, typename S::PrimType>::value);
         static_assert((config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1),
                       "scalarTensorIndex out of range");
+        #ifdef __MSTX_DFX_REPORT__
+            if constexpr (Std::is_same_v<MaskType, uint64_t>) {
+                MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, mask, mask, repeatTime, repeatParams, isSetMask);
+            } else {
+                MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask);
+            }            
+        #endif
         OrsImpl<ActualT, isSetMask, config.scalarTensorIndex>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(),
             mask, repeatTime, repeatParams);
@@ -1332,6 +1476,9 @@ __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, const int
         static_assert(Std::is_same<ActualT, typename S::PrimType>::value);
         static_assert((config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1),
                       "scalarTensorIndex out of range");
+        #ifdef __MSTX_DFX_REPORT__
+            MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, isSetMask);
+        #endif
         OrsImpl<ActualT, isSetMask, config.scalarTensorIndex>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(), count);
     } else if constexpr(TypeUtils::IsLocalTensorType<V>() && TypeUtils::IsInnerDefaultType<S>()) {
@@ -1361,6 +1508,13 @@ __aicore__ inline void SubsCommon(const U& dst, const S& src0, const V& src1, Ma
         static_assert(Std::is_same<ActualT, typename S::PrimType>::value);
         static_assert((config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1),
                       "scalarTensorIndex out of range");
+        #ifdef __MSTX_DFX_REPORT__
+            if constexpr (Std::is_same_v<MaskType, uint64_t>) {
+                MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, mask, mask, repeatTime, repeatParams, isSetMask);
+            } else {
+                MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask);
+            }            
+        #endif
         SubsImpl<ActualT, isSetMask, config.scalarTensorIndex>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(),
             mask, repeatTime, repeatParams);
@@ -1420,6 +1574,9 @@ __aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, const in
         static_assert(Std::is_same<ActualT, typename S::PrimType>::value);
         static_assert((config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1),
                       "scalarTensorIndex out of range");
+        #ifdef __MSTX_DFX_REPORT__
+            MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, isSetMask);
+        #endif
         SubsImpl<ActualT, isSetMask, config.scalarTensorIndex>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(), count);
     } else if constexpr(TypeUtils::IsLocalTensorType<V>() && TypeUtils::IsInnerDefaultType<S>()) {
@@ -1449,6 +1606,13 @@ __aicore__ inline void DivsCommon(const U& dst, const S& src0, const V& src1, Ma
         static_assert(Std::is_same<ActualT, typename S::PrimType>::value);
         static_assert((config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1),
                       "scalarTensorIndex out of range");
+        #ifdef __MSTX_DFX_REPORT__
+            if constexpr (Std::is_same_v<MaskType, uint64_t>) {
+                MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, mask, mask, repeatTime, repeatParams, isSetMask);
+            } else {
+                MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask);
+            }            
+        #endif
         DivsImpl<ActualT, isSetMask, config.scalarTensorIndex>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(),
             mask, repeatTime, repeatParams);
@@ -1507,6 +1671,9 @@ __aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, const in
         static_assert(Std::is_same<ActualT, typename S::PrimType>::value);
         static_assert((config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1),
                       "scalarTensorIndex out of range");
+        #ifdef __MSTX_DFX_REPORT__
+            MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1, isSetMask);
+        #endif
         DivsImpl<ActualT, isSetMask, config.scalarTensorIndex>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualT*)src0.GetPhyAddr(), (__ubuf__ ActualT*)src1.GetPhyAddr(), count);
     } else if constexpr(TypeUtils::IsLocalTensorType<V>() && TypeUtils::IsInnerDefaultType<S>()) {
@@ -1620,6 +1787,9 @@ __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &sr
         static_assert(Std::is_same<T3, T4>::value);
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
         static_assert((config.scalarTensorIndex == 0 || config.scalarTensorIndex == 1), "scalarTensorIndex out of range");
+        #ifdef __MSTX_DFX_REPORT__
+            MstxTensor::GetMstxVecBinaryScalarInfo(dst, src0, src1,false);
+        #endif
         if constexpr (config.scalarTensorIndex == 0) {
             FusedMulsCastImpl<ActualT, ActualU>((__ubuf__ ActualT*)dst.GetPhyAddr(),
                 (__ubuf__ ActualU*)src1.GetPhyAddr(), (__ubuf__ ActualU*)src0.GetPhyAddr(), count);
