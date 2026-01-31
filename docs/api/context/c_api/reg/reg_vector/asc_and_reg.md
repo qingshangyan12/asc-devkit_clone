@@ -16,8 +16,8 @@ $$
 
 ## 函数原型
     ```c++
-    __simd_callee__ inline void asc_and(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, uint32_t count)
-    __simd_callee__ inline void asc_and(_ubuf__ uint16_t* dst, _ubuf__ uint16_t* src0, _ubuf__ uint16_t* src1, uint32_t count)
+    __simd_callee__ inline void asc_and(_ubuf__ int16_t* dst, _ubuf__ int16_t* src0, _ubuf__ int16_t* src1, vector_bool mask)
+    __simd_callee__ inline void asc_and(_ubuf__ uint16_t* dst, _ubuf__ uint16_t* src0, _ubuf__ uint16_t* src1, vector_bool mask)
     ```
 
 ## 参数说明
@@ -28,6 +28,7 @@ $$
 | --------- | ----- | ----------------- |
 | dst       | 输出    | 目的操作数。            |
 | src0、src1 | 输入    | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。             |
+| mask | 输入 | 源操作数掩码（矢量），类型为[掩码寄存器](../reg数据类型定义.md/#掩码寄存器)，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 ## 返回值说明
 
@@ -39,8 +40,8 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
-- dst、src的需要32字节对齐。
+- 非饱和模式：输入数据超出目标数据范围时，会截断为目标数据格式，例如输入uint16_t值为256，输出uint8_t值为0。
+- 饱和模式：输入数据超出目标数据范围时，返回输出类型的对应最值。
 
 ## 调用示例
 
