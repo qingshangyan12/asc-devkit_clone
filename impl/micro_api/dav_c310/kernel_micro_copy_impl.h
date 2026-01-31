@@ -28,9 +28,9 @@ __simd_callee__ inline void CopyImpl(U& dstReg, U& srcReg, MaskReg mask)
                   "current Move api only supported MaskMergeMode MERGING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (IsSameType<ActualT, bool>::value) {
-        vmov((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, modeValue);
+        bisheng::cce::simd::vmov((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, modeValue);
     } else if constexpr (sizeof(ActualT) != 8) {
-        vmov(dstReg, srcReg, mask, modeValue);
+        bisheng::cce::simd::vmov(dstReg, srcReg, mask, modeValue);
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             constexpr auto lowerDist =
@@ -38,12 +38,12 @@ __simd_callee__ inline void CopyImpl(U& dstReg, U& srcReg, MaskReg mask)
             MaskReg dstMask;
             MaskReg tmpMask;
             MaskReg dumpMask;
-            ppack(tmpMask, mask, lowerDist);
+            bisheng::cce::simd::ppack(tmpMask, mask, lowerDist);
             pintlv_b32(dstMask, dumpMask, tmpMask, tmpMask);
-            vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, dstMask, modeValue);
+            bisheng::cce::simd::vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, dstMask, modeValue);
         } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-            vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
-            vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
+            bisheng::cce::simd::vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
+            bisheng::cce::simd::vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
         }
     }
 }
@@ -56,15 +56,15 @@ __simd_callee__ inline void CopyImpl(U& dstReg, U& srcReg)
     static_assert(SupportType<ActualT, bool, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t,
                   half, float, bfloat16_t>(), "current data type is not supported on current device!");
     if constexpr (IsSameType<ActualT, bool>::value) {
-        vmov((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg);
+        bisheng::cce::simd::vmov((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg);
     } else if constexpr (sizeof(ActualT) != 8) {
-        vmov(dstReg, srcReg);
+        bisheng::cce::simd::vmov(dstReg, srcReg);
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-            vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg);
+            bisheng::cce::simd::vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg);
         } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-            vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0]);
-            vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1]);
+            bisheng::cce::simd::vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0]);
+            bisheng::cce::simd::vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1]);
         }
     }
 }

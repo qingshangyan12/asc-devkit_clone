@@ -388,7 +388,7 @@ namespace MicroAPIAddDeqRelu {
 template <typename T, typename RegT, typename RegU>
 __aicore__ inline void AddDeqRelu(RegU &dstReg, RegT &srcReg0, RegT &srcReg1, MicroAPI::MaskReg &mask)
 {
-    // max(float(srcReg0 + srcReg1) * (1/131072) * g_deqValue * 131072, 0)
+    // bisheng::cce::max(float(srcReg0 + srcReg1) * (1/131072) * g_deqValue * 131072, 0)
     MicroAPI::RegTensor<float> tmpReg;
     MicroAPI::Add(srcReg0, srcReg0, srcReg1, mask);
     MicroAPI::Cast<float, int32_t, CastParam::s322floatCastTrait>(tmpReg, srcReg0, mask);

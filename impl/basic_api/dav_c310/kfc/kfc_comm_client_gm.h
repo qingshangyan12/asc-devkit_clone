@@ -111,7 +111,7 @@ public:
             __mstx_dfx_report_stub(0, sizeof(MstxCrossRecord), &record);
 #endif
  
-            dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+            bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         }
     }
  
@@ -122,7 +122,7 @@ public:
         SetFlag<HardEvent::S_MTE3>(eventID);
         WaitFlag<HardEvent::S_MTE3>(eventID);
         PipeBarrier<PIPE_MTE3>();
-        copy_ubuf_to_gm_align_v2((__gm__ void *)msg, (__ubuf__ void *)ubMsg, 0, 1, sizeof(KfcMsg), 0, 0, 0);
+        bisheng::cce::copy_ubuf_to_gm_align_v2((__gm__ void *)msg, (__ubuf__ void *)ubMsg, 0, 1, sizeof(KfcMsg), 0, 0, 0);
 #ifdef __MSTX_DFX_REPORT__
         MstxCrossRecord record = {
             .addr = reinterpret_cast<uint64_t>(msg),
@@ -163,13 +163,13 @@ public:
  
         GM_ADDR ret;
         if (head + size >= WORKSPACE_UB_SIZE) {
-            dcci(reinterpret_cast<__gm__ int64_t *>(ubAvalidTail), cache_line_t::SINGLE_CACHE_LINE,
-                dcci_dst_t::CACHELINE_OUT);
+            bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(ubAvalidTail), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE,
+                bisheng::cce::dcci_dst_t::CACHELINE_OUT);
             tail = *(reinterpret_cast<__gm__ uint32_t *>(ubAvalidTail));
             while (head < tail || tail == 0) {
                 Barrier();
-                dcci(reinterpret_cast<__gm__ int64_t *>(ubAvalidTail), cache_line_t::SINGLE_CACHE_LINE,
-                    dcci_dst_t::CACHELINE_OUT);
+                bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(ubAvalidTail), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE,
+                    bisheng::cce::dcci_dst_t::CACHELINE_OUT);
                 Barrier();
                 tail = *(reinterpret_cast<__gm__ uint32_t *>(ubAvalidTail));
             }
@@ -181,8 +181,8 @@ public:
  
         while (head < tail && (head + size >= tail)) {
             Barrier();
-            dcci(reinterpret_cast<__gm__ int64_t *>(ubAvalidTail), cache_line_t::SINGLE_CACHE_LINE,
-                dcci_dst_t::CACHELINE_OUT);
+            bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(ubAvalidTail), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE,
+                bisheng::cce::dcci_dst_t::CACHELINE_OUT);
             Barrier();
             tail = *(reinterpret_cast<__gm__ uint32_t *>(ubAvalidTail));
         }

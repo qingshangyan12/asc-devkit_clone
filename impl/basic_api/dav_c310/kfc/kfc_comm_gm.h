@@ -382,11 +382,11 @@ __aicore__ inline void ClearWorkspaceImpl(__gm__ uint8_t* workspace)
  
     for (size_t i = 0; i < block; i++) {
         // 第四参数：blockCount: 16 ; 第五参数： burstLength: 128; 第七参数: dstStride: 128
-        copy_ubuf_to_gm_align_v2((__gm__ void *)msgStartAddr, (__ubuf__ void *)ubMsg, 0, 16, 128, 0, 128, 0);
+        bisheng::cce::copy_ubuf_to_gm_align_v2((__gm__ void *)msgStartAddr, (__ubuf__ void *)ubMsg, 0, 16, 128, 0, 128, 0);
         msgStartAddr += 2048;
     }
     
-    copy_ubuf_to_gm_align_v2((__gm__ void *)ubMsgStartAddr, (__ubuf__ void *)ubMsg, 0, 1, sizeUbmsg, 0, 0, 0);
+    bisheng::cce::copy_ubuf_to_gm_align_v2((__gm__ void *)ubMsgStartAddr, (__ubuf__ void *)ubMsg, 0, 1, sizeUbmsg, 0, 0, 0);
     PipeBarrier<PIPE_ALL>();
 }
 __aicore__ inline GM_ADDR GetMsgHead(GM_ADDR workspace, int i)
@@ -453,10 +453,10 @@ __aicore__ inline __gm__ KfcMsg *AllocMessageImpl(
     ASCENDC_ASSERT((msgSendStart != nullptr),
                    { KERNEL_LOG(KERNEL_ERROR, "msgSendStart can not be nullptr"); });
     if constexpr (KFC_APPLY_MSG) {
-        dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         while (static_cast<bool>(KfcMsgGetState(msg->head))) {
             Barrier();
-            dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+            bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
             Barrier();
         }
     }
@@ -486,10 +486,10 @@ __aicore__ inline __gm__ KfcMsg *RcvMessageImpl(
     });
     __gm__ KfcMsg* msg = msgRcvHead;
     Barrier();
-    dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+    bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
     Barrier();
  
-    dc_preload((__gm__ uint64_t*)msg, int64_t(0));
+    bisheng::cce::dc_preload((__gm__ uint64_t*)msg, int64_t(0));
  
 #ifdef __MSTX_DFX_REPORT__
     MstxCrossRecord record = {
@@ -521,7 +521,7 @@ __aicore__ inline void FreeMessageImpl(__gm__ KfcMsg *msg)
     __asm__ __volatile__("" ::: "memory");
     *(reinterpret_cast<__gm__ uint64_t *>(msg)) = 0;
     Barrier();
-    dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+    bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
     Barrier();
 }
  

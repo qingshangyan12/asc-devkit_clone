@@ -33,7 +33,11 @@
 
 namespace AscendC {
 namespace MicroAPI {
+#if __NPU_ARCH__ == 3101
+using UnalignReg = bisheng::cce::simd::vector_align;
+#else
 using UnalignReg = vector_align;
+#endif
 
 template <typename T, const RegTrait& regTrait>
 __aicore__ void RegTensor<T, regTrait>::Print() const
