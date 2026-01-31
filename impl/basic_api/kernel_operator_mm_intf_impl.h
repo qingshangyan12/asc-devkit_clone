@@ -410,17 +410,15 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(const LocalTensor<T> &
  #endif 
  }
 
-constexpr const char* fillIntriName = "Fill";
-constexpr const char* initConstValueIntriName = "InitConstValue";
-
 template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type> 
 __aicore__ inline void Fill(const LocalTensor<T> &dst, 
     const InitConstValueParams<U>& initConstValueParams) 
 { 
-    CheckInitParams(dst, initConstValueParams, fillIntriName); 
+    static constexpr const char FILL_INTRINSIC_NAME = "Fill";
+    CheckInitParams(dst, initConstValueParams, FILL_INTRINSIC_NAME); 
     FillImpl(dst, initConstValueParams); 
 }
- 
+
 /* **************************************************************************************************
  * InitConstValue                                             *
  * ************************************************************************************************* */
@@ -433,12 +431,12 @@ __aicore__ inline void Fill(const LocalTensor<T> &dst,
  * @param [in] initConstValueParams.dstGap interval between the previous tail and the next block head
  * @param [in] initConstValueParams.initValue initialize Value
  */
-template <typename T, typename U = PrimT<T>,	 
-     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type> 
 __aicore__ inline void InitConstValue(const LocalTensor<T> &dst, 
     const InitConstValueParams<U>& initConstValueParams) 
 { 
-    CheckInitParams(dst, initConstValueParams, initConstValueIntriName); 
+    static constexpr const char INITCONSTVALUE_INTRINSIC_NAME = "InitConstValue";
+    CheckInitParams(dst, initConstValueParams, INITCONSTVALUE_INTRINSIC_NAME); 
     InitConstValueImpl(dst, initConstValueParams); 
 }
 
@@ -568,19 +566,6 @@ template <typename T>
 __aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTensor<T>& src)
 {
     LoadDataUnzipImpl(dst, src);
-}
-
-/* **************************************************************************************************
- * SetMMLayoutTransform                                             *
- * ************************************************************************************************* */
-/*
- * @ingroup SetMMLayoutTransform
- * @brief set mmad computation to prioritize M/N direction
- * @param [in] mmLayoutMode mm layout mode
- */
-__aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode)
-{
-    SetMMLayoutTransformImpl(mmLayoutMode);
 }
 
  /* **************************************************************************************************

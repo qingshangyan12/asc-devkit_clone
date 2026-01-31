@@ -1193,7 +1193,7 @@ __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T
  * @param [in] intriParams.src0RepStride src0 repeat stride
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask>
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams)
@@ -1215,7 +1215,7 @@ __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTen
         repeatParams);
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask>
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
