@@ -114,7 +114,7 @@ void MainCpuCmpMmadBiasDemo(__gm__ uint8_t* __restrict__ featureGm, __gm__ uint8
 
     // mov ub to gm
     DataCopy(outputGlobal, output_local, outputDataSize);
-    pipe_barrier(PIPE_ALL);
+    bisheng::cce::pipe_barrier(PIPE_ALL);
     SetSysWorkSpacePtr(GetSysWorkSpacePtr());
 }
 

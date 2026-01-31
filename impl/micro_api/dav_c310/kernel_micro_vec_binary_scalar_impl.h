@@ -117,10 +117,10 @@ __simd_callee__ inline void MulsKernel(S& dstReg, S& srcReg, const U& scalarValu
     RegTensor<typename ActualT::EleType> f;
     RegTensor<typename ActualT::EleType> g;
     RegTensor<typename ActualT::EleType> h;
-    vmul(e, src0Real, src1Real, mask, modeValue);
-    vmul(f, src0Imag, src1Imag, mask, modeValue);
-    vmul(g, src0Imag, src1Real, mask, modeValue);
-    vmul(h, src0Real, src1Imag, mask, modeValue);
+    bisheng::cce::simd::vmul(e, src0Real, src1Real, mask, modeValue);
+    bisheng::cce::simd::vmul(f, src0Imag, src1Imag, mask, modeValue);
+    bisheng::cce::simd::vmul(g, src0Imag, src1Real, mask, modeValue);
+    bisheng::cce::simd::vmul(h, src0Real, src1Imag, mask, modeValue);
     vsub(dstReal, e, f, mask, modeValue);
     vadd(dstImag, g, h, mask, modeValue);
 }
@@ -155,7 +155,7 @@ __simd_callee__ inline void MulsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
                 B32TraitTwoToTaitOne(dstReg, traitTwoDstReg);
             }
         } else {
-            vmuls(dstReg, srcReg, scalarValue, mask, modeValue);
+            bisheng::cce::simd::vmuls(dstReg, srcReg, scalarValue, mask, modeValue);
         }
     } else {
         if constexpr(SupportType<ActualT, complex64>()) {

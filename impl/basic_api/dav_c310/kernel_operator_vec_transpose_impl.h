@@ -20,65 +20,65 @@ constexpr int8_t TWO_NUM = 2;
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl(__ubuf__ float* dstList[16], __ubuf__ float* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b32(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b32(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl(__ubuf__ int32_t* dstList[16], __ubuf__ int32_t* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b32(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b32(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl(__ubuf__ uint32_t* dstList[16], __ubuf__ uint32_t* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b32(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b32(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl(__ubuf__ int16_t* dstList[16], __ubuf__ int16_t* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b16(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b16(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl(__ubuf__ uint16_t* dstList[16], __ubuf__ uint16_t* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b16(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b16(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl(__ubuf__ half* dstList[16], __ubuf__ half* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b16(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b16(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl(__ubuf__ bfloat16_t* dstList[16], __ubuf__ bfloat16_t* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b16(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b16(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
 __aicore__ inline void TransDataTo5HDB8IntrinsicsCommonImpl(const TransDataTo5HDParams& transDataTo5HDParams)
 {
     if ((transDataTo5HDParams.dstHighHalf == false) && (transDataTo5HDParams.srcHighHalf == false)) {
-        scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+        bisheng::cce::scatter_vnchwconv_b8(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, false);
     } else if ((transDataTo5HDParams.dstHighHalf == false) && (transDataTo5HDParams.srcHighHalf == true)) {
-        scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+        bisheng::cce::scatter_vnchwconv_b8(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, true);
     } else if ((transDataTo5HDParams.dstHighHalf == true) && (transDataTo5HDParams.srcHighHalf == true)) {
-        scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+        bisheng::cce::scatter_vnchwconv_b8(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, true, true);
     } else {
-        scatter_vnchwconv_b8(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+        bisheng::cce::scatter_vnchwconv_b8(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, true, false);
     }
 }
@@ -115,7 +115,7 @@ template<>
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl<float>(uint64_t dstList[16], uint64_t srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b32(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b32(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
@@ -123,7 +123,7 @@ template <>
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl<int32_t>(uint64_t dstList[16], uint64_t srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b32(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b32(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
@@ -131,7 +131,7 @@ template <>
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl<uint32_t>(uint64_t dstList[16], uint64_t srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b32(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b32(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
@@ -139,7 +139,7 @@ template <>
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl<int16_t>(uint64_t dstList[16], uint64_t srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b16(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b16(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
@@ -147,7 +147,7 @@ template <>
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl<uint16_t>(uint64_t dstList[16], uint64_t srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b16(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b16(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
@@ -155,7 +155,7 @@ template <>
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl<half>(uint64_t dstList[16], uint64_t srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b16(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b16(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
@@ -163,7 +163,7 @@ template <>
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl<bfloat16_t>(uint64_t dstList[16], uint64_t srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    scatter_vnchwconv_b16(VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
+    bisheng::cce::scatter_vnchwconv_b16(bisheng::cce::VA0, bisheng::cce::VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
         transDataTo5HDParams.srcRepStride);
 }
 
@@ -202,27 +202,27 @@ template <typename T> __aicore__ inline void SetVaReg(__ubuf__ T* dstList[16], _
         vaRegArray4[i] = (uint64_t)srcList[VA_REG_ARRAY_LEN + i];
     }
 
-    set_va_reg_sb(VA0, vaRegArray1);
-    set_va_reg_sb(VA1, vaRegArray2);
-    set_va_reg_sb(VA2, vaRegArray3);
-    set_va_reg_sb(VA3, vaRegArray4);
+    bisheng::cce::set_va_reg_sb(bisheng::cce::VA0, vaRegArray1);
+    bisheng::cce::set_va_reg_sb(bisheng::cce::VA1, vaRegArray2);
+    bisheng::cce::set_va_reg_sb(bisheng::cce::VA2, vaRegArray3);
+    bisheng::cce::set_va_reg_sb(bisheng::cce::VA3, vaRegArray4);
 }
 
 __aicore__ inline void SetVaReg(uint64_t dst[NCHW_CONV_ADDR_LIST_SIZE],
     uint64_t src[NCHW_CONV_ADDR_LIST_SIZE])
 {
-    set_va_reg_sb(VA0, dst);
-    set_va_reg_sb(VA1, dst + VA_REG_ARRAY_LEN);
-    set_va_reg_sb(VA2, src);
-    set_va_reg_sb(VA3, src + VA_REG_ARRAY_LEN);
+    bisheng::cce::set_va_reg_sb(bisheng::cce::VA0, dst);
+    bisheng::cce::set_va_reg_sb(bisheng::cce::VA1, dst + VA_REG_ARRAY_LEN);
+    bisheng::cce::set_va_reg_sb(bisheng::cce::VA2, src);
+    bisheng::cce::set_va_reg_sb(bisheng::cce::VA3, src + VA_REG_ARRAY_LEN);
 }
 
 __aicore__ inline void VldVaReg(__ubuf__ uint64_t* dst, __ubuf__ uint64_t* src)
 {
-    ldva(VA0, (uint64_t)dst, false); // false refers to low 128 bit;
-    ldva(VA1, (uint64_t)dst, true); // true refers to high 128 bit;
-    ldva(VA2, (uint64_t)src, false);
-    ldva(VA3, (uint64_t)src, true);
+    bisheng::cce::ldva(bisheng::cce::VA0, (uint64_t)dst, false); // false refers to low 128 bit;
+    bisheng::cce::ldva(bisheng::cce::VA1, (uint64_t)dst, true); // true refers to high 128 bit;
+    bisheng::cce::ldva(bisheng::cce::VA2, (uint64_t)src, false);
+    bisheng::cce::ldva(bisheng::cce::VA3, (uint64_t)src, true);
 }
 
 template <typename T>

@@ -30,7 +30,7 @@ __simd_callee__ inline void PackImpl(S& dstReg, V& srcReg)
                   int64_t>>()), "unsupport datatype");
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     if constexpr (sizeof(ActualU) != 8) {
-        vpack(dstReg, srcReg, partValue);
+        bisheng::cce::simd::vpack(dstReg, srcReg, partValue);
     } else {
         if constexpr (CheckRegTrait<V, RegTraitNumOne>()) {
             RegTensor<uint32_t> zeroReg;
@@ -61,7 +61,7 @@ __simd_callee__ inline void UnPackImpl(S& dstReg, V& srcReg)
                   int32_t>>()), "unsupport datatype");
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     if constexpr (sizeof(ActualT) != 8) {
-        vunpack(dstReg, srcReg, partValue);
+        bisheng::cce::simd::vunpack(dstReg, srcReg, partValue);
     } else {
         RegTensor<uint32_t> padReg;
         MaskReg mask0 = CreateMask<ActualU, MaskPattern::ALL>();

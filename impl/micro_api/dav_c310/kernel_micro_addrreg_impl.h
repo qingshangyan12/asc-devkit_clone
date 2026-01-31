@@ -26,13 +26,13 @@ __simd_callee__ inline AddrReg CreateAddrRegImpl(uint16_t index0, uint32_t strid
     return VagCpuSim(sizeof(T), index0, stride0);
 #endif
     if constexpr (sizeof(T) == 1) {
-        return vag_b8(stride0);
+        return bisheng::cce::simd::vag_b8(stride0);
     } else if constexpr (sizeof(T) == 2) {
-        return vag_b16(stride0);
+        return bisheng::cce::simd::vag_b16(stride0);
     } else if constexpr (sizeof(T) == 8) {
-        return vag_b32(stride0 * 2);
+        return bisheng::cce::simd::vag_b32(stride0 * 2);
     }
-    return vag_b32(stride0);
+    return bisheng::cce::simd::vag_b32(stride0);
 }
 
 template <typename T>
@@ -44,13 +44,13 @@ __simd_callee__ inline AddrReg CreateAddrRegImpl(uint16_t index0, uint32_t strid
     return VagCpuSim(sizeof(T), index0, stride0, index1, stride1);
 #endif
     if constexpr (sizeof(T) == 1) {
-        return vag_b8(stride0, stride1);
+        return bisheng::cce::simd::vag_b8(stride0, stride1);
     } else if constexpr (sizeof(T) == 2) {
-        return vag_b16(stride0, stride1);
+        return bisheng::cce::simd::vag_b16(stride0, stride1);
     }else if constexpr (sizeof(T) == 8) {
-        return vag_b32(stride0 * 2, stride1 * 2);
+        return bisheng::cce::simd::vag_b32(stride0 * 2, stride1 * 2);
     }
-    return vag_b32(stride0, stride1);
+    return bisheng::cce::simd::vag_b32(stride0, stride1);
 }
 
 template <typename T>
@@ -63,13 +63,13 @@ __simd_callee__ inline AddrReg CreateAddrRegImpl(uint16_t index0, uint32_t strid
     return VagCpuSim(sizeof(T), index0, stride0, index1, stride1, index2, stride2);
 #endif
     if constexpr (sizeof(T) == 1) {
-        return vag_b8(stride0, stride1, stride2);
+        return bisheng::cce::simd::vag_b8(stride0, stride1, stride2);
     } else if constexpr (sizeof(T) == 2) {
-        return vag_b16(stride0, stride1, stride2);
+        return bisheng::cce::simd::vag_b16(stride0, stride1, stride2);
     } else if constexpr (sizeof(T) == 8) {
-        return vag_b32(stride0 * 2, stride1 * 2, stride2 * 2);
+        return bisheng::cce::simd::vag_b32(stride0 * 2, stride1 * 2, stride2 * 2);
     }
-    return vag_b32(stride0, stride1, stride2);
+    return bisheng::cce::simd::vag_b32(stride0, stride1, stride2);
 }
 
 template <typename T>
@@ -82,13 +82,13 @@ __simd_callee__ inline AddrReg CreateAddrRegImpl(uint16_t index0, uint32_t strid
     return VagCpuSim(sizeof(T), index0, stride0, index1, stride1, index2, stride2, index3, stride3);
 #endif
     if constexpr (sizeof(T) == 1) {
-        return vag_b8(stride0, stride1, stride2, stride3);
+        return bisheng::cce::simd::vag_b8(stride0, stride1, stride2, stride3);
     } else if constexpr (sizeof(T) == 2) {
-        return vag_b16(stride0, stride1, stride2, stride3);
+        return bisheng::cce::simd::vag_b16(stride0, stride1, stride2, stride3);
     } else if constexpr (sizeof(T) == 8) {
-        return vag_b32(stride0 * 2, stride1 * 2, stride2 * 2, stride3 * 2);
+        return bisheng::cce::simd::vag_b32(stride0 * 2, stride1 * 2, stride2 * 2, stride3 * 2);
     }
-    return vag_b32(stride0, stride1, stride2, stride3);
+    return bisheng::cce::simd::vag_b32(stride0, stride1, stride2, stride3);
 }
 } // namespace MicroAPI
 } // namespace AscendC

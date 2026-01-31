@@ -38,22 +38,22 @@ __simd_callee__ inline void CompareUint64Impl(MaskReg& dst, T& srcReg0, T& srcRe
         vcmp_eq(highEq, (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1], mask);
         vcmp_gt(lowCmp, (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
         vcmp_gt(highCmp, (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1], mask);
-        psel(dst, lowCmp, highCmp, highEq);
+        bisheng::cce::simd::psel(dst, lowCmp, highCmp, highEq);
     } else if constexpr (mode == CMPMODE::GE) {
         vcmp_eq(highEq, (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1], mask);
         vcmp_ge(lowCmp, (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
         vcmp_ge(highCmp, (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1], mask);
-        psel(dst, lowCmp, highCmp, highEq);
+        bisheng::cce::simd::psel(dst, lowCmp, highCmp, highEq);
     } else if constexpr (mode == CMPMODE::LT) {
         vcmp_eq(highEq, (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1], mask);
         vcmp_lt(lowCmp, (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
         vcmp_lt(highCmp, (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1], mask);
-        psel(dst, lowCmp, highCmp, highEq);
+        bisheng::cce::simd::psel(dst, lowCmp, highCmp, highEq);
     } else if constexpr (mode == CMPMODE::LE) {
         vcmp_eq(highEq, (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1], mask);
         vcmp_le(lowCmp, (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
         vcmp_le(highCmp, (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1], mask);
-        psel(dst, lowCmp, highCmp, highEq);
+        bisheng::cce::simd::psel(dst, lowCmp, highCmp, highEq);
     }
 }
 
@@ -78,22 +78,22 @@ __simd_callee__ inline void CompareInt64Impl(MaskReg& dst, T& srcReg0, T& srcReg
         vcmp_eq(highEq, (RegTensor<int32_t>&)srcReg0.reg[1], (RegTensor<int32_t>&)srcReg1.reg[1], mask);
         vcmp_gt(lowCmp, (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
         vcmp_gt(highCmp, (RegTensor<int32_t>&)srcReg0.reg[1], (RegTensor<int32_t>&)srcReg1.reg[1], mask);
-        psel(dst, lowCmp, highCmp, highEq);
+        bisheng::cce::simd::psel(dst, lowCmp, highCmp, highEq);
     } else if constexpr (mode == CMPMODE::GE) {
         vcmp_eq(highEq, (RegTensor<int32_t>&)srcReg0.reg[1], (RegTensor<int32_t>&)srcReg1.reg[1], mask);
         vcmp_ge(lowCmp, (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
         vcmp_ge(highCmp, (RegTensor<int32_t>&)srcReg0.reg[1], (RegTensor<int32_t>&)srcReg1.reg[1], mask);
-        psel(dst, lowCmp, highCmp, highEq);
+        bisheng::cce::simd::psel(dst, lowCmp, highCmp, highEq);
     } else if constexpr (mode == CMPMODE::LT) {
         vcmp_eq(highEq, (RegTensor<int32_t>&)srcReg0.reg[1], (RegTensor<int32_t>&)srcReg1.reg[1], mask);
         vcmp_lt(lowCmp, (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
         vcmp_lt(highCmp, (RegTensor<int32_t>&)srcReg0.reg[1], (RegTensor<int32_t>&)srcReg1.reg[1], mask);
-        psel(dst, lowCmp, highCmp, highEq);
+        bisheng::cce::simd::psel(dst, lowCmp, highCmp, highEq);
     } else if constexpr (mode == CMPMODE::LE) {
         vcmp_eq(highEq, (RegTensor<int32_t>&)srcReg0.reg[1], (RegTensor<int32_t>&)srcReg1.reg[1], mask);
         vcmp_le(lowCmp, (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
         vcmp_le(highCmp, (RegTensor<int32_t>&)srcReg0.reg[1], (RegTensor<int32_t>&)srcReg1.reg[1], mask);
-        psel(dst, lowCmp, highCmp, highEq);
+        bisheng::cce::simd::psel(dst, lowCmp, highCmp, highEq);
     }
 }
 
@@ -185,11 +185,11 @@ __simd_callee__ inline void SelectImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
     static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
                   "Select only supports datatype bool/b8/b16/b32/b64 on current device");
     if constexpr (sizeof(ActualT) == 1) {
-        vsel((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg0, (RegTensor<uint8_t>&)srcReg1, mask);
+        bisheng::cce::simd::vsel((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg0, (RegTensor<uint8_t>&)srcReg1, mask);
     } else if constexpr (sizeof(ActualT) == 2) {
-        vsel((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg0, (RegTensor<uint16_t>&)srcReg1, mask);
+        bisheng::cce::simd::vsel((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg0, (RegTensor<uint16_t>&)srcReg1, mask);
     } else if constexpr (sizeof(ActualT) == 4) {
-        vsel((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1, mask);
+        bisheng::cce::simd::vsel((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1, mask);
     } else if constexpr (sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
@@ -199,15 +199,15 @@ __simd_callee__ inline void SelectImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             B64TraitOneToTaitTwo(traitTwoSrcReg0, srcReg0);
             B64TraitOneToTaitTwo(traitTwoSrcReg1, srcReg1);
-            vsel((RegTensor<uint32_t>&)traitTwoDstReg.reg[0], (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[0],
+            bisheng::cce::simd::vsel((RegTensor<uint32_t>&)traitTwoDstReg.reg[0], (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[0],
                 (RegTensor<uint32_t>&)traitTwoSrcReg1.reg[0], maskTrait2);
-            vsel((RegTensor<uint32_t>&)traitTwoDstReg.reg[1], (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[1],
+            bisheng::cce::simd::vsel((RegTensor<uint32_t>&)traitTwoDstReg.reg[1], (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[1],
                 (RegTensor<uint32_t>&)traitTwoSrcReg1.reg[1], maskTrait2);
             B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
         } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-            vsel((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg0.reg[0],
+            bisheng::cce::simd::vsel((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg0.reg[0],
                 (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
-            vsel((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[1],
+            bisheng::cce::simd::vsel((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[1],
                 (RegTensor<uint32_t>&)srcReg1.reg[1], mask);
         }
     }

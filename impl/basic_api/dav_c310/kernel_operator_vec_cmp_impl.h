@@ -1468,19 +1468,19 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T 
 template <typename T>
 __aicore__ inline void GetCmpMaskImpl(__ubuf__ T* dst)
 {
-    pipe_barrier(PIPE_ALL);
+    bisheng::cce::pipe_barrier(PIPE_ALL);
     (*(__ubuf__ uint64_t *)((__ubuf__ uint64_t *)dst)) = Internal::g_cmpMaskLow;
     (*(__ubuf__ uint64_t *)((__ubuf__ uint64_t *)dst + 1)) = Internal::g_cmpMaskHigh;
-    pipe_barrier(PIPE_ALL);
+    bisheng::cce::pipe_barrier(PIPE_ALL);
 }
 
 template <typename T>
 __aicore__ inline void SetCmpMaskImpl(__ubuf__ T* src)
 {
-    pipe_barrier(PIPE_ALL);
+    bisheng::cce::pipe_barrier(PIPE_ALL);
     Internal::g_cmpMaskLow = reinterpret_cast<uint64_t>(((__ubuf__ uint64_t *)src)[0]);
     Internal::g_cmpMaskHigh = reinterpret_cast<uint64_t>(((__ubuf__ uint64_t *)src)[1]);
-    pipe_barrier(PIPE_ALL);
+    bisheng::cce::pipe_barrier(PIPE_ALL);
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CMP_IMPL_H

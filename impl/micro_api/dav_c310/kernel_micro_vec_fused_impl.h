@@ -30,7 +30,7 @@ __simd_callee__ inline void FusedMulsCastImpl(T3& dstReg, T4& srcReg, T2 scalarV
                   "current MulsCast api only supported RegLayout ZERO, ONE on current device!");
 
     constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layout)>();
-    vmulscvt(dstReg, srcReg, scalarValue, mask, partModeValue);
+    bisheng::cce::simd::vmulscvt(dstReg, srcReg, scalarValue, mask, partModeValue);
 }
 
 template <typename T, MaskMergeMode mode, typename U>
@@ -85,7 +85,7 @@ __simd_callee__ inline void FusedExpSubImpl(S& dstReg, V& srcReg0, V& srcReg1, M
                   "current ExpSub api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layout)>();
-    vexpdif(dstReg, srcReg0, srcReg1, mask, partModeValue);
+    bisheng::cce::simd::vexpdif(dstReg, srcReg0, srcReg1, mask, partModeValue);
 }
 
 template <typename T, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
