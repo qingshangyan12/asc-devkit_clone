@@ -74,6 +74,23 @@ static inline SocVersion SocVersionStrMap(const char *socVersionStr)
     return SocVersion::RESERVED_VERSION;
 }
 
+uint32_t PlatformAscendC::GetVecRegLen(void) const 
+{
+    std::string sizeStr; 
+    bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "vector_reg_width", sizeStr);
+    if(!ret){
+        PF_LOGE("platform do not support get vector_reg_width size !");
+        return 0u;
+    }
+    bool isDecimalNumber = !sizeStr.empty() && std::all_of(sizeStr.begin(), sizeStr.end(), [](unsigned char ch){ return std::isdigit(ch); });
+    uint64_t size = isDecimalNumber ? std::stoull(sizeStr) : 0;
+    if(size > UINT32_MAX){
+        PF_LOGE("The bit width exceeds the maximum value of uint32.");
+        return 0u;
+    }
+    return static_cast<uint32_t>(size);
+}
+
 static inline uint32_t GetCoreNumByType(fe::PlatFormInfos *platformInfo, bool isAiv)
 {
     std::string key;
@@ -342,6 +359,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Kirin9030", "Kirin9030"}
 };
 
+
 const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = {
     {"Ascend910B", "2201"}, // ascend910b_list
     {"Ascend910", "1001"},
@@ -352,6 +370,7 @@ const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = 
     {"KirinX90", "3003"},
     {"Kirin9030", "3113"}
 };
+
 
 bool SwitchIntoShortSocVersion(const char *socVersionStr, std::string &shortSocVersion)
 {
