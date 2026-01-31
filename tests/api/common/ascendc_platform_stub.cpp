@@ -74,4 +74,19 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size)
 uint32_t PlatformAscendC::GetCoreNumAiv(void) const {
     return this->platformInfo_->GetCoreNum();
 }
+
+uint32_t PlatformAscendC::GetVecRegLen(void) const 
+{
+    std::string sizeStr; 
+    bool ret = this->platformInfo_->GetPlatformResWithLock("AICoreSpec", "vector_reg_width", sizeStr);
+    if(!ret){
+        return 0u;
+    }
+    bool isDecimalNumber = !sizeStr.empty() && std::all_of(sizeStr.begin(), sizeStr.end(), ::isdigit);
+    uint64_t size = isDecimalNumber ? std::stoull(sizeStr) : 0;
+    if(size > UINT32_MAX){
+        return 0u;
+    }
+    return static_cast<uint32_t>(size);
+}
 }
