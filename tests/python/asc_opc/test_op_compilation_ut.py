@@ -174,68 +174,68 @@ class TestOpCompilationUt(unittest.TestCase):
         os.remove(test_root_dir + "/debug_dir/kernel_meta_Sqrt/kernel_meta/Sqrt.o")
         logger.debug("End to execute ============ test_01_op_compilation_st ============")
 
-    # @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
-    # def test_01_op_compilation(self, mock_set_current_compile_soc_info):
-    #     mock_set_current_compile_soc_info.return_value = "success"
-    #     """test op_compilation"""
-    #     logger.debug("Start to execute ============ test_01_op_compilation ============")
+    @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
+    def test_01_op_compilation(self, mock_set_current_compile_soc_info):
+        mock_set_current_compile_soc_info.return_value = "success"
+        """test op_compilation"""
+        logger.debug("Start to execute ============ test_01_op_compilation ============")
 
-    #     test_root_dir = os.path.abspath(os.path.dirname(__file__))
-    #     input_param_path = test_root_dir + "/stub/files/matmul_1.json"
-    #     op_path = test_root_dir + "/stub/files/MatMul.py"
-    #     json_path = test_root_dir + "/stub/files/ascend910.json"
-    #     with open(json_path, "r") as file_in:
-    #         op_builtin_info_dict = json.load(file_in)
-    #     SubOpInfoStore().set_op_content(op_builtin_info_dict)
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
+        input_param_path = test_root_dir + "/stub/files/matmul_1.json"
+        op_path = test_root_dir + "/stub/files/MatMul.py"
+        json_path = test_root_dir + "/stub/files/ascend910.json"
+        with open(json_path, "r") as file_in:
+            op_builtin_info_dict = json.load(file_in)
+        SubOpInfoStore().set_op_content(op_builtin_info_dict)
     
-    #     opc_compile_args = {
-    #         "op_path" : op_path,
-    #         "input_param" : input_param_path,
-    #         "soc_version" : "Ascend910A",
-    #         "output" : test_root_dir + "/output",
-    #         "debug_dir" : test_root_dir + "/debug_dir",
-    #         "op_compile_classify": "single_op_compile_config_file_mode",
-    #         "op_debug_level": 3,
-    #         "simplified_key_mode" : 0,
-    #         "core_type" : "AiCore"
-    #     }
-    #     op_compile = OpCompilation(opc_compile_args)
-    #     ret = op_compile.op_compilation()
-    #     self.assertEqual(ret, True)
-    #     self.del_files(test_root_dir + "/output")
-    #     logger.debug("End to execute ============ test_01_op_compilation ============")
+        opc_compile_args = {
+            "op_path" : op_path,
+            "input_param" : input_param_path,
+            "soc_version" : "Ascend910A",
+            "output" : test_root_dir + "/output",
+            "debug_dir" : test_root_dir + "/debug_dir",
+            "op_compile_classify": "single_op_compile_config_file_mode",
+            "op_debug_level": 3,
+            "simplified_key_mode" : 0,
+            "core_type" : "AiCore"
+        }
+        op_compile = OpCompilation(opc_compile_args)
+        ret = op_compile.op_compilation()
+        self.assertEqual(ret, True)
+        self.del_files(test_root_dir + "/output")
+        logger.debug("End to execute ============ test_01_op_compilation ============")
 
-    # @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
-    # def test_02_op_compilation(self, mock_set_current_compile_soc_info):
-    #     mock_set_current_compile_soc_info.return_value = "success"
-    #     """test op_compilation"""
-    #     logger.debug("Start to execute ============ test_02_op_compilation ============")
+    @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
+    def test_02_op_compilation(self, mock_set_current_compile_soc_info):
+        mock_set_current_compile_soc_info.return_value = "success"
+        """test op_compilation"""
+        logger.debug("Start to execute ============ test_02_op_compilation ============")
 
-    #     test_root_dir = os.path.abspath(os.path.dirname(__file__))
-    #     input_param_path = test_root_dir + "/stub/files/matmul_1.json"
-    #     op_path = test_root_dir + "/stub/files/MatMul.py"
-    #     json_path = test_root_dir + "/stub/files/ascend910.json"
-    #     with open(json_path, "r") as file_in:
-    #         op_builtin_info_dict = json.load(file_in)
-    #     SubOpInfoStore().set_op_content(op_builtin_info_dict)
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
+        input_param_path = test_root_dir + "/stub/files/matmul_1.json"
+        op_path = test_root_dir + "/stub/files/MatMul.py"
+        json_path = test_root_dir + "/stub/files/ascend910.json"
+        with open(json_path, "r") as file_in:
+            op_builtin_info_dict = json.load(file_in)
+        SubOpInfoStore().set_op_content(op_builtin_info_dict)
 
-    #     opc_compile_args = {
-    #         "op_path" : op_path,
-    #         "input_param" : input_param_path,
-    #         "soc_version" : "Ascend910A",
-    #         "output" : test_root_dir + "/output",
-    #         "debug_dir" : test_root_dir + "/debug_dir",
-    #         "op_compile_classify": "single_op_compile_config_file_mode",
-    #         "op_debug_level": 3,
-    #         "simplified_key_mode" : 0,
-    #         "optional_input_mode": "gen_placeholder",
-    #         "dynamic_param_mode": "folded_with_desc"
-    #     }
-    #     op_compile = OpCompilation(opc_compile_args)
-    #     ret = op_compile.op_compilation()
-    #     self.assertEqual(ret, True)
-    #     self.del_files(test_root_dir + "/output")
-    #     logger.debug("End to execute ============ test_02_op_compilation ============")
+        opc_compile_args = {
+            "op_path" : op_path,
+            "input_param" : input_param_path,
+            "soc_version" : "Ascend910A",
+            "output" : test_root_dir + "/output",
+            "debug_dir" : test_root_dir + "/debug_dir",
+            "op_compile_classify": "single_op_compile_config_file_mode",
+            "op_debug_level": 3,
+            "simplified_key_mode" : 0,
+            "optional_input_mode": "gen_placeholder",
+            "dynamic_param_mode": "folded_with_desc"
+        }
+        op_compile = OpCompilation(opc_compile_args)
+        ret = op_compile.op_compilation()
+        self.assertEqual(ret, True)
+        self.del_files(test_root_dir + "/output")
+        logger.debug("End to execute ============ test_02_op_compilation ============")
 
     @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
     def test_03_op_compilation(self, mock_set_current_compile_soc_info):
@@ -597,84 +597,84 @@ class TestOpCompilationUt(unittest.TestCase):
         self.assertEqual(ret, False)
         logger.debug("End to execute ============ test_construct_op_kernel_info_ut ============")
 
-    # def test_get_single_op_operator_ut(self):
-    #     logger.debug("Start to excute ============ test_get_single_op_operator_ut ============")
-    #     test_root_dir = os.path.abspath(os.path.dirname(__file__))
-    #     ascend_path = test_root_dir + "/stub"
-    #     os.environ["ASCEND_OPP_PATH"] = ascend_path
+    def test_get_single_op_operator_ut(self):
+        logger.debug("Start to excute ============ test_get_single_op_operator_ut ============")
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
+        ascend_path = test_root_dir + "/stub"
+        os.environ["ASCEND_OPP_PATH"] = ascend_path
 
-    #     with unittest.mock.patch('asc_op_compile_base.common.register.get_operator') as mock_get_operator:
-    #         def mock_get_operator_from_ops(key):
-    #             def conv2d(*args, **kwargs):
-    #                 return "conv2d"
+        with unittest.mock.patch('asc_op_compile_base.common.register.get_operator') as mock_get_operator:
+            def mock_get_operator_from_ops(key):
+                def conv2d(*args, **kwargs):
+                    return "conv2d"
 
-    #             def fresnel_cos(*args, **kwargs):
-    #                 return "fresnel_cos"
-    #             operators = {
-    #                 "conv2d": Operator(None, conv2d),
-    #                 "fresnel_cos": Operator(None, fresnel_cos),
-    #             }
-    #             if key in operators.keys():
-    #                 return operators[key]
-    #             else:
-    #                 return None
-    #         mock_get_operator.side_effect = mock_get_operator_from_ops
-    #         op_type = "conv2d"
-    #         ret = get_single_op_operator(op_type, "true", True)
-    #         self.assertEqual(ret.__name__, "conv2d")
-    #         op_type = "fresnel_cos"
-    #         res = get_single_op_operator(op_type, "true", True)
-    #         self.assertEqual(res.__name__, "fresnel_cos")
-    #     op_type = "asdsddd"
-    #     res = get_single_op_operator(op_type, "false", True)
-    #     self.assertEqual(res, None)
-    #     logger.debug("End to excute ============ test_get_single_op_operator_ut ============")
+                def fresnel_cos(*args, **kwargs):
+                    return "fresnel_cos"
+                operators = {
+                    "conv2d": Operator(None, conv2d),
+                    "fresnel_cos": Operator(None, fresnel_cos),
+                }
+                if key in operators.keys():
+                    return operators[key]
+                else:
+                    return None
+            mock_get_operator.side_effect = mock_get_operator_from_ops
+            op_type = "conv2d"
+            ret = get_single_op_operator(op_type, "true", True)
+            self.assertEqual(ret.__name__, "conv2d")
+            op_type = "fresnel_cos"
+            res = get_single_op_operator(op_type, "true", True)
+            self.assertEqual(res.__name__, "fresnel_cos")
+        op_type = "asdsddd"
+        res = get_single_op_operator(op_type, "false", True)
+        self.assertEqual(res, None)
+        logger.debug("End to excute ============ test_get_single_op_operator_ut ============")
 
 
-    # @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
-    # def test_get_custom_op_operator_ut(self, mock_set_current_compile_soc_info):
-    #     mock_set_current_compile_soc_info.return_value = "success"
-    #     logger.debug("Start to excute ============ test_get_custom_op_operator_ut ============")
-    #     test_root_dir = os.path.abspath(os.path.dirname(__file__))
-    #     custom_path = test_root_dir + "/stub/vendors/custom"
-    #     os.environ["ASCEND_CUSTOM_OPP_PATH"] = custom_path
+    @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
+    def test_get_custom_op_operator_ut(self, mock_set_current_compile_soc_info):
+        mock_set_current_compile_soc_info.return_value = "success"
+        logger.debug("Start to excute ============ test_get_custom_op_operator_ut ============")
+        test_root_dir = os.path.abspath(os.path.dirname(__file__))
+        custom_path = test_root_dir + "/stub/vendors/custom"
+        os.environ["ASCEND_CUSTOM_OPP_PATH"] = custom_path
 
-    #     with unittest.mock.patch('asc_op_compile_base.common.platform.platform_info.get_soc_spec') as mock_get_soc_spec:
-    #         mock_get_soc_spec.return_value = "Ascend310"
-    #         load_op_info_store("Ascend310")
-    #     with unittest.mock.patch('asc_op_compile_base.common.register.get_operator') as mock_get_operator:
-    #         def mock_get_operator_from_ops(key):
-    #             def conv2d(*args, **kwargs):
-    #                 return "conv2d"
+        with unittest.mock.patch('asc_op_compile_base.common.platform.platform_info.get_soc_spec') as mock_get_soc_spec:
+            mock_get_soc_spec.return_value = "Ascend310"
+            load_op_info_store("Ascend310")
+        with unittest.mock.patch('asc_op_compile_base.common.register.get_operator') as mock_get_operator:
+            def mock_get_operator_from_ops(key):
+                def conv2d(*args, **kwargs):
+                    return "conv2d"
 
-    #             def fresnel_cos(*args, **kwargs):
-    #                 return "fresnel_cos"
+                def fresnel_cos(*args, **kwargs):
+                    return "fresnel_cos"
 
-    #             def flash_attentions_score(*args, **kwargs):
-    #                 return "FlashAttentionScore"
-    #             operators = {
-    #                 "conv2d": Operator(None, conv2d),
-    #                 "fresnel_cos": Operator(None, fresnel_cos),
-    #                 "FlashAttentionScore": Operator(None, flash_attentions_score),
-    #             }
-    #             if key in operators.keys():
-    #                 return operators[key]
-    #             else:
-    #                 return None
-    #         mock_get_operator.side_effect = mock_get_operator_from_ops
-    #         op_type = "conv2d"
-    #         ret = get_single_op_operator(op_type, "true", True)
-    #         self.assertEqual(ret.__name__, "conv2d")
-    #         op_type = "fresnel_cos"
-    #         res = get_single_op_operator(op_type, "true", True)
-    #         self.assertEqual(res.__name__, "fresnel_cos")
-    #         op_type = "FlashAttentionScore"
-    #         res = get_single_op_operator(op_type, "true", True)
-    #         self.assertEqual(res.__name__, "flash_attentions_score")
-    #     op_type = "asdsddd"
-    #     res = get_single_op_operator(op_type, "false", True)
-    #     self.assertEqual(res, None)
-    #     logger.debug("End to excute ============ test_get_custom_op_operator_ut ============")
+                def flash_attentions_score(*args, **kwargs):
+                    return "FlashAttentionScore"
+                operators = {
+                    "conv2d": Operator(None, conv2d),
+                    "fresnel_cos": Operator(None, fresnel_cos),
+                    "FlashAttentionScore": Operator(None, flash_attentions_score),
+                }
+                if key in operators.keys():
+                    return operators[key]
+                else:
+                    return None
+            mock_get_operator.side_effect = mock_get_operator_from_ops
+            op_type = "conv2d"
+            ret = get_single_op_operator(op_type, "true", True)
+            self.assertEqual(ret.__name__, "conv2d")
+            op_type = "fresnel_cos"
+            res = get_single_op_operator(op_type, "true", True)
+            self.assertEqual(res.__name__, "fresnel_cos")
+            op_type = "FlashAttentionScore"
+            res = get_single_op_operator(op_type, "true", True)
+            self.assertEqual(res.__name__, "flash_attentions_score")
+        op_type = "asdsddd"
+        res = get_single_op_operator(op_type, "false", True)
+        self.assertEqual(res, None)
+        logger.debug("End to excute ============ test_get_custom_op_operator_ut ============")
 
     @patch('asc_op_compile_base.common.platform.platform_info.set_current_compile_soc_info')
     @patch('asc_op_compile_base.common.platform.platform_info.get_soc_spec')
