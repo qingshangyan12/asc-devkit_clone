@@ -23,7 +23,7 @@ constexpr uint32_t GEGLU_HALF_BUFFER_SIZE = 8; // 1 half data needs 2 float tmpb
 #endif
 
 enum TestMode {
-    NO_INTPUT_PARA_MODE,
+    NO_INPUT_PARA_MODE,
     TMPBUF_PARA_MODE,
     COUNT_PARA_MODE,
     TMPBUF_COUNT_PARA_MODE,
@@ -73,7 +73,7 @@ void main_vec_geglu_level2_demo(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8
     SetFlag<HardEvent::MTE2_V>(EVENT_ID0);
     WaitFlag<HardEvent::MTE2_V>(EVENT_ID0);
 
-    if (testMode == NO_INTPUT_PARA_MODE) {
+    if (testMode == NO_INPUT_PARA_MODE) {
         GeGLU<T, false>(outputLocal, input0Local, input1Local);
     } else if (testMode == COUNT_PARA_MODE) {
         GeGLU<T, false>(outputLocal, input0Local, input1Local, dataSize);
@@ -114,11 +114,11 @@ void main_vec_geglu_level2_demo(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8
             EXPECT_EQ(outputGm[i], 0x00);                                                                      \
         }                                                                                                       \
     }
-VEC_GEGLU_LEVEL2_TESTCASE(half, NO_INTPUT_PARA_MODE);
+VEC_GEGLU_LEVEL2_TESTCASE(half, NO_INPUT_PARA_MODE);
 VEC_GEGLU_LEVEL2_TESTCASE(half, TMPBUF_PARA_MODE);
 VEC_GEGLU_LEVEL2_TESTCASE(half, COUNT_PARA_MODE);
 VEC_GEGLU_LEVEL2_TESTCASE(half, TMPBUF_COUNT_PARA_MODE);
-VEC_GEGLU_LEVEL2_TESTCASE(float, NO_INTPUT_PARA_MODE);
+VEC_GEGLU_LEVEL2_TESTCASE(float, NO_INPUT_PARA_MODE);
 VEC_GEGLU_LEVEL2_TESTCASE(float, TMPBUF_PARA_MODE);
 VEC_GEGLU_LEVEL2_TESTCASE(float, COUNT_PARA_MODE);
 VEC_GEGLU_LEVEL2_TESTCASE(float, TMPBUF_COUNT_PARA_MODE);

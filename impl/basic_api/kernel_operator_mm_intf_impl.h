@@ -239,7 +239,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003))
-// cce compiler process laod3d bfloat16_t using B8, so use the half dtype instead
+// cce compiler process load3d bfloat16_t using B8, so use the half dtype instead
 template <>
 __aicore__ inline void LoadData(const LocalTensor<bfloat16_t>& dst, const LocalTensor<bfloat16_t>& src,
     const LoadData3DParamsV2Pro& loadDataParams)
@@ -259,8 +259,8 @@ __aicore__ inline void LoadData(const LocalTensor<bfloat16_t>& dst, const LocalT
  * @param [in] loadDataParams.startIndex index of the first fractal in the first repeat in the source matrix
  * in unit of frac num
  * @param [in] loadDataParams.repeatTimes the repeat times
- * @param [in] loadDataParams.srcStride source stride between consequent repeat times in unit of frac num
- * @param [in] loadDataParams.dstGap destination gap between consequent repeat times in unit of 512byte
+ * @param [in] loadDataParams.srcStride source stride between consecutive repeat times in unit of frac num
+ * @param [in] loadDataParams.dstGap destination gap between consecutive repeat times in unit of 512byte
  * @param [in] loadDataParams.dstFracGap dst fractal gap in unit of one 512byte fractal
  */
 template <typename T>
@@ -278,8 +278,8 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
  * @param [in] loadDataParams.startIndex index of the first fractal in the first repeat in the source matrix
  * in unit of 512byte fractal
  * @param [in] loadDataParams.repeatTime the repeat times
- * @param [in] loadDataParams.srcStride source stride between consequent repeat times in unit of 512byte
- * @param [in] loadDataParams.dstGap destination gap between consequent repeat times in unit of 512byte
+ * @param [in] loadDataParams.srcStride source stride between consecutive repeat times in unit of 512byte
+ * @param [in] loadDataParams.dstGap destination gap between consecutive repeat times in unit of 512byte
  * @param [in] loadDataParams.dstFracGap dst fractal gap in unit of one 512byte fractal
  * @param [in] loadDataParams.srcFracGap dst fractal gap in unit of one 512byte fractal
  */
@@ -379,48 +379,6 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(const LocalTensor<T> &
     BroadCastVecToMMImpl(dst, src, blockCount, blockLen, srcGap, dstGap);
 }
 
- /* ************************************************************************************************** 
-  * Fill                                             * 
-  * ************************************************************************************************* */ 
- /* 
-  * @ingroup Fill 
-  * @brief L0A/L0B/L1 value initializing 
-  * @param [out] dst output LocalTensor 
-  * @param [in] initConstValueParams.repeatTimes repeat times 
-  * @param [in] initConstValueParams.repeatTimes blockNum block number 
-  * @param [in] initConstValueParams.dstGap interval between the previous tail and the next block head 
-  * @param [in] initConstValueParams.initValue initialize Value 
-  */ 
-  template <typename T, typename U> 
- __aicore__ inline void CheckInitParams(const LocalTensor<T> &dst, 
-     const InitConstValueParams<U>& initConstValueParams, const char* intriName) 
- { 
- #if ASCENDC_CPU_DEBUG 
-     uint16_t repeatTime = initConstValueParams.repeatTimes; 
- #if __NPU_ARCH__ == 2201 
-     uint16_t blockNum = initConstValueParams.blockNum; 
-     uint16_t dstGap = initConstValueParams.dstGap; 
- #else 
-     uint16_t blockNum = 1; 
-     uint16_t dstGap = 0; 
- #endif 
-     if (!CheckFuncInitConstValue(dst, repeatTime, blockNum, dstGap, intriName)) { 
-         ASCENDC_REPORT_CHECK_ERROR(intriName, KernelFuncType::NONE_MODE); 
-     } 
- #endif 
- }
-
-constexpr const char* fillIntriName = "Fill";
-constexpr const char* initConstValueIntriName = "InitConstValue";
-
-template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type> 
-__aicore__ inline void Fill(const LocalTensor<T> &dst, 
-    const InitConstValueParams<U>& initConstValueParams) 
-{ 
-    CheckInitParams(dst, initConstValueParams, fillIntriName); 
-    FillImpl(dst, initConstValueParams); 
-}
- 
 /* **************************************************************************************************
  * InitConstValue                                             *
  * ************************************************************************************************* */
@@ -433,13 +391,24 @@ __aicore__ inline void Fill(const LocalTensor<T> &dst,
  * @param [in] initConstValueParams.dstGap interval between the previous tail and the next block head
  * @param [in] initConstValueParams.initValue initialize Value
  */
-template <typename T, typename U = PrimT<T>,	 
-     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-__aicore__ inline void InitConstValue(const LocalTensor<T> &dst, 
-    const InitConstValueParams<U>& initConstValueParams) 
-{ 
-    CheckInitParams(dst, initConstValueParams, initConstValueIntriName); 
-    InitConstValueImpl(dst, initConstValueParams); 
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void InitConstValue(const LocalTensor<T> &dst,
+    const InitConstValueParams<U>& initConstValueParams)
+{
+#if ASCENDC_CPU_DEBUG
+    uint16_t repeatTime = initConstValueParams.repeatTimes;
+#if __NPU_ARCH__ == 2201
+    uint16_t blockNum = initConstValueParams.blockNum;
+    uint16_t dstGap = initConstValueParams.dstGap;
+#else
+    uint16_t blockNum = 1;
+    uint16_t dstGap = 0;
+#endif
+    if (!CheckFuncInitConstValue(dst, repeatTime, blockNum, dstGap, "InitConstValue")) {
+        ASCENDC_REPORT_CHECK_ERROR("InitConstValue", KernelFuncType::NONE_MODE);
+    }
+#endif
+    InitConstValueImpl(dst, initConstValueParams);
 }
 
 /* **************************************************************************************************
@@ -569,45 +538,5 @@ __aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTens
 {
     LoadDataUnzipImpl(dst, src);
 }
-
-/* **************************************************************************************************
- * SetMMLayoutTransform                                             *
- * ************************************************************************************************* */
-/*
- * @ingroup SetMMLayoutTransform
- * @brief set mmad computation to prioritize M/N direction
- * @param [in] mmLayoutMode mm layout mode
- */
-__aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode)
-{
-    SetMMLayoutTransformImpl(mmLayoutMode);
-}
-
- /* **************************************************************************************************
- * SetHF32Mode                                             *
- * ************************************************************************************************* */
-/*
- * @ingroup SetHF32Mode
- * @brief set mmad hf32 mode
- * @param [in] hf32Mode mm layout mode
- */
-__aicore__ inline void SetHF32Mode(bool hf32Mode)
-{
-    SetHF32ModeImpl(hf32Mode);
-}
-
- /* **************************************************************************************************
- * SetHF32TransMode                                             *
- * ************************************************************************************************* */
-/*
- * @ingroup SetHF32TransMode
- * @brief specify rounding mode for hf32 mode
- * @param [in] hf32TransMode rounding mode for hf32 mode
- */
-__aicore__ inline void SetHF32TransMode(bool hf32TransMode)
-{
-    SetHF32TransModeImpl(hf32TransMode);
-}
-
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H

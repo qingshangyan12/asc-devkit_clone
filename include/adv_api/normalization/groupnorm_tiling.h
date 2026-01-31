@@ -46,7 +46,7 @@ void GetGroupNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSiz
  * \param [in] groupNum: number of groups to separate the channels into
  * \param [out] tiling GroupNorm tiling
  * \return flag for whether the tiling is calculated successfully
-   if src shape and origin src shape is illeagl or input stackBufferSize is not big enough, it will return false.
+   if src shape and origin src shape is illegal or input stackBufferSize is not big enough, it will return false.
  */
 void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
     const bool isReuseSource, const uint32_t groupNum, optiling::GroupNormTiling& tiling);

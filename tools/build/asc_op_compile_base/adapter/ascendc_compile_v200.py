@@ -38,7 +38,7 @@ def judge_valid_for_v200(tiling_key_kernel_type):
         elif kernel_type == KernelMetaType.KERNEL_TYPE_MIX_VECTOR_CORE:
             kernel_type_res |= 0b1000
         else:
-            raise Exception(f'kernel type {KERNEL_TYPE_TO_STR[kernel_type]} is unvaild in v200')
+            raise Exception(f'kernel type {KERNEL_TYPE_TO_STR[kernel_type]} is unvalid in v200')
 
     if kernel_type_res == 0b1:
         return "AiCore"
@@ -49,7 +49,7 @@ def judge_valid_for_v200(tiling_key_kernel_type):
     elif kernel_type_res in [0b1000, 0b1001]:
         return "MIX_VECTOR_CORE"
     else:
-        raise Exception(f'kernel type {kernel_type_res} combination is unvaild in v200')
+        raise Exception(f'kernel type {kernel_type_res} combination is unvalid in v200')
 
 
 def gen_compile_cmd_v200(src_file: str, dst_file: str, compile_option_tuple, sub_arch: str, tiling_file: str):

@@ -924,7 +924,7 @@ __simd_vf__ inline void QuantPerGroupForKRowHif8VF(__ubuf__ dstT* dstUb, __ubuf_
         for (uint16_t j = 0; j < static_cast<uint16_t>(para.groupSize); ++j) {
             uint32_t sreg = para.n;
             for (uint16_t k = 0; k < repeat; ++k) {
-                LoadContinousScaleAndOffset<scaleT, config>(scaleUb + i * para.n + k * vecLen,
+                LoadContinuousScaleAndOffset<scaleT, config>(scaleUb + i * para.n + k * vecLen,
                     offsetUb + i * para.n + k * vecLen, scaleVreg, offsetVreg);
                 preg = MicroAPI::UpdateMask<scaleT>(sreg);;
                 if constexpr (SupportType<srcT, half, bfloat16_t>() && SupportType<scaleT, float>()) {
@@ -1020,7 +1020,7 @@ __simd_vf__ inline void QuantPerGroupForKRowS8VF(__ubuf__ dstT* dstUb, __ubuf__ 
         for (uint16_t j = 0; j < static_cast<uint16_t>(para.groupSize); ++j) {
             uint32_t sreg = para.n;
             for (uint16_t k = 0; k < repeat; ++k) {
-                LoadContinousScaleAndOffset<scaleT, config>(scaleUb + i * para.n + k * vecLen,
+                LoadContinuousScaleAndOffset<scaleT, config>(scaleUb + i * para.n + k * vecLen,
                     offsetUb + i * para.n + k * vecLen, scaleVreg, offsetVreg);
                 preg = MicroAPI::UpdateMask<scaleT>(sreg);;
                 if constexpr (SupportType<srcT, half, bfloat16_t>() && SupportType<scaleT, float>()) {

@@ -60,3 +60,107 @@ run_llt_test(
     TARGET ascendc_ut_asc_plugin
     TASK_NUM 1
 )
+
+if(NOT BUILD_OPEN_PROJECT)
+# ########################### bishengcc ut ###########################
+set(ASCC_TEST_HEADERS_FILES
+    ${ASCENDC_DIR}/tools/ascc/ascc/include
+    ${ASCENDC_DIR}/tools/ascc/common/include
+    ${CMAKE_CURRENT_LIST_DIR}
+)
+
+file(GLOB ASCC_SRC_FILES
+    ${ASCENDC_DIR}/tools/ascc/ascc/src/*.cpp
+    ${ASCENDC_DIR}/tools/ascc/common/src/*.cpp
+)
+
+file(GLOB TEST_ASCC_SRC_FILES
+    ${ASCENDC_DIR}/tests/main.cpp
+    llvm/Support/*.cpp
+    ascc/*.cpp
+)
+
+add_executable(ascendc_utest_ascc
+    ${ASCC_SRC_FILES}
+    ${TEST_ASCC_SRC_FILES}
+)
+
+target_compile_definitions(ascendc_utest_ascc PRIVATE
+    UT_TEST
+    ASCENDC_CPU_DEBUG=1
+)
+
+target_include_directories(ascendc_utest_ascc PRIVATE
+    ${ASCC_TEST_HEADERS_FILES}
+    ${JSON_INCLUDE_DIR}
+    ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/base/
+)
+
+target_compile_options(ascendc_utest_ascc PRIVATE
+    -Werror
+)
+
+target_link_libraries(ascendc_utest_ascc PRIVATE
+    $<BUILD_INTERFACE:intf_llt_pub_basic>
+    json
+    -Wl,--no-as-needed
+    c_sec
+    -Wl,--as-needed
+)
+
+run_llt_test(
+    TARGET ascendc_utest_ascc
+    TASK_NUM 1
+)
+
+# ########################### ascendfe ut ###########################
+set(ASCENDFE_TEST_HEADERS_FILES
+    ${ASCENDC_DIR}/tools/ascc/ascendfe/include
+    ${ASCENDC_DIR}/tools/ascc/common/include
+    ${CMAKE_CURRENT_LIST_DIR}
+)
+
+file(GLOB ASCENDFE_SRC_FILES
+    ${ASCENDC_DIR}/tools/ascc/common/src/*.cpp
+    ${ASCENDC_DIR}/tools/ascc/ascendfe/src/*.cpp
+)
+
+file(GLOB TEST_ASCENDFE_SRC_FILES
+    ${ASCENDC_DIR}/tests/main.cpp
+    llvm/Support/*.cpp
+    ascendfe/*.cpp
+)
+
+add_executable(ascendc_utest_ascendfe
+    ${ASCENDFE_SRC_FILES}
+    ${TEST_ASCENDFE_SRC_FILES}
+)
+
+target_compile_definitions(ascendc_utest_ascendfe PRIVATE
+    UT_TEST
+    ASCENDC_CPU_DEBUG=1
+)
+
+target_include_directories(ascendc_utest_ascendfe PRIVATE
+    ${ASCENDFE_TEST_HEADERS_FILES}
+    ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/base/
+)
+
+target_compile_options(ascendc_utest_ascendfe PRIVATE
+    -Werror
+)
+
+target_link_libraries(ascendc_utest_ascendfe PRIVATE
+    $<BUILD_INTERFACE:intf_llt_pub_basic>
+    -Wl,--no-as-needed
+    c_sec
+    -Wl,--as-needed
+)
+
+run_llt_test(
+    TARGET ascendc_utest_ascendfe
+    TASK_NUM 1
+)
+endif()

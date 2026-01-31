@@ -127,7 +127,7 @@ void AscDevStubGenerator::StubFuncWorkSpaceImpl()
     codeStream_ << "    GM_ADDR ascendc_workspace_param = " << workspaceArgName << ";\n";
     codeStream_ << "    AscendC::SetSysWorkspaceForce(ascendc_workspace_param);\n";
     codeStream_ << "    GM_ADDR ascendc_workspace_usr = AscendC::GetUserWorkspace(ascendc_workspace_param);\n";
-    if (socVersion_ != ShortSocVersion::ASCEND950) {
+    if (socVersion_ != ShortSocVersion::ASCEND910_95) {
         codeStream_ << "    if constexpr (g_coreType == AscendC::AIC) {\n";
         codeStream_ << "        matmul::clearWorkspace(ascendc_workspace_param);\n";
         codeStream_ << "    }\n";
@@ -142,7 +142,7 @@ void AscDevStubGenerator::StubFuncCallImpl(const std::string& templateArgs)
         codeStream_ << "<" << templateArgs << ">";
     }
     codeStream_ << "(" << JoinParamWithComma(kernelInfo_.kernelParameters, ParamJoinType::ONLY_NAME) << ");\n";
-    if (socVersion_ == ShortSocVersion::ASCEND950) {
+    if (socVersion_ == ShortSocVersion::ASCEND910_95) {
         codeStream_ << "    pipe_barrier(PIPE_ALL);\n";
         codeStream_ << "    dsb(mem_dsb_t::DSB_ALL);\n";
         codeStream_ << "    dci();\n";

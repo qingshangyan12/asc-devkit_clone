@@ -19,6 +19,11 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p20751740131216"><a name="p20751740131216"></a><a name="p20751740131216"></a>√</p>
 </td>
 </tr>
+<tr id="row684613241156"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p1384614241357"><a name="p1384614241357"></a><a name="p1384614241357"></a><span id="ph32117402515"><a name="ph32117402515"></a><a name="ph32117402515"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p18846524051"><a name="p18846524051"></a><a name="p18846524051"></a>√</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -58,4 +63,3 @@ mm.template IterateAll<false>(gm_c[offsetC], 0, false, true);
 // do some others compute
 mm.WaitIterateAll(); // 等待IterateAll完成
 ```
-

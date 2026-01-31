@@ -16,7 +16,7 @@ set(ASCENDC_ADV_API_INCLUDE ${ASCENDC_DIR}/include/adv_api)
 set(ASCENDC_ADV_API_IMPL ${ASCENDC_DIR}/impl/adv_api)
 set(ASCENDC_UTILS_INCLUDE ${ASCENDC_DIR}/include/utils)
 
-set(PRODUCT_TYPE_LIST_INIT ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend950pr_9599_AIC ascend950pr_9599_AIV ascend310B1)
+set(PRODUCT_TYPE_LIST_INIT ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend910_9599_AIC ascend910_9599_AIV ascend310B1)
 set(PRODUCT_TYPE_LIST ${PRODUCT_TYPE_LIST_INIT} CACHE STRING "Supported product types")
 
 set(ASCENDC_DEP_HEADER_DIR
@@ -229,8 +229,8 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/scheduler/batch_scheduler/test_batch_scheduler_single.cpp
 )
 
-# ascend950pr_9599 test cases
-file(GLOB ASCENDC_TEST_ascend950pr_9599_AIC_CASE_SRC_FILES
+# ascend910_9599 test cases
+file(GLOB ASCENDC_TEST_ascend910_9599_AIC_CASE_SRC_FILES
     matmul/resource/cube_out_buffer/test_cube_out_buffer_co1_shared.cpp
     matmul/param/test_matmul_cross_core_sync.cpp
     matmul/kfc/test_matmul_server_c310.cpp
@@ -255,7 +255,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIC_CASE_SRC_FILES
     matmul/load_buffer/test_matmul_load_to_l0a_gemv_mx.cpp
     matmul/lib/test_matmul_client.cpp
 )
-file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
+file(GLOB ASCENDC_TEST_ascend910_9599_AIV_CASE_SRC_FILES
     #utils
     utils/init_global_memory/test_operator_init_global_memory.cpp
     #activate
@@ -363,7 +363,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     # transpose
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
-    hccl/test_hccl_950.cpp
+    hccl/test_hccl_910_9599.cpp
 )
 
 # ascend310B1 test cases
@@ -382,8 +382,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend310p>:../common/tik_pv_wrapper.cpp>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:../common/k3_pvwrap.cpp>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIV>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend310B1>:../common/k3_pvwrap.cpp>
         ${ASCENDC_TEST_${product_type}_CASE_SRC_FILES}
     )
@@ -396,8 +396,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend610>:__NPU_ARCH__=2002;__DAV_M200__>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_CUBE__;__DAV_CUBE__>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_VEC__;__DAV_VEC__>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_CUBE__>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_CUBE__>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIV>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002;__DAV_M300__>
         __disable_kernel_type_autoinfer__=
     )
@@ -419,8 +419,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend610>:tikicpulib::ascend610>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:tikicpulib::ascend910B1>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:tikicpulib::ascend910_9599>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIV>:tikicpulib::ascend910_9599>
         $<$<STREQUAL:${product_type},ascend310B1>:tikicpulib::ascend310B1>
         -Wl,--no-as-needed
         error_manager
@@ -480,8 +480,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend610>:__NPU_ARCH__=2002>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:__NPU_ARCH__=2201>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:__NPU_ARCH__=2201>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3101>
-        $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3101>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIC>:__NPU_ARCH__=3101>
+        $<$<STREQUAL:${product_type},ascend910_9599_AIV>:__NPU_ARCH__=3101>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002>
     )
 

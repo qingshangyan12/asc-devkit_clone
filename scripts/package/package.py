@@ -71,7 +71,7 @@ def get_compress_cmd(delivery_dir: str,
         if pkg_args.independent_pkg:
             exec_pack_cmd(delivery_dir, pack_cmd, package_name.getvalue())
     else:
-        CommLog.cilog_error("the repack type '%s' is not support!", suffix)
+        CommLog.cilog_error("the repack type '%s' is not supported!", suffix)
         sys.exit(FAIL)
     try:
         makeself_dir = os.path.join(build_dir, "makeself.txt")
@@ -245,10 +245,10 @@ def parse_install_info(infos: List,
         target_name = get_target_name(target_config)
         if target_config.get("optional") == 'true'and operate_type in ('copy', 'move'):
             path = os.path.join(TOP_DIR, DELIVERY_PATH, target_config.get('dst_path'))
-            vaule = os.path.join(TOP_DIR, DELIVERY_PATH, target_config.get('dst_path'), target_name)
+            value = os.path.join(TOP_DIR, DELIVERY_PATH, target_config.get('dst_path'), target_name)
             if not os.path.exists(path):
                 continue
-            if not os.path.exists(vaule):
+            if not os.path.exists(value):
                 continue
         if operate_type in ('copy', 'move'):
             relative_path_in_pkg = os.path.join(target_config.get('dst_path'), target_name)
@@ -364,7 +364,7 @@ def check_path_is_conflict(xml_config):
 
 def checksum_value(limit_value, release_dir):
     """
-    功能描叙: 校验传入的文件或目录大小是否合格
+    功能描述: 校验传入的文件或目录大小是否合格
     参数:
     limit_value: limit.csv中的一行数据如[compiler/bin, 3976, 110%]
     返回值: True/False
@@ -402,7 +402,7 @@ def checksum_value(limit_value, release_dir):
 
 def processing_csv_file(release_dir, package_name, chip_name, build_type):
     """
-    功能描叙: 处理limit.csv文件数据
+    功能描述: 处理limit.csv文件数据
     返回值: [],True/[],False
     """
     ret = True

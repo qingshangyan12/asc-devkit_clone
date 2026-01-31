@@ -42,7 +42,7 @@ SocVersion PlatformAscendC::GetSocVersion(void) const {
         {"Ascend910", SocVersion::ASCEND910},
         {"Ascend910B", SocVersion::ASCEND910B},
         {"Ascend910_93", SocVersion::ASCEND910B},
-        {"Ascend950", SocVersion::ASCEND950},
+        {"Ascend910_95", SocVersion::ASCEND910_95},
         {"Ascend310B", SocVersion::ASCEND310B},
         {"MC62CM12A", SocVersion::MC62CM12A},
     };

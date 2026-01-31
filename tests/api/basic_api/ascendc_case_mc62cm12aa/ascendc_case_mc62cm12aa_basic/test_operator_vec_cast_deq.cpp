@@ -31,7 +31,7 @@ protected:
     }
 };
 
-template <typename T, typename U, TestMode TEST_MODE, bool IS_SET_MASK, bool IS_COUNTER_MODE, bool IS_VEC_DEQ, bool HALF_BLOCK, bool USE_CAST_DEQ>
+template <typename T, typename U, TestMode TEST_MODE, bool IS_SET_MASK, bool IS_COUNTER_MODE, bool IS_VEC_DEQ, bool HALF_BLOCK>
 void main_vec_cast_deq_demo(__gm__ uint8_t* __restrict__ dst_gm, __gm__ uint8_t* __restrict__ src_gm,
     uint32_t data_size)
 {
@@ -109,10 +109,7 @@ void main_vec_cast_deq_demo(__gm__ uint8_t* __restrict__ dst_gm, __gm__ uint8_t*
                 SetDeqScale(Scale, Offset, 0);
             }
         }
-        if constexpr (USE_CAST_DEQ)
-            CastDeq<U, T, IS_SET_MASK, IS_VEC_DEQ, HALF_BLOCK>(dst_local, input_local, mask, repeatTimes, repeatParams);
-        else
-            CastDequant<U, T, IS_SET_MASK, IS_VEC_DEQ, HALF_BLOCK>(dst_local, input_local, mask, repeatTimes, repeatParams);
+        CastDeq<U, T, IS_SET_MASK, IS_VEC_DEQ, HALF_BLOCK>(dst_local, input_local, mask, repeatTimes, repeatParams);
         ResetMask();
         SetMaskNorm();
     } else if constexpr (TEST_MODE == LEVEL0_COUNT_MODE) {
@@ -162,10 +159,7 @@ void main_vec_cast_deq_demo(__gm__ uint8_t* __restrict__ dst_gm, __gm__ uint8_t*
                 SetDeqScale(Scale, Offset, 0);
             }
         }
-        if constexpr (USE_CAST_DEQ)
-            CastDeq<U, T, IS_SET_MASK, IS_VEC_DEQ, HALF_BLOCK>(dst_local, input_local, mask, repeatTimes, repeatParams);
-        else
-            CastDequant<U, T, IS_SET_MASK, IS_VEC_DEQ, HALF_BLOCK>(dst_local, input_local, mask, repeatTimes, repeatParams);
+        CastDeq<U, T, IS_SET_MASK, IS_VEC_DEQ, HALF_BLOCK>(dst_local, input_local, mask, repeatTimes, repeatParams);
         ResetMask();
         SetMaskNorm();
     } else {
@@ -202,10 +196,7 @@ void main_vec_cast_deq_demo(__gm__ uint8_t* __restrict__ dst_gm, __gm__ uint8_t*
                 SetDeqScale(Scale, Offset, 0);
             }
         }
-        if constexpr (USE_CAST_DEQ)
-            CastDeq<U, T, IS_VEC_DEQ, HALF_BLOCK>(dst_local, input_local, LowMask);
-        else
-            CastDequant<U, T, IS_VEC_DEQ, HALF_BLOCK>(dst_local, input_local, LowMask);
+        CastDeq<U, T, IS_VEC_DEQ, HALF_BLOCK>(dst_local, input_local, LowMask);
     }
         DataCopy(dst_global, dst_local, dstSize);
 
@@ -215,22 +206,11 @@ void main_vec_cast_deq_demo(__gm__ uint8_t* __restrict__ dst_gm, __gm__ uint8_t*
 #define VEC_CAST_EQ_TESTCASE(T , U, TEST_MODE, IS_SET_MASK, IS_COUNTER_MODE, IS_VEC_DEQ, HALF_BLOCK)                                                \
     TEST_F(TEST_CAST_DEQ, CastDeq##T##U##RELATION_OP##TEST_MODE##IS_SET_MASK##IS_COUNTER_MODE##IS_VEC_DEQ##HALF_BLOCK##Case)                                 \
     {                                                                                                      \
-        uint32_t data_size = 2048;                                                                         \
+        uint32_t data_size = 2048;                                                                          \
         uint32_t sel_mask_size = data_size / AscendCUtils::GetBitSize(sizeof(uint8_t));                    \
-        uint8_t input_gm[data_size * sizeof(T)];                                                           \
-        uint8_t output_gm[data_size * 2 * sizeof(U)];                                                      \
-        main_vec_cast_deq_demo<T, U, TEST_MODE, IS_SET_MASK, IS_COUNTER_MODE, IS_VEC_DEQ, HALF_BLOCK, true>(output_gm, input_gm, data_size);                                                                     \
-        for (uint32_t i = 0; i < sel_mask_size; i++) {                                                     \
-            EXPECT_EQ(output_gm[i], 0x00);                                                                 \
-        }                                                                                                  \
-    }                                                                                                      \
-    TEST_F(TEST_CAST_DEQ, CastDequant##T##U##RELATION_OP##TEST_MODE##IS_SET_MASK##IS_COUNTER_MODE##IS_VEC_DEQ##HALF_BLOCK##Case)                                 \
-    {                                                                                                      \
-        uint32_t data_size = 2048;                                                                         \
-        uint32_t sel_mask_size = data_size / AscendCUtils::GetBitSize(sizeof(uint8_t));                    \
-        uint8_t input_gm[data_size * sizeof(T)];                                                           \
-        uint8_t output_gm[data_size * 2 * sizeof(U)];                                                      \
-        main_vec_cast_deq_demo<T, U, TEST_MODE, IS_SET_MASK, IS_COUNTER_MODE, IS_VEC_DEQ, HALF_BLOCK, false>(output_gm, input_gm, data_size);                                                                     \
+        uint8_t input_gm[data_size * sizeof(T)];                                                  \
+        uint8_t output_gm[data_size * 2 * sizeof(U)];                                                                      \
+        main_vec_cast_deq_demo<T, U, TEST_MODE, IS_SET_MASK, IS_COUNTER_MODE, IS_VEC_DEQ, HALF_BLOCK>(output_gm, input_gm, data_size);                                                                     \
         for (uint32_t i = 0; i < sel_mask_size; i++) {                                                     \
             EXPECT_EQ(output_gm[i], 0x00);                                                                 \
         }                                                                                                  \

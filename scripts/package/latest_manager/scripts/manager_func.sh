@@ -301,9 +301,9 @@ package_uninstalled() {
 
     if [ "$is_recreate_softlink" = "y" ]; then
         # 多版本卸载时检查版本兼容性
-        if ! recreate_compatiable_softlink_in_multi_version_uninstall "$install_path" "$LATEST_DIR" "$package" \
+        if ! recreate_compatible_softlink_in_multi_version_uninstall "$install_path" "$LATEST_DIR" "$package" \
             "$USERNAME" "$USERGROUP" "$docker_root"; then
-            comm_log "ERROR" "Recreate ${package} compatiable softlink in package uninstalled failed!"
+            comm_log "ERROR" "Recreate ${package} compatible softlink in package uninstalled failed!"
             return 1
         fi
     fi
@@ -682,7 +682,7 @@ get_package_chip_type() {
     local _install_info="$2"
     local _package="$3"
     local _operation="$4"
-    local _cihp_gpct=""
+    local _chip_gpct=""
 
     eval "${_outvar}=\"\""
 
@@ -691,17 +691,17 @@ get_package_chip_type() {
     fi
 
     if [ "${_package}" = "opp" ]; then
-        _cihp_gpct="$(grep -i "^Opp_Install_Chip=" "${_install_info}" | cut -d"=" -f2-)"
+        _chip_gpct="$(grep -i "^Opp_Install_Chip=" "${_install_info}" | cut -d"=" -f2-)"
     else
-        _cihp_gpct="$(grep -i "^\(${_package}_\)\?chip_type=" "${_install_info}" | cut -d"=" -f2-)"
+        _chip_gpct="$(grep -i "^\(${_package}_\)\?chip_type=" "${_install_info}" | cut -d"=" -f2-)"
     fi
-    if [ "${_cihp_gpct}" = "" ]; then
-        _cihp_gpct="all"
+    if [ "${_chip_gpct}" = "" ]; then
+        _chip_gpct="all"
     fi
 
-    normalize_feature "_cihp_gpct" "${_cihp_gpct}" "${_operation}"
+    normalize_feature "_chip_gpct" "${_chip_gpct}" "${_operation}"
 
-    eval "${_outvar}=\"${_cihp_gpct}\""
+    eval "${_outvar}=\"${_chip_gpct}\""
 }
 
 # 创建latest软链接
@@ -1408,7 +1408,7 @@ deal_with_aicpu_package() {
 }
 
 # 恢复可兼容的子包软链接
-recreate_compatiable_softlink_sibling_package() {
+recreate_compatible_softlink_sibling_package() {
     local package="$1"
 
     # 判断是否有本包的running版本包
@@ -1419,7 +1419,7 @@ recreate_compatiable_softlink_sibling_package() {
         return 0
     fi
 
-    if check_current_package_compatiable "$scope_install_path" "$scope_version" "$scope_version_dir" "$package"; then
+    if check_current_package_compatible "$scope_install_path" "$scope_version" "$scope_version_dir" "$package"; then
         compat_create_package_softlink_to_latest "$scope_install_path" "$package" "$scope_version" "$scope_version_dir" "$scope_latest_dir" \
             "$scope_username" "$scope_usergroup" "$scope_install_for_all" "$scope_docker_root"
         ret="$?" && [ $ret -ne 0 ] && return $ret
@@ -1429,7 +1429,7 @@ recreate_compatiable_softlink_sibling_package() {
 }
 
 # 多版本卸载时检查版本兼容性
-recreate_compatiable_softlink_in_multi_version_uninstall() {
+recreate_compatible_softlink_in_multi_version_uninstall() {
     local scope_install_path="$1"
     local scope_latest_dir="$2"
     local package="$3"
@@ -1463,7 +1463,7 @@ recreate_compatiable_softlink_in_multi_version_uninstall() {
         unpack_version_pair "version_pair_arr" "${version_pair}"
         __index_list "${version_pair_arr}" 0 "scope_version" 1 "scope_version_dir"
 
-        if check_current_package_compatiable "$scope_install_path" "$scope_version" "$scope_version_dir" "$package"; then
+        if check_current_package_compatible "$scope_install_path" "$scope_version" "$scope_version_dir" "$package"; then
             compat_create_package_softlink_to_latest "${scope_install_path}" "${package}" "${scope_version}" "${scope_version_dir}" "${scope_latest_dir}" \
                 "${scope_username}" "${scope_usergroup}" "${scope_install_for_all}" "${scope_docker_root}"
             ret="$?" && [ $ret -ne 0 ] && return $ret
@@ -1472,7 +1472,7 @@ recreate_compatiable_softlink_in_multi_version_uninstall() {
             get_version_cfg_path "version_cfg_path" "$scope_latest_dir"
             grep -F "installed_version=" "$version_cfg_path" | grep -F "[$scope_version:$scope_version_dir]" | cut -d= -f1 | sed 's/_installed_version$//' | while read sibling_package; do
                 if [ "$sibling_package" != "$package" ]; then
-                    recreate_compatiable_softlink_sibling_package "$sibling_package"
+                    recreate_compatible_softlink_sibling_package "$sibling_package"
                 fi
             done
 
@@ -1489,7 +1489,7 @@ recreate_compatiable_softlink_in_multi_version_uninstall() {
 }
 
 # 检查包版本兼容性
-check_package_compatiable() {
+check_package_compatible() {
     local install_path="$1"
     local version_left="$2"
     local version_dir_left="$3"
@@ -1522,7 +1522,7 @@ check_package_compatiable() {
 }
 
 # 检查当前包与latest版本兼容性
-check_current_package_compatiable() {
+check_current_package_compatible() {
     local install_path="$1"
     local current_version="$2"
     local current_version_dir="$3"
@@ -1542,7 +1542,7 @@ check_current_package_compatiable() {
         unpack_version_pair "version_pair_arr" "$version_pair"
         __index_list "$version_pair_arr" 0 "version" 1 "version_dir"
 
-        if ! check_package_compatiable "$install_path" "$current_version" "$current_version_dir" "$current_package" \
+        if ! check_package_compatible "$install_path" "$current_version" "$current_version_dir" "$current_package" \
             "$version" "$version_dir" "$package" "$script_dir"; then
             return 1
         fi
@@ -1552,7 +1552,7 @@ check_current_package_compatiable() {
 }
 
 # 多版本安装时检查版本兼容性
-check_compatiable_in_multi_version_install() {
+check_compatible_in_multi_version_install() {
     local install_path="$1"
     local username="$2"
     local docker_root="$3"
@@ -1574,7 +1574,7 @@ check_compatiable_in_multi_version_install() {
         unpack_version_pair "version_pair_arr" "$version_pair"
         __index_list "$version_pair_arr" 0 "version" 1 "version_dir"
 
-        if ! check_package_compatiable "$install_path" "$current_version" "$current_version_dir" "$current_package" \
+        if ! check_package_compatible "$install_path" "$current_version" "$current_version_dir" "$current_package" \
             "$version" "$version_dir" "$package" "$script_dir"; then
             compat_del_package_softlink_in_latest "$install_path" "$package" "$version" "$version_dir" \
                 "$LATEST_DIR" "$username" "$docker_root"

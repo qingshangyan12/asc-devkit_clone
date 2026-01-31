@@ -188,8 +188,8 @@ struct   AddCustomTilingData
                     )
                 ),
                 func_template_decl='',
-                func_template_specilization_args=(),
-                func_params_specilization_args=(),
+                func_template_specialization_args=(),
+                func_params_specialization_args=(),
             ),
         )
 
@@ -267,8 +267,8 @@ struct AddCustomTilingData {{
                     ),
                 ),
                 func_template_decl='int a',
-                func_template_specilization_args=['35', '45'],
-                func_params_specilization_args=['', ''],
+                func_template_specialization_args=['35', '45'],
+                func_params_specialization_args=['', ''],
             ),
         )
 
@@ -388,8 +388,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
                     ),
                     FuncSign('', '', (), '', (), ()),
                 ), 
@@ -421,8 +421,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
                     ),
                     FuncSign('', '', (), '', (), ()),
                 ), 
@@ -454,8 +454,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
                     ),
                     FuncSign('', '', (), '', (), ()),
                 ), 
@@ -487,8 +487,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
                     ),
                     FuncSign('', '', (), '', (), ()),
                 ), 
@@ -520,8 +520,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
                     ),
                     FuncSign('', '', (), '', (), ()),
                 ), 
@@ -553,8 +553,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
                     ),
                     FuncSign('', '', (), '', (), ()),
                 ), 
@@ -586,8 +586,8 @@ struct AddCustomTilingData {{
                                                     tiling_struct=False )
                                     ),
                                     func_template_decl='',
-                                    func_template_specilization_args=(),
-                                    func_params_specilization_args=(),
+                                    func_template_specialization_args=(),
+                                    func_params_specialization_args=(),
                                 ),
                                 FuncSign('', '', (), '', (), ()),
                             ), 
@@ -619,8 +619,8 @@ struct AddCustomTilingData {{
                                                     tiling_struct=False )
                                     ),
                                     func_template_decl='',
-                                    func_template_specilization_args=(),
-                                    func_params_specilization_args=(),
+                                    func_template_specialization_args=(),
+                                    func_params_specialization_args=(),
                                 ),
                                 FuncSign('', '', (), '', (), ()),
                             ), 
@@ -654,8 +654,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
                     ),
                     FuncSign('', '', (), '', (), ()),
                 ), 
@@ -689,8 +689,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='int a',
-                        func_template_specilization_args=['20', '30'],
-                        func_params_specilization_args=['', ''],
+                        func_template_specialization_args=['20', '30'],
+                        func_params_specialization_args=['', ''],
                     ),
                     FuncSign('', '', (), 'int a', (), ()),
                 ), 
@@ -724,8 +724,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='int a',
-                        func_template_specilization_args=['20', '30'],
-                        func_params_specilization_args=['', ''],
+                        func_template_specialization_args=['20', '30'],
+                        func_params_specialization_args=['', ''],
                     ),
                     FuncSign('', '', (), 'int a', (), ()),
                 ), 
@@ -804,8 +804,8 @@ struct AddCustomTilingData {{
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
                     ),
                     FuncSign('', '', (), '', (), ()),
                 ), 
@@ -858,8 +858,8 @@ struct AddCustomTilingData {{
                 ),
             ),
             func_template_decl='int a',
-            func_template_specilization_args=['35', '45'],
-            func_params_specilization_args=['', ''],
+            func_template_specialization_args=['35', '45'],
+            func_params_specialization_args=['', ''],
         )
  
         golden_res = f"""
@@ -907,8 +907,8 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
         )
 
         nomal_without_ptr_func_sign=FuncSign(
@@ -935,8 +935,8 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
         )
 
         template_func_sign=FuncSign(
@@ -963,8 +963,8 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
                                         tiling_struct=False )
                         ),
                         func_template_decl='int a',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
         )
 
         template_without_ref_func_sign=FuncSign(
@@ -991,8 +991,8 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
                                         tiling_struct=False )
                         ),
                         func_template_decl='int a',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
         )
 
         nomal_func_params_res = tiling_remove_ref_or_ptr_func_params(nomal_func_sign, nomal_func_sign.func_params)
@@ -1029,8 +1029,8 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
                                         tiling_struct=False )
                         ),
                         func_template_decl='',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
         )
 
         template_func_sign=FuncSign(
@@ -1057,8 +1057,8 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
                                         tiling_struct=False )
                         ),
                         func_template_decl='int a',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
         )
 
         nomal_func_params_res = tiling_add_ref_or_ptr_func_params(nomal_func_sign, nomal_func_sign.func_params)
@@ -1438,8 +1438,8 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
                                         tiling_struct=False )
                         ),
                         func_template_decl='int a',
-                        func_template_specilization_args=(),
-                        func_params_specilization_args=(),
+                        func_template_specialization_args=(),
+                        func_params_specialization_args=(),
         )
         self.assertFalse(get_func_template_specialization_mangle_name("not_file","not_kernel")[0])
         with (mock.patch('subprocess.run') as mock_run,
@@ -1452,9 +1452,9 @@ inline uint32_t hello_world(uint32_t blockDim, void* hold, void* stream)
                     "returncode": 1
                 }
             )
-            self.assertRaises(Exception, add_template_specilization_args, template_func_sign, "not_file", "not_file")
+            self.assertRaises(Exception, add_template_specialization_args, template_func_sign, "not_file", "not_file")
             with mock.patch.object(extract_host_stub, 'get_func_template_specialization_mangle_name', return_value=(True, "int b", "")):
-                self.assertRaises(Exception, add_template_specilization_args, template_func_sign, "not_file", "not_file")
+                self.assertRaises(Exception, add_template_specialization_args, template_func_sign, "not_file", "not_file")
 
 
 if __name__ == "__main__":

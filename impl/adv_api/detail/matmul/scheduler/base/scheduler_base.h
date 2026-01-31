@@ -64,7 +64,6 @@ public:
             ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Unsupported matmul version."); });
             return;
         }
-        static_assert(!(ToMatmulConfig(MM_CFG).doNorm && ToMatmulConfig(MM_CFG).doIBShareNorm), "Neither Norm nor IBShareNorm can be enabled simultaneously!");
         MATMUL_MODULE(MatmulShapeTiling)->SetTiling(cubeTiling);
         MATMUL_MODULE(MatmulShapeTiling)->template CheckTiling<SrcAT, L0cT>();
         auto& var = MATMUL_PARAM_VAR;

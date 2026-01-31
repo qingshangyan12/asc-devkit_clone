@@ -865,23 +865,23 @@ TEST_F(HcclAbnormalTestSuite, HcclNotInit)
 {
     char ch[2048] = {'\0'}; // Prevent stack memory reuse
     Hccl hccl;
-    auto hanleId1 = hccl.AllReduce(reinterpret_cast<__gm__ uint8_t*>(0x11), reinterpret_cast<__gm__ uint8_t*>(0x11),
+    auto handleId1 = hccl.AllReduce(reinterpret_cast<__gm__ uint8_t*>(0x11), reinterpret_cast<__gm__ uint8_t*>(0x11),
                                    100, HcclDataType::HCCL_DATA_TYPE_INT8,
                                    HcclReduceOp::HCCL_REDUCE_SUM, 3);
-    EXPECT_EQ(hanleId1, INVALID_HANDLE_ID);
-    auto hanleId2 = hccl.AllGather(reinterpret_cast<__gm__ uint8_t*>(0x11), reinterpret_cast<__gm__ uint8_t*>(0x11),
+    EXPECT_EQ(handleId1, INVALID_HANDLE_ID);
+    auto handleId2 = hccl.AllGather(reinterpret_cast<__gm__ uint8_t*>(0x11), reinterpret_cast<__gm__ uint8_t*>(0x11),
                                    100, HcclDataType::HCCL_DATA_TYPE_INT8, 0, 3);
-    EXPECT_EQ(hanleId2, INVALID_HANDLE_ID);
-    auto hanleId3 = hccl.ReduceScatter(reinterpret_cast<__gm__ uint8_t*>(0x11), reinterpret_cast<__gm__ uint8_t*>(0x11),
+    EXPECT_EQ(handleId2, INVALID_HANDLE_ID);
+    auto handleId3 = hccl.ReduceScatter(reinterpret_cast<__gm__ uint8_t*>(0x11), reinterpret_cast<__gm__ uint8_t*>(0x11),
                                        100, HcclDataType::HCCL_DATA_TYPE_INT8, HcclReduceOp::HCCL_REDUCE_SUM, 100 * 3,
                                        3);
-    EXPECT_EQ(hanleId3, INVALID_HANDLE_ID);
+    EXPECT_EQ(handleId3, INVALID_HANDLE_ID);
     hccl.Finalize();
 
-    hccl.Commit(hanleId1);
-    auto ret = hccl.Wait(hanleId1);
+    hccl.Commit(handleId1);
+    auto ret = hccl.Wait(handleId1);
     EXPECT_EQ(ret, HCCL_FAILED);
-    ret = hccl.Query(hanleId1);
+    ret = hccl.Query(handleId1);
     EXPECT_EQ(ret, HCCL_FAILED);
 }
 

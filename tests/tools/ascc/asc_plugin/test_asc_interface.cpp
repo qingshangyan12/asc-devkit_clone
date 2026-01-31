@@ -256,8 +256,8 @@ TEST_F(TestAscInterFace, asc_plugin_gen_kernel_gen_device_code_failure)
     std::pair<std::unordered_set<AscPlugin::KernelMetaType>, AscPlugin::KfcScene> test_pair{test_set, AscPlugin::KfcScene::Open};
     MOCKER(AscPlugin::GetKernelFuncScene).stubs().will(returnValue(test_pair));
     MOCKER(AscPlugin::GetDeviceCode).stubs().will(returnValue(std::tuple{1, std::string("a"), std::string("a")}));
-    AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend950DT_9591");
-    AscPlugin::InfoManager::GetInstance().SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND950);
+    AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend910_9591");
+    AscPlugin::InfoManager::GetInstance().SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910_95);
     auto res = AscPlugin::PluginGenKernel(&a, infoObjPtr);
     EXPECT_EQ(res, AscPlugin::ASC_FAILURE);
     AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend910B");
@@ -281,8 +281,8 @@ TEST_F(TestAscInterFace, asc_plugin_gen_kernel_gen_device_code_success_without_9
     std::pair<std::unordered_set<AscPlugin::KernelMetaType>, AscPlugin::KfcScene> test_pair{test_set, AscPlugin::KfcScene::Open};
     MOCKER(AscPlugin::GetKernelFuncScene).stubs().will(returnValue(test_pair));
     MOCKER(AscPlugin::GetDeviceCode).stubs().will(returnValue(std::tuple{0, std::string("a"), std::string("a")}));
-    AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend950DT_9591");
-    AscPlugin::InfoManager::GetInstance().SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND950);
+    AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend910_9591");
+    AscPlugin::InfoManager::GetInstance().SetShortSocVersion(AscPlugin::ShortSocVersion::ASCEND910_95);
     auto res = AscPlugin::PluginGenKernel(&a, infoObjPtr);
     EXPECT_EQ(res, AscPlugin::ASC_SUCCESS);
     AscPlugin::InfoManager::GetInstance().SetSocVersion("Ascend910B");
@@ -591,7 +591,7 @@ TEST_F(TestAscInterFace, asc_PluginPrologue_ast_failed)
 {
     AscPlugin::PrologueConfig config;
     PrologueConfigUpdate(config);
-    config.npuSoc = "Ascend950DT_9591";
+    config.npuSoc = "Ascend910_9591";
     config.npuArch = "dav-c310";
     nlohmann::json configObj= config;
     const char* configObjPtr = strdup(configObj.dump().c_str());

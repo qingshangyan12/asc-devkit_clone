@@ -84,9 +84,9 @@ namespace optiling {
     TILING_DATA_FIELD_DEF(uint8_t, fixpParamsFullLoadFlag);
     TILING_DATA_FIELD_DEF(uint8_t, hf32Enable);
     TILING_DATA_FIELD_DEF(uint8_t, hf32TransMode);
-    TILING_DATA_FIELD_DEF(uint8_t, resvered1);
-    TILING_DATA_FIELD_DEF(uint16_t, resvered2);
-    TILING_DATA_FIELD_DEF(uint32_t, resvered3);
+    TILING_DATA_FIELD_DEF(uint8_t, reserved1);
+    TILING_DATA_FIELD_DEF(uint16_t, reserved2);
+    TILING_DATA_FIELD_DEF(uint32_t, reserved3);
  
     END_TILING_DATA_DEF;
     REGISTER_TILING_DATA_CLASS(TConv3DApiTilingOpApi, TConv3DApiTiling);

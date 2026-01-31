@@ -27,8 +27,7 @@ enum class OpType{
     MulAddDst = 9,
     FusedMulAddRelu = 10,
     AddRelu = 11,
-    SubRelu = 12,
-    MulAddRelu = 13
+    SubRelu = 12
 };
 
 template <typename SrcType> class KernelVecBinary {
@@ -125,10 +124,6 @@ private:
             FusedMulAddRelu(dstLocal, src0Local, src1Local, maskCounter, repeatTimes, repeatParams);
             FusedMulAddRelu(dstLocal, src0Local, src1Local, maskBit, repeatTimes, repeatParams);
             FusedMulAddRelu(dstLocal, src0Local, src1Local, dataSize);
-        } else if (cmdKey == OpType::MulAddRelu) {
-            MulAddRelu(dstLocal, src0Local, src1Local, maskCounter, repeatTimes, repeatParams);
-            MulAddRelu(dstLocal, src0Local, src1Local, maskBit, repeatTimes, repeatParams);
-            MulAddRelu(dstLocal, src0Local, src1Local, dataSize);
         } else if (cmdKey == OpType::AddRelu) {
             AddRelu(dstLocal, src0Local, src1Local, maskCounter, repeatTimes, repeatParams);
             AddRelu(dstLocal, src0Local, src1Local, maskBit, repeatTimes, repeatParams);
@@ -426,8 +421,6 @@ SUPPORT_MAP(MulAddDst, mula, half, f16, float, f32, int16_t, s16, int32_t, s32, 
 SUPPORT_FUSED_MAP(FusedMulAddRelu, madd, relu, half, f16, float, f32);
 SUPPORT_FUSED_MAP(AddRelu, add, relu, half, f16, float, f32);
 SUPPORT_FUSED_MAP(SubRelu, sub, relu, half, f16, float, f32);
-#define MulAddReluImpl FusedMulAddReluImpl
-SUPPORT_FUSED_MAP(MulAddRelu, madd, relu, half, f16, float, f32);
 
 UNSUPPORT_MAP(Add, add, uint8_t, int8_t, uint16_t,          uint32_t,          uint64_t, int64_t, bfloat16_t);
 UNSUPPORT_MAP(Sub, sub, uint8_t, int8_t, uint16_t,          uint32_t,          uint64_t, int64_t, bfloat16_t);
@@ -442,5 +435,3 @@ UNSUPPORT_MAP(MulAddDst, mula, uint8_t, int8_t, uint64_t, int64_t, bfloat16_t);
 UNSUPPORT_MAP(FusedMulAddRelu, madd, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t, bfloat16_t);
 UNSUPPORT_MAP(AddRelu, madd, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t, bfloat16_t);
 UNSUPPORT_MAP(SubRelu, madd, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t, bfloat16_t);
-UNSUPPORT_MAP(MulAddRelu, madd, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t, bfloat16_t);
-#undef MulAddReluImpl

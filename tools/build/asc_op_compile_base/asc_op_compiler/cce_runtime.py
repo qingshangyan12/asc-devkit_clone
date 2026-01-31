@@ -133,7 +133,7 @@ def _get_kernel_magic_asecnd_910B(aicore_type: str, mix: str = None,
                                   compatible_needed: bool = False,
                                   mix_type_info: str = None) -> dict:
     """
-    get the magic info for Ascend910B / Ascend910_93 / Ascend950 / MC62CM12A
+    get the magic info for Ascend910B / Ascend910_93 / Ascend910_95 / MC62CM12A
     Parameters
     ----------
     aicore_type: core type, VectorCore or AiCore
@@ -197,7 +197,7 @@ def _add_kernel_magic(short_soc_version: str,
     if short_soc_version in ["Ascend610", "BS9SX1A", "Ascend610B", "Ascend310P"] and \
             aicore_type == "VectorCore":
         title_dict = {"magic": "RT_DEV_BINARY_MAGIC_ELF_AIVEC"}
-    elif short_soc_version in ["Ascend910B", "Ascend910_93", "Ascend950", "MC62CM12A"]:
+    elif short_soc_version in ["Ascend910B", "Ascend910_93", "Ascend910_95", "MC62CM12A"]:
         title_dict = _get_kernel_magic_asecnd_910B(aicore_type, mix, compatible_needed,
                                                    mix_type_info)
     elif short_soc_version == "Ascend310B" or short_soc_version == "AS31XM1":
@@ -387,19 +387,19 @@ def _add_workspace_to_title_dict(title_dict):
             a. use create_block_sync()
             b. sync tensor applied by user
         3. pure TBE: use create_block_sync()
-        add worksapce info in order:
+        add workspace info in order:
             TIK_WORKSPACE_SIZE_LIST
             TBE_WORKSPACE_SIZE_LIST
     """
     # set parameters info
-    tbe_worksapce = hasattr(TBE_WORKSPACE_SIZE_LIST, "local_list") and \
+    tbe_workspace = hasattr(TBE_WORKSPACE_SIZE_LIST, "local_list") and \
                     len(TBE_WORKSPACE_SIZE_LIST.local_list) > 0
     tik_workspace = hasattr(TIK_WORKSPACE_SIZE_LIST, "local_list") and \
                     len(TIK_WORKSPACE_SIZE_LIST.local_list) > 0
 
     from asc_op_compile_base.common.platform.platform_info import get_soc_spec, ASCEND_910B, ASCEND_910_93
     is_c220 = get_soc_spec("SHORT_SOC_VERSION") in [ASCEND_910B, ASCEND_910_93]
-    if tbe_worksapce:  # use create_block_sync()
+    if tbe_workspace:  # use create_block_sync()
         if hasattr(TIK_ATOMIC_ADD_LIST, "local_list") and \
                 len(TIK_ATOMIC_ADD_LIST.local_list) > 0:
             # 2. TIK TBE hybrid: a. use create_block_sync()
@@ -417,7 +417,7 @@ def _add_workspace_to_title_dict(title_dict):
     if tik_workspace:
         _add_workspace_info(title_dict, TIK_WORKSPACE_SIZE_LIST.local_list, True, "tik_")
     # add tbe workspace from block sync
-    if tbe_worksapce:  # use create_block_sync()
+    if tbe_workspace:  # use create_block_sync()
         _add_workspace_info(title_dict, TBE_WORKSPACE_SIZE_LIST.local_list, True, "tbe_")
 
     if hasattr(TBE_ATUO_ATOMIC_IND_LIST, "local_list") and \
@@ -657,10 +657,10 @@ def tvm_callback_cce_postproc(target,
 
     from asc_op_compile_base.common.platform.platform_info import ASCEND_910B
     from asc_op_compile_base.common.platform.platform_info import ASCEND_910_93
-    from asc_op_compile_base.common.platform.platform_info import ASCEND_950
+    from asc_op_compile_base.common.platform.platform_info import ASCEND_910_95
     from asc_op_compile_base.common.platform.platform_info import MC62CM12A
     short_soc_version = get_soc_spec("SHORT_SOC_VERSION")
-    if short_soc_version in [ASCEND_910B, ASCEND_910_93, ASCEND_950, MC62CM12A]:
+    if short_soc_version in [ASCEND_910B, ASCEND_910_93, ASCEND_910_95, MC62CM12A]:
         if (is_ffts_id_needed or mix == "MIX" or ccec.current_build_config().get(enforce_mix_mode)):
             title_dict["coreType"] = "MIX"
             from asc_op_compile_base.common import cce_params
@@ -672,7 +672,7 @@ def tvm_callback_cce_postproc(target,
     title_dict["blockDim"] = blockdim
     title_dict["opParaSize"] = args_size
 
-    if short_soc_version in ["Ascend910B", "Ascend910_93", "Ascend950", "MC62CM12A"]:
+    if short_soc_version in ["Ascend910B", "Ascend910_93", "Ascend910_95", "MC62CM12A"]:
         mode_in_args_first_field = 0
         if is_ffts_id_needed or ccec.current_build_config().get(enforce_mix_mode):
             mode_in_args_first_field = 1

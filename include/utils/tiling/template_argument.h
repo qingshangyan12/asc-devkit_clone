@@ -92,7 +92,7 @@ constexpr uint64_t INVALID_TILING_KEY = 0XFFFFFFFFFFFFFFFF;
 #define ASCENDC_TPL_SEL(...) @@ASCENDC_TPL_LISTS@@ = {__VA_ARGS__}
 
 #elif defined(ASCENDC_TPL_KERNEL)
-// check arch for native date type
+// check arch for native data type
 #define ASC_INNER_DATATYPE_ENABLE_INT4
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
     #define ASC_INNER_DATATYPE_ENABLE_BF16

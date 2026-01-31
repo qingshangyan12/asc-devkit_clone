@@ -69,10 +69,10 @@ __aicore__ inline void RmsNorm(const LocalTensor<T>& dstLocal, const LocalTensor
     if ASCEND_IS_AIC {
         return;
     }
-    LocalTensor<uint8_t> stackBufer;
-    bool ret = PopStackBuffer<uint8_t, TPosition::LCM>(stackBufer);
+    LocalTensor<uint8_t> stackBuffer;
+    bool ret = PopStackBuffer<uint8_t, TPosition::LCM>(stackBuffer);
     ASCENDC_ASSERT((ret), { KERNEL_LOG(KERNEL_ERROR, "RmsNorm failed to apply for tmp buffer!"); });
-    RmsNorm<T, isBasicBlock>(dstLocal, srcLocal, gammaLocal, stackBufer, epsilon, tiling);
+    RmsNorm<T, isBasicBlock>(dstLocal, srcLocal, gammaLocal, stackBuffer, epsilon, tiling);
 }
 #pragma end_pipe
 } // namespace AscendC

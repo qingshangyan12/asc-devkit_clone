@@ -139,7 +139,7 @@ def get_int64_mode(inputs_or_outputs) -> bool:
             return True
 
         if data_size is None:
-            logger.warn("Data type[%s] is not support.", in_or_out.get(CompileParam.DTYPE, ""))
+            logger.warn("Data type[%s] is not supported.", in_or_out.get(CompileParam.DTYPE, ""))
             return True
 
         if shape_sum[0] * data_size > INT32_MAX:

@@ -38,7 +38,7 @@ enum class SocVersion {
     ASCEND910B,     // Ascend910B1~4, Ascend910B2C, Ascend910_93 Serials
     ASCEND310P,     // Ascend310P1, Ascend310P3
     ASCEND310B,     // Ascend310B1, Ascend310B2, Ascend310B3, Ascend310B4
-    ASCEND950,   // ASCEND950, __DAV_C310__
+    ASCEND910_95,   // ASCEND910_95, __DAV_C310__
     RESERVED_VERSION = 99999
 };
 
@@ -68,12 +68,12 @@ bool OpTilingRegistry::LoadTilingLibrary(const char *tilingSoPath) const
         CXT_ASCENDC_LOGE("OpTilingRegistry tiling so path [%s] is too long.", tilingSoPath);
         return false;
     }
-    char resovedPath[PATH_MAX] = {0};
-    if (realpath(tilingSoPath, resovedPath) == nullptr) {
+    char resolvedPath[PATH_MAX] = {0};
+    if (realpath(tilingSoPath, resolvedPath) == nullptr) {
         CXT_ASCENDC_LOGE("OpTilingRegistry Tiling so path [%s] is not exist.", tilingSoPath);
         return false;
     }
-    std::string absFilePath(resovedPath);
+    std::string absFilePath(resolvedPath);
     void *handle = nullptr;
     void (*registryFunc)(const char *);
 
@@ -267,7 +267,7 @@ ContextBuilder &ContextBuilder::AddPlatformInfo(const char *customSocVersion)
         {"Ascend910B", SocVersion::ASCEND910B},
         {"Ascend910_93", SocVersion::ASCEND910B},
         {"Ascend310B", SocVersion::ASCEND310B},
-        {"Ascend950", SocVersion::ASCEND950},
+        {"Ascend910_95", SocVersion::ASCEND910_95},
     };
     const static std::string labelVersion = "version";
     const static std::string labelShortSocVersion = "Short_SoC_version";

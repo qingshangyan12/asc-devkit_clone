@@ -294,13 +294,13 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
     const LocalTensor<T>& sharedTmpBuffer, const int32_t count);
 #pragma end_pipe
 template <typename T>
-__aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex);
+__aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue, T &maxMinIndex);
 
 template <typename T>
-__aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T &maxMinValue);
+__aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue);
 
 template <typename T>
-__aicore__ inline __inout_pipe__(S) T GetReduceRepeatSumSpr();
+__aicore__ inline __inout_pipe__(S) T GetAccVal();
 } // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_vec_reduce_intf_impl.h"

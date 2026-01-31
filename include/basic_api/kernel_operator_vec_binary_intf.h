@@ -567,10 +567,10 @@ __aicore__ inline void FusedMulAdd(const LocalTensor<T>& dst, const LocalTensor<
                                    const LocalTensor<T>& src1, const int32_t& count);
 
 /* **************************************************************************************************
- * MulAddRelu                                             *
+ * FusedMulAddRelu                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup MulAddRelu Level 0
+ * @ingroup FusedMulAddRelu Level 0
  * @brief dst = relu(src0 * dst + src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -585,17 +585,17 @@ __aicore__ inline void FusedMulAdd(const LocalTensor<T>& dst, const LocalTensor<
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
-__aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
+__aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
-__aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
+__aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup MulAddRelu Level 2
+ * @ingroup FusedMulAddRelu Level 2
  * @brief dst = relu(src0 * dst + src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -603,7 +603,7 @@ __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
+__aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, const int32_t& count);
 
 /* **************************************************************************************************
@@ -672,10 +672,10 @@ __aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T>& ds
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count);
 
 /* **************************************************************************************************
- * AbsSub                                             *
+ * FusedAbsSub                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup AbsSub Level 2
+ * @ingroup FusedAbsSub Level 2
  * @brief dst = abs(src0 - src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -683,7 +683,7 @@ __aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T>& ds
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
+__aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
     const LocalTensor<T> &src1, const uint32_t count);
 
 /* **************************************************************************************************

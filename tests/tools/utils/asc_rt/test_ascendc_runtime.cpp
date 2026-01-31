@@ -142,7 +142,7 @@ typedef struct {
 } AscendCStreamForVectorCore;
 
 extern "C" uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *handle, const uint64_t key, void **args, uint32_t size,
-    const void *stream, bool enbaleProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks, uint32_t aivNumBlocksOffset);
+    const void *stream, bool enableProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks, uint32_t aivNumBlocksOffset);
 extern "C" void AscendCDestroyStreamCallBack(rtStream_t stream, const bool isCreate);
 extern std::unordered_map<const void *, AscendCStreamForVectorCore> g_ascStreamMap;
 extern "C" uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t numBlocks, void **args, uint32_t size,
@@ -374,7 +374,7 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_310P_mix_vector_core
     }, ::testing::ExitedWithCode(1), "");
 }
 
-TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_950) {
+TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_910_95) {
     void* funcHandle = nullptr;
     uint32_t numBlocks = 1;
     void* stream = nullptr;
@@ -382,7 +382,7 @@ TEST_F(TEST_ASCENDC_RUNTIME, AscendLaunchKernelWithHostArgs_950) {
     size_t argsSize = 0;
     uint32_t ubufDynamicSize = 512;
     EXPECT_EXIT({
-        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend950"));
+        MOCKER(aclrtGetSocName).stubs().will(returnValue((const char*)"Ascend910_95"));
         int32_t ret = AscendLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, hostArgs, argsSize, ubufDynamicSize);
         exit(ret == 0 ? 0 : 1);
     }, ::testing::ExitedWithCode(0), "");

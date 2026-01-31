@@ -32,11 +32,11 @@ namespace AscendC {
  * \brief Selects values from two sources(tensor/scalar) and put into dst tensor elementwisely according to the mask
  * Tensor Value.
  * True: mask tensor position value == 1, select src1 scalar.
- * False: mask tensor position value == 0, select src0 Tensor correspoding value.
+ * False: mask tensor position value == 0, select src0 Tensor corresponding value.
  * \note support data type: T half/float, U uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t/bool
  * Tensor shape can be considered as [first_axis, last_axis],
- * and it requries that mask_first_axis = source_first_axis, mask_last_axis >= source_first_axis
- * mask last axis should be 32B aligned and element size should be time of 16
+ * and it requires that mask_first_axis = source_first_axis, mask_last_axis >= source_first_axis
+ * mask last axis should be 32B aligned and element size should be times of 16
  * src last axis should be 32B aligned
  * it doesn't allow src/sharedTmpBuffer tensor address overlap.
  * \tparam isReuseMask: whether to reuse the mask space for process
@@ -58,12 +58,12 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<T>& s
  * \ingroup Select
  * \brief Selects values from two sources(tensor/scalar) and put into dst tensor elementwisely according to the mask
  * Tensor Value.
- * True: mask tensor position value == 1, select src1 Tensor correspoding value.
+ * True: mask tensor position value == 1, select src1 Tensor corresponding value.
  * False: mask tensor position value == 0, select src0 scalar.
  * \note support data type: T half/float, U uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t/bool
  * Tensor shape can be considered as [first_axis, last_axis],
- * and it requries that mask_first_axis = source_first_axis, mask_last_axis >= source_first_axis
- * mask last axis should be 32B aligned and element size should be time of 16
+ * and it requires that mask_first_axis = source_first_axis, mask_last_axis >= source_first_axis
+ * mask last axis should be 32B aligned and element size should be times of 16
  * src last axis should be 32B aligned
  * it doesn't allow src/sharedTmpBuffer tensor address overlap.
  * \tparam isReuseMask: whether to reuse the mask space for process

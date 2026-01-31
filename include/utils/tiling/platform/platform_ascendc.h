@@ -62,7 +62,7 @@ enum class SocVersion {
     ASCEND910B,    // Ascend910B1~4, Ascend910B2C, Ascend910_93 Serials
     ASCEND310P,    // Ascend310P1, Ascend310P3
     ASCEND310B,    // Ascend310B1, Ascend310B2, Ascend310B3, Ascend310B4
-    ASCEND950,  // ASCEND950, __DAV_C310__
+    ASCEND910_95,  // ASCEND910_95, __DAV_C310__
     ASCEND910_55,  // ASCEND910_55, __DAV_310R6__
     AS31XM1,
     ASCEND031,
@@ -125,7 +125,7 @@ public:
     uint32_t CalcTschBlockDim(uint32_t sliceNum, uint32_t aicCoreNum, uint32_t aivCoreNum) const;
     /**
      * Get Work Space Size
-     * @return work sapce size by chip type
+     * @return work space size by chip type
      */
     uint32_t GetLibApiWorkSpaceSize(void) const;
     uint32_t GetResCubeGroupWorkSpaceSize(void) const;

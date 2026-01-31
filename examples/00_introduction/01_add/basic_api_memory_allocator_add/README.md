@@ -51,10 +51,10 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom_v1 / add_custom_v2 / add_custom_v3 / add_custom_v4</td></tr>
   </table>
 
-- 算子实现：  
+- 算子实现：
   本样例中实现的是固定shape为72*4096的Add算子。
   
-  - Kernel实现
+  - kernel实现
   
     Add算子的数学表达式为：
   
@@ -72,9 +72,8 @@
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
-
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash

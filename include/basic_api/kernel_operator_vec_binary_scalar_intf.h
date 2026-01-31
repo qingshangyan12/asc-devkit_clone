@@ -27,7 +27,7 @@ namespace AscendC {
  * ************************************************************************************************* */
 /*
  * @ingroup Adds Level 0
- * @brief dst[i] = src[i] + sacalar
+ * @brief dst[i] = src[i] + scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -71,7 +71,7 @@ __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1,
 
 /*
  * @ingroup Adds Level 2
- * @brief dst = src[i] + sacalar
+ * @brief dst = src[i] + scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -98,7 +98,7 @@ __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, const in
  * ************************************************************************************************* */
 /*
  * @ingroup Muls Level 0
- * @brief dst[i] = src[i] * sacalar
+ * @brief dst[i] = src[i] * scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -142,7 +142,7 @@ __aicore__ inline void Muls(const U& dst, const S& src0, const V& src1,
 
 /*
  * @ingroup Muls Level 2
- * @brief dst = src[i] * sacalar
+ * @brief dst = src[i] * scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -169,7 +169,7 @@ __aicore__ inline void Muls(const U& dst, const S& src0, const V& src1, const in
  * ************************************************************************************************* */
 /*
  * @ingroup Maxs Level 0
- * @brief dst[i] = src[i] > sacalar ? src[0] : scalar
+ * @brief dst[i] = src[i] > scalar ? src[0] : scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -213,7 +213,7 @@ __aicore__ inline void Maxs(const U& dst, const S& src0, const V& src1,
 
 /*
  * @ingroup Maxs Level 2
- * @brief dst = src[i] > sacalar ? src[0] : scalar
+ * @brief dst = src[i] > scalar ? src[0] : scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -240,7 +240,7 @@ __aicore__ inline void Maxs(const U& dst, const S& src0, const V& src1, const in
  * ************************************************************************************************* */
 /*
  * @ingroup Mins Level 0
- * @brief dst[i] = src[i] < sacalar ? src[0] : scalar
+ * @brief dst[i] = src[i] < scalar ? src[0] : scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -284,7 +284,7 @@ __aicore__ inline void Mins(const U& dst, const S& src0, const V& src1,
 
 /*
  * @ingroup Mins Level 2
- * @brief dst = src[i] < sacalar ? src[0] : scalar
+ * @brief dst = src[i] < scalar ? src[0] : scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -311,7 +311,7 @@ __aicore__ inline void Mins(const U& dst, const S& src0, const V& src1, const in
  * ************************************************************************************************* */
 /*
  * @ingroup ShiftLeft Level 0
- * @brief dst[i] = src[i] << sacalar
+ * @brief dst[i] = src[i] << scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -342,7 +342,7 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
 
 /*
  * @ingroup Shiftleft Level 2
- * @brief dst = src[i] << sacalar
+ * @brief dst = src[i] << scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -362,7 +362,7 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
  * ************************************************************************************************* */
 /*
  * @ingroup ShiftRight Level 0
- * @brief dst[i] = src[i] >> sacalar
+ * @brief dst[i] = src[i] >> scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -393,7 +393,7 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
 
 /*
  * @ingroup ShiftRight Level 2
- * @brief dst = src[i] >> sacalar
+ * @brief dst = src[i] >> scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar input scalar number
@@ -613,10 +613,10 @@ template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryCon
 __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, const int32_t& count);
 
 /* **************************************************************************************************
- * MulsCast                                             *
+ * FusedMulsCast                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup MulsCast Level 2
+ * @ingroup FusedMulsCast Level 2
  * @brief dst = abs(src0 - src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -625,7 +625,7 @@ __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, const int
  */
 template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, 
     const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
-__aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count);
+__aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count);
 
 #endif
 } // namespace AscendC

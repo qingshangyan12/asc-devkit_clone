@@ -20,7 +20,7 @@
 
 namespace AscendC {
 [[deprecated(__FILE__
-    " is deprecated, please use sekectwithbytesmask.h instead!")]] typedef void SelectWithBytesMaskDeprecatedHeader;
+    " is deprecated, please use selectwithbytesmask.h instead!")]] typedef void SelectWithBytesMaskDeprecatedHeader;
 using AscendCModuleSelectWithBytesMaskInterface = SelectWithBytesMaskDeprecatedHeader;
 } // namespace AscendC
 #endif

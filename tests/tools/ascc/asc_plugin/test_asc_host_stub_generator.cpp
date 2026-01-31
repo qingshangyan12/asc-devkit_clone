@@ -336,7 +336,7 @@ TEST_F(TEST_ASC_HOST_STUB_GENERATOR, asc_get_host_stub_printf)
     kernelInfo.templateInstances = {};
 
     auto& manager = AscPlugin::InfoManager::GetInstance();
-    manager.shortSocVersion_ = ShortSocVersion::ASCEND950;
+    manager.shortSocVersion_ = ShortSocVersion::ASCEND910_95;
     std::unordered_set<AscPlugin::KernelMetaType> kernelType = {AscPlugin::KernelMetaType::KERNEL_TYPE_MIX_AIC_1_2};
     auto hostStubCode = GetHostStubCode(kernelInfo, kernelType);
     EXPECT_EQ(hostStubCode, golden);

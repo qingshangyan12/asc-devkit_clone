@@ -81,7 +81,7 @@ class FuncMetaType(enum.Enum):
 class DFXArgInfo:
     def __init__(self, param_name: str, param_type: DFXParamType):
         if param_type == DFXParamType.DEFAULT:
-            CommonUtility().ascendc_raise_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("DFX paramter type is invaild."))
+            CommonUtility().ascendc_raise_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("DFX parameter type is invalid."))
         self.param_name: str = param_name
         self.param_type: DFXParamType = param_type
         self.point_type: DFXPointType = DFXPointType.LEVEL_1
@@ -98,7 +98,7 @@ class DFXSectionGenerator:
     def dfx_info_reset(self, op_info: OpInfo):
         self.index: int = 0
         self.param_to_index: dict = {}
-        self.params_base: list = [] # push paramter in params_base
+        self.params_base: list = [] # push parameter in params_base
         self.section_size: int = 0
         self.gen_dfx_struct_flag: bool = False
         self.is_support: bool = False
@@ -133,7 +133,7 @@ class DFXSectionGenerator:
             return param
         except Exception as err:
             CommonUtility().ascendc_raise_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, \
-                (f"DFX paramter name: {param_name} do not currect.", err))
+                (f"DFX parameter name: {param_name} do not currect.", err))
             return DFXArgInfo("error", DFXParamType.TENSOR)
 
 

@@ -25,7 +25,7 @@ protected:
     }
 };
 
-template <typename T, bool UseMulAddRelu = false>
+template <typename T>
 void MainVecFusedMulAddLevel2Demo(__gm__ uint8_t* __restrict__ dstGm,
     __gm__ uint8_t* __restrict__ srcGm, uint32_t dataSize)
 {
@@ -50,18 +50,12 @@ void MainVecFusedMulAddLevel2Demo(__gm__ uint8_t* __restrict__ dstGm,
     wait_flag(PIPE_MTE2, PIPE_V, EVENT_ID0);
     uint64_t maskCount = 32;
     uint64_t mask[2] = {0xff, 0};
-        FusedMulAdd(outputLocal, input0Local, input0Local, dataSize);
-        FusedMulAdd(outputLocal, input0Local, input0Local, maskCount, sizeof(T), repeatParams);
-        FusedMulAdd(outputLocal, input0Local, input0Local, mask, sizeof(T), repeatParams);
-    if constexpr (UseMulAddRelu) {
-        FusedMulAddRelu(outputLocal, input0Local, input0Local, dataSize);
-        FusedMulAddRelu(outputLocal, input0Local, input0Local, maskCount, sizeof(T), repeatParams);
-        FusedMulAddRelu(outputLocal, input0Local, input0Local, mask, sizeof(T), repeatParams);
-    }else{
-        MulAddRelu(outputLocal, input0Local, input0Local, dataSize);
-        MulAddRelu(outputLocal, input0Local, input0Local, maskCount, sizeof(T), repeatParams);
-        MulAddRelu(outputLocal, input0Local, input0Local, mask, sizeof(T), repeatParams);
-    }
+    FusedMulAdd(outputLocal, input0Local, input0Local, dataSize);
+    FusedMulAdd(outputLocal, input0Local, input0Local, maskCount, sizeof(T), repeatParams);
+    FusedMulAdd(outputLocal, input0Local, input0Local, mask, sizeof(T), repeatParams);
+    FusedMulAddRelu(outputLocal, input0Local, input0Local, dataSize);
+    FusedMulAddRelu(outputLocal, input0Local, input0Local, maskCount, sizeof(T), repeatParams);
+    FusedMulAddRelu(outputLocal, input0Local, input0Local, mask, sizeof(T), repeatParams);
 
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
@@ -72,27 +66,14 @@ void MainVecFusedMulAddLevel2Demo(__gm__ uint8_t* __restrict__ dstGm,
 }
 
 #define VEC_FUSED_MUL_ADD_LEVEL2_TESTCASE(dataType)                                              \
-    TEST_F(TEST_FUSED_MUL_ADD, FusedMulAddRelu##dataType##Case)                                           \
+    TEST_F(TEST_FUSED_MUL_ADD, FusedMulAdd##dataType##Case)                                           \
     {                                                                                                           \
         uint32_t dataSize = 256;                                                                               \
         uint32_t selMaskSize = dataSize / AscendCUtils::GetBitSize(sizeof(uint8_t));                         \
         uint8_t input0Gm[dataSize * sizeof(dataType)];                                                       \
         uint8_t outputGm[dataSize * sizeof(dataType)];                                                       \
                                                                                                                 \
-        MainVecFusedMulAddLevel2Demo<dataType, false>(outputGm, input0Gm, dataSize);                     \
-                                                                                                                \
-        for (uint32_t i = 0; i < dataSize; i++) {                                                              \
-            EXPECT_EQ(outputGm[i], 0x00);                                                                      \
-        }                                                                                                       \
-    }                                                                                                          \
-    TEST_F(TEST_FUSED_MUL_ADD, MulAddRelu##dataType##Case)                                                    \
-    {                                                                                                           \
-        uint32_t dataSize = 256;                                                                               \
-        uint32_t selMaskSize = dataSize / AscendCUtils::GetBitSize(sizeof(uint8_t));                         \
-        uint8_t input0Gm[dataSize * sizeof(dataType)];                                                       \
-        uint8_t outputGm[dataSize * sizeof(dataType)];                                                       \
-                                                                                                                \
-        MainVecFusedMulAddLevel2Demo<dataType, true>(outputGm, input0Gm, dataSize);                     \
+        MainVecFusedMulAddLevel2Demo<dataType>(outputGm, input0Gm, dataSize);                     \
                                                                                                                 \
         for (uint32_t i = 0; i < dataSize; i++) {                                                              \
             EXPECT_EQ(outputGm[i], 0x00);                                                                      \

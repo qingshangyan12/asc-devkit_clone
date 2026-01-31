@@ -137,7 +137,7 @@ class OpContext:
         return self._compile_info.get(k)
 
     def set_compile_info(self, compile_info):
-        # set compile info for muti process
+        # set compile info for multi process
         self._compile_info = compile_info
 
     def add_build_res(self, k, v):

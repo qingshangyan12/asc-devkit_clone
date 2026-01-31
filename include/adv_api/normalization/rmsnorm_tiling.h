@@ -25,9 +25,9 @@ namespace AscendC {
  * \param [out] maxValue max size of tmp buffer
  * \param [out] minValue min size of tmp buffer
  * \param [in] isBasicBlock indicate whether enable basicBlock.
-   When enable basicBlock, better performance will be achived and more tmp buffer will be needed
+   When enable basicBlock, better performance will be achieved and more tmp buffer will be needed
  * \return flag for whether the tmp buffer size is calculated successfully
-           if src shape is illeagl for basic block, it will return false.
+           if src shape is illegal for basic block, it will return false.
  */
 bool GetRmsNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue,
     uint32_t& minValue, const bool isBasicBlock = false);
@@ -43,9 +43,9 @@ bool GetRmsNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize,
  * \param [in] typeSize data type size: sizeof(TYPE)
  * \param [out] tiling RmsNorm tiling
  * \param [in] isBasicBlock indicate whether enable basicBlock.
-   When enable basicBlock, better performance will be achived and more tmp buffer will be needed
+   When enable basicBlock, better performance will be achieved and more tmp buffer will be needed
  * \return flag for whether the tiling is calculated successfully
-   if src shape and origin src shape is illeagl or input stackBufferByteSize is not big enough, it will return false.
+   if src shape and origin src shape is illegal or input stackBufferByteSize is not big enough, it will return false.
  */
 bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape,
     const uint32_t stackBufferByteSize, const uint32_t typeSize, optiling::RmsNormTiling& tiling,

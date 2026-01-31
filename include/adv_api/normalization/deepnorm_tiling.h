@@ -20,7 +20,7 @@ namespace AscendC {
  * \param [in] isReuseSource: indicate whether to reuse source tensor.
  *             When enable isReuseSource, src tensor will be used as tmp buffer for calculation.
  * \param [in] isBasicBlock: indicate whether enable basicBlock.
- *             When enable basicBlock, better performance will be achived and more tmp buffer will be needed
+ *             When enable basicBlock, better performance will be achieved and more tmp buffer will be needed
  * \param [out] maxValue: max size required for tmp buffer
  * \param [out] minValue: min size required for tmp buffer
  * \return flag for whether the tmp buffer size is calculated successfully
@@ -39,7 +39,7 @@ bool GetDeepNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize
  * \param [in] typeSize: data type size: sizeof(TYPE)
  * \param [in] isReuseSource: indicate whether intermediate variables can reuse the input memory
  * \param [in] isBasicBlock: indicate whether enable basicBlock.
- *             When enable basicBlock, better performance will be achived and more tmp buffer will be needed
+ *             When enable basicBlock, better performance will be achieved and more tmp buffer will be needed
  * \param [out] tiling: DeepNorm tiling
  * \return Flag for whether the tiling is calculated successfully. If src shape and origin src shape is illegal or
  *         input stackBufferSize is not big enough, it will return false.

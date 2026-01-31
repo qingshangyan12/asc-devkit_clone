@@ -73,8 +73,8 @@ TEST_F(TEST_ASC_COMPILE_OPTIONS, asc_GetDeviceCompileOptionsWithSoc_91095_onttoo
     CompileOptionManager mng = CompileOptionManager();
     KernelTypeResult kernelTypeRes = {true, true, true, true};
     MOCKER(AscPlugin::CheckHasMixKernelFunc).stubs().will(returnValue(kernelTypeRes));
-    auto cubeOpts = mng.GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND950>(CoreType::CUBE);
-    auto vecOpts = mng.GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND950>(CoreType::VEC);
+    auto cubeOpts = mng.GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND910_95>(CoreType::CUBE);
+    auto vecOpts = mng.GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND910_95>(CoreType::VEC);
     EXPECT_TRUE(cubeOpts.empty());
     EXPECT_TRUE(vecOpts.empty());
 }
@@ -86,8 +86,8 @@ TEST_F(TEST_ASC_COMPILE_OPTIONS, asc_GetDeviceCompileOptionsWithSoc_91095)
     mng.l2CacheOn_ = true;
     KernelTypeResult kernelTypeRes = {true, false, false, false};
     MOCKER(AscPlugin::CheckHasMixKernelFunc).stubs().will(returnValue(kernelTypeRes));
-    auto cubeOpts = mng.GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND950>(CoreType::CUBE);
-    auto vecOpts = mng.GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND950>(CoreType::VEC);
+    auto cubeOpts = mng.GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND910_95>(CoreType::CUBE);
+    auto vecOpts = mng.GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND910_95>(CoreType::VEC);
     std::vector<std::string> expCubeOpts = { "-mllvm", "-cce-aicore-stack-size=0x8000", "-mllvm", "-cce-aicore-function-stack-size=0x8000", "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false", "-DL2_CACHE_HINT", "-D__MIX_CORE_MACRO__=1", "-D__MIX_CORE_AIC_RATION__=1" };
     std::vector<std::string> expVecOpts = { "-mllvm", "-cce-aicore-stack-size=0x8000", "-mllvm", "-cce-aicore-function-stack-size=0x8000", "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false", "-DL2_CACHE_HINT", "-D__MIX_CORE_MACRO__=1", "-D__MIX_CORE_AIC_RATION__=1" };
     EXPECT_EQ(cubeOpts, expCubeOpts);

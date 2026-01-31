@@ -113,7 +113,7 @@ __aicore__ inline void CastAdaptor(RegTensor<T> &dstReg, RegTensor<U> &srcReg, M
         return Cast<T, U, roundMode, mode>(dstReg, srcReg, mask);
     }
     else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport pattern of CastAdaptor"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported pattern of CastAdaptor"); });
     }
 }
 
@@ -129,7 +129,7 @@ __aicore__ inline void CastAdaptor(RegTensor<T> &dstReg, RegTensor<U> &srcReg, M
         return Cast<T, U, mode, ppMode>(dstReg, srcReg, mask);
     }
     else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport pattern of CastAdaptor"); });
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported pattern of CastAdaptor"); });
     }
 }
 
@@ -254,7 +254,7 @@ __aicore__ inline void CastAdaptor(RegTensor<T> &dstReg, RegTensor<U> &srcReg, M
     }                                                                                                            \
 
 // For Cast L2
-#define CAST_LOWER_QUATER(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)                           \
+#define CAST_LOWER_QUARTER(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)                           \
     __aicore__ inline void CastIntrinsicsImpl##rndStr(__ubuf__ dstType* dst,                                            \
         __ubuf__ srcType* src, const uint32_t count)                                                                 \
     {                                                                                                                   \
@@ -295,7 +295,7 @@ __aicore__ inline void CastAdaptor(RegTensor<T> &dstReg, RegTensor<U> &srcReg, M
     }                                                                                                                   \
 
 // For Cast L2
-#define CAST_UPPER_QUATER(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)                           \
+#define CAST_UPPER_QUARTER(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)                           \
     __aicore__ inline void CastIntrinsicsImpl##rndStr(__ubuf__ dstType* dst,                                            \
         __ubuf__ srcType* src, const uint32_t count)                                                                 \
     {                                                                                                                   \
@@ -399,10 +399,10 @@ __aicore__ inline void CastAdaptor(RegTensor<T> &dstReg, RegTensor<U> &srcReg, M
 #define UPPER_TO_HALF(dstType, srcType, rndMode, satMode, mode)                                     \
     CastAdaptor<dstType, srcType, rndMode, mode, satMode, PartMode::EVEN>(vreg1, vreg0, preg_dst)
 
-#define LOWER_TO_QUATER(dstType, srcType, rndMode, satMode, mode)                                   \
+#define LOWER_TO_QUARTER(dstType, srcType, rndMode, satMode, mode)                                   \
     CastAdaptor<dstType, srcType, rndMode, mode, satMode, PPMode::ZERO>(vreg1, vreg0, preg)
 
-#define UPPER_TO_QUATER(dstType, srcType, rndMode, satMode, mode)                                   \
+#define UPPER_TO_QUARTER(dstType, srcType, rndMode, satMode, mode)                                   \
     CastAdaptor<dstType, srcType, rndMode, mode, satMode, PPMode::ZERO>(vreg1, vreg0, preg_dst)
 
 #define TRUNCATE_ROUND(dstType, srcType, rndMode, satMode, mode)                                    \
@@ -416,9 +416,9 @@ __aicore__ inline void CastAdaptor(RegTensor<T> &dstReg, RegTensor<U> &srcReg, M
         srcBits, dstBits, satMode, mode)                                                                \
     CAST_UPPER_HALF(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)
 
-#define REGISTER_CAST_LOWER_QUATER(rndStr, rndMode, srcType, dstType,                                   \
+#define REGISTER_CAST_LOWER_QUARTER(rndStr, rndMode, srcType, dstType,                                   \
         srcBits, dstBits, satMode, mode)                                                                \
-    CAST_LOWER_QUATER(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)
+    CAST_LOWER_QUARTER(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)
 
 #define REGISTER_CAST_S322HALF(rndStr, rndMode, srcType, dstType, srcBits, dstBits, satMode, mode) \
     CAST_S322HALF(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)
@@ -426,9 +426,9 @@ __aicore__ inline void CastAdaptor(RegTensor<T> &dstReg, RegTensor<U> &srcReg, M
 #define REGISTER_CAST_HALF2S4(rndStr, rndMode, srcType, dstType, srcBits, dstBits, satMode, mode) \
     CAST_HALF2S4(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)
 
-#define REGISTER_CAST_UPPER_QUATER(rndStr, rndMode, srcType, dstType,                                   \
+#define REGISTER_CAST_UPPER_QUARTER(rndStr, rndMode, srcType, dstType,                                   \
         srcBits, dstBits, satMode, mode)                                                                 \
-    CAST_UPPER_QUATER(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)
+    CAST_UPPER_QUARTER(srcType, dstType, srcBits, dstBits, rndStr, rndMode, satMode, mode)
 
 #define REGISTER_CAST_EQUAL(rndStr, rndMode, srcType, dstType,                                          \
         srcBits, dstBits, satMode, mode)                                                                \
@@ -520,16 +520,16 @@ REGISTER_CAST_ROUND_GROUP2(UPPER_HALF, int8_t, int16_t, 8, 16, SatMode::UNKNOWN,
 REGISTER_CAST_ROUND_GROUP2(UPPER_HALF, uint16_t, uint32_t, 16, 32, SatMode::UNKNOWN, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP2(UPPER_HALF, int16_t, uint32_t, 16, 32, SatMode::UNKNOWN, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP2(UPPER_HALF, int16_t, int32_t, 16, 32, SatMode::UNKNOWN, Mode::ZEROING);
-REGISTER_CAST_ROUND_GROUP2(UPPER_QUATER, int8_t, int32_t, 8, 32, SatMode::UNKNOWN, Mode::ZEROING);
-REGISTER_CAST_ROUND_GROUP2(UPPER_QUATER, uint8_t, uint32_t, 8, 32, SatMode::UNKNOWN, Mode::ZEROING);
+REGISTER_CAST_ROUND_GROUP2(UPPER_QUARTER, int8_t, int32_t, 8, 32, SatMode::UNKNOWN, Mode::ZEROING);
+REGISTER_CAST_ROUND_GROUP2(UPPER_QUARTER, uint8_t, uint32_t, 8, 32, SatMode::UNKNOWN, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP2(LOWER_HALF, uint16_t, uint8_t, 16, 8, SatMode::SAT, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP2(LOWER_HALF, int16_t, uint8_t, 16, 8, SatMode::SAT, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP2(LOWER_HALF, uint32_t, uint16_t, 32, 16, SatMode::SAT, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP2(LOWER_HALF, uint32_t, int16_t, 32, 16, SatMode::SAT, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP2(LOWER_HALF, int32_t, uint16_t, 32, 16, SatMode::SAT, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP2(LOWER_HALF, int32_t, int16_t, 32, 16, SatMode::SAT, Mode::ZEROING);
-REGISTER_CAST_ROUND_GROUP2(LOWER_QUATER, int32_t, uint8_t, 32, 8, SatMode::SAT, Mode::ZEROING);
-REGISTER_CAST_ROUND_GROUP2(LOWER_QUATER, uint32_t, uint8_t, 32, 8, SatMode::SAT, Mode::ZEROING);
+REGISTER_CAST_ROUND_GROUP2(LOWER_QUARTER, int32_t, uint8_t, 32, 8, SatMode::SAT, Mode::ZEROING);
+REGISTER_CAST_ROUND_GROUP2(LOWER_QUARTER, uint32_t, uint8_t, 32, 8, SatMode::SAT, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP1(EQUAL, int16_t, half, 16, 16, SatMode::UNKNOWN, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP1(EQUAL, int32_t, float, 32, 32, SatMode::UNKNOWN, Mode::ZEROING);
 REGISTER_CAST_ROUND_GROUP1(TRUNCATE, half, half, 16, 16, SatMode::UNKNOWN, Mode::ZEROING);

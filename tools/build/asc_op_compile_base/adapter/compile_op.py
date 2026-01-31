@@ -1748,7 +1748,7 @@ def _compile_ascendc_cce_v200_with_kernel_type_for_static(compile_info: CompileI
         # gen json for v200
         _gen_static_json_for_no_mix_v200(compile_info, tiling_info, kernel_type)
     else:
-        raise Exception(f'current kernel core type is not support')
+        raise Exception(f'current kernel core type is not supported')
     return
 
 
@@ -1809,7 +1809,7 @@ def _compile_ascendc_cce_v200_with_kernel_type_for_dynamic(compile_info: Compile
             obj_files.append(dst_file)
             tiling_key_aicore.append(tiling_key)
         else:
-            raise Exception(f'current kernel core type is not support')
+            raise Exception(f'current kernel core type is not supported')
                 # gen main json
     new_sources += "#endif\n"
     # add dfx info section to sourse file

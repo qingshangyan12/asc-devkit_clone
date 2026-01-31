@@ -98,11 +98,11 @@ def load_op_host_tiling_lib():
     import platform
     archlinux = platform.machine()
     if 'x86' in archlinux:
-        incompatiable_arch_name = "aarch64"
+        incompatible_arch_name = "aarch64"
     else:
-        incompatiable_arch_name = "x86_64"
+        incompatible_arch_name = "x86_64"
     for tiling_path in builtin_op_host_tiling_file_path:
-        if incompatiable_arch_name in tiling_path[len(builtin_op_host_tiling_prefix):]:
+        if incompatible_arch_name in tiling_path[len(builtin_op_host_tiling_prefix):]:
             continue
         try:
             if os.path.exists(tiling_path):
@@ -1177,7 +1177,7 @@ def get_tiling_copy_func_and_micro(class_name):
     class_body += get_tiling_data_func()
 
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-    if short_soc_version in ["Ascend950", "mc62cm12a"]:
+    if short_soc_version in ["Ascend910_95", "mc62cm12a"]:
         # use __AUX__ to create a new struct to reduce running time. __AUX__ name does not matter
         # original: initialize, then write value    use __AUX__: write value, then interpret_cast to needed struct
         class_body += _get_tiling_data_without_time_stamp(class_name)
@@ -1565,7 +1565,7 @@ def get_tiling_info(op_info: OpInfo, tiling_key_list: list = None, value_depends
         optype (str): operator type
         tiling_key_list (list): tiling_key_list of op
         value_depends (list): value_depends info of op
-        enable_vd : is support value depends
+        enable_vd : is supported value depends
 
     Returns:
         tiling_info (TilingInfo): tiling info formatted by tiling define and tiling data
@@ -1740,7 +1740,7 @@ def process_tiling_info(op_info: OpInfo, tiling_key_list: list = None, value_dep
         op_info(tuple): operator infos
         tiling_key_list(list): tiling_key_list of op
         value_depends(dict): value_depends info of op
-        enable_vd(bool): is support value depends
+        enable_vd(bool): is supported value depends
     Returns:
         tiling_info (TilingInfo): tiling info formatted by tiling define and tiling data
     """

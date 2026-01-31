@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 enum class ElfType { ELF_TYPE_ELF = 0, ELF_TYPE_AIVEC, ELF_TYPE_AICUBE, ELF_TYPE_MAX };
-enum class SocVersion { UNKNOWN, ASCEND310P, ASCEND910B, ASCEND950 };
+enum class SocVersion { UNKNOWN, ASCEND310P, ASCEND910B, ASCEND910_95 };
 
 typedef enum KernelType : unsigned int {
     K_TYPE_AICORE = 1,
@@ -65,12 +65,6 @@ constexpr size_t ASCENDC_KERNEL_ID = 69;
 
 #define PROF_TASK_TIME 0x00000002ULL  // dynamic profiling hwts log
 
-bool AscendCheckSoC950Version(const char *socVersion) {
-    const char* prefix = "ascend950";
-    size_t prefixLen = strlen(prefix);
-    return strncmp(socVersion, prefix, prefixLen) == 0;
-}
-
 bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
 {
     static const std::unordered_map<std::string, std::string> ascendcSocVersionMap {
@@ -86,6 +80,39 @@ bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
         {"ascend910_9392", "ascend910b"},
         {"ascend910_9382", "ascend910b"},
         {"ascend910_9362", "ascend910b"},
+        {"ascend910_9599", "ascend910_95"},
+        {"ascend910_9589", "ascend910_95"},
+        {"ascend910_9579", "ascend910_95"},
+        {"ascend910_958b", "ascend910_95"},
+        {"ascend910_957b", "ascend910_95"},
+        {"ascend910_957c", "ascend910_95"},
+        {"ascend910_957d", "ascend910_95"},
+        {"ascend910_950x", "ascend910_95"},
+        {"ascend910_950y", "ascend910_95"},
+        {"ascend910_950z", "ascend910_95"},
+        {"ascend910_958a", "ascend910_95"},
+        {"ascend910_95a1", "ascend910_95"},
+        {"ascend910_95a2", "ascend910_95"},
+        {"ascend910_9591", "ascend910_95"},
+        {"ascend910_9592", "ascend910_95"},
+        {"ascend910_9595", "ascend910_95"},
+        {"ascend910_9596", "ascend910_95"},
+        {"ascend910_9581", "ascend910_95"},
+        {"ascend910_9582", "ascend910_95"},
+        {"ascend910_9583", "ascend910_95"},
+        {"ascend910_9584", "ascend910_95"},
+        {"ascend910_9585", "ascend910_95"},
+        {"ascend910_9586", "ascend910_95"},
+        {"ascend910_9587", "ascend910_95"},
+        {"ascend910_9588", "ascend910_95"},
+        {"ascend910_9571", "ascend910_95"},
+        {"ascend910_9572", "ascend910_95"},
+        {"ascend910_9573", "ascend910_95"},
+        {"ascend910_9574", "ascend910_95"},
+        {"ascend910_9575", "ascend910_95"},
+        {"ascend910_9576", "ascend910_95"},
+        {"ascend910_9577", "ascend910_95"},
+        {"ascend910_9578", "ascend910_95"},
 
         {"ascend910a", "ascend910"},
         {"ascend910proa", "ascend910"},
@@ -123,7 +150,39 @@ bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
         {"ascend910_9392", "Ascend910_9392"},
         {"ascend910_9382", "Ascend910_9382"},
         {"ascend910_9362", "Ascend910_9362"},
-
+        {"ascend910_9599", "Ascend910_9599"},
+        {"ascend910_9589", "Ascend910_9589"},
+        {"ascend910_9579", "Ascend910_9579"},
+        {"ascend910_958b", "Ascend910_958b"},
+        {"ascend910_957b", "Ascend910_957b"},
+        {"ascend910_957c", "Ascend910_957c"},
+        {"ascend910_957d", "Ascend910_957d"},
+        {"ascend910_950x", "Ascend910_950x"},
+        {"ascend910_950y", "Ascend910_950y"},
+        {"ascend910_950z", "Ascend910_950z"},
+        {"ascend910_958a", "Ascend910_958a"},
+        {"ascend910_95a1", "ascend910_95A1"},
+        {"ascend910_95a2", "ascend910_95A2"},
+        {"ascend910_9591", "ascend910_9591"},
+        {"ascend910_9592", "ascend910_9592"},
+        {"ascend910_9595", "ascend910_9595"},
+        {"ascend910_9596", "ascend910_9596"},
+        {"ascend910_9581", "ascend910_9581"},
+        {"ascend910_9582", "ascend910_9582"},
+        {"ascend910_9583", "ascend910_9583"},
+        {"ascend910_9584", "ascend910_9584"},
+        {"ascend910_9585", "ascend910_9585"},
+        {"ascend910_9586", "ascend910_9586"},
+        {"ascend910_9587", "ascend910_9587"},
+        {"ascend910_9588", "ascend910_9588"},
+        {"ascend910_9571", "ascend910_9571"},
+        {"ascend910_9572", "ascend910_9572"},
+        {"ascend910_9573", "ascend910_9573"},
+        {"ascend910_9574", "ascend910_9574"},
+        {"ascend910_9575", "ascend910_9575"},
+        {"ascend910_9576", "ascend910_9576"},
+        {"ascend910_9577", "ascend910_9577"},
+        {"ascend910_9578", "ascend910_9578"},
 
         {"ascend910a", "Ascend910A"},
         {"ascend910proa", "Ascend910ProA"},
@@ -155,10 +214,6 @@ bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
     for (char c : curSocVersion) {
         lowerCurSocVersion += std::tolower(c);
     }
-    // ascend950
-    if (AscendCheckSoC950Version(lowerCurSocVersion.c_str())) {
-        return true;
-    }
 
     const auto &it = ascendcSocVersionMap.find(compileSocVersion);
     if (it == ascendcSocVersionMap.end()) {
@@ -172,10 +227,10 @@ bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
     }
 
     if (it->second != it1->second) {
-        std::string tmpMsg = "the socversion " + ascendcOriSocVersionMap.at(compileSocVersion) +
+        std::string tmpMsg = "the socVersion " + ascendcOriSocVersionMap.at(compileSocVersion) +
             " of bin package does not match the current device socverison " +
             ascendcOriSocVersionMap.at(lowerCurSocVersion) +
-            ". Please modify default socversion in run.sh or execute run.sh with socversion parameter.";
+            ". Please modify default socVersion in run.sh or execute run.sh with socVersion parameter.";
         errno_t err = strcpy_s(errMsg, 1024, tmpMsg.c_str()); // 1024 is errMsg length
         if (err != EOK) {
             ASCENDLOGE("strcpy_s failed in AscendCheckSoCVersion!");
@@ -207,15 +262,14 @@ static SocVersion GetSocVersion() {
         ASCENDLOGE("aclrtGetSocName failed\n");
         return SocVersion::UNKNOWN;
     }
-    if (std::strncmp(socName, "Ascend310P", sizeof("Ascend310P") - 1) == 0) {
+    if (std::strncmp(socName, "Ascend310P", 10) == 0) {
         return SocVersion::ASCEND310P;
     }
-    if (std::strncmp(socName, "Ascend910B", sizeof("Ascend910B") - 1) == 0 ||
-        std::strncmp(socName, "Ascend910_93", sizeof("Ascend910_93") - 1) == 0) {
+    if (std::strncmp(socName, "Ascend910B", 10) == 0) {
         return SocVersion::ASCEND910B;
     }
-    if (std::strncmp(socName, "Ascend950", sizeof("Ascend950") - 1) == 0) {
-        return SocVersion::ASCEND950;
+    if (std::strncmp(socName, "Ascend910_95", 12) == 0) {
+        return SocVersion::ASCEND910_95;
     }
     ASCENDLOGE("unsupport soc name: %s\n", socName);
     return SocVersion::UNKNOWN;
@@ -237,10 +291,10 @@ int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
             return 1;
         }
     }
-    if (currentSoc == SocVersion::ASCEND910B || (currentSoc == SocVersion::ASCEND950 && ubufDynamicSize == 0)) {
+    if (currentSoc == SocVersion::ASCEND910B || (currentSoc == SocVersion::ASCEND910_95 && ubufDynamicSize == 0)) {
         return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, hostArgs, argsSize, nullptr, 0);
     }
-    if (currentSoc == SocVersion::ASCEND950 && ubufDynamicSize !=0) {
+    if (currentSoc == SocVersion::ASCEND910_95 && ubufDynamicSize !=0) {
         constexpr uint32_t attrLen = 1;
         aclrtLaunchKernelAttrValue attrValue{};
         attrValue.localMemorySize = ubufDynamicSize;
@@ -653,7 +707,7 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
 }
 
 uint32_t LaunchAscendKernelForVectorCore(const char* opType, void* handle, const uint64_t key, void** args,
-    uint32_t size, const rtStream_t stream, bool enbaleProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks,
+    uint32_t size, const rtStream_t stream, bool enableProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks,
     uint32_t aivNumBlocksOffset)
 {
     ASCENDLOGI("aicNumBlocks is %u, aivNumBlocks is %u, aivNumBlocksOffset is %u.\n", aicNumBlocks, aivNumBlocks,
@@ -670,26 +724,26 @@ uint32_t LaunchAscendKernelForVectorCore(const char* opType, void* handle, const
 
     uint64_t launchMainBeginTime = 0;
     uint64_t launchSubBeginTime = 0;
-    if (enbaleProf) {
+    if (enableProf) {
         launchMainBeginTime = MsprofSysCycleTime();
     }
 
     // aicore kernel launch
     ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorLaunchKernel(handle, key, aicNumBlocks, args, size, stream));
 
-    if (enbaleProf) {
+    if (enableProf) {
         ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorPreportProfiling(
             opType, aicNumBlocks, MSPROF_GE_TASK_TYPE_AI_CORE, launchMainBeginTime));
     }
     ASCENDLOGI("Main stream launch sucess.\n");
 
-    if (enbaleProf) {
+    if (enableProf) {
         launchSubBeginTime = MsprofSysCycleTime();
     }
     // vector core kernel launch
     ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorVectorCoreLaunchKernel(handle, key, aivNumBlocks,
         args, size, ascBaseStream.stream, aivNumBlocksOffset));
-    if (enbaleProf) {
+    if (enableProf) {
         ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorPreportProfiling(
             opType, aivNumBlocks, MSPROF_GE_TASK_TYPE_AIV, launchSubBeginTime));
     }

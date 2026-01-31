@@ -38,7 +38,7 @@ __simd_callee__ inline void FusedAbsSubImpl(U& dstReg, U& srcReg0, U& srcReg1, M
 {
     using ActualT = typename U::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportType<ActualT, half, float, int64_t>(),
+    static_assert(SupportType<ActualT, half, float, int64_t>(), 
                   "current data type is not supported on current device!");
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
                   "current FusedAbsSub api only supported Mode ZEROING on current device!");
@@ -49,11 +49,11 @@ __simd_callee__ inline void FusedAbsSubImpl(U& dstReg, U& srcReg0, U& srcReg1, M
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg1;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-            B64TraitOneToTaitTwo(traitTwoSrcReg0, srcReg0);
-            B64TraitOneToTaitTwo(traitTwoSrcReg1, srcReg1);
+            B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg0);
+            B64TraitOneToTraitTwo(traitTwoSrcReg1, srcReg1);
             Sub(traitTwoDstReg, traitTwoSrcReg0, traitTwoSrcReg1, maskTrait2);
             Abs(traitTwoDstReg, traitTwoDstReg, maskTrait2);
-            B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
         } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             Sub(dstReg, srcReg0, srcReg1, mask);
             Abs(dstReg, dstReg, mask);

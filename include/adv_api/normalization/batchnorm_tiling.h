@@ -25,9 +25,9 @@ namespace AscendC {
  * \param [out] maxValue max size of tmp buffer
  * \param [out] minValue min size of tmp buffer
  * \param [in] isBasicBlock indicate whether enable basicBlock.
-   When enable basicBlock, better performance will be achived and more tmp buffer will be needed
+   When enable basicBlock, better performance will be achieved and more tmp buffer will be needed
  * \return flag for whether the tmp buffer size is calculated successfully
-           if src shape is illeagl for basic block, it will return false.
+           if src shape is illegal for basic block, it will return false.
  */
 bool GetBatchNormMaxMinTmpSize(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize,
     const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false);
@@ -44,9 +44,9 @@ bool GetBatchNormMaxMinTmpSize(const ge::Shape& srcShape, const ge::Shape& origi
  * \param [in] isReuseSource indicate whether intermediate variables can reuse the input memory
  * \param [out] tiling BatchNorm tiling
  * \param [in] isBasicBlock indicate whether enable basicBlock.
-   When enable basicBlock, better performance will be achived and more tmp buffer will be needed
+   When enable basicBlock, better performance will be achieved and more tmp buffer will be needed
  * \return flag for whether the tiling is calculated successfully
-   if src shape and origin src shape is illeagl or input stackBufferByteSize is not big enough, it will return false.
+   if src shape and origin src shape is illegal or input stackBufferByteSize is not big enough, it will return false.
  */
 bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape,
     const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource,

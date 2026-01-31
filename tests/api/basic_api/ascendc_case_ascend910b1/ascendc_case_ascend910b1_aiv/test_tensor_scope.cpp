@@ -1140,10 +1140,6 @@ INSTANTIATE_TEST_CASE_P(TEST_ELEMWISE_OP, ElemwiseOpTestsuite, ::testing::Values
     ElemwiseOpTestParams{BinaryOpTest<float, FusedMulAddRelu>, "FusedMulAddRelu", {TPosition::VECIN, TPosition::VECIN, TPosition::A1}, "src1", "A1", "VECIN / VECOUT / VECCALC" },
     ElemwiseOpTestParams{BinaryOpTest<float, FusedMulAddRelu>, "FusedMulAddRelu", {TPosition::A1, TPosition::VECIN, TPosition::VECIN}, "dst", "A1", "VECIN / VECOUT / VECCALC" },
     ElemwiseOpTestParams{BinaryOpTest<float, FusedMulAddRelu>, "FusedMulAddRelu", {TPosition::VECIN, TPosition::A1, TPosition::VECIN}, "src0", "A1", "VECIN / VECOUT / VECCALC" },
-    // MulAddRelu
-    ElemwiseOpTestParams{BinaryOpTest<float, MulAddRelu>, "MulAddRelu", {TPosition::VECIN, TPosition::VECIN, TPosition::A1}, "src1", "A1", "VECIN / VECOUT / VECCALC" },
-    ElemwiseOpTestParams{BinaryOpTest<float, MulAddRelu>, "MulAddRelu", {TPosition::A1, TPosition::VECIN, TPosition::VECIN}, "dst", "A1", "VECIN / VECOUT / VECCALC" },
-    ElemwiseOpTestParams{BinaryOpTest<float, MulAddRelu>, "MulAddRelu", {TPosition::VECIN, TPosition::A1, TPosition::VECIN}, "src0", "A1", "VECIN / VECOUT / VECCALC" },
     // MulAddDst
     ElemwiseOpTestParams{BinaryOp2TypeTest<float, half, MulAddDst>, "MulAddDst", {TPosition::VECIN, TPosition::A1, TPosition::VECIN}, "src0", "A1", "VECIN / VECOUT / VECCALC" },
     ElemwiseOpTestParams{BinaryOp2TypeTest<float, half, MulAddDst>, "MulAddDst", {TPosition::A1, TPosition::VECIN, TPosition::VECIN}, "dst", "A1", "VECIN / VECOUT / VECCALC" },

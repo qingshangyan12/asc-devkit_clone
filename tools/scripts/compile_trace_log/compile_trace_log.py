@@ -48,7 +48,7 @@ def extract_info_lines(filename):
         raise
 
     if matching_lines:
-        print(f"INFO: Found {len(matching_lines)} matching log rows：")
+        print(f"INFO: Found {len(matching_lines)} matching log rows:")
     else:
         frame = inspect.currentframe()
         raise RuntimeError(f"INFO: {frame.f_code.co_filename}:line {frame.f_lineno}: No log starting with [INFO] "

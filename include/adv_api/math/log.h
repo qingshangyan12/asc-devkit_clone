@@ -44,7 +44,7 @@ __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 }
 
 /*
- * @brief dst = log(src), calcalate
+ * @brief dst = log(src), calculate
  * @ingroup Log
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor

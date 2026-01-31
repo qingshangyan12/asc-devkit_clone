@@ -19,25 +19,14 @@
 
 namespace AscendC {
 template <int countValue>
-__aicore__ inline int64_t GetBitCount(uint64_t valueIn)
-{
-    return GetBitCountImpl<countValue>(valueIn);
-}
-
-__aicore__ inline int64_t CountLeadingZero(uint64_t valueIn)
-{
-    return CountLeadingZeroImpl(valueIn);
-}
-
-template <int countValue>
 __aicore__ inline int64_t ScalarGetCountOfValue(uint64_t valueIn)
 {
-    return GetBitCount<countValue>(valueIn);
+    return ScalarGetCountOfValueImpl<countValue>(valueIn);
 }
 
 __aicore__ inline int64_t ScalarCountLeadingZero(uint64_t valueIn)
 {
-    return CountLeadingZero(valueIn);
+    return ScalarCountLeadingZeroImpl(valueIn);
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
@@ -54,21 +43,9 @@ __aicore__ inline int64_t CountBitsCntSameAsSignBit(int64_t valueIn)
 }
 
 template <int countValue>
-__aicore__ inline int64_t GetSFFValue(uint64_t valueIn)
-{
-    return GetSFFValueImpl<countValue>(valueIn);
-}
-
-template <int countValue>
 __aicore__ inline int64_t ScalarGetSFFValue(uint64_t valueIn)
 {
-    return GetSFFValue<countValue>(valueIn);
-}
-
-template <typename T, typename U, RoundMode roundMode>
-__aicore__ inline U Cast(T valueIn)
-{
-    return CastImpl<T, U, roundMode>(valueIn);
+    return ScalarGetSFFValueImpl<countValue>(valueIn);
 }
 
 template <typename T, typename U, RoundMode roundMode>

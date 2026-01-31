@@ -157,7 +157,7 @@ class TestCompileOp(unittest.TestCase):
 
 
     def test_compile_op_dynamic_with_inferinfo(self):
-        SetCurrentSocInfo("Ascend950PR_9599")
+        SetCurrentSocInfo("Ascend910_9599")
         cce_file = os.path.join(TOP_PATH, "tests/python/adapter/stub_kernels/add_custom_unalign.cpp")
         origin_func_name = "add_custom_unalign"
         code_channel = 0
@@ -232,7 +232,7 @@ class TestCompileOp(unittest.TestCase):
         os.remove(json_file)
 
     def test_compile_op_dynamic_c310(self):
-        SetCurrentSocInfo("Ascend950PR_9599")
+        SetCurrentSocInfo("Ascend910_9599")
         cce_file = os.path.join(TOP_PATH, "tests/python/adapter/stub_kernels/add_custom_unalign.cpp")
         origin_func_name = "add_custom_unalign"
         code_channel = 0
@@ -425,7 +425,7 @@ class TestCompileOp(unittest.TestCase):
 
 
     def test_compile_op_dynamic_c310_cube(self):
-        SetCurrentSocInfo("Ascend950PR_9599")
+        SetCurrentSocInfo("Ascend910_9599")
         cce_file = os.path.join(TOP_PATH, "tests/python/adapter/stub_kernels/cube_custom.cpp")
         origin_func_name = "cube_custom"
         code_channel = 0
@@ -723,7 +723,7 @@ class TestCompileOp(unittest.TestCase):
     @mock.patch('shutil.which')
     def test_gen_compile_cmd_c310(self, mock_shutil):
         from adapter.compile_op import gen_compile_cmd_v220
-        SetCurrentSocInfo("Ascend950PR_9599")
+        SetCurrentSocInfo("Ascend910_9599")
         mock_shutil.return_value = '/tmp/ascendc_compiler'
         op_info = OpInfo(kernel_name='AddCustom_0904bc1781946e62d385bfc6e6f99d97',
                          op_type='AddCustom')
@@ -1018,7 +1018,7 @@ class TestCompileOp(unittest.TestCase):
                 os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'test.json'))
     
     def test_gen_meta_info_section(self):
-        SetCurrentSocInfo("Ascend950PR_9599")
+        SetCurrentSocInfo("Ascend910_9599")
         compile_info = CompileInfo()
         op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d96',
                          op_type='AddCustomUnalign',
@@ -1756,7 +1756,7 @@ Contents of section
             self.assertEqual(ret, ['1'])
 
     def test_call_bisheng_c310(self):
-        SetCurrentSocInfo("Ascend950PR_9599")
+        SetCurrentSocInfo("Ascend910_9599")
         cce_file = os.path.join(
             TOP_PATH, "tests/python/adapter/stub_kernels/add_custom_unalign.cpp")
         kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
@@ -2479,7 +2479,7 @@ Contents of section
                     os.remove(os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + file_name_tag))
 
     def test_compile_ascendc_cce_c310_with_kernel_type(self):
-        SetCurrentSocInfo("Ascend950PR_9599")
+        SetCurrentSocInfo("Ascend910_9599")
         cce_file = os.path.join(
             TOP_PATH, "tests/python/adapter/stub_kernels/add_custom_unalign.cpp")
         kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
@@ -3012,7 +3012,7 @@ Contents of section
     def test_run_cmd_inner_c310(self):
         with mock.patch('subprocess.Popen'):
             with mock.patch.object(subprocess.Popen(), 'communicate', return_value=[None, None]):
-                SetCurrentSocInfo("Ascend950PR_9599")
+                SetCurrentSocInfo("Ascend910_9599")
                 cmd = ["--cce-aicore-only", "-O0", "-g", ".o"]
                 compile_op_module.global_var_storage.set_variable("ascendc_compile_debug_config", True)
                 s = "unsupported API".encode("utf-8")
@@ -4976,12 +4976,12 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         SetCurrentSocInfo("Ascend910B1")
         self.assertTrue(CommonUtility.is_has_ffts_mode())
 
-        SetCurrentSocInfo("Ascend950PR_9599")
+        SetCurrentSocInfo("Ascend910_9599")
         self.assertFalse(CommonUtility.is_has_ffts_mode())
 
 
     def test_gen_kernel_function_c310_dcci_false(self):
-        SetCurrentSocInfo("Ascend950PR_9599")
+        SetCurrentSocInfo("Ascend910_9599")
         cce_file = os.path.join(
             TOP_PATH, "tests/python/adapter/stub_kernels/add_custom_unalign.cpp")
         kernel_meta_dir = CommonUtility.get_kernel_meta_dir()

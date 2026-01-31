@@ -23,7 +23,7 @@ __aicore__ inline void SetAtomicType();
 template <typename T>
 __aicore__ inline void SetAtomicAdd();
 
-__aicore__ inline void DisableDmaAtomic();
+__aicore__ inline void SetAtomicNone();
 
 template <typename T>
 __aicore__ inline void SetAtomicMax();

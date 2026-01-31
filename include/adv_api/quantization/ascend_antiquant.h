@@ -26,7 +26,7 @@ namespace AscendC {
  * \param [in] offset, input LocalTensor
  * \param [in] scale, input LocalTensor
  * \param [in] sharedTmpBuffer, input local temporary Tensor
- * \param [in] K, src height/width when isTranspos is false/true
+ * \param [in] K, src height/width when isTranspose is false/true
  * \param [in] shapeInfo, input offset/scale shape
  * \param [in] isTranspose, enable transpose of input
  */
@@ -48,7 +48,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
  * \param [in] src, input LocalTensor
  * \param [in] scale, input LocalTensor
  * \param [in] sharedTmpBuffer, input local temporary Tensor
- * \param [in] K, src height/width when isTranspos is false/true
+ * \param [in] K, src height/width when isTranspose is false/true
  * \param [in] shapeInfo, input offset/scale shape
  * \param [in] isTranspose, enable transpose of input
  */
@@ -69,7 +69,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
  * \param [in] src, input LocalTensor
  * \param [in] offset, input LocalTensor
  * \param [in] scale, input LocalTensor
- * \param [in] K, src height/width when isTranspos is false/true
+ * \param [in] K, src height/width when isTranspose is false/true
  * \param [in] shapeInfo, input offset/scale shape
  * \param [in] isTranspose, enable transpose of input
  */
@@ -91,7 +91,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
  * \param [in] offset, input Scalar
  * \param [in] scale, input Scalar
  * \param [in] sharedTmpBuffer, input local temporary Tensor
- * \param [in] K, src height/width when isTranspos is false/true
+ * \param [in] K, src height/width when isTranspose is false/true
  * \param [in] shapeInfo, input offset/scale shape
  * \param [in] isTranspose, enable transpose of input
  */
@@ -113,7 +113,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
  * \param [in] src, input LocalTensor
  * \param [in] scale, input Scalar
  * \param [in] sharedTmpBuffer, input local temporary Tensor
- * \param [in] K, src height/width when isTranspos is false/true
+ * \param [in] K, src height/width when isTranspose is false/true
  * \param [in] shapeInfo, input offset/scale shape
  * \param [in] isTranspose, enable transpose of input
  */
@@ -134,7 +134,7 @@ __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, c
  * \param [in] src, input LocalTensor
  * \param [in] offset, input Scalar
  * \param [in] scale, input Scalar
- * \param [in] K, src height/width when isTranspos is false/true
+ * \param [in] K, src height/width when isTranspose is false/true
  * \param [in] shapeInfo, input offset/scale shape
  * \param [in] isTranspose, enable transpose of input
  */

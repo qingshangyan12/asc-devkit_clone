@@ -12,14 +12,14 @@
 CURPATH=$(dirname "$(readlink -f "$0")")
 VAR_PATH="$CURPATH"
 common_func_path="$CURPATH/manager/common_func.inc"
-version_compatiable_path="$CURPATH/manager/version_compatiable.inc"
+version_compatible_path="$CURPATH/manager/version_compatible.inc"
 common_func_v2_path="$CURPATH/manager/common_func_v2.inc"
 version_cfg_path="$CURPATH/manager/version_cfg.inc"
 script_operator_path="$CURPATH/manager/script_operator.inc"
 manager_func_path="$CURPATH/manager/manager_func.sh"
 
 . "$common_func_path"
-. "$version_compatiable_path"
+. "$version_compatible_path"
 . "$common_func_v2_path"
 . "$version_cfg_path"
 . "$script_operator_path"
@@ -31,7 +31,7 @@ VERSION=""
 VERSION_DIR=""
 PACKAGE=""
 DOCKER_ROOT=""
-INTPUT_INSTALL_FOR_ALL="n"
+INPUT_INSTALL_FOR_ALL="n"
 IS_RECREATE_SOFTLINK="n"
 INCREMENT="n"
 USE_SHARE_INFO="n"
@@ -78,7 +78,7 @@ do
         shift 1
         ;;
     --install-for-all)
-        INTPUT_INSTALL_FOR_ALL="y"
+        INPUT_INSTALL_FOR_ALL="y"
         shift 1
         ;;
     --increment)
@@ -108,10 +108,10 @@ OPERATION="$1"
 
 if [ "$OPERATION" = "package_installed" ]; then
     package_installed "$CURPATH" "$VERSION" "$VERSION_DIR" "$PACKAGE" \
-        "$INTPUT_INSTALL_FOR_ALL" "$DOCKER_ROOT"
+        "$INPUT_INSTALL_FOR_ALL" "$DOCKER_ROOT"
 elif [ "$OPERATION" = "package_pre_uninstall" ]; then
     package_pre_uninstall "$CURPATH" "$VERSION" "$VERSION_DIR" "$PACKAGE" \
-        "$INTPUT_INSTALL_FOR_ALL" "$DOCKER_ROOT"
+        "$INPUT_INSTALL_FOR_ALL" "$DOCKER_ROOT"
 elif [ "$OPERATION" = "package_uninstalled" ]; then
     package_uninstalled "$CURPATH" "$VERSION" "$VERSION_DIR" "$PACKAGE" "$IS_RECREATE_SOFTLINK" \
         "$DOCKER_ROOT"

@@ -30,13 +30,13 @@ template <TPosition POSITION, CubeFormat FORMAT, typename TYPE> struct InputInfo
     constexpr static CubeFormat format = FORMAT;
     using T = TYPE;
 };
-constexpr int32_t NZ_MASK_VAlUE = 2;
+constexpr int32_t NZ_MASK_VALUE = 2;
 int32_t constexpr GetNdNzMask(CubeFormat dstFormat, CubeFormat srcFormat)
 {
     if ((srcFormat == CubeFormat::ND) && (dstFormat == CubeFormat::NZ)) {
         return 1;
     } else if ((srcFormat == CubeFormat::NZ) && (dstFormat == CubeFormat::ND)) {
-        return NZ_MASK_VAlUE;
+        return NZ_MASK_VALUE;
     }
     return 0;
 }
@@ -610,7 +610,7 @@ TEST_P(DataCopyGm2L1Nd2NzTestsuite, DataCopyGm2L1Nd2NzTestsuiteOpTestCase)
 }
 
 namespace AscendC {
-template <typename src0_T, bool UseFill = false> class KernelCreatMartix {
+template <typename src0_T> class KernelCreatMartix {
 public:
     __aicore__ inline void Init()
     {
@@ -647,13 +647,8 @@ private:
         // set repeat
         set_l3d_rpt(0);
         // init l1
-        if constexpr (UseFill) {
-            Fill<src0_T>(featureMapA1,
-                { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(src0_T) / 32), 0, static_cast<src0_T>(1) });
-        }else{
-            InitConstValue<src0_T>(featureMapA1,
-                { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(src0_T) / 32), 0, static_cast<src0_T>(1) });
-        }
+        InitConstValue<src0_T>(featureMapA1,
+            { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(src0_T) / 32), 0, static_cast<src0_T>(1) });
         inQueueFmA1.FreeTensor(featureMapA1);
     }
 
@@ -676,15 +671,7 @@ private:
 template <typename src0_T>
 __global__ __aicore__ void creat_martix_AscendC()
 {
-    KernelCreatMartix<src0_T, false> op;
-    op.Init();
-    op.Process();
-}
-
-template <typename Src0T>
-__global__ __aicore__ void FillAscendC()
-{
-    AscendC::KernelCreatMartix<Src0T, true> op;
+    KernelCreatMartix<src0_T> op;
     op.Init();
     op.Process();
 }
@@ -717,16 +704,6 @@ INSTANTIATE_TEST_CASE_P(SetCreatmartixTest, CreatmartixTestsuite,
     CreatmartixTestParams { 192, 32, 64, creat_martix_AscendC<int32_t>, 4 },
     CreatmartixTestParams { 192, 32, 64, creat_martix_AscendC<uint32_t>, 4 },
     CreatmartixTestParams { 192, 32, 64, creat_martix_AscendC<float>, 4 }
-    ));
-
-INSTANTIATE_TEST_CASE_P(SetFillTest, CreatmartixTestsuite,
-    ::testing::Values(CreatmartixTestParams { 192, 32, 64, FillAscendC<half>, 2 },
-    CreatmartixTestParams { 192, 32, 64, FillAscendC<int16_t>, 2 },
-    CreatmartixTestParams { 192, 32, 64, FillAscendC<uint16_t>, 2 },
-    CreatmartixTestParams { 192, 32, 64, FillAscendC<bfloat16_t>, 2 },
-    CreatmartixTestParams { 192, 32, 64, FillAscendC<int32_t>, 4 },
-    CreatmartixTestParams { 192, 32, 64, FillAscendC<uint32_t>, 4 },
-    CreatmartixTestParams { 192, 32, 64, FillAscendC<float>, 4 }
     ));
 
 TEST_P(CreatmartixTestsuite, CreatmartixTest)

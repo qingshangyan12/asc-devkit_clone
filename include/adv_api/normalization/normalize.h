@@ -9,7 +9,7 @@
 */
 
 /*!
- * \file noramlize.h
+ * \file normalize.h
  * \brief Given mean and variance, calculate rstd and output.
  */
 #ifndef LIB_NORMALIZATION_NORMALIZE_H

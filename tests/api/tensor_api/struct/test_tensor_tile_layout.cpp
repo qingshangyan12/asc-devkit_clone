@@ -118,8 +118,8 @@ TEST_F(Tensor_Api_Layout, LayoutOperation)
     auto shapeTuple = GetShape(AscendC::Select<1,2>(layoutMake));
     EXPECT_EQ(AscendC::Std::get<0>(shapeTuple), 20);
     EXPECT_EQ(Size(layoutMake), 6000);
-    EXPECT_EQ(layoutMake.Capacity(), 6000);
-    EXPECT_EQ(layoutMake.Capacity(), 6000);
+    EXPECT_EQ(layoutMake.GetSize(), 6000);
+    EXPECT_EQ(layoutMake.GetSize(), 6000);
     EXPECT_EQ(AscendC::Coshape(layoutMake), 7710);
     EXPECT_EQ(AscendC::Cosize(layoutMake), 7710);
 }

@@ -73,7 +73,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
             if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
                 RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
                 DuplicateComplexTraitTwoImpl(traitTwoDstReg, scalarValue);
-                B32TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+                B32TraitTwoToTraitOne(dstReg, traitTwoDstReg);
             } else {
                 DuplicateComplexTraitTwoImpl(dstReg, scalarValue);
             }
@@ -84,7 +84,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
         if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             DuplicateB64Impl(traitTwoDstReg, scalarValue);
-            B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
         } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
             S dstTemp;
             DuplicateB64Impl(dstTemp, scalarValue);
@@ -151,7 +151,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
                 MaskPack(maskTrait2, mask);
                 RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
                 DuplicateComplexTraitTwoImpl(traitTwoDstReg, scalarValue, maskTrait2);
-                B32TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+                B32TraitTwoToTraitOne(dstReg, traitTwoDstReg);
             } else {
                 DuplicateComplexTraitTwoImpl(dstReg, scalarValue, mask);
             }
@@ -164,13 +164,13 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
             MaskPack(maskTrait2, mask);
             if constexpr (mode == MaskMergeMode::MERGING) {
                 RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-                B64TraitOneToTaitTwo(traitTwoDstReg, dstReg);
+                B64TraitOneToTraitTwo(traitTwoDstReg, dstReg);
                 DuplicateB64Impl<mode>(traitTwoDstReg, scalarValue, maskTrait2);
-                B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+                B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
             } else {
                 RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
                 DuplicateB64Impl<mode>(traitTwoDstReg, scalarValue, maskTrait2);
-                B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+                B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
             }
         } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
             S dstTemp;
@@ -220,7 +220,7 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
                                fp8_e4m3fn_t, fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float,
                                half, uint64_t, int64_t, complex32, complex64>()),
                   "current data type is not supported on current device!");
-    ASCENDC_ASSERT((mode != MaskMergeMode::UNKNOWN),
+    ASCENDC_ASSERT((mode != MaskMergeMode::UNKNOWN), 
                    {KERNEL_LOG(KERNEL_ERROR, "The MergeMode only support: MODE_MERGING, MODE_ZEROING.");});
     constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
     constexpr auto modeValue = GetMaskMergeMode<mode>();
@@ -237,9 +237,9 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
                 MaskPack(maskTrait2, mask);
                 RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
                 RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
-                B32TraitOneToTaitTwo(traitTwoSrcReg, srcReg);
+                B32TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
                 DuplicateComplexTraitTwoImpl(traitTwoDstReg, traitTwoSrcReg, maskTrait2);
-                B32TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+                B32TraitTwoToTraitOne(dstReg, traitTwoDstReg);
             } else {
                 DuplicateComplexTraitTwoImpl(dstReg, srcReg, mask);
             }
@@ -252,9 +252,9 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
             MaskPack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
-            B64TraitOneToTaitTwo(traitTwoSrcReg, srcReg);
+            B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
             DuplicateB64Impl<pos, mode>(traitTwoDstReg, traitTwoSrcReg, maskTrait2);
-            B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
         } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             U dstTemp;
             DuplicateB64Impl<pos, mode>(dstTemp, srcReg, mask);

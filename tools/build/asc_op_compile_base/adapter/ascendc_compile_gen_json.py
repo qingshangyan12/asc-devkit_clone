@@ -310,7 +310,7 @@ def _gen_static_json_for_mix_v200(compile_info: CompileInfo, tiling_info: Tiling
     elif kernel_type is KernelMetaType.KERNEL_TYPE_MIX_VECTOR_CORE:
         js['coreType'] = 'MIX_VECTOR_CORE'
     else:
-        raise Exception(f'kernel_type is not support')
+        raise Exception(f'kernel_type is not supported')
     try:
         with open(kernel_json_path, 'w') as fd_write:
             json.dump(js, fd_write, indent=2)

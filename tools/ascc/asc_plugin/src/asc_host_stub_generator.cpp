@@ -61,7 +61,7 @@ std::string AscHostStubGenerator::GenStubFuncDecl() const
     auto &infoManager = InfoManager::GetInstance();
     ShortSocVersion shortSoc = infoManager.GetShortSocVersion();
     std::string paramsList = "";
-    if (shortSoc == ShortSocVersion::ASCEND950) {
+    if (shortSoc == ShortSocVersion::ASCEND910_95) {
         paramsList = "(uint32_t __ascendc_blockDim, uint32_t __ascendc_ubufDynamicSize, void* __ascendc_stream";
     } else {
         paramsList = "(uint32_t __ascendc_blockDim, void* __ascendc_hold, void* __ascendc_stream";
@@ -202,7 +202,7 @@ void AscHostStubGenerator::GenStubFuncImpl()
     constexpr uint32_t bufMaxSize = 512;
     char buffer[bufMaxSize];
     ShortSocVersion shortSoc = infoManager.GetShortSocVersion();
-    if (shortSoc == ShortSocVersion::ASCEND950) {
+    if (shortSoc == ShortSocVersion::ASCEND910_95) {
         snprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmtLaunchAndProfiling, "__ascendc_ubufDynamicSize");
     } else {
         snprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmtLaunchAndProfiling, "0");

@@ -42,5 +42,5 @@ void GetAcoshMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, c
  * \param [out] extraBuf, the size of the extra temporary space
  */
 void GetAcoshTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf);
-} // namespace AcsendC
+} // namespace AscendC
 #endif // LIB_MATH_ACOSH_TILING

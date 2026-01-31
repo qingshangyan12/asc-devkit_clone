@@ -49,14 +49,9 @@ __aicore__ inline void SetAtomicAdd()
     SetAtomicAddImpl<T>();
 }
 
-__aicore__ inline void DisableDmaAtomic()
-{
-    SetAtomicNoneImpl();
-}
-
 __aicore__ inline void SetAtomicNone()
 {
-    DisableDmaAtomic();
+    SetAtomicNoneImpl();
 }
 
 template <typename T>

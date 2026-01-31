@@ -89,8 +89,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIC>:tikicpulib::ascend910B1>
         $<$<STREQUAL:${product_type},NPU_ARCH_2201_AIV>:tikicpulib::ascend910B1>
-        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:tikicpulib::ascend950pr_9599>
-        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIC>:tikicpulib::ascend910_9599>
+        $<$<STREQUAL:${product_type},NPU_ARCH_3510_AIV>:tikicpulib::ascend910_9599>
         -Wl,--no-as-needed
         error_manager
         mmpa

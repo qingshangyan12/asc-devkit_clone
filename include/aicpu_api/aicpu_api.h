@@ -25,10 +25,10 @@
 #undef assert
 #endif
 
-#define assert(conditon) \
+#define assert(condition) \
     do { \
-        if (!(conditon)) { \
-            AscendC::printf("[ASSERT]` " #conditon " ' at %s:%d\n", __FILE__, __LINE__);\
+        if (!(condition)) { \
+            AscendC::printf("[ASSERT]` " #condition " ' at %s:%d\n", __FILE__, __LINE__);\
             abort(); \
         }\
     } while (0)

@@ -56,7 +56,7 @@ __aicore__ inline void Quantize(const LocalTensor<DstT>& dstTensor, const LocalT
  * \tparam OffsetT: offset data type, can be a scalar or LocalTensor
  * \param [out] dstTensor: output LocalTensor
  * \param [in] srcTensor: input LocalTensor
- * \param [in] sharedTmpBuffer：extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             quantize_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it

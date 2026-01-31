@@ -220,7 +220,7 @@ class OpKernelInfo:
         res_status = result and dynamic_rank_support_str is not None \
             and dynamic_rank_support_str.lower() == "true"
         if res_status:
-            logger.debug("op_type:{} is support dynamic rank.".format(op_kernel_info.op_type))
+            logger.debug("op_type:{} is supported dynamic rank.".format(op_kernel_info.op_type))
             op_kernel_info.is_support_dynamic_rank = True
 
         # parse the input_mem_continues.flag
@@ -251,7 +251,7 @@ class OpKernelInfo:
         res_status = result and enable_vector_core_str is not None \
             and enable_vector_core_str.lower() == "true"
         if res_status:
-            logger.debug("op_type:{} is support customized vector core.".format(op_kernel_info.op_type))
+            logger.debug("op_type:{} is supported customized vector core.".format(op_kernel_info.op_type))
             op_kernel_info.enable_vector_core = True
 
         return True

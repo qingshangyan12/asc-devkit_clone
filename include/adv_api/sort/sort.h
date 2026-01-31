@@ -47,7 +47,7 @@ namespace AscendC {
  * \tparam T: half/float/bfloat16_t/int16_t/uint16_t/int32_t/uint32_t
  * \tparam U: uint32_t/int32_t/uint64_t/int64_t
  * \tparam isReuseSource: whether allows API to modify source data, usually for performance or
- * save less temp bufffer size.
+ * save less temp buffer size.
  * \tparam config: sort relative configuration.
  * \param [out] dstTensor: output LocalTensor for value elements
  * \param [out] dstIndexTensor: output LocalTensor for index elements
@@ -75,7 +75,7 @@ __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<U>& dstIndexT
  * \tparam T: half/float/bfloat16_t/int16_t/uint16_t/int32_t/uint32_t
  * \tparam U: uint32_t/int32_t/uint64_t/int64_t
  * \tparam isReuseSource: whether allows API to modify source data, usually for performance or
- * save less temp bufffer size.
+ * save less temp buffer size.
  * \tparam config: sort relative configuration.
  * \param [out] dstTensor: output LocalTensor for value elements
  * \param [out] dstIndexTensor: output LocalTensor for index elements
@@ -97,7 +97,7 @@ __aicore__ inline void Sort(const LocalTensor<T>& dstTensor, const LocalTensor<U
  * \brief Sort the given sources accordingly with first calCount elements
  * \tparam T: half/float/bfloat16_t/int16_t/uint16_t/int32_t/uint32_t
  * \tparam isReuseSource: whether allows API to modify source data, usually for performance or
- * save less temp bufffer size.
+ * save less temp buffer size.
  * \tparam config: sort relative configuration.
  * \param [out] dstTensor: output LocalTensor for value elements
  * \param [in] srcTensor: input LocalTensor for value elements
@@ -121,7 +121,7 @@ __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& src
  * \brief Sort the given sources accordingly with first calCount elements
  * \tparam T: half/float/bfloat16_t/int16_t/uint16_t/int32_t/uint32_t
  * \tparam isReuseSource: whether allows API to modify source data, usually for performance or
- * save less temp bufffer size.
+ * save less temp buffer size.
  * \tparam config: sort relative configuration.
  * \param [out] dstTensor: output LocalTensor for value elements
  * \param [in] srcTensor: input LocalTensor for value elements
@@ -139,7 +139,7 @@ __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& src
  * \brief Sort the given sources accordingly with first calCount elements
  * \tparam T: half/float/bfloat16_t/int16_t/uint16_t/int32_t/uint32_t
  * \tparam isReuseSource: whether allows API to modify source data, usually for performance or
- * save less temp bufffer size.
+ * save less temp buffer size.
  * \tparam config: sort relative configuration.
  * \param [out] dstTensor: output LocalTensor for value elements
  * \param [out] dstIndexTensor: output LocalTensor for index elements based on default index for inputs.
@@ -165,7 +165,7 @@ __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& ds
  * \brief Sort the given sources accordingly with first calCount elements
  * \tparam T: half/float/bfloat16_t/int16_t/uint16_t/int32_t/uint32_t
  * \tparam isReuseSource: whether allows API to modify source data, usually for performance reason or
- * save less temp bufffer size.
+ * save less temp buffer size.
  * \tparam config: sort relative configuration.
  * \param [out] dstTensor: output LocalTensor for value elements
  * \param [out] dstIndexTensor: output LocalTensor for index elements based on default index for inputs.

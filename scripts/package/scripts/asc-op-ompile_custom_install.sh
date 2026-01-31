@@ -43,7 +43,7 @@ checkPip() {
     fi
     version=$(echo "${pip_info}" | cut -d" " -f2 | cut -d"." -f1)
     if [ ${version} -lt ${MIN_PIP_VERSION} ]; then
-        log_and_print $LEVEL_WARN "pip3 version low than ${MIN_PIP_VERSION}.0"
+        log_and_print $LEVEL_WARN "pip3 version lower than ${MIN_PIP_VERSION}.0"
         log_and_print $LEVEL_WARN "Current pip3 version may cause the installation problems."
     fi
     curpath="$(dirname ${BASH_SOURCE:-$0})"
@@ -248,7 +248,7 @@ installOpPythonLocal() {
     installPyWhlLocal "show_kernel_debug_data-0.1.0-py3-none-any.whl"
     [ $? -ne 0 ] && return 1
 
-    log $LEVEL_INFO "Install opeator python package succeed."
+    log $LEVEL_INFO "Install operator python package succeed."
     return 0
 }
 
@@ -262,7 +262,7 @@ installAllPythonLocal() {
     installPyWhlLocal "show_kernel_debug_data-0.1.0-py3-none-any.whl"
     [ $? -ne 0 ] && return 1
 
-    log $LEVEL_INFO "Install all module python package succeed."
+    log $LEVEL_INFO "Install all modules python package succeed."
     return 0
 }
 

@@ -26,7 +26,7 @@ constexpr uint32_t REGION_PROPOSAL_DATA_SIZE_FLOAT_V220 = 2;
 /*
  * @ingroup GetConcatTmpSize
  * @brief get concat tmp buffer size
- * @param [in] ascendcPlatform ascendc platform infomation
+ * @param [in] ascendcPlatform ascendc platform information
  * @param [in] elemCount element count number
  * @param [in] dataTypeSize data size number
  */
@@ -37,7 +37,7 @@ uint32_t GetConcatTmpSize(const platform_ascendc::PlatformAscendC &ascendcPlatfo
 /*
  * @ingroup GetSortTmpSize
  * @brief get sort tmp buffer size
- * @param [in] ascendcPlatform ascendc platform infomation
+ * @param [in] ascendcPlatform ascendc platform information
  * @param [in] elemCount element count number
  * @param [in] dataTypeSize data size number
  */

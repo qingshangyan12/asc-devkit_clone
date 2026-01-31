@@ -975,7 +975,7 @@ TEST_F(TestTiling, TestWelfordFinalizeTiling)
     EXPECT_EQ(maxSize, 768);
 }
 
-TEST_F(TestTiling, TestLayerNormMaxMinTmpSize_ASCEND950)
+TEST_F(TestTiling, TestLayerNormMaxMinTmpSize_ASCEND910_95)
 {
     const uint32_t stackBufferSize = 0;
     const uint32_t typeSize = sizeof(float);
@@ -997,7 +997,7 @@ TEST_F(TestTiling, TestLayerNormMaxMinTmpSize_ASCEND950)
     EXPECT_EQ(minValue, totalLength * typeSize);
 }
 
-TEST_F(TestTiling, TestLayerNormMaxMinTmpSize_ASCEND950_OutputRstd)
+TEST_F(TestTiling, TestLayerNormMaxMinTmpSize_ASCEND910_95_OutputRstd)
 {
     const uint32_t stackBufferSize = 0;
     const uint32_t typeSize = sizeof(float);

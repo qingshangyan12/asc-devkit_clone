@@ -268,7 +268,7 @@ class SuperOperatorInfos:
             if event_recv.get(send_id) is not None:
                 if event_send[send_id] == event_recv[send_id]:
                     CommonUtility().ascendc_raise_python_err(ERR_CODE, \
-(f"send op {event_send[send_id].kernel_name_for_multi_stream} can not same with recv op \
+(f"send op {event_send[send_id].kernel_name_for_multi_stream} can not same as recv op \
 {event_recv[send_id].kernel_name_for_multi_stream}"))
                 self.insert_sync_event(event_send[send_id], event_recv[send_id])
 

@@ -86,7 +86,7 @@ void UpdateManglingNameSuffix(std::vector<std::string>& compileOptions, const Co
 {
     auto& manager = InfoManager::GetInstance();
     ShortSocVersion shortSoc = manager.GetShortSocVersion();
-    if (shortSoc == ShortSocVersion::ASCEND910B || shortSoc == ShortSocVersion::ASCEND950) {
+    if (shortSoc == ShortSocVersion::ASCEND910B || shortSoc == ShortSocVersion::ASCEND910_95) {
         for (const auto& funcInfo : InfoManager::GetInstance().GetGlobalSymbolInfo()) {
             std::string manglingName = funcInfo.first;
             KernelMetaType kType = std::get<0>(funcInfo.second);
@@ -124,7 +124,7 @@ std::vector<std::string> CompileOptionManager::GetDeviceCompileOptionsWithSoc<Sh
 }
 
 template <>
-std::vector<std::string> CompileOptionManager::GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND950>(
+std::vector<std::string> CompileOptionManager::GetDeviceCompileOptionsWithSoc<ShortSocVersion::ASCEND910_95>(
     CoreType coreType) const
 {
     KernelTypeResult kernelTypeRes = CheckHasMixKernelFunc();
@@ -177,7 +177,7 @@ void CompileOptionManager::RegisterOptHandler()
 void CompileOptionManager::InitDispatchTable()
 {
     RegisterOptHandler<ShortSocVersion::ASCEND910B>();
-    RegisterOptHandler<ShortSocVersion::ASCEND950>();
+    RegisterOptHandler<ShortSocVersion::ASCEND910_95>();
     RegisterOptHandler<ShortSocVersion::ASCEND310P>();
 }
 

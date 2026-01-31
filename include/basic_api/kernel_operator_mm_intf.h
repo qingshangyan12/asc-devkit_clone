@@ -206,8 +206,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
  * @param [in] loadDataParams.startIndex index of the first fractal in the first repeat in the source matrix
  * in unit of frac num
  * @param [in] loadDataParams.repeatTimes the repeat times
- * @param [in] loadDataParams.srcStride source stride between consequent repeat times in unit of frac num
- * @param [in] loadDataParams.dstGap destination gap between consequent repeat times in unit of 512byte
+ * @param [in] loadDataParams.srcStride source stride between consecutive repeat times in unit of frac num
+ * @param [in] loadDataParams.dstGap destination gap between consecutive repeat times in unit of 512byte
  * @param [in] loadDataParams.dstFracGap dst fractal gap in unit of one 512byte fractal
  */
 template <typename T>
@@ -222,8 +222,8 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
  * @param [in] loadDataParams.startIndex index of the first fractal in the first repeat in the source matrix
  * in unit of 512byte fractal
  * @param [in] loadDataParams.repeatTimes the repeat times
- * @param [in] loadDataParams.srcStride source stride between consequent repeat times in unit of 512byte
- * @param [in] loadDataParams.dstGap destination gap between consequent repeat times in unit of 512byte
+ * @param [in] loadDataParams.srcStride source stride between consecutive repeat times in unit of 512byte
+ * @param [in] loadDataParams.dstGap destination gap between consecutive repeat times in unit of 512byte
  * @param [in] loadDataParams.dstFracGap dst fractal gap in unit of one 512byte fractal
  * @param [in] loadDataParams.srcFracGap dst fractal gap in unit of one 512byte fractal
  */
@@ -297,10 +297,10 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(const LocalTensor<T> &
     const uint8_t dstGap);
 
 /* **************************************************************************************************
- * Fill                                             *
+ * InitConstValue                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Fill
+ * @ingroup InitConstValue
  * @brief L0A/L0B/L1 value initializing
  * @param [out] dst output LocalTensor
  * @param [in] InitConstValueParams.repeatTimes repeat times
@@ -310,9 +310,8 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(const LocalTensor<T> &
  */
 template <typename T, typename U = PrimT<T>,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-__aicore__ inline void Fill(const LocalTensor<T> &dst,
+__aicore__ inline void InitConstValue(const LocalTensor<T> &dst,
     const InitConstValueParams<U> &initConstValueParams);
-    
 /* **************************************************************************************************
  * SetLoadDataPaddingValue                                             *
  * ************************************************************************************************* */

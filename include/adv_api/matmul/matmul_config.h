@@ -25,10 +25,10 @@ constexpr uint32_t SHARED_CO1_BUFFER_SIZE = 64 * 1024;
 */
 enum class CubeFormat {
     ND = 0,           // Standard format, row-major
-    NZ,               // Colum-major between blocks, row-major within blocks
-    ZN,               // row-major between blocks, Colum-major within blocks
+    NZ,               // Column-major between blocks, row-major within blocks
+    ZN,               // row-major between blocks, Column-major within blocks
     ZZ,               // row-major between blocks, row-major within blocks
-    NN,               // Colum-major between blocks, Colum-major within blocks
+    NN,               // Column-major between blocks, Column-major within blocks
     ND_ALIGN,         // Aligned ND format, the output is aligned to 32-byte boundaries along the N dimension
     SCALAR,           // A single numerical value with no dimensions
     VECTOR,           // 1D array format for vector data
@@ -215,9 +215,9 @@ struct MatmulShapeParams {
     uint32_t singleCoreM;  // size of M axis shape within a single core, in unit of element
     uint32_t singleCoreN;  // size of N axis shape within a single core, in unit of element
     uint32_t singleCoreK;  // size of K axis shape within a single core, in unit of element
-    uint32_t basicM;  // size of M axis shape for Matmul caculation, in unit of element
-    uint32_t basicN;  // size of N axis shape for Matmul caculation, in unit of element
-    uint32_t basicK;  // size of K axis shape for Matmul caculation, in unit of element
+    uint32_t basicM;  // size of M axis shape for Matmul calculation, in unit of element
+    uint32_t basicN;  // size of N axis shape for Matmul calculation, in unit of element
+    uint32_t basicK;  // size of K axis shape for Matmul calculation, in unit of element
 };
 
 /**
@@ -264,7 +264,7 @@ struct MatmulFuncParams {
     bool enableUBReuse;  // enable reuse of UB buffer to cache double data for two iterate
     bool isPartialOutput = false;  // enable K axis does not atomic add
     bool isA2B2Shared = false;  // enable all Mamtul instance share the double buffer feature of A2 and B2
-    bool isEnableChannelSplit = false;  // enable C matrix split form [x]*[m*n] to [2x]*[m*(n/2)]
+    bool isEnableChannelSplit = false;  // enable C matrix split from [x]*[m*n] to [2x]*[m*(n/2)]
                                         //     when C's DataType is float, Position is GM and CubeFormat is NZ
     bool enableKdimReorderLoad = false;  // enable K axis load data by peak-shifting
     bool enableL1BankConflictOptimise = false; // Whether to enable L1BankConflictOptimise

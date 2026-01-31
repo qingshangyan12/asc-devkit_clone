@@ -42,7 +42,7 @@ class TestOpcOpInfoPaserUt(unittest.TestCase):
         """test get_op_info and generate_kernel_name"""
         logger.debug("Start to execute ============ test_01_get_op_info_and_generate_kernel_name_ut ============")
         opc_compile_args_dict = dict()
-        opc_compile_args_dict["core_type"] = "Acend910"
+        opc_compile_args_dict["core_type"] = "Ascend910"
         opc_compile_args_dict["aicore_num"] = 1
         op_info_dict = dict()
         op_info_dict["op_type"] = "add"
@@ -199,14 +199,14 @@ class TestOpcOpInfoPaserUt(unittest.TestCase):
         self.assertEqual(check, True)
 
         kernel_name = op_info_parser.generate_kernel_name()
-        self.assertEqual(kernel_name, "add_05db7513122f8dc56c39ca9befcf46c006b0cf41f24250cb5859608e527954b2")
+        self.assertEqual(kernel_name, "add_43ed747967f5fe422265a3d63b2e73ca7e59d98de7503963626f10d92d50c621")
         logger.debug("End to execute ============ test_01_get_op_info_and_generate_kernel_name_ut ============")
 
     def test_02_get_op_info_and_generate_kernel_name_ut(self):
         """test_02_get_op_info_and_generate_kernel_name_ut"""
         logger.debug("Start to execute ============ test_02_get_op_info_and_generate_kernel_name_ut ============")
         opc_compile_args_dict = dict()
-        opc_compile_args_dict["core_type"] = "Acend910"
+        opc_compile_args_dict["core_type"] = "Ascend910"
         opc_compile_args_dict["aicore_num"] = 1
         op_info_dict = dict()
         op_info_dict["op_type"] = "add"
@@ -346,7 +346,7 @@ class TestOpcOpInfoPaserUt(unittest.TestCase):
         self.assertEqual(check, True)
 
         kernel_name = op_info_parser.generate_kernel_name()
-        self.assertEqual(kernel_name, "add_cad913795db5b7909271604914284ea6ab28f95aa5a7a9db2451127c1cc3d855")
+        self.assertEqual(kernel_name, "add_a84af074f30820d9d13fb1d97e1f69950bf9bbf5400f92ca08d301f9d30d43f9")
         logger.debug("End to execute ============ test_02_get_op_info_and_generate_kernel_name_ut ============")
 
     def test_03_generate_kernel_name_binfilename_ut(self):
@@ -364,7 +364,7 @@ class TestOpcOpInfoPaserUt(unittest.TestCase):
         """test get_op_info"""
         logger.debug("Start to execute ============ test_04_check_get_op_info_ut ============")
         opc_compile_args_dict = dict()
-        opc_compile_args_dict["core_type"] = "Acend910"
+        opc_compile_args_dict["core_type"] = "Ascend910"
         opc_compile_args_dict["aicore_num"] = 1
         op_info_dict = dict()
         op_info_dict["op_type"] = "add"
@@ -410,7 +410,7 @@ class TestOpcOpInfoPaserUt(unittest.TestCase):
         """test get_op_info"""
         logger.debug("Start to execute ============ test_05_check_get_op_info_ut ============")
         opc_compile_args_dict = dict()
-        opc_compile_args_dict["core_type"] = "Acend910"
+        opc_compile_args_dict["core_type"] = "Ascend910"
         opc_compile_args_dict["aicore_num"] = 1
         op_info_dict = dict()
         op_info_dict["op_type"] = "add"
@@ -441,7 +441,7 @@ class TestOpcOpInfoPaserUt(unittest.TestCase):
         """test get_op_info"""
         logger.debug("Start to execute ============ test_06_check_get_op_info_ut ============")
         opc_compile_args_dict = dict()
-        opc_compile_args_dict["core_type"] = "Acend910"
+        opc_compile_args_dict["core_type"] = "Ascend910"
         opc_compile_args_dict["aicore_num"] = 1
         op_info_dict = dict()
         op_info_dict["op_type"] = "add"
@@ -472,7 +472,7 @@ class TestOpcOpInfoPaserUt(unittest.TestCase):
         """test get_op_info"""
         logger.debug("Start to execute ============ test_07_check_get_op_info_ut ============")
         opc_compile_args_dict = dict()
-        opc_compile_args_dict["core_type"] = "Acend910"
+        opc_compile_args_dict["core_type"] = "Ascend910"
         opc_compile_args_dict["aicore_num"] = 1
         op_info_dict = dict()
         op_info_dict["op_type"] = "add"

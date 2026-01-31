@@ -414,11 +414,11 @@ def gen_sync_and_event_code_for_two_stream(super_operator, pre_sub_operator, sub
     return sync_and_event_code
 
 
-def gen_2_real_stream_code_by_arch(super_operator, arch, super_kernel_params_str, exits_dynamic_op, sub_ops):
+def gen_2_real_stream_code_by_arch(super_operator, arch, super_kernel_params_str, exists_dynamic_op, sub_ops):
     super_kernel_file = f"__aicore__ inline void \
 auto_gen_{super_operator.kernel_name}_kernel_{arch}(void) {{\n"
     super_kernel_file += "    GM_ADDR *param_base = (GM_ADDR *)get_para_base();\n"
-    if exits_dynamic_op is True:
+    if exists_dynamic_op is True:
         super_kernel_file += "    uint64_t aiv_func_addr = 0;\n"
         super_kernel_file += "    uint64_t aic_func_addr = 0;\n"
         super_kernel_file += "    uint64_t dy_blockNum = 0;\n"
@@ -607,7 +607,7 @@ def gen_2_real_stream_super_kernel_file(super_operator):
     super_kernel_file += gen_notify_wait_func()
     super_kernel_params = []
     sub_ops = super_operator.info_base
-    exits_dynamic_op = False
+    exists_dynamic_op = False
     for _, sub_operator in enumerate(sub_ops):
         if super_operator.sub_decl_list.get(sub_operator.kernel_name) is None:
             super_kernel_file += sub_operator.kernel_declare
@@ -616,7 +616,7 @@ def gen_2_real_stream_super_kernel_file(super_operator):
             if super_operator.sub_decl_list.get(sub_operator.kernel_name) is None:
                 super_kernel_file += sub_operator.dynamic_impl_func_block
             super_kernel_params += sub_operator.extra_kernel_params
-            exits_dynamic_op = True
+            exists_dynamic_op = True
         elif sub_operator.sub_op_task_type.value == SubOperatorType.STATIC_OP.value:
             super_kernel_params += sub_operator.extra_kernel_params
         super_operator.sub_decl_list[sub_operator.kernel_name] = '1'
@@ -626,7 +626,7 @@ def gen_2_real_stream_super_kernel_file(super_operator):
         if len(sub_ops) == 0:
             continue
         super_kernel_file += \
-            gen_2_real_stream_code_by_arch(super_operator, arch, super_kernel_params_str, exits_dynamic_op, sub_ops)
+            gen_2_real_stream_code_by_arch(super_operator, arch, super_kernel_params_str, exists_dynamic_op, sub_ops)
 
     align_size = super_operator.op_options.get('func-align', 512)
     func_attribute = gen_func_align_attribute(align_size)
@@ -895,14 +895,14 @@ def gen_super_kernel_file(super_operator):
     super_kernel_file += gen_profling_func_code(super_operator)
     super_kernel_file += gen_notify_wait_func()
     sub_ops = super_operator.info_base
-    exits_dynamic_op = False
+    exists_dynamic_op = False
     for _, sub_operator in enumerate(sub_ops):
         if super_operator.sub_decl_list.get(sub_operator.kernel_name) is None:
             super_kernel_file += sub_operator.kernel_declare
         if sub_operator.sub_op_task_type.value == SubOperatorType.DYNAMIC_OP.value:
             if super_operator.sub_decl_list.get(sub_operator.kernel_name) is None:
                 super_kernel_file += sub_operator.dynamic_impl_func_block
-            exits_dynamic_op = True
+            exists_dynamic_op = True
         super_operator.sub_decl_list[sub_operator.kernel_name] = '1'
 
     align_size = super_operator.op_options.get('func-align', 512)
@@ -943,7 +943,7 @@ auto_gen_{super_operator.kernel_name}_kernel(void) {{\n"
         super_kernel_file += "        set_ffts_base_addr((uint64_t)ffts_addr);\n"
         super_kernel_file += "    }\n\n"
     super_kernel_file += indent_code_func(gen_clear_syncall_worskspace(super_operator))
-    if exits_dynamic_op is True:
+    if exists_dynamic_op is True:
         super_kernel_file += "    uint64_t aiv_func_addr = 0;\n"
         super_kernel_file += "    uint64_t aic_func_addr = 0;\n"
         super_kernel_file += "    uint64_t dy_blockNum = 0;\n"

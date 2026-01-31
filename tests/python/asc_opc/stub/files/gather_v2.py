@@ -2925,11 +2925,11 @@ class GatherV2():
         row_offset_tuple = RowOffsetTuple(x_pre_offset, y_pre_offset, y_offset)
 
         with tik_inst.new_stmt_scope():
-            self.compute_mode_15_aixs_eq_0(row_offset_tuple, cur_idx_tuple)
+            self.compute_mode_15_axis_eq_0(row_offset_tuple, cur_idx_tuple)
 
-    def compute_mode_15_aixs_eq_0(self, row_offset_tuple, cur_idx_tuple):
+    def compute_mode_15_axis_eq_0(self, row_offset_tuple, cur_idx_tuple):
         """
-        compute_mode_15 branch for cases which aixs is 0
+        compute_mode_15 branch for cases which axis is 0
         """
         tik_inst = self.tik_instance
         (x_pre_offset, y_pre_offset, y_offset) = row_offset_tuple
@@ -3111,11 +3111,11 @@ class GatherV2():
         row_offset_tuple = RowOffsetTuple(x_pre_offset, y_pre_offset, y_offset)
 
         with tik_inst.new_stmt_scope():
-            self.compute_mode_16_aixs_eq_0(row_offset_tuple, cur_idx_tuple)
+            self.compute_mode_16_axis_eq_0(row_offset_tuple, cur_idx_tuple)
 
-    def compute_mode_16_aixs_eq_0(self, row_offset_tuple, cur_idx_tuple):
+    def compute_mode_16_axis_eq_0(self, row_offset_tuple, cur_idx_tuple):
         """
-        compute_mode_16_aixs_eq_0 branch for cases which aixs is 0
+        compute_mode_16_axis_eq_0 branch for cases which axis is 0
         """
         tik_inst = self.tik_instance
         (x_pre_offset, y_pre_offset, y_offset) = row_offset_tuple
@@ -3391,11 +3391,11 @@ class GatherV2():
         row_offset_tuple = RowOffsetTuple(x_pre_offset, y_pre_offset, y_offset)
 
         with tik_inst.new_stmt_scope():
-            self.compute_mode_17_aixs_eq_0(row_offset_tuple, cur_idx_tuple)
+            self.compute_mode_17_axis_eq_0(row_offset_tuple, cur_idx_tuple)
 
-    def compute_mode_17_aixs_eq_0(self, row_offset_tuple, cur_idx_tuple):
+    def compute_mode_17_axis_eq_0(self, row_offset_tuple, cur_idx_tuple):
         """
-        compute_mode_17_aixs_eq_0 branch for cases which aixs is 0
+        compute_mode_17_axis_eq_0 branch for cases which axis is 0
         """
         tik_inst = self.tik_instance
         (x_pre_offset, y_pre_offset, y_offset) = row_offset_tuple
@@ -3595,11 +3595,11 @@ class GatherV2():
         row_offset_tuple = RowOffsetTuple(x_pre_offset, y_pre_offset, y_offset)
 
         with tik_inst.new_stmt_scope():
-            self.compute_mode_18_aixs_eq_0(row_offset_tuple, cur_idx_tuple)
+            self.compute_mode_18_axis_eq_0(row_offset_tuple, cur_idx_tuple)
 
-    def compute_mode_18_aixs_eq_0(self, row_offset_tuple, cur_idx_tuple):
+    def compute_mode_18_axis_eq_0(self, row_offset_tuple, cur_idx_tuple):
         """
-        compute_mode_18_aixs_eq_0 branch for cases which aixs is 0
+        compute_mode_18_axis_eq_0 branch for cases which axis is 0
         """
         tik_inst = self.tik_instance
         (x_pre_offset, y_pre_offset, y_offset) = row_offset_tuple

@@ -132,7 +132,7 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
 #define UNARY_VEC_NORMAL_NOT_SUPPORT(FUNC_NAME)                                                                                  \
     template <typename T, bool isSetMask = true>                                                                                 \
     __aicore__ inline void FUNC_NAME(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask,                                      \
-        const uint8_t repeatTimes, const UnaryRepeatParams& reapeatParams)                                                       \
+        const uint8_t repeatTimes, const UnaryRepeatParams& repeatParams)                                                       \
     {                                                                                                                            \
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });                             \
     }                                                                                                                            \
@@ -140,7 +140,7 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
 #define UNARY_VEC_BITWISE_NOT_SUPPORT(FUNC_NAME)                                                                                 \
     template <typename T, bool isSetMask = true>                                                                                 \
     __aicore__ inline void FUNC_NAME(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[2],                                   \
-        const uint8_t repeatTimes, const UnaryRepeatParams& reapeatParams)                                                       \
+        const uint8_t repeatTimes, const UnaryRepeatParams& repeatParams)                                                       \
     {                                                                                                                            \
         ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });                             \
     }                                                                                                                            \

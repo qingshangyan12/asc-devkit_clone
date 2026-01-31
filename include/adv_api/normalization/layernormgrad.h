@@ -33,11 +33,11 @@ namespace AscendC {
  * main process:
  * x1Tensor = inputDy * inputGamma
  * x2Tensor = inputX - inputMean
- * pd_var = np.sum(((-0.5) * x1Tensor * (x2Tensor) * np.power((inputVariace + EPSLON), (-1.5))), reduce_axis,
+ * pd_var = np.sum(((-0.5) * x1Tensor * (x2Tensor) * np.power((inputVariance + EPSILON), (-1.5))), reduce_axis,
  * keepdims=True)
- * pd_mean = np.sum(((-1.0) * x1Tensor * np.power((inputVariace + EPSLON), (-0.5))), reduce_axis, keepdims = True) +
+ * pd_mean = np.sum(((-1.0) * x1Tensor * np.power((inputVariance + EPSILON), (-0.5))), reduce_axis, keepdims = True) +
  * pd_var * (1.0/m) * np.sum(((-2.0) * (x2Tensor)), reduce_axis, keepdims=True)
- * pd_x = x1Tensor * np.power((inputVariace + EPSLON), (-0.5)) +
+ * pd_x = x1Tensor * np.power((inputVariance + EPSILON), (-0.5)) +
  * pd_var*(2.0 / H)*(x2Tensor) +
  * pd_mean*(1.0 / H)
  *
