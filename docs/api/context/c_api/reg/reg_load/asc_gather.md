@@ -57,18 +57,21 @@
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
-    | dst | 输出 | 目的操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md/#矢量数据寄存器)。 |
+    | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
     | src | 输入 | 源操作数（矢量）的起始地址。 |
-    | index | 输入 | dst中每个元素在UB中相对于src的索引位置。索引值要大于等于0。类型为[矢量数据寄存器](../reg数据类型定义.md/#矢量数据寄存器)。 |
-    | mask | 输入 | 源操作数掩码（矢量），类型为[掩码寄存器](../reg数据类型定义.md/#掩码寄存器)，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+    | index | 输入 | 数据索引（矢量数据寄存器），dst中每个元素在UB中相对于src的索引位置。索引值要大于等于0。 |
+    | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 - 收集矢量数据寄存器中的元素
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
-    | dst | 输出 | 目的操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md/#矢量数据寄存器)。 |
-    | src | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md/#矢量数据寄存器)。 |
-    | index | 输入 | 数据索引（矢量）。索引值要大于等于0。类型为[矢量数据寄存器](../reg数据类型定义.md/#矢量数据寄存器)。 |
+    | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+    | src | 输入 | 源操作数（矢量数据寄存器）。 |
+    | index | 输入 | 数据索引（矢量数据寄存器）。索引值要大于等于0。 |
+
+
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
 ## 返回值说明
 
@@ -100,7 +103,8 @@ PIPE_V
     vector_half dst;
     __ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
     vector_uint16_t index;
-    vector_bool mask;
+    vector_bool mask = asc_create_mask_b16(Pat::ALL);
+    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
     asc_gather(dst, src, index, mask);
     ```
 
@@ -109,6 +113,7 @@ PIPE_V
     ```cpp
     vector_half dst;
     vector_half src;
-    vector_uint16_t index;
+    asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
     asc_gather(dst, src, index);
     ```

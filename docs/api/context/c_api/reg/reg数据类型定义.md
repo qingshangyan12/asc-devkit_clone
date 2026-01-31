@@ -58,13 +58,11 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b8(count);
-        auto src_addr_tmp = src_addr + i * one_repeat_size;
-        asc_loadunalign_pre(ureg0, src_addr_tmp); // 非对齐搬入前的初始化
-        asc_loadunalign_postupdate(src, ureg0, src_addr_tmp, one_repeat_size); // 配合vector_load_align的使用，非对齐搬入源数据
+        asc_loadunalign_pre(ureg0, src_addr + i * one_repeat_size); // 非对齐搬入前的初始化
+        asc_loadunalign(src, ureg0, src_addr + i * one_repeat_size); // 配合vector_load_align的使用，非对齐搬入源数据
         asc_neg(dst, src, mask);
-        auto dst_addr_tmp = dst_addr + i * one_repeat_size;
-        asc_storeunalign_postupdate(dst_addr_tmp, ureg1, dst, one_repeat_size); // 配合vector_store_align的使用，非对齐搬出目的数据
-        asc_storeunalign_post(dst_addr_tmp, ureg1, 0); // 处理非对齐搬出的尾块
+        asc_storeunalign(dst_addr + i * one_repeat_size, ureg1, dst, one_repeat_size); // 配合vector_store_align的使用，非对齐搬出目的数据
+        asc_storeunalign_post(dst_addr + i * one_repeat_size, ureg1, 0); // 处理非对齐搬出的尾块
     }
 }
 ```

@@ -33,10 +33,12 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_float src, fl
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md/#矢量数据寄存器)。 |
-| src | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md/#矢量数据寄存器)。 |
+| dst | 输出 | 目的操作数（掩码寄存器）。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。 |
 | value | 输入 | 源操作数（标量）。 |
-| mask | 输入 | 源操作数掩码（矢量），类型为[掩码寄存器](../reg数据类型定义.md/#掩码寄存器)，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
 ## 返回值说明
 
@@ -56,6 +58,7 @@ PIPE_V
 vector_bool dst;
 vector_half src;
 half value;
-vector_bool mask;
+vector_bool mask = asc_create_mask_b16(Pat::ALL);
+asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_ge_scalar(dst, src, value, mask);
 ```
