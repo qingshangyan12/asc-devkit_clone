@@ -52,6 +52,9 @@ template <typename T>
 __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const uint8_t repeatTime,
     const BrcbRepeatParams& repeatParams)
 {
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecBrcbInfo(dst, src0, repeatTime, repeatParams, "Brcb");
+#endif
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunBcB(dst, src0, repeatTime, repeatParams, "Brcb")) {
