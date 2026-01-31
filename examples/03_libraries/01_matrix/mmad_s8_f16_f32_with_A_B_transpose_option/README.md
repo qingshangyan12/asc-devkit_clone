@@ -546,13 +546,15 @@ B矩阵在GM、L1和L0B上的数据排布分别是ND、NZ和ZN。如下图所示
 </p>
 
 <p align="center">
-图8：B矩阵不转置，int8_t数据类型下，n轴实际对齐要求与Mmad指令默认的对齐要求不一致（图片待补充）
+图8：B矩阵不转置，int8_t数据类型下，n轴实际对齐要求与Mmad指令默认的对齐要求不一致
 </p>
 
 
-如下图9所示，mmadParams.kDirectionAlign参数使用场景与上述场景类似，用在A矩阵转置、K轴实际对齐要求与Mmad指令默认的对齐要求不一致的场景。
+上述场景类似，当输入数据类型为float、A矩阵转置时，K轴实际对齐要求与Mmad指令默认的对齐要求也不一致，但是此种场景下的解决方法与上述场景有所不同，需要单独引入mmadParams.kDirectionAlign参数来解决，下面说明原因。
 
-mmadParams.kDirectionAlign仅在输入数据类型为float时生效。当A矩阵转置时，该参数需要设置为真，此时L0A上A矩阵在K方向向16对齐，矩阵计算单元从L0A读取数据会跳过填充的无效数据，其余场景下该参数取默认值为假，此时L0A上A矩阵在K方向向8对齐。
+根据矩阵乘法的计算公式可知，K轴作为A、B矩阵公共的维度，此时如果像上述场景那样设置mmadParams.k = CeilAlign(k, fractalShape[1] * fractalNum)会导致C矩阵中每个元素的数值都受到多读入的无效数据的影响，并且也不能通过设置fixpipeParams的参数来保证无效数据参与计算的结果不会被搬出。
+
+如下图9所示，mmadParams.kDirectionAlign仅在输入数据类型为float时生效。当A矩阵转置时，该参数需要设置为真，此时L0A上A矩阵在K方向向16对齐，矩阵计算单元从L0A读取数据会跳过填充的无效数据，其余场景下该参数取默认值为假，此时L0A上A矩阵在K方向向8对齐。
 
 
 <p align="center">
@@ -560,7 +562,7 @@ mmadParams.kDirectionAlign仅在输入数据类型为float时生效。当A矩阵
 </p>
 
 <p align="center">
-图9：A矩阵转置，float数据类型下，K轴实际对齐要求与Mmad指令默认的对齐要求不一致（图片待补充）
+图9：A矩阵转置，float数据类型下，K轴实际对齐要求与Mmad指令默认的对齐要求不一致
 </p>
 
         AscendC::MmadParams mmadParams;
