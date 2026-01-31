@@ -1,10 +1,10 @@
 # reg数据类型定义
 
-## 矢量数据寄存器
+## [矢量数据寄存器](../reg数据类型定义.md)
 
-矢量数据寄存器用于存储矢量数据，其位宽为VL（Vector Length），可存储VL/sizeof(T)的数据（T表示数据类型）。在Ascend 950PR/Ascend 950DT版本中， VL = 256B。
+[矢量数据寄存器](../reg数据类型定义.md)用于存储矢量数据，其位宽为VL（Vector Length），可存储VL/sizeof(T)的数据（T表示数据类型）。在Ascend 950PR/Ascend 950DT版本中， VL = 256B。
 
-以下是以位宽为分类，列举的所有矢量数据寄存器的数据类型：
+以下是以位宽为分类，列举的所有[矢量数据寄存器](../reg数据类型定义.md)的数据类型：
 
 | 位宽      | 矢量数据类型|
 | --------- | --------- |
@@ -38,7 +38,7 @@ vector_bool mask = asc_update_mask_b16(length); // 根据矢量计算需要操�
 
 ## 非对齐寄存器
 
-非对齐寄存器包括vector_load_align和vector_store_align，作为缓冲区，用来优化UB和矢量数据寄存器之间的连续非对齐地址访问的开销。在读非对齐地址前，vector_load_align应该通过asc_loadunalign_pre初始化，然后再使用asc_loadunalign。在写非对齐地址时，先使用asc_storealign，再使用asc_storealign_post进行处理。
+非对齐寄存器包括vector_load_align和vector_store_align，作为缓冲区，用来优化UB和[矢量数据寄存器](../reg数据类型定义.md)之间的连续非对齐地址访问的开销。在读非对齐地址前，vector_load_align应该通过asc_loadunalign_pre初始化，然后再使用asc_loadunalign。在写非对齐地址时，先使用asc_storealign，再使用asc_storealign_post进行处理。
 
 ### 调用示例
 
