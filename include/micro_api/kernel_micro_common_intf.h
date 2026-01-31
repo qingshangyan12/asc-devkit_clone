@@ -28,10 +28,17 @@
 
 namespace AscendC {
 namespace MicroAPI {
+#if __NPU_ARCH__ == 3101
+using MaskReg = bisheng::cce::simd::vector_bool;
+using UnalignRegForLoad = bisheng::cce::simd::vector_align;
+using UnalignRegForStore = bisheng::cce::simd::vector_align;
+using AddrReg = bisheng::cce::simd::vector_address;
+#else
 using MaskReg = vector_bool;
 using UnalignRegForLoad = vector_align;
 using UnalignRegForStore = vector_align;
 using AddrReg = vector_address;
+#endif
 
 #define __local_mem__ __ubuf__
 

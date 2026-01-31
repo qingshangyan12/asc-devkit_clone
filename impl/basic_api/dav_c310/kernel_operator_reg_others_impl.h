@@ -19,12 +19,12 @@
 namespace AscendC {
 template <typename T> __aicore__ inline void SetFlag(pipe_t pipe, pipe_t tpipe, T pipeID)
 {
-    set_flag(pipe, tpipe, pipeID);
+    bisheng::cce::set_flag(pipe, tpipe, pipeID);
 }
  
 template <typename T> __aicore__ inline void WaitFlag(pipe_t pipe, pipe_t tpipe, T pipeID)
 {
-    wait_flag(pipe, tpipe, pipeID);
+    bisheng::cce::wait_flag(pipe, tpipe, pipeID);
 }
 }
 #endif

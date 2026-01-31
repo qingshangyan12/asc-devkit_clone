@@ -41,7 +41,7 @@ __simd_callee__ inline void ArangeImpl(S& dstReg, U scalarValue)
                   "scalarValue data type could be converted to RegTensor data type");
     constexpr auto orderMode = std::integral_constant<::Order, static_cast<::Order>(order)>();
     if constexpr(sizeof(ActualT) != 8) {
-        vci(dstReg, scalarValue, orderMode);
+        bisheng::cce::simd::vci(dstReg, scalarValue, orderMode);
     } else {
         if constexpr(CheckRegTrait<S, RegTraitNumOne>()) {
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;

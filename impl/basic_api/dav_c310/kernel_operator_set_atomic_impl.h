@@ -11,12 +11,12 @@
 #define ASCENDC_MODULE_OPERATOR_SET_ATOMIC_ADD_IMPL_H
 
 namespace AscendC {
-// bisheng::cce::set_atomic_none
+// set_atomic_none
 __aicore__ inline void SetAtomicNoneImpl()
 {
     bisheng::cce::set_atomic_none();
 }
-// bisheng::cce::set_atomic_add
+// set_atomic_add
 template <typename T>
 __aicore__ inline void SetAtomicAddImpl()
 {
@@ -64,7 +64,7 @@ __aicore__ inline void SetAtomicAddImpl<bfloat16_t>()
     bisheng::cce::set_atomic_bf16();
     bisheng::cce::set_atomic_add();
 }
-// bisheng::cce::set_atomic_max
+// set_atomic_max
 template <typename T>
 __aicore__ inline void SetAtomicMaxImpl()
 {
@@ -114,7 +114,7 @@ __aicore__ inline void SetAtomicMaxImpl<bfloat16_t>()
     bisheng::cce::set_atomic_bf16();
 }
 
-// bisheng::cce::set_atomic_min
+// set_atomic_min
 template <typename T>
 __aicore__ inline void SetAtomicMinImpl()
 {

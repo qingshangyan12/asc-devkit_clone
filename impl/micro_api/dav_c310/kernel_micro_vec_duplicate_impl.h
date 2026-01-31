@@ -27,8 +27,8 @@ __simd_callee__ inline void DuplicateComplexTraitTwoImpl(U& dstReg, T scalarValu
     static_assert(SupportType<ActualT, complex32, complex64>(), "current data type is not supported on current device!");
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo for DuplicateComplexTraitTwoImpl");
     ActualT scalarAux(scalarValue);
-    vbr((RegTensor<typename ActualT::EleType>&)dstReg.reg[0], scalarAux.real);
-    vbr((RegTensor<typename ActualT::EleType>&)dstReg.reg[1], scalarAux.imag);
+    bisheng::cce::simd::vbr((RegTensor<typename ActualT::EleType>&)dstReg.reg[0], scalarAux.real);
+    bisheng::cce::simd::vbr((RegTensor<typename ActualT::EleType>&)dstReg.reg[1], scalarAux.imag);
 }
 
 template <typename T, typename U>
@@ -40,13 +40,13 @@ __simd_callee__ inline void DuplicateB64Impl(U& dstReg, T scalarValue)
     if constexpr (SupportType<ActualT, complex64>()) {
         DuplicateComplexTraitTwoImpl(dstReg, scalarValue);
     } else {
-        vbr((RegTensor<uint32_t> &)dstReg.reg[0], static_cast<uint32_t>(scalarValue));
+        bisheng::cce::simd::vbr((RegTensor<uint32_t> &)dstReg.reg[0], static_cast<uint32_t>(scalarValue));
         if constexpr (sizeof(T) == 8) {
-            vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32));
+            bisheng::cce::simd::vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32));
         } else if constexpr (IsSameType<T, uint32_t>::value) {
-            vbr((RegTensor<uint32_t>&)dstReg.reg[1], 0);
+            bisheng::cce::simd::vbr((RegTensor<uint32_t>&)dstReg.reg[1], 0);
         } else {
-            vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31));
+            bisheng::cce::simd::vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31));
         }
     }
 }
@@ -63,11 +63,11 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
 
     if constexpr (IsSameType<ActualT, bool>::value) {
-        vbr((RegTensor<int8_t> &)dstReg, (int8_t)scalarValue);
+        bisheng::cce::simd::vbr((RegTensor<int8_t> &)dstReg, (int8_t)scalarValue);
     } else if constexpr (IsSameType<ActualT, fp4x2_e2m1_t>::value || IsSameType<ActualT, fp4x2_e1m2_t>::value ||
                          IsSameType<ActualT, hifloat8_t>::value || IsSameType<ActualT, fp8_e8m0_t>::value ||
                          IsSameType<ActualT, fp8_e5m2_t>::value || IsSameType<ActualT, fp8_e4m3fn_t>::value) {
-        vbr((RegTensor<int8_t> &)dstReg, (int8_t &)scalarValue);
+        bisheng::cce::simd::vbr((RegTensor<int8_t> &)dstReg, (int8_t &)scalarValue);
     } else if constexpr (sizeof(ActualT) != 8) {
         if constexpr (SupportType<ActualT, complex32>()) {
             if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
@@ -78,7 +78,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
                 DuplicateComplexTraitTwoImpl(dstReg, scalarValue);
             }
         } else {
-            vbr(dstReg, (ActualT)scalarValue);
+            bisheng::cce::simd::vbr(dstReg, (ActualT)scalarValue);
         }
     } else {
         if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
@@ -101,8 +101,8 @@ __simd_callee__ inline void DuplicateComplexTraitTwoImpl(U& dstReg, T scalarValu
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo for DuplicateComplexTraitTwoImpl");
     ActualT scalarAux(scalarValue);
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vdup((RegTensor<typename ActualT::EleType>&)dstReg.reg[0], scalarAux.real, mask, modeValue);
-    vdup((RegTensor<typename ActualT::EleType>&)dstReg.reg[1], scalarAux.imag, mask, modeValue);
+    bisheng::cce::simd::vdup((RegTensor<typename ActualT::EleType>&)dstReg.reg[0], scalarAux.real, mask, modeValue);
+    bisheng::cce::simd::vdup((RegTensor<typename ActualT::EleType>&)dstReg.reg[1], scalarAux.imag, mask, modeValue);
 }
 
 template <MaskMergeMode mode = MaskMergeMode::ZEROING, typename T, typename U>
@@ -115,13 +115,13 @@ __simd_callee__ inline void DuplicateB64Impl(U& dstReg, T scalarValue, MaskReg& 
     if constexpr (SupportType<ActualT, complex64>()) {
         DuplicateComplexTraitTwoImpl(dstReg, scalarValue, mask);
     } else {
-        vdup((RegTensor<uint32_t>&)dstReg.reg[0], static_cast<uint32_t>(scalarValue), mask, modeValue);
+        bisheng::cce::simd::vdup((RegTensor<uint32_t>&)dstReg.reg[0], static_cast<uint32_t>(scalarValue), mask, modeValue);
         if constexpr (sizeof(T) == 8) {
-            vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32), mask, modeValue);
+            bisheng::cce::simd::vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32), mask, modeValue);
         } else if constexpr (IsSameType<T, uint32_t>::value) {
-            vdup((RegTensor<uint32_t>&)dstReg.reg[1], 0, mask, modeValue);
+            bisheng::cce::simd::vdup((RegTensor<uint32_t>&)dstReg.reg[1], 0, mask, modeValue);
         } else {
-            vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31), mask, modeValue);
+            bisheng::cce::simd::vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31), mask, modeValue);
         }
     }
 }
@@ -139,11 +139,11 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
     ASCENDC_ASSERT((mode != MaskMergeMode::UNKNOWN), { KERNEL_LOG(KERNEL_ERROR, "The MergeMode only support: MODE_MERGING, MODE_ZEROING."); });
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (IsSameType<ActualT, bool>::value) {
-        vdup((RegTensor<int8_t>&)dstReg, (int8_t)scalarValue, mask, modeValue);
+        bisheng::cce::simd::vdup((RegTensor<int8_t>&)dstReg, (int8_t)scalarValue, mask, modeValue);
     } else if constexpr (IsSameType<ActualT, fp4x2_e2m1_t>::value || IsSameType<ActualT, fp4x2_e1m2_t>::value ||
                          IsSameType<ActualT, hifloat8_t>::value || IsSameType<ActualT, fp8_e8m0_t>::value ||
                          IsSameType<ActualT, fp8_e5m2_t>::value || IsSameType<ActualT, fp8_e4m3fn_t>::value) {
-        vdup((RegTensor<int8_t>&)dstReg, (int8_t&)scalarValue, mask, modeValue);
+        bisheng::cce::simd::vdup((RegTensor<int8_t>&)dstReg, (int8_t&)scalarValue, mask, modeValue);
     } else if constexpr (sizeof(ActualT) != 8) {
         if constexpr (IsSameType<ActualT, complex32>::value) {
             if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
@@ -156,7 +156,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
                 DuplicateComplexTraitTwoImpl(dstReg, scalarValue, mask);
             }
         } else {
-            vdup(dstReg, (ActualT)scalarValue, mask, modeValue);
+            bisheng::cce::simd::vdup(dstReg, (ActualT)scalarValue, mask, modeValue);
         }
     } else {
         if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
@@ -188,9 +188,9 @@ __simd_callee__ inline void DuplicateComplexTraitTwoImpl(T& dstReg, T& srcReg, M
     static_assert(CheckRegTrait<T, RegTraitNumTwo>(), "T should be RegTraitNumTwo for DuplicateComplexTraitTwoImpl");
     constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vdup((RegTensor<typename ActualT::EleType> &)dstReg.reg[0], (RegTensor<typename ActualT::EleType> &)srcReg.reg[0],
+    bisheng::cce::simd::vdup((RegTensor<typename ActualT::EleType> &)dstReg.reg[0], (RegTensor<typename ActualT::EleType> &)srcReg.reg[0],
         mask, posValue, modeValue);
-    vdup((RegTensor<typename ActualT::EleType> &)dstReg.reg[1], (RegTensor<typename ActualT::EleType> &)srcReg.reg[1],
+    bisheng::cce::simd::vdup((RegTensor<typename ActualT::EleType> &)dstReg.reg[1], (RegTensor<typename ActualT::EleType> &)srcReg.reg[1],
         mask, posValue, modeValue);
 }
 
@@ -205,8 +205,8 @@ __simd_callee__ inline void DuplicateB64Impl(T& dstReg, T& srcReg, MaskReg& mask
     } else {
         constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
         constexpr auto modeValue = GetMaskMergeMode<mode>();
-        vdup((RegTensor<uint32_t> &)dstReg.reg[0], (RegTensor<uint32_t> &)srcReg.reg[0], mask, posValue, modeValue);
-        vdup((RegTensor<uint32_t> &)dstReg.reg[1], (RegTensor<uint32_t> &)srcReg.reg[1], mask, posValue, modeValue);
+        bisheng::cce::simd::vdup((RegTensor<uint32_t> &)dstReg.reg[0], (RegTensor<uint32_t> &)srcReg.reg[0], mask, posValue, modeValue);
+        bisheng::cce::simd::vdup((RegTensor<uint32_t> &)dstReg.reg[1], (RegTensor<uint32_t> &)srcReg.reg[1], mask, posValue, modeValue);
     }
 }
 
@@ -225,11 +225,11 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
     constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (IsSameType<ActualT, bool>::value) {
-        vdup((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, posValue, modeValue);
+        bisheng::cce::simd::vdup((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, posValue, modeValue);
     } else if constexpr (IsSameType<ActualT, fp4x2_e2m1_t>::value || IsSameType<ActualT, fp4x2_e1m2_t>::value ||
                          IsSameType<ActualT, hifloat8_t>::value || IsSameType<ActualT, fp8_e8m0_t>::value ||
                          IsSameType<ActualT, fp8_e5m2_t>::value || IsSameType<ActualT, fp8_e4m3fn_t>::value) {
-        vdup((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, posValue, modeValue);
+        bisheng::cce::simd::vdup((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, posValue, modeValue);
     } else if constexpr (sizeof(ActualT) != 8) {
         if constexpr (IsSameType<ActualT, complex32>::value) {
             if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
@@ -244,7 +244,7 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
                 DuplicateComplexTraitTwoImpl(dstReg, srcReg, mask);
             }
         } else {
-            vdup(dstReg, srcReg, mask, posValue, modeValue);
+            bisheng::cce::simd::vdup(dstReg, srcReg, mask, posValue, modeValue);
         }
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
@@ -282,11 +282,11 @@ __simd_callee__ inline void InterleaveImpl(U& dstReg0, U& dstReg1, U& srcReg0, U
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), "Interleave only support type bool/b8/b16/b32/b64 on current device");
     if constexpr (sizeof(ActualT) == 1) {
-        vintlv((RegTensor<int8_t>&)dstReg0, (RegTensor<int8_t>&)dstReg1, (RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1);
+        bisheng::cce::simd::vintlv((RegTensor<int8_t>&)dstReg0, (RegTensor<int8_t>&)dstReg1, (RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1);
     } else if constexpr (sizeof(ActualT) == 2) {
-        vintlv((RegTensor<int16_t>&)dstReg0, (RegTensor<int16_t>&)dstReg1, (RegTensor<int16_t>&)srcReg0, (RegTensor<int16_t>&)srcReg1);
+        bisheng::cce::simd::vintlv((RegTensor<int16_t>&)dstReg0, (RegTensor<int16_t>&)dstReg1, (RegTensor<int16_t>&)srcReg0, (RegTensor<int16_t>&)srcReg1);
     } else if constexpr (sizeof(ActualT) == 4) {
-        vintlv((RegTensor<int32_t>&)dstReg0, (RegTensor<int32_t>&)dstReg1, (RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1);
+        bisheng::cce::simd::vintlv((RegTensor<int32_t>&)dstReg0, (RegTensor<int32_t>&)dstReg1, (RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1);
     } else {
         static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "Interleave only support RegTraitNumTwo on current device");
         U dstTemp0;
@@ -317,11 +317,11 @@ __simd_callee__ inline void DeInterleaveImpl(U& dstReg0, U& dstReg1, U& srcReg0,
     static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
                   "DeInterleave only support type bool/b8/b16/b32/b64 on current device");
     if constexpr (sizeof(ActualT) == 1) {
-        vdintlv((RegTensor<int8_t>&)dstReg0, (RegTensor<int8_t>&)dstReg1, (RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1);
+        bisheng::cce::simd::vdintlv((RegTensor<int8_t>&)dstReg0, (RegTensor<int8_t>&)dstReg1, (RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1);
     } else if constexpr (sizeof(ActualT) == 2) {
-        vdintlv((RegTensor<int16_t>&)dstReg0, (RegTensor<int16_t>&)dstReg1, (RegTensor<int16_t>&)srcReg0, (RegTensor<int16_t>&)srcReg1);
+        bisheng::cce::simd::vdintlv((RegTensor<int16_t>&)dstReg0, (RegTensor<int16_t>&)dstReg1, (RegTensor<int16_t>&)srcReg0, (RegTensor<int16_t>&)srcReg1);
     } else if constexpr (sizeof(ActualT) == 4) {
-        vdintlv((RegTensor<int32_t>&)dstReg0, (RegTensor<int32_t>&)dstReg1, (RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1);
+        bisheng::cce::simd::vdintlv((RegTensor<int32_t>&)dstReg0, (RegTensor<int32_t>&)dstReg1, (RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1);
     } else {
         static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "DeInterleave only support RegTraitNumTwo on current device");
         U dstTemp0;

@@ -46,15 +46,15 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
         if constexpr (SupportType<Tuple<T, U>, Tuple<bfloat16_t, fp8_e8m0_t>>()) {
             // f8e8m02bf16
             constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
-            vcvt((RegTensor<uint16_t>&)srcReg, (RegTensor<uint8_t>&)srcReg, mask, partModeValue, modeValue);
+            bisheng::cce::simd::vcvt((RegTensor<uint16_t>&)srcReg, (RegTensor<uint8_t>&)srcReg, mask, partModeValue, modeValue);
             vshls((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg, SHIFT_SEVEN_BIT, mask, modeValue);
             // when f8e8m0 is nan, output bf16 to nan
             MaskReg nanMask;
             constexpr auto mgModeValue = GetMaskMergeMode<MaskMergeMode::MERGING>();
             vcmps_eq(nanMask, (RegTensor<uint16_t>&)dstReg, BF16_INF, mask);
-            vdup((RegTensor<uint16_t>&)dstReg, BF16_NAN, nanMask, mgModeValue);
+            bisheng::cce::simd::vdup((RegTensor<uint16_t>&)dstReg, BF16_NAN, nanMask, mgModeValue);
         } else {
-            vcvt(dstReg, srcReg, mask, partModeValue, modeValue);
+            bisheng::cce::simd::vcvt(dstReg, srcReg, mask, partModeValue, modeValue);
         }
     } else if constexpr (ppCondition) {
         constexpr auto ppModeValue = std::integral_constant<::Part_T, static_cast<::Part_T>(layoutMode)>();
@@ -66,11 +66,11 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
             vcvt_s42bf16(dstReg, srcReg, mask, ppModeValue, modeValue);
         } else if constexpr (SupportType<Tuple<T, U>, Tuple<int16_t, int4x2_t>>()) {
             // vcvt_if s42s16
-            vcvt_s42s16(dstReg, srcReg, mask, ppModeValue, modeValue);
+            bisheng::cce::simd::vcvt_s42s16(dstReg, srcReg, mask, ppModeValue, modeValue);
         } else {
             // vcvt_ii u82u32/s82s32/
             // vcvt_ff hif82f32/e4m32f32/e5m22f32/fp4e2m12bf16/fp4e1m22bf16
-            vcvt(dstReg, srcReg, mask, ppModeValue, modeValue);
+            bisheng::cce::simd::vcvt(dstReg, srcReg, mask, ppModeValue, modeValue);
         }
     } else {
         static_assert(!(partCondition && ppCondition), "current cast data type is not supported on current device!");
@@ -107,18 +107,18 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
                       "current cast api RegLayout Mode is not supported on current device!");
         // vcvt_ii u162u8/s162u8/u322u16/u322s16/s322u16/s322s16/s642s32
         constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
-        vcvt(dstReg, srcReg, mask, satModeValue, partModeValue, modeValue);
+        bisheng::cce::simd::vcvt(dstReg, srcReg, mask, satModeValue, partModeValue, modeValue);
     } else if constexpr (ppCondition) {
         constexpr auto ppModeValue = std::integral_constant<::Part_T, static_cast<::Part_T>(layoutMode)>();
         if constexpr (SupportType<Tuple<T, U>, Tuple<int4x2_t, int16_t>>()) {
             // vcvt_ii s162s4x2
             RegTensor<half> halfTmp;
             constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
-            vcvt(halfTmp, srcReg, mask, roundModeValue, modeValue);
-            vcvt_f162s4(dstReg, halfTmp, mask, roundModeValue, satModeValue, ppModeValue, modeValue);
+            bisheng::cce::simd::vcvt(halfTmp, srcReg, mask, roundModeValue, modeValue);
+            bisheng::cce::simd::vcvt_f162s4(dstReg, halfTmp, mask, roundModeValue, satModeValue, ppModeValue, modeValue);
         } else {
             // vcvt_ii u322u8/s322u8
-            vcvt(dstReg, srcReg, mask, satModeValue, ppModeValue, modeValue);
+            bisheng::cce::simd::vcvt(dstReg, srcReg, mask, satModeValue, ppModeValue, modeValue);
         }
     } else {
         static_assert(!(partCondition && ppCondition), "current cast data type is not supported on current device!");
@@ -162,12 +162,12 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
         if constexpr (conditionNoneToRint && (roundMode == RoundMode::CAST_NONE)) {
             constexpr auto roundModeNoneToRint = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
             constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
-            vcvt(dstReg, srcReg, mask, roundModeNoneToRint, satModeValue, partModeValue, modeValue);
+            bisheng::cce::simd::vcvt(dstReg, srcReg, mask, roundModeNoneToRint, satModeValue, partModeValue, modeValue);
         } else if constexpr (conditionNoNone) {
             static_assert(!(SupportEnum<roundMode, RoundMode::CAST_NONE>()),
                           "roundMode can't be CAST_NONE when float to bfloat16_t!");
             constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
-            vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, partModeValue, modeValue);
+            bisheng::cce::simd::vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, partModeValue, modeValue);
         } else if constexpr (SupportType<Tuple<T, U>, Tuple<fp8_e8m0_t, bfloat16_t>>()) {
             constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
             // bf162f8e8m0 will ignore sat mode and use sat only.
@@ -175,11 +175,11 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
                 std::integral_constant<::RoundingSaturation, static_cast<::RoundingSaturation>(SatMode::SAT)>();
             vshls((RegTensor<uint16_t> &)srcReg, (RegTensor<uint16_t> &)srcReg, SHIFT_ONE_BIT, mask, modeValue);
             vshrs((RegTensor<uint16_t> &)srcReg, (RegTensor<uint16_t> &)srcReg, SHIFT_EIGHT_BIT, mask, modeValue);
-            vcvt((RegTensor<uint8_t> &)dstReg, (RegTensor<uint16_t> &)srcReg, mask, satModeOnly, partModeValue,
+            bisheng::cce::simd::vcvt((RegTensor<uint8_t> &)dstReg, (RegTensor<uint16_t> &)srcReg, mask, satModeOnly, partModeValue,
                 modeValue);
         } else {
             constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
-            vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, partModeValue, modeValue);
+            bisheng::cce::simd::vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, partModeValue, modeValue);
         }
     } else if constexpr (ppCondition) {
         constexpr auto ppModeValue = std::integral_constant<::Part_T, static_cast<::Part_T>(layoutMode)>();
@@ -187,13 +187,13 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
         if constexpr (SupportType<Tuple<T, U>, Tuple<int4x2_t, half>>()) {
             if(roundMode == RoundMode::CAST_NONE) {
                 constexpr auto roundModeNoneToRint = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
-                vcvt_f162s4(dstReg, srcReg, mask, roundModeNoneToRint, satModeValue, ppModeValue, modeValue);
+                bisheng::cce::simd::vcvt_f162s4(dstReg, srcReg, mask, roundModeNoneToRint, satModeValue, ppModeValue, modeValue);
             } else {
-                vcvt_f162s4(dstReg, srcReg, mask, roundModeValue, satModeValue, ppModeValue, modeValue);
+                bisheng::cce::simd::vcvt_f162s4(dstReg, srcReg, mask, roundModeValue, satModeValue, ppModeValue, modeValue);
             }
         } else {
             // vcvt_ff f322hif8/f322e5m2/f322e4m3
-            vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, ppModeValue, modeValue);
+            bisheng::cce::simd::vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, ppModeValue, modeValue);
         }
     } else {
         static_assert(!(partCondition && ppCondition), "current cast data type is not supported on current device!");
@@ -225,10 +225,10 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
     constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
     if constexpr (partCondition) {
         // vcvt_fi f322s32/f162s16
-        vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, modeValue);
+        bisheng::cce::simd::vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, modeValue);
     } else if constexpr (ppCondition) {
         // bf162f16
-        vcvt(dstReg, srcReg, mask, satModeValue, roundModeValue, modeValue);
+        bisheng::cce::simd::vcvt(dstReg, srcReg, mask, satModeValue, roundModeValue, modeValue);
     } else {
         static_assert(!(partCondition && ppCondition), "current cast data type is not supported on current device!");
     }
@@ -262,11 +262,11 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
         static_assert(SupportEnum<layoutMode, RegLayout::ZERO, RegLayout::ONE>(),
                       "current cast api RegLayout Mode is not supported on current device!");
         constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
-        vcvt(dstReg, srcReg, mask, roundModeValue, partModeValue, modeValue);
+        bisheng::cce::simd::vcvt(dstReg, srcReg, mask, roundModeValue, partModeValue, modeValue);
     } else if constexpr (ppCondition) {
         // vcvt_ff bf162fp4e2m1/bf162fp4e1m2
         constexpr auto ppModeValue = std::integral_constant<::Part_T, static_cast<::Part_T>(layoutMode)>();
-        vcvt(dstReg, srcReg, mask, roundModeValue, ppModeValue, modeValue);
+        bisheng::cce::simd::vcvt(dstReg, srcReg, mask, roundModeValue, ppModeValue, modeValue);
     } else {
         static_assert(!(partCondition && ppCondition), "current cast data type is not supported on current device!");
     }
@@ -295,11 +295,11 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
     if constexpr (conditionNoneToRint && (roundMode == RoundMode::CAST_NONE)) {
         constexpr auto modeValue = GetMaskMergeMode<mode>();
         constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
-        vcvt(dstReg, srcReg, mask, roundModeValue, modeValue);
+        bisheng::cce::simd::vcvt(dstReg, srcReg, mask, roundModeValue, modeValue);
     } else {
         constexpr auto modeValue = GetMaskMergeMode<mode>();
         constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
-        vcvt(dstReg, srcReg, mask, roundModeValue, modeValue);
+        bisheng::cce::simd::vcvt(dstReg, srcReg, mask, roundModeValue, modeValue);
     }
 }
 
@@ -331,11 +331,11 @@ __simd_callee__ inline void TruncateImpl(U& dstReg, U& srcReg, MaskReg& mask)
     if constexpr (roundMode == RoundMode::CAST_NONE) {
         constexpr auto modeValue = GetMaskMergeMode<mode>();
         constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
-        vtrc(dstReg, srcReg, roundModeValue, mask, modeValue);
+        bisheng::cce::simd::vtrc(dstReg, srcReg, roundModeValue, mask, modeValue);
     } else {
         constexpr auto modeValue = GetMaskMergeMode<mode>();
         constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
-        vtrc(dstReg, srcReg, roundModeValue, mask, modeValue);
+        bisheng::cce::simd::vtrc(dstReg, srcReg, roundModeValue, mask, modeValue);
     }
 }
 

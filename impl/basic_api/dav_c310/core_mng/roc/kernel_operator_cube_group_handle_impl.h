@@ -117,12 +117,12 @@ __aicore__ inline __gm__ CubeMsgType *CubeResGroupHandle<CubeMsgType>::AllocMess
         if constexpr (pipeMode == PipeMode::MTE3_MODE) {
             WaitFlag<HardEvent::MTE3_S>((event_t)eventID);
         }
-        dcci(
-            reinterpret_cast<__gm__ int64_t *>(msgCurrent), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        bisheng::cce::dcci(
+            reinterpret_cast<__gm__ int64_t *>(msgCurrent), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         while ((msgCurrent->head).msgState != CubeMsgState::FREE) {
-            dcci(reinterpret_cast<__gm__ int64_t *>(msgCurrent),
-                cache_line_t::SINGLE_CACHE_LINE,
-                dcci_dst_t::CACHELINE_OUT);
+            bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msgCurrent),
+                bisheng::cce::cache_line_t::SINGLE_CACHE_LINE,
+                bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         }
         __gm__ CubeMsgType *msgReturn = msgCurrent;
         __AivUpdateMsgCurrent();
@@ -165,9 +165,9 @@ template <typename CubeMsgType>
 __aicore__ inline uint16_t CubeResGroupHandle<CubeMsgType>::FreeMessage(__gm__ CubeMsgType *msg, CubeMsgState waitState)
 {
     if ASCEND_IS_AIC {
-        dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         while ((msg->head).msgState != waitState) {
-            dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+            bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         }
         __WriteGmStateByScalar(msg, CubeMsgState::FREE);
     }
@@ -223,13 +223,13 @@ __aicore__ inline bool CubeResGroupHandle<CubeMsgType>::Wait(uint16_t offset)
 {
     if ASCEND_IS_AIV {
         __gm__ CubeMsgType *cubeMsgCur = msgHead + offset;
-        dcci(
-            reinterpret_cast<__gm__ int64_t *>(cubeMsgCur), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        bisheng::cce::dcci(
+            reinterpret_cast<__gm__ int64_t *>(cubeMsgCur), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         if constexpr (sync) {
             while ((cubeMsgCur->head).msgState != CubeMsgState::FREE) {
-                dcci(reinterpret_cast<__gm__ int64_t *>(cubeMsgCur),
-                    cache_line_t::SINGLE_CACHE_LINE,
-                    dcci_dst_t::CACHELINE_OUT);
+                bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(cubeMsgCur),
+                    bisheng::cce::cache_line_t::SINGLE_CACHE_LINE,
+                    bisheng::cce::dcci_dst_t::CACHELINE_OUT);
             }
             return true;
         } else {
@@ -303,13 +303,13 @@ template <typename CubeMsgType>
 __aicore__ inline __gm__ CubeMsgType *__RcvMessage(CubeResGroupHandle<CubeMsgType> handle)
 {
     if ASCEND_IS_AIC {
-        dcci(reinterpret_cast<__gm__ int64_t *>(handle.msgCurrent),
-            cache_line_t::SINGLE_CACHE_LINE,
-            dcci_dst_t::CACHELINE_OUT);
+        bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(handle.msgCurrent),
+            bisheng::cce::cache_line_t::SINGLE_CACHE_LINE,
+            bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         while ((handle.msgCurrent->head).msgState == CubeMsgState::FREE) {
-            dcci(reinterpret_cast<__gm__ int64_t *>(handle.msgCurrent),
-                cache_line_t::SINGLE_CACHE_LINE,
-                dcci_dst_t::CACHELINE_OUT);
+            bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(handle.msgCurrent),
+                bisheng::cce::cache_line_t::SINGLE_CACHE_LINE,
+                bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         }
     }
     return handle.msgCurrent;
@@ -365,11 +365,11 @@ __aicore__ inline void CubeResGroupHandle<CubeMsgType>::__WriteGmCubeMsgByScalar
     ASCENDC_DEBUG_ASSERT((msg != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "In __WriteGmStateByScalar, msg can not be nullptr"));
     // Note: must first refresh last (n-1) * 64B msg content, then refresh first 64B of msgState
     for (uint32_t i = 1; i < sizeof(CubeMsgType) / sizeof(int64_t); i++) {
-        dcci(reinterpret_cast<__gm__ int64_t *>(msg) + sizeof(int64_t) * i,
-            cache_line_t::SINGLE_CACHE_LINE,
-            dcci_dst_t::CACHELINE_OUT);
+        bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg) + sizeof(int64_t) * i,
+            bisheng::cce::cache_line_t::SINGLE_CACHE_LINE,
+            bisheng::cce::dcci_dst_t::CACHELINE_OUT);
     }
-    dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+    bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
 }
 
 // set msgState to newState by Scalar
@@ -379,7 +379,7 @@ __aicore__ inline void CubeResGroupHandle<CubeMsgType>::__WriteGmStateByScalar(
 {
     ASCENDC_DEBUG_ASSERT((msg != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "In __WriteGmStateByScalar, msg can not be nullptr"));
     (msg->head).msgState = newState;
-    dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+    bisheng::cce::dcci(reinterpret_cast<__gm__ int64_t *>(msg), bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
 }
 
 template <typename CubeMsgType>
