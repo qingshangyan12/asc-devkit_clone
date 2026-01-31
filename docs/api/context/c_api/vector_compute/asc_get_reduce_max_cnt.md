@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-此接口用于获取执行[asc_repeat_reduce_max](./asc_repeat_reduce_max.md)操作后的最大值，以及第一个最大值时的索引。
+此接口用于获取执行[asc_repeat_reduce_max](./asc_repeat_reduce_max.md)操作后的最大值，以及第一个最大值的索引。
 
 ## 函数原型
 
@@ -23,7 +23,7 @@ __aicore__ inline void asc_get_reduce_max_cnt(float& val, uint32_t& index)
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | val | 输出 | 最大值。 |
-| index | 输出 | 第一个最大值时的索引。 |
+| index | 输出 | 第一个最大值的索引。 |
 
 ## 返回值说明
 

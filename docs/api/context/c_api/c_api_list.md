@@ -5,8 +5,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 |结构名|说明|
 |-----------------------|-----------------------|
-| [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | Load3Dv2接口的repeat参数 |
-| [asc_store_atomic_config](struct/asc_store_atomic_config.md) | 原子操作使能位与原子操作类型的值 |
+| [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | Load3Dv2接口的repeat参数。 |
+| [asc_store_atomic_config](struct/asc_store_atomic_config.md) | 原子操作使能位与原子操作类型的值。 |
+| [asc_fill_value_config](struct/asc_fill_value_config.md) | 数据初始化类API的参数结构体。 |
 
 ## 矢量计算
 
@@ -38,6 +39,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_repeat_reduce_sum](vector_compute/asc_repeat_reduce_sum.md) | 对每个Repeat内所有元素求和。 |
 | [asc_repeat_reduce_max](vector_compute/asc_repeat_reduce_max.md) | 对每个Repeat内所有元素求最大值。 |
 | [asc_repeat_reduce_min](vector_compute/asc_repeat_reduce_min.md) | 对每个Repeat内所有元素求最小值。 |
+| [asc_get_reduce_max_cnt](vector_compute/asc_get_reduce_max_cnt.md) | 获取执行asc_repeat_reduce_max操作后的最大值，以及第一个最大值的索引。 |
+| [asc_get_reduce_min_cnt](vector_compute/asc_get_reduce_min_cnt.md) | 获取执行asc_repeat_reduce_min操作后的最小值，以及第一个最小值的索引。 |
 | [asc_brcb](vector_compute/asc_brcb.md) | 将源操作数中的每一个数填充到目的操作数的一个DataBlock中。 |
 | [asc_duplicate](vector_compute/asc_duplicate.md) | 将一个变量或立即数填充到一个矢量中。 |
 | [asc_select](vector_compute/asc_select.md) | 根据掩码，从两个源操作数中选取元素，输出到目的操作数。 |
@@ -126,6 +129,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_fill_l1](cube_datamove/asc_fill_l1.md) | 将L1 Buffer的Local Memory初始化为某一具体数值。 |
 | [asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md) | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)的3D格式搬运接口在L1 Buffer的边界值。 |
 | [asc_load_image_to_cbuf](cube_datamove/asc_load_image_to_cbuf.md) | 将图像数据从Global Memory搬运到L1 Buffer。 |
+| [asc_copy_l0c2l1](cube_datamove/asc_copy_l0c2l1.md) | 将数据从L0C Buffer搬运到L1 Buffer中。 |
 | [asc_copy_l12bt](cube_datamove/asc_copy_l12bt.md) | 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。 |
 | [asc_copy_l12fb](cube_datamove/asc_copy_l12fb.md) | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
 | [asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md) | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
