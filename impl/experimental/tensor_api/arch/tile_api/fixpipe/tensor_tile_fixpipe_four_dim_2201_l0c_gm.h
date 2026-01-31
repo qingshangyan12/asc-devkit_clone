@@ -25,6 +25,7 @@ public:
     template <typename T, typename U, const FixpipeTrait& trait>
     __aicore__ inline void Run(const T& dst, const U& src) {
         auto params = GenFixpipeParams<T, U, trait>(dst, src);
+        
         DataCopy<T, U, decltype(params), trait>(dst, src, params);
     }
 
