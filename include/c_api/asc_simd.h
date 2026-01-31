@@ -36,7 +36,7 @@
 #include "utils/debug/asc_printf.h"
 #include "utils/debug/asc_assert.h"
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "vector_compute/vector_compute.h"
 #include "include/c_api/reg_compute/reg_convert.h"
 #include "include/c_api/reg_compute/reg_load.h"
