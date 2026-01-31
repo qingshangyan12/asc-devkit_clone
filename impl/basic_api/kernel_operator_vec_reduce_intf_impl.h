@@ -1008,6 +1008,7 @@ __aicore__ inline int64_t GetReduceRepeatSumSpr()
 #endif
 }
 
+// GetAccVal has been updated, please use GetReduceRepeatSumSpr instead.
 __aicore__ inline int64_t GetAccVal()
 {
     return GetReduceRepeatSumSpr();
@@ -1070,6 +1071,7 @@ __aicore__ inline __inout_pipe__(S) T GetReduceRepeatSumSpr()
     return GetAccValImpl<T>();
 }
 
+// GetAccVal has been updated, please use GetReduceRepeatSumSpr instead.
 template <typename T>
 __aicore__ inline __inout_pipe__(S) T GetAccVal()
 {

@@ -237,8 +237,8 @@ TEST_F(TestScalarInstr, ScalarInstrNewCase)
     EXPECT_EQ(stAtomicCfg, 0);
 
     SetHF32Mode(HF32Mode::Enable);
-    SetHF32TransMode(HF32TransMode::Enable);
-    SetMMColumnMajor();
+    SetHF32TransMode(HF32TransMode::NEAREST_ZERO);
+    SetMMRowMajor();
 
     set_cond(u64XnVal);
     EXPECT_EQ(get_cond(), 0);
