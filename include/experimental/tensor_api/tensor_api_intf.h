@@ -12,13 +12,3 @@
 * \file tensor_api_impl.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_TENSOR_API_IMPL_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_TENSOR_API_IMPL_H
-
-#include "include/tensor_api/algorithm/tensor_tile_algorithm_intf.h"
-#include "include/tensor_api/arch/tensor_tile_arch_intf.h"
-#include "include/tensor_api/atom/tensor_tile_atom.h"
-#include "include/tensor_api/struct/tensor_tile_struct.h"
-#include "include/tensor_api/utils/tensor_tile_utils.h"
-
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_TENSOR_API_IMPL_H
