@@ -35,7 +35,7 @@ __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int32_t src, 
 | dst | 输出 | 目的操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
 | src | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
 | value | 输入 | 源操作数（标量）的值。|
-| mask | 输入 | 源操作数掩码。对应位置为1时参与计算，为0时不参与计算。 |
+| mask | 输入 | 源操作数掩码（矢量），类型为[掩码寄存器](../reg数据类型定义.md/#掩码寄存器)，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 ## 返回值说明
 
@@ -46,9 +46,6 @@ __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int32_t src, 
 PIPE_V
 
 ## 约束说明
-
-- dst、src（为矢量时）的需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../../../docs/api/context/c_api/general_instruction.md#通用地址重叠约束)。
 
 ## 调用示例
 
