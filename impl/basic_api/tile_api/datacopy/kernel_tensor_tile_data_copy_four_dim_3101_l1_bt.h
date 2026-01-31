@@ -55,7 +55,7 @@ private:
         CheckNDTemplate<T>();
         CheckNDTemplate<U>();
 
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<srcType, half, bfloat16_t, float, int32_t>, "The source data type is not supported.");
 #endif
     }

@@ -147,7 +147,7 @@ private:
     };
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 class MmadBitModeParams {
 public:
     __aicore__ inline MmadBitModeParams();
