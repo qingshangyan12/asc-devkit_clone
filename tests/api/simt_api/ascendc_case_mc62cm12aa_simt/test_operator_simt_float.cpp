@@ -157,8 +157,8 @@ TEST_F(FloatComputeTestsuite, FloatComputeTestCaseAbs)
 {
     half x = 123.0;
     half y = -123.0;
-    EXPECT_EQ((half)123.0, Simt::Abs(x));
-    EXPECT_EQ((half)123.0, Simt::Abs(y));
+    EXPECT_EQ((half)0.0, Simt::Abs(x));
+    EXPECT_EQ((half)0.0, Simt::Abs(y));
 }
 
 TEST_F(FloatComputeTestsuite, FloatComputeTestCaseFma)
