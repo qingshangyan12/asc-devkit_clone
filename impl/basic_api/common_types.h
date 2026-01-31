@@ -39,6 +39,6 @@ enum class TPosition : uint8_t {
     C2PIPE2LOCAL,
     MAX,
 };
-} // namespace AscendC
+} 
 
 #endif // AICORE_BASIS_API_COMMON_TYPES_H
