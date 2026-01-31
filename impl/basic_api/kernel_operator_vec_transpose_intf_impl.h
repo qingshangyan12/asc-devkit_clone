@@ -18,6 +18,7 @@
 #include "kernel_tpipe.h"
 #include "kernel_check.h"
 #include "kernel_struct_transpose.h"
+#include "mstx_local_tensor_info.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_transpose_impl.h"
@@ -52,6 +53,9 @@ namespace AscendC {
  */
 template <typename T> __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src)
 {
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecTransposeInfo(dst, src);
+#endif
     ASCENDC_ASSERT((SupportType<PrimT<T>, int16_t, uint16_t, half>()),
         {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Transpose, current api support dtype combination is "
         "src and dst both: int16_t, uint16_t, half");});
@@ -122,6 +126,9 @@ template <typename T>
 __aicore__ inline void Transpose(const LocalTensor<T> &dst, const LocalTensor<T> &src,
     const LocalTensor<uint8_t> &sharedTmpBuffer, const TransposeParamsExt &transposeParams)
 {
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecTransposeTempInfo(dst, src, sharedTmpBuffer);
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunTranspose(dst, src, sharedTmpBuffer, transposeParams, "Transpose")) {
         ASCENDC_REPORT_CHECK_ERROR("Transpose", KernelFuncType::NONE_MODE);
@@ -164,6 +171,9 @@ template <typename T>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(const LocalTensor<uint64_t> &dst,
     const LocalTensor<uint64_t> &src, const TransDataTo5HDParams &nchwconvParams)
 {
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecTransdataInfo(dst, src);
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunTransDataTo5HD<T, uint64_t>(dst, src, nchwconvParams, "TransDataTo5HD")) {
         ASCENDC_REPORT_CHECK_ERROR("TransDataTo5HD", KernelFuncType::NONE_MODE);
