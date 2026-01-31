@@ -352,7 +352,7 @@ __aicore__ inline void FixpipeL0C2L1Impl(
 
     // nz2dn mode need set CHANNEL_PARA extra
     if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        // Loop0_dst_stride in uint of CO_SIZE
+        // Loop0_dst_stride in uint of C0_SIZE
         uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride)
                                 << 48;  // CHANNEL_PARA[63:48]
         set_channel_para(channelPara);
@@ -381,7 +381,7 @@ __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ DstT* dst, __cc__ SrcT* src, _
 
     // nz2dn mode need set CHANNEL_PARA extra
     if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        // Loop0_dst_stride in uint of CO_SIZE
+        // Loop0_dst_stride in uint of C0_SIZE
         uint64_t channelPara = static_cast<uint64_t>(intriParams.params.srcNzC0Stride)
                                 << 48;  // CHANNEL_PARA[63:48]
         set_channel_para(channelPara);
