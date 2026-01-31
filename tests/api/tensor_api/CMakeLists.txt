@@ -25,7 +25,7 @@ set(ASCENDC_UT_HEADER
     ${ASCENDC_DIR}/include
     ${ASCENDC_DIR}/include/utils
     ${ASCENDC_DIR}/impl
-    ${ASCENDC_DIR}/impl/tensor_api
+    ${ASCENDC_DIR}/impl/experimental/tensor_api
 )
 
 file(GLOB ASCENDC_UT_COMMON_SRC
