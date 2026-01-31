@@ -28,14 +28,6 @@
 #include <iostream>
 using namespace std;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
 class TEST_ASCENDC_RUNTIME : public testing::Test {
 protected:
     void SetUp() {}

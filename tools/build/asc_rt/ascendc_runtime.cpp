@@ -367,7 +367,7 @@ static void AscendBuildNodeBasicInfo(uint32_t numBlocks, const std::pair<uint64_
     profNodeBasicInfo.opName = opNameAndTypeHash.first;
     profNodeBasicInfo.opType = opNameAndTypeHash.second;
     profNodeBasicInfo.taskType = taskType;
-    profNodeBasicInfo.blockDim = numBlocks;
+    profNodeBasicInfo.numBlocks = numBlocks;
     nodeBasicInfo.level = static_cast<uint16_t>(MSPROF_REPORT_NODE_LEVEL);
     nodeBasicInfo.type = MSPROF_REPORT_NODE_BASIC_INFO_TYPE;
     nodeBasicInfo.timeStamp = timeStamp;
