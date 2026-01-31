@@ -18,20 +18,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_UTILS_IMPL_DEBUG_UTILS_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_UTILS_IMPL_DEBUG_UTILS_H
 
-#ifndef __host_aicore__
-#define __host_aicore__ [host, aicore]
-#endif // __host_aicore__
-
-#if (_ASCENDC_HAS_BISHENG_COMPILER)
-#define ASCENDC_HOST __host__
-#define ASCENDC_AICORE __aicore__
-#define ASCENDC_HOST_AICORE __host_aicore__
-#else
-#define ASCENDC_HOST
-#define ASCENDC_AICORE
-#define ASCENDC_HOST_AICORE
-#endif
-
+#include "impl/utils/base_defs/types_def.h"
 #include "include/utils/std/tuple.h"
 #include "include/utils/std/algorithm.h"
 #include "include/utils/std/type_traits.h"
@@ -92,11 +79,6 @@ enum KernelType {
     K_TYPE_MAX
 };
 
-struct BaseTlv {  // TLV头部定义
-    unsigned short type;
-    unsigned short len;
-};
-
 struct FunMetaKType {
     BaseTlv head;
     unsigned int ktype;
@@ -111,10 +93,6 @@ struct BinaryMetaAscFeature {
     uint32_t feature;
 };
 
-struct BinaryMetaVersion {
-    BaseTlv head;      // B_TYPE_BIN_VERSION = 0
-    uint32_t version;  // version info
-};
 
 __aicore__ inline void enable_printf()
 {
@@ -259,7 +237,6 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype()
     }
 }
 
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
 __aicore__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
 {
     return (a + b - 1) / b;
