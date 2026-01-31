@@ -204,8 +204,11 @@ class CommonUtility:
         cmd.append("-mllvm")
         cmd.append("-disable-lsr")
         cmd.append("-fno-unroll-loops")
-        proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        cmd_str = ' '.join(cmd)
+        if cmd_type == "compile":
+            proc = subprocess.Popen(cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        else:
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         return out, proc.returncode
 
@@ -245,8 +248,11 @@ class CommonUtility:
         elif global_var_storage.get_variable("ascendc_short_soc_version") == ASCEND_310:
             cmd.insert(5, "-mllvm")
             cmd.insert(6, "-cce-aicore-function-stack-size=8192")
-        proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        cmd_str = ' '.join(cmd)
+        if cmd_type == "compile":
+            proc = subprocess.Popen(cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        else:
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         if proc.returncode != 0:
             (out, retcode) = CommonUtility.run_cmd_stack_spill_case_ascendc(cmd, cmd_type, cce_file)
@@ -272,8 +278,11 @@ class CommonUtility:
         returncode : int
             success or fail
         """
-        proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        cmd_str = ' '.join(cmd)
+        if cmd_type == "compile":
+            proc = subprocess.Popen(cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        else:
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         is_compile_cmd = cmd_type == "compile"
         if proc.returncode != 0:
@@ -281,8 +290,11 @@ class CommonUtility:
                 switching_compilation_mode()
                 cmd[cmd.index("-O0")] = "-O2"
                 del cmd[cmd.index("-g")]
-                proc_now = subprocess.Popen(
-                    cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                cmd_str = ' '.join(cmd)
+                if cmd_type == "compile":
+                    proc_now = subprocess.Popen(cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+                else:
+                    proc_now = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 (out, _) = proc_now.communicate()
                 if proc_now.returncode != 0:
                     if "--cce-aicore-only" in cmd:

@@ -642,8 +642,9 @@ def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
         if 'vec' in arch and params.no_kfc_server_flag:
             compile_cmd += [f"-D__NO_KFC_SERVER__"]
         CommonUtility.dump_compile_log(compile_cmd, CompileStage.INFERCHANNEL, params.compile_log_path)
+        compile_cmd_str = ' '.join(compile_cmd)
         proc = subprocess.Popen(
-            compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            compile_cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
         CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
         objdump_cmd = ['llvm-objdump', '-s', '-j', '.text', '{}'.format(dst_file)]
