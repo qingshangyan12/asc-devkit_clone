@@ -22,31 +22,35 @@ __simd_callee__ inline MaskReg UpdateMaskImpl(uint32_t& scalarValue)
 {
     static_assert(SupportBytes<T, 1, 2, 4, 8>(), "UpdateMask only support type b8/b16/b32/b64 on current device");
     MaskReg reg;
+    constexpr auto postValue = std::integral_constant<Post,
+        static_cast<Post>(PostLiteral::POST_MODE_UPDATE)>();
+    constexpr auto lowerValue = std::integral_constant<HiloPart,
+        static_cast<HiloPart>(HighLowPart::LOWEST)>();
     if constexpr (sizeof(T) == 1) {
-        reg = plt_b8(scalarValue, POST_UPDATE);
+        reg = plt_b8(scalarValue, postValue);
     } else if constexpr (sizeof(T) == 2) {
-        reg = plt_b16(scalarValue, POST_UPDATE);
+        reg = plt_b16(scalarValue, postValue);
     } else if constexpr (sizeof(T) == 4) {
         if constexpr (SupportType<T, complex32>()) {
             if constexpr (regTrait.REG_NUM == 2) {
-                reg = plt_b16(scalarValue, POST_UPDATE);
+                reg = plt_b16(scalarValue, postValue);
             } else {
                 uint32_t updateScalar = scalarValue;
-                reg = plt_b16(scalarValue, POST_UPDATE);
-                punpack(reg, reg, LOWER);
+                reg = plt_b16(scalarValue, postValue);
+                bisheng::cce::simd::punpack(reg, reg, lowerValue);
                 constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(T);
                 scalarValue = (updateScalar > one_repeat_num) ? (updateScalar - one_repeat_num) : 0;
             }
         } else {
-            reg = plt_b32(scalarValue, POST_UPDATE);
+            reg = plt_b32(scalarValue, postValue);
         }
     } else if constexpr (sizeof(T) == 8) {
         if constexpr (regTrait.REG_NUM == 2) {
-            reg = plt_b32(scalarValue, POST_UPDATE);
+            reg = plt_b32(scalarValue, postValue);
         } else {
             uint32_t updateScalar = scalarValue;
-            reg = plt_b32(scalarValue, POST_UPDATE);
-            punpack(reg, reg, LOWER);
+            reg = plt_b32(scalarValue, postValue);
+            bisheng::cce::simd::punpack(reg, reg, lowerValue);
             constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(T);
             scalarValue = (updateScalar > one_repeat_num) ? (updateScalar - one_repeat_num) : 0;
         }
@@ -77,25 +81,28 @@ template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTr
 __simd_callee__ inline MaskReg CreateMaskImpl()
 {
     static_assert(SupportBytes<T, 1, 2, 4, 8>(), "CreateMask only support type b8/b16/b32/b64 on current device");
-    constexpr auto modeValue = std::integral_constant<::Pat, static_cast<::Pat>(GetMaskPattern<T, mode, regTrait>())>();
+    constexpr auto modeValue = std::integral_constant<Pat,
+        static_cast<Pat>(GetMaskPattern<T, mode, regTrait>())>();
+    constexpr auto lowerValue = std::integral_constant<HiloPart,
+        static_cast<HiloPart>(HighLowPart::LOWEST)>();
     MaskReg reg;
     if constexpr (sizeof(T) == 1) {
-        reg = pset_b8(modeValue);
+        reg = bisheng::cce::simd::pset_b8(modeValue);
     } else if constexpr (sizeof(T) == 2) {
-        reg = pset_b16(modeValue);
+        reg = bisheng::cce::simd::pset_b16(modeValue);
     } else if constexpr (sizeof(T) == 4) {
         if constexpr (SupportType<T, complex32>()) {
-            reg = pset_b16(modeValue);
+            reg = bisheng::cce::simd::pset_b16(modeValue);
             if constexpr (regTrait.REG_NUM == 1) {
-                punpack(reg, reg, LOWER);
+                bisheng::cce::simd::punpack(reg, reg, lowerValue);
             }
         } else {
-            reg = pset_b32(modeValue);
+            reg = bisheng::cce::simd::pset_b32(modeValue);
         }
     } else if constexpr (sizeof(T) == 8) {
-        reg = pset_b32(modeValue);
+        reg = bisheng::cce::simd::pset_b32(modeValue);
         if constexpr (regTrait.REG_NUM == 1) {
-            punpack(reg, reg, LOWER);
+            bisheng::cce::simd::punpack(reg, reg, lowerValue);
         }
     }
     return reg;
@@ -109,16 +116,16 @@ __simd_callee__ inline void MaskGenWithRegTensorImpl(MaskReg &dst, U &srcReg)
     static_assert(SupportBytes<ActualT, 2, 4>(), "MaskGenWithRegTensor only support type b16/b32 on current device");
     if constexpr (sizeof(ActualT) == 2) {
         static_assert((offset >= 0) && (offset <= 15), "MaskGenWithRegTensor offset must be in 0~15 when T is b16");
-        movvp(dst, (RegTensor<uint16_t>&)srcReg, offset);
+        bisheng::cce::simd::movvp(dst, (RegTensor<uint16_t>&)srcReg, offset);
     } else if constexpr (sizeof(ActualT) == 4) {
         static_assert((offset >= 0) && (offset <= 31), "MaskGenWithRegTensor offset must be in 0~31 when T is b32");
-        movvp(dst, (RegTensor<uint32_t>&)srcReg, offset);
+        bisheng::cce::simd::movvp(dst, (RegTensor<uint32_t>&)srcReg, offset);
     }
 }
 
 __simd_callee__ inline void MaskNotImpl(MaskReg& dst, MaskReg& src, MaskReg& mask)
 {
-    pnot(dst, src, mask);
+    bisheng::cce::simd::pnot(dst, src, mask);
 }
 
 __simd_callee__ inline void MaskAndImpl(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
@@ -138,12 +145,12 @@ __simd_callee__ inline void MaskXorImpl(MaskReg& dst, MaskReg& src0, MaskReg& sr
 
 __simd_callee__ inline void MaskMovImpl(MaskReg& dst, MaskReg& src, MaskReg& mask)
 {
-    pmov(dst, src, mask);
+    bisheng::cce::simd::pmov(dst, src, mask);
 }
 
 __simd_callee__ inline void MaskMovImpl(MaskReg& dst, MaskReg& src)
 {
-    pmov(dst, src);
+    bisheng::cce::simd::pmov(dst, src);
 }
 
 template <typename T>
@@ -174,21 +181,21 @@ __simd_callee__ inline void MaskDeInterleaveImpl(MaskReg& dst0, MaskReg& dst1, M
 
 __simd_callee__ inline void MaskSelImpl(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
 {
-    psel(dst, src0, src1, mask);
+    bisheng::cce::simd::psel(dst, src0, src1, mask);
 }
 
 template <HighLowPart part = HighLowPart::LOWEST>
 __simd_callee__ inline void MaskPackImpl(MaskReg& dst, MaskReg& src)
 {
-    constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
-    ppack(dst, src, partValue);
+    constexpr auto partValue = std::integral_constant<HiloPart, static_cast<HiloPart>(part)>();
+    bisheng::cce::simd::ppack(dst, src, partValue);
 }
 
 template <HighLowPart part = HighLowPart::LOWEST>
 __simd_callee__ inline void MaskUnPackImpl(MaskReg& dst, MaskReg& src)
 {
-    constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
-    punpack(dst, src, partValue);
+    constexpr auto partValue = std::integral_constant<HiloPart, static_cast<HiloPart>(part)>();
+    bisheng::cce::simd::punpack(dst, src, partValue);
 }
 
 template <typename T>

@@ -43,24 +43,24 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, MaskReg
     CheckStoreDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     if constexpr (SupportBytes<ActualT, 1>()) {
-        vsts((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, 0, distValue, mask);
+        bisheng::cce::simd::vsts((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, 0, distValue, mask);
     } else if constexpr (SupportBytes<ActualT, 8>()) {
         MaskReg dstMask0;
         MaskReg dstMask1;
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             constexpr auto lowerDist =
-                std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>();
+                std::integral_constant<HiloPart, static_cast<HiloPart>(HighLowPart::LOWEST)>();
             MaskReg tmpMask;
-            ppack(tmpMask, mask, lowerDist);
+            bisheng::cce::simd::ppack(tmpMask, mask, lowerDist);
             pintlv_b32(dstMask0, dstMask1, tmpMask, tmpMask);
-            vsts((RegTensor<uint32_t> &)srcReg, (__ubuf__ uint32_t*)dstAddr, 0, distValue, dstMask0);
+            bisheng::cce::simd::vsts((RegTensor<uint32_t> &)srcReg, (__ubuf__ uint32_t*)dstAddr, 0, distValue, dstMask0);
         } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             RegTensor<uint32_t> reg0;
             RegTensor<uint32_t> reg1;
             pintlv_b32(dstMask0, dstMask1, mask, mask);
             Interleave(reg0, reg1, (RegTensor<uint32_t>&)srcReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[1]);
-            vsts((RegTensor<uint32_t> &)reg0, (__ubuf__ uint32_t*)dstAddr, 0, distValue, dstMask0);
-            vsts((RegTensor<uint32_t> &)reg1, (__ubuf__ uint32_t*)dstAddr, VECTOR_REG_WIDTH / sizeof(uint32_t),
+            bisheng::cce::simd::vsts((RegTensor<uint32_t> &)reg0, (__ubuf__ uint32_t*)dstAddr, 0, distValue, dstMask0);
+            bisheng::cce::simd::vsts((RegTensor<uint32_t> &)reg1, (__ubuf__ uint32_t*)dstAddr, VECTOR_REG_WIDTH / sizeof(uint32_t),
                  distValue, dstMask1);
         }
     } else {
@@ -71,18 +71,18 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, MaskReg
             RegTensor<uint16_t> reg1;
             pintlv_b16(dstMask0, dstMask1, mask, mask);
             Interleave(reg0, reg1, (RegTensor<uint16_t>&)srcReg.reg[0], (RegTensor<uint16_t>&)srcReg.reg[1]);
-            vsts((RegTensor<uint16_t>&)reg0, (__ubuf__ uint16_t*)dstAddr, 0, distValue, dstMask0);
-            vsts((RegTensor<uint16_t>&)reg1, (__ubuf__ uint16_t*)dstAddr, VECTOR_REG_WIDTH / sizeof(uint16_t),
+            bisheng::cce::simd::vsts((RegTensor<uint16_t>&)reg0, (__ubuf__ uint16_t*)dstAddr, 0, distValue, dstMask0);
+            bisheng::cce::simd::vsts((RegTensor<uint16_t>&)reg1, (__ubuf__ uint16_t*)dstAddr, VECTOR_REG_WIDTH / sizeof(uint16_t),
                  distValue, dstMask1);
         } else {
             static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
                 "StoreAlign only support type b8/b16/b32/b64 on current device");
             if constexpr (std::is_same_v<T, bool>) {
-                vsts((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, 0, distValue, mask);
+                bisheng::cce::simd::vsts((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, 0, distValue, mask);
             } else if constexpr (SupportBytes<ActualT, 4>()) {
-                vsts((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, 0, distValue, mask);
+                bisheng::cce::simd::vsts((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, 0, distValue, mask);
             } else {
-                vsts(srcReg, dstAddr, 0, distValue, mask);
+                bisheng::cce::simd::vsts(srcReg, dstAddr, 0, distValue, mask);
             }
         }
     }
@@ -99,16 +99,16 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, U& srcReg, int32_
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
     if constexpr (SupportBytes<ActualT, 1>()) {
-        vsts((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr, postUpdateStride, distValue, mask, postValue);
+        bisheng::cce::simd::vsts((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr, postUpdateStride, distValue, mask, postValue);
     } else if constexpr (SupportBytes<ActualT, 8>()) {
         MaskReg dstMask0, dstMask1;
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-            constexpr auto lowerDist =
-                std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>();
+            constexpr auto lowerDist = 
+                std::integral_constant<HiloPart, static_cast<HiloPart>(HighLowPart::LOWEST)>();
             MaskReg tmpMask;
-            ppack(tmpMask, mask, lowerDist);
+            bisheng::cce::simd::ppack(tmpMask, mask, lowerDist);
             pintlv_b32(dstMask0, dstMask1, tmpMask, tmpMask);
-            vsts((RegTensor<uint32_t>&)srcReg, (__ubuf__ uint32_t*&)dstAddr, postUpdateStride * 2, distValue,
+            bisheng::cce::simd::vsts((RegTensor<uint32_t>&)srcReg, (__ubuf__ uint32_t*&)dstAddr, postUpdateStride * 2, distValue,
                  dstMask0, postValue);
         } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             RegTensor<uint32_t> reg0, reg1;
@@ -117,9 +117,9 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, U& srcReg, int32_
             constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(ActualT);
             uint32_t tmpStride1 = (postUpdateStride > one_repeat_num) ? one_repeat_num : postUpdateStride;
             uint32_t tmpStride2 = (postUpdateStride > one_repeat_num) ? postUpdateStride - one_repeat_num : 0;
-            vsts((RegTensor<uint32_t>&)reg0, (__ubuf__ uint32_t*&)dstAddr, tmpStride1 * 2, distValue, dstMask0,
+            bisheng::cce::simd::vsts((RegTensor<uint32_t>&)reg0, (__ubuf__ uint32_t*&)dstAddr, tmpStride1 * 2, distValue, dstMask0,
                 postValue);
-            vsts((RegTensor<uint32_t>&)reg1, (__ubuf__ uint32_t*&)dstAddr, tmpStride2 * 2, distValue, dstMask1,
+            bisheng::cce::simd::vsts((RegTensor<uint32_t>&)reg1, (__ubuf__ uint32_t*&)dstAddr, tmpStride2 * 2, distValue, dstMask1,
                 postValue);
         }
     } else {
@@ -133,21 +133,21 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, U& srcReg, int32_
             static constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(ActualT);
             uint32_t tmpStride1 = (postUpdateStride > one_repeat_num) ? one_repeat_num : postUpdateStride;
             uint32_t tmpStride2 = (postUpdateStride > one_repeat_num) ? postUpdateStride - one_repeat_num : 0;
-            vsts((RegTensor<uint16_t>&)reg0, (__ubuf__ uint16_t*&)dstAddr, tmpStride1 * 2, distValue, dstMask0,
+            bisheng::cce::simd::vsts((RegTensor<uint16_t>&)reg0, (__ubuf__ uint16_t*&)dstAddr, tmpStride1 * 2, distValue, dstMask0,
                 postValue);
-            vsts((RegTensor<uint16_t>&)reg1, (__ubuf__ uint16_t*&)dstAddr, tmpStride2 * 2, distValue, dstMask1,
+            bisheng::cce::simd::vsts((RegTensor<uint16_t>&)reg1, (__ubuf__ uint16_t*&)dstAddr, tmpStride2 * 2, distValue, dstMask1,
                 postValue);
         } else {
             static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
                 "StoreAlign only support type b8/b16/b32/b64 on current device");
             if constexpr (std::is_same_v<T, bool>) {
-                vsts((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postUpdateStride, distValue, mask,
+                bisheng::cce::simd::vsts((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postUpdateStride, distValue, mask,
                      postValue);
             } else if constexpr (SupportBytes<ActualT, 4>()) {
-                vsts((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postUpdateStride, distValue, mask,
+                bisheng::cce::simd::vsts((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postUpdateStride, distValue, mask,
                      postValue);
             } else {
-                vsts(srcReg, dstAddr, postUpdateStride, distValue, mask, postValue);
+                bisheng::cce::simd::vsts(srcReg, dstAddr, postUpdateStride, distValue, mask, postValue);
             }
         }
     }
@@ -163,23 +163,23 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, AddrReg
     CheckStoreDist<1, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     if constexpr (SupportBytes<ActualT, 1>()) {
-        vst((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, offset, distValue, mask);
+        bisheng::cce::simd::vst((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, offset, distValue, mask);
     } else {
         static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
             "StoreAlign only support type b8/b16/b32/b64 on current device");
         if constexpr (std::is_same_v<T, bool>) {
-            vst((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, offset, distValue, mask);
+            bisheng::cce::simd::vst((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, offset, distValue, mask);
         } else if constexpr (SupportBytes<T, 4>()) {
-            vst((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, offset, distValue, mask);
+            bisheng::cce::simd::vst((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, offset, distValue, mask);
         } else if constexpr (SupportBytes<T, 8>()) {
             // using b32 vst to simulate b64 vst
             MaskReg tmpMask;
             MaskReg emptyMask;
             MaskPack(tmpMask, mask);
             pintlv_b32(tmpMask, emptyMask, tmpMask, tmpMask);
-            vst((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, offset, distValue, tmpMask);
+            bisheng::cce::simd::vst((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, offset, distValue, tmpMask);
         } else {
-            vst(srcReg, dstAddr, offset, distValue, mask);
+            bisheng::cce::simd::vst(srcReg, dstAddr, offset, distValue, mask);
         }
     }
 }
@@ -194,19 +194,19 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
     CheckStoreDist<2, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     if constexpr (SupportBytes<ActualT, 1>()) {
-        vsts((RegTensor<uint8_t>&)srcReg0, (RegTensor<uint8_t>&)srcReg1, (__ubuf__ uint8_t*)dstAddr, 0, distValue,
+        bisheng::cce::simd::vsts((RegTensor<uint8_t>&)srcReg0, (RegTensor<uint8_t>&)srcReg1, (__ubuf__ uint8_t*)dstAddr, 0, distValue,
              mask);
     } else if constexpr (SupportType<ActualT, float>()) { // ccec no float signature
-        vsts((RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1, (__ubuf__ uint32_t*)dstAddr, 0, distValue,
+        bisheng::cce::simd::vsts((RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1, (__ubuf__ uint32_t*)dstAddr, 0, distValue,
              mask);
     } else {
-        static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
+        static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), 
                       "StoreAlign only support type b8/b16/b32/b64 on current device");
         if constexpr (std::is_same_v<T, bool>) {
-            vsts((RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1, (__ubuf__ int8_t*)dstAddr, 0, distValue,
+            bisheng::cce::simd::vsts((RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1, (__ubuf__ int8_t*)dstAddr, 0, distValue,
                  mask);
         } else if constexpr (SupportBytes<ActualT, 4>()) {
-            vsts((RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr, 0,
+            bisheng::cce::simd::vsts((RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr, 0,
                  distValue, mask);
         } else if constexpr (SupportBytes<T, 8>()) {
             // using b32 vst to simulate b64 vst
@@ -214,10 +214,10 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
             MaskReg emptyMask;
             MaskPack(tmpMask, mask);
             pintlv_b32(tmpMask, emptyMask, tmpMask, tmpMask);
-            vsts((RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr, 0,
+            bisheng::cce::simd::vsts((RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr, 0,
                  distValue, tmpMask);
         } else {
-            vsts(srcReg0, srcReg1, dstAddr, 0, distValue, mask);
+            bisheng::cce::simd::vsts(srcReg0, srcReg1, dstAddr, 0, distValue, mask);
         }
     }
 }
@@ -233,19 +233,19 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
     CheckStoreDist<2, dist>();
     constexpr auto distValue = std::integral_constant<::DistVST, static_cast<::DistVST>(GetStoreDist<T, dist>())>();
     if constexpr (SupportBytes<ActualT, 1>()) {
-        vst((RegTensor<uint8_t>&)srcReg0, (RegTensor<uint8_t>&)srcReg1, (__ubuf__ uint8_t*)dstAddr, offset,
+        bisheng::cce::simd::vst((RegTensor<uint8_t>&)srcReg0, (RegTensor<uint8_t>&)srcReg1, (__ubuf__ uint8_t*)dstAddr, offset,
             distValue, mask);
     } else if constexpr (SupportType<ActualT, float>()) { // ccec no float signature
-        vst((RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1, (__ubuf__ uint32_t*)dstAddr, offset,
+        bisheng::cce::simd::vst((RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1, (__ubuf__ uint32_t*)dstAddr, offset,
             distValue, mask);
     } else {
         static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(),
                       "StoreAlign only support type b8/b16/b32/b64 on current device");
         if constexpr (std::is_same_v<T, bool>) {
-            vst((RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1, (__ubuf__ int8_t*)dstAddr,
+            bisheng::cce::simd::vst((RegTensor<int8_t>&)srcReg0, (RegTensor<int8_t>&)srcReg1, (__ubuf__ int8_t*)dstAddr,
                 offset, distValue, mask);
         } else if constexpr (SupportBytes<ActualT, 4>()) {
-            vst((RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr,
+            bisheng::cce::simd::vst((RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr,
                 offset, distValue, mask);
         } else if constexpr (SupportBytes<T, 8>()) {
             // using b32 vst to simulate b64 vst
@@ -253,10 +253,10 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
             MaskReg emptyMask;
             MaskPack(tmpMask, mask);
             pintlv_b32(tmpMask, emptyMask, tmpMask, tmpMask);
-            vst((RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr,
+            bisheng::cce::simd::vst((RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr,
                 offset, distValue, tmpMask);
         } else {
-            vst(srcReg0, srcReg1, dstAddr, offset, distValue, mask);
+            bisheng::cce::simd::vst(srcReg0, srcReg1, dstAddr, offset, distValue, mask);
         }
     }
 }
@@ -270,15 +270,15 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, uint32_
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
     if constexpr (SupportBytes<ActualT, 1>()) {
-        vsstb((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, (dataBlockStride << 16u), mask);
+        bisheng::cce::simd::vsstb((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, (dataBlockStride << 16u), mask);
     } else {
         static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
         if constexpr (std::is_same_v<T, bool>) {
-            vsstb((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, (dataBlockStride << 16u), mask);
+            bisheng::cce::simd::vsstb((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, (dataBlockStride << 16u), mask);
         } else if constexpr (std::is_same_v<T, complex32>) {
-            vsstb((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, (dataBlockStride << 16u), mask);
+            bisheng::cce::simd::vsstb((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, (dataBlockStride << 16u), mask);
         } else {
-            vsstb(srcReg, dstAddr, (dataBlockStride << 16u), mask);
+            bisheng::cce::simd::vsstb(srcReg, dstAddr, (dataBlockStride << 16u), mask);
         }
     }
 }
@@ -295,19 +295,19 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, U& srcReg, uint32
         static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only suppoort RegTraitNumOne on current device!");
         if constexpr (SupportBytes<ActualT, 1>()) {
             constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
-            vsstb((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr,
+            bisheng::cce::simd::vsstb((RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr,
                   (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);
         } else {
             static_assert(SupportBytes<ActualT, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
-            constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
+            constexpr auto postValue = std::integral_constant<Post, static_cast<Post>(postMode)>();
             if constexpr (std::is_same_v<T, bool>) {
-                vsstb((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr,
+                bisheng::cce::simd::vsstb((RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr,
                     (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);
             } else if constexpr (std::is_same_v<T, complex32>) {
-                vsstb((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr,
+                bisheng::cce::simd::vsstb((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr,
                     (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);
             } else {
-                vsstb(srcReg, dstAddr, (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);
+                bisheng::cce::simd::vsstb(srcReg, dstAddr, (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);
             }
         }
     }
@@ -324,10 +324,10 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, U& srcReg,
                   "StoreUnAlign only support type b8/b16/b32/b64 on current device");
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
     if constexpr (SupportBytes<T, 1>()) {
-        vstus(ureg, postUpdateStride, (RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr, postValue);
+        bisheng::cce::simd::vstus(ureg, postUpdateStride, (RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr, postValue);
     } else if constexpr (sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-            vstus(ureg, postUpdateStride * 2, (RegTensor<uint32_t>&)srcReg, (__ubuf__ uint32_t*&)dstAddr,
+            bisheng::cce::simd::vstus(ureg, postUpdateStride * 2, (RegTensor<uint32_t>&)srcReg, (__ubuf__ uint32_t*&)dstAddr,
                   postValue);
         } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             RegTensor<uint32_t> tmp1;
@@ -335,9 +335,9 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, U& srcReg,
             Interleave(tmp1, tmp2, (RegTensor<uint32_t>&)srcReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[1]);
             constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(ActualT);
             uint32_t tmpStride1 = (postUpdateStride > one_repeat_num) ? one_repeat_num : postUpdateStride;
-            vstus(ureg, tmpStride1 * 2, tmp1, (__ubuf__ uint32_t*&)dstAddr, postValue);
+            bisheng::cce::simd::vstus(ureg, tmpStride1 * 2, tmp1, (__ubuf__ uint32_t*&)dstAddr, postValue);
             uint32_t tmpStride2 = (postUpdateStride > one_repeat_num) ? (postUpdateStride - one_repeat_num) : 0;
-            vstus(ureg, tmpStride2 * 2, tmp2, (__ubuf__ uint32_t*&)dstAddr, postValue);
+            bisheng::cce::simd::vstus(ureg, tmpStride2 * 2, tmp2, (__ubuf__ uint32_t*&)dstAddr, postValue);
         }
     } else {
         if constexpr(SupportType<ActualT, complex32>() && (CheckRegTrait<U, RegTraitNumTwo>())) {
@@ -346,16 +346,16 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, U& srcReg,
             Interleave(tmp1, tmp2, (RegTensor<uint16_t>&)srcReg.reg[0], (RegTensor<uint16_t>&)srcReg.reg[1]);
             constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(ActualT);
             uint32_t tmpStride1 = (postUpdateStride > one_repeat_num) ? one_repeat_num : postUpdateStride;
-            vstus(ureg, tmpStride1 * 2, tmp1, (__ubuf__ uint16_t*&)dstAddr, postValue);
+            bisheng::cce::simd::vstus(ureg, tmpStride1 * 2, tmp1, (__ubuf__ uint16_t*&)dstAddr, postValue);
             uint32_t tmpStride2 = (postUpdateStride > one_repeat_num) ? (postUpdateStride - one_repeat_num) : 0;
-            vstus(ureg, tmpStride2 * 2, tmp2, (__ubuf__ uint16_t*&)dstAddr, postValue);
+            bisheng::cce::simd::vstus(ureg, tmpStride2 * 2, tmp2, (__ubuf__ uint16_t*&)dstAddr, postValue);
         } else {
             if constexpr (std::is_same_v<T, bool>) {
-                vstus(ureg, postUpdateStride, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postValue);
+                bisheng::cce::simd::vstus(ureg, postUpdateStride, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postValue);
             } else if constexpr (SupportBytes<T, 4>()) {
-                vstus(ureg, postUpdateStride, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
+                bisheng::cce::simd::vstus(ureg, postUpdateStride, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
             } else {
-                vstus(ureg, postUpdateStride, srcReg, dstAddr, postValue);
+                bisheng::cce::simd::vstus(ureg, postUpdateStride, srcReg, dstAddr, postValue);
             }
         }
     }
@@ -369,32 +369,32 @@ __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf__ T*& dstAddr, Unalig
         "StoreUnAlignPost only support type b8/b16/b32/b64 on current device");
     if constexpr (SupportBytes<T, 1>()) {
         if constexpr (postMode == PostLiteral::POST_MODE_UPDATE) {
-            vstas(ureg, (__ubuf__ uint8_t*&)dstAddr, postUpdateStride, POST_UPDATE);
+            bisheng::cce::simd::vstas(ureg, (__ubuf__ uint8_t*&)dstAddr, postUpdateStride, POST_UPDATE);
         } else {
-            vstas(ureg, (__ubuf__ uint8_t*&)dstAddr, postUpdateStride);
+            bisheng::cce::simd::vstas(ureg, (__ubuf__ uint8_t*&)dstAddr, postUpdateStride);
         }
     } else if constexpr (sizeof(T) == 8) {
         if constexpr (postMode == PostLiteral::POST_MODE_UPDATE) {
-            vstas(ureg, (__ubuf__ uint32_t*&)dstAddr, postUpdateStride * 2, POST_UPDATE);
+            bisheng::cce::simd::vstas(ureg, (__ubuf__ uint32_t*&)dstAddr, postUpdateStride * 2, postValue);
         } else {
-            vstas(ureg, (__ubuf__ uint32_t*&)dstAddr, postUpdateStride * 2);
+            bisheng::cce::simd::vstas(ureg, (__ubuf__ uint32_t*&)dstAddr, postUpdateStride * 2);
         }
     } else {
         if constexpr (postMode == PostLiteral::POST_MODE_UPDATE) {
             if constexpr (std::is_same_v<T, bool>) {
-                vstas(ureg, (__ubuf__ int8_t*&)dstAddr, postUpdateStride, POST_UPDATE);
+                bisheng::cce::simd::vstas(ureg, (__ubuf__ int8_t*&)dstAddr, postUpdateStride, postValue);
             } else if constexpr (SupportBytes<T, 4>()) {
-                vstas(ureg, (__ubuf__ int32_t*&)dstAddr, postUpdateStride, POST_UPDATE);
+                bisheng::cce::simd::vstas(ureg, (__ubuf__ int32_t*&)dstAddr, postUpdateStride, postValue);
             } else {
-                vstas(ureg, dstAddr, postUpdateStride, POST_UPDATE);
+                bisheng::cce::simd::vstas(ureg, dstAddr, postUpdateStride, postValue);
             }
         } else {
             if constexpr (std::is_same_v<T, bool>) {
-                vstas(ureg, (__ubuf__ int8_t*&)dstAddr, postUpdateStride);
+                bisheng::cce::simd::vstas(ureg, (__ubuf__ int8_t*&)dstAddr, postUpdateStride);
             } else if constexpr (SupportBytes<T, 4>()) {
-                vstas(ureg, (__ubuf__ int32_t*&)dstAddr, postUpdateStride);
+                bisheng::cce::simd::vstas(ureg, (__ubuf__ int32_t*&)dstAddr, postUpdateStride);
             } else {
-                vstas(ureg, dstAddr, postUpdateStride);
+                bisheng::cce::simd::vstas(ureg, dstAddr, postUpdateStride);
             }
         }
     }
@@ -435,17 +435,17 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, U& srcReg,
     static_assert(SupportBytes<ActualT, 1, 2, 4, 8>(), "only support type b8/b16/b32/b64 on current device");
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
     if constexpr (SupportBytes<T, 1>()) {
-        vstu(ureg, areg, (RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr, postValue);
+        bisheng::cce::simd::vstu(ureg, areg, (RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*&)dstAddr, postValue);
     } else {
         if constexpr (std::is_same_v<T, bool>) {
-            vstu(ureg, areg, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postValue);
+            bisheng::cce::simd::vstu(ureg, areg, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postValue);
         } else if constexpr (SupportBytes<T, 4>()) {
-            vstu(ureg, areg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
+            bisheng::cce::simd::vstu(ureg, areg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
         } else if constexpr (SupportBytes<T, 8>()) {
-            vstu(ureg, areg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
+            bisheng::cce::simd::vstu(ureg, areg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*&)dstAddr, postValue);
         } else {
-            vstu(ureg, areg, srcReg, dstAddr, postValue);
-        }
+            bisheng::cce::simd::vstu(ureg, areg, srcReg, dstAddr, postValue);
+        }        
     }
 }
 
@@ -454,16 +454,16 @@ __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf__ T*& dstAddr, Unalig
 {
     static_assert(SupportBytes<T, 1, 2, 4, 8>(), "only support type b8/b16/b32/b64 on current device");
     if constexpr (SupportBytes<T, 1>()) {
-        vsta(ureg, (__ubuf__ uint8_t*&)dstAddr, areg);
+        bisheng::cce::simd::vsta(ureg, (__ubuf__ uint8_t*&)dstAddr, areg);
     } else {
         if constexpr (std::is_same_v<T, bool>) {
-            vsta(ureg, (__ubuf__ int8_t*&)dstAddr, areg);
+            bisheng::cce::simd::vsta(ureg, (__ubuf__ int8_t*&)dstAddr, areg);
         } else if constexpr (SupportBytes<T, 4>()) {
-            vsta(ureg, (__ubuf__ int32_t*&)dstAddr, areg);
+            bisheng::cce::simd::vsta(ureg, (__ubuf__ int32_t*&)dstAddr, areg);
         } else if constexpr (SupportBytes<T, 8>()) {
-            vsta(ureg, (__ubuf__ int32_t*&)dstAddr, areg);
+            bisheng::cce::simd::vsta(ureg, (__ubuf__ int32_t*&)dstAddr, areg);
         } else {
-            vsta(ureg, dstAddr, areg);
+            bisheng::cce::simd::vsta(ureg, dstAddr, areg);
         }
     }
 }
@@ -478,16 +478,16 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T* dstAddr, U& srcReg, 
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only support RegTraitNumOne on current device!");
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(postMode)>();
     if constexpr (SupportBytes<T, 1>()) {
-        vstur(ureg, (RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, postValue);
+        bisheng::cce::simd::vstur(ureg, (RegTensor<uint8_t>&)srcReg, (__ubuf__ uint8_t*)dstAddr, postValue);
     } else {
         if constexpr (std::is_same_v<T, bool>) {
-            vstur(ureg, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, postValue);
+            bisheng::cce::simd::vstur(ureg, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*)dstAddr, postValue);
         } else if constexpr (SupportBytes<T, 4>()) {
-            vstur(ureg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, postValue);
+            bisheng::cce::simd::vstur(ureg, (RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, postValue);
         } else if constexpr (SupportBytes<T, 8>()) {
-            vstur(ureg, (RegTensor<int64_t>&)srcReg, (__ubuf__ int64_t*)dstAddr, postValue);
+            bisheng::cce::simd::vstur(ureg, (RegTensor<int64_t>&)srcReg, (__ubuf__ int64_t*)dstAddr, postValue);
         } else {
-            vstur(ureg, srcReg, dstAddr, postValue);
+            bisheng::cce::simd::vstur(ureg, srcReg, dstAddr, postValue);
         }
     }
 }
@@ -496,16 +496,16 @@ template <typename T> __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf
 {
     static_assert(SupportBytes<T, 1, 2, 4, 8>(), "only support type b8/b16/b32/b64 on current device");
     if constexpr (SupportBytes<T, 1>()) {
-        vstar(ureg, (__ubuf__ uint8_t*)dstAddr);
+        bisheng::cce::simd::vstar(ureg, (__ubuf__ uint8_t*)dstAddr);
     } else {
         if constexpr (std::is_same_v<T, bool>) {
-            vstar(ureg, (__ubuf__ int8_t*)dstAddr);
+            bisheng::cce::simd::vstar(ureg, (__ubuf__ int8_t*)dstAddr);
         } else if constexpr (SupportBytes<T, 4>()) {
-            vstar(ureg, (__ubuf__ int32_t*)dstAddr);
+            bisheng::cce::simd::vstar(ureg, (__ubuf__ int32_t*)dstAddr);
         } else if constexpr (SupportBytes<T, 8>()) {
-            vstar(ureg, (__ubuf__ int64_t*)dstAddr);
+            bisheng::cce::simd::vstar(ureg, (__ubuf__ int64_t*)dstAddr);
         } else {
-            vstar(ureg, dstAddr);
+            bisheng::cce::simd::vstar(ureg, dstAddr);
         }
     }
 }

@@ -108,7 +108,7 @@ __simd_callee__ inline void MulsKernel(S& dstReg, S& srcReg, const U& scalarValu
     U scalarAux(scalarValue);
     Duplicate(src1Real, scalarAux.real, mask);
     Duplicate(src1Imag, scalarAux.imag, mask);
-
+ 
     RegTensor<typename ActualT::EleType>& src0Real= (RegTensor<typename ActualT::EleType>&)srcReg.reg[0];
     RegTensor<typename ActualT::EleType>& src0Imag = (RegTensor<typename ActualT::EleType>&)srcReg.reg[1];
     RegTensor<typename ActualT::EleType>& dstReal = (RegTensor<typename ActualT::EleType>&)dstReg.reg[0];
@@ -117,10 +117,10 @@ __simd_callee__ inline void MulsKernel(S& dstReg, S& srcReg, const U& scalarValu
     RegTensor<typename ActualT::EleType> f;
     RegTensor<typename ActualT::EleType> g;
     RegTensor<typename ActualT::EleType> h;
-    vmul(e, src0Real, src1Real, mask, modeValue);
-    vmul(f, src0Imag, src1Imag, mask, modeValue);
-    vmul(g, src0Imag, src1Real, mask, modeValue);
-    vmul(h, src0Real, src1Imag, mask, modeValue);
+    bisheng::cce::simd::vmul(e, src0Real, src1Real, mask, modeValue);
+    bisheng::cce::simd::vmul(f, src0Imag, src1Imag, mask, modeValue);
+    bisheng::cce::simd::vmul(g, src0Imag, src1Real, mask, modeValue);
+    bisheng::cce::simd::vmul(h, src0Real, src1Imag, mask, modeValue);
     vsub(dstReal, e, f, mask, modeValue);
     vadd(dstImag, g, h, mask, modeValue);
 }
@@ -155,7 +155,7 @@ __simd_callee__ inline void MulsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
                 B32TraitTwoToTaitOne(dstReg, traitTwoDstReg);
             }
         } else {
-            vmuls(dstReg, srcReg, scalarValue, mask, modeValue);
+            bisheng::cce::simd::vmuls(dstReg, srcReg, scalarValue, mask, modeValue);
         }
     } else {
         if constexpr(SupportType<ActualT, complex64>()) {
@@ -208,7 +208,7 @@ __simd_callee__ inline void MinsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
 {
     using ActualT = typename S::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t,
+    static_assert(SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, 
                   uint64_t, int64_t>(), "current data type is not supported on current device!");
     static_assert(SupportType<U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t,
                   int64_t>(), "current scalarValue data type is not supported on current device!");

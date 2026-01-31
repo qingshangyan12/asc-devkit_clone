@@ -23,8 +23,8 @@ __aicore__ inline void ClcSyncCount(__gm__ int32_t* localSyncGM, __ubuf__ int32_
 {
     if (isFirst) {
         *(reinterpret_cast<__ubuf__ int32_t*>(ubWorkspaceAddr)) = 1;
-        set_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
-        wait_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
+        bisheng::cce::set_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
+        bisheng::cce::wait_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
         bisheng::cce::copy_ubuf_to_gm_align_v2(static_cast<__gm__ int32_t *>(localSyncGM),
             static_cast<__ubuf__ int32_t *>(ubWorkspaceAddr),
             0,
@@ -53,7 +53,7 @@ __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__
     if ASCEND_IS_AIC {
         return;
     }
-    pipe_barrier(PIPE_ALL);
+    bisheng::cce::pipe_barrier(PIPE_ALL);
 
     int32_t totalBlocks = isAIVOnly ? get_block_num() : (GetTaskRationImpl() * get_block_num());
     totalBlocks = usedCores != 0 ? usedCores : totalBlocks;
@@ -71,13 +71,13 @@ __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__
         0,
         32,
         32);
-    set_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
-    wait_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
+    bisheng::cce::set_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
+    bisheng::cce::wait_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
     int32_t curValue = *(reinterpret_cast<__ubuf__ int32_t *>(ubWorkspaceAddr)) + 1;
     bool isFirst = curValue == 1 ? true : false;
     *(reinterpret_cast<__ubuf__ int32_t *>(ubWorkspaceAddr)) = curValue;
-    set_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
-    wait_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
+    bisheng::cce::set_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
+    bisheng::cce::wait_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
     bisheng::cce::copy_ubuf_to_gm_align_v2(static_cast<__gm__ int32_t *>(localSyncGM),
         static_cast<__ubuf__ int32_t *>(ubWorkspaceAddr),
         0,
@@ -86,8 +86,8 @@ __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__
         0,
         32,
         32);
-    set_flag(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-    wait_flag(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    bisheng::cce::set_flag(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    bisheng::cce::wait_flag(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
     int32_t totalBlockCount = ONE_BLK_FLOAT_NUM * totalBlocks;
     uint16_t blockLen = totalBlockCount / AscendCUtils::GetC0Count(sizeof(int32_t));
     while (true) {
@@ -102,11 +102,11 @@ __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__
             0,
             blockLen * 32,
             blockLen * 32);
-        set_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
-        wait_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
+        bisheng::cce::set_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
+        bisheng::cce::wait_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
         int32_t count = 0;
         ClcSyncCount(localSyncGM, ubWorkspaceAddr, blockIdx, totalBlocks, isFirst, count);
-        pipe_barrier(PIPE_ALL);
+        bisheng::cce::pipe_barrier(PIPE_ALL);
         if ((isFirst && count == (totalBlocks * curValue)) || !isFirst && count >= (totalBlocks * curValue)) {
             break;
         }
@@ -159,14 +159,14 @@ __aicore__ inline void SyncAllImpl()
                 "SyncAllConfig waitPipe only supports PIPE_MTE2, PIPE_MTE3, PIPE_ALL on current device!");
             PipeBarrier<triggerPipe>();
             if constexpr (triggerPipe == PIPE_ALL) {
-                ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
+                bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
             } else {
-                ffts_cross_core_sync(triggerPipe, GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
+                bisheng::cce::ffts_cross_core_sync(triggerPipe, GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
             }
             if constexpr (waitPipe == PIPE_ALL) {
-                wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+                bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
             } else {
-                wait_flag_dev(waitPipe, AscendC::SYNC_AIV_ONLY_ALL);
+                bisheng::cce::wait_flag_dev(waitPipe, AscendC::SYNC_AIV_ONLY_ALL);
             }
         }
         return;
@@ -176,31 +176,31 @@ __aicore__ inline void SyncAllImpl()
     // handle MIX 1:1 specifically due to loose coupled mode in david.
 #if defined(__MIX_CORE_AIC_RATION__) && __MIX_CORE_AIC_RATION__ == 1
     if ASCEND_IS_AIC {
-        wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
-        ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
-        wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-        ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+        bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+        bisheng::cce::ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
+        bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+        bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
         return;
     }
     if ASCEND_IS_AIV {
-        ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
-        wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+        bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+        bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         return;
     }
 #else
     // trans software sync to hardware sync
     if ASCEND_IS_AIC {
-        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
-        ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
-        wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-        set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
-        set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+        bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+        bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+        bisheng::cce::ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
+        bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+        bisheng::cce::set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+        bisheng::cce::set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         return;
     }
     if ASCEND_IS_AIV {
-        set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
-        wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+        bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+        bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         return;
     }
 #endif
@@ -210,10 +210,10 @@ template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
 __aicore__ inline void SetNextTaskStartImpl()
 {
     if ASCEND_IS_AIC {
-        ffts_cross_core_sync(AIC_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
+        bisheng::cce::ffts_cross_core_sync(AIC_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
     }
     if ASCEND_IS_AIV {
-        ffts_cross_core_sync(AIV_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
+        bisheng::cce::ffts_cross_core_sync(AIV_PIPE, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
     }
     return;
 }
@@ -223,27 +223,27 @@ __aicore__ inline void WaitPreTaskEndV1Impl()
 {
     if constexpr(enableTightSync){
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     }
     return;
@@ -254,80 +254,80 @@ __aicore__ inline void WaitPreTaskEndTightV2DefaultImpl()
 #if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
     if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIV) {
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIV) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIV) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     }
     return;
@@ -342,80 +342,80 @@ __aicore__ inline void WaitPreTaskEndTightV2Impl()
         WaitPreTaskEndTightV2DefaultImpl();
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIV) {
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIV) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIV) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
-            wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     }
     return;
@@ -438,72 +438,72 @@ __aicore__ inline void WaitPreTaskEndLooseV2DefaultImpl()
 #if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
     if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIV) {
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIV) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIV) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     }
     return;
@@ -518,72 +518,72 @@ __aicore__ inline void WaitPreTaskEndLooseV2Impl()
         WaitPreTaskEndLooseV2DefaultImpl();
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIV) {
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIV) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIV) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIC) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_AIV_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_FLAG);
         }
         if ASCEND_IS_AIV {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
-            ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         }
     }
     return;
@@ -618,8 +618,8 @@ template <bool isAIVOnly = true> __aicore__ inline void SuperKernelAutoSyncAllIm
     if constexpr (isAIVOnly) {
         if ASCEND_IS_AIV {
             PipeBarrier<PIPE_ALL>();
-            ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
+            bisheng::cce::ffts_cross_core_sync(PIPE_MTE3, GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));
+            bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIV_ONLY_ALL);
         }
         return;
     }
@@ -627,18 +627,18 @@ template <bool isAIVOnly = true> __aicore__ inline void SuperKernelAutoSyncAllIm
     PipeBarrier<PIPE_ALL>();
 
     if ASCEND_IS_AIC {
-        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
-        wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
-        ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
-        wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
-        set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
-        set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+        bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
+        bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
+        bisheng::cce::ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));
+        bisheng::cce::wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+        bisheng::cce::set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+        bisheng::cce::set_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
         return;
     }
     
     if ASCEND_IS_AIV {
-        set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
-        wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
+        bisheng::cce::set_intra_block(PIPE_MTE3, AscendC::SYNC_AIV_FLAG);
+        bisheng::cce::wait_intra_block(PIPE_S, AscendC::SYNC_AIC_AIV_FLAG);
         return;
     }
 }
@@ -706,23 +706,23 @@ __aicore__ inline void NotifyEventImpl(uint16_t flagId)
     if constexpr(modeId == 4) {
         if constexpr (IsSplitVectorPipe<pipe>()) {
             if ASCEND_IS_AIV {
-                set_intra_block(pipe, flagId);
+                bisheng::cce::set_intra_block(pipe, flagId);
             }
         }
         if constexpr (IsSplitCubePipe<pipe>()){
             if ASCEND_IS_AIC {
-                set_intra_block(pipe, flagId);
+                bisheng::cce::set_intra_block(pipe, flagId);
             }
         }
     } else {
         if constexpr (IsSplitVectorPipe<pipe>()) {
             if ASCEND_IS_AIV {
-                ffts_cross_core_sync(pipe, GetffstMsg(modeId, flagId));
+                bisheng::cce::ffts_cross_core_sync(pipe, GetffstMsg(modeId, flagId));
             }
         }
         if constexpr (IsSplitCubePipe<pipe>()){
             if ASCEND_IS_AIC {
-                ffts_cross_core_sync(pipe, GetffstMsg(modeId, flagId));
+                bisheng::cce::ffts_cross_core_sync(pipe, GetffstMsg(modeId, flagId));
             }
         }
     }
@@ -734,23 +734,23 @@ __aicore__ inline void WaitEventImpl(uint16_t flagId)
     if constexpr(modeId == 4) {
         if constexpr (IsSplitVectorPipe<pipe>()) {
             if ASCEND_IS_AIV {
-                wait_intra_block(pipe, flagId);
+                bisheng::cce::wait_intra_block(pipe, flagId);
             }
         }
         if constexpr (IsSplitCubePipe<pipe>()){
             if ASCEND_IS_AIC {
-                wait_intra_block(pipe, flagId);
+                bisheng::cce::wait_intra_block(pipe, flagId);
             }
         }
     } else {
         if constexpr (IsSplitVectorPipe<pipe>()) {
             if ASCEND_IS_AIV {
-                wait_flag_dev(pipe, flagId);
+                bisheng::cce::wait_flag_dev(pipe, flagId);
             }
         }
         if constexpr (IsSplitCubePipe<pipe>()){
             if ASCEND_IS_AIC {
-                wait_flag_dev(pipe, flagId);
+                bisheng::cce::wait_flag_dev(pipe, flagId);
             }
         }
     }

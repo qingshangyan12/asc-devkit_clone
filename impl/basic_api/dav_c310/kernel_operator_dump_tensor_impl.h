@@ -188,7 +188,7 @@ __aicore__ inline __ssbuf__ L12UBDumpCtrlMessage* GetDumpCtrlMsg()
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return reinterpret_cast<__ssbuf__ L12UBDumpCtrlMessage*>(ConstDefiner::Instance().cpuSSbuf);
 #else
-    return reinterpret_cast<__ssbuf__ L12UBDumpCtrlMessage*>(get_imm(0));
+    return reinterpret_cast<__ssbuf__ L12UBDumpCtrlMessage*>(bisheng::cce::get_imm(0));
 #endif
 }
 
@@ -253,15 +253,15 @@ __aicore__ inline void DumpTensorL12GMImpl(const LocalTensor<T>& tensor, uint32_
     #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         auto ubAddr = reinterpret_cast<__ubuf__ PrimType*>(ConstDefiner::Instance().cpuUB);
     #else
-        auto ubAddr = reinterpret_cast<__ubuf__ PrimType*>(get_imm(0));
+        auto ubAddr = reinterpret_cast<__ubuf__ PrimType*>(bisheng::cce::get_imm(0));
     #endif
         // L1 to UB
         DataCopyL12UBImpl(ubAddr,
             reinterpret_cast<__cbuf__ PrimType*>((__cbuf__ uint8_t*)tensor.GetPhyAddr() + idx * L1_DUMP_UB_SIZE), repeatParams);
         PipeBarrier<PIPE_ALL>(); // set_intra_block前需要保证所有流水已经执行完毕
-        set_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID); // notify vector copy UB2GM
+        bisheng::cce::set_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID); // notify vector copy UB2GM
         // 等待AIV上一次数据搬运完成
-        wait_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID);
+        bisheng::cce::wait_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID);
         needCopyLen -= copyLen;
     }
 }
@@ -282,7 +282,7 @@ __aicore__ inline void DumpTensorL0C2GMImpl(const LocalTensor<T>& tensor, __gm__
         0, n, m, m * BLOCK_CUBE, m, 0,
         0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant),
         static_cast<uint8_t>(false), false, false,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true,
+        static_cast<uint64_t>(bisheng::cce::QuantMode_post::NoConv), 0, false, false, 0, false, false, true,
         false, false, false);
 }
 
@@ -387,7 +387,7 @@ __aicore__ inline void InitTmpTensor(LocalTensor<T>& tmpLocal, uint8_t quePos)
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     tmpLocal.address_.absAddr = reinterpret_cast<uint8_t *>(ConstDefiner::Instance().cpuUB);
 #else
-    tmpLocal.address_.bufferAddr = get_imm(0);
+    tmpLocal.address_.bufferAddr = bisheng::cce::get_imm(0);
 #endif
     tmpLocal.address_.dataLen = ONE_DUMP_BACKUP_SIZE;
 }
@@ -614,8 +614,8 @@ __aicore__ inline void DumpL1TensorTransferByUB()
         // 监听是否接收到dump数据信号
         if (GetDumpCtrlMsg()->sig == ConstantsInternal::L1_2_UB_DUMP_CTRL_SIGNAL_DUMP) {
             // 等待AIC搬运完成
-            wait_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID);
-            // 刷bisheng::cce::dcci, 更新最新gm内容
+            bisheng::cce::wait_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID);
+            // 刷dcci, 更新最新gm内容
             bisheng::cce::dcci((__gm__ uint64_t*)gmAddr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
             // 重新获取len信息 避免信息老化
             uint32_t copyLen = GetDumpCtrlMsg()->len;
@@ -623,7 +623,7 @@ __aicore__ inline void DumpL1TensorTransferByUB()
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
             auto ubAddr = reinterpret_cast<__ubuf__ uint8_t*>(ConstDefiner::Instance().cpuUB);
 #else
-            auto ubAddr = reinterpret_cast<__ubuf__ uint8_t*>(get_imm(0));
+            auto ubAddr = reinterpret_cast<__ubuf__ uint8_t*>(bisheng::cce::get_imm(0));
 #endif
             // UB to GM
             PipeBarrier<PIPE_ALL>();
@@ -636,7 +636,7 @@ __aicore__ inline void DumpL1TensorTransferByUB()
             // 清除dump标志位，避免aiv误进入下一次循环，卡在wait_intra_block
             SendL12UBDumpCtrlMessage(0, 0);
             PipeBarrier<PIPE_ALL>();
-            set_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID); // notify cube core copy again
+            bisheng::cce::set_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID); // notify cube core copy again
         }
     }
 }

@@ -33,7 +33,7 @@ __simd_callee__ inline void ReduceSumImpl(S& dstReg, V srcReg, MaskReg mask)
                   "current Reduce api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr(sizeof(ActualSrcRegT) != 8) {
-        vcadd(dstReg, srcReg, mask, modeValue);
+        bisheng::cce::simd::vcadd(dstReg, srcReg, mask, modeValue);
     } else if constexpr(sizeof(ActualSrcRegT) == 8) {
         if constexpr(CheckRegTrait<V, RegTraitNumTwo>()) {
             S dstTemp;
@@ -65,10 +65,10 @@ __simd_callee__ inline void ReduceSumB64Impl(T& dstReg, T srcReg, MaskReg mask)
     Duplicate(lowReg, 0xffff);
     // srcreg[1] for high 32 bit, tmpReg1 for mid 16 bit, tmpReg0 for low 16 bit
     vand(lowReg, lowReg, (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
-    vcadd(lowReg, lowReg, mask, modeValue);
+    bisheng::cce::simd::vcadd(lowReg, lowReg, mask, modeValue);
     MicroAPI::ShiftRights(midReg, (RegTensor<uint32_t>&)srcReg.reg[0], (int16_t)16, mask);
-    vcadd(midReg, midReg, mask, modeValue);
-    vcadd((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
+    bisheng::cce::simd::vcadd(midReg, midReg, mask, modeValue);
+    bisheng::cce::simd::vcadd((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
     // add low carry to mid
     MicroAPI::ShiftRights(tmpReg, lowReg, (int16_t)16, mask);
     vadd(midReg, midReg, tmpReg, mask, modeValue);
@@ -90,7 +90,7 @@ __simd_callee__ inline void ReduceMaxImpl(U& dstReg, U srcReg, MaskReg mask)
                   "current Reduce api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr(sizeof(ActualT) != 8) {
-        vcmax(dstReg, srcReg, mask, modeValue);
+        bisheng::cce::simd::vcmax(dstReg, srcReg, mask, modeValue);
     } else {
         if constexpr(CheckRegTrait<U, RegTraitNumTwo>()) {
             U dstTemp;
@@ -158,7 +158,7 @@ __simd_callee__ inline void ReduceMinImpl(U& dstReg, U srcReg, MaskReg mask)
                   "current Reduce api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr(sizeof(ActualT) != 8) {
-        vcmin(dstReg, srcReg, mask, modeValue);
+        bisheng::cce::simd::vcmin(dstReg, srcReg, mask, modeValue);
     } else if constexpr(sizeof(ActualT) == 8) {
         if constexpr(CheckRegTrait<U, RegTraitNumTwo>()) {
             U dstTemp;
@@ -238,7 +238,7 @@ __simd_callee__ inline void ReduceMaxWithDataBlockImpl(U& dstReg, U srcReg, Mask
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
                   "current ReduceDataBlock api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vcgmax(dstReg, srcReg, mask, modeValue);
+    bisheng::cce::simd::vcgmax(dstReg, srcReg, mask, modeValue);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -251,7 +251,7 @@ __simd_callee__ inline void ReduceMinWithDataBlockImpl(U& dstReg, U srcReg, Mask
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(),
                   "current ReduceDataBlock api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vcgmin(dstReg, srcReg, mask, modeValue);
+    bisheng::cce::simd::vcgmin(dstReg, srcReg, mask, modeValue);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
