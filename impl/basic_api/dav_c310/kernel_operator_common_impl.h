@@ -147,10 +147,10 @@ __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam& che
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "CheckLocalMemoryIA is not supported on current device"); });
 }
 
-template <atomic_type_t type, atomic_op_t op>
+template <bisheng::cce::atomic_type_t type, bisheng::cce::atomic_op_t op>
 __aicore__ inline void SetStoreAtomicConfigImpl()
 {
-    set_st_atomic_cfg(type, op);
+    bisheng::cce::set_st_atomic_cfg(type, op);
 }
 
 template <SpecialPurposeReg spr>
@@ -165,7 +165,7 @@ __simd_vf__ inline void ClearARImpl()
 {
     constexpr uint8_t SPR_AR_VALUE = 74;
     constexpr auto sprValue = std::integral_constant<::Spr, static_cast<::Spr>(SPR_AR_VALUE)>();
-    sprclr(sprValue);
+    bisheng::cce::simd::sprclr(sprValue);
 }
  
 template <SpecialPurposeReg spr>

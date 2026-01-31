@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
+ 
 /* !
  * \file kernel_micro_histograms_impl.h
  * \brief
@@ -29,9 +29,9 @@ __simd_callee__ inline void HistogramsImpl(V& dstReg, S& srcReg, MaskReg& mask)
     static_assert((SupportType<ActualU, uint16_t>()), "current data type is not supported on current device!");
     auto constexpr HistogramsMode = std::integral_constant<::Bin, static_cast<::Bin>(mode)>();
     if constexpr (type == HistogramsType::FREQUENCY) {
-        dhistv2(dstReg, srcReg, mask, HistogramsMode);
+        bisheng::cce::simd::dhistv2(dstReg, srcReg, mask, HistogramsMode);
     } else if constexpr (type == HistogramsType::ACCUMULATE) {
-        chistv2(dstReg, srcReg, mask, HistogramsMode);
+        bisheng::cce::simd::chistv2(dstReg, srcReg, mask, HistogramsMode);
     }
 }
 } // namespace MicroAPI
