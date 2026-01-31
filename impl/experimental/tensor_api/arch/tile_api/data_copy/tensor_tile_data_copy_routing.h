@@ -24,7 +24,7 @@ namespace TileInternal {
 
 class DataCopyIgnore {
 public:
-    template <typename T, typename U, const DataCopyTrait& trait>
+    template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline void Run(const T& dst, const U& src) {}
 };
 
