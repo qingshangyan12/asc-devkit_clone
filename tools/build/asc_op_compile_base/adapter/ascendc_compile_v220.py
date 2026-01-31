@@ -18,7 +18,8 @@ import stat
 import subprocess
 from tbe.common.buildcfg import get_current_build_config
 from .global_storage import global_var_storage
-from .ascendc_common_utility import CommonUtility, CompileInfo, get_kernel_fun_name_with_tiling_key_and_kernel_type
+from .ascendc_common_utility import CommonUtility, CompileInfo, get_kernel_fun_name_with_tiling_key_and_kernel_type,\
+    replace_env_vars
 from .get_op_tiling import TilingInfo
 from .log_utils import CompileStage
 from .ascendc_constants import CORE_TYPE_MIX, CORE_TYPE_CUBE, CORE_TYPE_VEC, ASCENDC_OOM, KernelMetaType,\
@@ -642,7 +643,8 @@ def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
         if 'vec' in arch and params.no_kfc_server_flag:
             compile_cmd += [f"-D__NO_KFC_SERVER__"]
         CommonUtility.dump_compile_log(compile_cmd, CompileStage.INFERCHANNEL, params.compile_log_path)
-        proc = subprocess.Popen(
+        compile_cmd = [replace_env_vars(item) for item in compile_cmd]
+        proc = subprocess.Popen(	 
             compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
