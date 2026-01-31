@@ -114,7 +114,7 @@ __aicore__ inline void CheckFixpipeQuantParams()
     using srcType = typename GetTensorTraitType<U>::LiteType;
     using dstType = typename GetTensorTraitType<T>::LiteType;
     using currentType = Std::tuple<srcType, dstType>;
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101) {
         if constexpr (trait.quantPre == QuantMode_t::NoQuant) {
             using quantDataType1 = Std::tuple<float, float>;

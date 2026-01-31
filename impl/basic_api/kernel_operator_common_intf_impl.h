@@ -49,7 +49,7 @@
 #include "dav_c310/kernel_operator_common_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_set_atomic_impl.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "dav_c310/kernel_operator_set_atomic_impl.h"
 #include "dav_c310/kernel_operator_common_impl.h"
 #include "dav_c310/kernel_operator_sync_impl.h"
@@ -60,7 +60,7 @@
 #include "dav_c310/kfc/kfc_comm_client_gm.h"
 #include "dav_c310/kfc/kfc_comm_server_gm.h"
 #endif
-#if __NPU_ARCH__ == 3101
+#if __NPU_ARCH__ == 3510
 #include "dav_c310/core_mng/roc/kernel_operator_cube_group_handle_impl.h"
 #include "dav_c310/core_mng/roc/kernel_operator_group_barrier_impl.h"
 #endif
@@ -90,7 +90,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t> &gmWorkspace,
     const LocalTensor<int32_t> &ubWorkspace, int32_t blockIdx, int32_t eventID)
 {
     int32_t blockNum = GetBlockNum();
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
@@ -131,7 +131,7 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t> &gmWorkspace,
     const LocalTensor<int32_t> &ubWorkspace, int32_t blockIdx, int32_t eventID)
 {
     int32_t blockNum = GetBlockNum();
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
@@ -245,7 +245,7 @@ template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void InitOutput(GlobalTensor<T> gmWorkspaceAddr, uint32_t size, T value)
 {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
@@ -283,7 +283,7 @@ __aicore__ inline __in_pipe__(V)
 #endif
 }
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template<bool isAIVOnly, const SyncAllConfig& config>
 __aicore__ inline void SyncAll()
 {
@@ -313,7 +313,7 @@ __aicore__ inline void GetStoreAtomicConfig(uint16_t &atomicType, uint16_t &atom
     GetStoreAtomicConfigImpl(atomicType, atomicOp);
 }
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <pipe_t pipe, uint8_t subBlockSyncMode = 2>
 __aicore__ inline void NotifyEvent(uint16_t flagId)
 {
@@ -341,7 +341,7 @@ __aicore__ inline void WaitEvent(uint16_t flagId)
 }
 #endif
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <int count>
 __aicore__ inline void Nop()
 {
@@ -372,7 +372,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 template <typename T>
 __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t> &src, const T cacheOffset)
 {
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     DataCachePreloadImpl((__gm__ uint64_t*)src.GetPhyAddr(), cacheOffset);
 #else
     DataCachePreloadImpl(src, cacheOffset);
@@ -394,7 +394,7 @@ __aicore__ inline void CheckLocalMemoryIA(const CheckLocalMemoryIAParam& checkPa
     CheckLocalMemoryIAImpl(checkParams);
 }
 
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <HardEvent event, MemoryT memT, bool isVirtual> __aicore__ inline void HSetFlag(int32_t eventID)
 {
     if (g_coreType == AIV) {
@@ -412,7 +412,7 @@ template <HardEvent event, MemoryT memT, bool isVirtual> __aicore__ inline void 
 }
 #endif
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr(){
  

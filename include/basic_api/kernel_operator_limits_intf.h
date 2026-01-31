@@ -16,7 +16,7 @@
 #define ASCENDC_KERNEL_OPERATOR_LIMITS_INTF_H
 
 #include "kernel_operator_vec_duplicate_intf.h"
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 namespace AscendC {
 template <typename T>
 struct NumericLimits {

@@ -98,7 +98,7 @@ private:
         CheckNZTemplate<T>();
         CheckNZTemplate<U>();
 
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<srcType, bfloat16_t, half, float, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t>,
             "The source data type is not supported.");
 #endif
@@ -169,7 +169,7 @@ private:
         CheckNDTemplate<T>();
         CheckNDTemplate<U>();
 
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<srcType, half, bfloat16_t, float, int32_t>, "The source data type is not supported.");
 #endif
     }
@@ -255,7 +255,7 @@ private:
         CheckDNTemplate<U>();
         CheckNZTemplate<T>();
 
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<srcType, bfloat16_t, half, float, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t>,
             "The source data type is not supported.");
 #endif
@@ -379,7 +379,7 @@ private:
         CheckNDTemplate<U>();
         CheckNZTemplate<T>();
 
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<srcType, bfloat16_t, half, float, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t>,
             "The source data type is not supported.");
 #endif
