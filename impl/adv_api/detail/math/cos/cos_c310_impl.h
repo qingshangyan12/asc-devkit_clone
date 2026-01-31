@@ -119,7 +119,7 @@ __simd_callee__ inline void CosPolynomialApproximation(MicroAPI::RegTensor<float
 }
 
 template <typename T>
-__simd_vf__ inline void CosPolymonial(__ubuf__ T* dst, __ubuf__ T* src, uint32_t calCount, uint16_t repeat)
+__simd_vf__ inline void CosPolynomial(__ubuf__ T* dst, __ubuf__ T* src, uint32_t calCount, uint16_t repeat)
 {
     MicroAPI::RegTensor<T> x;
     MicroAPI::RegTensor<float> xTmp;
@@ -154,7 +154,7 @@ __aicore__ inline void CosPolynomialImpl(__ubuf__ T *dst, __ubuf__ T *src, uint3
 {
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(float);
     uint16_t repeat = CeilDivision(calCount, oneRepSize);
-    Internal::CosPolymonial<T>(dst, src, calCount, repeat);
+    Internal::CosPolynomial<T>(dst, src, calCount, repeat);
 }
 
 __aicore__ inline constexpr uint32_t GetCosTmpBufferLiveNode() {

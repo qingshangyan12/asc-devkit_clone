@@ -248,7 +248,7 @@ __aicore__ inline void LoadToA1(Intf *self, bool cachePosA1, uint64_t kaIdx, con
             }
         }
 
-        // blockcout and blockLen are associated with L1, and the risk of overflow is low
+        // blockcount and blockLen are associated with L1, and the risk of overflow is low
         uint64_t srcStride = self->ctx.hwO_ - dataCopyParams.blockLen;
         if (srcStride <= MAX_16BITS_STRIDE) {
             dataCopyParams.srcStride = srcStride;

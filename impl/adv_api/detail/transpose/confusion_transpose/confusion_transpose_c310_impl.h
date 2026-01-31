@@ -486,12 +486,12 @@ __simd_vf__ inline void ConfusionTransposeND2NZWithInlvVFImpl(__ubuf__ T* dstAdd
         dstOffset = i * regWidth * heightLoopNum * factor;
         for (uint16_t j = 0; j < heightLoopNum; j++) {
             uint64_t rowStrideAddr = uint64_t(srcAddr + srcOffset + factor * j * width);
-            uint64_t nerborStrideAddr = uint64_t(srcAddr + srcOffset + (factor * j + 1) * width);
+            uint64_t neighborStrideAddr = uint64_t(srcAddr + srcOffset + (factor * j + 1) * width);
 
             AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg0, (__ubuf__ T*&)rowStrideAddr, 1, 0, mask);
             AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
-                vSrcReg1, (__ubuf__ T*&)nerborStrideAddr, 1, 0, mask);
+                vSrcReg1, (__ubuf__ T*&)neighborStrideAddr, 1, 0, mask);
             AscendC::MicroAPI::Interleave<T>(vDstReg0, vDstReg1, vSrcReg0, vSrcReg1);
 
             uint64_t dstRowStrideAddr = uint64_t(dstAddr + dstOffset + j * c0Size);
@@ -512,7 +512,7 @@ __simd_vf__ inline void ConfusionTransposeND2NZWithInlvVFImpl(__ubuf__ T* dstAdd
         const uint32_t regWidthHalf = 128;
         for (uint16_t j = 0; j < heightLoopNum; j++) {
             uint64_t rowStrideAddr = uint64_t(srcAddr + srcOffset + factor * j * width);
-            uint64_t nerborStrideAddr = uint64_t(srcAddr + srcOffset + (factor * j + 1) * width);
+            uint64_t neighborStrideAddr = uint64_t(srcAddr + srcOffset + (factor * j + 1) * width);
             uint32_t mask_size = tailWidth * factor;
             if (tailWidth > regWidthHalf) {
                 mask_size = regWidth;
@@ -521,7 +521,7 @@ __simd_vf__ inline void ConfusionTransposeND2NZWithInlvVFImpl(__ubuf__ T* dstAdd
             AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg0, (__ubuf__ T*&)rowStrideAddr, 1, 0, mask);
             AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
-                vSrcReg1, (__ubuf__ T*&)nerborStrideAddr, 1, 0, mask);
+                vSrcReg1, (__ubuf__ T*&)neighborStrideAddr, 1, 0, mask);
             AscendC::MicroAPI::Interleave<T>(vDstReg0, vDstReg1, vSrcReg0, vSrcReg1);
 
             uint64_t dstRowStrideAddr = uint64_t(dstAddr + dstOffset + j * c0Size);

@@ -69,7 +69,7 @@ __simd_callee__ inline void FMaf(MicroAPI::RegTensor<float>& dstReg, MicroAPI::R
 __simd_callee__ inline void FMaf(MicroAPI::RegTensor<float>& dstReg, MicroAPI::RegTensor<float>& srcReg1,
     MicroAPI::RegTensor<float>& srcReg2, float scalarValue, MicroAPI::MaskReg& mask)
 {
-    // dst = src1 * src2 + scalerValue
+    // dst = src1 * src2 + scalarValue
     MicroAPI::RegTensor<float> tmpReg;
     MicroAPI::Duplicate(tmpReg, scalarValue, mask);
     FMaf(dstReg, srcReg1, srcReg2, tmpReg, mask);
@@ -565,7 +565,7 @@ __simd_vf__ inline void TrigRedFComputePImpl(__ubuf__ uint32_t *tmpBufferRegPHig
         // a = a * 0.0f + a
         MicroAPI::Duplicate(tmpF32Reg, 0.0f, mask);
         MicroAPI::FusedMulDstAdd(castReg, tmpF32Reg, castReg, mask);
-        // initilize q and r: *q = 0; r = a;
+        // initialize q and r: *q = 0; r = a;
         MicroAPI::Duplicate(regI, 0, mask);
         regR = castReg;
         // store the origin q and r in ub

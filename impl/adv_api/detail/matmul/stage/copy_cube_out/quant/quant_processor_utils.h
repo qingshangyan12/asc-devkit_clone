@@ -21,7 +21,7 @@ namespace Impl {
 namespace Detail {
     
 template <typename CType, typename AType>
-__aicore__ inline constexpr static bool IsQuantSenario()
+__aicore__ inline constexpr static bool IsQuantScenario()
 {
     using L0cT = typename GetMmDstType<AType>::Type;
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
