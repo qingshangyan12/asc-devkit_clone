@@ -44,6 +44,9 @@ __aicore__ inline void GatherMask(const LocalTensor<T>& dst, const LocalTensor<T
     const LocalTensor<U>& src1Pattern, const bool reduceMode, const uint32_t mask,
     const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
 {
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecGatherMaskInfo(dst, src0, mask, mask, gatherMaskParams, mode);
+#endif
     using DstPrimType = PrimT<T>;
     using Src1PrimType = PrimT<U>;
 #if ASCENDC_CPU_DEBUG
@@ -69,6 +72,9 @@ __aicore__ inline void GatherMask(const LocalTensor<T>& dst, const LocalTensor<T
     const uint8_t src1Pattern, const bool reduceMode, const uint32_t mask, const GatherMaskParams& gatherMaskParams,
     uint64_t& rsvdCnt)
 {
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecGatherMaskInfo(dst, src0, mask, mask, gatherMaskParams, mode);
+#endif
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecGatherMask(dst, src0, src1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt,

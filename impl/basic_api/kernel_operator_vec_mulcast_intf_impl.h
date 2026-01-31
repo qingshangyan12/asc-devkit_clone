@@ -54,6 +54,9 @@ __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &
         ASCENDC_REPORT_CHECK_ERROR("MulCast", KernelFuncType::MASK_COUNT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask, mask, repeatTime, repeatParams, isSetMask, "MulCast");
+#endif
     MulCastCalc<DstPrimType, SrcPrimType, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams);
 }
 
@@ -72,6 +75,9 @@ __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &
         ASCENDC_REPORT_CHECK_ERROR("MulCast", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask[0], mask[1], repeatTime, repeatParams, isSetMask, "MulCast");
+#endif
     MulCastCalc<DstPrimType, SrcPrimType, isSetMask>(dst, src0, src1, mask, repeatTime, repeatParams);
 }
 
@@ -83,6 +89,9 @@ __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &
     if (!CheckFuncVecBinaryDiffType(dst, src0, src1, count, "MulCast")) {
         ASCENDC_REPORT_CHECK_ERROR("MulCast", KernelFuncType::CALCOUNT_MODE);
     }
+#endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, "MulCast", count);
 #endif
     MulCastCalc(dst, src0, src1, count);
 }
