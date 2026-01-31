@@ -23,9 +23,20 @@
 #include "kernel_operator_sys_var_intf.h"
 #include "kernel_operator_swap_mem_intf.h"
 
+
 namespace AscendC {
 class TPipe;
 class KfcCommClient;
+
+enum class HF32Mode {
+    ENABLE,
+    DISABLE
+};
+
+enum class HF32TransMode {
+    NEAREST_ZERO,
+    NEAREST_EVEN
+};
 } // namespace AscendC
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
@@ -163,22 +174,40 @@ __aicore__ inline void SetMaskNorm()
 
 __aicore__ inline void SetHF32Mode(HF32Mode mode)
 {
-    SetHF32ModeImpl(mode == HF32Mode::Enable);
+    SetHF32ModeImpl(mode == AscendC::HF32Mode::ENABLE);
+}
+
+// SetHF32Mode(bool hf32Mode) has been updated, please use SetHF32Mode(HF32Mode mode) instead.
+__aicore__ inline void SetHF32Mode(bool hf32Mode)
+{
+    SetHF32ModeImpl(hf32Mode);
 }
 
 __aicore__ inline void SetHF32TransMode(HF32TransMode mode)
 {
-    SetHF32TransModeImpl(mode == HF32TransMode::Enable);
+    SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_ZERO);
+}
+
+// SetHF32TransMode(bool hf32TransMode) has been updated, please use SetHF32TransMode(HF32TransMode mode) instead.
+__aicore__ inline void SetHF32TransMode(bool hf32TransMode)
+{
+    SetHF32TransModeImpl(hf32TransMode);
 }
 
 __aicore__ inline void SetMMRowMajor()
 {
-    SetMMLayoutTransformImpl(false);
+    SetMMLayoutTransformImpl(true);
 }
 
 __aicore__ inline void SetMMColumnMajor()
 {
-    SetMMLayoutTransformImpl(true);
+    SetMMLayoutTransformImpl(false);
+}
+
+// SetMMLayoutTransform has been updated, please use SetMMRowMajor/SetMMColumnMajor instead.
+__aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode)	 
+{	 
+    SetMMLayoutTransformImpl(mmLayoutMode);
 }
 
 template <uint32_t index>

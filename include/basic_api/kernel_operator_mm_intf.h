@@ -313,6 +313,12 @@ template <typename T, typename U = PrimT<T>,
 __aicore__ inline void Fill(const LocalTensor<T> &dst,
     const InitConstValueParams<U> &initConstValueParams);
     
+// InitConstValue has been updated, please use Fill instead.
+template <typename T, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(const LocalTensor<T> &dst,
+    const InitConstValueParams<U> &initConstValueParams);
+    
 /* **************************************************************************************************
  * SetLoadDataPaddingValue                                             *
  * ************************************************************************************************* */
