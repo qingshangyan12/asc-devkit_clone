@@ -9,6 +9,6 @@
 */
 
 /*!
-* \file tensor_api_impl.h
+* \file tensor_intf.h
 * \brief
 */
