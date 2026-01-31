@@ -125,7 +125,7 @@ private:
     }
 };
 
-} // namespace ACTE
+} // namespace TILEINTERNAL
 } // namespace AscendC
 
 #endif // IMPL_TILE_API_KERNEL_TENSOR_TILE_LOAD_DATA_FOUR_DIM_3101_L1_L0B_H
