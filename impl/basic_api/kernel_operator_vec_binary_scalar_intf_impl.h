@@ -1599,8 +1599,8 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, 
-    const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+// FusedMulsCast has been updated, please use MulsCast instead.
+template <typename T0, typename T1, const BinaryConfig &config, typename T2, typename T3, typename T4>
 __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count)
 {
     using ActualT = typename T2::PrimType;

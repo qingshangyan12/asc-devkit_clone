@@ -90,6 +90,39 @@ template <typename T, typename U, bool isVecDeq = true, bool halfBlock = true>
 __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const uint32_t count);
 
+/*
+ * @ingroup CastDeq Level 0
+ * @brief Dequant from int16_t to uint8_t/int8_t
+ * @param [out] dst output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] repeatTime repeat times
+ * @param [in] repeatParams.dstBlkStride dst block stride
+ * @param [in] repeatParams.srcBlkStride src block stride
+ * @param [in] repeatParams.dstRepStride dst repeat stride
+ * @param [in] repeatParams.srcRepStride src repeat stride
+ */
+// CastDeq has been updated, please use CastDequant instead.
+template <typename T, typename U, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true>
+__aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& src,
+    const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+// CastDeq has been updated, please use CastDequant instead.
+template <typename T, typename U, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true>
+__aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& src,
+    const int32_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
+
+/*
+ * @ingroup CastDeq Level 2
+ * @brief Dequant from int16_t to uint8_t/int8_t
+ * @param [out] dst output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+// CastDeq has been updated, please use CastDequant instead.
+template <typename T, typename U, bool isVecDeq = true, bool halfBlock = true>
+__aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& src,
+    const uint32_t count);
+
 /* **************************************************************************************************
  * AddReluCast                                             *
  * ************************************************************************************************* */

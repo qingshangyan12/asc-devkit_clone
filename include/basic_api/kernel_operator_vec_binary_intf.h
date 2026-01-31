@@ -607,6 +607,49 @@ __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T
                                        const LocalTensor<T>& src1, const int32_t& count);
 
 /* **************************************************************************************************
+ * FusedMulAddRelu                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup FusedMulAddRelu Level 0
+ * @brief dst = relu(src0 * dst + src1)
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor
+ * @param [in] src1 input LocalTensor
+ * @param [in] mask[]/mask mask array/count
+ * @param [in] repeatTime repeat times
+ * @param [in] repeatParams.dstBlkStride dst block stride
+ * @param [in] repeatParams.src0BlkStride src0 block stride
+ * @param [in] repeatParams.src1BlkStride src1 block stride
+ * @param [in] repeatParams.dstRepStride dst repeat stride
+ * @param [in] repeatParams.src0RepStride src0 repeat stride
+ * @param [in] repeatParams.src1RepStride src1 repeat stride
+ */
+// FusedMulAddRelu has been updated, please use MulAddRelu instead.
+template <typename T, bool isSetMask = true>
+__aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
+                                       const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
+                                       const BinaryRepeatParams& repeatParams);
+
+// FusedMulAddRelu has been updated, please use MulAddRelu instead.
+template <typename T, bool isSetMask = true>
+__aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
+                                       const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
+                                       const BinaryRepeatParams& repeatParams);
+
+/*
+ * @ingroup FusedMulAddRelu Level 2
+ * @brief dst = relu(src0 * dst + src1)
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor
+ * @param [in] src1 input LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+// FusedMulAddRelu has been updated, please use MulAddRelu instead.
+template <typename T>
+__aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
+                                       const LocalTensor<T>& src1, const int32_t& count);
+
+/* **************************************************************************************************
  * SubRelu                                             *
  * ************************************************************************************************* */
 /*
@@ -687,6 +730,22 @@ __aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &s
     const LocalTensor<T> &src1, const uint32_t count);
 
 /* **************************************************************************************************
+ * FusedAbsSub                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup FusedAbsSub Level 2
+ * @brief dst = abs(src0 - src1)
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor
+ * @param [in] src1 input LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+// FusedAbsSub has been updated, please use AbsSub instead.
+template <typename T>
+__aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
+    const LocalTensor<T> &src1, const uint32_t count);
+
+/* **************************************************************************************************
  * FusedExpSub                                             *
  * ************************************************************************************************* */
 /*
@@ -697,8 +756,24 @@ __aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &s
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
+// FusedExpSub has been updated, please use ExpSub instead.
 template <typename T, typename U>
 __aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
+    const LocalTensor<U> &src1, const uint32_t count);
+
+/* **************************************************************************************************
+ * ExpSub                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup ExpSub Level 2
+ * @brief when T is float : dst = e^(src0 - src1); when T is half : dst = e^(cast_f16_to_f32(src0) - cast_f16_to_f32(src1))
+ * @param [out] dst output LocalTensor
+ * @param [in] src0 input LocalTensor
+ * @param [in] src1 input LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+template <typename T, typename U>
+__aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
     const LocalTensor<U> &src1, const uint32_t count);
 #endif
 }  // namespace AscendC
