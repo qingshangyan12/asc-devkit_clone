@@ -42,22 +42,22 @@ TEST_F(TestFfts, MIXFftsCaseMode0)
     memset_s(ffts_addr, fftsCounterSize, 0, fftsCounterSize);
     set_ffts_base_addr(reinterpret_cast<uint64_t>(ffts_addr));
     AscendC::CheckBlockdimForFfts(1);
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
     EXPECT_EQ(AscendC::g_syncCounterFfts[72][3], 0);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[72][3], 1);
-    wait_flag_dev(PIPE_MTE3, 0x3l);
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[72][3], 0);
     g_coreType = 2;
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
     sub_block_idx = 1;
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
     EXPECT_EQ(AscendC::g_syncCounterFfts[0][3], 0);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[0][3], 1);
     sub_block_idx = 0;
-    wait_flag_dev(PIPE_MTE3, 0x3l);
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[0][3], 0);
     sub_block_idx = 1;
-    wait_flag_dev(PIPE_MTE3, 0x3l);
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[1][3], 0);
     AscendC::GmFree((void*)AscendC::g_syncCounterFfts);
 }
@@ -72,10 +72,10 @@ TEST_F(TestFfts, AICFftsCaseMode0)
     memset_s(ffts_addr, fftsCounterSize, 0, fftsCounterSize);
     set_ffts_base_addr(reinterpret_cast<uint64_t>(ffts_addr));
     AscendC::CheckBlockdimForFfts(1);
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
     EXPECT_EQ(AscendC::g_syncCounterFfts[72][3], 0);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[72][3], 1);
-    wait_flag_dev(PIPE_MTE3, static_cast<uint16_t>(0x3));
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, static_cast<uint16_t>(0x3));
     EXPECT_EQ(AscendC::g_syncCounterEachcore[72][3], 0);
     AscendC::GmFree((void*)AscendC::g_syncCounterFfts);
     AscendC::SetKernelMode(KernelMode::MIX_MODE);
@@ -91,10 +91,10 @@ TEST_F(TestFfts, AIVFftsCaseMode0)
     memset_s(ffts_addr, fftsCounterSize, 0, fftsCounterSize);
     set_ffts_base_addr(reinterpret_cast<uint64_t>(ffts_addr));
     AscendC::CheckBlockdimForFfts(1);
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x301);
     EXPECT_EQ(AscendC::g_syncCounterFfts[0][3], 0);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[0][3], 1);
-    wait_flag_dev(PIPE_MTE3, 0x3l);
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[0][3], 0);
     AscendC::GmFree((void*)AscendC::g_syncCounterFfts);
     AscendC::SetKernelMode(KernelMode::MIX_MODE);
@@ -110,19 +110,19 @@ TEST_F(TestFfts, FftsCaseMode1)
     AscendC::CheckBlockdimForFfts(1);
     g_coreType = 2;
     sub_block_idx = 0;
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x311);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x311);
     EXPECT_EQ(AscendC::g_syncCounterFfts[0][3], 1);
     sub_block_idx = 1;
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x311);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x311);
     EXPECT_EQ(AscendC::g_syncCounterFfts[0][3], 0);
     EXPECT_EQ(AscendC::g_syncCounterFfts[1][3], 0);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[0][3], 1);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[1][3], 1);
     sub_block_idx = 0;
-    wait_flag_dev(PIPE_MTE3, 0x3l);
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[0][3], 0);
     sub_block_idx = 1;
-    wait_flag_dev(PIPE_MTE3, 0x3l);
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[1][3], 0);
     AscendC::GmFree((void*)AscendC::g_syncCounterFfts);
 }
@@ -143,28 +143,28 @@ TEST_F(TestFfts, FftsCaseMode2)
     g_kernelMode = KernelMode::MIX_MODE;
 
     AscendC::CheckBlockdimForFfts(1);
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x321);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x321);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[0][3], 1);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[1][3], 1);
     g_coreType = 2;
     sub_block_idx = 0;
-    wait_flag_dev(PIPE_MTE3, 0x3l);
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[0][3], 0);
     sub_block_idx = 1;
-    wait_flag_dev(PIPE_MTE3, 0x3l);
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[1][3], 0);
     sub_block_idx = 0;
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x321);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x321);
     EXPECT_EQ(AscendC::g_syncCounterFfts[0][3], 1);
     EXPECT_EQ(AscendC::g_syncCounterFfts[72][3], 0);
     sub_block_idx = 1;
-    ffts_cross_core_sync(static_cast<pipe_t>(0), 0x321);
+    bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x321);
     EXPECT_EQ(AscendC::g_syncCounterFfts[0][3], 0);
     EXPECT_EQ(AscendC::g_syncCounterFfts[1][3], 0);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[72][3], 1);
     sub_block_idx = 0;
     g_coreType = 1;
-    wait_flag_dev(PIPE_MTE3, 0x3l);
+    bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
     EXPECT_EQ(AscendC::g_syncCounterEachcore[72][3], 0);
     AscendC::GmFree((void*)AscendC::g_syncCounterFfts);
 }
@@ -190,7 +190,7 @@ TEST_F(TestFfts, MultiProcessTest)
     } else if (pid1 == 0) {
         g_coreType = 2;
         sub_block_idx = 0;
-        wait_flag_dev(PIPE_MTE3, 0x3l);
+        bisheng::cce::wait_flag_dev(PIPE_MTE3, 0x3l);
         exit(0);
     }
     
@@ -200,7 +200,7 @@ TEST_F(TestFfts, MultiProcessTest)
     } else if (pid2 == 0) {
         g_coreType = 1;
         sub_block_idx = 0;
-        ffts_cross_core_sync(static_cast<pipe_t>(0), 0x321);
+        bisheng::cce::ffts_cross_core_sync(static_cast<pipe_t>(0), 0x321);
         exit(0);
     }
 

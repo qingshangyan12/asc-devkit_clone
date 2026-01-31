@@ -362,7 +362,7 @@ __simd_callee__ inline void MulImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
         }
     } else {
         constexpr auto modeValue = GetMaskMergeMode<mode>();
-        vmul(dstReg, srcReg0, srcReg1, mask, modeValue);
+        bisheng::cce::simd::vmul(dstReg, srcReg0, srcReg1, mask, modeValue);
     }
 }
 
@@ -371,19 +371,19 @@ __simd_callee__ inline void AbsUsingS32(T& dstReg, T& srcReg0, MaskReg& mask)
 {
     RegTensor<int32_t, RegTraitNumOne> vTmp1, vTmp2, vTmp3;
     MaskReg carry0, carry1, carry2;
-    vbr(vTmp1, 0);
+    bisheng::cce::simd::vbr(vTmp1, 0);
     vcmp_lt(carry0, (RegTensor<int32_t>&)srcReg0.reg[1], vTmp1, mask);
     vsubc(carry1, vTmp2, vTmp1, (RegTensor<int32_t>&)srcReg0.reg[0], carry0);
     vsubcs(carry2, vTmp3, vTmp1, (RegTensor<int32_t>&)srcReg0.reg[1], carry1, carry0);
-    vsel((RegTensor<int32_t>&)dstReg.reg[0], vTmp2, (RegTensor<int32_t>&)srcReg0.reg[0], carry0);
-    vsel((RegTensor<int32_t>&)dstReg.reg[1], vTmp3, (RegTensor<int32_t>&)srcReg0.reg[1], carry0);
+    bisheng::cce::simd::vsel((RegTensor<int32_t>&)dstReg.reg[0], vTmp2, (RegTensor<int32_t>&)srcReg0.reg[0], carry0);
+    bisheng::cce::simd::vsel((RegTensor<int32_t>&)dstReg.reg[1], vTmp3, (RegTensor<int32_t>&)srcReg0.reg[1], carry0);
 }
 
 template <typename T>
 __simd_callee__ inline void VbrUsingU32(T& dstReg, uint32_t highScalr, uint32_t lowScalar)
 {
-    vbr((RegTensor<uint32_t>&)dstReg.reg[0], highScalr);
-    vbr((RegTensor<uint32_t>&)dstReg.reg[1], lowScalar);
+    bisheng::cce::simd::vbr((RegTensor<uint32_t>&)dstReg.reg[0], highScalr);
+    bisheng::cce::simd::vbr((RegTensor<uint32_t>&)dstReg.reg[1], lowScalar);
 }
 
 template <typename T, typename U>
@@ -392,12 +392,12 @@ __simd_callee__ inline void VcvtS642F32(T& vDst, U& vSrc)
     RegTensor<float, RegTraitNumOne> vDummy, vVcvt0Tmp1, vVcvt0Tmp2;
     RegTensor<int64_t, RegTraitNumTwo> vVcvt0Tmp0;
 
-    vintlv((RegTensor<int32_t>&)vVcvt0Tmp0.reg[0], (RegTensor<int32_t>&)vVcvt0Tmp0.reg[1],
+    bisheng::cce::simd::vintlv((RegTensor<int32_t>&)vVcvt0Tmp0.reg[0], (RegTensor<int32_t>&)vVcvt0Tmp0.reg[1],
            (RegTensor<int32_t>&)vSrc.reg[0], (RegTensor<int32_t>&)vSrc.reg[1]);
-    MaskReg maskTmp = pset_b32(PAT_ALL);
-    vcvt(vVcvt0Tmp1, (RegTensor<int64_t>&)vVcvt0Tmp0.reg[0], maskTmp, ROUND_R, PART_EVEN);
-    vcvt(vVcvt0Tmp2, (RegTensor<int64_t>&)vVcvt0Tmp0.reg[1], maskTmp, ROUND_R, PART_EVEN);
-    vdintlv(vDst, vDummy, vVcvt0Tmp1, vVcvt0Tmp2);
+    MaskReg maskTmp = bisheng::cce::simd::pset_b32(PAT_ALL);
+    bisheng::cce::simd::vcvt(vVcvt0Tmp1, (RegTensor<int64_t>&)vVcvt0Tmp0.reg[0], maskTmp, ROUND_R, PART_EVEN);
+    bisheng::cce::simd::vcvt(vVcvt0Tmp2, (RegTensor<int64_t>&)vVcvt0Tmp0.reg[1], maskTmp, ROUND_R, PART_EVEN);
+    bisheng::cce::simd::vdintlv(vDst, vDummy, vVcvt0Tmp1, vVcvt0Tmp2);
 }
 
 template <typename T, typename U>
@@ -405,19 +405,19 @@ __simd_callee__ inline void VcvtF322S64(T& vDst, U& vSrc)
 {
     RegTensor<int64_t, RegTraitNumOne> vVcvt1Tmp0, vVcvt1Tmp1;
     RegTensor<float, RegTraitNumOne> vVcvt1Tmp2, vVcvt1Tmp3;
-    vintlv(vVcvt1Tmp2, vVcvt1Tmp3, (RegTensor<float>&)vSrc, (RegTensor<float>&)vSrc);
-    MaskReg maskTmp = pset_b32(PAT_ALL);
-    vcvt(vVcvt1Tmp0, vVcvt1Tmp2, maskTmp, ROUND_Z, RS_DISABLE, PART_EVEN);
-    vcvt(vVcvt1Tmp1, vVcvt1Tmp3, maskTmp, ROUND_Z, RS_DISABLE, PART_EVEN);
-    vdintlv((RegTensor<int32_t>&)vDst.reg[0], (RegTensor<int32_t>&)vDst.reg[1],
+    bisheng::cce::simd::vintlv(vVcvt1Tmp2, vVcvt1Tmp3, (RegTensor<float>&)vSrc, (RegTensor<float>&)vSrc);
+    MaskReg maskTmp = bisheng::cce::simd::pset_b32(PAT_ALL);
+    bisheng::cce::simd::vcvt(vVcvt1Tmp0, vVcvt1Tmp2, maskTmp, ROUND_Z, RS_DISABLE, PART_EVEN);
+    bisheng::cce::simd::vcvt(vVcvt1Tmp1, vVcvt1Tmp3, maskTmp, ROUND_Z, RS_DISABLE, PART_EVEN);
+    bisheng::cce::simd::vdintlv((RegTensor<int32_t>&)vDst.reg[0], (RegTensor<int32_t>&)vDst.reg[1],
             (RegTensor<int32_t>&)vVcvt1Tmp0, (RegTensor<int32_t>&)vVcvt1Tmp1);
 }
 
 template <typename T>
 __simd_callee__ inline void VnotInPlace(T& vReg, MaskReg& mask)
 {
-    vnot((RegTensor<uint32_t>&)vReg.reg[0], (RegTensor<uint32_t>&)vReg.reg[0], mask, MODE_ZEROING);
-    vnot((RegTensor<uint32_t>&)vReg.reg[1], (RegTensor<uint32_t>&)vReg.reg[1], mask, MODE_ZEROING);
+    bisheng::cce::simd::vnot((RegTensor<uint32_t>&)vReg.reg[0], (RegTensor<uint32_t>&)vReg.reg[0], mask, MODE_ZEROING);
+    bisheng::cce::simd::vnot((RegTensor<uint32_t>&)vReg.reg[1], (RegTensor<uint32_t>&)vReg.reg[1], mask, MODE_ZEROING);
 }
 
 template <typename T, typename U, typename S>
@@ -463,9 +463,9 @@ __simd_callee__ inline void B128Calc(T& vSrc0, U& vSrc1, S& vSrc2, MaskReg& mask
 template <typename T, typename U, typename S>
 __simd_callee__ inline void VselUsingU32(T& vDst, U& vSrc0, S& vSrc1, MaskReg& mask)
 {
-    vsel((RegTensor<uint32_t>&)vDst.reg[0], (RegTensor<uint32_t>&)vSrc0.reg[0],
+    bisheng::cce::simd::vsel((RegTensor<uint32_t>&)vDst.reg[0], (RegTensor<uint32_t>&)vSrc0.reg[0],
          (RegTensor<uint32_t>&)vSrc1.reg[0], mask);
-    vsel((RegTensor<uint32_t>&)vDst.reg[1], (RegTensor<uint32_t>&)vSrc0.reg[1],
+    bisheng::cce::simd::vsel((RegTensor<uint32_t>&)vDst.reg[1], (RegTensor<uint32_t>&)vSrc0.reg[1],
          (RegTensor<uint32_t>&)vSrc1.reg[1], mask);
 }
 
@@ -485,7 +485,7 @@ __simd_callee__ inline void VcmpGeUsingU32(MaskReg& Dst, T& vSrc0, U& vSrc1, Mas
     vcmp_eq(highEq, (RegTensor<uint32_t>&)vSrc0.reg[1], (RegTensor<uint32_t>&)vSrc1.reg[1], Src);
     vcmp_ge(lowCmp, (RegTensor<uint32_t>&)vSrc0.reg[0], (RegTensor<uint32_t>&)vSrc1.reg[0], Src);
     vcmp_ge(highCmp, (RegTensor<uint32_t>&)vSrc0.reg[1], (RegTensor<uint32_t>&)vSrc1.reg[1], Src);
-    psel(Dst, lowCmp, highCmp, highEq);
+    bisheng::cce::simd::psel(Dst, lowCmp, highCmp, highEq);
 }
 
 template <typename T, typename U, typename S>
@@ -515,15 +515,15 @@ __simd_callee__ inline void DivSignCal(MaskReg& signResP, T& vSrc0, U& vSrc1, S&
     vcmp_ge(src0Ge0P, (RegTensor<int32_t>&)vSrc0.reg[1], (RegTensor<int32_t>&)vSrc2, mask);
     vcmp_ge(src1Ge0P, (RegTensor<int32_t>&)vSrc1.reg[1], (RegTensor<int32_t>&)vSrc2, mask);
     pxor(signResP, src0Ge0P, src1Ge0P, mask);
-    pnot(signResP, signResP, mask);
+    bisheng::cce::simd::pnot(signResP, signResP, mask);
 }
 
 template<typename T, typename U, typename S>
 __simd_callee__ inline void F32PreProcess(T& vTmp4, U& vTmp3, S& vTmp2, MaskReg& mask)
 {
     constexpr uint32_t divF32Bias = 0x1FFFFFFEU;
-    vbr(vTmp3, static_cast<float>(1));
-    vdiv(vTmp3, vTmp3, vTmp2, mask, MODE_ZEROING);
+    bisheng::cce::simd::vbr(vTmp3, static_cast<float>(1));
+    bisheng::cce::simd::vdiv(vTmp3, vTmp3, vTmp2, mask, MODE_ZEROING);
     vadds(vTmp4, (RegTensor<uint32_t>&)vTmp3, divF32Bias, mask);
 }
 
@@ -543,10 +543,10 @@ __simd_callee__ inline void DivS64Impl(T& dstReg, T& srcReg0, T& srcReg1, MaskRe
     VbrUsingU32(qZero, u32MaxNum, u32MaxNum);
     VbrUsingU32(vConstDup1, static_cast<uint32_t>(1), static_cast<uint32_t>(0));
     VcmpEqUsingU32( zeroMask, srcReg1, vConstDup0, mask);
-    pnot( nonZeroMask,  zeroMask, mask);
+    bisheng::cce::simd::pnot( nonZeroMask,  zeroMask, mask);
     mask =  nonZeroMask;
     VcmpEqUsingU32(oneMask, vAbsSrc1, vConstDup1, mask);
-    pnot(nonOneMask, oneMask, mask);
+    bisheng::cce::simd::pnot(nonOneMask, oneMask, mask);
     oriMask = mask;
     pand(mask, nonOneMask,  nonZeroMask, mask);
     VcvtS642F32(vTmp2, vAbsSrc1);
@@ -555,7 +555,7 @@ __simd_callee__ inline void DivS64Impl(T& dstReg, T& srcReg0, T& srcReg1, MaskRe
     VmulUsingU32(vTmp6, vAbsSrc1, vTmp5, mask);
     VnotInPlace(vTmp6, mask);
     AddB64Impl(vTmp6, vTmp6, vConstDup1, mask);
-    vbr(vTmp4, 0);
+    bisheng::cce::simd::vbr(vTmp4, 0);
     B128Calc(vTmp5, vTmp6, vTmp4, mask);
     VaddUsingU32(vTmp7, vTmp5, vTmp6, mask);
     VmulUsingU32(vTmp6, vAbsSrc1, vTmp7, mask);
@@ -577,7 +577,7 @@ __simd_callee__ inline void DivS64Impl(T& dstReg, T& srcReg0, T& srcReg1, MaskRe
     VselUsingU32(vTmp6, vAbsSrc0, vTmp6, oneMask);
     mask = oriMask;
     DivSignCal(signResP, srcReg0, srcReg1, vTmp4, mask);
-    MaskReg pg1 = pset_b32(PAT_ALL);
+    MaskReg pg1 = bisheng::cce::simd::pset_b32(PAT_ALL);
     VsubUsingU32(vTmp8, vConstDup0, vTmp6, pg1);
     VselUsingU32(vTmp6, vTmp6, vTmp8, signResP);
     VselUsingU32(dstReg, qZero, vTmp6,  zeroMask);
@@ -598,25 +598,25 @@ __simd_callee__ inline void DivU64Impl(T &dstReg, T &srcReg0, T &srcReg1, MaskRe
     VbrUsingU32(qZero, u32MaxNum, u32MaxNum);
     VbrUsingU32(vConstDup1, static_cast<uint32_t>(1), static_cast<uint32_t>(0));
     VcmpEqUsingU32( zeroMask, srcReg1, vConstDup0, mask);
-    pnot( nonZeroMask,  zeroMask, mask);
+    bisheng::cce::simd::pnot( nonZeroMask,  zeroMask, mask);
     mask =  nonZeroMask;
     vAbsSrc0 = srcReg0;
-    vmov((RegTensor<int32_t> &)vAbsSrc1.reg[0], (RegTensor<int32_t> &)srcReg1.reg[0]);
-    vmov((RegTensor<int32_t> &)vAbsSrc1.reg[1], (RegTensor<int32_t> &)srcReg1.reg[1]);
+    bisheng::cce::simd::vmov((RegTensor<int32_t> &)vAbsSrc1.reg[0], (RegTensor<int32_t> &)srcReg1.reg[0]);
+    bisheng::cce::simd::vmov((RegTensor<int32_t> &)vAbsSrc1.reg[1], (RegTensor<int32_t> &)srcReg1.reg[1]);
     constexpr uint64_t vdivU64Const = 0x7FFFFFFFFFFFFFFFULL;
     CompareScalar<uint64_t, CMPMODE::GT, T>(uSrc1Mask, srcReg1, vdivU64Const, mask);
     Compare<uint64_t, CMPMODE::GE, T>(srcCmpMask, srcReg0, srcReg1, mask);
     pand(cmpDivMask, srcCmpMask, uSrc1Mask, mask);
     Select<uint64_t, T>(vResQ, vConstDup1, vConstDup0, cmpDivMask);
-    cmpDivMask = pset_b32(PAT_ALLF);
-    srcCmpMask = pset_b32(PAT_ALLF);
+    cmpDivMask = bisheng::cce::simd::pset_b32(PAT_ALLF);
+    srcCmpMask = bisheng::cce::simd::pset_b32(PAT_ALLF);
     Compare<uint64_t, CMPMODE::LT, T>(srcCmpMask, srcReg0, srcReg1, mask);
     pand(cmpDivMask, srcCmpMask, uSrc1Mask, mask);
     Select<uint64_t, T>(vResQ, vConstDup0, vConstDup1, cmpDivMask);
     CompareScalar<uint64_t, CMPMODE::LE, T>(sDivMask, srcReg1, vdivU64Const, mask);
     mask = sDivMask;
     VcmpEqUsingU32(oneMask, vAbsSrc1, vConstDup1, mask);
-    pnot(nonOneMask, oneMask, mask);
+    bisheng::cce::simd::pnot(nonOneMask, oneMask, mask);
     pand(mask, nonOneMask,  nonZeroMask, mask);
     VcvtS642F32(vTmp2, vAbsSrc1);
     F32PreProcess(vTmp4, vTmp3, vTmp2, mask);
@@ -624,7 +624,7 @@ __simd_callee__ inline void DivU64Impl(T &dstReg, T &srcReg0, T &srcReg1, MaskRe
     VmulUsingU32(vTmp6, vAbsSrc1, vTmp5, mask);
     VnotInPlace(vTmp6, mask);
     AddB64Impl(vTmp6, vTmp6, vConstDup1, mask);
-    vbr(vTmp4, 0);
+    bisheng::cce::simd::vbr(vTmp4, 0);
     B128Calc(vTmp5, vTmp6, vTmp4, mask);
     VaddUsingU32(vTmp7, vTmp5, vTmp6, mask);
     VmulUsingU32(vTmp6, vAbsSrc1, vTmp7, mask);
@@ -851,11 +851,11 @@ __simd_callee__ inline void DivPrecisionImpl(U& dstReg, U& srcReg0, U& srcReg1, 
 
     // a = fma(a, temp_b, x1)  // a = a + temp_b*x1, high precision fma instr is required.
     // temp_mask = vcmp(a, a, "eq", "bit")
-    // temp_a = vsel(temp_mask, a, one_temp)
+    // temp_a = bisheng::cce::simd::vsel(temp_mask, a, one_temp)
     // e = div(temp_a, b)
 
     // x = x1 + e
-    // x = vsel(inf_nan_cmp_mask, x1, x)
+    // x = bisheng::cce::simd::vsel(inf_nan_cmp_mask, x1, x)
     constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(mode);
     constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
     constexpr uint32_t infNanBound = 0xff800000u;
@@ -869,16 +869,16 @@ __simd_callee__ inline void DivPrecisionImpl(U& dstReg, U& srcReg0, U& srcReg1, 
     MaskReg infNanCmp;
     MaskReg zeroCmp;
     MaskReg preg;
-    preg = pset_b8(PAT_ALL);
-    vdup((vector_u32&)regNegZero, signBitNum, preg, modeValue);
-    vdiv(z, srcReg0, srcReg1, mask, modeValue);
+    preg = bisheng::cce::simd::pset_b8(PAT_ALL);
+    bisheng::cce::simd::vdup((vector_u32&)regNegZero, signBitNum, preg, modeValue);
+    bisheng::cce::simd::vdiv(z, srcReg0, srcReg1, mask, modeValue);
     vor(infNan, (vector_u32&)z, (vector_u32&)regNegZero, mask, modeValue);
     tmpDst = z;
     vcmps_eq(zeroCmp, z, 0.0f, mask);
     vcmps_ge(infNanCmp, infNan, infNanBound, mask);
     por(infNanCmp, infNanCmp, zeroCmp, mask);
 
-    vmuls(y, srcReg1, -1.0f, mask, modeValue);
+    bisheng::cce::simd::vmuls(y, srcReg1, -1.0f, mask, modeValue);
     r = srcReg0;
     vmula(r, z, y, mask, modeValue);
     RegTensor<T> rPre, rNext, zPre, zNext;
@@ -892,16 +892,16 @@ __simd_callee__ inline void DivPrecisionImpl(U& dstReg, U& srcReg0, U& srcReg1, 
     vmula(rPre, zPre, y, mask, modeValue);
     vmula(rNext, zNext, y, mask, modeValue);
 
-    vabs(r, r, mask, modeValue);
-    vabs(rPre, rPre, mask, modeValue);
-    vabs(rNext, rNext, mask, modeValue);
+    bisheng::cce::simd::vabs(r, r, mask, modeValue);
+    bisheng::cce::simd::vabs(rPre, rPre, mask, modeValue);
+    bisheng::cce::simd::vabs(rNext, rNext, mask, modeValue);
     vcmp_lt(cmpMaskReg, r, rPre, mask);
-    vsel(r, r, rPre, cmpMaskReg);
-    vsel(z, z, zPre, cmpMaskReg);
+    bisheng::cce::simd::vsel(r, r, rPre, cmpMaskReg);
+    bisheng::cce::simd::vsel(z, z, zPre, cmpMaskReg);
 
     vcmp_lt(cmpMaskReg, rNext, r, mask);
-    vsel(z, zNext, z, cmpMaskReg);
-    vsel(dstReg, tmpDst, z, infNanCmp);
+    bisheng::cce::simd::vsel(z, zNext, z, cmpMaskReg);
+    bisheng::cce::simd::vsel(dstReg, tmpDst, z, infNanCmp);
 }
 
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U, bool is0ULP>
@@ -1025,7 +1025,7 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     } else {
         constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(MaskMergeMode::ZEROING);
         constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-        vdiv(dst, src0Norm, src1Norm, mask, modeValue);
+        bisheng::cce::simd::vdiv(dst, src0Norm, src1Norm, mask, modeValue);
     }
 
     // subnormal dividend, normal divisor
@@ -1243,7 +1243,7 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
 
     constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(MaskMergeMode::ZEROING);
     constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    vdiv(dst, src0Norm, src1Norm, mask, modeValue);
+    bisheng::cce::simd::vdiv(dst, src0Norm, src1Norm, mask, modeValue);
 
     // subnormal dividend, normal divisor
     MaskAnd(mask0, maskSrc0Subormal, maskSrc1Normal, mask);
@@ -1388,7 +1388,7 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
         if constexpr (sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
             DivIEEE754HalfImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
         } else {
-            vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
+            bisheng::cce::simd::vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
         }
     } else if constexpr (SupportType<ActualT, float>()) {
         if constexpr (sprMode.precisionMode) {
@@ -1405,11 +1405,11 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
             } else if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE) {
                 DivPrecisionImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
             } else {
-                vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
+                bisheng::cce::simd::vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
             }
         }
     } else {
-        vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
+        bisheng::cce::simd::vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
     }
 }
 
@@ -1420,7 +1420,7 @@ __simd_callee__ inline void MaxOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskR
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
         if constexpr (sizeof(ActualT) < 8) {
-            vmax(dstReg, srcReg0, srcReg1, mask, modeValue);
+            bisheng::cce::simd::vmax(dstReg, srcReg0, srcReg1, mask, modeValue);
         } else if constexpr (sizeof(ActualT) == 8) {
             MaskReg maskTrait2;
             MaskPack(maskTrait2, mask);
@@ -1472,7 +1472,7 @@ __simd_callee__ inline void MinOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskR
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
         if constexpr (sizeof(ActualT) < 8) {
-            vmin(dstReg, srcReg0, srcReg1, mask, modeValue);
+            bisheng::cce::simd::vmin(dstReg, srcReg0, srcReg1, mask, modeValue);
         } else if constexpr (sizeof(ActualT) == 8) {
             MaskReg maskTrait2;
             MaskPack(maskTrait2, mask);
@@ -1832,7 +1832,7 @@ __simd_callee__ inline void MullImpl(U& dstReg0, U& dstReg1, U& srcReg0, U& srcR
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(SupportType<ActualT, uint32_t, int32_t>(), "current data type is not supported on current device!");
-    vmull(dstReg0, dstReg1, srcReg0, srcReg1, mask);
+    bisheng::cce::simd::vmull(dstReg0, dstReg1, srcReg0, srcReg1, mask);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>

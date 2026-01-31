@@ -125,12 +125,12 @@ __simd_callee__ inline void AbsB64Impl(T& dstReg, T& srcReg, MaskReg& mask)
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     RegTensor<int32_t, RegTraitNumOne> zeroReg, lowReg, highReg;
     MaskReg carryMask, carryLow, carryHigh;
-    vbr(zeroReg, 0);
+    bisheng::cce::simd::vbr(zeroReg, 0);
     vcmp_lt(carryMask, (RegTensor<int32_t>&)srcReg.reg[1], zeroReg, mask);
     Sub(carryLow, lowReg, zeroReg, (RegTensor<int32_t>&)srcReg.reg[0], carryMask);
     SubC(carryHigh, highReg, zeroReg, (RegTensor<int32_t>&)srcReg.reg[1], carryLow, carryMask);
-    vsel((RegTensor<int32_t>&)dstReg.reg[0], lowReg, (RegTensor<int32_t>&)srcReg.reg[0], carryMask);
-    vsel((RegTensor<int32_t>&)dstReg.reg[1], highReg, (RegTensor<int32_t>&)srcReg.reg[1], carryMask);
+    bisheng::cce::simd::vsel((RegTensor<int32_t>&)dstReg.reg[0], lowReg, (RegTensor<int32_t>&)srcReg.reg[0], carryMask);
+    bisheng::cce::simd::vsel((RegTensor<int32_t>&)dstReg.reg[1], highReg, (RegTensor<int32_t>&)srcReg.reg[1], carryMask);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -144,7 +144,7 @@ __simd_callee__ inline void AbsImpl(U& dstReg, U& srcReg, MaskReg& mask)
                   "current Abs api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (sizeof(ActualT) != 8) {
-        vabs(dstReg, srcReg, mask, modeValue);
+        bisheng::cce::simd::vabs(dstReg, srcReg, mask, modeValue);
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
@@ -259,10 +259,10 @@ __simd_callee__ inline void ExpPrecision(U& dstReg, U& srcReg, MaskReg& maskSubn
     using ActualT = typename U::ActualT;
     constexpr ExpSpecificMode sprMode = Internal::GetExpSpecificMode(mode);
     constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    vdup(regTwo, 2, maskSubnormal, modeValue);
-    vdiv(tmpReg0, srcReg, regTwo, maskSubnormal, modeValue);
+    bisheng::cce::simd::vdup(regTwo, 2, maskSubnormal, modeValue);
+    bisheng::cce::simd::vdiv(tmpReg0, srcReg, regTwo, maskSubnormal, modeValue);
     vexp(tmpReg0, tmpReg0, maskSubnormal, modeValue);
-    vmul(dstReg, tmpReg0, tmpReg0, maskSubnormal, modeValue);
+    bisheng::cce::simd::vmul(dstReg, tmpReg0, tmpReg0, maskSubnormal, modeValue);
 }
 
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
@@ -293,7 +293,7 @@ __simd_callee__ inline void ExpImpl(U& dstReg, U& srcReg, MaskReg& mask)
             vexp(dstReg, srcReg, mask, modeValue);
             vcmps_le(maskSubnormal, dstReg, subnormalBound.f, mask);
             ExpPrecision(tmpReg, srcReg, maskSubnormal);
-            vsel(dstReg, tmpReg, dstReg, maskSubnormal);
+            bisheng::cce::simd::vsel(dstReg, tmpReg, dstReg, maskSubnormal);
         } else {
             HalfUnion posInf;
             posInf.i = 0x7C00;
@@ -304,7 +304,7 @@ __simd_callee__ inline void ExpImpl(U& dstReg, U& srcReg, MaskReg& mask)
             vexp(dstReg, srcReg, mask, modeValue);
             vcmps_le(maskSubnormal, dstReg, subnormalBound.f, mask);
             ExpPrecision(tmpReg, srcReg, maskSubnormal);
-            vsel(dstReg, tmpReg, dstReg, maskSubnormal);
+            bisheng::cce::simd::vsel(dstReg, tmpReg, dstReg, maskSubnormal);
         }
     } else {
         vexp(dstReg, srcReg, mask, modeValue);
@@ -359,38 +359,38 @@ __simd_callee__ inline void SqrtFastInverseImpl(U& dstReg, U& srcReg, MaskReg& m
     MaskReg isInfPreg;
     MaskReg isZeroPreg;
     MaskReg maskFull;
-    maskFull = pset_b8(PAT_ALL);
+    maskFull = bisheng::cce::simd::pset_b8(PAT_ALL);
 
     vcmps_lt(cmpMaskReg, srcRegCopy, subnormalBound, mask);
-    vmuls(tmpReg, srcRegCopy, multiplyFactor0, mask, modeValue);
-    vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
+    bisheng::cce::simd::vmuls(tmpReg, srcRegCopy, multiplyFactor0, mask, modeValue);
+    bisheng::cce::simd::vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
 
-    vdup(regOne, 1.0f, maskFull, modeValue);
-    vsqrt(tmpReg, srcRegCopy, mask, modeValue);
-    vdiv(dstRegCopy, regOne, tmpReg, mask, modeValue);
+    bisheng::cce::simd::vdup(regOne, 1.0f, maskFull, modeValue);
+    bisheng::cce::simd::vsqrt(tmpReg, srcRegCopy, mask, modeValue);
+    bisheng::cce::simd::vdiv(dstRegCopy, regOne, tmpReg, mask, modeValue);
 
-    vmuls(tmpReg, dstRegCopy, negOne, mask, modeValue);      // -x
-    vmul(errReg, dstRegCopy, srcRegCopy, mask, modeValue);   // b*x
+    bisheng::cce::simd::vmuls(tmpReg, dstRegCopy, negOne, mask, modeValue);      // -x
+    bisheng::cce::simd::vmul(errReg, dstRegCopy, srcRegCopy, mask, modeValue);   // b*x
     vmula(regOne, errReg, tmpReg, mask, modeValue);      // x2 = 1-b*x*x
-    vmuls(tmpReg, dstRegCopy, halfFactor, mask, modeValue);  // 0.5x
+    bisheng::cce::simd::vmuls(tmpReg, dstRegCopy, halfFactor, mask, modeValue);  // 0.5x
     vmula(dstRegCopy, regOne, tmpReg, mask, modeValue);      // x = x + x2*0.5x
 
-    vmul(resReg, dstRegCopy, srcRegCopy, mask, modeValue);   // x1 = x*b
-    vmuls(tmpReg, resReg, negOne, mask, modeValue);      // -x1
-    vmov(errReg, srcRegCopy);                            // err = b
+    bisheng::cce::simd::vmul(resReg, dstRegCopy, srcRegCopy, mask, modeValue);   // x1 = x*b
+    bisheng::cce::simd::vmuls(tmpReg, resReg, negOne, mask, modeValue);      // -x1
+    bisheng::cce::simd::vmov(errReg, srcRegCopy);                            // err = b
     vmula(errReg, resReg, tmpReg, mask, modeValue);      // err = b - x1*x1
-    vmuls(tmpReg, dstRegCopy, halfFactor, mask, modeValue);  // 0.5x
+    bisheng::cce::simd::vmuls(tmpReg, dstRegCopy, halfFactor, mask, modeValue);  // 0.5x
     vmadd(tmpReg, errReg, resReg, mask, modeValue);      // x2 = x2*err + x1
 
-    vmuls(dstRegCopy, tmpReg, multiplyFactor1, mask, modeValue);
-    vsel(tmpReg, dstRegCopy, tmpReg, cmpMaskReg);
+    bisheng::cce::simd::vmuls(dstRegCopy, tmpReg, multiplyFactor1, mask, modeValue);
+    bisheng::cce::simd::vsel(tmpReg, dstRegCopy, tmpReg, cmpMaskReg);
 
     vcmps_eq(isInfPreg, (vector_u32&)srcRegCopy, posInf, mask);
-    vdup(regNegOne, negZero, maskFull, modeValue);
+    bisheng::cce::simd::vdup(regNegOne, negZero, maskFull, modeValue);
     vor(zeroReg, (vector_u32&)srcRegCopy, regNegOne, mask, modeValue);
     vcmps_eq(isZeroPreg, zeroReg, negZero, mask);
     por(cmpMaskReg, isZeroPreg, isInfPreg, mask);
-    vsel(dstReg, srcRegCopy, tmpReg, cmpMaskReg);
+    bisheng::cce::simd::vsel(dstReg, srcRegCopy, tmpReg, cmpMaskReg);
 }
 
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
@@ -430,13 +430,13 @@ __simd_callee__ inline void SqrtImpl(U& dstReg, U& srcReg, MaskReg& mask)
             MaskReg cmpMaskReg;
 
             vcmps_lt(cmpMaskReg, srcRegCopy, subnormalThreshold.f, mask);
-            vmuls(tmpReg, srcRegCopy, multiplyFactor0.f, mask, modeValue);
-            vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
-            vsqrt(dstRegCopy, srcRegCopy, mask, modeValue);
-            vmuls(tmpReg, dstRegCopy, multiplyFactor1.f, mask, modeValue);
-            vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vmuls(tmpReg, srcRegCopy, multiplyFactor0.f, mask, modeValue);
+            bisheng::cce::simd::vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vsqrt(dstRegCopy, srcRegCopy, mask, modeValue);
+            bisheng::cce::simd::vmuls(tmpReg, dstRegCopy, multiplyFactor1.f, mask, modeValue);
+            bisheng::cce::simd::vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
         } else {
-            vsqrt(dstReg, srcReg, mask, modeValue);
+            bisheng::cce::simd::vsqrt(dstReg, srcReg, mask, modeValue);
         }
     }
 }
@@ -460,11 +460,11 @@ __simd_callee__ inline void LnCompute(U& dstReg, U& srcReg, MaskReg& mask)
             MaskReg cmpMaskReg;
 
             vcmps_lt(cmpMaskReg, srcRegCopy, subnormalThreshold.f, mask);
-            vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
-            vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
+            bisheng::cce::simd::vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
             vln(dstRegCopy, srcRegCopy, mask, modeValue);
             vadds(tmpReg, dstRegCopy, compensationFactor, mask, modeValue);
-            vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
         } else {
             NotNumUnion multiplyFactor;
             multiplyFactor.i = 0x4B000000; // 2^23;
@@ -477,11 +477,11 @@ __simd_callee__ inline void LnCompute(U& dstReg, U& srcReg, MaskReg& mask)
             MaskReg cmpMaskReg;
 
             vcmps_lt(cmpMaskReg, srcRegCopy, subnormalThreshold.f, mask);
-            vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
-            vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
+            bisheng::cce::simd::vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
             vln(dstRegCopy, srcRegCopy, mask, modeValue);
             vadds(tmpReg, dstRegCopy, compensationFactor, mask, modeValue);
-            vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
         }
     } else {
         vln(dstReg, srcReg, mask, modeValue);
@@ -531,35 +531,37 @@ __simd_callee__ inline void LogXImpl(RegTensor<half>& dstReg, RegTensor<half>& s
     vector_bool MaskLow;
     vector_bool MaskHigh;
     vector_f16 tmpReg;
-    constexpr auto patAll = std::integral_constant<::Pat, static_cast<::Pat>(MicroAPI::MaskPattern::ALL)>();
-    vector_bool maskAll = pset_b32(patAll);
-    constexpr auto patVal = std::integral_constant<::Pat, static_cast<::Pat>(MicroAPI::MaskPattern::H)>();
-    vector_bool selMask = pset_b16(patVal);
-    constexpr auto partModeEvenVal = std::integral_constant<::Part, static_cast<::Part>(RegLayout::ZERO)>();
+    constexpr auto patAll = std::integral_constant<Pat, static_cast<Pat>(MicroAPI::MaskPattern::ALL)>();
+    vector_bool maskAll = bisheng::cce::simd::pset_b32(patAll);
+    constexpr auto patVal = std::integral_constant<Pat, static_cast<Pat>(MicroAPI::MaskPattern::H)>();
+    vector_bool selMask = bisheng::cce::simd::pset_b16(patVal);
+    constexpr auto partModeEvenVal = std::integral_constant<Part, static_cast<Part>(RegLayout::ZERO)>();
     constexpr auto satModeValue =
-        std::integral_constant<::RoundingSaturation, static_cast<::RoundingSaturation>(SatMode::NO_SAT)>();
-    constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
+        std::integral_constant<RoundingSaturation, static_cast<RoundingSaturation>(SatMode::NO_SAT)>();
+    constexpr auto roundModeValue = std::integral_constant<ROUND, GetRound<RoundMode::CAST_RINT>()>();
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    punpack(MaskLow, mask, LOWER);
-    punpack(MaskHigh, mask, HIGHER);
+    constexpr auto lowerValue = std::integral_constant<Pat, static_cast<Pat>(HighLowPart::LOWEST)>();
+    constexpr auto higherValue = std::integral_constant<HiloPart, static_cast<HiloPart>(HighLowPart::HIGHEST)>();
+    bisheng::cce::simd::punpack(MaskLow, mask, lowerValue);
+    bisheng::cce::simd::punpack(MaskHigh, mask, higherValue);
 
-    vintlv(f16RegLow, f16RegHigh, srcReg, srcReg);
+    bisheng::cce::simd::vintlv(f16RegLow, f16RegHigh, srcReg, srcReg);
 
-    vcvt(f32RegLow, f16RegLow, maskAll, partModeEvenVal, modeValue);
-    vcvt(f32RegHigh, f16RegHigh, maskAll, partModeEvenVal, modeValue);
+    bisheng::cce::simd::vcvt(f32RegLow, f16RegLow, maskAll, partModeEvenVal, modeValue);
+    bisheng::cce::simd::vcvt(f32RegHigh, f16RegHigh, maskAll, partModeEvenVal, modeValue);
 
     vln(f32RegLow, f32RegLow, maskAll, modeValue);
     vln(f32RegHigh, f32RegHigh, maskAll, modeValue);
 
-    vmuls(f32RegLow, f32RegLow, lnXReciprocal, maskAll, modeValue);
-    vmuls(f32RegHigh, f32RegHigh, lnXReciprocal, maskAll, modeValue);
+    bisheng::cce::simd::vmuls(f32RegLow, f32RegLow, lnXReciprocal, maskAll, modeValue);
+    bisheng::cce::simd::vmuls(f32RegHigh, f32RegHigh, lnXReciprocal, maskAll, modeValue);
 
-    vcvt(f16RegLow, f32RegLow, MaskLow, roundModeValue, satModeValue, partModeEvenVal, modeValue);
-    vcvt(f16RegHigh, f32RegHigh, MaskHigh, roundModeValue, satModeValue, partModeEvenVal, modeValue);
+    bisheng::cce::simd::vcvt(f16RegLow, f32RegLow, MaskLow, roundModeValue, satModeValue, partModeEvenVal, modeValue);
+    bisheng::cce::simd::vcvt(f16RegHigh, f32RegHigh, MaskHigh, roundModeValue, satModeValue, partModeEvenVal, modeValue);
 
-    vdintlv(f16RegLow, tmpReg, f16RegLow, tmpReg);
-    vdintlv(f16RegHigh, tmpReg, tmpReg, f16RegHigh);
-    vsel(dstReg, f16RegLow, f16RegHigh, selMask);
+    bisheng::cce::simd::vdintlv(f16RegLow, tmpReg, f16RegLow, tmpReg);
+    bisheng::cce::simd::vdintlv(f16RegHigh, tmpReg, tmpReg, f16RegHigh);
+    bisheng::cce::simd::vsel(dstReg, f16RegLow, f16RegHigh, selMask);
 }
 
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
@@ -589,11 +591,11 @@ __simd_callee__ inline void Log2Impl(U& dstReg, U& srcReg, MaskReg& mask)
             MaskReg cmpMaskReg;
 
             vcmps_lt(cmpMaskReg, srcRegCopy, subnormalThreshold.f, mask);
-            vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
-            vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
+            bisheng::cce::simd::vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
             LogXImpl<sprMode.mrgMode>(dstRegCopy, srcRegCopy, mask, ln2Reciprocal);
             vadds(tmpReg, dstRegCopy, compensationFactor, mask, modeValue);
-            vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
         } else {
             NotNumUnion multiplyFactor;
             multiplyFactor.i = 0x4B000000; // 2^23;
@@ -606,19 +608,19 @@ __simd_callee__ inline void Log2Impl(U& dstReg, U& srcReg, MaskReg& mask)
             MaskReg cmpMaskReg;
 
             vcmps_lt(cmpMaskReg, srcRegCopy, subnormalThreshold.f, mask);
-            vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
-            vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
+            bisheng::cce::simd::vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
             vln(dstRegCopy, srcRegCopy, mask, modeValue);
-            vmuls(dstRegCopy, dstRegCopy, ln2Reciprocal, mask, modeValue);
+            bisheng::cce::simd::vmuls(dstRegCopy, dstRegCopy, ln2Reciprocal, mask, modeValue);
             vadds(tmpReg, dstRegCopy, compensationFactor, mask, modeValue);
-            vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
         }
     } else {
         if constexpr (SupportType<ActualT, half>()) {
             LogXImpl<mode>(dstReg, srcReg, mask, ln2Reciprocal);
         } else {
             vln(dstReg, srcReg, mask, modeValue);
-            vmuls(dstReg, dstReg, ln2Reciprocal, mask, modeValue);
+            bisheng::cce::simd::vmuls(dstReg, dstReg, ln2Reciprocal, mask, modeValue);
         }
     }
 }
@@ -650,11 +652,11 @@ __simd_callee__ inline void Log10Impl(U& dstReg, U& srcReg, MaskReg& mask)
             MaskReg cmpMaskReg;
 
             vcmps_lt(cmpMaskReg, srcRegCopy, subnormalThreshold.f, mask);
-            vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
-            vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
+            bisheng::cce::simd::vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
             LogXImpl<sprMode.mrgMode>(dstRegCopy, srcRegCopy, mask, ln10Reciprocal);
             vadds(tmpReg, dstRegCopy, compensationFactor, mask, modeValue);
-            vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
         } else {
             NotNumUnion multiplyFactor;
             multiplyFactor.i = 0x4B000000; // 2^23;
@@ -667,19 +669,19 @@ __simd_callee__ inline void Log10Impl(U& dstReg, U& srcReg, MaskReg& mask)
             MaskReg cmpMaskReg;
 
             vcmps_lt(cmpMaskReg, srcRegCopy, subnormalThreshold.f, mask);
-            vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
-            vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vmuls(tmpReg, srcRegCopy, multiplyFactor.f, mask, modeValue);
+            bisheng::cce::simd::vsel(srcRegCopy, tmpReg, srcRegCopy, cmpMaskReg);
             vln(dstRegCopy, srcRegCopy, mask, modeValue);
-            vmuls(dstRegCopy, dstRegCopy, ln10Reciprocal, mask, modeValue);
+            bisheng::cce::simd::vmuls(dstRegCopy, dstRegCopy, ln10Reciprocal, mask, modeValue);
             vadds(tmpReg, dstRegCopy, compensationFactor, mask, modeValue);
-            vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
+            bisheng::cce::simd::vsel(dstReg, tmpReg, dstRegCopy, cmpMaskReg);
         }
     } else {
         if constexpr (SupportType<ActualT, half>()) {
             LogXImpl<mode>(dstReg, srcReg, mask, ln10Reciprocal);
         } else {
             vln(dstReg, srcReg, mask, modeValue);
-            vmuls(dstReg, dstReg, ln10Reciprocal, mask, modeValue);
+            bisheng::cce::simd::vmuls(dstReg, dstReg, ln10Reciprocal, mask, modeValue);
         }
     }
 }
@@ -707,7 +709,7 @@ __simd_callee__ inline void NegImpl(U& dstReg, U& srcReg, MaskReg& mask)
                   "current Neg api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (sizeof(ActualT) != 8) {
-        vneg(dstReg, srcReg, mask, modeValue);
+        bisheng::cce::simd::vneg(dstReg, srcReg, mask, modeValue);
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
@@ -730,8 +732,8 @@ __simd_callee__ inline void NotB64Impl(T& dstReg, T& srcReg, MaskReg& mask)
     static_assert(sizeof(ActualT) == 8, "NotB64Impl data type should be B64");
     static_assert(CheckRegTrait<T, RegTraitNumTwo>(), "NotB64Impl T should be RegTraitNumTwo");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vnot((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
-    vnot((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
+    bisheng::cce::simd::vnot((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
+    bisheng::cce::simd::vnot((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -745,7 +747,7 @@ __simd_callee__ inline void NotImpl(U& dstReg, U& srcReg, MaskReg& mask)
                   "current Not api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (sizeof(ActualT) != 8) {
-        vnot(dstReg, srcReg, mask, modeValue);
+        bisheng::cce::simd::vnot(dstReg, srcReg, mask, modeValue);
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;

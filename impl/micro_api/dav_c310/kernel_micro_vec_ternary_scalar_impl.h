@@ -31,7 +31,7 @@ __simd_callee__ inline void AxpyImpl(S& dstReg, S& srcReg, const U scalarValue, 
                   "current Axpy api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (sizeof(ActualT) != 8) {
-        vaxpy(dstReg, srcReg, scalarValue, mask, modeValue);
+        bisheng::cce::simd::vaxpy(dstReg, srcReg, scalarValue, mask, modeValue);
     } else {
         S midReg;
         Muls<ActualT, U, mode, S>(midReg, srcReg, scalarValue, mask);

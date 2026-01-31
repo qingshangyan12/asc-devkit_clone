@@ -132,17 +132,17 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T *dst, __cbuf__ T *src, const
 #else
         if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
             if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_ca_s4((__ca__ T *)dst, (__cbuf__ T *)src,
+                bisheng::cce::load_cbuf_to_ca_s4((__ca__ T *)dst, (__cbuf__ T *)src,
                     loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
             } else {
-                load_cbuf_to_ca_s4((__ca__ T *)dst, (__cbuf__ T *)src,
+                bisheng::cce::load_cbuf_to_ca_s4((__ca__ T *)dst, (__cbuf__ T *)src,
                     loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
             }
         } else {
             if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+                bisheng::cce::load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
             } else {
-                load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+                bisheng::cce::load_cbuf_to_ca(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
             }
         }
 #endif
@@ -159,7 +159,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const
     if ASCEND_IS_AIC {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         if (loadDataParam.GetIfTranspose()) {
-            load_cbuf_to_cb(dst,
+            bisheng::cce::load_cbuf_to_cb(dst,
                 src,
                 loadDataParam.GetMStartPosition(),
                 loadDataParam.GetKStartPosition(),
@@ -169,7 +169,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const
                 loadDataParam.GetDstStride(),
                 1);
         } else {
-            load_cbuf_to_cb(dst,
+            bisheng::cce::load_cbuf_to_cb(dst,
                 src,
                 loadDataParam.GetMStartPosition(),
                 loadDataParam.GetKStartPosition(),
@@ -182,17 +182,17 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const
 #else
         if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>()) {
             if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_cb_s4((__cb__ T *)dst, (__cbuf__ T *)src,
+                bisheng::cce::load_cbuf_to_cb_s4((__cb__ T *)dst, (__cbuf__ T *)src,
                     loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
             } else {
-                load_cbuf_to_cb_s4((__cb__ T *)dst, (__cbuf__ T *)src,
+                bisheng::cce::load_cbuf_to_cb_s4((__cb__ T *)dst, (__cbuf__ T *)src,
                     loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
             }
         } else {
             if (loadDataParam.GetIfTranspose()) {
-                load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
+                bisheng::cce::load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), true);
             } else {
-                load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
+                bisheng::cce::load_cbuf_to_cb(dst, src, loadDataParam.GetConfig0(), loadDataParam.GetConfig1(), false);
             }
         }
 #endif
@@ -585,20 +585,20 @@ __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b,
         if constexpr (isMx) {
             using AType = typename GetDstType<Src0T>::Type;
             using BType = typename GetDstType<Src1T>::Type;
-            mad_mx(c, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.GetM(), mmadParams.GetK(), mmadParams.GetN(),
+            bisheng::cce::mad_mx(c, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.GetM(), mmadParams.GetK(), mmadParams.GetN(),
                 mmadParams.GetUnitFlag(), mmadParams.GetDisableGemv(), mmadParams.GetCmatrixSource(),
                 mmadParams.GetCmatrixInitVal());
         } else {
-            mad(c, a, b, mmadParams.GetM(), mmadParams.GetK(), mmadParams.GetN(), mmadParams.GetUnitFlag(),
+            bisheng::cce::mad(c, a, b, mmadParams.GetM(), mmadParams.GetK(), mmadParams.GetN(), mmadParams.GetUnitFlag(),
                 mmadParams.GetDisableGemv(), mmadParams.GetCmatrixSource(), mmadParams.GetCmatrixInitVal());
         }
 #else
         if constexpr (isMx) {
             using AType = typename GetDstType<Src0T>::Type;
             using BType = typename GetDstType<Src1T>::Type;
-            mad_mx(c, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.GetConfig0());
+            bisheng::cce::mad_mx(c, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.GetConfig0());
         } else {
-            mad(c, a, b, mmadParams.GetConfig0());
+            bisheng::cce::mad(c, a, b, mmadParams.GetConfig0());
         }
 #endif
     }
@@ -623,11 +623,11 @@ __aicore__ inline void MmadCal(
         if constexpr (isMx) {
             using AType = typename GetDstType<Src0T>::Type;
             using BType = typename GetDstType<Src1T>::Type;
-            mad_mx((__cc__ DstT*)c, (__ca__ AType*)a, (__cb__ BType*)b, bias, mmadParams.GetM(), mmadParams.GetK(),
+            bisheng::cce::mad_mx((__cc__ DstT*)c, (__ca__ AType*)a, (__cb__ BType*)b, bias, mmadParams.GetM(), mmadParams.GetK(),
                 mmadParams.GetN(), mmadParams.GetUnitFlag(), mmadParams.GetDisableGemv(), mmadParams.GetCmatrixSource(),
                 mmadParams.GetCmatrixInitVal());
         } else {
-            mad(c, a, b, bias, mmadParams.GetM(), mmadParams.GetK(), mmadParams.GetN(), mmadParams.GetUnitFlag(),
+            bisheng::cce::mad(c, a, b, bias, mmadParams.GetM(), mmadParams.GetK(), mmadParams.GetN(), mmadParams.GetUnitFlag(),
                 mmadParams.GetDisableGemv(), mmadParams.GetCmatrixSource(), mmadParams.GetCmatrixInitVal());
         }
 #else
@@ -636,9 +636,9 @@ __aicore__ inline void MmadCal(
         if constexpr (isMx) {
             using AType = typename GetDstType<Src0T>::Type;
             using BType = typename GetDstType<Src1T>::Type;
-            mad_mx((__cc__ DstT*)xd, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.GetConfig0());
+            bisheng::cce::mad_mx((__cc__ DstT*)xd, (__ca__ AType*)a, (__cb__ BType*)b, mmadParams.GetConfig0());
         } else {
-            mad((__cc__ DstT*)xd, a, b, mmadParams.GetConfig0());
+            bisheng::cce::mad((__cc__ DstT*)xd, a, b, mmadParams.GetConfig0());
         }
 #endif
     }
@@ -747,7 +747,7 @@ __aicore__ inline void Load3DSetFMatrixCal(uint16_t l1H, uint16_t l1W, const uin
 __aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix)
 {
     if ASCEND_IS_AIC {
-        set_fmatrix(regFMatrix);
+        bisheng::cce::set_fmatrix(regFMatrix);
     }
 }
 
@@ -773,7 +773,7 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
 __aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
 {
     if ASCEND_IS_AIC {
-        set_fmatrix_b(regFMatrix);
+        bisheng::cce::set_fmatrix_b(regFMatrix);
     }
 }
 
@@ -890,16 +890,16 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ T* dst, __cbuf__ T* src, con
 {
     if ASCEND_IS_AIC {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        img2colv2_cbuf_to_ca(dst, src, loadDataParams.GetKExtension(), loadDataParams.GetMExtension(), loadDataParams.GetKStartPt(),
+        bisheng::cce::img2colv2_cbuf_to_ca(dst, src, loadDataParams.GetKExtension(), loadDataParams.GetMExtension(), loadDataParams.GetKStartPt(),
             loadDataParams.GetMStartPt(), loadDataParams.GetStrideW(), loadDataParams.GetStrideH(), loadDataParams.GetFilterW(),
             loadDataParams.GetFilterH(), loadDataParams.GetDilationFilterW(), loadDataParams.GetDilationFilterH(),
             loadDataParams.GetFilterSizeW(), loadDataParams.GetFilterSizeH(), loadDataParams.GetTranspose(),
             loadDataParams.GetFMatrixCtrl(), loadDataParams.GetChannelSize());
 #else
         if constexpr (std::is_same<T, bfloat16_t>::value) {
-            img2colv2_cbuf_to_ca((__ca__ half *)dst, (__cbuf__ half *)src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
+            bisheng::cce::img2colv2_cbuf_to_ca((__ca__ half *)dst, (__cbuf__ half *)src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
         } else {
-            img2colv2_cbuf_to_ca(dst, src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
+            bisheng::cce::img2colv2_cbuf_to_ca(dst, src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
         }
 #endif
     }
@@ -910,16 +910,16 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ T* dst, __cbuf__ T* src, con
 {
     if ASCEND_IS_AIC {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        img2colv2_cbuf_to_cb(dst, src, loadDataParams.GetKExtension(), loadDataParams.GetMExtension(), loadDataParams.GetKStartPt(),
+        bisheng::cce::img2colv2_cbuf_to_cb(dst, src, loadDataParams.GetKExtension(), loadDataParams.GetMExtension(), loadDataParams.GetKStartPt(),
             loadDataParams.GetMStartPt(), loadDataParams.GetStrideW(), loadDataParams.GetStrideH(), loadDataParams.GetFilterW(),
             loadDataParams.GetFilterH(), loadDataParams.GetDilationFilterW(), loadDataParams.GetDilationFilterH(),
             loadDataParams.GetFilterSizeW(), loadDataParams.GetFilterSizeH(), loadDataParams.GetTranspose(),
             loadDataParams.GetFMatrixCtrl(), loadDataParams.GetChannelSize());
 #else
         if constexpr (std::is_same<T, bfloat16_t>::value) {
-            img2colv2_cbuf_to_cb((__cb__ half *)dst, (__cbuf__ half *)src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
+            bisheng::cce::img2colv2_cbuf_to_cb((__cb__ half *)dst, (__cbuf__ half *)src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
         } else {
-            img2colv2_cbuf_to_cb(dst, src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
+            bisheng::cce::img2colv2_cbuf_to_cb(dst, src, loadDataParams.GetConfig0(), loadDataParams.GetConfig1());
         }
 #endif
     }

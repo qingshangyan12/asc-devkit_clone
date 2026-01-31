@@ -45,42 +45,42 @@ template <typename T, const RegTrait& otherTrait = RegTraitNumOne> constexpr __a
 }
 
 #ifndef __ASC_NPU_HOST__
-template <RoundMode mode> __aicore__ inline constexpr ::ROUND GetRound()
+template <RoundMode mode> __aicore__ inline constexpr ROUND GetRound()
 {
 // To avoid naming conflicts of ROUND member variables in cpu debug,
 // the names of the returned member variables are changed to be different from those of
 // the ROUND enumeration class of the compiler.
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if constexpr (mode == RoundMode::CAST_RINT) {
-        return ::ROUND::CAST_RINT;
+        return ROUND::CAST_RINT;
     } else if constexpr (mode == RoundMode::CAST_ROUND) {
-        return ::ROUND::CAST_ROUND;
+        return ROUND::CAST_ROUND;
     } else if constexpr (mode == RoundMode::CAST_FLOOR) {
-        return ::ROUND::CAST_FLOOR;
+        return ROUND::CAST_FLOOR;
     } else if constexpr (mode == RoundMode::CAST_CEIL) {
-        return ::ROUND::CAST_CEIL;
+        return ROUND::CAST_CEIL;
     } else if constexpr (mode == RoundMode::CAST_TRUNC) {
-        return ::ROUND::CAST_TRUNC;
+        return ROUND::CAST_TRUNC;
     } else if constexpr (mode == RoundMode::CAST_ODD) {
-        return ::ROUND::CAST_ODD;
+        return ROUND::CAST_ODD;
     } else {
-        return ::ROUND::CAST_HYBRID;
+        return ROUND::CAST_HYBRID;
     }
 #else
     if constexpr (mode == RoundMode::CAST_RINT) {
-        return ::ROUND::R;
+        return ROUND::R;
     } else if constexpr (mode == RoundMode::CAST_ROUND) {
-        return ::ROUND::A;
+        return ROUND::A;
     } else if constexpr (mode == RoundMode::CAST_FLOOR) {
-        return ::ROUND::F;
+        return ROUND::F;
     } else if constexpr (mode == RoundMode::CAST_CEIL) {
-        return ::ROUND::C;
+        return ROUND::C;
     } else if constexpr (mode == RoundMode::CAST_TRUNC) {
-        return ::ROUND::Z;
+        return ROUND::Z;
     } else if constexpr (mode == RoundMode::CAST_ODD) {
-        return ::ROUND::O;
+        return ROUND::O;
     } else {
-        return ::ROUND::H;
+        return ROUND::H;
     }
 #endif
 }
@@ -93,7 +93,7 @@ template <MaskMergeMode mode> __aicore__ inline constexpr auto GetMaskMergeMode(
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return std::integral_constant<::CpuMode, static_cast<::CpuMode>(mode)>();
 #else
-    return std::integral_constant<::Mode, static_cast<::Mode>(mode)>();
+    return std::integral_constant<Mode, static_cast<Mode>(mode)>();
 #endif
 }
 
@@ -113,29 +113,29 @@ template <MemType src, MemType dst> __simd_callee__ inline void LocalMemBarImpl(
                   (SupportEnum<src, MemType::SCALAR_ALL>() && SupportEnum<dst, MemType::VEC_ALL>()),
                   "LocalMemBar does support current MemType Combination on current device!");
     if constexpr (src == MemType::VEC_STORE && dst == MemType::VEC_LOAD) {
-        mem_bar(VST_VLD);
+        bisheng::cce::simd::mem_bar(VST_VLD);
     } else if constexpr (src == MemType::VEC_LOAD && dst == MemType::VEC_STORE) {
-        mem_bar(VLD_VST);
+        bisheng::cce::simd::mem_bar(VLD_VST);
     } else if constexpr (src == MemType::VEC_STORE && dst == MemType::VEC_STORE) {
-        mem_bar(VST_VST);
+        bisheng::cce::simd::mem_bar(VST_VST);
     } else if constexpr (src == MemType::VEC_STORE && dst == MemType::SCALAR_LOAD) {
-        mem_bar(VST_LD);
+        bisheng::cce::simd::mem_bar(VST_LD);
     } else if constexpr (src == MemType::VEC_STORE && dst == MemType::SCALAR_STORE) {
-        mem_bar(VST_ST);
+        bisheng::cce::simd::mem_bar(VST_ST);
     } else if constexpr (src == MemType::VEC_LOAD && dst == MemType::SCALAR_STORE) {
-        mem_bar(VLD_ST);
+        bisheng::cce::simd::mem_bar(VLD_ST);
     } else if constexpr (src == MemType::SCALAR_STORE && dst == MemType::VEC_LOAD) {
-        mem_bar(ST_VLD);
+        bisheng::cce::simd::mem_bar(ST_VLD);
     } else if constexpr (src == MemType::SCALAR_STORE && dst == MemType::VEC_STORE) {
-        mem_bar(ST_VST);
+        bisheng::cce::simd::mem_bar(ST_VST);
     } else if constexpr (src == MemType::SCALAR_LOAD && dst == MemType::VEC_STORE) {
-        mem_bar(LD_VST);
+        bisheng::cce::simd::mem_bar(LD_VST);
     } else if constexpr (src == MemType::VEC_ALL && dst == MemType::VEC_ALL) {
-        mem_bar(VV_ALL);
+        bisheng::cce::simd::mem_bar(VV_ALL);
     } else if constexpr (src == MemType::VEC_ALL && dst == MemType::SCALAR_ALL) {
-        mem_bar(VS_ALL);
+        bisheng::cce::simd::mem_bar(VS_ALL);
     } else if constexpr (src == MemType::SCALAR_ALL && dst == MemType::VEC_ALL) {
-        mem_bar(SV_ALL);
+        bisheng::cce::simd::mem_bar(SV_ALL);
     }
 }
 #endif
@@ -176,26 +176,26 @@ __simd_callee__ inline void CopyMerging(RegT& dstReg, RegT& srcReg, MaskReg& mas
     using ActualT = typename RegT::ActualT;
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (IsSameType<ActualT, bool>::value) {
-        vmov((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, modeValue);
+        bisheng::cce::simd::vmov((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, modeValue);
     } else if constexpr (sizeof(ActualT) == 1) {
-        vmov((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg, mask, modeValue);
+        bisheng::cce::simd::vmov((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg, mask, modeValue);
     } else if constexpr (sizeof(ActualT) == 2) {
-        vmov((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg, mask, modeValue);
+        bisheng::cce::simd::vmov((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg, mask, modeValue);
     } else if constexpr (sizeof(ActualT) == 4) {
-        vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, mask, modeValue);
+        bisheng::cce::simd::vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, mask, modeValue);
     } else if constexpr (sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<RegT, RegTraitNumOne>()) {
             constexpr auto lowerDist =
-                std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>();
+                std::integral_constant<HiloPart, static_cast<HiloPart>(HighLowPart::LOWEST)>();
             MaskReg dstMask;
             MaskReg tmpMask;
             MaskReg dumpMask;
-            ppack(tmpMask, mask, lowerDist);
+            bisheng::cce::simd::ppack(tmpMask, mask, lowerDist);
             pintlv_b32(dstMask, dumpMask, tmpMask, tmpMask);
-            vmov((RegTensor<uint32_t> &)dstReg, (RegTensor<uint32_t> &)srcReg, dstMask, modeValue);
+            bisheng::cce::simd::vmov((RegTensor<uint32_t> &)dstReg, (RegTensor<uint32_t> &)srcReg, dstMask, modeValue);
         } else if constexpr (CheckRegTrait<RegT, RegTraitNumTwo>()) {
-            vmov((RegTensor<uint32_t> &)dstReg.reg[0], (RegTensor<uint32_t> &)srcReg.reg[0], mask, modeValue);
-            vmov((RegTensor<uint32_t> &)dstReg.reg[1], (RegTensor<uint32_t> &)srcReg.reg[1], mask, modeValue);
+            bisheng::cce::simd::vmov((RegTensor<uint32_t> &)dstReg.reg[0], (RegTensor<uint32_t> &)srcReg.reg[0], mask, modeValue);
+            bisheng::cce::simd::vmov((RegTensor<uint32_t> &)dstReg.reg[1], (RegTensor<uint32_t> &)srcReg.reg[1], mask, modeValue);
         }
     }
 }

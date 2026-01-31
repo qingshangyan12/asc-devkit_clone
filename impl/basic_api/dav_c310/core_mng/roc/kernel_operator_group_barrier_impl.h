@@ -63,9 +63,9 @@ __aicore__ inline void GroupBarrier<pipeMode>::Arrive(uint32_t arriveIndex)
             GlobalTensor<uint32_t> barrierInfoWaitGlobal;
             __gm__ BarrierInfo *BarrierInfoAddr =
                 barrierInfoWait + (CACHE_LINE_LEN / sizeof(BarrierInfo)) * arriveIndex;
-            dcci((__gm__ uint64_t *)BarrierInfoAddr, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+            bisheng::cce::dcci((__gm__ uint64_t *)BarrierInfoAddr, bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
             while (BarrierInfoAddr->head != expectedWaitNum) {  // check wait in last round all finished
-                dcci((__gm__ uint64_t *)BarrierInfoAddr, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+                bisheng::cce::dcci((__gm__ uint64_t *)BarrierInfoAddr, bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
             }
         }
         __WriteCurrentValue(barrierInfoArrive);
@@ -85,9 +85,9 @@ __aicore__ inline void GroupBarrier<pipeMode>::Wait(uint32_t waitIndex)
         uint32_t waitCounter = (hasArrive) ? counter - 1 : counter;
         uint32_t expectedArriveNum = waitCounter * arriveSize;
         __gm__ BarrierInfo *BarrierInfoAddr = barrierInfoArrive + (CACHE_LINE_LEN / sizeof(BarrierInfo)) * waitIndex;
-        dcci((__gm__ uint64_t *)BarrierInfoAddr, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        bisheng::cce::dcci((__gm__ uint64_t *)BarrierInfoAddr, bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         while (BarrierInfoAddr->head < expectedArriveNum) {  // check in current round, all aiv has arrived
-            dcci((__gm__ uint64_t *)BarrierInfoAddr, cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+            bisheng::cce::dcci((__gm__ uint64_t *)BarrierInfoAddr, bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         }
         __WriteCurrentValue(barrierInfoWait);
         counter =
