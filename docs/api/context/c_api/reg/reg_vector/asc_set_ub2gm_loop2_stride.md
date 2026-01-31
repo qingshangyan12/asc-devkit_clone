@@ -30,6 +30,10 @@ __aicore__ inline void asc_set_ub2gm_loop2_stride(uint64_t loop2_src_stride, uin
 
 无
 
+## 流水类型
+
+PIPE_V
+
 ## 调用示例
 
 ```cpp

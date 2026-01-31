@@ -36,9 +36,15 @@ __simd_callee__ inline void asc_max_scalar(vector_bfloat16_t& dst, vector_bfloat
 | value | 输入    | 源操作数（标量）。       |
 | mask | 输入 | 源操作数掩码（矢量），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
+矢量数据寄存器和掩码寄存器的详细说明请参见xxx.md。
+
 ## 返回值说明
 
 无
+
+## 流水类型
+
+PIPE_V
 
 ## 约束说明
 
@@ -53,8 +59,4 @@ vector_int8_t src;
 int8_t value;
 vector_bool mask;
 asc_max_scalar(dst, src, value, mask);
-
-// src : [1, 2, 3, 4, ... , 256]
-// value : 3 
-// dst : [3, 3, 3, 5, ... , 256]
 ```

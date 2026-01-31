@@ -30,6 +30,10 @@ __aicore__ inline void asc_set_ub2gm_loop_size(uint32_t loop1_size, uint32_t loo
 
 无
 
+## 流水类型
+
+PIPE_V
+
 ## 调用示例
 
 ```cpp
