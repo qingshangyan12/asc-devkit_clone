@@ -135,6 +135,9 @@ __simd_vf__ inline void VfGatherApi0B64Normal(__ubuf__ T *dst, __ubuf__ T *src, 
         if constexpr (!isNormalMode) {
             dstMask = MicroAPI::UpdateMask<uint32_t>(sregPlt);
         }
+#ifndef NO_OVERLAP_IN_MULTI_REPEAT
+        MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
+#endif
         MicroAPI::LoadAlign(offsetReg, srcOffsetLocal + i * u64OffsetRepeatCount);
         // convert addr offset into B64 element index: divide by 8 (implemented by ShiftRight 3 bit)
         ShiftRights(indexReg, offsetReg, (int16_t)3, indexMask);
@@ -187,6 +190,9 @@ __simd_vf__ inline void VfGatherApi0B64Bits(__ubuf__ T *dst, __ubuf__ T *src, __
         if constexpr (!isNormalMode) {
             dstMask = MicroAPI::UpdateMask<uint32_t>(sregPlt);
         }
+#ifndef NO_OVERLAP_IN_MULTI_REPEAT
+        MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
+#endif
         MicroAPI::LoadAlign(offsetReg, srcOffsetLocal + i * u64OffsetRepeatCount);
         // convert addr offset into B64 element index: divide by 8 (implemented by ShiftRight 3 bit)
         ShiftRights(bitsIndexReg, offsetReg, (int16_t)3, indexMask);
