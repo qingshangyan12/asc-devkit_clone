@@ -9,8 +9,8 @@
 ## 功能说明
 
 对齐数据搬出接口，从源操作数连续对齐搬出到UB，支持多种搬入模式。
-- asc_storealign（入参带uint16_t repeat_stride）：用户自定义单次迭代内不同DataBlock间的间隔以及相邻迭代间的地址间隔，其余功能与asc_storealign(入参不带uint16_t repeat_stride)相同。
-- asc_storealign_postupdate（入参带uint16_t repeat_stride）：用户自定义单次迭代内不同DataBlock间的间隔以及相邻迭代间的地址间隔，同时开启硬件自动Post Update模式，UB地址同时作为输入和输出，每次调用会更新。
+- asc_storealign（入参带uint16_t repeat_stride）：用户自定义单次迭代内不同DataBlock间的步长以及相邻迭代间的地址步长，其余功能与asc_storealign(入参不带uint16_t repeat_stride)相同。
+- asc_storealign_postupdate（入参带uint16_t repeat_stride）：用户自定义单次迭代内不同DataBlock间的步长以及相邻迭代间的地址步长，同时开启硬件自动Post Update模式，UB地址同时作为输入和输出，每次调用会更新。
 
 
 ## 函数原型
@@ -49,12 +49,12 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ float* dst_align3
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst_align32b | 输出 | 目的操作数（矢量）的起始地址。 |
-| src | 输入 | 源操作数（矢量）的起始地址。 |
-| block_stride | 输入 | 源操作数（矢量）的起始地址。 |
-| repeat_stride | 输入 | 源操作数（矢量）的起始地址。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。 |
+| block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
+| repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
 | mask | 输入 | 源操作数掩码（矢量），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见xxx.md。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg数据类型定义.md)。
 
 ## 返回值说明
 
