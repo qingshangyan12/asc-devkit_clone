@@ -17,6 +17,7 @@
 #include "kernel_tensor.h"
 #include "kernel_check.h"
 #include "kernel_struct_gather.h"
+#include "mstx_local_tensor_info.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_gather_impl.h"
@@ -60,6 +61,9 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
         ASCENDC_REPORT_CHECK_ERROR("Gatherb", KernelFuncType::NONE_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecGatherInfo(dst, src0, offset, repeatParams);
+#endif
     uint32_t srcLength = src0.GetSize();
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113))
@@ -93,6 +97,9 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
         ASCENDC_REPORT_CHECK_ERROR("Gather", KernelFuncType::MASK_COUNT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecGatherInfo(dst, src, srcOffset, dstRepStride);
+#endif
     const uint32_t srcLength = src.GetSize();
     GatherImpl((__ubuf__ PrimType *)dst.GetPhyAddr(), (__ubuf__ PrimType *)src.GetPhyAddr(),
         (__ubuf__ uint32_t *)srcOffset.GetPhyAddr(), srcLength, srcBaseAddr, mask, repeatTime, dstRepStride);
@@ -120,6 +127,9 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
         ASCENDC_REPORT_CHECK_ERROR("Gather", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecGatherInfo(dst, src, srcOffset, dstRepStride);
+#endif
     const uint32_t srcLength = src.GetSize();
     GatherImpl((__ubuf__ PrimType *)dst.GetPhyAddr(), (__ubuf__ PrimType *)src.GetPhyAddr(),
         (__ubuf__ uint32_t *)srcOffset.GetPhyAddr(), srcLength, srcBaseAddr, mask, repeatTime, dstRepStride);
@@ -139,6 +149,9 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
     const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint32_t count)
 {
     using PrimType = PrimT<T>;
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecGatherInfo(dst, src, srcOffset);
+#endif
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
       (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
