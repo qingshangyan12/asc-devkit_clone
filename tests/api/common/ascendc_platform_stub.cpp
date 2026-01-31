@@ -74,4 +74,15 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size)
 uint32_t PlatformAscendC::GetCoreNumAiv(void) const {
     return this->platformInfo_->GetCoreNum();
 }
+
+uint32_t PlatformAscendC::GetVecRegLen(void) const 
+{
+    std::string sizeStr; 
+    bool ret = this->platformInfo_->GetPlatformResWithLock("AICoreSpec", "vector_reg_width", sizeStr);
+    if(!ret){
+        return 0u;
+    }
+    uint64_t size = sizeStr.empty() ? 0 : std::stoull(sizeStr);
+    return static_cast<uint32_t>(size);
+}
 }
