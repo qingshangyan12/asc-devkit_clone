@@ -151,8 +151,8 @@ DATA_COPY_L2_CACHE_UB_PAD_TEST(int16_t, CACHE_MODE_DISABLE)
         tpipe.InitBuffer(tbuf1, dataSize * sizeof(T));                                                                 \
         LocalTensor<T> inputLocal = tbuf1.Get<T>();                                                                    \
                                                                                                                        \
-        MultiCopyParams<T, 2> params;                                                                                  \
-                                                                                                                       \
+        NdDmaParams<T, 2> params;                                                                                      \
+        NdDmaDci();                                                                                                    \
         DataCopy(inputLocal, globalTensor, params);                                                                    \
         EXPECT_EQ(expectedMode, actualMode);                                                                           \
     }
