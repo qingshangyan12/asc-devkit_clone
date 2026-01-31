@@ -2,7 +2,7 @@
 
 ## 矢量数据寄存器
 
-矢量数据寄存器用于存储矢量数据，其位宽为VL（Vector Length），可存储VL/sizeof(T)的数据（T表示数据类型）。在Ascend 950PR/Ascend 950DT版本中， VL = 256B，对于矢量数据类型vector_float，可存储的元素数量为256B / sizeof(float) = 64个。
+矢量数据寄存器用于存储矢量数据，其位宽为VL（Vector Length），可存储VL/sizeof(T)的数据（T表示数据类型）。在Ascend 950PR/Ascend 950DT版本中， VL = 256B。例如对于矢量数据类型vector_float，该寄存器可存储的元素数量为256B / sizeof(float) = 64个。
 
 以下是以位宽为分类，列举的所有矢量数据寄存器的数据类型：
 
@@ -14,7 +14,7 @@
 | b64       | vector_int64_t/vector_uint64_t |
 
 **注意：**
-vector_int4x2_t/vector_fp4x2_e2m1_t/vector_fp4x2_e1m2_t这三个矢量数据类型在内存中的排布需要将两个元素打包为一个字节的存储单元。
+vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t这三个矢量数据类型在内存中的排布需要将两个元素打包为一个字节的存储单元。
 
 ### 调用示例
 
@@ -27,6 +27,8 @@ asc_arange(dst, index);
 ## 掩码寄存器
 
 掩码寄存器的数据类型为vector_bool，用于矢量计算中选择参与计算的元素，其位宽为VL/8。
+
+![vector_bool](../figures/vector_bool.png)
 
 ### 调用示例
 
@@ -58,13 +60,11 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b8(count);
-        auto src_addr_tmp = src_addr + i * one_repeat_size;
-        asc_loadunalign_pre(ureg0, src_addr_tmp); // 非对齐搬入前的初始化
-        asc_loadunalign_postupdate(src, ureg0, src_addr_tmp, one_repeat_size); // 配合vector_load_align的使用，非对齐搬入源数据
+        asc_loadunalign_pre(ureg0, src_addr + i * one_repeat_size); // 非对齐搬入前的初始化
+        asc_loadunalign(src, ureg0, src_addr + i * one_repeat_size); // 配合vector_load_align的使用，非对齐搬入源数据
         asc_neg(dst, src, mask);
-        auto dst_addr_tmp = dst_addr + i * one_repeat_size;
-        asc_storeunalign_postupdate(dst_addr_tmp, ureg1, dst, one_repeat_size); // 配合vector_store_align的使用，非对齐搬出目的数据
-        asc_storeunalign_post(dst_addr_tmp, ureg1, 0); // 处理非对齐搬出的尾块
+        asc_storeunalign(dst_addr + i * one_repeat_size, ureg1, dst, one_repeat_size); // 配合vector_store_align的使用，非对齐搬出目的数据
+        asc_storeunalign_post(dst_addr + i * one_repeat_size, ureg1, 0); // 处理非对齐搬出的尾块
     }
 }
 ```
