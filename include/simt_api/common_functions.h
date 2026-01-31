@@ -25,7 +25,7 @@
 #endif
 
 #ifndef SPLIT_CORE_VEC
-#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101)) 
+#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)) 
 #define SPLIT_CORE_VEC
 #endif
 #endif

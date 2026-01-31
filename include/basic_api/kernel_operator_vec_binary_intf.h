@@ -161,7 +161,7 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] repeatParams.src0RepStride src0 repeat stride
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG>
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
@@ -191,7 +191,7 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const DivConfig& config = DEFAULT_DIV_CONFIG>
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, const int32_t& count);
@@ -402,7 +402,7 @@ template <typename T>
 __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                           const LocalTensor<T>& src1, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /* **************************************************************************************************
  * ShiftLeft                                             *
  * ************************************************************************************************* */
@@ -638,7 +638,7 @@ template <typename T>
 __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                const LocalTensor<T>& src1, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /* **************************************************************************************************
  * Prelu                                             *
  * ************************************************************************************************* */
