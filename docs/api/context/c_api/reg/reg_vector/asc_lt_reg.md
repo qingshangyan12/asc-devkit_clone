@@ -4,13 +4,11 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| <term>Atlas A5 训练系列产品/Atlas A5 推理系列产品</term> | √ |
+| <term>Ascend 950PR/Ascend 950DT</term> | √ |
 
 ## 功能说明
 
-逐元素比较第一个源操作数是否小于第二个源操作数中的对应数值。如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。该比较逻辑分为两种类型：
-- 矢量与矢量比较：对两个矢量的元素按位置一一对应，逐元素比较大小。
-- 矢量与标量比较：将矢量中的每一个元素分别与同一个标量进行大小比较。
+lt（less than），对源操作数执行逐元素比较。对于src0 < src1，若条件成立则目的操作数对应结果位为1，否则为0，每个元素的比较结果占一个bit。
 
 ## 函数原型
 
@@ -30,10 +28,12 @@ __simd_callee__ inline void asc_lt(vector_bool& dst, vector_int32 src0, vector_i
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
-| src0 | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
-| src1 | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。。|
-| mask | 输入 | 源操作数掩码（矢量），类型为[掩码寄存器](../reg数据类型定义.md/#掩码寄存器)，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。|
+| src0 | 输入 | 源操作数（矢量数据寄存器）。|
+| src1 | 输入 | 源操作数（矢量数据寄存器）。。|
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
 ## 返回值说明
 
@@ -45,17 +45,14 @@ PIPE_V
 
 ## 约束说明
 
-- dst、src0、src1（为矢量时）的需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../../../docs/api/context/c_api/general_instruction.md#通用地址重叠约束)。
-
 ## 调用示例
 
 ```cpp
-// total_length 指参与计算的数据长度
-constexpr uint32_t total_length = 128;
-vector_half src0[total_length];
-vector_half src1[total_length];
-vector_bool dst[total_length];
-// mask为源操作数掩码
+vector_bool dst;
+vector_half src0;
+vector_half src1;
+vector_bool mask = asc_create_mask_b16(Pat::ALL);
+asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址。
+asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
 asc_lt(dst, src0, src1, mask);
 ```

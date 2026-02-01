@@ -4,8 +4,7 @@
 
 | 产品     | 是否支持 |
 | ----------- |:----:|
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √    |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √    |
+| <term>Ascend 950PR/Ascend 950DT</term> | √ |
 
 ## 功能说明
 
@@ -20,8 +19,8 @@ $$
 - 前n个数据计算
 
     ```c++
-    __aicore__ inline void asc_not(_ubuf__ int16_t* dst, _ubuf__ int16_t* src, uint32_t count)
-    __aicore__ inline void asc_not(_ubuf__ uint16_t* dst, _ubuf__ uint16_t* src, uint32_t count)
+    __simd_callee__ inline void asc_pair_reduce_sum(vector_half& dst, vector_half src, vector_bool mask)
+    __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float src, vector_bool mask)
     ```
 
 ## 参数说明
@@ -31,8 +30,10 @@ $$
 | 参数名       | 输入/输出 | 描述                |
 | --------- | ----- | ----------------- |
 | dst       | 输出    | 目的操作数。            |
-| src0、src1 | 输入    | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。             |
-| mask | 输入 | 源操作数掩码（矢量），类型为[掩码寄存器](../reg数据类型定义.md/#掩码寄存器)，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| src | 输入    | 源操作数（矢量数据寄存器）。             |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
 ## 返回值说明
 
@@ -47,9 +48,8 @@ PIPE_V
 ## 调用示例
 
 ```c++
-constexpr uint64_t total_length = 64;
-//total_length 指参与计算的数据长度
-__ubuf__ int16_t src[total_length];
-__ubuf__ int16_t dst[total_length];
-asc_and(dst, src0, src1, total_length);
+vector_half dst;
+vector_half src;
+vector_bool mask;
+asc_pair_reduce_sum(dst, src, mask);
 ```
