@@ -1,4 +1,4 @@
-# asc_bfloat162float
+# asc_half2int4x2_reg
 
 ## 产品支持情况
 
@@ -8,45 +8,76 @@
 
 ## 功能说明
 
-将regtensor的half类型数据转为int4x2类型，无舍入模式。
+将regtensor的half类型数据转为int4x2类型，并支持多种舍入模式。
+
+- RINT舍入模式：四舍六入五成双舍入
+- ROUND舍入模式：四舍五入舍入
+- FLOOR舍入模式：向负无穷舍入
+- CEIL舍入模式：向正无穷舍入
+- TRUNC舍入模式：向零舍入
 
 ## 函数原型
 
 - 前n个数据计算
 ```cpp
+// FLOOR舍入模式，
 __simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rd_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+
+// RINT舍入模式
 __simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rn_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rn_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+
+// ROUND舍入模式
 __simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rna_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rna_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_half2int4x2_ro(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_half2int4x2_ro_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_half2int4x2_ro_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_half2int4x2_ro_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+
+// CEIL舍入模式
 __simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_ru_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_ru_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+
+// TRUNC舍入模式
 __simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rz_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rz_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 ```
 
 ## 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
-|dst|输出|目的操作数。类型为[矢量数据寄存器](../../reg数据类型定义.md)。|
-|src|输入|源操作数。类型为[矢量数据寄存器](../../reg数据类型定义.md)。|
-|mask|输入|参与计算的元素掩码。|
+|dst|输出|目的操作数（矢量数据寄存器）。|
+|src|输入|源操作数（矢量数据寄存器）。|
+|mask|输入|源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。|
 
 ## 返回值说明
 
@@ -58,15 +89,21 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
-- dst、src的需要32字节对齐。
+- 非饱和模式：
+  - 输入数据超过输出类型最值时，结果被截断为目标格式的数据宽度，例如输入half值为257，输出int4x2_t值为1。
+  - 输入数据为+/-inf时, 返回输出类型的最值。
+  - 输入数据为nan时，返回0。
+- 饱和模式：
+  - 输入数据超过输出类型最值时，返回输出类型的对应最值，例如输入half值为257，输出int4x2值为127。
+  - 输入数据为+/-inf时, 返回输出类型的最值。
+  - 输入数据为nan时，返回0。
 
 ## 调用示例
 
 ```cpp
-constexpr uint32_t total_length = 128;
-__ubuf__ bfloat16_t src[total_length];
-vector_half src = asc_load(src, dstub, mask);
-vector_bfloat16_t dst;
-asc_half2bfloat16_rd(dst, src, mask);
+vector_half src;
+vector_int4x2_t dst;
+vector_bool mask = asc_create_mask_b16(Pat::ALL);
+asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_half2int4x2_rna(dst, src, mask);
 ```
