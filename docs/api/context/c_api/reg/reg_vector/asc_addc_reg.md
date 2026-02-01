@@ -25,11 +25,13 @@ __simd_callee__ inline void asc_addc(vector_bool& dst0, vector_int32& dst1, vect
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst0 | 输出 | 目的操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。类型为vector_bool。 |
-| src0 | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
-| src1 | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
+| dst0 | 输出 | 目的操作数（矢量数据寄存器）。类型为vector_bool。 |
+| src0 | 输入 | 源操作数（矢量数据寄存器）。|
+| src1 | 输入 | 源操作数（矢量数据寄存器）。|
 | src2 | 输入 | 源操作数（矢量）的，进位值。|
-| mask | 输入 | 源操作数掩码（矢量），类型为[掩码寄存器](../reg数据类型定义.md/#掩码寄存器)，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。  |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。  |
+
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
 ## 返回值说明
 
@@ -45,11 +47,10 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-// total_length 指参与计算的数据长度
-constexpr uint32_t total_length = 128;
-vector_half src0[total_length];
-vector_half src1[total_length];
-vector_half dst[total_length];
-// mask为源操作数掩码
+vector_bool dst0;
+vector_int32 dst1;
+vector_int32 src0, src1;
+vector_bool src2;
+vector_bool mask;
 asc_addc(dst0, dst1, src0, src1, src2, mask);
 ```
