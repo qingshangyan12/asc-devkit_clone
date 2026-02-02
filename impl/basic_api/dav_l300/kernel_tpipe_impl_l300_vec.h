@@ -1486,6 +1486,7 @@ __aicore__ inline TEventID TPipe::FetchEventID()
     return lastId;
 }
 
+// NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
 template <TPosition pos>
 __aicore__ inline TBuffAddr TPipe::GetAbsAddr(int32_t offset, int32_t len) const
 {
@@ -1507,6 +1508,7 @@ __aicore__ inline TBuffAddr TPipe::GetAbsAddr(int32_t offset, int32_t len) const
     return addr;
 }
 
+// NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
 template <TPosition pos, typename T>
 __aicore__ inline __sync_noalias__ LocalTensor<T> TPipe::GetAbsAddr(int32_t offset, int32_t size) const
 {
@@ -1833,6 +1835,7 @@ inline uint64_t TPipe::GetAbsAddr(const LocalTensor<T> &tensor)
     return delta;
 }
 
+// NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
 template <typename T>
 inline uint64_t GetAbsAddr(TPipe *tpipe, const LocalTensor<T> &tensor)
 {
