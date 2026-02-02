@@ -56,4 +56,5 @@ add_custom_target(tiling_log_target ALL
 add_dependencies(kernel_tiling_headers template_argument tiling_log_target)
 target_include_directories(kernel_tiling_headers INTERFACE
     $<BUILD_INTERFACE:${TEMPLATE_ARG}>
+    $<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include>
 )
