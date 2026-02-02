@@ -103,6 +103,38 @@ __aicore__ inline void InitSocState()
     AscendCUtils::InitSocStateImpl();
 }
 
+__aicore__ inline int64_t GetBlockIdx()
+{
+    return GetBlockIdxImpl();
+}
+
+__aicore__ inline int64_t GetBlockNum()
+{
+#ifdef __SUPER_KERNEL_STATIC_BLOCK_NUM__
+    return __SUPER_KERNEL_STATIC_BLOCK_NUM__;
+#elif defined(__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__)
+    return g_super_kernel_dynamic_block_num;
+#else
+    return get_block_num();
+#endif
+}
+
+__aicore__ inline int64_t GetSubBlockIdx()
+{
+    return GetSubBlockIdxImpl();
+}
+
+__aicore__ inline int64_t GetTaskRatio()
+{
+    return GetTaskRationImpl();
+}
+
+__aicore__ inline int64_t GetTaskRation()
+{
+    return GetTaskRatio();
+}
+
+// NOTICE: InitOutput has been deprecated and will be removed in the next version. Please use InitGlobalMemory instead!
 template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void InitOutput(GlobalTensor<T> gmWorkspaceAddr, uint32_t size, T value)
