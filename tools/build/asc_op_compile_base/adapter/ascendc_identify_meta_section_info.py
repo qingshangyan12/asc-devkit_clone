@@ -67,18 +67,6 @@ def parse_hexdump_to_tlv(hexdump: str) -> str:
             tlv_lines.append(f"{address} {formatted_hex.ljust(39)} {ascii_part}")
 
     return '\n'.join(tlv_lines)
-            
-
-def format_hex_to_groups(hex_data: str) -> Optional[str]:
-    clean_hex = hex_data.replace(' ', '')
-    if not clean_hex:
-        return None
-    hex_parts = []
-    for i in range(0, len(clean_hex), 8):
-        chunk = clean_hex[i: i+8]
-        groups.append(chunk if len(chunk) == 8 else chunk.ljust(8, '0'))
-    
-    return ' '.join(hex_parts)
 
 
 # .o生成tlv
@@ -86,11 +74,11 @@ def generate_tlv_from_object_file(object_file_path: str, section_name: str) -> O
     if not os.path.exists(object_file_path):
         raise FileNotFoundError(f"object file {object_file_path} not found, please check it.")
     
-    generate_cmd = ['llvm-objdump', '-s', '-j', '{}'.format(section_content), '{}'.format(object_file_path)]
+    generate_cmd = ['llvm-objdump', '-s', '-j', '{}'.format(section_name), '{}'.format(object_file_path)]
 
-    proc = subprocess(generate_cmd, stdout=subprocess.PIPE, stderr=None)
+    proc = subprocess.Popen(generate_cmd, stdout=subprocess.PIPE, stderr=None)
     (tlv_info, _) = proc.communicate()
-    tlv_info = tlv_info.decode('utf-8').split('\n')
+    tlv_info = tlv_info.decode('utf-8')
     
     tlv_string = parse_hexdump_to_tlv(tlv_info)
     
