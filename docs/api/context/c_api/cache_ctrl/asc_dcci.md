@@ -6,6 +6,7 @@
 | :-----------| :------: |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 |    √     |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 |    √     |
+|<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √</cann-filter> |
 
 ## 功能说明
 
@@ -37,6 +38,21 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
    __aicore__ inline void asc_dcci_entire_out(__gm__ void* dst)
    __aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst)
    ```
+   
+<cann-filter npu_type = "950">
+   ```cpp
+   // 刷新传入地址所在的单个Cache Line
+   __aicore__ inline void asc_dcci_single(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_single_all(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_single_out(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_single_atomic(__gm__ void* dst)
+   // 刷新所有Cache Line
+   __aicore__ inline void asc_dcci_entire(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_entire_all(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_entire_out(__gm__ void* dst)
+   __aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst)
+   ```
+</cann-filter>
 
 ## 参数说明
 
