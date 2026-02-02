@@ -6,7 +6,7 @@ import struct
 from dataclasses import dataclass
 from typing import Optional
 from asc_op_compile_base.common.utils.log_utils import LogUtil, AscendCLogLevel
-
+from .ascendc_common_utility import CommonUtility
 
 
 F_TYPE_AIV_TYPE_FLAG = 12
@@ -70,12 +70,12 @@ def parse_hexdump_to_tlv(hexdump: str) -> str:
 
 
 # .o生成tlv
-def generate_tlv_from_object_file(object_file_path: str, section_name: str) -> Optional[str]:
+def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Optional[str]:
     if not os.path.exists(object_file_path):
         raise FileNotFoundError(f"object file {object_file_path} not found, please check it.")
-    
+    section_name = ".ascend.meta." + kernel_name
     generate_cmd = ['llvm-objdump', '-s', '-j', '{}'.format(section_name), '{}'.format(object_file_path)]
-
+    CommonUtility.print_compile_log(kernel_name, f"start generate tlv info ...", AscendCLogLevel.LOG_INFO)
     proc = subprocess.Popen(generate_cmd, stdout=subprocess.PIPE, stderr=None)
     (tlv_info, _) = proc.communicate()
     tlv_info = tlv_info.decode('utf-8')
@@ -87,6 +87,7 @@ def generate_tlv_from_object_file(object_file_path: str, section_name: str) -> O
 
 def parse_tlv_get_simt_value(tlv_string: str):
     try:        
+        CommonUtility.print_compile_log(kernel_name, f"start parse tlv info ...", AscendCLogLevel.LOG_INFO)
         hex_data = extract_hex_data(tlv_string)
         if not hex_data:
             return None
@@ -118,8 +119,7 @@ def parse_tlv_get_simt_value(tlv_string: str):
 
 
 def check_op_type_is_simt(object_file_path: str, kernel_name: str):
-    section_name = ".ascend.meta." + kernel_name
-    tlv_string = generate_tlv_from_object_file(object_file_path, section_name)
+    tlv_string = generate_tlv_from_object_file(object_file_path, kernel_name)
     simt_value = parse_tlv_get_simt_value(tlv_string)
     if not simt_value:
         LogUtil.print_compile_log(kernel_name, f"simt type in section is None", \
@@ -129,5 +129,6 @@ def check_op_type_is_simt(object_file_path: str, kernel_name: str):
         decimal_val = int(simt_value.lstrip('0x'), 16)
         target_values = {AIV_TYPE_SIMD_SIMT_MIX_VF, AIV_TYPE_SIMT_VF_ONLY}
         if decimal_val in target_values:
+            CommonUtility.print_compile_log(kernel_name, f"{kernel_name} is simt ...", AscendCLogLevel.LOG_INFO)
             return True
         return False
