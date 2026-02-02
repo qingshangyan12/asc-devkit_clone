@@ -20,9 +20,9 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline void SetAtomicTypeImpl()
 {
-    ASCENDC_ASSERT((SupportType<T, half, float, int16_t, int32_t, int8_t, bfloat16_t>()), {KERNEL_LOG(KERNEL_ERROR,
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int16_t, int32_t, int8_t, bfloat16_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
         "Failed to check dtype in SetAtomicType, current api support dtype is: half / float / int16_t / int32_t / "
-        "int8_t / bfloat16_t");});
+        "int8_t / bfloat16_t"));
     if constexpr(IsSameType<T, float>::value) {
         set_atomic_f32();
     } else if constexpr(IsSameType<T, half>::value) {
@@ -48,9 +48,9 @@ __aicore__ inline void SetAtomicNoneImpl()
 template <typename T>
 __aicore__ inline void SetAtomicAddImpl()
 {
-    ASCENDC_ASSERT((SupportType<T, half, float, int16_t, int32_t, int8_t, bfloat16_t>()), {KERNEL_LOG(KERNEL_ERROR,
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int16_t, int32_t, int8_t, bfloat16_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
         "Failed to check dtype in SetAtomicAdd, current api support dtype is: half / float / int16_t / int32_t / "
-        "int8_t / bfloat16_t");});
+        "int8_t / bfloat16_t"));
     set_atomic_add();
     SetAtomicTypeImpl<T>();
 }
@@ -59,9 +59,9 @@ __aicore__ inline void SetAtomicAddImpl()
 template <typename T>
 __aicore__ inline void SetAtomicMaxImpl()
 {
-    ASCENDC_ASSERT((SupportType<T, half, float, int16_t, int32_t, int8_t, bfloat16_t>()), {KERNEL_LOG(KERNEL_ERROR,
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int16_t, int32_t, int8_t, bfloat16_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
         "Failed to check dtype in SetAtomicMax, current api support dtype is: half / float / int16_t / int32_t / "
-        "int8_t / bfloat16_t");});
+        "int8_t / bfloat16_t"));
     set_atomic_max();
     SetAtomicTypeImpl<T>();
 }
@@ -70,9 +70,9 @@ __aicore__ inline void SetAtomicMaxImpl()
 template <typename T>
 __aicore__ inline void SetAtomicMinImpl()
 {
-    ASCENDC_ASSERT((SupportType<T, half, float, int16_t, int32_t, int8_t, bfloat16_t>()), {KERNEL_LOG(KERNEL_ERROR,
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int16_t, int32_t, int8_t, bfloat16_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
         "Failed to check dtype in SetAtomicMin, current api support dtype is: half / float / int16_t / int32_t / "
-        "int8_t / bfloat16_t");});
+        "int8_t / bfloat16_t"));
     set_atomic_min();
     SetAtomicTypeImpl<T>();
 }

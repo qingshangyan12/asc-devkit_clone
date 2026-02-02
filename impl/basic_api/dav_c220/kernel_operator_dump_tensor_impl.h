@@ -62,8 +62,8 @@ __aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
     uint32_t totalBlockNum;
 
     if (g_dumpWorkspaceReserved == nullptr) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "init dump get nullptr system workspace ptr"); });
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "init dump get nullptr system workspace ptr"));
         return;
     }
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) - DUMP_WORKSPACE_SIZE;
@@ -170,12 +170,12 @@ __aicore__ inline void WriteDumpShapeInfo(const ShapeInfo &shapeInfo)
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     uint32_t tlvSize = valueSize + DUMP_SHAPE_MESSAGE_TL_LEN;
     if (ptr->dumpOffset < tlvSize) {
-        ASCENDC_ASSERT((false), {
-            KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                 "Space not enough! need %u Bytes, current remained dump space is %u Bytes",
                 tlvSize,
-                ptr->dumpOffset);
-        });
+                ptr->dumpOffset)
+        );
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
         return;
@@ -211,8 +211,8 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& src, u
     uint32_t position = CheckValidPosition(src);
     // set the head struct value
     if (position == 0) {
-        ASCENDC_ASSERT((false),
-                   { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+        ASCENDC_DEBUG_ASSERT((false),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"));
         return;
     }
 
@@ -228,12 +228,12 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& src, u
 
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     if (ptr->dumpOffset < (padOffset + sizeof(DumpMessageHead))) {
-        ASCENDC_ASSERT((false), {
-            KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                 "Space not enough! need %u Bytes, current remained dump space is %u Bytes",
                 (padOffset + sizeof(DumpMessageHead)),
-                ptr->dumpOffset);
-        });
+                ptr->dumpOffset)
+        );
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
         return;
@@ -1029,8 +1029,8 @@ __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc
 #ifdef ASCENDC_DUMP
     EnablePrintf();
     if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
-        ASCENDC_ASSERT((false),
-                   { KERNEL_LOG(KERNEL_ERROR, "dump tensor not support this data type"); });
+        ASCENDC_DEBUG_ASSERT((false),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dump tensor not support this data type"));
         return;
     }
 
@@ -1042,8 +1042,8 @@ __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc
         Hardware position = CheckDumpTensorPosition(src);
         // set the head struct value
         if (position == Hardware::MAX) {
-            ASCENDC_ASSERT((false),
-                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+            ASCENDC_DEBUG_ASSERT((false),
+                    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"));
             return;
         } else if (position == Hardware::L0C) {
             if ASCEND_IS_NOT_AIC {

@@ -25,8 +25,8 @@ __aicore__ inline void GatherbImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ u
     const uint32_t srcLength, uint8_t repeatTime, const GatherRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, uint16_t, uint32_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-            "Gatherb, current api support dtype combination is src and dst both: uint16_t, uint32_t");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, uint16_t, uint32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "Gatherb, current api support dtype combination is src and dst both: uint16_t, uint32_t"));
         ResetMask();
         uint16_t dstRptStd = repeatParams.dstRepStride;
         uint8_t dstBlkStd = repeatParams.dstBlkStride;
@@ -45,9 +45,9 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
     const uint16_t dstRepStride)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination is src and "
-            "dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination is src and "
+            "dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t"));
         uint32_t offsetAddr = (uint64_t)srcLocal + srcBaseAddr;
 #if ASCENDC_CPU_DEBUG
         uint64_t cpuAddr = (uint64_t)srcLocal + srcBaseAddr;
@@ -59,7 +59,7 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
         } else if constexpr (sizeof(T) == sizeof(uint32_t)) {
             vgather((__ubuf__ uint32_t *)dstLocal, srcOffsetLocal, offsetAddr, dstRepStride, repeatTime);
         } else {
-            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "size of dtype for Gather should be 2 / 4"); });
+            ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "size of dtype for Gather should be 2 / 4"));
         }
     }
 }
@@ -70,9 +70,9 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
     const uint16_t dstRepStride)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination is src and "
-            "dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination is src and "
+            "dst both: half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t"));
         uint32_t offsetAddr = (uint64_t)srcLocal + srcBaseAddr;
 #if ASCENDC_CPU_DEBUG
         uint64_t cpuAddr = (uint64_t)srcLocal + srcBaseAddr;
@@ -86,7 +86,7 @@ __aicore__ inline void GatherImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __
             vgather((__ubuf__ uint32_t *)dstLocal, (__ubuf__ uint32_t *)srcOffsetLocal, offsetAddr, dstRepStride,
                 repeatTime);
         } else {
-            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "size of dtype for Gather should be 2 / 4"); });
+            ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "size of dtype for Gather should be 2 / 4"));
         }
     }
 }
