@@ -110,7 +110,7 @@ __aicore__ inline constexpr auto GetAuxDataType()
         fp8_e8m0_t mxType = *(reinterpret_cast<fp8_e8m0_t*>(&mxData));
         return mxType;
 #else
-        uint8_t mxData = 0;
+        fp8_e8m0_t mxData = 0;
         return mxData;
 #endif
     } else {
