@@ -21,6 +21,26 @@
 #include "simt_api/device_atomic_functions.h"
 #include "simt_api/device_types.h"
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rn(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rn_sat(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rz(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rz_sat(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rd(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rd_sat(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_ru(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_ru_sat(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rna(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rna_sat(const float x);
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_rn(const float x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_rz(const float x);
