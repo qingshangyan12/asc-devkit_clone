@@ -438,6 +438,7 @@ template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
     return lastId;
 }
 
+// NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
 template <TPosition pos> __aicore__ inline TBuffAddr TPipe::GetAbsAddr(int32_t offset, int32_t len) const
 {
     TBuffAddr addr;
@@ -446,6 +447,7 @@ template <TPosition pos> __aicore__ inline TBuffAddr TPipe::GetAbsAddr(int32_t o
     addr.bufferAddr = offset;
     addr.dataLen = len;
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    KERNEL_LOG(KERNEL_WARN, "GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!");
     auto bufferInitLen = ConstDefiner::Instance().bufferInitLen;
     constexpr auto pool = GetPhyType(pos);
     ASCENDC_ASSERT((pool != Hardware::GM), { KERNEL_LOG(KERNEL_ERROR, "buffer pos can not be Hardware::GM"); });
@@ -458,9 +460,13 @@ template <TPosition pos> __aicore__ inline TBuffAddr TPipe::GetAbsAddr(int32_t o
     return addr;
 }
 
+// NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
 template <TPosition pos, typename T>
 __aicore__ inline __sync_noalias__ LocalTensor<T> TPipe::GetAbsAddr(int32_t offset, int32_t size) const
 {
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    KERNEL_LOG(KERNEL_WARN, "GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!");
+#endif
     TBuffAddr addr = GetAbsAddr<pos>(offset, static_cast<int32_t>((size * sizeof(T))));
     LocalTensor<T> tensor;
     tensor.SetAddr(addr);
@@ -781,8 +787,10 @@ inline uint64_t TPipe::GetAbsAddr(const LocalTensor<T>& tensor)
     return delta;
 }
 
+// NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
 template <typename T> inline uint64_t GetAbsAddr(TPipe* tpipe, const LocalTensor<T>& tensor)
 {
+    KERNEL_LOG(KERNEL_WARN, "GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!");
     // Translates the CPU address to the actual physical address.
     // Currently, only L1 or UB address translation is supported.
     int8_t logicPos = tensor.GetPosition();

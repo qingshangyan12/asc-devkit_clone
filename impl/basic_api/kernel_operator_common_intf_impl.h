@@ -241,10 +241,14 @@ __aicore__ inline int64_t GetTaskRation()
     return GetTaskRatio();
 }
 
+// NOTICE: InitOutput has been deprecated and will be removed in the next version. Please do not use it!
 template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void InitOutput(GlobalTensor<T> gmWorkspaceAddr, uint32_t size, T value)
 {
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    KERNEL_LOG(KERNEL_WARN, "InitOutput has been deprecated and will be removed in the next version. Please do not use it!");
+#endif
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
 #if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
