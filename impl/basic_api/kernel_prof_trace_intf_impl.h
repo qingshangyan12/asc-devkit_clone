@@ -15,6 +15,7 @@
 #ifndef ASCENDC_KERNEL_PROF_TRACE_INTERFACE_IMPL_H
 #define ASCENDC_KERNEL_PROF_TRACE_INTERFACE_IMPL_H
 #include "kernel_prof_trace.h"
+#include "utils/debug/asc_time.h"
 
 namespace AscendC {
 __aicore__ inline void MetricsProfStart()
@@ -32,6 +33,12 @@ template<pipe_t pipe, uint16_t index>
 __aicore__ inline void MarkStamp()
 {
     MarkStampImpl<pipe, index>();
+}
+
+template<pipe_t pipe>
+__aicore__ inline void MarkStamp(uint16_t index)
+{
+    asc_mark_stamp<pipe>(index);
 }
 #endif
 } // namespace AscendC
