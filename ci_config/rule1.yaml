@@ -1,0 +1,79 @@
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
+CB:
+  commiter:
+    "qiaoll"
+  team: "asc-devkit" ##组件名称
+  llt1:
+      ut_check: true
+      st_check: false
+      release:
+        - impl
+        - include
+        - tools
+      version:cann
+  tasks:
+    llt2:
+      ut_check: true
+      st_check: false
+      release:
+        - impl
+        - include
+        - tools
+      version:cann
+    llt3:
+      ut_check: true
+      st_check: false
+      release:
+        - impl
+        - include
+        - tools
+      version:cann
+    llt4:
+      ut_check: true
+      st_check: false
+      release:
+        - impl
+        - include
+        - tools
+      version:cann2
+    llt5:
+      ut_check: true
+      st_check: false
+      release:
+        - impl
+        - include
+        - tools
+      version:cann2
+    llt6:
+      ut_check: true
+      st_check: false
+      release:
+        - impl
+        - include
+        - tools
+      version:cann2
+  src:
+    release:
+      - impl
+      - include
+      - tools
+    unrelease:
+      - cmake
+      - docs
+      - examples
+      - scripts
+      - tests
+      - include/**/*.h
+      - tools/**/*.h
+  llt:
+    ut_check: true
+    st_check: false
