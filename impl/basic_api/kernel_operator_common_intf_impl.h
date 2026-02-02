@@ -241,6 +241,7 @@ __aicore__ inline int64_t GetTaskRation()
     return GetTaskRatio();
 }
 
+// NOTICE: InitOutput has been deprecated and will be removed in the next version. Please use InitGlobalMemory instead!
 template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void InitOutput(GlobalTensor<T> gmWorkspaceAddr, uint32_t size, T value)
