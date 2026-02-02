@@ -91,6 +91,7 @@ install(CODE "file(CREATE_LINK ../basic_api/core_mng ${CMAKE_INSTALL_PREFIX}/${I
 install(CODE "file(CREATE_LINK ../basic_api/kernel_common.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_common.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/kernel_operator_atomic_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_operator_atomic_intf.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/kernel_operator_block_sync_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_operator_block_sync_intf.h SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../basic_api/kernel_operator_sync_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_operator_sync_intf.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/kernel_operator_cache_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_operator_cache_intf.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/kernel_operator_common_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_operator_common_intf.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/kernel_operator_conv2d_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_operator_conv2d_intf.h SYMBOLIC)")
