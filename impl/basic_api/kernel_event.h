@@ -18,6 +18,7 @@
 #include "kernel_macros.h"
 #include "kernel_log.h"
 #include "common_types.h"
+#include "kernel_sync.h"
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
 #include "stub_def.h"
@@ -26,50 +27,6 @@
 
 namespace AscendC {
 using QuePosition = TPosition;
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
-
-enum class HardEvent : uint8_t {
-    // src_dst
-    MTE2_MTE1,
-    MTE1_MTE2,
-    MTE1_M,
-    M_MTE1,
-    MTE2_V,
-    V_MTE2,
-    MTE3_V,
-    V_MTE3,
-    M_V,
-    V_M,
-    V_V,
-    MTE3_MTE1,
-    MTE1_MTE3,
-    MTE1_V,
-    MTE2_M,
-    M_MTE2,
-    V_MTE1,
-    M_FIX,
-    FIX_M,
-    MTE3_MTE2,
-    MTE2_MTE3,
-    S_V,
-    V_S,
-    S_MTE2,
-    MTE2_S,
-    S_MTE3,
-    MTE3_S,
-    MTE2_FIX,
-    FIX_MTE2,
-    FIX_S,
-    M_S,
-    FIX_MTE3,
-    MTE1_FIX,
-    FIX_MTE1,
-    FIX_FIX,
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003))
-    FIX_V,
-#endif
-    MAX,
-};
 
 enum class HardEventAic : uint8_t {
     // src_dst
@@ -245,89 +202,6 @@ constexpr int32_t PIPE_NUM = 6;
 constexpr pipe_t SUPPORTED_PIPE[PIPE_NUM] = { PIPE_S, PIPE_V, PIPE_M, PIPE_MTE1, PIPE_MTE2, PIPE_MTE3 };
 #endif
 
-#if defined(__NPU_ARCH__)
-template <pipe_t pipe>
-__aicore__ inline constexpr bool IsSplitVectorPipe()
-{
-    return pipe == PIPE_S || pipe == PIPE_V || pipe == PIPE_MTE2 || pipe == PIPE_MTE3;
-}
-
-template <pipe_t pipe>
-__aicore__ inline constexpr bool IsSplitCubePipe()
-{
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002)
-    return pipe == PIPE_S || pipe == PIPE_MTE1 || pipe == PIPE_MTE2 || pipe == PIPE_MTE3 || pipe == PIPE_M;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-    return pipe == PIPE_S || pipe == PIPE_MTE1 || pipe == PIPE_MTE2 || pipe == PIPE_FIX || pipe == PIPE_M;
-#else
-    return pipe == PIPE_S || pipe == PIPE_MTE1 || pipe == PIPE_MTE2 || pipe == PIPE_MTE3 || pipe == PIPE_FIX || pipe == PIPE_M;
-#endif
-}
-
-template <pipe_t pipe>
-__aicore__ inline void PipeBarrierInternal()
-{
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-    if constexpr (IsSplitVectorPipe<pipe>() || pipe == PIPE_ALL) {
-        if ASCEND_IS_AIV {
-            pipe_barrier(pipe);
-        }
-    }
-    if constexpr (IsSplitCubePipe<pipe>() || pipe == PIPE_ALL){
-        if ASCEND_IS_AIC {
-            pipe_barrier(pipe);
-        }
-    }
-#else
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-    if constexpr (pipe == PIPE_V) {
-        return;
-    }
-#endif
-    pipe_barrier(pipe);
-#endif
-}
-
-template <pipe_t srcPipe, pipe_t dstPipe>
-__aicore__ inline void SetFlagInternal(event_t evt)
-{
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-    if constexpr (IsSplitVectorPipe<srcPipe>() && IsSplitVectorPipe<dstPipe>()) {
-        if ASCEND_IS_AIV {
-            set_flag(srcPipe, dstPipe, evt);
-        }
-    }
-    if constexpr (IsSplitCubePipe<srcPipe>() && IsSplitCubePipe<dstPipe>()){
-        if ASCEND_IS_AIC {
-            set_flag(srcPipe, dstPipe, evt);
-        }
-    }
-#else
-    set_flag(srcPipe, dstPipe, evt);
-#endif
-}
-
-template <pipe_t srcPipe, pipe_t dstPipe>
-__aicore__ inline void WaitFlagInternal(event_t evt)
-{
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-    (void)evt;
-    if constexpr (IsSplitVectorPipe<srcPipe>() && IsSplitVectorPipe<dstPipe>()) {
-        if ASCEND_IS_AIV {
-            wait_flag(srcPipe, dstPipe, evt);
-        }
-    }
-    if constexpr (IsSplitCubePipe<srcPipe>() && IsSplitCubePipe<dstPipe>()){
-        if ASCEND_IS_AIC {
-            wait_flag(srcPipe, dstPipe, evt);
-        }
-    }
-#else
-    wait_flag(srcPipe, dstPipe, evt);
-#endif
-}
-#endif
-
 __aicore__ constexpr bool IsSupportedPipe(pipe_t pipe)
 {
     for (int i = 0; i < PIPE_NUM; i++) {
@@ -367,7 +241,7 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
     } else if (pos == TPosition::A1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::A2) {
-hard = Hardware::L0A;
+        hard = Hardware::L0A;
     } else if (pos == TPosition::B1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::B2) {
@@ -420,7 +294,7 @@ hard = Hardware::L0A;
         hard = Hardware::FIXBUF;
 #endif
     } else if (pos == TPosition::CO1) {
-hard = Hardware::L0C;
+        hard = Hardware::L0C;
     } else if (pos == TPosition::SHM) {
         hard = Hardware::L1;
     } else if (pos == TPosition::TSCM) {
@@ -780,16 +654,6 @@ __aicore__ constexpr bool IsUseBufId(Hardware src, Hardware dst)
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                       \
     (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||                       \
     (__NPU_ARCH__ == 3113))
-template <MemDsbT arg>
-__aicore__ inline void DataSyncBarrierImpl()
-{
-    if constexpr (arg == MemDsbT::UB) {
-        if ASCEND_IS_AIC {
-            return;
-        }
-    }
-    dsb((mem_dsb_t)arg);
-}
 
 template <HardEvent event, MemoryT memT, bool isVirtual>
 __aicore__ inline void HSetFlagImpl(int32_t eventID)
@@ -862,270 +726,6 @@ __aicore__ inline void HWaitFlagImpl(int32_t eventID)
 }
 #endif
 
-template <HardEvent event>
-__aicore__ inline void SetFlagImpl(int32_t eventID)
-{
-    ASCENDC_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
-                   { KERNEL_LOG(KERNEL_ERROR, "eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT); });
-    event_t e = static_cast<event_t>(eventID);
-    switch (event) {
-        case HardEvent::MTE2_MTE1:
-            SetFlagInternal<PIPE_MTE2, PIPE_MTE1>(e);
-            break;
-        case HardEvent::MTE1_MTE2:
-            SetFlagInternal<PIPE_MTE1, PIPE_MTE2>(e);
-            break;
-        case HardEvent::MTE2_MTE3:
-            SetFlagInternal<PIPE_MTE2, PIPE_MTE3>(e);
-            break;
-        case HardEvent::MTE3_MTE2:
-            SetFlagInternal<PIPE_MTE3, PIPE_MTE2>(e);
-            break;
-        case HardEvent::MTE1_M:
-            SetFlagInternal<PIPE_MTE1, PIPE_M>(e);
-            break;
-        case HardEvent::M_MTE1:
-            SetFlagInternal<PIPE_M, PIPE_MTE1>(e);
-            break;
-        case HardEvent::MTE2_V:
-            SetFlagInternal<PIPE_MTE2, PIPE_V>(e);
-            break;
-        case HardEvent::V_MTE2:
-            SetFlagInternal<PIPE_V, PIPE_MTE2>(e);
-            break;
-        case HardEvent::MTE3_V:
-            SetFlagInternal<PIPE_MTE3, PIPE_V>(e);
-            break;
-        case HardEvent::V_MTE3:
-            SetFlagInternal<PIPE_V, PIPE_MTE3>(e);
-            break;
-        case HardEvent::M_V:
-            SetFlagInternal<PIPE_M, PIPE_V>(e);
-            break;
-        case HardEvent::M_S:
-            SetFlagInternal<PIPE_M, PIPE_S>(e);
-            break;
-        case HardEvent::V_M:
-            SetFlagInternal<PIPE_V, PIPE_M>(e);
-            break;
-        case HardEvent::S_V:
-            SetFlagInternal<PIPE_S, PIPE_V>(e);
-            break;
-        case HardEvent::V_S:
-            SetFlagInternal<PIPE_V, PIPE_S>(e);
-            break;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ != 3002) || (__NPU_ARCH__ == 3003))
-        case HardEvent::V_V:
-            PipeBarrierInternal<PIPE_V>();
-            return;
-#endif
-        case HardEvent::MTE3_MTE1:
-            SetFlagInternal<PIPE_MTE3, PIPE_MTE1>(e);
-            break;
-        case HardEvent::MTE1_MTE3:
-            SetFlagInternal<PIPE_MTE1, PIPE_MTE3>(e);
-            break;
-        case HardEvent::MTE1_V:
-            SetFlagInternal<PIPE_MTE1, PIPE_V>(e);
-            break;
-        case HardEvent::MTE2_M:
-            SetFlagInternal<PIPE_MTE2, PIPE_M>(e);
-            break;
-        case HardEvent::M_MTE2:
-            SetFlagInternal<PIPE_M, PIPE_MTE2>(e);
-            break;
-        case HardEvent::S_MTE2:
-            SetFlagInternal<PIPE_S, PIPE_MTE2>(e);
-            break;
-        case HardEvent::MTE2_S:
-            SetFlagInternal<PIPE_MTE2, PIPE_S>(e);
-            break;
-        case HardEvent::V_MTE1:
-            SetFlagInternal<PIPE_V, PIPE_MTE1>(e);
-            break;
-        case HardEvent::S_MTE3:
-            SetFlagInternal<PIPE_S, PIPE_MTE3>(e);
-            break;
-        case HardEvent::MTE3_S:
-            SetFlagInternal<PIPE_MTE3, PIPE_S>(e);
-            break;
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||           \
-    (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||                            \
-    ((__NPU_ARCH__ == 3113)))
-        case HardEvent::M_FIX:
-            SetFlagInternal<PIPE_M, PIPE_FIX>(e);
-            break;
-        case HardEvent::FIX_M:
-            SetFlagInternal<PIPE_FIX, PIPE_M>(e);
-            break;
-        case HardEvent::FIX_MTE3:
-            SetFlagInternal<PIPE_FIX, PIPE_MTE3>(e);
-            break;
-        case HardEvent::FIX_MTE2:
-            SetFlagInternal<PIPE_FIX, PIPE_MTE2>(e);
-            break;
-        case HardEvent::MTE2_FIX:
-            SetFlagInternal<PIPE_MTE2, PIPE_FIX>(e);
-            break;
-        case HardEvent::FIX_S:
-            SetFlagInternal<PIPE_FIX, PIPE_S>(e);
-            break;
-        case HardEvent::MTE1_FIX:
-            SetFlagInternal<PIPE_MTE1, PIPE_FIX>(e);
-            break;
-        case HardEvent::FIX_MTE1:
-            SetFlagInternal<PIPE_FIX, PIPE_MTE1>(e);
-            break;
-        case HardEvent::FIX_FIX:
-            PipeBarrierInternal<PIPE_FIX>();
-            break;
-#endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
-        case HardEvent::FIX_V:
-            SetFlagInternal<PIPE_FIX, PIPE_V>(e);
-            break;
-#endif
-        case HardEvent::MAX:
-            break;
-        default:
-            ASCENDC_ASSERT((0), { KERNEL_LOG(KERNEL_ERROR, "invalid event %d", static_cast<int32_t>(event)); });
-            break;
-    }
-}
-
-__aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
-{
-    ASCENDC_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
-                   { KERNEL_LOG(KERNEL_ERROR, "eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT); });
-    event_t e = static_cast<event_t>(eventID);
-    switch (event) {
-#ifndef SPLIT_CORE_VEC // CUBE core
-        case HardEvent::MTE2_MTE1:
-            WaitFlagInternal<PIPE_MTE2, PIPE_MTE1>(e);
-            break;
-        case HardEvent::MTE1_MTE2:
-            WaitFlagInternal<PIPE_MTE1, PIPE_MTE2>(e);
-            break;
-        case HardEvent::MTE1_M:
-            WaitFlagInternal<PIPE_MTE1, PIPE_M>(e);
-            break;
-        case HardEvent::M_MTE1:
-            WaitFlagInternal<PIPE_M, PIPE_MTE1>(e);
-            break;
-        case HardEvent::MTE3_MTE1:
-            WaitFlagInternal<PIPE_MTE3, PIPE_MTE1>(e);
-            break;
-        case HardEvent::MTE1_MTE3:
-            WaitFlagInternal<PIPE_MTE1, PIPE_MTE3>(e);
-            break;
-        case HardEvent::MTE2_M:
-            WaitFlagInternal<PIPE_MTE2, PIPE_M>(e);
-            break;
-        case HardEvent::M_MTE2:
-            WaitFlagInternal<PIPE_M, PIPE_MTE2>(e);
-            break;
-#endif
-#ifndef SPLIT_CORE_CUBE // VECTOR core
-        case HardEvent::MTE2_V:
-            WaitFlagInternal<PIPE_MTE2, PIPE_V>(e);
-            break;
-        case HardEvent::V_MTE2:
-            WaitFlagInternal<PIPE_V, PIPE_MTE2>(e);
-            break;
-        case HardEvent::MTE3_V:
-            WaitFlagInternal<PIPE_MTE3, PIPE_V>(e);
-            break;
-        case HardEvent::V_MTE3:
-            WaitFlagInternal<PIPE_V, PIPE_MTE3>(e);
-            break;
-#endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ != 2201) && (__NPU_ARCH__ != 3101))
-        case HardEvent::M_V:
-            WaitFlagInternal<PIPE_M, PIPE_V>(e);
-            break;
-        case HardEvent::V_M:
-            WaitFlagInternal<PIPE_V, PIPE_M>(e);
-            break;
-        case HardEvent::MTE1_V:
-            WaitFlagInternal<PIPE_MTE1, PIPE_V>(e);
-            break;
-        case HardEvent::V_MTE1:
-            WaitFlagInternal<PIPE_V, PIPE_MTE1>(e);
-            break;
-#endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||           \
-    (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||                            \
-    ((__NPU_ARCH__ == 3113)))
-        case HardEvent::FIX_M:
-            WaitFlagInternal<PIPE_FIX, PIPE_M>(e);
-            break;
-        case HardEvent::M_FIX:
-            WaitFlagInternal<PIPE_M, PIPE_FIX>(e);
-            break;
-        case HardEvent::MTE2_FIX:
-            WaitFlagInternal<PIPE_MTE2, PIPE_FIX>(e);
-            break;
-        case HardEvent::FIX_MTE2:
-            WaitFlagInternal<PIPE_FIX, PIPE_MTE2>(e);
-            break;
-        case HardEvent::FIX_S:
-            WaitFlagInternal<PIPE_FIX, PIPE_S>(e);
-            break;
-        case HardEvent::FIX_MTE3:
-            WaitFlagInternal<PIPE_FIX, PIPE_MTE3>(e);
-            break;
-        case HardEvent::MTE1_FIX:
-            WaitFlagInternal<PIPE_MTE1, PIPE_FIX>(e);
-            break;
-        case HardEvent::FIX_MTE1:
-            WaitFlagInternal<PIPE_FIX, PIPE_MTE1>(e);
-            break;
-        case HardEvent::FIX_FIX:
-            PipeBarrierInternal<PIPE_FIX>();
-            break;
-#endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
-        case HardEvent::FIX_V:
-            WaitFlagInternal<PIPE_FIX, PIPE_V>(e);
-            break;
-#endif
-        case HardEvent::MTE3_MTE2:
-            WaitFlagInternal<PIPE_MTE3, PIPE_MTE2>(e);
-            break;
-        case HardEvent::MTE2_MTE3:
-            WaitFlagInternal<PIPE_MTE2, PIPE_MTE3>(e);
-            break;
-        case HardEvent::S_MTE2:
-            WaitFlagInternal<PIPE_S, PIPE_MTE2>(e);
-            break;
-        case HardEvent::MTE2_S:
-            WaitFlagInternal<PIPE_MTE2, PIPE_S>(e);
-            break;
-        case HardEvent::S_MTE3:
-            WaitFlagInternal<PIPE_S, PIPE_MTE3>(e);
-            break;
-        case HardEvent::MTE3_S:
-            WaitFlagInternal<PIPE_MTE3, PIPE_S>(e);
-            break;
-        case HardEvent::M_S:
-            WaitFlagInternal<PIPE_M, PIPE_S>(e);
-            break; 
-        case HardEvent::S_V:
-            WaitFlagInternal<PIPE_S, PIPE_V>(e);
-            break;
-        case HardEvent::V_S:
-            WaitFlagInternal<PIPE_V, PIPE_S>(e);
-            break;
-        case HardEvent::V_V:
-            return;
-        case HardEvent::MAX:
-            break;
-        default:
-            break;
-    }
-    return;
-}
 }  // namespace AscendC
 
 #endif  // ASCENDC_KERNEL_EVENT_IMPL_H
