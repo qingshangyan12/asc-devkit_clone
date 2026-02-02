@@ -127,6 +127,35 @@ __aicore__ inline void CalcLoopGroupParam(uint64_t *xnData, uint64_t m, uint64_t
         xnData[7] = p; // ccu xn7
     }
 }
+
+__aicore__ inline void CalcLoopGroupParams(uint64_t *loopParam, uint64_t sliceSize, uint64_t loopCount)
+{
+    uint64_t loopSize = loopCount * CCU_MEMSLICE_SIZE;
+    uint64_t m = sliceSize / loopSize;
+    uint64_t n = (sliceSize - m * loopSize) / CCU_MEMSLICE_SIZE;
+    uint64_t p = sliceSize - m * loopSize - n * CCU_MEMSLICE_SIZE;
+    KERNEL_LOG(KERNEL_INFO, "ApiClient loopParam loopSize:%d, m:%d, n:%d, p:%d", loopSize, m, n, p);
+
+    loopParam[0] = loopSize * m;
+    loopParam[1] = m;
+    if (n == 0 && p == 0) {
+        // 数据量为loopSize的整数倍，跳过LoopGroup1
+        loopParam[2] = 0;
+        loopParam[3] = 0;
+    } else if (n != 0 && p == 0) {
+        // 数据量为256K * m + CCU_MEMSLICE_SIZE * n
+        loopParam[2] = GetParallelParameters(n - 1, 0, 1);
+        loopParam[3] = CCU_MEMSLICE_SIZE;
+    } else if (n == 0 && p != 0) {
+        // 数据量为loopSize * m + p
+        loopParam[2] = GetParallelParameters(0, 0, 1);
+        loopParam[3] = p;
+    } else {
+        // 数据量为loopSize * m + CCU_MEMSLICE_SIZE * n + p
+        loopParam[2] = GetParallelParameters(n - 1, 1, CCU_PARAM_INDEX);
+        loopParam[3] = p;
+    }
+}
 }
 
 #endif

@@ -108,6 +108,23 @@ enum class ScopeType: uint8_t {
 
     INVALID_TYPE
 };
+
+enum class AlgorithmType: uint8_t {
+    CcuAllGatherMesh1D = 0,
+    CcuAllGatherMeshMem2Mem1D,
+    CcuAllGatherMesh2D,
+    CcuReduceScatterMesh1D,
+    CcuReduceScatterMeshMem2Mem1D,
+    CcuReduceScatterMesh2D,
+    CcuAllReduceMesh1D,
+    CcuAllReduceMeshMem2Mem1D,
+    CcuAllReduceMesh2DOneShot,
+    CcuReduceMesh1D,
+    CcuReduceMesh2D,
+    CcuAlltoAllMesh1D,
+    CcuAlltoAllVMesh1D,
+    CcuHalfAll2AllVMesh1D
+};
 }  // namespace AscendC
 
 #endif  // LIB_HCCL_HCCL_COMMON_H

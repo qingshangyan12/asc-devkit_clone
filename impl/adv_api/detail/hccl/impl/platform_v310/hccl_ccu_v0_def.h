@@ -102,6 +102,9 @@ private:
         __gm__ AlltoAllVParamCcu *allToAllVParam);
     __aicore__ inline void CcuPrepareForAllToAllVWrite(__gm__ CommonPrepareParamCcu *commParam);
     __aicore__ inline void CcuPrepareForReduceScatter(__gm__ CommonPrepareParamCcu *commParam);
+    __aicore__ inline void CcuPrepareForAllReduceM2M(__gm__ CommonPrepareParamCcu *commParam);
+    __aicore__ inline void CcuPrepareForAllGatherM2M(__gm__ CommonPrepareParamCcu *commParam);
+    __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu *commParam);
 
 private:
     __gm__ HcclCombineOpParam *hcclContext_;
@@ -139,7 +142,6 @@ private:
     uint32_t globalCurWaitCnt_ = 0;
 
     uint8_t ccuUsedXnNum_ = 0;
-    uint64_t sizeOfXnMsg_ = 0;
 
     bool msgQueueIsAvailable_[CCU_MAX_MSG_NUM];
     uint64_t xnData_[CCU_USED_XN_NUM];
