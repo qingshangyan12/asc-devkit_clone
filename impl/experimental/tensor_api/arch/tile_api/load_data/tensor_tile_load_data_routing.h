@@ -18,6 +18,9 @@
 #include "impl/experimental/tensor_api/arch/tile_api/load_data/tensor_tile_load_data_four_dim_2201_l1_l0a.h"
 #include "impl/experimental/tensor_api/arch/tile_api/load_data/tensor_tile_load_data_four_dim_2201_l1_l0b.h"
 
+#include "impl/experimental/tensor_api/arch/tile_api/load_data/tensor_tile_load_data_four_dim_3101_l1_l0a.h"
+#include "impl/experimental/tensor_api/arch/tile_api/load_data/tensor_tile_load_data_four_dim_3101_l1_l0b.h"
+
 namespace AscendC {
 namespace TileInternal {
 
@@ -42,6 +45,18 @@ template <>
 struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V2201, FOUR_DIM_DATA>
 {
     using type = LoadDataFourDim2201L12L0B;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3101, FOUR_DIM_DATA>
+{
+    using type = LoadDataFourDim3101L12L0A;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3101, FOUR_DIM_DATA>
+{
+    using type = LoadDataFourDim3101L12L0B;
 };
 } // namespace TileInternal
 } // namespace AscendC

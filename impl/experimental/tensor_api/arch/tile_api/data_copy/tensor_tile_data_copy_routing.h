@@ -19,6 +19,10 @@
 #include "tensor_tile_data_copy_four_dim_2201_l1_bt.h"
 #include "tensor_tile_data_copy_four_dim_2201_l1_fb.h"
 
+#include "tensor_tile_data_copy_four_dim_3101_gm_l1.h"
+#include "tensor_tile_data_copy_four_dim_3101_l1_bt.h"
+#include "tensor_tile_data_copy_four_dim_3101_l1_fb.h"
+
 namespace AscendC {
 namespace TileInternal {
 
@@ -47,6 +51,22 @@ template <>
 struct DataCopyTensor2Tensor<Hardware::FIXBUF, Hardware::L1, ArchVersion::V2201, FOUR_DIM_DATA> {
     using type = CopyCbufToFB2201;
 };
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::L1, Hardware::GM, ArchVersion::V3101, FOUR_DIM_DATA> {
+    using type = DataCopyFourDim3101GM2L1;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::BIAS, Hardware::L1, ArchVersion::V3101, FOUR_DIM_DATA> {
+    using type = CopyCbufToBT3101;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::FIXBUF, Hardware::L1, ArchVersion::V3101, FOUR_DIM_DATA> {
+    using type = CopyCbufToFB3101;
+};
+
 } // namespace TileInternal
 } // namespace AscendC
 
