@@ -15,9 +15,9 @@
 #ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_ARCH_H
 #define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_ARCH_H
 
-#include "impl/experimental/detail/tensor_api/arch/tile_api/mmad_impl.h"
-#include "impl/experimental/detail/tensor_api/arch/tile_api/load_data_impl.h"
-#include "impl/experimental/detail/tensor_api/arch/tile_api/data_copy_impl.h"
-#include "impl/experimental/detail/tensor_api/arch/tile_api/fixpipe_impl.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad_impl.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data_impl.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy_impl.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe_impl.h"
 
 #endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_ARCH_H
