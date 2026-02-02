@@ -60,7 +60,6 @@ public:
         }
     #elif __NPU_ARCH__ == 3101
         set_mask_norm();
-        Internal::g_deqValue = static_cast<half>(1);
         uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
         uint64_t val = 0x1000000000000008 | prevCtrl;
         set_ctrl(val);
