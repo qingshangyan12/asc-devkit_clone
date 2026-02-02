@@ -183,6 +183,8 @@ add_library(
 
 target_include_directories(tiling_api PRIVATE
   ${KERNEL_TILING_DIR}
+  ${ASCEND_CANN_PACKAGE_PATH}/include
+  ${TOP_DIR}/runtime/include/external
   ${ASCENDC_DIR}/include/utils/context
   ${ASCENDC_DIR}/include/utils/tiling/platform
   ${ASCENDC_DIR}/include/utils
@@ -203,6 +205,7 @@ target_compile_options(
           -Wfloat-equal
           -D_FORTIFY_SOURCE=2
           -O2
+          -g
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fPIC>
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fstack-protector-strong>
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fstack-protector-all>
