@@ -9,30 +9,30 @@
 */
 
 /*!
-* \file copy_l12l0_traits.h
+* \file copy_gm2l1_traits.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_IMPL_COPY_L12L0_TRAITS_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_IMPL_COPY_L12L0_TRAITS_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_IMPL_COPY_GM2L1_TRAITS_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_IMPL_COPY_GM2L1_TRAITS_H
 
 #include "impl/experimental/tensor_api/detail/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/arch/arch.h"
+#include "include/experimental/tensor_api/arch/arch.h"
 
 namespace AscendC {
 
-struct LoadDataTraitDefault {
-    using TraitType = LoadDataTrait;
-    static constexpr const TraitType value = DEFAULT_LOAD_DATA_TRAIT;
+struct DataCopyTraitDefault {
+    using TraitType = DataCopyTrait;
+    static constexpr const TraitType value = DEFAULT_DATA_COPY_TRAIT;
 };
 
-struct CopyL12L0 {
+struct CopyGM2L1 {
     template <typename Tp, const Tp& traits, typename... Args>
     __aicore__ inline static void Copy(const Args& ...args)
     {
-        LoadData<traits, Args...>(args...);
+        DataCopy<traits, Args...>(args...);
     }
 };
 
 }
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_IMPL_COPY_L12L0_TRAITS_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_IMPL_COPY_GM2L1_TRAITS_H

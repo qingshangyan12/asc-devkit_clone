@@ -12,8 +12,8 @@
  * \file fixpipe_impl.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_FIXPIPE_IMPL_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_FIXPIPE_IMPL_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_IMPL_H
 
 namespace AscendC {
 struct FixpipeTrait {
@@ -93,4 +93,4 @@ Fixpipe(const T& dst, const U& src, const V& quant, const Coord& coord)
 }
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_FIXPIPE_IMPL_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_IMPL_H

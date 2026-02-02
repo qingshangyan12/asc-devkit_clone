@@ -12,11 +12,11 @@
 * \file copy_l0c2gm_traits.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_IMPL_COPY_L0C2GM_TRAITS_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_IMPL_COPY_L0C2GM_TRAITS_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_IMPL_COPY_L0C2GM_TRAITS_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_IMPL_COPY_L0C2GM_TRAITS_H
 
 #include "impl/experimental/tensor_api/detail/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/arch/arch.h"
+#include "include/experimental/tensor_api/arch/arch.h"
 
 namespace AscendC {
 
@@ -35,4 +35,4 @@ struct CopyL0C2GM {
 
 }
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_IMPL_COPY_L0C2GM_TRAITS_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_IMPL_COPY_L0C2GM_TRAITS_H

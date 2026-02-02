@@ -12,12 +12,12 @@
 * \file arch.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_ARCH_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_ARCH_H
+#ifndef EXPERIMENTAL_TENSOR_API_ARCH_ARCH_H
+#define EXPERIMENTAL_TENSOR_API_ARCH_ARCH_H
 
-#include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad_impl.h"
-#include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data_impl.h"
-#include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy_impl.h"
-#include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe_impl.h"
+#include "include/experimental/tensor_api/arch/cube_compute/mmad_intf.h"
+#include "include/experimental/tensor_api/arch/cube_datamove/load_data_intf.h"
+#include "include/experimental/tensor_api/arch/cube_datamove/data_copy_intf.h"
+#include "include/experimental/tensor_api/arch/cube_datamove/fixpipe_intf.h"
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_ARCH_H
+#endif // EXPERIMENTAL_TENSOR_API_ARCH_ARCH_H

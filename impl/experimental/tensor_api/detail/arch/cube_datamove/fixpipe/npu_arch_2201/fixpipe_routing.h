@@ -12,8 +12,8 @@
  * \file fixpipe_routing.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_FIXPIPE_ROUTING_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_FIXPIPE_ROUTING_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_ROUTING_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_ROUTING_H
 
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_four_dim_2201_l0c_gm.h"
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_quant_four_dim_2201_l0c_gm.h"
@@ -61,4 +61,4 @@ struct FixpipeQuantTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201
 } // namespace TileInternal
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_FIXPIPE_FIXPIPE_ROUTING_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_ROUTING_H

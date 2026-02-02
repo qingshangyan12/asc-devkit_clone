@@ -12,8 +12,8 @@
  * \brief
  */
 
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_LOAD_DATA_ROUTING_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_LOAD_DATA_ROUTING_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_2201_LOAD_DATA_ROUTING_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_2201_LOAD_DATA_ROUTING_H
 
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data/npu_arch_2201/load_data_four_dim_2201_l1_l0a.h"
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data/npu_arch_2201/load_data_four_dim_2201_l1_l0b.h"
@@ -45,4 +45,4 @@ struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V2201, FO
 };
 } // namespace TileInternal
 } // namespace AscendC
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_LOAD_DATA_ROUTING_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_2201_LOAD_DATA_ROUTING_H

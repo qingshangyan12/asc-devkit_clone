@@ -12,10 +12,10 @@
 * \file copy_atom.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_ATOM_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_ATOM_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
 
-#include "impl/experimental/tensor_api/detail/atom/copy_traits.h"
+#include "impl/experimental/tensor_api/detail/atom/cube_datamove/copy_traits.h"
 
 namespace AscendC {
 
@@ -54,4 +54,4 @@ __aicore__ inline auto MakeCopy(const Args& ...traits) {
 
 }
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ATOM_COPY_ATOM_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_ATOM_H

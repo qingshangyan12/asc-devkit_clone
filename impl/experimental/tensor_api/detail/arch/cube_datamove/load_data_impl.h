@@ -12,8 +12,8 @@
  * \file load_data_impl.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_IMPL_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_IMPL_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_IMPL_H
 
 namespace AscendC {
 struct LoadDataTrait {
@@ -51,4 +51,4 @@ LoadData(const T& dst, const U& src, const Coord& coord)
     Tensor2Tensor{}.template Run<T, U, trait, Coord>(dst, src, coord);
 }
 } // namespace AscendC
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_IMPL_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_IMPL_H
