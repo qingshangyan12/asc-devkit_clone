@@ -19,6 +19,7 @@
 #include "simt_api/device_types.h"
 #include "utils/debug/asc_printf.h"
 #include "utils/debug/asc_assert.h"
+#include "utils/debug/asc_clock.h"
 
 #ifndef __aicore__
 #define __aicore__ [aicore]
