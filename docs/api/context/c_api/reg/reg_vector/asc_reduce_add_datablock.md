@@ -44,14 +44,14 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址对齐要求请参考
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
+无
 
 ## 调用示例
 
 ```cpp
 vector_half dst;
 vector_half src;
-vector_bool mask;
+vector_bool mask = asc_create_mask_b16(Pat::ALL);
+asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_reduce_add_datablock(dst, src, mask);
 ```

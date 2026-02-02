@@ -45,9 +45,7 @@ PIPE_V
 
 ## 约束说明
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
-- dst、src的起始地址需要32字节对齐。
-- dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
+无
 
 
 ## 调用示例
@@ -56,6 +54,8 @@ PIPE_V
 vector_bool dst;
 vector_uint8_t src0;
 vector_uint8_t src1;
-vector_bool mask;
+vector_bool mask = asc_create_mask_b8(Pat::ALL);
+asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址
+asc_loadalign(src1, src1_addr); //arc1_addr是外部输入的UB内存空间地址。
 asc_ne(dst, src0, src1, mask);
 ```

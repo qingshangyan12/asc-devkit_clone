@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-用于设置内层循环中，源操作数在相邻迭代间的数据块间隔，以及目的操作数在相邻迭代间的数据块间隔。需和[asc_copy_ub2gm_align](../../vector_datamove/asc_copy_ub2gm_align.md)操作配合使用。
+用于设置内层循环中，源操作数在相邻迭代间的数据块间隔，以及目的操作数在相邻迭代间的数据块间隔。需和[asc_copy_ub2gm_align](asc_copy_ub2gm_align.md)操作配合使用。
 ## 函数原型
 
 ```cpp
@@ -37,9 +37,15 @@ PIPE_V
 ## 调用示例
 
 ```cpp
+uint32_t loop1_size = 2;
+uint32_t loop2_size =2;
 uint64_t loop1_src_stride = 32;
 uint64_t loop1_dst_stride = 64;
+uint32_t loop2_src_stride = 32;
+uint32_t loop2_dst_stride = 64;
+asc_set_ub2gm_loop_size(loop1_size, loop2_size);
 asc_set_ub2gm_loop1_stride(loop1_src_stride, loop1_dst_stride);
+asc_set_ub2gm_loop2_stride(loop2_src_stride, loop2_dst_stride);
 //total_length指参与搬运的数据总长度。dst是外部输入的uint8_t类型的GM内存。
 constexpr uint64_t total_length = 128;
 __ubuf__ uint8_t src[total_length];

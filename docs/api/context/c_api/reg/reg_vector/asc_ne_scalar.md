@@ -44,15 +44,15 @@ PIPE_V
 
 ## 约束说明
 
-- dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
+无
 
 ## 调用示例
 
 ```cpp
-vector_boo dst;
+vector_bool dst;
 vector_uint8_t src;
 uint8_t value;
-vector_bool mask;
+vector_bool mask = asc_create_mask_b8(Pat::ALL);
+asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_ne_scalar(dst, src, value, mask);
 ```
