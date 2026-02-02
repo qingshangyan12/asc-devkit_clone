@@ -464,14 +464,17 @@ def _get_simt_type_in_staic(tiling_info: TilingInfo, compile_info: CompileInfo, 
         return False
     if tiling_info.static_shape_flag is False or compile_info.kernel_name.startswith("te_superkernel"):
         return False
+    vec_marker = "_mix_aiv"
     if compile_info.no_set_kernel_type is False:
         kernel_type = compile_info.tiling_key_kernel_type[str(tiling_info.tiling_key)]
-        if kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, \
+        if kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY]:
+            kernel_name = compile_info.get_kernel_func_name()
+            return check_op_type_is_simt(obj_path, kernel_name)
+        elif kernel_type in [KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, \
             KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
-            kernel_name = get_kernel_fun_name_with_tiling_key_and_kernel_type(compile_info, tiling_info.tiling_key)
+            kernel_name = compile_info.kernel_name + vec_marker
             return check_op_type_is_simt(obj_path, kernel_name)
     elif compile_info.code_channel in [CORE_TYPE_MIX, CORE_TYPE_VEC]:
-        vec_marker = "_mix_aiv"
         kernel_name = compile_info.kernel_name + vec_marker
         return check_op_type_is_simt(obj_path, kernel_name)
     
