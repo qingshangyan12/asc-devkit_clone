@@ -43,6 +43,18 @@ struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V2201, FO
 {
     using type = LoadDataFourDim2201L12L0B;
 };
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3101, FOUR_DIM_DATA>
+{
+    using type = LoadDataFourDim2201L12L0A;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3101, FOUR_DIM_DATA>
+{
+    using type = LoadDataFourDim2201L12L0B;
+};
 } // namespace TileInternal
 } // namespace AscendC
 #endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_LOAD_DATA_TENSOR_TILE_LOAD_DATA_ROUTING_H

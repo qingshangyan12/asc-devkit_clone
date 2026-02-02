@@ -17,49 +17,11 @@
 
 #include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
 #include "impl/experimental/tensor_api/struct/tensor_tile_struct.h"
-
+#include "impl/experimental/tensor_api/arch/tile_api/tensor_tile_fixpipe_utils.h"
 namespace AscendC {
 namespace TileInternal {
 constexpr uint32_t MAIN_LOOP_N_SIZE_2201 = 512;
 constexpr uint32_t CBURST_NUM_2201 = MAIN_LOOP_N_SIZE_2201 / BLOCK_CUBE;
-
-template <typename T>
-__aicore__ inline auto AllocTempBuf(const T& calNSize)
-{
-    uint64_t deqTensorTempBuf = 0;
-    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 ||
-                  CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-        deqTensorTempBuf = reinterpret_cast<uint64_t>(get_imm(0));
-    }
-    return deqTensorTempBuf;
-}
-
-template <typename T>
-__aicore__ inline void FreeTempBuf(const T& deqTensorTempBuf)
-{
-    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 ||
-                  CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-        (void)(deqTensorTempBuf);
-    }
-}
-
-template <typename T>
-__aicore__ inline void SetFpc(const T& deqTensorTempBuf)
-{
-    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 ||
-                  CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-        uint64_t deqTensorAddr = (deqTensorTempBuf >> static_cast<uint64_t>(7)) << 8;
-        set_fpc(deqTensorAddr);
-    }
-}
-
- __aicore__ inline void InsertSync()
-{
- 	if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 || 
- 	              CURRENT_ARCH_VERSION == ArchVersion::V2201) {
- 	    pipe_barrier(PIPE_FIX);
- 	}
-}
 
 class Copy2201DeqTensorToFbuf {
 public:
@@ -70,7 +32,6 @@ public:
         uint64_t dstAddr = AllocTempBuf(calNSize);
         DataCopyImpl<T, decltype(params)>(dstAddr, src, params, tuple_sequence<decltype(params)>{});
         SetFpc(dstAddr);
-        FreeTempBuf(dstAddr);
     }
 
 private:
