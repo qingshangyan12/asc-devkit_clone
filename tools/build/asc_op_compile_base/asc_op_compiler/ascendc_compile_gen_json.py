@@ -474,9 +474,16 @@ def _get_simt_type_in_staic(tiling_info: TilingInfo, compile_info: CompileInfo, 
             KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
             kernel_name = compile_info.kernel_name + vec_marker
             return check_op_type_is_simt(obj_path, kernel_name)
-    elif compile_info.code_channel in [CORE_TYPE_MIX, CORE_TYPE_VEC]:
-        kernel_name = compile_info.kernel_name + vec_marker
-        return check_op_type_is_simt(obj_path, kernel_name)
-    
+    else:
+        if compile_info.code_channel == CORE_TYPE_MIX:
+            kernel_name = compile_info.kernel_name + vec_marker
+            return check_op_type_is_simt(obj_path, kernel_name)
+        elif compile_info.code_channel == CORE_TYPE_VEC:
+            if compile_info.hard_sync:
+                kernel_name = compile_info.kernel_name + vec_marker
+            else:
+                kernel_name = compile_info.get_kernel_func_name()
+            return check_op_type_is_simt(obj_path, kernel_name)
+
     return False
         
