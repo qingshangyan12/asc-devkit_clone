@@ -65,8 +65,8 @@ __aicore__ inline void VcmpvIntrinsicsImpl(__ubuf__ uint8_t* dst, __ubuf__ T* sr
             break;
         }
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cmp mode %d", static_cast<int32_t>(cmpMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cmp mode %d", static_cast<int32_t>(cmpMode)));
             break;
     }
 }
@@ -113,8 +113,8 @@ __aicore__ inline void VcmpIntrinsicsImpl(__ubuf__ T* src0, __ubuf__ T* src1, CM
             break;
         }
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cmp mode %d", static_cast<int32_t>(cmpMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cmp mode %d", static_cast<int32_t>(cmpMode)));
             break;
     }
 }
@@ -122,9 +122,9 @@ __aicore__ inline void VcmpIntrinsicsImpl(__ubuf__ T* src0, __ubuf__ T* src1, CM
 __aicore__ inline void VcmpvIntrinsicsImpl(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1,
     CMPMODE cmpMode, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT(
+    ASCENDC_DEBUG_ASSERT(
         (cmpMode == CMPMODE::EQ),
-        { KERNEL_LOG(KERNEL_ERROR, "Compare: Only CMPMODE::EQ is valid for int32_t input!"); });
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Compare: Only CMPMODE::EQ is valid for int32_t input!"));
     vcmpv_eq(dst, src0, src1, repeatTime, repeatParams.dstBlkStride,
         repeatParams.src0BlkStride, repeatParams.src1BlkStride, repeatParams.dstRepStride,
         repeatParams.src0RepStride, repeatParams.src1RepStride);
@@ -207,9 +207,9 @@ __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* 
 {
     if ASCEND_IS_AIV {
         if constexpr (IsSameType<T, int32_t>::value) {
-            ASCENDC_ASSERT((cmpMode == CMPMODE::EQ),
-                { KERNEL_LOG(KERNEL_ERROR, "Failed to check CMPMODE in Compare, current api only support "
-                    "CMPMODE::EQ, when src dtype is int32_t."); });
+            ASCENDC_DEBUG_ASSERT((cmpMode == CMPMODE::EQ),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check CMPMODE in Compare, current api only support "
+                    "CMPMODE::EQ, when src dtype is int32_t."));
         }
         CompareCompute(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode, count);
     }
@@ -260,8 +260,8 @@ __aicore__ inline void VcmpvsIntrinsicsImpl(__ubuf__ uint8_t* dst, __ubuf__ T* s
             break;
         }
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cmp mode %d", static_cast<int32_t>(cmpMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cmp mode %d", static_cast<int32_t>(cmpMode)));
             break;
     }
 }
@@ -269,9 +269,9 @@ __aicore__ inline void VcmpvsIntrinsicsImpl(__ubuf__ uint8_t* dst, __ubuf__ T* s
 __aicore__ inline void VcmpvsIntrinsicsImpl(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src0, int32_t src1,
     CMPMODE cmpMode, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT(
+    ASCENDC_DEBUG_ASSERT(
         (cmpMode == CMPMODE::EQ),
-        { KERNEL_LOG(KERNEL_ERROR, "CompareScalar: Only CMPMODE::EQ is valid for int32_t input!"); });
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CompareScalar: Only CMPMODE::EQ is valid for int32_t input!"));
     vcmpvs_eq(dst, src0, src1, repeatTime,
         static_cast<uint16_t>(repeatParams.dstBlkStride), static_cast<uint16_t>(repeatParams.srcBlkStride),
         static_cast<uint16_t>(repeatParams.dstRepStride), static_cast<uint16_t>(repeatParams.srcRepStride));
@@ -333,9 +333,9 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, T src1, CMP
 {
     if ASCEND_IS_AIV {
         if constexpr (IsSameType<T, int32_t>::value) {
-            ASCENDC_ASSERT((cmpMode == CMPMODE::EQ),
-                { KERNEL_LOG(KERNEL_ERROR, "Failed to check CMPMODE in CompareScalar, current api only support "
-                    "CMPMODE::EQ, when src dtype is int32_t."); });
+            ASCENDC_DEBUG_ASSERT((cmpMode == CMPMODE::EQ),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check CMPMODE in CompareScalar, current api only support "
+                    "CMPMODE::EQ, when src dtype is int32_t."));
         }
         CompareScalarCompute(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode, count);
     }

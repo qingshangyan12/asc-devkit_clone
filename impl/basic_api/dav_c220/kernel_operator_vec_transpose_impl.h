@@ -221,9 +221,9 @@ template <typename T>
 __aicore__ inline void TransDataTo5HDImpl(__ubuf__ T* dstList[16], __ubuf__ T* srcList[16],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    ASCENDC_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype combination is "
-        "src and dst both: int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype combination is "
+        "src and dst both: int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t"));
     if ASCEND_IS_AIV {
         SetVaReg(dstList, srcList);
         TransDataTo5HDIntrinsicsImpl(dstList, srcList, transDataTo5HDParams);
@@ -234,9 +234,9 @@ template <typename T>
 __aicore__ inline void TransDataTo5HDImpl(uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE],
     uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    ASCENDC_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype combination is "
-        "src and dst both: int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype combination is "
+        "src and dst both: int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t"));
     if ASCEND_IS_AIV {
         SetVaReg(dstList, srcList);
         TransDataTo5HDIntrinsicsImpl<T>(dstList, srcList, transDataTo5HDParams);
@@ -247,9 +247,9 @@ template <typename T>
 __aicore__ inline void TransDataTo5HDVldVaRegImpl(
     __ubuf__ uint64_t* dst, __ubuf__ uint64_t* src, const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    ASCENDC_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype combination is "
-        "src and dst both: int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in TransDataTo5HD, current api support dtype combination is "
+        "src and dst both: int8_t, uint8_t, int16_t, uint16_t, half, float, int32_t, uint32_t"));
     if ASCEND_IS_AIV {
         VldVaReg(dst, src);
         uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE] = { 0 };
@@ -705,10 +705,10 @@ __aicore__ inline void GetTransposeParamCal(const TransposeParamsExt &transposeP
 template <typename T>
 __aicore__ inline void TransposeUB2UBImpl(__ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
-    ASCENDC_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
-    {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / "
+    ASCENDC_DEBUG_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
+    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / "
     "TRANSPOSE_NHWC2NCHW, current api support dtype combination is src and dst both: int8_t / uint8_t / int16_t"
-    " / uint16_t / half / int32_t / uint32_t / float");});
+    " / uint16_t / half / int32_t / uint32_t / float"));
 
     DataCopyUB2UBImpl(dst, src, intriParams);
 }
@@ -717,13 +717,13 @@ template <typename T>
 __aicore__ inline void Transpose4DImpl(const LocalTensor<T> &dst, const LocalTensor<T> &src,
     const LocalTensor<uint8_t> &sharedTmpBuffer, const TransposeParamsExt &transposeParams)
 {
-    ASCENDC_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
-    {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / "
+    ASCENDC_DEBUG_ASSERT((SupportType<T, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>()),
+    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / "
     "TRANSPOSE_NHWC2NCHW, current api support dtype combination is src and dst both: int8_t / uint8_t / int16_t"
-    " / uint16_t / half / int32_t / uint32_t / float");});
+    " / uint16_t / half / int32_t / uint32_t / float"));
 
     LocalTensor<T> stackBuffer = sharedTmpBuffer.ReinterpretCast<T>();
-    ASCENDC_ASSERT((sharedTmpBuffer.GetSize() > 0), { KERNEL_LOG(KERNEL_ERROR, "sharedTmpBuffer size must > 0!"); });
+    ASCENDC_DEBUG_ASSERT((sharedTmpBuffer.GetSize() > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "sharedTmpBuffer size must > 0!"));
 
     Transpose4dParams<T> params;
     GetTransposeParamCal(transposeParams, params);

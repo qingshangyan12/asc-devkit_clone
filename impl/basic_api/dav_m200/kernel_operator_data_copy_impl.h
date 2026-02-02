@@ -17,6 +17,9 @@
 #include "kernel_common.h"
 #include "kernel_operator_vec_duplicate_impl.h"
 #include "kernel_struct_unary.h"
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+#include "kernel_tpipe_impl.h"
+#endif
 
 namespace AscendC {
 
