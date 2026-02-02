@@ -1,4 +1,4 @@
-# asc_pa
+# asc_pair_reduce_sum_reg
 
 ## 产品支持情况
 
@@ -8,11 +8,7 @@
 
 ## 功能说明
 
-执行矢量与运算。计算公式如下：
-
-$$
-dst_i = src0_i
-$$
+PairReduceSum: 相邻两个（奇偶）元素求和，结果写入dst。例如：src={1,2,3,4}，则dst={3,7}。归约指令的总体介绍请参考[reg_vector.md]()。
 
 ## 函数原型
 
