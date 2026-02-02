@@ -594,8 +594,8 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T *dst, const InitConstValuePara
         } else if constexpr (IsSameType<T, float>::value || IsSameType<T, int32_t>::value) {
             create_cbuf_matrix(dst, repeatBit, static_cast<uint32_t>(GetScalarBitcodeValue(initConstValueParams.initValue)));
         } else {
-            ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
-                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float");});
+            ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
+                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float"));
         }
     }
 }
@@ -620,8 +620,8 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T *dst, const InitConstValuePar
         } else if constexpr (IsSameType<T, float>::value || IsSameType<T, int32_t>::value) {
             create_ca_matrix(dst, repeatBit, static_cast<uint32_t>(GetScalarBitcodeValue(initConstValueParams.initValue)));
         } else {
-            ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
-                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float");});
+            ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
+                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float"));
         }
     }
 }
@@ -646,8 +646,8 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T *dst, const InitConstValuePar
         } else if constexpr (IsSameType<T, float>::value || IsSameType<T, int32_t>::value) {
             create_cb_matrix(dst, repeatBit, static_cast<uint32_t>(GetScalarBitcodeValue(initConstValueParams.initValue)));
         } else {
-            ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
-                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float");});
+            ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
+                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float"));
         }
     }
 }
@@ -680,8 +680,8 @@ template <typename T>
 __aicore__ inline void LoadImageToLocalCal(__cbuf__ T *dst, const LoadImageToLocalParams &loadDataParams)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<T, int8_t, half>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-            "LoadImageToLocal, current api support dtype combination is dst: int8_t / half.");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, int8_t, half>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "LoadImageToLocal, current api support dtype combination is dst: int8_t / half."));
         load_image_to_cbuf(dst, static_cast<uint16_t>(loadDataParams.horizSize - 1),
             static_cast<uint16_t>(loadDataParams.vertSize - 1), loadDataParams.horizStartPos,
             loadDataParams.vertStartPos, static_cast<uint16_t>(loadDataParams.srcHorizSize - 1),

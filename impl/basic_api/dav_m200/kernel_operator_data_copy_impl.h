@@ -24,6 +24,9 @@
 #include "kernel_operator_vec_binary_scalar_impl.h"
 #include "kernel_struct_unary.h"
 #include "kernel_tpipe.h"
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+#include "kernel_tpipe_impl.h"
+#endif
 
 namespace AscendC {
 
