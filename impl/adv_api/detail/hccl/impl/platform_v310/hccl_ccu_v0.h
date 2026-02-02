@@ -172,9 +172,9 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitInner(GM_ADDR contex
     }
 
     isInited_ = true;
-    KERNEL_LOG(KERNEL_INFO, "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx",
+    KERNEL_LOG(KERNEL_INFO, "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx, algorithmType:%u",
                     hcclContext_->rankId, hcclContext_->rankNum, hcclContext_->xnOffset, hcclContext_->ckeOffset,
-                    reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt));
+                    reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt), hcclContext_->algorithmType);
 }
 
 template<const auto &config>
@@ -229,9 +229,8 @@ template<const auto &config>
 __aicore__ inline void
 HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForOp(const HcclHandle handleId)
 {
-    ccuUsedXnNum_ = 8; // 除alltoallvWrite外其他算法用8个Xn
+    ccuUsedXnNum_ = 8; // 大部分算法用8个Xn
     FlushDataCache(&handleParamGM_[handleId]);
-    KERNEL_LOG(KERNEL_INFO, "ApiClient CcuPrepareForOp algorithmType:%u", hcclContext_->algorithmType);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         if (hcclContext_->algorithmType == static_cast<uint8_t>(AlgorithmType::CcuAllGatherMeshMem2Mem1D)) {
             ccuUsedXnNum_ = 9;
