@@ -467,7 +467,7 @@ def _get_simt_type_in_staic(tiling_info: TilingInfo, compile_info: CompileInfo, 
     if compile_info.no_set_kernel_type is False:
         kernel_type = compile_info.tiling_key_kernel_type[str(tiling_info.tiling_key)]
         if kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, \
-            KERNEL_TYPE_MIX_AIC_1_2]:
+            KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
             kernel_name = get_kernel_fun_name_with_tiling_key_and_kernel_type(compile_info, tiling_info.tiling_key)
             return check_op_type_is_simt(obj_path, kernel_name)
     elif compile_info.code_channel in [CORE_TYPE_MIX, CORE_TYPE_VEC]:
