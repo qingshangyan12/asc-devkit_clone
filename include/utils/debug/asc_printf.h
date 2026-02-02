@@ -34,9 +34,14 @@ __attribute__((always_inline)) inline __SIMT_DEVICE_FUNCTIONS_DECL__ void printf
 #endif
 }   // namespase __asc_simt_vf
 
+#include "impl/utils/debug/asc_printf_simt_impl.h"
+namespace __asc_aicore {
+template <class... Args>
+__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
+} // namespace __asc_aicore
 #endif
 
-#include "impl/utils/debug/asc_printf_simt_impl.h"
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
