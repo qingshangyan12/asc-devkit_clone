@@ -364,16 +364,6 @@ static const FuncMetaSknlMap SK_BIND_NAME_CONCAT(g_sknl_map_, __COUNTER__) =    
     sizeof(val)
 #define TILING_STRUCT_SECTION_INIT(counter, val)       TILING_STRUCT_SECTION_INIT_BASE(counter, val)
 
-#ifdef __CHECK_FEATURE_AT_PRECOMPILE
-#define ENABLE_FEATURE_FOR_COMPILE(f, val) auto __enable_feature_for_compile_##f = val
-#define ENABLE_FEATURE_FOR_TILING(expression, val) auto __enable_custom_tiling val = expression
-#define REGISTER_NONE_TILING auto __enable_no_register_custom_tiling ascendc_trigger_tiling_struct = default
-#else
-#define ENABLE_FEATURE_FOR_COMPILE(f, val)
-#define ENABLE_FEATURE_FOR_TILING(expression, val) TILING_STRUCT_SECTION_INIT(__COUNTER__, val)
-#define REGISTER_NONE_TILING
-#endif
-
 #define ENABLE_DETERMINISTIC() ENABLE_FEATURE_FOR_COMPILE(deterministic, 1)
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))

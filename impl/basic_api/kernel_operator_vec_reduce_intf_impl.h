@@ -743,8 +743,8 @@ __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>
     ReduceMaxImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride, calIndex);
 #else
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceMax, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceMax, "
+        "current api support dtype combination is src and dst both: half / float"));
     if (mask == 0) {
         return;
     }
@@ -784,8 +784,8 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>
     ReduceMinImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride, calIndex);
 #else
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceMin, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceMin, "
+        "current api support dtype combination is src and dst both: half / float"));
     if (mask == 0) {
         return;
     }
@@ -823,8 +823,8 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
     ReduceSumImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride);
 #else
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceSum, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceSum, "
+        "current api support dtype combination is src and dst both: half / float"));
     if (mask == 0) {
         return;
     }
@@ -853,8 +853,8 @@ __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>
     ReduceMaxImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride, calIndex);
 #else
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceMax, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceMax, "
+        "current api support dtype combination is src and dst both: half / float"));
     if (mask[0] == 0 && mask[1] == 0) {
         return;
     }
@@ -883,8 +883,8 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>
     ReduceMinImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride, calIndex);
 #else
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceMin, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceMin, "
+        "current api support dtype combination is src and dst both: half / float"));
     if (mask[0] == 0 && mask[1] == 0) {
         return;
     }
@@ -912,8 +912,8 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
     ReduceSumImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride);
 #else
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceSum, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceSum, "
+        "current api support dtype combination is src and dst both: half / float"));
     if (mask[0] == 0 && mask[1] == 0) {
         return;
     }
@@ -952,8 +952,8 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>
     ReduceMinImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(),
             (__ubuf__ PrimType*)src.GetPhyAddr(), (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), count, calIndex);
 #else
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceMin, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceMin, "
+        "current api support dtype combination is src and dst both: half / float"));
     ASCENDC_CHECK_VALUE_RANGE(count, 1, TOTAL_UB_SIZE / sizeof(PrimType), "count", "ReduceMin");
     int32_t elementNumPerRep = ONE_REPEAT_BYTE_SIZE / sizeof(PrimType); // fp16=128 , fp32=64
     int32_t repeatTime = count / elementNumPerRep;
@@ -1012,8 +1012,8 @@ __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>
     ReduceMaxImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(),
         (__ubuf__ PrimType*)src.GetPhyAddr(), (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), count, calIndex);
 #else
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceMax, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceMax, "
+        "current api support dtype combination is src and dst both: half / float"));
     ASCENDC_CHECK_VALUE_RANGE(count, 1, TOTAL_UB_SIZE / sizeof(PrimType), "count", "ReduceMax");
     int32_t elementNumPerRep = ONE_REPEAT_BYTE_SIZE / sizeof(PrimType); // fp16=128 , fp32=64
     int32_t repeatTime = count / elementNumPerRep;
@@ -1063,8 +1063,8 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
     using PrimType = PrimT<T>;
     ASCENDC_CHECK_VALUE_RANGE(count, 1, TOTAL_UB_SIZE / sizeof(PrimType), "count", "ReduceSum");
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceSum, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceSum, "
+        "current api support dtype combination is src and dst both: half / float"));
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecReduceMode2(dst, src, count, "ReduceSum")) {
         ASCENDC_REPORT_CHECK_ERROR("ReduceSum", KernelFuncType::CALCOUNT_MODE);
@@ -1087,8 +1087,8 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
     ReduceSumImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), count);
 #else // other version
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ReduceSum, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ReduceSum, "
+        "current api support dtype combination is src and dst both: half / float"));
     int32_t elementNumPerRep = ONE_REPEAT_BYTE_SIZE / sizeof(PrimType); // fp16=128 , fp32=64
     int32_t repeatTime = count / elementNumPerRep;
     int32_t tailCount = count % elementNumPerRep; // tailCount  <= 128/64 repeatTime=1
@@ -1208,9 +1208,9 @@ __aicore__ inline int64_t GetAccVal()
 template <typename T>
 __aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue, T &maxMinIndex)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
         "GetReduceMaxMinCount, current api support dtype combination is maxMinValue and maxMinIndex both: half / "
-        "float");});
+        "float"));
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     if (g_coreType == AIC) {
         return;
@@ -1223,17 +1223,17 @@ __aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue, T 
 template <typename T>
 __aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "GetReduceMaxMinCount, current api support dtype combination is maxMinValue: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "GetReduceMaxMinCount, current api support dtype combination is maxMinValue: half / float"));
     GetReduceMaxMinCountImpl<T>(maxMinValue);
 }
 
 template <typename T>
 __aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
         "GetReduceRepeatMaxMinSpr, current api support dtype combination is maxMinValue and maxMinIndex both: half / "
-        "float");});
+        "float"));
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     if (g_coreType == AIC) {
         return;
@@ -1245,16 +1245,16 @@ __aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T &maxMinValue
 template <typename T>
 __aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T &maxMinValue)
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "GetReduceRepeatMaxMinSpr, current api support dtype combination is maxMinValue: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "GetReduceRepeatMaxMinSpr, current api support dtype combination is maxMinValue: half / float"));
     GetReduceMaxMinCountImpl<T>(maxMinValue);
 }
 
 template <typename T>
 __aicore__ inline __inout_pipe__(S) T GetReduceRepeatSumSpr()
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in GetReduceRepeatSumSpr, "
-        "current api support dtype combination is half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in GetReduceRepeatSumSpr, "
+        "current api support dtype combination is half / float"));
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     if (g_coreType == AIC) {
         return 0;
@@ -1267,8 +1267,8 @@ __aicore__ inline __inout_pipe__(S) T GetReduceRepeatSumSpr()
 template <typename T>
 __aicore__ inline __inout_pipe__(S) T GetAccVal()
 {
-    ASCENDC_ASSERT((SupportType<T, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in GetAccVal, "
-        "current api support dtype combination is half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in GetAccVal, "
+        "current api support dtype combination is half / float"));
     return GetReduceRepeatSumSpr<T>();
 }
 } // namespace AscendC

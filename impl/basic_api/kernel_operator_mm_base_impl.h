@@ -22,6 +22,7 @@
 #define ASCENDC_MODULE_OPERATOR_MM_BASE_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_npu_debug.h"
+#include "kernel_check.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_mm_impl.h"
@@ -97,10 +98,10 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
         ASCENDC_REPORT_CHECK_ERROR("LoadData with LoadData3DParamsV1", KernelFuncType::NONE_MODE);
     }
 #endif
-    ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
         "LoadData with LoadData3DParamsV1, current api support dtype combination is src and dst both: uint8_t / int8_t "
-        "/ half.");});
+        "/ half."));
 
     if constexpr (defaultConfig.isSetFMatrix) {
         Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
@@ -162,9 +163,11 @@ template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D
 __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2<U>& loadDataParams)
 {
-    ASCENDC_ASSERT(CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadData with LoadData3DParamsV2"), {
-        ASCENDC_REPORT_CHECK_ERROR("LoadData with LoadData3DParamsV2", KernelFuncType::NONE_MODE);
-    });
+    #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    ASCENDC_DEBUG_ASSERT(CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadData with LoadData3DParamsV2"),
+        ASCENDC_REPORT_CHECK_ERROR_INTERNAL("LoadData with LoadData3DParamsV2", KernelFuncType::NONE_MODE)
+    );
+    #endif
     if constexpr (defaultConfig.isSetFMatrix) {
         Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
     }
@@ -174,41 +177,41 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
 
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
 #if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, int4b_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, int4b_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
         "LoadData with LoadData3DParamsV2, current api support dtype combination is src and dst both: uint8_t / int8_t "
-        "/ half / int4b_t.");});
+        "/ half / int4b_t."));
 #elif __NPU_ARCH__ == 2201
     if (dstScope == Hardware::L0A) {
-        ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, bfloat16_t, float, uint32_t, int32_t, int4b_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst position is "
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, bfloat16_t, float, uint32_t, int32_t, int4b_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst position is "
             "A2, current api support dtype combination is src and dst both: uint8_t / int8_t / half / bfloat16_t / "
-            "float / uint32_t / int32_t / int4b_t.");});
+            "float / uint32_t / int32_t / int4b_t."));
     } else if (dstScope == Hardware::L0B) {
-        ASCENDC_ASSERT((SupportType<PrimT<T>, half, bfloat16_t, float, uint32_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, half, bfloat16_t, float, uint32_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst position is B2, current api support "
-            "dtype combination is src and dst both: half / bfloat16_t / float / uint32_t / int32_t.");});
+            "dtype combination is src and dst both: half / bfloat16_t / float / uint32_t / int32_t."));
     }
 #elif __NPU_ARCH__ == 3510
-    ASCENDC_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0, {
-        KERNEL_LOG(KERNEL_ERROR, "kExtension * sizeof(T) must be a multiple of 32");});
-    ASCENDC_ASSERT(loadDataParams.mExtension % 16 == 0, {
-        KERNEL_LOG(KERNEL_ERROR, "mExtension should be a multiple of 16");});
-    ASCENDC_ASSERT(loadDataParams.kStartPt * sizeof(T) % ONE_BLK_SIZE == 0, {
-        KERNEL_LOG(KERNEL_ERROR, "kStartPt * sizeof(T) must be a multiple of 32");});
-    ASCENDC_ASSERT(loadDataParams.mStartPt % 16 == 0, {
-        KERNEL_LOG(KERNEL_ERROR, "mStartPt should be a multiple of 16");});
+    ASCENDC_DEBUG_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0,
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "kExtension * sizeof(T) must be a multiple of 32"));
+    ASCENDC_DEBUG_ASSERT(loadDataParams.mExtension % 16 == 0,
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "mExtension should be a multiple of 16"));
+    ASCENDC_DEBUG_ASSERT(loadDataParams.kStartPt * sizeof(T) % ONE_BLK_SIZE == 0,
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "kStartPt * sizeof(T) must be a multiple of 32"));
+    ASCENDC_DEBUG_ASSERT(loadDataParams.mStartPt % 16 == 0,
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "mStartPt should be a multiple of 16"));
 #elif __NPU_ARCH__ == 3102
     if (dstScope == Hardware::L0A) {
-        ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, uint16_t, int16_t, int4b_t>()),
-            {KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, uint16_t, int16_t, int4b_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in LoadData with LoadData3DParamsV2 when dst position is A2, current api support "
-            "dtype combination is src and dst both: uint8_t / int8_t / half / uint16_t / int16_t / int4b_t.");});
+            "dtype combination is src and dst both: uint8_t / int8_t / half / uint16_t / int16_t / int4b_t."));
     } else {
-        ASCENDC_ASSERT((SupportType<PrimT<T>, half, int16_t, uint16_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype "
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, half, int16_t, uint16_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype "
             "in LoadData with LoadData3DParamsV2 when dst position is B2, current api support dtype combination is src "
-            "and dst both: half / int16_t / uint16_t.");});
+            "and dst both: half / int16_t / uint16_t."));
     }
 #endif
 
@@ -238,9 +241,9 @@ template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D
 __aicore__ inline void LoadDataWithStrideImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2<U>& loadDataParams)
 {
-    ASCENDC_ASSERT(CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadDataWithStride with LoadData3DParamsV2"), {
-        ASCENDC_REPORT_CHECK_ERROR("LoadDataWithStride with LoadData3DParamsV2", KernelFuncType::NONE_MODE);
-    });
+    ASCENDC_DEBUG_ASSERT(CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadDataWithStride with LoadData3DParamsV2"),
+        ASCENDC_REPORT_CHECK_ERROR_INTERNAL("LoadDataWithStride with LoadData3DParamsV2", KernelFuncType::NONE_MODE)
+    );
     if constexpr (defaultConfig.isSetFMatrix) {
         Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
     }
@@ -249,14 +252,14 @@ __aicore__ inline void LoadDataWithStrideImpl(const LocalTensor<T>& dst, const L
     }
 
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-    ASCENDC_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0, {
-        KERNEL_LOG(KERNEL_ERROR, "kExtension * sizeof(T) must be a multiple of 32");});
-    ASCENDC_ASSERT(loadDataParams.mExtension % 16 == 0, {
-        KERNEL_LOG(KERNEL_ERROR, "mExtension should be a multiple of 16");});
-    ASCENDC_ASSERT(loadDataParams.kStartPt * sizeof(T) % ONE_BLK_SIZE == 0, {
-        KERNEL_LOG(KERNEL_ERROR, "kStartPt * sizeof(T) must be a multiple of 32");});
-    ASCENDC_ASSERT(loadDataParams.mStartPt % 16 == 0, {
-        KERNEL_LOG(KERNEL_ERROR, "mStartPt should be a multiple of 16");});
+    ASCENDC_DEBUG_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0,
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "kExtension * sizeof(T) must be a multiple of 32"));
+    ASCENDC_DEBUG_ASSERT(loadDataParams.mExtension % 16 == 0,
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "mExtension should be a multiple of 16"));
+    ASCENDC_DEBUG_ASSERT(loadDataParams.kStartPt * sizeof(T) % ONE_BLK_SIZE == 0,
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "kStartPt * sizeof(T) must be a multiple of 32"));
+    ASCENDC_DEBUG_ASSERT(loadDataParams.mStartPt % 16 == 0,
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "mStartPt should be a multiple of 16"));
 
     CheckTensorPos<T>(src, Hardware::L1, "src", "A1 / B1", "LoadDataWithStride with LoadData3DParamsV2");
     if (dstScope == Hardware::L0A) {
@@ -310,7 +313,7 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(const LocalTensor<T>& d
     if (dstScope == Hardware::L1) {
         LoadData2DGM2L1Cal((__cbuf__ T *)dst.GetPhyAddr(), (__gm__ U *)src.GetPhyAddr(), loadDataParams, nd2nzParams);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dst only support A1/B1"); });
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dst only support A1/B1"));
     }
 }
 #endif
@@ -396,9 +399,9 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<bfloat16_t>& dst, const Lo
     const LoadData3DParamsV2Pro& loadDataParams)
 {
 #if ASCENDC_CPU_DEBUG
-    ASCENDC_ASSERT(CheckFuncLoadData3dv2Pro(dst, src, loadDataParams, "loaddata3dv2Pro"), {
-        KERNEL_LOG(KERNEL_ERROR, "check loaddata3dv2Pro instr failed");
-    });
+    ASCENDC_DEBUG_ASSERT(CheckFuncLoadData3dv2Pro(dst, src, loadDataParams, "loaddata3dv2Pro"),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "check loaddata3dv2Pro instr failed")
+    );
 #endif
 
     const Hardware dstScope = GetPhyType((QuePosition)dst.GetPosition());
@@ -410,7 +413,7 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<bfloat16_t>& dst, const Lo
         LoadData3DV2L12L0BCal((__cb__ half*)dst.GetPhyAddr(),
             (__cbuf__ half*)src.GetPhyAddr(), loadDataParams);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dst only support A2/B2"); });
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dst only support A2/B2"));
     }
 }
 #endif
@@ -460,8 +463,8 @@ __aicore__ inline void MmadImpl(const LocalTensor<T>& dst, const LocalTensor<U>&
     } else if (biasScope == Hardware::L0C) {
         cmatrixSource = false;
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR,
-            "Failed to check bias tensor position in Mmad, supported positions are CO1 or C2"); });
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check bias tensor position in Mmad, supported positions are CO1 or C2"));
     }
     MmadCal((__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(),
         (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadParams, cmatrixSource);
@@ -500,8 +503,8 @@ __aicore__ inline void MmadImpl(const LocalTensor<T>& dst, const LocalTensor<U>&
     } else if (biasScope == Hardware::L0C) {
         cmatrixSource = false;
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR,
-            "Failed to check bias tensor position in Mmad, supported positions are CO1 or C2"); });
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check bias tensor position in Mmad, supported positions are CO1 or C2"));
     }
     MmadCal((__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(),
         (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadParams);
@@ -733,8 +736,8 @@ __aicore__ inline void LoadDataUnzipImpl(const LocalTensor<T>& dst, const Global
         CheckTensorAlign<T>(dst, VALUE_512, "dst", "LoadDataUnzip in B2");               // 512B align
     }
     if constexpr(!SupportType<PrimT<T>, int8_t>()) {
-        ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadDataUnzip, current api support "
-            "dtype combination is dst: int8_t.");});
+        ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadDataUnzip, current api support "
+            "dtype combination is dst: int8_t."));
     }
 #endif
     if (dstScope == Hardware::L1) {
@@ -744,8 +747,8 @@ __aicore__ inline void LoadDataUnzipImpl(const LocalTensor<T>& dst, const Global
     } else if (dstScope == Hardware::L0B) {
         LoadDataUnzipToL0BCal((__cb__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr());
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dst tensor position in LoadDataUnzip, "
-            "supported positions are A1 / B1 / B2"); });
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor position in LoadDataUnzip, "
+            "supported positions are A1 / B1 / B2"));
     }
 }
 

@@ -167,9 +167,9 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
     using PrimType = PrimT<T>;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
       (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination is src and "
-        "dst both: uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Gather, current api support dtype combination is src and "
+        "dst both: uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t"));
     GatherImpl((__ubuf__ PrimType *)dst.GetPhyAddr(), (__ubuf__ PrimType *)src.GetPhyAddr(),
         (__ubuf__ uint32_t *)srcOffset.GetPhyAddr(), srcBaseOffset, count);
 #else

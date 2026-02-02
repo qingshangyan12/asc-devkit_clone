@@ -65,8 +65,8 @@ public:
     __aicore__ inline void Process(const LocalTensor<T> &dst) const
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
-        "Add operator")), { ASCENDC_REPORT_CHECK_ERROR("Add operator", KernelFuncType::NONE_MODE);});
+        ASCENDC_DEBUG_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
+        "Add operator")), ASCENDC_REPORT_CHECK_ERROR_INTERNAL("Add operator", KernelFuncType::NONE_MODE));
 #endif
         AddImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
             (__ubuf__ PrimT<T>*)this->src1_.GetPhyAddr(), dst.GetSize());
@@ -86,8 +86,8 @@ public:
     __aicore__ inline void Process(const LocalTensor<T> &dst) const
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
-            "Sub operator")), { ASCENDC_REPORT_CHECK_ERROR("Sub operator", KernelFuncType::NONE_MODE);});
+        ASCENDC_DEBUG_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
+            "Sub operator")), ASCENDC_REPORT_CHECK_ERROR_INTERNAL("Sub operator", KernelFuncType::NONE_MODE));
 #endif
         SubImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
             (__ubuf__ PrimT<T>*)this->src1_.GetPhyAddr(), dst.GetSize());
@@ -107,8 +107,8 @@ public:
     __aicore__ inline void Process(const LocalTensor<T> &dst) const
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
-            "Mul operator")), { ASCENDC_REPORT_CHECK_ERROR("Mul operator", KernelFuncType::NONE_MODE);});
+        ASCENDC_DEBUG_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
+            "Mul operator")), ASCENDC_REPORT_CHECK_ERROR_INTERNAL("Mul operator", KernelFuncType::NONE_MODE));
 #endif
         MulImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
             (__ubuf__ PrimT<T>*)this->src1_.GetPhyAddr(), dst.GetSize());
@@ -128,8 +128,8 @@ public:
     __aicore__ inline void Process(const LocalTensor<T> &dst) const
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
-            "Div operator")), { ASCENDC_REPORT_CHECK_ERROR("Div operator", KernelFuncType::NONE_MODE);});
+        ASCENDC_DEBUG_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
+            "Div operator")), ASCENDC_REPORT_CHECK_ERROR_INTERNAL("Div operator", KernelFuncType::NONE_MODE));
 #endif
         DivImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
             (__ubuf__ PrimT<T>*)this->src1_.GetPhyAddr(), dst.GetSize());
@@ -150,8 +150,8 @@ public:
     __aicore__ inline void Process(const LocalTensor<T> &dst) const
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
-            "And operator")), { ASCENDC_REPORT_CHECK_ERROR("And operator", KernelFuncType::NONE_MODE);});
+        ASCENDC_DEBUG_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
+            "And operator")), ASCENDC_REPORT_CHECK_ERROR_INTERNAL("And operator", KernelFuncType::NONE_MODE));
 #endif
         if constexpr(SupportType<T, int32_t, uint32_t>()) {
             AndImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
@@ -176,8 +176,8 @@ public:
     __aicore__ inline void Process(const LocalTensor<T> &dst) const
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
-            "Or operator")), { ASCENDC_REPORT_CHECK_ERROR("Or operator", KernelFuncType::NONE_MODE);});
+        ASCENDC_DEBUG_ASSERT((CheckFuncVecBinary(dst, this->src0_, this->src1_, dst.GetSize(),
+            "Or operator")), ASCENDC_REPORT_CHECK_ERROR_INTERNAL("Or operator", KernelFuncType::NONE_MODE));
 #endif
         if constexpr(SupportType<T, int32_t, uint32_t>()) {
             OrImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
@@ -204,8 +204,8 @@ public:
     template <typename U> __aicore__ inline void Process(const LocalTensor<U> &dst) const
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((CheckFuncVecBinaryCmp(dst, this->src0_, this->src1_, dst.GetSize(),
-            "Compare operator")), { ASCENDC_REPORT_CHECK_ERROR("Compare operator", KernelFuncType::NONE_MODE);});
+        ASCENDC_DEBUG_ASSERT((CheckFuncVecBinaryCmp(dst, this->src0_, this->src1_, dst.GetSize(),
+            "Compare operator")), ASCENDC_REPORT_CHECK_ERROR_INTERNAL("Compare operator", KernelFuncType::NONE_MODE));
 #endif
         VcmpvImpl((__ubuf__ PrimT<U> *)dst.GetPhyAddr(), (__ubuf__ PrimT<T> *)this->src0_.GetPhyAddr(),
             (__ubuf__ PrimT<T> *)this->src1_.GetPhyAddr(), cmpMode_, this->src0_.GetSize());

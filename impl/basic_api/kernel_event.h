@@ -790,18 +790,18 @@ __aicore__ constexpr pipe_t GetPipe(Hardware src, Hardware dst, bool fwdDirect)
 
 template <pipe_t pipe, bool mode> __aicore__ inline void GetBuffImpl(uint8_t bufId)
 {
-    ASCENDC_ASSERT((bufId <= MAX_TBUFID), {
-        KERNEL_LOG(KERNEL_ERROR, "current id is %u, max buffer ID is %u", bufId, MAX_TBUFID);
-    });
+    ASCENDC_DEBUG_ASSERT((bufId <= MAX_TBUFID),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %u, max buffer ID is %u", bufId, MAX_TBUFID)
+    );
     DEBUG_CODE(BufIdTracker::GetInstance().AddBufIdEvent(bufId, pipe, mode, false));
     GetBufInternal<pipe, mode>(bufId);
 }
 
 template <pipe_t pipe, bool mode> __aicore__ inline void ReleaseBuffImpl(uint8_t bufId)
 {
-    ASCENDC_ASSERT((bufId <= MAX_TBUFID), {
-        KERNEL_LOG(KERNEL_ERROR, "current id is %u, max buffer ID is %u", bufId, MAX_TBUFID);
-    });
+    ASCENDC_DEBUG_ASSERT((bufId <= MAX_TBUFID),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %u, max buffer ID is %u", bufId, MAX_TBUFID)
+    );
     DEBUG_CODE(BufIdTracker::GetInstance().AddBufIdEvent(bufId, pipe, mode, true));
     RlsBufInternal<pipe, mode>(bufId);
 }
@@ -829,8 +829,8 @@ __aicore__ inline void DataSyncBarrierImpl()
 template <HardEvent event, MemoryT memT, bool isVirtual>
 __aicore__ inline void HSetFlagImpl(int32_t eventID)
 {
-    ASCENDC_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
-        { KERNEL_LOG(KERNEL_ERROR, "For HSetFlag, eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT); });
+    ASCENDC_DEBUG_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "For HSetFlag, eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT));
     static_assert(((int32_t)memT >= 0 && memT <= MemoryT::BIAS && memT != MemoryT::UB && memT != MemoryT::L1),
         "For HSetFlag, memT only support L0A, L0B, L0C, BIAS.");
 
@@ -838,25 +838,25 @@ __aicore__ inline void HSetFlagImpl(int32_t eventID)
 
     switch (event) {
         case HardEvent::MTE1_M:
-            ASCENDC_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
+            ASCENDC_DEBUG_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
                            "memT only support L0A, L0B, BIAS in MTE1_M.");
             hset_flag(PIPE_MTE1, PIPE_M, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::M_MTE1:
-            ASCENDC_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
+            ASCENDC_DEBUG_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
                            "memT only support L0A, L0B, BIAS in M_MTE1.");
             hset_flag(PIPE_M, PIPE_MTE1, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::M_FIX:
-            ASCENDC_ASSERT((memT == MemoryT::L0C), "memT only support L0C in M_FIX.");
+            ASCENDC_DEBUG_ASSERT((memT == MemoryT::L0C), "memT only support L0C in M_FIX.");
             hset_flag(PIPE_M, PIPE_FIX, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::FIX_M:
-            ASCENDC_ASSERT((memT == MemoryT::L0C), "memT only support L0C in FIX_M.");
+            ASCENDC_DEBUG_ASSERT((memT == MemoryT::L0C), "memT only support L0C in FIX_M.");
             hset_flag(PIPE_FIX, PIPE_M, e, (mem_t)memT, isVirtual);
             break;
         default:
-            ASCENDC_ASSERT((0), KERNEL_LOG(KERNEL_ERROR, "invalid event %d", static_cast<int32_t>(event)););
+            ASCENDC_DEBUG_ASSERT((0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "invalid event %d", static_cast<int32_t>(event)));
             break;
     }
 }
@@ -864,8 +864,8 @@ __aicore__ inline void HSetFlagImpl(int32_t eventID)
 template <HardEvent event, MemoryT memT, bool isVirtual>
 __aicore__ inline void HWaitFlagImpl(int32_t eventID)
 {
-    ASCENDC_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
-                   { KERNEL_LOG(KERNEL_ERROR, "For HWaitFlag, eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT); });
+    ASCENDC_DEBUG_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "For HWaitFlag, eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT));
     static_assert(((int32_t)memT >= 0 && memT <= MemoryT::BIAS && memT != MemoryT::UB && memT != MemoryT::L1),
                   "For HWaitFlag, memT only support L0A, L0B, L0C, BIAS.");
 
@@ -873,25 +873,25 @@ __aicore__ inline void HWaitFlagImpl(int32_t eventID)
 
     switch (event) {
         case HardEvent::MTE1_M:
-            ASCENDC_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
+            ASCENDC_DEBUG_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
                            "memT only support L0A, L0B, BIAS in MTE1_M.");
             hwait_flag(PIPE_MTE1, PIPE_M, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::M_MTE1:
-            ASCENDC_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
+            ASCENDC_DEBUG_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
                            "memT only support L0A, L0B, BIAS in M_MTE1.");
             hwait_flag(PIPE_M, PIPE_MTE1, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::M_FIX:
-            ASCENDC_ASSERT((memT == MemoryT::L0C), "memT only support L0C in M_FIX.");
+            ASCENDC_DEBUG_ASSERT((memT == MemoryT::L0C), "memT only support L0C in M_FIX.");
             hwait_flag(PIPE_M, PIPE_FIX, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::FIX_M:
-            ASCENDC_ASSERT((memT == MemoryT::L0C), "memT only support L0C in FIX_M.");
+            ASCENDC_DEBUG_ASSERT((memT == MemoryT::L0C), "memT only support L0C in FIX_M.");
             hwait_flag(PIPE_FIX, PIPE_M, e, (mem_t)memT, isVirtual);
             break;
         default:
-            ASCENDC_ASSERT((0), KERNEL_LOG(KERNEL_ERROR, "invalid event %d", static_cast<int32_t>(event)););
+            ASCENDC_DEBUG_ASSERT((0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "invalid event %d", static_cast<int32_t>(event)));
             break;
     }
 }
@@ -900,8 +900,8 @@ __aicore__ inline void HWaitFlagImpl(int32_t eventID)
 template <HardEvent event>
 __aicore__ inline void SetFlagImpl(int32_t eventID)
 {
-    ASCENDC_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
-                   { KERNEL_LOG(KERNEL_ERROR, "eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT); });
+    ASCENDC_DEBUG_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT));
     event_t e = static_cast<event_t>(eventID);
     switch (event) {
         case HardEvent::MTE2_MTE1:
@@ -1024,15 +1024,15 @@ __aicore__ inline void SetFlagImpl(int32_t eventID)
         case HardEvent::MAX:
             break;
         default:
-            ASCENDC_ASSERT((0), { KERNEL_LOG(KERNEL_ERROR, "invalid event %d", static_cast<int32_t>(event)); });
+            ASCENDC_DEBUG_ASSERT((0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "invalid event %d", static_cast<int32_t>(event)));
             break;
     }
 }
 
 __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
 {
-    ASCENDC_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
-                   { KERNEL_LOG(KERNEL_ERROR, "eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT); });
+    ASCENDC_DEBUG_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "eventID %d should be in range [0, %d)", eventID, QUE_MAX_EVENT));
 #ifdef ASCENDC_CPU_DEBUG
     if ASCEND_IS_AIC {
         if (event == HardEvent::MTE2_V || event == HardEvent::V_MTE2 || event == HardEvent::MTE3_V
