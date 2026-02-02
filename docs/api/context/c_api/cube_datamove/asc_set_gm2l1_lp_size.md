@@ -1,0 +1,46 @@
+# asc_set_gm2l1_loop_size
+
+## 产品支持情况
+
+|产品   | 是否支持 |
+| ------------|:----:|
+| Ascend 950PR/Ascend 950DT | √    |
+
+## 功能说明
+
+将数据从Global Memory (GM) 搬运到L1 Buffer时，通过调用该接口设置数据搬运流程中的循环次数。
+
+## 函数原型
+
+```cpp
+__aicore__ inline void asc_set_gm2l1_loop_size(uint64_t loop1_size, uint64_t loop2_size)
+```
+
+## 参数说明
+
+|参数名|输入/输出|描述|
+|------------|------------|-----------|
+| loop1_size     | 输入     | 内层循环的循环次数，取值范围为[0,2^21]。|
+| loop2_size     | 输入     | 外层循环的循环次数，取值范围为[0,2^21]。|
+
+## 返回值说明
+
+无
+
+## 流水类型
+
+PIPE_S
+
+## 约束说明
+
+无
+
+## 调用示例
+
+```cpp
+asc_set_gm2l1_loop_size(loop1_size, loop2_size);
+asc_set_gm2l1_loop1_stride(loop1_src_stride, loop1_dst_stride);
+asc_set_gm2l1_loop2_stride(loop2_src_stride, loop2_dst_stride);
+asc_copy_gm2l1_align(dst, src, size);
+asc_set_gm2l1_loop_size(1, 1);
+```
