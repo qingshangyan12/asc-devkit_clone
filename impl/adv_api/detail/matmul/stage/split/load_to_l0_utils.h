@@ -109,8 +109,11 @@ __aicore__ inline constexpr auto GetAuxDataType()
         uint8_t mxData = get_imm(0);
         fp8_e8m0_t mxType = *(reinterpret_cast<fp8_e8m0_t*>(&mxData));
         return mxType;
-#else
+#elif defined(ASCENDC_CPU_DEBUG)
         fp8_e8m0_t mxData = 0;
+        return mxData;
+#else
+        uint8_t mxData = 0;
         return mxData;
 #endif
     } else {
