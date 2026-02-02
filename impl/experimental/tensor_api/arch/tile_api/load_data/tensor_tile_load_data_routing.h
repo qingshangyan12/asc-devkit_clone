@@ -23,7 +23,7 @@ namespace TileInternal {
 
 class LoadDataIgnore {
 public:
-    template<typename T, typename U, const LoadDataTrait& config, class Coord>
+    template<const LoadDataTrait& trait, typename T, typename U, class Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {}
 };
 

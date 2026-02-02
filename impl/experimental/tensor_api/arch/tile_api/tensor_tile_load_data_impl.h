@@ -33,11 +33,7 @@ template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typen
 __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplate<T, U>, void>::type 
 LoadData(const T& dst, const U& src)
 {
-    auto coord = AscendC::MakeCoord(
-        AscendC::MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
-        AscendC::MakeCoord(Std::Int<0>{}, Std::Int<0>{})
-    );
-    LoadData<trait, T, U, decltype(coord)>(dst, src, coord);
+    LoadData<trait>(dst, src, ZERO_COORD);
 }
 
 template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>

@@ -55,9 +55,9 @@ Mmad(const T& dst, const U& fm, const S& filter)
    constexpr Hardware dstPos = TileInternal::GetHardPos<T>();
    constexpr Hardware fmPos = TileInternal::GetHardPos<U>();
    constexpr Hardware filterPos = TileInternal::GetHardPos<S>();
-   using Tensor2Tensor = typename TileInternal::MmadTensor2Tensor<dstPos, fmPos, filterPos, 
+   using Tensor2Tensor = typename TileInternal::MmadTensor2Tensor<dstPos, fmPos, filterPos, Hardware::MAX, 
       TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
-   Tensor2Tensor{}.template Run<T, U, S, trait>(dst, fm, filter);
+   Tensor2Tensor{}.template Run<trait>(dst, fm, filter);
 }
 
 template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V>
@@ -68,9 +68,9 @@ Mmad(const T& dst, const U& fm, const S& filter, const V& bias)
    constexpr Hardware fmPos = TileInternal::GetHardPos<U>();
    constexpr Hardware filterPos = TileInternal::GetHardPos<S>();
    constexpr Hardware biasPos = TileInternal::GetHardPos<V>();
-   using Tensor2Tensor = typename TileInternal::MmadWithBiasTensor2Tensor<dstPos, fmPos, filterPos, biasPos, 
+   using Tensor2Tensor = typename TileInternal::MmadTensor2Tensor<dstPos, fmPos, filterPos, biasPos, 
       TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
-   Tensor2Tensor{}.template Run<T, U, S, V, trait>(dst, fm, filter, bias);
+   Tensor2Tensor{}.template Run<trait>(dst, fm, filter, bias);
 }
 } // namespace AscendC
 #endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_MMAD_IMPL_H
