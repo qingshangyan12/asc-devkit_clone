@@ -69,13 +69,13 @@ __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& 
     using SrcPrimType = PrimT<T>;
     using DstPrimType = PrimT<U>;
 #if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float, dst: int8_t / uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<SrcPrimType, half, float>() && SupportType<DstPrimType, int8_t, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
+        "half / float, dst: int8_t / uint8_t."));
 #elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float, int32_t>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float / int32_t, dst: int8_t / uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<SrcPrimType, half, float, int32_t>() && SupportType<DstPrimType, int8_t, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
+        "half / float / int32_t, dst: int8_t / uint8_t."));
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -95,13 +95,13 @@ __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& 
     using SrcPrimType = PrimT<T>;
     using DstPrimType = PrimT<U>;
 #if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float, dst: int8_t / uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<SrcPrimType, half, float>() && SupportType<DstPrimType, int8_t, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
+        "half / float, dst: int8_t / uint8_t."));
 #elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float, int32_t>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float / int32_t, dst: int8_t / uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<SrcPrimType, half, float, int32_t>() && SupportType<DstPrimType, int8_t, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
+        "half / float / int32_t, dst: int8_t / uint8_t."));
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -119,8 +119,8 @@ __aicore__ inline void Compare(const LocalTensor<T>& src0, const LocalTensor<T>&
 {
     using PrimType = PrimT<T>;
 #if __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, "
-        "current api support dtype combination is src: half / float.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Compare, "
+        "current api support dtype combination is src: half / float."));
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -138,8 +138,8 @@ __aicore__ inline void Compare(const LocalTensor<T>& src0, const LocalTensor<T>&
 {
     using PrimType = PrimT<T>;
 #if __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, "
-        "current api support dtype combination is src: half / float.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Compare, "
+        "current api support dtype combination is src: half / float."));
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -167,13 +167,13 @@ __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& 
     using SrcPrimType = PrimT<T>;
     using DstPrimType = PrimT<U>;
 #if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float, dst: int8_t / uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<SrcPrimType, half, float>() && SupportType<DstPrimType, int8_t, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
+        "half / float, dst: int8_t / uint8_t."));
 #elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half, float, int32_t>() && SupportType<DstPrimType, int8_t, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
-        "half / float / int32_t, dst: int8_t / uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<SrcPrimType, half, float, int32_t>() && SupportType<DstPrimType, int8_t, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
+        "half / float / int32_t, dst: int8_t / uint8_t."));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryCmp(dst, src0, src1, count, "Compare")) {
@@ -181,9 +181,9 @@ __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& 
     }
 #endif
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-    ASCENDC_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check count elements size in Compare, current size "
-        "is %u, should be an integer multiple of 256.", count * sizeof(T));});
+    ASCENDC_DEBUG_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check count elements size in Compare, current size "
+        "is %u, should be an integer multiple of 256.", count * sizeof(T)));
 #endif
     VcmpvImpl((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src0.GetPhyAddr(),
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), cmpMode, count);
@@ -246,13 +246,13 @@ __aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTenso
     const UnaryRepeatParams& repeatParams)
 {
 #if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float, dst: uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
+        "src0: half / float, dst: uint8_t."));
 #elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float / int32_t, dst: uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
+        "src0: half / float / int32_t, dst: uint8_t."));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryScalarCmp(dst, src0, src1Scalar, ONE_REPEAT_BYTE_SIZE / sizeof(T), repeatTime,
@@ -270,13 +270,13 @@ __aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTenso
     const UnaryRepeatParams& repeatParams)
 {
 #if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float, dst: uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
+        "src0: half / float, dst: uint8_t."));
 #elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float / int32_t, dst: uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
+        "src0: half / float / int32_t, dst: uint8_t."));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryScalarCmp(dst, src0, src1Scalar, ONE_REPEAT_BYTE_SIZE / sizeof(T), repeatTime,
@@ -302,17 +302,17 @@ __aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTenso
     const T src1Scalar, CMPMODE cmpMode, uint32_t count)
 {
 #if __NPU_ARCH__ == 2002
-    ASCENDC_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float, dst: uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>() && SupportType<U, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
+        "src0: half / float, dst: uint8_t."));
 #elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
-        "src0: half / float / int32_t, dst: uint8_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CompareScalar, current api support dtype combination is "
+        "src0: half / float / int32_t, dst: uint8_t."));
 #endif
-    ASCENDC_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check count elements size in CompareScalar, current size "
-        "is %u, should be an integer multiple of 256.", count * sizeof(T));});
+    ASCENDC_DEBUG_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check count elements size in CompareScalar, current size "
+        "is %u, should be an integer multiple of 256.", count * sizeof(T)));
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryScalarCmp(dst, src0, src1Scalar, count, "CompareScalar")) {
         ASCENDC_REPORT_CHECK_ERROR("CompareScalar", KernelFuncType::CALCOUNT_MODE);
@@ -700,9 +700,9 @@ __aicore__ inline void CompareScalar(const T2& dst, const T3& src0,
 
     using ActualU = typename T2::PrimType;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-    ASCENDC_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check count elements size in CompareScalar, current size "
-        "is %u, should be an integer multiple of 256.", count * sizeof(T3));});
+    ASCENDC_DEBUG_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check count elements size in CompareScalar, current size "
+        "is %u, should be an integer multiple of 256.", count * sizeof(T3)));
 #endif
     if constexpr(TypeUtils::IsLocalTensorType<T3, T4>()) {
         static_assert(Std::is_same<T3, T4>::value);

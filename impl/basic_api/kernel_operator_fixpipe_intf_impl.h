@@ -130,9 +130,9 @@ __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& 
         (GetPhyType((TPosition)dst.GetPosition()) == Hardware::UB), "dst", "A1", "Fixpipe",
         ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
     CheckTensorPos<S>(cbufWorkspace, Hardware::L1, "cbufWorkspace", "A1", "Fixpipe");
-    ASCENDC_ASSERT((intriParams.quantPre == QuantMode_t::VDEQF16 || intriParams.quantPre == QuantMode_t::VQF322B8_PRE ||
-        intriParams.quantPre == QuantMode_t::VREQ8), {KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in "
-        "Fixpipe, when cbufWorkspace is given, supported values are VDEQF16 / VQF322B8_PRE / VREQ8");});
+    ASCENDC_DEBUG_ASSERT((intriParams.quantPre == QuantMode_t::VDEQF16 || intriParams.quantPre == QuantMode_t::VQF322B8_PRE ||
+        intriParams.quantPre == QuantMode_t::VREQ8), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in "
+        "Fixpipe, when cbufWorkspace is given, supported values are VDEQF16 / VQF322B8_PRE / VREQ8"));
     if ((GetPhyType((TPosition)dst.GetPosition()) == Hardware::L1)) {
         FixpipeL0C2L1Impl<PrimT<T>, PrimT<U>, config>((__cbuf__ PrimT<T>*)dst.GetPhyAddr(),
             (__cc__ PrimT<U>*)src.GetPhyAddr(), (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
@@ -174,9 +174,9 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> 
 {
     CheckTensorPos<U>(src, Hardware::L0C, "src", "CO1", "Fixpipe");
     CheckTensorPos<S>(cbufWorkspace, Hardware::L1, "cbufWorkspace", "A1", "Fixpipe");
-    ASCENDC_ASSERT((intriParams.quantPre == QuantMode_t::VDEQF16 || intriParams.quantPre == QuantMode_t::VQF322B8_PRE ||
-        intriParams.quantPre == QuantMode_t::VREQ8), {KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in "
-        "Fixpipe, when cbufWorkspace is given, supported values are VDEQF16 / VQF322B8_PRE / VREQ8");});
+    ASCENDC_DEBUG_ASSERT((intriParams.quantPre == QuantMode_t::VDEQF16 || intriParams.quantPre == QuantMode_t::VQF322B8_PRE ||
+        intriParams.quantPre == QuantMode_t::VREQ8), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in "
+        "Fixpipe, when cbufWorkspace is given, supported values are VDEQF16 / VQF322B8_PRE / VREQ8"));
     FixpipeL0C2GMImpl<PrimT<T>, PrimT<U>, config>((__gm__ PrimT<T>*)dst.GetPhyAddr(),
         (__cc__ PrimT<U>*)src.GetPhyAddr(),
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);

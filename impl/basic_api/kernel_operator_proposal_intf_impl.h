@@ -78,14 +78,14 @@ __aicore__ inline void MrgSort4(const LocalTensor<T>& dst, const MrgSortSrcList<
     const MrgSort4Info& params)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in MrgSort4, current api support dtype combination is "
-        "src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in MrgSort4, current api support dtype combination is "
+        "src and dst both: half / float"));
     for (int8_t i = 0; i < MRG_SORT_ELEMENT_LEN; ++i) {
         ASCENDC_CHECK_VALUE_RANGE(params.elementLengths[i], 0, 4095, "elementLengths", "MrgSort4");
     }
-    ASCENDC_ASSERT((params.validBit == 3 || params.validBit == 7 || params.validBit == 15),
-        { KERNEL_LOG(KERNEL_ERROR, "Failed to check validBit value in MrgSort4, its valid value is 3 / 7 / 15"); });
+    ASCENDC_DEBUG_ASSERT((params.validBit == 3 || params.validBit == 7 || params.validBit == 15),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check validBit value in MrgSort4, its valid value is 3 / 7 / 15"));
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunProposal(dst, src, params, sizeof(PrimType) * Internal::REGION_PROPOSAL_ELEMENT_NUM, "MrgSort4")) {
         ASCENDC_REPORT_CHECK_ERROR("MrgSort4", KernelFuncType::NONE_MODE);
@@ -120,9 +120,9 @@ __aicore__ inline void RpSort16(const LocalTensor<T>& dst, const LocalTensor<T>&
     const int32_t repeatTime)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in RpSort16, current api support dtype combination is "
-        "src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in RpSort16, current api support dtype combination is "
+        "src and dst both: half / float"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "RpSort16");
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunProposal(dst, src, repeatTime, "RpSort16")) {
@@ -151,14 +151,14 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
     const MrgSort4Info& params)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in MrgSort, current api support dtype combination is "
-        "src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in MrgSort, current api support dtype combination is "
+        "src and dst both: half / float"));
     for (int8_t i = 0; i < MRG_SORT_ELEMENT_LEN; ++i) {
         ASCENDC_CHECK_VALUE_RANGE(params.elementLengths[i], 0, 4095, "elementLengths", "MrgSort");
     }
-    ASCENDC_ASSERT((params.validBit == 3 || params.validBit == 7 || params.validBit == 15),
-        { KERNEL_LOG(KERNEL_ERROR, "Failed to check validBit value in MrgSort, its valid value is 3 / 7 / 15"); });
+    ASCENDC_DEBUG_ASSERT((params.validBit == 3 || params.validBit == 7 || params.validBit == 15),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check validBit value in MrgSort, its valid value is 3 / 7 / 15"));
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunProposal(dst, src, params, Internal::REGION_PROPOSAL_ELEMENT_NUM, "MrgSort")) {
         ASCENDC_REPORT_CHECK_ERROR("MrgSort", KernelFuncType::NONE_MODE);
@@ -204,9 +204,9 @@ __aicore__ inline void Sort32(const LocalTensor<T>& dst, const LocalTensor<T>& s
     const LocalTensor<uint32_t>& src1, const int32_t repeatTime)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Sort32, current api support dtype combination is "
-        "src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Sort32, current api support dtype combination is "
+        "src and dst both: half / float"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "Sort32");
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunProposal(dst, src0, src1, repeatTime, "Sort32")) {
@@ -233,8 +233,8 @@ __aicore__ inline void ProposalConcat(const LocalTensor<T>& dst, const LocalTens
     const int32_t repeatTime, const int32_t modeNumber)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in ProposalConcat,"
-        " current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in ProposalConcat,"
+        " current api support dtype combination is src and dst both: half / float"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "ProposalConcat");
     ASCENDC_CHECK_VALUE_RANGE(modeNumber, 0, 5, "modeNumber", "ProposalConcat");
 #if ASCENDC_CPU_DEBUG
@@ -262,8 +262,8 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
     const int32_t repeatTime, const int32_t modeNumber)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "ProposalExtract, current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+        "ProposalExtract, current api support dtype combination is src and dst both: half / float"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "ProposalExtract");
     ASCENDC_CHECK_VALUE_RANGE(modeNumber, 0, 5, "modeNumber", "ProposalExtract");
 #if ASCENDC_CPU_DEBUG
@@ -291,8 +291,8 @@ __aicore__ inline void Concat(LocalTensor<T>& concat, const LocalTensor<T>& src,
     const LocalTensor<T>& tmp, const int32_t repeatTime)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Concat, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Concat, "
+        "current api support dtype combination is src and dst both: half / float"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "Concat");
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
@@ -323,8 +323,8 @@ __aicore__ inline void Extract(const LocalTensor<T>& dstValue, const LocalTensor
     const LocalTensor<T>& sorted, const int32_t repeatTime)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Extract, "
-        "current api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Extract, "
+        "current api support dtype combination is src and dst both: half / float"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "Extract");
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunProposal(dstValue, sorted, dstIndex, repeatTime, "Extract")) {
@@ -392,9 +392,9 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
         return;
     }
 #endif
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in MrgSort, current api support dtype combination is "
-        "src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in MrgSort, current api support dtype combination is "
+        "src and dst both: half / float"));
     MrgSort4Info mrgSortInfo(elementCountList, isExhaustedSuspension, validBit, (uint16_t)repeatTime);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
@@ -437,8 +437,8 @@ __aicore__ inline void Sort(const LocalTensor<T>& dst, const LocalTensor<T>& con
     const LocalTensor<uint32_t>& index, LocalTensor<T>& tmp, const int32_t repeatTime)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Sort, current "
-        "api support dtype combination is src and dst both: half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Sort, current "
+        "api support dtype combination is src and dst both: half / float"));
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "Sort");
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncSort<T, uint32_t, isFullSort>(dst, concat, index, tmp, repeatTime, "Sort")) {
@@ -497,9 +497,9 @@ template <typename T>
 __aicore__ inline uint32_t GetSortOffset(const uint32_t elemOffset)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in GetSortOffset, current api support dtype combination is "
-        "half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in GetSortOffset, current api support dtype combination is "
+        "half / float"));
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101))
@@ -523,9 +523,9 @@ template <typename T>
 __aicore__ inline uint32_t GetSortLen(const uint32_t elemCount)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((SupportType<PrimType, half, float>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in GetSortLen, current api support dtype combination is "
-        "half / float");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimType, half, float>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in GetSortLen, current api support dtype combination is "
+        "half / float"));
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) ||                        \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                        \
     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101))

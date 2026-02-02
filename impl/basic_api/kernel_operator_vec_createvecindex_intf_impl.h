@@ -43,8 +43,8 @@ template <typename T>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue,
     uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
 {
-    ASCENDC_ASSERT((SupportType<T, half, int16_t, float, int32_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check "
-        "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, int16_t, float, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+        "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t"));
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncCreateVecIndex(dst, mask, repeatTime, dstBlkStride, dstRepStride, "CreateVecIndex")) {
         ASCENDC_REPORT_CHECK_ERROR("CreateVecIndex", KernelFuncType::MASK_COUNT_MODE);
@@ -57,8 +57,8 @@ template <typename T>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue,
     uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
 {
-    ASCENDC_ASSERT((SupportType<T, half, int16_t, float, int32_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check "
-        "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<T, half, int16_t, float, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+        "dtype in CreateVecIndex, current api support dtype combination is dst: half / int16_t / float / int32_t"));
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncCreateVecIndex(dst, mask, repeatTime, dstBlkStride, dstRepStride, "CreateVecIndex")) {
         ASCENDC_REPORT_CHECK_ERROR("CreateVecIndex", KernelFuncType::MASK_BIT_MODE);

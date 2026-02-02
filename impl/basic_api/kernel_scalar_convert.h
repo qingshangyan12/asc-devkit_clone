@@ -170,27 +170,26 @@ __aicore__ inline float ToFloat(const bfloat16_t& bVal)
 template <typename T>
 __aicore__ constexpr inline float Cast(const T& bVal)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport Cast to float"); });
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "unsupport Cast to float"));
     return 0.0f;
 }
 
-template <typename T>
 __aicore__ constexpr inline float ToFloat(const T& bVal)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport ToFloat"); });
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "unsupport ToFloat"));
     return 0.0f;
 }
 
 __aicore__ inline bfloat16_t Cast(const float& fVal)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport Cast to bfloat16"); });
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "unsupport Cast to bfloat16"));
     bfloat16_t bNum;
     return bNum;
 }
 
 __aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupport ToBfloat"); });
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "unsupport ToBfloat"));
     bfloat16_t bNum;
     return bNum;
 }
