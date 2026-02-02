@@ -179,9 +179,9 @@ __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& 
     }
 #endif
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    ASCENDC_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check count elements size in Compare, current size "
-        "is %u, should be an integer multiple of 256.", count * sizeof(T));});
+    ASCENDC_DEBUG_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check count elements size in Compare, current size "
+        "is %u, should be an integer multiple of 256.", count * sizeof(T)));
 #endif
     VcmpvImpl((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src0.GetPhyAddr(),
         (__ubuf__ SrcPrimType*)src1.GetPhyAddr(), cmpMode, count);
@@ -735,9 +735,9 @@ __aicore__ inline void Compares(const T2& dst, const T3& src0,
 
     using ActualU = typename T2::PrimType;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    ASCENDC_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check count elements size in Compares, current size "
-        "is %u, should be an integer multiple of 256.", count * sizeof(T3));});
+    ASCENDC_DEBUG_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check count elements size in Compares, current size "
+        "is %u, should be an integer multiple of 256.", count * sizeof(T3)));
 #endif
     if constexpr(TypeUtils::IsLocalTensorType<T3, T4>()) {
         static_assert(Std::is_same<T3, T4>::value);
@@ -771,9 +771,9 @@ __aicore__ inline void CompareScalar(const T2& dst, const T3& src0,
 
     using ActualU = typename T2::PrimType;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    ASCENDC_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check count elements size in CompareScalar, current size "
-        "is %u, should be an integer multiple of 256.", count * sizeof(T3));});
+    ASCENDC_DEBUG_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check count elements size in CompareScalar, current size "
+        "is %u, should be an integer multiple of 256.", count * sizeof(T3)));
 #endif
     if constexpr(TypeUtils::IsLocalTensorType<T3, T4>()) {
         static_assert(Std::is_same<T3, T4>::value);

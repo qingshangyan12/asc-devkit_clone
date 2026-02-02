@@ -52,9 +52,9 @@ __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &
 {
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half>() && SupportType<DstPrimType, int8_t, uint8_t>()), {
-        KERNEL_LOG(KERNEL_ERROR, "Failed "
-        "to check dtype in MulCast, current api support dtype combination is src: half, dst: int8_t / uint8_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<SrcPrimType, half>() && SupportType<DstPrimType, int8_t, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed "
+        "to check dtype in MulCast, current api support dtype combination is src: half, dst: int8_t / uint8_t"));
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryDiffType(dst, src0, src1, mask, repeatTime, repeatParams, "MulCast")) {
         ASCENDC_REPORT_CHECK_ERROR("MulCast", KernelFuncType::MASK_COUNT_MODE);
@@ -73,9 +73,9 @@ __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &
 {
     using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
-    ASCENDC_ASSERT((SupportType<SrcPrimType, half>() && SupportType<DstPrimType, int8_t, uint8_t>()), {
-        KERNEL_LOG(KERNEL_ERROR, "Failed "
-        "to check dtype in MulCast, current api support dtype combination is src: half, dst: int8_t / uint8_t");});
+    ASCENDC_DEBUG_ASSERT((SupportType<SrcPrimType, half>() && SupportType<DstPrimType, int8_t, uint8_t>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed "
+        "to check dtype in MulCast, current api support dtype combination is src: half, dst: int8_t / uint8_t"));
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinaryDiffType(dst, src0, src1, mask, repeatTime, repeatParams, "MulCast")) {
         ASCENDC_REPORT_CHECK_ERROR("MulCast", KernelFuncType::MASK_BIT_MODE);

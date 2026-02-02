@@ -215,7 +215,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
             enableSmallC0, cacheMode);
         return;
     }
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopy dn2nz only support position:GM to position: L1"); });
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DataCopy dn2nz only support position:GM to position: L1"));
 }
 #endif
 
@@ -460,10 +460,10 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<U> 
             }
 #endif
             if constexpr (Std::is_same<PrimSrcType, bfloat16_t>::value && (!Std::is_same<PrimDstType, float>::value)) {
-                ASCENDC_ASSERT((false), {
-                    KERNEL_LOG(KERNEL_ERROR,
-                        "unsupported case where src dtype is bfloat16, dst dtype is not float on current device");
-                });
+                ASCENDC_DEBUG_ASSERT((false),
+                    KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                        "unsupported case where src dtype is bfloat16, dst dtype is not float on current device")
+                );
             } else if constexpr (Std::is_same<PrimDstType, PrimSrcType>::value ||
                 (Std::is_same<PrimSrcType, bfloat16_t>::value && Std::is_same<PrimDstType, float>::value)) {
 #else
@@ -475,8 +475,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<U> 
                 DataCopyL12BTImpl((uint64_t)dst.GetPhyAddr(), (__cbuf__ half *)src.GetPhyAddr(), static_cast<uint16_t>(1),
                     repeatParams);
             } else {
-                ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in DataCopy from C1 to C2, "
-                    "current api support dtype combination is U = T or src: half, dst: float.");});
+                ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in DataCopy from C1 to C2, "
+                    "current api support dtype combination is U = T or src: half, dst: float."));
             }
         } else {
             ASCENDC_CHECK_TPOSITION(false, "dst", "C2",
@@ -718,35 +718,35 @@ __aicore__ inline void DataCopyCheck(const uint32_t count, DataCopyParams& repea
     using PrimType = PrimT<T>;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     if constexpr(Std::is_same<PrimType, int2b_t>::value) {
-        ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_B2_NUM == 0),
-            { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
-                    In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
+        ASCENDC_DEBUG_ASSERT((count % ConstantsInternal::ONE_BLK_B2_NUM == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
+                    In NPU mode, no error is reported. The value is rounded down by 32B.", count));
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_B2_NUM;
     } else if constexpr(Std::is_same<PrimType, uint1b_t>::value) {
-        ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_B1_NUM == 0),
-            { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
-                    In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
+        ASCENDC_DEBUG_ASSERT((count % ConstantsInternal::ONE_BLK_B1_NUM == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
+                    In NPU mode, no error is reported. The value is rounded down by 32B.", count));
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_B1_NUM;
     } else if constexpr (Std::is_same<PrimType, fp4x2_e2m1_t>::value || Std::is_same<PrimType, fp4x2_e1m2_t>::value || Std::is_same<PrimType, int4b_t>::value) {
-        ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0),
-            { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
-                    In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
+        ASCENDC_DEBUG_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
+                    In NPU mode, no error is reported. The value is rounded down by 32B.", count));
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
     } else
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (Std::is_same<PrimType, fp4x2_e2m1_t>::value || Std::is_same<PrimType, fp4x2_e1m2_t>::value) {
-        ASCENDC_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0),
-            { KERNEL_LOG(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
-                    In NPU mode, no error is reported. The value is rounded down by 32B.", count); });
+        ASCENDC_DEBUG_ASSERT((count % ConstantsInternal::ONE_BLK_FP4_NUM == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DataCopy count is %d, which should be 32B align. \
+                    In NPU mode, no error is reported. The value is rounded down by 32B.", count));
         repeatParams.blockLen = count / ConstantsInternal::ONE_BLK_FP4_NUM;
     } else
 #endif
     {
-        ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
+        ASCENDC_DEBUG_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
             "check count value in DataCopy from GlobalTensor to LocalTensor or from LocalTensor to GlobalTensor, "
             "count * sizeof(T) must be 32B align, current count value is %u. "
             "In NPU mode, no error is reported. The value is rounded down by 32B.",
-            count); });
+            count));
         repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
     }
 }
@@ -796,10 +796,10 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
+    ASCENDC_DEBUG_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
         "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
         "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
-        count); });
+        count));
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
     struct DataCopyParams repeatParams;
 
@@ -1271,8 +1271,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
 #endif
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     const uint8_t cacheMode = ExtractCacheMode(src);
-    ASCENDC_ASSERT(((dstHWPos == Hardware::UB) || (dstHWPos == Hardware::L1)),
-                   { KERNEL_LOG(KERNEL_ERROR, "DataCopyPad dst position must be VECIN/VECOUT/LCM/TSCM"); });
+    ASCENDC_DEBUG_ASSERT(((dstHWPos == Hardware::UB) || (dstHWPos == Hardware::L1)),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "DataCopyPad dst position must be VECIN/VECOUT/LCM/TSCM"));
     if (dstHWPos == Hardware::UB) {
         DataCopyPadGm2UBImpl<PrimType, mode>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(),
             dataCopyParams, padParams, cacheMode);

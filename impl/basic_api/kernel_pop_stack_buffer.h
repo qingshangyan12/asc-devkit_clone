@@ -25,7 +25,7 @@ namespace AscendC {
 template <TPosition pos> __aicore__ inline uint64_t GetEndAddress()
 {
     Hardware hardType = GetPhyType(pos);
-    ASCENDC_ASSERT((hardType == Hardware::UB), { KERNEL_LOG(KERNEL_ERROR, "hardType should be UB"); });
+    ASCENDC_DEBUG_ASSERT((hardType == Hardware::UB), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "hardType should be UB"));
     // the last 64B reserved for ub kfc msg send
 #if __NPU_ARCH__ == 2201
     return TOTAL_UB_SIZE - sizeof(KfcMsg);
@@ -40,16 +40,16 @@ template <typename T, TPosition pos> __aicore__ inline bool PopStackBuffer(Local
 {
     TBuffAddr addr;
     addr.logicPos = (int8_t)pos;
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "GetTPipePtr is nullptr"); });
+    ASCENDC_DEBUG_ASSERT((GetTPipePtr() != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "GetTPipePtr is nullptr"));
     uint64_t endAddress = GetEndAddress<pos>();
     uint64_t queEndAddress = GetTPipePtr()->GetQueueEndAddress<pos>();
-    ASCENDC_ASSERT((queEndAddress % ONE_BLK_SIZE == 0),
-                   { KERNEL_LOG(KERNEL_ERROR, "queEndAddress is %lu, which must be 32B aligned", queEndAddress); });
-    ASCENDC_ASSERT((endAddress > queEndAddress), {
-        KERNEL_LOG(KERNEL_ERROR,
+    ASCENDC_DEBUG_ASSERT((queEndAddress % ONE_BLK_SIZE == 0),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "queEndAddress is %lu, which must be 32B aligned", queEndAddress));
+    ASCENDC_DEBUG_ASSERT((endAddress > queEndAddress),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "PopStackBuffer failed, local memory has used %lu bytes, there is no enough memory to pop",
-            queEndAddress);
-    });
+            queEndAddress)
+    );
     addr.dataLen = static_cast<uint32_t>(endAddress - queEndAddress);
     addr.bufferAddr = queEndAddress;
 #ifdef ASCENDC_CPU_DEBUG
@@ -68,13 +68,13 @@ template <TPosition pos> __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuf
 {
     uint64_t endAddress = GetEndAddress<pos>();
     uint64_t queEndAddress = GetTPipePtr()->GetQueueEndAddress<pos>();
-    ASCENDC_ASSERT((queEndAddress % ONE_BLK_SIZE == 0),
-                   { KERNEL_LOG(KERNEL_ERROR, "queEndAddress is %lu, which must be 32B aligned", queEndAddress); });
-    ASCENDC_ASSERT((endAddress > queEndAddress), {
-        KERNEL_LOG(KERNEL_ERROR,
+    ASCENDC_DEBUG_ASSERT((queEndAddress % ONE_BLK_SIZE == 0),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "queEndAddress is %lu, which must be 32B aligned", queEndAddress));
+    ASCENDC_DEBUG_ASSERT((endAddress > queEndAddress),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "PopStackBuffer failed, local memory has used %lu bytes, there is no enough memory to pop",
-            queEndAddress);
-    });
+            queEndAddress)
+    );
     uint32_t dataLen = static_cast<uint32_t>(endAddress - queEndAddress);
     bufStart.address = queEndAddress;
     bufStart.dataLen = dataLen;

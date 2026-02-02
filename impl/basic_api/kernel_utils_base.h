@@ -87,7 +87,7 @@ public:
 
     __aicore__ static inline int32_t GetC0Count(const int32_t dtypeSize)
     {
-        ASCENDC_ASSERT((dtypeSize != 0), { KERNEL_LOG(KERNEL_ERROR, "dtypeSize can not be 0"); });
+        ASCENDC_DEBUG_ASSERT((dtypeSize != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dtypeSize can not be 0"));
         return GetC0Size() / dtypeSize;
     }
 
@@ -111,11 +111,11 @@ public:
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         if (sizeof(T) >= sizeof(int32_t)) {
-            ASCENDC_ASSERT((maskHigh == 0ULL),
-                           { KERNEL_LOG(KERNEL_ERROR, "maskHigh must be 0 for type b32 and b64"); });
+            ASCENDC_DEBUG_ASSERT((maskHigh == 0ULL),
+                           KERNEL_LOG_INTERNAL(KERNEL_ERROR, "maskHigh must be 0 for type b32 and b64"));
         }
-        ASCENDC_ASSERT(((maskLow != 0ULL) || (maskHigh != 0ULL)),
-                       { KERNEL_LOG(KERNEL_ERROR, "maskLow and maskHigh can not be zero at the same time"); });
+        ASCENDC_DEBUG_ASSERT(((maskLow != 0ULL) || (maskHigh != 0ULL)),
+                       KERNEL_LOG_INTERNAL(KERNEL_ERROR, "maskLow and maskHigh can not be zero at the same time"));
 #endif
 #endif
         if ASCEND_IS_NOT_AIC {
@@ -224,18 +224,18 @@ public:
     __aicore__ static inline __ubuf__ T* GetTemporaryBufferAddr(const int32_t bufferOffset, const int32_t bufferSize)
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((bufferOffset % ONE_BLK_SIZE == 0),
-                       { KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset); });
-        ASCENDC_ASSERT(
-            (bufferOffset + bufferSize * sizeof(T) <= ConstDefiner::Instance().bufferInitLen.at(Hardware::UB)), {
-                KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of ub %d",
-                    bufferOffset, bufferSize, ConstDefiner::Instance().bufferInitLen.at(Hardware::UB));
-            });
+        ASCENDC_DEBUG_ASSERT((bufferOffset % ONE_BLK_SIZE == 0),
+                       KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset));
+        ASCENDC_DEBUG_ASSERT(
+            (bufferOffset + bufferSize * sizeof(T) <= ConstDefiner::Instance().bufferInitLen.at(Hardware::UB)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of ub %d",
+                    bufferOffset, bufferSize, ConstDefiner::Instance().bufferInitLen.at(Hardware::UB))
+            );
         const int32_t maxTempSize = 0x100000;
-        ASCENDC_ASSERT((bufferSize < maxTempSize), {
-            KERNEL_LOG(KERNEL_ERROR, "bufferSize is %d, which exceed the maxTempSize limits %d", bufferSize,
-                maxTempSize);
-        });
+        ASCENDC_DEBUG_ASSERT((bufferSize < maxTempSize),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferSize is %d, which exceed the maxTempSize limits %d", bufferSize,
+                maxTempSize)
+        );
         T* addr = reinterpret_cast<T*>(ConstDefiner::Instance().hardwareCpuBufferMap.at(Hardware::UB) + bufferOffset);
 #else
         (void)bufferSize;
@@ -257,13 +257,13 @@ public:
     __aicore__ static inline __fbuf__ T* GetTemporaryFbBufferAddr(const int32_t bufferOffset, const int32_t bufferSize)
     {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-        ASCENDC_ASSERT((bufferOffset % ONE_BLK_SIZE == 0),
-                       { KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset); });
-        ASCENDC_ASSERT(
-            (bufferOffset + bufferSize * sizeof(T) <= ConstDefiner::Instance().bufferInitLen.at(Hardware::FIXBUF)), {
-                KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of fixbuf %d",
-                    bufferOffset, bufferSize, ConstDefiner::Instance().bufferInitLen.at(Hardware::FIXBUF));
-            });
+        ASCENDC_DEBUG_ASSERT((bufferOffset % ONE_BLK_SIZE == 0),
+                       KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset));
+        ASCENDC_DEBUG_ASSERT(
+            (bufferOffset + bufferSize * sizeof(T) <= ConstDefiner::Instance().bufferInitLen.at(Hardware::FIXBUF)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of fixbuf %d",
+                    bufferOffset, bufferSize, ConstDefiner::Instance().bufferInitLen.at(Hardware::FIXBUF))
+            );
         T* addr =
             reinterpret_cast<T*>(ConstDefiner::Instance().hardwareCpuBufferMap.at(Hardware::FIXBUF) + bufferOffset);
 #else

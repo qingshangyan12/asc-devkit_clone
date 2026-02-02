@@ -23,7 +23,7 @@
 #ifndef ASCENDC_MODULE_CHECK_H
 #define ASCENDC_MODULE_CHECK_H
 
-#if ASCENDC_CPU_DEBUG
+#if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
 #include "utils/kernel_check_copy.h"
 #include "utils/kernel_check_vec_binary.h"
 #include "utils/kernel_check_vec_binary_scalar.h"
@@ -332,8 +332,8 @@ __aicore__ inline void CheckTensorAlign(const LocalTensor<T>& input, uint32_t al
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     int8_t tensorTpos = int8_t(input.GetPosition());
     uint64_t tensorAddr = (uint8_t*)(input.GetPhyAddr()) - (uint8_t*)(GetBaseAddrCpu(tensorTpos));
-    ASCENDC_ASSERT((tensorAddr % alignByte == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check %s start address "
-        "alignment in %s, its start address must align with %uB.", tensorName, apiMsg, alignByte);});
+    ASCENDC_DEBUG_ASSERT((tensorAddr % alignByte == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s start address "
+        "alignment in %s, its start address must align with %uB.", tensorName, apiMsg, alignByte));
 #endif
 }
 

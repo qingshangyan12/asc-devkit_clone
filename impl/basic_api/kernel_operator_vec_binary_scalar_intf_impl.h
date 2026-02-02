@@ -1842,10 +1842,10 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
     static_assert(TypeUtils::IsLocalTensorType<T2>());
     static_assert(SupportType<typename T2::PrimType, half>());
     if constexpr(Std::is_same<T3, T4>::value) {
-        ASCENDC_ASSERT((count <= src0.GetSize() && count <= src1.GetSize() && count <= dst.GetSize()), {
-            KERNEL_LOG(KERNEL_ERROR,
-                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
-        });
+        ASCENDC_DEBUG_ASSERT((count <= src0.GetSize() && count <= src1.GetSize() && count <= dst.GetSize()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count)
+        );
         using ActualU = typename T3::PrimType;
         CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN / VECCALC / VECOUT", "MulsCast");
         CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "MulsCast");
@@ -1860,10 +1860,10 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
                 (__ubuf__ ActualU*)src0.GetPhyAddr(), (__ubuf__ ActualU*)src1.GetPhyAddr(), count);
         }
     } else if constexpr(TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
-        ASCENDC_ASSERT((count <= src1.GetSize() && count <= dst.GetSize()), {
-            KERNEL_LOG(KERNEL_ERROR,
-                    "count is %u, which should not larger than tensor size of dst / src1", count);
-        });
+        ASCENDC_DEBUG_ASSERT((count <= src1.GetSize() && count <= dst.GetSize()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "count is %u, which should not larger than tensor size of dst / src1", count)
+        );
         using ActualU = typename T4::PrimType;
         CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "MulsCast");
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
@@ -1872,10 +1872,10 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
         FusedMulsCastImpl<ActualT, ActualU>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualU*)src1.GetPhyAddr(), src0, count);
     } else if constexpr(TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
-        ASCENDC_ASSERT((count <= src0.GetSize() && count <= dst.GetSize()), {
-            KERNEL_LOG(KERNEL_ERROR,
-                    "count is %u, which should not larger than tensor size of dst / src0", count);
-        });
+        ASCENDC_DEBUG_ASSERT((count <= src0.GetSize() && count <= dst.GetSize()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "count is %u, which should not larger than tensor size of dst / src0", count)
+        );
         using ActualU = typename T3::PrimType;
         CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN / VECCALC / VECOUT", "MulsCast");
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
@@ -1885,7 +1885,7 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
             (__ubuf__ ActualU*)src0.GetPhyAddr(), src1, count);
     }
 #else
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "MulsCast not supported on current device."); });
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "MulsCast not supported on current device."));
 #endif
 }
 
@@ -1900,10 +1900,10 @@ __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &sr
     static_assert(TypeUtils::IsLocalTensorType<T2>());
     static_assert(SupportType<typename T2::PrimType, half>());
     if constexpr(Std::is_same<T3, T4>::value) {
-        ASCENDC_ASSERT((count <= src0.GetSize() && count <= src1.GetSize() && count <= dst.GetSize()), {
-            KERNEL_LOG(KERNEL_ERROR,
-                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
-        });
+        ASCENDC_DEBUG_ASSERT((count <= src0.GetSize() && count <= src1.GetSize() && count <= dst.GetSize()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count)
+        );
         using ActualU = typename T3::PrimType;
         CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
         CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
@@ -1918,10 +1918,10 @@ __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &sr
                 (__ubuf__ ActualU*)src0.GetPhyAddr(), (__ubuf__ ActualU*)src1.GetPhyAddr(), count);
         }
     } else if constexpr(TypeUtils::IsLocalTensorType<T4>() && TypeUtils::IsInnerDefaultType<T3>()) {
-        ASCENDC_ASSERT((count <= src1.GetSize() && count <= dst.GetSize()), {
-            KERNEL_LOG(KERNEL_ERROR,
-                    "count is %u, which should not larger than tensor size of dst / src1", count);
-        });
+        ASCENDC_DEBUG_ASSERT((count <= src1.GetSize() && count <= dst.GetSize()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "count is %u, which should not larger than tensor size of dst / src1", count)
+        );
         using ActualU = typename T4::PrimType;
         CheckTensorPos<ActualU>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
@@ -1930,10 +1930,10 @@ __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &sr
         FusedMulsCastImpl<ActualT, ActualU>((__ubuf__ ActualT*)dst.GetPhyAddr(),
             (__ubuf__ ActualU*)src1.GetPhyAddr(), src0, count);
     } else if constexpr(TypeUtils::IsLocalTensorType<T3>() && TypeUtils::IsInnerDefaultType<T4>()) {
-        ASCENDC_ASSERT((count <= src0.GetSize() && count <= dst.GetSize()), {
-            KERNEL_LOG(KERNEL_ERROR,
-                    "count is %u, which should not larger than tensor size of dst / src0", count);
-        });
+        ASCENDC_DEBUG_ASSERT((count <= src0.GetSize() && count <= dst.GetSize()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "count is %u, which should not larger than tensor size of dst / src0", count)
+        );
         using ActualU = typename T3::PrimType;
         CheckTensorPos<ActualU>(src0, Hardware::UB, "src0", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
         static_assert(Std::is_same<ActualT, typename T2::PrimType>::value);
@@ -1943,7 +1943,7 @@ __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &sr
             (__ubuf__ ActualU*)src0.GetPhyAddr(), src1, count);
     }
 #else
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "FusedMulsCast not supported on current device."); });
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "FusedMulsCast not supported on current device."));
 #endif
 }
 #endif

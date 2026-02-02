@@ -364,16 +364,6 @@ static const FuncMetaSknlMap SK_BIND_NAME_CONCAT(g_sknl_map_, __COUNTER__) =    
     sizeof(val)
 #define TILING_STRUCT_SECTION_INIT(counter, val)       TILING_STRUCT_SECTION_INIT_BASE(counter, val)
 
-#ifdef __CHECK_FEATURE_AT_PRECOMPILE
-#define ENABLE_FEATURE_FOR_COMPILE(f, val) auto __enable_feature_for_compile_##f = val
-#define ENABLE_FEATURE_FOR_TILING(expression, val) auto __enable_custom_tiling val = expression
-#define REGISTER_NONE_TILING auto __enable_no_register_custom_tiling ascendc_trigger_tiling_struct = default
-#else
-#define ENABLE_FEATURE_FOR_COMPILE(f, val)
-#define ENABLE_FEATURE_FOR_TILING(expression, val) TILING_STRUCT_SECTION_INIT(__COUNTER__, val)
-#define REGISTER_NONE_TILING
-#endif
-
 #define ENABLE_DETERMINISTIC() ENABLE_FEATURE_FOR_COMPILE(deterministic, 1)
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
@@ -392,8 +382,6 @@ static const FuncMetaSknlMap SK_BIND_NAME_CONCAT(g_sknl_map_, __COUNTER__) =    
 
 #define ENABLE_PRINTF() ENABLE_FEATURE_FOR_COMPILE(printf, 1)
 #define ENABLE_PRINTF_DUMP_SIZE() ENABLE_FEATURE_FOR_COMPILE(printfBufSize, 1048576)
-#define ENABLE_ASSERT() ENABLE_FEATURE_FOR_COMPILE(assert, 1)
-#define ENABLE_ASSERT_DUMP_SIZE() ENABLE_FEATURE_FOR_COMPILE(assertBufSize, 1024)
 
 #ifndef ONE_CORE_DUMP_SIZE
 #define ONE_CORE_DUMP_SIZE (1024 * 1024)

@@ -572,9 +572,9 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(const LocalTensor<T
     const LoadImageToLocalParams& loadDataParams)
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    ASCENDC_ASSERT(CheckFuncLoadImageToLocal(dst, loadDataParams, "LoadImageToLocal"), {
-        ASCENDC_REPORT_CHECK_ERROR("LoadImageToLocal", KernelFuncType::NONE_MODE);
-    });
+    ASCENDC_DEBUG_ASSERT(CheckFuncLoadImageToLocal(dst, loadDataParams, "LoadImageToLocal"),
+        ASCENDC_REPORT_CHECK_ERROR_INTERNAL("LoadImageToLocal", KernelFuncType::NONE_MODE)
+    );
 #endif
     ASCENDC_CHECK_VALUE_RANGE(loadDataParams.horizSize, 2, UINT12_MAX, "horizSize", "LoadImageToLocal");
     ASCENDC_CHECK_VALUE_RANGE(loadDataParams.vertSize, 2, UINT12_MAX, "vertSize", "LoadImageToLocal");
