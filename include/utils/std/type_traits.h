@@ -49,6 +49,7 @@
 #include "impl/utils/std/type_traits/remove_reference.h"
 #include "impl/utils/std/type_traits/remove_volatile.h"
 #include "impl/utils/std/type_traits/is_one_of.h"
+#include "impl/utils/std/type_traits/is_same_one_of.h"
 
 namespace AscendC {
 namespace Std {
