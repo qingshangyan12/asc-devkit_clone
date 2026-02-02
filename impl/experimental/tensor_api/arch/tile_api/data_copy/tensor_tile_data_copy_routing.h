@@ -24,11 +24,11 @@ namespace TileInternal {
 
 class DataCopyIgnore {
 public:
-    template <typename T, typename U, const DataCopyTrait& trait>
+    template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline void Run(const T& dst, const U& src) {}
 };
 
-template <Hardware dstTPos, Hardware srcTpos, uint32_t Version, size_t dimension>
+template <Hardware dstTPos, Hardware srcTpos, uint32_t Version, size_t dimension, Coord coord>
 struct DataCopyTensor2Tensor {
     using type = DataCopyIgnore;
 };
