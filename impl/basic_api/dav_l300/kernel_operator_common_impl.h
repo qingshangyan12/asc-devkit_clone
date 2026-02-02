@@ -180,21 +180,6 @@ __aicore__ inline constexpr DistVST GetDistVst()
     return dist;
 }
 
-__aicore__ inline int64_t GetSubBlockIdxImpl()
-{
-    return 0;
-}
-
-__aicore__ inline int64_t GetTaskRationImpl()
-{
-    return 1;
-}
-
-__aicore__ inline int64_t GetBlockIdxImpl()
-{
-    return block_idx;
-}
-
 __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -242,23 +227,6 @@ __aicore__ inline int64_t GetStoreAtomicConfigImpl()
 __aicore__ inline void GetStoreAtomicConfigImpl(uint16_t &atomicType, uint16_t &atomicOp)
 {
     ASCENDC_ASSERT((false), "GetStoreAtomicConfig is not supported!");
-}
-
-template <typename T>
-__aicore__ inline void DataCachePreloadImpl(const GlobalTensor<uint64_t> &srcTensor, const T cacheOffset)
-{
-    ASCENDC_ASSERT((false), "unsupport DataCachePreload!");
-}
-
-__aicore__ inline int64_t GetICachePreloadStatusImpl()
-{
-    ASCENDC_ASSERT((false), "GetICachePreloadStatus is not supported on this device!");
-    return 0;
-}
-
-__aicore__ inline void PreLoad(const int64_t preFetchLen)
-{
-    ASCENDC_ASSERT((false), "ICachePreLoad is not supported on this device!");
 }
 
 __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam &checkParams)

@@ -15,6 +15,8 @@
 #ifndef IMPL_HCCL_COMMON_H
 #define IMPL_HCCL_COMMON_H
 
+#include "kernel_operator_cache_intf.h"
+
 namespace AscendC {
 __aicore__ inline void FlushDataCache(GlobalTensor<int64_t> &globalHcclMsgArea, __gm__ void *gmAddr)
 {
