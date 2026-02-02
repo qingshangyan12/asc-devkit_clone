@@ -33,11 +33,7 @@ template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typen
 __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplate<T, U>, void>::type 
 LoadData(const T& dst, const U& src)
 {
-    auto coord = AscendC::MakeCoord(
-        AscendC::MakeCoord(Std::Int<0>{}, Std::Int<0>{}),
-        AscendC::MakeCoord(Std::Int<0>{}, Std::Int<0>{})
-    );
-    LoadData<trait, T, U, decltype(coord)>(dst, src, coord);
+    LoadData(dst, src, MakeCoord(Std::Int<1>{}, Std::Int<1>{}));
 }
 
 template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>
@@ -48,7 +44,7 @@ LoadData(const T& dst, const U& src, const Coord& coord)
     constexpr Hardware srcPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename TileInternal::LoadDataTensor2Tensor<dstPos, srcPos, 
         TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
-    Tensor2Tensor{}.template Run<T, U, trait, Coord>(dst, src, coord);
+    Tensor2Tensor{}.template <trait, T, U, Coord>(dst, src, coord);
 }
 } // namespace AscendC
 #endif // IMPL_EXPERIMENTAL_TENSOR_API_ARCH_TILE_API_TENSOR_TILE_LOAD_DATA_IMPL_H

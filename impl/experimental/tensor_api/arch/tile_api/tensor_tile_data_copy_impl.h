@@ -32,14 +32,16 @@ DataCopy(const T& dst, const U& src)
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename
         TileInternal::DataCopyTensor2Tensor<dstTPos, srcTPos, TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
-    Tensor2Tensor{}.template Run<T, U, trait>(dst, src);
+    Tensor2Tensor{}.template Run<trait, T, U>(dst, src);
 }
 
 template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
 __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplateWithCoord<T, U, Coord>, void>::type
 DataCopy(const T& dst, const U& src, const Coord& coord)
 {
-    DataCopy<trait, T, U>(dst, src);
+    dst = MakeTensorWithCoord(dst, coord);
+    src = MakeTensorWithCoord(src, coord);
+    DataCopy<T, U, trait>(dst, src);
 }
 
 } // namespace AscendC
