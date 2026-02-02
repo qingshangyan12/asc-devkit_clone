@@ -21,6 +21,7 @@
 #include "kernel_reg.h"
 #include "kernel_tensor.h"
 #include "kernel_tensor_base.h"
+#include "kernel_operator_sync_intf.h"
 #include "utils/kernel_utils_mode.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -30,23 +31,6 @@
 #endif
 
 namespace AscendC {
-
-template <HardEvent event>
-__aicore__ inline void SetFlag(int32_t eventID);
-
-template <HardEvent event>
-__aicore__ inline void WaitFlag(int32_t eventID);
-
-template <pipe_t pipe>
-__aicore__ inline void PipeBarrier();
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||       \
-    (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) ||       \
-    (__NPU_ARCH__ == 3003) ||                                 \
-    (__NPU_ARCH__ == 3113))
-template <MemDsbT arg0>
-__aicore__ inline void DataSyncBarrier();
-#endif
 
 /*
  * @ingroup：IBSet, IBWait
