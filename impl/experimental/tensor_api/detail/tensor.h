@@ -15,4 +15,10 @@
 #ifndef TENSOR_API_DETAIL_TENSOR_H
 #define TENSOR_API_DETAIL_TENSOR_H
 
+#include "impl/experimental/detail/tensor_api/algorithm/algorithm.h"
+#include "impl/experimental/detail/tensor_api/arch/arch.h"
+#include "impl/experimental/detail/tensor_api/atom/atom.h"
+#include "impl/experimental/detail/tensor_api/struct/struct.h"
+#include "impl/experimental/detail/tensor_api/utils/utils.h"
+
 #endif // TENSOR_API_DETAIL_TENSOR_H
