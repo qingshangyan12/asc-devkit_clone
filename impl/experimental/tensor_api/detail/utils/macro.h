@@ -12,8 +12,8 @@
 * \file macro.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_MACRO_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_MACRO_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_MACRO_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_MACRO_H
 
 #define GM_ADDR __gm__ uint8_t*
 
@@ -213,4 +213,4 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define ASCEND_IS_NOT_AIC constexpr(g_coreType != AscendC::AIC)
 #endif
 
-#endif //IMPL_EXPERIMENTAL_TENSOR_API_UTILS_MACRO_H
+#endif //EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_MACRO_H

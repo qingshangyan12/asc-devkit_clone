@@ -12,7 +12,9 @@
 * \file copy.h
 * \brief
 */
-#ifndef TENSOR_API_ALGORITHM_CPOY_H
-#define TENSOR_API_ALGORITHM_COPY_H
+#ifndef EXPERIMENTAL_TENSOR_API_ALGORITHM_CPOY_H
+#define EXPERIMENTAL_TENSOR_API_ALGORITHM_CPOY_H
 
-#endif // TENSOR_API_ALGORITHM_CPOY_H
+#include "impl/experimental/tensor_api/detail/algorithm/copy_impl.h"
+
+#endif // EXPERIMENTAL_TENSOR_API_ALGORITHM_CPOY_H

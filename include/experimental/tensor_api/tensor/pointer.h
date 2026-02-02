@@ -9,10 +9,42 @@
 */
 
 /*!
-* \file layout.h
-* \brief
-*/
-#ifndef TENSOR_API_TENSOR_POINTER_H
-#define TENSOR_API_TENSOR_POINTER_H
+ * \file ptr_impl.h
+ * \brief
+ */
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_PTR_IMPL_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_PTR_IMPL_H
 
-#endif // TENSOR_API_TENSOR_POINTER_H
+#include "impl/experimental/tensor_api/detail/utils/utils.h"
+#include "impl/experimental/tensor_api/detail/struct/struct.h"
+
+// algorithm
+namespace AscendC {
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter);
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeUBmemPtr(Iterator iter);
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeL1memPtr(Iterator iter);
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeL0AmemPtr(Iterator iter);
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeL0BmemPtr(Iterator iter);
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeL0CmemPtr(Iterator iter);
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeBiasmemPtr(Iterator iter);
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter);
+
+} // namespace AscendC
+
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_PTR_IMPL_H

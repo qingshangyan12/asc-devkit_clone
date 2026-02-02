@@ -12,8 +12,8 @@
 * \file constant.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_CONSTANT_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_CONSTANT_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_H
 
 #include <cstdint>
 #include <utility>
@@ -25,9 +25,6 @@
 #include "include/utils/std/algorithm.h"
 
 namespace AscendC{
-
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
-
 namespace TileInternal{
 constexpr size_t TWO_DIM_DATA = 2;
 constexpr size_t FOUR_DIM_DATA = 4;
@@ -85,4 +82,4 @@ using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUAN
 }
 }
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSORTILE_CONSTANT_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_TENSORTILE_CONSTANT_H

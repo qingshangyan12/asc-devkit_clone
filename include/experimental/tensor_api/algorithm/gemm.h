@@ -12,7 +12,9 @@
 * \file gemm.h
 * \brief
 */
-#ifndef TENSOR_API_ALGORITHM_GEMM_H
-#define TENSOR_API_ALGORITHM_GEMM_H
+#ifndef EXPERIMENTAL_TENSOR_API_ALGORITHM_GEMM_H
+#define EXPERIMENTAL_TENSOR_API_ALGORITHM_GEMM_H
 
-#endif // TENSOR_API_ALGORITHM_GEMM_H
+#include "impl/experimental/tensor_api/detail/algorithm/gemm_impl.h"
+
+#endif // EXPERIMENTAL_TENSOR_API_ALGORITHM_GEMM_H

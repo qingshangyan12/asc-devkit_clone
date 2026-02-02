@@ -12,8 +12,8 @@
 * \file extra.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_EXTRA_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_EXTRA_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_EXTRA_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_EXTRA_H
 
 #include "impl/experimental/tensor_api/detail/utils/constant.h"
 
@@ -55,4 +55,4 @@ struct IterVal<T,void_t<typename T::valueType>> {
 } // namespace TileInternal
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_UTILS_EXTRA_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_EXTRA_H
