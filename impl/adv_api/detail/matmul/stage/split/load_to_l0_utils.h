@@ -107,11 +107,12 @@ __aicore__ inline constexpr auto GetAuxDataType()
     } else if constexpr (HasScalePosition<INPUT_TYPE>::value) {
 #ifdef IS_AICORE
         uint8_t mxData = get_imm(0);
-#else
-        uint8_t mxData = 0;
-#endif
         fp8_e8m0_t mxType = *(reinterpret_cast<fp8_e8m0_t*>(&mxData));
         return mxType;
+#else
+        uint8_t mxData = 0;
+        return mxData;
+#endif
     } else {
         uint8_t defaultData = 0;
         return defaultData;
