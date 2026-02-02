@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-根据mask对32位源操作数src0、src1进行按元素做乘操作，将结果的低位写入目的操作数dst0，高位写入dst1。
+根据mask对32位源操作数src0、src1进行按元素做乘操作，将结果写入目的操作数dst0，溢出写入dst1。
 
 $$
 dst0_i = src0_i \quad ×  \quad src1_i \quad \text{mod} \quad 2^{16}
