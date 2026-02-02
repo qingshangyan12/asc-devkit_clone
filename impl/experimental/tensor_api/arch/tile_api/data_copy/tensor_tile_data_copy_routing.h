@@ -47,6 +47,22 @@ template <>
 struct DataCopyTensor2Tensor<Hardware::FIXBUF, Hardware::L1, ArchVersion::V2201, FOUR_DIM_DATA> {
     using type = CopyCbufToFB2201;
 };
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::CBUF, Hardware::GM, ArchVersion::V3101, FOUR_DIM_DATA> {
+    using type = DataCopyFourDim3101GM2L1;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::BIAS, Hardware::L1, ArchVersion::V3101, FOUR_DIM_DATA> {
+    using type = CopyCbufToBT;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::FIXBUF, Hardware::L1, ArchVersion::V3101, FOUR_DIM_DATA> {
+    using type = CopyCbufToFB;
+};
+
 } // namespace TileInternal
 } // namespace AscendC
 
