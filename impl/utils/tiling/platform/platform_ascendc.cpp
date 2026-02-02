@@ -21,6 +21,7 @@
 #include "platform_ascendc_log.h"
 #include "platform/platform_infos_def.h"
 #include "platform_ascendc.h"
+#include "acl/acl_rt.h"
 
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
@@ -472,11 +473,12 @@ fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char *custo
         socVersion = customSocVersion;
     }
 
-    fe::PlatformInfoManager::GeInstance().InitRuntimePlatformInfos(socVersion);
+    fe::PlatformInfoManager::Instance().InitRuntimePlatformInfos(socVersion);
     fe::OptionalInfos optionalInfos;
     static fe::PlatFormInfos gPlatformInfo;
-    fe::PlatformInfoManager::GeInstance().GetPlatformInfos(socVersion,
-        gPlatformInfo, optionalInfos);
+    int32_t deviceId;
+    auto aclRet = aclrtGetDevice(&deviceId);
+    fe::PlatformInfoManager::Instance().GetRuntimePlatformInfosByDevice(deviceId, gPlatformInfo);
     std::string socVersionStr;
     const auto ret = gPlatformInfo.GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVersionStr);
     if (!ret) {
