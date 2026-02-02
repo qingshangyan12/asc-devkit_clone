@@ -31,6 +31,8 @@ function(run_llt_test)
 
     # 设置是否启用gtest_parallel的默认值
     if(NOT DEFINED LLT_ENABLE_GTEST_PARALLEL)
+        set(LLT_ENABLE_GTEST_PARALLEL OFF)
+    else()
         set(LLT_ENABLE_GTEST_PARALLEL ON)
     endif()
 
