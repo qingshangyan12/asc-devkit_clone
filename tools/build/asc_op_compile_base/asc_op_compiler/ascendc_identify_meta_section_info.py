@@ -32,7 +32,7 @@ def extract_hex_data(hex_dump: str) -> str:
         if not line:
             continue
         
-        parts = lines.split()
+        parts = line.split()
         if len(parts) < 2:
             continue
 
@@ -78,7 +78,7 @@ def format_hex_to_groups(hex_data: str) -> Optional[str]:
         chunk = clean_hex[i: i+8]
         groups.append(chunk if len(chunk) == 8 else chunk.ljust(8, '0'))
     
-    return ' '.json(hex_parts)
+    return ' '.join(hex_parts)
 
 
 # .o生成tlv
