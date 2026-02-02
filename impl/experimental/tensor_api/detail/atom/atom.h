@@ -15,6 +15,6 @@
 #ifndef IMPL_EXPERIMENTAL_TENSOR_API_ATOM_ATOM_H
 #define IMPL_EXPERIMENTAL_TENSOR_API_ATOM_ATOM_H
 
-#include "impl/experimental/detail/tensor_api/atom/copy_atom.h"
+#include "impl/experimental/tensor_api/detail/atom/copy_atom.h"
 
 #endif // IMPL_EXPERIMENTAL_TENSOR_API_ATOM_ATOM_H

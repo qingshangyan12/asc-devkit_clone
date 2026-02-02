@@ -12,13 +12,13 @@
 * \file tensor.h
 * \brief
 */
-#ifndef TENSOR_API_DETAIL_TENSOR_H
-#define TENSOR_API_DETAIL_TENSOR_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_H
 
-#include "impl/experimental/detail/tensor_api/algorithm/algorithm.h"
-#include "impl/experimental/detail/tensor_api/arch/arch.h"
-#include "impl/experimental/detail/tensor_api/atom/atom.h"
-#include "impl/experimental/detail/tensor_api/struct/struct.h"
-#include "impl/experimental/detail/tensor_api/utils/utils.h"
+#include "impl/experimental/tensor_api/detail/algorithm/algorithm.h"
+#include "impl/experimental/tensor_api/detail/arch/arch.h"
+#include "impl/experimental/tensor_api/detail/atom/atom.h"
+#include "impl/experimental/tensor_api/detail/struct/struct.h"
+#include "impl/experimental/tensor_api/detail/utils/utils.h"
 
-#endif // TENSOR_API_DETAIL_TENSOR_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_H

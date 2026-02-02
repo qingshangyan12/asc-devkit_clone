@@ -15,8 +15,8 @@
 #ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_FORMAT_H
 #define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_FORMAT_H
 
-#include "impl/experimental/detail/tensor_api/utils/constant.h"
-#include "impl/experimental/detail/tensor_api/struct/struct.h"
+#include "impl/experimental/tensor_api/detail/utils/constant.h"
+#include "impl/experimental/tensor_api/detail/struct/struct.h"
 
 namespace AscendC {
 template <typename T, typename U>

@@ -15,9 +15,9 @@
 #ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_ALGORITHM_H
 #define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_ALGORITHM_H
 
-#include "impl/experimental/detail/tensor_api/algorithm/fractal_impl.h"
-#include "impl/experimental/detail/tensor_api/algorithm/layout_impl.h"
-#include "impl/experimental/detail/tensor_api/algorithm/ptr_impl.h"
-#include "impl/experimental/detail/tensor_api/algorithm/tensor_impl.h"
+#include "impl/experimental/tensor_api/detail/algorithm/fractal_impl.h"
+#include "impl/experimental/tensor_api/detail/algorithm/layout_impl.h"
+#include "impl/experimental/tensor_api/detail/algorithm/ptr_impl.h"
+#include "impl/experimental/tensor_api/detail/algorithm/tensor_impl.h"
 
 #endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_ALGORITHM_H

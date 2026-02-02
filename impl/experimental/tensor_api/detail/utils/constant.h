@@ -18,7 +18,7 @@
 #include <cstdint>
 #include <utility>
 #include <type_traits>
-#include "impl/experimental/detail/tensor_api/utils/macro.h"
+#include "impl/experimental/tensor_api/detail/utils/macro.h"
 #include "include/utils/std/tuple.h"
 #include "include/utils/std/type_traits.h"
 #include "include/utils/std/utility.h"

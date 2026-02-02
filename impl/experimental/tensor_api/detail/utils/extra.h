@@ -15,7 +15,7 @@
 #ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_EXTRA_H
 #define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_EXTRA_H
 
-#include "impl/experimental/detail/tensor_api/utils/constant.h"
+#include "impl/experimental/tensor_api/detail/utils/constant.h"
 
 namespace AscendC {
 namespace TileInternal {

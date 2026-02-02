@@ -15,8 +15,8 @@
 #ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_LAYOUT_IMPL_H
 #define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_LAYOUT_IMPL_H
 
-#include "impl/experimental/detail/tensor_api/utils/utils.h"
-#include "impl/experimental/detail/tensor_api/struct/struct.h"
+#include "impl/experimental/tensor_api/detail/utils/utils.h"
+#include "impl/experimental/tensor_api/detail/struct/struct.h"
 
 namespace AscendC {
 
