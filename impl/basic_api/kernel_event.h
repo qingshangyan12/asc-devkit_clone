@@ -994,6 +994,52 @@ __aicore__ inline void SetFlagImpl(int32_t eventID)
     }
 }
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
+{
+#if (__NPU_ARCH__ == 5102)
+    if constexpr (pipe == PIPE_MTE3) {
+        return;
+    }
+#else
+    if ASCEND_IS_AIC {
+        if constexpr (pipe == PIPE_MTE3) {
+            return;
+        }
+    }
+#endif
+    if constexpr (pipe != PIPE_V) {
+        pipe_barrier(pipe);
+    }
+    return;
+}
+#else
+template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
+{
+#if __NPU_ARCH__ == 3102
+    return;
+#endif
+#if (__NPU_ARCH__ == 3002)
+    if constexpr (pipe == PIPE_S || pipe == PIPE_V) {
+        return;
+    }
+#endif
+#if (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+    if constexpr (pipe == PIPE_V) {
+        return;
+    }
+#endif
+#if (__NPU_ARCH__ == 2201)
+    if ASCEND_IS_AIC {
+        if constexpr (pipe == PIPE_V) {
+            return;
+        }
+    }
+#endif
+    pipe_barrier(pipe);
+}
+#endif
+
 __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
 {
     ASCENDC_ASSERT((eventID >= 0 && eventID < QUE_MAX_EVENT),
@@ -1125,6 +1171,78 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
             break;
     }
     return;
+}
+
+template<typename T, size_t N>
+__aicore__ inline constexpr bool IsAnyOf(std::array<T, N> arr, T value)
+{
+    for (size_t i = 0; i < N; ++i) {
+        if (arr[i] == value) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+template <HardEvent event>
+__aicore__ inline constexpr bool JudgeEventValidWhenFlag()
+{
+    if ASCEND_IS_AIC {
+        constexpr auto RelatedArray = std::array{HardEvent::MTE2_V, HardEvent::V_MTE2, HardEvent::MTE3_V,
+            HardEvent::V_MTE3, HardEvent::V_V, HardEvent::S_V,
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+            HardEvent::MTE2_MTE3, HardEvent::MTE3_MTE2, HardEvent::MTE3_S, HardEvent::S_MTE3,
+#endif
+            HardEvent::V_S};
+        if (IsAnyOf(RelatedArray, event)) {
+            return false;
+        }
+    }
+    if ASCEND_IS_AIV {
+        constexpr auto RelatedArray = std::array{HardEvent::MTE2_MTE1, HardEvent::MTE1_MTE2, HardEvent::MTE1_M,
+            HardEvent::M_MTE1, HardEvent::M_FIX, HardEvent::FIX_M};
+        if (IsAnyOf(RelatedArray, event)) {
+            return false;
+        }
+
+    }
+        
+//     if ASCEND_IS_AIC {
+//         if constexpr (event == HardEvent::MTE2_V || event == HardEvent::V_MTE2 || event == HardEvent::MTE3_V
+//                       || event == HardEvent::V_MTE3 || event == HardEvent::V_V || event == HardEvent::S_V ||
+// #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+//                       event == HardEvent::MTE2_MTE3 || event == HardEvent::MTE3_MTE2
+//                       || event == HardEvent::MTE3_S || event == HardEvent::S_MTE3 ||
+// #endif
+//                       event == HardEvent::V_S) {
+//             return false;
+//         }
+//     }
+//     if ASCEND_IS_AIV {
+//         if constexpr ((event == HardEvent::MTE2_MTE1) || (event == HardEvent::MTE1_MTE2) ||
+//                       (event == HardEvent::MTE1_M) || (event == HardEvent::M_MTE1) || (event == HardEvent::M_FIX) ||
+//                       (event == HardEvent::FIX_M)) {
+//             return false;
+//         }
+//     }
+    return true;
+}
+
+template <HardEvent event>
+__aicore__ inline void FlagSetFlagImpl(int32_t eventID)
+{
+    if (JudgeEventValidWhenFlag<event>()) {
+        SetFlagImpl<event>(eventID);
+    }
+}
+
+template <HardEvent event>
+__aicore__ inline void FlagWaitFlagImpl(int32_t eventID)
+{
+    if (JudgeEventValidWhenFlag<event>()) {
+        WaitFlagImpl(event, eventID);
+    }
 }
 }  // namespace AscendC
 
