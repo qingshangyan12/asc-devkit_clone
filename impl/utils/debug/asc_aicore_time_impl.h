@@ -21,7 +21,6 @@
 #warning "asc_aicore_time_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
 #endif
 
-#include "impl/utils/debug/asc_debug_types.h"
 #include "impl/utils/debug/asc_debug_utils.h"
 
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3501 || __NPU_ARCH__ == 3101
@@ -41,10 +40,10 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
     time_stamp_tlv->type = static_cast<uint32_t>(DumpType::DUMP_TIME_STAMP);
     time_stamp_tlv->length = tlv_len - sizeof(uint32_t[2]);
     time_stamp_tlv->descId = desc_id;
-    time_stamp_tlv->blockIdx = static_cast<uint16_t>(asc_get_block_idx());
+    time_stamp_tlv->blockIdx = static_cast<uint16_t>(asc_debug_get_block_idx());
     time_stamp_tlv->resv = static_cast<uint16_t>(0U);
-    time_stamp_tlv->cycle = asc_get_system_cycle();
-    time_stamp_tlv->pc = static_cast<uint64_t>(asc_get_program_counter());
+    time_stamp_tlv->cycle = asc_debug_get_system_cycle();
+    time_stamp_tlv->pc = static_cast<uint64_t>(asc_debug_get_program_counter());
     time_stamp_tlv->entry = static_cast<uint64_t>(__get_entry_sys_cnt()); 
     time_stamp_tlv->resvMem[0] = static_cast<uint32_t>(0U);
     time_stamp_tlv->resvMem[1] = static_cast<uint32_t>(0U);
@@ -72,20 +71,39 @@ __aicore__ inline void asc_prof_stop()
 }
 
 #if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3501
-template<pipe_t pipe = PIPE_S>
+template<pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
-    bisheng::cce::mark_stamp<pipe, index>();
+    bisheng::cce::mark_stamp<pipe, idx>();
 }
 
-template<pipe_t pipe = PIPE_S, uint16_t idx>
+template<pipe_t pipe, uint16_t idx>
 __aicore__ inline void asc_mark_stamp()
 {
-    bisheng::cce::mark_stamp<pipe, index>();
+    bisheng::cce::mark_stamp<pipe, idx>();
 }
 #endif
 } // namespace __asc_aicore
 #endif
+
+constexpr uint32_t ASC_PROF_START_EVENT = 0x80000000;
+constexpr uint32_t ASC_PROF_STOP_EVENT = 0xc0000000;
+
+__aicore__ inline void prof_mark_event(void)
+{
+    if (g_coreType == AIV) {
+        __asm__ volatile("NOP_BAR.V");
+    } else if (g_coreType == AIC) {
+        __asm__ volatile("NOP_BAR.M");
+        __asm__ volatile("NOP_BAR.MTE1");
+    } else {
+        __asm__ volatile("NOP_BAR.V");
+        __asm__ volatile("NOP_BAR.M");
+        __asm__ volatile("NOP_BAR.MTE1");
+    }
+    __asm__ volatile("NOP_BAR.MTE2");
+    __asm__ volatile("NOP_BAR.MTE3");
+}
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_TIME_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
