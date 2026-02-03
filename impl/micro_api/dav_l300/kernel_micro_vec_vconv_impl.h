@@ -138,9 +138,15 @@ __simd_callee__ inline void TruncateImpl(U& dstReg, U& srcReg, MaskReg& mask)
 {
     using ActualT = typename U::ActualT;
     static_assert(SupportType<ActualT, half, float>(), "current trunc data type is not supported!");
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
-    vtrc(dstReg, srcReg, roundModeValue, mask, modeValue);
+    if constexpr (roundMode == RoundMode::CAST_NONE) {
+        constexpr auto modeValue = GetMaskMergeMode<mode>();
+        constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
+        vtrc(dstReg, srcReg, roundModeValue, mask, modeValue);
+    } else {
+        constexpr auto modeValue = GetMaskMergeMode<mode>();
+        constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
+        vtrc(dstReg, srcReg, roundModeValue, mask, modeValue);
+    }
 }
 
 // s322s64 RegTraitNumOne -> RegTraitNumTwo
