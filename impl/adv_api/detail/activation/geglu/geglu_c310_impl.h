@@ -13,11 +13,11 @@
  * \brief
  */
 
-#if !defined(ASCENDC_INCLUDE_INTERNAL_HEADERS)
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
 #warning                                                                                                               \
-    "impl/adv_api/detail/activation/geglu/geglu_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/geglu.h"" and use public functions or variables defined in interface headers files."
-#define ASCENDC_INCLUDE_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GEGL_C310_IMPL_H
+    "impl/adv_api/detail/activation/geglu/geglu_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/activation/geglu.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GEGLU_C310_IMPL_H
 #endif
 
 #ifndef IMPL_ACTIVATION_GEGLU_GEGLU_IMPL_C310_H
@@ -109,7 +109,7 @@ __aicore__ inline void GeGLUImpl(const LocalTensor<T>& dstTensor, const LocalTen
 } // namespace AscendC
 #endif // IMPL_ACTIVATION_GEGLU_GEGLU_IMPL_C310_H
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GEGL_C310_IMPL_H)
-#undef ASCENDC_INCLUDE_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GEGL_C310_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GEGLU_C310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GEGLU_C310_IMPL_H
 #endif
