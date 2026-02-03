@@ -636,7 +636,7 @@ __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdD
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-#ifdef ASCENDC_CPU_DEBUG
+#if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
 class BufIdTracker {
 public:
     struct BufState {

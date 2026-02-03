@@ -66,10 +66,10 @@ __aicore__ inline void VecDupLevel0Template(__ubuf__ T *dst, const T& scalarValu
 {
     BasicAPIMaskStruct maskArrayStruct;
     if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+        ASCENDC_DEBUG_ASSERT(maskCount == 0, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."));
         maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
     } else {
-        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+        ASCENDC_DEBUG_ASSERT(maskArray == nullptr, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false."));
     }
     __ubuf__ uint64_t *maskBuf = nullptr;
     
@@ -85,7 +85,7 @@ __aicore__ inline void VecDupLevel0Template(__ubuf__ T *dst, const T& scalarValu
     } else {
         if constexpr (isMaskBitMode) {
             if constexpr (SupportBytes<T, 1>()) {
-                ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
+                ASCENDC_DEBUG_ASSERT(isSetMask, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "mask must be set when sizeof(T) is 1."));
                 auto eventIDV2S = GetTPipePtr()->FetchEventID(HardEvent::V_S);
                 SetFlag<HardEvent::V_S>(eventIDV2S);
                 WaitFlag<HardEvent::V_S>(eventIDV2S);
@@ -316,7 +316,7 @@ __aicore__ inline void InterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Loc
     static_assert(SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t,
         uint64_t, int64_t>(),
         "current data type is not supported on current device!");
-    ASCENDC_ASSERT((calCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount % 2 = 0!"); });
+    ASCENDC_DEBUG_ASSERT((calCount % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "calCount % 2 = 0!"));
     if constexpr (sizeof(T) != 8) {
         if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
             InterleaveImplNormal<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
@@ -497,7 +497,7 @@ __aicore__ inline void DeInterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1L
     static_assert(SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t,
         uint64_t, int64_t>(),
         "current data type is not supported on current device!");
-    ASCENDC_ASSERT((calCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount % 2 = 0!"); });
+    ASCENDC_DEBUG_ASSERT((calCount % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "calCount % 2 = 0!"));
     if constexpr (sizeof(T) != 8) {
         if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
             DeInterleaveImplNormal<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
@@ -520,7 +520,7 @@ __aicore__ inline void DeInterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1L
     static_assert(SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t,
         uint64_t, int64_t>(),
         "current data type is not supported on current device!");
-    ASCENDC_ASSERT((srcCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "srcCount % 2 = 0!"); });
+    ASCENDC_DEBUG_ASSERT((srcCount % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "srcCount % 2 = 0!"));
     // no unalign problem
     if constexpr (sizeof(T) != 8) {
         DeInterleaveImplNormal<T, false, false>(dst0Local, dst1Local, srcLocal, nullptr, srcCount);

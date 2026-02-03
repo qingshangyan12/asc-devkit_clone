@@ -66,8 +66,8 @@ __aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
 {
     uint32_t totalBlockNum = get_block_num();
     if (g_dumpWorkspaceReserved == nullptr) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "init dump get nullptr system workspace ptr"); });
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "init dump get nullptr system workspace ptr"));
         return;
     }
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved);
@@ -153,9 +153,9 @@ __aicore__ inline void WriteDumpShapeInfo(const ShapeInfo &shapeInfo)
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     uint32_t tlvSize = valueSize + DUMP_SHAPE_MESSAGE_TL_LEN;
     if (ptr->dumpOffset < tlvSize) {
-        ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "remained space is %d, which is not enough for write data %u", ptr->dumpOffset,
-            tlvSize); });
+        ASCENDC_DEBUG_ASSERT((false),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "remained space is %d, which is not enough for write data %u", ptr->dumpOffset,
+            tlvSize));
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         return;
@@ -297,14 +297,14 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor
     uint32_t position = CheckValidPosition(tensor);
     // set the head struct value
     if (position == 0) {
-        ASCENDC_ASSERT((false),
-                   { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+        ASCENDC_DEBUG_ASSERT((false),
+                   KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"));
         return;
     }
     const Hardware srcHWPos = GetPhyType((TPosition)tensor.GetPosition());
     if (srcHWPos == Hardware::L1 && !IsL1DumpEnable()) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "data moving from L1 to Gm is not supported on current device"); });
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "data moving from L1 to Gm is not supported on current device"));
         return;
     }
     PrimType data;
@@ -322,9 +322,9 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor
     padOffset = AlignUp(offset, ONE_BLK_SIZE);
 
     if (ptr->dumpOffset < (padOffset + sizeof(DumpMessageHead))) {
-        ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "remained space is %d, which is not enough for write data %u", ptr->dumpOffset,
-            (padOffset + sizeof(DumpMessageHead))); });
+        ASCENDC_DEBUG_ASSERT((false),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "remained space is %d, which is not enough for write data %u", ptr->dumpOffset,
+            (padOffset + sizeof(DumpMessageHead))));
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
         return;
@@ -563,8 +563,8 @@ __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 #if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     g_dumpWorkspaceReserved = GetSysWorkSpacePtr();
     if (g_dumpWorkspaceReserved == nullptr) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "init dump get nullptr system workspace ptr"); });
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "init dump get nullptr system workspace ptr"));
         return;
     }
     if (reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) < DUMP_WORKSPACE_SIZE) {
@@ -583,8 +583,8 @@ __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gm
 #if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     g_dumpWorkspaceReserved = dumpStartAddr;
     if (g_dumpWorkspaceReserved == nullptr) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "init dump get nullptr system workspace ptr"); });
+        ASCENDC_DEBUG_ASSERT((false),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "init dump get nullptr system workspace ptr"));
         return;
     }
     InitDumpImpl(mixFlag, gmLen);
