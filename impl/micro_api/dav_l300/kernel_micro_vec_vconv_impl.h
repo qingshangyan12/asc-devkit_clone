@@ -133,10 +133,10 @@ __simd_callee__ inline void CastImpl(RegTensor<T> &dstReg, RegTensor<U> &srcReg,
 }
 
 // truncate f162f16/f322f32
-template <typename T, RoundMode roundMode = RoundMode::CAST_NONE, MaskMergeMode mode = MaskMergeMode::ZEROING>
-__simd_callee__ inline void TruncateImpl(T& dstReg, T& srcReg, MaskReg &mask)
+template <typename T, RoundMode roundMode, MaskMergeMode mode, typename U>
+__simd_callee__ inline void TruncateImpl(U& dstReg, U& srcReg, MaskReg& mask)
 {
-    using ActualT = typename T::ActualT;
+    using ActualT = typename U::ActualT;
     static_assert(SupportType<ActualT, half, float>(), "current trunc data type is not supported!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
