@@ -179,7 +179,7 @@ bool CheckFuncLoadData3dv1(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 template <typename T, typename U>
 bool CheckFuncLoadData3dv2(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const LoadData3DParamsV2<U>& loadDataParams, const char* intriName)
+    const LoadData3DParamsV2<U>& loadDataParams, const __gm__ char* intriName)
 {
     check::LoadData3dv2ApiParams chkParams { static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
