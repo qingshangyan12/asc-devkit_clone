@@ -16,7 +16,7 @@
 #define EXPERIMENTAL_TENSOR_API_TENSOR_TENSOR_H
 
 #include "include/experimental/tensor_api/tensor/engine.h"
-#include "include/experimental/tensor_api/tensor/fractal.h"
+#include "include/experimental/tensor_api/tensor/layout.h"
 #include "include/experimental/tensor_api/tensor/local_tensor.h"
 
 #endif // EXPERIMENTAL_TENSOR_API_TENSOR_TENSOR_H

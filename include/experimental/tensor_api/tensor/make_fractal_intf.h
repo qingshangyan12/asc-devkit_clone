@@ -22,9 +22,6 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column);
 
-template <>
-__aicore__ inline decltype(auto) MakeNZLayout<Std::ignore_t>(size_t row, size_t column);
-
 template <typename T>
 __aicore__ inline decltype(auto) MakeRowMajorLayout(size_t row, size_t column);
 
