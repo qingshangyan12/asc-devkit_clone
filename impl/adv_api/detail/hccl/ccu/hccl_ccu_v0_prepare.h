@@ -191,10 +191,10 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
         CalcLoopGroupParams(&loopParam[0], normalSliceSize, loopCount);
     }
     
-    xnData_[9] = loopParam[0];
-    xnData_[10] = loopParam[1];
-    xnData_[11] = loopParam[2];
-    xnData_[12] = loopParam[3];
+    xnData_[11] = loopParam[0];
+    xnData_[12] = loopParam[1];
+    xnData_[13] = loopParam[2];
+    xnData_[14] = loopParam[3];
 }
 
 template<const auto &config>
@@ -243,7 +243,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatt
                ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
     xnData_[7] = sliceSize;
-    xnData_[8] = 1;
+    xnData_[8] = UINT64_MAX - 1;
 
     uint64_t loopParam[4];
     CalcLoopGroupParams(&loopParam[0], sliceSize, loopCount);
