@@ -135,7 +135,7 @@ def write_mk(tiling_key_list, cmds_list, dst, compile_log_path):
                     f.write(f' {cmds_str_long}\n')
                     CommonUtility.dump_compile_log(cmds_long, CompileStage.COMPILE, compile_log_path)
                 else:
-                    f.write(f'\t{cmds_str}\n')
+                    f.write(f'\t{cmds_str} 2>/dev/null \n')
                 i += 1
     except Exception as err:
         raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write mk file failed, reason is:", err))
@@ -924,3 +924,10 @@ def get_kernel_fun_name_with_tiling_key_and_kernel_type(compile_info: CompileInf
         suffix_marker = "_mix_aiv"
     full_kernel_name += suffix_marker
     return full_kernel_name
+
+
+def get_tilingkey_tpl_compile_definitions(compile_info: CompileInfo, tiling_key):
+    compile_options = []
+    if int(tiling_key) in compile_info.template_tiling_info:
+        compile_options += compile_info.template_tiling_info[int(tiling_key)].get('compile_definitions', [])
+    return compile_options

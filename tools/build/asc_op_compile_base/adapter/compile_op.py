@@ -38,7 +38,7 @@ from .ascendc_constants import InferChannelParamsFromIFile, InferChannelParams, 
     ASCENDC_OOM, MIX_CORE_MACRO, CustomizedConfig
 from .ascendc_common_utility import CommonUtility, CompileInfo, \
     process_ascendc_api_version, gen_func_align_attribute, convert_customized_config_to_inferchannel, \
-    get_kernel_fun_name_with_tiling_key_and_kernel_type
+    get_kernel_fun_name_with_tiling_key_and_kernel_type, get_tilingkey_tpl_compile_definitions
 from .ascendc_compile_dfx import DFXParamType, DFXPointType, DFXArgInfo, DFXSectionGenerator
 from .ascendc_compile_v220 import gen_compile_cmd_v220, get_v220_kernel_type_mix_flag, call_bisheng_v220, \
     get_ktype_section_variable, get_code_channel_v220_by_first_tiling_key, \
@@ -1375,6 +1375,7 @@ def _compile_single_tiling(tiling_key, compile_info, tiling_info, compile_option
     compile_cmd = _gen_compile_cmd(compile_info.gen_kernel_func_file, dst_file, compile_option_tuple, \
                             tiling_info.tiling_data_file_path)
     compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_key}UL"]
+    compile_cmd += get_tilingkey_tpl_compile_definitions(compile_info, tiling_key)
     compile_cmd += [f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey"]
     kernel_func_name = compile_info.kernel_name + '_%s' % tiling_key
     compile_cmd += [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={kernel_func_name}"]
@@ -1400,6 +1401,7 @@ def _compile_ascendc_cce(compile_info: CompileInfo, compile_option_tuple, tiling
         # tbe-pass add "__kernel0" in tbe-codegen and json, we use -D to change function name
         compile_cmd += [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={compile_info.get_kernel_func_name()}"]
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
+        compile_cmd += get_tilingkey_tpl_compile_definitions(compile_info, tiling_info.tiling_key)
         new_sources += DFXSectionGenerator().generate_dfx_section(str(tiling_info.tiling_key),\
                                             tiling_info, compile_info.get_kernel_func_name(), compile_info, True)
         new_sources += "#endif\n"
@@ -1468,6 +1470,7 @@ def _get_compile_cmd_and_section_content(compile_info: CompileInfo, arch: str, \
     compile_option_tuple, tiling_info: TilingInfo, tiling_key: str):
     compile_cmd = gen_compile_cmd_v220(compile_info.gen_kernel_func_file, compile_info.dst_file, \
         compile_option_tuple, arch, tiling_info.tiling_data_file_path)
+    compile_cmd += get_tilingkey_tpl_compile_definitions(compile_info, tiling_key)
 
     if CommonUtility.is_c310():
         if compile_info.raw_tiling_key_kernel_type.get(str(tiling_key)) == KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2:
@@ -2022,6 +2025,7 @@ def _compile_single_tiling_regbase(param : SingleTilingKeyCompileParams):
                                                param.compile_option_tuple, param.sub_arch, \
                                                param.tiling_info.tiling_data_file_path)
     compile_cmd += [f"-D{TILING_KEY_MACRO}={param.tiling_key}UL"]
+    compile_cmd += get_tilingkey_tpl_compile_definitions(param.compile_info, param.tiling_key)
     compile_cmd += \
         [f"-D{param.compile_info.origin_func_name}={param.compile_info.origin_func_name}_{param.tiling_key}_tilingkey"]
     kernel_func_name = param.compile_info.kernel_name + '_%s' % param.tiling_key
@@ -2077,6 +2081,7 @@ def _call_bisheng_regbase(compile_info: CompileInfo, compile_option_tuple, tilin
         # tbe-pass add "__kernel0" in tbe-codegen and json, we use -D to change function name
         compile_cmd += [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={compile_info.get_kernel_func_name()}"]
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
+        compile_cmd += get_tilingkey_tpl_compile_definitions(compile_info, tiling_info.tiling_key)
         new_sources += DFXSectionGenerator().generate_dfx_section(str(tiling_info.tiling_key), \
                                             tiling_info, compile_info.get_kernel_func_name(), compile_info, True)
         new_sources += "#endif\n"

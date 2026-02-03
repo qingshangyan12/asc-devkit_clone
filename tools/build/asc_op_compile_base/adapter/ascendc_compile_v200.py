@@ -21,7 +21,7 @@ from .global_storage import global_var_storage
 from .ascendc_constants import ASCENDC_OOM
 from .ascendc_compile_base import SingleTilingKeyCompileParams
 from .ascendc_compile_dfx import DFXSectionGenerator
-from .ascendc_common_utility import CommonUtility, CompileInfo
+from .ascendc_common_utility import CommonUtility, CompileInfo, get_tilingkey_tpl_compile_definitions
 from .ascendc_constants import CORE_TYPE_MIX, CORE_TYPE_CUBE, CORE_TYPE_VEC, ASCENDC_OOM, KernelMetaType,\
     MIX_CORE_MACRO, TILING_KEY_MACRO
 
@@ -97,6 +97,7 @@ def call_bisheng_v200_dynamic(param : SingleTilingKeyCompileParams, kernel_type)
     compile_cmd = gen_compile_cmd_v200(param.compile_info.gen_kernel_func_file, dst_file, \
         param.compile_option_tuple, param.sub_arch, param.tiling_info.tiling_data_file_path)
     compile_cmd += [f"-D{TILING_KEY_MACRO}={param.tiling_key}UL"]
+    compile_cmd += get_tilingkey_tpl_compile_definitions(param.compile_info, param.tiling_key)
     compile_cmd += \
         [f"-D{param.compile_info.origin_func_name}={param.compile_info.origin_func_name}_{param.tiling_key}_tilingkey"]
     if kernel_type \
@@ -131,7 +132,7 @@ def call_bisheng_v200_static(compile_info: CompileInfo, compile_option_tuple, ti
         kernel_name = compile_info.get_kernel_func_name()
     compile_cmd += [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={kernel_name}"]
     compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
-
+    compile_cmd += get_tilingkey_tpl_compile_definitions(compile_info, tiling_info.tiling_key)
 
     sources = CommonUtility().ascendc_read_file(compile_info.gen_kernel_func_file)
     new_sources = sources[:-1]

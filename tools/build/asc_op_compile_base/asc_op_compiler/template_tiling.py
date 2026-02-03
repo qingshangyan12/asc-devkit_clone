@@ -621,6 +621,14 @@ def decode_tiling(tiling_key: int = None) -> dict:
         decode_results.update(decode_result)
         if length_before != len(decode_results):
             raise RuntimeError("ASCENDC_TPL_SELECT has duplicated definitions!")
+    for tkey, tkey_tpl_info in decode_results.items():
+        compile_definition_list = []
+        param_args = tkey_tpl_info.get('paramArgs')
+        if param_args is None:
+            continue
+        for idx, arg in enumerate(param_args):
+            compile_definition_list.append(f'-DTPL_KEY_{TILING_DECLARE_MAP[idx].name.upper()}={arg}')
+        decode_results[tkey]['compile_definitions'] = compile_definition_list
     if tiling_key is None:
         return decode_results
     if tiling_key not in decode_results.keys():

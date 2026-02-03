@@ -18,7 +18,8 @@ import stat
 import subprocess
 from asc_op_compile_base.common.buildcfg import get_current_build_config
 from .global_storage import global_var_storage
-from .ascendc_common_utility import CommonUtility, CompileInfo, get_kernel_fun_name_with_tiling_key_and_kernel_type
+from .ascendc_common_utility import CommonUtility, CompileInfo, get_kernel_fun_name_with_tiling_key_and_kernel_type, \
+    get_tilingkey_tpl_compile_definitions
 from .get_op_tiling import TilingInfo
 from asc_op_compile_base.common.utils.log_utils import CompileStage
 from .ascendc_constants import CORE_TYPE_MIX, CORE_TYPE_CUBE, CORE_TYPE_VEC, ASCENDC_OOM, KernelMetaType, \
@@ -277,6 +278,7 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
     compile_cmd = gen_compile_cmd_v220(param.compile_info.gen_kernel_func_file, dst_file, param.compile_option_tuple, \
                                             param.sub_arch, param.tiling_info.tiling_data_file_path)
     compile_cmd += [f"-D{TILING_KEY_MACRO}={param.tiling_key}UL"]
+    compile_cmd += get_tilingkey_tpl_compile_definitions(param.compile_info, param.tiling_key)
     compile_cmd += \
         [f"-D{param.compile_info.origin_func_name}={param.compile_info.origin_func_name}_{param.tiling_key}_tilingkey"]
     if param.code_channel == CORE_TYPE_MIX or \
@@ -359,6 +361,7 @@ def call_bisheng_v220(compile_info: CompileInfo, compile_option_tuple, tiling_in
         CommonUtility().ascendc_write_file(compile_info.gen_kernel_func_file, new_sources)
 
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
+        compile_cmd += get_tilingkey_tpl_compile_definitions(compile_info, tiling_info.tiling_key)
         CommonUtility.run_cmd_inner(compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path)
         return [f'{tiling_info.tiling_key}']
     else:
