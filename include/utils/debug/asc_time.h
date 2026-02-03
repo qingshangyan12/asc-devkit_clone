@@ -21,7 +21,7 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_TIME_H__
 #endif
 
-#ifndef __CHECK_FEATURE_AT_PRECOMPILE
+#include "impl/utils/debug/asc_aicore_time_impl.h"
 
 namespace __asc_aicore {
 __aicore__ inline void asc_time_stamp(uint32_t desc_id);
@@ -39,9 +39,8 @@ __aicore__ inline void asc_mark_stamp();
 #endif
 }   // namespase __asc_aicore
 
-#endif
-
-#include "impl/utils/debug/asc_aicore_time_impl.h"
+#define TRACE_START(...) TRACE_START_IMPL(...)
+#define TRACE_STOP(...) TRACE_STOP_IMPL(...)
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_TIME_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
