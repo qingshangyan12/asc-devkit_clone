@@ -13,21 +13,43 @@
 
 
 import os
+import sys
+import torch
 import numpy as np
 
 
 def gen_golden_data_simple():
     dtype = np.float32
-    input_shape = [7, 2024]
-    input_x = np.random.uniform(-100, 100, input_shape).astype(dtype)
-    golden = np.sum(input_x[:, :-1], axis=1).astype(dtype)
+    np.set_printoptions(threshold=sys.maxsize)
+
+    np.random.seed(123321)
+    src_type = dtype
+    src_shape = [1024]
+    calcount = 1024
+    api_mode = 0
+    min_value = np.finfo(src_type).min
+    max_value = np.finfo(src_type).max
+    src = np.random.uniform(min_value, max_value, src_shape).astype(src_type)
+    golden = np.zeros(src_shape).astype(src_type)
+
+    if src_type in [np.float16]:
+        src_tmp = src.astype(np.float32)
+        src_tensor = torch.from_numpy(src_tmp)
+    else:
+        src_tensor = torch.from_numpy(src)
+    
+    if api_mode == 1 or api_mode == 2:
+        golden[:calcount] = torch.sigmoid(src_tensor[:calcount]).numpy()
+    else:
+        golden = torch.sigmoid(src_tensor).numpy()
+
+    if src_type in [np.float16]:
+        golden = golden.astype(src_type)
+
     os.makedirs("input", exist_ok=True)
+    src.tofile("./input/input_src.bin")
     os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
     golden.tofile("./output/golden.bin")
-    print(f" golden: {golden}")
-    print(f" input: {input_x}")
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     gen_golden_data_simple()
