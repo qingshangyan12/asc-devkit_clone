@@ -21,6 +21,7 @@ from tbe.common.platform.platform_info import set_soc_spec
 from tbe.tvm.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from tbe.tvm.runtime.cce_runtime import tvm_callback_cce_postproc
 from tbe.tvm import var
+from .log_utils import LogUtil, AscendCLogLevel
 from .ascendc_common_utility import CommonUtility, CompileInfo
 from .ascendc_constants import CORE_TYPE_CUBE, CORE_TYPE_VEC, CORE_TYPE_MIX
 from .get_op_tiling import TilingInfo
@@ -463,8 +464,16 @@ def _generate_final_json(compile_info: CompileInfo, tiling_info: TilingInfo):
 
 def _get_simt_type_in_staic(tiling_info: TilingInfo, compile_info: CompileInfo, obj_path):
     if not CommonUtility.is_c310():
+        LogUtil.print_compile_log(compile_info.kernel_name, f"current soc version \
+no need to detect SIMT type", AscendCLogLevel.LOG_INFO)
         return False
-    if tiling_info.static_shape_flag is False or compile_info.kernel_name.startswith("te_superkernel"):
+    if tiling_info.static_shape_flag is False:
+        LogUtil.print_compile_log(compile_info.kernel_name, f"non static scenarios \
+not support detecting SIMT type", AscendCLogLevel.LOG_INFO)
+        return False
+    if compile_info.kernel_name.startswith("te_superkernel"):
+        LogUtil.print_compile_log(compile_info.kernel_name, f"current op is superkernel, \
+no need to detect SIMT type", AscendCLogLevel.LOG_INFO)
         return False
     vec_marker = "_mix_aiv"
     if compile_info.no_set_kernel_type is False:

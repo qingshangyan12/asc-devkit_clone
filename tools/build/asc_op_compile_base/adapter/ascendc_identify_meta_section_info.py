@@ -6,7 +6,6 @@ import struct
 from dataclasses import dataclass
 from typing import Optional
 from asc_op_compile_base.common.utils.log_utils import LogUtil, AscendCLogLevel
-from .ascendc_common_utility import CommonUtility
 
 
 F_TYPE_AIV_TYPE_FLAG = 12
@@ -75,7 +74,7 @@ def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Op
         raise FileNotFoundError(f"object file {object_file_path} not found, please check it.")
     section_name = ".ascend.meta." + kernel_name
     generate_cmd = ['llvm-objdump', '-s', '-j', '{}'.format(section_name), '{}'.format(object_file_path)]
-    CommonUtility.print_compile_log(kernel_name, f"start generate tlv info ...", AscendCLogLevel.LOG_INFO)
+    LogUtil.print_compile_log(kernel_name, f"start generate tlv info ...", AscendCLogLevel.LOG_INFO)
     proc = subprocess.Popen(generate_cmd, stdout=subprocess.PIPE, stderr=None)
     (tlv_info, _) = proc.communicate()
     tlv_info = tlv_info.decode('utf-8')
@@ -87,7 +86,7 @@ def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Op
 
 def parse_tlv_get_simt_value(tlv_string: str, kernel_name: str):
     try:        
-        CommonUtility.print_compile_log(kernel_name, f"start parse tlv info ...", AscendCLogLevel.LOG_INFO)
+        LogUtil.print_compile_log(kernel_name, f"start parse tlv info ...", AscendCLogLevel.LOG_INFO)
         hex_data = extract_hex_data(tlv_string)
         if not hex_data:
             return None
@@ -113,7 +112,7 @@ def parse_tlv_get_simt_value(tlv_string: str, kernel_name: str):
             offset += 4 + length
         return None
     except Exception as e:
-        LogUtil.print_compile_log("", f"parse TLV data failed", \
+        LogUtil.print_compile_log(kernel_name, f"parse TLV data failed", \
                 AscendCLogLevel.LOG_WARNING)
         return None
 
@@ -129,6 +128,7 @@ def check_op_type_is_simt(object_file_path: str, kernel_name: str):
         decimal_val = int(simt_value.lstrip('0x'), 16)
         target_values = {AIV_TYPE_SIMD_SIMT_MIX_VF, AIV_TYPE_SIMT_VF_ONLY}
         if decimal_val in target_values:
-            CommonUtility.print_compile_log(kernel_name, f"{kernel_name} is simt ...", AscendCLogLevel.LOG_INFO)
+            LogUtil.print_compile_log(kernel_name, f"{kernel_name} is simt op", AscendCLogLevel.LOG_INFO)
             return True
+        LogUtil.print_compile_log(kernel_name, f"{kernel_name} is not simt op", AscendCLogLevel.LOG_INFO)
         return False
