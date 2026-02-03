@@ -15,6 +15,13 @@
 #ifndef ASCENDC_MODULE_UTILS_MODE_CPU_H
 #define ASCENDC_MODULE_UTILS_MODE_CPU_H
 #include "utils/kernel_utils_constants.h"
+#if defined(ASCENDC_DEBUG)
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+#include <cstdint>
+#endif
 
 namespace AscendC {
 class MaskSetter {
@@ -107,7 +114,7 @@ enum class BlockMode : uint8_t {
     BLOCK_MODE_DEPTHWISE,
 };
 
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
 class ConstDefiner {
 public:
     static ConstDefiner& Instance()

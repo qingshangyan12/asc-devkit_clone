@@ -152,7 +152,7 @@ __aicore__ inline void SetLoop3Para(const FixpipeParamsC310<config.format>& intr
 {
     // the loop3DstStride range has increased.
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
-        ASCENDC_ASSERT((intriParams.params.ndNum > 0), { KERNEL_LOG(KERNEL_ERROR, "ndNum must be larger than 0"); });
+        ASCENDC_DEBUG_ASSERT((intriParams.params.ndNum > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "ndNum must be larger than 0"));
         // Loop3_dst_stride in uint of element
         uint64_t loop3Para = static_cast<uint64_t>(intriParams.params.dstNdStride) << 32;  // LOOP3_PARA[63:32]
         // original src_nd_stride in uint of fractal_size(1024B = 16 * 16 * sizeof(SrcT))
@@ -161,7 +161,7 @@ __aicore__ inline void SetLoop3Para(const FixpipeParamsC310<config.format>& intr
         loop3Para |= static_cast<uint64_t>(intriParams.params.ndNum);              // LOOP3_PARA[15:0]
         bisheng::cce::set_loop3_para(loop3Para);
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
-        ASCENDC_ASSERT((intriParams.params.dnNum > 0), { KERNEL_LOG(KERNEL_ERROR, "dnNum must be larger than 0"); });
+        ASCENDC_DEBUG_ASSERT((intriParams.params.dnNum > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dnNum must be larger than 0"));
         // Loop3_dst_stride in uint of element
         uint64_t loop3Para = static_cast<uint64_t>(intriParams.params.dstDnMatrixStride) << 32;  // LOOP3_PARA[63:32]
         // src_nd_stride in unit of C0_SIZE, Loop3_src_stride
@@ -218,22 +218,22 @@ __aicore__ inline void FixpipeL0cToUB(__ubuf__ DstT* dst, __cc__ SrcT* src,
         "CO1 and dst position is VECIN/VECCALC/VECOUT, isChannelSplit must be set as false \n"));
 
     // dual destination mode limit
-    ASCENDC_ASSERT(!(intriParams.dualDstCtl != 0b00 && (config.format == CO2Layout::COLUMN_MAJOR ||
-        intriParams.quantPre != QuantMode_t::NoQuant || intriParams.reluEn)), {
-            KERNEL_LOG(KERNEL_ERROR,
+    ASCENDC_DEBUG_ASSERT(!(intriParams.dualDstCtl != 0b00 && (config.format == CO2Layout::COLUMN_MAJOR ||
+        intriParams.quantPre != QuantMode_t::NoQuant || intriParams.reluEn)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                 "Dual destination mode can be enabled only when normal DMA or NZ2ND is enabled with any other "
-                "Fixpipe functions bypassed.");
-    });
+                "Fixpipe functions bypassed.")
+    );
 
-    ASCENDC_ASSERT(!(intriParams.dualDstCtl == 0b01 && intriParams.mSize % 2 != 0), {
-        KERNEL_LOG(KERNEL_ERROR,
-            "dual destination mode, split in M dimension, M/2 * N is written to each UB, M must be number of 2.");
-    });
+    ASCENDC_DEBUG_ASSERT(!(intriParams.dualDstCtl == 0b01 && intriParams.mSize % 2 != 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "dual destination mode, split in M dimension, M/2 * N is written to each UB, M must be number of 2.")
+    );
 
-    ASCENDC_ASSERT(!(intriParams.dualDstCtl == 0b10 && calNSize % 32 != 0), {
-        KERNEL_LOG(KERNEL_ERROR,
-            "dual destination mode, split in N dimension, M * N/2 is written to each UB, N must be number of 32.");
-    });
+    ASCENDC_DEBUG_ASSERT(!(intriParams.dualDstCtl == 0b10 && calNSize % 32 != 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "dual destination mode, split in N dimension, M * N/2 is written to each UB, N must be number of 32.")
+    );
 
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
     uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
@@ -362,39 +362,39 @@ template <typename DstT, typename SrcT, const FixpipeConfig &config>
 __aicore__ inline void CheckFixpipeQuantParams(const FixpipeParamsC310<config.format> &params)
 {
     if (params.quantPre == QuantMode_t::NoQuant) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, float>, Tuple<int32_t, int32_t>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, float>, Tuple<int32_t, int32_t>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     } else if (params.quantPre == QuantMode_t::F322F16 || params.quantPre == QuantMode_t::QF322F16_PRE ||
                params.quantPre == QuantMode_t::VQF322F16_PRE) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, half>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, half>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     } else if (params.quantPre == QuantMode_t::F322BF16 || params.quantPre == QuantMode_t::QF322BF16_PRE ||
                params.quantPre == QuantMode_t::VQF322BF16_PRE) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, bfloat16_t>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, bfloat16_t>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     } else if (params.quantPre == QuantMode_t::DEQF16 || params.quantPre == QuantMode_t::VDEQF16) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<int32_t, half>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<int32_t, half>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     } else if (params.quantPre == QuantMode_t::QF322B8_PRE || params.quantPre == QuantMode_t::VQF322B8_PRE) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, int8_t>, Tuple<float, uint8_t>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, int8_t>, Tuple<float, uint8_t>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     } else if (params.quantPre == QuantMode_t::REQ8 || params.quantPre == QuantMode_t::VREQ8) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<int32_t, int8_t>, Tuple<int32_t, uint8_t>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<int32_t, int8_t>, Tuple<int32_t, uint8_t>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     } else if (params.quantPre == QuantMode_t::QF322FP8_PRE || params.quantPre == QuantMode_t::VQF322FP8_PRE) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, fp8_e4m3fn_t>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, fp8_e4m3fn_t>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     } else if (params.quantPre == QuantMode_t::QF322HIF8_PRE || params.quantPre == QuantMode_t::VQF322HIF8_PRE ||
                params.quantPre == QuantMode_t::QF322HIF8_PRE_HYBRID ||
                params.quantPre == QuantMode_t::VQF322HIF8_PRE_HYBRID) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, hifloat8_t>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, hifloat8_t>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     } else if (params.quantPre == QuantMode_t::QS322BF16_PRE || params.quantPre == QuantMode_t::VQS322BF16_PRE) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<int32_t, bfloat16_t>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<int32_t, bfloat16_t>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     } else if (params.quantPre == QuantMode_t::QF322F32_PRE || params.quantPre == QuantMode_t::VQF322F32_PRE) {
-        ASCENDC_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, float>>()),
-            { KERNEL_LOG(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"); });
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<SrcT, DstT>, Tuple<float, float>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check quantPre value in Fixpipe"));
     }
 }
 
@@ -410,33 +410,33 @@ __aicore__ inline void CheckFixpipeParams(__cc__ SrcT *src, const FixpipeParamsC
     CheckFixpipeQuantParams<DstT, SrcT, config>(params);
     constexpr uint32_t L0C_SRC_ALIGN = 16 * sizeof(float); // src must align with 16 elements, each of them is F32 / S32
     uint64_t srcAbsAddr = src - (SrcT*)(GetTPipePtr()->GetBaseAddr(int8_t(TPosition::CO1)));
-    ASCENDC_ASSERT((srcAbsAddr % L0C_SRC_ALIGN == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check src start "\
-        "address alignment in Fixpipe");});
+    ASCENDC_DEBUG_ASSERT((srcAbsAddr % L0C_SRC_ALIGN == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src start "\
+        "address alignment in Fixpipe"));
 
     if (params.isChannelSplit) {
-        ASCENDC_ASSERT((params.nSize <= UINT12_MAX && params.nSize >=1 && params.nSize % 8 == 0),
-            {KERNEL_LOG(KERNEL_ERROR,"Failed to check nSize value in Fixpipe, when isChannelSplit is true, its valid "
-            "range is 1 ~ 4095 and must be divisible by 8, current value is %u", params.nSize); });
+        ASCENDC_DEBUG_ASSERT((params.nSize <= UINT12_MAX && params.nSize >=1 && params.nSize % 8 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,"Failed to check nSize value in Fixpipe, when isChannelSplit is true, its valid "
+            "range is 1 ~ 4095 and must be divisible by 8, current value is %u", params.nSize));
     } else if (config.format == CO2Layout::ROW_MAJOR || config.format == CO2Layout::COLUMN_MAJOR) {
         ASCENDC_CHECK_VALUE_RANGE(params.nSize, 1, UINT12_MAX, "nSize",
             "Fixpipe when isChannelSplit is false and format is NZ2ND");
         if constexpr (!IsGm) {
-            ASCENDC_ASSERT((params.nSize * sizeof(DstT) % 32 == 0),
-                {KERNEL_LOG(KERNEL_ERROR,"Failed to check nSize value in Fixpipe, when NZ2ND/NZ2DN, "
-                "its valid value * sizeof(DstT) must be divisible by 32B, current value is %u", params.nSize); });
-            ASCENDC_ASSERT((params.mSize * sizeof(DstT) % 32 == 0),
-                {KERNEL_LOG(KERNEL_ERROR,"Failed to check mSize value in Fixpipe, when NZ2ND/NZ2DN, "
-                "its valid value * sizeof(DstT) must be divisible by 32B, current value is %u", params.mSize); });
+            ASCENDC_DEBUG_ASSERT((params.nSize * sizeof(DstT) % 32 == 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,"Failed to check nSize value in Fixpipe, when NZ2ND/NZ2DN, "
+                "its valid value * sizeof(DstT) must be divisible by 32B, current value is %u", params.nSize));
+            ASCENDC_DEBUG_ASSERT((params.mSize * sizeof(DstT) % 32 == 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,"Failed to check mSize value in Fixpipe, when NZ2ND/NZ2DN, "
+                "its valid value * sizeof(DstT) must be divisible by 32B, current value is %u", params.mSize));
         }
     } else {
-        ASCENDC_ASSERT((params.nSize <= UINT12_MAX && params.nSize >=1 && params.nSize % 16 == 0),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check nSize value in Fixpipe, when isChannelSplit is false and format "
-            "is NZ, its valid range is 1 ~ 4095 and must be divisible by 16, current value is %u", params.nSize); });
+        ASCENDC_DEBUG_ASSERT((params.nSize <= UINT12_MAX && params.nSize >=1 && params.nSize % 16 == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check nSize value in Fixpipe, when isChannelSplit is false and format "
+            "is NZ, its valid range is 1 ~ 4095 and must be divisible by 16, current value is %u", params.nSize));
     }
     ASCENDC_CHECK_VALUE_RANGE(params.mSize, 1, UINT16_MAX, "mSize", "Fixpipe");
 
-    ASCENDC_ASSERT((params.dstStride != 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dstStride value in Fixpipe, "\
-        "its valid range is 1 ~ 4294967295, current value is %u", params.dstStride);});
+    ASCENDC_DEBUG_ASSERT((params.dstStride != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dstStride value in Fixpipe, "\
+        "its valid range is 1 ~ 4294967295, current value is %u", params.dstStride));
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         if (params.params.ndNum > 1) {
             ASCENDC_CHECK_VALUE_RANGE(params.params.srcNdStride, 0, UINT16_MAX, "srcNdStride", "Fixpipe when ndNum is > 1");
@@ -458,8 +458,8 @@ __aicore__ inline void CheckFixpipeL0C2UBParam(
     CheckFixpipeParams<DstT, SrcT, config>(src, params);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     uint64_t dstAbsAddr = dst - (DstT*)(GetTPipePtr()->GetBaseAddr(int8_t(TPosition::VECCALC)));
-    ASCENDC_ASSERT((dstAbsAddr * sizeof(DstT) % ONE_BLK_SIZE == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dst start "\
-        "address alignment in Fixpipe");});
+    ASCENDC_DEBUG_ASSERT((dstAbsAddr % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst start "\
+        "address alignment in Fixpipe"));
 #endif
 }
 
@@ -470,8 +470,8 @@ __aicore__ inline void CheckFixpipeL0C2L1Param(
     CheckFixpipeParams<DstT, SrcT, config>(src, params);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     uint64_t dstAbsAddr = dst - (DstT*)(GetTPipePtr()->GetBaseAddr(int8_t(TPosition::C1)));
-    ASCENDC_ASSERT((dstAbsAddr * sizeof(DstT) % ONE_BLK_SIZE == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dst start "\
-        "address alignment in Fixpipe");});
+    ASCENDC_DEBUG_ASSERT((dstAbsAddr % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst start "\
+        "address alignment in Fixpipe"));
 #endif
 }
 

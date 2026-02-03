@@ -69,8 +69,8 @@ __aicore__ inline int64_t GetBlockIdxImpl()
 __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    ASCENDC_ASSERT((workspace != nullptr),
-        { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((workspace != nullptr),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "workspace can not be nullptr"));
 #else
     if (g_sysWorkspaceReserved == nullptr) {
         g_sysWorkspaceReserved = workspace;
@@ -81,8 +81,8 @@ __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
 __aicore__ inline void SetSysWorkspaceForce(GM_ADDR workspace)
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    ASCENDC_ASSERT((workspace != nullptr),
-        { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((workspace != nullptr),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "workspace can not be nullptr"));
 #else
 #if (WORKSPACE_PARAM_OFFSET == 0xffffffff)
 #if defined(__NPU_DEVICE__)
@@ -97,8 +97,8 @@ __aicore__ inline void SetSysWorkspaceForce(GM_ADDR workspace)
 __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    ASCENDC_ASSERT((workspace != nullptr),
-        { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
+    ASCENDC_DEBUG_ASSERT((workspace != nullptr),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "workspace can not be nullptr"));
     return workspace;
 #else
     (void)(workspace);
@@ -148,7 +148,7 @@ __aicore__ inline void PreLoad(const int64_t preFetchLen)
 __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam& checkParams)
 {
     (void)(checkParams);
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "CheckLocalMemoryIA is not supported on current device"); });
+    ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CheckLocalMemoryIA is not supported on current device"));
 }
 
 template <atomic_type_t type, atomic_op_t op>
@@ -164,20 +164,20 @@ __aicore__ inline int64_t GetSprImpl()
         "current GetSpr api only support SpecialPurposeReg AR on current device!");
     return bisheng::cce::get_ar();
 }
-
+ 
 __simd_vf__ inline void ClearARImpl()
 {
     constexpr uint8_t SPR_AR_VALUE = 74;
     constexpr auto sprValue = std::integral_constant<::Spr, static_cast<::Spr>(SPR_AR_VALUE)>();
     sprclr(sprValue);
 }
-
+ 
 template <SpecialPurposeReg spr>
 __aicore__ inline void ClearSprImpl()
 {
     static_assert(SupportEnum<spr, SpecialPurposeReg::AR>(),
         "current ClearSpr api only support SpecialPurposeReg AR on current device!");
-
+    
     if constexpr (spr == SpecialPurposeReg::AR) {
         ClearARImpl();
     }

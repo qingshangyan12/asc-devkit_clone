@@ -19,7 +19,7 @@
 namespace AscendC {
 __aicore__ inline int64_t GetGatherMaskRemainCountImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetGatherMaskRemainCount on current device");
+    ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "unsupported GetGatherMaskRemainCount on current device"));
     return 0;
 }
 
@@ -294,7 +294,7 @@ __aicore__ inline void GatherMaskCal(__ubuf__ T *dst, __ubuf__ T *src0, const ui
     } else if (src1Pattern == 7) {
         GatherMaskAll(dst, src0, reduceMode, mask, reducev2Params, rsvdCnt);
     } else {
-        ASCENDC_ASSERT((false), "GatherMask Pattern can only be 1~7");
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "GatherMask Pattern can only be 1~7"));
     }
 }
 

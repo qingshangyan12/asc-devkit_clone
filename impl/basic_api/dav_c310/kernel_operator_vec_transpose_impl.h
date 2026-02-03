@@ -720,7 +720,7 @@ __aicore__ inline void Transpose4DImpl(const LocalTensor<T> &dstLocal, const Loc
     const LocalTensor<uint8_t> &sharedTmpBuffer, const TransposeParamsExt &transposeParams)
 {
     static_assert((SupportBytes<PrimT<T>, 1, 2, 4>()), "Transpose only supports type fp4/b8/b16/b32 on current device");
-    ASCENDC_ASSERT((sharedTmpBuffer.GetSize() > 0), { KERNEL_LOG(KERNEL_ERROR, "sharedTmpBuffer size must > 0!"); });
+    ASCENDC_DEBUG_ASSERT((sharedTmpBuffer.GetSize() > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "sharedTmpBuffer size must > 0!"));
     using Transpose4DType = typename ExtractTranposeTypeBySize<sizeof(PrimT<T>)>::T;
     LocalTensor<Transpose4DType> stackBuffer = sharedTmpBuffer.ReinterpretCast<Transpose4DType>();
     LocalTensor<Transpose4DType> dstTmpLocal = dstLocal.template ReinterpretCast<Transpose4DType>();

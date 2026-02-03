@@ -25,7 +25,12 @@
 #ifndef ASSERT
 #define ASSERT(x)
 #endif
+
+#if defined(ASCENDC_DEBUG)
+#define DEBUG_CODE(T) T
+#else
 #define DEBUG_CODE(T)
+#endif
 
 // For ascc preprocess: __global__ should not be replaced
 #ifdef __ASCC_PRE__
@@ -152,8 +157,11 @@ constexpr int32_t AIC = 1;
 constexpr int32_t AIV = 2;
 } // namespace AscendC
 
-#if defined(ASCENDC_CPU_DEBUG)
+#if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
 extern int32_t g_matmulCount;
+#endif
+
+#if defined(ASCENDC_CPU_DEBUG)
 extern int32_t g_coreType;
 #define ASCEND_IS_AIV (g_coreType == AscendC::AIV)
 #define ASCEND_IS_AIC (g_coreType == AscendC::AIC)

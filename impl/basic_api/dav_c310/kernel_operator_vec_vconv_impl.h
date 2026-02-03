@@ -1413,7 +1413,7 @@ __aicore__ inline void CastDouble(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src
     } else if constexpr (cast_DoubleToInt64) {
         CastDoubleToInt64<DST_TYPE, SRC_TYPE, roundMode>(dst, src, calCount);
     } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast"); });
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast"));
     }
 }
 
@@ -1463,7 +1463,7 @@ __aicore__ inline void CastImpl(
             } else if constexpr (cast_double) {
                 CastDouble<DST_TYPE, SRC_TYPE, RoundMode::CAST_RINT>(dst, src, calCount);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast rint"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast rint"));
             }
             break;
         case RoundMode::CAST_FLOOR:
@@ -1472,7 +1472,7 @@ __aicore__ inline void CastImpl(
             } else if constexpr (cast_double) {
                 CastDouble<DST_TYPE, SRC_TYPE, RoundMode::CAST_FLOOR>(dst, src, calCount);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast floor"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast floor"));
             }
             break;
         case RoundMode::CAST_CEIL:
@@ -1481,7 +1481,7 @@ __aicore__ inline void CastImpl(
             } else if constexpr (cast_double) {
                 CastDouble<DST_TYPE, SRC_TYPE, RoundMode::CAST_CEIL>(dst, src, calCount);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast ceil"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast ceil"));
             }
             break;
         case RoundMode::CAST_ROUND:
@@ -1490,7 +1490,7 @@ __aicore__ inline void CastImpl(
             } else if constexpr (cast_double) {
                 CastDouble<DST_TYPE, SRC_TYPE, RoundMode::CAST_ROUND>(dst, src, calCount);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast round"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast round"));
             }
             break;
         case RoundMode::CAST_TRUNC:
@@ -1499,14 +1499,14 @@ __aicore__ inline void CastImpl(
             } else if constexpr (cast_double || cast_double0) {
                 CastDouble<DST_TYPE, SRC_TYPE, RoundMode::CAST_TRUNC>(dst, src, calCount);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast trunc"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast trunc"));
             }
             break;
         case RoundMode::CAST_ODD:
             if constexpr (cast_odd) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_ODD>(dst, src, calCount);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast odd"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast odd"));
             }
             break;
         case RoundMode::CAST_NONE:
@@ -1515,19 +1515,19 @@ __aicore__ inline void CastImpl(
             } else if constexpr (using_cast_rint) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_RINT>(dst, src, calCount);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast none"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast none"));
             }
             break;
         case RoundMode::CAST_HYBRID:
             if constexpr (cast_hybrid) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_HYBRID>(dst, src, calCount);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast hybrid"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast hybrid"));
             }
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -1923,42 +1923,42 @@ __aicore__ inline void CastImpl(__ubuf__ ORI_DST_TYPE *oriDst, __ubuf__ ORI_SRC_
             if constexpr (cast_round_all || cast_rint) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_RINT, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast rint"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast rint"));
             }
             break;
         case RoundMode::CAST_FLOOR:
             if constexpr (cast_round_all) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_FLOOR, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast floor"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast floor"));
             }
             break;
         case RoundMode::CAST_CEIL:
             if constexpr (cast_round_all) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_CEIL, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast ceil"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast ceil"));
             }
             break;
         case RoundMode::CAST_ROUND:
             if constexpr (cast_round_all || cast_round) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_ROUND, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast round"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast round"));
             }
             break;
         case RoundMode::CAST_TRUNC:
             if constexpr (cast_round_all) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_TRUNC, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast trunc"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast trunc"));
             }
             break;
         case RoundMode::CAST_ODD:
             if constexpr (cast_odd) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_ODD, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast odd"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast odd"));
             }
             break;
         case RoundMode::CAST_NONE:
@@ -1967,19 +1967,19 @@ __aicore__ inline void CastImpl(__ubuf__ ORI_DST_TYPE *oriDst, __ubuf__ ORI_SRC_
             } else if constexpr (using_cast_rint) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_RINT, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast none"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast none"));
             }
             break;
         case RoundMode::CAST_HYBRID:
             if constexpr (cast_hybrid) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_HYBRID, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast hybrid"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast hybrid"));
             }
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -2190,42 +2190,42 @@ __aicore__ inline void CastImpl(__ubuf__ ORI_DST_TYPE *oriDst, __ubuf__ ORI_SRC_
             if constexpr (cast_round_all || cast_rint) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_RINT, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast rint"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast rint"));
             }
             break;
         case RoundMode::CAST_FLOOR:
             if constexpr (cast_round_all) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_FLOOR, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast floor"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast floor"));
             }
             break;
         case RoundMode::CAST_CEIL:
             if constexpr (cast_round_all) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_CEIL, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast ceil"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast ceil"));
             }
             break;
         case RoundMode::CAST_ROUND:
             if constexpr (cast_round_all || cast_round) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_ROUND, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast round"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast round"));
             }
             break;
         case RoundMode::CAST_TRUNC:
             if constexpr (cast_round_all) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_TRUNC, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast trunc"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast trunc"));
             }
             break;
         case RoundMode::CAST_ODD:
             if constexpr (cast_odd) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_ODD, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast odd"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast odd"));
             }
             break;
         case RoundMode::CAST_NONE:
@@ -2234,19 +2234,19 @@ __aicore__ inline void CastImpl(__ubuf__ ORI_DST_TYPE *oriDst, __ubuf__ ORI_SRC_
             } else if constexpr (using_cast_rint) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_RINT, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast none"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast none"));
             }
             break;
         case RoundMode::CAST_HYBRID:
             if constexpr (cast_hybrid) {
                 CastIntrinsicsImpl<DST_TYPE, SRC_TYPE, RoundMode::CAST_HYBRID, isSetMask>(dst, src, mask, repeatTime, repeatParams);
             } else {
-                ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "illegal type for cast hybrid"); });
+                ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal type for cast hybrid"));
             }
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
