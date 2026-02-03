@@ -42,9 +42,9 @@
 
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">src</td><td align="center">16 * 16 * 1 * 3 * 5</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">src</td><td align="center">16 * 16 * 1 * 3 * 5</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">dst</td><td align="center">16 * 16 * 1 * 3 * 5</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">dst</td><td align="center">16 * 16 * 1 * 3 * 5</td><td align="center">half</td><td align="center">ND</td></tr>
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">transdata_custom</td></tr>
   </table>

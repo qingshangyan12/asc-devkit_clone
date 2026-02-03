@@ -19,6 +19,11 @@ add_executable(demo
     transdata.asc
 )
 
+target_link_libraries(demo PRIVATE
+    tiling_api
+    register
+)
+
 # ======================================================================================
 # NPU 编译选项配置
 #
