@@ -35,14 +35,14 @@ struct TypeTraits;
 template <>
 struct TypeTraits<float> {
     static constexpr aclDataType kAclType = ACL_FLOAT;
-    static float ToFloat(float v) { return v; }
+    static float Cast(float v) { return v; }
     static float FromFloat(float v) { return v; }
 };
 
 template <>
 struct TypeTraits<aclFloat16> {
     static constexpr aclDataType kAclType = ACL_FLOAT16;
-    static float ToFloat(aclFloat16 v) { return aclFloat16ToFloat(v); }
+    static float Cast(aclFloat16 v) { return aclFloat16ToFloat(v); }
     static aclFloat16 FromFloat(float v) { return aclFloatToFloat16(v); }
 };
 
@@ -97,7 +97,7 @@ int32_t RunOnce(const std::vector<int64_t>& shape)
 
     printf("result is:\n");
     const int64_t previewCount = std::min<int64_t>(elementCount, 10);
-    for (int64_t i = 0; i < previewCount; i++) { printf("%.6f ", TypeTraits<T>::ToFloat(output0HostData[i])); }
+    for (int64_t i = 0; i < previewCount; i++) { printf("%.6f ", TypeTraits<T>::Cast(output0HostData[i])); }
     printf("\ntest %s\n", std::equal(output0HostData.begin(), output0HostData.end(), goldenData.begin()) ? "pass" : "failed");
 
     aclDestroyTensor(input0);
