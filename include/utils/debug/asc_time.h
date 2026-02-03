@@ -41,7 +41,7 @@ __aicore__ inline void asc_mark_stamp();
 
 #endif
 
-#include "impl/utils/debug/asc_aicore_time_impl.h"
+// #include "impl/utils/debug/asc_aicore_time_impl.h"
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_TIME_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
