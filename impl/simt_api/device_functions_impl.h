@@ -21,174 +21,178 @@
 #warning "device_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "device_functions.h" and use public functions or variables defined in interface header files."
 #endif
 
+#define ASCRT_Y_OFFSET       1   // 1 : offset of y
+#define ASCRT_Z_OFFSET       2   // 2 : offset of z
+#define ASCRT_W_OFFSET       3   // 3 : offset of w
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_rn(const float x) {
-    return bisheng::cce::simt::__cvt_uint32_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint32_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_rz(const float x) {
-    return bisheng::cce::simt::__cvt_uint32_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint32_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_rd(const float x) {
-    return bisheng::cce::simt::__cvt_uint32_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint32_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_ru(const float x) {
-    return bisheng::cce::simt::__cvt_uint32_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint32_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_rna(const float x) {
-    return bisheng::cce::simt::__cvt_uint32_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint32_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __float2int_rn(const float x) {
-    return bisheng::cce::simt::__cvt_int32_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int32_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __float2int_rz(const float x) {
-    return bisheng::cce::simt::__cvt_int32_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int32_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __float2int_rd(const float x) {
-    return bisheng::cce::simt::__cvt_int32_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int32_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __float2int_ru(const float x) {
-    return bisheng::cce::simt::__cvt_int32_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int32_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int __float2int_rna(const float x) {
-    return bisheng::cce::simt::__cvt_int32_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int32_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int __float2ull_rn(const float x) {
-    return bisheng::cce::simt::__cvt_uint64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int __float2ull_rz(const float x) {
-    return bisheng::cce::simt::__cvt_uint64_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint64_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int __float2ull_rd(const float x) {
-    return bisheng::cce::simt::__cvt_uint64_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint64_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int __float2ull_ru(const float x) {
-    return bisheng::cce::simt::__cvt_uint64_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint64_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int __float2ull_rna(const float x) {
-    return bisheng::cce::simt::__cvt_uint64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_uint64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __float2ll_rn(const float x) {
-    return bisheng::cce::simt::__cvt_int64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __float2ll_rz(const float x) {
-    return bisheng::cce::simt::__cvt_int64_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int64_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __float2ll_rd(const float x) {
-    return bisheng::cce::simt::__cvt_int64_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int64_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __float2ll_ru(const float x) {
-    return bisheng::cce::simt::__cvt_int64_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int64_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __float2ll_rna(const float x) {
-    return bisheng::cce::simt::__cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
+    return __cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __uint2float_rn(const unsigned int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __uint2float_rz(const unsigned int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __uint2float_rd(const unsigned int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __uint2float_ru(const unsigned int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __uint2float_rna(const unsigned int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int2float_rn(const int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int2float_rz(const int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int2float_rd(const int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int2float_ru(const int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int2float_rna(const int x) {
-    return bisheng::cce::simt::__cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    return __cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ull2float_rn(const unsigned long long int x) {
     uint64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ull2float_rz(const unsigned long long int x) {
     uint64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ull2float_rd(const unsigned long long int x) {
     uint64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ull2float_ru(const unsigned long long int x) {
     uint64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ull2float_rna(const unsigned long long int x) {
     uint64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ll2float_rn(const long long int x) {
     int64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ll2float_rz(const long long int x) {
     int64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ll2float_rd(const long long int x) {
     int64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ll2float_ru(const long long int x) {
     int64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __ll2float_rna(const long long int x) {
     int64_t y = x;
-    return bisheng::cce::simt::__cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return __cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __int_as_float(const int x) {
@@ -228,7 +232,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float_as_uint(const float x
 }
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int asc_ldcg(__gm__ long int* address)
 {
     return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address);
@@ -997,10 +1000,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ float4* address, floa
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(address, val);
 }
-#endif
 
 #else
-#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int asc_ldcg(long int* address)
 {
     return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address);
@@ -1037,9 +1038,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline long4 asc_ldcg(long4* address)
 {
     longlong4 t;
     t.x = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address);
-    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 1);
-    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 2);
-    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 3);
+    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET);
+    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET);
+    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET);
     return (long4&)t;
 }
 
@@ -1047,9 +1048,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline ulong4 asc_ldcg(ulong4* address)
 {
     longlong4 t;
     t.x = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address);
-    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 1);
-    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 2);
-    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 3);
+    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET);
+    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET);
+    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET);
     return (ulong4&)t;
 }
 
@@ -1067,9 +1068,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline longlong4 asc_ldcg(longlong4* address)
 {
     longlong4 t;
     t.x = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address);
-    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 1);
-    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 2);
-    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 3);
+    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET);
+    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET);
+    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET);
     return t;
 }
 
@@ -1077,9 +1078,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline ulonglong4 asc_ldcg(ulonglong4* address)
 {
     longlong4 t;
     t.x = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address);
-    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 1);
-    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 2);
-    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 3);
+    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET);
+    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET);
+    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET);
     return (ulonglong4&)t;
 }
 
@@ -1234,9 +1235,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline long4 asc_ldca(long4* address)
 {
     long4 t;
     t.x = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address);
-    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 1);
-    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 2);
-    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 3);
+    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET);
+    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET);
+    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET);
     return t;
 }
 
@@ -1244,9 +1245,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline ulong4 asc_ldca(ulong4* address)
 {
     ulong4 t;
     t.x = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address);
-    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 1);
-    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 2);
-    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 3);
+    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET);
+    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET);
+    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET);
     return t;
 }
 
@@ -1264,9 +1265,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline longlong4 asc_ldca(longlong4* address)
 {
     longlong4 t;
     t.x = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address);
-    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 1);
-    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 2);
-    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 3);
+    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET);
+    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET);
+    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET);
     return t;
 }
 
@@ -1274,9 +1275,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline ulonglong4 asc_ldca(ulonglong4* address)
 {
     longlong4 t;
     t.x = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address);
-    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 1);
-    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 2);
-    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 3);
+    t.y = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET);
+    t.z = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET);
+    t.w = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET);
     return (ulonglong4&)t;
 }
 
@@ -1428,17 +1429,17 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(ulong2* address, ulong2 val)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(long4* address, long4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address, (int64_t)val.x);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 1, (int64_t)val.y);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 2, (int64_t)val.z);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 3, (int64_t)val.w);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET, (int64_t)val.y);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET, (int64_t)val.z);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET, (int64_t)val.w);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(ulong4* address, ulong4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address, (int64_t)val.x);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 1, (int64_t)val.y);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 2, (int64_t)val.z);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 3, (int64_t)val.w);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET, (int64_t)val.y);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET, (int64_t)val.z);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET, (int64_t)val.w);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(longlong2* address, longlong2 val)
@@ -1454,17 +1455,17 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(ulonglong2* address, ulonglo
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(longlong4* address, longlong4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address, (int64_t)val.x);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 1, (int64_t)val.y);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 2, (int64_t)val.z);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 3, (int64_t)val.w);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET, (int64_t)val.y);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET, (int64_t)val.z);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET, (int64_t)val.w);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(ulonglong4* address, ulonglong4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address, (int64_t)val.x);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 1, (int64_t)val.y);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 2, (int64_t)val.z);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + 3, (int64_t)val.w);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET, (int64_t)val.y);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET, (int64_t)val.z);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET, (int64_t)val.w);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(signed char* address, signed char val)
@@ -1605,17 +1606,17 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(ulong2* address, ulong2 val)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(long4* address, long4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address, (int64_t)val.x);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 1, (int64_t)val.y);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 2, (int64_t)val.z);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 3, (int64_t)val.w);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET, (int64_t)val.y);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET, (int64_t)val.z);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET, (int64_t)val.w);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(ulong4* address, ulong4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((uint64_t*)address, (uint64_t)val.x);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((uint64_t*)address + 1, (uint64_t)val.y);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((uint64_t*)address + 2, (uint64_t)val.z);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((uint64_t*)address + 3, (uint64_t)val.w);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((uint64_t*)address + ASCRT_Y_OFFSET, (uint64_t)val.y);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((uint64_t*)address + ASCRT_Z_OFFSET, (uint64_t)val.z);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((uint64_t*)address + ASCRT_W_OFFSET, (uint64_t)val.w);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(longlong2* address, longlong2 val)
@@ -1631,17 +1632,17 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(ulonglong2* address, ulonglo
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(longlong4* address, longlong4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address, (int64_t)val.x);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 1, (int64_t)val.y);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 2, (int64_t)val.z);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 3, (int64_t)val.w);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET, (int64_t)val.y);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET, (int64_t)val.z);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET, (int64_t)val.w);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(ulonglong4* address, ulonglong4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address, (int64_t)val.x);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 1, (int64_t)val.y);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 2, (int64_t)val.z);
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + 3, (int64_t)val.w);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Y_OFFSET, (int64_t)val.y);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_Z_OFFSET, (int64_t)val.z);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int64_t*)address + ASCRT_W_OFFSET, (int64_t)val.w);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(signed char* address, signed char val)
@@ -1748,7 +1749,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(float4* address, float4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(address, val);
 }
-#endif
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_IMPL__)
