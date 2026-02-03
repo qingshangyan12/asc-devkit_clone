@@ -21,6 +21,10 @@
 #warning "asc_printf_simt_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "asc_printf.h" and use public functions or variables defined in interface header files."
 #endif
 
+#ifndef __aicore__
+#define __aicore__ [aicore]
+#endif
+
 #ifndef __SIMT_DEVICE_FUNCTIONS_DECL__
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
