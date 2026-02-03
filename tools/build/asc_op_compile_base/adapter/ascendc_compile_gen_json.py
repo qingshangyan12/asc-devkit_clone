@@ -22,7 +22,7 @@ from tbe.tvm.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_COD
 from tbe.tvm.runtime.cce_runtime import tvm_callback_cce_postproc
 from tbe.tvm import var
 from .ascendc_common_utility import CommonUtility, CompileInfo
-from .ascendc_constants import CORE_TYPE_CUBE, CORE_TYPE_VEC
+from .ascendc_constants import CORE_TYPE_CUBE, CORE_TYPE_VEC, CORE_TYPE_MIX
 from .get_op_tiling import TilingInfo
 from .ascendc_constants import KernelMetaType
 from .super_kernel_sub_op_compile import save_kernel_type
@@ -462,7 +462,7 @@ def _generate_final_json(compile_info: CompileInfo, tiling_info: TilingInfo):
 
 
 def _get_simt_type_in_staic(tiling_info: TilingInfo, compile_info: CompileInfo, obj_path):
-    if CommonUtility.is_c310():
+    if not CommonUtility.is_c310():
         return False
     if tiling_info.static_shape_flag is False or compile_info.kernel_name.startswith("te_superkernel"):
         return False

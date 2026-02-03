@@ -85,7 +85,7 @@ def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Op
     return tlv_string
             
 
-def parse_tlv_get_simt_value(tlv_string: str):
+def parse_tlv_get_simt_value(tlv_string: str, kernel_name: str):
     try:        
         CommonUtility.print_compile_log(kernel_name, f"start parse tlv info ...", AscendCLogLevel.LOG_INFO)
         hex_data = extract_hex_data(tlv_string)
@@ -120,7 +120,7 @@ def parse_tlv_get_simt_value(tlv_string: str):
 
 def check_op_type_is_simt(object_file_path: str, kernel_name: str):
     tlv_string = generate_tlv_from_object_file(object_file_path, kernel_name)
-    simt_value = parse_tlv_get_simt_value(tlv_string)
+    simt_value = parse_tlv_get_simt_value(tlv_string, kernel_name)
     if not simt_value:
         LogUtil.print_compile_log(kernel_name, f"simt type in section is None", \
                 AscendCLogLevel.LOG_WARNING)
