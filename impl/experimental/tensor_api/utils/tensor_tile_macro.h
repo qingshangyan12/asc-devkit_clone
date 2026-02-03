@@ -213,4 +213,13 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define ASCEND_IS_NOT_AIC constexpr(g_coreType != AscendC::AIC)
 #endif
 
+struct BaseTlv {  // TLV头部定义
+    unsigned short type;
+    unsigned short len;
+};
+
+struct BinaryMetaVersion {
+    BaseTlv head;     // B_TYPE_BIN_VERSION = 0
+    uint32_t version;  // 版本信息'
+};
 #endif //IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_MACRO_H
