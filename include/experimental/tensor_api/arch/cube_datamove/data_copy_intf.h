@@ -19,11 +19,11 @@
 
 namespace AscendC {
 
-template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
+template <const DataCopyTrait& trait, typename T, typename U>
 __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplate<T, U>, void>::type
 DataCopy(const T& dst, const U& src);
 
-template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U, typename Coord>
+template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
 __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplateWithCoord<T, U, Coord>, void>::type
 DataCopy(const T& dst, const U& src, const Coord& coord);
 

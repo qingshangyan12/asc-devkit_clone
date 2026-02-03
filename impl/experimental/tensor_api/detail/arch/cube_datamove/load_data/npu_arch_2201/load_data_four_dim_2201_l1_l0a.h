@@ -16,7 +16,7 @@
 #define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_2201_LOAD_DATA_FOUR_DIM_2201_L1_L0A_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/tensor/make.h"
+#include "include/experimental/tensor_api/tensor/make.h"
 
 namespace AscendC {
 namespace TileInternal {

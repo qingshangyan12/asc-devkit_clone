@@ -9,14 +9,14 @@
 */
 
 /*!
- * \file fractal_impl.h
+ * \file make_fractal.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_FRACTAL_IMPL_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_FRACTAL_IMPL_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_FRACTAL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_FRACTAL_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/tensor/make_layout.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_layout_impl.h"
 
 // algorithm
 namespace AscendC {
@@ -51,4 +51,4 @@ __aicore__ inline decltype(auto) MakeZZLayout(size_t row, size_t column) {
 }
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_FRACTAL_IMPL_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_FRACTAL_H

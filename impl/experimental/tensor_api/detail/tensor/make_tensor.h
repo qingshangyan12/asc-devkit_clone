@@ -9,46 +9,22 @@
 */
 
 /*!
-* \file make_tensor.h
-* \brief
-*/
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TENSOR_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TENSOR_H
+ * \file make_tensor.h
+ * \brief
+ */
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LOCAL_MAKE_TENSOR_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LOCAL_MAKE_TENSOR_H
 
-#include "include/experimental/tensor_api/tensor/local_tensor.h"
+#include "include/experimental/tensor_api/utils/utils.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_tensor_impl.h"
 
+// algorithm
 namespace AscendC {
-namespace TileInternal {
-
-template <typename T, typename = void>
-struct HasDereference : Std::false_type {};
-
-template <typename T>
-struct HasDereference<T, void_t<decltype(*Std::declval<T&>())>> : Std::true_type {};
-
-template <typename T>
-struct MakeLocalTensor {
-template <typename Arg0, typename... Args>
-__aicore__ inline constexpr auto operator()(const Arg0& arg0, const Args&... args) const {
-    if constexpr (HasDereference<Arg0>::value) {
-    using Engine = ViewEngine<Arg0>;
-    if constexpr (sizeof...(Args) == 1 && (is_layout<Args>::value && ...)) {
-        return LocalTensor<TensorAttribute<Engine, Args...>>{Engine{arg0}, args...};
-    } else {
-        return LocalTensor<TensorAttribute<Engine, decltype(MakeLayout(args...))>>{Engine{arg0}, MakeLayout(args...)};
-    }
-    }
-}
-};
-
 template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto MakeTensorImpl(const Iterator& iter, const Args&... args)
+__aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
 {
-    static_assert(HasDereference<Iterator>::value, "Expected iterator iter in MakeLocalTensor(iter, args...)");
-    static_assert(!(HasDereference<Args>::value && ...), "Expected layout args... in MakeLocalTensor(iter, args...)");
-    return MakeLocalTensor<Iterator>{}(iter, args...);
-}
+    return TileInternal::MakeTensorImpl<Iterator, Args...>(iter, args...);
 }
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TENSOR_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LOCAL_MAKE_TENSOR_H

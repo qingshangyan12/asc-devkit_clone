@@ -9,22 +9,18 @@
 */
 
 /*!
- * \file local_tensor_impl.h
+ * \file make_tensor_intf.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LOCAL_TENSOR_IMPL_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LOCAL_TENSOR_IMPL_H
+#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_INTF_H
+#define EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_INTF_H
 
-#include "include/experimental/tensor_api/utils/utils.h"
 #include "impl/experimental/tensor_api/detail/tensor/make_tensor.h"
 
-// algorithm
+// algorithm 
 namespace AscendC {
 template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
-{
-    return TileInternal::MakeTensorImpl<Iterator, Args...>(iter, args...);
-}
+__aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args);
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LOCAL_TENSOR_IMPL_H
+#endif // EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_INTF_H

@@ -15,7 +15,7 @@
 #define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_FOUR_DIM_2201_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/tensor/make.h"
+#include "include/experimental/tensor_api/tensor/make.h"
 
 namespace AscendC {
 namespace TileInternal {

@@ -15,14 +15,6 @@
 #ifndef EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 #define EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 
-#include "impl/experimental/tensor_api/detail/tensor/local_tensor_impl.h"
-
-// algorithm 
-namespace AscendC {
-template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args);
-} // namespace AscendC
-
 // struct
 #include "include/experimental/tensor_api/tensor/engine.h"
 #include "include/experimental/tensor_api/tensor/layout.h"

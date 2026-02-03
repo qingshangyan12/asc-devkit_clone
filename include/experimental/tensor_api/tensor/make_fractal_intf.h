@@ -9,13 +9,13 @@
 */
 
 /*!
- * \file fractal.h
+ * \file make_fractal_intf.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_FRACTAL_H
-#define EXPERIMENTAL_TENSOR_API_TENSOR_FRACTAL_H
+#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_FRACTAL_INTF_H
+#define EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_FRACTAL_INTF_H
 
-#include "impl/experimental/tensor_api/detail/tensor/fractal_impl.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_fractal.h"
 
 // algorithm
 namespace AscendC {
@@ -63,4 +63,4 @@ template <typename T, size_t row, size_t column>
 using ZZLayoutFormat = Layout<TileInternal::ZZShapeFormat<T, row, column>, TileInternal::ZZStrideFormat<T, row, column>>;
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_TENSOR_FRACTAL_H
+#endif // EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_FRACTAL_INTF_H

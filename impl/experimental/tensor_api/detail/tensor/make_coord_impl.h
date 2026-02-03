@@ -9,11 +9,11 @@
 */
 
 /*!
- * \file make_coord.h
+ * \file make_coord_impl.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_COORD_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_COORD_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_COORD_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_COORD_IMPL_H
 
 #include "include/experimental/tensor_api/tensor/local_tensor.h"
 
@@ -76,4 +76,4 @@ __aicore__ inline constexpr auto Crd2IdxImpl(const T& coord, const Layout<U, S>&
 }
 }
 } // namespace AscendC
-#endif
+#endif  // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_COORD_IMPL_H

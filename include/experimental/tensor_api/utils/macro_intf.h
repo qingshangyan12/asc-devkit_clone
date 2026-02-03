@@ -15,6 +15,6 @@
 #ifndef EXPERIMENTAL_TENSOR_API_UTILS_MACRO_INTF_H
 #define EXPERIMENTAL_TENSOR_API_UTILS_MACRO_INTF_H
 
-#include "include/experimental/tensor_api/utils/macro.h"
+#include "impl/experimental/tensor_api/detail/utils/macro.h"
 
 #endif //EXPERIMENTAL_TENSOR_API_UTILS_MACRO_INTF_H

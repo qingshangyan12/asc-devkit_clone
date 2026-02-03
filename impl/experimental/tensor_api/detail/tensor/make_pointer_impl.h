@@ -9,16 +9,26 @@
 */
 
 /*!
- * \file make.h
- * \brief
- */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_H
+* \file make_pointer_impl.h
+* \brief
+*/
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_POINTER_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_POINTER_IMPL_H
 
-#include "impl/experimental/tensor_api/detail/tensor/make_layout.h"
-#include "impl/experimental/tensor_api/detail/tensor/make_ptr.h"
-#include "impl/experimental/tensor_api/detail/tensor/make_tensor.h"
-#include "impl/experimental/tensor_api/detail/tensor/make_tuple.h"
-#include "impl/experimental/tensor_api/detail/tensor/make_coord.h"
+#include "impl/experimental/tensor_api/detail/tensor/hw_ptr.h"
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_H
+namespace AscendC {
+namespace TileInternal {
+template <Hardware hardPos, typename Iterator>
+__aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
+{
+    if constexpr (IsHardwareMem<hardPos, Iterator>::value) {
+        return iter;
+    } else {
+        return HardwareMemPtr<hardPos, Iterator>{iter};
+    }
+}
+}
+} // namespace AscendC
+
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_POINTER_IMPL_H

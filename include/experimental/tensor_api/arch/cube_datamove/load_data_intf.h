@@ -19,11 +19,11 @@
 
 namespace AscendC {
 
-template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U>
+template<const LoadDataTrait& trait, typename T, typename U>
 __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplate<T, U>, void>::type 
 LoadData(const T& dst, const U& src);
 
-template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>
+template<const LoadDataTrait& trait, typename T, typename U, class Coord>
 __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplateWithCoord<T, U, Coord>, void>::type 
 LoadData(const T& dst, const U& src, const Coord& coord);
 
