@@ -25,7 +25,8 @@ class BaseTlv:
 
 def extract_hex_data(hex_dump: str) -> str:
     hex_parts = []
-
+    if hex_dump is None:
+        return " "
     for line in hex_dump.splitlines():
         line = line.strip()
         if not line:
@@ -75,8 +76,13 @@ def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Op
     section_name = ".ascend.meta." + kernel_name
     generate_cmd = ['llvm-objdump', '-s', '-j', '{}'.format(section_name), '{}'.format(object_file_path)]
     LogUtil.print_compile_log(kernel_name, f"start generate tlv info ...", AscendCLogLevel.LOG_INFO)
-    proc = subprocess.Popen(generate_cmd, stdout=subprocess.PIPE, stderr=None)
-    (tlv_info, _) = proc.communicate()
+    try:
+        proc = subprocess.Popen(generate_cmd, stdout=subprocess.PIPE, stderr=None)
+        (tlv_info, _) = proc.communicate()
+    export Exception as e:
+        LogUtil.print_compile_log(kernel_name, f"generate tlv info failed", AscendCLogLevel.LOG_WARNING)
+        return None
+
     tlv_info = tlv_info.decode('utf-8')
     
     tlv_string = parse_hexdump_to_tlv(tlv_info)
