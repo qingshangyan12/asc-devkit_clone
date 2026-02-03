@@ -156,9 +156,7 @@ template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D
 __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2<U>& loadDataParams)
 {
-    const char* tempInfoStr = "LoadData with LoadData3DParamsV2";
-    bool checkfuncLoadRes = CheckFuncLoadData3dv2(dst, src, loadDataParams, tempInfoStr);
-    ASCENDC_DEBUG_ASSERT(checkfuncLoadRes,
+    ASCENDC_DEBUG_ASSERT(CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadData with LoadData3DParamsV2"),
         ASCENDC_REPORT_CHECK_ERROR_INTERNAL("LoadData with LoadData3DParamsV2", KernelFuncType::NONE_MODE)
     );
     if constexpr (defaultConfig.isSetFMatrix) {
