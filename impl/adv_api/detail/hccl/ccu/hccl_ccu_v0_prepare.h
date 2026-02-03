@@ -160,6 +160,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
  
+    uint64_t loopCount = CCU_LOOP_COUNT;
     uint64_t tmpCount = commParam->count / ccuParam_.rankNum;
     uint64_t sliceCount = (ccuParam_.rankId == ccuParam_.rankNum - 1) ?
                      (commParam->count - (ccuParam_.rankNum - 1) * tmpCount) : tmpCount;
@@ -173,8 +174,8 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
     xnData_[4] = rankSliceOffset;
     xnData_[5] = rankSliceOffset;
 
-    uint64_t normalSliceSize = (commParam->count + ccuParam_.rankNum - 1) / ccuParam_.rankNum; // count/rankNum 向上取整
-    uint64_t lastSliceSize = commParam->count - ((ccuParam_.rankNum - 1) * normalSliceSize);
+    uint64_t normalSliceSize = ((commParam->count * dataSize) + ccuParam_.rankNum - 1) / ccuParam_.rankNum; // count/rankNum 向上取整
+    uint64_t lastSliceSize = (commParam->count * dataSize) - ((ccuParam_.rankNum - 1) * normalSliceSize);
     KERNEL_LOG(KERNEL_INFO, "ApiClient CcuPrepareForAllReduceM2M normalSliceSize:%d, lastSliceSize:%d", normalSliceSize,
                lastSliceSize);
     xnData_[6] = normalSliceSize;
@@ -182,6 +183,18 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
     xnData_[8] = ccuParam_.rankId < (commParam->count / normalSliceSize) ? normalSliceSize : lastSliceSize;
     xnData_[9] = ccuParam_.rankId * normalSliceSize;
     xnData_[10] = 0; // input output not equals
+
+    uint64_t loopParam[4];
+    if (ccuParam_.rankId == ccuParam_.rankNum - 1) {
+        CalcLoopGroupParams(&loopParam[0], lastSliceSize, loopCount);
+    } else {
+        CalcLoopGroupParams(&loopParam[0], normalSliceSize, loopCount);
+    }
+    
+    xnData_[9] = loopParam[0];
+    xnData_[10] = loopParam[1];
+    xnData_[11] = loopParam[2];
+    xnData_[12] = loopParam[3];
 }
 
 template<const auto &config>
@@ -219,6 +232,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatt
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
  
+    uint64_t loopCount = CCU_LOOP_COUNT;
     uint64_t sliceCount = commParam->count;
     uint64_t sliceSize = sliceCount * dataSize;
  
@@ -228,10 +242,15 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatt
     KERNEL_LOG(KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
                ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
-    xnData_[5] = rankSliceOffset;
-    xnData_[6] = rankSliceOffset;
     xnData_[7] = sliceSize;
     xnData_[8] = 1;
+
+    uint64_t loopParam[4];
+    CalcLoopGroupParams(&loopParam[0], sliceSize, loopCount);
+    xnData_[9] = loopParam[0];
+    xnData_[10] = loopParam[1];
+    xnData_[11] = loopParam[2];
+    xnData_[12] = loopParam[3];
 }
 }
  

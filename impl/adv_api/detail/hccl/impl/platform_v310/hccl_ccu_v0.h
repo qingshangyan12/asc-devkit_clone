@@ -240,7 +240,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForOp(const Hc
         }
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
         if (hcclContext_->algorithmType == static_cast<uint8_t>(AlgorithmType::CcuAllReduceMeshMem2Mem1D)) {
-            ccuUsedXnNum_ = 11;
+            ccuUsedXnNum_ = 15;
             CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
         } else {
             CcuPrepareForAllReduce(&handleParamGM_[handleId]);
@@ -256,7 +256,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForOp(const Hc
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) { 
         if (hcclContext_->algorithmType == static_cast<uint8_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1D)) {
-            ccuUsedXnNum_ = 9;
+            ccuUsedXnNum_ = 13;
             CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
         } else {
             CcuPrepareForReduceScatter(&handleParamGM_[handleId]);
