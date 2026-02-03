@@ -39,6 +39,9 @@ __aicore__ inline void asc_mark_stamp();
 #endif
 }   // namespase __asc_aicore
 
+#define TRACE_START(...) TRACE_START_IMPL(...)
+#define TRACE_STOP(...) TRACE_STOP_IMPL(...)
+
 #endif
 
 #include "impl/utils/debug/asc_aicore_time_impl.h"
