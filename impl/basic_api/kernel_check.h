@@ -15,7 +15,7 @@
 #ifndef ASCENDC_MODULE_CHECK_H
 #define ASCENDC_MODULE_CHECK_H
 
-#if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
+#if ASCENDC_CPU_DEBUG
 #include "utils/kernel_check_copy.h"
 #include "utils/kernel_check_vec_binary.h"
 #include "utils/kernel_check_vec_binary_scalar.h"
