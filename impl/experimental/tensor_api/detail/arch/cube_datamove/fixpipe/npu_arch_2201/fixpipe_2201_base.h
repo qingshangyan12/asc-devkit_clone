@@ -15,8 +15,8 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_2201_BASE_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_2201_BASE_H
 
-#include "impl/experimental/tensor_api/detail/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/struct/struct.h"
+#include "include/experimental/tensor_api/utils/utils.h"
+#include "impl/experimental/tensor_api/detail/tensor/make.h"
 
 namespace AscendC {
 namespace TileInternal {

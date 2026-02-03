@@ -9,17 +9,17 @@
 */
 
 /*!
- * \file ptr_impl.h
+ * \file pointer_impl.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_PTR_IMPL_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_PTR_IMPL_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_POINTER_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_POINTER_IMPL_H
 
-#include "impl/experimental/tensor_api/detail/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/struct/struct.h"
+#include "include/experimental/tensor_api/utils/utils.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_ptr.h"
 
+// algorithm
 namespace AscendC {
-
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter) {
     return TileInternal::MakeMemPtr<Hardware::GM, Iterator>(iter);
@@ -59,7 +59,67 @@ template <typename Iterator>
 __aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter) {
     return TileInternal::MakeMemPtr<Hardware::FIXBUF, Iterator>(iter);
 }
-
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_PTR_IMPL_H
+// struct
+namespace AscendC {
+namespace TileInternal{
+
+template <typename Iterator, typename DerivedType>
+struct IterAdaptor
+{
+    using iterator     = Iterator;
+    using reference    = typename TileInternal::IterRef<iterator>::type; // T&
+    using elementType = typename TileInternal::IterEle<iterator>::type; // rm_ref
+    using valueType   = typename TileInternal::IterVal<iterator>::type; // rm_cvf
+
+    __aicore__ inline constexpr IterAdaptor(iterator ptr = {}) : ptr(ptr) {}
+
+    __aicore__ inline constexpr reference operator*() const {
+        return *ptr;
+    }
+
+    template <typename Index>
+    __aicore__ inline constexpr reference operator[](const Index& i) const {
+        return ptr[i];
+    }
+
+    template <typename Index>
+    __aicore__ inline constexpr DerivedType operator+(const Index& i) const {
+        return {ptr + i};
+    }
+
+    __aicore__ inline constexpr iterator Get() const {
+        return ptr; 
+    }
+
+    __aicore__ inline constexpr friend bool operator==(const DerivedType& x, const DerivedType& y) {
+        return x.ptr == y.ptr;
+    }
+
+    __aicore__ inline constexpr friend bool operator!=(const DerivedType& x, const DerivedType& y) {
+        return x.ptr != y.ptr;
+    }
+
+    __aicore__ inline constexpr friend bool operator< (const DerivedType& x, const DerivedType& y) {
+        return x.ptr <  y.ptr; 
+    }
+
+    __aicore__ inline constexpr friend bool operator<=(const DerivedType& x, const DerivedType& y) {
+        return x.ptr <= y.ptr; 
+    }
+
+    __aicore__ inline constexpr friend bool operator> (const DerivedType& x, const DerivedType& y) {
+        return x.ptr >  y.ptr; 
+    }
+
+    __aicore__ inline constexpr friend bool operator>=(const DerivedType& x, const DerivedType& y) {
+        return x.ptr >= y.ptr; 
+    }
+private:
+    iterator ptr; // u8*
+};
+}
+} // namespace AscendC
+
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_POINTER_IMPL_H

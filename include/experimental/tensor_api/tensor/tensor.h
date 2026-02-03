@@ -9,15 +9,16 @@
 */
 
 /*!
- * \file algorithm.h
+ * \file tensor.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_ALGORITHM_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_ALGORITHM_H
+#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_TENSOR_H
+#define EXPERIMENTAL_TENSOR_API_TENSOR_TENSOR_H
 
-#include "impl/experimental/tensor_api/detail/algorithm/fractal_impl.h"
-#include "impl/experimental/tensor_api/detail/algorithm/layout_impl.h"
-#include "impl/experimental/tensor_api/detail/algorithm/ptr_impl.h"
-#include "impl/experimental/tensor_api/detail/algorithm/tensor_impl.h"
+#include "include/experimental/tensor_api/tensor/engine.h"
+#include "include/experimental/tensor_api/tensor/fractal.h"
+#include "include/experimental/tensor_api/tensor/layout.h"
+#include "include/experimental/tensor_api/tensor/local_tensor.h"
+#include "include/experimental/tensor_api/tensor/pointer.h"
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_ALGORITHM_H
+#endif // EXPERIMENTAL_TENSOR_API_TENSOR_TENSOR_H

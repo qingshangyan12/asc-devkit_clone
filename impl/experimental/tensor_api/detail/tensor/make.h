@@ -9,16 +9,16 @@
 */
 
 /*!
- * \file tensor_tile_struct.h
+ * \file make.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_H
 
-#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_layout.h"
-#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_ptr.h"
-#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_tensor.h"
-#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_tuple.h"
-#include "impl/experimental/tensor_api/struct/constructor/tensor_tile_make_coord.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_layout.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_ptr.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_tensor.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_tuple.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_coord.h"
 
-#endif //IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STRUCT_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_H

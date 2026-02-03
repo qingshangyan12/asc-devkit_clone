@@ -12,14 +12,15 @@
  * \file layout_impl.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_LAYOUT_IMPL_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_LAYOUT_IMPL_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LAYOUT_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LAYOUT_IMPL_H
 
-#include "impl/experimental/tensor_api/detail/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/struct/struct.h"
+#include "include/experimental/tensor_api/utils/utils.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_layout.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_coord.h"
 
+// algorithm
 namespace AscendC {
-
 template <typename... Ts>
 __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
 {
@@ -129,4 +130,4 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, con
 }
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_LAYOUT_IMPL_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LAYOUT_IMPL_H

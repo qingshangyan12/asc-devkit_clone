@@ -9,17 +9,16 @@
 */
 
 /*!
- * \file tensor_tile_make_tuple.h
+ * \file make_tuple.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TUPLE_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TUPLE_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TUPLE_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TUPLE_H
 
-#include "tensor_tile_algorithm.h"
+#include "impl/experimental/tensor_api/detail/tensor/basic_algorithm.h"
 
 namespace AscendC {
-namespace TileInternal
-{
+namespace TileInternal {
 struct MultipliesUnaryLeftFold {
     template <typename... T>
     __aicore__ inline constexpr auto operator()(T&&... t) const {

@@ -9,17 +9,17 @@
 */
 
 /*!
- * \file tensor_tile_make_stride.h
+ * \file make_stride.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_STRIDE_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_STRIDE_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_STRIDE_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_STRIDE_H
 
-#include "tensor_tile_make_tuple.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_tuple.h"
 
 namespace AscendC {
-namespace TileInternal
-{
+namespace TileInternal {
+
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
 

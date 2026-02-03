@@ -16,7 +16,7 @@
 #define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_FORMAT_H
 
 #include "impl/experimental/tensor_api/detail/utils/constant.h"
-#include "impl/experimental/tensor_api/detail/struct/struct.h"
+#include "impl/experimental/tensor_api/detail/tensor/make.h"
 
 namespace AscendC {
 namespace TileInternal {

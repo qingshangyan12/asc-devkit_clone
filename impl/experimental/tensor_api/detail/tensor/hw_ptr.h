@@ -9,13 +9,13 @@
 */
 
 /*!
-* \file tensor_tile_hw_ptr.h
+* \file hw_ptr.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_HW_PTR_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_HW_PTR_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_HW_PTR_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_HW_PTR_H
 
-#include "impl/experimental/tensor_api/struct/definition/tensor_tile_pointer.h"
+#include "impl/experimental/tensor_api/detail/tensor/pointer_impl.h"
 
 namespace AscendC {
 namespace TileInternal {
@@ -41,4 +41,4 @@ constexpr bool IsHardwareMemV = IsHardwareMem<hardPos, Pointer>::value;
 }
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_HW_PTR_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_HW_PTR_H

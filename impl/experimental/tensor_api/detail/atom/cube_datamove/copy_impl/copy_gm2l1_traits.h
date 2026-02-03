@@ -15,7 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_IMPL_COPY_GM2L1_TRAITS_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_IMPL_COPY_GM2L1_TRAITS_H
 
-#include "impl/experimental/tensor_api/detail/utils/utils.h"
+#include "include/experimental/tensor_api/utils/utils.h"
 #include "include/experimental/tensor_api/arch/arch.h"
 
 namespace AscendC {

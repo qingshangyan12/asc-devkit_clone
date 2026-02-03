@@ -9,14 +9,13 @@
 */
 
 /*!
- * \file tensor_impl.h
+ * \file local_tensor.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_IMPL_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_IMPL_H
+#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_TENSOR_H
+#define EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 
-#include "impl/experimental/tensor_api/detail/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/struct/struct.h"
+#include "impl/experimental/tensor_api/detail/tensor/local_tensor_impl.h"
 
 // algorithm 
 namespace AscendC {
@@ -24,6 +23,133 @@ template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args);
 } // namespace AscendC
 
+// struct
+#include "include/experimental/tensor_api/tensor/engine.h"
+#include "include/experimental/tensor_api/tensor/layout.h"
 
+namespace AscendC {
+template <typename EngineType, typename LayoutType>
+struct TensorAttribute {};
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_TENSOR_IMPL_H
+template <typename T>
+struct LocalTensor {};
+
+template <typename EngineType, typename LayoutType>
+struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
+    using iterator = typename EngineType::iterator;
+    using valueType = typename EngineType::valueType;
+    using elementType = typename EngineType::elementType;
+    using reference = typename EngineType::reference;
+
+    using engineType  = EngineType;
+    using layoutType  = LayoutType;
+
+    Std::tuple<layoutType, engineType> rep;
+
+    __aicore__ inline constexpr LocalTensor() {}
+    __aicore__ inline constexpr LocalTensor(const EngineType& engine, const LayoutType& layout) : rep(layout, engine) {}
+
+    static constexpr int rank  = LayoutType::rank; // tuple size
+
+    __aicore__ inline constexpr decltype(auto) Tensor() const {
+        return *this;
+    }
+
+    __aicore__ inline constexpr decltype(auto) Engine() const {
+        return Std::get<1>(rep);
+    }
+
+    __aicore__ inline constexpr decltype(auto) Engine() {
+        return Std::get<1>(rep);
+    }
+
+    __aicore__ inline constexpr decltype(auto) Layout() const {
+        return Std::get<0>(rep);
+    }
+
+    __aicore__ inline constexpr decltype(auto) Data() const {
+        return Engine().Begin();
+    }
+
+    __aicore__ inline constexpr decltype(auto) Data() {
+        return Engine().Begin();
+    }
+
+    __aicore__ inline constexpr decltype(auto) Shape() const {
+        return Layout().Shape();
+    }
+
+    __aicore__ inline constexpr decltype(auto) Stride() const {
+        return Layout().Stride();
+    }
+
+    __aicore__ inline constexpr auto Size() const {
+        return Layout().Size();
+    }
+
+    __aicore__ inline constexpr auto Capacity() const {
+        return Layout().Capacity();
+    }
+
+    template <typename Coord>
+    __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) {
+        return Data()[Layout()(coord)];
+    }
+
+    template <typename Coord>
+    __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const {
+        return Data()[Layout()(coord)];
+    }
+
+    template <typename Coord>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
+        return Data()[Layout()(coord)];
+    }
+
+    template <typename Coord>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
+        return Data()[Layout()(coord)];
+    }
+
+    template <typename Coord0, typename Coord1, typename... Coords>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) {
+        return operator()(MakeCoord(c0,c1,cs...));
+    }
+
+    template <typename Coord0, typename Coord1, typename... Coords>
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const {
+        return operator()(MakeCoord(c0,c1,cs...));
+    }
+
+    template <typename... Layouts>
+    __aicore__ inline constexpr auto Compose(const Layouts&... layouts) {
+        return MakeTensor(Data(), Layout().Compose(layouts...));
+    }
+
+    template <typename... Layouts>
+    __aicore__ inline constexpr auto Compose(const Layouts&... layouts) const {
+        return MakeTensor(Data(), Layout().Compose(layouts...));
+    }
+
+    template <typename... Layouts>
+    __aicore__ inline constexpr auto Tile(const Layouts&... layouts) {
+        return MakeTensor(Data(), Layout().Tile(layouts...));
+    }
+
+    template <typename... Layouts>
+    __aicore__ inline constexpr auto Tile(const Layouts&... layouts) const {
+        return MakeTensor(Data(), Layout().Tile(layouts...));
+    }
+};
+
+template <typename T>
+struct IsTileTensor : Std::false_type {};
+
+template <typename Engine, typename Layout>
+struct IsTileTensor<LocalTensor<TensorAttribute<Engine,Layout>>> : Std::true_type {};
+
+template <typename T>
+constexpr bool IsTileTensorV = IsTileTensor<T>::value;
+} // namespace AscendC
+
+#endif // EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_TENSOR_H

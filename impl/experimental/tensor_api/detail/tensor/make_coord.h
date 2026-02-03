@@ -9,13 +9,13 @@
 */
 
 /*!
- * \file tensor_tile_make_coord.h
+ * \file make_coord.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_COORD_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_COORD_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_COORD_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_COORD_H
 
-#include "impl/experimental/tensor_api/struct/definition/tensor_tile_tensor.h"
+#include "include/experimental/tensor_api/tensor/local_tensor.h"
 
 namespace AscendC {
 namespace TileInternal

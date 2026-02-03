@@ -9,17 +9,17 @@
 */
 
 /*!
-* \file tensor_tile_make_tensor.h
+* \file make_tensor.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TENSOR_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TENSOR_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TENSOR_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TENSOR_H
 
-#include "impl/experimental/tensor_api/struct/definition/tensor_tile_tensor.h"
+#include "include/experimental/tensor_api/tensor/local_tensor.h"
 
 namespace AscendC {
-namespace TileInternal
-{
+namespace TileInternal {
+
 template <typename T, typename = void>
 struct HasDereference : Std::false_type {};
 
@@ -51,4 +51,4 @@ __aicore__ inline constexpr auto MakeTensorImpl(const Iterator& iter, const Args
 }
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_TENSOR_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TENSOR_H

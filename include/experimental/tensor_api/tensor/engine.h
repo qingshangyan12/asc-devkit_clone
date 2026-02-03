@@ -9,16 +9,15 @@
 */
 
 /*!
-* \file tensor_tile_engine.h
+* \file engine.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
+#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_ENGINE_H
+#define EXPERIMENTAL_TENSOR_API_TENSOR_ENGINE_H
 
-#include "impl/experimental/tensor_api/struct/definition/tensor_tile_hw_ptr.h"
+#include "impl/experimental/tensor_api/detail/tensor/hw_ptr.h"
 
 namespace AscendC {
-
 template <typename Iterator>
 struct ViewEngine
 {
@@ -53,7 +52,6 @@ struct ConstViewEngine
 private:
     iterator storage;
 };
-
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_ENGINE_H
+#endif // EXPERIMENTAL_TENSOR_API_TENSOR_ENGINE_H

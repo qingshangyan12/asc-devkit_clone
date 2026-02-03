@@ -9,18 +9,16 @@
 */
 
 /*!
- * \file ptr_impl.h
+ * \file pointer.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_PTR_IMPL_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_PTR_IMPL_H
+#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_POINTER_H
+#define EXPERIMENTAL_TENSOR_API_TENSOR_POINTER_H
 
-#include "impl/experimental/tensor_api/detail/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/struct/struct.h"
+#include "impl/experimental/tensor_api/detail/tensor/pointer_impl.h"
 
 // algorithm
 namespace AscendC {
-
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter);
 
@@ -44,7 +42,6 @@ __aicore__ inline constexpr auto MakeBiasmemPtr(Iterator iter);
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter);
-
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_PTR_IMPL_H
+#endif // EXPERIMENTAL_TENSOR_API_TENSOR_POINTER_H

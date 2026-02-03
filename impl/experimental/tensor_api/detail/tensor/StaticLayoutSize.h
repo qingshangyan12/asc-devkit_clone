@@ -9,16 +9,17 @@
 */
 
 /*!
- * \file tensor_tile_StaticLayoutSize.h
+ * \file StaticLayoutSize.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STATICLAYOUTSIZE_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_TENSOR_TILE_STATICLAYOUTSIZE_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_STATICLAYOUTSIZE_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_STATICLAYOUTSIZE_H
 
-#include "impl/experimental/tensor_api/utils/tensor_tile_utils.h"
+#include "include/experimental/tensor_api/utils/utils.h"
 
 namespace AscendC {
 namespace TileInternal {
+
 template <typename T>
 struct nesting_depth {
     static constexpr size_t value = 1;

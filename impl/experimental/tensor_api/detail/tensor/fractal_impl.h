@@ -12,14 +12,14 @@
  * \file fractal_impl.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_FRACTAL_IMPL_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_FRACTAL_IMPL_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_FRACTAL_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_FRACTAL_IMPL_H
 
-#include "impl/experimental/tensor_api/detail/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/struct/struct.h"
+#include "include/experimental/tensor_api/utils/utils.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_layout.h"
 
+// algorithm
 namespace AscendC {
-
 template <typename T>
 __aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column) {
     return TileInternal::MakeLayoutForNZ<T>(row, column);
@@ -49,32 +49,6 @@ template <typename T>
 __aicore__ inline decltype(auto) MakeZZLayout(size_t row, size_t column) {
     return TileInternal::MakeLayoutForZZ<T>(row, column);
 }
-
-template <typename T, size_t row, size_t column, typename Enable = void>
-struct NZLayoutFormat;
-
-template <typename T, size_t row, size_t column>
-struct NZLayoutFormat<T, row, column, typename Std::enable_if<!Std::is_same_v<T, Std::ignore_t>>::type> {
-    using type = Layout<TileInternal::NZShapeFormat<T, row, column>, TileInternal::NZStrideFormat<T, row, column>>;
-};
-
-template <typename T, size_t row, size_t column>
-struct NZLayoutFormat<T, row, column, typename Std::enable_if<Std::is_same_v<T, Std::ignore_t>>::type> {
-    using type = Layout<TileInternal::NZShapeFormat<uint16_t, row, column>, TileInternal::NZStrideFormat<uint16_t, row, column>>;
-};
-
-template <typename T, size_t row, size_t column>
-using NDLayoutFormat = Layout<TileInternal::NDShapeFormat<T, row, column>, TileInternal::NDStrideFormat<T, row, column>>;
-
-template <typename T, size_t row, size_t column>
-using DNLayoutFormat = Layout<TileInternal::DNShapeFormat<T, row, column>, TileInternal::DNStrideFormat<T, row, column>>;
-
-template <typename T, size_t row, size_t column>
-using ZNLayoutFormat = Layout<TileInternal::ZNShapeFormat<T, row, column>, TileInternal::ZNStrideFormat<T, row, column>>;
-
-template <typename T, size_t row, size_t column>
-using ZZLayoutFormat = Layout<TileInternal::ZZShapeFormat<T, row, column>, TileInternal::ZZStrideFormat<T, row, column>>;
-
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_ALGORITHM_FRACTAL_IMPL_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_FRACTAL_IMPL_H

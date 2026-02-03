@@ -9,17 +9,16 @@
 */
 
 /*!
-* \file tensor_tile_make_ptr.h
+* \file make_ptr.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_PTR_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_PTR_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_PTR_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_PTR_H
 
-#include "impl/experimental/tensor_api/struct/definition/tensor_tile_tensor.h"
+#include "include/experimental/tensor_api/tensor/local_tensor.h"
 
 namespace AscendC {
-namespace TileInternal
-{
+namespace TileInternal {
 template <Hardware hardPos, typename Iterator>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
 {
@@ -30,7 +29,6 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
     }
 }
 }
-
 } // namespace AscendC
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_STRUCT_CONSTRUCTOR_TENSOR_TILE_MAKE_PTR_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_PTR_H
