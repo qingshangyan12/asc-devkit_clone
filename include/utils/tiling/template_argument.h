@@ -16,6 +16,8 @@
 #ifndef TEMPLATE_ARGUMENT_H
 #define TEMPLATE_ARGUMENT_H
 
+#if !defined(ASCENDC_CPU_DEBUG)
+
 #include <cstdint>
 #if defined(ASCENDC_TPL_KERNEL) && !defined(ASCENDC_TPL_PRE)
 #include "kernel_type.h"
@@ -328,5 +330,28 @@ do {                                                  \
 } while(0)
 
 #endif // TEMPLATEDE_TILING
+
+#else
+#define ASCENDC_TPL_DTYPE_DECL(...)
+#define ASCENDC_TPL_DATATYPE_DECL(...)
+#define ASCENDC_TPL_FORMAT_DECL(...)
+#define ASCENDC_TPL_UINT_DECL(...)
+#define ASCENDC_TPL_BOOL_DECL(...)
+#define ASCENDC_TPL_KERNEL_TYPE_DECL(...)
+
+#define ASCENDC_TPL_DTYPE_SEL(...)
+#define ASCENDC_TPL_DATATYPE_SEL(...)
+#define ASCENDC_TPL_FORMAT_SEL(...)
+#define ASCENDC_TPL_UINT_SEL(...)
+#define ASCENDC_TPL_BOOL_SEL(...)
+#define ASCENDC_TPL_TILING_STRUCT_SEL(...)
+#define ASCENDC_TPL_KERNEL_TYPE_SEL(...)
+#define ASCENDC_TPL_DETERMINISTIC_SEL(...)
+#define ASCENDC_TPL_SHARED_KERNEL_TYPE_SEL(...)
+
+#define ASCENDC_TPL_ARGS_DECL(...)
+#define ASCENDC_TPL_ARGS_SEL(...)
+#define ASCENDC_TPL_SEL(...)
+#endif // end：!defined(ASCENDC_CPU_DEBUG)
 
 #endif
