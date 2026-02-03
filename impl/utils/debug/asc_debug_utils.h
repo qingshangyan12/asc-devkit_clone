@@ -73,6 +73,11 @@ __aicore__ inline uint64_t asc_get_block_idx()
     return asc_get_block_idx_impl();
 }
 
+__aicore__ inline int64_t asc_get_program_counter()
+{
+    return get_pc();
+}
+
 template <uint64_t timeoutCycle = 15 * 1000 * 1000> // 20ms * 15
 __aicore__ inline void ringbuf_wait_rts_sync()
 {
