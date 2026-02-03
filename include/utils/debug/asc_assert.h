@@ -20,6 +20,10 @@
 #define __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__
 #endif
 
+#ifndef __aicore__
+#define __aicore__ [aicore]
+#endif
+
 #ifndef __SIMT_DEVICE_FUNCTIONS_DECL__
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
@@ -30,21 +34,15 @@
 
 namespace __asc_simt_vf {
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
-
-#ifdef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void __assert_fail(const char* __assertion, const char* __file,
-    unsigned int __line, const char* __function) noexcept;
-#else
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void __assert_fail(const __gm__ char* __assertion, const __gm__ char* __file,
-    unsigned int __line, const __gm__ char* __function) noexcept;
-#endif
 } // namespace __asc_simt_vf
 
-#ifndef assert
-#define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
+#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#include "impl/utils/debug/asc_assert_simt_impl.h"
 #endif
 
-#include "impl/utils/debug/asc_assert_simt_impl.h"
+#ifndef assert
+#define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, __func__))
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

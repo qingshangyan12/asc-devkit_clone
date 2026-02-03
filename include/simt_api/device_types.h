@@ -21,6 +21,9 @@
 #endif
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#ifndef __aicore__
+#define __aicore__ [aicore]
+#endif
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
 #else
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __simt_callee__

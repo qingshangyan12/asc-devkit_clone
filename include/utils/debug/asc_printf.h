@@ -21,7 +21,17 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__
 #endif
 
-#include "simt_api/device_types.h"
+#ifndef __aicore__
+#define __aicore__ [aicore]
+#endif
+
+#ifndef __SIMT_DEVICE_FUNCTIONS_DECL__
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
+#else
+#define __SIMT_DEVICE_FUNCTIONS_DECL__ __simt_callee__
+#endif
+#endif
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 
@@ -34,9 +44,11 @@ __attribute__((always_inline)) inline __SIMT_DEVICE_FUNCTIONS_DECL__ void printf
 #endif
 }   // namespase __asc_simt_vf
 
+#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#include "impl/utils/debug/asc_printf_simt_impl.h"
 #endif
 
-#include "impl/utils/debug/asc_printf_simt_impl.h"
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
