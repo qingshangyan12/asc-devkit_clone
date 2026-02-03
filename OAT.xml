@@ -13,15 +13,13 @@
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility,license header policies">
                 <filteritem type="filename" name="OAT.xml" desc="Describe commite owner"/> 
                 <filteritem type="filename" name=".gitmodules" desc="git submodule "/>
-                <filteritem type="filename" name="*.xml" desc="xml file"/>
-                <filteritem type="filename" name="*.csv" desc="csv file"/>
-                <filteritem type="filename" name="*.info" desc="info file"/>
+                <filteritem type="filename" name=".xml" desc="xml file"/>
+                <filteritem type="filename" name=".csv" desc="csv file"/>
             </filefilter>
             <filefilter name="copyrightPolicyFilter" desc="Filters for copyright header policies">
                 <filteritem type="filename" name=".gitmodules" desc="git submodule "/>
-                <filteritem type="filename" name="*.xml" desc="xml file"/>
-                <filteritem type="filename" name="*.csv" desc="xml csv"/>
-                <filteritem type="filename" name="*.info" desc="info file"/>
+                <filteritem type="filename" name=".xml" desc="xml file"/>
+                <filteritem type="filename" name=".csv" desc="xml csv"/>
             </filefilter>
             <filefilter name="licenseFileNamePolicyFilter" desc="Filters for LICENSE file policies">
             </filefilter>
@@ -36,7 +34,6 @@
         <licensematcherlist>
             <licensematcher name="CANN License" desc="License for CANN Open Software">
                 <licensetext name="
-                    * Copyright (c) 2025 Huawei Technologies Co., Ltd.
                     * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
                     * CANN Open Software License Agreement Version 2.0 (the &quot;License&quot;).
                     * Please refer to the License for details. You may not use this file except in compliance with the License.
