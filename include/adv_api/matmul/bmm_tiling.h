@@ -51,7 +51,7 @@ public:
     explicit MultiCoreMatmulTiling(const PlatformInfo &platform)
         : MatmulApiTilingBase(platform) {};
     /**
-     * @brief Set the allowed block dim.
+     * @brief Set the allowed core number.
      * @param dim : core number.
      */
     int32_t SetDim(int32_t dim);
