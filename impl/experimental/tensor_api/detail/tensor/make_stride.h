@@ -18,7 +18,7 @@
 #include "impl/experimental/tensor_api/detail/tensor/make_tuple.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
@@ -32,7 +32,7 @@ __aicore__ inline constexpr auto Compact(const Shape& shape, const Current& curr
     if constexpr (Std::is_tuple_v<Shape>) {
         using Lambda =CompactLambda<Major>;
         using Seq = typename Lambda::template seq<Shape>;
-        return TileInternal::Fold(shape, Std::make_tuple(Std::make_tuple(), current), Lambda{}, Seq{});
+        return TensorInternal::Fold(shape, Std::make_tuple(Std::make_tuple(), current), Lambda{}, Seq{});
     } else {
         if constexpr (Std::is_constant<1, Shape>::value) {
             return Std::make_tuple(Std::Int<0>{}, current);
@@ -48,7 +48,7 @@ __aicore__ inline constexpr auto CompactMajor(const Shape& shape, const Current&
     if constexpr (Std::is_tuple_v<Current>) {
         static_assert(Std::is_tuple_v<Shape>, "Invalid parameters");
         static_assert(Std::tuple_size_v<Shape> == Std::tuple_size_v<Current>, "Mismatched Ranks");
-        return TileInternal::Transform(shape, current, [&](auto const& s, auto const& c){ return CompactMajor<Major>(s, c);});
+        return TensorInternal::Transform(shape, current, [&](auto const& s, auto const& c){ return CompactMajor<Major>(s, c);});
     }else {
         static_assert(Std::is_tuple_v<Shape> || Std::is_integral_v<Shape>, "Shape is not tuple or integer");
         return Std::get<0>(Compact<Major>(shape, current));
@@ -66,7 +66,7 @@ struct CompactLambda<LayoutLeft>
     template <typename Init, typename Shape>
     __aicore__ inline constexpr auto operator()(const Init& init, const Shape& shape) {
         auto result = Compact<LayoutLeft>(shape, Std::get<1>(init));
-        return Std::make_tuple(TileInternal::Append(Std::get<0>(init), Std::get<0>(result)), Std::get<1>(result));
+        return Std::make_tuple(TensorInternal::Append(Std::get<0>(init), Std::get<0>(result)), Std::get<1>(result));
     }
     template <typename Shape>
     using seq = tuple_sequence<Shape>;

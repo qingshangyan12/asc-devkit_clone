@@ -23,7 +23,7 @@ namespace AscendC {
 template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
 {
-    return TileInternal::MakeTensorImpl<Iterator, Args...>(iter, args...);
+    return TensorInternal::MakeTensorImpl<Iterator, Args...>(iter, args...);
 }
 } // namespace AscendC
 

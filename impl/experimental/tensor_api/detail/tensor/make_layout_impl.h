@@ -18,7 +18,7 @@
 #include "include/experimental/tensor_api/tensor/local_tensor.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 
 template <typename... Ts>
 __aicore__ inline constexpr Shape<Ts...> MakeShapeImpl(const Ts&... t)

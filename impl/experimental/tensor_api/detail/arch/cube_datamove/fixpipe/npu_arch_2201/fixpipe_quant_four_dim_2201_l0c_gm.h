@@ -19,7 +19,7 @@
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_quant_nz2nz_four_dim_2201_l0c_gm.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 
 enum class Format2201 : uint8_t { None, NZ, ND};
 enum class QuantMode2201 : uint8_t { None, Scalar, Vector, Direct };
@@ -150,7 +150,7 @@ public:
         FixpipeQuantCoordL0C2GM{}.template Run<T, U, V, trait, Coord>(dst, src, quant, coord);
     }
 };
-}  // namespace TileInternal
+}  // namespace TensorInternal
 }  // namespace AscendC
 
 #endif  // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_QUANT_FOUR_DIM_2201_L0C_GM_H

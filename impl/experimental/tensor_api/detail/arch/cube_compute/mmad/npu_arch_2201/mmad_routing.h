@@ -19,7 +19,7 @@
 #include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad/npu_arch_2201/mmad_with_bias_four_dim_2201.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 
 class MmadIgnore
 {
@@ -66,7 +66,7 @@ struct MmadWithBiasTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Ha
     using type = MmadWithBiasFourDim2201;
 };
 
-} // namespace TileInternal
+} // namespace TensorInternal
 } // namespace AscendC
 
 #endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_ROUTING_H

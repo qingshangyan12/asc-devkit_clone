@@ -22,32 +22,32 @@
 namespace AscendC {
 template <typename T>
 __aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column) {
-    return TileInternal::MakeLayoutForNZ<T>(row, column);
+    return TensorInternal::MakeLayoutForNZ<T>(row, column);
 }
 
 template <>
 __aicore__ inline decltype(auto) MakeNZLayout<Std::ignore_t>(size_t row, size_t column) {
-    return TileInternal::MakeLayoutForNZ<uint16_t>(row, column);
+    return TensorInternal::MakeLayoutForNZ<uint16_t>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeRowMajorLayout(size_t row, size_t column) {
-    return TileInternal::MakeLayoutForND<T>(row, column);
+    return TensorInternal::MakeLayoutForND<T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeColumnMajorLayout(size_t row, size_t column) {
-    return TileInternal::MakeLayoutForDN<T>(row, column);
+    return TensorInternal::MakeLayoutForDN<T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeZNLayout(size_t row, size_t column) {
-    return TileInternal::MakeLayoutForZN<T>(row, column);
+    return TensorInternal::MakeLayoutForZN<T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeZZLayout(size_t row, size_t column) {
-    return TileInternal::MakeLayoutForZZ<T>(row, column);
+    return TensorInternal::MakeLayoutForZZ<T>(row, column);
 }
 } // namespace AscendC
 

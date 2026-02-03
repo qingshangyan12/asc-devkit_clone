@@ -18,7 +18,7 @@
 #include "impl/experimental/tensor_api/detail/tensor/basic_algorithm.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 struct MultipliesUnaryLeftFold {
     template <typename... T>
     __aicore__ inline constexpr auto operator()(T&&... t) const {
@@ -34,7 +34,7 @@ struct Product {
             if constexpr (Std::tuple_size_v<T> == 0) {
                 return Std::Int<1>{};
             } else {
-                return TileInternal::TransformApply(intT, Product{}, MultipliesUnaryLeftFold{});
+                return TensorInternal::TransformApply(intT, Product{}, MultipliesUnaryLeftFold{});
             }
         } else if constexpr (Std::is_integral<T>::value) {
             return intT;
@@ -136,7 +136,7 @@ template<typename Tuple>
 __aicore__ inline constexpr auto GetShape(const Tuple& s)
 {
     if constexpr (Std::is_tuple_v<Tuple>) {
-        return TileInternal::Transform(s, [](const auto& a) { return GetShape(a);});
+        return TensorInternal::Transform(s, [](const auto& a) { return GetShape(a);});
     } else {
         return s;
     }
@@ -181,7 +181,7 @@ __aicore__ inline constexpr auto InnerProduct(const TupleA& a, const TupleB& b)
 {
     if constexpr (Std::is_tuple_v<TupleA> && Std::is_tuple_v<TupleB>) {
         static_assert(Std::tuple_size_v<TupleA> == Std::tuple_size_v<TupleB>, "Mismatched ranks");
-        return TileInternal::TransformApply(a, b, [](const auto& x, const auto& y) { return InnerProduct(x,y);},
+        return TensorInternal::TransformApply(a, b, [](const auto& x, const auto& y) { return InnerProduct(x,y);},
                                     [](const auto&... v) { return (Std::Int<0>{} + ... + v);});
     } else {
         return a * b;

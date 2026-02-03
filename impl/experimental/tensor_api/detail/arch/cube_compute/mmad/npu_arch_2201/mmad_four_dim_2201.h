@@ -18,7 +18,7 @@
 #include "include/experimental/tensor_api/tensor/make.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 
 class MmadGenParams
 {
@@ -145,7 +145,7 @@ public:
         Mmad<T, U, S, decltype(params), trait>(dst, fm, filter, params, tuple_sequence<decltype(params)>{});
     }
 };
-} // namespace TileInternal
+} // namespace TensorInternal
 } // namespace AscendC
 
 #endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_FOUR_DIM_2201_H

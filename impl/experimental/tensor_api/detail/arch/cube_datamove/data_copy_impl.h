@@ -28,10 +28,10 @@ template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, type
 __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplate<T, U>, void>::type
 DataCopy(const T& dst, const U& src)
 {
-    constexpr Hardware dstTPos = TileInternal::GetHardPos<T>();
-    constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
+    constexpr Hardware dstTPos = TensorInternal::GetHardPos<T>();
+    constexpr Hardware srcTPos = TensorInternal::GetHardPos<U>();
     using Tensor2Tensor = typename
-        TileInternal::DataCopyTensor2Tensor<dstTPos, srcTPos, TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
+        TensorInternal::DataCopyTensor2Tensor<dstTPos, srcTPos, TensorInternal::CURRENT_ARCH_VERSION, TensorInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, trait>(dst, src);
 }
 

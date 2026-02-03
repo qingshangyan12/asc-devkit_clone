@@ -18,7 +18,7 @@
 #include "impl/experimental/tensor_api/detail/tensor/hw_ptr.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 template <Hardware hardPos, typename Iterator>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
 {

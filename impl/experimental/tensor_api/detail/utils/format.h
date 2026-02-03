@@ -19,7 +19,7 @@
 #include "impl/experimental/tensor_api/detail/utils/constant.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 struct ArchVersion {
     static constexpr uint32_t V3101 = 3101;
     static constexpr uint32_t V2201 = 2201;
@@ -255,7 +255,7 @@ __aicore__ inline constexpr auto GetHardPos()
 {
    return T::iterator::hardPos;
 }
-} // namespace TileInternal
+} // namespace TensorInternal
 } // namespace AscendC
 
 #endif // EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_FORMAT_H

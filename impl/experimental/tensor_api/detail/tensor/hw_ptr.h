@@ -18,7 +18,7 @@
 #include "impl/experimental/tensor_api/detail/tensor/pointer_impl.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 template <Hardware hPos, typename Pointer>
 struct HardwareMemPtr : IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>> {
     using IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>>::IterAdaptor;
@@ -33,7 +33,7 @@ template <Hardware hardPos, typename Pointer>
 struct IsHardwareMem<hardPos, HardwareMemPtr<hardPos, Pointer>> : Std::true_type {};
 
 template <Hardware hardPos, typename Pointer>
-struct IsHardwareMem<hardPos, Pointer, TileInternal::void_t<typename Pointer::iterator>> : IsHardwareMem<hardPos, typename Pointer::iterator> {};
+struct IsHardwareMem<hardPos, Pointer, TensorInternal::void_t<typename Pointer::iterator>> : IsHardwareMem<hardPos, typename Pointer::iterator> {};
 
 template <Hardware hardPos, typename Pointer>
 constexpr bool IsHardwareMemV = IsHardwareMem<hardPos, Pointer>::value;

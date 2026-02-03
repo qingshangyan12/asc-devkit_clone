@@ -19,15 +19,15 @@
 
 // struct
 namespace AscendC {
-namespace TileInternal{
+namespace TensorInternal{
 
 template <typename Iterator, typename DerivedType>
 struct IterAdaptor
 {
     using iterator     = Iterator;
-    using reference    = typename TileInternal::IterRef<iterator>::type; // T&
-    using elementType = typename TileInternal::IterEle<iterator>::type; // rm_ref
-    using valueType   = typename TileInternal::IterVal<iterator>::type; // rm_cvf
+    using reference    = typename TensorInternal::IterRef<iterator>::type; // T&
+    using elementType = typename TensorInternal::IterEle<iterator>::type; // rm_ref
+    using valueType   = typename TensorInternal::IterVal<iterator>::type; // rm_cvf
 
     __aicore__ inline constexpr IterAdaptor(iterator ptr = {}) : ptr(ptr) {}
 

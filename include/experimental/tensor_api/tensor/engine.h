@@ -22,9 +22,9 @@ template <typename Iterator>
 struct ViewEngine
 {
     using iterator     = Iterator;
-    using reference    = typename TileInternal::IterRef<iterator>::type; // T&
-    using elementType = typename TileInternal::IterEle<iterator>::type; // rm_ref
-    using valueType   = typename TileInternal::IterVal<iterator>::type; // rm_cvf
+    using reference    = typename TensorInternal::IterRef<iterator>::type; // T&
+    using elementType = typename TensorInternal::IterEle<iterator>::type; // rm_ref
+    using valueType   = typename TensorInternal::IterVal<iterator>::type; // rm_cvf
     __aicore__ inline constexpr iterator const& Begin() const {
         return storage;
     }
@@ -41,9 +41,9 @@ template <typename Iterator>
 struct ConstViewEngine
 {
     using iterator     = Iterator;
-    using reference    = typename TileInternal::IterRef<iterator>::type; // T&
-    using elementType = typename TileInternal::IterEle<iterator>::type; // rm_ref
-    using valueType   = typename TileInternal::IterVal<iterator>::type; // rm_cvf
+    using reference    = typename TensorInternal::IterRef<iterator>::type; // T&
+    using elementType = typename TensorInternal::IterEle<iterator>::type; // rm_ref
+    using valueType   = typename TensorInternal::IterVal<iterator>::type; // rm_cvf
 
     __aicore__ inline constexpr iterator const& Begin() const {
         return storage;

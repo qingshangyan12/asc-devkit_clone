@@ -16,7 +16,7 @@
 #define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_BASIC_ALGORITHM_H
 
 namespace AscendC {
-namespace TileInternal
+namespace TensorInternal
 {
 template <typename Tuple>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<Tuple>>>;

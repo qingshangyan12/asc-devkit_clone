@@ -25,7 +25,7 @@
 #include "include/utils/std/algorithm.h"
 
 namespace AscendC{
-namespace TileInternal{
+namespace TensorInternal{
 constexpr size_t TWO_DIM_DATA = 2;
 constexpr size_t FOUR_DIM_DATA = 4;
 constexpr size_t C0_SIZE = 32;

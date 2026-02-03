@@ -18,7 +18,7 @@
 #include "include/experimental/tensor_api/utils/utils.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 
 template <typename T>
 struct nesting_depth {
@@ -93,9 +93,9 @@ private:
     }
 
     __aicore__ inline static constexpr auto GetStaticLayoutSize() {
-        if constexpr (IsStaticLayout<TileInternal::FOUR_DIM_DATA, T, U>::value) {
+        if constexpr (IsStaticLayout<TensorInternal::FOUR_DIM_DATA, T, U>::value) {
             return GetFourDimStaticLayoutSize();
-        } else if constexpr (IsStaticLayout<TileInternal::TWO_DIM_DATA, T, U>::value) {
+        } else if constexpr (IsStaticLayout<TensorInternal::TWO_DIM_DATA, T, U>::value) {
             return GetTwoDimStaticLayoutSize();
         } else {
             return Std::Int<0>{};

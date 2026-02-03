@@ -19,7 +19,7 @@
 #include "include/experimental/tensor_api/tensor/make.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 
 class LoadDataFourDim2201L12L0BBase {
 public:

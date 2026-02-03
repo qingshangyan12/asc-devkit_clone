@@ -44,10 +44,10 @@ template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typen
 __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplateWithCoord<T, U, Coord>, void>::type 
 LoadData(const T& dst, const U& src, const Coord& coord)
 {
-    constexpr Hardware dstPos = TileInternal::GetHardPos<T>();
-    constexpr Hardware srcPos = TileInternal::GetHardPos<U>();
-    using Tensor2Tensor = typename TileInternal::LoadDataTensor2Tensor<dstPos, srcPos, 
-        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
+    constexpr Hardware dstPos = TensorInternal::GetHardPos<T>();
+    constexpr Hardware srcPos = TensorInternal::GetHardPos<U>();
+    using Tensor2Tensor = typename TensorInternal::LoadDataTensor2Tensor<dstPos, srcPos, 
+        TensorInternal::CURRENT_ARCH_VERSION, TensorInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, trait, Coord>(dst, src, coord);
 }
 } // namespace AscendC

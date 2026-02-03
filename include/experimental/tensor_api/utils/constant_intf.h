@@ -17,7 +17,7 @@
 
 #include "impl/experimental/tensor_api/detail/utils/constant.h"
 
-namespace AscendC{
+namespace AscendC {
 enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
 
 }

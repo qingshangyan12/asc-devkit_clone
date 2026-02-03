@@ -32,10 +32,10 @@ using Tile = Std::tuple<Layouts...>;
 template <typename... Coords>
 using Coord = Std::tuple<Coords...>;
 
-template <typename T, typename U = TileInternal::LayoutLeft::Apply<T>>
+template <typename T, typename U = TensorInternal::LayoutLeft::Apply<T>>
 struct Layout : private Std::tuple<T, U>
 {
-    static constexpr auto size = TileInternal::StaticLayoutSize<T, U>::size;
+    static constexpr auto size = TensorInternal::StaticLayoutSize<T, U>::size;
 
     __aicore__ inline constexpr Layout(const T& shape  = {}, const U& stride = {})
         : Std::tuple<T, U>(shape, stride)
@@ -45,7 +45,7 @@ struct Layout : private Std::tuple<T, U>
 
     __aicore__ inline constexpr decltype(auto) GetSize() const
     {
-        return TileInternal::GetCapicitySize(GetShape(), GetStride());
+        return TensorInternal::GetCapicitySize(GetShape(), GetStride());
     }
 
     __aicore__ inline constexpr decltype(auto) layout()
@@ -61,25 +61,25 @@ struct Layout : private Std::tuple<T, U>
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) GetShape()
     {
-        return TileInternal::GetValue<0, I...>(static_cast<Std::tuple<T, U>&>(*this));
+        return TensorInternal::GetValue<0, I...>(static_cast<Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) GetShape() const
     {
-        return TileInternal::GetValue<0, I...>(static_cast<const Std::tuple<T, U>&>(*this));
+        return TensorInternal::GetValue<0, I...>(static_cast<const Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) GetStride()
     {
-        return TileInternal::GetValue<1, I...>(static_cast<Std::tuple<T, U>&>(*this));
+        return TensorInternal::GetValue<1, I...>(static_cast<Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) GetStride() const
     {
-        return TileInternal::GetValue<1, I...>(static_cast<const Std::tuple<T, U>&>(*this));
+        return TensorInternal::GetValue<1, I...>(static_cast<const Std::tuple<T, U>&>(*this));
     }
 
     template <typename S>
@@ -92,13 +92,13 @@ struct Layout : private Std::tuple<T, U>
     __aicore__ inline constexpr decltype(auto) Rank() const
     {
         static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "The dimensions of the Shape and Stride are not the same.");
-        return TileInternal::GetRank<I...>(GetShape());
+        return TensorInternal::GetRank<I...>(GetShape());
     }
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) ShapeSize() const
     {
-        return TileInternal::TupleSize<I...>(GetShape());
+        return TensorInternal::TupleSize<I...>(GetShape());
     }
 
     static constexpr auto rank = Std::tuple_size_v<T>;

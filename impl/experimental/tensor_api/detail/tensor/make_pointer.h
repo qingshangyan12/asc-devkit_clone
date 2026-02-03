@@ -22,42 +22,42 @@
 namespace AscendC {
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::GM, Iterator>(iter);
+    return TensorInternal::MakeMemPtr<Hardware::GM, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeUBmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::UB, Iterator>(iter);
+    return TensorInternal::MakeMemPtr<Hardware::UB, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeL1memPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::L1, Iterator>(iter);
+    return TensorInternal::MakeMemPtr<Hardware::L1, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeL0AmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::L0A, Iterator>(iter);
+    return TensorInternal::MakeMemPtr<Hardware::L0A, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeL0BmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::L0B, Iterator>(iter);
+    return TensorInternal::MakeMemPtr<Hardware::L0B, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeL0CmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::L0C, Iterator>(iter);
+    return TensorInternal::MakeMemPtr<Hardware::L0C, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeBiasmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::BIAS, Iterator>(iter);
+    return TensorInternal::MakeMemPtr<Hardware::BIAS, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter) {
-    return TileInternal::MakeMemPtr<Hardware::FIXBUF, Iterator>(iter);
+    return TensorInternal::MakeMemPtr<Hardware::FIXBUF, Iterator>(iter);
 }
 } // namespace AscendC
 

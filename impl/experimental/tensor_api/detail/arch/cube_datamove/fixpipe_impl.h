@@ -52,10 +52,10 @@ template <const FixpipeTrait& trait, typename T, typename U>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplate<T, U>, void>::type
 Fixpipe(const T& dst, const U& src)
 {
-    constexpr Hardware dstTPos = TileInternal::GetHardPos<T>();
-    constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
-    using Tensor2Tensor = typename TileInternal::FixpipeTensor2Tensor<dstTPos, srcTPos,
-        TileInternal::CURRENT_ARCH_VERSION,TileInternal::FOUR_DIM_DATA>::type;
+    constexpr Hardware dstTPos = TensorInternal::GetHardPos<T>();
+    constexpr Hardware srcTPos = TensorInternal::GetHardPos<U>();
+    using Tensor2Tensor = typename TensorInternal::FixpipeTensor2Tensor<dstTPos, srcTPos,
+        TensorInternal::CURRENT_ARCH_VERSION,TensorInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, trait>(dst, src);
 }
 
@@ -63,10 +63,10 @@ template <const FixpipeTrait& trait, typename T, typename U, typename V>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, V>, void>::type
 Fixpipe(const T& dst, const U& src, const V& quant)
 {
-    constexpr Hardware dstTPos = TileInternal::GetHardPos<T>();
-    constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
-    using Tensor2Tensor = typename TileInternal::FixpipeQuantTensor2Tensor<dstTPos, srcTPos,
-        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
+    constexpr Hardware dstTPos = TensorInternal::GetHardPos<T>();
+    constexpr Hardware srcTPos = TensorInternal::GetHardPos<U>();
+    using Tensor2Tensor = typename TensorInternal::FixpipeQuantTensor2Tensor<dstTPos, srcTPos,
+        TensorInternal::CURRENT_ARCH_VERSION, TensorInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, V, trait>(dst, src, quant);
 }
 
@@ -74,10 +74,10 @@ template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplateWithCoord<T, U, Coord>, void>::type
 Fixpipe(const T& dst, const U& src, const Coord& coord)
 {
-    constexpr Hardware dstTPos = TileInternal::GetHardPos<T>();
-    constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
-    using Tensor2Tensor = typename TileInternal::FixpipeTensor2Tensor<dstTPos, srcTPos,
-        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
+    constexpr Hardware dstTPos = TensorInternal::GetHardPos<T>();
+    constexpr Hardware srcTPos = TensorInternal::GetHardPos<U>();
+    using Tensor2Tensor = typename TensorInternal::FixpipeTensor2Tensor<dstTPos, srcTPos,
+        TensorInternal::CURRENT_ARCH_VERSION, TensorInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, trait, Coord>(dst, src, coord);
 }
 
@@ -85,10 +85,10 @@ template <const FixpipeTrait& trait, typename T, typename U, typename V,  typena
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplateWithCoord<T, U, V, Coord>, void>::type
 Fixpipe(const T& dst, const U& src, const V& quant, const Coord& coord)
 {
-    constexpr Hardware dstTPos = TileInternal::GetHardPos<T>();
-    constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
-    using Tensor2Tensor = typename TileInternal::FixpipeQuantTensor2Tensor<dstTPos, srcTPos,
-        TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
+    constexpr Hardware dstTPos = TensorInternal::GetHardPos<T>();
+    constexpr Hardware srcTPos = TensorInternal::GetHardPos<U>();
+    using Tensor2Tensor = typename TensorInternal::FixpipeQuantTensor2Tensor<dstTPos, srcTPos,
+        TensorInternal::CURRENT_ARCH_VERSION, TensorInternal::FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<T, U, V, trait, Coord>(dst, src, quant, coord);
 }
 } // namespace AscendC

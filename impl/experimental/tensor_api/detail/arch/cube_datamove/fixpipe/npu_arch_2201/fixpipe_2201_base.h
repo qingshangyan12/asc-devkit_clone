@@ -19,7 +19,7 @@
 #include "include/experimental/tensor_api/tensor/make.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 constexpr uint32_t MAIN_LOOP_N_SIZE_2201 = 512;
 constexpr uint32_t CBURST_NUM_2201 = MAIN_LOOP_N_SIZE_2201 / BLOCK_CUBE;
 
@@ -99,7 +99,7 @@ private:
     {
         using srcType = typename T::elementType;
         CheckNDTemplate<T>();
-        constexpr Hardware srcTPos = TileInternal::GetHardPos<T>();
+        constexpr Hardware srcTPos = TensorInternal::GetHardPos<T>();
         static_assert(srcTPos == Hardware::L1, "The hardware of quant must be L1");
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
         static_assert(Std::is_one_of_v<srcType, __cbuf__ uint64_t>, "The source data type is not supported.");

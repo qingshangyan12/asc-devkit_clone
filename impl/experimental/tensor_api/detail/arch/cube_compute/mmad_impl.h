@@ -52,11 +52,11 @@ template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, t
 __aicore__ inline typename Std::enable_if<VerifyingMmadTemplate<T, U, S>, void>::type 
 Mmad(const T& dst, const U& fm, const S& filter)
 {
-   constexpr Hardware dstPos = TileInternal::GetHardPos<T>();
-   constexpr Hardware fmPos = TileInternal::GetHardPos<U>();
-   constexpr Hardware filterPos = TileInternal::GetHardPos<S>();
-   using Tensor2Tensor = typename TileInternal::MmadTensor2Tensor<dstPos, fmPos, filterPos, 
-      TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
+   constexpr Hardware dstPos = TensorInternal::GetHardPos<T>();
+   constexpr Hardware fmPos = TensorInternal::GetHardPos<U>();
+   constexpr Hardware filterPos = TensorInternal::GetHardPos<S>();
+   using Tensor2Tensor = typename TensorInternal::MmadTensor2Tensor<dstPos, fmPos, filterPos, 
+      TensorInternal::CURRENT_ARCH_VERSION, TensorInternal::FOUR_DIM_DATA>::type;
    Tensor2Tensor{}.template Run<T, U, S, trait>(dst, fm, filter);
 }
 
@@ -64,12 +64,12 @@ template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, t
 __aicore__ inline typename Std::enable_if<VerifyingMmadWithBiasTemplate<T, U, S, V>, void>::type 
 Mmad(const T& dst, const U& fm, const S& filter, const V& bias)
 {
-   constexpr Hardware dstPos = TileInternal::GetHardPos<T>();
-   constexpr Hardware fmPos = TileInternal::GetHardPos<U>();
-   constexpr Hardware filterPos = TileInternal::GetHardPos<S>();
-   constexpr Hardware biasPos = TileInternal::GetHardPos<V>();
-   using Tensor2Tensor = typename TileInternal::MmadWithBiasTensor2Tensor<dstPos, fmPos, filterPos, biasPos, 
-      TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
+   constexpr Hardware dstPos = TensorInternal::GetHardPos<T>();
+   constexpr Hardware fmPos = TensorInternal::GetHardPos<U>();
+   constexpr Hardware filterPos = TensorInternal::GetHardPos<S>();
+   constexpr Hardware biasPos = TensorInternal::GetHardPos<V>();
+   using Tensor2Tensor = typename TensorInternal::MmadWithBiasTensor2Tensor<dstPos, fmPos, filterPos, biasPos, 
+      TensorInternal::CURRENT_ARCH_VERSION, TensorInternal::FOUR_DIM_DATA>::type;
    Tensor2Tensor{}.template Run<T, U, S, V, trait>(dst, fm, filter, bias);
 }
 } // namespace AscendC

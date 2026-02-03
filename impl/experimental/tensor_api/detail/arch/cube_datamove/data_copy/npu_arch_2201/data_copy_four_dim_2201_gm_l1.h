@@ -19,7 +19,7 @@
 #include "include/experimental/tensor_api/tensor/make.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 class CopyGmToCbufBase {
 public:
     template <typename T, typename U, typename V, const DataCopyTrait& trait>
@@ -426,7 +426,7 @@ public:
     }
 };
 
-} // namespace TileInternal
+} // namespace TensorInternal
 } // namespace AscendC
 
 #endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_FOUR_DIM_2201_GM_L1_H

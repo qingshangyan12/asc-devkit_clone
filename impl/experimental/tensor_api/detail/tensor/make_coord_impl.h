@@ -18,7 +18,7 @@
 #include "include/experimental/tensor_api/tensor/local_tensor.h"
 
 namespace AscendC {
-namespace TileInternal
+namespace TensorInternal
 {
 template <typename T, typename U, typename S>
 __aicore__ inline constexpr auto Crd2IdxImpl(const T& coord, const U& shape, const S& stride);

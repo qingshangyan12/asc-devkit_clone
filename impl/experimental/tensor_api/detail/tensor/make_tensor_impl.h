@@ -19,7 +19,7 @@
 #include "include/experimental/tensor_api/tensor/engine.h"
 
 namespace AscendC {
-namespace TileInternal {
+namespace TensorInternal {
 
 template <typename T, typename = void>
 struct HasDereference : Std::false_type {};
