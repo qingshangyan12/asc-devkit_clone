@@ -22,6 +22,14 @@ npu_op_package(${package_name}
         INSTALL_PATH ${CMAKE_BINARY_DIR}
 )
 
-add_subdirectory(framework)
-add_subdirectory(op_host)
-add_subdirectory(op_kernel)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/framework")
+    add_subdirectory(framework)
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/op_host")
+    add_subdirectory(op_host)
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/op_kernel")
+    add_subdirectory(op_kernel)
+endif()
