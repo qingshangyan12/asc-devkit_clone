@@ -17,7 +17,6 @@
 
 #include "../../common/hccl_utils.h"
 #include "../../ccu/hccl_ccu_v0_prepare.h"
-#include "kernel_operator_utils_intf.h"
 
 namespace AscendC {
 template<const auto &config>
