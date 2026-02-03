@@ -1,0 +1,22 @@
+Add Fixpipe examples.
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Author:    彭程 <pengcheng40@hisilicon.com>
+# Date:      Tue Feb 3 20:35:03 2026 +0800
+#
+# On branch master
+# Your branch is up to date with 'origin/master'.
+#
+# Changes to be committed:
+#	new file:   examples/03_libraries/01_matrix/fixp_unitflag/CMakeLists.txt
+#	new file:   examples/03_libraries/01_matrix/fixp_unitflag/README.md
+#	new file:   examples/03_libraries/01_matrix/fixp_unitflag/data_utils.h
+#	new file:   examples/03_libraries/01_matrix/fixp_unitflag/fixp_unitflag.asc
+#	new file:   examples/03_libraries/01_matrix/fixp_unitflag/mmad_unitflag_disable.asc
+#	new file:   examples/03_libraries/01_matrix/fixp_unitflag/scripts/gen_data.py
+#	new file:   examples/03_libraries/01_matrix/fixp_unitflag/scripts/verify_result.py
+#	new file:   examples/03_libraries/01_matrix/fixpipe_co12c1_quantization_s322f16/run.sh
+#	modified:   tests/test_parts.sh
+#
