@@ -41,10 +41,10 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
     time_stamp_tlv->type = static_cast<uint32_t>(DumpType::DUMP_TIME_STAMP);
     time_stamp_tlv->length = tlv_len - sizeof(uint32_t[2]);
     time_stamp_tlv->descId = desc_id;
-    time_stamp_tlv->blockIdx = static_cast<uint16_t>(asc_get_block_idx());
+    time_stamp_tlv->blockIdx = static_cast<uint16_t>(asc_debug_get_block_idx());
     time_stamp_tlv->resv = static_cast<uint16_t>(0U);
-    time_stamp_tlv->cycle = asc_get_system_cycle();
-    time_stamp_tlv->pc = static_cast<uint64_t>(asc_get_program_counter());
+    time_stamp_tlv->cycle = asc_debug_get_system_cycle();
+    time_stamp_tlv->pc = static_cast<uint64_t>(asc_debug_get_program_counter());
     time_stamp_tlv->entry = static_cast<uint64_t>(__get_entry_sys_cnt()); 
     time_stamp_tlv->resvMem[0] = static_cast<uint32_t>(0U);
     time_stamp_tlv->resvMem[1] = static_cast<uint32_t>(0U);
@@ -72,16 +72,16 @@ __aicore__ inline void asc_prof_stop()
 }
 
 #if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3501
-template<pipe_t pipe = PIPE_S>
+template<pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
-    bisheng::cce::mark_stamp<pipe, index>();
+    bisheng::cce::mark_stamp<pipe, idx>();
 }
 
-template<pipe_t pipe = PIPE_S, uint16_t idx>
+template<pipe_t pipe, uint16_t idx>
 __aicore__ inline void asc_mark_stamp()
 {
-    bisheng::cce::mark_stamp<pipe, index>();
+    bisheng::cce::mark_stamp<pipe, idx>();
 }
 #endif
 } // namespace __asc_aicore
