@@ -305,7 +305,7 @@ __aicore__ inline void WholeReduceSum(const LocalTensor<U>& dst, const LocalTens
     const int32_t srcRepStride)
 {
     using DstPrimType = PrimT<U>;
-    using SrcPrmiType = PrimT<T>;
+    using SrcPrimType = PrimT<T>;
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "WholeReduceSum");
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -314,7 +314,7 @@ __aicore__ inline void WholeReduceSum(const LocalTensor<U>& dst, const LocalTens
         ASCENDC_REPORT_CHECK_ERROR("WholeReduceSum", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
-    WholeReduceSumImpl<SrcPrmiType, isSetMask, DstPrimType>((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrmiType*)src.GetPhyAddr(), mask,
+    WholeReduceSumImpl<SrcPrimType, isSetMask, DstPrimType>((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), mask,
         repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 #else

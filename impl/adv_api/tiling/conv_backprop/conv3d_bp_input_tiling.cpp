@@ -170,7 +170,7 @@ bool Conv3DBpInputTiling::CheckOutputHeight()
     return true;
 }
 
-bool Conv3DBpInputTiling::CheckTransposeOutputdingRange() 
+bool Conv3DBpInputTiling::CheckTransposeOutputtingRange() 
 {
   // The outputPadding value needs to be less than the dilation or stride of the same dimension
   OP_TILING_CHECK((attrInfo.outputPadD >= attrInfo.strideD && attrInfo.outputPadD >= attrInfo.dilationD), 
@@ -206,7 +206,7 @@ bool Conv3DBpInputTiling::CheckInputParam()
         return false;
     }
     if (opType_ == OpType::kConv3DTranspose) {
-        CheckTransposeOutputdingRange();
+        CheckTransposeOutputtingRange();
         if(!InferShape()) {
             return false;
         }

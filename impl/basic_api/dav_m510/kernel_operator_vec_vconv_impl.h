@@ -1983,7 +1983,7 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ T1* dst, __ubuf__ T2* src0, __ub
     }
 }
 
-//  castDequanValue bit arrange
+//  castDequantValue bit arrange
 //  =========================================================================
 //  | unused 17bit | 1bit signMode | 9bit offset | unused 5bit | 32bit scale|
 //  =========================================================================

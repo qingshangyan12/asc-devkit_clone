@@ -543,7 +543,7 @@ template <typename T>
 __aicore__ inline void ConfusionTransposeND2NZWithInlvImpl(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, ConfusionTranspose210Tiling& tiling)
 {
     constexpr uint32_t regWidth = 256; // vf reg length
-    constexpr uint32_t c0Size = 32; // factal size
+    constexpr uint32_t c0Size = 32; // fractal size
     constexpr uint32_t factor = 2; // row factor
     uint32_t height = tiling.dim1;
     uint32_t width = tiling.dim2;

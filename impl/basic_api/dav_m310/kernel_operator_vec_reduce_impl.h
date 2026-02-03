@@ -475,7 +475,7 @@ __aicore__ inline void BlockReduceMinImpl(__ubuf__ float* dst, __ubuf__ float* s
 
 template <typename T, bool isSetMask = true>
 __aicore__ inline void RepeatReduceSumImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, const int32_t repeatTime,
-    const int32_t elemsInOneRepeate, const int32_t dstBlkStride, const int32_t srcBlkStride, const int32_t dstRepStride,
+    const int32_t elemsInOneRepeat, const int32_t dstBlkStride, const int32_t srcBlkStride, const int32_t dstRepStride,
     const int32_t srcRepStride)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported on current device"); });

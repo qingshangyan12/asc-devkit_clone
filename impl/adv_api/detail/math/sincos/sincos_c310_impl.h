@@ -380,7 +380,7 @@ __simd_callee__ inline void CosfPoly(MicroAPI::RegTensor<float> &dstReg, MicroAP
     FMaf(dstReg, srcRegS, COS_POLY_COEFF4, mask);
 }
 
-__simd_callee__ inline void TrigRedFPreporcessForHalf(MicroAPI::RegTensor<float> &regR, MicroAPI::RegTensor<int32_t> &regI,
+__simd_callee__ inline void TrigRedFPreprocessForHalf(MicroAPI::RegTensor<float> &regR, MicroAPI::RegTensor<int32_t> &regI,
     MicroAPI::RegTensor<float> &srcRegA, MicroAPI::MaskReg& mask)
 {
     constexpr float J_MUL_COEFF = 0.636619747f;
@@ -540,7 +540,7 @@ __simd_vf__ inline void TrigRedFPreProcessImpl(__ubuf__ float *tmpBufferR, __ubu
         MicroAPI::MaskReg mask = MicroAPI::UpdateMask<float>(calCount);
         MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, src + i * B32_DATA_NUM_PER_REPEAT);
         MicroAPI::Cast<float, T, SinCosImpl::castTraitF16F32>(castReg, srcReg, mask);
-        TrigRedFPreporcessForHalf(regR, regI, castReg, mask);
+        TrigRedFPreprocessForHalf(regR, regI, castReg, mask);
 
         MicroAPI::StoreAlign(tmpBufferR + i * B32_DATA_NUM_PER_REPEAT, regR, mask);
         MicroAPI::StoreAlign(tmpBufferI + i * B32_DATA_NUM_PER_REPEAT, regI, mask);

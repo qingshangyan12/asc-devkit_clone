@@ -382,7 +382,7 @@ __aicore__ inline void DigammaNegPicotPix(
     PipeBarrier<PIPE_V>();
     Div<float, false>(params.tmpCal1, params.tmpScalar, params.tmpCal1, MASK_PLACEHOLDER, 1, params.binaryParams);
     PipeBarrier<PIPE_V>();
-    // selsct f34
+    // select f34
     DigammaSelect(dst, params.tmpCal1, params.mask1,  params.tmpCal3, params);
 
     // dst = dst * pi

@@ -753,7 +753,7 @@ __aicore__ inline void ReduceTailCompute(const LocalTensor<T>& dst, const LocalT
     PrimType bodyValue = dst.GetValue(0);
     PrimType bodyIndex = dst.GetValue(1);
 
-    struct ReduceRepeatParams tailParams(tailCount, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+    struct ReduceRepeatParams tailParams(tailCount, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
         DEFAULT_REPEAT_STRIDE);
 
     ReduceImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), // 复用dst
@@ -765,7 +765,7 @@ __aicore__ inline void ReduceTailCompute(const LocalTensor<T>& dst, const LocalT
     PrimType tailIndex = dst.GetValue(1);
 
     // bodyresult tailresult need vcmin/vcmax again
-    struct ReduceRepeatParams lastParams(2, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE);
+    struct ReduceRepeatParams lastParams(2, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE);
     work.SetValue(0, bodyValue);
     work.SetValue(1, tailValue);
     event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));

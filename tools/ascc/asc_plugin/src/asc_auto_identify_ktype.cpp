@@ -62,7 +62,7 @@ uint8_t GetV220CoreMode(const std::string& output) {
         }
         if (tokens.size() < 5) continue; // 5 is Exceed the field limit
 
-        for (size_t  i = 1; i <= 4 && i < tokens.size(); ++i) {  // 4 is max fileds
+        for (size_t  i = 1; i <= 4 && i < tokens.size(); ++i) {  // 4 is max fields
             const std::string& inst = tokens[i];
             if (inst.length() != 8) continue;     // 8 is expected inst length
 

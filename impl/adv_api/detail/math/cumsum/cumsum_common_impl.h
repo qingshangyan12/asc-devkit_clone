@@ -379,17 +379,17 @@ __aicore__ inline void CumSumImpl(LocalTensor<T>& dstTensor, LocalTensor<T>& las
         });
 #endif
         // outter serves as the loop count, process at least 16 rows of data at once.
-        const uint32_t oneRepeateSize = tmpBufferSize / minTmpBufferSize * NCHW_CONV_ADDR_LIST_SIZE;
-        const uint32_t rangeM = cumSumInfo.outter / oneRepeateSize;
-        const uint32_t tailM = cumSumInfo.outter - oneRepeateSize * rangeM;
+        const uint32_t oneRepeatSize = tmpBufferSize / minTmpBufferSize * NCHW_CONV_ADDR_LIST_SIZE;
+        const uint32_t rangeM = cumSumInfo.outter / oneRepeatSize;
+        const uint32_t tailM = cumSumInfo.outter - oneRepeatSize * rangeM;
         uint32_t dstLocalOffset = 0;
         uint32_t srcLocalOffset = 0;
         LocalTensor<T> tmpBuffer = sharedTmpBuffer.ReinterpretCast<T>();
         for (uint32_t i = 0; i < rangeM; i++) {
             CumSumLastDim<T>(
-                dstTensor[dstLocalOffset], srcTensor[srcLocalOffset], tmpBuffer, {oneRepeateSize, cumSumInfo.inner});
-            dstLocalOffset += cumSumInfo.inner * oneRepeateSize;
-            srcLocalOffset += cumSumInfo.inner * oneRepeateSize;
+                dstTensor[dstLocalOffset], srcTensor[srcLocalOffset], tmpBuffer, {oneRepeatSize, cumSumInfo.inner});
+            dstLocalOffset += cumSumInfo.inner * oneRepeatSize;
+            srcLocalOffset += cumSumInfo.inner * oneRepeatSize;
         }
 
         if (tailM != 0) {
