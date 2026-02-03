@@ -97,7 +97,7 @@
     # 安装命令
     ./Ascend-cann-${soc_name}-ops_9.0.0_linux-${arch}.run --install --install-path=${install_path}
     ```
-    - \$\{soc\_name\}：表示NPU型号名称，（Atlas A2 训练系列产品/Atlas A2 推理系列产品：910b，Atlas A3 训练系列产品/Atlas A3 推理系列产品：A3）。
+    - \$\{soc\_name\}：表示NPU型号名称。
     - \$\{install\_path\}：表示指定安装路径，需要与toolkit包安装在相同路径，root用户默认安装在`/usr/local/Ascend`目录，非root用户默认安装在`$HOME/Ascend`目录。
 
 3. **配置环境变量**
