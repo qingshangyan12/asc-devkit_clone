@@ -1,0 +1,14 @@
+{
+  "commands": [
+    "python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ci_config/rule.yaml -r CB -k enabled -v 0",
+    "python .claude/skills/edit-yaml/scripts/add_node_key_value.py -f ci_config/rule.yaml --nodes-file nodes_only.txt -k version -v cann"
+  ],
+  "timestamp": "2026-02-03",
+  "description": "在rule.yaml中所有enabled: 0的CB任务中,添加version: cann",
+  "results": {
+    "total_nodes_found": 446,
+    "nodes_modified": 445,
+    "nodes_skipped": 1,
+    "backup_file": "ci_config/rule.yaml.backup_20260203_101023"
+  }
+}

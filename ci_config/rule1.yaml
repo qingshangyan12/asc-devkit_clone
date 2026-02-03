@@ -1,79 +1,55 @@
-# ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
-# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-# CANN Open Software License Agreement Version 2.0 (the "License").
-# Please refer to the License for details. You may not use this file except in compliance with the License.
-# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-# See LICENSE in the root of the software repository for the full text of the License.
-# ----------------------------------------------------------------------------------------------------------
-
-CB:
-  commiter:
-    "qiaoll"
-  team: "asc-devkit" ##组件名称
-  llt1:
-      ut_check: true
-      st_check: false
-      release:
-        - impl
-        - include
-        - tools
-      version:cann
-  tasks:
-    llt2:
-      ut_check: true
-      st_check: false
-      release:
-        - impl
-        - include
-        - tools
-      version:cann
-    llt3:
-      ut_check: true
-      st_check: false
-      release:
-        - impl
-        - include
-        - tools
-      version:cann
-    llt4:
-      ut_check: true
-      st_check: false
-      release:
-        - impl
-        - include
-        - tools
-      version:cann2
-    llt5:
-      ut_check: true
-      st_check: false
-      release:
-        - impl
-        - include
-        - tools
-      version:cann2
-    llt6:
-      ut_check: true
-      st_check: false
-      release:
-        - impl
-        - include
-        - tools
-      version:cann2
-  src:
-    release:
-      - impl
-      - include
-      - tools
-    unrelease:
-      - cmake
-      - docs
-      - examples
-      - scripts
-      - tests
-      - include/**/*.h
-      - tools/**/*.h
-  llt:
-    ut_check: true
-    st_check: false
+CV:
+  block_1:
+    id: 1
+    name: extended_block_1
+    enabled: 0
+  block_2:
+    id: 2
+    name: extended_block_2
+    enabled: 1
+    config:
+      level1:
+        level2:
+          level3:
+            value: 26891
+            timestamp: 29138
+      nested_list:
+      - item1
+      - item2
+      - item3
+    parameters:
+      param1:
+        type: string
+        default: value_846
+        required: 1
+      param2:
+        type: number
+        default: 7282
+        required: 1
+    metadata:
+      author: user_91
+      created_at: '2025-01-11'
+      description: Extended configuration block 2
+      tags:
+      - tag1
+      - tag2
+      - tag3
+    nested_config:
+      section1:
+        subsection1:
+          item1: 284
+          item2: 189
+        subsection2:
+          item3: value_53
+      section2:
+      - name: item_92
+        value: 1980
+      - name: item_75
+        value: 2424
+    advanced:
+      feature1:
+        enabled: 0
+        config:
+          option1: 48
+          option2: 24
+        version: cann
