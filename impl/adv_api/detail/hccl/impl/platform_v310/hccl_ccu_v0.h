@@ -103,18 +103,6 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::AlltoAllvWrite(GM_ADDR u
 }
 
 template<const auto &config>
-__aicore__ inline void
-HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::FlushDataCacheForCopy(GM_ADDR gmAddr, uint32_t size)
-{
-    uint32_t offset = 0;
-    for (uint32_t i = 0; i < size; i += MAX_DCCI_CNT) {
-        FlushDataCache((GM_ADDR)(gmAddr + i));
-        offset += MAX_DCCI_CNT;
-    }
-    FlushDataCache((GM_ADDR)(gmAddr + offset));
-}
-
-template<const auto &config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitWorkingFlag()
 {
     using T = decltype(config);

@@ -84,8 +84,6 @@ private:
 
     __aicore__ inline bool IsFinish(uint8_t reqId);
 
-    __aicore__ inline void FlushDataCacheForCopy(GM_ADDR gmAddr, uint32_t size);
-
     __aicore__ inline void InitHandleInfo(uint8_t handleId);
 
     __aicore__ inline void InitCcuParam(const HcclHandle handleId);
