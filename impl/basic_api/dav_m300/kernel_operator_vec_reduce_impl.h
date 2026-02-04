@@ -129,7 +129,7 @@ __aicore__ inline void PairReduceSumImpl(__ubuf__ float* dst, __ubuf__ float* sr
         newSrc += srcStrideOffset;
         newDstRepStride = 1;
     }
-    BITBYBIT_MODE_FLOAT_REDUCE_VF(VCPADD_FUNC, HLAF_MASK_LEN / HALF_FACTOR);
+    BITBYBIT_MODE_FLOAT_REDUCE_VF(VCPADD_FUNC, HALF_MASK_LEN / HALF_FACTOR);
 }
 
 template <typename T = half, bool isSetMask = true>
@@ -163,7 +163,7 @@ __aicore__ inline void PairReduceSumImpl(__ubuf__ float* dst, __ubuf__ float* sr
         newSrc += srcStrideOffset;
         newDstRepStride = 1;
     }
-    CONTINUOUS_MODE_REDUCE_VF(VCPADD_FUNC, f32, b32, HLAF_MASK_LEN / HALF_FACTOR);
+    CONTINUOUS_MODE_REDUCE_VF(VCPADD_FUNC, f32, b32, HALF_MASK_LEN / HALF_FACTOR);
 }
 
 /* **************************************** Block Reduce Impl ****************************************** */
@@ -1220,7 +1220,7 @@ template <typename T>
 __aicore__ inline void CreateSpecialFormatMask(const int32_t& maskLen, uint64_t& highMask, uint64_t& lowMask)
 {
     // create mask in the "0101010101" format
-    int32_t halfLen = HLAF_MASK_LEN / 2;
+    int32_t halfLen = HALF_MASK_LEN / 2;
     for (int32_t i = 0; i < maskLen - halfLen; i++) {
         highMask = highMask << 2;
         highMask = highMask | 1;
@@ -1316,7 +1316,7 @@ __aicore__ inline void ReduceImplSecondStep(__ubuf__ T* sharedTmpBuffer, const R
         lowMask = 0x5555555555555555;
         newMask[0] = lowMask;
         newMask[1] = highMask;
-        struct ReduceRepeatParams newParams(newMask, newRepeatTimes, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+        struct ReduceRepeatParams newParams(newMask, newRepeatTimes, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
             DEFAULT_REPEAT_STRIDE);
 
         ReduceOperation<T>(sharedTmpBuffer + secondStartPos, sharedTmpBuffer + preStartPos, newParams, mode);
@@ -1331,7 +1331,7 @@ __aicore__ inline void ReduceImplSecondStep(__ubuf__ T* sharedTmpBuffer, const R
         CreateSpecialFormatMask<T>(newMaskLen, highMask, lowMask);
         newMask[0] = lowMask;
         newMask[1] = highMask;
-        struct ReduceRepeatParams leftParams(newMask, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+        struct ReduceRepeatParams leftParams(newMask, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
             DEFAULT_REPEAT_STRIDE);
 
         dstOffset = secondStartPos + bodyOutputCount;
@@ -1482,7 +1482,7 @@ __aicore__ inline void ReduceImplThirdStep(__ubuf__ T* dstLocal, __ubuf__ T* sha
             (((thirdStartPos + curData) * sizeof(T) + ONE_BLK_SIZE - 1) / ONE_BLK_SIZE) * ONE_BLK_SIZE / sizeof(T);
         dstOffset = fourthStartPos;
         srcOffset = thirdStartPos;
-        struct ReduceRepeatParams newParams(newMask, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+        struct ReduceRepeatParams newParams(newMask, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
             DEFAULT_REPEAT_STRIDE);
 
         ReduceOperation<T>(sharedTmpBuffer + dstOffset, sharedTmpBuffer + srcOffset, newParams, mode);
@@ -1500,7 +1500,7 @@ __aicore__ inline void ReduceImplThirdStep(__ubuf__ T* dstLocal, __ubuf__ T* sha
     } else {
         dstOffset = thirdStartPos;
         srcOffset = secondStartPos;
-        struct ReduceRepeatParams newParams(newMask, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+        struct ReduceRepeatParams newParams(newMask, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
             DEFAULT_REPEAT_STRIDE);
         ReduceOperation<T>(sharedTmpBuffer + dstOffset, sharedTmpBuffer + srcOffset, newParams, mode);
         SetFlag<HardEvent::V_S>(eventIdVToS);
@@ -1562,7 +1562,7 @@ __aicore__ inline void ReduceSumFinalStep(__ubuf__ T* dstLocal, __ubuf__ T* shar
         SetFlag<HardEvent::S_MTE3>(eventIdSToMTE3);
         WaitFlag<HardEvent::S_MTE3>(eventIdSToMTE3);
     } else {
-        struct ReduceRepeatParams newParams(secondResultNum, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+        struct ReduceRepeatParams newParams(secondResultNum, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
             DEFAULT_REPEAT_STRIDE);
         ReduceOperation<T>(dstLocal, sharedTmpBuffer, newParams, ReduceMode::REDUCE_SUM);
     }
@@ -1591,7 +1591,7 @@ __aicore__ inline void ReduceImplSecondStepNoIndex(__ubuf__ T* sharedTmpBuffer, 
         CreateSpecialFormatMask<T>(elementNumPerRep / VREDUCE_PER_REP_OUTPUT, highMask, lowMask);
         newMask[0] = lowMask;
         newMask[1] = highMask;
-        struct ReduceRepeatParams newParams(newMask, newRepeatTimes, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+        struct ReduceRepeatParams newParams(newMask, newRepeatTimes, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
             DEFAULT_REPEAT_STRIDE);
         ReduceOperation<T>(sharedTmpBuffer, sharedTmpBuffer, newParams, mode);
     }
@@ -1601,7 +1601,7 @@ __aicore__ inline void ReduceImplSecondStepNoIndex(__ubuf__ T* sharedTmpBuffer, 
         CreateSpecialFormatMask<T>(leftData / VREDUCE_PER_REP_OUTPUT, highMask, lowMask);
         newMask[0] = lowMask;
         newMask[1] = highMask;
-        struct ReduceRepeatParams leftParams(newMask, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+        struct ReduceRepeatParams leftParams(newMask, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
             DEFAULT_REPEAT_STRIDE);
         ReduceOperation<T>(sharedTmpBuffer + newRepeatTimes * VREDUCE_PER_REP_OUTPUT,
             sharedTmpBuffer + newRepeatTimes * elementNumPerRep, leftParams, mode);
@@ -1620,7 +1620,7 @@ __aicore__ inline void ReduceImplThirdStepNoIndex(__ubuf__ T* dstLocal, __ubuf__
     CreateSpecialFormatMask<T>(curData / VREDUCE_PER_REP_OUTPUT, highMask, lowMask);
     newMask[0] = lowMask;
     newMask[1] = highMask;
-    struct ReduceRepeatParams newParams(newMask, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+    struct ReduceRepeatParams newParams(newMask, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
         DEFAULT_REPEAT_STRIDE);
     ReduceOperation<T>(sharedTmpBuffer, sharedTmpBuffer, newParams, mode);
     event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
@@ -1731,7 +1731,7 @@ __aicore__ inline void ReduceTailCompute(const LocalTensor<T>& dst, const LocalT
     PrimType bodyValue = dst.GetValue(0);
     PrimType bodyIndex = dst.GetValue(1);
 
-    struct ReduceRepeatParams tailParams(tailCount, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE,
+    struct ReduceRepeatParams tailParams(tailCount, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,
         DEFAULT_REPEAT_STRIDE);
 
     ReduceImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), // 复用dst
@@ -1743,7 +1743,7 @@ __aicore__ inline void ReduceTailCompute(const LocalTensor<T>& dst, const LocalT
     PrimType tailIndex = dst.GetValue(1);
 
     // bodyresult tailresult need vcmin/vcmax again
-    struct ReduceRepeatParams lastParams(2, 1, DEFAULT_REDUCE_DST_REP_SRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE);
+    struct ReduceRepeatParams lastParams(2, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE);
     sharedTmpBuffer.SetValue(0, bodyValue);
     sharedTmpBuffer.SetValue(1, tailValue);
     event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
