@@ -16,7 +16,7 @@
 #define EXPERIMENTAL_TENSOR_API_TENSOR_LAYOUT_H
 
 // struct
-#include "impl/experimental/tensor_api/detail/tensor/StaticLayoutSize.h"
+#include "impl/experimental/tensor_api/detail/tensor/static_layout_size.h"
 #include "impl/experimental/tensor_api/detail/tensor/make_stride.h"
 
 namespace AscendC {

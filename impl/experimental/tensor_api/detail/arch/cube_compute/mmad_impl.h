@@ -9,7 +9,7 @@
 */
 
 /*!
- * \file mmad_impl.h.h
+ * \file mmad_impl.h
  * \brief
  */
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_IMPL_H

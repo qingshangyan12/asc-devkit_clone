@@ -9,16 +9,16 @@
 */
 
 /*!
-* \file constant.h
+* \file constant_impl.h
 * \brief
 */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_IMPL_H
 
 #include <cstdint>
 #include <utility>
 #include <type_traits>
-#include "impl/experimental/tensor_api/detail/utils/macro.h"
+#include "impl/experimental/tensor_api/detail/utils/macro_impl.h"
 #include "include/utils/std/tuple.h"
 #include "include/utils/std/type_traits.h"
 #include "include/utils/std/utility.h"
@@ -82,4 +82,4 @@ using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUAN
 }
 }
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_TENSORTILE_CONSTANT_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_IMPL_H

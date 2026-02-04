@@ -9,11 +9,11 @@
 */
 
 /*!
- * \file StaticLayoutSize.h
+ * \file static_layout_size.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_STATICLAYOUTSIZE_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_STATICLAYOUTSIZE_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_STATIC_LAYOUT_SIZE_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_STATIC_LAYOUT_SIZE_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
 

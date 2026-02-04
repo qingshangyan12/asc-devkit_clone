@@ -15,7 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_TENSOR_ENGINE_H
 #define EXPERIMENTAL_TENSOR_API_TENSOR_ENGINE_H
 
-#include "impl/experimental/tensor_api/detail/tensor/hw_ptr.h"
+#include "impl/experimental/tensor_api/detail/tensor/hardware_pointer.h"
 
 namespace AscendC {
 template <typename Iterator>

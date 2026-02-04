@@ -9,11 +9,11 @@
 */
 
 /*!
- * \file mmad_intf.h
+ * \file mmad.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_INTF_H
-#define EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_INTF_H
+#ifndef EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_H
+#define EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_H
 
 #include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad_impl.h"
 
@@ -28,4 +28,4 @@ __aicore__ inline typename Std::enable_if<VerifyingMmadWithBiasTemplate<T, U, S,
 Mmad(const T& dst, const U& fm, const S& filter, const V& bias);
 
 } // namespace AscendC
-#endif // EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_INTF_H
+#endif // EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_H

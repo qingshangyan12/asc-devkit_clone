@@ -9,12 +9,12 @@
 */
 
 /*!
-* \file macro_intf.h
+* \file macro.h
 * \brief
 */
-#ifndef EXPERIMENTAL_TENSOR_API_UTILS_MACRO_INTF_H
-#define EXPERIMENTAL_TENSOR_API_UTILS_MACRO_INTF_H
+#ifndef EXPERIMENTAL_TENSOR_API_UTILS_MACRO_H
+#define EXPERIMENTAL_TENSOR_API_UTILS_MACRO_H
 
-#include "impl/experimental/tensor_api/detail/utils/macro.h"
+#include "impl/experimental/tensor_api/detail/utils/macro_impl.h"
 
-#endif //EXPERIMENTAL_TENSOR_API_UTILS_MACRO_INTF_H
+#endif //EXPERIMENTAL_TENSOR_API_UTILS_MACRO_H

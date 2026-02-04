@@ -9,11 +9,11 @@
 */
 
 /*!
- * \file make_layout_intf.h
+ * \file make_layout.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_INTF_H
-#define EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_INTF_H
+#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_H
+#define EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_H
 
 #include "impl/experimental/tensor_api/detail/tensor/make_layout.h"
 
@@ -74,4 +74,4 @@ template <typename T, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_INTF_H
+#endif // EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_H

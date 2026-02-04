@@ -15,9 +15,9 @@
 #ifndef EXPERIMENTAL_TENSOR_API_UTILS_UTILS_H
 #define EXPERIMENTAL_TENSOR_API_UTILS_UTILS_H
 
-#include "include/experimental/tensor_api/utils/constant_intf.h"
-#include "include/experimental/tensor_api/utils/extra_intf.h"
-#include "include/experimental/tensor_api/utils/format_intf.h"
-#include "include/experimental/tensor_api/utils/macro_intf.h"
+#include "include/experimental/tensor_api/utils/constant.h"
+#include "include/experimental/tensor_api/utils/extra.h"
+#include "include/experimental/tensor_api/utils/format.h"
+#include "include/experimental/tensor_api/utils/macro.h"
 
 #endif // EXPERIMENTAL_TENSOR_API_UTILS_UTILS_H

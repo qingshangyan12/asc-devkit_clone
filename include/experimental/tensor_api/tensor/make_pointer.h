@@ -9,11 +9,11 @@
 */
 
 /*!
- * \file make_pointer_intf.h
+ * \file make_pointer.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_POINTER_INTF_H
-#define EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_POINTER_INTF_H
+#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_POINTER_H
+#define EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_POINTER_H
 
 #include "impl/experimental/tensor_api/detail/tensor/make_pointer.h"
 
@@ -44,4 +44,4 @@ template <typename Iterator>
 __aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter);
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_POINTER_INTF_H
+#endif // EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_POINTER_H

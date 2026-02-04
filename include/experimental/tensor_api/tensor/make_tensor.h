@@ -9,11 +9,11 @@
 */
 
 /*!
- * \file make_tensor_intf.h
+ * \file make_tensor.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_INTF_H
-#define EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_INTF_H
+#ifndef EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_H
+#define EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_H
 
 #include "impl/experimental/tensor_api/detail/tensor/make_tensor.h"
 
@@ -23,4 +23,4 @@ template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args);
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_INTF_H
+#endif // EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_H

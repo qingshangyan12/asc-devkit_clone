@@ -9,13 +9,13 @@
 */
 
 /*!
- * \file format_intf.h
+ * \file format.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_UTILS_FORMAT_INTF_H
-#define EXPERIMENTAL_TENSOR_API_UTILS_FORMAT_INTF_H
+#ifndef EXPERIMENTAL_TENSOR_API_UTILS_FORMAT_H
+#define EXPERIMENTAL_TENSOR_API_UTILS_FORMAT_H
 
-#include "impl/experimental/tensor_api/detail/utils/format.h"
+#include "impl/experimental/tensor_api/detail/utils/format_impl.h"
 
 namespace AscendC {
 template <typename T, typename U>
@@ -55,4 +55,4 @@ constexpr bool VerifyingFixpipeQuantTemplateWithCoord = Std::is_tuple_v<Coord> &
 
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_UTILS_FORMAT_INTF_H
+#endif // EXPERIMENTAL_TENSOR_API_UTILS_FORMAT_H

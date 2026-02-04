@@ -9,11 +9,11 @@
 */
 
 /*!
- * \file data_copy_intf.h
+ * \file data_copy.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_INTF_H
-#define EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_INTF_H
+#ifndef EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_H
+#define EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_H
 
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy_impl.h"
 
@@ -29,4 +29,4 @@ DataCopy(const T& dst, const U& src, const Coord& coord);
 
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_INTF_H
+#endif // EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_H

@@ -15,7 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_POINTER_IMPL_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_POINTER_IMPL_H
 
-#include "impl/experimental/tensor_api/detail/tensor/hw_ptr.h"
+#include "impl/experimental/tensor_api/detail/tensor/hardware_pointer.h"
 
 namespace AscendC {
 namespace TensorInternal {

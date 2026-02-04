@@ -9,14 +9,14 @@
 */
 
 /*!
- * \file format.h
+ * \file format_impl.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_FORMAT_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_FORMAT_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_FORMAT_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_FORMAT_IMPL_H
 
 #include "include/experimental/tensor_api/tensor/make.h"
-#include "impl/experimental/tensor_api/detail/utils/constant.h"
+#include "impl/experimental/tensor_api/detail/utils/constant_impl.h"
 
 namespace AscendC {
 namespace TensorInternal {
@@ -258,4 +258,4 @@ __aicore__ inline constexpr auto GetHardPos()
 } // namespace TensorInternal
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_FORMAT_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_FORMAT_IMPL_H

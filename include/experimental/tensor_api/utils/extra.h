@@ -9,17 +9,12 @@
 */
 
 /*!
-* \file constant_intf.h
+* \file extra.h
 * \brief
 */
-#ifndef EXPERIMENTAL_TENSOR_API_UTILS_CONSTANT_INTF_H
-#define EXPERIMENTAL_TENSOR_API_UTILS_CONSTANT_INTF_H
+#ifndef EXPERIMENTAL_TENSOR_API_UTILS_EXTRA_H
+#define EXPERIMENTAL_TENSOR_API_UTILS_EXTRA_H
 
-#include "impl/experimental/tensor_api/detail/utils/constant.h"
+#include "impl/experimental/tensor_api/detail/utils/extra_impl.h"
 
-namespace AscendC {
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
-
-}
-
-#endif // EXPERIMENTAL_TENSOR_API_UTILS_CONSTANT_INTF_H
+#endif // EXPERIMENTAL_TENSOR_API_UTILS_EXTRA_H
