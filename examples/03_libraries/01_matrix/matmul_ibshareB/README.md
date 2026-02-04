@@ -78,16 +78,6 @@
           using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
           AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
           ```
-        - 方式三：使用默认的Norm模板CFG_NORM创建Matmul对象。
-          ```
-          #include "lib/matmul_intf.h"
-
-          using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-          using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false>;
-          using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-          using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-          AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
-          ```
       - 初始化操作。
       - 设置左矩阵A、右矩阵B、Bias。
       - 完成矩阵乘操作。
@@ -138,11 +128,10 @@
 
 - 样例执行  
   ```bash
-  # -DMODE=0：使能Norm模板；
-  # -DMODE=1：默认实现。使能IBShare模板；
-  # -DMODE=2：使能纯Cube模式 + IBShareB；
+  # -DMODE=0：默认实现。使能IBShare模板；
+  # -DMODE=1：使能纯Cube模式 + IBShareB；
   mkdir -p build && cd build;    # 创建并进入build目录
-  cmake .. -DMODE=1;make -j;    # 编译工程
+  cmake .. -DMODE=0;make -j;    # 编译工程
   python3 ../scripts/gen_data.py    # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
