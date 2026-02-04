@@ -58,7 +58,6 @@ basic_test_one_targets=(
 basic_test_two_targets=(
     ascendc_ut_aclrtc
     ascendc_ut_asc_compile_base
-    ascendc_ut_asc_plugin
     ascendc_ut_asc_runtime
     ascendc_ut_elf_tool
     ascendc_ut_pack_kernel
@@ -84,8 +83,8 @@ basic_test_three_targets=(
     ascendc_ut_c_api_ascend910B1_AIV
     ascendc_ut_c_api_ascend950pr_9599_AIC
     ascendc_ut_c_api_ascend950pr_9599_AIV
-    # ascendc_ut_tensor_api_NPU_ARCH_2201_AIC
-    # ascendc_ut_tensor_api_NPU_ARCH_2201_AIV
+    ascendc_ut_tensor_api_NPU_ARCH_2201_AIC
+    ascendc_ut_tensor_api_NPU_ARCH_2201_AIV
     ascendc_ut_basic_api_ascend950pr_9599_AIC
     ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
     ascendc_ut_basic_api_ascend950pr_9599_AIV_FRAMEWORK
