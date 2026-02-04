@@ -9,11 +9,11 @@
 */
 
 /*!
-* \file copy_atom.h
+* \file copy_atom_impl.h
 * \brief
 */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_ATOM_IMPL_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_ATOM_IMPL_H
 
 #include "impl/experimental/tensor_api/detail/atom/cube_datamove/copy_traits.h"
 
@@ -54,4 +54,4 @@ __aicore__ inline auto MakeCopy(const Args& ...traits) {
 
 }
 
-#endif // IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
+#endif // IMPL_EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_ATOM_IMPL_H

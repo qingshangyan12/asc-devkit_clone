@@ -9,13 +9,13 @@
 */
 
 /*!
-* \file copy_atom_intf.h
+* \file copy_atom.h
 * \brief
 */
-#ifndef EXPERIMENTAL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_INTF_H
-#define EXPERIMENTAL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_INTF_H
+#ifndef EXPERIMENTAL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
+#define EXPERIMENTAL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
 
-#include "impl/experimental/tensor_api/detail/atom/cube_datamove/copy_atom.h"
+#include "impl/experimental/tensor_api/detail/atom/cube_datamove/copy_atom_impl.h"
 
 namespace AscendC {
 
@@ -30,4 +30,4 @@ __aicore__ inline auto MakeCopy(const Args& ...traits);
 
 }
 
-#endif // EXPERIMENTAL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_INTF_H
+#endif // EXPERIMENTAL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_H
