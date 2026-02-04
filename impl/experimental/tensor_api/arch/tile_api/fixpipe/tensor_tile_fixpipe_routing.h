@@ -18,6 +18,9 @@
 #include "impl/experimental/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_four_dim_2201_l0c_gm.h"
 #include "impl/experimental/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_quant_four_dim_2201_l0c_gm.h"
 
+#include "impl/experimental/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_four_dim_3101_l0c_gm.h"
+#include "impl/experimental/tensor_api/arch/tile_api/fixpipe/tensor_tile_fixpipe_quant_four_dim_3101_l0c_gm.h"
+
 namespace AscendC {
 namespace TileInternal {
 
@@ -40,6 +43,11 @@ struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201, FOU
     using type = FixpipeFourDim2201L0C2GM;
 };
 
+template <>
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V3101, FOUR_DIM_DATA> {
+    using type = FixpipeFourDim3101L0C2GM;
+};
+
 class FixpipeQuantIgnore {
 public:
     template <typename T, typename U, typename V, const FixpipeTrait& trait>
@@ -57,6 +65,11 @@ struct FixpipeQuantTensor2Tensor {
 template <>
 struct FixpipeQuantTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V2201, FOUR_DIM_DATA> {
     using type = FixpipeQuantFourDim2201L0C2GM;
+};
+
+template <>
+struct FixpipeQuantTensor2Tensor<Hardware::GM, Hardware::L0C, ArchVersion::V3101, FOUR_DIM_DATA> {
+    using type = FixpipeQuantFourDim3101L0C2GM;
 };
 } // namespace TileInternal
 } // namespace AscendC
