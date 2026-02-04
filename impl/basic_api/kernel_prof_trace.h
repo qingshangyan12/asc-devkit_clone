@@ -70,4 +70,5 @@ __aicore__ inline void MarkStampImpl()
 }
 #endif
 } // namespace AscendC
+
 #endif // ASCENDC_KERNEL_PROF_TRACE_IMPL_H
