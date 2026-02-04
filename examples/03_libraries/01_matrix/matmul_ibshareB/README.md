@@ -90,7 +90,7 @@
         - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等。
         - 调用GetTiling接口，获取Tiling信息。
 
-  - 核函数
+  - 核函数  
     // 纯Cube模式，指定KERNEL_TYPE_AIC_ONLY。
     ```
     #ifdef ENABLE_CUBE_ONLY
