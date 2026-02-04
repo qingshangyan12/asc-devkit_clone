@@ -15,8 +15,8 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TENSOR_IMPL_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_MAKE_TENSOR_IMPL_H
 
+#include "include/experimental/tensor_api/utils/utils.h"
 #include "include/experimental/tensor_api/tensor/local_tensor.h"
-#include "include/experimental/tensor_api/tensor/engine.h"
 
 namespace AscendC {
 namespace TensorInternal {
@@ -49,6 +49,15 @@ __aicore__ inline constexpr auto MakeTensorImpl(const Iterator& iter, const Args
     static_assert(!(HasDereference<Args>::value && ...), "Expected layout args... in MakeLocalTensor(iter, args...)");
     return MakeLocalTensor<Iterator>{}(iter, args...);
 }
+}
+} // namespace AscendC
+
+// make_tensor.h
+namespace AscendC {
+template <typename Iterator, typename... Args>
+__aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
+{
+    return TensorInternal::MakeTensorImpl<Iterator, Args...>(iter, args...);
 }
 } // namespace AscendC
 

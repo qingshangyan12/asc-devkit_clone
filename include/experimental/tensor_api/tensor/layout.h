@@ -15,9 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_TENSOR_LAYOUT_H
 #define EXPERIMENTAL_TENSOR_API_TENSOR_LAYOUT_H
 
-// struct
-#include "impl/experimental/tensor_api/detail/tensor/static_layout_size.h"
-#include "impl/experimental/tensor_api/detail/tensor/make_stride.h"
+#include "impl/experimental/tensor_api/detail/tensor/basic_algorithm.h"
 
 namespace AscendC {
 template <typename... Shapes>

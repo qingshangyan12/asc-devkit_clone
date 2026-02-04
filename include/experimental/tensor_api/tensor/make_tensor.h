@@ -15,7 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_H
 #define EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_MAKE_TENSOR_H
 
-#include "impl/experimental/tensor_api/detail/tensor/make_tensor.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_tensor_impl.h"
 
 // algorithm 
 namespace AscendC {

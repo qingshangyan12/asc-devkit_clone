@@ -9,22 +9,30 @@
 */
 
 /*!
- * \file make_tensor.h
- * \brief
- */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LOCAL_MAKE_TENSOR_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LOCAL_MAKE_TENSOR_H
+* \file copy_l12l0_traits_impl.h
+* \brief
+*/
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_COPY_L12L0_TRAITS_IMPL_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_COPY_L12L0_TRAITS_IMPL_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
-#include "impl/experimental/tensor_api/detail/tensor/make_tensor_impl.h"
+#include "include/experimental/tensor_api/arch/arch.h"
 
-// algorithm
 namespace AscendC {
-template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
-{
-    return TensorInternal::MakeTensorImpl<Iterator, Args...>(iter, args...);
-}
-} // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_LOCAL_MAKE_TENSOR_H
+struct LoadDataTraitDefault {
+    using TraitType = LoadDataTrait;
+    static constexpr const TraitType value = DEFAULT_LOAD_DATA_TRAIT;
+};
+
+struct CopyL12L0 {
+    template <typename Tp, const Tp& traits, typename... Args>
+    __aicore__ inline static void Copy(const Args& ...args)
+    {
+        LoadData<traits, Args...>(args...);
+    }
+};
+
+}
+
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ATOM_CUBE_DATAMOVE_COPY_COPY_L12L0_TRAITS_IMPL_H

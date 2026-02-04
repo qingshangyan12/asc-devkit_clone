@@ -15,7 +15,68 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_HARDWARE_POINTER_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_HARDWARE_POINTER_H
 
-#include "impl/experimental/tensor_api/detail/tensor/pointer_impl.h"
+#include "include/experimental/tensor_api/utils/utils.h"
+
+// pointer_impl.h
+namespace AscendC {
+namespace TensorInternal{
+
+template <typename Iterator, typename DerivedType>
+struct IterAdaptor
+{
+    using iterator     = Iterator;
+    using reference    = typename TensorInternal::IterRef<iterator>::type; // T&
+    using elementType = typename TensorInternal::IterEle<iterator>::type; // rm_ref
+    using valueType   = typename TensorInternal::IterVal<iterator>::type; // rm_cvf
+
+    __aicore__ inline constexpr IterAdaptor(iterator ptr = {}) : ptr(ptr) {}
+
+    __aicore__ inline constexpr reference operator*() const {
+        return *ptr;
+    }
+
+    template <typename Index>
+    __aicore__ inline constexpr reference operator[](const Index& i) const {
+        return ptr[i];
+    }
+
+    template <typename Index>
+    __aicore__ inline constexpr DerivedType operator+(const Index& i) const {
+        return {ptr + i};
+    }
+
+    __aicore__ inline constexpr iterator Get() const {
+        return ptr; 
+    }
+
+    __aicore__ inline constexpr friend bool operator==(const DerivedType& x, const DerivedType& y) {
+        return x.ptr == y.ptr;
+    }
+
+    __aicore__ inline constexpr friend bool operator!=(const DerivedType& x, const DerivedType& y) {
+        return x.ptr != y.ptr;
+    }
+
+    __aicore__ inline constexpr friend bool operator< (const DerivedType& x, const DerivedType& y) {
+        return x.ptr <  y.ptr; 
+    }
+
+    __aicore__ inline constexpr friend bool operator<=(const DerivedType& x, const DerivedType& y) {
+        return x.ptr <= y.ptr; 
+    }
+
+    __aicore__ inline constexpr friend bool operator> (const DerivedType& x, const DerivedType& y) {
+        return x.ptr >  y.ptr; 
+    }
+
+    __aicore__ inline constexpr friend bool operator>=(const DerivedType& x, const DerivedType& y) {
+        return x.ptr >= y.ptr; 
+    }
+private:
+    iterator ptr; // u8*
+};
+}
+} // namespace AscendC
 
 namespace AscendC {
 namespace TensorInternal {

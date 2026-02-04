@@ -15,9 +15,8 @@
 #ifndef EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_H
 #define EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_H
 
-#include "impl/experimental/tensor_api/detail/tensor/make_layout.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_layout_impl.h"
 
-// algorithm
 namespace AscendC {
 template <typename... Ts>
 __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t);
@@ -72,6 +71,49 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Layout<U, S>& lay
 
 template <typename T, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
+} // namespace AscendC
+
+// make_fractal.h
+namespace AscendC {
+template <typename T>
+__aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeRowMajorLayout(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeColumnMajorLayout(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeZNLayout(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeZZLayout(size_t row, size_t column);
+
+template <typename T, size_t row, size_t column, typename Enable = void>
+struct NZLayoutFormat;
+
+template <typename T, size_t row, size_t column>
+struct NZLayoutFormat<T, row, column, typename Std::enable_if<!Std::is_same_v<T, Std::ignore_t>>::type> {
+    using type = Layout<TensorInternal::NZShapeFormat<T, row, column>, TensorInternal::NZStrideFormat<T, row, column>>;
+};
+
+template <typename T, size_t row, size_t column>
+struct NZLayoutFormat<T, row, column, typename Std::enable_if<Std::is_same_v<T, Std::ignore_t>>::type> {
+    using type = Layout<TensorInternal::NZShapeFormat<uint16_t, row, column>, TensorInternal::NZStrideFormat<uint16_t, row, column>>;
+};
+
+template <typename T, size_t row, size_t column>
+using NDLayoutFormat = Layout<TensorInternal::NDShapeFormat<T, row, column>, TensorInternal::NDStrideFormat<T, row, column>>;
+
+template <typename T, size_t row, size_t column>
+using DNLayoutFormat = Layout<TensorInternal::DNShapeFormat<T, row, column>, TensorInternal::DNStrideFormat<T, row, column>>;
+
+template <typename T, size_t row, size_t column>
+using ZNLayoutFormat = Layout<TensorInternal::ZNShapeFormat<T, row, column>, TensorInternal::ZNStrideFormat<T, row, column>>;
+
+template <typename T, size_t row, size_t column>
+using ZZLayoutFormat = Layout<TensorInternal::ZZShapeFormat<T, row, column>, TensorInternal::ZZStrideFormat<T, row, column>>;
 } // namespace AscendC
 
 #endif // EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_H

@@ -15,7 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_POINTER_H
 #define EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_POINTER_H
 
-#include "impl/experimental/tensor_api/detail/tensor/make_pointer.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_pointer_impl.h"
 
 // algorithm
 namespace AscendC {

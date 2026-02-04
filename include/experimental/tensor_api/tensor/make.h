@@ -15,7 +15,6 @@
 #ifndef EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_H
 #define EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_H
 
-#include "include/experimental/tensor_api/tensor/make_fractal.h"
 #include "include/experimental/tensor_api/tensor/make_layout.h"
 #include "include/experimental/tensor_api/tensor/make_pointer.h"
 #include "include/experimental/tensor_api/tensor/make_tensor.h"

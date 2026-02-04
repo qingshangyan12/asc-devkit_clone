@@ -15,7 +15,6 @@
 #ifndef EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 #define EXPERIMENTAL_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 
-// struct
 #include "include/experimental/tensor_api/tensor/engine.h"
 #include "include/experimental/tensor_api/tensor/layout.h"
 
