@@ -58,10 +58,10 @@ public:
     __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& tensor) {}
 
     /**
-     * @description: if is quant senario
-     * @return: quant senario or not
+     * @description: if is quant scenario
+     * @return: quant scenario or not
      */
-    __aicore__ inline bool IsQuantSenario()
+    __aicore__ inline bool IsQuantScenario()
     {
         return false;
     }
@@ -105,7 +105,7 @@ public:
      * @description: Get the flag to district scalar or vector quant mode
      * @return: void
      */
-    __aicore__ inline bool IsPerChannelSenario()
+    __aicore__ inline bool IsPerChannelScenario()
     {
         return false;
     }
