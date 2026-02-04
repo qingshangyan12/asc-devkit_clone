@@ -31,7 +31,7 @@ namespace Detail {
 template <typename IMPL, class A_TYPE, class B_TYPE, class C_TYPE, const auto &MM_CFG, McgShfMode FIXPIPE_MODE,
     template <class INPUT_TYPE, class OUTPUT_TYPE, typename T = void> class CopyOut>
 class CopyCubeOut<IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, FIXPIPE_MODE,
-    enable_if_t<!AscendC::Impl::Detail::IsQuantSenario<typename C_TYPE::T, typename A_TYPE::T>()>,
+    enable_if_t<!AscendC::Impl::Detail::IsQuantScenario<typename C_TYPE::T, typename A_TYPE::T>()>,
     CopyOut> {
     using DstT = typename C_TYPE::T;
     using SrcT = typename GetMmDstType<typename A_TYPE::T>::Type;
@@ -77,7 +77,7 @@ public:
 template <typename IMPL, class A_TYPE, class B_TYPE, class C_TYPE, const auto &MM_CFG, McgShfMode FIXPIPE_MODE,
     template <class INPUT_TYPE, class OUTPUT_TYPE, typename T = void> class CopyOut>
 class CopyCubeOut<IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, FIXPIPE_MODE,
-    enable_if_t<AscendC::Impl::Detail::IsQuantSenario<typename C_TYPE::T, typename A_TYPE::T>()>,
+    enable_if_t<AscendC::Impl::Detail::IsQuantScenario<typename C_TYPE::T, typename A_TYPE::T>()>,
     CopyOut> {
     using DstT = typename C_TYPE::T;
     using SrcT = typename GetMmDstType<typename A_TYPE::T>::Type;
@@ -97,7 +97,7 @@ public:
         const ScheduleContext &context = 0)
     {
         CopyOut<A_TYPE, C_TYPE> copyOut;
-        if (MATMUL_MODULE(MatmulQuantProcessor)->IsPerChannelSenario()) {
+        if (MATMUL_MODULE(MatmulQuantProcessor)->IsPerChannelScenario()) {
             LocalTensor<uint64_t> quantTensor;
             MATMUL_MODULE(MatmulQuantProcessor)->CopyQuantTensor(quantTensor, curCol, baseWidth);
             copyOut(gm, co1Local, curRow, curCol, baseHeight, baseWidth,

@@ -93,7 +93,7 @@ __aicore__ inline void DataCachePreloadImpl(const GlobalTensor<uint64_t> &src, c
         dc_preload((__gm__ uint64_t *)src.GetPhyAddr(), cacheOffset);
     } else {
         ASCENDC_ASSERT(false, {
-            KERNEL_LOG(KERNEL_ERROR, "cacheOffset only supporte int16_t and int64_t on current device"); });
+            KERNEL_LOG(KERNEL_ERROR, "cacheOffset only support int16_t and int64_t on current device"); });
     }
 }
 
