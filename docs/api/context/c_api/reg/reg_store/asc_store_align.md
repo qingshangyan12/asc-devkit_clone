@@ -9,7 +9,7 @@
 ## 功能说明
 
 对齐数据搬出接口，从源操作数连续对齐搬出到UB，支持多种搬入模式。
-- asc_storealign（入参带uint16_t repeat_stride）：用户自定义单次迭代内不同DataBlock间的步长以及相邻迭代间的地址步长，其余功能与asc_storealign(入参不带uint16_t repeat_stride)相同。
+- asc_storealign（入参带uint16_t repeat_stride）：用户自定义单次迭代内不同DataBlock间的步长以及相邻迭代间的地址步长，其余功能与asc_storealign（入参不带uint16_t repeat_stride）相同。
 - asc_storealign_postupdate（入参带uint16_t repeat_stride）：用户自定义单次迭代内不同DataBlock间的步长以及相邻迭代间的地址步长，同时开启硬件自动Post Update模式，UB地址同时作为输入和输出，每次调用会更新。
 
 

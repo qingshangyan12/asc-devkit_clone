@@ -11,6 +11,7 @@
 ## 功能说明
 
 在AI Core内部，Scalar单元和DMA单元都可能对Global Memory进行访问。
+
 ![](../figures/dcci.png "DataCache内存层次示意图") \\
 
 如上图所示：
@@ -40,6 +41,7 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
    ```
    
 <cann-filter npu_type = "950">
+
    ```cpp
    // 刷新传入地址所在的单个Cache Line
    __aicore__ inline void asc_dcci_single(__gm__ void* dst)
@@ -52,7 +54,9 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
    __aicore__ inline void asc_dcci_entire_out(__gm__ void* dst)
    __aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst)
    ```
+
 </cann-filter>
+
 
 ## 参数说明
 
@@ -71,7 +75,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+针对Ascend 950PR/Ascend 950DT 不支持asc_dcci_single_ub、asc_dcci_entire_ub接口。
 
 ## 调用示例
 
