@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示了基于FasterGeluV2高阶API实现的算子实现。样例采用的FastGeluV2版本能降低GELU的算力需求。
+本样例演示了基于FasterGeluV2高阶API实现的算子实现。样例采用的FastGeluV2版本能降低Gelu的算力需求。
 
 ## 支持的产品
 
@@ -24,7 +24,7 @@
 ## 算子描述
 
 - 算子功能：  
-  在神经网络中，GELU是一个重要的激活函数，其灵感来源于relu和dropout，在激活中引入了随机正则的思想。为了降低GELU的算力需求，业界提出了FastGeluV2版本。本接口实现了FastGeluV2。
+  在神经网络中，Gelu是一个重要的激活函数，其灵感来源于relu和dropout，在激活中引入了随机正则的思想。为了降低Gelu的算力需求，业界提出了FastGeluV2版本。本接口实现了FastGeluV2。
 
   计算公式如下：
   $$dstLocal_i = FasterGeluV2(srcLocal_i)$$

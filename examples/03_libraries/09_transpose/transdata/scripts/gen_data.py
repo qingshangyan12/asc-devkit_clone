@@ -27,11 +27,9 @@ class TransDataMode(Enum):
 
 def gen_golden_data_simple():
     dtype = np.float16
-
     np.random.seed(123)
     np.set_printoptions(threshold=sys.maxsize)
     np.set_printoptions(linewidth=32)
-
     mode = 1
     n = 16
     c = 16
@@ -41,7 +39,6 @@ def gen_golden_data_simple():
     n0 = 16
     c0 = 16
     hw0 = 16
-
     n1 = (n + n0 - 1) // n0
     c1 = (c + c0 - 1) // c0
 
@@ -116,6 +113,7 @@ def gen_golden_data_simple():
         dst_array = ncdhw_array
         src_array.tofile("./input/input_src.bin")
         dst_array.flatten().tofile("./output/golden.bin")
+
 
 if __name__ == "__main__":
     gen_golden_data_simple()
