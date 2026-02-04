@@ -56,7 +56,7 @@ Fixpipe(const T& dst, const U& src)
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename TileInternal::FixpipeTensor2Tensor<dstTPos, srcTPos,
         TileInternal::CURRENT_ARCH_VERSION,TileInternal::FOUR_DIM_DATA>::type;
-    Tensor2Tensor{}.template Run<T, U, trait>(dst, src);
+    Tensor2Tensor{}.template Run<trait, T, U>(dst, src);
 }
 
 template <const FixpipeTrait& trait, typename T, typename U, typename V>
@@ -67,7 +67,7 @@ Fixpipe(const T& dst, const U& src, const V& quant)
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename TileInternal::FixpipeQuantTensor2Tensor<dstTPos, srcTPos,
         TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
-    Tensor2Tensor{}.template Run<T, U, V, trait>(dst, src, quant);
+    Tensor2Tensor{}.template Run<trait, T, U, V>(dst, src, quant);
 }
 
 template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
@@ -78,7 +78,7 @@ Fixpipe(const T& dst, const U& src, const Coord& coord)
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename TileInternal::FixpipeTensor2Tensor<dstTPos, srcTPos,
         TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
-    Tensor2Tensor{}.template Run<T, U, trait, Coord>(dst, src, coord);
+    Tensor2Tensor{}.template Run<trait, T, U, Coord>(dst, src, coord);
 }
 
 template <const FixpipeTrait& trait, typename T, typename U, typename V,  typename Coord>
@@ -89,7 +89,7 @@ Fixpipe(const T& dst, const U& src, const V& quant, const Coord& coord)
     constexpr Hardware srcTPos = TileInternal::GetHardPos<U>();
     using Tensor2Tensor = typename TileInternal::FixpipeQuantTensor2Tensor<dstTPos, srcTPos,
         TileInternal::CURRENT_ARCH_VERSION, TileInternal::FOUR_DIM_DATA>::type;
-    Tensor2Tensor{}.template Run<T, U, V, trait, Coord>(dst, src, quant, coord);
+    Tensor2Tensor{}.template Run<trait, T, U, V, Coord>(dst, src, quant, coord);
 }
 } // namespace AscendC
 

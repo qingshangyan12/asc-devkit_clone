@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
 #include "impl/experimental/tensor_api/tensor_api_impl.h"
+#include <mockcpp/mockcpp.hpp>
 
 class Tensor_Api_LoadData : public testing::Test {
 protected:
@@ -40,7 +41,15 @@ TEST_F(Tensor_Api_LoadData, LoadDataL1ToL0aNzToZzOperation)
     LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0aTensor, aTensor);
 
     auto coord = MakeCoord(MakeCoord(Std::Int<0>{}, Std::Int<0>{}), MakeCoord(Std::Int<0>{}, Std::Int<0>{}) );
+    
+    MOCKER_CPP(img2colv2_cbuf_to_ca, void(__ca__ float *,__cbuf__ float *,
+                uint16_t, uint16_t, uint16_t, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, 
+                uint8_t, uint8_t, bool, bool, bool, bool, uint16_t))
+            .times(1)
+            .will(invoke(cce_name##_##data_type##_##data_type##_##data_type##_uint64_t_Stub));
     LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0aTensor, aTensor, coord);
+
+    GlobalMockObject::verify();
 }
 
 TEST_F(Tensor_Api_LoadData, LoadDataL1ToL0aZnToZzOperation)

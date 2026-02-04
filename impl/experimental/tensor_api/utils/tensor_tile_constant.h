@@ -36,6 +36,7 @@ constexpr size_t FRACTAL_FIXED = 16;
 constexpr size_t DISABLE_COORD = 0;
 constexpr size_t ENABLE_COORD = 1;
 constexpr size_t SHIFT_LEFT_16 = 0x00010000;
+constexpr size_t L2_CACHE_OFFSET = 60;
 
 template <QuantMode_t Value, QuantMode_t... Args>
 struct is_one_of_value : Std::false_type {};
@@ -83,6 +84,11 @@ using IsVectorQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_TENSOR_QUAN
 
 template <QuantMode_t quantPre>
 using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
+
+template <typename T>
+__aicore__ inline uint8_t GetCacheModeFromTensor(__gm__ T* addr) {
+    return static_cast<uint8_t>(((uint64_t)addr) >> L2_CACHE_OFFSET);
+}
 }
 }
 
