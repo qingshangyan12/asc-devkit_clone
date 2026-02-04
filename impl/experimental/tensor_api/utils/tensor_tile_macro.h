@@ -213,4 +213,18 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define ASCEND_IS_NOT_AIC constexpr(g_coreType != AscendC::AIC)
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+    using fp4x2_e2m1_t = float4_e2m1x2_t;
+    using fp4x2_e1m2_t = float4_e1m2x2_t;
+    using fp8_e5m2_t = float8_e5m2_t;
+    using fp8_e4m3fn_t = float8_e4m3_t;
+    using fp8_e8m0_t = float8_e8m0_t;
+#else
+    using fp4x2_e2m1_t = uint8_t;
+    using fp4x2_e1m2_t = uint8_t;
+    using fp8_e5m2_t = uint8_t;
+    using fp8_e4m3fn_t = uint8_t;
+    using fp8_e8m0_t = uint8_t;
+#endif
+
 #endif //IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_MACRO_H

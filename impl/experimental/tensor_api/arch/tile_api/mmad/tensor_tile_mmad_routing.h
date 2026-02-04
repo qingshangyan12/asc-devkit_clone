@@ -52,6 +52,24 @@ struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::
     using type = MmadWithBiasFourDim2201;
 };
 
+template<>
+struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::MAX, ArchVersion::V3101, FOUR_DIM_DATA>
+{
+    using type = MmadFourDim3101;
+};
+
+template<>
+struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::L0C, ArchVersion::V3101, FOUR_DIM_DATA>
+{
+    using type = MmadWithBiasFourDim3101;
+};
+
+template<>
+struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::BIAS, ArchVersion::V3101, FOUR_DIM_DATA>
+{
+    using type = MmadWithBiasFourDim3101;
+};
+
 } // namespace TileInternal
 } // namespace AscendC
 
