@@ -42,12 +42,12 @@ void set_deqscale_float_int16_t_bool_Stub(uint64_t config)
 
 TEST_F(TestSetDeqScale, set_deqscale_ubuf_float_int16_t_bool_arr_Succ)
 {
-    constexpr uint8_t ASC_VDEQ_SZIE = 16;
-    std::vector<uint64_t> tmp_vec(ASC_VDEQ_SZIE);
+    constexpr uint8_t ASC_VDEQ_SIZE = 16;
+    std::vector<uint64_t> tmp_vec(ASC_VDEQ_SIZE);
     __ubuf__ uint64_t* tmp = tmp_vec.data();
-    float scale_arr[ASC_VDEQ_SZIE] = {0};
-    int16_t offset_arr[ASC_VDEQ_SZIE] = {0};
-    bool sign_mode_arr[ASC_VDEQ_SZIE] = {true};
+    float scale_arr[ASC_VDEQ_SIZE] = {0};
+    int16_t offset_arr[ASC_VDEQ_SIZE] = {0};
+    bool sign_mode_arr[ASC_VDEQ_SIZE] = {true};
     MOCKER_CPP(set_deqscale, void(uint64_t))
         .times(1)
         .will(invoke(set_deqscale_ubuf_float_int16_t_bool_arr_Stub));
