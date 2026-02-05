@@ -67,6 +67,30 @@ __aicore__ inline uint64_t asc_debug_get_block_idx_impl()
     return get_block_idx();
 #endif
 }
+
+__aicore__ inline void sync_all_impl()
+{
+    pipe_barrier(pipe_t::PIPE_ALL);
+}
+
+template<typename T>
+__aicore__ inline void mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
+{
+
+}
+
+template<typename T>
+__aicore__ inline void mem_copy_l1buf_to_gm_impl(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
+{
+    
+}
+
+template<typename T>
+__aicore__ inline void mem_copy_ub_to_gm_impl(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
+{
+    copy_ubuf_to_gm(reinterpret_cast<__gm__ void*>(dst), reinterpret_cast<__gm__ void*>(src), 0, 1, len, 0, 0);
+}
+
 } // namespace __asc_aicore
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
