@@ -172,7 +172,7 @@ uint32_t aclrtlaunch_hello_world<45>(uint32_t numBlocks, void* stream)
     AllocAscendMemDevice(&(__ascendc_args.__ascendc_overflow), __ascendc_overflow_status_size);
 
     const char *__ascendc_name = "hello_world";
-    __ascendc_ret = launch_and_profiling_hello_world(1000000, , stream, (void **)&__ascendc_args, sizeof(__ascendc_args));
+    __ascendc_ret = launch_and_profiling_hello_world(1000000, numBlocks, stream, (void **)&__ascendc_args, sizeof(__ascendc_args));
     KernelHandleGradUnregister::GetInstance();
 #if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON
     Adx::AdumpPrintWorkSpace(__ascendc_args.__ascendc_dump, __ascendc_one_core_dump_size * 75, stream, __ascendc_name);
