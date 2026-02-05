@@ -33,11 +33,26 @@
 #include "kernel_fp16.h"
 #endif
 
+
 namespace AscendC {
 class TPipe;
+<<<<<<< HEAD
 
 template <typename T>
 class GlobalTensor;
+=======
+class KfcCommClient;
+
+enum class HF32Mode {
+    ENABLE,
+    DISABLE
+};
+
+enum class HF32TransMode {
+    NEAREST_ZERO,
+    NEAREST_EVEN
+};
+>>>>>>> 937be193 (restore include for basic api rename)
 } // namespace AscendC
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
