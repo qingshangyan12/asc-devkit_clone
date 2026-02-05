@@ -12,12 +12,16 @@
  * \file data_copy_routing.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_ROUTING_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_ROUTING_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_DATA_COPY_ROUTING_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_DATA_COPY_ROUTING_H
 
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_2201/data_copy_four_dim_2201_gm_l1.h"
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_2201/data_copy_four_dim_2201_l1_bt.h"
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_2201/data_copy_four_dim_2201_l1_fb.h"
+
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_four_dim_3510_gm_l1.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_four_dim_3510_l1_bt.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_four_dim_3510_l1_fb.h"
 
 namespace AscendC {
 namespace TensorInternal {
@@ -47,7 +51,22 @@ template <>
 struct DataCopyTensor2Tensor<Hardware::FIXBUF, Hardware::L1, ArchVersion::V2201, FOUR_DIM_DATA> {
     using type = CopyCbufToFB2201;
 };
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::L1, Hardware::GM, ArchVersion::V3510, FOUR_DIM_DATA> {
+    using type = DataCopyFourDim3510GM2L1;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::BIAS, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA> {
+    using type = CopyCbufToBT3510;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::FIXBUF, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA> {
+    using type = CopyCbufToFB3510;
+};
 } // namespace TensorInternal
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_ROUTING_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_DATA_COPY_ROUTING_H

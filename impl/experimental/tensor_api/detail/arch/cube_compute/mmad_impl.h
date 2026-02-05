@@ -15,7 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_IMPL_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_IMPL_H
 
-#include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad/npu_arch_2201/mmad_routing.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad/mmad_routing.h"
 
 namespace AscendC {
 

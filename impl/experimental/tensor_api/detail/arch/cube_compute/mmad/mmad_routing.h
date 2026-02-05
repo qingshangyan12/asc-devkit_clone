@@ -12,11 +12,14 @@
  * \file mmad_routing.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_ROUTING_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_ROUTING_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_MMAD_ROUTING_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_MMAD_ROUTING_H
 
 #include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad/npu_arch_2201/mmad_four_dim_2201.h"
 #include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad/npu_arch_2201/mmad_with_bias_four_dim_2201.h"
+
+#include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad/npu_arch_3510/mmad_four_dim_3510.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_compute/mmad/npu_arch_3510/mmad_with_bias_four_dim_3510.h"
 
 namespace AscendC {
 namespace TensorInternal {
@@ -52,7 +55,24 @@ struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::
     using type = MmadWithBiasFourDim2201;
 };
 
+template<>
+struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::MAX, ArchVersion::V3510, FOUR_DIM_DATA>
+{
+    using type = MmadFourDim2201;
+};
+
+template<>
+struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::L0C, ArchVersion::V3510, FOUR_DIM_DATA>
+{
+    using type = MmadWithBiasFourDim3510;
+};
+
+template<>
+struct MmadTensor2Tensor<Hardware::L0C, Hardware::L0A, Hardware::L0B, Hardware::BIAS, ArchVersion::V3510, FOUR_DIM_DATA>
+{
+    using type = MmadWithBiasFourDim3510;
+};
 } // namespace TensorInternal
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_ROUTING_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_MMAD_ROUTING_H
