@@ -26,7 +26,7 @@ namespace Impl {
 namespace Detail {
 
 template <typename IMPL, class A_TYPE, class C_TYPE, const auto& MM_CFG>
-class MatmulQuantProcessor<IMPL, A_TYPE, C_TYPE, MM_CFG, enable_if_t<(IsQuantSenario<typename C_TYPE::T, typename A_TYPE::T>() &&
+class MatmulQuantProcessor<IMPL, A_TYPE, C_TYPE, MM_CFG, enable_if_t<(IsQuantScenario<typename C_TYPE::T, typename A_TYPE::T>() &&
     MatmulFeatureTrait<MM_CFG>::IsNeedUB())>>
 {
     using SrcT = typename A_TYPE::T;
@@ -96,12 +96,12 @@ public:
         quantTensor_ = quantTensor_[idx];
     }
 
-    __aicore__ inline bool IsPerChannelSenario()
+    __aicore__ inline bool IsPerChannelScenario()
     {
         return false;
     }
 
-    __aicore__ inline bool IsPerTensorSenario()
+    __aicore__ inline bool IsPerTensorScenario()
     {
         return false;
     }
