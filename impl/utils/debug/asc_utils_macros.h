@@ -25,6 +25,9 @@
 #define __aicore__ [aicore]
 #endif // __aicore__
 
+#ifndef K_MAX_SHAPE_DIM
+#define K_MAX_SHAPE_DIM 8
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_UTILS_MACROS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

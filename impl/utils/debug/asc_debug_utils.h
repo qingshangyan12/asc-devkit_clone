@@ -90,6 +90,48 @@ __aicore__ inline uint32_t get_cstring_len(__gm__ const char* s)
     return i + 1;
 }
 
+__aicore__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
+{
+    return (a + b - 1) / b;
+}
+
+__aicore__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b)
+{
+    return div_ceil(a, b) * b;
+}
+
+__aicore__ inline void sync_all()
+{
+    sync_all_impl();
+}
+
+// template<typename T>
+// __aicore__ inline void mem_copy_cbuf_to_gm(__gm__ T* dst, __cc__ T* src, const uint32_t& len)
+// {
+//     if (dst == nullptr || src == nullptr) {
+//         return;
+//     }
+//     mem_copy_cbuf_to_gm_impl(dst, src, len);
+// }
+
+// template<typename T>
+// __aicore__ inline void mem_copy_l1buf_to_gm(__gm__ T* dst, __cbuf__ T* src, const uint32_t& len)
+// {
+//     if (dst == nullptr || src == nullptr) {
+//         return;
+//     }
+//     mem_copy_l1buf_to_gm_impl(dst, src, len);
+// }
+
+// template<typename T>
+// __aicore__ inline void mem_copy_ub_to_gm(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
+// {
+//     if (dst == nullptr || src == nullptr) {
+//         return;
+//     }
+//     mem_copy_ub_to_gm_impl(dst, src, len);
+// }
+
 __aicore__ inline void mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
 {
     if (dst == nullptr || src == nullptr)
@@ -219,6 +261,13 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
     }
     return true;
 }
+
+template <typename T>
+__aicore__ constexpr inline DumpTensorDataType get_dump_datatype()
+{
+    return get_dump_datatype_impl<T>();
+}
+
 } // namespace __asc_aicore
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__)

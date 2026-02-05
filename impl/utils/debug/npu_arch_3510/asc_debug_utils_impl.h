@@ -53,12 +53,13 @@ __aicore__ inline uint32_t asc_debug_get_core_idx_impl()
 
 __aicore__ inline uint64_t asc_debug_get_block_idx_impl()
 {
-#if defined(SPLIT_CORE_VEC)
+#if defined(__DAV_VEC__)
     return get_block_idx() * bisheng::cce::get_subblockdim() + bisheng::cce::get_subblockid();
-#else // SPLIT_CORE_CUBE(3510 is split)
+#else
     return get_block_idx();
 #endif
 }
+
 }
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
