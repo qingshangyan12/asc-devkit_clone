@@ -61,7 +61,7 @@ private:
         CheckNDTemplate<T>();
         constexpr TPosition srcTPos = T::tPos;
         static_assert(srcTPos == TPosition::C1, "The logical position of quant must be C1");
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<srcType, uint64_t>, "The source data type is not supported.");
 #endif
     }
