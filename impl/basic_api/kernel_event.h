@@ -20,6 +20,8 @@
 #include "common_types.h"
 #if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
 #include <cstdint>
+#endif
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include "stub_def.h"
 #include "stub_fun.h"
 #endif
