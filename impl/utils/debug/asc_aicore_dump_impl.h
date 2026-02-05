@@ -1,0 +1,107 @@
+/**
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/*!
+ * \file asc_aicore_dump_impl.h
+ * \brief
+ */
+#ifndef IMPL_UTILS_DEBUG_ASC_AICORE_DUMP_IMPL_H
+#define IMPL_UTILS_DEBUG_ASC_AICORE_DUMP_IMPL_H
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_DUMP_IMPL__
+#warning "asc_aicore_dump_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
+#endif
+
+#include "impl/utils/debug/asc_utils_macros.h"
+#include "impl/utils/debug/asc_debug_types.h"
+#include "impl/utils/debug/asc_debug_utils.h"
+
+namespace __asc_aicore {
+
+template <AscendC::Hardware hardware, typename T, typename U>
+__aicore__ inline void set_dump_tlv_info(U src, __gm__ DumpTensorTlv* dumpTlv, uint32_t alignDumpLen, uint32_t desc, uint32_t dumpSize)
+{
+    dumpTlv->type = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
+    dumpTlv->length = sizeof(DumpTensorTlv) - sizeof(uint32_t[2]) + alignDumpLen;
+    dumpTlv->tensorAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src));
+    dumpTlv->dataType = static_cast<uint32_t>(get_dump_datatype<T>());
+    dumpTlv->desc = desc;
+    dumpTlv->blockIdx = static_cast<uint32_t>(asc_debug_get_block_idx());
+    dumpTlv->bufferId = static_cast<uint32_t>(0U);
+    dumpTlv->position = static_cast<uint16_t>(hardware);
+    dumpTlv->resv0 = static_cast<uint16_t>(0U);
+    dumpTlv->dim = static_cast<uint32_t>(0U);
+    for (uint32_t i = 0; i < K_MAX_SHAPE_DIM; ++i) {
+        dumpTlv->shape[i] = static_cast<uint32_t>(0U);
+    }
+    dumpTlv->resv1 = static_cast<uint32_t>(0U);
+    dumpTlv->dumpSize = dumpSize * sizeof(T);
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(dumpTlv));
+}
+
+template <AscendC::Hardware hardware, typename T, typename U>
+__aicore__ inline void set_dump_tlv_data(U src, __gm__ DumpTensorTlv* dumpTlv, uint32_t alignDumpLen, uint32_t dumpSize)
+{
+    __gm__ T* dumpDstAddr = reinterpret_cast<__gm__ T*>(dumpTlv + 1);
+    if (dumpDstAddr == nullptr || src == nullptr) {
+        return;
+    }
+    sync_all();
+    uint32_t dumpLen = 0;
+    if constexpr (hardware == AscendC::Hardware::GM) {
+        dumpLen = dumpSize * sizeof(T);
+        mem_copy_gm_to_gm(dumpDstAddr, src, dumpLen);
+    } else if constexpr (hardware == AscendC::Hardware::UB) {
+        dumpLen = alignDumpLen / ASC_ONE_DATABLOCK_SIZE;
+        mem_copy_ub_to_gm(dumpDstAddr, src, static_cast<uint16_t>(dumpLen));
+    } else if constexpr (hardware == AscendC::Hardware::L1) {
+        dumpLen = alignDumpLen / ASC_ONE_DATABLOCK_SIZE;
+        mem_copy_l1buf_to_gm(dumpDstAddr, src, static_cast<uint16_t>(dumpLen));
+    } else if constexpr (hardware == AscendC::Hardware::L0C) {
+        dumpLen = alignDumpLen / ASC_ONE_DATABLOCK_SIZE;
+        mem_copy_cbuf_to_gm(dumpDstAddr, src, static_cast<uint16_t>(dumpLen));
+    }
+    sync_all();
+}
+
+template <AscendC::Hardware hardware, typename T, typename U>
+__aicore__ inline void asc_dump_impl(U src, uint32_t desc, uint32_t dumpSize)
+{
+    static_assert((get_dump_datatype<T>() != DumpTensorDataType::ACL_MAX), "dump tensor not support this data type\n");
+    __gm__ DebugBlockHeadInfo* blockInfo = get_block_info();
+    if (dumpSize <= 0 || blockInfo == nullptr) {
+        return;
+    }
+    constexpr uint16_t dataBlockSize = 32;
+    uint32_t alignDumpLen = align_up(dumpSize * sizeof(T), dataBlockSize);
+    uint32_t tlvLen = sizeof(DumpTensorTlv) + alignDumpLen;
+    if (!check_ringbuf_space(blockInfo, tlvLen)) {
+        return;
+    }
+    
+    __gm__ DumpTensorTlv* dumpTlv = reinterpret_cast<__gm__ DumpTensorTlv*>(get_ringbuf_tlv_addr(blockInfo));
+
+    set_dump_tlv_info<hardware, T>(src, dumpTlv, alignDumpLen, desc, dumpSize);
+    set_dump_tlv_data<hardware, T>(src, dumpTlv, alignDumpLen, desc, dumpSize);
+
+    __gm__ DebugBlockWriteInfo* writeInfo = get_block_write_info(blockInfo);
+    update_write_info(writeInfo, tlvLen);
+}
+
+}
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_DUMP_IMPL__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_DUMP_IMPL__
+#endif
+
+#endif // IMPL_UTILS_DEBUG_ASC_AICORE_DUMP_IMPL_H
