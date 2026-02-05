@@ -39,24 +39,6 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
    __aicore__ inline void asc_dcci_entire_out(__gm__ void* dst)
    __aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst)
    ```
-   
-<cann-filter npu_type = "950">
-
-   ```cpp
-   // 刷新传入地址所在的单个Cache Line
-   __aicore__ inline void asc_dcci_single(__gm__ void* dst)
-   __aicore__ inline void asc_dcci_single_all(__gm__ void* dst)
-   __aicore__ inline void asc_dcci_single_out(__gm__ void* dst)
-   __aicore__ inline void asc_dcci_single_atomic(__gm__ void* dst)
-   // 刷新所有Cache Line
-   __aicore__ inline void asc_dcci_entire(__gm__ void* dst)
-   __aicore__ inline void asc_dcci_entire_all(__gm__ void* dst)
-   __aicore__ inline void asc_dcci_entire_out(__gm__ void* dst)
-   __aicore__ inline void asc_dcci_entire_atomic(__gm__ void* dst)
-   ```
-
-</cann-filter>
-
 
 ## 参数说明
 
@@ -77,7 +59,7 @@ PIPE_S
 
 ## 约束说明
 
-针对Ascend 950PR/Ascend 950DT 不支持asc_dcci_single_ub、asc_dcci_entire_ub接口。
+针对Ascend 950PR/Ascend 950DT，不支持asc_dcci_single_ub、asc_dcci_entire_ub接口。
 
 </cann-filter>
 
