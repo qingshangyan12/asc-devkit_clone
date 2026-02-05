@@ -73,9 +73,13 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
 PIPE_S
 
 
+<cann-filter npu_type = "950">
+
 ## 约束说明
 
 针对Ascend 950PR/Ascend 950DT 不支持asc_dcci_single_ub、asc_dcci_entire_ub接口。
+
+</cann-filter>
 
 ## 调用示例
 

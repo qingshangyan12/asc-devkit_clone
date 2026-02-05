@@ -51,9 +51,6 @@ uint32_t loop2_dst_stride = 288;
 asc_set_ub2gm_loop_size(loop1_size, loop2_size);
 asc_set_ub2gm_loop1_stride(loop1_src_stride, loop1_dst_stride);
 asc_set_ub2gm_loop2_stride(loop2_src_stride, loop2_dst_stride);
-//total_length指参与搬运的数据总长度。dst是外部输入的uint8_t类型的GM内存。
-constexpr uint64_t total_length = 128;
-__ubuf__ uint8_t src[total_length];
-asc_copy_ub2gm_align(dst, src, total_length * sizeof(uint8_t));
+asc_copy_ub2gm_align(dst, src, size);
 asc_set_ub2gm_loop_size(1, 1);
 ```
