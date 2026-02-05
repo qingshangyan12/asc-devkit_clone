@@ -43,7 +43,7 @@ __aicore__ inline auto MakeTensorWithCoord(const T& oldTensor, const Coord& coor
     auto oldTensorLayout = oldTensor.Layout();
     auto index = Crd2Idx(coord, oldTensorLayout);
     using oldTensorType = typename T::elementType;
-    constexpr Hardware oldTensorPos = TileInternal::GetHardPos<T>();
+    constexpr Hardware oldTensorPos = TensorInternal::GetHardPos<T>();
     auto oldTensorIterator = MakeMemPtr<oldTensorPos>(reinterpret_cast<oldTensorType *>(oldTensor.Data().Get() + offset + index));
     auto oldTensorMatrixLayout = MakeLayout(oldTensorLayout.GetShape(), oldTensorLayout.GetStride());
     auto newTensor = MakeTensor(oldTensorIterator, oldTensorMatrixLayout); 
@@ -126,7 +126,7 @@ private:
     {
         using srcType = typename T::elementType;
         CheckNDTemplate<T>();
-        constexpr Hardware srcTPos = TileInternal::GetHardPos<T>();
+        constexpr Hardware srcTPos = TensorInternal::GetHardPos<T>();
         static_assert(srcTPos == Hardware::L1, "The hardware of quant must be L1");
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
         static_assert(Std::is_one_of_v<srcType, __cbuf__ uint64_t>, "The source data type is not supported.");
