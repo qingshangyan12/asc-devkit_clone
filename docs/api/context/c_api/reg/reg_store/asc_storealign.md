@@ -15,8 +15,6 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬�
 - PACK搬出模式：压缩模式，根据mask将src中有效元素的低半部分bit数据连续存储于dst_align32b中，支持数据类型为b16、b32、b64。
 - PACKV2搬出模式：压缩模式，根据mask将src中有效元素的低8bits数据连续存储于dst_align32b中，支持数据类型为b32。
 - INTLV搬出模式：双搬出模式，忽略mask，将src0，src1中的元素交错存储于dst中，存储长度为VL*2。
-- asc_storealign（入参带uint16_t repeat_stride）：用户自定义单次迭代内不同DataBlock间的步长以及相邻迭代间的地址步长，其余功能与asc_storealign（入参不带uint16_t repeat_stride）相同。
-- asc_storealign_postupdate（入参带uint16_t repeat_stride）：用户自定义单次迭代内不同DataBlock间的步长以及相邻迭代间的地址步长，同时开启硬件自动Post Update模式，UB地址同时作为输入和输出，每次调用会更新。
 
 ## 函数原型
 
@@ -152,34 +150,6 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬�
     __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1, iter_reg offset)
     __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src0, vector_fp4x2_e2m1_t src1, iter_reg offset)
     __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src0, vector_fp4x2_e1m2_t src1, iter_reg offset)
-
-    // repeat stride模式搬出
-    __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst_align32b, vector_int8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst_align32b, vector_uint8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ int16_t* dst_align32b, vector_int16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ int32_t* dst_align32b, vector_int32_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ half* dst_align32b, vector_half src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign(__ubuf__ float* dst_align32b, vector_float src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-
-    // repeat stride模式搬出，同时开启硬件自动Post Update模式
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int8_t* dst_align32b, vector_int8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t* dst_align32b, vector_uint8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int16_t* dst_align32b, vector_int16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int32_t* dst_align32b, vector_int32_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ half* dst_align32b, vector_half src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-    __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ float* dst_align32b, vector_float src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
     ```
 
 ## 参数说明
@@ -192,16 +162,6 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬�
 | src1 | 输入 | 源操作数1（矢量数据寄存器）。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 | offset | 输入 | 地址寄存器，存储地址偏移量。 |
-
-- repeat stride模式写出
-
-    | 参数名  | 输入/输出 | 描述 |
-    | :----- | :------- | :------- |
-    | dst_align32b | 输出 | 目的操作数（矢量）的起始地址。 |
-    | src | 输入 | 源操作数（矢量数据寄存器）。 |
-    | block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
-    | repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
-    | mask | 输入 | 源操作数掩码（矢量），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 矢量数据寄存器、掩码寄存器和地址寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
@@ -236,22 +196,4 @@ PIPE_V
     uint32_t offset = 128;
     iter_reg addr_reg = asc_create_iter_reg_b16(offset);
     asc_storealign(dst, src, addr_reg, mask)
-    ```
-- repeat stride模式写出
-    ```cpp
-    // asc_storealign
-    __ubuf__ int8_t dst_align32b;
-    vector_int8_t src;
-    uint16_t block_stride;
-    uint16_t repeat_stride;
-    vector_bool mask = asc_create_mask_b8(Pat::ALL);
-    asc_storealign(dst_align32b, src, block_stride, repeat_stride, mask);
-    
-    // asc_storealign_postupdate
-    __ubuf__ int8_t dst_align32b;
-    vector_int8_t src;
-    uint16_t block_stride;
-    uint16_t repeat_stride;
-    vector_bool mask = asc_create_mask_b8(Pat::ALL);
-    asc_storealign_postupdate(dst_align32b, src, block_stride, repeat_stride, mask);
     ```
