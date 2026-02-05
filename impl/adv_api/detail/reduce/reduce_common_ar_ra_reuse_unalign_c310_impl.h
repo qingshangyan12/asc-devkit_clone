@@ -23,7 +23,7 @@ __simd_callee__ inline void ReduceRAReuseSourceUnAlignedFoldOne(__ubuf__ T *dstA
     uint32_t postUpdateStrideMain, uint32_t postUpdateStrideTail)
 {
     uint64_t newSrc;
-    MicroAPI::UnalignReg uSrc;
+    Reg::UnalignReg uSrc;
     MicroAPI::UnalignReg uDst;
     MicroAPI::RegTensor<T, Trait> vreg0;
     MicroAPI::RegTensor<T, Trait> vreg1;
