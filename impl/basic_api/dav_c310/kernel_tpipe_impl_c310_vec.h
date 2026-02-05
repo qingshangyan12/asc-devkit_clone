@@ -1335,8 +1335,10 @@ __aicore__ inline bool TBufPoolExtImpl<pos, bufIDSize>::InitBuffer(TBuf<bufPos> 
         ptr->usertag = -1;
         curPoolAddr += len;
     }
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ASCENDC_DEBUG_ASSERT((curPoolAddr <= bufferInitLen.at(pool)),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "curPoolAddr is %d, exceed limits %d", curPoolAddr, bufferInitLen.at(pool)));
+#endif
     this->tBufPoolImpl.maxAddr_ = curPoolAddr;
     this->tBufPoolImpl.curBufSize_ += bufHandleSize;
     ASCENDC_DEBUG_ASSERT((this->tBufPoolImpl.curBufSize_ <= bufIDSize),
@@ -1385,8 +1387,10 @@ __aicore__ inline bool TBufPoolExtImpl<pos, bufIDSize>::InitBufPool(T &bufPool, 
         reinterpret_cast<uint64_t>(&this->tBufPoolImpl), reinterpret_cast<uint64_t>(&bufPool.tBufPoolImpl));
 #endif
     curPoolAddr += len;
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ASCENDC_DEBUG_ASSERT((curPoolAddr <= bufferInitLen.at(pool)),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "curPoolAddr is %d, limits is %d", curPoolAddr, bufferInitLen.at(pool)));
+#endif
     this->tBufPoolImpl.maxAddr_ = curPoolAddr;
     return true;
 }
