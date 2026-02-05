@@ -50,44 +50,6 @@ __aicore__ inline auto MakeTensorWithCoord(const T& oldTensor, const Coord& coor
     return newTensor;
 }
 
-template <typename T>
-__aicore__ inline auto AllocTempBuf(const T& calNSize)
-{
-    uint64_t deqTensorTempBuf = 0;
-    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 ||
-                  CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-        deqTensorTempBuf = reinterpret_cast<uint64_t>(get_imm(0));
-    }
-    return deqTensorTempBuf;
-}
-
-template <typename T>
-__aicore__ inline void FreeTempBuf(const T& deqTensorTempBuf)
-{
-    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 ||
-                  CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-        (void)(deqTensorTempBuf);
-    }
-}
-
-template <typename T>
-__aicore__ inline void SetFpc(const T& deqTensorTempBuf)
-{
-    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 ||
-                  CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-        uint64_t deqTensorAddr = (deqTensorTempBuf >> static_cast<uint64_t>(7)) << 8;
-        set_fpc(deqTensorAddr);
-    }
-}
-
- __aicore__ inline void InsertSync()
-{
- 	if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 || 
- 	              CURRENT_ARCH_VERSION == ArchVersion::V2201) {
- 	    pipe_barrier(PIPE_FIX);
- 	}
-}
-
 class Copy2201DeqTensorToFbuf {
 public:
     template <typename T>
@@ -97,7 +59,6 @@ public:
         uint64_t dstAddr = AllocTempBuf(calNSize);
         DataCopyImpl<T, decltype(params)>(dstAddr, src, params, tuple_sequence<decltype(params)>{});
         SetFpc(dstAddr);
-        FreeTempBuf(dstAddr);
     }
 
 private:
