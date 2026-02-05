@@ -17,10 +17,10 @@
 ## 算子描述
 
 - 算子功能：  
-  gather & adds算子实现了从长度为10万的一维向量中获取指定索引的8192个数据，将获取到的数据分别加1，返回相加结果的功能。算子输出output第i个数据计算公式为：
+  将self每个元素除以other的对应元素得到的余数，结果与除数other同符号，并且绝对值小于other的绝对值。算子输出output第i个数据计算公式为：
   
   ```
-  output[i] = input[index[i]] + 1
+  output[i] = self[i] - floor(self[i]/other[i]) * other[i]
   ```
 
 - 算子规格：  
