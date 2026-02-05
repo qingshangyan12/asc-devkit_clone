@@ -54,7 +54,7 @@ from .ascendc_compile_gen_json import _gen_mix_json_from_seperate_json, \
     _gen_mix_json_from_seperate_json_for_kernel_type, _dynamic_kernel_list_to_json, \
     _dynamic_regbase_kernel_list_to_json, _static_regbase_kernel_list_to_json, _gen_mix_sub_json, \
     _gen_static_json_for_no_mix_v200, _gen_non_mix_sub_json, _gen_static_json_for_mix_v200, \
-    _gen_dynamic_json_for_v200, _generate_final_json
+    _gen_dynamic_json_for_v200, _generate_final_json, _get_simt_type_in_staic
 from .ascendc_compile_base import compile_multi_tilingkey, link_relocatable, fatbin_objs, \
     SingleTilingKeyCompileParams, get_actual_kernel_type, compile_pre_process, link_relocatable_meta_file
 from .super_kernel_sub_op_compile import gen_sub_kernel_name, split_sub_kernel_objs, \
@@ -232,6 +232,8 @@ def _json_post_process(compile_info: CompileInfo, op_info: OpInfo, tiling_info: 
 
     superkernel_black_op_list = ["MoeInitRoutingV3", "MoeInitRoutingV2", "MoeInitRoutingQuant"]
     if op_info.op_type not in superkernel_black_op_list or not CommonUtility.is_v220():
+        js["supportSuperKernel"] = 1
+    elif tiling_info.local_memory_size == -1 and not _get_simt_type_in_staic(tiling_info, compile_info, obj_path):
         js["supportSuperKernel"] = 1
     else:
         CommonUtility.print_compile_log(compile_info.kernel_name, \
