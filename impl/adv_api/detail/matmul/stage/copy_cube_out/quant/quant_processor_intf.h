@@ -61,7 +61,7 @@ public:
      * @description: if is quant scenario
      * @return: quant scenario or not
      */
-    __aicore__ inline bool IsQuantScenario()
+    __aicore__ inline bool IsQuantSenario()
     {
         return false;
     }
@@ -105,7 +105,7 @@ public:
      * @description: Get the flag to district scalar or vector quant mode
      * @return: void
      */
-    __aicore__ inline bool IsPerChannelScenario()
+    __aicore__ inline bool IsPerChannelSenario()
     {
         return false;
     }
