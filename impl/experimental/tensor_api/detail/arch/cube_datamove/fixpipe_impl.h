@@ -15,35 +15,6 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_IMPL_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_IMPL_H
 
-namespace AscendC {
-struct FixpipeTrait {
-    __aicore__ constexpr FixpipeTrait() {}
-
-    __aicore__ constexpr FixpipeTrait(const QuantMode_t quantPreIn) : quantPre(quantPreIn) {}
-
-    __aicore__ constexpr FixpipeTrait(
-        const QuantMode_t quantPreIn,
-        const bool enableReluIn,
-        const bool enableChannleSplitIn,
-        const uint8_t unitFlagIn,
-        const uint8_t dualDstCtlIn
-    ) :
-        quantPre(quantPreIn),
-        enableRelu(enableReluIn),
-        enableChannleSplit(enableChannleSplitIn),
-        unitFlag(unitFlagIn),
-        dualDstCtl(dualDstCtlIn)
-    {}
-
-    QuantMode_t quantPre = QuantMode_t::NoQuant;
-    bool enableRelu = false;
-    bool enableChannleSplit = false;
-    uint8_t unitFlag = false;
-    uint8_t dualDstCtl = false;
-};
-constexpr FixpipeTrait DEFAULT_FIXPIPE_TRAIT;
-}
-
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_routing.h"
 
 namespace AscendC {
