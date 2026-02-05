@@ -91,7 +91,7 @@ public:
         auto ndParams = GenRegisterParams<trait, T, U>(dst, src);
         SetRegister<decltype(ndParams)>(ndParams);
         auto params = GenFixpipeParams<trait, T, U>(dst, src);
-        auto dstNDTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
+        auto dstNDTensor = dst(coord);
 
         DataCopy<trait, T, U, decltype(params)>(dstNDTensor, src, params);
     }
