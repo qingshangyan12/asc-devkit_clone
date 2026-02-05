@@ -12,11 +12,11 @@
  * \file fixpipe_routing.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_ROUTING_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_ROUTING_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_FIXPIPE_ROUTING_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_FIXPIPE_ROUTING_H
 
-#include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_four_dim_2201_l0c_gm.h"
-#include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_quant_four_dim_2201_l0c_gm.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_four_dim_l0c_gm.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_quant_four_dim_l0c_gm.h"
 
 namespace AscendC {
 namespace TensorInternal {
@@ -41,7 +41,17 @@ template <>
 struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::L1, ArchVersion::V2201, FOUR_DIM_DATA> {
     using type = FixpipeQuantFourDim2201L0C2GM;
 };
+
+template <>
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::MAX, ArchVersion::V3510, FOUR_DIM_DATA> {
+    using type = FixpipeFourDim3510L0C2GM;
+};
+
+template <>
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA> {
+    using type = FixpipeQuantFourDim3510L0C2GM;
+};
 } // namespace TensorInternal
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_ROUTING_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_FIXPIPE_ROUTING_H
