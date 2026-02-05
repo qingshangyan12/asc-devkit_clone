@@ -205,6 +205,7 @@ class CommonUtility:
         cmd.append("-disable-lsr")
         cmd.append("-fno-unroll-loops")
         cmd_str = ' '.join(cmd)
+        print(f"11111111111111111   {cmd_str}")
         proc = subprocess.Popen(
             cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
@@ -247,6 +248,7 @@ class CommonUtility:
             cmd.insert(5, "-mllvm")
             cmd.insert(6, "-cce-aicore-function-stack-size=8192")
         cmd_str = ' '.join(cmd)
+        print(f"222222222222222   {cmd_str}")
         proc = subprocess.Popen(
             cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
@@ -275,6 +277,7 @@ class CommonUtility:
             success or fail
         """
         cmd_str = ' '.join(cmd)
+        print(f"33333333333333   {cmd_str}")
         proc = subprocess.Popen(
             cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
@@ -285,6 +288,7 @@ class CommonUtility:
                 cmd[cmd.index("-O0")] = "-O2"
                 del cmd[cmd.index("-g")]
                 cmd_str = ' '.join(cmd)
+                print(f"555555555555555   {cmd_str}")
                 proc_now = subprocess.Popen(
                     cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
                 (out, _) = proc_now.communicate()
