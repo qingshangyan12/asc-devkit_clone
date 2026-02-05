@@ -18,7 +18,7 @@
 #include "kernel_macros.h"
 #include "kernel_log.h"
 #include "common_types.h"
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
 #include <cstdint>
 #include "stub_def.h"
 #include "stub_fun.h"
