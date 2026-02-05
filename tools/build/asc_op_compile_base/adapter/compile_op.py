@@ -229,7 +229,16 @@ def _json_post_process(compile_info: CompileInfo, op_info: OpInfo, tiling_info: 
             js["deterministic"] = "true"
         else:
             js["deterministic"] = "false"
-    js["supportSuperKernel"] = 1
+
+    superkernel_black_op_list = ["MoeInitRoutingV3", "MoeInitRoutingV2", "MoeInitRoutingQuant"]
+    if op_info.op_type not in superkernel_black_op_list or not CommonUtility.is_v220():
+        js["supportSuperKernel"] = 1
+    else:
+        CommonUtility.print_compile_log(compile_info.kernel_name, \
+            f"The operator {op_info.op_type} has not been adapted to superkernel. Therefore, \
+the superkernel cannot be integrated with the operator.", \
+            AscendCLogLevel.LOG_WARNING)
+
     if not global_var_storage.get_variable("ascendc_dump_disable_compile_options") \
         and compile_info.dump_info.get("dump_type", "") != "":
         js["debugOptions"] = compile_info.dump_info["dump_type"]
@@ -524,7 +533,7 @@ def gen_meta_info_section(compile_info, op_info):
         f"static const struct BinaryMetaDynamicParam "
     section_var += f"{kernel_name}_kernel_metainfo_dynamicparam_section __attribute__ "
     section_var += f"((used, section (\".ascend.meta\"))) = "
-    section_var += f" {{{{B_TYPE_DYNAMIC_PARAM, 2}}, {dynamic_param}}};\n"
+    section_var += f" {{{{B_TYPE_DYNAMIC_PARAM, 4}}, 0, {dynamic_param}}};\n"
 
     #optinalparam
     optional_input_mode = 1 if check_if_gen_placehoder(op_info, True) else 0
