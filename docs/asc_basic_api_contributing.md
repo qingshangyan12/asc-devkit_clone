@@ -1,48 +1,48 @@
-# Basic API贡献指南
+# 基础API贡献指南
 
 ## 概述
 
-Basic API（基础API）是Ascend C编程框架中的指令级API层，直接封装昇腾AI处理器的硬件指令，使用`LocalTensor`抽象提供类型安全的接口。Basic API是高阶API的构建基础，开发者可以通过组合Basic API实现复杂的算法逻辑。
+基础API是Ascend C编程框架中的指令级API层，直接封装昇腾AI处理器的硬件指令，采用C++语言风格的函数接口。基础API是高阶API的构建基础，开发者可以通过组合基础API实现复杂的算法逻辑。
 
-**Basic API的核心特点：**
+**基础API的核心特点：**
 
 - **指令级封装**：每个API对应一条或多条硬件指令
 - **LocalTensor抽象**：使用`LocalTensor<T>`类型操作内存
-- **模板化设计**：支持多种数据类型（half, float, int16_t, int32_t等）
-- **双层接口**：Level 0（精细控制）和 Level 2（简化调用）
-- **架构适配**：通过宏定义支持不同NPU架构
+- **模板化设计**：支持多种数据类型（half、float、int16_t、int32_t等）
+- **双层接口**：高维切分计算（精细控制）和 前n个数据计算（简化调用）
+- **架构适配**：通过架构宏定义支持不同NPU架构
 
 ---
 
 ## 开发流程
 
-### 1. 需求分析
+### 需求分析
 
 - 明确API功能（如Add、Mul、Relu等）
 - 确定支持的数据类型
 - 分析硬件指令支持情况
 
-### 2. API设计
+### API设计
 
 - 定义函数原型（使用LocalTensor）
-- 设计Level 0和Level 2接口
-- 确定参数规范（mask, repeat, stride等）
+- 设计高维切分计算和前n个数据计算接口
+- 确定参数规范（mask、repeat、stride等）
 
-### 3. 实现开发
+### 实现开发
 
 - 编写接口声明（include/basic_api/）
 - 实现核心逻辑（impl/basic_api/）
 - 处理架构差异
 
-### 4. 测试验证
+### 测试验证
 
 - 编写单元测试
 - 验证功能正确性
 - 检查边界条件
 
-### 5. 文档编写
+### 文档编写
 
-- 完善API文档
+- 完成API文档
 - 提供使用示例
 - 说明约束条件
 
@@ -50,9 +50,9 @@ Basic API（基础API）是Ascend C编程框架中的指令级API层，直接封
 
 ## API介绍
 
-### Level 0 vs Level 2接口
+### 高维切分计算 vs 前n个数据计算接口
 
-#### Level 0（精细控制）
+#### 高维切分计算（精细控制）
 
 ```cpp
 // 需要手动设置mask和repeat参数
@@ -71,7 +71,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 - 非连续内存访问
 - 性能优化
 
-#### Level 2（简化调用）
+#### 前n个数据计算（简化调用）
 
 ```cpp
 // 自动处理mask和repeat
@@ -95,9 +95,9 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 ### 目录结构
 
 ```text
-asc-devkit-dev/
+asc-devkit/
 ├── include/
-│   └── basic_api/                    # Basic API头文件
+│   └── basic_api/                    # 基础API头文件
 │       ├── kernel_operator_common_intf.h        # 通用接口
 │       ├── kernel_operator_vec_binary_intf.h    # 矢量二元运算
 │       ├── kernel_operator_vec_unary_intf.h     # 矢量一元运算
@@ -111,33 +111,29 @@ asc-devkit-dev/
 │       └── kernel_struct_*.h                    # 参数结构体
 │
 ├── impl/
-│   └── basic_api/                    # Basic API实现
-│       ├── dav_c100/                 # DAV-C100架构
+│   └── basic_api/                    # 基础API实现
+│       ├── dav_m200/                 # NPU ARCH 200x 架构
 │       │   ├── kernel_operator_vec_binary_impl.h
-│       │   ├── kernel_operator_vec_unary_impl.h
 │       │   └── ...
-│       ├── dav_c220/                 # DAV-C220架构
+│       ├── dav_c220/                 # NPU ARCH 220x 架构
 │       │   ├── kernel_operator_vec_binary_impl.h
 │       │   └── ...
 │       └── CMakeLists.txt
 │
 ├── tests/
 │   └── api/
-│       └── basic_api/                # Basic API测试
-│           ├── tikcpp_case_common/   # 通用测试
+│       └── basic_api/                # 基础API测试
+│           ├── tikcpp_case_common/
 │           │   └── test_operator_axpy.cpp
-│           ├── tikcpp_case_ascend610/    # Atlas 610
-│           │   ├── test_operator_vec_binary.cpp
-│           │   └── test_operator_vec_unary.cpp
-│           ├── tikcpp_case_ascend310p/   # Atlas 310P
+│           ├── tikcpp_case_ascend910/
 │           │   └── ...
-│           └── tikcpp_case_ascend910/    # Atlas 910
+│           └── tikcpp_case_ascend910b1/
 │               └── ...
 │
 └── docs/
     └── api/
         └── context/
-            └── ...              # Basic API文档
+            └── ...              # 基础API文档
 ```
 
 ### 文件命名规范
@@ -180,7 +176,7 @@ asc-devkit-dev/
 
 namespace AscendC {
 
-// Add - Level 0
+// Add - 高维切分计算
 template <typename T, bool isSetMask = true>
 __aicore__ inline void Add(const LocalTensor<T>& dst,
                            const LocalTensor<T>& src0,
@@ -189,7 +185,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
                            const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
 
-// Add - Level 2
+// Add - 前n个数据计算
 template <typename T>
 __aicore__ inline void Add(const LocalTensor<T>& dst,
                            const LocalTensor<T>& src0,
@@ -198,7 +194,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 
 }  // namespace AscendC
 
-#include "../../impl/basic_api/kernel_operator_vec_binary_intf_impl.h"
+#include "impl/basic_api/kernel_operator_vec_binary_intf_impl.h"
 #endif
 ```
 
@@ -211,7 +207,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 
 namespace AscendC {
 
-// Add实现 - Level 2
+// Add实现 - 前n个数据计算
 template <typename T>
 __aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
                                __ubuf__ T* src1, const int32_t& count) {
@@ -231,7 +227,7 @@ __aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
     }
 }
 
-// Add实现 - Level 0
+// Add实现 - 高维切分计算
 template <typename T, bool isSetMask = true>
 __aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
                                __ubuf__ T* src1, const uint64_t mask[],
@@ -261,7 +257,7 @@ __aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
 // impl/basic_api/kernel_operator_vec_binary_intf_impl.h
 namespace AscendC {
 
-// Level 2接口封装
+// 前n个数据计算接口封装
 template <typename T>
 __aicore__ inline void Add(const LocalTensor<T>& dst,
                            const LocalTensor<T>& src0,
@@ -270,7 +266,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
     AddImpl<T>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(), count);
 }
 
-// Level 0接口封装
+// 高维切分计算接口封装
 template <typename T, bool isSetMask = true>
 __aicore__ inline void Add(const LocalTensor<T>& dst,
                            const LocalTensor<T>& src0,
@@ -287,23 +283,23 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 
 ### 架构适配
 
-不同NPU架构的实现可能有差异，需要重新实现
+不同NPU架构的硬件可能有差异，需要重新实现
 
 ---
 
-## 开发示例：实现Axpy Basic API
+## 开发示例：实现Axpy 基础API
 
-### 需求分析
+### API需求分析
 
 实现矢量乘加：`dst = src * scalar + dst`
 
 - 支持数据类型：half, float
-- 接口类型：Level 2（简化调用）
+- 接口类型：前n个数据计算（简化调用）
 - 硬件支持：确认支持硬件
 
-### 1. 查看现有API结构
+### 查看现有API结构
 
-Basic API使用`LocalTensor<T>`作为参数，Level 2接口仅需count参数：
+基础API使用`LocalTensor<T>`作为参数，前n个数据计算接口仅需count参数：
 
 ```cpp
 // 参考现有Add接口
@@ -314,7 +310,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
                            const int32_t& count);
 ```
 
-### 2. 接口设计
+### 接口设计
 
 在 `include/basic_api/kernel_operator_vec_binary_intf.h` 中添加：
 
@@ -323,7 +319,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
  * Axpy                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Axpy Level 2
+ * @ingroup Axpy
  * @brief dst = dst + src * scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -337,11 +333,11 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dst,
                            const int32_t& count);
 ```
 
-### 3. 实现代码
+### 实现代码
 
 参考其他接口实现
 
-### 4. 接口封装
+### 接口封装
 
 在 `impl/basic_api/kernel_operator_vec_binary_intf_impl.h` 中添加：
 
@@ -355,7 +351,7 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dst,
 }
 ```
 
-### 5. 测试代码
+### 测试代码
 
 增加对应接口的测试代码
 
@@ -363,13 +359,11 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dst,
 
 ## 测试验证要求
 
-### 测试类型
-
-#### 1. 功能测试
+### 功能测试
 
 验证API计算结果正确性
 
-#### 2. 边界测试
+### 边界测试
 
 ```cpp
 TEST_F(TestAxpy, BoundaryTest) {
@@ -379,7 +373,7 @@ TEST_F(TestAxpy, BoundaryTest) {
 }
 ```
 
-#### 3. 数据类型测试
+### 数据类型测试
 
 ```cpp
 INSTANTIATE_TEST_CASE_P(TEST_AXPY_TYPES, AxpyTestsuite,

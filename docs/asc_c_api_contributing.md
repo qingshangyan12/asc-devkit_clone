@@ -19,15 +19,15 @@ C API的主要特点：
 
 C API的开发流程主要包括以下步骤：
 
-- **指令分析**：分析硬件指令集和微架构特性。
+- **需求分析**：明确API功能。
 - **接口设计**：定义C风格的函数接口。
 - **实现开发**：编写指令封装和参数转换代码。
 - **测试验证**：完成Mock测试和功能测试。
-- **文档编写**：完善API文档和约束说明。+
+- **文档编写**：完成API文档和约束说明。
 
 ---
 
-## 编程基础
+## API介绍
 
 ### 硬件指令基础
 
@@ -35,15 +35,15 @@ C API直接封装硬件指令，需要理解：
 
 #### 指令类型
 
-- **矢量指令**：VADD, VMUL, VCONV, VREDUCE等
-- **标量指令**：SADD, SMUL等
-- **数据搬运指令**：VMOV, DCOPY等
-- **控制指令**：SETMASK, PIPEBARRIER等
+- **矢量指令**：VADD、VMUL、VCONV、VREDUCE等
+- **标量指令**：SADD、SMUL等
+- **数据搬运指令**：VMOV、DCOPY等
+- **控制指令**：SETMASK、PIPEBARRIER等
 
 #### 指令属性
 
-- **流水线类型**：V, M, S, MTE1/2/3等
-- **数据类型**：half, float, int16, int32等
+- **流水线类型**：V、M、S、MTE1/2/3等
+- **数据类型**：half、float、int16、int32等
 - **操作数个数**：一元、二元、三元运算
 - **同步特性**：异步/同步执行
 
@@ -67,7 +67,7 @@ asc_add(dst, src0, src1, count);
 
 C API支持三种数据流模式：
 
-**模式1：前n个数据计算**
+模式1：前n个数据计算
 
 ```cpp
 asc_add(dst, src0, src1, count);
@@ -77,7 +77,7 @@ asc_add(dst, src0, src1, count);
 - 自动处理mask
 - 简单易用
 
-**模式2：高维切分计算**
+模式2：高维切分计算
 
 ```cpp
 asc_add(dst, src0, src1, repeat,
@@ -89,7 +89,7 @@ asc_add(dst, src0, src1, repeat,
 - 支持多维数据
 - 灵活控制
 
-**模式3：同步计算**
+模式3：同步计算
 
 ```cpp
 asc_add_sync(dst, src0, src1, count);
@@ -140,7 +140,7 @@ asc_add_sync(dst, src0, src1, count);
 ### 目录结构
 
 ```text
-asc-devkit-dev/
+asc-devkit/
 ├── include/
 │   └── c_api/                    # C API头文件
 │       ├── vector_compute/       # 矢量计算
@@ -177,7 +177,7 @@ asc-devkit-dev/
 ├── impl/
 │   └── c_api/                    # C API实现
 │       ├── instr_impl/           # 指令实现
-│       │   ├── npu_arch_2201/    # Atlas A2/A3架构
+│       │   ├── npu_arch_2201/    # NPU ARCH 220X架构
 │       │   │   ├── vector_compute_impl/
 │       │   │   │   ├── asc_abs_impl.h
 │       │   │   │   └── ...
@@ -187,7 +187,7 @@ asc-devkit-dev/
 │       │   │   ├── vector_compute_impl.h
 │       │   │   ├── vector_datamove_impl.h
 │       │   │   └── ...
-│       │   └── npu_arch_3510/    # Atlas A5架构
+│       │   └── npu_arch_3510/    # NPU ARCH 351X架构
 │       │       ├── vector_compute_impl/
 │       │       │   ├── asc_abs_impl.h
 │       │       │   └── ...
@@ -195,20 +195,20 @@ asc-devkit-dev/
 │       │       └── ...
 │       ├── utils/
 │       │   └── c_api_utils_impl.cpp
-│       └── stub/                 # Stub/钩子
+│       └── stub/                 # Stub
 │           └── cce_stub.h
 │
 ├── tests/
 │   └── api/
 │       └── c_api/                # C API测试
-│           ├── npu_arch_2201/    # Atlas A2/A3架构
+│           ├── npu_arch_2201/    # NPU ARCH 220X架构
 │           │   ├── vector_compute/
 │           │   │   ├── test_add_instr.cpp
 │           │   │   ├── test_axpy_instr.cpp
 │           │   │   └── ...
 │           │   ├── scalar_compute/
 │           │   └── ...
-│           ├── npu_arch_3510/    # Atlas A5架构
+│           ├── npu_arch_3510/    # NPU ARCH 351X架构
 │           │   └── ...
 │           └── common/           # 通用测试
 │               └── test_utils.cpp
@@ -234,7 +234,7 @@ asc-devkit-dev/
 3. **接口与实现分离**：include/存放声明，impl/存放实现
 4. **测试按架构组织**：便于多架构测试和维护
 
-### 命名规范
+### 文件命名规范
 
 - **头文件**：`<category>.h`，如 `vector_compute.h`
 - **实现文件**：`<category>_c_api_impl.h`，如 `vector_compute_c_api_impl.h`
@@ -253,9 +253,7 @@ asc-devkit-dev/
 - 支持三种调用模式
 - 直接映射硬件指令
 
-### 1. 指令分析
-
-### 2. 接口设计
+### 接口设计
 
 在 `include/c_api/vector_compute/vector_compute.h` 中添加：
 
@@ -279,10 +277,9 @@ __aicore__ inline void asc_axpy_sync(__ubuf__ half* dst, __ubuf__ half* src, hal
 __aicore__ inline void asc_axpy_sync(__ubuf__ float* dst, __ubuf__ float* src, float scalar, uint32_t count);
 ```
 
-### 3. 实现代码
+### 实现代码
 
-在 `impl/c_api/instr_impl/vector_compute_c_api_impl/vector_compute_c_api_impl.h` 中添加：
-
+参考其他接口实现
 
 ---
 
@@ -301,32 +298,13 @@ C API测试使用 **gTest + MockCPP** 框架：
 
 ### 测试类型
 
-#### 1. Mock测试（指令映射验证）
+#### Mock测试（指令映射验证）
 
 验证C API是否正确调用底层指令。
 
-#### 2. 功能测试（正确性验证）
+#### 功能测试（正确性验证）
 
 验证API计算结果正确。
-
-#### 3. 性能测试
-
-验证API性能指标。
-
-### 测试覆盖率要求
-
-- **指令映射测试**：100%覆盖所有API重载版本
-- **功能测试**：≥ 95%语句覆盖
-- **边界测试**：必须覆盖
-- **性能测试**：关键API必须有性能基准
-
----
-
-## 文档编写要求
-
-### C API文档模板
-
-每个C API必须包含以下内容...
 
 ---
 
@@ -419,20 +397,14 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 
 ```cpp
 // 头文件保护
-#ifndef INCLUDE_C_API_VECTOR_COMPUTE_H
-#define INCLUDE_C_API_VECTOR_COMPUTE_H
-
-// 架构保护
-#if defined(__CCE_AICORE__) && (__CCE_AICORE__ < 300) && (__NPU_ARCH__ != 5102)
-    // 仅在特定架构下启用
-    #include "vector_compute_c_api_impl.h"
-#endif
+#ifndef INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
+#define INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
 
 // 条件编译
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    // Atlas A2特定代码
+    // NPU ARCH 220X架构特定代码
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-    // Atlas A3特定代码
+    // NPU ARCH 310X架构特定代码
 #endif
 
 #endif

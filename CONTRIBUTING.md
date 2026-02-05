@@ -22,12 +22,12 @@
 
 基础API实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。
 
-- **适用场景**：需要直接操作LocalTensor的底层运算
+- **适用场景**：使用C++语言编程风格的场景
 - **贡献指南**：[docs/asc_basic_api_contributing.md](./docs/asc_basic_api_contributing.md)
 
 ### 3. C API
 
-C API提供纯C风格的接口，符合C语言算子开发习惯，提供与业界类似的编程体验。
+C API提供纯C风格的接口，符合C语言算子开发习惯，开放芯片完备编程能力，支持数组分配内存，一般基于指针编程。提供与业界类似的编程体验。
 
 - **适用场景**：使用C语言编程风格的场景
 - **贡献指南**：[docs/asc_c_api_contributing.md](./docs/asc_c_api_contributing.md)
