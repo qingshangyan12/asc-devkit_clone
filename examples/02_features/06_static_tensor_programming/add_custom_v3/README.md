@@ -1,14 +1,18 @@
 # AddCustomV3样例
+
 ## 概述
+
 使用静态Tensor编程方法进行add算子的编程，优化double buffer实现，简化判断逻辑，并使用LocalMemAllocator简化代码。
 
 优化add_custom_v2中反向同步，替换为MTE2等待MTE3执行结束。减少分支判断的同时，算子性能因为double buffer的原因不受影响。另外使用LocalMemAllocator进行线性内存分配，Bank冲突不敏感场景可以使用这种方式简化分配。
 
 ## 支持的产品
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── add_custom_v3
 │   ├── scripts
@@ -61,6 +65,7 @@ z = x + y
   Add算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm和yGm搬运到Local Memory，分别存储在xLocal、yLocal，Compute任务负责对xLocal、yLocal执行加法操作，计算结果存储在zLocal中，CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
