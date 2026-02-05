@@ -281,9 +281,9 @@ private:
     __aicore__ inline void CopyTensor(const T& dst, const LocalTensor<SrcT>& co1Local,
         FixpipeAdaptor& fixpipe, const int32_t curN = 0, const int32_t baseUseN = 0)
     {
-        if (MATMUL_MODULE(MatmulQuantProcessor)->IsQuantSenario()) {
+        if (MATMUL_MODULE(MatmulQuantProcessor)->IsQuantScenario()) {
             fixpipe.SetQuantMode(MATMUL_MODULE(MatmulQuantProcessor)->GetMatmulQuantMode());
-            if (MATMUL_MODULE(MatmulQuantProcessor)->IsPerChannelSenario()) {
+            if (MATMUL_MODULE(MatmulQuantProcessor)->IsPerChannelScenario()) {
                 LocalTensor<uint64_t> quantTensor;
                 MATMUL_MODULE(MatmulQuantProcessor)->CopyQuantTensor(quantTensor, curN, baseUseN);
                 fixpipe.template FixpipeOut<T>(dst, co1Local, quantTensor);
@@ -377,10 +377,10 @@ private:
         FixpipeAdaptor& fixpipe, const int32_t curN = 0, const int32_t baseUseN = 0)
     {
         fixpipe.SetCastMode();
-        if constexpr (IsQuantSenario<DstT, typename A_TYPE::T>()) {
+        if constexpr (IsQuantScenario<DstT, typename A_TYPE::T>()) {
             fixpipe.SetQuantMode(MATMUL_MODULE(MatmulQuantProcessor)->GetMatmulQuantMode());
             LocalTensor<uint64_t> quantTensor;
-            if (MATMUL_MODULE(MatmulQuantProcessor)->IsPerChannelSenario()) {
+            if (MATMUL_MODULE(MatmulQuantProcessor)->IsPerChannelScenario()) {
                 MATMUL_MODULE(MatmulQuantProcessor)->CopyQuantTensor(quantTensor, curN, baseUseN);
                 fixpipe.template FixpipeOut<T>(dst, co1Local, quantTensor);
                 MATMUL_MODULE(MatmulQuantProcessor)->FreeQuantTensor(quantTensor);
@@ -477,9 +477,9 @@ private:
             dstStrideIn, nSize, EnUnitFlag(MM_CFG), curRow, curCol);
 
         // Update quant params
-        if constexpr (IsQuantSenario<DstT, typename A_TYPE::T>()) {
+        if constexpr (IsQuantScenario<DstT, typename A_TYPE::T>()) {
             param.quantMode = MATMUL_MODULE(MatmulQuantProcessor)->GetMatmulQuantMode();
-            if (MATMUL_MODULE(MatmulQuantProcessor)->IsPerChannelSenario()) {
+            if (MATMUL_MODULE(MatmulQuantProcessor)->IsPerChannelScenario()) {
                 LocalTensor<uint64_t> l1TmpForQuant;
                 MATMUL_MODULE(MatmulQuantProcessor)->CopyQuantTensor(l1TmpForQuant, curCol, baseWidth);
                 param.cbufWorkspaceAddr = reinterpret_cast<uint64_t>(l1TmpForQuant.GetPhyAddr());
