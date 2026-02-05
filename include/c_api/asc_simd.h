@@ -22,8 +22,8 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
-#include "c_api/atomic/atomic.h"
 #include "c_api/cache_ctrl/cache_ctrl.h"
+#include "c_api/atomic/atomic.h"
 #include "c_api/cube_compute/cube_compute.h"
 #include "c_api/cube_datamove/cube_datamove.h"
 #include "c_api/misc/misc.h"

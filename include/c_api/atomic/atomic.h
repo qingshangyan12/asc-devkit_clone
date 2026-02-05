@@ -16,8 +16,6 @@
 #ifndef INCLUDE_C_API_ATOMIC_ATOMIC_H
 #define INCLUDE_C_API_ATOMIC_ATOMIC_H
 
-// #include "atomic_c_api_impl.h"
-
 __aicore__ inline void asc_set_atomic_add_float();
 
 __aicore__ inline void asc_set_atomic_max_float16();

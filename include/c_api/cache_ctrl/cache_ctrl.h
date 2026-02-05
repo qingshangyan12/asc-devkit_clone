@@ -16,8 +16,6 @@
 
 #ifndef INCLUDE_C_API_SIMD_ATOMIC_H
 #define INCLUDE_C_API_SIMD_ATOMIC_H
- 
-// #include "cache_ctrl_c_api_impl.h"
 
 __aicore__ inline void asc_dcci_single(__gm__ void* dst);
 
