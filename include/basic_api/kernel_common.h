@@ -33,6 +33,7 @@
 #include "kernel_fp16.h"
 #endif
 
+
 namespace AscendC {
 class TPipe;
 
