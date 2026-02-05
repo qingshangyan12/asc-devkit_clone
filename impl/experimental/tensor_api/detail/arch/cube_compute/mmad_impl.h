@@ -55,9 +55,9 @@ Mmad(const T& dst, const U& fm, const S& filter)
    constexpr Hardware dstPos = TensorInternal::GetHardPos<T>();
    constexpr Hardware fmPos = TensorInternal::GetHardPos<U>();
    constexpr Hardware filterPos = TensorInternal::GetHardPos<S>();
-   using Tensor2Tensor = typename TensorInternal::MmadTensor2Tensor<dstPos, fmPos, filterPos, 
+   using Tensor2Tensor = typename TensorInternal::MmadTensor2Tensor<dstPos, fmPos, filterPos, Hardware::MAX, 
       TensorInternal::CURRENT_ARCH_VERSION, TensorInternal::FOUR_DIM_DATA>::type;
-   Tensor2Tensor{}.template Run<T, U, S, trait>(dst, fm, filter);
+   Tensor2Tensor{}.template Run<trait>(dst, fm, filter);
 }
 
 template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V>
@@ -68,9 +68,9 @@ Mmad(const T& dst, const U& fm, const S& filter, const V& bias)
    constexpr Hardware fmPos = TensorInternal::GetHardPos<U>();
    constexpr Hardware filterPos = TensorInternal::GetHardPos<S>();
    constexpr Hardware biasPos = TensorInternal::GetHardPos<V>();
-   using Tensor2Tensor = typename TensorInternal::MmadWithBiasTensor2Tensor<dstPos, fmPos, filterPos, biasPos, 
+   using Tensor2Tensor = typename TensorInternal::MmadTensor2Tensor<dstPos, fmPos, filterPos, biasPos, 
       TensorInternal::CURRENT_ARCH_VERSION, TensorInternal::FOUR_DIM_DATA>::type;
-   Tensor2Tensor{}.template Run<T, U, S, V, trait>(dst, fm, filter, bias);
+   Tensor2Tensor{}.template Run<trait>(dst, fm, filter, bias);
 }
 } // namespace AscendC
 #endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_COMPUTE_MMAD_IMPL_H
