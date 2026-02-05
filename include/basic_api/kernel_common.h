@@ -33,11 +33,22 @@
 #include "kernel_fp16.h"
 #endif
 
+
 namespace AscendC {
 class TPipe;
 
 template <typename T>
 class GlobalTensor;
+
+enum class HF32Mode {
+    ENABLE,
+    DISABLE
+};
+
+enum class HF32TransMode {
+    NEAREST_ZERO,
+    NEAREST_EVEN
+};
 } // namespace AscendC
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
