@@ -12,8 +12,8 @@
 * \file macro_impl.h
 * \brief
 */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_MACRO_IMPL_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_MACRO_IMPL_H
+#ifndef IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
+#define IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
 
 #include "impl/utils/sys_constants.h"
 #include "impl/utils/sys_macros.h"
@@ -162,4 +162,4 @@ constexpr uint32_t BLOCK_CUBE = 16;
 extern int32_t g_matmulCount;
 #endif
 
-#endif //EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_MACRO_IMPL_H
+#endif //IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
