@@ -56,6 +56,28 @@ __aicore__ inline uint64_t asc_debug_get_block_idx_impl()
 {
     return static_cast<uint64_t>(asc_debug_get_core_idx_impl());
 }
+
+template<typename T>
+__aicore__ inline void mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
+{
+    
+}
+
+template<typename T>
+__aicore__ inline void mem_copy_l1buf_to_gm_impl(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
+{
+    
+}
+
+template<typename T>
+__aicore__ inline void mem_copy_ub_to_gm_impl(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
+{
+    static_assert(reinterpret_cast<uint64_t>(src) % ASC_ONE_DATABLOCK_SIZE == 0, "src address shouled be 32B aligned!\n");
+    // 校验len的范围
+    // 溢出校验
+    copy_ubuf_to_gm(reinterpret_cast<__gm__ void*>(dst), reinterpret_cast<__ubuf__ void*>(src), 0, 1, len, 0, 0);
+}
+
 } // namespace __asc_aicore
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

@@ -20,6 +20,10 @@
 #warning "asc_utils_types.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
 #endif
 
+namespace AscendC {
+    enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
+}
+
 struct AscTlvHead { // TLV Head include type and length
     uint16_t type;
     uint16_t len;
@@ -29,6 +33,12 @@ struct AscTlv {
     AscTlvHead head;
     uint32_t value; // feature: PRINT = 1, FFTS = 2, L2CACHE = 3
 };
+
+constexpr uint16_t ASC_ONE_DATABLOCK_SIZE = 32;
+
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+constexpr bool g_gm_overflow_check = true;
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_UTILS_TYPES__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
