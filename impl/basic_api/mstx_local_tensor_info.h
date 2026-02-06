@@ -697,23 +697,6 @@ __aicore__ inline void GetMstxVecCopyInfo(const LocalTensor<T>& dst, const Local
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_COPY), sizeof(mstxVecCopy), &mstxVecCopy);
 }
 
-template <typename T>
-__aicore__ inline void GetMstxVecCopyInfo(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count, bool isSetMask, __gm__ const char* name)
-{
-    MstxVecCopy mstxVecCopy;
-    mstxVecCopy.dst = From(dst);
-    mstxVecCopy.src = From(src);
-    mstxVecCopy.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
-    mstxVecCopy.repeatTimes = 1;
-    mstxVecCopy.dstStride = 0;
-    mstxVecCopy.srcStride = 0;
-    mstxVecCopy.dstRepeatSize = 8;
-    mstxVecCopy.srcRepeatSize = 8;
-    CopyName(mstxVecCopy.name, name);
-
-    __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_COPY), sizeof(mstxVecCopy), &mstxVecCopy);
-}
-
 template <typename T, typename U>
 __aicore__ inline void GetMstxVecReduceBlkInfo(const LocalTensor<U>& dst, const LocalTensor<T>& src, uint64_t mask0, uint64_t mask1,
     const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride, bool isSetMask, __gm__ const char* name)
@@ -1133,7 +1116,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.src1 = From(src1);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1142,7 +1130,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
     mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
     mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
@@ -1158,7 +1145,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.src1 = From(src1);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1167,7 +1159,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
     mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
     mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
@@ -1182,7 +1173,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dst = From(dst);
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.src1 = From(src1);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1191,7 +1187,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
     mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
     mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
@@ -1206,7 +1201,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dst = From(dst);
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1215,7 +1215,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
     mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
     mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
@@ -1230,7 +1229,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.src1 = From(src1);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = 8;
     mstxVecSelDesc.repeatTimes = 1;
     mstxVecSelDesc.dstBlockStride = 1;
@@ -1239,7 +1243,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = 8;
     mstxVecSelDesc.src0RepeatStride = 8;
     mstxVecSelDesc.src1RepeatStride = 8;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
