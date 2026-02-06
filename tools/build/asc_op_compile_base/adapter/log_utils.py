@@ -12,6 +12,7 @@
 """
 AscendC compile log
 """
+import re
 import os
 import stat
 import threading
@@ -187,8 +188,8 @@ class LogUtil:
     @staticmethod
     def fix_string_escapes(log_message: str) -> str:
         common_escapes = {
-                0: r'\0', 7: r'\a', 8: r'\b', 9: r'\t', 10: r'\n', 11: r'\v', 12: r'\f', 13: r'\r', 27: r'\e', 
-            }
+            0: r'\0', 7: r'\a', 8: r'\b', 9: r'\t', 10: r'\n', 11: r'\v', 12: r'\f', 13: r'\r', 27: r'\e', 
+        }
 
         # process control symbols
         def escape_control_symbols(match):
