@@ -93,11 +93,6 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     }
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
-        return Data()[Layout()(coord)];
-    }
-
-    template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
         return Data()[Layout()(coord)];
     }
