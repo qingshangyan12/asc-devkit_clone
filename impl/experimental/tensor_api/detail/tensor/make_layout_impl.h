@@ -159,7 +159,7 @@ template <size_t... Is, typename ShapeType, typename StrideType>
 __aicore__ inline constexpr auto GetShapeImpl(const Layout<ShapeType, StrideType>& layout)
 {
     static_assert(Std::is_tuple_v<ShapeType> && Std::is_tuple_v<StrideType>, "ShapeType or StrideType is not tuple!");
-    return layout.template ShapeType<Is...>();
+    return layout.template Shape<Is...>();
 }
 
 template<typename T>
@@ -398,7 +398,7 @@ __aicore__ inline constexpr auto Crd2IdxImpl(const T& coord, const U& shape, con
 template <typename T, typename U, typename S>
 __aicore__ inline constexpr auto Crd2IdxImpl(const T& coord, const Layout<U, S>& layout)
 {
-    return Crd2IdxImpl(coord, layout.GetShape(), layout.GetStride());
+    return Crd2IdxImpl(coord, layout.Shape(), layout.Stride());
 }
 }
 } // namespace AscendC
@@ -502,9 +502,9 @@ __aicore__ inline constexpr auto Size(const Layout<Shape, Stride>& layout)
 }
 
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Capicity(const Layout<Shape, Stride>& layout)
+__aicore__ inline constexpr auto Capacity(const Layout<Shape, Stride>& layout)
 {
-    return TensorInternal::CapicityImpl<Is...>(layout);
+    return TensorInternal::CapacityImpl<Is...>(layout);
 }
 
 template <size_t... Is, typename Shape, typename Stride>

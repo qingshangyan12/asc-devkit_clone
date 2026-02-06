@@ -201,24 +201,30 @@ __aicore__ inline constexpr auto GetShape(const Tuple& shape)
 template<typename T0, typename... Ts>
 __aicore__ inline constexpr auto GetMax(const T0& t0, const Ts&... ts)
 {
-    if constexpr (Std::is_tuple_v<T0>) {
-        return GetMax(Apply(t0, [](auto const&... a){ return GetMax(a...);}), ts...);
-    } else if constexpr (sizeof...(Ts) == 0) {
+    if constexpr (sizeof...(Ts) == 0) {
         return t0;
     } else {
-        return Std::max(t0, GetMax(ts...));
+        return TileInternal::max(t0, GetMax(ts...));
     }
 }
 
-template<typename TupleA, typename TupleB>
-__aicore__ inline constexpr auto GetCapicitySize(const TupleA& a, const TupleB& b)
+template<typename Shape, typename Stride>
+__aicore__ inline constexpr auto GetCapacity(const Shape& shape, const Stride& stride);
+
+template <typename Shape, typename Stride, size_t... Is>
+__aicore__ inline constexpr auto GetCapacityImpl(const Shape& shape, const Stride& stride, Std::index_sequence<Is...>)
 {
-    if constexpr (Std::is_tuple_v<TupleA> && Std::is_tuple_v<TupleB>) {
-        static_assert(Std::tuple_size_v<TupleA> == Std::tuple_size_v<TupleB>, "Mismatched ranks");
-        return TransformApply(a, b, [](const auto& x, const auto& y) { return GetCapicitySize(x,y);},
-                                    [](const auto&... v) { return GetMax(v...);});
+    return GetMax(GetCapacity(Std::get<Is>(shape), Std::get<Is>(stride))...);
+}
+
+template<typename Shape, typename Stride>
+__aicore__ inline constexpr auto GetCapacity(const Shape& shape, const Stride& stride)
+{
+    if constexpr (Std::is_tuple_v<Shape> && Std::is_tuple_v<Stride>) {
+        static_assert(Std::tuple_size_v<Shape> == Std::tuple_size_v<Stride>, "Mismatched ranks");
+        return GetCapacityImpl(shape, stride, Std::make_index_sequence<Std::tuple_size_v<Shape>>{});
     } else {
-        return a * b;
+        return shape * stride;
     }
 }
 }

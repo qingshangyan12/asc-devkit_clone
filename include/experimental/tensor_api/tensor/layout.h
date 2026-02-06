@@ -41,9 +41,9 @@ struct Layout : private Std::tuple<T, U>
         static_assert(Std::is_tuple_v<T> && Std::is_tuple_v<U>, "Shape or Stride is not tuple!");
     }
 
-    __aicore__ inline constexpr decltype(auto) GetSize() const
+    __aicore__ inline constexpr decltype(auto) Capacity() const
     {
-        return TensorInternal::GetCapicitySize(GetShape(), GetStride());
+        return TensorInternal::GetCapacity(GetShape(), GetStride());
     }
 
     __aicore__ inline constexpr decltype(auto) layout()
@@ -57,25 +57,25 @@ struct Layout : private Std::tuple<T, U>
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) GetShape()
+    __aicore__ inline constexpr decltype(auto) Shape()
     {
         return TensorInternal::GetValue<0, I...>(static_cast<Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) GetShape() const
+    __aicore__ inline constexpr decltype(auto) Shape() const
     {
         return TensorInternal::GetValue<0, I...>(static_cast<const Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) GetStride()
+    __aicore__ inline constexpr decltype(auto) Stride()
     {
         return TensorInternal::GetValue<1, I...>(static_cast<Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) GetStride() const
+    __aicore__ inline constexpr decltype(auto) Stride() const
     {
         return TensorInternal::GetValue<1, I...>(static_cast<const Std::tuple<T, U>&>(*this));
     }

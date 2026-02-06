@@ -67,7 +67,7 @@ template <size_t... Is, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Size(const Layout<Shape, Stride>& layout);
 
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Capicity(const Layout<Shape, Stride>& layout);
+__aicore__ inline constexpr auto Capacity(const Layout<Shape, Stride>& layout);
 
 template <size_t... Is, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Coshape(const Layout<Shape, Stride>& layout);
@@ -86,6 +86,8 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, con
 namespace AscendC {
 template <typename T>
 __aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column);
+
+__aicore__ inline decltype(auto) MakeL0CLayout(size_t row, size_t column);
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeRowMajorLayout(size_t row, size_t column);
