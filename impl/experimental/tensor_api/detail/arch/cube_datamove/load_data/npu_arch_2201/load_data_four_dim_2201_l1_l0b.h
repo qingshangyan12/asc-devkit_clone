@@ -79,9 +79,9 @@ public:
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
         if constexpr (trait.transposed) {
-            CheckZNTemplate<U>();
-        } else {
             CheckNZTemplate<U>();
+        } else {
+            CheckZNTemplate<U>();
         }
         CheckZNTemplate<T>();
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
@@ -188,7 +188,7 @@ private:
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
         using srcType = typename U::elementType;
-        LoadL1ToL0B<!trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
+        LoadL1ToL0B<trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
             Std::get<Is>(tupleParams)...);
     }
 
@@ -247,7 +247,7 @@ private:
     template <typename T, typename U, typename V, const LoadDataTrait& trait, size_t... Is>
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-        LoadL1ToL0B<!trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
+        LoadL1ToL0B<trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
             Std::get<Is>(tupleParams)...);
     }
 
@@ -309,7 +309,7 @@ private:
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
         using srcType = typename U::elementType;
-        LoadL1ToL0B<!trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
+        LoadL1ToL0B<trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
             Std::get<Is>(tupleParams)...);
     }
 
