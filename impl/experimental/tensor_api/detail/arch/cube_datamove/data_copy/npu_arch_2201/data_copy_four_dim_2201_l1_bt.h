@@ -12,8 +12,8 @@
  * \file data_copy_four_dim_2201_l1_bt.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_FOUR_DIM_2201_GM_BT_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_FOUR_DIM_2201_GM_BT_H
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_FOUR_DIM_2201_GM_BT_H
+#define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_FOUR_DIM_2201_GM_BT_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
 #include "include/experimental/tensor_api/tensor/make.h"
@@ -23,10 +23,10 @@ namespace TensorInternal {
 
 class CopyCbufToBT2201 {
 public:
-    template <typename T, typename U, const DataCopyTrait& trait>
-    __aicore__ inline void Run(const T& dst, const U& src) {
-        auto params = GenDataCopyParams<T, U, trait>(dst, src);
-        DataCopyImpl<T, U, decltype(params), trait>(dst, src, params, tuple_sequence<decltype(params)>{});
+    template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        auto params = GenDataCopyParams<trait, T, U>(dst, src);
+        DataCopyImpl<trait, T, U, decltype(params)>(dst, src, params, tuple_sequence<decltype(params)>{});
     }
 
 private:
@@ -46,7 +46,7 @@ private:
         static_assert(Std::is_same_v<StrideColumn1, Std::Int<1>>, "CopyCbufToBT Layout->Stride->Column->OneDim, is not Std::Int<1> type!");
     }
 
-    template <typename T, typename U, const DataCopyTrait& trait>
+    template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline constexpr void CheckTemplate()
     {
         using srcType = typename U::elementType;
@@ -55,17 +55,17 @@ private:
         CheckNDTemplate<T>();
         CheckNDTemplate<U>();
 
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
         static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, 
             Std::tuple<__biasbuf__ float, __cbuf__ float>, Std::tuple<__biasbuf__ int32_t, __cbuf__ int32_t>>, "The data type is not supported.");
 #endif
     }
 
-    template <typename T, typename U, const DataCopyTrait& trait>
+    template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline auto GenDataCopyParams(const T& dst, const U& src)
     {
         constexpr auto L12BT_UNIT = TensorInternal::C0_SIZE * 2;
-        CheckTemplate<T, U, trait>();
+        CheckTemplate<trait, T, U>();
 
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
@@ -86,10 +86,10 @@ private:
         return Std::make_tuple(convControl, blockCount, blockLen, srcStride, dstStride);
     }
 
-    template <typename T, typename U, typename V, const DataCopyTrait& trait, size_t... Is>
+    template <const DataCopyTrait& trait, typename T, typename U, typename V, size_t... Is>
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-        CopyCbufToBt(reinterpret_cast<uint64_t>(dst.Engine().Begin().Get()), src.Engine().Begin().Get(), Std::get<Is>(tupleParams)...);
+        CopyCbufToBt(reinterpret_cast<uint64_t>(dst.Data().Get()), src.Data().Get(), Std::get<Is>(tupleParams)...);
     }
 
     template <typename T>
@@ -109,4 +109,4 @@ private:
 } // namespace TensorInternal
 } // namespace AscendC
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_FOUR_DIM_2201_GM_BT_H
+#endif // IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_2201_DATA_COPY_FOUR_DIM_2201_GM_BT_H

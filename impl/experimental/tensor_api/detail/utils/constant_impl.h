@@ -12,8 +12,8 @@
 * \file constant_impl.h
 * \brief
 */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_IMPL_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_IMPL_H
+#ifndef IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
+#define IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H
 
 #include <cstdint>
 #include <utility>
@@ -32,6 +32,7 @@ constexpr size_t C0_SIZE = 32;
 constexpr size_t FRACTAL_FIXED = 16;
 constexpr size_t DISABLE_COORD = 0;
 constexpr size_t ENABLE_COORD = 1;
+constexpr size_t SHIFT_LEFT_16 = 0x00010000;
 
 template <QuantMode_t Value, QuantMode_t... Args>
 struct is_one_of_value : Std::false_type {};
@@ -82,4 +83,4 @@ using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUAN
 }
 }
 
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_UTILS_CONSTANT_IMPL_H
+#endif // IMPL_TENSOR_API_UTILS_CONSTANT_IMPL_H

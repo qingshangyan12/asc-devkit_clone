@@ -12,8 +12,8 @@
  * \file basic_algorithm.h
  * \brief
  */
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_BASIC_ALGORITHM_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_TENSOR_BASIC_ALGORITHM_H
+#ifndef IMPL_TENSOR_API_TENSOR_BASIC_ALGORITHM_H
+#define IMPL_TENSOR_API_TENSOR_BASIC_ALGORITHM_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
 
@@ -51,6 +51,14 @@ __aicore__ inline constexpr auto TransformApply(T0&& t0, T1&& t1, F&& f, G&& g)
     } else {
         return g(f(static_cast<T0&&>(t0), static_cast<T1&&>(t1)));
     }
+}
+
+__aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
+{
+    if (num2 == 0) {
+        return 0;
+    }
+    return (num1 + num2 - 1) / num2;
 }
 }
 }
@@ -306,4 +314,4 @@ public:
 };
 }
 } // namespace AscendC
-#endif
+#endif // IMPL_TENSOR_API_TENSOR_BASIC_ALGORITHM_H
