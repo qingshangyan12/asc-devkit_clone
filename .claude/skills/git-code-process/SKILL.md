@@ -14,6 +14,7 @@ description: 采用git进行代码管理，完成添加文件到暂存区、提�
 本技能的核心价值在于：
 - **标准化流程**：提供统一的 Git 操作规范，确保代码上库流程的一致性
 - **冲突预防**：通过 git stash → git pull → git stash pop 机制，有效避免代码冲突
+- **冲突处理**：通过 hooks 机制实现冲突检测、流程暂停、人工干预、流程恢复
 - **规范提交**：强制使用符合项目要求的提交信息格式（DTS、Description、Team、Feature or Bugfix）
 - **自动化执行**：自动化完成 add、commit、repo upload 等操作
 - **安全可靠**：内置安全检查机制，避免误操作导致的数据丢失
@@ -60,6 +61,7 @@ description: 采用git进行代码管理，完成添加文件到暂存区、提�
 - **日志记录**：完整记录所有操作步骤和结果
 - **CodeHub集成**：直接对接华为 CodeHub 平台
 - **冲突预防**：通过 stash + pull 机制避免代码冲突
+- **冲突处理**：通过 hooks 机制实现冲突检测、流程暂停、人工干预、流程恢复
 
 ## 三、详细操作指南
 
@@ -263,6 +265,394 @@ repo upload .
 # 看到提示 "Upload project ... to remote branch ... (y/N)?" 时，输入 y 确认
 ```
 
+### 4.3 Hooks 机制与冲突处理
+
+本技能通过 **hooks 机制** 实现代码冲突的人工干预流程，确保在遇到冲突时能够安全地暂停、处理和恢复。
+
+#### 4.3.1 Hooks 触发点
+
+在以下关键操作点会触发 hooks：
+
+| Hook 点 | 触发时机 | 功能 |
+|---------|---------|------|
+| **pre-stash** | git stash 执行前 | 检查是否有未提交的修改 |
+| **post-stash** | git stash 执行后 | 验证暂存是否成功 |
+| **pre-pull** | git pull 执行前 | 检查网络连接和远程仓库状态 |
+| **post-pull** | git pull 执行后 | **检测是否有冲突**，如有冲突则暂停流程 |
+| **pre-stash-pop** | git stash pop 执行前 | 检查工作目录状态 |
+| **post-stash-pop** | git stash pop 执行后 | **检测是否有冲突**，如有冲突则暂停流程 |
+| **pre-commit** | git commit 执行前 | 检查暂存区状态和提交信息格式 |
+| **post-commit** | git commit 执行后 | 验证提交是否成功 |
+| **pre-upload** | repo upload 执行前 | 检查本地是否有未推送的提交 |
+| **post-upload** | repo upload 执行后 | 验证上传是否成功 |
+
+#### 4.3.2 冲突检测流程
+
+**自动冲突检测：**
+
+```bash
+# post-pull 和 post-stash-pop hook 会自动执行：
+git status | grep "Unmerged files"  # 检测未合并的文件
+git status | grep "both modified"   # 检测冲突文件
+```
+
+**检测到冲突时的处理流程：**
+
+```
+【检测到冲突】
+    ↓
+【Hook 暂停】自动化流程暂停
+    ↓
+【通知用户】显示冲突文件列表和冲突标记示例
+    ↓
+【等待人工处理】提供详细的冲突解决指导
+    ↓
+【用户解决冲突】手动编辑文件，解决冲突
+    ↓
+【用户确认】告知系统冲突已解决
+    ↓
+【Hook 恢复】验证冲突已解决，继续后续流程
+```
+
+#### 4.3.3 冲突处理完整流程
+
+**步骤1：冲突检测与暂停**
+
+```bash
+# 系统检测到冲突
+============================================================
+⚠️  检测到代码冲突！
+============================================================
+
+冲突文件列表：
+  - ci_config/rule.yaml
+  - ci_config/custom/config.yaml
+
+自动化流程已暂停，请按照以下步骤解决冲突。
+```
+
+**步骤2：人工解决冲突**
+
+打开冲突文件，查找冲突标记：
+
+```yaml
+# <<<<<<< Updated upstream
+# 远程代码
+version: cann_new
+enabled: true
+# =======
+# 本地代码
+version: cann
+enabled: false
+# >>>>>>> Stashed changes
+```
+
+**解决冲突的三种方式：**
+
+**方式1：接受远程代码**
+
+放弃本地修改，完全使用远程版本：
+
+```bash
+# 1. 接受远程版本
+git checkout --theirs <冲突文件>
+
+# 2. 添加到暂存区
+git add <冲突文件>
+
+# 示例：
+git checkout --theirs ci_config/rule.yaml
+git add ci_config/rule.yaml
+```
+
+**适用场景：**
+- 远程修改是正确的，本地修改已过时
+- 不确定哪个版本正确，选择信任团队代码
+- 快速解决冲突，接受权威版本
+
+---
+
+**方式2：接受本地代码**
+
+保留本地修改，覆盖远程修改：
+
+```bash
+# 1. 接受本地版本
+git checkout --ours <冲突文件>
+
+# 2. 添加到暂存区
+git add <冲突文件>
+
+# 示例：
+git checkout --ours ci_config/rule.yaml
+git add ci_config/rule.yaml
+```
+
+**适用场景：**
+- 本地修改是正确的，远程修改是错误的
+- 本地修改是紧急修复，必须保留
+- 确认远程修改可以被覆盖
+
+---
+
+**方式3：手动合并（推荐）**
+
+编辑文件，选择需要保留的内容：
+
+```bash
+# 1. 打开冲突文件
+vi ci_config/rule.yaml
+
+# 2. 查找冲突标记
+<<<<<<< Updated upstream
+# 远程代码
+version: cann_new
+enabled: true
+=======
+# 本地代码
+version: cann
+enabled: false
+>>>>>>> Stashed changes
+
+# 3. 删除冲突标记，保留需要的内容
+# 例如：
+version: cann_new
+enabled: true
+
+# 4. 保存文件
+
+# 5. 添加到暂存区
+git add ci_config/rule.yaml
+```
+
+**适用场景：**
+- 需要保留远程和本地两部分的有用修改
+- 需要仔细审查每一处冲突
+- 复杂的合并场景
+
+**手动合并注意事项：**
+- 完全删除所有冲突标记（<<<<<<<、=======、>>>>>>>）
+- 确保合并后的代码语法正确
+- 测试验证功能正常
+- 可以与团队成员沟通确认
+
+**步骤3：验证冲突已解决**
+
+```bash
+# 检查冲突文件状态
+git status
+
+# 应该看到：
+# both modified: <冲突文件>
+# 或
+# modified: <冲突文件>
+# 不应该再看到 "Unmerged files"
+```
+
+**步骤4：标记冲突已解决**
+
+```bash
+# 将解决后的文件添加到暂存区
+git add <冲突文件>
+
+# 确认所有冲突已解决
+git status
+
+# 应该看不到任何冲突标记
+```
+
+**步骤5：继续流程**
+
+```bash
+# 告诉系统继续执行
+# 输入："继续" 或 "resume"
+```
+
+系统会自动验证冲突已解决，并继续执行剩余的上库流程。
+
+#### 4.3.4 Hook 辅助脚本：check_conflict.py
+
+**冲突检测脚本位置**：`.claude/skills/git-code-process/scripts/check_conflict.py`
+
+该脚本用于检测工作目录中的 Git 冲突，提供详细的冲突信息和处理建议。
+
+##### 基本用法
+
+```bash
+# 检测是否存在冲突
+python .claude/skills/git-code-process/scripts/check_conflict.py
+
+# 检测并显示详细信息（包括原始冲突标记）
+python .claude/skills/git-code-process/scripts/check_conflict.py --verbose
+
+# 安静模式（仅返回退出码，不输出信息）
+python .claude/skills/git-code-process/scripts/check_conflict.py --quiet
+```
+
+##### 命令行参数
+
+| 参数 | 说明 |
+|------|------|
+| 无参数 | 默认模式，显示冲突检测报告 |
+| `--verbose, -v` | 详细模式，显示原始冲突标记内容 |
+| `--quiet, -q` | 安静模式，仅返回退出码（0=无冲突，1=有冲突） |
+| `--list, -l` | 列出原始冲突标记（同 --verbose） |
+
+##### 退出码
+
+- `0`：无冲突，可以继续操作
+- `1`：存在冲突，需要先解决
+
+##### 输出示例
+
+**无冲突时：**
+
+```bash
+$ python .claude/skills/git-code-process/scripts/check_conflict.py
+
+============================================================
+Git 冲突检测报告
+============================================================
+
+✓ 未检测到冲突
+工作目录干净，可以继续操作。
+```
+
+**有冲突时（默认模式）：**
+
+```bash
+$ python .claude/skills/git-code-process/scripts/check_conflict.py
+
+============================================================
+Git 冲突检测报告
+============================================================
+
+✗ 检测到冲突！
+
+冲突文件数：2
+
+【类型1】已删除冲突（DD/DU/UD）：
+  - ci_config/custom/config.yaml
+
+  建议：
+  - 查看远程和本地差异
+  - 与团队成员沟通确认
+
+【类型2】内容冲突（UU/AA/U）：
+  - ci_config/rule.yaml
+
+  建议：
+  - 手动编辑文件解决冲突
+  - 删除冲突标记（<<<<<<<, =======, >>>>>>>）
+
+============================================================
+冲突解决指导：
+============================================================
+
+1. 打开冲突文件，查找冲突标记
+2. 根据需要保留远程代码、本地代码或手动合并
+3. 删除所有冲突标记（<<<<<<<, =======, >>>>>>>）
+4. 保存文件
+5. 执行：git add <冲突文件>
+6. 再次运行本脚本验证冲突已解决
+```
+
+**有冲突时（详细模式）：**
+
+```bash
+$ python .claude/skills/git-code-process/scripts/check_conflict.py --verbose
+
+============================================================
+Git 冲突检测报告
+============================================================
+
+✗ 检测到冲突！
+
+...（省略基本信息）...
+
+============================================================
+冲突标记详情：
+============================================================
+
+冲突文件：ci_config/rule.yaml
+------------------------------------------------------------
+<<<<<<< Updated upstream
+version: cann_new
+enabled: true
+=======
+version: cann
+enabled: false
+>>>>>>> Stashed changes
+------------------------------------------------------------
+```
+
+##### 在脚本中使用
+
+```bash
+#!/bin/bash
+
+# 拉取远程代码
+git pull
+
+# 检测冲突
+python .claude/skills/git-code-process/scripts/check_conflict.py
+if [ $? -ne 0 ]; then
+    echo "请先解决冲突后再继续"
+    exit 1
+fi
+
+# 继续后续流程
+git stash pop
+```
+
+#### 4.3.5 冲突处理最佳实践
+
+**1. 备份优先**
+```bash
+# 在解决冲突前先备份
+cp <冲突文件> <冲突文件>.conflict_backup
+```
+
+**2. 逐个文件处理**
+- 不要一次性解决所有冲突
+- 逐个文件处理，验证后继续下一个
+
+**3. 理解冲突原因**
+- 查看冲突内容，理解远程和本地的差异
+- 询问团队成员相关修改的背景
+
+**4. 测试验证**
+- 冲突解决后，先在本地测试
+- 确保功能正常后再提交
+
+**5. 保留记录**
+- 记录冲突原因和解决方案
+- 便于后续查阅和团队分享
+
+#### 4.3.6 冲突预防建议
+
+虽然本技能提供了完整的冲突处理机制，但预防冲突更为重要：
+
+**1. 及时同步**
+```bash
+# 定期执行 git pull
+# 不要长时间不更新代码
+git pull
+```
+
+**2. 小步快跑**
+```bash
+# 频繁提交小改动
+# 避免积累大量本地修改
+git add .
+git commit -m "xxx"
+```
+
+**3. 沟通协调**
+- 修改公共文件前先沟通
+- 使用分支隔离开发
+- 定期同步代码
+
 ## 五、异常处理
 
 ### 5.1 git stash pop 冲突
@@ -411,8 +801,15 @@ git commit -m "修改文件"      # ❌ 缺少细节
 
 - 技能名称：git-code-process
 - 技能路径：`.claude/skills/git-code-process/`
+- 脚本位置：`.claude/skills/git-code-process/scripts/`
 - 文档位置：`.claude/skills/git-code-process/SKILL.md`
-- 更新日期：2025-02-05
+- 更新日期：2025-02-06
+
+### 脚本文件
+
+| 脚本名称 | 功能说明 | 用途 |
+|---------|---------|------|
+| **check_conflict.py** | Git 冲突检测工具 | 检测工作目录中的冲突文件，提供处理建议 |
 
 ## 八、常见问题
 
@@ -530,18 +927,112 @@ git stash clear
 git stash
 
 # 2. 拉取远程最新代码
-git pull 
+git pull
 
-# 3. 恢复本地修改
+# 3. 检测冲突（hooks 自动触发）
+python .claude/skills/git-code-process/scripts/check_conflict.py
+
+# 4. 恢复本地修改
 git stash pop
 
-# 4. 如有冲突，手动解决
-# 5. 提交并上传
+# 5. 如果有冲突，按照提示解决
+# 6. 再次检测冲突
+python .claude/skills/git-code-process/scripts/check_conflict.py
 ```
 
-### Q8：如何清理未跟踪的文件？
+### Q8：如何使用 hooks 机制处理冲突？
+
+**回答：**
+
+hooks 机制是本技能的核心特性，用于在冲突发生时提供人工干预流程。
+
+**完整流程：**
 ```bash
-# 查看未跟踪的文件
+# 1. 检测冲突
+python .claude/skills/git-code-process/scripts/check_conflict.py
+
+# 2. 如果有冲突，会显示冲突文件列表
+# ✗ 检测到冲突文件：
+#   - ci_config/rule.yaml
+
+# 3. 查看冲突内容
+python .claude/skills/git-code-process/scripts/check_conflict.py --verbose
+
+# 4. 手动解决冲突
+# - 打开冲突文件
+# - 删除冲突标记
+# - 保存文件
+
+# 5. 标记冲突已解决
+git add ci_config/rule.yaml
+
+# 6. 再次检测确认
+python .claude/skills/git-code-process/scripts/check_conflict.py
+
+# 7. 确认无冲突后，继续流程
+```
+
+**三种解决冲突的方式：**
+
+```bash
+# 方式1：接受远程代码（放弃本地修改）
+git checkout --theirs ci_config/rule.yaml
+
+# 方式2：接受本地代码（保留本地修改）
+git checkout --ours ci_config/rule.yaml
+
+# 方式3：手动合并（推荐）
+# - 手动编辑文件，选择需要保留的内容
+# - 删除冲突标记：<<<<<<<, =======, >>>>>>>
+# - 保存文件
+```
+
+### Q9：如何知道冲突已经完全解决？
+
+**验证方法：**
+```bash
+# 方法1：使用冲突检测脚本
+python .claude/skills/git-code-process/scripts/check_conflict.py
+# 如果输出 "未检测到冲突"，说明冲突已解决
+
+# 方法2：检查 git status
+git status
+# 应该看不到 "Unmerged files" 或 "both modified"
+
+# 方法3：尝试添加到暂存区
+git add .
+# 如果没有错误提示，说明所有冲突已解决
+```
+
+### Q10：冲突解决后如何继续上库流程？
+
+**回答：**
+
+冲突解决并验证后，可以继续执行上库流程：
+
+```bash
+# 1. 确认冲突已解决
+python .claude/skills/git-code-process/scripts/check_conflict.py
+
+# 2. 继续添加到暂存区
+git add .
+
+# 3. 继续本地提交
+git commit -m "DTS: AR20250113161172" -m "Description: 解决合并冲突" -m "Team: HISI_EE" -m "Feature or Bugfix: Feature"
+
+# 4. 继续上传
+repo upload .
+```
+
+**注意：**
+- 提交信息中应注明"解决合并冲突"
+- 如果冲突复杂，建议先在本地测试验证
+- 确保功能正常后再上传
+
+### Q11：如何清理未跟踪的文件？
+
+```bash
+# 查看未跟踪的文件（不删除，仅预览）
 git clean -n
 
 # 删除未跟踪的文件（不删除目录）

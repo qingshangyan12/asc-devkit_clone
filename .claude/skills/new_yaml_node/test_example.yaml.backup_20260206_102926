@@ -1,0 +1,128 @@
+# YAML 结构分析测试文件
+# 包含各种类型的节点，用于测试分析脚本
+
+CB:
+  tasks:
+    pkg:
+      # pkg 类型节点 - 符合规范
+      pkg_common_compile:
+        version: cann
+        enabled: true
+        timeout: 3600
+        type: pkg
+        target:
+          - libcommon.so
+          - libcommon.a
+
+      # pkg 类型节点 - 缺少 enabled
+      pkg_utils:
+        version: cann
+        timeout: 3600
+        type: pkg
+        target:
+          - libutils.so
+
+      # pkg 类型节点 - 不符合命名规范（使用了大写）
+      Pkg_Module:  # 这个会被检查出来
+        version: cann
+        enabled: true
+        type: pkg
+        target:
+          - libmodule.so
+
+    compile:
+      # compile 类型节点 - 符合规范
+      compile_core_module:
+        version: cann
+        enabled: true
+        timeout: 7200
+        type: compile
+        source:
+          - src/core/*.cpp
+        include:
+          - include/
+        flags:
+          - -O2
+          - -Wall
+
+      # compile 类型节点 - 缺少必需的 source 配置项
+      compile_helper:
+        version: cann
+        enabled: true
+        type: compile
+        flags:
+          - -O2
+
+    test:
+      # test 类型节点 - 符合规范
+      test_api_smoke:
+        version: cann
+        enabled: true
+        timeout: 1800
+        type: test
+        case:
+          - test_api_001
+          - test_api_002
+        dependency:
+          - compile_api_module
+        ut_check: true
+
+      # test 类型节点 - 不符合命名规范（以数字开头）
+      test_1st_case:  # 这个会被检查出来
+        version: cann
+        enabled: true
+        type: test
+        case:
+          - test_case_001
+
+      # test 类型节点 - 使用了连字符
+      test-integration:  # 这个会被检查出来
+        version: cann
+        enabled: true
+        type: test
+        case:
+          - test_integration_001
+
+    llt:
+      # llt 类型节点 - 符合规范
+      llt_memory_leak:
+        version: cann
+        enabled: true
+        timeout: 5400
+        type: llt
+        module:
+          - memory_alloc
+          - memory_free
+        coverage:
+          - line: 80
+          - branch: 70
+
+      # llt 类型节点 - 缺少 module 配置项
+      llt_performance:
+        version: cann
+        enabled: true
+        type: llt
+        timeout: 7200
+
+    deploy:
+      # deploy 类型节点 - 符合规范
+      deploy_online_prod:
+        version: cann
+        enabled: true
+        timeout: 2400
+        type: deploy
+        target:
+          host: 192.168.1.100
+          path: /opt/cann/deploy
+        pre_check:
+          - disk_space_check
+        post_check:
+          - service_status_check
+
+    misc:
+      # misc 类型节点 - 没有类型前缀
+      helper_task:  # 这个会被检查出来缺少类型前缀
+        version: cann
+        enabled: true
+        timeout: 1200
+        description: "辅助任务"

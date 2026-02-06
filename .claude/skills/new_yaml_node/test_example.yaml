@@ -1,0 +1,110 @@
+CB:
+  tasks:
+    pkg:
+      pkg_common_compile:
+        version: cann
+        enabled: true
+        timeout: 3600
+        type: pkg
+        target:
+        - libcommon.so
+        - libcommon.a
+      pkg_utils:
+        version: cann
+        timeout: 3600
+        type: pkg
+        target:
+        - libutils.so
+      Pkg_Module:
+        version: cann
+        enabled: true
+        type: pkg
+        target:
+        - libmodule.so
+      pkg_new_feature:
+        version: cann
+        enabled: true
+        timeout: 3600
+        type: pkg
+        target:
+        - new_feature.so
+        - new_feature.a
+    compile:
+      compile_core_module:
+        version: cann
+        enabled: true
+        timeout: 7200
+        type: compile
+        source:
+        - src/core/*.cpp
+        include:
+        - include/
+        flags:
+        - -O2
+        - -Wall
+      compile_helper:
+        version: cann
+        enabled: true
+        type: compile
+        flags:
+        - -O2
+    test:
+      test_api_smoke:
+        version: cann
+        enabled: true
+        timeout: 1800
+        type: test
+        case:
+        - test_api_001
+        - test_api_002
+        dependency:
+        - compile_api_module
+        ut_check: true
+      test_1st_case:
+        version: cann
+        enabled: true
+        type: test
+        case:
+        - test_case_001
+      test-integration:
+        version: cann
+        enabled: true
+        type: test
+        case:
+        - test_integration_001
+    llt:
+      llt_memory_leak:
+        version: cann
+        enabled: true
+        timeout: 5400
+        type: llt
+        module:
+        - memory_alloc
+        - memory_free
+        coverage:
+        - line: 80
+        - branch: 70
+      llt_performance:
+        version: cann
+        enabled: true
+        type: llt
+        timeout: 7200
+    deploy:
+      deploy_online_prod:
+        version: cann
+        enabled: true
+        timeout: 2400
+        type: deploy
+        target:
+          host: 192.168.1.100
+          path: /opt/cann/deploy
+        pre_check:
+        - disk_space_check
+        post_check:
+        - service_status_check
+    misc:
+      helper_task:
+        version: cann
+        enabled: true
+        timeout: 1200
+        description: 辅助任务
