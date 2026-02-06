@@ -98,7 +98,7 @@ protected:
     Conv3DBpDxDesc descInfo;
     Conv3DBpAttr attrInfo;
     Conv3DDxBpCalcShape shapeCalc;
-    uint32_t blockDim_ = 1;
+    uint32_t numBlocks_ = 1;
     uint32_t coreNum_ = 1;
     OpType opType_ = OpType::kConv3DTranspose;
 private:
