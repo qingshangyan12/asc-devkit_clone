@@ -30,7 +30,7 @@ using Tile = Std::tuple<Layouts...>;
 template <typename... Coords>
 using Coord = Std::tuple<Coords...>;
 
-template <typename T, typename U = TensorInternal::LayoutLeft::Apply<T>>
+template <typename T, typename U>
 struct Layout : private Std::tuple<T, U>
 {
     static constexpr auto size = TensorInternal::StaticLayoutSize<T, U>::size;
