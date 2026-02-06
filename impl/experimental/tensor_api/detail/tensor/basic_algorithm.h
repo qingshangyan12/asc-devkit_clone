@@ -107,21 +107,21 @@ __aicore__ inline constexpr auto GetTuple(Tuple&& t)
 template <size_t I0, size_t I1, size_t... Is, typename Tuple>
 __aicore__ inline constexpr auto GetTuple(Tuple&& t) 
 {
-    static_assert(Std::is_tuple_v<Tuple>, "Shape or Stride is not Tuple");
+    static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
     return GetTuple<I1, Is...>(GetTuple<I0>(static_cast<Tuple&&>(t)));
 }
 
 template <typename Tuple>
 __aicore__ inline constexpr auto GetTuple(Tuple&& t) 
 {
-    static_assert(Std::is_tuple_v<Tuple>, "Shape or Stride is not Tuple");
+    static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
     return static_cast<Tuple&&>(t);
 }
 
 template <size_t... Is, typename Tuple>
 __aicore__ inline constexpr auto GetRank(const Tuple& t)
 {
-    static_assert(Std::is_tuple_v<Tuple>, "Shape or Stride is not Tuple!");
+    static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple!");
     if constexpr (sizeof...(Is) == 0) {
         return Std::Int<Std::tuple_size_v<Tuple>>{};
     } else {
@@ -142,7 +142,7 @@ __aicore__ inline constexpr auto TupleSize(const Tuple& t)
 template <size_t I, typename Tuple>
 __aicore__ inline constexpr auto SelectTuple(Tuple&& t)
 {
-    static_assert(Std::is_tuple_v<Tuple>, "Shape or Stride is not Tuple");
+    static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
     auto&& tt = Std::get<I>(static_cast<Tuple&&>(t));
     if constexpr (Std::is_tuple_v<Std::remove_cvref_t<decltype(tt)>>) {
         return tt;
