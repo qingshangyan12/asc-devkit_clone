@@ -45,6 +45,12 @@ __aicore__ inline constexpr auto GetShape(const Layout<Shape, Stride>& layout);
 template <size_t... Is, typename Shape, typename Stride>
 __aicore__ inline constexpr auto GetShape(Layout<Shape, Stride>& layout);
 
+template <typename Tuple>
+__aicore__ inline constexpr auto GetShape(const Tuple& shape);
+
+template <size_t I, size_t... Is, typename Tuple>
+__aicore__ inline constexpr auto GetShape(const Tuple& shape);
+
 template <size_t... Is, typename Shape, typename Stride>
 __aicore__ inline constexpr auto GetStride(const Layout<Shape, Stride>& layout);
 
@@ -53,6 +59,9 @@ __aicore__ inline constexpr auto GetStride(Layout<Shape, Stride>& layout);
 
 template <size_t... Is, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Select(const Layout<Shape, Stride>& layout);
+
+template <size_t... Is, typename Shape, typename Stride>
+__aicore__ inline constexpr auto Get(const Layout<Shape, Stride>& layout);
 
 template <size_t... Is, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Size(const Layout<Shape, Stride>& layout);
@@ -114,6 +123,10 @@ using ZNLayoutFormat = Layout<TensorInternal::ZNShapeFormat<T, row, column>, Ten
 
 template <typename T, size_t row, size_t column>
 using ZZLayoutFormat = Layout<TensorInternal::ZZShapeFormat<T, row, column>, TensorInternal::ZZStrideFormat<T, row, column>>;
-} // namespace AscendC
+
+template <size_t row, size_t column>
+using L0CLayoutFormat = NZLayoutFormat<Std::ignore_t, row, column>;
+}
+// namespace AscendC
 
 #endif // EXPERIMENTAL_TENSOR_API_TENSOR_MAKE_LAYOUT_H
