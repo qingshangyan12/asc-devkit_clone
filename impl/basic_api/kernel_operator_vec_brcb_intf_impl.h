@@ -17,6 +17,7 @@
 #include "kernel_tensor.h"
 #include "kernel_check.h"
 #include "kernel_struct_brcb.h"
+#include "mstx_local_tensor_info.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_brcb_impl.h"

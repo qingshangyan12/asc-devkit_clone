@@ -61,21 +61,34 @@ __aicore__ inline MstxTensorDesc From(const LocalTensor<T>& dst) {
         space = MSTX_TENSOR_AT_PRIVATE;
     }
 
+    uint8_t sizebit;
+    if constexpr (IsSameType<PrimT<T>, int4b_t>::value) {
+        sizebit = static_cast<uint8_t>(4 * sizeof(PrimT<T>));
+    } else {
+        sizebit = static_cast<uint8_t>(8 * sizeof(PrimT<T>));
+    }
+
     return MstxTensorDesc{
         space,
         reinterpret_cast<uint64_t>(dst.GetPhyAddr()),
         dst.GetSize(),
-        static_cast<uint8_t>(8 * sizeof(PrimT<T>))
+        sizebit
     };
 }
 
 template <typename T>
 __aicore__ inline MstxTensorDesc FromGm(const GlobalTensor<T>& dst) {
+    uint8_t sizebit;
+    if constexpr (IsSameType<PrimT<T>, int4b_t>::value) {
+        sizebit = static_cast<uint8_t>(4 * sizeof(PrimT<T>));
+    } else {
+        sizebit = static_cast<uint8_t>(8 * sizeof(PrimT<T>));
+    }
     return MstxTensorDesc{
         MSTX_TENSOR_AT_GM,
         reinterpret_cast<uint64_t>(dst.GetPhyAddr()),
         dst.GetSize(),
-        static_cast<uint8_t>(8 * sizeof(PrimT<T>))
+        sizebit
     };
 }
 
@@ -135,12 +148,27 @@ __aicore__ inline MstxVecWrapper WrapperFrom(MstxMaskMode maskMode, uint64_t mas
     };
 }
 
+template <typename T>
 __aicore__ inline MstxVecWrapper WrapperFrom(MstxMaskMode maskMode, uint64_t mask, bool isSetMask, uint32_t reserveBufSize) {
-    uint64_t trueMask0, trueMask1;
+    int32_t typeLen = 0;
     constexpr int32_t halfTypeLen = 64;  // 1 register -> 64 bits -> 64 elements
     constexpr int32_t lenCoeff = 2; 
-    trueMask0 = (mask > halfTypeLen) ? FULL_MASK : (((static_cast<uint64_t>(1)) << static_cast<uint32_t>(mask)) - 1);
-    trueMask1 = (mask > halfTypeLen) ? (((static_cast<uint64_t>(1)) << static_cast<uint32_t>(mask - halfTypeLen)) - 1) : 0;
+    uint64_t trueMask0, trueMask1;
+    if constexpr (IsSameType<T, int4b_t>::value) {
+        typeLen = DEFAULT_BLOCK_SIZE * INT4_TWO;
+    } else {
+        typeLen = DEFAULT_BLOCK_SIZE / sizeof(T);
+    }
+    if (mask == halfTypeLen) {
+        trueMask0 = FULL_MASK;
+        trueMask1 = 0;
+    } else if (mask == typeLen || mask >= halfTypeLen * lenCoeff) { 
+        trueMask0 = FULL_MASK;
+        trueMask1 = FULL_MASK;
+    } else {
+        trueMask0 = (mask > halfTypeLen) ? FULL_MASK : (((static_cast<uint64_t>(1)) << static_cast<uint32_t>(mask)) - 1);
+        trueMask1 = (mask > halfTypeLen) ? (((static_cast<uint64_t>(1)) << static_cast<uint32_t>(mask - halfTypeLen)) - 1) : 0;
+    } 
 
     return MstxVecWrapper{
         maskMode,
@@ -153,7 +181,7 @@ __aicore__ inline MstxVecWrapper WrapperFrom(MstxMaskMode maskMode, uint64_t mas
 struct MstxVecUnaryDesc {
     MstxTensorDesc dst;
     MstxTensorDesc src;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     uint32_t blockNum;
     uint32_t dstBlockStride;
     uint32_t srcBlockStride;
@@ -166,7 +194,7 @@ struct MstxVecUnaryDesc {
 struct MstxVecReduceDesc {
     MstxTensorDesc dst;
     MstxTensorDesc src;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     uint32_t srcBlockStride;
     uint32_t repeatTimes;
     uint32_t dstRepeatStride;
@@ -177,7 +205,7 @@ struct MstxVecReduceDesc {
 struct MstxVecBrcbDesc {
     MstxTensorDesc dst;
     MstxTensorDesc src;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     uint32_t dstBlockStride;
     uint32_t repeatTimes;
     uint32_t dstRepeatStride;
@@ -188,7 +216,7 @@ struct MstxVecComplexReduceDesc {
     MstxTensorDesc dst;
     MstxTensorDesc src;
     MstxTensorDesc tmp;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     uint32_t repeatTimes;
     uint32_t srcRepeatStride;
     char name[64];
@@ -196,7 +224,7 @@ struct MstxVecComplexReduceDesc {
 
 struct MstxVecDupDesc {
     MstxTensorDesc dst;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     uint32_t dstBlockStride;
     uint32_t repeatTimes;
     uint32_t dstRepeatStride;
@@ -206,7 +234,7 @@ struct MstxVecDupDesc {
 struct MstxVecCopy {
     MstxTensorDesc dst;
     MstxTensorDesc src;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     uint32_t repeatTimes;
     uint32_t dstStride;
     uint32_t srcStride;
@@ -218,7 +246,7 @@ struct MstxVecCopy {
 struct MstxVecCastDeqDesc {
     MstxTensorDesc dst;
     MstxTensorDesc src;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     uint32_t blockNum;
     uint32_t dstBlockStride;
     uint32_t srcBlockStride;
@@ -255,7 +283,7 @@ struct MstxVecBinaryDesc {
     MstxTensorDesc dst;
     MstxTensorDesc src0;
     MstxTensorDesc src1;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     uint32_t blockNum;
     uint32_t dstBlockStride;
     uint32_t src0BlockStride;
@@ -273,7 +301,7 @@ struct MstxVecBilinearInterpolation {
     MstxTensorDesc src1;
     MstxTensorDesc src0Offset;
     MstxTensorDesc shared;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     uint32_t hRepeat;
     bool repeatMode;
     uint32_t dstBlockStride;
@@ -295,7 +323,7 @@ struct MstxVecSelDesc {
     MstxTensorDesc src0;
     MstxTensorDesc src1;
     MstxTensorDesc mask;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     bool scalarMode;
     uint32_t blockNum;
     uint32_t dstBlockStride;
@@ -316,7 +344,7 @@ enum class MstxGatherMaskMode {
 struct MstxVecGatherMaskDesc {
     MstxTensorDesc dst;
     MstxTensorDesc src;
-    MstxVecWrapper wapper;
+    MstxVecWrapper wrapper;
     MstxGatherMaskMode mode;
     uint32_t repeatTimes;
     uint32_t src0BlockStride;
@@ -345,7 +373,7 @@ __aicore__ inline void GetMstxVecUnaryInfo(const LocalTensor<T>& dst, const Loca
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecUnaryDesc.repeatTimes = repeatTime;
     mstxVecUnaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -364,7 +392,7 @@ __aicore__ inline void GetMstxVecUnaryInfo(const LocalTensor<T>& dst, const Loca
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecUnaryDesc.repeatTimes = repeatTime;
     mstxVecUnaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -383,7 +411,7 @@ __aicore__ inline void GetMstxVecUnaryInfo(const LocalTensor<T>& dst, const Loca
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = 8;
     mstxVecUnaryDesc.repeatTimes = 1;
     mstxVecUnaryDesc.dstBlockStride = 1;
@@ -402,7 +430,7 @@ __aicore__ inline void GetMstxVecUnaryTenaryInfo(const LocalTensor<T>& dst, cons
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecUnaryDesc.repeatTimes = repeatTime;
     mstxVecUnaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -421,7 +449,7 @@ __aicore__ inline void GetMstxVecUnaryTenaryInfo(const LocalTensor<T>& dst, cons
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecUnaryDesc.repeatTimes = repeatTime;
     mstxVecUnaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -440,13 +468,17 @@ __aicore__ inline void GetMstxVecUnaryTenaryInfo(const LocalTensor<T>& dst, cons
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = 8;
     mstxVecUnaryDesc.repeatTimes = 1;
     mstxVecUnaryDesc.dstBlockStride = 1;
     mstxVecUnaryDesc.srcBlockStride = 1;
     mstxVecUnaryDesc.dstRepeatStride = 8;
-    mstxVecUnaryDesc.srcRepeatStride = 8;
+    if constexpr (sizeof(T) > sizeof(U)) {
+        mstxVecUnaryDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE / 2 ;
+    } else {
+        mstxVecUnaryDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE;
+    }
     CopyName(mstxVecUnaryDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_TENARY), sizeof(mstxVecUnaryDesc), &mstxVecUnaryDesc);
@@ -459,7 +491,7 @@ __aicore__ inline void GetMstxVecUnaryCastInfo(const LocalTensor<T>& dst, const 
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecUnaryDesc.repeatTimes = repeatTime;
     mstxVecUnaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -478,7 +510,7 @@ __aicore__ inline void GetMstxVecUnaryCastInfo(const LocalTensor<T>& dst, const 
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecUnaryDesc.repeatTimes = repeatTime;
     mstxVecUnaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -497,13 +529,31 @@ __aicore__ inline void GetMstxVecUnaryCastInfo(const LocalTensor<T>& dst, const 
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = 8;
     mstxVecUnaryDesc.repeatTimes = 1;
     mstxVecUnaryDesc.dstBlockStride = 1;
     mstxVecUnaryDesc.srcBlockStride = 1;
-    mstxVecUnaryDesc.dstRepeatStride = 8;
-    mstxVecUnaryDesc.srcRepeatStride = 8;
+    if constexpr (sizeof(T) > sizeof(U)) {
+        if constexpr (IsSameType<U, int4b_t>::value) {
+            mstxVecUnaryDesc.dstRepeatStride = DEFAULT_REPEAT_STRIDE;
+            mstxVecUnaryDesc.srcRepeatStride = ONE_FOURTH_DEFAULT_REPEAT_STRIDE;
+        } else {
+            mstxVecUnaryDesc.dstRepeatStride = DEFAULT_REPEAT_STRIDE;
+            mstxVecUnaryDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE / 2;
+        }
+    } else if constexpr (sizeof(T) < sizeof(U)) {
+        if constexpr (IsSameType<T, int4b_t>::value) {
+            mstxVecUnaryDesc.dstRepeatStride = ONE_FOURTH_DEFAULT_REPEAT_STRIDE;
+            mstxVecUnaryDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE;
+        } else {
+            mstxVecUnaryDesc.dstRepeatStride = DEFAULT_REPEAT_STRIDE / 2;
+            mstxVecUnaryDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE;
+        }
+    } else {
+        mstxVecUnaryDesc.dstRepeatStride = DEFAULT_REPEAT_STRIDE;
+        mstxVecUnaryDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE;
+    }
     CopyName(mstxVecUnaryDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_CAST), sizeof(mstxVecUnaryDesc), &mstxVecUnaryDesc);
@@ -516,7 +566,7 @@ __aicore__ inline void GetMstxVecUnaryCastDeqInfo(const LocalTensor<T>& dst, con
     MstxVecCastDeqDesc mstxVecCastDeqDesc;
     mstxVecCastDeqDesc.dst = From(dst);
     mstxVecCastDeqDesc.src = From(src);
-    mstxVecCastDeqDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecCastDeqDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecCastDeqDesc.blockNum = repeatParams.blockNumber;
     mstxVecCastDeqDesc.repeatTimes = repeatTime;
     mstxVecCastDeqDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -536,7 +586,7 @@ __aicore__ inline void GetMstxVecUnaryCastDeqInfo(const LocalTensor<T>& dst, con
     MstxVecCastDeqDesc mstxVecCastDeqDesc;
     mstxVecCastDeqDesc.dst = From(dst);
     mstxVecCastDeqDesc.src = From(src);
-    mstxVecCastDeqDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecCastDeqDesc.wrapper = WrapperFrom<U>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecCastDeqDesc.blockNum = repeatParams.blockNumber;
     mstxVecCastDeqDesc.repeatTimes = repeatTime;
     mstxVecCastDeqDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -556,13 +606,34 @@ __aicore__ inline void GetMstxVecUnaryCastDeqInfo(const LocalTensor<T>& dst, con
     MstxVecCastDeqDesc mstxVecCastDeqDesc;
     mstxVecCastDeqDesc.dst = From(dst);
     mstxVecCastDeqDesc.src = From(src);
-    mstxVecCastDeqDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    mstxVecCastDeqDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
     mstxVecCastDeqDesc.blockNum = 8;
     mstxVecCastDeqDesc.repeatTimes = 1;
     mstxVecCastDeqDesc.dstBlockStride = 1;
     mstxVecCastDeqDesc.srcBlockStride = 1;
     mstxVecCastDeqDesc.dstRepeatStride = 8;
     mstxVecCastDeqDesc.srcRepeatStride = 8;
+        if constexpr (sizeof(T) > sizeof(U)) {
+            if constexpr (IsSameType<U, int4b_t>::value) {
+                mstxVecCastDeqDesc.dstRepeatStride = DEFAULT_REPEAT_STRIDE;
+                mstxVecCastDeqDesc.srcRepeatStride = ONE_FOURTH_DEFAULT_REPEAT_STRIDE;
+            } else {
+                mstxVecCastDeqDesc.dstRepeatStride = DEFAULT_REPEAT_STRIDE;
+                mstxVecCastDeqDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE / 2;
+            }
+        } else if constexpr (sizeof(T) < sizeof(U)) {
+            if constexpr (IsSameType<T, int4b_t>::value) {
+                mstxVecCastDeqDesc.dstRepeatStride = ONE_FOURTH_DEFAULT_REPEAT_STRIDE;
+                mstxVecCastDeqDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE;
+            } else {
+                mstxVecCastDeqDesc.dstRepeatStride = DEFAULT_REPEAT_STRIDE / 2;
+                mstxVecCastDeqDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE;
+            }
+        } else {
+            mstxVecCastDeqDesc.dstRepeatStride = DEFAULT_REPEAT_STRIDE;
+            mstxVecCastDeqDesc.srcRepeatStride = DEFAULT_REPEAT_STRIDE;
+        }
+
     mstxVecCastDeqDesc.halfBlock = halfBlock;
     CopyName(mstxVecCastDeqDesc.name, name);
 
@@ -577,7 +648,7 @@ __aicore__ inline void GetMstxVecUnaryCmpsInfo(const LocalTensor<T>& dst, const 
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecUnaryDesc.repeatTimes = repeatTime;
     mstxVecUnaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -596,7 +667,7 @@ __aicore__ inline void GetMstxVecUnaryCmpsInfo(const LocalTensor<T>& dst, const 
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecUnaryDesc.repeatTimes = repeatTime;
     mstxVecUnaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -615,7 +686,7 @@ __aicore__ inline void GetMstxVecUnaryCmpsInfo(const LocalTensor<T>& dst, const 
     MstxVecUnaryDesc mstxVecUnaryDesc;
     mstxVecUnaryDesc.dst = From(dst);
     mstxVecUnaryDesc.src = From(src);
-    mstxVecUnaryDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    mstxVecUnaryDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
     mstxVecUnaryDesc.blockNum = 8;
     mstxVecUnaryDesc.repeatTimes = 1;
     mstxVecUnaryDesc.dstBlockStride = 1;
@@ -634,7 +705,7 @@ __aicore__ inline void GetMstxVecReduceInfo(const LocalTensor<U>& dst, const Loc
     MstxVecReduceDesc mstxVecReduceDesc;
     mstxVecReduceDesc.dst = From(dst);
     mstxVecReduceDesc.src = From(src);
-    mstxVecReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecReduceDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecReduceDesc.repeatTimes = repeatTime;
     mstxVecReduceDesc.srcBlockStride = srcBlkStride;
     mstxVecReduceDesc.dstRepeatStride = dstRepStride;
@@ -651,7 +722,7 @@ __aicore__ inline void GetMstxVecReduceInfo(const LocalTensor<U>& dst, const Loc
     MstxVecReduceDesc mstxVecReduceDesc;
     mstxVecReduceDesc.dst = From(dst);
     mstxVecReduceDesc.src = From(src);
-    mstxVecReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecReduceDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecReduceDesc.repeatTimes = repeatTime;
     mstxVecReduceDesc.srcBlockStride = srcBlkStride;
     mstxVecReduceDesc.dstRepeatStride = dstRepStride;
@@ -668,7 +739,7 @@ __aicore__ inline void GetMstxVecCopyInfo(const LocalTensor<T>& dst, const Local
     MstxVecCopy mstxVecCopy;
     mstxVecCopy.dst = From(dst);
     mstxVecCopy.src = From(src);
-    mstxVecCopy.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecCopy.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecCopy.repeatTimes = repeatTime;
     mstxVecCopy.dstStride = repeatParams.dstStride;
     mstxVecCopy.srcStride = repeatParams.srcStride;
@@ -686,29 +757,12 @@ __aicore__ inline void GetMstxVecCopyInfo(const LocalTensor<T>& dst, const Local
     MstxVecCopy mstxVecCopy;
     mstxVecCopy.dst = From(dst);
     mstxVecCopy.src = From(src);
-    mstxVecCopy.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecCopy.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecCopy.repeatTimes = repeatTime;
     mstxVecCopy.dstStride = repeatParams.dstStride;
     mstxVecCopy.srcStride = repeatParams.srcStride;
     mstxVecCopy.dstRepeatSize = repeatParams.dstRepeatSize;
     mstxVecCopy.srcRepeatSize = repeatParams.srcRepeatSize;
-    CopyName(mstxVecCopy.name, name);
-
-    __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_COPY), sizeof(mstxVecCopy), &mstxVecCopy);
-}
-
-template <typename T>
-__aicore__ inline void GetMstxVecCopyInfo(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count, bool isSetMask, __gm__ const char* name)
-{
-    MstxVecCopy mstxVecCopy;
-    mstxVecCopy.dst = From(dst);
-    mstxVecCopy.src = From(src);
-    mstxVecCopy.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
-    mstxVecCopy.repeatTimes = 1;
-    mstxVecCopy.dstStride = 0;
-    mstxVecCopy.srcStride = 0;
-    mstxVecCopy.dstRepeatSize = 8;
-    mstxVecCopy.srcRepeatSize = 8;
     CopyName(mstxVecCopy.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_COPY), sizeof(mstxVecCopy), &mstxVecCopy);
@@ -721,7 +775,7 @@ __aicore__ inline void GetMstxVecReduceBlkInfo(const LocalTensor<U>& dst, const 
     MstxVecReduceDesc mstxVecReduceDesc;
     mstxVecReduceDesc.dst = From(dst);
     mstxVecReduceDesc.src = From(src);
-    mstxVecReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecReduceDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecReduceDesc.repeatTimes = repeatTime;
     mstxVecReduceDesc.srcBlockStride = srcBlkStride;
     mstxVecReduceDesc.dstRepeatStride = dstRepStride;
@@ -738,7 +792,7 @@ __aicore__ inline void GetMstxVecReduceBlkInfo(const LocalTensor<U>& dst, const 
     MstxVecReduceDesc mstxVecReduceDesc;
     mstxVecReduceDesc.dst = From(dst);
     mstxVecReduceDesc.src = From(src);
-    mstxVecReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecReduceDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecReduceDesc.repeatTimes = repeatTime;
     mstxVecReduceDesc.srcBlockStride = srcBlkStride;
     mstxVecReduceDesc.dstRepeatStride = dstRepStride;
@@ -755,7 +809,7 @@ __aicore__ inline void GetMstxVecReducePairInfo(const LocalTensor<U>& dst, const
     MstxVecReduceDesc mstxVecReduceDesc;
     mstxVecReduceDesc.dst = From(dst);
     mstxVecReduceDesc.src = From(src);
-    mstxVecReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecReduceDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecReduceDesc.repeatTimes = repeatTime;
     mstxVecReduceDesc.srcBlockStride = srcBlkStride;
     mstxVecReduceDesc.dstRepeatStride = dstRepStride;
@@ -772,7 +826,7 @@ __aicore__ inline void GetMstxVecReducePairInfo(const LocalTensor<U>& dst, const
     MstxVecReduceDesc mstxVecReduceDesc;
     mstxVecReduceDesc.dst = From(dst);
     mstxVecReduceDesc.src = From(src);
-    mstxVecReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecReduceDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecReduceDesc.repeatTimes = repeatTime;
     mstxVecReduceDesc.srcBlockStride = srcBlkStride;
     mstxVecReduceDesc.dstRepeatStride = dstRepStride;
@@ -789,7 +843,7 @@ __aicore__ inline void GetMstxVecReduceRepeatInfo(const LocalTensor<U>& dst, con
     MstxVecReduceDesc mstxVecReduceDesc;
     mstxVecReduceDesc.dst = From(dst);
     mstxVecReduceDesc.src = From(src);
-    mstxVecReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecReduceDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecReduceDesc.repeatTimes = repeatTime;
     mstxVecReduceDesc.srcBlockStride = srcBlkStride;
     mstxVecReduceDesc.dstRepeatStride = dstRepStride;
@@ -806,7 +860,7 @@ __aicore__ inline void GetMstxVecReduceRepeatInfo(const LocalTensor<U>& dst, con
     MstxVecReduceDesc mstxVecReduceDesc;
     mstxVecReduceDesc.dst = From(dst);
     mstxVecReduceDesc.src = From(src);
-    mstxVecReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecReduceDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecReduceDesc.repeatTimes = repeatTime;
     mstxVecReduceDesc.srcBlockStride = srcBlkStride;
     mstxVecReduceDesc.dstRepeatStride = dstRepStride;
@@ -823,25 +877,13 @@ __aicore__ inline void GetMstxVecBrcbInfo(const LocalTensor<T>& dst, const Local
     MstxVecBrcbDesc mstxVecBrcbDesc;
     mstxVecBrcbDesc.dst = From(dst);
     mstxVecBrcbDesc.src = From(src);
-    mstxVecBrcbDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
+    mstxVecBrcbDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
     mstxVecBrcbDesc.repeatTimes = repeatTime;
     mstxVecBrcbDesc.dstBlockStride = repeatParams.dstBlkStride;
     mstxVecBrcbDesc.dstRepeatStride = repeatParams.dstRepStride;
     CopyName(mstxVecBrcbDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_BROADCAST), sizeof(mstxVecBrcbDesc), &mstxVecBrcbDesc);
-}
-
-template <typename T>
-__aicore__ inline void GetMstxVecTransdataInfo(const LocalTensor<T>& dst, const LocalTensor<T>& src, __gm__ const char* name)
-{
-    MstxVecTranspose mstxVecTranspose;
-    mstxVecTranspose.dst = From(dst);
-    mstxVecTranspose.src = From(src);
-    mstxVecTranspose.temp = false;
-    CopyName(mstxVecTranspose.name, name);
-
-    __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_TRANSDATA), sizeof(mstxVecTranspose), &mstxVecTranspose);
 }
 
 template <typename T>
@@ -876,7 +918,7 @@ __aicore__ inline void GetMstxVecDupInfo(const LocalTensor<T>& dst, uint64_t mas
 {
     MstxVecDupDesc mstxVecDupDesc;
     mstxVecDupDesc.dst = From(dst);
-    mstxVecDupDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecDupDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecDupDesc.repeatTimes = repeatTime;
     mstxVecDupDesc.dstBlockStride = dstBlockStride;
     mstxVecDupDesc.dstRepeatStride = dstRepeatStride;
@@ -891,7 +933,7 @@ __aicore__ inline void GetMstxVecDupInfo(const LocalTensor<T>& dst, uint64_t mas
 {
     MstxVecDupDesc mstxVecDupDesc;
     mstxVecDupDesc.dst = From(dst);
-    mstxVecDupDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecDupDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecDupDesc.repeatTimes = repeatTime;
     mstxVecDupDesc.dstBlockStride = dstBlockStride;
     mstxVecDupDesc.dstRepeatStride = dstRepeatStride;
@@ -905,7 +947,7 @@ __aicore__ inline void GetMstxVecDupInfo(const LocalTensor<T>& dst, const int32_
 {
     MstxVecDupDesc mstxVecDupDesc;
     mstxVecDupDesc.dst = From(dst);
-    mstxVecDupDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(0));
+    mstxVecDupDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(0));
     mstxVecDupDesc.repeatTimes = 1;
     mstxVecDupDesc.dstBlockStride = 1;
     mstxVecDupDesc.dstRepeatStride = 8;
@@ -920,7 +962,7 @@ __aicore__ inline void GetMstxVecIndexInfo(const LocalTensor<T>& dst, uint64_t m
 {
     MstxVecDupDesc mstxVecDupDesc;
     mstxVecDupDesc.dst = From(dst);
-    mstxVecDupDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, true, static_cast<uint32_t>(8192));
+    mstxVecDupDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, true, static_cast<uint32_t>(8192));
     mstxVecDupDesc.repeatTimes = repeatTime;
     mstxVecDupDesc.dstBlockStride = dstBlockStride;
     mstxVecDupDesc.dstRepeatStride = dstRepeatStride;
@@ -935,7 +977,7 @@ __aicore__ inline void GetMstxVecIndexInfo(const LocalTensor<T>& dst, uint64_t m
 {
     MstxVecDupDesc mstxVecDupDesc;
     mstxVecDupDesc.dst = From(dst);
-    mstxVecDupDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, true, static_cast<uint32_t>(8192));
+    mstxVecDupDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, true, static_cast<uint32_t>(8192));
     mstxVecDupDesc.repeatTimes = repeatTime;
     mstxVecDupDesc.dstBlockStride = dstBlockStride;
     mstxVecDupDesc.dstRepeatStride = dstRepeatStride;
@@ -949,7 +991,7 @@ __aicore__ inline void GetMstxVecIndexInfo(const LocalTensor<T>& dst, uint32_t c
 {
     MstxVecDupDesc mstxVecDupDesc;
     mstxVecDupDesc.dst = From(dst);
-    mstxVecDupDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(8192));
+    mstxVecDupDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(8192));
     mstxVecDupDesc.repeatTimes = 1;
     mstxVecDupDesc.dstBlockStride = 1;
     mstxVecDupDesc.dstRepeatStride = 8;
@@ -968,7 +1010,7 @@ __aicore__ inline void GetMstxVecReduceComplexInfo(const LocalTensor<U>& dst, co
     mstxVecComplexReduceDesc.dst = From(dst);
     mstxVecComplexReduceDesc.src = From(src);
     mstxVecComplexReduceDesc.tmp = From(sharedTmpBuffer);
-    mstxVecComplexReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, true, static_cast<uint32_t>(8192));
+    mstxVecComplexReduceDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, true, static_cast<uint32_t>(8192));
     mstxVecComplexReduceDesc.repeatTimes = repeatTime;
     mstxVecComplexReduceDesc.srcRepeatStride = srcRepStride;
     CopyName(mstxVecComplexReduceDesc.name, name);
@@ -985,7 +1027,7 @@ __aicore__ inline void GetMstxVecReduceComplexInfo(const LocalTensor<U>& dst, co
     mstxVecComplexReduceDesc.dst = From(dst);
     mstxVecComplexReduceDesc.src = From(src);
     mstxVecComplexReduceDesc.tmp = From(sharedTmpBuffer);
-    mstxVecComplexReduceDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, true, static_cast<uint32_t>(8192));
+    mstxVecComplexReduceDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, true, static_cast<uint32_t>(8192));
     mstxVecComplexReduceDesc.repeatTimes = repeatTime;
     mstxVecComplexReduceDesc.srcRepeatStride = srcRepStride;
     CopyName(mstxVecComplexReduceDesc.name, name);
@@ -1001,7 +1043,7 @@ __aicore__ inline void GetMstxVecReduceComplexInfo(const LocalTensor<U>& dst, co
     mstxVecComplexReduceDesc.dst = From(dst);
     mstxVecComplexReduceDesc.src = From(src);
     mstxVecComplexReduceDesc.tmp = From(sharedTmpBuffer);
-    mstxVecComplexReduceDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(8192));
+    mstxVecComplexReduceDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(8192));
     mstxVecComplexReduceDesc.repeatTimes = 1;
     mstxVecComplexReduceDesc.srcRepeatStride = 8;
     CopyName(mstxVecComplexReduceDesc.name, name);
@@ -1018,7 +1060,7 @@ __aicore__ inline void GetMstxVecBinaryInfo(const LocalTensor<T>& dst, const Loc
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1041,7 +1083,7 @@ __aicore__ inline void GetMstxVecBinaryInfo(const LocalTensor<T>& dst, const Loc
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1063,7 +1105,7 @@ __aicore__ inline void GetMstxVecBinaryInfo(const LocalTensor<T>& dst, const Loc
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = 8;
     mstxVecBinaryDesc.repeatTimes = 1;
     mstxVecBinaryDesc.dstBlockStride = 1;
@@ -1088,7 +1130,7 @@ __aicore__ inline void GetMstxVecBilinearInterpolationInfo(const LocalTensor<T> 
     mstxVecBilinearInterpolation.src1 = From(src1);
     mstxVecBilinearInterpolation.src0Offset = From(src0Offset);
     mstxVecBilinearInterpolation.shared = From(sharedTmpBuffer);
-    mstxVecBilinearInterpolation.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, true, static_cast<uint32_t>(8192));
+    mstxVecBilinearInterpolation.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, true, static_cast<uint32_t>(8192));
     mstxVecBilinearInterpolation.hRepeat = hRepeat;
     mstxVecBilinearInterpolation.repeatMode = repeatMode;
     mstxVecBilinearInterpolation.dstBlockStride = dstBlkStride;
@@ -1110,7 +1152,7 @@ __aicore__ inline void GetMstxVecBilinearInterpolationInfo(const LocalTensor<T> 
     mstxVecBilinearInterpolation.src1 = From(src1);
     mstxVecBilinearInterpolation.src0Offset = From(src0Offset);
     mstxVecBilinearInterpolation.shared = From(sharedTmpBuffer);
-    mstxVecBilinearInterpolation.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, true, static_cast<uint32_t>(8192));
+    mstxVecBilinearInterpolation.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, true, static_cast<uint32_t>(8192));
     mstxVecBilinearInterpolation.hRepeat = hRepeat;
     mstxVecBilinearInterpolation.repeatMode = repeatMode;
     mstxVecBilinearInterpolation.dstBlockStride = dstBlkStride;
@@ -1133,7 +1175,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.src1 = From(src1);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1142,7 +1189,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
     mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
     mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
@@ -1158,7 +1204,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.src1 = From(src1);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1167,7 +1218,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
     mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
     mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
@@ -1182,7 +1232,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dst = From(dst);
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.src1 = From(src1);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1191,7 +1246,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
     mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
     mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
@@ -1206,7 +1260,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dst = From(dst);
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, 0, 0, false, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1215,7 +1274,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = repeatParams.dstRepStride;
     mstxVecSelDesc.src0RepeatStride = repeatParams.src0RepStride;
     mstxVecSelDesc.src1RepeatStride = repeatParams.src1RepStride;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
@@ -1230,7 +1288,12 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.src1 = From(src1);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
+    if (mstxVecSelDesc.scalarMode) {
+        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(8192));
+    } else {
+        mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    }
     mstxVecSelDesc.blockNum = 8;
     mstxVecSelDesc.repeatTimes = 1;
     mstxVecSelDesc.dstBlockStride = 1;
@@ -1239,7 +1302,6 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dstRepeatStride = 8;
     mstxVecSelDesc.src0RepeatStride = 8;
     mstxVecSelDesc.src1RepeatStride = 8;
-    mstxVecSelDesc.scalarMode = (selMode == AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE);
     CopyName(mstxVecSelDesc.name, name);
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_SEL), sizeof(mstxVecSelDesc), &mstxVecSelDesc);
@@ -1254,7 +1316,7 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dst = From(dst);
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(8192));
+    mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(8192));
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1278,7 +1340,7 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dst = From(dst);
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(8192));
+    mstxVecSelDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(8192));
     mstxVecSelDesc.blockNum = repeatParams.blockNumber;
     mstxVecSelDesc.repeatTimes = repeatTime;
     mstxVecSelDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1301,7 +1363,7 @@ __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const 
     mstxVecSelDesc.dst = From(dst);
     mstxVecSelDesc.src0 = From(src0);
     mstxVecSelDesc.mask = From(selMask);
-    mstxVecSelDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(8192));
+    mstxVecSelDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(8192));
     mstxVecSelDesc.blockNum = 8;
     mstxVecSelDesc.repeatTimes = 1;
     mstxVecSelDesc.dstBlockStride = 1;
@@ -1326,7 +1388,7 @@ __aicore__ inline void GetMstxVecBinaryCmpInfo(const LocalTensor<T>& dst, const 
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1349,7 +1411,7 @@ __aicore__ inline void GetMstxVecBinaryCmpInfo(const LocalTensor<T>& dst, const 
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1371,7 +1433,7 @@ __aicore__ inline void GetMstxVecBinaryCmpInfo(const LocalTensor<T>& dst, const 
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = 8;
     mstxVecBinaryDesc.repeatTimes = 1;
     mstxVecBinaryDesc.dstBlockStride = 1;
@@ -1395,7 +1457,7 @@ __aicore__ inline void GetMstxVecBinaryAddReqReluInfo(const LocalTensor<T>& dst,
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(8192));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(8192));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1418,7 +1480,7 @@ __aicore__ inline void GetMstxVecBinaryAddReqReluInfo(const LocalTensor<T>& dst,
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(8192));
+    mstxVecBinaryDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(8192));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1440,7 +1502,7 @@ __aicore__ inline void GetMstxVecBinaryAddReqReluInfo(const LocalTensor<T>& dst,
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(8192));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), true, static_cast<uint32_t>(8192));
     mstxVecBinaryDesc.blockNum = 8;
     mstxVecBinaryDesc.repeatTimes = 1;
     mstxVecBinaryDesc.dstBlockStride = 1;
@@ -1463,7 +1525,7 @@ __aicore__ inline void GetMstxVecBinaryScalarInfo(const LocalTensor<T>& dst, con
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1486,7 +1548,7 @@ __aicore__ inline void GetMstxVecBinaryScalarInfo(const LocalTensor<T>& dst, con
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1508,7 +1570,7 @@ __aicore__ inline void GetMstxVecBinaryScalarInfo(const LocalTensor<T>& dst, con
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = 8;
     mstxVecBinaryDesc.repeatTimes = 1;
     mstxVecBinaryDesc.dstBlockStride = 1;
@@ -1532,7 +1594,7 @@ __aicore__ inline void GetMstxVecBinaryScalarCmpsInfo(const LocalTensor<T>& dst,
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1555,7 +1617,7 @@ __aicore__ inline void GetMstxVecBinaryScalarCmpsInfo(const LocalTensor<T>& dst,
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = repeatParams.blockNumber;
     mstxVecBinaryDesc.repeatTimes = repeatTime;
     mstxVecBinaryDesc.dstBlockStride = repeatParams.dstBlkStride;
@@ -1577,7 +1639,7 @@ __aicore__ inline void GetMstxVecBinaryScalarCmpsInfo(const LocalTensor<T>& dst,
     mstxVecBinaryDesc.dst = From(dst);
     mstxVecBinaryDesc.src0 = From(src0);
     mstxVecBinaryDesc.src1 = From(src1);
-    mstxVecBinaryDesc.wapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
+    mstxVecBinaryDesc.wrapper = WrapperFrom(MSTX_MASK_COUNT, count, static_cast<uint64_t>(0), isSetMask, static_cast<uint32_t>(0));
     mstxVecBinaryDesc.blockNum = 8;
     mstxVecBinaryDesc.repeatTimes = 1;
     mstxVecBinaryDesc.dstBlockStride = 1;
@@ -1599,7 +1661,7 @@ __aicore__ inline void GetMstxVecGatherMaskInfo(const LocalTensor<T>& dst, const
     MstxVecGatherMaskDesc mstxVecGatherMaskDesc;
     mstxVecGatherMaskDesc.dst = From(dst);
     mstxVecGatherMaskDesc.src = From(src);
-    mstxVecGatherMaskDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, true, static_cast<uint32_t>(0));
+    mstxVecGatherMaskDesc.wrapper = WrapperFrom(MSTX_MASK_FROM_REG, mask0, mask1, true, static_cast<uint32_t>(0));
     mstxVecGatherMaskDesc.mode = (mode == GatherMaskMode::VERSION_V2) ? AscendC::MstxTensor::MstxGatherMaskMode::V2 : AscendC::MstxTensor::MstxGatherMaskMode::V1;
     mstxVecGatherMaskDesc.repeatTimes = gatherMaskParams.repeatTimes;
     mstxVecGatherMaskDesc.src0BlockStride = gatherMaskParams.src0BlockStride;
@@ -1617,7 +1679,7 @@ __aicore__ inline void GetMstxVecGatherMaskInfo(const LocalTensor<T>& dst, const
     MstxVecGatherMaskDesc mstxVecGatherMaskDesc;
     mstxVecGatherMaskDesc.dst = From(dst);
     mstxVecGatherMaskDesc.src = From(src);
-    mstxVecGatherMaskDesc.wapper = WrapperFrom(MSTX_MASK_FROM_REG, mask, true, static_cast<uint32_t>(0));
+    mstxVecGatherMaskDesc.wrapper = WrapperFrom<T>(MSTX_MASK_FROM_REG, mask, true, static_cast<uint32_t>(0));
     mstxVecGatherMaskDesc.mode = (mode == GatherMaskMode::VERSION_V2) ? AscendC::MstxTensor::MstxGatherMaskMode::V2 : AscendC::MstxTensor::MstxGatherMaskMode::V1;
     mstxVecGatherMaskDesc.repeatTimes = gatherMaskParams.repeatTimes;
     mstxVecGatherMaskDesc.src0BlockStride = gatherMaskParams.src0BlockStride;
