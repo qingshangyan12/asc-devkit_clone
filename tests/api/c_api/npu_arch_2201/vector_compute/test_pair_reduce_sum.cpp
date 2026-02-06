@@ -82,7 +82,7 @@ TEST_F(TestVectorCompute##class_name##data_type, c_api_name##_half_half_half_int
             .will(invoke(cce_name##_##data_type##_set_vector_mask_Stub));                       \
                                                                                                 \
     MOCKER_CPP(cce_name, void(__ubuf__ data_type *,__ubuf__ data_type *,                        \
-                uint8_t, uint16_t, uint16_t, uint16_t, uint16_t))                               \
+                uint8_t, uint16_t, uint16_t, uint16_t))                                         \
             .times(1)                                                                           \
             .will(invoke(cce_name##_##data_type##_##data_type##_##data_type##_uint64_t_Stub));  \
                                                                                                 \
