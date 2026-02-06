@@ -188,12 +188,7 @@ private:
     template <const LoadDataTrait& trait, typename T, typename U, typename V, size_t... Is>
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-<<<<<<< HEAD
-        using srcType = typename U::elementType;
-        LoadL1ToL0B<trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
-=======
         LoadL1ToL0B<trait.transposed>(dst.Data().Get(), src.Data().Get(),
->>>>>>> 208bf6040feb032b58c3f1c4b0aed3f1be84f6f2
             Std::get<Is>(tupleParams)...);
     }
 
@@ -252,11 +247,7 @@ private:
     template <const LoadDataTrait& trait, typename T, typename U, typename V, size_t... Is>
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-<<<<<<< HEAD
-        LoadL1ToL0B<trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
-=======
         LoadL1ToL0B<trait.transposed>(dst.Data().Get(), src.Data().Get(),
->>>>>>> 208bf6040feb032b58c3f1c4b0aed3f1be84f6f2
             Std::get<Is>(tupleParams)...);
     }
 
@@ -317,12 +308,7 @@ private:
     template <const LoadDataTrait& trait, typename T, typename U, typename V, size_t... Is>
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
-<<<<<<< HEAD
-        using srcType = typename U::elementType;
-        LoadL1ToL0B<trait.transposed>(dst.Engine().Begin().Get(), src.Engine().Begin().Get(),
-=======
         LoadL1ToL0B<trait.transposed>(dst.Data().Get(), src.Data().Get(),
->>>>>>> 208bf6040feb032b58c3f1c4b0aed3f1be84f6f2
             Std::get<Is>(tupleParams)...);
     }
 
