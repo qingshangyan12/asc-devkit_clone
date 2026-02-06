@@ -13,21 +13,6 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl.h"
 
-// =========asc_loadalign(fp4x2_e2m1/fp4x2_e1m2/u8/s8/f8_e4m3/fp8_e5m2/fp8_e8m0/u16/s16/bf16/half/u32/s32/float/u64/s64)=========
-// __simd_callee__ inline void asc_loadalign_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, NORM);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, NORM);
-//     }
-// }
-
 __simd_callee__ inline void asc_loadalign_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
@@ -41,27 +26,6 @@ __simd_callee__ inline void asc_loadalign_impl(vector_int8_t& dst, __ubuf__ int8
         vld(dst, src_align_32b, offset, NORM);
     }
 }
-
-// __simd_callee__ inline void asc_loadalign_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, NORM);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, NORM);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, NORM);
-//     }
-// }
 
 __simd_callee__ inline void asc_loadalign_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src_align_32b, iter_reg offset)
 {
@@ -119,21 +83,6 @@ __simd_callee__ inline void asc_loadalign_impl(vector_float& dst, __ubuf__ float
     }
 }
 
-// =========BRC_B8(fp4x2_e2m1/fp4x2_e1m2/u8/s8/f8_e4m3/fp8_e5m2/fp8_e8m0)=========
-// __simd_callee__ inline void asc_loadalign_brc_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BRC_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_brc_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BRC_B8);
-//     }
-// }
-
 __simd_callee__ inline void asc_loadalign_brc_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
@@ -147,27 +96,6 @@ __simd_callee__ inline void asc_loadalign_brc_impl(vector_int8_t& dst, __ubuf__ 
         vld(dst, src_align_32b, offset, BRC_B8);
     }
 }
-
-// __simd_callee__ inline void asc_loadalign_brc_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BRC_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_brc_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BRC_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_brc_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BRC_B8);
-//     }
-// }
 
 // =========BRC_B16(u16/s16/bf16/half)=========
 __simd_callee__ inline void asc_loadalign_brc_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src_align_32b, iter_reg offset)
@@ -220,21 +148,6 @@ __simd_callee__ inline void asc_loadalign_brc_impl(vector_float& dst, __ubuf__ f
     }
 }
 
-// =========US(B8/B16)=========
-// __simd_callee__ inline void asc_loadalign_upsample_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, US_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_upsample_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, US_B8);
-//     }
-// }
-
 __simd_callee__ inline void asc_loadalign_upsample_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
@@ -248,27 +161,6 @@ __simd_callee__ inline void asc_loadalign_upsample_impl(vector_int8_t& dst, __ub
         vld(dst, src_align_32b, offset, US_B8);
     }
 }
-
-// __simd_callee__ inline void asc_loadalign_upsample_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, US_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_upsample_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, US_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_upsample_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, US_B8);
-//     }
-// }
 
 __simd_callee__ inline void asc_loadalign_upsample_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src_align_32b, iter_reg offset)
 {
@@ -298,21 +190,6 @@ __simd_callee__ inline void asc_loadalign_upsample_impl(vector_half& dst, __ubuf
     }
 }
 
-// =========DS(B8/B16)=========
-// __simd_callee__ inline void asc_loadalign_downsample_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, DS_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_downsample_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, US_B8);
-//     }
-// }
-
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
@@ -326,27 +203,6 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(vector_int8_t& dst, __
         vld(dst, src_align_32b, offset, US_B8);
     }
 }
-
-// __simd_callee__ inline void asc_loadalign_downsample_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, US_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_downsample_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, US_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_downsample_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, US_B8);
-//     }
-// }
 
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src_align_32b, iter_reg offset)
 {
@@ -376,21 +232,6 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(vector_half& dst, __ub
     }
 }
 
-// DINTLV(B8/B16/B32)
-// __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, DINTLV_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, DINTLV_B8);
-//     }
-// }
-
 __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_uint8_t& dst0, vector_uint8_t& dst1, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
@@ -404,27 +245,6 @@ __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_int8_t& dst0, vect
         vld(dst0, dst1, src_align_32b, offset, DINTLV_B8);
     }
 }
-
-// __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, DINTLV_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, DINTLV_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, DINTLV_B8);
-//     }
-// }
 
 __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_uint16_t& dst0, vector_uint16_t& dst1, __ubuf__ uint16_t* src_align_32b, iter_reg offset)
 {
@@ -475,21 +295,6 @@ __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_float& dst0, vecto
     }
 }
 
-// unpack(B8/B16/B32)
-// __simd_callee__ inline void asc_loadalign_unpack_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_unpack_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK_B8);
-//     }
-// }
-
 __simd_callee__ inline void asc_loadalign_unpack_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
@@ -503,27 +308,6 @@ __simd_callee__ inline void asc_loadalign_unpack_impl(vector_int8_t& dst, __ubuf
         vld(dst, src_align_32b, offset, UNPK_B8);
     }
 }
-
-// __simd_callee__ inline void asc_loadalign_unpack_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_unpack_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_unpack_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK_B8);
-//     }
-// }
 
 __simd_callee__ inline void asc_loadalign_unpack_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src_align_32b, iter_reg offset)
 {
@@ -574,21 +358,6 @@ __simd_callee__ inline void asc_loadalign_unpack_impl(vector_float& dst, __ubuf_
     }
 }
 
-// unpack v2
-// __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK4_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK4_B8);
-//     }
-// }
-
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
@@ -603,42 +372,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_int8_t& dst, __u
     }
 }
 
-// __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK4_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK4_B8);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, UNPK4_B8);
-//     }
-// }
-
-// brc_v2
-// __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BRC);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BRC);
-//     }
-// }
-
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
@@ -652,27 +385,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int8_t& dst, __ubuf
         vld(dst, src_align_32b, offset, BLK);
     }
 }
-
-// __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BLK);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BLK);
-//     }
-// }
-
-// __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
-// {
-//     if ASC_IS_AIV {
-//         vld(dst, src_align_32b, offset, BLK);
-//     }
-// }
 
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src_align_32b, iter_reg offset)
 {
