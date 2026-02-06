@@ -171,7 +171,7 @@ class TestGetOpTiling(unittest.TestCase):
         with mock.patch('asc_op_compile_base.asc_op_compiler.get_op_tiling.get_tiling_def', return_value=TilingDef(\
             {"class_name": "add_custiom", "data_size": 0, "fields": [field_0, field_1]})) as mock_get_tiling_def:
             struct_base = get_struct_tiling_info(tiling_def, {})
-        self.assertRaises(Exception, gen_static_shape, tiling_def, [], struct_base, all_dynamic_struct_def_except_self)
+        self.assertRaises(Exception, gen_static_shape, tiling_def, {''}, struct_base, all_dynamic_struct_def_except_self)
         tiling_data = {"testDefault": b'\x01\x00\x02\x00\n\x00\x02\x00\x08\x00', "testArr": b'\x01\x00\x02\x00\n\x00\x02\x00\x08\x00'*128, "testStruct": {"testDefault": b'\x01\x00\x02\x00\n\x00\x02\x00\x08\x00', "testArr": b'\x01\x00\x02\x00\n\x00\x02\x00\x08\x00'*128}}
         source = " "
 
