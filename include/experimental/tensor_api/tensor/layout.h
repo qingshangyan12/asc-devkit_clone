@@ -94,7 +94,7 @@ struct Layout : private Std::tuple<T, U>
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) ShapeSize() const
+    __aicore__ inline constexpr decltype(auto) Size() const
     {
         return TensorInternal::TupleSize<I...>(GetShape());
     }

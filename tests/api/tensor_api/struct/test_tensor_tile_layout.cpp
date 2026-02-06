@@ -156,8 +156,9 @@ TEST_F(Tensor_Api_Layout, MakeLayoutByShapeOperation)
     EXPECT_EQ(AscendC::Std::get<1>(layoutMake2.Stride()), 2);
     EXPECT_EQ(AscendC::Size(layoutMake1), 24);
     EXPECT_EQ(AscendC::Size(layoutMake2), 24);
-    EXPECT_EQ(layoutMake1.ShapeSize(), 24);
-    EXPECT_EQ(layoutMake2.ShapeSize(), 24);
+    EXPECT_EQ(layoutMake1.Size(), 24);
+    EXPECT_EQ(layoutMake2.Size(), 24);
+    EXPECT_EQ(layoutMake2.Capacity(), 24);
 }
 
 TEST_F(Tensor_Api_Layout, LayoutSizeOperation)
@@ -169,7 +170,7 @@ TEST_F(Tensor_Api_Layout, LayoutSizeOperation)
     AscendC::Coord<int, int> coord = AscendC::MakeCoord(1,2);
 
     EXPECT_EQ(layoutMake.size, 256);
-    EXPECT_EQ(AscendC::Std::get<0>(layoutMake.GetShape()), 16);
+    EXPECT_EQ(AscendC::Std::get<0>(layoutMake.Shape()), 16);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape(layoutMake)), 16);
     EXPECT_EQ(AscendC::Std::get<0>(layoutMake.Stride()), 1);
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(layoutMake)), 1);
