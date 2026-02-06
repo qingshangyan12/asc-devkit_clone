@@ -1,0 +1,58 @@
+# asc_addc
+
+## 产品支持情况
+
+| 产品         | 是否支持 |
+| :-----------------------| :-----:|
+| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+
+## 功能说明
+
+基于掩码mask，对输入数据src0、src1及进位数据src2执行元素逐位相加操作，相加结果写入dst1。若src0和src1的数据类型为uint32_t，且二者与进位值src2的累加结果超出uint32_t的最值时，在dst0的对应位置上，每4个比特位写入1，否则写入0。计算公式如下：
+
+$$
+dst1_i = src0_i + src1_i + src2_i
+$$
+
+## 函数原型
+
+```cpp
+__simd_callee__ inline void asc_addc(vector_bool& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool src2, vector_bool mask)
+__simd_callee__ inline void asc_addc(vector_bool& dst0, vector_int32& dst1, vector_int32 src0, vector_int32 src1, vector_bool src2, vector_bool mask)
+```
+
+## 参数说明
+
+| 参数名  | 输入/输出 | 描述 |
+| :----- | :------- | :------- |
+| dst0 | 输出 | 目的操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。类型为vector_bool。 |
+| src0 | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
+| src1 | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
+| src2 | 输入 | 源操作数（矢量）的，进位值。|
+| mask | 输入 | 源操作数掩码。对应位置为1时参与计算，为0时不参与计算。 |
+
+## 返回值说明
+
+无
+
+## 流水类型
+
+PIPE_V
+
+## 约束说明
+
+- 三个源操作数src0、src1、src2的数据类型要和目的操作数dst1保持一致。
+- dst1、src0、src1、src2的需要32字节对齐。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../../../docs/api/context/c_api/general_instruction.md#通用地址重叠约束)。
+
+## 调用示例
+
+```cpp
+// total_length 指参与计算的数据长度
+constexpr uint32_t total_length = 128;
+vector_half src0[total_length];
+vector_half src1[total_length];
+vector_half dst[total_length];
+// mask为源操作数掩码
+asc_addc(dst0, dst1, src0, src1, src2, mask);
+```

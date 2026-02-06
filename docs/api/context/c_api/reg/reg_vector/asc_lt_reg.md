@@ -1,0 +1,61 @@
+# asc_lt
+
+## 产品支持情况
+
+| 产品         | 是否支持 |
+| :-----------------------| :-----:|
+| <term>Atlas A5 训练系列产品/Atlas A5 推理系列产品</term> | √ |
+
+## 功能说明
+
+逐元素比较第一个源操作数是否小于第二个源操作数中的对应数值。如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。该比较逻辑分为两种类型：
+- 矢量与矢量比较：对两个矢量的元素按位置一一对应，逐元素比较大小。
+- 矢量与标量比较：将矢量中的每一个元素分别与同一个标量进行大小比较。
+
+## 函数原型
+
+```cpp
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int32 src0, vector_int32 src1, vector_bool mask)
+```
+
+## 参数说明
+
+| 参数名  | 输入/输出 | 描述 |
+| :----- | :------- | :------- |
+| dst | 输出 | 目的操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
+| src0 | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。|
+| src1 | 输入 | 源操作数（矢量）。类型为[矢量数据寄存器](../reg数据类型定义.md)。。|
+| mask | 输入 | 源操作数掩码。对应位置为1时参与计算，为0时不参与计算。 |
+
+## 返回值说明
+
+无
+
+## 流水类型
+
+PIPE_V
+
+## 约束说明
+
+- dst、src0、src1（为矢量时）的需要32字节对齐。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../../../docs/api/context/c_api/general_instruction.md#通用地址重叠约束)。
+
+## 调用示例
+
+```cpp
+// total_length 指参与计算的数据长度
+constexpr uint32_t total_length = 128;
+vector_half src0[total_length];
+vector_half src1[total_length];
+vector_bool dst[total_length];
+// mask为源操作数掩码
+asc_lt(dst, src0, src1, mask);
+```
