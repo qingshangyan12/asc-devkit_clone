@@ -19,15 +19,6 @@ add_executable(demo
     gelu.asc
 )
 
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    ascendalog
-    m
-    graph_base
-)
-
 # ======================================================================================
 # NPU 编译选项配置
 #

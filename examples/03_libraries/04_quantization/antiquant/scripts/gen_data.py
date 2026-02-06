@@ -24,16 +24,16 @@ def gen_golden_data_simple():
     groupSize = K // offsetLength
 
     src = np.random.uniform(-10, 10, [8, 128]).astype(np.int8)
-    offset = np.random.uniform(-10, 10, [1, 128]).astype(np.floar16)
-    scale = np.random.uniform(-10, 10, [1, 128]).astype(np.floar16)
-    src_fp32 = src.astype(np.floar16)
-    dst = np.zeros([8, 128]).astype(np.floar16)
+    offset = np.random.uniform(-10, 10, [1, 128]).astype(np.float16)
+    scale = np.random.uniform(-10, 10, [1, 128]).astype(np.float16)
+    src_fp32 = src.astype(np.float16)
+    dst = np.zeros([8, 128]).astype(np.float16)
 
     for i in range(0, K):
         for j in range(0, N):
             dst[i][j] = scale[i // groupSize][j] * (src_fp32[i][j] + offset[i // groupSize][j])
 
-    dst = dst.astype(np.floar16)
+    dst = dst.astype(np.float16)
 
     os.makedirs("input", exist_ok=True)
     src.tofile("./input/input_src.bin")
