@@ -176,10 +176,10 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
 
     uint64_t normalSliceSize = ((commParam->count * dataSize) + ccuParam_.rankNum - 1) / ccuParam_.rankNum; // count/rankNum 向上取整
     int64_t lastSliceSize = (commParam->count * dataSize) - ((ccuParam_.rankNum - 1) * normalSliceSize);
-    KERNEL_LOG(KERNEL_INFO, "ApiClient CcuPrepareForAllReduceM2M normalSliceSize:%d, lastSliceSize:%d", normalSliceSize,
-               lastSliceSize);
+    lastSliceSize = lastSliceSize > 0 ? lastSliceSize : 0;
+    KERNEL_LOG(KERNEL_INFO, "ApiClient CcuPrepareForAllReduceM2M normalSliceSize:%d, lastSliceSize:%d", normalSliceSize, lastSliceSize);
     xnData_[6] = normalSliceSize;
-    xnData_[7] = lastSliceSize > 0 ? lastSliceSize : 0;
+    xnData_[7] = lastSliceSize;
     xnData_[8] = ccuParam_.rankId < (commParam->count / normalSliceSize) ? normalSliceSize : lastSliceSize;
     xnData_[9] = ccuParam_.rankId * normalSliceSize;
     xnData_[10] = 0; // input output not equals
