@@ -206,6 +206,7 @@ class CommonUtility:
         cmd.append("-fno-unroll-loops")
         cmd_str = ' '.join(cmd)
         if cmd_type == "compile":
+            print(f"111111111111111111 {cmd_str} ")
             proc = subprocess.Popen(cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         else:
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -250,6 +251,7 @@ class CommonUtility:
             cmd.insert(6, "-cce-aicore-function-stack-size=8192")
         cmd_str = ' '.join(cmd)
         if cmd_type == "compile":
+            print(f"2222222222222 {cmd_str} ")
             proc = subprocess.Popen(cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         else:
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -280,6 +282,7 @@ class CommonUtility:
         """
         cmd_str = ' '.join(cmd)
         if cmd_type == "compile":
+            print(f"3333333333333333 {cmd_str} ")
             proc = subprocess.Popen(cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         else:
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -292,6 +295,7 @@ class CommonUtility:
                 del cmd[cmd.index("-g")]
                 cmd_str = ' '.join(cmd)
                 if cmd_type == "compile":
+                    print(f"555555555555555 {cmd_str} ")
                     proc_now = subprocess.Popen(cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
                 else:
                     proc_now = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

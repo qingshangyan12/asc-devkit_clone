@@ -643,6 +643,7 @@ def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
             compile_cmd += [f"-D__NO_KFC_SERVER__"]
         CommonUtility.dump_compile_log(compile_cmd, CompileStage.INFERCHANNEL, params.compile_log_path)
         compile_cmd_str = ' '.join(compile_cmd)
+        print(f"6666666666666 {compile_cmd_str} ")
         proc = subprocess.Popen(
             compile_cmd_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
