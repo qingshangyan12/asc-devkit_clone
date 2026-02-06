@@ -448,7 +448,7 @@ def add_block_num_and_stream_func_params(func_params: Tuple[FuncParam, ...]
     param_names = set(get_param_names_by_func_params(func_params))
 
     if 'numBlocks' in param_names:
-        block_num_param = FuncParam(('uint32_t', 'numBlocks'))
+        block_num_param = FuncParam(('uint32_t', '_numBlocks'))
     else:
         block_num_param = FuncParam(('uint32_t', 'numBlocks'))
 
