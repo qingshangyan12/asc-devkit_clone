@@ -171,9 +171,6 @@ template <typename T>
 __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(const LocalTensor<uint64_t> &dst,
     const LocalTensor<uint64_t> &src, const TransDataTo5HDParams &nchwconvParams)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecTransdataInfo(dst, src, "TransDataTo5HD");
-#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunTransDataTo5HD<T, uint64_t>(dst, src, nchwconvParams, "TransDataTo5HD")) {
         ASCENDC_REPORT_CHECK_ERROR("TransDataTo5HD", KernelFuncType::NONE_MODE);
