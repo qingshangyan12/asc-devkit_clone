@@ -217,7 +217,7 @@ template<const auto &config>
 __aicore__ inline void
 HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForOp(const HcclHandle handleId)
 {
-    ccuUsedXnNum_ = 8; // 大部分算法用8个Xn
+    ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         if (hcclContext_->algorithmType == static_cast<uint8_t>(AlgorithmType::CcuAllGatherMeshMem2Mem1D)) {
@@ -392,9 +392,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     for (int i = 0; i < ccuUsedXnNum_; i++) {
         *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
     }
-    FlushDataCache(ccuMsg_.xnAddr);
-    if (ccuUsedXnNum_ > 8) { // 一次dcci是8个unit64
-        FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT);
+
+    // 循环刷新xn, ccuUsedXnNum_ + 7) / 8 向上取整
+    for (int i = 0; i < ((ccuUsedXnNum_ + 7) / 8); i++) {
+        FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
     }
 
     KERNEL_LOG(KERNEL_INFO, "ApiClient CcuSendMsg ccuMsg_.xnAddr, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: 0x%llx, Id6: 0x%llx, Id7: 0x%llx, Id8: 0x%llx, Id9: 0x%llx, Id10: 0x%llx, Id11: 0x%llx, Id12: 0x%llx, Id13: 0x%llx, Id14: 0x%llx",

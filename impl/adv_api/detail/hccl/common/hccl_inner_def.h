@@ -97,9 +97,9 @@ struct HcclCombineOpParam {
     uint64_t windowsOut[HCCL_MAX_RANK_NUM_V310];
     GM_ADDR xnOffset;
     GM_ADDR ckeOffset;
-    uint8_t res2[16];
+    uint8_t res[16];
     uint8_t algorithmType;
-    uint8_t res[7783];
+    uint8_t res2[7783];
 #else
     uint64_t windowsIn[HCCL_MAX_RANK_NUM];
     uint64_t windowsOut[HCCL_MAX_RANK_NUM];
@@ -139,7 +139,7 @@ struct HcclOpResParam {
 }
 constexpr uint16_t CCU_CKE_SIZE = 8;
 constexpr uint64_t CCU_XN_DATA_SIZE = 8; // Number of bytes per xn
-constexpr uint16_t CCU_USED_XN_NUM = 15;  // Currently only the first 11 xn are used
+constexpr uint16_t CCU_USED_XN_NUM = 15;  // Currently xn are used
 constexpr uint16_t CCU_MAX_MSG_NUM = 64;  // The message queue length sent to CCU 
 constexpr uint16_t CCU_MSG_XN_NUM = 64;  // Maximum xn number, each CCU message body occupies 8 registers
                                          // the message body length is 64*8B=512B

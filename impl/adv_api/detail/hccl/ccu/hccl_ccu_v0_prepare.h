@@ -175,7 +175,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
     xnData_[5] = rankSliceOffset;
 
     uint64_t normalSliceSize = ((commParam->count * dataSize) + ccuParam_.rankNum - 1) / ccuParam_.rankNum; // count/rankNum 向上取整
-    uint64_t lastSliceSize = (commParam->count * dataSize) - ((ccuParam_.rankNum - 1) * normalSliceSize);
+    int64_t lastSliceSize = (commParam->count * dataSize) - ((ccuParam_.rankNum - 1) * normalSliceSize);
     KERNEL_LOG(KERNEL_INFO, "ApiClient CcuPrepareForAllReduceM2M normalSliceSize:%d, lastSliceSize:%d", normalSliceSize,
                lastSliceSize);
     xnData_[6] = normalSliceSize;
@@ -183,18 +183,11 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
     xnData_[8] = ccuParam_.rankId < (commParam->count / normalSliceSize) ? normalSliceSize : lastSliceSize;
     xnData_[9] = ccuParam_.rankId * normalSliceSize;
     xnData_[10] = 0; // input output not equals
-
-    uint64_t loopParam[4];
     if (ccuParam_.rankId == ccuParam_.rankNum - 1) {
-        CalcLoopGroupParams(&loopParam[0], lastSliceSize, loopCount);
+        CalcGoSize(&loopParam[0], lastSliceSize, loopCount, &xnData_[11]);
     } else {
-        CalcLoopGroupParams(&loopParam[0], normalSliceSize, loopCount);
+        CalcGoSize(&loopParam[0], normalSliceSize, loopCount, &xnData_[11]);
     }
-    
-    xnData_[11] = loopParam[0];
-    xnData_[12] = loopParam[1];
-    xnData_[13] = loopParam[2];
-    xnData_[14] = loopParam[3];
 }
 
 template<const auto &config>
@@ -213,13 +206,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllGatherM2
  
     xnData_[3] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
     xnData_[4] = sliceSize;
-
-    uint64_t loopParam[4];
-    CalcLoopGroupParams(&loopParam[0], sliceSize, loopCount);
-    xnData_[5] = loopParam[0];
-    xnData_[6] = loopParam[1];
-    xnData_[7] = loopParam[2];
-    xnData_[8] = loopParam[3];
+    CalcGoSize(sliceSize, loopCount, &xnData_[5]);
 }
 
 template<const auto &config>
@@ -244,13 +231,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatt
     xnData_[4] = rankSliceOffset;
     xnData_[7] = sliceSize;
     xnData_[8] = UINT64_MAX - 1;
-
-    uint64_t loopParam[4];
-    CalcLoopGroupParams(&loopParam[0], sliceSize, loopCount);
-    xnData_[9] = loopParam[0];
-    xnData_[10] = loopParam[1];
-    xnData_[11] = loopParam[2];
-    xnData_[12] = loopParam[3];
+    CalcGoSize(sliceSize, loopCount, &xnData_[9]);
 }
 }
  
