@@ -507,9 +507,6 @@ template <typename T, bool isSetMask>
 __aicore__ inline __inout_pipe__(V) void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint32_t count)
 {
-#ifdef __MSTX_DFX_REPORT__
-    MstxTensor::GetMstxVecCopyInfo(dst, src, count, isSetMask, "Copy");
-#endif
     using PrimType = PrimT<T>;
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncCopy(dst, src, count, "Copy")) {
