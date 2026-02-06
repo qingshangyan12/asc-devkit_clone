@@ -123,11 +123,7 @@ __aicore__ inline void asc_enable_hf32();
 
 __aicore__ inline void asc_set_fp32_mode();
 
-__aicore__ inline void asc_set_l0c2gm_quant(uint64_t quant);
-
-__aicore__ inline void asc_set_l0c2gm_relu(uint64_t relu);
-
-__aicore__ inline void asc_set_l0c2gm_unitflag(uint64_t unit_flag);
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag);
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
 

@@ -21,9 +21,7 @@
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_fp32_mode_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_mmad_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_mmad_impl.h"
-#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_quant_impl.h"
-#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_relu_impl.h"
-#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_unitflag_impl.h"
+#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_config_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_mmad_direction_m_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_mmad_direction_n_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_enable_hf32_impl.h"
@@ -242,21 +240,10 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t
                           unit_flag, k_direction_align, is_weight_offset, c_matrix_source, c_matrix_init_val);
 }
 
-__aicore__ inline void asc_set_l0c2gm_quant(uint64_t quant)
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag)
 {
-    asc_set_l0c2gm_quant_impl(quant);
+    asc_set_l0c2gm_config_impl(reluPre, quantPre, isUnitFlag);
 }
-
-__aicore__ inline void asc_set_l0c2gm_relu(uint64_t relu)
-{
-    asc_set_l0c2gm_relu_impl(relu);
-}
-
-__aicore__ inline void asc_set_l0c2gm_unitflag(uint64_t unit_flag)
-{
-    asc_set_l0c2gm_unitflag_impl(unit_flag);
-}
-
 
 #endif
 
