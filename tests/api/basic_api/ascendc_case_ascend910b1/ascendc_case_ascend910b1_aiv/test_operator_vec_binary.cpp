@@ -7,9 +7,6 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#define __MSTX_DFX_REPORT__
-#include <cstdint>
-extern "C" void __mstx_dfx_report_stub(int type, uint8_t size, void* desc);
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
 #include "test_operator_vec_binary.h"
