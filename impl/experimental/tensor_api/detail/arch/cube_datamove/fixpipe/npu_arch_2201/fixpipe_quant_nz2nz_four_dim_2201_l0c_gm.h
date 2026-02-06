@@ -30,7 +30,7 @@ public:
         SetRegister<S, decltype(nzParams)>(quant, nzParams);
         auto copyParams = GenFixpipeQuantParams<trait, T, U>(dst, src);
         auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
-
+        
         DataCopy<trait, T, U, decltype(copyParams)>(dstTensor, src, copyParams);
     }
 
@@ -145,7 +145,7 @@ private:
             InsertSync();
             auto coordZero = MakeCoord(Std::Int<0>{}, Std::Int<0>{});
             auto srcTensor = MakeTensorWithCoord<U, Coord>(src, coordZero, srcOffset * i);
-            auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, dstOffset * i);
+            auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, dstOffset * i); 
 
             DataCopy<trait, T, U, decltype(mainLoopParam)>(dstTensor, srcTensor, mainLoopParam);
         }
@@ -155,7 +155,7 @@ private:
             InsertSync();
             auto coordZero = MakeCoord(Std::Int<0>{}, Std::Int<0>{});
             auto srcTensor = MakeTensorWithCoord<U, Coord>(src, coordZero, srcOffset * nIterNum);
-            auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, dstOffset * nIterNum);
+            auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, dstOffset * nIterNum); 
 
             DataCopy<trait, T, U, decltype(tailParam)>(dstTensor, srcTensor, tailParam);
         }
