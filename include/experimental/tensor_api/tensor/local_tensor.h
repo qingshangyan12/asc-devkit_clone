@@ -93,8 +93,12 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     }
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
-        return Data()[Layout()(coord)];
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, uint32_t offset = 0) {
+        auto layout = Layout();
+        auto index = Crd2Idx(coord, layout) + offset;
+        auto newIterator = TensorInternal::MakeMemPtr<iteraotr::hardPos>(reinterpret_cast<elementType*>(Data().Get() + index));
+        auto newLayout = MakeLayout(layout.GetShape(), layout.GetStride());
+        return MakeTensor(newIterator, newLayout); 
     }
 
     template <typename Coord>

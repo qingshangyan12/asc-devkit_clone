@@ -15,6 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_2201_BASE_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_2201_BASE_H
 
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/fixpipe_utils.h"
 #include "include/experimental/tensor_api/utils/utils.h"
 #include "include/experimental/tensor_api/tensor/make.h"
 
@@ -22,71 +23,6 @@ namespace AscendC {
 namespace TensorInternal {
 constexpr uint32_t MAIN_LOOP_N_SIZE_2201 = 512;
 constexpr uint32_t CBURST_NUM_2201 = MAIN_LOOP_N_SIZE_2201 / FRACTAL_FIXED;
-
-template <typename T, typename U, typename Coord>
-__aicore__ inline void CheckCoord(const T& dst, const U& src, const Coord& coord)
-{
-    auto coordRow = Std::get<0>(coord);
-    auto coordCol = Std::get<1>(coord);
-    auto dstLayout = dst.Layout();
-    auto srcLayout = src.Layout();
-    uint32_t dstRow1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
-    uint32_t dstCol1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
-    uint32_t srcRow1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
-    uint32_t srcCol1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
-    ASSERT((coordRow >= 0) && (coordCol >= 0) && (coordRow <= dstRow1 - srcRow1) && (coordCol <= dstCol1 - srcCol1));
-}
-
-template <typename T, typename Coord>
-__aicore__ inline auto MakeTensorWithCoord(const T& oldTensor, const Coord& coord, uint32_t offset = 0)
-{
-    auto oldTensorLayout = oldTensor.Layout();
-    auto index = Crd2Idx(coord, oldTensorLayout);
-    using oldTensorType = typename T::elementType;
-    constexpr Hardware oldTensorPos = TensorInternal::GetHardPos<T>();
-    auto oldTensorIterator = MakeMemPtr<oldTensorPos>(reinterpret_cast<oldTensorType *>(oldTensor.Data().Get() + offset + index));
-    auto oldTensorMatrixLayout = MakeLayout(oldTensorLayout.GetShape(), oldTensorLayout.GetStride());
-    auto newTensor = MakeTensor(oldTensorIterator, oldTensorMatrixLayout); 
-    return newTensor;
-}
-
-template <typename T>
-__aicore__ inline auto AllocTempBuf(const T& calNSize)
-{
-    uint64_t deqTensorTempBuf = 0;
-    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 ||
-                  CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-        deqTensorTempBuf = reinterpret_cast<uint64_t>(get_imm(0));
-    }
-    return deqTensorTempBuf;
-}
-
-template <typename T>
-__aicore__ inline void FreeTempBuf(const T& deqTensorTempBuf)
-{
-    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 ||
-                  CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-        (void)(deqTensorTempBuf);
-    }
-}
-
-template <typename T>
-__aicore__ inline void SetFpc(const T& deqTensorTempBuf)
-{
-    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 ||
-                  CURRENT_ARCH_VERSION == ArchVersion::V2201) {
-        uint64_t deqTensorAddr = (deqTensorTempBuf >> static_cast<uint64_t>(7)) << 8;
-        set_fpc(deqTensorAddr);
-    }
-}
-
- __aicore__ inline void InsertSync()
-{
- 	if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3101 || 
- 	              CURRENT_ARCH_VERSION == ArchVersion::V2201) {
- 	    pipe_barrier(PIPE_FIX);
- 	}
-}
 
 class Copy2201DeqTensorToFbuf {
 public:
@@ -97,7 +33,6 @@ public:
         uint64_t dstAddr = AllocTempBuf(calNSize);
         DataCopyImpl<T, decltype(params)>(dstAddr, src, params, tuple_sequence<decltype(params)>{});
         SetFpc(dstAddr);
-        FreeTempBuf(dstAddr);
     }
 
 private:
