@@ -27,7 +27,6 @@ public:
         CheckCoord<T, U, Coord>(dst, src, coord);
         auto params = GenFixpipeParams<trait, T, U>(dst, src); 
         auto dstNzTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
-
         DataCopy<trait, T, U, decltype(params)>(dstNzTensor, src, params);
     }
 
