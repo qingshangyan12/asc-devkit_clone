@@ -178,26 +178,6 @@ __aicore__ inline constexpr decltype(auto) GetValue(const Tuple& t)
     return Std::get<index>(t);
 }
 
-template<typename Tuple>
-__aicore__ inline constexpr auto GetShape(const Tuple& s)
-{
-    if constexpr (Std::is_tuple_v<Tuple>) {
-        return TensorInternal::Transform(s, [](const auto& a) { return GetShape(a);});
-    } else {
-        return s;
-    }
-}
-
-template<size_t I, size_t... Is, typename Tuple>
-__aicore__ inline constexpr auto GetShape(const Tuple& shape)
-{
-    if constexpr (Std::is_tuple_v<Tuple>) {
-        return GetShape<Is...>(Std::get<I>(shape));
-    } else {
-        return GetTuple<I,Is...>(shape);
-    }
-}
-
 template<typename T0, typename... Ts>
 __aicore__ inline constexpr auto GetMax(const T0& t0, const Ts&... ts)
 {
