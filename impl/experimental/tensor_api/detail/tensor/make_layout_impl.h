@@ -129,18 +129,10 @@ __aicore__ inline constexpr auto ComputeFlatStride(const ShapeType& shape) {
     return BuildFlatStrideImpl(shape, Std::make_index_sequence<N>{});
 }
 
-struct ColumnMajorType {};
-
-template <typename ShapeType>
-__aicore__ inline constexpr auto MakeLayoutImpl(const ShapeType& shape) {
-    return MakeLayoutImpl<DefaultLayoutTag>(shape);
-}
-
 template <typename LayoutType, typename ShapeType>
 __aicore__ inline constexpr auto MakeLayoutImpl(const ShapeType& shape) {
     static_assert(Std::is_tuple_v<ShapeType>, "ShapeType is not tuple!");
     using ElemT = Std::remove_cvref_t<decltype(Std::get<0>(shape))>;
-    static_assert(Std::is_same_v<LayoutType, ColumnMajorType>, "Only support ColumnMajorType"); 
     if constexpr (Std::is_tuple_v<ElemT>) {
         return MakeLayoutImpl(shape, ComputeStride(shape));
     } else {
