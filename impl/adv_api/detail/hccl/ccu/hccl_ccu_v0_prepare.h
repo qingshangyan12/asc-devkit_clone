@@ -184,9 +184,9 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2
     xnData_[9] = ccuParam_.rankId * normalSliceSize;
     xnData_[10] = 0; // input output not equals
     if (ccuParam_.rankId == ccuParam_.rankNum - 1) {
-        CalcGoSize(&loopParam[0], lastSliceSize, loopCount, &xnData_[11]);
+        CalcGoSize(lastSliceSize, loopCount, &xnData_[11]);
     } else {
-        CalcGoSize(&loopParam[0], normalSliceSize, loopCount, &xnData_[11]);
+        CalcGoSize(normalSliceSize, loopCount, &xnData_[11]);
     }
 }
 
