@@ -14,9 +14,25 @@
 3. **使用git-code-process技能执行**：进行**ci_config**代码仓的版本管理，将修改后的配置文件标准化上传至 CodeHub。
 
 ## 四、重要操作原则
-**⚠️ 关键原则：所有用户自然语言诉求必须优先使用user_require_analysis技能，所有YAML配置文件修改必须优先使用edit-yaml技能**
+**⚠️ 关键原则：所有用户自然语言诉求必须优先使用user_require_analysis技能，所有YAML配置文件修改必须优先使用edit-yaml技能，所有代码提交上库必须优先使用git-code-process技能**
 
-### 4.1 YAML修改优先级
+### 4.1 代码上库优先级
+
+**强制要求：代码提交上库必须优先使用git-code-process技能**
+
+- **第一优先级：git-code-process 技能**
+  - 所有涉及代码提交、上库的操作，**必须**优先通过 `git-code-process` 技能执行；
+  - 该技能提供标准化的 Git 操作流程：git stash → git pull → git stash pop → git add → git commit → repo upload；
+  - 内置冲突预防机制，确保代码基于最新基线；
+  - 支持规范化的提交信息格式。
+
+- **禁止直接操作**：
+  - 禁止绕过 git-code-process 技能直接使用 Bash 工具执行 git 命令；
+  - 禁止跳过 stash + pull 机制直接提交代码。
+
+- **工具优先级**：Skill工具(git-code-process技能) > Bash工具(git命令) > 手动操作。
+
+### 4.2 YAML修改优先级
 - **第一优先级：user_require_analysis 技能**
   - 用户使用自然语言描述工程需求时，**必须**优先通过`user_require_analysis`技能进行需求分析和转化；
   - 该技能将自然语言诉求转化为 edit-yaml 技能可执行的标准命令；
@@ -33,7 +49,7 @@
 - **工具优先级**：Skill工具(user_require_analysis技能) > Skill工具(edit-yaml技能) > Bash工具(脚本) > Read+Edit工具；
 - **可回溯要求**：将执行过程中使用的脚本命令都保存到项目目录下的cd.json内，重新开启claude时清空。
 
-### 4.2 edit-yaml技能核心工具集
+### 4.3 edit-yaml技能核心工具集
 
 | 工具名称 | 功能说明 | 典型使用场景 |
 |---------|---------|-------------|
