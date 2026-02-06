@@ -129,7 +129,7 @@ __aicore__ inline constexpr auto ComputeFlatStride(const ShapeType& shape) {
     return BuildFlatStrideImpl(shape, Std::make_index_sequence<N>{});
 }
 
-template <typename LayoutType, typename ShapeType>
+template <typename ShapeType>
 __aicore__ inline constexpr auto MakeLayoutImpl(const ShapeType& shape) {
     static_assert(Std::is_tuple_v<ShapeType>, "ShapeType is not tuple!");
     using ElemT = Std::remove_cvref_t<decltype(Std::get<0>(shape))>;
@@ -190,7 +190,7 @@ template <size_t... Is, typename ShapeType, typename StrideType>
 __aicore__ inline constexpr auto SelectImpl(const Layout<ShapeType, StrideType>& layout)
 {
     static_assert(Std::is_tuple_v<ShapeType> && Std::is_tuple_v<StrideType>, "ShapeType or StrideType is not tuple!");
-    return MakeLayoutImpl(SelectTuple<Is...>(layout.ShapeType()),
+    return MakeLayoutImpl(SelectTuple<Is...>(layout.Shape()),
                             SelectTuple<Is...>(layout.Stride()));
 }
 
