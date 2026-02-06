@@ -43,7 +43,7 @@ struct Layout : private Std::tuple<T, U>
 
     __aicore__ inline constexpr decltype(auto) Capacity() const
     {
-        return TensorInternal::GetCapacity(GetShape(), GetStride());
+        return TensorInternal::GetCapacity(Shape(), Stride());
     }
 
     __aicore__ inline constexpr decltype(auto) layout()
@@ -90,13 +90,13 @@ struct Layout : private Std::tuple<T, U>
     __aicore__ inline constexpr decltype(auto) Rank() const
     {
         static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "The dimensions of the Shape and Stride are not the same.");
-        return TensorInternal::GetRank<I...>(GetShape());
+        return TensorInternal::GetRank<I...>(Shape());
     }
 
     template <size_t... I>
     __aicore__ inline constexpr decltype(auto) Size() const
     {
-        return TensorInternal::TupleSize<I...>(GetShape());
+        return TensorInternal::TupleSize<I...>(Shape());
     }
 
     static constexpr auto rank = Std::tuple_size_v<T>;

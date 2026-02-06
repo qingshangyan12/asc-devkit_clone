@@ -220,7 +220,7 @@ struct CoshapeCompute {
     __aicore__ inline constexpr auto operator()(const T& shape, const U& stride) const {
         if constexpr (Std::is_tuple_v<T> && Std::is_tuple_v<U>) {
             static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "Mismatched ranks");
-            return TileInternal::TransformApply(shape, stride, CoshapeCompute{}, CoshapeSum{});
+            return TensorInternal::TransformApply(shape, stride, CoshapeCompute{}, CoshapeSum{});
         } else {
             auto m1Shape = shape - Std::Int<1>{};
             auto absStride = stride < 0 ? -stride : stride;
