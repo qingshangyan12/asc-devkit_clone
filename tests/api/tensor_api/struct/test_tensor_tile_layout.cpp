@@ -153,7 +153,7 @@ TEST_F(Tensor_Api_Layout, MakeLayoutByShapeOperation)
     auto layoutMake2 = AscendC::MakeLayout(shape);
 
     EXPECT_EQ(AscendC::Std::get<1>(layoutMake1.Stride()), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(layoutMake2.Stride()), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(layoutMake2.Stride()), 4);
     EXPECT_EQ(AscendC::Size(layoutMake1), 24);
     EXPECT_EQ(AscendC::Size(layoutMake2), 24);
     EXPECT_EQ(layoutMake1.Size(), 24);
