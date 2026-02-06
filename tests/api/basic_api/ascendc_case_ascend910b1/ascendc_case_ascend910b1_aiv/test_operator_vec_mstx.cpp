@@ -12,7 +12,7 @@
 extern "C" void __mstx_dfx_report_stub(int type, uint8_t size, void* desc);
 #include <gtest/gtest.h>
 #include <string.h>
-
+ 
 #include "kernel_log.h"
 static uint8_t g_testRes = 1;      // 全局变量记录运行结果, 如果进入ASCENDC_ASSERT报错，会被置为0
 // 重定义ASCENDC_ASSERT，不Abort，仅修改全局变量通知进入报错分支
