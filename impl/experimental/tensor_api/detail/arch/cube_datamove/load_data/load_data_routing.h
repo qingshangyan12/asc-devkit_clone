@@ -12,18 +12,21 @@
  * \brief
  */
 
-#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_2201_LOAD_DATA_ROUTING_H
-#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_2201_LOAD_DATA_ROUTING_H
+#ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_LOAD_DATA_ROUTING_H
+#define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_LOAD_DATA_ROUTING_H
 
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data/npu_arch_2201/load_data_four_dim_2201_l1_l0a.h"
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data/npu_arch_2201/load_data_four_dim_2201_l1_l0b.h"
+
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data/npu_arch_3510/load_data_four_dim_3510_l1_l0a.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data/npu_arch_3510/load_data_four_dim_3510_l1_l0b.h"
 
 namespace AscendC {
 namespace TensorInternal {
 
 class LoadDataIgnore {
 public:
-    template<typename T, typename U, const LoadDataTrait& config, class Coord>
+    template<const LoadDataTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {}
 };
 
@@ -43,6 +46,18 @@ struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V2201, FO
 {
     using type = LoadDataFourDim2201L12L0B;
 };
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0A, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA>
+{
+    using type = LoadDataFourDim3510L12L0A;
+};
+
+template <>
+struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA>
+{
+    using type = LoadDataFourDim3510L12L0B;
+};
 } // namespace TensorInternal
 } // namespace AscendC
-#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_2201_LOAD_DATA_ROUTING_H
+#endif // EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_LOAD_DATA_ROUTING_H

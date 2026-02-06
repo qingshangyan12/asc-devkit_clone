@@ -19,13 +19,17 @@
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_2201/data_copy_four_dim_2201_l1_bt.h"
 #include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_2201/data_copy_four_dim_2201_l1_fb.h"
 
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_four_dim_3510_gm_l1.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_four_dim_3510_l1_bt.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_four_dim_3510_l1_fb.h"
+
 namespace AscendC {
 namespace TensorInternal {
 
 class DataCopyIgnore {
 public:
-    template <typename T, typename U, const DataCopyTrait& trait>
-    __aicore__ inline void Run(const T& dst, const U& src) {}
+    template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {}
 };
 
 template <Hardware dstTPos, Hardware srcTpos, uint32_t Version, size_t dimension>
@@ -46,6 +50,21 @@ struct DataCopyTensor2Tensor<Hardware::BIAS, Hardware::L1, ArchVersion::V2201, F
 template <>
 struct DataCopyTensor2Tensor<Hardware::FIXBUF, Hardware::L1, ArchVersion::V2201, FOUR_DIM_DATA> {
     using type = CopyCbufToFB2201;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::L1, Hardware::GM, ArchVersion::V3510, FOUR_DIM_DATA> {
+    using type = DataCopyFourDim3510GM2L1;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::BIAS, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA> {
+    using type = CopyCbufToBT3510;
+};
+
+template <>
+struct DataCopyTensor2Tensor<Hardware::FIXBUF, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA> {
+    using type = CopyCbufToFB3510;
 };
 } // namespace TensorInternal
 } // namespace AscendC
