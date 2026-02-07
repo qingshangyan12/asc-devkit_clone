@@ -55,7 +55,7 @@
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquantCustom算子。本样例为PER_TENSOR场景（按张量量化），将int8_t数据类型伪量化为half数据类型。
+  本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquant_custom算子。本样例为PER_CHANNEL场景（按通道量化），将int8_t数据类型伪量化为half数据类型。
 
   - Kernel实现
 
