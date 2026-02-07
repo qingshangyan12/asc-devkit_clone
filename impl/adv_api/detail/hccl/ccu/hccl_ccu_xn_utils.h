@@ -8,6 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/hccl/ccu/hccl_ccu_xn_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/hccl.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_CCU_XN_UTILS_H
+#endif
+
 /*!
  * \file hccl_ccu_xn_utils.h
  * \brief
@@ -155,7 +162,12 @@ __aicore__ inline void CalcGoSize(uint64_t sliceSize, uint64_t loopCount, uint64
         goSize[2] = GetParallelParameters(n - 1, 1, CCU_PARAM_INDEX);
         goSize[3] = p;
     }
-}
+    }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_CCU_XN_UTILS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_CCU_XN_UTILS_H
 #endif

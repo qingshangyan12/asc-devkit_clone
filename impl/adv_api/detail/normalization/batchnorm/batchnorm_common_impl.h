@@ -8,6 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/normalization/batchnorm/batchnorm_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/normalization/batchnorm.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_BATCHNORM_COMMON_IMPL_H
+#endif
+
 /* !
  * \file batchnorm_common_impl.h
  * \brief
@@ -333,3 +340,8 @@ __aicore__ inline void BatchNormImpl(const LocalTensor<T>& output, const LocalTe
 } // namespace BatchNormAPI
 } // namespace AscendC
 #endif // IMPL_NORMALIZATION_BATCHNORM_BATCHNORM_COMMON_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_BATCHNORM_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_BATCHNORM_COMMON_IMPL_H
+#endif
