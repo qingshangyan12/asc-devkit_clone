@@ -259,7 +259,7 @@ extern "C" __global__ __aicore__ void KernelTestSetLoadDataRepeat1() {
     AscendC::SetLoadDataRepeat(repeatParams);
 }
 
-#if __NPU_ARCH__ != 5102
+#if __NPU_ARCH__ != 3101 && __NPU_ARCH__ != 5102
 // __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadImageToLocalParams& loadDataParams);
 extern "C" __global__ __aicore__ void KernelTestLoadImageToLocal1() {
     AscendC::LocalTensor<int8_t> dst;
