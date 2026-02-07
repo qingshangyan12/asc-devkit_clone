@@ -15,6 +15,18 @@
 #ifndef EXPERIMENTAL_TENSOR_API_ATOM_ATOM_H
 #define EXPERIMENTAL_TENSOR_API_ATOM_ATOM_H
 
-#include "include/experimental/tensor_api/atom/cube_datamove/copy_atom.h"
+#include "impl/experimental/tensor_api/detail/atom/copy_atom_impl.h"
+
+namespace AscendC {
+namespace Te {
+
+template <typename CopyOperation, typename... CopyOpArgs>
+struct CopyTraits;
+
+template <typename... Args>
+struct CopyAtom;
+
+}
+}
 
 #endif // EXPERIMENTAL_TENSOR_API_ATOM_ATOM_H
