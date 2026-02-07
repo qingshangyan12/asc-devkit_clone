@@ -8,6 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/math/math_constant_util.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/math/asin.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_CONSTANT_UTIL_H
+#endif
+
 /*!
  * \file math_constant_util.h
  * \brief defined common used math related constant value.
@@ -40,3 +47,8 @@ constexpr float kCOEF[] = {
 };
 } // namespace AscendC
 #endif // IMPL_MATH_MATH_CONSTANT_UTIL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_CONSTANT_UTIL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_CONSTANT_UTIL_H
+#endif

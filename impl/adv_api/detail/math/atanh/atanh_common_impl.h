@@ -8,6 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/math/atanh/atanh_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/math/atanh.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ATANH_COMMON_IMPL_H
+#endif
+
 /* !
  * \file atanh_common_impl.h
  * \brief
@@ -187,3 +194,8 @@ __aicore__ inline void AtanhImpl(
 } // namespace AscendC
 
 #endif // IMPL_MATH_ATANH_ATANH_COMMON_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ATANH_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ATANH_COMMON_IMPL_H
+#endif

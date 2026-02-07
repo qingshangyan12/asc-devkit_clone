@@ -8,6 +8,13 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/math/cumsum/regbase/c310/cumsum_c310_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/math/cumsum.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CUMSUM_C310_UTILS_H
+#endif
+
 /* !
  * \file cumsum_c310_utils.h
  * \brief
@@ -787,3 +794,8 @@ __aicore__ inline void Transpose5HDBA(const LocalTensor<half>& dstTensor, const 
 } // namespace AscendC
 
 #endif // IMPL_MATH_CUMSUM_CUMSUM_C310_UTILS_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CUMSUM_C310_UTILS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CUMSUM_C310_UTILS_H
+#endif

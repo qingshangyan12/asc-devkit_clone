@@ -8,6 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/sort/topk/topk_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/sort/topk.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TOPK_C310_IMPL_H
+#endif
+
 /*!
  * \file topk_c310_impl.h
  * \brief
@@ -1364,3 +1371,8 @@ __aicore__ inline void TopKNSmall(const LocalTensor<T> &dstValueLocal, const Loc
 }  // namespace AscendC
 
 #endif  // IMPL_SORT_TOPK_TOPK_C310_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TOPK_C310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TOPK_C310_IMPL_H
+#endif
