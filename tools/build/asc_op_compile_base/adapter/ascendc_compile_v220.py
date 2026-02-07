@@ -643,15 +643,14 @@ def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
             compile_cmd += [f"-D__NO_KFC_SERVER__"]
         CommonUtility.dump_compile_log(compile_cmd, CompileStage.INFERCHANNEL, params.compile_log_path)
         compile_cmd_str = ' '.join(compile_cmd)
-        with open('tmp_run_cmd.sh', 'w') as f:
+        cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
+        with open(cmd_file, 'w') as f:
             f.write(compile_cmd_str)
-        os.chmod('tmp_run_cmd.sh', 0o755)
-        try:
-            proc = subprocess.Popen(
-                ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        finally:
-            os.remove('tmp_run_cmd.sh')
+        os.chmod(cmd_file, 0o755)
+        proc = subprocess.Popen(
+            'bash ${cmd_file}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
+        os.remove(cmd_file)
         CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
         objdump_cmd = ['llvm-objdump', '-s', '-j', '.text', '{}'.format(dst_file)]
 

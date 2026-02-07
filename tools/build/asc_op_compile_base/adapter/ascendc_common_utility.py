@@ -205,15 +205,14 @@ class CommonUtility:
         cmd.append("-disable-lsr")
         cmd.append("-fno-unroll-loops")
         cmd_str = ' '.join(cmd)
-        with open('tmp_run_cmd.sh', 'w') as f:
+        cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
+        with open(cmd_file, 'w') as f:
             f.write(cmd_str)
-        os.chmod('tmp_run_cmd.sh', 0o755)
-        try:
-            proc = subprocess.Popen(
-                ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        finally:
-            os.remove('tmp_run_cmd.sh')
+        os.chmod(cmd_file, 0o755)
+        proc = subprocess.Popen(
+            'bash ${cmd_file}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
+        os.remove(cmd_file)
         return out, proc.returncode
 
     @staticmethod
@@ -253,15 +252,14 @@ class CommonUtility:
             cmd.insert(5, "-mllvm")
             cmd.insert(6, "-cce-aicore-function-stack-size=8192")
         cmd_str = ' '.join(cmd)
-        with open('tmp_run_cmd.sh', 'w') as f:
+        cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
+        with open(cmd_file, 'w') as f:
             f.write(cmd_str)
-        os.chmod('tmp_run_cmd.sh', 0o755)
-        try:
-            proc = subprocess.Popen(
-                ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        finally:
-            os.remove('tmp_run_cmd.sh')
+        os.chmod(cmd_file, 0o755)
+        proc = subprocess.Popen(
+            'bash ${cmd_file}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
+        os.remove(cmd_file)
         if proc.returncode != 0:
             (out, retcode) = CommonUtility.run_cmd_stack_spill_case_ascendc(cmd, cmd_type, cce_file)
             return out, retcode
@@ -287,15 +285,14 @@ class CommonUtility:
             success or fail
         """
         cmd_str = ' '.join(cmd)
-        with open('tmp_run_cmd.sh', 'w') as f:
+        cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
+        with open(cmd_file, 'w') as f:
             f.write(cmd_str)
-        os.chmod('tmp_run_cmd.sh', 0o755)
-        try:
-            proc = subprocess.Popen(
-                ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        finally:
-            os.remove('tmp_run_cmd.sh')
+        os.chmod(cmd_file, 0o755)
+        proc = subprocess.Popen(
+            'bash ${cmd_file}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
+        os.remove(cmd_file)
         is_compile_cmd = cmd_type == "compile"
         if proc.returncode != 0:
             if is_compile_cmd and "-O0" in cmd and "-g" in cmd:
@@ -303,15 +300,14 @@ class CommonUtility:
                 cmd[cmd.index("-O0")] = "-O2"
                 del cmd[cmd.index("-g")]
                 cmd_str = ' '.join(cmd)
-                with open('tmp_run_cmd.sh', 'w') as f:
+                cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
+        with open(cmd_file, 'w') as f:
                     f.write(cmd_str)
-                os.chmod('tmp_run_cmd.sh', 0o755)
-                try:
-                    proc_now = subprocess.Popen(
-                        ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                finally:
-                    os.remove('tmp_run_cmd.sh')
+                os.chmod(cmd_file, 0o755)
+                proc_now = subprocess.Popen(
+                    'bash ${cmd_file}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
                 (out, _) = proc_now.communicate()
+                os.remove(cmd_file)
                 if proc_now.returncode != 0:
                     if "--cce-aicore-only" in cmd:
                         (out_tmp, retcode) = CommonUtility.run_cmd_stackoverflow_ascnendc(cmd, cmd_type)
