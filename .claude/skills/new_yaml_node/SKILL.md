@@ -388,13 +388,13 @@ deploy_online_prod:
 
 ```bash
 # 构造节点（仅显示，不添加到文件）
-python .claude/skills/new_yaml_node/scripts/create_node.py -n pkg_common_utils
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_common_utils
 
 # 构造节点并添加到 YAML 文件
-python .claude/skills/new_yaml_node/scripts/create_node.py -n pkg_common_utils -f ci_config/rule.yaml
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_common_utils -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 # 预览模式（不实际添加）
-python .claude/skills/new_yaml_node/scripts/create_node.py -n test_api_smoke -f ci_config/rule.yaml --dry-run
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n test_api_smoke -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --dry-run
 ```
 
 #### 6.2.2 命令行参数
@@ -496,8 +496,8 @@ create_node.py 解析名称并生成节点内容
 
 **自动执行的命令示例：**
 ```bash
-python .claude/skills/edit-yaml/scripts/add_node.py \
-  -f ci_config/rule.yaml \
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
   -p CB.tasks.pkg \
   -n "pkg_common_utils: {version: cann, enabled: true, timeout: 3600, type: pkg, target: [common_utils.so, common_utils.a]}"
 ```
@@ -506,13 +506,13 @@ python .claude/skills/edit-yaml/scripts/add_node.py \
 
 ```bash
 # 步骤1：预览节点内容
-python .claude/skills/new_yaml_node/scripts/create_node.py -n pkg_new_feature
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_new_feature
 
 # 步骤2：添加到测试文件验证
-python .claude/skills/new_yaml_node/scripts/create_node.py -n pkg_new_feature -f test_example.yaml
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_new_feature -f test_example.yaml
 
 # 步骤3：验证添加结果
-python .claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --type-distribution
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --type-distribution
 ```
 
 ## 七、YAML 文件结构分析
@@ -543,22 +543,22 @@ python .claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_ex
 
 ```bash
 # 完整分析（包含所有功能）
-python .claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f ci_config/rule.yaml
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 # 仅分析节点类型分布
-python .claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f ci_config/rule.yaml --type-distribution
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --type-distribution
 
 # 仅检查命名规范
-python .claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f ci_config/rule.yaml --check-naming
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --check-naming
 
 # 仅检查配置项完整性
-python .claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f ci_config/rule.yaml --check-config
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --check-config
 
 # 仅提取内容映射规则
-python .claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f ci_config/rule.yaml --extract-rules
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --extract-rules
 
 # 仅输出总结报告
-python .claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f ci_config/rule.yaml --summary
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --summary
 ```
 
 #### 7.2.2 命令行参数
@@ -688,8 +688,8 @@ edit-yaml（将节点添加到 YAML 文件）
 Skill(skill="new_yaml_node", args="构造任务名为 pkg_common_utils 的节点")
 
 # 步骤2：使用 edit-yaml 添加节点
-python .claude/skills/edit-yaml/scripts/add_node.py \
-  -f ci_config/rule.yaml \
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
   -p CB.tasks.pkg \
   -n "pkg_common_utils: {version: cann, enabled: true, timeout: 3600, type: pkg, target: [libcommon_utils.so]}"
 ```
@@ -802,16 +802,16 @@ Windows 控制台可能显示中文乱码，但功能正常。建议在 Git Bash
 
 ```bash
 # 进入技能目录
-cd .claude/skills/new_yaml_node
+cd $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node
 
 # 运行完整分析
-python scripts/analyze_yaml_structure.py -f test_example.yaml
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml
 
 # 测试单个功能
-python scripts/analyze_yaml_structure.py -f test_example.yaml --type-distribution
-python scripts/analyze_yaml_structure.py -f test_example.yaml --check-naming
-python scripts/analyze_yaml_structure.py -f test_example.yaml --check-config
-python scripts/analyze_yaml_structure.py -f test_example.yaml --extract-rules
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --type-distribution
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --check-naming
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --check-config
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --extract-rules
 ```
 
 ## 十三、常见问题

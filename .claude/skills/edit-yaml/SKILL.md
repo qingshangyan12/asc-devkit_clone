@@ -52,10 +52,10 @@ description: 采用流式读取、递归遍历、命令行参数解析等功能�
 **命令格式：**
 ```bash
 # 推荐方式：使用命令行参数
-python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r target_root -k target_key -v target_value
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r target_root -k target_key -v target_value
 
 # 使用示例
-python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ci_config/rule.yaml -r CB.pkg -k version -v cann
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/find_yaml_node.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml -r CB.pkg -k version -v cann
 ```
 
 **参数说明：**
@@ -71,10 +71,10 @@ python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ci_config/rule.yaml
 **命令格式：**
 ```bash
 # 批量修改（3个及以上节点，使用映射文件）
-python .claude/skills/edit-yaml/scripts/modify_node_name.py -f ${yaml_path} --mappings-file mappings.txt
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/modify_node_name.py -f ${yaml_path} --mappings-file mappings.txt
 
 # 少量修改（1-2个节点，使用命令行参数）
-python .claude/skills/edit-yaml/scripts/modify_node_name.py -f ${yaml_path} -m CB.tasks.pkg.llt1=CB.tasks.pkg.llt1_test
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/modify_node_name.py -f ${yaml_path} -m CB.tasks.pkg.llt1=CB.tasks.pkg.llt1_test
 ```
 
 **映射文件格式（每行一个映射）：**
@@ -100,11 +100,11 @@ CB.tasks.pkg.llt1_newllt = CB.tasks.pkg.llt1_pkg
 **命令格式：**
 ```bash
 # 批量修改（3个及以上节点）
-python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r CB -k version -v cann > nodes.txt
-python .claude/skills/edit-yaml/scripts/modify_node_key_value.py -f ${yaml_path} --nodes-file nodes.txt -k version -v cann_new
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r CB -k version -v cann > nodes.txt
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/modify_node_key_value.py -f ${yaml_path} --nodes-file nodes.txt -k version -v cann_new
 
 # 少量修改（1-2个节点）
-python .claude/skills/edit-yaml/scripts/modify_node_key_value.py -f ${yaml_path} -n CB.tasks.pkg.llt1_new -k ut_check -v false
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/modify_node_key_value.py -f ${yaml_path} -n CB.tasks.pkg.llt1_new -k ut_check -v false
 ```
 
 **参数说明：**
@@ -123,11 +123,11 @@ python .claude/skills/edit-yaml/scripts/modify_node_key_value.py -f ${yaml_path}
 **命令格式：**
 ```bash
 # 批量添加（3个及以上节点）
-python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r CB -k version -v cann > nodes.txt
-python .claude/skills/edit-yaml/scripts/add_node_key_value.py -f ${yaml_path} --nodes-file nodes.txt -k enabled -v true
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r CB -k version -v cann > nodes.txt
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node_key_value.py -f ${yaml_path} --nodes-file nodes.txt -k enabled -v true
 
 # 少量添加（1-2个节点）
-python .claude/skills/edit-yaml/scripts/add_node_key_value.py -f ${yaml_path} -n CB.tasks.pkg.llt1 -k retry_count -v 3 -t int
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node_key_value.py -f ${yaml_path} -n CB.tasks.pkg.llt1 -k retry_count -v 3 -t int
 ```
 
 **参数说明：**
@@ -147,14 +147,14 @@ python .claude/skills/edit-yaml/scripts/add_node_key_value.py -f ${yaml_path} -n
 **命令格式：**
 ```bash
 # 批量添加节点（3个及以上父节点）
-python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r CB.tasks -k type -v pkg > parents.txt
-python .claude/skills/edit-yaml/scripts/add_node.py -f ${yaml_path} --parents-file parents.txt -n "new_task: {version: cann}"
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r CB.tasks -k type -v pkg > parents.txt
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py -f ${yaml_path} --parents-file parents.txt -n "new_task: {version: cann}"
 
 # 少量添加节点（1-2个父节点）
-python .claude/skills/edit-yaml/scripts/add_node.py -f ${yaml_path} -p CB.tasks.pkg -n "new_task: {version: cann, enabled: true}"
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py -f ${yaml_path} -p CB.tasks.pkg -n "new_task: {version: cann, enabled: true}"
 
 # 添加嵌套节点
-python .claude/skills/edit-yaml/scripts/add_node.py -f ${yaml_path} -p CB.tasks.pkg -n "new_sub_node.level1.level2: {key: value}"
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py -f ${yaml_path} -p CB.tasks.pkg -n "new_sub_node.level1.level2: {key: value}"
 ```
 
 **参数说明：**
@@ -175,18 +175,18 @@ python .claude/skills/edit-yaml/scripts/add_node.py -f ${yaml_path} -p CB.tasks.
 **命令格式：**
 ```bash
 # 批量移动（3个及以上节点）
-python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r CB -k version -v cann > nodes.txt
-python .claude/skills/edit-yaml/scripts/move_yaml_node.py -f ${yaml_path} --nodes-file nodes.txt -t CB.tasks.pkg
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/find_yaml_node.py -f ${yaml_path} -r CB -k version -v cann > nodes.txt
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/move_yaml_node.py -f ${yaml_path} --nodes-file nodes.txt -t CB.tasks.pkg
 
 # 少量移动（1-2个节点）
-python .claude/skills/edit-yaml/scripts/move_yaml_node.py -f ${yaml_path} -n CB.tasks.llt1 -t CB.tasks.compile
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/move_yaml_node.py -f ${yaml_path} -n CB.tasks.llt1 -t CB.tasks.compile
 
 # 移动并替换后缀（替换模式）
-python .claude/skills/edit-yaml/scripts/move_yaml_node.py -f ${yaml_path} -n CB.tasks.llt1_test -t CB.tasks.pkg --suffix prod
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/move_yaml_node.py -f ${yaml_path} -n CB.tasks.llt1_test -t CB.tasks.pkg --suffix prod
 # 结果：CB.tasks.llt1_test -> CB.tasks.pkg.llt1_prod
 
 # 移动并添加后缀（添加模式）
-python .claude/skills/edit-yaml/scripts/move_yaml_node.py -f ${yaml_path} -n CB.tasks.llt1 -t CB.tasks.pkg --suffix test --addmode
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/move_yaml_node.py -f ${yaml_path} -n CB.tasks.llt1 -t CB.tasks.pkg --suffix test --addmode
 # 结果：CB.tasks.llt1 -> CB.tasks.pkg.llt1_test
 ```
 
@@ -211,10 +211,10 @@ python .claude/skills/edit-yaml/scripts/move_yaml_node.py -f ${yaml_path} -n CB.
 **命令格式：**
 ```bash
 # 仅检查语法问题
-python .claude/skills/edit-yaml/scripts/fix_non_standard_yaml.py ci_config/rule.yaml
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/fix_non_standard_yaml.py ci_config/rule.yaml
 
 # 检查并自动修复（创建备份）
-python .claude/skills/edit-yaml/scripts/fix_non_standard_yaml.py ci_config/rule.yaml --fix
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/fix_non_standard_yaml.py ci_config/rule.yaml --fix
 ```
 
 **检测与修复的问题：**

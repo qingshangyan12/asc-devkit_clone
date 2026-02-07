@@ -95,19 +95,19 @@ description: 编译问题定位技能，自动解析编译日志，定位出问�
 
 ```bash
 # 分析编译日志文件
-python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
 
 # 分析指定 target 的编译失败
-python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log -t libbase.so
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log -t libbase.so
 
 # 详细模式（显示完整诊断过程）
-python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log -v
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log -v
 
 # 只定位问题源文件
-python .claude/skills/compile-issue-diagnosis/scripts/find_target_source.py -t libbase.so
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/find_target_source.py -t libbase.so
 
 # 分析编译错误并给出建议
-python .claude/skills/compile-issue-diagnosis/scripts/analyze_compile_error.py -f compile.log
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/analyze_compile_error.py -f compile.log
 ```
 
 ### 4.2 完整诊断流程示例
@@ -116,7 +116,7 @@ python .claude/skills/compile-issue-diagnosis/scripts/analyze_compile_error.py -
 
 ```bash
 # 步骤1：解析编译日志，定位问题
-python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log -v
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log -v
 
 # 输出：
 # [√] 解析编译日志: compile.log
@@ -129,7 +129,7 @@ python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f co
 #   错误信息: undefined reference to 'get_config_value'
 
 # 步骤2：查找失败 target 的源代码
-python .claude/skills/compile-issue-diagnosis/scripts/find_target_source.py -t libbase.so
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/find_target_source.py -t libbase.so
 
 # 输出：
 # [√] 查找 Target: libbase.so
@@ -143,7 +143,7 @@ python .claude/skills/compile-issue-diagnosis/scripts/find_target_source.py -t l
 #       - Android.mk: base/Android.mk
 
 # 步骤3：分析错误原因，获取修复建议
-python .claude/skills/compile-issue-diagnosis/scripts/analyze_compile_error.py -f compile.log
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/analyze_compile_error.py -f compile.log
 
 # 输出：
 # ============================================================
@@ -171,13 +171,13 @@ undefined reference to 'get_config_value(char const*)'
 **诊断步骤：**
 ```bash
 # 1. 解析日志
-python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
 
 # 2. 查找源代码
-python .claude/skills/compile-issue-diagnosis/scripts/find_target_source.py -t libbase.so
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/find_target_source.py -t libbase.so
 
 # 3. 分析错误原因
-python .claude/skills/compile-issue-diagnosis/scripts/analyze_compile_error.py -f compile.log
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/analyze_compile_error.py -f compile.log
 
 # 输出：
 # 根本原因: 符号 'get_config_value' 未定义，可能缺少链接库
@@ -208,13 +208,13 @@ fatal error: 'utils/helper.h' file not found
 **诊断步骤：**
 ```bash
 # 1. 分析日志
-python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
 
 # 2. 查找头文件
 find . -name "helper.h"
 
 # 3. 分析原因
-python .claude/skills/compile-issue-diagnosis/scripts/analyze_compile_error.py -f compile.log
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/analyze_compile_error.py -f compile.log
 
 # 输出：
 # 根本原因: 文件 'utils/helper.h' 不存在或路径错误
@@ -534,7 +534,7 @@ grep -c "error:" compile.log
 **复杂问题排查：**
 ```bash
 # 步骤1：分析编译日志
-python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
 
 # 步骤2：定位源代码
 cd <代码仓>
@@ -718,13 +718,13 @@ AI 提供的修复建议可能不完全适用，需要根据实际情况调整�
 **检查方法：**
 ```bash
 # 检查脚本权限
-ls -la .claude/skills/compile-issue-diagnosis/scripts/
+ls -la $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/
 ```
 
 **解决方法：**
 ```bash
 # 添加执行权限
-chmod +x .claude/skills/compile-issue-diagnosis/scripts/*.py
+chmod +x $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/*.py
 ```
 
 ### Q7：如何避免编译错误？
@@ -769,16 +769,16 @@ make test
 **检查方法：**
 ```bash
 # 检查脚本权限
-ls -la .claude/skills/compile-issue-diagnosis/scripts/
+ls -la $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/
 ```
 
 **解决方法：**
 ```bash
 # 添加执行权限
-chmod +x .claude/skills/compile-issue-diagnosis/scripts/*.py
+chmod +x $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/*.py
 
 # 验证权限
-ls -la .claude/skills/compile-issue-diagnosis/scripts/
+ls -la $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/
 # 应该看到 -rwxr-xr-x (可执行权限)
 ```
 
@@ -797,10 +797,10 @@ python3 --version
 **解决方法：**
 ```bash
 # 方法1：使用 python3
-python3 .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
+python3 $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
 
 # 方法2：使用完整路径
-/usr/bin/python3 .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
+/usr/bin/python3 $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
 ```
 
 ### Q9：日志文件编码问题怎么办？
@@ -815,7 +815,7 @@ python3 .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f c
 iconv -f GBK -t UTF-8 compile.log > compile_utf8.log
 
 # 方法2：脚本已内置编码容错（errors='ignore'）
-python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
+python $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f compile.log
 
 # 方法3：在 Git Bash 中运行（推荐）
 # Git Bash 默认使用 UTF-8 编码
@@ -824,10 +824,10 @@ python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f co
 ## 九、维护信息
 
 - **技能名称**：compile-issue-diagnosis
-- **技能路径**：`.claude/skills/compile-issue-diagnosis/`
-- **脚本位置**：`.claude/skills/compile-issue-diagnosis/scripts/`
-- **子代理配置**：`.claude/subagents/compile-diagnosis-agent.json`
-- **文档位置**：`.claude/skills/compile-issue-diagnosis/SKILL.md`
+- **技能路径**：`$CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/`
+- **脚本位置**：`$CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/`
+- **子代理配置**：`$CLAUDE_PROJECT_DIR/.claude/agents/compile-diagnosis-agent.md`
+- **文档位置**：`$CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/SKILL.md`
 - **更新日期**：2025-02-06
 
 ### 脚本文件
@@ -844,13 +844,13 @@ python .claude/skills/compile-issue-diagnosis/scripts/parse_compile_log.py -f co
 
 ```bash
 # 检查权限
-ls -la .claude/skills/compile-issue-diagnosis/scripts/
+ls -la $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/
 
 # 添加执行权限（如果缺失）
-chmod +x .claude/skills/compile-issue-diagnosis/scripts/*.py
+chmod +x $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/*.py
 
 # 验证权限
-ls -la .claude/skills/compile-issue-diagnosis/scripts/
+ls -la $CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/scripts/
 # 应该看到 -rwxr-xr-x (可执行权限)
 ```
 

@@ -42,7 +42,7 @@ description: 理解用户的自然语言工程诉求，将其转化为 edit-yaml
 
 | 信息类型 | 提取内容 | 示例 |
 |---------|---------|------|
-| **目标文件** | YAML 文件路径或文件名 | `ci_config/rule.yaml` 或 `rule.yaml` |
+| **目标文件** | YAML 文件路径或文件名 | `$CLAUDE_PROJECT_DIR/ci_config/rule.yaml` 或 `rule.yaml` |
 | **操作类型** | 查找/修改/新增/删除/移动 | "修改 ut_check 为 false" → 修改操作 |
 | **目标节点** | 节点路径或节点特征 | `CB.tasks.pkg.llt1` 或 "version 为 cann 的任务" |
 | **配置项** | 要操作的键名 | `ut_check`、`version`、`enabled` |
@@ -180,10 +180,10 @@ Skill(skill="edit-yaml", args="{命令3}")
 
 | 用户表述 | 提取的文件路径 | 处理方式 |
 |---------|--------------|---------|
-| "rule.yaml 文件" | `ci_config/rule.yaml` | 自动添加 `ci_config/` 前缀 |
-| "在 ci_config/rule.yaml 中" | `ci_config/rule.yaml` | 直接使用 |
-| "配置文件 rule.yaml" | `ci_config/rule.yaml` | 自动添加路径前缀 |
-| "所有 yaml 文件" | `ci_config/**/*.yaml` | 执行搜索操作 |
+| "rule.yaml 文件" | `$CLAUDE_PROJECT_DIR/ci_config/rule.yaml` | 自动添加 `ci_config/` 前缀 |
+| "在 ci_config/rule.yaml 中" | `$CLAUDE_PROJECT_DIR/ci_config/rule.yaml` | 直接使用 |
+| "配置文件 rule.yaml" | `$CLAUDE_PROJECT_DIR/ci_config/rule.yaml` | 自动添加路径前缀 |
+| "所有 yaml 文件" | `$CLAUDE_PROJECT_DIR/ci_config/**/*.yaml` | 执行搜索操作 |
 
 ### 3.2 节点路径识别
 
@@ -256,7 +256,7 @@ Skill(skill="edit-yaml", args="{命令3}")
 > "修改 rule.yaml 中 CB.tasks.pkg 下 version 为 cann 的任务，将 ut_check 设置为 false"
 
 **分析过程：**
-1. 文件路径：`ci_config/rule.yaml`
+1. 文件路径：`$CLAUDE_PROJECT_DIR/ci_config/rule.yaml`
 2. 查找条件：`-r CB.tasks.pkg -k version -v cann`
 3. 操作类型：修改键值
 4. 修改目标：`-k ut_check -v false -t bool`
@@ -264,10 +264,10 @@ Skill(skill="edit-yaml", args="{命令3}")
 **转化后的命令：**
 ```bash
 # 步骤1：查找节点
-python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ci_config/rule.yaml -r CB.tasks.pkg -k version -v cann > nodes.txt
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/find_yaml_node.py -f ci_config/rule.yaml -r CB.tasks.pkg -k version -v cann > nodes.txt
 
 # 步骤2：修改键值
-python .claude/skills/edit-yaml/scripts/modify_node_key_value.py -f ci_config/rule.yaml --nodes-file nodes.txt -k ut_check -v false
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/modify_node_key_value.py -f ci_config/rule.yaml --nodes-file nodes.txt -k ut_check -v false
 ```
 
 **传递给 edit-yaml 的参数：**
@@ -281,14 +281,14 @@ python .claude/skills/edit-yaml/scripts/modify_node_key_value.py -f ci_config/ru
 > "在 rule.yaml 中 CB.tasks.compile 下添加一个新任务 new_task，version 为 cann，enabled 为 true"
 
 **分析过程：**
-1. 文件路径：`ci_config/rule.yaml`
+1. 文件路径：`$CLAUDE_PROJECT_DIR/ci_config/rule.yaml`
 2. 父节点：`CB.tasks.compile`
 3. 新节点名：`new_task`
 4. 节点内容：`{version: cann, enabled: true}`
 
 **转化后的命令：**
 ```bash
-python .claude/skills/edit-yaml/scripts/add_node.py -f ci_config/rule.yaml \
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py -f ci_config/rule.yaml \
   -p CB.tasks.compile -n "new_task: {version: cann, enabled: true}"
 ```
 
@@ -303,13 +303,13 @@ python .claude/skills/edit-yaml/scripts/add_node.py -f ci_config/rule.yaml \
 > "查找 rule.yaml 中所有 version 为 cann_eco_debug 的任务"
 
 **分析过程：**
-1. 文件路径：`ci_config/rule.yaml`
+1. 文件路径：`$CLAUDE_PROJECT_DIR/ci_config/rule.yaml`
 2. 查找条件：`-k version -v cann_eco_debug`
 3. 默认根节点：`CB`
 
 **转化后的命令：**
 ```bash
-python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ci_config/rule.yaml -k version -v cann_eco_debug
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/find_yaml_node.py -f ci_config/rule.yaml -k version -v cann_eco_debug
 ```
 
 **传递给 edit-yaml 的参数：**
@@ -323,13 +323,13 @@ python .claude/skills/edit-yaml/scripts/find_yaml_node.py -f ci_config/rule.yaml
 > "把 rule.yaml 中 CB.tasks.compile 下的 llt1 和 llt2 任务移动到 CB.tasks.pkg 下"
 
 **分析过程：**
-1. 文件路径：`ci_config/rule.yaml`
+1. 文件路径：`$CLAUDE_PROJECT_DIR/ci_config/rule.yaml`
 2. 移动节点：`CB.tasks.compile.llt1`、`CB.tasks.compile.llt2`
 3. 目标路径：`CB.tasks.pkg`
 
 **转化后的命令：**
 ```bash
-python .claude/skills/edit-yaml/scripts/move_yaml_node.py -f ci_config/rule.yaml \
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/move_yaml_node.py -f ci_config/rule.yaml \
   -n CB.tasks.compile.llt1 CB.tasks.compile.llt2 -t CB.tasks.pkg
 ```
 
@@ -344,13 +344,13 @@ python .claude/skills/edit-yaml/scripts/move_yaml_node.py -f ci_config/rule.yaml
 > "将 rule.yaml 中 CB.tasks.pkg 下的 llt1 重命名为 llt1_test"
 
 **分析过程：**
-1. 文件路径：`ci_config/rule.yaml`
+1. 文件路径：`$CLAUDE_PROJECT_DIR/ci_config/rule.yaml`
 2. 原节点：`CB.tasks.pkg.llt1`
 3. 新节点名：`CB.tasks.pkg.llt1_test`
 
 **转化后的命令：**
 ```bash
-python .claude/skills/edit-yaml/scripts/modify_node_name.py -f ci_config/rule.yaml \
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/modify_node_name.py -f ci_config/rule.yaml \
   -m CB.tasks.pkg.llt1=CB.tasks.pkg.llt1_test
 ```
 
@@ -501,7 +501,7 @@ find ci_config -name "*.yaml" -type f
 Skill(skill="edit-yaml", args="{标准化命令}")
 
 # ❌ 错误：禁止直接使用 Bash 工具调用 edit-yaml 的脚本
-# Bash(command="python .claude/skills/edit-yaml/scripts/xxx.py ...")
+# Bash(command="python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/xxx.py ...")
 
 # ❌ 错误：禁止使用 Read + Edit 工具直接修改 YAML 文件
 # Read(file_path="ci_config/rule.yaml")

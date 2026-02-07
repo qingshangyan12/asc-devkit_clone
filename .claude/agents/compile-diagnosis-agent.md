@@ -8,13 +8,13 @@
 
 **创建日期**：2025-02-06
 
-**技能路径**：`.claude/skills/compile-issue-diagnosis/`
+**技能路径**：`$CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/`
 
 ## 二、子代理概述
 
 编译任务分析子代理是专门用于分析和解决编译问题的智能助手，通过深度解析编译日志、定位源代码、分析错误原因，并给出精准的修复建议。
 
-**详细使用说明**：请参阅 `.claude/skills/compile-issue-diagnosis/SKILL.md` 获取完整的使用指南、脚本说明和典型案例。
+**详细使用说明**：请参阅 `$CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/SKILL.md` 获取完整的使用指南、脚本说明和典型案例。
 
 ### 核心能力
 
@@ -56,7 +56,7 @@
 5. **方案生成** (generate_solution) - 生成修复建议和代码示例
 6. **方案验证** (validate_solution) - 评估方案完整性和风险
 
-**完整诊断流程图和详细说明**：请参阅 `.claude/skills/compile-issue-diagnosis/SKILL.md` 第 3 节。
+**完整诊断流程图和详细说明**：请参阅 `$CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/SKILL.md` 第 3 节。
 
 ## 四、核心功能
 
@@ -68,7 +68,7 @@
 - **知识推理**：基于历史案例推断问题原因
 - **方案生成**：提供针对性的修复建议和代码示例
 
-**详细功能说明和输出格式**：请参阅 `.claude/skills/compile-issue-diagnosis/SKILL.md`。
+**详细功能说明和输出格式**：请参阅 `$CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/SKILL.md`。
 
 ## 五、使用方法
 
@@ -93,7 +93,7 @@
 
 ### 5.2 使用示例和参数
 
-**详细的使用示例、命令行参数和典型案例**：请参阅 `.claude/skills/compile-issue-diagnosis/SKILL.md` 第 4 节。
+**详细的使用示例、命令行参数和典型案例**：请参阅 `$CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/SKILL.md` 第 4 节。
 
 典型使用场景：
 - 分析编译日志文件
@@ -360,7 +360,7 @@ Round 3: 解决警告问题
 **解决方法**：
 1. 明确说明"编译失败"
 2. 或直接调用技能：`使用 compile-issue-diagnosis 技能`
-3. 检查子代理配置：`.claude/agents/compile-diagnosis-agent.md`
+3. 检查子代理配置：`$CLAUDE_PROJECT_DIR/.claude/agents/compile-diagnosis-agent.md`
 
 ### Q2：分析不准确？
 
@@ -401,8 +401,8 @@ Round 3: 解决警告问题
 
 ## 十、相关文档
 
-- **技能文档**：`.claude/skills/compile-issue-diagnosis/SKILL.md`
-- **子代理配置**：本文档（`.claude/agents/compile-diagnosis-agent.md`）
+- **技能文档**：`$CLAUDE_PROJECT_DIR/.claude/skills/compile-issue-diagnosis/SKILL.md`
+- **子代理配置**：本文档（`$CLAUDE_PROJECT_DIR/.claude/agents/compile-diagnosis-agent.md`）
 - **使用指南**：内嵌于技能文档
 
 ## 十一、维护信息

@@ -101,10 +101,10 @@ git diff --staged
 git add .
 
 # 添加指定文件
-git add ci_config/rule.yaml
+git add $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 # 添加多个指定文件
-git add ci_config/rule.yaml ci_config/custom/rule_custom.yaml
+git add $CLAUDE_PROJECT_DIR/ci_config/rule.yaml ci_config/custom/rule_custom.yaml
 
 ```
 
@@ -361,8 +361,8 @@ git checkout --theirs <冲突文件>
 git add <冲突文件>
 
 # 示例：
-git checkout --theirs ci_config/rule.yaml
-git add ci_config/rule.yaml
+git checkout --theirs $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+git add $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 ```
 
 **适用场景：**
@@ -384,8 +384,8 @@ git checkout --ours <冲突文件>
 git add <冲突文件>
 
 # 示例：
-git checkout --ours ci_config/rule.yaml
-git add ci_config/rule.yaml
+git checkout --ours $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+git add $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 ```
 
 **适用场景：**
@@ -401,7 +401,7 @@ git add ci_config/rule.yaml
 
 ```bash
 # 1. 打开冲突文件
-vi ci_config/rule.yaml
+vi $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 # 2. 查找冲突标记
 <<<<<<< Updated upstream
@@ -422,7 +422,7 @@ enabled: true
 # 4. 保存文件
 
 # 5. 添加到暂存区
-git add ci_config/rule.yaml
+git add $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 ```
 
 **适用场景：**
@@ -472,7 +472,7 @@ git status
 
 #### 4.3.4 Hook 辅助脚本：check_conflict.py
 
-**冲突检测脚本位置**：`.claude/skills/git-code-process/scripts/check_conflict.py`
+**冲突检测脚本位置**：`$CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py`
 
 该脚本用于检测工作目录中的 Git 冲突，提供详细的冲突信息和处理建议。
 
@@ -480,13 +480,13 @@ git status
 
 ```bash
 # 检测是否存在冲突
-python .claude/skills/git-code-process/scripts/check_conflict.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 
 # 检测并显示详细信息（包括原始冲突标记）
-python .claude/skills/git-code-process/scripts/check_conflict.py --verbose
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py --verbose
 
 # 安静模式（仅返回退出码，不输出信息）
-python .claude/skills/git-code-process/scripts/check_conflict.py --quiet
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py --quiet
 ```
 
 ##### 命令行参数
@@ -508,7 +508,7 @@ python .claude/skills/git-code-process/scripts/check_conflict.py --quiet
 **无冲突时：**
 
 ```bash
-$ python .claude/skills/git-code-process/scripts/check_conflict.py
+$ python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 
 ============================================================
 Git 冲突检测报告
@@ -521,7 +521,7 @@ Git 冲突检测报告
 **有冲突时（默认模式）：**
 
 ```bash
-$ python .claude/skills/git-code-process/scripts/check_conflict.py
+$ python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 
 ============================================================
 Git 冲突检测报告
@@ -560,7 +560,7 @@ Git 冲突检测报告
 **有冲突时（详细模式）：**
 
 ```bash
-$ python .claude/skills/git-code-process/scripts/check_conflict.py --verbose
+$ python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py --verbose
 
 ============================================================
 Git 冲突检测报告
@@ -595,7 +595,7 @@ enabled: false
 git pull
 
 # 检测冲突
-python .claude/skills/git-code-process/scripts/check_conflict.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 if [ $? -ne 0 ]; then
     echo "请先解决冲突后再继续"
     exit 1
@@ -930,14 +930,14 @@ git stash
 git pull
 
 # 3. 检测冲突（hooks 自动触发）
-python .claude/skills/git-code-process/scripts/check_conflict.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 
 # 4. 恢复本地修改
 git stash pop
 
 # 5. 如果有冲突，按照提示解决
 # 6. 再次检测冲突
-python .claude/skills/git-code-process/scripts/check_conflict.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 ```
 
 ### Q8：如何使用 hooks 机制处理冲突？
@@ -949,14 +949,14 @@ hooks 机制是本技能的核心特性，用于在冲突发生时提供人工�
 **完整流程：**
 ```bash
 # 1. 检测冲突
-python .claude/skills/git-code-process/scripts/check_conflict.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 
 # 2. 如果有冲突，会显示冲突文件列表
 # ✗ 检测到冲突文件：
 #   - ci_config/rule.yaml
 
 # 3. 查看冲突内容
-python .claude/skills/git-code-process/scripts/check_conflict.py --verbose
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py --verbose
 
 # 4. 手动解决冲突
 # - 打开冲突文件
@@ -964,10 +964,10 @@ python .claude/skills/git-code-process/scripts/check_conflict.py --verbose
 # - 保存文件
 
 # 5. 标记冲突已解决
-git add ci_config/rule.yaml
+git add $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 # 6. 再次检测确认
-python .claude/skills/git-code-process/scripts/check_conflict.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 
 # 7. 确认无冲突后，继续流程
 ```
@@ -976,10 +976,10 @@ python .claude/skills/git-code-process/scripts/check_conflict.py
 
 ```bash
 # 方式1：接受远程代码（放弃本地修改）
-git checkout --theirs ci_config/rule.yaml
+git checkout --theirs $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 # 方式2：接受本地代码（保留本地修改）
-git checkout --ours ci_config/rule.yaml
+git checkout --ours $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 # 方式3：手动合并（推荐）
 # - 手动编辑文件，选择需要保留的内容
@@ -992,7 +992,7 @@ git checkout --ours ci_config/rule.yaml
 **验证方法：**
 ```bash
 # 方法1：使用冲突检测脚本
-python .claude/skills/git-code-process/scripts/check_conflict.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 # 如果输出 "未检测到冲突"，说明冲突已解决
 
 # 方法2：检查 git status
@@ -1012,7 +1012,7 @@ git add .
 
 ```bash
 # 1. 确认冲突已解决
-python .claude/skills/git-code-process/scripts/check_conflict.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 
 # 2. 继续添加到暂存区
 git add .

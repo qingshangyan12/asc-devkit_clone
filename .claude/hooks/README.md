@@ -104,10 +104,10 @@
 冲突文件数：2
 
 【类型1】已删除冲突（DD/DU/UD）：
-  - ci_config/custom/config.yaml
+  - $CLAUDE_PROJECT_DIR/ci_config/custom/config.yaml
 
 【类型2】内容冲突（UU/AA/U）：
-  - ci_config/rule.yaml
+  - $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 请按照以下步骤解决冲突：
 1. 打开冲突文件，查找冲突标记（<<<<<<<, =======, >>>>>>>）
@@ -223,13 +223,13 @@
 
 ```bash
 # 测试 post-pull 钩子
-bash .claude/hooks/post-pull.bash
+bash $CLAUDE_PROJECT_DIR/.claude/hooks/post-pull.bash
 
 # 测试 pre-commit 钩子
-bash .claude/hooks/pre-commit.bash
+bash $CLAUDE_PROJECT_DIR/.claude/hooks/pre-commit.bash
 
 # 测试 pre-upload 钩子
-bash .claude/hooks/pre-upload.bash
+bash $CLAUDE_PROJECT_DIR/.claude/hooks/pre-upload.bash
 ```
 
 ## 钩子工作流程
@@ -298,10 +298,10 @@ bash .claude/hooks/pre-upload.bash
 
 ### 检测原理
 
-钩子通过调用 `.claude/skills/git-code-process/scripts/check_conflict.py` 脚本检测冲突：
+钩子通过调用 `$CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py` 脚本检测冲突：
 
 ```bash
-python .claude/skills/git-code-process/scripts/check_conflict.py
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py
 ```
 
 该脚本解析 `git status --porcelain` 的输出，识别以下状态码：
@@ -341,14 +341,14 @@ python .claude/skills/git-code-process/scripts/check_conflict.py
 
 ```bash
 # 示例：修改 post-pull 钩子
-vim .claude/hooks/post-pull.bash
+vim $CLAUDE_PROJECT_DIR/.claude/hooks/post-pull.bash
 ```
 
 ### 添加新的钩子
 
 1. 创建新的 `.bash` 文件：
    ```bash
-   touch .claude/hooks/pre-pull.bash
+   touch $CLAUDE_PROJECT_DIR/.claude/hooks/pre-pull.bash
    ```
 
 2. 编写钩子逻辑：
@@ -366,7 +366,7 @@ vim .claude/hooks/post-pull.bash
 临时禁用钩子（不推荐）：
 ```bash
 # 重命名钩子文件，移除 .bash 后缀
-mv .claude/hooks/post-pull.bash .claude/hooks/post-pull.bash.disabled
+mv $CLAUDE_PROJECT_DIR/.claude/hooks/post-pull.bash $CLAUDE_PROJECT_DIR/.claude/hooks/post-pull.bash.disabled
 ```
 
 ## 故障排查
@@ -376,10 +376,10 @@ mv .claude/hooks/post-pull.bash .claude/hooks/post-pull.bash.disabled
 **检查**:
 ```bash
 # 确认钩子文件存在
-ls -la .claude/hooks/
+ls -la $CLAUDE_PROJECT_DIR/.claude/hooks/
 
 # 确认钩子有执行权限
-chmod +x .claude/hooks/*.bash
+chmod +x $CLAUDE_PROJECT_DIR/.claude/hooks/*.bash
 ```
 
 ### Q2：钩子报告错误但实际没有冲突？
@@ -387,7 +387,7 @@ chmod +x .claude/hooks/*.bash
 **检查**:
 ```bash
 # 手动运行冲突检测脚本
-python .claude/skills/git-code-process/scripts/check_conflict.py --verbose
+python $CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py --verbose
 
 # 查看 git status
 git status --porcelain
@@ -398,7 +398,7 @@ git status --porcelain
 钩子输出会在 Claude Code 的终端中显示。如需调试：
 ```bash
 # 手动执行钩子脚本
-bash .claude/hooks/post-pull.bash
+bash $CLAUDE_PROJECT_DIR/.claude/hooks/post-pull.bash
 ```
 
 ## 相关文档
@@ -409,6 +409,6 @@ bash .claude/hooks/post-pull.bash
 
 ## 维护信息
 
-- 钩子位置：`.claude/hooks/`
-- 冲突检测脚本：`.claude/skills/git-code-process/scripts/check_conflict.py`
+- 钩子位置：`$CLAUDE_PROJECT_DIR/.claude/hooks/`
+- 冲突检测脚本：`$CLAUDE_PROJECT_DIR/.claude/skills/git-code-process/scripts/check_conflict.py`
 - 更新日期：2026-02-06
