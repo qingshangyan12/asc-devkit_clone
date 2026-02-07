@@ -1,107 +1,151 @@
 ---
 name: new-yaml-node
-description: 描述yaml节点的命令规则和节点内容的映射规则，用于根据任务名构造新的yaml节点。同时，可针对特定yaml文件进行结构分析。
+description: YAML节点构造技能 - 根据任务名自动生成符合规范的YAML配置节点，支持YAML文件结构分析和规则提取
 ---
 
 # YAML节点构造技能
 
 ## 一、技能概述
 
+### 1.1 技能定位
+
 本技能（new-yaml-node）为华为 CANN CI/CD 体系下 **ci_config** 仓库提供 **YAML 节点构造和结构分析** 能力，核心支撑基于任务名自动生成符合规范的 YAML 配置节点。
 
-本技能的核心价值在于：
+### 1.2 核心价值
+
 - **自动化节点构造**：根据任务名自动生成符合规范的 YAML 节点结构
-- **规则映射**：提供节点命令规则与节点内容的映射关系
+- **规则映射**：提供节点命名规则与节点内容的映射关系
 - **结构分析**：支持对现有 YAML 文件进行结构分析和规则提取
 - **标准化输出**：确保生成的节点符合 CI/CD 配置规范
 - **减少错误**：避免手动构造节点时的拼写错误和格式问题
 
-## 二、核心脚本
+### 1.3 核心脚本
 
-本技能提供两个核心脚本：
+| 脚本名称 | 功能说明 | 典型用途 |
+|---------|---------|---------|
+| **create_node.py** | 根据节点名称自动构造节点内容 | 新建标准化任务节点 |
+| **analyze_yaml_structure.py** | 分析YAML文件结构和规则 | 提取现有配置规则、验证命名规范 |
 
-| 脚本名称 | 功能说明 |
-|---------|---------|
-| **create_node.py** | 根据节点名称自动构造节点内容并添加到 YAML 文件 |
-| **analyze_yaml_structure.py** | YAML 文件结构分析工具，提取节点命名和内容映射规则 |
+## 二、快速开始
 
-## 三、重要操作原则
+### 2.1 三大典型使用场景
 
-### 3.1 ⚠️ 强制要求
+**场景1：根据任务名创建新节点**
+```bash
+# 最简单的用法 - 只提供节点名
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_common_utils
 
-**关键原则：节点构造必须遵循标准化规则**
+# 指定目标文件
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n test_api_smoke -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
-- **强制要求**：所有新增 YAML 节点必须遵循本技能定义的命名规则和内容映射规则；
-- **规则一致性**：节点命名规则必须与现有 CI/CD 配置保持一致；
-- **内容完整性**：生成的节点必须包含必需的配置项，符合最小完整性要求；
-- **格式规范性**：节点格式必须符合 YAML 语法规范和 CI/CD 配置要求；
-- **可验证性**：生成的节点应能通过 YAML 语法检查和 CI/CD 配置验证。
+# 预览模式（不实际写入）
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n compile_core -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --dry-run
+```
 
-### 3.2 核心能力
+**场景2：分析YAML文件结构**
+```bash
+# 基本分析
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
-| 能力类型 | 功能说明 | 典型使用场景 |
-|---------|---------|-------------|
-| **节点命名规则** | 定义符合规范的 YAML 节点命名规则 | 新建任务节点时的命名指导 |
-| **内容映射规则** | 定义节点名称与节点内容的映射关系 | 根据任务名自动填充节点内容 |
-| **节点构造** | 根据任务名自动生成完整的 YAML 节点 | 批量创建标准化任务节点 |
-| **结构分析** | 分析现有 YAML 文件的节点结构和规则 | 提取现有配置的构造规则 |
-| **规则验证** | 验证节点命名和内容是否符合规范 | 生成节点后的质量检查 |
+# 类型分布分析
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --type-distribution
 
-**技术特性：**
-- **规则引擎**：内置节点命名和内容映射规则引擎
-- **模板系统**：提供常用节点类型的内容模板
-- **智能推断**：根据任务名自动推断节点类型和必需配置项
-- **批量处理**：支持批量生成多个节点
-- **格式检查**：自动检查生成节点的格式正确性
+# 命名规范检查
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --check-naming
+```
 
-## 四、YAML 节点命名规则
+**场景3：与edit-yaml技能配合使用**
+```bash
+# 1. 使用create_node.py生成节点
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n pkg_new_feature > node_template.yaml
 
-### 4.1 节点命名规范
+# 2. 使用edit-yaml技能的add_node.py添加节点
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
+  -p CB.tasks.pkg \
+  --content-file node_template.yaml
+```
+
+### 2.2 典型工作流程
+
+```
+【需求】创建新的pkg任务节点
+    ↓
+【步骤1】使用create_node.py生成节点
+  python create_node.py -n pkg_new_feature -f ci_config/rule.yaml
+    ↓
+【步骤2】验证生成的节点内容
+  检查version、enabled、timeout等必需配置项
+    ↓
+【步骤3】调整节点内容（可选）
+  根据实际需求修改target、env等配置项
+    ↓
+【步骤4】验证YAML格式
+  python fix_non_standard_yaml.py -f ci_config/rule.yaml
+    ↓
+【完成】节点已添加到YAML文件
+```
+
+## 三、节点命名规则
+
+### 3.1 命名规范
 
 **基本格式：**
 ```
 <任务类型>_<任务名称>_<可选后缀>
 ```
 
-**命名规则：**
-1. **任务类型（必需）**
-   - `pkg`：打包任务
-   - `compile`：编译任务
-   - `test`：测试任务
-   - `llt`：链接测试任务
-   - `deploy`：部署任务
-   - `misc`：其他任务
+**任务类型（必需）：**
+| 类型 | 说明 | 示例 |
+|-----|------|------|
+| `pkg` | 打包任务 | pkg_common_utils |
+| `compile` | 编译任务 | compile_core_module |
+| `test` | 测试任务 | test_api_function |
+| `llt` | 链接测试任务 | llt_memory_check |
+| `deploy` | 部署任务 | deploy_online_prod |
+| `misc` | 其他任务 | misc_custom_task |
 
-2. **任务名称（必需）**
-   - 使用小写字母和数字
-   - 不能以数字开头
-   - 使用下划线分隔多个单词
-   - 长度建议：3-20 个字符
+**任务名称（必需）：**
+- 使用小写字母和数字
+- 不能以数字开头
+- 使用下划线分隔多个单词
+- 长度建议：3-20个字符
 
-3. **可选后缀（可选）**
-   - `_test`：测试版本
-   - `_prod`：生产版本
-   - `_bak`：备份版本
-   - `_v<版本号>`：版本标识
-   - `smoke`：烟雾测试
-   - `perf/performance`：性能测试
+**可选后缀：**
+| 后缀 | 说明 | 示例 |
+|-----|------|------|
+| `_test` | 测试版本 | pkg_utils_test |
+| `_prod` | 生产版本 | deploy_service_prod |
+| `_bak` | 备份版本 | compile_module_bak |
+| `_v<版本号>` | 版本标识 | test_smoke_v1 |
+| `smoke` | 烟雾测试 | test_api_smoke |
+| `perf` | 性能测试 | test_benchmark_perf |
 
-**命名示例：**
+### 3.2 命名示例
+
 ```yaml
-# 合法命名
+# ✓ 合法命名
 pkg_common_compile
 test_smoke_v1
 llt_memory_check
 deploy_online_prod
+compile_core_module_test
 
-# 非法命名
-PkgCompile           # ❌ 未使用下划线
-pkg                  # ❌ 缺少任务名称
-1st_test             # ❌ 以数字开头
-pkg-my-task          # ❌ 使用连字符
+# ✗ 非法命名
+PkgCompile           # 未使用下划线
+pkg                  # 缺少任务名称
+1st_test             # 以数字开头
+pkg-my-task          # 使用连字符
+PKG_COMMON_UTILS     # 使用大写字母
 ```
 
-### 4.2 节点路径规则
+### 3.3 节点路径规则
 
 **完整路径格式：**
 ```
@@ -113,11 +157,12 @@ CB.tasks.<任务类型>.<完整节点名>
 CB.tasks.pkg.pkg_common_compile
 CB.tasks.test.test_smoke_v1
 CB.tasks.llt.llt_memory_check
+CB.tasks.compile.compile_core_module
 ```
 
-## 五、节点内容映射规则
+## 四、节点内容映射规则
 
-### 5.1 通用配置项
+### 4.1 通用配置项
 
 所有节点类型必须包含的通用配置项：
 
@@ -128,9 +173,16 @@ CB.tasks.llt.llt_memory_check
   timeout: 3600             # 超时时间（秒）
 ```
 
-### 5.2 各类型节点映射规则
+**配置项说明：**
+| 配置项 | 类型 | 默认值 | 说明 |
+|-------|------|--------|------|
+| `version` | string | `cann` | 版本标识 |
+| `enabled` | boolean | `true` | 是否启用该任务 |
+| `timeout` | integer | `3600` | 超时时间（秒），不同类型默认值不同 |
 
-#### 5.2.1 pkg 类型节点
+### 4.2 各类型节点规则
+
+#### 4.2.1 pkg 类型节点
 
 **任务名特征：** 以 `pkg_` 开头
 
@@ -150,11 +202,11 @@ pkg_<任务名>:
 
 **必需配置项：**
 - `type`: 必须为 `pkg`
-- `target`: 打包目标列表
+- `target`: 打包目标列表（.so/.a文件）
 
-**示例：**
+**典型示例：**
 ```yaml
-pkg_common_compile:
+pkg_common_utils:
   version: cann
   enabled: true
   timeout: 3600
@@ -162,9 +214,11 @@ pkg_common_compile:
   target:
     - libcommon.so
     - libcommon.a
+  env:
+    BUILD_TYPE: release
 ```
 
-#### 5.2.2 compile 类型节点
+#### 4.2.2 compile 类型节点
 
 **任务名特征：** 以 `compile_` 开头
 
@@ -188,7 +242,7 @@ compile_<任务名>:
 - `type`: 必须为 `compile`
 - `source`: 源文件列表
 
-**示例：**
+**典型示例：**
 ```yaml
 compile_core_module:
   version: cann
@@ -204,7 +258,7 @@ compile_core_module:
     - -Wall
 ```
 
-#### 5.2.3 test 类型节点
+#### 4.2.3 test 类型节点
 
 **任务名特征：** 以 `test_` 开头
 
@@ -227,7 +281,7 @@ test_<任务名>:
 - `type`: 必须为 `test`
 - `case`: 测试用例列表
 
-**示例：**
+**典型示例：**
 ```yaml
 test_api_function:
   version: cann
@@ -242,7 +296,7 @@ test_api_function:
   ut_check: true
 ```
 
-#### 5.2.4 llt 类型节点
+#### 4.2.4 llt 类型节点
 
 **任务名特征：** 以 `llt_` 开头
 
@@ -251,35 +305,35 @@ test_api_function:
 llt_<任务名>:
   version: cann
   enabled: true
-  timeout: 5400
+  timeout: 2400
   type: llt
-  module:
-    - <模块1>
-    - <模块2>
-  coverage:
-    - <覆盖率目标>
+  test_suite:
+    - <测试套件1>
+  dependency:
+    - <依赖任务>
+  ut_check: true
 ```
 
 **必需配置项：**
 - `type`: 必须为 `llt`
-- `module`: 测试模块列表
+- `test_suite`: 测试套件列表
 
-**示例：**
+**典型示例：**
 ```yaml
-llt_memory_leak:
+llt_memory_check:
   version: cann
   enabled: true
-  timeout: 5400
+  timeout: 2400
   type: llt
-  module:
-    - memory_alloc
-    - memory_free
-  coverage:
-    - line: 80
-    - branch: 70
+  test_suite:
+    - memory_leak_test
+    - memory_corruption_test
+  dependency:
+    - compile_core_module
+  ut_check: true
 ```
 
-#### 5.2.5 deploy 类型节点
+#### 4.2.5 deploy 类型节点
 
 **任务名特征：** 以 `deploy_` 开头
 
@@ -288,156 +342,77 @@ llt_memory_leak:
 deploy_<任务名>:
   version: cann
   enabled: true
-  timeout: 2400
+  timeout: 1800
   type: deploy
   target:
-    host: <目标主机>
-    path: <部署路径>
-  pre_check:
-    - <前置检查>
-  post_check:
-    - <后置检查>
+    - <部署目标1>
+  env:
+    DEPLOY_ENV: prod
 ```
 
 **必需配置项：**
 - `type`: 必须为 `deploy`
-- `target`: 部署目标信息
+- `target`: 部署目标列表
 
-**示例：**
+**典型示例：**
 ```yaml
 deploy_online_prod:
   version: cann
   enabled: true
-  timeout: 2400
+  timeout: 1800
   type: deploy
   target:
-    host: 192.168.1.100
-    path: /opt/cann/deploy
-  pre_check:
-    - disk_space_check
-    - network_check
-  post_check:
-    - service_status_check
+    - online_server
+  env:
+    DEPLOY_ENV: production
+    ROLLBACK_ENABLED: true
 ```
 
-### 5.3 智能内容推断规则
+### 4.3 智能内容推断规则
 
-**基于任务名的智能推断：**
+create_node.py 脚本根据任务名自动推断节点类型和内容：
 
-1. **包含 `smoke` 的任务名**
-   - 自动添加 `smoke_test: true` 配置项
+| 任务名前缀 | 推断类型 | 默认timeout | 默认必需配置项 |
+|-----------|---------|------------|---------------|
+| `pkg_` | pkg | 3600 | type, target |
+| `compile_` | compile | 7200 | type, source |
+| `test_` | test | 1800 | type, case |
+| `llt_` | llt | 2400 | type, test_suite |
+| `deploy_` | deploy | 1800 | type, target |
+| 其他 | misc | 3600 | type |
 
-2. **包含 `performance` 或 `perf` 的任务名**
-   - 自动添加性能测试相关配置项
-   - 延长默认 timeout 时间
+## 五、核心脚本使用
 
-3. **包含 `v<数字>` 后缀的任务名**
-   - 自动提取版本号到 `version` 配置项
+### 5.1 create_node.py - 节点构造
 
-4. **包含 `prod` 后缀的任务名**
-   - 设置 `env: production`
-   - 启用更严格的检查
-
-## 六、节点构造
-
-### 6.1 节点构造流程
-
-```
-【步骤1】任务名称解析
-    ├─ 提取任务类型（pkg/compile/test/llt/deploy）
-    ├─ 提取任务名称
-    └─ 识别可选后缀
-
-【步骤2】规则匹配
-    ├─ 匹配任务类型对应的内容模板
-    ├─ 应用智能推断规则
-    └─ 确定必需配置项
-
-【步骤3】内容生成
-    ├─ 填充通用配置项
-    ├─ 添加类型特定配置项
-    └─ 应用智能推断结果
-
-【步骤4】格式验证
-    ├─ YAML 语法检查
-    ├─ 必需配置项完整性检查
-    └─ 命名规范检查
-
-【步骤5】节点输出
-    └─ 输出符合规范的 YAML 节点
-```
-
-### 6.2 使用 create_node.py 构造节点
-
-**功能特性：**
-
-1. **智能解析节点名称**
-   - 自动识别节点类型（pkg/compile/test/llt/deploy）
-   - 提取节点名称和后缀信息
-
-2. **自动生成节点内容**
-   - 根据节点类型匹配对应的模板
-   - 应用智能推断规则（smoke、performance、prod等后缀）
-   - 自动填充通用配置项
-
-3. **集成 edit-yaml 技能**
-   - 直接调用 add_node.py 将节点添加到 YAML 文件
-   - 支持预览模式（--dry-run）
-
-#### 6.2.1 基本用法
+#### 5.1.1 基本用法
 
 ```bash
-# 构造节点（仅显示，不添加到文件）
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py [选项]
+```
+
+#### 5.1.2 参数说明
+
+| 参数 | 简写 | 说明 | 必需 | 示例 |
+|-----|------|------|------|------|
+| `--node-name` | `-n` | 节点名称 | ✓ | `-n pkg_common_utils` |
+| `--file` | `-f` | YAML文件路径 | ✗ | `-f ci_config/rule.yaml` |
+| `--dry-run` | | 预览模式，不实际写入 | ✗ | `--dry-run` |
+| `--help` | `-h` | 显示帮助信息 | ✗ | `-h` |
+
+**参数说明：**
+- `-n/--node-name`（必需）：节点名称，必须符合命名规范
+- `-f/--file`（可选）：目标YAML文件路径，不指定则输出到标准输出
+- `--dry-run`（可选）：预览模式，显示将要生成的节点内容但不写入文件
+
+#### 5.1.3 使用示例
+
+**示例1：输出到标准输出**
+```bash
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_common_utils
-
-# 构造节点并添加到 YAML 文件
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_common_utils -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
-
-# 预览模式（不实际添加）
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n test_api_smoke -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --dry-run
 ```
 
-#### 6.2.2 命令行参数
-
-| 参数 | 说明 | 必需 |
-|------|------|------|
-| `-n, --name` | 节点名称 | 是 |
-| `-f, --file` | YAML 文件路径 | 否（添加到文件时必需） |
-| `-p, --parent` | 父路径（可选，默认自动推断） | 否 |
-| `--dry-run` | 预览模式，不实际添加 | 否 |
-| `-v, --verbose` | 显示详细信息 | 否 |
-
-#### 6.2.3 智能推断规则详解
-
-**1. Smoke 测试**
-```bash
-python create_node.py -n test_api_smoke
-# 自动添加：smoke_test: true
-```
-
-**2. 性能测试**
-```bash
-python create_node.py -n test_performance_test
-# 自动调整：
-# - timeout: 7200（增加超时时间）
-# - performance_test: true
-```
-
-**3. 生产环境**
-```bash
-python create_node.py -n deploy_online_prod
-# 自动添加：env: production
-```
-
-**4. 版本标识**
-```bash
-python create_node.py -n pkg_module_v2
-# 自动添加：build_version: 2
-```
-
-#### 6.2.4 输出示例
-
-**pkg 类型节点：**
+输出：
 ```yaml
 pkg_common_utils:
   version: cann
@@ -445,438 +420,546 @@ pkg_common_utils:
   timeout: 3600
   type: pkg
   target:
-    - common_utils.so
-    - common_utils.a
+    - libcommon_utils.so
+    - libcommon_utils.a
 ```
 
-**test 类型节点（带 smoke 后缀）：**
-```yaml
-test_api_smoke:
-  version: cann
-  enabled: true
-  timeout: 3600
-  type: test
-  case:
-    - test_api_smoke_001
-  dependency:
-    - compile_api_smoke
-  ut_check: true
-  smoke_test: true
-```
-
-**compile 类型节点：**
-```yaml
-compile_core_module:
-  version: cann
-  enabled: true
-  timeout: 7200
-  type: compile
-  source:
-    - src/core_module/*.cpp
-  include:
-    - include/
-  flags:
-    - -O2
-    - -Wall
-```
-
-#### 6.2.5 与 edit-yaml 技能的集成
-
-create_node.py 通过调用 edit-yaml 的 add_node.py 将节点添加到 YAML 文件：
-
-```
-用户输入节点名称
-    ↓
-create_node.py 解析名称并生成节点内容
-    ↓
-调用 add_node.py 将节点添加到 YAML 文件
-    ↓
-返回添加结果
-```
-
-**自动执行的命令示例：**
+**示例2：直接写入YAML文件**
 ```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n test_api_smoke -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+```
+
+**示例3：预览模式**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n compile_core -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --dry-run
+```
+
+### 5.2 analyze_yaml_structure.py - 结构分析
+
+#### 5.2.1 基本用法
+
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py [选项]
+```
+
+#### 5.2.2 参数说明
+
+| 参数 | 简写 | 说明 | 必需 | 示例 |
+|-----|------|------|------|------|
+| `--file` | `-f` | YAML文件路径 | ✓ | `-f ci_config/rule.yaml` |
+| `--type-distribution` | | 显示节点类型分布 | ✗ | `--type-distribution` |
+| `--check-naming` | | 检查命名规范 | ✗ | `--check-naming` |
+| `--check-config` | | 检查配置完整性 | ✗ | `--check-config` |
+| `--extract-rules` | | 提取内容映射规则 | ✗ | `--extract-rules` |
+| `--summary` | | 显示摘要信息 | ✗ | `--summary` |
+| `--help` | `-h` | 显示帮助信息 | ✗ | `-h` |
+
+**分析模式说明：**
+
+1. **默认模式**：基本结构分析
+2. `--type-distribution`：显示各类型节点数量和占比
+3. `--check-naming`：检查所有节点命名是否符合规范
+4. `--check-config`：检查节点配置项是否完整
+5. `--extract-rules`：提取节点名称与内容的映射规则
+6. `--summary`：显示文件摘要信息
+
+#### 5.2.3 使用示例
+
+**示例1：基本分析**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+```
+
+**示例2：类型分布分析**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --type-distribution
+```
+
+输出：
+```
+节点类型分布报告：
+=================
+pkg:     15 (30%)
+compile: 12 (24%)
+test:    10 (20%)
+llt:      8 (16%)
+deploy:   5 (10%)
+总计:    50 个节点
+```
+
+**示例3：命名规范检查**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --check-naming
+```
+
+输出：
+```
+命名规范检查报告：
+==================
+✓ 符合规范的节点: 48 个
+✗ 不符合规范的节点: 2 个
+
+不规范节点详情：
+1. PkgCompile (CB.tasks.pkg)
+   - 问题: 使用了大写字母
+   - 建议: pkg_compile
+
+2. 1st_test (CB.tasks.test)
+   - 问题: 以数字开头
+   - 建议: first_test
+```
+
+**示例4：配置完整性检查**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --check-config
+```
+
+输出：
+```
+配置完整性检查报告：
+====================
+pkg类型节点:
+  ✓ pkg_common_utils: 配置完整
+  ✗ pkg_missing_target: 缺少必需配置项 [target]
+  ...
+
+test类型节点:
+  ✓ test_api_smoke: 配置完整
+  ✗ test_no_cases: 缺少必需配置项 [case]
+  ...
+```
+
+**示例5：提取映射规则**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --extract-rules
+```
+
+输出：
+```
+节点内容映射规则：
+================
+pkg类型节点规则:
+  - 通用配置项: version, enabled, timeout
+  - 必需配置项: type, target
+  - 典型配置项: env
+
+compile类型节点规则:
+  - 通用配置项: version, enabled, timeout
+  - 必需配置项: type, source
+  - 典型配置项: include, flags
+  ...
+```
+
+**示例6：组合使用多种分析模式**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
+  --type-distribution \
+  --check-naming \
+  --summary
+```
+
+## 六、与其他技能配合
+
+### 6.1 与 edit-yaml 技能配合
+
+**典型工作流程：**
+
+1. **使用 new_yaml_node 生成节点模板**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n pkg_new_feature > node_template.yaml
+```
+
+2. **编辑节点内容（可选）**
+```bash
+# 手动调整或使用脚本修改
+vi node_template.yaml
+```
+
+3. **使用 edit-yaml 技能添加节点**
+```bash
+# 方式1：使用add_node.py从文件添加
 python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
   -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
   -p CB.tasks.pkg \
-  -n "pkg_common_utils: {version: cann, enabled: true, timeout: 3600, type: pkg, target: [common_utils.so, common_utils.a]}"
+  --content-file node_template.yaml
+
+# 方式2：使用add_node.py直接指定内容
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
+  -p CB.tasks.pkg \
+  -n "pkg_new_feature: {version: cann, enabled: true, timeout: 3600, type: pkg}"
 ```
 
-#### 6.2.6 完整工作流程示例
+4. **验证和修复格式**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/fix_non_standard_yaml.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+```
+
+### 6.2 完整工作流示例
+
+**场景：批量创建多个新节点**
 
 ```bash
-# 步骤1：预览节点内容
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_new_feature
+# 步骤1：创建节点模板
+for nodename in pkg_utils compile_core test_api; do
+  python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+    -n $nodename > ${nodename}_template.yaml
+done
 
-# 步骤2：添加到测试文件验证
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_new_feature -f test_example.yaml
+# 步骤2：使用edit-yaml添加到YAML文件
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
+  -p CB.tasks.pkg \
+  --content-file pkg_utils_template.yaml
 
-# 步骤3：验证添加结果
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --type-distribution
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
+  -p CB.tasks.compile \
+  --content-file compile_core_template.yaml
+
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
+  -p CB.tasks.test \
+  --content-file test_api_template.yaml
+
+# 步骤3：验证YAML格式
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/fix_non_standard_yaml.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+
+# 步骤4：分析新添加的节点
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --check-naming --check-config
 ```
 
-## 七、YAML 文件结构分析
+## 七、最佳实践
 
-### 7.1 结构分析功能
+### 7.1 节点命名建议
 
-本技能支持对现有 YAML 文件进行结构分析，提取以下信息：
+**推荐做法：**
+- ✓ 使用描述性的任务名称，见名知意
+  - `pkg_common_utils` ✓
+  - `test_api_smoke` ✓
+  - `compile_core_module` ✓
 
-1. **节点类型分布**
-   - 统计各类型节点的数量
-   - 分析节点类型占比
+- ✓ 使用下划线分隔单词
+  - `pkg_common_utils` ✓
+  - `test_api_function_v2` ✓
 
-2. **命名规范分析**
-   - 检查节点命名是否符合规范
-   - 识别命名模式
+- ✓ 添加有意义的后缀
+  - `test_smoke` ✓
+  - `deploy_prod` ✓
+  - `compile_test` ✓
 
-3. **配置项完整性**
-   - 检查各节点是否包含必需配置项
-   - 识别缺失的配置项
+**避免做法：**
+- ✗ 使用模糊的名称
+  - `pkg_task1` ✗
+  - `test_abc` ✗
 
-4. **内容规则提取**
-   - 从现有节点中提取内容模式
-   - 生成规则映射建议
+- ✗ 使用过长的名称
+  - `pkg_common_utilities_for_computation_module` ✗ (太长)
 
-### 7.2 使用 analyze_yaml_structure.py
+- ✗ 混用命名风格
+  - `PkgCommonUtils` ✗
+  - `pkg-common-utils` ✗
 
-#### 7.2.1 基本用法
+### 7.2 内容配置建议
 
-```bash
-# 完整分析（包含所有功能）
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
-
-# 仅分析节点类型分布
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --type-distribution
-
-# 仅检查命名规范
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --check-naming
-
-# 仅检查配置项完整性
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --check-config
-
-# 仅提取内容映射规则
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --extract-rules
-
-# 仅输出总结报告
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --summary
-```
-
-#### 7.2.2 命令行参数
-
-| 参数 | 说明 | 必需 |
-|------|------|------|
-| `-f, --file` | YAML 文件路径 | 是 |
-| `--type-distribution` | 仅输出节点类型分布 | 否 |
-| `--check-naming` | 仅检查命名规范 | 否 |
-| `--check-config` | 仅检查配置项完整性 | 否 |
-| `--extract-rules` | 仅提取内容映射规则 | 否 |
-| `--summary` | 仅输出总结报告 | 否 |
-
-### 7.3 分析结果示例
-
-#### 7.3.1 节点类型分布报告
-
-```
-============================================================
-节点类型分布统计
-============================================================
-
-总计：21 个节点
-
-├─ pkg: 4 个节点 (19.0%)
-├─ test: 4 个节点 (19.0%)
-├─ compile: 3 个节点 (14.3%)
-├─ llt: 3 个节点 (14.3%)
-└─ deploy: 2 个节点 (9.5%)
-```
-
-#### 7.3.2 命名规范检查报告
-
-```
-============================================================
-命名规范检查
-============================================================
-
-命名规范检查结果：
-[√] 符合规范：9 个节点 (42.9%)
-[X] 不符合规范：12 个节点 (57.1%)
-
-不规范节点列表：
-
-1. Pkg_Module
-   路径: CB.tasks.pkg.Pkg_Module
-   问题:
-   - 未使用小写字母和下划线
-   - 缺少类型前缀（pkg/compile/test/llt/deploy）
-```
-
-#### 7.3.3 配置项完整性报告
-
-```
-============================================================
-配置项完整性分析
-============================================================
-
-[X] 2 个节点配置不完整（共检查 21 个节点）
-
-1. pkg_utils (类型: pkg)
-   - 建议项缺失: enabled
-2. compile_helper (类型: compile)
-   - 必需项缺失: source
-   - 建议项缺失: timeout
-```
-
-#### 7.3.4 内容映射规则报告
-
-```
-============================================================
-节点内容映射规则提取
-============================================================
-
-### pkg 类型节点规则
-------------------------------------------------------------
-
-基于 4 个 pkg 节点的统计：
-
-配置项                  出现次数      占比        必需性
-------------------------------------------------------------
-version              3            75.0%    可选
-type                 3            75.0%    可选
-target               3            75.0%    可选
-enabled              2            50.0%    可选
-timeout              2            50.0%    可选
-
-推荐内容模板：
-pkg_common_compile_<任务名>:
-  version: cann
-  enabled: true
-  timeout: 3600
-  type: <type_值>
-  target: [libcommon.so]
-```
-
-### 7.4 5种分析模式详解
-
-**analyze_yaml_structure.py** 提供5种分析模式：
-
-1. **完整分析（默认）**：执行所有分析功能
-2. **节点类型分布**：统计各类型节点的数量和占比
-3. **命名规范检查**：检查节点命名是否符合规范
-4. **配置项完整性检查**：检查必需和推荐配置项
-5. **内容规则提取**：从现有节点提取配置项使用频率和推荐模板
-
-## 八、与其他技能的配合
-
-### 8.1 与 edit-yaml 技能配合
-
-**典型工作流：**
-```
-用户需求
-  ↓
-new_yaml_node（构造节点内容）
-  ↓
-edit-yaml（将节点添加到 YAML 文件）
-```
-
-**使用场景：**
-1. 使用 new_yaml_node 根据任务名生成节点内容
-2. 使用 edit-yaml 的 `add_node.py` 将节点添加到 YAML 文件
+**推荐做法：**
+- ✓ 确保所有必需配置项都存在
+- ✓ 使用合理的timeout值（根据任务类型调整）
+- ✓ 设置明确的enabled状态
+- ✓ 提供完整的依赖关系
 
 **示例：**
-```bash
-# 步骤1：使用 new_yaml_node 生成节点
-Skill(skill="new_yaml_node", args="构造任务名为 pkg_common_utils 的节点")
+```yaml
+test_api_integration:
+  version: cann
+  enabled: true          # 明确启用状态
+  timeout: 3600         # 合理的超时时间（1小时）
+  type: test
+  case:
+    - test_api_001
+    - test_api_002
+  dependency:
+    - compile_api        # 明确的依赖关系
+    - pkg_lib_depend     # 明确的依赖关系
+  ut_check: true
+```
 
-# 步骤2：使用 edit-yaml 添加节点
-python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
+**避免做法：**
+- ✗ 缺少必需配置项
+  ```yaml
+  test_api_bad:
+    version: cann
+    # 缺少 type, case 等必需配置
+  ```
+
+- ✗ timeout设置不合理
+  ```yaml
+  compile_large_module:
+    timeout: 60  # 1分钟对于编译任务太短
+  ```
+
+- ✗ 依赖关系不明确
+  ```yaml
+  test_api:
+    # 缺少 dependency 配置
+  ```
+
+### 7.3 批量操作建议
+
+**批量创建节点：**
+```bash
+# 1. 创建节点列表文件
+cat > nodes_list.txt << EOF
+pkg_common_utils
+pkg_core_tools
+compile_base_module
+test_api_smoke
+test_unit_basic
+EOF
+
+# 2. 批量生成节点
+while read nodename; do
+  python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+    -n "$nodename" -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+done < nodes_list.txt
+```
+
+**批量验证节点：**
+```bash
+# 一次运行多种分析
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
   -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
-  -p CB.tasks.pkg \
-  -n "pkg_common_utils: {version: cann, enabled: true, timeout: 3600, type: pkg, target: [libcommon_utils.so]}"
+  --check-naming \
+  --check-config \
+  --type-distribution \
+  --summary
 ```
 
-### 8.2 与 user_require_analysis 技能配合
-
-**典型工作流：**
-```
-用户自然语言需求
-  ↓
-user_require_analysis（分析需求）
-  ↓
-new_yaml_node（构造节点）
-  ↓
-edit-yaml（添加节点）
-```
-
-**使用场景：**
-用户描述："创建一个名为 pkg_common_utils 的打包任务"
-
-1. user_require_analysis 解析需求，识别出：
-   - 任务类型：pkg
-   - 任务名：common_utils
-   - 操作：创建新节点
-
-2. new_yaml_node 根据任务名生成节点内容
-
-3. edit-yaml 将节点添加到 YAML 文件
-
-## 九、最佳实践
-
-### 9.1 节点命名建议
-
-- **语义化命名**：使用能清晰表达任务功能的名称
-- **避免缩写**：除非是广泛认知的缩写（如 api、utils）
-- **保持一致性**：相同类型的任务使用相同的命名模式
-- **版本标识**：使用后缀区分不同版本
-
-**良好示例：**
-```yaml
-pkg_common_utils          # ✅ 清晰表达功能和类型
-test_api_smoke            # ✅ 明确测试类型和范围
-compile_core_module_v2    # ✅ 包含版本信息
-```
-
-**避免示例：**
-```yaml
-pkg_cu                    # ❌ 缩写不清晰
-t1                        # ❌ 无意义的名称
-pkg_test                  # ❌ 类型混淆
-```
-
-### 9.2 内容配置建议
-
-- **保持简洁**：只包含必需的配置项
-- **合理设置超时**：根据任务复杂度设置合适的 timeout
-- **明确依赖关系**：正确配置 dependency 避免执行顺序错误
-- **环境隔离**：使用 env 配置项隔离不同环境
-
-### 9.3 批量构造建议
-
-- **统一规划**：批量构造前先规划所有节点
-- **分批验证**：每批节点生成后立即验证
-- **版本控制**：批量修改前做好版本备份
-- **渐进式添加**：先添加基础节点，再添加复杂节点
-
-## 十、依赖要求
-
-### 10.1 Python 环境
-
-- Python 3.x
-
-### 10.2 Python 模块
-
-- PyYAML 模块
-
-### 10.3 安装依赖
-
-```bash
-pip3 install PyYAML
-```
-
-## 十一、注意事项
-
-### 11.1 编码问题
-
-Windows 控制台可能显示中文乱码，但功能正常。建议在 Git Bash 或支持 UTF-8 的终端中运行。
-
-### 11.2 节点识别
-
-脚本会递归遍历 YAML 文件中的所有字典节点，包括非任务节点（如 CB、tasks 等）。分析时需要根据实际情况判断哪些是真正的任务节点。
-
-### 11.3 类型推断
-
-节点类型根据节点名称前缀或内容中的 `type` 字段推断。如果没有明确的类型标识，会被归类为 `misc` 类型。
-
-### 11.4 必需配置项
-
-每种类型节点定义了必需配置项，但这些规则可能需要根据实际项目需求调整。
-
-### 11.5 父路径验证
-
-在使用 create_node.py 添加节点前，需确认目标父路径存在。如果父路径不存在，需要先创建。
-
-## 十二、测试示例
-
-### 12.1 使用测试文件验证
-
-使用测试文件验证脚本功能：
-
-```bash
-# 进入技能目录
-cd $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node
-
-# 运行完整分析
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml
-
-# 测试单个功能
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --type-distribution
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --check-naming
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --check-config
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py -f test_example.yaml --extract-rules
-```
-
-## 十三、常见问题
+## 八、常见问题（FAQ）
 
 ### Q1：如何为已存在的节点类型添加新的映射规则？
 
-根据现有节点的命名和内容模式，在对应类型的映射规则中添加新的规则条目。
+**答：** 修改 `create_node.py` 脚本中的 `TYPE_TEMPLATES` 字典：
+
+```python
+TYPE_TEMPLATES = {
+    'pkg': {
+        'timeout': 3600,
+        'type': 'pkg',
+        'target': ['<target_name>.so', '<target_name>.a']
+    },
+    # 添加新的类型
+    'custom_type': {
+        'timeout': 1800,
+        'type': 'custom_type',
+        'custom_field': ['<default_value>']
+    }
+}
+```
 
 ### Q2：节点构造后如何验证正确性？
 
-使用以下方法验证：
-1. YAML 语法检查
-2. 必需配置项完整性检查
-3. 与现有同类节点对比
-4. CI/CD 配置验证工具
+**答：** 使用三种验证方法：
+
+1. **YAML语法验证**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/fix_non_standard_yaml.py \
+  -f ci_config/rule.yaml
+```
+
+2. **命名规范检查**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f ci_config/rule.yaml --check-naming
+```
+
+3. **配置完整性检查**
+```bash
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f ci_config/rule.yaml --check-config
+```
 
 ### Q3：如何处理不符合命名规范的现有节点？
 
-1. 使用结构分析功能识别不规范节点
-2. 评估影响范围
-3. 制定重命名计划
-4. 使用 edit-yaml 的 modify_node_name.py 进行批量修改
+**答：** 使用 edit-yaml 技能的 modify_node_name.py：
+
+```bash
+# 1. 先分析找出不规范的节点
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py \
+  -f ci_config/rule.yaml --check-naming
+
+# 2. 使用modify_node_name.py批量重命名
+python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/modify_node_name.py \
+  -f ci_config/rule.yaml \
+  -m "PkgCompile=pkg_compile"
+```
 
 ### Q4：智能推断规则是否可以自定义？
 
-是的，可以根据项目需求自定义智能推断规则，修改规则配置文件。
+**答：** 可以，修改 `create_node.py` 中的以下部分：
+
+1. **修改类型推断规则**
+```python
+def get_type_from_nodename(nodename: str) -> str:
+    # 添加自定义前缀规则
+    if nodename.startswith('custom_'):
+        return 'custom'
+    # ... 其他规则
+```
+
+2. **修改内容模板**
+```python
+TYPE_TEMPLATES = {
+    # 修改或添加类型模板
+}
+```
+
+3. **修改必需配置项**
+```python
+REQUIRED_FIELDS = {
+    'custom': ['type', 'custom_field'],
+    # ...
+}
+```
 
 ### Q5：为什么有些节点被识别为 misc 类型？
 
-这通常是因为节点名称没有明确的类型前缀（pkg/compile/test/llt/deploy），或者节点内容中没有 `type` 字段。
+**答：** 当节点名称不符合任何已知类型前缀（pkg/compile/test/llt/deploy）时，会被识别为 `misc` 类型。解决方法：
+
+1. **使用标准前缀**
+```bash
+# 不推荐
+misc_mytasks
+
+# 推荐
+pkg_mytasks  # 如果是打包任务
+compile_mytasks  # 如果是编译任务
+```
+
+2. **或添加自定义类型**
+修改 `create_node.py` 中的类型识别规则。
 
 ### Q6：如何修改必需配置项的定义？
 
-编辑 `analyze_yaml_structure.py` 脚本中的 `required_keys` 字典（约第 200-209 行），根据实际需求添加或修改配置项。
+**答：** 修改 `create_node.py` 中的 `REQUIRED_FIELDS` 字典：
+
+```python
+REQUIRED_FIELDS = {
+    'pkg': ['type', 'target'],
+    'compile': ['type', 'source'],
+    'test': ['type', 'case'],
+    # 添加或修改必需字段
+    'custom_type': ['type', 'custom_field1', 'custom_field2']
+}
+```
 
 ### Q7：如何添加新的节点类型？
 
-1. 在 `required_keys` 中添加新类型的必需配置项
-2. 在 `_infer_node_type` 方法中添加类型识别规则（如果需要）
-3. 在 create_node.py 的 TYPE_TEMPLATES 中添加新类型的模板
+**答：** 三个步骤：
 
-## 十四、维护信息
-
-- **技能名称**：new-yaml-node
-- **技能路径**：`.claude/skills/new_yaml_node/`
-- **脚本位置**：`.claude/skills/new_yaml_node/scripts/`
-- **文档位置**：`.claude/skills/new_yaml_node/SKILL.md`
-- **更新日期**：2025-02-06
-
-### 脚本文件
-
-| 脚本名称 | 功能说明 |
-|---------|---------|
-| **create_node.py** | 根据节点名称构造节点并添加到 YAML 文件 |
-| **analyze_yaml_structure.py** | YAML 文件结构分析工具 |
-
-## 十五、相关技能
-
-- **edit-yaml**：YAML 配置文件修改技能
-- **user_require_analysis**：用户需求分析技能
-
-**典型工作流：**
+1. **在 TYPE_TEMPLATES 中添加模板**
+```python
+TYPE_TEMPLATES = {
+    # ... 现有类型
+    'new_type': {
+        'timeout': 1800,
+        'type': 'new_type',
+        'field1': ['<default_value1>'],
+        'field2': ['<default_value2>']
+    }
+}
 ```
-用户需求
-  → user_require_analysis（分析需求）
-  → new_yaml_node（构造节点）✅ 本技能
-  → edit-yaml（添加节点）
+
+2. **在 REQUIRED_FIELDS 中添加必需字段**
+```python
+REQUIRED_FIELDS = {
+    # ... 现有类型
+    'new_type': ['type', 'field1']
+}
 ```
+
+3. **在 get_type_from_nodename 中添加识别规则**
+```python
+def get_type_from_nodename(nodename: str) -> str:
+    if nodename.startswith('newtype_'):
+        return 'new_type'
+    # ... 其他规则
+```
+
+## 九、附录
+
+### 9.1 依赖要求
+
+**Python 版本：**
+- Python 3.6 或更高版本
+
+**Python 模块：**
+```bash
+# 必需模块
+pyyaml                   # YAML解析
+
+# 可选模块
+typing                   # 类型提示（Python 3.5+内置）
+```
+
+**安装依赖：**
+```bash
+pip install pyyaml
+```
+
+### 9.2 注意事项
+
+1. **编码问题**
+   - 确保YAML文件使用UTF-8编码
+   - 避免使用BOM（Byte Order Mark）
+
+2. **节点识别**
+   - 节点名称必须符合命名规范
+   - 节点路径必须存在（如 CB.tasks.pkg）
+
+3. **类型推断**
+   - 基于节点名前缀自动推断类型
+   - 无法识别的类型默认为 misc
+
+4. **必需配置项**
+   - 每种类型有特定的必需配置项
+   - 缺少必需配置项会在验证时报错
+
+5. **文件写入**
+   - 直接写入YAML文件会覆盖原文件
+   - 建议先使用 --dry-run 预览
+   - 操作前建议备份原文件
+
+### 9.3 维护信息
+
+**脚本位置：**
+- `$CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py`
+- `$CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_structure.py`
+
+**技能文档：**
+- `$CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/SKILL.md`
+
+**维护者：**
+- Claude Code Agent System
+
+**更新频率：**
+- 根据实际使用情况和需求更新
+
+**相关技能：**
+- **edit-yaml**：YAML文件编辑技能
+- **git-code-process**：代码版本管理技能
+
+**反馈渠道：**
+- 如有问题或建议，请通过项目issue反馈
