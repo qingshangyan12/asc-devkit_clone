@@ -14,7 +14,11 @@
 
 编译任务分析子代理是专门用于分析和解决编译问题的智能助手，通过深度解析编译日志、定位源代码、分析错误原因，并给出精准的修复建议。
 
+**详细使用说明**：请参阅 `.claude/skills/compile-issue-diagnosis/SKILL.md` 获取完整的使用指南、脚本说明和典型案例。
+
 ### 核心能力
+
+子代理通过 compile-issue-diagnosis 技能实现以下核心能力：
 
 | 能力名称 | 能力描述 | 使用场景 |
 |---------|---------|---------|
@@ -24,6 +28,9 @@
 | **知识推理** | 基于历史知识库和编译规则推断问题原因 | 新问题分析、边缘案例 |
 | **方案生成** | 根据错误类型和上下文生成针对性修复方案 | 提供可执行的修复步骤 |
 | **多轮交互** | 支持交互式诊断，逐步深入分析复杂问题 | 复杂问题排查、方案验证 |
+
+**支持的错误类型**（详见技能文档 3.2 节）：
+- 语法错误、链接错误、依赖错误、类型错误、宏定义错误、模板错误
 
 ### 适用场景
 
@@ -38,167 +45,30 @@
 
 ## 三、工作流程
 
-### 3.1 标准诊断流程
+子代理采用标准的 6 步诊断流程，详细流程说明请参阅技能文档第 3 节。
 
-```
-【触发】用户报告编译错误
-    ↓
-【步骤1】信息收集
-    ├─ 获取编译日志
-    ├─ 验证日志完整性
-    ├─ 识别编译环境
-    └─ 提取失败标志
-    ↓
-【步骤2】日志解析
-    ├─ 识别失败的 target
-    ├─ 定位出问题的 .o 文件
-    ├─ 提取编译命令
-    ├─ 获取错误信息和上下文
-    └─ 分类错误类型
-    ↓
-【步骤3】源码定位
-    ├─ 根据 target 查找代码仓
-    ├─ 定位对应的源文件
-    ├─ 查找函数/变量定义
-    ├─ 分析编译配置（Android.mk/CMakeLists.txt）
-    └─ 理解依赖关系
-    ↓
-【步骤4】错误分析
-    ├─ 分析错误上下文
-    ├─ 定位根本原因
-    ├─ 判断问题类型
-    └─ 评估影响范围
-    ↓
-【步骤5】方案生成
-    ├─ 参考历史解决方案
-    ├─ 生成修复建议
-    ├─ 提供代码示例
-    └─ 标注注意事项
-    ↓
-【步骤6】方案验证
-    ├─ 检查方案完整性
-    ├─ 评估风险和影响
-    ├─ 提供替代方案
-    └─ 等待用户确认
-```
+### 3.1 高层流程概览
 
-### 3.2 快速诊断流程
+1. **信息收集** (collect_information) - 获取并验证编译日志
+2. **日志解析** (parse_log) - 提取 target、.o 文件、错误信息
+3. **源码定位** (locate_source) - 查找源文件和编译配置
+4. **错误分析** (analyze_error) - 分类错误并定位根本原因
+5. **方案生成** (generate_solution) - 生成修复建议和代码示例
+6. **方案验证** (validate_solution) - 评估方案完整性和风险
 
-```
-【用户输入】编译错误信息或日志文件
-    ↓
-[子代理] 自动分类错误类型
-    ↓
-[子代理] 匹配历史案例
-    ↓
-[子代理] 生成修复建议
-    ↓
-[子代理] 提供验证步骤
-```
+**完整诊断流程图和详细说明**：请参阅 `.claude/skills/compile-issue-diagnosis/SKILL.md` 第 3 节。
 
-## 四、核心功能详解
+## 四、核心功能
 
-### 4.1 日志深度分析
+子代理的核心功能通过 compile-issue-diagnosis 技能实现，包括：
 
-**功能描述**：
-从编译日志中提取关键信息，识别错误模式，分析错误之间的关联性。
+- **日志深度分析**：从编译日志中提取关键错误信息
+- **智能代码搜索**：在代码仓中快速定位符号定义
+- **错误模式识别**：识别 6 大类编译错误（语法、链接、依赖、类型、宏、模板）
+- **知识推理**：基于历史案例推断问题原因
+- **方案生成**：提供针对性的修复建议和代码示例
 
-**分析内容**：
-- 错误类型识别（链接错误、语法错误、依赖错误等）
-- Target 识别（失败的编译目标）
-- 源文件定位（出问题的 .o 文件）
-- 编译命令提取（完整的编译命令行）
-- 错误上下文提取（错误前后的关键信息）
-
-**输出示例**：
-```json
-{
-  "target": "libbase.so",
-  "obj_file": "base_utils.o",
-  "error_line": 245",
-  "error_type": "链接错误-符号未定义",
-  "symbol": "get_config_value",
-  "suggestions": ["添加链接库 libconfig", "检查函数实现"]
-}
-```
-
-### 4.2 智能代码搜索
-
-**功能描述**：
-在代码仓中快速查找符号定义、宏定义、类型定义等，帮助定位问题根源。
-
-**搜索能力**：
-- 函数/变量定义搜索
-- 宏定义搜索
-- 类型定义搜索
-- Include 路径搜索
-- 依赖关系分析
-
-**搜索模式**：
-```bash
-# 搜索函数定义
-grep -r "get_config_value" --include="*.cpp" --include="*.c" --include="*.h"
-
-# 搜索宏定义
-grep -r "#define.*CONFIG" --include="*.h"
-
-# 搜索类型定义
-grep -r "class.*Config" --include="*.h"
-```
-
-### 4.3 错误模式识别
-
-**支持的模式**：
-
-| 错误模式 | 特征字符串 | 解决方案库 |
-|---------|-----------|-----------|
-| **链接错误-符号未定义** | `undefined reference` | 100+ 历史案例 |
-| **致命错误-文件缺失** | `fatal error:.*No such file` | 50+ 历史案例 |
-| **类型转换错误** | `cannot convert` | 80+ 历史案例 |
-| **语法错误** | `expected.*;` | 200+ 历史案例 |
-| **模板错误** | `template argument deduction` | 30+ 历史案例 |
-| **宏定义错误** | `macro.*passed.*arguments` | 40+ 历史案例 |
-
-### 4.4 知识推理
-
-**推理机制**：
-- 基于错误特征的相似度匹配
-- 参考历史解决方案
-- 分析代码上下文和依赖关系
-- 结合编译规范和最佳实践
-- 评估方案的可行性和风险
-
-**推理示例**：
-```
-错误：undefined reference to 'get_config_value'
-
-推理过程：
-1. 识别符号：get_config_value
-2. 搜索代码：未找到定义
-3. 搜索历史案例：类似错误通常缺少 libconfig 库
-4. 推断原因：缺少链接库
-5. 生成方案：添加 target_link_libraries(...)
-```
-
-### 4.5 方案生成
-
-**方案类型**：
-
-| 方案类型 | 适用场景 | 优先级 |
-|---------|---------|--------|
-| **直接修复** | 明确问题，有标准解决方案 | 高 |
-| **配置调整** | 需要修改编译配置 | 中 |
-| **代码修改** | 需要修改源代码 | 中 |
-| **环境修复** | 编译环境问题 | 低 |
-
-**方案结构**：
-- 问题描述
-- 根本原因
-- 修复步骤（具体可执行）
-- 代码示例
-- 验证方法
-- 注意事项
-- 替代方案
+**详细功能说明和输出格式**：请参阅 `.claude/skills/compile-issue-diagnosis/SKILL.md`。
 
 ## 五、使用方法
 
@@ -207,111 +77,29 @@ grep -r "class.*Config" --include="*.h"
 **方式1：自动触发**
 
 当用户描述中包含编译错误关键词时，子代理自动激活：
-
-```bash
-# 用户输入
-"编译失败了，undefined reference to 'xxx'"
-"链接错误，找不到符号"
-"fatal error，找不到头文件"
-
-# Agent 自动激活 compile-diagnosis 子代理
-```
+- "编译失败了"
+- "undefined reference"
+- "fatal error"
 
 **方式2：技能调用**
 
-通过 compile-issue-diagnosis 技能调用：
-
-```bash
-# 用户输入
-"使用 compile-issue-diagnosis 技能分析这个编译错误"
-"诊断编译日志：compile.log"
-
-# Agent 调用技能并激活子代理
-```
+明确指定使用 compile-issue-diagnosis 技能：
+- "使用 compile-issue-diagnosis 技能分析编译错误"
+- "诊断编译日志：compile.log"
 
 **方式3：直接调用**
 
-通过 SubAgent 工具直接调用子代理：
+通过 SubAgent 工具直接调用（仅供开发者使用）。
 
-```python
-SubAgent(
-    subagent="compile-diagnosis-agent",
-    prompt="分析编译日志 compile.log"
-)
-```
+### 5.2 使用示例和参数
 
-### 5.2 交互示例
+**详细的使用示例、命令行参数和典型案例**：请参阅 `.claude/skills/compile-issue-diagnosis/SKILL.md` 第 4 节。
 
-**示例1：链接错误诊断**
-
-```
-用户: 编译 libbase.so 时出现 undefined reference to 'get_config_value'
-
-[子代理] 开始分析...
-
-[子代理] 步骤1：收集编译日志
-[子代理] 步骤2：解析日志信息
-  错误类型：链接错误-符号未定义
-  符号名称：get_config_value
-  出错位置：base_utils.o:245
-
-[子代理] 步骤3：定位源代码
-  源文件：src/base/utils.cpp
-  函数位置：第 245 行
-  调用上下文：Utils::getConfig()
-
-[子代理] 步骤4：分析原因
-  根本原因：函数 get_config_value() 未定义
-  可能原因：缺少链接库 libconfig
-
-[子代理] 步骤5：生成修复方案
-  方案1：添加链接库（推荐）
-    - 在 Android.mk 中添加：LOCAL_SHARED_LIBRARIES += libconfig
-    - 在 CMakeLists.txt 中添加：target_link_libraries(base PRIVATE config)
-
-  方案2：验证函数实现
-    - 检查 get_config_value() 函数是否存在
-    - 命令：grep -r 'get_config_value' --include='*.cpp'
-
-[子代理] 分析完成！
-
-修复步骤：
-1. 在 base/Android.mk 中添加 LOCAL_SHARED_LIBRARIES += libconfig
-2. 清理编译产物：make clean
-3. 重新编译：make libbase.so
-4. 验证错误是否解决
-```
-
-**示例2：头文件缺失诊断**
-
-```
-用户: fatal error: 'utils/helper.h' file not found
-
-[子代理] 开始分析...
-
-[子代理] 步骤1：分析错误信息
-  错误类型：致命错误-文件缺失
-  缺失文件：utils/helper.h
-
-[子代理] 步骤2：定位问题
-  查找文件：utils/helper.h 不存在
-  可能原因：include 路径配置错误
-
-[子代理] 步骤3：生成修复方案
-  方案1：添加 include 路径（推荐）
-    - CMakeLists.txt: include_directories(${CMAKE_SOURCE_DIR}/utils)
-    - Android.mk: LOCAL_C_INCLUDES += $(LOCAL_PATH)/utils
-
-  方案2：检查模块编译
-    - 确认 utils 模块是否已编译
-    - 命令：make utils
-
-[子代理] 分析完成！
-
-修复步骤：
-1. 在 Android.mk 中添加：LOCAL_C_INCLUDES += $(LOCAL_PATH)/utils
-2. 重新编译验证
-```
+典型使用场景：
+- 分析编译日志文件
+- 定位链接错误
+- 查找缺失的头文件
+- 诊断类型转换错误
 
 ## 六、配置说明
 
