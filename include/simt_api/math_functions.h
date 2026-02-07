@@ -177,12 +177,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, float* a);
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, __ubuf__ float* a);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, __gm__ float* a);
+#else
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, float* a);
 #endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, float* a);
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, __ubuf__ float* a);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, __gm__ float* a);
+#else
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, float* a);
 #endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y);

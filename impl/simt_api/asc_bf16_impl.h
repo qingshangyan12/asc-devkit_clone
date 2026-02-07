@@ -21,6 +21,10 @@
 #warning "impl/simt_api/asc_bf16_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "simt_api/asc_bf16.h" and use public functions or variables defined in interface header files."
 #endif
 
+#if __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#include "__clang_cce_simt_bf16.h"
+#endif
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hisnan(bfloat16_t x)
 {
     return __isnan(x);
