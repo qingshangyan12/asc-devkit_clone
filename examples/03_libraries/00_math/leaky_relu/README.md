@@ -39,12 +39,12 @@
 
 - 算子规格：  
   <table>
-  <tr><th align="center">算子类型(OpType)</th><th colspan="5" align="center">LeakyRelu</th></tr> <tr><td rowspan="2" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">default</td></tr> <tr><td align="center">x</td><td align="center">4 * 128</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr> <tr><td rowspan="1" align="center">算子输出</td><td align="center">out</td><td align="center">4 * 128</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr> <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">leaky_relu</td></tr> 
+  <tr><th align="center">算子类型(OpType)</th><th colspan="5" align="center">LeakyRelu</th></tr> <tr><td rowspan="2" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">default</td></tr> <tr><td align="center">x</td><td align="center">4 * 128</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr> <tr><td rowspan="1" align="center">算子输出</td><td align="center">out</td><td align="center">4 * 128</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr> <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">leaky_relu_kernel</td></tr> 
   </table>
 
 - 算子实现：  
   本样例中实现的是固定shape为4*128的LeakyRelu算子。
-  - kernel实现   
+  - Kernel实现   
     LeakyRelu算子的数学表达式为：  
   $$
   out = 
