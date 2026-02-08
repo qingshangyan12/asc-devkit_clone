@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(/c/Users/Administrator/AppData/Local/Microsoft/WindowsApps/python3:*)",
+      "Bash(py:*)",
+      "Bash(chmod:*)",
+      "Bash(bash:*)",
+      "Bash(ls:*)",
+      "Bash(git mv:*)"
+    ]
+  }
+}
