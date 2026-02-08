@@ -118,3 +118,12 @@
   ```
   [Success] Case accuracy is verification passed.
   ```
+当前样例代码默认执行整形场景功能，可通过修改main()函数调用`process_float()`的方法执行float场景的功能。
+```
+int32_t main()
+{
+    // process_float:  test float function
+    // process_int:  test int32_t function
+    return process_float();
+}
+```
