@@ -320,6 +320,61 @@ class NodeConstructor:
         """
         return f"CB.tasks.{self.node_type}"
 
+    def validate_hierarchy(self, parent_path=None):
+        """
+        验证节点名称与层级的对应关系
+
+        规则：节点名称的前缀必须与层级类型一致
+
+        Args:
+            parent_path: 指定的父路径（可选）
+
+        Returns:
+            tuple: (is_valid, error_message)
+        """
+        # 如果没有指定parent_path，使用默认推断的路径
+        if not parent_path:
+            parent_path = self.get_parent_path()
+
+        # 从父路径中提取层级类型
+        # CB.tasks.<层级类型> -> 提取 <层级类型>
+        parts = parent_path.split('.')
+        if len(parts) >= 3 and parts[0] == 'CB' and parts[1] == 'tasks':
+            hierarchy_type = parts[2]  # pkg, compile, test, llt, deploy, misc
+        else:
+            return False, f"父路径格式不正确：{parent_path}，应为 CB.tasks.<层级类型>"
+
+        # 验证节点名称前缀是否与层级类型匹配
+        node_prefix = self.node_type  # 从节点名称中提取的类型
+
+        if node_prefix == 'misc':
+            # misc类型的节点可以在任何层级下
+            return True, None
+
+        if node_prefix != hierarchy_type:
+            # 提供清晰的错误信息
+            error_msg = (
+                f"节点名称与层级不匹配！\n"
+                f"  节点名称：{self.full_name}（前缀：{node_prefix}）\n"
+                f"  父路径：{parent_path}（层级类型：{hierarchy_type}）\n\n"
+                f"规则：节点名称必须以所在层级类型开头\n"
+                f"  正确示例：CB.tasks.{node_prefix}.{node_prefix}_xxx\n"
+                f"  当前路径：CB.tasks.{hierarchy_type}.{node_prefix}_xxx\n\n"
+                f"建议：\n"
+            )
+
+            # 根据层级类型提供具体建议
+            if hierarchy_type in ['pkg', 'compile', 'test', 'llt', 'deploy']:
+                error_msg += f"  1. 将节点放到 CB.tasks.{node_prefix} 层级下\n"
+                error_msg += f"  2. 或修改节点名称为 {hierarchy_type}_{self.node_name}"
+            else:
+                error_msg += f"  1. 将节点放到 CB.tasks.{node_prefix} 层级下\n"
+                error_msg += f"  2. 或修改节点名称以匹配层级类型"
+
+            return False, error_msg
+
+        return True, None
+
     def add_to_yaml(self, yaml_file, content):
         """
         将节点添加到 YAML 文件
@@ -338,9 +393,25 @@ class NodeConstructor:
         print(f"\n准备添加节点到 YAML 文件...")
         print(f"文件: {yaml_file}")
         print(f"父路径: {parent_path}")
+        print(f"节点名称: {self.full_name}")
         print(f"\n节点内容：")
         print(self.format_node_yaml(content))
         print(f"\n{'='*60}")
+
+        # 验证层级对应关系
+        is_valid, error_msg = self.validate_hierarchy(parent_path)
+        if not is_valid:
+            print(f"\n[✗] 层级验证失败！")
+            print(f"\n{error_msg}")
+            print(f"\n请修正后再执行添加操作。")
+            print(f"\n提示：使用 --parent 参数可以指定其他父路径")
+            print(f"示例：python create_node.py -n {self.full_name} -f {yaml_file} -p CB.tasks.{self.node_type}")
+            return False
+
+        print(f"\n[√] 层级验证通过")
+        print(f"  节点名称前缀：{self.node_type}")
+        print(f"  父层级类型：{parent_path.split('.')[2] if len(parent_path.split('.')) >= 3 else '未知'}")
+        print(f"  ✓ 匹配正确")
 
         # 调用 edit-yaml 的 add_node.py
         script_path = Path(__file__).parent.parent.parent / 'edit-yaml' / 'scripts' / 'add_node.py'

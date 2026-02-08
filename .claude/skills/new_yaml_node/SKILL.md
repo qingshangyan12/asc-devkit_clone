@@ -102,14 +102,43 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
 ```
 
 **任务类型（必需）：**
-| 类型 | 说明 | 示例 |
-|-----|------|------|
-| `pkg` | 打包任务 | pkg_common_utils |
-| `compile` | 编译任务 | compile_core_module |
-| `test` | 测试任务 | test_api_function |
-| `llt` | 链接测试任务 | llt_memory_check |
-| `deploy` | 部署任务 | deploy_online_prod |
-| `misc` | 其他任务 | misc_custom_task |
+| 类型 | 说明 | 示例 | 对应层级 |
+|-----|------|------|---------|
+| `pkg` | 打包任务 | pkg_common_utils | CB.tasks.pkg |
+| `compile` | 编译任务 | compile_core_module | CB.tasks.compile |
+| `test` | 测试任务 | test_api_function | CB.tasks.test |
+| `llt` | 链接测试任务 | llt_memory_check | CB.tasks.llt |
+| `deploy` | 部署任务 | deploy_online_prod | CB.tasks.deploy |
+| `misc` | 其他任务 | misc_custom_task | CB.tasks.misc |
+
+**重要规则：任务名与层级对应关系**
+
+节点名称的任务类型前缀**必须**与节点所在层级的名称一致：
+
+```
+节点层级规则：
+CB.tasks.<层级类型>.<节点名称>
+
+其中：<节点名称> 必须以 <层级类型> 开头
+
+示例：
+✓ CB.tasks.pkg.pkg_common_utils  （层级pkg，节点名pkg_common_utils以pkg开头）
+✓ CB.tasks.compile.compile_core  （层级compile，节点名compile_core以compile开头）
+✓ CB.tasks.test.test_smoke      （层级test，节点名test_smoke以test开头）
+
+✗ CB.tasks.pkg.compile_core   （错误：层级pkg，节点名compile_core以compile开头）
+✗ CB.tasks.compile.pkg_utils   （错误：层级compile，节点名pkg_utils以pkg开头）
+```
+
+**层级对应验证：**
+
+| 节点路径 | 节点名称前缀 | 是否匹配 | 验证结果 |
+|---------|------------|---------|---------|
+| CB.tasks.pkg | pkg_xxx | ✓ 匹配 | ✅ 正确 |
+| CB.tasks.compile | compile_xxx | ✓ 匹配 | ✅ 正确 |
+| CB.tasks.test | test_xxx | ✓ 匹配 | ✅ 正确 |
+| CB.tasks.pkg | compile_xxx | ✗ 不匹配 | ❌ 错误：节点应在CB.tasks.compile下 |
+| CB.tasks.compile | pkg_xxx | ✗ 不匹配 | ❌ 错误：节点应在CB.tasks.pkg下 |
 
 **任务名称（必需）：**
 - 使用小写字母和数字
@@ -130,19 +159,37 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
 ### 3.2 命名示例
 
 ```yaml
-# ✓ 合法命名
+# ✓ 合法命名且层级匹配
+# CB.tasks.pkg 层级下
 pkg_common_compile
-test_smoke_v1
-llt_memory_check
-deploy_online_prod
-compile_core_module_test
+pkg_utils
+pkg_core_tools
 
-# ✗ 非法命名
-PkgCompile           # 未使用下划线
-pkg                  # 缺少任务名称
-1st_test             # 以数字开头
-pkg-my-task          # 使用连字符
-PKG_COMMON_UTILS     # 使用大写字母
+# CB.tasks.compile 层级下
+compile_core_module
+compile_base_lib
+compile_test_util
+
+# CB.tasks.test 层级下
+test_smoke_v1
+test_api_function
+test_unit_basic
+
+# CB.tasks.llt 层级下
+llt_memory_check
+llt_performance_test
+
+# ✗ 命名规范正确但层级不匹配
+# （节点名称符合规范，但放在了错误的层级下）
+CB.tasks.pkg.compile_core_module      # ✗ 应在 CB.tasks.compile 下
+CB.tasks.compile.pkg_common_utils   # ✗ 应在 CB.tasks.pkg 下
+CB.tasks.test.llt_memory_check       # ✗ 应在 CB.tasks.llt 下
+
+# ✗ 完全不合法的命名
+PkgCompile           # ✗ 未使用下划线、使用大写
+pkg                  # ✗ 缺少任务名称
+1st_test             # ✗ 以数字开头
+pkg-my-task          # ✗ 使用连字符
 ```
 
 ### 3.3 节点路径规则
@@ -152,12 +199,30 @@ PKG_COMMON_UTILS     # 使用大写字母
 CB.tasks.<任务类型>.<完整节点名>
 ```
 
-**路径示例：**
-```yaml
+**路径-名称一致性验证：**
+
+```
+规则：节点名称的前缀必须与层级类型一致
+
+正确示例：
 CB.tasks.pkg.pkg_common_compile
-CB.tasks.test.test_smoke_v1
-CB.tasks.llt.llt_memory_check
+  ├─ 层级：pkg
+  └─ 节点名：pkg_common_compile（以pkg开头）✓
+
 CB.tasks.compile.compile_core_module
+  ├─ 层级：compile
+  └─ 节点名：compile_core_module（以compile开头）✓
+
+错误示例：
+CB.tasks.pkg.compile_core_module
+  ├─ 层级：pkg
+  └─ 节点名：compile_core_module（以compile开头）✗
+  错误：节点应在 CB.tasks.compile 下
+
+CB.tasks.test.pkg_common_utils
+  ├─ 层级：test
+  └─ 节点名：pkg_common_utils（以pkg开头）✗
+  错误：节点应在 CB.tasks.pkg 下
 ```
 
 ## 四、节点内容映射规则
@@ -434,6 +499,39 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
 ```bash
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
   -n compile_core -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --dry-run
+```
+
+**示例4：层级验证（自动验证节点名称与层级是否匹配）**
+```bash
+# 自动验证：节点compile_xxx 会自动添加到 CB.tasks.compile 下
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n compile_core_module -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+
+# 如果层级不匹配，会自动报错并给出建议
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n compile_core_module -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml -p CB.tasks.pkg
+
+# 输出：
+# [✗] 层级验证失败！
+# 节点名称：compile_core_module（前缀：compile）
+# 父路径：CB.tasks.pkg（层级类型：pkg）
+#
+# 规则：节点名称必须以所在层级类型开头
+#   正确示例：CB.tasks.compile.compile_xxx
+#   当前路径：CB.tasks.pkg.compile_xxx
+#
+# 建议：
+#   1. 将节点放到 CB.tasks.compile 层级下
+#   2. 或修改节点名称为 pkg_core_module
+```
+
+**示例5：指定正确的父路径**
+```bash
+# 使用 --parent 参数指定正确的父路径
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n compile_core_module \
+  -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
+  -p CB.tasks.compile
 ```
 
 ### 5.2 analyze_yaml_structure.py - 结构分析
@@ -897,6 +995,96 @@ def get_type_from_nodename(nodename: str) -> str:
         return 'new_type'
     # ... 其他规则
 ```
+
+### Q8：节点名称与层级不匹配怎么办？
+
+**答：** create_node.py 脚本会自动验证层级对应关系：
+
+**验证规则：**
+```
+CB.tasks.<层级类型>.<节点名称>
+
+要求：<节点名称> 必须以 <层级类型> 开头
+
+正确示例：
+✓ CB.tasks.pkg.pkg_xxx
+✓ CB.tasks.compile.compile_xxx
+✓ CB.tasks.test.test_xxx
+
+错误示例：
+✗ CB.tasks.pkg.compile_xxx  （节点应在CB.tasks.compile下）
+✗ CB.tasks.compile.test_xxx   （节点应在CB.tasks.test下）
+```
+
+**错误输出示例：**
+```
+[✗] 层级验证失败！
+节点名称：compile_core_module（前缀：compile）
+父路径：CB.tasks.pkg（层级类型：pkg）
+
+规则：节点名称必须以所在层级类型开头
+  正确示例：CB.tasks.compile.compile_xxx
+  当前路径：CB.tasks.pkg.compile_xxx
+
+建议：
+  1. 将节点放到 CB.tasks.compile 层级下
+  2. 或修改节点名称为 pkg_core_module
+```
+
+**解决方法：**
+
+**方法1：自动推断（推荐）**
+```bash
+# 脚本会自动推断正确的父路径
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n compile_core_module -f ci_config/rule.yaml
+# 自动添加到 CB.tasks.compile 下
+```
+
+**方法2：手动指定父路径**
+```bash
+# 使用 --parent 参数
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n compile_core_module -f ci_config/rule.yaml -p CB.tasks.compile
+```
+
+**方法3：修改节点名称**
+```bash
+# 如果确实需要在pkg层级下，修改节点名称
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
+  -n pkg_core_module -f ci_config/rule.yaml
+# 添加到 CB.tasks.pkg 下
+```
+
+### Q9：为什么需要节点名称与层级对应？
+
+**答：** 这是CI/CD配置的组织规范要求：
+
+**1. 清晰的组织结构**
+- 同类型的任务集中在同一层级下
+- 便于查找和管理
+
+**2. 避免混淆和错误**
+- 防止将compile任务错误地放在pkg层级下
+- 防止将test任务错误地放在compile层级下
+
+**3. 符合CI/CD规范**
+- 华为 CANN CI/CD 体系的组织要求
+- 便于自动化工具识别和处理
+
+**4. 提高可维护性**
+- 按类型分层，职责清晰
+- 便于依赖关系管理
+
+**层级与类型对应表：**
+| 层级路径 | 节点名称前缀 | 节点类型 | 典型任务 |
+|---------|------------|---------|---------|
+| CB.tasks.pkg | pkg_ | pkg | 打包任务 |
+| CB.tasks.compile | compile_ | compile | 编译任务 |
+| CB.tasks.test | test_ | test | 测试任务 |
+| CB.tasks.llt | llt_ | llt | 链接测试任务 |
+| CB.tasks.deploy | deploy_ | deploy | 部署任务 |
+| CB.tasks.misc | misc_ | misc | 其他任务 |
 
 ## 九、附录
 
