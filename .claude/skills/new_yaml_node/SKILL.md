@@ -33,15 +33,15 @@ description: YAML节点构造技能 - 根据任务名自动生成符合规范的
 **场景1：根据任务名创建新节点**
 ```bash
 # 最简单的用法 - 只提供节点名
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_common_utils
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n common_utils_pkg
 
 # 指定目标文件
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n test_api_smoke -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+  -n api_smoke_test -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 # 预览模式（不实际写入）
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n compile_core -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --dry-run
+  -n core_compile -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --dry-run
 ```
 
 **场景2：分析YAML文件结构**
@@ -63,7 +63,7 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_str
 ```bash
 # 1. 使用create_node.py生成节点
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n pkg_new_feature > node_template.yaml
+  -n new_feature_pkg > node_template.yaml
 
 # 2. 使用edit-yaml技能的add_node.py添加节点
 python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
@@ -78,7 +78,7 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
 【需求】创建新的pkg任务节点
     ↓
 【步骤1】使用create_node.py生成节点
-  python create_node.py -n pkg_new_feature -f ci_config/rule.yaml
+  python create_node.py -n new_feature_pkg -f ci_config/rule.yaml
     ↓
 【步骤2】验证生成的节点内容
   检查version、enabled、timeout等必需配置项
@@ -98,47 +98,47 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
 
 **基本格式：**
 ```
-<任务类型>_<任务名称>_<可选后缀>
+<任务名称>_<任务类型>_<可选后缀>
 ```
 
 **任务类型（必需）：**
 | 类型 | 说明 | 示例 | 对应层级 |
 |-----|------|------|---------|
-| `pkg` | 打包任务 | pkg_common_utils | CB.tasks.pkg |
-| `compile` | 编译任务 | compile_core_module | CB.tasks.compile |
-| `test` | 测试任务 | test_api_function | CB.tasks.test |
-| `llt` | 链接测试任务 | llt_memory_check | CB.tasks.llt |
-| `deploy` | 部署任务 | deploy_online_prod | CB.tasks.deploy |
-| `misc` | 其他任务 | misc_custom_task | CB.tasks.misc |
+| `pkg` | 打包任务 | common_utils_pkg | CB.tasks.pkg |
+| `compile` | 编译任务 | core_module_compile | CB.tasks.compile |
+| `test` | 测试任务 | api_function_test | CB.tasks.test |
+| `llt` | 链接测试任务 | memory_check_llt | CB.tasks.llt |
+| `deploy` | 部署任务 | online_prod_deploy | CB.tasks.deploy |
+| `misc` | 其他任务 | custom_task_misc | CB.tasks.misc |
 
 **重要规则：任务名与层级对应关系**
 
-节点名称的任务类型前缀**必须**与节点所在层级的名称一致：
+节点名称的任务类型后缀**必须**与节点所在层级的名称一致：
 
 ```
 节点层级规则：
 CB.tasks.<层级类型>.<节点名称>
 
-其中：<节点名称> 必须以 <层级类型> 开头
+其中：<节点名称> 必须以 _<层级类型> 结尾
 
 示例：
-✓ CB.tasks.pkg.pkg_common_utils  （层级pkg，节点名pkg_common_utils以pkg开头）
-✓ CB.tasks.compile.compile_core  （层级compile，节点名compile_core以compile开头）
-✓ CB.tasks.test.test_smoke      （层级test，节点名test_smoke以test开头）
+✓ CB.tasks.pkg.common_utils_pkg    （层级pkg，节点名common_utils_pkg以_pkg结尾）
+✓ CB.tasks.compile.core_module_compile （层级compile，节点名core_module_compile以_compile结尾）
+✓ CB.tasks.test.api_function_test  （层级test，节点名api_function_test以_test结尾）
 
-✗ CB.tasks.pkg.compile_core   （错误：层级pkg，节点名compile_core以compile开头）
-✗ CB.tasks.compile.pkg_utils   （错误：层级compile，节点名pkg_utils以pkg开头）
+✗ CB.tasks.pkg.core_module_compile （错误：层级pkg，节点名core_module_compile以_compile结尾）
+✗ CB.tasks.compile.common_utils_pkg  （错误：层级compile，节点名common_utils_pkg以_pkg结尾）
 ```
 
 **层级对应验证：**
 
-| 节点路径 | 节点名称前缀 | 是否匹配 | 验证结果 |
+| 节点路径 | 节点名称后缀 | 是否匹配 | 验证结果 |
 |---------|------------|---------|---------|
-| CB.tasks.pkg | pkg_xxx | ✓ 匹配 | ✅ 正确 |
-| CB.tasks.compile | compile_xxx | ✓ 匹配 | ✅ 正确 |
-| CB.tasks.test | test_xxx | ✓ 匹配 | ✅ 正确 |
-| CB.tasks.pkg | compile_xxx | ✗ 不匹配 | ❌ 错误：节点应在CB.tasks.compile下 |
-| CB.tasks.compile | pkg_xxx | ✗ 不匹配 | ❌ 错误：节点应在CB.tasks.pkg下 |
+| CB.tasks.pkg | xxx_pkg | ✓ 匹配 | ✅ 正确 |
+| CB.tasks.compile | xxx_compile | ✓ 匹配 | ✅ 正确 |
+| CB.tasks.test | xxx_test | ✓ 匹配 | ✅ 正确 |
+| CB.tasks.pkg | xxx_compile | ✗ 不匹配 | ❌ 错误：节点应在CB.tasks.compile下 |
+| CB.tasks.compile | xxx_pkg | ✗ 不匹配 | ❌ 错误：节点应在CB.tasks.pkg下 |
 
 **任务名称（必需）：**
 - 使用小写字母和数字
@@ -149,41 +149,41 @@ CB.tasks.<层级类型>.<节点名称>
 **可选后缀：**
 | 后缀 | 说明 | 示例 |
 |-----|------|------|
-| `_test` | 测试版本 | pkg_utils_test |
-| `_prod` | 生产版本 | deploy_service_prod |
-| `_bak` | 备份版本 | compile_module_bak |
-| `_v<版本号>` | 版本标识 | test_smoke_v1 |
-| `smoke` | 烟雾测试 | test_api_smoke |
-| `perf` | 性能测试 | test_benchmark_perf |
+| `_test` | 测试版本 | utils_test |
+| `_prod` | 生产版本 | service_prod |
+| `_bak` | 备份版本 | module_bak |
+| `_v<版本号>` | 版本标识 | smoke_v1_test |
+| `smoke` | 烟雾测试 | api_smoke_test |
+| `perf` | 性能测试 | benchmark_perf_test |
 
 ### 3.2 命名示例
 
 ```yaml
 # ✓ 合法命名且层级匹配
 # CB.tasks.pkg 层级下
-pkg_common_compile
-pkg_utils
-pkg_core_tools
+common_compile_pkg
+utils_pkg
+core_tools_pkg
 
 # CB.tasks.compile 层级下
-compile_core_module
-compile_base_lib
-compile_test_util
+core_module_compile
+base_lib_compile
+test_util_compile
 
 # CB.tasks.test 层级下
-test_smoke_v1
-test_api_function
-test_unit_basic
+smoke_v1_test
+api_function_test
+unit_basic_test
 
 # CB.tasks.llt 层级下
-llt_memory_check
-llt_performance_test
+memory_check_llt
+performance_test_llt
 
 # ✗ 命名规范正确但层级不匹配
 # （节点名称符合规范，但放在了错误的层级下）
-CB.tasks.pkg.compile_core_module      # ✗ 应在 CB.tasks.compile 下
-CB.tasks.compile.pkg_common_utils   # ✗ 应在 CB.tasks.pkg 下
-CB.tasks.test.llt_memory_check       # ✗ 应在 CB.tasks.llt 下
+CB.tasks.pkg.core_module_compile      # ✗ 应在 CB.tasks.compile 下
+CB.tasks.compile.common_utils_pkg   # ✗ 应在 CB.tasks.pkg 下
+CB.tasks.test.memory_check_llt       # ✗ 应在 CB.tasks.llt 下
 
 # ✗ 完全不合法的命名
 PkgCompile           # ✗ 未使用下划线、使用大写
@@ -202,26 +202,26 @@ CB.tasks.<任务类型>.<完整节点名>
 **路径-名称一致性验证：**
 
 ```
-规则：节点名称的前缀必须与层级类型一致
+规则：节点名称的后缀必须与层级类型一致
 
 正确示例：
-CB.tasks.pkg.pkg_common_compile
+CB.tasks.pkg.common_compile_pkg
   ├─ 层级：pkg
-  └─ 节点名：pkg_common_compile（以pkg开头）✓
+  └─ 节点名：common_compile_pkg（以_pkg结尾）✓
 
-CB.tasks.compile.compile_core_module
+CB.tasks.compile.core_module_compile
   ├─ 层级：compile
-  └─ 节点名：compile_core_module（以compile开头）✓
+  └─ 节点名：core_module_compile（以_compile结尾）✓
 
 错误示例：
-CB.tasks.pkg.compile_core_module
+CB.tasks.pkg.core_module_compile
   ├─ 层级：pkg
-  └─ 节点名：compile_core_module（以compile开头）✗
+  └─ 节点名：core_module_compile（以_compile结尾）✗
   错误：节点应在 CB.tasks.compile 下
 
-CB.tasks.test.pkg_common_utils
+CB.tasks.test.common_utils_pkg
   ├─ 层级：test
-  └─ 节点名：pkg_common_utils（以pkg开头）✗
+  └─ 节点名：common_utils_pkg（以_pkg结尾）✗
   错误：节点应在 CB.tasks.pkg 下
 ```
 
@@ -249,11 +249,11 @@ CB.tasks.test.pkg_common_utils
 
 #### 4.2.1 pkg 类型节点
 
-**任务名特征：** 以 `pkg_` 开头
+**任务名特征：** 以 `_pkg` 结尾
 
 **默认内容模板：**
 ```yaml
-pkg_<任务名>:
+<任务名>_pkg:
   version: cann
   enabled: true
   timeout: 3600
@@ -271,7 +271,7 @@ pkg_<任务名>:
 
 **典型示例：**
 ```yaml
-pkg_common_utils:
+common_utils_pkg:
   version: cann
   enabled: true
   timeout: 3600
@@ -285,11 +285,11 @@ pkg_common_utils:
 
 #### 4.2.2 compile 类型节点
 
-**任务名特征：** 以 `compile_` 开头
+**任务名特征：** 以 `_compile` 结尾
 
 **默认内容模板：**
 ```yaml
-compile_<任务名>:
+<任务名>_compile:
   version: cann
   enabled: true
   timeout: 7200
@@ -309,7 +309,7 @@ compile_<任务名>:
 
 **典型示例：**
 ```yaml
-compile_core_module:
+core_module_compile:
   version: cann
   enabled: true
   timeout: 7200
@@ -325,11 +325,11 @@ compile_core_module:
 
 #### 4.2.3 test 类型节点
 
-**任务名特征：** 以 `test_` 开头
+**任务名特征：** 以 `_test` 结尾
 
 **默认内容模板：**
 ```yaml
-test_<任务名>:
+<任务名>_test:
   version: cann
   enabled: true
   timeout: 1800
@@ -348,7 +348,7 @@ test_<任务名>:
 
 **典型示例：**
 ```yaml
-test_api_function:
+api_function_test:
   version: cann
   enabled: true
   timeout: 1800
@@ -357,17 +357,17 @@ test_api_function:
     - test_api_001
     - test_api_002
   dependency:
-    - compile_api_module
+    - api_module_compile
   ut_check: true
 ```
 
 #### 4.2.4 llt 类型节点
 
-**任务名特征：** 以 `llt_` 开头
+**任务名特征：** 以 `_llt` 结尾
 
 **默认内容模板：**
 ```yaml
-llt_<任务名>:
+<任务名>_llt:
   version: cann
   enabled: true
   timeout: 2400
@@ -385,7 +385,7 @@ llt_<任务名>:
 
 **典型示例：**
 ```yaml
-llt_memory_check:
+memory_check_llt:
   version: cann
   enabled: true
   timeout: 2400
@@ -394,17 +394,17 @@ llt_memory_check:
     - memory_leak_test
     - memory_corruption_test
   dependency:
-    - compile_core_module
+    - core_module_compile
   ut_check: true
 ```
 
 #### 4.2.5 deploy 类型节点
 
-**任务名特征：** 以 `deploy_` 开头
+**任务名特征：** 以 `_deploy` 结尾
 
 **默认内容模板：**
 ```yaml
-deploy_<任务名>:
+<任务名>_deploy:
   version: cann
   enabled: true
   timeout: 1800
@@ -421,7 +421,7 @@ deploy_<任务名>:
 
 **典型示例：**
 ```yaml
-deploy_online_prod:
+online_prod_deploy:
   version: cann
   enabled: true
   timeout: 1800
@@ -437,13 +437,13 @@ deploy_online_prod:
 
 create_node.py 脚本根据任务名自动推断节点类型和内容：
 
-| 任务名前缀 | 推断类型 | 默认timeout | 默认必需配置项 |
+| 任务名后缀 | 推断类型 | 默认timeout | 默认必需配置项 |
 |-----------|---------|------------|---------------|
-| `pkg_` | pkg | 3600 | type, target |
-| `compile_` | compile | 7200 | type, source |
-| `test_` | test | 1800 | type, case |
-| `llt_` | llt | 2400 | type, test_suite |
-| `deploy_` | deploy | 1800 | type, target |
+| `_pkg` | pkg | 3600 | type, target |
+| `_compile` | compile | 7200 | type, source |
+| `_test` | test | 1800 | type, case |
+| `_llt` | llt | 2400 | type, test_suite |
+| `_deploy` | deploy | 1800 | type, target |
 | 其他 | misc | 3600 | type |
 
 ## 五、核心脚本使用
@@ -460,7 +460,7 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py [
 
 | 参数 | 简写 | 说明 | 必需 | 示例 |
 |-----|------|------|------|------|
-| `--node-name` | `-n` | 节点名称 | ✓ | `-n pkg_common_utils` |
+| `--node-name` | `-n` | 节点名称 | ✓ | `-n common_utils_pkg` |
 | `--file` | `-f` | YAML文件路径 | ✗ | `-f ci_config/rule.yaml` |
 | `--dry-run` | | 预览模式，不实际写入 | ✗ | `--dry-run` |
 | `--help` | `-h` | 显示帮助信息 | ✗ | `-h` |
@@ -474,12 +474,12 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py [
 
 **示例1：输出到标准输出**
 ```bash
-python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n pkg_common_utils
+python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py -n common_utils_pkg
 ```
 
 输出：
 ```yaml
-pkg_common_utils:
+common_utils_pkg:
   version: cann
   enabled: true
   timeout: 3600
@@ -492,44 +492,44 @@ pkg_common_utils:
 **示例2：直接写入YAML文件**
 ```bash
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n test_api_smoke -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+  -n api_smoke_test -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 ```
 
 **示例3：预览模式**
 ```bash
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n compile_core -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --dry-run
+  -n core_compile -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml --dry-run
 ```
 
 **示例4：层级验证（自动验证节点名称与层级是否匹配）**
 ```bash
-# 自动验证：节点compile_xxx 会自动添加到 CB.tasks.compile 下
+# 自动验证：节点 xxx_compile 会自动添加到 CB.tasks.compile 下
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n compile_core_module -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
+  -n core_module_compile -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml
 
 # 如果层级不匹配，会自动报错并给出建议
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n compile_core_module -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml -p CB.tasks.pkg
+  -n core_module_compile -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml -p CB.tasks.pkg
 
 # 输出：
 # [✗] 层级验证失败！
-# 节点名称：compile_core_module（前缀：compile）
+# 节点名称：core_module_compile（后缀类型：compile）
 # 父路径：CB.tasks.pkg（层级类型：pkg）
 #
-# 规则：节点名称必须以所在层级类型开头
-#   正确示例：CB.tasks.compile.compile_xxx
-#   当前路径：CB.tasks.pkg.compile_xxx
+# 规则：节点名称必须以所在层级类型结尾（_<层级类型>）
+#   正确示例：CB.tasks.compile.xxx_compile
+#   当前路径：CB.tasks.pkg.core_module_compile
 #
 # 建议：
 #   1. 将节点放到 CB.tasks.compile 层级下
-#   2. 或修改节点名称为 pkg_core_module
+#   2. 或修改节点名称为 core_module_pkg
 ```
 
 **示例5：指定正确的父路径**
 ```bash
 # 使用 --parent 参数指定正确的父路径
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n compile_core_module \
+  -n core_module_compile \
   -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
   -p CB.tasks.compile
 ```
@@ -605,7 +605,7 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_str
 不规范节点详情：
 1. PkgCompile (CB.tasks.pkg)
    - 问题: 使用了大写字母
-   - 建议: pkg_compile
+   - 建议: compile_pkg
 
 2. 1st_test (CB.tasks.test)
    - 问题: 以数字开头
@@ -623,13 +623,13 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_str
 配置完整性检查报告：
 ====================
 pkg类型节点:
-  ✓ pkg_common_utils: 配置完整
-  ✗ pkg_missing_target: 缺少必需配置项 [target]
+  ✓ common_utils_pkg: 配置完整
+  ✗ missing_target_pkg: 缺少必需配置项 [target]
   ...
 
 test类型节点:
-  ✓ test_api_smoke: 配置完整
-  ✗ test_no_cases: 缺少必需配置项 [case]
+  ✓ api_smoke_test: 配置完整
+  ✗ no_cases_test: 缺少必需配置项 [case]
   ...
 ```
 
@@ -673,7 +673,7 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_str
 1. **使用 new_yaml_node 生成节点模板**
 ```bash
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n pkg_new_feature > node_template.yaml
+  -n new_feature_pkg > node_template.yaml
 ```
 
 2. **编辑节点内容（可选）**
@@ -694,7 +694,7 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
 python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
   -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
   -p CB.tasks.pkg \
-  -n "pkg_new_feature: {version: cann, enabled: true, timeout: 3600, type: pkg}"
+  -n "new_feature_pkg: {version: cann, enabled: true, timeout: 3600, type: pkg}"
 ```
 
 4. **验证和修复格式**
@@ -709,7 +709,7 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/fix_non_standard_yam
 
 ```bash
 # 步骤1：创建节点模板
-for nodename in pkg_utils compile_core test_api; do
+for nodename in utils_pkg core_compile api_test; do
   python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
     -n $nodename > ${nodename}_template.yaml
 done
@@ -718,17 +718,17 @@ done
 python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
   -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
   -p CB.tasks.pkg \
-  --content-file pkg_utils_template.yaml
+  --content-file utils_pkg_template.yaml
 
 python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
   -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
   -p CB.tasks.compile \
-  --content-file compile_core_template.yaml
+  --content-file core_compile_template.yaml
 
 python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/add_node.py \
   -f $CLAUDE_PROJECT_DIR/ci_config/rule.yaml \
   -p CB.tasks.test \
-  --content-file test_api_template.yaml
+  --content-file api_test_template.yaml
 
 # 步骤3：验证YAML格式
 python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/fix_non_standard_yaml.py \
@@ -745,26 +745,26 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_str
 
 **推荐做法：**
 - ✓ 使用描述性的任务名称，见名知意
-  - `pkg_common_utils` ✓
-  - `test_api_smoke` ✓
-  - `compile_core_module` ✓
+  - `common_utils_pkg` ✓
+  - `api_smoke_test` ✓
+  - `core_module_compile` ✓
 
 - ✓ 使用下划线分隔单词
-  - `pkg_common_utils` ✓
-  - `test_api_function_v2` ✓
+  - `common_utils_pkg` ✓
+  - `api_function_v2_test` ✓
 
 - ✓ 添加有意义的后缀
-  - `test_smoke` ✓
-  - `deploy_prod` ✓
-  - `compile_test` ✓
+  - `smoke_test` ✓
+  - `prod_deploy` ✓
+  - `test_compile` ✓
 
 **避免做法：**
 - ✗ 使用模糊的名称
-  - `pkg_task1` ✗
-  - `test_abc` ✗
+  - `task1_pkg` ✗
+  - `abc_test` ✗
 
 - ✗ 使用过长的名称
-  - `pkg_common_utilities_for_computation_module` ✗ (太长)
+  - `common_utilities_for_computation_module_pkg` ✗ (太长)
 
 - ✗ 混用命名风格
   - `PkgCommonUtils` ✗
@@ -780,7 +780,7 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_str
 
 **示例：**
 ```yaml
-test_api_integration:
+api_integration_test:
   version: cann
   enabled: true          # 明确启用状态
   timeout: 3600         # 合理的超时时间（1小时）
@@ -789,28 +789,28 @@ test_api_integration:
     - test_api_001
     - test_api_002
   dependency:
-    - compile_api        # 明确的依赖关系
-    - pkg_lib_depend     # 明确的依赖关系
+    - api_compile        # 明确的依赖关系
+    - lib_depend_pkg     # 明确的依赖关系
   ut_check: true
 ```
 
 **避免做法：**
 - ✗ 缺少必需配置项
   ```yaml
-  test_api_bad:
+  api_bad_test:
     version: cann
     # 缺少 type, case 等必需配置
   ```
 
 - ✗ timeout设置不合理
   ```yaml
-  compile_large_module:
+  large_module_compile:
     timeout: 60  # 1分钟对于编译任务太短
   ```
 
 - ✗ 依赖关系不明确
   ```yaml
-  test_api:
+  api_test:
     # 缺少 dependency 配置
   ```
 
@@ -820,11 +820,11 @@ test_api_integration:
 ```bash
 # 1. 创建节点列表文件
 cat > nodes_list.txt << EOF
-pkg_common_utils
-pkg_core_tools
-compile_base_module
-test_api_smoke
-test_unit_basic
+common_utils_pkg
+core_tools_pkg
+base_module_compile
+api_smoke_test
+unit_basic_test
 EOF
 
 # 2. 批量生成节点
@@ -901,7 +901,7 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/analyze_yaml_str
 # 2. 使用modify_node_name.py批量重命名
 python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/modify_node_name.py \
   -f ci_config/rule.yaml \
-  -m "PkgCompile=pkg_compile"
+  -m "PkgCompile=compile_pkg"
 ```
 
 ### Q4：智能推断规则是否可以自定义？
@@ -911,8 +911,8 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/edit-yaml/scripts/modify_node_name.py 
 1. **修改类型推断规则**
 ```python
 def get_type_from_nodename(nodename: str) -> str:
-    # 添加自定义前缀规则
-    if nodename.startswith('custom_'):
+    # 添加自定义后缀规则
+    if nodename.endswith('_custom'):
         return 'custom'
     # ... 其他规则
 ```
@@ -934,16 +934,16 @@ REQUIRED_FIELDS = {
 
 ### Q5：为什么有些节点被识别为 misc 类型？
 
-**答：** 当节点名称不符合任何已知类型前缀（pkg/compile/test/llt/deploy）时，会被识别为 `misc` 类型。解决方法：
+**答：** 当节点名称不符合任何已知类型后缀（_pkg/_compile/_test/_llt/_deploy）时，会被识别为 `misc` 类型。解决方法：
 
-1. **使用标准前缀**
+1. **使用标准后缀**
 ```bash
 # 不推荐
 misc_mytasks
 
 # 推荐
-pkg_mytasks  # 如果是打包任务
-compile_mytasks  # 如果是编译任务
+mytasks_pkg  # 如果是打包任务
+mytasks_compile  # 如果是编译任务
 ```
 
 2. **或添加自定义类型**
@@ -1004,31 +1004,31 @@ def get_type_from_nodename(nodename: str) -> str:
 ```
 CB.tasks.<层级类型>.<节点名称>
 
-要求：<节点名称> 必须以 <层级类型> 开头
+要求：<节点名称> 必须以 _<层级类型> 结尾
 
 正确示例：
-✓ CB.tasks.pkg.pkg_xxx
-✓ CB.tasks.compile.compile_xxx
-✓ CB.tasks.test.test_xxx
+✓ CB.tasks.pkg.xxx_pkg
+✓ CB.tasks.compile.xxx_compile
+✓ CB.tasks.test.xxx_test
 
 错误示例：
-✗ CB.tasks.pkg.compile_xxx  （节点应在CB.tasks.compile下）
-✗ CB.tasks.compile.test_xxx   （节点应在CB.tasks.test下）
+✗ CB.tasks.pkg.xxx_compile  （节点应在CB.tasks.compile下）
+✗ CB.tasks.compile.xxx_test   （节点应在CB.tasks.test下）
 ```
 
 **错误输出示例：**
 ```
 [✗] 层级验证失败！
-节点名称：compile_core_module（前缀：compile）
+节点名称：core_module_compile（后缀类型：compile）
 父路径：CB.tasks.pkg（层级类型：pkg）
 
-规则：节点名称必须以所在层级类型开头
-  正确示例：CB.tasks.compile.compile_xxx
-  当前路径：CB.tasks.pkg.compile_xxx
+规则：节点名称必须以所在层级类型结尾（_<层级类型>）
+  正确示例：CB.tasks.compile.xxx_compile
+  当前路径：CB.tasks.pkg.core_module_compile
 
 建议：
   1. 将节点放到 CB.tasks.compile 层级下
-  2. 或修改节点名称为 pkg_core_module
+  2. 或修改节点名称为 core_module_pkg
 ```
 
 **解决方法：**
@@ -1037,7 +1037,7 @@ CB.tasks.<层级类型>.<节点名称>
 ```bash
 # 脚本会自动推断正确的父路径
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n compile_core_module -f ci_config/rule.yaml
+  -n core_module_compile -f ci_config/rule.yaml
 # 自动添加到 CB.tasks.compile 下
 ```
 
@@ -1045,14 +1045,14 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
 ```bash
 # 使用 --parent 参数
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n compile_core_module -f ci_config/rule.yaml -p CB.tasks.compile
+  -n core_module_compile -f ci_config/rule.yaml -p CB.tasks.compile
 ```
 
 **方法3：修改节点名称**
 ```bash
 # 如果确实需要在pkg层级下，修改节点名称
 python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
-  -n pkg_core_module -f ci_config/rule.yaml
+  -n core_module_pkg -f ci_config/rule.yaml
 # 添加到 CB.tasks.pkg 下
 ```
 
@@ -1077,14 +1077,14 @@ python $CLAUDE_PROJECT_DIR/.claude/skills/new_yaml_node/scripts/create_node.py \
 - 便于依赖关系管理
 
 **层级与类型对应表：**
-| 层级路径 | 节点名称前缀 | 节点类型 | 典型任务 |
+| 层级路径 | 节点名称后缀 | 节点类型 | 典型任务 |
 |---------|------------|---------|---------|
-| CB.tasks.pkg | pkg_ | pkg | 打包任务 |
-| CB.tasks.compile | compile_ | compile | 编译任务 |
-| CB.tasks.test | test_ | test | 测试任务 |
-| CB.tasks.llt | llt_ | llt | 链接测试任务 |
-| CB.tasks.deploy | deploy_ | deploy | 部署任务 |
-| CB.tasks.misc | misc_ | misc | 其他任务 |
+| CB.tasks.pkg | _pkg | pkg | 打包任务 |
+| CB.tasks.compile | _compile | compile | 编译任务 |
+| CB.tasks.test | _test | test | 测试任务 |
+| CB.tasks.llt | _llt | llt | 链接测试任务 |
+| CB.tasks.deploy | _deploy | deploy | 部署任务 |
+| CB.tasks.misc | _misc | misc | 其他任务 |
 
 ## 九、附录
 
@@ -1118,7 +1118,7 @@ pip install pyyaml
    - 节点路径必须存在（如 CB.tasks.pkg）
 
 3. **类型推断**
-   - 基于节点名前缀自动推断类型
+   - 基于节点名后缀自动推断类型
    - 无法识别的类型默认为 misc
 
 4. **必需配置项**

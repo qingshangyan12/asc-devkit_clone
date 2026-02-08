@@ -103,22 +103,22 @@ class NodeConstructor:
             print(f"规范：必须使用小写字母和下划线，不能以数字开头")
             return False
 
-        # 提取类型前缀
-        for prefix in ['pkg_', 'compile_', 'test_', 'llt_', 'deploy_']:
-            if name.startswith(prefix):
-                self.node_type = prefix[:-1]  # 去掉下划线
-                self.node_name = name[len(prefix):]
+        # 提取类型后缀
+        for suffix in ['_pkg', '_compile', '_test', '_llt', '_deploy']:
+            if name.endswith(suffix):
+                self.node_type = suffix[1:]  # 去掉下划线
+                self.node_name = name[:-len(suffix)]  # 去掉后缀
                 self.suffix = None
                 self.full_name = name
                 return True
 
-        # 没有类型前缀，视为 misc 类型
+        # 没有类型后缀，视为 misc 类型
         self.node_type = 'misc'
         self.node_name = name
         self.suffix = None
         self.full_name = name
 
-        print(f"警告：节点名称缺少类型前缀（pkg/compile/test/llt/deploy），归类为 misc 类型")
+        print(f"警告：节点名称缺少类型后缀（_pkg/_compile/_test/_llt/_deploy），归类为 misc 类型")
         return True
 
     def extract_suffix(self):
@@ -324,7 +324,7 @@ class NodeConstructor:
         """
         验证节点名称与层级的对应关系
 
-        规则：节点名称的前缀必须与层级类型一致
+        规则：节点名称的后缀必须与层级类型一致
 
         Args:
             parent_path: 指定的父路径（可选）
@@ -344,31 +344,31 @@ class NodeConstructor:
         else:
             return False, f"父路径格式不正确：{parent_path}，应为 CB.tasks.<层级类型>"
 
-        # 验证节点名称前缀是否与层级类型匹配
-        node_prefix = self.node_type  # 从节点名称中提取的类型
+        # 验证节点名称后缀是否与层级类型匹配
+        node_suffix_type = self.node_type  # 从节点名称后缀中提取的类型
 
-        if node_prefix == 'misc':
+        if node_suffix_type == 'misc':
             # misc类型的节点可以在任何层级下
             return True, None
 
-        if node_prefix != hierarchy_type:
+        if node_suffix_type != hierarchy_type:
             # 提供清晰的错误信息
             error_msg = (
                 f"节点名称与层级不匹配！\n"
-                f"  节点名称：{self.full_name}（前缀：{node_prefix}）\n"
+                f"  节点名称：{self.full_name}（后缀类型：{node_suffix_type}）\n"
                 f"  父路径：{parent_path}（层级类型：{hierarchy_type}）\n\n"
-                f"规则：节点名称必须以所在层级类型开头\n"
-                f"  正确示例：CB.tasks.{node_prefix}.{node_prefix}_xxx\n"
-                f"  当前路径：CB.tasks.{hierarchy_type}.{node_prefix}_xxx\n\n"
+                f"规则：节点名称必须以所在层级类型结尾（_<层级类型>）\n"
+                f"  正确示例：CB.tasks.{hierarchy_type}.xxx_{hierarchy_type}\n"
+                f"  当前路径：CB.tasks.{hierarchy_type}.{self.full_name}\n\n"
                 f"建议：\n"
             )
 
             # 根据层级类型提供具体建议
             if hierarchy_type in ['pkg', 'compile', 'test', 'llt', 'deploy']:
-                error_msg += f"  1. 将节点放到 CB.tasks.{node_prefix} 层级下\n"
-                error_msg += f"  2. 或修改节点名称为 {hierarchy_type}_{self.node_name}"
+                error_msg += f"  1. 将节点放到 CB.tasks.{node_suffix_type} 层级下\n"
+                error_msg += f"  2. 或修改节点名称为 {self.node_name}_{hierarchy_type}"
             else:
-                error_msg += f"  1. 将节点放到 CB.tasks.{node_prefix} 层级下\n"
+                error_msg += f"  1. 将节点放到 CB.tasks.{node_suffix_type} 层级下\n"
                 error_msg += f"  2. 或修改节点名称以匹配层级类型"
 
             return False, error_msg
@@ -409,7 +409,7 @@ class NodeConstructor:
             return False
 
         print(f"\n[√] 层级验证通过")
-        print(f"  节点名称前缀：{self.node_type}")
+        print(f"  节点名称后缀类型：{self.node_type}")
         print(f"  父层级类型：{parent_path.split('.')[2] if len(parent_path.split('.')) >= 3 else '未知'}")
         print(f"  ✓ 匹配正确")
 
