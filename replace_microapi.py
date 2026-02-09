@@ -77,13 +77,6 @@ def collect_files(root_dirs, exts):
     return files
 
 
-def backup_file(path, bak_suffix):
-    """生成备份（同名+bak_suffix），覆盖同名旧备份"""
-    bak_path = path.with_name(path.name + bak_suffix)
-    shutil.move(path, bak_path)
-    return bak_path
-
-
 def replace_in_file(path, old, new, *, dry_run, bak_suffix, encoding):
     """读取、替换、写回（或仅打印）"""
     try:
@@ -107,9 +100,6 @@ def replace_in_file(path, old, new, *, dry_run, bak_suffix, encoding):
         print(f"    ...{before}....")
         print(f"=>    ...{after}....")
         return
-
-    # 正式写回前先备份
-    #backup_file(path, bak_suffix)
 
     try:
         path.write_text(new_text, encoding=encoding)

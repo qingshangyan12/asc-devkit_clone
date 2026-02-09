@@ -24,7 +24,6 @@
 #include "stub_def.h"
 #endif
 
-using namespace MicroAPI = Reg;
 #include "kernel_micro_utils.h"
 #include "kernel_micro_maskreg_intf.h"
 #include "kernel_micro_common_intf.h"
@@ -46,5 +45,6 @@ using namespace MicroAPI = Reg;
 #include "kernel_micro_vec_vconv_intf.h"
 #include "kernel_micro_vec_fused_intf.h"
 #include "kernel_micro_histograms_intf.h"
+using namespace MicroAPI = Reg;
 #endif
 #endif // ASCENDC_MODULE_MICRO_INTERFACE_H
