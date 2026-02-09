@@ -21,7 +21,6 @@ protected:
 
 TEST_F(Tensor_Api_Atom, CopyGM2L1Operation)
 {
-    using namespace AscendC;
     using namespace AscendC::Std;
     using namespace AscendC::Te;
 
@@ -55,7 +54,7 @@ TEST_F(Tensor_Api_Atom, CopyGM2L1Operation)
 
 TEST_F(Tensor_Api_Atom, CopyL12L0Operation)
 {
-    using namespace AscendC;
+    using namespace AscendC::Te;
     using namespace AscendC::Std;
     using namespace AscendC::Te;
 
@@ -104,7 +103,7 @@ TEST_F(Tensor_Api_Atom, CopyL12L0Operation)
 
 TEST_F(Tensor_Api_Atom, CopyL0C2GMOperation)
 {
-    using namespace AscendC;
+    using namespace AscendC::Te;
     using namespace AscendC::Std;
     using namespace AscendC::Te;
 
