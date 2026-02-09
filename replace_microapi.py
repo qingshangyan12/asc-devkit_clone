@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-replace_microcpi.py
+replace_microapi.py
 
 批量把文件中的字符串"MicroAPI"替换为"Reg"
 - 递归遍历目录
@@ -11,8 +11,8 @@ replace_microcpi.py
 - 支持dry-run（仅打印要改动的文件/行，不实际写入）
 
 使用示例：
-    python replace_microcpi.py -d ./src
-    python replace_microcpi.py -d ./src -e .cpp .h .py .txt --dry-run
+    python replace_microapi.py -d ./src
+    python replace_microapi.py -d ./src -e .cpp .h .py .txt --dry-run
 """
 
 import argparse
@@ -30,35 +30,35 @@ DEFAULT_EXTS = [".c", ".cpp", ".h", ".py"]
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="批量把MicroAPI替换为Reg"，
-        formatter_calss=argparse.ArgumentDefalutHelpFormatter,
+        description="批量把MicroAPI替换为Reg",
+        formatter_class=argparse.ArgumentDefalutHelpFormatter,
     )
     parser.add_argument(
         "-d", "--dir",
         nargs="+",
         required=True,
-        help="要搜索的根目录（可一次写多个）"，
+        help="要搜索的根目录（可一次写多个）",
     )
     parser.add_argument(
         "-e", "--ext",
         nargs="+",
-        required=DEFAULT_EXTS,
-        help="要处理的文件后缀（包括点号），如.c .h .py"，
+        default=DEFAULT_EXTS,
+        help="要处理的文件后缀（包括点号），如.c .h .py",
     )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="仅显示将要修改的文件/行，不实际写入"，
+        help="仅显示将要修改的文件/行，不实际写入",
     )
     parser.add_argument(
         "--bak-suffix",
-        default=".bak"
-        help="备份文件的后缀名（默认.bak）"，
+        default=".bak",
+        help="备份文件的后缀名（默认.bak）",
     )
     parser.add_argument(
         "--encoding",
         default="utf-8"
-        help="文件读取写入时的字符编码"，
+        help="文件读取/写入时的字符编码",
     )
     return parser.parse_args()
 
@@ -100,13 +100,15 @@ def replace_in_file(path, old, new, *, dry_run, bak_suffix, encoding):
 
     if dry_run:
         print(f"[DRY-RUN] {path} -> 将替换成 {count} 处")
+        # 简单答应前后差异（只展示第一处出现的位置）
         idx = text.find(old)
         before = text[max(0, idx - 30): idx + 30].replace("\n", "->")
         after = new_text[max(0, idx - 30): idx + 30].replace("\n", "->")
         print(f"    ...{before}....")
-        print(f"    ...{after}....")
+        print(f"=>    ...{after}....")
         return
 
+    # 正式写回前先备份
     backup_file(path, bak_suffix)
 
     try:
@@ -117,12 +119,12 @@ def replace_in_file(path, old, new, *, dry_run, bak_suffix, encoding):
 
 
 def main():
-    args = parse_arg()
-    exts = [e.lower() if e.startswith(".") else f".{e.lower()}" fir e in args.ext]
+    args = parse_args()
+    exts = [e.lower() if e.startswith(".") else f".{e.lower()}" for e in args.ext]
 
     files = collect_files(args.dir, exts)
     if not files:
-        print("[INFO]未找到匹配文件")
+        print("[INFO]未找到匹配的文件")
         return
     
     print(f"[INFO]共发现{len(files)}个文件，将把\"MicroAPI\"替换为\"Reg\"...")
@@ -131,7 +133,7 @@ def main():
         replace_in_file(
             f,
             old="MicroAPI",
-            mew="Reg",
+            new="Reg",
             dry_run=args.dry_run,
             bak_suffix=args.bak_suffix,
             encoding=args.encoding,
