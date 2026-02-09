@@ -25,11 +25,11 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_pair_reduce_sum_impl(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride,
+__aicore__ inline void asc_pair_reduce_sum_impl(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride,
                                                 uint16_t src_block_stride, uint16_t src_repeat_stride)
 {
     if ASC_IS_AIV {
-        vcpadd(dst, src, repeat, dst_block_stride, src_block_stride, src_repeat_stride);
+        vcpadd(dst, src, repeat, dst_repeat_stride, src_block_stride, src_repeat_stride);
     }
 }
 
@@ -49,11 +49,11 @@ __aicore__ inline void asc_pair_reduce_sum_sync_impl(__ubuf__ half* dst, __ubuf_
 }
 
 
-__aicore__ inline void asc_pair_reduce_sum_impl(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride,
+__aicore__ inline void asc_pair_reduce_sum_impl(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride,
                                                 uint16_t src_block_stride, uint16_t src_repeat_stride)
 {
     if ASC_IS_AIV {
-        vcpadd(dst, src, repeat, dst_block_stride, src_block_stride, src_repeat_stride);
+        vcpadd(dst, src, repeat, dst_repeat_stride, src_block_stride, src_repeat_stride);
     }
 }
 
