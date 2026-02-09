@@ -17,9 +17,9 @@
 #include "include/experimental/tensor_api/tensor/make.h"
 
 namespace AscendC {
-namespace TensorInternal {
+namespace Te {
 
-class MmadGenParams
+class MmadGenParams2201
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S>
@@ -112,7 +112,7 @@ private:
     }
 };
 
-class MmadCore
+class MmadCore2201
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, size_t... Is>
@@ -134,7 +134,7 @@ private:
     }
 };
 
-class MmadFourDim2201 : public MmadCore, public MmadGenParams
+class MmadFourDim2201 : public MmadCore2201, public MmadGenParams2201
 {
 public:
     template <const MmadTrait& trait, typename ...Args>
@@ -144,7 +144,7 @@ public:
         Mmad<trait>(args..., params, tuple_sequence<decltype(params)>{});
     }
 };
-} // namespace TensorInternal
+} // namespace Te
 } // namespace AscendC
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_FOUR_DIM_2201_H

@@ -18,9 +18,9 @@
 #include "include/experimental/tensor_api/tensor/make.h"
 
 namespace AscendC {
-namespace TensorInternal {
+namespace Te {
 
-class MmadWithBiasGenParams
+class MmadWithBiasGenParams2201
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
@@ -148,7 +148,7 @@ private:
     }
 };
 
-class MmadWithBiasCore
+class MmadWithBiasCore2201
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename K, size_t... Is>
@@ -171,7 +171,7 @@ private:
     }
 };
 
-class MmadWithBiasFourDim2201 : public MmadWithBiasCore, public MmadWithBiasGenParams
+class MmadWithBiasFourDim2201 : public MmadWithBiasCore2201, public MmadWithBiasGenParams2201
 {
 public:
     template <const MmadTrait& trait, typename ...Args>
@@ -181,7 +181,7 @@ public:
         Mmad<trait>(args..., params, tuple_sequence<decltype(params)>{});
     }
 };
-} // namespace TensorInternal
+} // namespace Te
 } // namespace AscendC
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_WITH_BIAS_FOUR_DIM_2201_H
