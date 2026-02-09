@@ -12,7 +12,7 @@
 #define ASCENDC_MODULE_OPERATOR_ATOMIC_IMPL_H
 
 namespace AscendC {
-// atomic_add
+// 
 template <typename T>
 __aicore__ inline T AtomicAddImpl(__gm__ T *address, T value)
 {
