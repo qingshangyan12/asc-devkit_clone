@@ -27,6 +27,6 @@ protected:
 TEST_F(TestGetSsbufBaseAddr, GetSsbufBaseAddrMIXMode)
 {
     void* ssbufAddr = AscendC::GetSsbufBaseAddr();
-    EXPECT_EQ(ssbufAddr, reinterpret_cast<void*>(ConstDefiner::Instance().cpuSSbuf));
+    EXPECT_EQ(ssbufAddr, reinterpret_cast<void*>(AscendC::ConstDefiner::Instance().cpuSSbuf));
 }
 }
