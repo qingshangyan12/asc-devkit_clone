@@ -75,11 +75,7 @@ struct IterAdaptor
 private:
     iterator ptr; // u8*
 };
-} // namespace Te
-} // namespace AscendC
 
-namespace AscendC {
-namespace Te {
 template <Hardware hPos, typename Pointer>
 struct HardwareMemPtr : IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>> {
     using IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>>::IterAdaptor;

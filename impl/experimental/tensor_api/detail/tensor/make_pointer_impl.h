@@ -29,12 +29,8 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
         return HardwareMemPtr<hardPos, Iterator>{iter};
     }
 }
-} // namespace Te
-} // namespace AscendC
 
 // make_pointer.h
-namespace AscendC {
-namespace Te {
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter) {
     return MakeMemPtr<Hardware::GM, Iterator>(iter);

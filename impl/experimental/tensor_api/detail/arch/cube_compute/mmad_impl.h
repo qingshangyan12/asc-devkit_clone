@@ -44,6 +44,6 @@ Mmad(const T& dst, const U& fm, const S& filter, const V& bias)
       CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
    Tensor2Tensor{}.template Run<trait>(dst, fm, filter, bias);
 }
-} // // namespace Te
+} // namespace Te
 } // namespace AscendC
 #endif // IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_IMPL_H

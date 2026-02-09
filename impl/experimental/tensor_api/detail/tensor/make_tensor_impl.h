@@ -49,12 +49,8 @@ __aicore__ inline constexpr auto MakeTensorImpl(const Iterator& iter, const Args
     static_assert(!(HasDereference<Args>::value && ...), "Expected layout args... in MakeLocalTensor(iter, args...)");
     return MakeLocalTensor<Iterator>{}(iter, args...);
 }
-} // namespace Te
-} // namespace AscendC
 
 // make_tensor.h
-namespace AscendC {
-namespace Te {
 template <typename Iterator, typename... Args>
 __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
 {

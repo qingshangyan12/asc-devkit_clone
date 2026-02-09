@@ -60,13 +60,8 @@ __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
     }
     return (num1 + num2 - 1) / num2;
 }
-} // namespace Te
-} // namespace AscendC
-
 
 // make_tuple.h
-namespace AscendC {
-namespace Te {
 struct MultipliesUnaryLeftFold {
     template <typename... T>
     __aicore__ inline constexpr auto operator()(T&&... t) const {
@@ -208,14 +203,8 @@ __aicore__ inline constexpr auto GetCapacity(const Shape& shape, const Stride& s
         return shape * stride;
     }
 }
-} // namespace Te
-} // namespace AscendC
-
 
 // static_layout_size.h
-namespace AscendC {
-namespace Te {
-
 template <typename T>
 struct nesting_depth {
     static constexpr size_t value = 1;
@@ -300,6 +289,7 @@ private:
 public:
     static constexpr size_t size = GetStaticLayoutSize();
 };
+
 } // namespace Te
 } // namespace AscendC
 

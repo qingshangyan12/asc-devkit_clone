@@ -331,13 +331,9 @@ template <typename T, size_t row, size_t column>
 using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRACTAL_FIXED * column>>,
     Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
 
-} // namespace Te
-} // namespace AscendC
+
 
 // make_coord_impl.h
-namespace AscendC {
-namespace Te
-{
 template <typename T, typename U, typename S>
 __aicore__ inline constexpr auto Crd2IdxImpl(const T& coord, const U& shape, const S& stride);
 
@@ -392,13 +388,8 @@ __aicore__ inline constexpr auto Crd2IdxImpl(const T& coord, const Layout<U, S>&
 {
     return Crd2IdxImpl(coord, layout.Shape(), layout.Stride());
 }
-} // namespace Te
-} // namespace AscendC
 
 // make_layout.h
-namespace AscendC {
-namespace Te {
-
 template <typename... Ts>
 __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
 {
@@ -525,13 +516,7 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, con
     return Crd2IdxImpl(coord, shape, stride);
 }
 
-} // namespace Te
-} // namespace AscendC
-
 // make_fractal.h
-namespace AscendC {
-namespace Te {
-
 template <typename T>
 __aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column) {
     return MakeLayoutForNZ<T>(row, column);
