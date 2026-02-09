@@ -60,6 +60,7 @@ constexpr int32_t g_coreType = MIX;
 #define ASCEND_IS_AIC constexpr(g_coreType == AIC)
 #define ASCEND_IS_NOT_AIV constexpr(g_coreType != AIV)
 #define ASCEND_IS_NOT_AIC constexpr(g_coreType != AIC)
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_UTILS_MACROS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

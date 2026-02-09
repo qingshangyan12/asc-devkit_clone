@@ -98,6 +98,9 @@ __aicore__ inline uint32_t get_cstring_len(__gm__ const char* s)
 
 __aicore__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
 {
+    if (b == 0) {
+        return;
+    }
     return (a + b - 1) / b;
 }
 
@@ -110,33 +113,6 @@ __aicore__ inline void sync_all()
 {
     sync_all_impl();
 }
-
-// template<typename T>
-// __aicore__ inline void mem_copy_cbuf_to_gm(__gm__ T* dst, __cc__ T* src, const uint32_t& len)
-// {
-//     if (dst == nullptr || src == nullptr) {
-//         return;
-//     }
-//     mem_copy_cbuf_to_gm_impl(dst, src, len);
-// }
-
-// template<typename T>
-// __aicore__ inline void mem_copy_l1buf_to_gm(__gm__ T* dst, __cbuf__ T* src, const uint32_t& len)
-// {
-//     if (dst == nullptr || src == nullptr) {
-//         return;
-//     }
-//     mem_copy_l1buf_to_gm_impl(dst, src, len);
-// }
-
-// template<typename T>
-// __aicore__ inline void mem_copy_ub_to_gm(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
-// {
-//     if (dst == nullptr || src == nullptr) {
-//         return;
-//     }
-//     mem_copy_ub_to_gm_impl(dst, src, len);
-// }
 
 __aicore__ inline void mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
 {
