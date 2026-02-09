@@ -27,14 +27,14 @@ void asc_sync_block_arrive_stub(pipe_t pipe, uint64_t config)
 }
 }
 
-TEST_F(estSyncBlkArrive, sync_block_arrive_Succ)
+TEST_F(TestSyncBlkArrive, sync_block_arrive_Succ)
 {
     uint64_t config = 33;
-    pipe_t pipe =PIPE_S;
+    pipe_t pipe = PIPE_S;
     MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))
             .times(1)
             .will(invoke(asc_sync_block_arrive_stub));
 
-    aasc_sync_block_arrive(pipe, config);
+    asc_sync_block_arrive(pipe, config);
     GlobalMockObject::verify();
 }
