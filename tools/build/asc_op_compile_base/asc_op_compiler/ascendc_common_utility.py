@@ -301,7 +301,7 @@ class CommonUtility:
                 del cmd[cmd.index("-g")]
                 cmd_str = ' '.join(cmd)
                 cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
-        with open(cmd_file, 'w') as f:
+                with open(cmd_file, 'w') as f:
                     f.write(cmd_str)
                 os.chmod(cmd_file, 0o755)
                 proc_now = subprocess.Popen(
