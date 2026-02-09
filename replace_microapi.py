@@ -16,7 +16,7 @@ replace_microapi.py
 """
 
 import argparse
-import patchlib
+import pathlib
 import shutil
 import sys
 
@@ -80,7 +80,7 @@ def collect_files(root_dirs, exts):
 def backup_file(path, bak_suffix):
     """生成备份（同名+bak_suffix），覆盖同名旧备份"""
     bak_path = path.with_name(path.name + bak_suffix)
-    shutil.copy2(path, bak_path)
+    shutil.move(path, bak_path)
     return bak_path
 
 
@@ -109,7 +109,7 @@ def replace_in_file(path, old, new, *, dry_run, bak_suffix, encoding):
         return
 
     # 正式写回前先备份
-    backup_file(path, bak_suffix)
+    #backup_file(path, bak_suffix)
 
     try:
         path.write_text(new_text, encoding=encoding)

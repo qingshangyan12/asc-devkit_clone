@@ -18,7 +18,7 @@
 #include "../../basic_api/utils/kernel_utils_macros.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T> struct TypeGet;
 
 template <> struct TypeGet<uint64_t> {
@@ -60,6 +60,6 @@ template <> struct TypeGet<bool> {
 template <> struct TypeGet<int4x2_t> {
     using T = vector_s4x2;
 };
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_DATATYPE_IMPL_H

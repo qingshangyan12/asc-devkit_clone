@@ -19,7 +19,7 @@
 #include "../../../include/utils/std/type_traits.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 namespace Internal {
 __aicore__ inline constexpr SqrtSpecificMode GetSqrtSpecificMode(MaskMergeMode mrgMode)
 {
@@ -210,9 +210,9 @@ __simd_callee__ inline void LogXImpl(RegTensor<half> &dstReg, RegTensor<half> &s
     vector_bool MaskLow;
     vector_bool MaskHigh;
     vector_f16 tmpReg;
-    constexpr auto patAll = std::integral_constant<::Pat, static_cast<::Pat>(MicroAPI::MaskPattern::ALL)>();
+    constexpr auto patAll = std::integral_constant<::Pat, static_cast<::Pat>(Reg::MaskPattern::ALL)>();
     vector_bool maskAll = pset_b32(patAll);
-    constexpr auto patVal = std::integral_constant<::Pat, static_cast<::Pat>(MicroAPI::MaskPattern::H)>();
+    constexpr auto patVal = std::integral_constant<::Pat, static_cast<::Pat>(Reg::MaskPattern::H)>();
     vector_bool selMask = pset_b16(patVal);
     constexpr auto partModeEvenVal = std::integral_constant<::Part, static_cast<::Part>(RegLayout::ZERO)>();
     constexpr auto satModeValue =
@@ -307,6 +307,6 @@ __simd_callee__ inline void NotImpl(U &dstReg, U &srcReg, MaskReg &mask)
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vnot(dstReg, srcReg, mask, modeValue);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_SINGLE_IMPL_H

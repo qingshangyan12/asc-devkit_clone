@@ -19,7 +19,7 @@
 #include "kernel_micro_utils.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename U>
 __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask);
 
@@ -34,7 +34,7 @@ __simd_callee__ inline void ClearSpr();
 
 template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
 __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg);
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_gather_mask_intf_impl.h"

@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 
 template <typename T>
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0)
@@ -53,7 +53,7 @@ __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, 
 {
     return CreateAddrRegImpl<T>(index0, stride0, index1, stride1, index2, stride2, index3, stride3);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_ADDRREG_INTERFACE_IMPL_H

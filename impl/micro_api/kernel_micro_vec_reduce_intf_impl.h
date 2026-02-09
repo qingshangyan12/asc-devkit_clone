@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
           typename S, typename V>
 __simd_callee__ inline void ReduceSum(S& dstReg, V srcReg, MaskReg mask)
@@ -101,7 +101,7 @@ __simd_callee__ inline void PairReduceElem(U& dstReg, U srcReg, MaskReg mask)
         PairReduceSumImpl<T, mode, U>(dstReg, srcReg, mask);
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_VEC_REDUCE_INTERFACE_IMPL_H

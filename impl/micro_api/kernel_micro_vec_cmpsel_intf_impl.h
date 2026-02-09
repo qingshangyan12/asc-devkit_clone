@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, CMPMODE mode, typename U>
 __simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
@@ -49,7 +49,7 @@ __simd_callee__ inline void Select(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 {
     SelectImpl<T, U>(dstReg, srcReg0, srcReg1, mask);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_VEC_CMPSEL_INTERFACE_IMPL_H

@@ -19,7 +19,7 @@
 #include "kernel_micro_utils.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U, typename S>
 __simd_callee__ inline void Duplicate(S& dstReg, U scalarValue);
 
@@ -35,7 +35,7 @@ __simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& sr
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1);
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_vec_duplicate_intf_impl.h"

@@ -24,6 +24,7 @@
 #include "stub_def.h"
 #endif
 
+using namespace MicroAPI = Reg;
 #include "kernel_micro_utils.h"
 #include "kernel_micro_maskreg_intf.h"
 #include "kernel_micro_common_intf.h"
