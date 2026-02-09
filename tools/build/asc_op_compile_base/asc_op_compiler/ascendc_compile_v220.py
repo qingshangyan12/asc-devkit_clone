@@ -643,8 +643,7 @@ def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
         if 'vec' in arch and params.no_kfc_server_flag:
             compile_cmd += [f"-D__NO_KFC_SERVER__"]
         CommonUtility.dump_compile_log(compile_cmd, CompileStage.INFERCHANNEL, params.compile_log_path)
-        for i in range(len(compile_cmd)):
-            compile_cmd[i] = replace_env_vars(compile_cmd[i])
+        compile_cmd = [replace_env_vars(item) for item in compile_cmd]
         proc = subprocess.Popen(	 
             compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()

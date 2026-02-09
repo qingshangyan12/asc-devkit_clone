@@ -216,8 +216,7 @@ class CommonUtility:
         cmd.append("-mllvm")
         cmd.append("-disable-lsr")
         cmd.append("-fno-unroll-loops")
-        for i in range(len(cmd)):
-            cmd[i] = replace_env_vars(cmd[i])
+        cmd = [replace_env_vars(item) for item in cmd]
         proc = subprocess.Popen(	 
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
@@ -259,8 +258,7 @@ class CommonUtility:
         elif global_var_storage.get_variable("ascendc_short_soc_version") == ASCEND_310:
             cmd.insert(5, "-mllvm")
             cmd.insert(6, "-cce-aicore-function-stack-size=8192")
-        for i in range(len(cmd)):
-            cmd[i] = replace_env_vars(cmd[i])
+        cmd = [replace_env_vars(item) for item in cmd]
         proc = subprocess.Popen(	 
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
@@ -288,8 +286,7 @@ class CommonUtility:
         returncode : int
             success or fail
         """
-        for i in range(len(cmd)):
-            cmd[i] = replace_env_vars(cmd[i])
+        cmd = [replace_env_vars(item) for item in cmd]
         proc = subprocess.Popen(	 
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
@@ -299,8 +296,7 @@ class CommonUtility:
                 switching_compilation_mode()
                 cmd[cmd.index("-O0")] = "-O2"
                 del cmd[cmd.index("-g")]
-                for i in range(len(cmd)):
-                    cmd[i] = replace_env_vars(cmd[i])
+                cmd = [replace_env_vars(item) for item in cmd]
                 proc_now = subprocess.Popen(	 
                     cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 (out, _) = proc_now.communicate()
