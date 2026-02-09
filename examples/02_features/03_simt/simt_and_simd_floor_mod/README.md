@@ -1,7 +1,7 @@
-# SIMT与SIMD新同构编程实现gather & adds算子样例
+# SIMT与SIMD新同构编程实现floor_mod算子样例
 
 ## 概述
-本样例以实现floor mod功能的算子为例，展示了SIMT和SIMD混合编程的算子开发方式。算子中使用SIMD完成数据搬入搬出，数据类型为float场景使用SIMD完成计算逻辑， 而int32_t场景则使用SIMT完成计算功能，提升整型场景性能。
+本样例以实现floor_mod功能的算子为例，展示了SIMT和SIMD混合编程的算子开发方式。算子中使用SIMD完成数据搬入搬出，数据类型为float场景使用SIMD完成计算逻辑， 而int32_t场景则使用SIMT完成计算功能，提升整型场景性能。
 
 
 ## 支持的产品
