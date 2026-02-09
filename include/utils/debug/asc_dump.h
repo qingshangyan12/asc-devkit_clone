@@ -23,19 +23,6 @@
 
 // #include "debug/asc_aicore_dump_impl.h"
 
-// namespace __asc_aicore {
-// template<typename T>
-// __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dump_size);
-
-// template<typename T>
-// __aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size);
-
-// template<typename T>
-// __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dump_size);
-
-// template<typename T>
-// __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dump_size);
-// }
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DUMP_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
