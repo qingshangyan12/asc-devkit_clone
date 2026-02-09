@@ -29,11 +29,11 @@ void asc_sync_block_wait_stub(int64_t flagID)
 
 TEST_F(TestSyncBlkWait, sync_block_arrive_Succ)
 {
-    int64_t config = 33;
+    int64_t flagID = 33;
     MOCKER_CPP(wait_flag_dev, void(int64_t))
             .times(1)
             .will(invoke(asc_sync_block_wait_stub));
 
-    asc_sync_block_wait(flahID);
+    asc_sync_block_wait(flagID);
     GlobalMockObject::verify();
 }

@@ -21,7 +21,7 @@ protected:
 };
 
 namespace {   
-void asc_set_ffts_base_addr_stub(uint64_t)
+void asc_set_ffts_base_addr_stub(uint64_t config)
 {
     EXPECT_EQ(33U, config);
 }
@@ -30,7 +30,7 @@ void asc_set_ffts_base_addr_stub(uint64_t)
 TEST_F(TestSetFftsBaseAddr, asc_set_ffts_base_addr_Succ)
 {
     uint64_t config = 33;
-    MOCKER_CPP(set_ffts_base_addr, void(uint4_t config))
+    MOCKER_CPP(set_ffts_base_addr, void(uint64_t))
             .times(1)
             .will(invoke(asc_set_ffts_base_addr_stub));
 
