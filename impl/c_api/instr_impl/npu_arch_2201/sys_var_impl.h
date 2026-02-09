@@ -31,6 +31,7 @@
 #include "sys_var_impl/asc_get_arch_ver_impl.h"
 #include "sys_var_impl/get_program_counter_impl.h"
 #include "sys_var_impl/asc_get_ffts_base_addr_impl.h"
+#include "sys_var_impl/asc_set_ffts_base_addr_impl.h"
 
 __aicore__ inline int64_t asc_get_core_id()
 {
@@ -95,6 +96,11 @@ __aicore__ inline int64_t asc_get_program_counter()
 __aicore__ inline int64_t asc_get_ffts_base_addr()
 {
     return asc_get_ffts_base_addr_impl();
+}
+
+__aicore__ inline void asc_set_ffts_base_addr(uint64_t config)
+{
+    asc_set_ffts_base_addr_impl(config);
 }
 
 #endif

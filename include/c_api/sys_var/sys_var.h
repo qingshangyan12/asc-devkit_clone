@@ -49,6 +49,8 @@ __simd_callee__ inline int64_t asc_get_ar_spr();
 
 __aicore__ inline int64_t asc_get_ffts_base_addr();
 
+__aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
+
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
 
 #include "instr_impl/npu_arch_3510/sys_var_impl.h"
