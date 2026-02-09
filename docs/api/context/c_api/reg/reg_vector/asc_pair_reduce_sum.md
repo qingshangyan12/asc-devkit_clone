@@ -1,10 +1,10 @@
-# asc_pair_reduce_sum_reg
+# asc_pair_reduce_sum
 
 ## 产品支持情况
 
 | 产品     | 是否支持 |
 | ----------- |:----:|
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
@@ -40,6 +40,8 @@ PairReduceSum: 相邻两个（奇偶）元素求和，结果写入dst。例如�
 PIPE_V
 
 ## 约束说明
+
+无
 
 ## 调用示例
 
