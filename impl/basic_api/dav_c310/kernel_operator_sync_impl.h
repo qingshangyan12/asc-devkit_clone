@@ -17,6 +17,7 @@
 
 #include "utils/kernel_utils_constants.h"
 #include "kernel_common.h"
+#include "kernel_operator_sync_utils.h"
 
 namespace AscendC {
 __aicore__ inline void ClcSyncCount(__gm__ int32_t* localSyncGM, __ubuf__ int32_t* ubWorkspaceAddr,
