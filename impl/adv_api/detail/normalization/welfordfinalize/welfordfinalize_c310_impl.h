@@ -282,7 +282,7 @@ __aicore__ inline void WelfordFinalizeWithCounts(__ubuf__ float *outMean, __ubuf
         WelfordFinalizeWithCountsOutMeanVF<isReuseSource, config>(outMean, counts, inMean, inVar,
             tmpbuffer, K, sregLower, repeat, m);
         uint32_t k = CalculateMainBlock(K);
-        uint32_t kOverflow = k + 1;
+        uint32_t kOverflow = k < K ? (k << 1) : k;
         BinaryReduceSum(outMean + m, tmpbuffer, sumTmpbuffer, K, k, 1 / (float)kOverflow, para.rRec * kOverflow,
             para.rRecWithCorrection * kOverflow);
         WelfordFinalizeWithCountsOutVarVF<isReuseSource, config>(outMean, counts, inMean, inVar,
