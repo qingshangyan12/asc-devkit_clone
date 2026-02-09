@@ -45,7 +45,7 @@
   </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">c</td><td align="center">M * N</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">tensor_api_matmul</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">tensor_api_matmul_custom</td></tr>
   </table>
 - 算子实现：  
   本样例中实现的是[M, K, N]固定为[128, 128, 128]的Matmul算子。Matmul的计算公式为：C = A * B。  
