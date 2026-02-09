@@ -39,7 +39,7 @@
 #endif
 
 namespace AscendC {
-__aicore__ inline void PrintTimeStamp(uint32_t descId);
+__aicore__ static __attribute__((noinline)) void PrintTimeStamp(uint32_t descId);
 namespace ConstantsInternal {
 const uint32_t FULL_MASK_B32 = 0xffffffff;
 } // namespace ConstantsInternal
