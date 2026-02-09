@@ -19,6 +19,7 @@
 
 namespace AscendC {
 namespace Te {
+namespace Te {
 
 template <typename... Args>
 struct CopyAtom;

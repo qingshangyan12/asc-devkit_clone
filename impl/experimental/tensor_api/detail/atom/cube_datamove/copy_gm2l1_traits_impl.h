@@ -22,6 +22,7 @@
 
 namespace AscendC {
 namespace Te {
+namespace Te {
 
 struct DataCopyTraitDefault {
     using TraitType = DataCopyTrait;
