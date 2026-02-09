@@ -35,6 +35,8 @@ __aicore__ inline void asc_sync();
 
 __aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint64_t config);
 
+__aicore__ inline void asc_sync_block_wait(int64_t flagID);
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  

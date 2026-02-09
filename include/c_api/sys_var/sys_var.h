@@ -45,6 +45,8 @@ __aicore__ inline int64_t asc_get_program_counter();
 
 __aicore__ inline int64_t asc_get_ffts_base_addr();
 
+__aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
