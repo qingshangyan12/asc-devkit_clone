@@ -9,6 +9,7 @@
 | [fixpipe_co12gm_tensor_quantization_s322f16](./fixpipe_co12gm_tensor_quantization_s322f16) | 本样例介绍如何使用基础API Fixpipe将矩阵乘的结果从CO1搬入GM，并使能随路量化将矩阵乘结果由int32_t类型数据量化为half类型 |
 | [fixpipe_co12c1_quantization_s322f16](./fixpipe_co12c1_quantization_s322f16)               | 本样例介绍如何使用基础API Fixpipe将矩阵乘的结果从CO1搬入C1，并使能随路量化将矩阵乘结果由int32_t类型数据量化为half类型 |
 | [fixpipe_co12c1_tensor_quantization_s322f16](./fixpipe_co12c1_tensor_quantization_s322f16) | 本样例介绍如何使用基础API Fixpipe将矩阵乘的结果从CO1搬入C1，并使能随路tensor量化将矩阵乘结果由int32_t类型数据量化为half类型 |
+| [fixpipe_nz2dn_tensor_quantization_f322f16](./fixpipe_nz2dn_tensor_quantization_f322f16)   | 本样例介绍如何使用基础API的Fixpipe将矩阵乘的结果从CO1搬入GM，完成NZ2DN分形转换，并使能随路量化将矩阵乘结果由float类型数据量化为half类型 |
 | [load_data](./load_data)                                                                   | 本样例介绍基于基础API LoadData实现A1至A2和B1至B2的数据搬运，其中A1至A2使用Load3D搬运，B1至B2使用Load2D搬运 |
 | [load_data_with_transpose_b8](./load_data_with_transpose_b8)                               | 本样例介绍基础API LoadDataWithTranspose b8数据类型下的使用 |
 | [load_data_with_transpose_b16](./load_data_with_transpose_b16)                             | 本样例介绍基础API LoadDataWithTranspose b16数据类型下的使用 |
@@ -51,6 +52,7 @@
 | [matmul_mndb](./matmul_mndb)                                                               | 本样例介绍调用Matmul API实现M或N轴方向流水并行的单算子 |
 | [matmul_preload](./matmul_preload)                                                         | 本样例介绍调用Matmul MDL模板实现使能M或N方向预加载功能的单算子 |
 | [matmul_constant](./matmul_constant)                                                       | 本样例介绍调用Matmul MDL模板使能Tiling常量化的单算子 |
+| [matmul_column_major](./matmul_column_major)                                               | 本样例介绍A、B、C矩阵为COLUMN_MAJOR格式排布的矩阵乘的单算子 |
 | [mmad](./mmad)                                                                             | 本样例介绍基于基础API Mmad实现矩阵乘 |
 | [mmad_load3dv2](./mmad_load3dv2)                                                           | 本样例介绍LoadData3DV2指令将A、B矩阵从L1搬运到L0A/L0B的过程，其中 A 和 B 分别表示矩阵乘法的左右输入矩阵。LoadData3DV2指令参数配置及执行指令前后各个矩阵数据排布变化，均配合示意图进行了说明 |
 | [mmad_s8_f16_f32_with_A_B_transpose_option](./mmad_s8_f16_f32_with_A_B_transpose_option)                                                           | 本样例介绍了在 int8_t / half / float 三种数据类型下，以及左、右矩阵均不转置 / 左矩阵不转置、右矩阵转置 / 左矩阵转置、右矩阵不转置 / 左、右矩阵均转置 共 12 种矩阵乘法场景中，相关指令的使用方法，其中 A 和 B 分别表示矩阵乘法的左右输入矩阵。|

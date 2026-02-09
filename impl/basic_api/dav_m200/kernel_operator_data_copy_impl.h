@@ -16,7 +16,9 @@
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #include "kernel_common.h"
 #include "kernel_operator_vec_duplicate_impl.h"
+#include "kernel_operator_vec_binary_scalar_impl.h"
 #include "kernel_struct_unary.h"
+#include "kernel_tpipe.h"
 
 namespace AscendC {
 
@@ -26,6 +28,9 @@ __aicore__ inline void CheckDataCopyParams(uint16_t blockCount, uint16_t blockLe
     ASCENDC_CHECK_VALUE_RANGE(blockCount, 1, UINT12_MAX, "blockCount", "DataCopy");
     ASCENDC_CHECK_VALUE_RANGE(blockLen, 1, UINT16_MAX, "blockLen", "DataCopy");
 }
+
+template <TPosition pos>
+__aicore__ inline uint64_t TransUBAddr(uint64_t addr);
 
 /* **************************************************************************************************
  * DataCopy                                             *
@@ -247,15 +252,15 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ T* dst, __gm__ T* src, co
 
     // tiling limited 8k, use half, 64*64B
     uint16_t highTiling = 64;  // Byte
-    uint16_t witdhTiling = 64; // Byte
+    uint16_t widthTiling = 64; // Byte
     uint16_t highFractal = (nValue * sizeof(T)) / highTiling;
     uint16_t highFractalTail = (nValue * sizeof(T)) % highTiling;
-    uint16_t widthFractal = (dValue * sizeof(T)) / witdhTiling;
-    uint16_t widthFractalTail = (dValue * sizeof(T)) % witdhTiling;
+    uint16_t widthFractal = (dValue * sizeof(T)) / widthTiling;
+    uint16_t widthFractalTail = (dValue * sizeof(T)) % widthTiling;
 
     Nd2NzParams intriParamsBase { ndNum,
         static_cast<uint16_t>(highTiling / sizeof(T)),
-        static_cast<uint16_t>(witdhTiling / sizeof(T)),
+        static_cast<uint16_t>(widthTiling / sizeof(T)),
         srcNdMatrixStride,
         srcDValue,
         dstNzC0Stride,
@@ -265,8 +270,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ T* dst, __gm__ T* src, co
     for (int i = 0; i < highFractal; ++i) {
         for (int j = 0; j < widthFractal; ++j) {
             DataCopyGM2L1ND2NZImplBase(dst + i * (highTiling / sizeof(T)) * (32 / sizeof(T)) +
-                j * witdhTiling * dstNzC0Stride / sizeof(T),
-                src + i * highTiling * srcDValue / sizeof(T) + j * witdhTiling / sizeof(T), intriParamsBase);
+                j * widthTiling * dstNzC0Stride / sizeof(T),
+                src + i * highTiling * srcDValue / sizeof(T) + j * widthTiling / sizeof(T), intriParamsBase);
         }
     }
 
@@ -274,7 +279,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ T* dst, __gm__ T* src, co
     if (highFractalTail) {
         Nd2NzParams intriParamsBase1 { ndNum,
             static_cast<uint16_t>(highFractalTail / sizeof(T)),
-            static_cast<uint16_t>(witdhTiling / sizeof(T)),
+            static_cast<uint16_t>(widthTiling / sizeof(T)),
             srcNdMatrixStride,
             srcDValue,
             dstNzC0Stride,
@@ -283,8 +288,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ T* dst, __gm__ T* src, co
 
         for (int j = 0; j < widthFractal; ++j) {
             DataCopyGM2L1ND2NZImplBase(dst + highFractal * (highTiling / sizeof(T)) * (32 / sizeof(T)) +
-                j * witdhTiling * dstNzC0Stride / sizeof(T),
-                src + highFractal * highTiling * srcDValue / sizeof(T) + j * witdhTiling / sizeof(T), intriParamsBase1);
+                j * widthTiling * dstNzC0Stride / sizeof(T),
+                src + highFractal * highTiling * srcDValue / sizeof(T) + j * widthTiling / sizeof(T), intriParamsBase1);
         }
     }
 
@@ -300,8 +305,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ T* dst, __gm__ T* src, co
 
         for (int i = 0; i < highFractal; ++i) {
             DataCopyGM2L1ND2NZImplBase(dst + i * (highTiling / sizeof(T)) * (32 / sizeof(T)) +
-                widthFractal * witdhTiling * dstNzC0Stride / sizeof(T),
-                src + i * highTiling * srcDValue / sizeof(T) + widthFractal * witdhTiling / sizeof(T),
+                widthFractal * widthTiling * dstNzC0Stride / sizeof(T),
+                src + i * highTiling * srcDValue / sizeof(T) + widthFractal * widthTiling / sizeof(T),
                 intriParamsBase2);
         }
     }
@@ -317,8 +322,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ T* dst, __gm__ T* src, co
             dstNzMatrixStride };
 
         DataCopyGM2L1ND2NZImplBase(dst + highFractal * (highTiling / sizeof(T)) * (32 / sizeof(T)) +
-            widthFractal * witdhTiling * dstNzC0Stride / sizeof(T),
-            src + highFractal * highTiling * srcDValue / sizeof(T) + widthFractal * witdhTiling / sizeof(T),
+            widthFractal * widthTiling * dstNzC0Stride / sizeof(T),
+            src + highFractal * highTiling * srcDValue / sizeof(T) + widthFractal * widthTiling / sizeof(T),
             intriParamsBase2);
     }
 }
@@ -380,7 +385,7 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImpl(__gm__ T* dst, __ubuf__ T* src, co
     ASCENDC_DEBUG_ASSERT(((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE) == 0),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "src address should be 32B aligned \n"));
     ASCENDC_ASSERT((sizeof(T) == sizeof(int16_t) || sizeof(T) == sizeof(int32_t)),
-        {KERNEL_LOG(KERNEL_ERROR, "DataCopy NZ2ND only suppports dtype B16 and B32");});
+        {KERNEL_LOG(KERNEL_ERROR, "DataCopy NZ2ND only supports dtype B16 and B32");});
     uint16_t ndNum = intriParams.ndNum;
     uint16_t nValue = intriParams.nValue;
     uint16_t dValue = intriParams.dValue;

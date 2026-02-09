@@ -17,6 +17,7 @@
 #include "kernel_utils.h"
 #include "kernel_operator_common_impl.h"
 #include "kernel_operator_vec_template_impl.h"
+#include "micro_api/kernel_micro_intf.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -526,7 +527,7 @@ __simd_vf__ inline void GatherbImpl(__ubuf__ T *dst, __ubuf__ T *src, __ubuf__ u
         MicroAPI::LoadAlign(indexReg, srcOffsetLocal + i * DEFAULT_BLK_NUM);
         if constexpr (sizeof(T) == 8) {
             // pg is the predicate for block index, and regarded as B32 format.
-            // For convinience, we use fullPreg format to represent it.
+            // For convenience, we use fullPreg format to represent it.
             MicroAPI::GatherB(dstReg, src, indexReg, fullPreg);
             MicroAPI::StoreAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY,
                 MicroAPI::PostLiteral::POST_MODE_UPDATE>((__ubuf__ uint32_t *&)dst,

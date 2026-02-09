@@ -18,6 +18,8 @@
 #include "kernel_utils.h"
 #include "kernel_struct_binary.h"
 #include "kernel_struct_unary.h"
+#include "kernel_tpipe.h"
+#include "kernel_common.h"
 
 namespace AscendC {
 /* ***************************************************************************************
@@ -301,7 +303,7 @@ __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ float* src0, __ubuf__
     AscendCUtils::FreeTemporaryBuffer<uint8_t>(tempBuf);
 }
 
-// Compare::Level 0 - mask normaL mode
+// Compare::Level 0 - mask normal mode
 template <typename T = half, typename U, bool isSetMask = true>
 __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ half* src0, __ubuf__ half* src1,
     CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,

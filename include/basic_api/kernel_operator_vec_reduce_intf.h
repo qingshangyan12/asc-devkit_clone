@@ -14,10 +14,14 @@
  */
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_H
-#include "kernel_tensor.h"
 
-#if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "kernel_macros.h"
+#include "kernel_tensor.h"
+#include "utils/kernel_utils_mode.h"
+
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#include <cstdint>
+#include "stub_def.h"
 #endif
 
 namespace AscendC {
@@ -299,8 +303,20 @@ __aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T &maxMinValue
 template <typename T>
 __aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T &maxMinValue);
 
+// GetReduceMaxMinCount has been updated, please use GetReduceRepeatMaxMinSpr instead.
+template <typename T>
+__aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue, T &maxMinIndex);
+
+// GetReduceMaxMinCount has been updated, please use GetReduceRepeatMaxMinSpr instead.
+template <typename T>
+__aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue);
+
 template <typename T>
 __aicore__ inline __inout_pipe__(S) T GetReduceRepeatSumSpr();
+
+// GetAccVal has been updated, please use GetReduceRepeatSumSpr instead.
+template <typename T>
+__aicore__ inline __inout_pipe__(S) T GetAccVal();
 } // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_vec_reduce_intf_impl.h"

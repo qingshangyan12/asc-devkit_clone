@@ -29,6 +29,38 @@
 #define K_MAX_SHAPE_DIM 8
 #endif
 
+constexpr int32_t MIX = 0;
+constexpr int32_t AIC = 1;
+constexpr int32_t AIV = 2;
+
+#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
+#define SPLIT_CORE_CUBE
+#endif
+
+#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
+#define SPLIT_CORE_VEC
+#endif
+
+#if defined(ASCENDC_CPU_DEBUG)
+extern int32_t g_matmulCount;
+extern int32_t g_coreType;
+#define ASCEND_IS_AIV (g_coreType == AIV)
+#define ASCEND_IS_AIC (g_coreType == AIC)
+#define ASCEND_IS_NOT_AIV (g_coreType != AIV)
+#define ASCEND_IS_NOT_AIC (g_coreType != AIC)
+#else
+#if defined(SPLIT_CORE_CUBE)
+constexpr int32_t g_coreType = AIC;
+#elif defined(SPLIT_CORE_VEC)
+constexpr int32_t g_coreType = AIV;
+#else
+constexpr int32_t g_coreType = MIX;
+#endif
+#define ASCEND_IS_AIV constexpr(g_coreType == AIV)
+#define ASCEND_IS_AIC constexpr(g_coreType == AIC)
+#define ASCEND_IS_NOT_AIV constexpr(g_coreType != AIV)
+#define ASCEND_IS_NOT_AIC constexpr(g_coreType != AIC)
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_UTILS_MACROS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_UTILS_MACROS__

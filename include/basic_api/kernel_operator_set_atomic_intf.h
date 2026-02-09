@@ -14,7 +14,12 @@
  */
 #ifndef ASCENDC_MODULE_OPERATOR_SET_ATOMIC_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_SET_ATOMIC_INTERFACE_H
-#include "kernel_tensor.h"
+
+#include "kernel_macros.h"
+
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#include "stub_def.h"
+#endif
 
 namespace AscendC {
 template <typename T>
@@ -24,6 +29,9 @@ template <typename T>
 __aicore__ inline void SetAtomicAdd();
 
 __aicore__ inline void DisableDmaAtomic();
+
+// SetAtomicNone has been updated, please use DisableDmaAtomic instead.
+__aicore__ inline void SetAtomicNone();
 
 template <typename T>
 __aicore__ inline void SetAtomicMax();

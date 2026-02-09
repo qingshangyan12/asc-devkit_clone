@@ -12,6 +12,8 @@ cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
 find_package(tikicpulib REQUIRED)
 
+add_subdirectory(ascendc_header_checker)
+
 set(BASIC_UT_PRODUCT_TYPE_LIST_INIT
     ascend910
     ascend610
@@ -19,13 +21,9 @@ set(BASIC_UT_PRODUCT_TYPE_LIST_INIT
     ascend910B1_AIC
     ascend910B1_AIV
     ascend310B1
-    ascend610Lite
     ascend950pr_9599_AIC
     ascend950pr_9599_AIV_BASIC
     ascend950pr_9599_AIV_FRAMEWORK
-    mc62cm12aa_AIC
-    mc62cm12aa_BASIC
-    mc62cm12aa_FRAMEWORK
 )
 set(BASIC_UT_PRODUCT_TYPE_LIST ${BASIC_UT_PRODUCT_TYPE_LIST_INIT} CACHE STRING "Supported product types")
 
