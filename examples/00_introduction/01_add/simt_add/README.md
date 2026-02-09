@@ -1,12 +1,15 @@
 # 纯SIMT编程模式实现Add算子样例
 
 ## 概述
+
 样例基于Ascend C纯SIMT编程方式实现Add算子，实现两个输入张量逐元素相加得到输出张量的功能，展示纯SIMT编程的基本流程。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构
+
 ```
 ├── aimt_add
 │   ├── add.asc             # SIMT实现add调用样例
@@ -16,7 +19,7 @@
 ## 算子描述
 
 - 算子功能：  
-  本add算子实现了形状为48 * 256的2个张量x，y相加得到算子输出z。第i个元素的计算公式为：
+  本算子实现了形状为48 * 256的两个张量x，y相加得到算子输出z。第i个元素的计算公式为：
   
   ```
   z[i] = x[i] + y[i]
@@ -49,6 +52,7 @@
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量   
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
@@ -68,11 +72,11 @@
     ```
     
 - 样例执行  
-```bash
-CANN_PATH=$(printenv ASCEND_HOME_PATH)  # 获取CANN包安装路径
-OUTPUT="demo"               #用户自定义编译生成的二进制文件名称
+  ```bash
+  CANN_PATH=$(printenv ASCEND_HOME_PATH)  # 获取CANN包安装路径
+  OUTPUT="demo"               #用户自定义编译生成的二进制文件名称
 
-bisheng \
+  bisheng \
   -x dpp --cce-aicore-arch=dav-c310-vec \
   -std=c++17 \
    add.asc \
