@@ -23,7 +23,9 @@ protected:
     }
 };
 
-using namespace AscendC;
+using namespace AscendC::Std;
+using namespace AscendC::Te;
+
 enum class CubeFormat {
     ND = 0,
     NZ,
@@ -124,7 +126,7 @@ public:
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
 
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNZLayout<ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
     }
 
@@ -132,12 +134,12 @@ public:
     {
         constexpr static FixpipeTrait trait(static_cast<QuantMode_t>(NoQuant), false, false, 0, 0);
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNZLayout<ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
             auto gmIterator = MakeGMmemPtr(gmC);
-            auto gmMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+            auto gmMatrixLayout = MakeNZLayout<ignore_t>(mLength, nLength);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
             Fixpipe<trait>(gmTensor, l0cTensor);
@@ -156,17 +158,17 @@ public:
     {
         constexpr static FixpipeTrait trait(static_cast<QuantMode_t>(NoQuant), false, false, 0, 0);
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNZLayout<ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
             auto gmIterator = MakeGMmemPtr(gmC);
-            auto gmMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+            auto gmMatrixLayout = MakeNZLayout<ignore_t>(mLength, nLength);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
-            auto coordM = AscendC::Std::Int<0>{};
-            auto coordN = AscendC::Std::Int<0>{};
-            auto coord = AscendC::MakeCoord(coordM, coordN);
+            auto coordM = Int<0>{};
+            auto coordN = Int<0>{};
+            auto coord = MakeCoord(coordM, coordN);
 
             Fixpipe<trait>(gmTensor, l0cTensor, coord);
         } else {
@@ -174,9 +176,9 @@ public:
             auto gmMatrixLayout = MakeRowMajorLayout<DstT>(mLength, nLength);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
-            auto coordM = AscendC::Std::Int<0>{};
-            auto coordN = AscendC::Std::Int<0>{};
-            auto coord = AscendC::MakeCoord(coordM, coordN);
+            auto coordM = Int<0>{};
+            auto coordN = Int<0>{};
+            auto coord = MakeCoord(coordM, coordN);
 
             Fixpipe<trait>(gmTensor, l0cTensor, coord);
         }
@@ -186,7 +188,7 @@ public:
     {
         constexpr static FixpipeTrait trait(static_cast<QuantMode_t>(F322BF16), false, false, 0, 0);
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNZLayout<ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
@@ -210,7 +212,7 @@ public:
     {
         constexpr static FixpipeTrait trait(static_cast<QuantMode_t>(F322BF16), false, false, 0, 0);
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNZLayout<ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
@@ -218,9 +220,9 @@ public:
             auto gmMatrixLayout = MakeNZLayout<DstT>(mLength, nLength);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
-            auto coordM = AscendC::Std::Int<0>{};
-            auto coordN = AscendC::Std::Int<0>{};
-            auto coord = AscendC::MakeCoord(coordM, coordN);
+            auto coordM = Int<0>{};
+            auto coordN = Int<0>{};
+            auto coord = MakeCoord(coordM, coordN);
 
             Fixpipe<trait>(gmTensor, l0cTensor, static_cast<uint64_t>(0), coord);
         } else {
@@ -228,9 +230,9 @@ public:
             auto gmMatrixLayout = MakeRowMajorLayout<DstT>(mLength, nLength);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
-            auto coordM = AscendC::Std::Int<0>{};
-            auto coordN = AscendC::Std::Int<0>{};
-            auto coord = AscendC::MakeCoord(coordM, coordN);
+            auto coordM = Int<0>{};
+            auto coordN = Int<0>{};
+            auto coord = MakeCoord(coordM, coordN);
 
             Fixpipe<trait>(gmTensor, l0cTensor, static_cast<uint64_t>(0), coord);
         }
@@ -244,7 +246,7 @@ public:
 
         constexpr static FixpipeTrait trait(static_cast<QuantMode_t>(VDEQF16), false, false, 0, 0);
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNZLayout<ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
@@ -270,7 +272,7 @@ public:
 
         constexpr static FixpipeTrait trait(static_cast<QuantMode_t>(VDEQF16), false, false, 0, 0);
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNZLayout<Std::ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNZLayout<ignore_t>(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
@@ -278,9 +280,9 @@ public:
             auto gmMatrixLayout = MakeNZLayout<DstT>(mLength, nLength);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
-            auto coordM = AscendC::Std::Int<0>{};
-            auto coordN = AscendC::Std::Int<0>{};
-            auto coord = AscendC::MakeCoord(coordM, coordN);
+            auto coordM = Int<0>{};
+            auto coordN = Int<0>{};
+            auto coord = MakeCoord(coordM, coordN);
 
             Fixpipe<trait>(gmTensor, l0cTensor, qTensor, coord);
         } else {
@@ -288,9 +290,9 @@ public:
             auto gmMatrixLayout = MakeRowMajorLayout<DstT>(mLength, nLength);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
-            auto coordM = AscendC::Std::Int<0>{};
-            auto coordN = AscendC::Std::Int<0>{};
-            auto coord = AscendC::MakeCoord(coordM, coordN);
+            auto coordM = Int<0>{};
+            auto coordN = Int<0>{};
+            auto coord = MakeCoord(coordM, coordN);
 
             Fixpipe<trait>(gmTensor, l0cTensor, qTensor, coord);
         }
@@ -347,7 +349,7 @@ __aicore__ inline void E2eKernel(GM_ADDR aGM, GM_ADDR bGM, GM_ADDR cGM, GM_ADDR 
     int32_t usedCoreNum, int hasBias)
 {
     // cube core cases, ignore vector core
-    if (g_coreType == AIV) {
+    if (g_coreType == AscendC::AIV) {
         return;
     }
 
