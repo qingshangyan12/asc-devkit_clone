@@ -31,7 +31,7 @@ DEFAULT_EXTS = [".c", ".cpp", ".h", ".py"]
 def parse_args():
     parser = argparse.ArgumentParser(
         description="批量把MicroAPI替换为Reg",
-        formatter_class=argparse.ArgumentDefalutHelpFormatter,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "-d", "--dir",
@@ -57,7 +57,7 @@ def parse_args():
     )
     parser.add_argument(
         "--encoding",
-        default="utf-8"
+        default="utf-8",
         help="文件读取/写入时的字符编码",
     )
     return parser.parse_args()
@@ -99,8 +99,8 @@ def replace_in_file(path, old, new, *, dry_run, bak_suffix, encoding):
     count = text.count(old)
 
     if dry_run:
-        print(f"[DRY-RUN] {path} -> 将替换成 {count} 处")
-        # 简单答应前后差异（只展示第一处出现的位置）
+        print(f"[DRY-RUN] {path} -> 将替换 {count} 处")
+        # 简单打印前后差异（只展示第一处出现的位置）
         idx = text.find(old)
         before = text[max(0, idx - 30): idx + 30].replace("\n", "->")
         after = new_text[max(0, idx - 30): idx + 30].replace("\n", "->")
