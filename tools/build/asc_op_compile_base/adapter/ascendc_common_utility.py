@@ -93,6 +93,18 @@ def _trans_compile_cmds_to_precompile(cmds_i: list):
     cmds_i.insert(compiler_index + 1, '-E')
 
 
+def replace_env_vars(input_str):
+    pattern = r'\$\{([^}]+)\}|\$([A-Za-z0-9_]+)'
+    
+    def replace_match(match):
+        var_name = match.group(1) or match.group(2)
+        if var_name not in os.environ:
+            LogUtil.print_compile_log("", f"{var_name} does not exist.", AscendCLogLevel.LOG_WARNING)
+        return os.environ[var_name]
+
+    return re.sub(pattern, replace_match, input_str)
+
+
 def _trans_compile_cmds_to_assemble(cmds_s: list):
     if len(cmds_s) < 2:
         raise Exception(f"invalid compile cmds = {cmds_s}")
@@ -204,15 +216,10 @@ class CommonUtility:
         cmd.append("-mllvm")
         cmd.append("-disable-lsr")
         cmd.append("-fno-unroll-loops")
-        cmd_str = ' '.join(cmd)
-        with open('tmp_run_cmd.sh', 'w') as f:
-            f.write(cmd_str)
-        os.chmod('tmp_run_cmd.sh', 0o755)
-        try:
-            proc = subprocess.Popen(
-                ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        finally:
-            os.remove('tmp_run_cmd.sh')
+        for i in range(len(cmd)):
+            cmd[i] = replace_env_vars(cmd[i])
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         return out, proc.returncode
 
@@ -252,15 +259,10 @@ class CommonUtility:
         elif global_var_storage.get_variable("ascendc_short_soc_version") == ASCEND_310:
             cmd.insert(5, "-mllvm")
             cmd.insert(6, "-cce-aicore-function-stack-size=8192")
-        cmd_str = ' '.join(cmd)
-        with open('tmp_run_cmd.sh', 'w') as f:
-            f.write(cmd_str)
-        os.chmod('tmp_run_cmd.sh', 0o755)
-        try:
-            proc = subprocess.Popen(
-                ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        finally:
-            os.remove('tmp_run_cmd.sh')
+        for i in range(len(cmd)):
+            cmd[i] = replace_env_vars(cmd[i])
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         if proc.returncode != 0:
             (out, retcode) = CommonUtility.run_cmd_stack_spill_case_ascendc(cmd, cmd_type, cce_file)
@@ -287,14 +289,10 @@ class CommonUtility:
             success or fail
         """
         cmd_str = ' '.join(cmd)
-        with open('tmp_run_cmd.sh', 'w') as f:
-            f.write(cmd_str)
-        os.chmod('tmp_run_cmd.sh', 0o755)
-        try:
-            proc = subprocess.Popen(
-                ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        finally:
-            os.remove('tmp_run_cmd.sh')
+        for i in range(len(cmd)):
+            cmd[i] = replace_env_vars(cmd[i])
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         is_compile_cmd = cmd_type == "compile"
         if proc.returncode != 0:
@@ -302,15 +300,10 @@ class CommonUtility:
                 switching_compilation_mode()
                 cmd[cmd.index("-O0")] = "-O2"
                 del cmd[cmd.index("-g")]
-                cmd_str = ' '.join(cmd)
-                with open('tmp_run_cmd.sh', 'w') as f:
-                    f.write(cmd_str)
-                os.chmod('tmp_run_cmd.sh', 0o755)
-                try:
-                    proc_now = subprocess.Popen(
-                        ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                finally:
-                    os.remove('tmp_run_cmd.sh')
+                for i in range(len(cmd)):
+                    cmd[i] = replace_env_vars(cmd[i])
+                proc = subprocess.Popen(
+                    cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 (out, _) = proc_now.communicate()
                 if proc_now.returncode != 0:
                     if "--cce-aicore-only" in cmd:

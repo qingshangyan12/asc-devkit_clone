@@ -18,7 +18,8 @@ import stat
 import subprocess
 from asc_op_compile_base.common.buildcfg import get_current_build_config
 from .global_storage import global_var_storage
-from .ascendc_common_utility import CommonUtility, CompileInfo, get_kernel_fun_name_with_tiling_key_and_kernel_type
+from .ascendc_common_utility import CommonUtility, CompileInfo, get_kernel_fun_name_with_tiling_key_and_kernel_type,\
+    replace_env_vars
 from .get_op_tiling import TilingInfo
 from asc_op_compile_base.common.utils.log_utils import CompileStage
 from .ascendc_constants import CORE_TYPE_MIX, CORE_TYPE_CUBE, CORE_TYPE_VEC, ASCENDC_OOM, KernelMetaType, \
@@ -642,15 +643,10 @@ def get_code_channel_v220_by_first_tiling_key(params: InferChannelParams):
         if 'vec' in arch and params.no_kfc_server_flag:
             compile_cmd += [f"-D__NO_KFC_SERVER__"]
         CommonUtility.dump_compile_log(compile_cmd, CompileStage.INFERCHANNEL, params.compile_log_path)
-        compile_cmd_str = ' '.join(compile_cmd)
-        with open('tmp_run_cmd.sh', 'w') as f:
-            f.write(compile_cmd_str)
-        os.chmod('tmp_run_cmd.sh', 0o755)
-        try:
-            proc = subprocess.Popen(
-                ['./tmp_run_cmd.sh'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        finally:
-            os.remove('tmp_run_cmd.sh')
+        for i in range(len(compile_cmd)):
+            compile_cmd[i] = replace_env_vars(compile_cmd[i])
+        proc = subprocess.Popen(	 
+            compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
         objdump_cmd = ['llvm-objdump', '-s', '-j', '.text', '{}'.format(dst_file)]
