@@ -39,6 +39,51 @@ enum class TPosition : uint8_t {
     C2PIPE2LOCAL,
     MAX,
 };
+
+enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
+
+enum class HardEvent : uint8_t {
+    // src_dst
+    MTE2_MTE1,
+    MTE1_MTE2,
+    MTE1_M,
+    M_MTE1,
+    MTE2_V,
+    V_MTE2,
+    MTE3_V,
+    V_MTE3,
+    M_V,
+    V_M,
+    V_V,
+    MTE3_MTE1,
+    MTE1_MTE3,
+    MTE1_V,
+    MTE2_M,
+    M_MTE2,
+    V_MTE1,
+    M_FIX,
+    FIX_M,
+    MTE3_MTE2,
+    MTE2_MTE3,
+    S_V,
+    V_S,
+    S_MTE2,
+    MTE2_S,
+    S_MTE3,
+    MTE3_S,
+    MTE2_FIX,
+    FIX_MTE2,
+    FIX_S,
+    M_S,
+    FIX_MTE3,
+    MTE1_FIX,
+    FIX_MTE1,
+    FIX_FIX,
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003))
+    FIX_V,
+#endif
+    MAX,
+};
 } // namespace AscendC
 
 #endif // AICORE_BASIS_API_COMMON_TYPES_H
