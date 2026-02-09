@@ -19,6 +19,7 @@
 #include "include/experimental/tensor_api/arch/arch.h"
 
 namespace AscendC {
+namespace Te {
 
 struct FixpipeTraitDefault {
     using TraitType = FixpipeTrait;
@@ -33,6 +34,7 @@ struct CopyL0C2GM {
     }
 };
 
-}
+} // namespace Te
+} // namespace AscendC
 
 #endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_COPY_L0C2GM_TRAITS_IMPL_H

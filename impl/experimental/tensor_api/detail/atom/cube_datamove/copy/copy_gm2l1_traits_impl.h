@@ -19,6 +19,7 @@
 #include "include/experimental/tensor_api/arch/arch.h"
 
 namespace AscendC {
+namespace Te {
 
 struct DataCopyTraitDefault {
     using TraitType = DataCopyTrait;
@@ -33,6 +34,7 @@ struct CopyGM2L1 {
     }
 };
 
-}
+} // namespace Te
+} // namespace AscendC
 
 #endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_COPY_GM2L1_TRAITS_IMPL_H

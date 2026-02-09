@@ -20,6 +20,7 @@
 #include "impl/experimental/tensor_api/detail/atom/cube_datamove/copy/copy_l12l0_traits_impl.h"
 
 namespace AscendC {
+namespace Te {
 
 template <typename CopyOperation, typename TraitType, typename... CopyOpArgs>
 struct CopyTraits{};
@@ -60,6 +61,8 @@ struct CopyTraits<CopyL12L0, TraitStruct>
     }
 };
 
-}
+
+} // namespace Te
+} // namespace AscendC
 
 #endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_TRAIT_IMPL_H
