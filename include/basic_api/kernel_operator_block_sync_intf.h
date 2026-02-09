@@ -31,15 +31,6 @@
 
 namespace AscendC {
 
-template <HardEvent event>
-__aicore__ inline void SetFlag(int32_t eventID);
-
-template <HardEvent event>
-__aicore__ inline void WaitFlag(int32_t eventID);
-
-template <pipe_t pipe>
-__aicore__ inline void PipeBarrier();
-
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||       \
     (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) ||       \
     (__NPU_ARCH__ == 3003) ||                                 \
