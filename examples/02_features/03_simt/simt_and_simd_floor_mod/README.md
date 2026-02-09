@@ -1,12 +1,16 @@
 # SIMT与SIMD新同构编程实现floor_mod算子样例
 
 ## 概述
+
 本样例以实现floor_mod功能的算子为例，展示了SIMT和SIMD混合编程的算子开发方式。算子中使用SIMD完成数据搬入搬出，数据类型为float场景使用SIMD完成计算逻辑， 而int32_t场景则使用SIMT完成计算功能，提升整型场景性能。
 
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
+
 ## 目录结构
+
 ```
 ├── simt_and_simd_floor_mod
 │   ├── CMakeLists.txt         # cmake编译文件
@@ -44,22 +48,21 @@
 - 数据切分：  
   本例中算子输入index的形状为6400，每个核处理数据量为1024，因此核数为8。
   - SIMT场景，设置每个核实际启动的线程数THREAD_COUNT为256，每个线程负责处理一部分数据，那么每个线程处理的数据个数为 1024 / 256 = 4个。每个线程处理的首元素数据位置是通过threadIdx进行索引，后续按照总线程数进行步进索引，例如，0号线程处理索引为（0, 256, 512, 768）上的4个数据，1号线程处理索引号为（1, 257, 513, 769）。
-  ```
-  for(uint32_t index = threadIdx.x; index < input_total_length; index += blockDim.x) {
-        ...
-    }
-  ```
-
+    ```cpp
+    for(uint32_t index = threadIdx.x; index < input_total_length; index += blockDim.x) {
+          ...
+      }
+    ```
   - SIMD场景，受限于微指令计算的Reg大小受限，单次只能处理256B数据，因此需要分多次循环处理1024个单核数据量。
 
   > ⚠️ **注意** SIMT场景下可以选择直接通过GM内存完成计算，本例仅展示先通过SIMD完成数据从GM搬运到UB的，再通过SIMT在UB上完成计算，两种方式在不同切分场景性能表现不同，本例只作为功能演示，不一定是性能最优的算子实践。
 
 - 算子实现：  
- 本算子的实现流程主要分为3个步骤：CopyIn， Compute， CupyOut。CopyIn和CopyOut遵循一般的SIMD算子开发方式，这里不再赘述。
+  本算子的实现流程主要分为3个步骤：CopyIn， Compute， CupyOut。CopyIn和CopyOut遵循一般的SIMD算子开发方式，这里不再赘述。
   Compute中通过数据类型判断不同的处理方式。
 
   floor_mod_simt负责整形场景的若干个元素的计算。
-  ```
+  ```cpp
   for(uint32_t index = threadIdx.x; index < input_total_length; index += blockDim.x) {
         auto rem = self[index] % other[index];
         ...
@@ -68,7 +71,7 @@
   ```
 
   floor_mod_simd负责float场景的计算。
-  ```
+  ```cpp
   for (uint16_t j = 0; j < loopTimes; j++) {
         preg = AscendC::MicroAPI::UpdateMask<T>(sregMask);
         AscendC::MicroAPI::DataCopy<T, AscendC::MicroAPI::LoadDist::DIST_NORM>(fmodResValue, fmodResAddr + VL_T * j);
@@ -90,6 +93,7 @@
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量   
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
@@ -118,12 +122,12 @@
   ```
   [Success] Case accuracy is verification passed.
   ```
-当前样例代码默认执行整形场景功能，可通过修改main()函数调用`process_float()`的方法执行float场景的功能。
-```
-int32_t main()
-{
-    // process_float:  test float function
-    // process_int:  test int32_t function
-    return process_float();
-}
-```
+  当前样例代码默认执行整形场景功能，可通过修改main()函数调用`process_float()`的方法执行float场景的功能。
+  ```
+  int32_t main()
+  {
+      // process_float:  test float function
+      // process_int:  test int32_t function
+      return process_float();
+  }
+  ```
