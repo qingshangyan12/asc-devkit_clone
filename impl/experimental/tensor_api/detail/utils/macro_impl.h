@@ -18,6 +18,22 @@
 #include "impl/utils/sys_constants.h"
 #include "impl/utils/sys_macros.h"
 
+#if !defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+    using fp4x2_e2m1_t = float4_e2m1x2_t;
+    using fp4x2_e1m2_t = float4_e1m2x2_t;
+    using fp8_e5m2_t = float8_e5m2_t;
+    using fp8_e4m3fn_t = float8_e4m3_t;
+    using fp8_e8m0_t = float8_e8m0_t;
+#else
+    using fp4x2_e2m1_t = uint8_t;
+    using fp4x2_e1m2_t = uint8_t;
+    using fp8_e5m2_t = uint8_t;
+    using fp8_e4m3fn_t = uint8_t;
+    using fp8_e8m0_t = uint8_t;
+#endif
+#endif
+
 #define GM_ADDR __gm__ uint8_t*
 
 #include <cstdint>
@@ -35,7 +51,7 @@
 #if (__CCE__)
 #define _ASCENDC_HAS_BISHENG_COMPILER 1
 #endif
-
+ 
 #if (_ASCENDC_HAS_BISHENG_COMPILER)
 #define ASCENDC_HOST __host__
 #define ASCENDC_AICORE __aicore__
@@ -88,6 +104,14 @@
 #define TPIPE_MAX_TYPE 4
 #endif
 
+#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
+#define SPLIT_CORE_CUBE
+#endif
+
+#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
+#define SPLIT_CORE_VEC
+#endif
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #define ASCENDC_MATMUL_AICORE
 #endif
@@ -95,7 +119,7 @@
 #if (defined(__NPU_ARCH__) &&                                               \
      ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) ||                   \
       (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                   \
-      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)))
+      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)))
 #ifndef ASCENDC_DUMP
 #define ASCENDC_DUMP 1
 #endif
@@ -107,7 +131,7 @@
 
 namespace AscendC {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||           \
-    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) ||           \
+    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) ||           \
     (__NPU_ARCH__ == 5102)) // Available for V200 and V210
 constexpr int32_t QUE_MAX_EVENT = 8;
 #else
@@ -119,7 +143,11 @@ constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
 constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
 constexpr int32_t CAST_MODE_BIT = 59;
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || \
+constexpr int32_t MIX = 0;
+constexpr int32_t AIC = 1;
+constexpr int32_t AIV = 2;
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
 __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {
