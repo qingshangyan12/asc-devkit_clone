@@ -22,6 +22,7 @@
 #endif
 
 #include "simt_api/device_types.h"
+#inlcude "impl/utils/debug/asc_utils_macros.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 
@@ -34,9 +35,20 @@ __attribute__((always_inline)) inline __SIMT_DEVICE_FUNCTIONS_DECL__ void printf
 #endif
 }   // namespase __asc_simt_vf
 
+namespace __asc_aicore {
+template <class... Args>
+__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
+}
+
 #endif
 
+#if __NPU_ARCH__ == 3510
 #include "impl/utils/debug/asc_printf_simt_impl.h"
+#endif
+
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#include "impl/utils/debug/asc_aicore_assert_impl.h"
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
