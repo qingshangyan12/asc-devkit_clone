@@ -25,6 +25,10 @@
 #define __aicore__ [aicore]
 #endif // __aicore__
 
+#ifndef K_MAX_SHAPE_DIM
+#define K_MAX_SHAPE_DIM 8
+#endif
+
 constexpr int32_t MIX = 0;
 constexpr int32_t AIC = 1;
 constexpr int32_t AIV = 2;
@@ -56,7 +60,6 @@ constexpr int32_t g_coreType = MIX;
 #define ASCEND_IS_AIC constexpr(g_coreType == AIC)
 #define ASCEND_IS_NOT_AIV constexpr(g_coreType != AIV)
 #define ASCEND_IS_NOT_AIC constexpr(g_coreType != AIC)
-#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_UTILS_MACROS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
