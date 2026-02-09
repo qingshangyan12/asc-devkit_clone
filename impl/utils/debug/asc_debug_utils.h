@@ -111,33 +111,6 @@ __aicore__ inline void sync_all()
     sync_all_impl();
 }
 
-// template<typename T>
-// __aicore__ inline void mem_copy_cbuf_to_gm(__gm__ T* dst, __cc__ T* src, const uint32_t& len)
-// {
-//     if (dst == nullptr || src == nullptr) {
-//         return;
-//     }
-//     mem_copy_cbuf_to_gm_impl(dst, src, len);
-// }
-
-// template<typename T>
-// __aicore__ inline void mem_copy_l1buf_to_gm(__gm__ T* dst, __cbuf__ T* src, const uint32_t& len)
-// {
-//     if (dst == nullptr || src == nullptr) {
-//         return;
-//     }
-//     mem_copy_l1buf_to_gm_impl(dst, src, len);
-// }
-
-// template<typename T>
-// __aicore__ inline void mem_copy_ub_to_gm(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
-// {
-//     if (dst == nullptr || src == nullptr) {
-//         return;
-//     }
-//     mem_copy_ub_to_gm_impl(dst, src, len);
-// }
-
 __aicore__ inline void mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
 {
     if (dst == nullptr || src == nullptr)
