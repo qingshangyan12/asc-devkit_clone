@@ -19,19 +19,12 @@
 
 #include "instr_impl/npu_arch_2201/vector_datamove_impl.h"
 
-__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src,
+__aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
     uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
 
-__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size);
+__aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
-__aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size);
-
-__aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size);
-
-__aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src,
-    uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
-
-__aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src, uint32_t size);
+__aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
 //asc_copy_gm2ub_align  int8_t / uint8_t / half / bfloat16_t / int16_t / uint16_t / float / int32_t / uint32_t
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t n_burst, uint32_t len_burst,
