@@ -43,6 +43,8 @@ __aicore__ inline void asc_get_arch_ver(uint32_t& core_version);
 
 __aicore__ inline int64_t asc_get_program_counter();
 
+__aicore__ inline int64_t asc_get_ffts_base_addr();
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
