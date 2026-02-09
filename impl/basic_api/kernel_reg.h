@@ -62,52 +62,6 @@ __aicore__ inline void ResetMaskImpl()
     }
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
-{
-#if (__NPU_ARCH__ == 5102)
-    if constexpr (pipe == PIPE_MTE3) {
-        return;
-    }
-#else
-    if ASCEND_IS_AIC {
-        if constexpr (pipe == PIPE_MTE3) {
-            return;
-        }
-    }
-#endif
-    if constexpr (pipe != PIPE_V) {
-        pipe_barrier(pipe);
-    }
-    return;
-}
-#else
-template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
-{
-#if __NPU_ARCH__ == 3102
-    return;
-#endif
-#if (__NPU_ARCH__ == 3002)
-    if constexpr (pipe == PIPE_S || pipe == PIPE_V) {
-        return;
-    }
-#endif
-#if (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
-    if constexpr (pipe == PIPE_V) {
-        return;
-    }
-#endif
-#if (__NPU_ARCH__ == 2201)
-    if ASCEND_IS_AIC {
-        if constexpr (pipe == PIPE_V) {
-            return;
-        }
-    }
-#endif
-    pipe_barrier(pipe);
-}
-#endif
-
 enum class CacheLine : uint64_t {
     SINGLE_CACHE_LINE = 0,
     ENTIRE_DATA_CACHE
