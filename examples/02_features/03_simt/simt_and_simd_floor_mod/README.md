@@ -1,4 +1,4 @@
-# SIMT与SIMD新同构编程实现floor_mod算子样例
+# SIMT与SIMD混合编程实现floor_mod算子样例
 
 ## 概述
 
