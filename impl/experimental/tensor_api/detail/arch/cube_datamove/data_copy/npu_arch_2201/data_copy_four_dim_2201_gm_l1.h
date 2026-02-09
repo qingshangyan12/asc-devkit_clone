@@ -418,7 +418,7 @@ public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
         auto checkSrc = PreProcess(dst, src);
-        Excute<T, decltype(checkSrc), trait>(dst, checkSrc);
+        Excute<trait, decltype(checkSrc), U, Coord>(dst, checkSrc, coord);
     }
 
 private:

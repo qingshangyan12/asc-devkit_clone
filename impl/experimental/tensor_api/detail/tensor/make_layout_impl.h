@@ -564,11 +564,10 @@ private:
         auto layout = tensor.Layout();
         auto row = Std::get<0>(layout.Shape());
         auto column = Std::get<1>(layout.Shape());
-        auto fourDimLayout = MakeLayoutForND<Std::ignore_t>(row, col);
+        auto fourDimLayout = MakeLayoutForND<Std::ignore_t>(row, column);
         return MakeTensorImpl(tensor.Engine().Begin(), fourDimLayout);
     }
-}
-
+};
 } // namespace Te
 } // namespace AscendC
 
