@@ -33,6 +33,8 @@
 #include "sync_impl/asc_wait_flag_impl.h"
 #include "sync_impl/asc_pipe_barrier_impl.h"
 #include "sync_impl/asc_sync_data_barrier_impl.h"
+#include "sync_impl/asc_sync_block_arrive_impl.h"
+#include "sync_impl/asc_sync_block_wait_imply.h"
 
 __aicore__ inline void asc_sync_vec()
 {
@@ -52,6 +54,16 @@ __aicore__ inline void asc_sync_mte2(int id)
 __aicore__ inline void asc_sync()
 {
     asc_sync_impl();
+}
+
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint64_t config)
+{
+    asc_sync_block_arrive_impl(pipe, config);
+}
+
+__aicore__ inline void asc_sync_block_wait(int64_t flagID)
+{
+    asc_sync_block_wait_impl(flagID);
 }
 
 #endif

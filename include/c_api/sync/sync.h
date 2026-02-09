@@ -31,6 +31,10 @@ __aicore__ inline void asc_sync_mte2(int id);
 
 __aicore__ inline void asc_sync();
 
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint64_t config);
+
+__aicore__ inline void asc_sync_block_wait(int64_t flagID);
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 #include "instr_impl/npu_arch_2201/sync_impl.h"
