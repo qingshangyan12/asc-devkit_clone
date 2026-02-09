@@ -19,7 +19,7 @@
 namespace AscendC {
 namespace Te {
 
-class MmadGenParams
+class MmadGenParams2201
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S>
@@ -112,7 +112,7 @@ private:
     }
 };
 
-class MmadCore
+class MmadCore2201
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, size_t... Is>
@@ -134,7 +134,7 @@ private:
     }
 };
 
-class MmadFourDim2201 : public MmadCore, public MmadGenParams
+class MmadFourDim2201 : public MmadCore2201, public MmadGenParams2201
 {
 public:
     template <const MmadTrait& trait, typename ...Args>
