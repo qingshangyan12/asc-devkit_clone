@@ -19,13 +19,13 @@
 #include "kernel_micro_utils.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::MERGING, typename U>
 __simd_callee__ inline void Move(U& dstReg, U& srcReg, MaskReg mask);
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void Move(U& dstReg, U& srcReg);
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_copy_intf_impl.h"

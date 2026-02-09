@@ -26,13 +26,13 @@
 #include "micro_api/dav_c310/kernel_micro_histograms_impl.h"
 #endif
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, typename U, HistogramsBinType mode, HistogramsType type, typename S, typename V>
 __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask)
 {
     HistogramsImpl<T, U, mode, type, S, V>(dstReg, srcReg, mask);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_MICRO_HISTOGRAMS_INTERFACE_IMPL_H

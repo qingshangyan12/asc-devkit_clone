@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, const RegTrait& regTrait>
 __simd_callee__ inline MaskReg UpdateMask(uint32_t& scalarValue)
 {
@@ -147,7 +147,7 @@ __simd_callee__ inline MaskReg MoveMask()
 {
     return MoveMaskImpl<T>();
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_MICRO_MASKREG_INTERFACE_IMPL_H

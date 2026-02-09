@@ -19,7 +19,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U = DefaultType, HighLowPart part = HighLowPart::LOWEST, typename RegT,
     typename RegU>
 __simd_callee__ inline void PackImpl(RegT &dstReg, RegU &srcReg)
@@ -86,6 +86,6 @@ __simd_callee__ inline void UnPackImpl(RegT &dstReg, RegU &srcReg)
         }
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_PACK_IMPL_H

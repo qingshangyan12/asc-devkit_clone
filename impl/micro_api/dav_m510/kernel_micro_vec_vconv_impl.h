@@ -18,7 +18,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 constexpr int16_t SHIFT_ONE_BIT = 1;
 constexpr int16_t SHIFT_EIGHT_BIT = 8;
 constexpr int16_t SHIFT_SEVEN_BIT = 7;
@@ -566,6 +566,6 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
         static_assert(allNotSupport, "current cast data type is not supported on current device!");
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_VCONV_IMPL_H

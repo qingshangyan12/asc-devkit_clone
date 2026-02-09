@@ -18,7 +18,7 @@
 #include "kernel_micro_common_impl.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, CMPMODE mode = CMPMODE::EQ, typename RegT>
 __simd_callee__ inline void CompareImpl(MaskReg &dstMask, RegT &srcReg0, RegT &srcReg1, MaskReg &mask)
 {
@@ -86,6 +86,6 @@ __simd_callee__ inline void SlideImpl(RegTensor<T> &dstReg, RegTensor<T> &srcReg
 {
     vslide(dstReg, srcReg0, srcReg1, slideAmount);
 }
-}  // namespace MicroAPI
+}  // namespace Reg
 }  // namespace AscendC
 #endif  // ASCENDC_MODULE_MICRO_VEC_CMPSEL_IMPL_H

@@ -18,7 +18,7 @@
 #include "../../../include/micro_api/kernel_micro_struct_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U = DefaultType, HistogramsBinType mode, HistogramsType type,
           typename S, typename V>
 __simd_callee__ inline void HistogramsImpl(V& dstReg, S& srcReg, MaskReg& mask)
@@ -36,6 +36,6 @@ __simd_callee__ inline void HistogramsImpl(V& dstReg, S& srcReg, MaskReg& mask)
         chistv2(dstReg, srcReg, mask, HistogramsMode);
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_HISTOGRAMS_IMPL_H

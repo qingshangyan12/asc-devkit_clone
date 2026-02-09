@@ -18,7 +18,7 @@
 #include "micro_api/kernel_micro_utils.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 
 template <MemType src, MemType dst> __simd_callee__ inline void LocalMemBarImpl()
 {
@@ -51,6 +51,6 @@ template <MemType src, MemType dst> __simd_callee__ inline void LocalMemBarImpl(
     }
 }
 
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_MEMBAR_IMPL_H

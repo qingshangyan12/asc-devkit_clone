@@ -25,13 +25,13 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, typename U, MaskMergeMode mode, typename S>
 __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, MaskReg& mask)
 {
     AxpyImpl<T, U, mode, S>(dstReg, srcReg, scalarValue, mask);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_VEC_TERNARY_SCALAR_INTERFACE_IMPL_H

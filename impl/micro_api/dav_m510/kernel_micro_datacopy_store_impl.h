@@ -18,7 +18,7 @@
 #include "../../../include/basic_api/kernel_operator_sys_var_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <int InputNum, StoreDist dist> __simd_callee__ inline void CheckStoreDist()
 {
     if constexpr (InputNum == 1) {
@@ -511,6 +511,6 @@ template <typename T> __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf
         }
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_DATACOPY_STORE_IMPL_H

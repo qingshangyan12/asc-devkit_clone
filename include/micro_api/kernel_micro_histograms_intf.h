@@ -19,11 +19,11 @@
 #include "kernel_micro_utils.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U = DefaultType, HistogramsBinType mode, HistogramsType type,
           typename S, typename V>
 __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask);
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_histograms_intf_impl.h"

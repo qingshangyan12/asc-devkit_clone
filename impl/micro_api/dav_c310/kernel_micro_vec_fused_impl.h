@@ -19,7 +19,7 @@
 #include "../../../include/micro_api/kernel_micro_struct_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T0, typename T1, typename T2, RegLayout layout, typename T3, typename T4>
 __simd_callee__ inline void FusedMulsCastImpl(T3& dstReg, T4& srcReg, T2 scalarValue, MaskReg& mask)
 {
@@ -102,6 +102,6 @@ __simd_callee__ inline void FusedMulDstAddImpl(U& dstReg, U& srcReg0, U& srcReg1
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vmadd(dstReg, srcReg0, srcReg1, mask, modeValue);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_FUSED_IMPL_H

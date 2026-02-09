@@ -19,7 +19,7 @@
 #include "../../basic_api/dav_l311/kernel_operator_common_impl.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename T1, typename RegT>
 __simd_callee__ inline void DuplicateImpl(RegT &dstReg, T1 scalarValue)
 {
@@ -74,6 +74,6 @@ __simd_callee__ inline void DeInterleaveImpl(RegT &dstReg0, RegT &dstReg1, RegT 
     static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DeInterleave only support type b8/b16/b32 on current device!");
     vdintlv(dstReg0, dstReg1, srcReg0, srcReg1);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_DUPLICATE_IMPL_H
