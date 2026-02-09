@@ -19,10 +19,10 @@
 #include "kernel_micro_utils.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, IndexOrder order = IndexOrder::INCREASE_ORDER, typename U, typename S>
 __simd_callee__ inline void Arange(S& dstReg, U scalarValue);
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_vec_arange_intf_impl.h"

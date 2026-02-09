@@ -19,7 +19,7 @@
 #include "kernel_micro_utils.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
 __simd_callee__ inline void Adds(S& dstReg, S& srcReg, U scalarValue, MaskReg& mask);
 
@@ -40,7 +40,7 @@ __simd_callee__ inline void ShiftRights(S& dstReg, S& srcReg, U scalarValue, Mas
 
 template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
 __simd_callee__ inline void LeakyRelu(S& dstReg, S& srcReg, U scalarValue, MaskReg& mask);
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_vec_binary_scalar_intf_impl.h"

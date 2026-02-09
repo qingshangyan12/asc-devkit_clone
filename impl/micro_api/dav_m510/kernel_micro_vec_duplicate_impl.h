@@ -21,7 +21,7 @@
 #include "../../../include/utils/std/type_traits.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, typename U>
 __simd_callee__ inline void DuplicateComplexTraitTwoImpl(U& dstReg, T scalarValue)
 {
@@ -333,6 +333,6 @@ __simd_callee__ inline void DeInterleaveImpl(U& dstReg0, U& dstReg1, U& srcReg0,
         dstReg1 = dstTemp1;
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_DUPLICATE_IMPL_H

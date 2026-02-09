@@ -19,7 +19,7 @@
 #include "kernel_micro_utils.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void Abs(U& dstReg, U& srcReg, MaskReg& mask);
 
@@ -53,7 +53,7 @@ __simd_callee__ inline void Neg(U& dstReg, U& srcReg, MaskReg& mask);
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void Not(U& dstReg, U& srcReg, MaskReg& mask);
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_vec_unary_intf_impl.h"

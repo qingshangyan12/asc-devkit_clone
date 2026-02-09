@@ -19,7 +19,7 @@
 #include "../../impl/basic_api/dav_l311/kernel_operator_common_impl.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 namespace Internal {
 __aicore__ inline constexpr DivSpecificMode GetDivSpecificMode(MaskMergeMode mrgMode)
 {
@@ -84,7 +84,7 @@ __simd_callee__ inline void DivImpl(RegT &dstReg, RegT &srcReg0, RegT &srcReg1, 
         "mode type must be either MaskMergeMode or const DivSpecificMode* ");
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(mode);
-    static_assert(!sprMode.precisionMode, "precision mode for MicroAPI Div is not supported on the current device!");
+    static_assert(!sprMode.precisionMode, "precision mode for Reg Div is not supported on the current device!");
     static_assert(SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float>(),
         "current data type is not supported on current device!!");
     constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
@@ -243,6 +243,6 @@ __simd_callee__ inline void SubCarryOutsImpl(MaskReg &carryp, RegT &dstReg, RegT
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SubCarryOuts api is not supported on current device!"); });
 }
 
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_BINARY_IMPL_H

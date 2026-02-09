@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, typename U, MaskMergeMode mode, typename S>
 __simd_callee__ inline void Adds(S& dstReg, S& srcReg, U scalarValue, MaskReg& mask)
 {
@@ -68,7 +68,7 @@ __simd_callee__ inline void LeakyRelu(S& dstReg, S& srcReg, U scalarValue, MaskR
 {
     LeakyReluImpl<T, U, mode, S>(dstReg, srcReg, scalarValue, mask);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_VEC_BINARY_SCALAR_INTERFACE_IMPL_H

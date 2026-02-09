@@ -20,7 +20,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_binary_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T0 = DefaultType, typename T1, typename T2 = DefaultType, typename T3, typename T4>
 __simd_callee__ inline void DataCopyGatherB64Impl(T3& dstReg, __ubuf__ T1* baseAddr, T4& index, MaskReg& mask)
 {
@@ -259,6 +259,6 @@ __simd_callee__ inline void DataCopyUnAlignImpl(__ubuf__ T*& dstAddr, MaskReg& m
         pstu(ureg, mask, (__ubuf__ uint32_t*&)dstAddr);
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_DATACOPY_IMPL_H

@@ -17,7 +17,7 @@
 
 #include "kernel_micro_common_impl.h"
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
 __simd_callee__ inline void CopyImpl(RegT &dstReg, RegT &srcReg, MaskReg mask)
 {
@@ -35,6 +35,6 @@ template <typename T = DefaultType, typename RegT> __simd_callee__ inline void C
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
     vmov(dstReg, srcReg);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif
