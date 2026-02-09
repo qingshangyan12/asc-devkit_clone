@@ -27,26 +27,28 @@
 
 namespace AscendC {
 template <typename T>
-__aicore__ inline void DumpTensor(const LocalTensor<T> &tensor, uint32_t desc, uint32_t dumpSize);
+__aicore__ static __attribute__((noinline)) void DumpTensor(const LocalTensor<T>& tensor, uint32_t desc,
+                                                            uint32_t dumpSize);
 template <typename T>
-__aicore__ inline void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize);
+__aicore__ static __attribute__((noinline)) void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc,
+                                                            uint32_t dumpSize);
 template <typename T>
-__aicore__ inline void DumpTensor(const LocalTensor<T>& tensor, uint32_t desc,
-    uint32_t dumpSize, const ShapeInfo& shapeInfo);
+__aicore__ static __attribute__((noinline)) void DumpTensor(const LocalTensor<T>& tensor, uint32_t desc,
+                                                            uint32_t dumpSize, const ShapeInfo& shapeInfo);
 template <typename T>
-__aicore__ inline void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc,
-    uint32_t dumpSize, const ShapeInfo& shapeInfo);
+__aicore__ static __attribute__((noinline)) void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc,
+                                                            uint32_t dumpSize, const ShapeInfo& shapeInfo);
 template <typename T>
-__aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &tensor,
-    uint32_t index, uint32_t countOff, uint32_t dumpSize);
+__aicore__ static __attribute__((noinline)) void DumpAccChkPoint(const LocalTensor<T>& tensor, uint32_t index,
+                                                                 uint32_t countOff, uint32_t dumpSize);
 template <typename T>
-__aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor,
-    uint32_t index, uint32_t countOff, uint32_t dumpSize);
+__aicore__ static __attribute__((noinline)) void DumpAccChkPoint(const GlobalTensor<T>& tensor, uint32_t index,
+                                                                 uint32_t countOff, uint32_t dumpSize);
 #ifndef ASCENDC_CPU_DEBUG
 template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args);
+__aicore__ static __attribute__((noinline)) void PRINTF(__gm__ const char* fmt, Args&&... args);
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
+__aicore__ static __attribute__((noinline)) void printf(__gm__ const char* fmt, Args&&... args);
 #endif
 
 // assert define
