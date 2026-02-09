@@ -15,7 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_IMPL_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_LOAD_DATA_IMPL_H
 
-#include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data/npu_arch_2201/load_data_routing.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/load_data/load_data_routing.h"
 
 namespace AscendC {
 namespace Te {

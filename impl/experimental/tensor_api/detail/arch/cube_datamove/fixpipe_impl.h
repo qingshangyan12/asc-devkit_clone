@@ -15,7 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_IMPL_H
 #define EXPERIMENTAL_TENSOR_API_DETAIL_ARCH_CUBE_DATAMOVE_FIXPIPE_IMPL_H
 
-#include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_routing.h"
+#include "impl/experimental/tensor_api/detail/arch/cube_datamove/fixpipe/fixpipe_routing.h"
 
 namespace AscendC {
 namespace Te {
