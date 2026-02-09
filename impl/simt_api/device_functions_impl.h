@@ -25,6 +25,26 @@
 #define ASCRT_Z_OFFSET       2   // 2 : offset of z
 #define ASCRT_W_OFFSET       3   // 3 : offset of w
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rn(const float x) {
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rz(const float x) {
+    return __cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rd(const float x) {
+    return __cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_ru(const float x) {
+    return __cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rna(const float x) {
+    return __cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_rn(const float x) {
     return __cvt_uint32_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
@@ -232,6 +252,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float_as_uint(const float x
 }
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int asc_ldcg(__gm__ long int* address)
 {
     return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address);
@@ -1000,8 +1021,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ float4* address, floa
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(address, val);
 }
+#endif
 
 #else
+#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int asc_ldcg(long int* address)
 {
     return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address);
@@ -1749,6 +1772,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(float4* address, float4 val)
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(address, val);
 }
+#endif
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_IMPL__)

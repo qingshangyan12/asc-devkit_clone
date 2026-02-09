@@ -357,20 +357,76 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_rn(const float
     return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_rn_sat(const float x) {
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_rz(const float x) {
     return __cvt_bfloat16_t<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_rz_sat(const float x) {
+    return __cvt_bfloat16_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_rd(const float x) {
     return __cvt_bfloat16_t<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_rd_sat(const float x) {
+    return __cvt_bfloat16_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_ru(const float x) {
     return __cvt_bfloat16_t<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_ru_sat(const float x) {
+    return __cvt_bfloat16_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_rna(const float x) {
     return __cvt_bfloat16_t<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16_rna_sat(const float x) {
+    return __cvt_bfloat16_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __float22bfloat162_rn_sat(const float2 x) {
+    return __cvt_bfloat16x2_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __float22bfloat162_rz(const float2 x) {
+    return __cvt_bfloat16x2_t<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __float22bfloat162_rz_sat(const float2 x) {
+    return __cvt_bfloat16x2_t<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __float22bfloat162_rd(const float2 x) {
+    return __cvt_bfloat16x2_t<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __float22bfloat162_rd_sat(const float2 x) {
+    return __cvt_bfloat16x2_t<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __float22bfloat162_ru(const float2 x) {
+    return __cvt_bfloat16x2_t<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __float22bfloat162_ru_sat(const float2 x) {
+    return __cvt_bfloat16x2_t<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __float22bfloat162_rna(const float2 x) {
+    return __cvt_bfloat16x2_t<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t __float22bfloat162_rna_sat(const float2 x) {
+    return __cvt_bfloat16x2_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __half2bfloat16_rn(const half x) {
@@ -397,20 +453,40 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_rn(const bfloat16_t x
     return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_rn_sat(const bfloat16_t x) {
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_rz(const bfloat16_t x) {
     return __cvt_half<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_rz_sat(const bfloat16_t x) {
+    return __cvt_half<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_rd(const bfloat16_t x) {
     return __cvt_half<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_rd_sat(const bfloat16_t x) {
+    return __cvt_half<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_ru(const bfloat16_t x) {
     return __cvt_half<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_ru_sat(const bfloat16_t x) {
+    return __cvt_half<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_rna(const bfloat16_t x) {
     return __cvt_half<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __bfloat162half_rna_sat(const bfloat16_t x) {
+    return __cvt_half<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __bfloat162float(const bfloat16_t x) {
@@ -426,6 +502,66 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __bfloat162float(const bfloat16_t x)
     };
     union Data2 d2 = {.i = u};
     return d2.f;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __bfloat162float_rn(const bfloat16_t x) {
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __bfloat162float_rz(const bfloat16_t x) {
+    return __cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __bfloat162float_rd(const bfloat16_t x) {
+    return __cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __bfloat162float_ru(const bfloat16_t x) {
+    return __cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __bfloat162float_rna(const bfloat16_t x) {
+    return __cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __bfloat1622float2_rn(const bfloat16x2_t x) {
+    return __cvt_float2<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __bfloat1622float2_rz(const bfloat16x2_t x) {
+    return __cvt_float2<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __bfloat1622float2_rd(const bfloat16x2_t x) {
+    return __cvt_float2<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __bfloat1622float2_ru(const bfloat16x2_t x) {
+    return __cvt_float2<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __bfloat1622float2_rna(const bfloat16x2_t x) {
+    return __cvt_float2<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __bfloat162bfloat16_rn(const bfloat16_t x) {
+    return __cvt_bfloat16_t<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __bfloat162bfloat16_rz(const bfloat16_t x) {
+    return __cvt_bfloat16_t<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __bfloat162bfloat16_rd(const bfloat16_t x) {
+    return __cvt_bfloat16_t<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __bfloat162bfloat16_ru(const bfloat16_t x) {
+    return __cvt_bfloat16_t<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __bfloat162bfloat16_rna(const bfloat16_t x) {
+    return __cvt_bfloat16_t<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __bfloat162uint_rn(const bfloat16_t x) {
@@ -722,6 +858,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_cas(__gm__ bfloat1
     return atomicCAS(address, compare, val);
 }
 
+#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_ldcg(__gm__ bfloat16_t* address)
 {
     return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address);
@@ -763,6 +900,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ bfloat16x2_t* address
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((__gm__ int32_t*)address, (int32_t&)val);
 }
+#endif
 
 #else
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_atomic_add(bfloat16_t *address, bfloat16_t val)
@@ -813,6 +951,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t asc_atomic_cas(bfloat16x2_t *
     return atomicCAS(address, compare, val);
 }
 
+#ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t asc_ldcg(bfloat16_t* address)
 {
     return __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(address);
@@ -854,6 +993,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(bfloat16x2_t* address, bfloa
 {
     __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int32_t*)address, (int32_t&)val);
 }
+#endif
 #endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t make_bfloat162(bfloat16_t x, bfloat16_t y)
