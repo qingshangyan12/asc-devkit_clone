@@ -1,0 +1,44 @@
+# asc_set_ffts_base_addr
+
+## 产品支持情况
+
+| 产品 | 是否支持 |
+| :-----------| :------: |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 |    √    |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 |    √    |
+
+## 功能说明
+
+在WaitEvent和NotifyEvent之前使用，设置核间同步寄存器的基地址。
+
+## 函数原型
+
+```cpp
+__aicore__ inline void asc_set_ffts_base_addr(uint64_t config)
+```
+
+## 参数说明
+
+| 参数名  | 输入/输出 | 描述 |
+| :----- | :------- | :------- |
+| config | 输入 | 核间同步的基地址。由Kernel外部RTS接口获取，通过Kernel传入。 |
+
+## 返回值说明
+
+无
+
+## 流水类型
+
+PIPE_S
+
+## 约束说明
+
+- 在使用WaitEvent和NotifyEvent之前必须使用本接口设置基地址。
+- CPU Debug过程中通过GmAlloc创建至少2400B的共享内存传入。
+
+## 调用示例
+
+```cpp
+uint64_t config = *(__gm__ uint64_t*)ffts_addr;
+asc_set_ffts_base_addr(config);
+```
