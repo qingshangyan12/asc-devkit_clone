@@ -204,9 +204,15 @@ class CommonUtility:
         cmd.append("-mllvm")
         cmd.append("-disable-lsr")
         cmd.append("-fno-unroll-loops")
+        cmd_str = ' '.join(cmd)
+        cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
+        with open(cmd_file, 'w') as f:
+            f.write(cmd_str)
+        os.chmod(cmd_file, 0o755)
         proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            'bash ${cmd_file}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
+        os.remove(cmd_file)
         return out, proc.returncode
 
     @staticmethod
@@ -245,9 +251,15 @@ class CommonUtility:
         elif global_var_storage.get_variable("ascendc_short_soc_version") == ASCEND_310:
             cmd.insert(5, "-mllvm")
             cmd.insert(6, "-cce-aicore-function-stack-size=8192")
+        cmd_str = ' '.join(cmd)
+        cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
+        with open(cmd_file, 'w') as f:
+            f.write(cmd_str)
+        os.chmod(cmd_file, 0o755)
         proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            'bash ${cmd_file}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
+        os.remove(cmd_file)
         if proc.returncode != 0:
             (out, retcode) = CommonUtility.run_cmd_stack_spill_case_ascendc(cmd, cmd_type, cce_file)
             return out, retcode
@@ -272,18 +284,30 @@ class CommonUtility:
         returncode : int
             success or fail
         """
+        cmd_str = ' '.join(cmd)
+        cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
+        with open(cmd_file, 'w') as f:
+            f.write(cmd_str)
+        os.chmod(cmd_file, 0o755)
         proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            'bash ${cmd_file}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         (out, _) = proc.communicate()
+        os.remove(cmd_file)
         is_compile_cmd = cmd_type == "compile"
         if proc.returncode != 0:
             if is_compile_cmd and "-O0" in cmd and "-g" in cmd:
                 switching_compilation_mode()
                 cmd[cmd.index("-O0")] = "-O2"
                 del cmd[cmd.index("-g")]
+                cmd_str = ' '.join(cmd)
+                cmd_file = os.path.join(CommonUtility.get_kernel_meta_dir(), 'tmp_run_cmd.sh')
+                with open(cmd_file, 'w') as f:
+                    f.write(cmd_str)
+                os.chmod(cmd_file, 0o755)
                 proc_now = subprocess.Popen(
-                    cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    'bash ${cmd_file}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
                 (out, _) = proc_now.communicate()
+                os.remove(cmd_file)
                 if proc_now.returncode != 0:
                     if "--cce-aicore-only" in cmd:
                         (out_tmp, retcode) = CommonUtility.run_cmd_stackoverflow_ascnendc(cmd, cmd_type)
