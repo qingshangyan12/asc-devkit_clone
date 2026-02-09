@@ -232,6 +232,11 @@ struct nesting_depth<Std::tuple<Args...>> {
 template <typename T>
 constexpr size_t nesting_depth_v = nesting_depth<T>::value;
 
+template <typename T, typename U>
+__aicore__ inline constexpr bool CheckDim() {
+    return nesting_depth_v<T> == nesting_depth_v<U>;
+}
+
 template <size_t Dim, typename T, typename U>
 struct IsStaticLayout {
 private:

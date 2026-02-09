@@ -559,6 +559,24 @@ template <typename T>
 __aicore__ inline decltype(auto) MakeZZLayout(size_t row, size_t column) {
     return TensorInternal::MakeLayoutForZZ<T>(row, column);
 }
+
+class DimConversion {
+public:
+    template<typename T>
+    __aicore__ inline auto Run(const T& tensor) {
+        return ConvertTwoDim2FourDim(tensor);
+    }
+    
+private:
+    template<typename T>
+    __aicore__ inline auto ConvertTwoDim2FourDim(const T& tensor) {
+        auto layout = tensor.Layout();
+        auto row = Std::get<0>(layout.Shape());
+        auto column = Std::get<1>(layout.Shape());
+        auto fourDimLayout = MakeLayoutForND<Std::ignore_t>(row, col);
+        return MakeTensorImpl(tensor.Engine().Begin(), fourDimLayout);
+    }
+}
 } // namespace AscendC
 
 #endif // IMPL_TENSOR_API_TENSOR_MAKE_LAYOUT_IMPL_H

@@ -416,6 +416,23 @@ class DataCopyFourDim2201GM2L1 : public CopyGmToCbufMultiND2NZBase, public CopyG
 public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        auto checkSrc = PreProcess(dst, src);
+        Excute<T, decltype(checkSrc), trait>(dst, checkSrc);
+    }
+
+private:
+    template <typename T, typename U>
+    __aicore__ inline auto PreProcess(const T& dst, const U& src) {
+        constexpr bool flag = CheckDim<decltype(GetShape(dst.Layout())), decltype(GetShape(src.Layout()))>();
+        if constexpr (!flag) {
+            return DimConversion{}.Run(src);
+        } else {
+            return src;
+        }
+    }
+
+    template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
+    __aicore__ inline void Excute(const T& dst, const U& src, const Coord& coord) {
         if constexpr (IsNZFormat<U>::value && IsNZFormat<T>::value) {
             CopyGmToCbufNZBase::Run<trait, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsNDFormat<U>::value && IsNZFormat<T>::value) {

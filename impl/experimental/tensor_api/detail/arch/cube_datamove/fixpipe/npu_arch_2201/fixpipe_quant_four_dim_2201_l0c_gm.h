@@ -132,6 +132,24 @@ public:
     template <const FixpipeTrait& trait, typename T, typename U, typename S, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const S& quant, const Coord& coord)
     {
+        auto checkDst = PreProcess(dst, src);
+        Excute<trait, decltype(checkDst), U, S, Coord>(checkDst, src, quant, coord);
+    }
+
+private:
+    template <typename T, typename U>
+    __aicore__ inline auto PreProcess(const T& dst, const U& src) {
+        constexpr bool flag = CheckDim<decltype(GetShape(dst.Layout())), decltype(GetShape(src.Layout()))>();
+        if constexpr (!flag) {
+            return DimConversion{}.Run(dst);
+        } else {
+            return dst;
+        }
+    }
+
+    template <const FixpipeTrait& trait, typename T, typename U, typename S, typename Coord>
+    __aicore__ inline void Excute(const T& dst, const U& src, const S& quant, const Coord& coord)
+    {
         CheckFixpipe2201QuantParams<trait, T, U>();
         using FixpipeQuantCoordL0C2GM =
             typename Format2201Registor<GetDataFormat2201<T>(), GetDataFormat2201<U>(), GetQuantMode2201<trait>()>::type;
