@@ -19,6 +19,7 @@
 #include "include/experimental/tensor_api/arch/arch.h"
 
 namespace AscendC {
+namespace Te {
 
 struct LoadDataTraitDefault {
     using TraitType = LoadDataTrait;
@@ -33,6 +34,7 @@ struct CopyL12L0 {
     }
 };
 
+}
 }
 
 #endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_COPY_L12L0_TRAITS_IMPL_H

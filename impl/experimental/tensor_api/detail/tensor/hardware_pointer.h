@@ -19,15 +19,15 @@
 
 // pointer_impl.h
 namespace AscendC {
-namespace TensorInternal{
+namespace Te {
 
 template <typename Iterator, typename DerivedType>
 struct IterAdaptor
 {
     using iterator     = Iterator;
-    using reference    = typename TensorInternal::IterRef<iterator>::type; // T&
-    using elementType = typename TensorInternal::IterEle<iterator>::type; // rm_ref
-    using valueType   = typename TensorInternal::IterVal<iterator>::type; // rm_cvf
+    using reference    = typename IterRef<iterator>::type; // T&
+    using elementType = typename IterEle<iterator>::type; // rm_ref
+    using valueType   = typename IterVal<iterator>::type; // rm_cvf
 
     __aicore__ inline constexpr IterAdaptor(iterator ptr = {}) : ptr(ptr) {}
 
@@ -79,7 +79,7 @@ private:
 } // namespace AscendC
 
 namespace AscendC {
-namespace TensorInternal {
+namespace Te {
 template <Hardware hPos, typename Pointer>
 struct HardwareMemPtr : IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>> {
     using IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>>::IterAdaptor;
@@ -94,7 +94,7 @@ template <Hardware hardPos, typename Pointer>
 struct IsHardwareMem<hardPos, HardwareMemPtr<hardPos, Pointer>> : Std::true_type {};
 
 template <Hardware hardPos, typename Pointer>
-struct IsHardwareMem<hardPos, Pointer, TensorInternal::void_t<typename Pointer::iterator>> : IsHardwareMem<hardPos, typename Pointer::iterator> {};
+struct IsHardwareMem<hardPos, Pointer, void_t<typename Pointer::iterator>> : IsHardwareMem<hardPos, typename Pointer::iterator> {};
 
 template <Hardware hardPos, typename Pointer>
 constexpr bool IsHardwareMemV = IsHardwareMem<hardPos, Pointer>::value;

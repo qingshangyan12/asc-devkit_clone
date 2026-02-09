@@ -18,6 +18,7 @@
 #include "impl/experimental/tensor_api/detail/atom/cube_datamove/copy_atom_impl.h"
 
 namespace AscendC {
+namespace Te {
 
 template <typename Tp, const Tp& traits, typename T, typename... Params>
 __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params);
@@ -28,6 +29,7 @@ __aicore__ inline void Copy(const CopyAtom<T>& atomCopy, const Params& ...params
 template <typename... Args>
 __aicore__ inline auto MakeCopy(const Args& ...traits);
 
+}
 }
 
 #endif // INCLUDE_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_ATOM_H

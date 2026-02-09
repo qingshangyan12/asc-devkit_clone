@@ -24,8 +24,8 @@
 #include "include/utils/std/utility.h"
 #include "include/utils/std/algorithm.h"
 
-namespace AscendC{
-namespace TensorInternal{
+namespace AscendC {
+namespace Te {
 constexpr size_t TWO_DIM_DATA = 2;
 constexpr size_t FOUR_DIM_DATA = 4;
 constexpr size_t C0_SIZE = 32;
