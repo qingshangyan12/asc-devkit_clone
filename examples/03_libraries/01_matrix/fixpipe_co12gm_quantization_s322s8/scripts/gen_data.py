@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -119,8 +119,6 @@ def gen_golden_data(output_format, pre_quant_mode, pre_relu_mode):
 
     input_type = np.dtype("int8")
     output_type = np.dtype("int8")
-    # x1_gm = np.random.randint(1, 2, [M, K]).astype(input_type)
-    # x2_gm = np.random.randint(1, 2, [K, N]).astype(input_type)
     x1_gm = np.random.randint(-3, 3, [M, K]).astype(input_type)
     x2_gm = np.random.randint(-3, 3, [K, N]).astype(input_type)
     golden = np.matmul(x1_gm.astype(np.int32), x2_gm.astype(np.int32)).astype(np.int32)
