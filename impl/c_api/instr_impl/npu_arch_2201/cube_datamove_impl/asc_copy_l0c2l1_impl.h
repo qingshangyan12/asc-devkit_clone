@@ -145,6 +145,27 @@ __aicore__ inline void asc_copy_l0c2l1_sync_impl(__cbuf__ int8_t* dst, __cc__ in
     asc_sync_post_process();
 }
 
+__aicore__ inline void asc_copy_l0c2l1_impl(__cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size,
+                                            uint16_t m_size, uint32_t dst_stride_dst_d, uint16_t src_stride,
+                                            uint8_t uint_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
+                                            bool nd2nz_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, uint_flag_mode,
+                               static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nd2nz_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1_sync_impl(__cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size,
+                                            uint16_t m_size, uint32_t dst_stride_dst_d, uint16_t src_stride,
+                                            uint8_t uint_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
+                                            bool nd2nz_en)
+{
+    asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride_dst_d, src_stride, uint_flag_mode, quant_pre, relu_pre,
+                        channel_split, nd2nz_en);
+    asc_sync_post_process();
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
