@@ -8,12 +8,12 @@
 
 ## 功能说明
 
-reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，应尽量避免使用该接口。
+reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，对齐场景推荐使用[asc_store_align](./asc_storealign)接口。
 
 ## 函数原型
 
 ```cpp
-// 不传入count参数，默认搬运256B长度的元素
+// 不传入count参数，默认搬运VL（Vector Length）长度的元素
 __simd_callee__ inline void asc_store(__ubuf__  int8_t* dst, vector_int8_t src)
 __simd_callee__ inline void asc_store(__ubuf__  uint8_t* dst, vector_uint8_t src)
 __simd_callee__ inline void asc_store(__ubuf__  fp4x2_e2m1_t* dst, vector_fp4x2_e2m1_t src)
@@ -67,7 +67,7 @@ PIPE_V
 
 ## 约束说明
 
-无
+- count的取值范围为[1, VL/sizeof(dst)]，VL为矢量长度。超出该范围会导致未定义行为。
 
 ## 调用示例
 
