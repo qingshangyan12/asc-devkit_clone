@@ -61,7 +61,7 @@
   本算子的实现流程主要分为3个步骤：CopyIn， Compute， CupyOut。CopyIn和CopyOut遵循一般的SIMD算子开发方式，这里不再赘述。
   Compute中通过数据类型判断不同的处理方式。
 
-  floor_mod_simt负责整形场景的若干个元素的计算。
+  floor_mod_simt负责整型场景的若干个元素的计算。
   ```cpp
   for(uint32_t index = threadIdx.x; index < input_total_length; index += blockDim.x) {
         auto rem = self[index] % other[index];
