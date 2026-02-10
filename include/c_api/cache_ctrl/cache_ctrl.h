@@ -57,7 +57,7 @@ __aicore__ inline void asc_icache_preload(const void* addr);
 
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len);
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 #endif
 

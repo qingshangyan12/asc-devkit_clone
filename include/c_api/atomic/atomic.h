@@ -70,7 +70,7 @@ __aicore__ inline void asc_set_atomic_min_int8();
 
 __aicore__ inline void asc_set_atomic_min_int16();
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 // ==========asc_set_atomic_add_float16==========
 __simd_callee__ inline void asc_set_atomic_add_float16();

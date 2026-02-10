@@ -33,11 +33,11 @@ constexpr int32_t MIX = 0;
 constexpr int32_t AIC = 1;
 constexpr int32_t AIV = 2;
 
-#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
+#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
 #define SPLIT_CORE_CUBE
 #endif
 
-#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
+#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
 #define SPLIT_CORE_VEC
 #endif
 
