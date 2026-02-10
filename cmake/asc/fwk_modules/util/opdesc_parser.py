@@ -12,6 +12,8 @@
 
 import sys
 import os
+import re
+from asc_op_compile_base.common.utils.log_utils import LogUtil, AscendCLogLevel
 
 
 OP_ALL = '__ALLOP__'
@@ -310,12 +312,26 @@ def _trans_soc_ver_to_short(soc_ver: str):
     return SOC_TO_SHORT_SOC_MAP[low_soc_ver]
 
 
+def replace_env_vars(input_str):
+    pattern = r'\$\{([^}]+)\}|\$([A-Za-z0-9_]+)'
+    
+    def replace_match(match):
+        var_name = match.group(1) or match.group(2)
+        if var_name not in os.environ:
+            LogUtil.print_compile_log("", f"{var_name} does not exist.", AscendCLogLevel.LOG_WARNING)
+        return os.environ.get(var_name, match.group(0))
+
+    return re.sub(pattern, replace_match, input_str)
+
+
 def get_impl_mode(options_list: list):
     tmp_impl_mode = ""
     for opt in options_list:
         if "--impl-mode" in opt:
             tmp_impl_mode = opt.split("=")[-1].strip()
             options_list.remove(opt)
+    for idx, opt in enumerate(options_list):
+        opt[idx] = replace_env_vars(opt)
     return str(tmp_impl_mode)
 
 
