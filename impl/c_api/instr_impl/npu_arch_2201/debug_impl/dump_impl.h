@@ -147,18 +147,18 @@ public:
         return get_ring_buf_tlv(block_ring_buf_info);
     }
 
-    template <Hardware hardware, typename T, typename U>
+    template <ASC_Hardware ASC_Hardware, typename T, typename U>
     __aicore__ inline void call_write_ring_buf_tlv_head(U src, __gm__ DumpTensorTlvInfoHead* dump_tensor_tlv,
         uint32_t align_dump_len, uint32_t desc, uint32_t dump_size)
     {
-        write_ring_buf_tlv_head<hardware, T, U>(src, dump_tensor_tlv, align_dump_len, desc, dump_size);
+        write_ring_buf_tlv_head<ASC_Hardware, T, U>(src, dump_tensor_tlv, align_dump_len, desc, dump_size);
     }
 
-    template <Hardware hardware, typename T, typename U>
+    template <ASC_Hardware ASC_Hardware, typename T, typename U>
     __aicore__ inline void call_write_ring_buf_tlv_data(U src, __gm__ DumpTensorTlvInfoHead* dump_tensor_tlv,
         uint32_t align_dump_len, uint32_t dump_size)
     {
-        write_ring_buf_tlv_data<hardware, T, U>(src, dump_tensor_tlv, align_dump_len, dump_size);
+        write_ring_buf_tlv_data<ASC_Hardware, T, U>(src, dump_tensor_tlv, align_dump_len, dump_size);
     }
 
     __aicore__ inline void call_update_write_info(__gm__ RingBufWriteInfo* write_info, uint32_t tlv_len)
@@ -179,7 +179,7 @@ private:
         return ring_buf_addr + write_info->bufOffset;
     }
 
-    template <Hardware hardware, typename T, typename U>
+    template <ASC_Hardware ASC_Hardware, typename T, typename U>
     __aicore__ inline void write_ring_buf_tlv_head(U src, __gm__ DumpTensorTlvInfoHead* dump_tensor_tlv,
         uint32_t align_dump_len, uint32_t desc, uint32_t dump_size)
     {
@@ -189,7 +189,7 @@ private:
         dump_tensor_tlv->dataType = static_cast<uint32_t>(get_dump_datatype<T>());
         dump_tensor_tlv->desc = desc;
         dump_tensor_tlv->bufferId = static_cast<uint32_t>(0U);
-        dump_tensor_tlv->position = static_cast<uint16_t>(hardware);
+        dump_tensor_tlv->position = static_cast<uint16_t>(ASC_Hardware);
         dump_tensor_tlv->resv0 = static_cast<uint16_t>(0U);
         dump_tensor_tlv->dim = static_cast<uint32_t>(0U);
         for (uint32_t i = 0; i < K_MAX_SHAPE_DIM; ++i) {
@@ -200,11 +200,11 @@ private:
         asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(dump_tensor_tlv));
     }
 
-    template <Hardware hardware, typename T, typename U>
+    template <ASC_Hardware ASC_Hardware, typename T, typename U>
     __aicore__ inline void write_ring_buf_tlv_data(U src, __gm__ DumpTensorTlvInfoHead* dump_tensor_tlv,
         uint32_t align_dump_len, uint32_t dump_size)
     {
-        if constexpr (hardware == Hardware::GM) {
+        if constexpr (ASC_Hardware == ASC_Hardware::GM) {
             __gm__ T* dst = reinterpret_cast<__gm__ T*>(dump_tensor_tlv + 1);
             if (dst == nullptr || src == nullptr) {
                 return;
@@ -214,11 +214,11 @@ private:
                 *(dst + i) = *(src + i);
             }
             asc_dcci_entire_out(reinterpret_cast<__gm__ uint64_t*>(dst));
-        } else if constexpr (hardware == Hardware::UB) {
+        } else if constexpr (ASC_Hardware == ASC_Hardware::UB) {
             __gm__ T* dump_addr = reinterpret_cast<__gm__ T*>(dump_tensor_tlv + 1);
             uint16_t burst_len = static_cast<uint16_t>(align_dump_len / ASC_C_API_ONE_DATABLOCK_SIZE);
             instruction_forward::call_sync();
-            if (dump_tensor_tlv->position == static_cast<uint16_t>(Hardware::UB)) {
+            if (dump_tensor_tlv->position == static_cast<uint16_t>(ASC_Hardware::UB)) {
                 instruction_forward::call_copy_ub2gm(dump_addr, src, 1, burst_len, 0, 0);
             }
             instruction_forward::call_sync();
@@ -236,12 +236,12 @@ private:
 class dump_base : public print_ring_buf_head_base, public check_print_ring_buf_base, public tlv_base
 {
 public:
-    template <Hardware hardware, typename T, typename U>
+    template <ASC_Hardware ASC_Hardware, typename T, typename U>
     __aicore__ inline void call_asc_dump_ring_impl(U src, uint32_t desc, uint32_t dump_size)
     {
         auto ctrl_value = asc_dump_pre_process();
         if (instruction_forward::call_get_g_sys_print_fifo_space() != nullptr) {
-            asc_dump_ring_impl<hardware, T>(src, desc, dump_size);
+            asc_dump_ring_impl<ASC_Hardware, T>(src, desc, dump_size);
         }
         asc_dump_post_process(ctrl_value);
     }
@@ -252,7 +252,7 @@ private:
         return reinterpret_cast<__gm__ RingBufWriteInfo*>(ring_buf_addr + block_ring_buf_info->ringBufLen);
     }
 
-    template <Hardware hardware, typename T, typename U>
+    template <ASC_Hardware ASC_Hardware, typename T, typename U>
     __aicore__ inline void asc_dump_ring_impl(U src, uint32_t desc, uint32_t dump_size) 
     {
         static_assert((get_dump_datatype<T>() != DumpTensorDataType::ACL_MAX), "dump tensor not support this data type");
@@ -273,8 +273,8 @@ private:
         __gm__ DumpTensorTlvInfoHead* dump_tensor_tlv =
             reinterpret_cast<__gm__ DumpTensorTlvInfoHead*>(call_get_ring_buf_tlv(block_ring_buf_info));
 
-        call_write_ring_buf_tlv_head<hardware, T>(src, dump_tensor_tlv, align_dump_len, desc, dump_size);
-        call_write_ring_buf_tlv_data<hardware, T>(src, dump_tensor_tlv, align_dump_len, dump_size);
+        call_write_ring_buf_tlv_head<ASC_Hardware, T>(src, dump_tensor_tlv, align_dump_len, desc, dump_size);
+        call_write_ring_buf_tlv_data<ASC_Hardware, T>(src, dump_tensor_tlv, align_dump_len, dump_size);
 
         __gm__ RingBufWriteInfo* write_info = get_ring_buf_write_info(block_ring_buf_info);
 
@@ -302,7 +302,7 @@ public:
     template<typename T>
     __attribute__((noinline)) __aicore__ void run(__gm__ T* input, uint32_t desc, uint32_t dump_size)
     {
-        call_asc_dump_ring_impl<Hardware::GM, T>(input, desc, dump_size);
+        call_asc_dump_ring_impl<ASC_Hardware::GM, T>(input, desc, dump_size);
     }
 };
 
@@ -312,7 +312,7 @@ public:
     template<typename T>
     __attribute__((noinline)) __aicore__ void run(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
     {
-        call_asc_dump_ring_impl<Hardware::UB, T>(input, desc, dump_size);
+        call_asc_dump_ring_impl<ASC_Hardware::UB, T>(input, desc, dump_size);
     }
 };
 #endif
