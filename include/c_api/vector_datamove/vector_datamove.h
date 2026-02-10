@@ -21,6 +21,14 @@
 
 #include "instr_impl/npu_arch_2201/vector_datamove_impl.h"
 
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+
+#include "instr_impl/npu_arch_3510/vector_datamove_impl.h"
+
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint8_t sid,
     uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
 
@@ -186,8 +194,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint64_t* dst, __ubuf__ 
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
 
-#include "instr_impl/npu_arch_3510/vector_datamove_impl.h"
-
 __aicore__ inline void asc_set_ub2gm_loop_size(uint32_t loop1_size, uint32_t loop2_size);
 
 __aicore__ inline void asc_set_ub2gm_loop1_stride(uint64_t loop1_src_stride, uint64_t loop1_dst_stride);
@@ -298,12 +304,6 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* sr
     uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size,
     uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode);
     
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-
-#include "instr_impl/npu_arch_3510/vector_datamove_impl.h"
-
-#endif
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  

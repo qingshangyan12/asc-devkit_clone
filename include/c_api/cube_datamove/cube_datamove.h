@@ -17,6 +17,16 @@
 #ifndef INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 #define INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+
+#include "instr_impl/npu_arch_2201/cube_datamove_impl.h"
+
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+
+#include "instr_impl/npu_arch_3510/cube_datamove_impl.h"
+
+#endif
+
 // ==========asc_set_l13d_rpt============
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config);
 
@@ -25,7 +35,6 @@ __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
-#include "instr_impl/npu_arch_2201/cube_datamove_impl.h"
 // ==========asc_copy_gm2l1==========
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t burst_len,
     uint16_t src_stride, uint16_t dst_stride, pad_t pad_mode);
@@ -598,8 +607,6 @@ __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
 __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride);
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-
-#include "instr_impl/npu_arch_3510/cube_datamove_impl.h"
 
 // ==========asc_copy_l12l0a_mx==========
 __aicore__ inline void asc_copy_l12l0a_mx(uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos,
