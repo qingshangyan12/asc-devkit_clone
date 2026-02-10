@@ -25,6 +25,14 @@
 #define __aicore__ [aicore]
 #endif // __aicore__
 
+#ifndef __SIMT_DEVICE_FUNCTIONS_DECL__
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
+#else
+#define __SIMT_DEVICE_FUNCTIONS_DECL__ __simt_callee__
+#endif
+#endif
+
 constexpr int32_t MIX = 0;
 constexpr int32_t AIC = 1;
 constexpr int32_t AIV = 2;
