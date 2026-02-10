@@ -305,6 +305,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __lows2half2(const half2 x, const ha
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __halves2half2(const half x, const half y);
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __half22float2(const half2 x);
+
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(__ubuf__ half *address, half val);
 
