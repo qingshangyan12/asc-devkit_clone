@@ -878,6 +878,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __halves2half2(const half x, const h
     tmp.y = y;
     return tmp;
 }
+
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(__ubuf__ half *address, half val)
