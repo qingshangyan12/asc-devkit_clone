@@ -606,7 +606,7 @@ __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
 
 __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride);
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 // ==========asc_l0c2l1_l0c2l1===========
 // half  float

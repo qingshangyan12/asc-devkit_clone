@@ -15,7 +15,7 @@
 #ifndef ASCENDC_MODULE_SIMT_INTF_IMPL_H
 #define ASCENDC_MODULE_SIMT_INTF_IMPL_H
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #include "kernel_simt_atomic_intf_impl.h"
 #include "kernel_simt_cast_intf_impl.h"
 #include "kernel_simt_cmp_intf_impl.h"

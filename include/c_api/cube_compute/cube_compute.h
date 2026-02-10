@@ -129,7 +129,7 @@ __aicore__ inline void asc_set_l0c2gm_relu(uint64_t relu);
 
 __aicore__ inline void asc_set_l0c2gm_unitflag(uint64_t unit_flag);
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 __aicore__ inline void asc_set_l0c2gm_relu(uint64_t relu);
 
