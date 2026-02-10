@@ -11,6 +11,8 @@
 #define __TESTS_C_API_STUB__
 #include <cstdint>
 #include "stub_fun.h"
+#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_constants.h"
 
 void vsts(vector_f8e4m3 data, __ubuf__ fp8_e4m3fn_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f8e5m2 data, __ubuf__ fp8_e5m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
@@ -32,10 +34,12 @@ void vsts(vector_f8e8m0 src0, vector_f8e8m0 src1, __ubuf__ fp8_e8m0_t* base, int
 void vsts(vector_f4e2m1x2 src0, vector_f4e2m1x2 src1, __ubuf__ fp4x2_e2m1_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 
-#if defined(__DAV_CUBE__)
-    inline uint32_t g_c_api_core_type = 1;
+#if defined(SPLIT_CORE_CUBE)
+    inline uint32_t g_c_api_core_type = AIC; // 1
+#elif defined(SPLIT_CORE_VEC)
+    inline uint32_t g_c_api_core_type = AIV; // 2 
 #else
-    inline uint32_t g_c_api_core_type = 2;
+    inline uint32_t g_c_api_core_type = MIX; // 2 
 #endif
 
 typedef std::integral_constant<Pos, Pos::LOWEST> Lowest_Type;
