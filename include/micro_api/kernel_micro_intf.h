@@ -45,6 +45,8 @@
 #include "kernel_micro_vec_vconv_intf.h"
 #include "kernel_micro_vec_fused_intf.h"
 #include "kernel_micro_histograms_intf.h"
+namespace AscendC{
 using MicroAPI = Reg;
+}
 #endif
 #endif // ASCENDC_MODULE_MICRO_INTERFACE_H
