@@ -41,9 +41,7 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
 
 #endif
 
-#if __NPU_ARCH__ == 3510
 #include "impl/utils/debug/asc_printf_simt_impl.h"
-#endif
 
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 #include "impl/utils/debug/asc_aicore_printf_impl.h"

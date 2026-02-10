@@ -39,10 +39,9 @@ inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm_
     const __gm__ char* __function);
 } // namespace __asc_aicore
 
-#ifdef assert
-#undef assert
-#endif
+#ifndef assert
 #define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
+#endif
 
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 #include "impl/utils/debug/asc_aicore_assert_impl.h"
