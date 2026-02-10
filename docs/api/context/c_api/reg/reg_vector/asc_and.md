@@ -4,7 +4,7 @@
 
 | 产品     | 是否支持 |
 | ----------- |:----:|
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
@@ -15,20 +15,20 @@ dst_i = src0_i \quad \&  \quad src1_i
 $$
 
 ## 函数原型
-    ```c++
-__simd_callee__ inline void asc_and_impl(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask)
-__simd_callee__ inline void asc_and_impl(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask)
-    ```
+```c++
+__simd_callee__ inline void asc_and_(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask)
+__simd_callee__ inline void asc_and_(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask)
+```
 
 ## 参数说明
 
@@ -51,6 +51,8 @@ __simd_callee__ inline void asc_and_impl(vector_fp8_e5m2_t& dst, vector_fp8_e5m2
 PIPE_V
 
 ## 约束说明
+
+无
 
 ## 调用示例
 
