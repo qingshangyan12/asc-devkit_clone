@@ -29,7 +29,7 @@ public:
         auto nzParams = GenRegisterParams<trait, T, U>(dst, src);
         SetRegister<S, decltype(nzParams)>(quant, nzParams);
         auto copyParams = GenFixpipeQuantParams<trait, T, U>(dst, src);
-        auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
+        auto dstTensor = dst(coord, 0);
 
         DataCopy<trait, T, U, decltype(copyParams)>(dstTensor, src, copyParams);
     }
@@ -144,8 +144,8 @@ private:
             CopyDeqTensorToFbufImpl(quant, calNSize, i);
             InsertSync();
             auto coordZero = MakeCoord(Std::Int<0>{}, Std::Int<0>{});
-            auto srcTensor = MakeTensorWithCoord<U, Coord>(src, coordZero, srcOffset * i);
-            auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, dstOffset * i);
+            auto srcTensor = src(coordZero, srcOffset * i);
+            auto dstTensor = dst(coord, dstOffset * i);
 
             DataCopy<trait, T, U, decltype(mainLoopParam)>(dstTensor, srcTensor, mainLoopParam);
         }
@@ -154,8 +154,8 @@ private:
             CopyDeqTensorToFbufImpl(quant, tailNSize, nIterNum);
             InsertSync();
             auto coordZero = MakeCoord(Std::Int<0>{}, Std::Int<0>{});
-            auto srcTensor = MakeTensorWithCoord<U, Coord>(src, coordZero, srcOffset * nIterNum);
-            auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, dstOffset * nIterNum);
+            auto srcTensor = src(coordZero, srcOffset * nIterNum);
+            auto dstTensor = dst(coord, dstOffset * nIterNum);
 
             DataCopy<trait, T, U, decltype(tailParam)>(dstTensor, srcTensor, tailParam);
         }

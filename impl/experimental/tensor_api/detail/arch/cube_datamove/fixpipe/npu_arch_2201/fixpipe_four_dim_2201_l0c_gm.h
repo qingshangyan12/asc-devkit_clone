@@ -26,7 +26,7 @@ public:
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
         CheckCoord<T, U, Coord>(dst, src, coord);
         auto params = GenFixpipeParams<trait, T, U>(dst, src); 
-        auto dstNzTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
+        auto dstNzTensor = dst(coord, 0);
         DataCopy<trait, T, U, decltype(params)>(dstNzTensor, src, params);
     }
 
@@ -90,7 +90,7 @@ public:
         auto ndParams = GenRegisterParams<trait, T, U>(dst, src);
         SetRegister<decltype(ndParams)>(ndParams);
         auto params = GenFixpipeParams<trait, T, U>(dst, src);
-        auto dstNDTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
+        auto dstNDTensor = dst(coord, 0);
 
         DataCopy<trait, T, U, decltype(params)>(dstNDTensor, src, params);
     }

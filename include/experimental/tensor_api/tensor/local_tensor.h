@@ -17,6 +17,7 @@
 
 #include "include/experimental/tensor_api/tensor/engine.h"
 #include "include/experimental/tensor_api/tensor/layout.h"
+#include "impl/experimental/tensor_api/detail/tensor/make_pointer_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -95,24 +96,30 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     }
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
-        return Data()[Layout()(coord)];
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, uint32_t offset) {
+        auto layout = Layout();
+        auto index = Crd2Idx(coord, layout) + offset;
+        auto iterator = MakeMemPtr<EngineType::iterator::hardPos>(reinterpret_cast<elementType*>(Data().Get() + index));
+        return MakeTensor(iterator, layout);
     }
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
-        return Data()[Layout()(coord)];
+    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, uint32_t offset) const {
+        auto layout = Layout();
+        auto index = Crd2Idx(coord, layout) + offset;
+        auto iterator = MakeMemPtr<EngineType::iterator::hardPos>(reinterpret_cast<elementType*>(Data().Get() + index));
+        return MakeTensor(iterator, layout);
     }
 
-    template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) {
-        return operator()(MakeCoord(c0,c1,cs...));
-    }
+    // template <typename Coord0, typename Coord1, typename... Coords>
+    // __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) {
+    //     return operator()(MakeCoord(c0,c1,cs...));
+    // }
 
-    template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const {
-        return operator()(MakeCoord(c0,c1,cs...));
-    }
+    // template <typename Coord0, typename Coord1, typename... Coords>
+    // __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const {
+    //     return operator()(MakeCoord(c0,c1,cs...));
+    // }
 
     template <typename... Layouts>
     __aicore__ inline constexpr auto Compose(const Layouts&... layouts) {
