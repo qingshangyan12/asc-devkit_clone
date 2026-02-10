@@ -37,7 +37,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+需配合[asc_ndim_copy_gm2ub](./asc_ndim_copy_gm2ub.md)使用。
 
 ## 调用示例
 
