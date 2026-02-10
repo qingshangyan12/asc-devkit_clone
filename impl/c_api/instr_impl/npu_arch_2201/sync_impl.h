@@ -56,9 +56,9 @@ __aicore__ inline void asc_sync()
     asc_sync_impl();
 }
 
-__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint64_t config)
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint8_t mode, int64_t flagID)
 {
-    asc_sync_block_arrive_impl(pipe, config);
+    asc_sync_block_arrive_impl(pipe, mode, flagID);
 }
 
 __aicore__ inline void asc_sync_block_wait(int64_t flagID)
