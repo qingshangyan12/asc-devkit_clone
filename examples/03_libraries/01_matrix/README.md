@@ -65,3 +65,4 @@
 | [matmul_no_ibshareAB](./matmul_no_ibshareAB)                                               | 本样例介绍了调用Matmul高阶API实现不开启IBShare功能的单算子。IBShare的功能是复用L1 Buffer上相同的A矩阵或者B矩阵数据，减少数据搬运开销。本样例为A矩阵和B矩阵同时不复用场景 |
 | [matmul_ibshareB](./matmul_ibshareB)                                                       | 本样例介绍多个AIV的B矩阵GM地址相同场景下，实现共享L1 Buffer上B矩阵数据的Matmul矩阵乘法，计算公式为：C = A * B + Bias |
 | [basic_block_matmul](./basic_block_matmul)                                                 | 本样例实现无尾块且tiling的base块大小固定的场景下的Matmul矩阵乘法，计算公式为：C = A * B + Bias |
+| [load2d_gm2l1](./load2d_gm2l1)                                                 | 本样例介绍了在 half 数据类型下，以及左、右矩阵均不转置，相关指令的使用方法，其中 A 和 B 分别表示矩阵乘法的左右输入矩阵，样例重点关注LoadData2D指令GM到L1的数据通路。 |
