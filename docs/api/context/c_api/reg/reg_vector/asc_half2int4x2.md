@@ -16,58 +16,97 @@
 - CEIL舍入模式：向正无穷舍入
 - TRUNC舍入模式：向零舍入
 
+- 非饱和模式：
+  - 输入数据超过输出类型最值时，返回输出类型的对应符号inf值。
+  - 输入数据为+/-inf时, 返回+/-inf。
+  - 输入数据为nan时，返回nan。
+- 饱和模式：
+  - 输入数据超过输出类型最值时，返回输出类型的对应最值。
+  - 输入数据为+/-inf时, 返回输出类型的对应最值。
+  - 输入数据为nan时，返回0。
+
 ## 函数原型
 
 ```cpp
-// 
-// FLOOR舍入模式，
+// FLOOR舍入模式，非饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// FLOOR舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rd_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// FLOOR舍入模式，饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// FLOOR舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// FLOOR舍入模式，非饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_rd_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// FLOOR舍入模式，饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// FLOOR舍入模式，非饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rd_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// FLOOR舍入模式，饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-
-// RINT舍入模式
+// RINT舍入模式，非饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// RINT舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rn_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// RINT舍入模式，饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// RINT舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rn_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// RINT舍入模式，非饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_rn_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// RINT舍入模式，饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_rn_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// RINT舍入模式，非饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rn_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// RINT舍入模式，饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rn_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-
-// ROUND舍入模式
+// ROUND舍入模式，非饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// ROUND舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rna_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// ROUND舍入模式，饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// ROUND舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rna_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// ROUND舍入模式，非饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_rna_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// ROUND舍入模式，饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_rna_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// ROUND舍入模式，非饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rna_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// ROUND舍入模式，饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rna_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-
-// CEIL舍入模式
+// CEIL舍入模式，非饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// CEIL舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_ru_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// CEIL舍入模式，饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// CEIL舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_ru_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// CEIL舍入模式，非饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_ru_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// CEIL舍入模式，饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_ru_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// CEIL舍入模式，非饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_ru_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// CEIL舍入模式，饱和模式，选取索引3的位置  
 __simd_callee__ inline void asc_half2int4x2_ru_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-
-// TRUNC舍入模式
+// TRUNC舍入模式，非饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// TRUNC舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rz_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// TRUNC舍入模式，饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// TRUNC舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rz_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// TRUNC舍入模式，非饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_rz_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// TRUNC舍入模式，饱和模式，选取索引2的位置
 __simd_callee__ inline void asc_half2int4x2_rz_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// TRUNC舍入模式，非饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rz_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+// TRUNC舍入模式，饱和模式，选取索引3的位置 
 __simd_callee__ inline void asc_half2int4x2_rz_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 ```
 
@@ -91,14 +130,7 @@ PIPE_V
 
 ## 约束说明
 
-- 非饱和模式：
-  - 输入数据超过输出类型最值时，结果被截断为目标格式的数据宽度，例如输入half值为257，输出int4x2_t值为1。
-  - 输入数据为+/-inf时, 返回输出类型的最值。
-  - 输入数据为nan时，返回0。
-- 饱和模式：
-  - 输入数据超过输出类型最值时，返回输出类型的对应最值，例如输入half值为257，输出int4x2值为127。
-  - 输入数据为+/-inf时, 返回输出类型的最值。
-  - 输入数据为nan时，返回0。
+- 使能饱和模式和非饱和模式生效时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
 
 ## 调用示例
 
