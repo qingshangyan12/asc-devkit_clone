@@ -19,7 +19,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 namespace Internal {
 __aicore__ inline constexpr DivSpecificMode GetDivSpecificMode(MaskMergeMode mrgMode)
 {
@@ -125,7 +125,7 @@ __simd_callee__ inline void AddOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskR
             dstReg = dstTemp;
         } else {
             CalTraitOneByTransToTraitTwo<T, mode, U,
-                AddB64Impl<T, mode, MicroAPI::RegTensor<ActualT, MicroAPI::RegTraitNumTwo>>>
+                AddB64Impl<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>>
                 (dstReg, srcReg0, srcReg1, mask);
         }
     } else {
@@ -239,7 +239,7 @@ __simd_callee__ inline void SubImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
             dstReg = dstTemp;
         } else {
             CalTraitOneByTransToTraitTwo<T, mode, U,
-                                         SubB64Impl<T, mode, MicroAPI::RegTensor<ActualT, MicroAPI::RegTraitNumTwo>>>
+                                         SubB64Impl<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>>
                                          (dstReg, srcReg0, srcReg1, mask);
         }
     } else {
@@ -306,7 +306,7 @@ __simd_callee__ inline void MulComplex64Impl(U& dstReg, U& srcReg0, U& srcReg1, 
     using ActualT = typename U::ActualT;
     static_assert(sizeof(ActualT) == 8, "data type should be B64");
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-    ComplexMulKernel<T, mode, MicroAPI::RegTensor<ActualT, MicroAPI::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
+    ComplexMulKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -315,7 +315,7 @@ __simd_callee__ inline void MulComplex32TwoImpl(U& dstReg, U& srcReg0, U& srcReg
     using ActualT = typename U::ActualT;
     static_assert(sizeof(ActualT) == 4, "data type should be B32");
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-    ComplexMulKernel<T, mode, MicroAPI::RegTensor<ActualT, MicroAPI::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
+    ComplexMulKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -360,7 +360,7 @@ __simd_callee__ inline void MulImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
             dstReg = dstTemp;
         } else {
             CalTraitOneByTransToTraitTwo<T, mode, U,
-                MulB64Impl<T, mode, MicroAPI::RegTensor<ActualT, MicroAPI::RegTraitNumTwo>>>
+                MulB64Impl<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>>
                 (dstReg, srcReg0, srcReg1, mask);
         }
     } else {
@@ -676,9 +676,9 @@ __simd_callee__ inline void ComplexDivKernel(U& dstReg, U& srcReg0, U& srcReg1, 
     Abs(absSrc1Imag, src1Imag, mask);
     RegTensor<typename ActualT::EleType> one;
     RegTensor<typename ActualT::EleType> zero;
-    MicroAPI::Duplicate<typename ActualT::EleType, typename ActualT::EleType, RegTensor<typename ActualT::EleType>>(one, 1.0f);
-    MicroAPI::Duplicate<typename ActualT::EleType, typename ActualT::EleType, RegTensor<typename ActualT::EleType>>(zero, 0.0f);
-    MaskReg maskFull = MicroAPI::CreateMask<typename ActualT::EleType, MicroAPI::MaskPattern::ALL>();
+    Reg::Duplicate<typename ActualT::EleType, typename ActualT::EleType, RegTensor<typename ActualT::EleType>>(one, 1.0f);
+    Reg::Duplicate<typename ActualT::EleType, typename ActualT::EleType, RegTensor<typename ActualT::EleType>>(zero, 0.0f);
+    MaskReg maskFull = Reg::CreateMask<typename ActualT::EleType, Reg::MaskPattern::ALL>();
 
     // condition : if abs_c >= abs_d
     MaskReg compareAbsCDMask;
@@ -772,7 +772,7 @@ __simd_callee__ inline void DivComplex64Impl(U &dstReg, U &srcReg0, U &srcReg1, 
     using ActualT = typename U::ActualT;
     static_assert(sizeof(ActualT) == 8, "data type should be B64");
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-    ComplexDivKernel<T, mode, MicroAPI::RegTensor<ActualT, MicroAPI::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
+    ComplexDivKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
 }
 
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
@@ -816,7 +816,7 @@ __simd_callee__ inline void DivComplex32TwoImpl(U& dstReg, U& srcReg0, U& srcReg
     using ActualT = typename U::ActualT;
     static_assert(sizeof(ActualT) == 4, "data type should be B32");
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-    ComplexDivKernel<T, mode, MicroAPI::RegTensor<ActualT, MicroAPI::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
+    ComplexDivKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
 }
 
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
@@ -840,7 +840,7 @@ __simd_callee__ inline void DivComplex32OnetraitImpl(U& dstReg, U& srcReg0, U& s
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void DivPrecisionImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
-    // Improves MicroAPI with high precision mode by using error-complemention approach with following formula.
+    // Improves Reg with high precision mode by using error-complemention approach with following formula.
     //
     // sign = vand(a, -0.0)
     // sign_one = vor(1.0, sign)
@@ -926,19 +926,19 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     NotNumUnion normalizeScaleReduce;
     normalizeScaleReduce.i = 0x34000000; // 2^-23
 
-    MicroAPI::RegTensor<float> maxSubnormal;
-    MicroAPI::RegTensor<uint32_t> tmp0;
-    MicroAPI::RegTensor<int32_t> tmp1;
+    Reg::RegTensor<float> maxSubnormal;
+    Reg::RegTensor<uint32_t> tmp0;
+    Reg::RegTensor<int32_t> tmp1;
 
-    MicroAPI::RegTensor<float> src0Abs;
-    MicroAPI::RegTensor<float> src0Subnormal;
-    MicroAPI::RegTensor<float> src0Norm;
-    MicroAPI::RegTensor<float> src0All;
+    Reg::RegTensor<float> src0Abs;
+    Reg::RegTensor<float> src0Subnormal;
+    Reg::RegTensor<float> src0Norm;
+    Reg::RegTensor<float> src0All;
 
-    MicroAPI::RegTensor<float> src1Abs;
-    MicroAPI::RegTensor<float> src1Subnormal;
-    MicroAPI::RegTensor<float> src1Norm;
-    MicroAPI::RegTensor<float> src1All;
+    Reg::RegTensor<float> src1Abs;
+    Reg::RegTensor<float> src1Subnormal;
+    Reg::RegTensor<float> src1Norm;
+    Reg::RegTensor<float> src1All;
 
     MaskReg mask0;
     MaskReg maskSrc0Normal;
@@ -1071,8 +1071,8 @@ __simd_callee__ inline void DivIEEE754FloatImpl(RegTensor<float>& dst, RegTensor
     Duplicate(tmp0, 255, mask);
     Compare<int32_t, CMPMODE::EQ>(mask0, scale, (RegTensor<int32_t>&)tmp0, mask);
     MaskAnd(mask0, mask0, maskValid, mask);
-    MicroAPI::Duplicate(tmp1, 1, mask0);
-    MicroAPI::Sub(tmp1, scale, tmp1, mask0);
+    Reg::Duplicate(tmp1, 1, mask0);
+    Reg::Sub(tmp1, scale, tmp1, mask0);
     Select(scale, tmp1, scale, mask0);
     Muls(z1, dst, 2, mask0);
     Select(dst, z1, dst, mask0);
@@ -1127,19 +1127,19 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
     HalfUnion normalizeScaleReduce;
     normalizeScaleReduce.i = 0x1400; // 2^-10
 
-    MicroAPI::RegTensor<half> maxSubnormal;
-    MicroAPI::RegTensor<uint16_t> tmp0;
-    MicroAPI::RegTensor<int16_t> tmp1;
+    Reg::RegTensor<half> maxSubnormal;
+    Reg::RegTensor<uint16_t> tmp0;
+    Reg::RegTensor<int16_t> tmp1;
 
-    MicroAPI::RegTensor<half> src0Abs;
-    MicroAPI::RegTensor<half> src0Subnormal;
-    MicroAPI::RegTensor<half> src0Norm;
-    MicroAPI::RegTensor<half> src0All;
+    Reg::RegTensor<half> src0Abs;
+    Reg::RegTensor<half> src0Subnormal;
+    Reg::RegTensor<half> src0Norm;
+    Reg::RegTensor<half> src0All;
 
-    MicroAPI::RegTensor<half> src1Abs;
-    MicroAPI::RegTensor<half> src1Subnormal;
-    MicroAPI::RegTensor<half> src1Norm;
-    MicroAPI::RegTensor<half> src1All;
+    Reg::RegTensor<half> src1Abs;
+    Reg::RegTensor<half> src1Subnormal;
+    Reg::RegTensor<half> src1Norm;
+    Reg::RegTensor<half> src1All;
 
     MaskReg mask0;
     MaskReg maskSrc0Normal;
@@ -1268,8 +1268,8 @@ __simd_callee__ inline void DivIEEE754HalfImpl(RegTensor<half>& dst, RegTensor<h
     Duplicate(tmp0, 31, mask);
     Compare<int16_t, CMPMODE::EQ>(mask0, scale, (RegTensor<int16_t>&)tmp0, mask);
     MaskAnd(mask0, mask0, maskValid, mask);
-    MicroAPI::Duplicate(tmp1, 1, mask0);
-    MicroAPI::Sub(tmp1, scale, tmp1, mask0);
+    Reg::Duplicate(tmp1, 1, mask0);
+    Reg::Sub(tmp1, scale, tmp1, mask0);
     Select(scale, tmp1, scale, mask0);
     Muls(z1, dst, 2, mask0);
     Select(dst, z1, dst, mask0);
@@ -1324,12 +1324,12 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     }
     if constexpr (sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
         static_assert(SupportType<T, half, float>(),
-                      "MicroAPI Div for PRECISION_1ULP_FTZ_FALSE only supports half/float.");
+                      "Reg Div for PRECISION_1ULP_FTZ_FALSE only supports half/float.");
     } else if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
-        static_assert(SupportType<T, float>(), "MicroAPI Div for PRECISION_0ULP_FTZ_FALSE only supports float.");
+        static_assert(SupportType<T, float>(), "Reg Div for PRECISION_0ULP_FTZ_FALSE only supports float.");
     } else if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE) {
         static_assert(SupportType<T, float, complex64>(),
-                      "MicroAPI Div for PRECISION_0ULP_FTZ_TRUE only supports float/complex64.");
+                      "Reg Div for PRECISION_0ULP_FTZ_TRUE only supports float/complex64.");
     }
     if constexpr (SupportType<ActualT, complex32>()) {
         if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
@@ -1340,11 +1340,11 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     } else if constexpr (SupportBytes<ActualT, 8>()) {
         if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             U dstTemp;
-            DivB64Impl<T, mode, MicroAPI::RegTensor<ActualT, MicroAPI::RegTraitNumTwo>>(dstTemp, srcReg0, srcReg1, mask);
+            DivB64Impl<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstTemp, srcReg0, srcReg1, mask);
             dstReg = dstTemp;
         } else {
             CalTraitOneByTransToTraitTwo<T, mode, U,
-                DivB64Impl<T, mode, MicroAPI::RegTensor<ActualT, MicroAPI::RegTraitNumTwo>>>
+                DivB64Impl<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>>
                 (dstReg, srcReg0, srcReg1, mask);
         }
     } else if constexpr (SupportType<ActualT, half>()) {
@@ -1858,6 +1858,6 @@ __simd_callee__ inline void SubCarryOutImpl(MaskReg& carry, U& dstReg, U& srcReg
     static_assert(SupportType<ActualT, uint32_t, int32_t>(), "current data type is not supported on current device!");
     vsubc(carry, dstReg, srcReg0, srcReg1, mask);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_BINARY_IMPL_H

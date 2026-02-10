@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, RoundMode roundMode, MaskMergeMode mode, typename U>
 __simd_callee__ inline void Truncate(U& dstReg, U& srcReg, MaskReg& mask)
 {
@@ -38,7 +38,7 @@ template <typename T, typename U, const CastTrait& trait, typename S, typename V
 __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask) {
     CastImpl<T, U, trait>(dstReg, srcReg, mask);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_VEC_VCONV_INTERFACE_IMPL_H

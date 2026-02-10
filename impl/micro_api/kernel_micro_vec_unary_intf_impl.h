@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, MaskMergeMode mode, typename U>
 __simd_callee__ inline void Abs(U& dstReg, U& srcReg, MaskReg& mask)
 {
@@ -92,7 +92,7 @@ __simd_callee__ inline void Not(U& dstReg, U& srcReg, MaskReg& mask)
 {
     NotImpl<T, mode, U>(dstReg, srcReg, mask);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_VEC_SINGLE_INTERFACE_IMPL_H

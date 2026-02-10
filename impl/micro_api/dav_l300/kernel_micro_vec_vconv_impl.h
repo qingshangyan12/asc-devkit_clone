@@ -19,7 +19,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, typename U, RegLayout layoutMode, MaskMergeMode mode>
 __simd_callee__ inline void CastImpl(RegTensor<T> &dstReg, RegTensor<U> &srcReg, MaskReg &mask)
 {
@@ -309,6 +309,6 @@ __simd_callee__ inline void CastImpl(RegT &dstReg, RegU &srcReg, MaskReg &mask)
         static_assert(allNotSupport, "current cast data type is not supported on current device!");
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_VCONV_IMPL_H

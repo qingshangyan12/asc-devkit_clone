@@ -33,7 +33,7 @@
 #endif
 
 namespace AscendC { 
-namespace MicroAPI {
+namespace Reg {
 
 template <MemType src, MemType dst> 
 __simd_callee__ inline void LocalMemBar() 
@@ -41,7 +41,7 @@ __simd_callee__ inline void LocalMemBar()
     LocalMemBarImpl<src, dst>(); 
 }
 
-} // namespace MicroAPI 
+} // namespace Reg 
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_MEMBAR_INTERFACE_IMPL_H

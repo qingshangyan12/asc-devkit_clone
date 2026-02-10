@@ -18,7 +18,7 @@
 #include "../../../include/micro_api/kernel_micro_struct_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename U>
 __simd_callee__ inline void GatherMaskImpl(U& dstReg, U srcReg, MaskReg& mask)
 {
@@ -82,6 +82,6 @@ __simd_callee__ inline void GatherImpl(S& dstReg, S& srcReg, V& indexReg)
         vselr((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, (RegTensor<uint32_t>&)indexReg);
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_GATHER_MASK_IMPL_H
