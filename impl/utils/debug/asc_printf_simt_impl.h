@@ -18,16 +18,10 @@
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_SIMT_IMPL__
-#warning "asc_printf_simt_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "asc_printf.h" and use public functions or variables defined in interface header files."
+#warning "impl/utils/debug/asc_printf_simt_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "utils/debug/asc_printf.h" and use public functions or variables defined in interface header files."
 #endif
 
-#ifndef __SIMT_DEVICE_FUNCTIONS_DECL__
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
-#else
-#define __SIMT_DEVICE_FUNCTIONS_DECL__ __simt_callee__
-#endif
-#endif
+#include "impl/utils/debug/asc_utils_macros.h"
 
 #ifdef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #define __gm__ 
