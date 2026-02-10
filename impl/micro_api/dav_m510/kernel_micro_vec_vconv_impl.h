@@ -181,7 +181,7 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
                 modeValue);
         } else {
             constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
-            vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, partModeValue, modeValue);
+            vcvt(dstReg, srcReg, mask, static_cast<int32_t>(roundModeValue.value), satModeValue, partModeValue, modeValue);
         }
     } else if constexpr (ppCondition) {
         constexpr auto ppModeValue = std::integral_constant<::Part_T, static_cast<::Part_T>(layoutMode)>();
@@ -227,7 +227,7 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
     constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
     if constexpr (partCondition) {
         // vcvt_fi f322s32/f162s16
-        vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, modeValue);
+        vcvt(dstReg, srcReg, mask, static_cast<int32_t>(roundModeValue.value), satModeValue, modeValue);
     } else if constexpr (ppCondition) {
         // bf162f16
         vcvt(dstReg, srcReg, mask, satModeValue, roundModeValue, modeValue);
@@ -301,7 +301,7 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
     } else {
         constexpr auto modeValue = GetMaskMergeMode<mode>();
         constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
-        vcvt(dstReg, srcReg, mask, roundModeValue, modeValue);
+        vcvt(dstReg, srcReg, mask, static_cast<int32_t>(roundModeValue.value), modeValue);
     }
 }
 
@@ -337,7 +337,7 @@ __simd_callee__ inline void TruncateImpl(U& dstReg, U& srcReg, MaskReg& mask)
     } else {
         constexpr auto modeValue = GetMaskMergeMode<mode>();
         constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
-        vtrc(dstReg, srcReg, roundModeValue, mask, modeValue);
+        vtrc(dstReg, srcReg, static_cast<int32_t>(roundModeValue.value), mask, modeValue);
     }
 }
 
