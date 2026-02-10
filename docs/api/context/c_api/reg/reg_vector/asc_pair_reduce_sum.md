@@ -8,16 +8,14 @@
 
 ## 功能说明
 
-PairReduceSum: 相邻两个（奇偶）元素求和，结果写入dst。例如：src={1,2,3,4}，则dst={3,7}。归约指令的总体介绍请参考[reg_vector.md]()。
+PairReduceSum: 相邻两个（奇偶）元素求和，结果写入dst。例如：src={1,2,3,4}，则dst={3,7}。
 
 ## 函数原型
 
-- 前n个数据计算
-
-    ```c++
-    __simd_callee__ inline void asc_pair_reduce_sum(vector_half& dst, vector_half src, vector_bool mask)
-    __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float src, vector_bool mask)
-    ```
+```cpp
+__simd_callee__ inline void asc_pair_reduce_sum(vector_half& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float src, vector_bool mask)
+```
 
 ## 参数说明
 
@@ -25,7 +23,7 @@ PairReduceSum: 相邻两个（奇偶）元素求和，结果写入dst。例如�
 
 | 参数名       | 输入/输出 | 描述                |
 | --------- | ----- | ----------------- |
-| dst       | 输出    | 目的操作数。            |
+| dst       | 输出    | 目的操作数（矢量数据寄存器）。            |
 | src | 输入    | 源操作数（矢量数据寄存器）。             |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 

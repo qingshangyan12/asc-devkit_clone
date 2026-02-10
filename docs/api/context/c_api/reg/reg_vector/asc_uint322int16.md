@@ -12,7 +12,6 @@
 
 ## 函数原型
 
-- 前n个数据计算
 ```cpp
 // 数据写入索引为偶数的位置，非饱和模式
 __simd_callee__ inline void asc_uint322int16(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
