@@ -93,6 +93,18 @@ def _trans_compile_cmds_to_precompile(cmds_i: list):
     cmds_i.insert(compiler_index + 1, '-E')
 
 
+def replace_env_vars(input_str):
+    pattern = r'\$\{([^}]+)\}|\$([A-Za-z0-9_]+)'
+    
+    def replace_match(match):
+        var_name = match.group(1) or match.group(2)
+        if var_name not in os.environ:
+            LogUtil.print_compile_log("", f"{var_name} does not exist.", AscendCLogLevel.LOG_WARNING)
+        return os.environ.get(var_name, match.group(0))
+
+    return re.sub(pattern, replace_match, input_str)
+
+
 def _trans_compile_cmds_to_assemble(cmds_s: list):
     if len(cmds_s) < 2:
         raise Exception(f"invalid compile cmds = {cmds_s}")
@@ -204,7 +216,8 @@ class CommonUtility:
         cmd.append("-mllvm")
         cmd.append("-disable-lsr")
         cmd.append("-fno-unroll-loops")
-        proc = subprocess.Popen(
+        cmd = [replace_env_vars(item) for item in cmd]
+        proc = subprocess.Popen(	 
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         return out, proc.returncode
@@ -245,7 +258,8 @@ class CommonUtility:
         elif global_var_storage.get_variable("ascendc_short_soc_version") == ASCEND_310:
             cmd.insert(5, "-mllvm")
             cmd.insert(6, "-cce-aicore-function-stack-size=8192")
-        proc = subprocess.Popen(
+        cmd = [replace_env_vars(item) for item in cmd]
+        proc = subprocess.Popen(	 
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         if proc.returncode != 0:
@@ -272,7 +286,8 @@ class CommonUtility:
         returncode : int
             success or fail
         """
-        proc = subprocess.Popen(
+        cmd = [replace_env_vars(item) for item in cmd]
+        proc = subprocess.Popen(	 
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (out, _) = proc.communicate()
         is_compile_cmd = cmd_type == "compile"
@@ -281,7 +296,8 @@ class CommonUtility:
                 switching_compilation_mode()
                 cmd[cmd.index("-O0")] = "-O2"
                 del cmd[cmd.index("-g")]
-                proc_now = subprocess.Popen(
+                cmd = [replace_env_vars(item) for item in cmd]
+                proc_now = subprocess.Popen(	 
                     cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 (out, _) = proc_now.communicate()
                 if proc_now.returncode != 0:
