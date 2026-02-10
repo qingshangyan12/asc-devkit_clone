@@ -17,5 +17,6 @@
 
 #include "include/experimental/tensor_api/algorithm/copy.h"
 #include "include/experimental/tensor_api/algorithm/gemm.h"
+#include "include/experimental/tensor_api/algorithm/mad.h"
 
 #endif // INCLUDE_TENSOR_API_ALGORITHM_ALGORITHM_H
