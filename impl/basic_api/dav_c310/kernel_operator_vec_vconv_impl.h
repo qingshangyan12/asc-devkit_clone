@@ -2877,7 +2877,7 @@ __aicore__ inline void CastDeqImpl(
     AscendCUtils::FreeTemporaryBuffer(tempBuf);
 }
 
-namespace MicroAPIAddReluCast {
+namespace RegAddReluCast {
 template <typename T1, typename T2, typename RegT, typename RegU>
 __simd_callee__ inline void AddReluCast(RegT &dstReg, RegU &src0Reg, RegU &src1Reg, MicroAPI::MaskReg &mask)
 {
@@ -2899,7 +2899,7 @@ __simd_callee__ inline void AddReluCast(RegT &dstReg, RegU &src0Reg, RegU &src1R
             (MicroAPI::RegTensor<uint8_t> &)dstReg, (MicroAPI::RegTensor<uint16_t> &)dstReg);
     }
 }
-}  // namespace MicroAPIAddReluCast
+}  // namespace RegAddReluCast
 
 template <typename T1, typename T2> constexpr __aicore__ inline void CheckAddReluCastSupportType()
 {
@@ -2985,7 +2985,7 @@ __simd_vf__ inline void AddReluCastImpl(__ubuf__ T1 *dst, __ubuf__ T2 *src0, __u
     }
 }
 
-namespace MicroAPISubReluCast {
+namespace RegSubReluCast {
 template <typename T1, typename T2, typename RegT, typename RegU>
 __simd_callee__ inline void SubReluCast(RegT &dstReg, RegU &src0Reg, RegU &src1Reg, MicroAPI::MaskReg &mask)
 {
@@ -3005,7 +3005,7 @@ __simd_callee__ inline void SubReluCast(RegT &dstReg, RegU &src0Reg, RegU &src1R
         MicroAPI::Pack((MicroAPI::RegTensor<uint8_t> &)dstReg, (MicroAPI::RegTensor<uint16_t> &)dstReg);
     }
 }
-}  // namespace MicroAPISubReluCast
+}  // namespace RegSubReluCast
 
 template <typename T1, typename T2>
 constexpr __aicore__ inline void CheckSubReluCastSupportType()

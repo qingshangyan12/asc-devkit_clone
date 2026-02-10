@@ -336,7 +336,7 @@ __aicore__ inline void AbsImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t 
     Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
 }
 
-namespace MicroAPIReciprocal {
+namespace RegReciprocal {
 template <typename T, typename RegT, bool precisionMode = false>
 __aicore__ inline void Reciprocal(RegT &dstReg, RegT &srcReg, MicroAPI::MaskReg &mask)
 {
@@ -349,7 +349,7 @@ __aicore__ inline void Reciprocal(RegT &dstReg, RegT &srcReg, MicroAPI::MaskReg 
         MicroAPI::Div<T, &mode>(dstReg, dstReg, srcReg, mask);
     }
 }
-} // namespace MicroAPIReciprocal
+} // namespace RegReciprocal
 template <typename T, bool isSetMask = true, const ReciprocalConfig& config>
 __aicore__ inline void ReciprocalImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
@@ -424,7 +424,7 @@ __aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t
     }
 }
 
-namespace MicroAPIRsqrt {
+namespace RegRsqrt {
 template <typename T, typename RegT, bool precisionMode = false> __aicore__ inline void Rsqrt(RegT &dstReg, RegT &srcReg, MicroAPI::MaskReg &mask)
 {
     MicroAPI::MaskReg cmpMask;
@@ -452,7 +452,7 @@ template <typename T, typename RegT, bool precisionMode = false> __aicore__ inli
         }
     }
 }
-} // namespace MicroAPIRsqrt
+} // namespace RegRsqrt
 template <typename T, bool isSetMask = true, const RsqrtConfig& config>
 __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams &repeatParams)

@@ -144,7 +144,7 @@ __aicore__ inline void VecAxpyImplTemplate(__ubuf__ T *dst, __ubuf__ U *src, U s
 }
 } // namespace Internal
 
-namespace MicroAPIAxpy {
+namespace RegAxpy {
 namespace CastParam {
 constexpr MicroAPI::CastTrait half2floatTrait = { MicroAPI::RegLayout::ZERO, MicroAPI::SatMode::UNKNOWN,
     MicroAPI::MaskMergeMode::ZEROING, RoundMode::UNKNOWN };
@@ -170,7 +170,7 @@ __aicore__ inline void Axpy(RegT &dstReg, RegU &srcReg, U scalarValue, MicroAPI:
         MicroAPI::Add(dstReg, cvtReg, dstReg, mask);
     }
 }
-} // namespace MicroAPIAxpy
+} // namespace RegAxpy
 
 // Axpy::Level 0
 template <typename T, typename U, bool isSetMask = true>

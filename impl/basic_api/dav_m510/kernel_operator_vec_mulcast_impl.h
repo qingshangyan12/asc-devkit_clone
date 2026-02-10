@@ -28,7 +28,7 @@ constexpr MicroAPI::CastTrait MulCastTrait = { MicroAPI::RegLayout::ZERO, MicroA
     MicroAPI::MaskMergeMode::ZEROING, RoundMode::CAST_RINT };
 }
 
-namespace MicroAPIMulCast {
+namespace RegMulCast {
 template <typename T, typename U, typename RegT, typename RegU>
 __aicore__ inline void MulCast(RegT &dstReg, RegU &src0Reg, RegU &src1Reg, MicroAPI::MaskReg &mask)
 {
@@ -37,7 +37,7 @@ __aicore__ inline void MulCast(RegT &dstReg, RegU &src0Reg, RegU &src1Reg, Micro
     MicroAPI::Pack<uint8_t, uint16_t, MicroAPI::HighLowPart::LOWEST>((MicroAPI::RegTensor<uint8_t> &)dstReg,
         (MicroAPI::RegTensor<uint16_t> &)dstReg);
 }
-} // namespace MicroAPIMulCast
+} // namespace RegMulCast
 
 template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void MulCastImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U *src1, uint64_t mask,
