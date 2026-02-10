@@ -314,7 +314,7 @@ __aicore__ inline void AddDeqReluImpl(__ubuf__ half *dst, __ubuf__ int32_t *src0
  * MulAddDst                                             *
  * ************************************************************************************************* */
 // MulAddDst::Level 0
-namespace RegMulAddDst {
+namespace MicroAPIMulAddDst {
 template <typename T, typename U, typename RegT, typename RegU>
 __aicore__ inline void MulAddDst(RegT &dstReg, RegU &srcReg0, RegU &srcReg1, MicroAPI::MaskReg &mask)
 {
@@ -333,7 +333,7 @@ __aicore__ inline void MulAddDst(RegT &dstReg, RegU &srcReg0, RegU &srcReg1, Mic
         MicroAPI::MulAddDst(dstReg, castReg1, castReg2, mask);
     }
 }
-} // namespace RegMulAddDst
+} // namespace MicroAPIMulAddDst
 
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void MulAddDstImpl(__ubuf__ T *dst, __ubuf__ U *src0, __ubuf__ U *src1,
@@ -520,14 +520,14 @@ __aicore__ inline void FusedMulAddReluImpl(__ubuf__ T *dst, __ubuf__ T *src0, __
  * SubRelu                                             *
  * ************************************************************************************************* */
 // SubRelu::Level 0
-namespace RegSubRelu {
+namespace MicroAPISubRelu {
 template <typename T, typename RegT>
 __aicore__ inline void SubRelu(RegT &dstReg, RegT &srcReg0, RegT &srcReg1, MicroAPI::MaskReg &mask)
 {
     MicroAPI::Sub(dstReg, srcReg0, srcReg1, mask);
     MicroAPI::Maxs(dstReg, dstReg, (T)0, mask);
 }
-} // namespace RegSubRelu
+} // namespace MicroAPISubRelu
 
 // SubRelu::Level 0
 template <typename T, bool isSetMask = true>

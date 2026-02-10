@@ -243,7 +243,7 @@ __aicore__ inline void AddsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue,
  * Muls                                             *
  * ************************************************************************************************* */
 // Muls::Level 0
-namespace RegMuls {
+namespace MicroAPIMuls {
 template <typename T, typename RegT>
 __simd_callee__ inline void Muls(RegT &dstReg, RegT &srcReg, T scalarValue, MicroAPI::MaskReg &mask)
 {
@@ -254,7 +254,7 @@ __simd_callee__ inline void Muls(RegT &dstReg, RegT &srcReg, T scalarValue, Micr
         MicroAPI::Muls(dstReg, srcReg, scalarValue, mask);
     }
 }
-} // namespace RegMuls
+} // namespace MicroAPIMuls
 template <typename T, bool isSetMask = true>
 __aicore__ inline void MulsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
@@ -454,7 +454,7 @@ __aicore__ inline void ShiftRightImpl(__ubuf__ T *dst, __ubuf__ T *src, const T 
 /* **************************************************************************************************
  * LeakyRelu                                             *
  * ************************************************************************************************* */
-namespace RegLeakyRelu {
+namespace MicroAPILeakyRelu {
 template <typename T, typename RegT>
 __simd_callee__ inline void LeakyRelu(RegT &dstReg, RegT &srcReg, T scalarValue, MicroAPI::MaskReg &mask)
 {
@@ -496,14 +496,14 @@ __aicore__ inline void LeakyReluImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarV
  * Subs: LocalTensor - Scalar                                             *
  * ************************************************************************************************* */
 // Subs::Level 0
-namespace RegSubs {
+namespace MicroAPISubs {
 template <typename T, typename RegT>
 __simd_callee__ inline void Subs(RegT &dstReg, RegT &srcReg, T scalarValue, MicroAPI::MaskReg &mask)
 {
     MicroAPI::Duplicate(dstReg, scalarValue, mask);
     MicroAPI::Sub(dstReg, srcReg, dstReg, mask);
 }
-} // namespace RegSubs
+} // namespace MicroAPISubs
 template <typename T, bool isSetMask = true>
 __aicore__ inline void SubsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
@@ -544,14 +544,14 @@ __aicore__ inline void SubsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue,
  * Subs: Scalar - LocalTensor                                             *
  * ************************************************************************************************* */
 // Subs::Level 0
-namespace RegSubs {
+namespace MicroAPISubs {
 template <typename T, typename RegT>
 __simd_callee__ inline void Subs2(RegT &dstReg, RegT &srcReg, T scalarValue, MicroAPI::MaskReg &mask)
 {
     MicroAPI::Duplicate(dstReg, scalarValue, mask);
     MicroAPI::Sub(dstReg, dstReg, srcReg, mask);
 }
-} // namespace RegSubs
+} // namespace MicroAPISubs
 
 template <typename T, bool isSetMask = true>
 __aicore__ inline void SubsImpl(__ubuf__ T *dst, T scalarValue, __ubuf__ T *src, const uint64_t mask[],
@@ -592,14 +592,14 @@ __aicore__ inline void SubsImpl(__ubuf__ T *dst, T scalarValue, __ubuf__ T *src,
 /* **************************************************************************************************
  * Divs                                             *
  * ************************************************************************************************* */
-namespace RegDivs {
+namespace MicroAPIDivs {
 template <typename T, typename RegT>
 __simd_callee__ inline void Divs(RegT &dstReg, RegT &srcReg, T scalarValue, MicroAPI::MaskReg &mask)
 {
     MicroAPI::Duplicate(dstReg, scalarValue, mask);
     MicroAPI::Div(dstReg, srcReg, dstReg, mask);
 }
-} // namespace RegDivs
+} // namespace MicroAPIDivs
 // Divs::Level 0
 template <typename T, bool isSetMask = true>
 __aicore__ inline void DivsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
@@ -639,14 +639,14 @@ __aicore__ inline void DivsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue,
 /* **************************************************************************************************
  * Divs   Scalar / LocalTensor                                         *
  * ************************************************************************************************* */
-namespace RegDivs {
+namespace MicroAPIDivs {
 template <typename T, typename RegT>
 __simd_callee__ inline void Divs2(RegT &dstReg, RegT &srcReg, T scalarValue, MicroAPI::MaskReg &mask)
 {
     MicroAPI::Duplicate(dstReg, scalarValue, mask);
     MicroAPI::Div(dstReg, dstReg, srcReg, mask);
 }
-} // namespace RegDivs
+} // namespace MicroAPIDivs
 // Div::Level 0
 template <typename T, bool isSetMask = true>
 __aicore__ inline void DivsImpl(__ubuf__ T *dst, T scalarValue, __ubuf__ T *src, const uint64_t mask[],
@@ -686,14 +686,14 @@ __aicore__ inline void DivsImpl(__ubuf__ T *dst, T scalarValue, __ubuf__ T *src,
 /* **************************************************************************************************
  * Ands                                             *
  * ************************************************************************************************* */
-namespace RegAnds {
+namespace MicroAPIAnds {
 template <typename T, typename RegT>
 __simd_callee__ inline void Ands(RegT &dstReg, RegT &srcReg, T scalarValue, MicroAPI::MaskReg &mask)
 {
     MicroAPI::Duplicate(dstReg, scalarValue, mask);
     MicroAPI::And(dstReg, dstReg, srcReg, mask);
 }
-} // namespace RegAnds
+} // namespace MicroAPIAnds
 // Ands::Level 0
 template <typename T, bool isSetMask = true>
 __aicore__ inline void AndsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
@@ -732,14 +732,14 @@ __aicore__ inline void AndsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue,
 /* **************************************************************************************************
  * Ors                                             *
  * ************************************************************************************************* */
-namespace RegOrs {
+namespace MicroAPIOrs {
 template <typename T, typename RegT>
 __simd_callee__ inline void Ors(RegT &dstReg, RegT &srcReg, T scalarValue, MicroAPI::MaskReg &mask)
 {
     MicroAPI::Duplicate(dstReg, scalarValue, mask);
     MicroAPI::Or(dstReg, dstReg, srcReg, mask);
 }
-} // namespace RegOrs
+} // namespace MicroAPIOrs
 // Ors::Level 0
 template <typename T, bool isSetMask = true>
 __aicore__ inline void OrsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],

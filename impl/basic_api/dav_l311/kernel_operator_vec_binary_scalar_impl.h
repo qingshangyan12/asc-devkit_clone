@@ -338,7 +338,7 @@ BINARY_SCALAR_OP_LEVEL2_IMPL(AddsImpl, Adds, float)
  * Muls                                                                                             *
  * **************************************************************************************************/
 // Muls::Level 0
-namespace RegMuls {
+namespace MicroAPIMuls {
 template <typename T, typename U>
 __aicore__ inline void Muls(U &dstReg, U &srcReg, T scalarValue, MicroAPI::MaskReg &mask)
 {
@@ -349,7 +349,7 @@ __aicore__ inline void Muls(U &dstReg, U &srcReg, T scalarValue, MicroAPI::MaskR
         MicroAPI::Muls(dstReg, srcReg, scalarValue, mask);
     }
 }
-} // namespace RegMuls
+} // namespace MicroAPIMuls
 template <typename T, bool isSetMask = true>
 __aicore__ inline void MulsImpl(__ubuf__ T *dst, __ubuf__ T *src, T scalarValue, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
