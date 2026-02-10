@@ -72,6 +72,8 @@ __aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value);
 
 #endif
 
+#endif
+
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H

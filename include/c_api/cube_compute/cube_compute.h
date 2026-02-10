@@ -19,7 +19,7 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
-#include "instr_impl/npu_arch_3510/cube_compute_impl.h"
+#include "instr_impl/npu_arch_2201/cube_compute_impl.h"
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
 
@@ -203,6 +203,8 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_
 __aicore__ inline void asc_mmad_mx_sync(__cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix,
     __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height, uint16_t right_width, uint16_t n_dim,
     uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+
+#endif
 
 #endif
 
