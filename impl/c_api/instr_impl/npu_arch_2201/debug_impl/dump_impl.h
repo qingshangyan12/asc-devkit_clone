@@ -22,6 +22,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_DEBUG_IMPL_DUMP_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_DEBUG_IMPL_DUMP_IMPL_H
 
+#include "impl/utils/common_types.h"
 #include "instr_impl/npu_arch_2201/utils_impl/debug_utils.h"
 #include "instr_impl/npu_arch_2201/utils_impl/instruction_forward.h"
 class print_ring_buf_head_base {

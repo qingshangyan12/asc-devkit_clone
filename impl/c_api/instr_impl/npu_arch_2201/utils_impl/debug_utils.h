@@ -259,7 +259,6 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype()
     }
 }
 
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
 __aicore__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
 {
     return (a + b - 1) / b;
