@@ -82,6 +82,8 @@ __aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op
 
 #endif
 
+#endif
+
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
