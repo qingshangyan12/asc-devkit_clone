@@ -177,7 +177,7 @@ public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
         auto checkDst = PreProcess(dst, src);
-        Excute<trait, decltype(checkDst), U, Coord>(checkDst, src, coord);
+        Execute<trait, decltype(checkDst), U, Coord>(checkDst, src, coord);
     }
 
 private:
@@ -192,7 +192,7 @@ private:
     }
 
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Excute(const T& dst, const U& src, const Coord& coord) {
+    __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
         if constexpr (IsL0cNZFormat<U>::value && IsL0cNZFormat<T>::value) {
             FixpipetNz2Nz2201Base::Run<trait, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsL0cNZFormat<U>::value && IsNDFormat<T>::value) {

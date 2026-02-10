@@ -418,7 +418,7 @@ public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
         auto checkSrc = PreProcess(dst, src);
-        Excute<trait, T, decltype(checkSrc), Coord>(dst, checkSrc, coord);
+        Execute<trait, T, decltype(checkSrc), Coord>(dst, checkSrc, coord);
     }
 
 private:
@@ -433,7 +433,7 @@ private:
     }
 
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Excute(const T& dst, const U& src, const Coord& coord) {
+    __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
         if constexpr (IsNZFormat<U>::value && IsNZFormat<T>::value) {
             CopyGmToCbufNZBase::Run<trait, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsNDFormat<U>::value && IsNZFormat<T>::value) {
