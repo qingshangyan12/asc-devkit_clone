@@ -15,6 +15,7 @@
 #ifndef ASCENDC_KERNEL_EVENT_IMPL_H
 #define ASCENDC_KERNEL_EVENT_IMPL_H
 
+#include "impl/utils/common_types.h"
 #include "kernel_macros.h"
 #include "kernel_log.h"
 #include "common_types.h"
@@ -26,7 +27,6 @@
 
 namespace AscendC {
 using QuePosition = TPosition;
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
 
 enum class HardEvent : uint8_t {
     // src_dst
