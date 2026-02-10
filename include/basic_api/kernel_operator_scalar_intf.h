@@ -14,14 +14,27 @@
  */
 #ifndef ASCENDC_MODULE_OPERATOR_SCALAR_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_SCALAR_INTERFACE_H
-#include "kernel_tensor.h"
-#include "kernel_scalar.h"
+
+#include "kernel_macros.h"
+#include "utils/kernel_utils_mode.h"
+
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#include <cstdint>
+#include "stub_def.h"
+#endif
 
 namespace AscendC {
 template <int countValue>
 __aicore__ inline int64_t GetBitCount(uint64_t valueIn);
 
+// ScalarGetCountOfValue has been updated, please use GetBitCount instead.
+template <int countValue>
+__aicore__ inline int64_t ScalarGetCountOfValue(uint64_t valueIn);
+
 __aicore__ inline int64_t CountLeadingZero(uint64_t valueIn);
+
+// ScalarCountLeadingZero has been updated, please use CountLeadingZero instead.
+__aicore__ inline int64_t ScalarCountLeadingZero(uint64_t valueIn);
 
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
 template <typename T>
@@ -33,8 +46,16 @@ __aicore__ inline int64_t CountBitsCntSameAsSignBit(int64_t valueIn);
 template <int countValue>
 __aicore__ inline int64_t GetSFFValue(uint64_t valueIn);
 
+// ScalarGetSFFValue has been updated, please use GetSFFValue instead.
+template <int countValue>
+__aicore__ inline int64_t ScalarGetSFFValue(uint64_t valueIn);
+
 template <typename T, typename U, RoundMode roundMode>
 __aicore__ inline U Cast(T valueIn);
+
+// ScalarCast has been updated, please use Cast instead.
+template <typename T, typename U, RoundMode roundMode>
+__aicore__ inline U ScalarCast(T valueIn);
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
 template <typename T>

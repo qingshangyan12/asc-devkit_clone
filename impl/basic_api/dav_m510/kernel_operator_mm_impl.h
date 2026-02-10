@@ -10,6 +10,8 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 
+#include "../../../include/basic_api/kernel_operator_mm_bitmode_intf.h"
+
 namespace AscendC {
 /* **************************************************************************************************
  * LoadData 2dv1                                             *
@@ -413,7 +415,7 @@ template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadParams& mmadParams)
 {
     bool cmatrixInitVal = mmadParams.cmatrixInitVal && (!mmadParams.isBias);
-    // f162s32,f16s8, e4m3e4m3, e4m3s8, e4m3s4 algorithm will need configure fixval, others don`t
+    // f162s32,f16s8, e4m3e4m3, e4m3s8, e4m3s4 algorithm will need configure fixval, others do not
     if constexpr (SupportType<Tuple<Src0T, Src1T, DstT>, Tuple<half, half, int32_t>>()) {
         // f162s32
         constexpr uint8_t fixShiftVal = 42;
@@ -451,7 +453,7 @@ __aicore__ inline void MmadCal(
 #else
     uint64_t xd = ((uint64_t)c) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
 #endif
-    // f162s32,f16s8, e4m3e4m3, e4m3s8, e4m3s4 algorithm will need configure fixval, others don`t
+    // f162s32,f16s8, e4m3e4m3, e4m3s8, e4m3s4 algorithm will need configure fixval, others do not
     if constexpr (SupportType<Tuple<Src0T, Src1T, DstT>, Tuple<half, half, int32_t>>()) {
         // f162s32
         constexpr uint8_t fixShiftVal = 42;

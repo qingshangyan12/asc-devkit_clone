@@ -15,6 +15,8 @@
 #ifndef ASCENDC_MODULE_MICRO_VEC_ARANGE_IMPL_H
 #define ASCENDC_MODULE_MICRO_VEC_ARANGE_IMPL_H
 
+#include "../../../include/micro_api/kernel_micro_vec_duplicate_intf.h"
+
 namespace AscendC {
 namespace MicroAPI {
 template <IndexOrder order = IndexOrder::INCREASE_ORDER, typename T, typename U>
@@ -46,7 +48,7 @@ __simd_callee__ inline void ArangeImpl(S& dstReg, U scalarValue)
         if constexpr(CheckRegTrait<S, RegTraitNumOne>()) {
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             ArangeB64Impl(traitTwoDstReg, scalarValue);
-            B64TraitTwoToTaitOne(dstReg, traitTwoDstReg);
+            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
         } else if constexpr(CheckRegTrait<S, RegTraitNumTwo>()) {
             S dstTemp;
             ArangeB64Impl<order, U, S>(dstTemp, scalarValue);

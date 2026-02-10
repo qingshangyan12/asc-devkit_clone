@@ -16,6 +16,7 @@
 #define ASCENDC_MODULE_OPERATOR_PROPOSAL_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_struct_proposal.h"
+#include "kernel_operator_block_sync_intf.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_proposal_impl.h"
@@ -56,7 +57,7 @@ constexpr int32_t REGION_PROPOSAL_LABEL_POSITION = 5;
 constexpr int32_t REGION_PROPOSAL_Y1_POSITION = 1;
 constexpr uint8_t GATHER_MASK_MODE_FOR_INDEX_EVEN = 1;
 constexpr uint8_t GATHER_MASK_MODE_FOR_INDEX_ODD = 2;
-// gahter mask mode 4 is 00100010: fetch 2nd and 6th elems for each 8 elems
+// gather mask mode 4 is 00100010: fetch 2nd and 6th elems for each 8 elems
 constexpr uint8_t GATHER_MASK_MODE_FOR_EXTRACT_INDEX = 4;
 constexpr int32_t REGION_PROPOSAL_SCORE_POSITION = 4;
 
@@ -226,7 +227,7 @@ __aicore__ inline void Sort32(const LocalTensor<T>& dst, const LocalTensor<T>& s
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] repeatTime repeat times
- * @param [in] modeNumbe Position parameter
+ * @param [in] modeNumber Position parameter
  */
 template <typename T>
 __aicore__ inline void ProposalConcat(const LocalTensor<T>& dst, const LocalTensor<T>& src,
@@ -255,7 +256,7 @@ __aicore__ inline void ProposalConcat(const LocalTensor<T>& dst, const LocalTens
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] repeatTime repeat times
- * @param [in] modeNumbe Position parameter
+ * @param [in] modeNumber Position parameter
  */
 template <typename T>
 __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTensor<T>& src,
@@ -517,7 +518,7 @@ __aicore__ inline uint32_t GetSortOffset(const uint32_t elemOffset)
 /*
  * @ingroup GetSortLen
  * @brief get sort length in the sorted struct
- * @param [in] elemOffset element number ocountffer
+ * @param [in] elemCount element number count
  */
 template <typename T>
 __aicore__ inline uint32_t GetSortLen(const uint32_t elemCount)

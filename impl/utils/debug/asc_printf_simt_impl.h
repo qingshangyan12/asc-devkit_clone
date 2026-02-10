@@ -38,13 +38,25 @@
 #endif // __host_aicore__
 
 #if (_ASCENDC_HAS_BISHENG_COMPILER)
+#ifndef ASCENDC_HOST
 #define ASCENDC_HOST __host__
+#endif
+#ifndef ASCENDC_AICORE
 #define ASCENDC_AICORE __aicore__
+#endif
+#ifndef ASCENDC_HOST_AICORE
 #define ASCENDC_HOST_AICORE __host_aicore__
+#endif
 #else
+#ifndef ASCENDC_HOST
 #define ASCENDC_HOST
+#endif
+#ifndef ASCENDC_AICORE
 #define ASCENDC_AICORE
+#endif
+#ifndef ASCENDC_HOST_AICORE
 #define ASCENDC_HOST_AICORE
+#endif
 #endif
 
 #include "impl/utils/std/type_traits/is_same.h"
@@ -233,7 +245,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t check_and_wait_ring_buf_space(
     __gm__ RingBufReadInfo* read_info = get_ring_buf_read_info(block_ring_buf_info);
     __gm__ RingBufWriteInfo* write_info = get_ring_buf_write_info(block_ring_buf_info);
 
-    uint64_t start_offset = bisheng::cce::simt::atomicAdd(&write_info->bufOffset, tlv_len);
+    uint64_t start_offset = atomicAdd(&write_info->bufOffset, tlv_len);
     uint64_t end_offset = start_offset + tlv_len;
     if (end_offset > read_info->bufOffset + block_ring_buf_info->ringBufLen) {
         ring_buffer_wait(read_info, end_offset - block_ring_buf_info->ringBufLen);
@@ -268,7 +280,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void write_ring_buf_tlv_head(__gm__ BlockR
         __gm__ PrintTlvInfoHead* print_tlv =
             reinterpret_cast<__gm__ PrintTlvInfoHead*>(block_ring_buf_info->ringBufAddr + write_ptr);
         print_tlv->type = static_cast<uint32_t>(DumpType::DUMP_WAIT);
-        print_tlv->length = static_cast<uint32_t>(tlv_len - (sizeof(uint32_t) * 2)); // exclude type and length
+        print_tlv->length = static_cast<uint32_t>(tlv_len - (sizeof(uint32_t) * 2)); // 2: exclude type and length
         print_tlv->blockIdx[0] = blockIdx.x;
         print_tlv->blockIdx[1] = blockIdx.y;
         print_tlv->blockIdx[2] = blockIdx.z;
@@ -427,7 +439,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void write_finish(__gm__ BlockRingBufInfo*
     }
 
     __gm__ RingBufWriteInfo* write_info = get_ring_buf_write_info(block_ring_buf_info);
-    bisheng::cce::simt::atomicAdd(&write_info->packIdx, 1);
+    atomicAdd(&write_info->packIdx, 1);
 }
 #endif
 
@@ -455,17 +467,21 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl(DumpType print_type,
     write_ring_buf_tlv_data(block_ring_buf_info, write_ptr, args_num, fmt, args...);
     __cce_scalar::dcci(reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info->ringBufAddr + start_offset), 1, 1);
 
+    __threadfence();
     write_finish(block_ring_buf_info, start_offset, print_type);
     __cce_scalar::dcci(reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info->ringBufAddr + start_offset), 0, 1);
+    if (print_type == DumpType::DUMP_SIMT_ASSERT) {
+        __sync_workitems();
+    }
 #endif
 }
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 
 template <class... Args>
-__SIMT_DEVICE_FUNCTIONS_DECL__ __attribute__((always_inline)) inline void printf(const __gm__ char* fmt, Args&&... args)
+static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(const __gm__ char* fmt, Args&&... args)
 {
-#if defined (ASCENDC_DUMP) && (ASCENDC_DUMP == 1)
+#if !defined (ASCENDC_DUMP) || (ASCENDC_DUMP != 0)
     simt_printf_impl(DumpType::DUMP_SIMT_PRINTF, fmt, args...);
 #endif
 }

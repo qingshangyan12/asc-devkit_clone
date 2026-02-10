@@ -124,7 +124,6 @@ bool AscendCheckSoCVersion(const char *socVersion, char *errMsg)
         {"ascend910_9382", "Ascend910_9382"},
         {"ascend910_9362", "Ascend910_9362"},
 
-
         {"ascend910a", "Ascend910A"},
         {"ascend910proa", "Ascend910ProA"},
         {"ascend910b", "Ascend910B"},
@@ -653,7 +652,7 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
 }
 
 uint32_t LaunchAscendKernelForVectorCore(const char* opType, void* handle, const uint64_t key, void** args,
-    uint32_t size, const rtStream_t stream, bool enbaleProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks,
+    uint32_t size, const rtStream_t stream, bool enableProf, uint32_t aicNumBlocks, uint32_t aivNumBlocks,
     uint32_t aivNumBlocksOffset)
 {
     ASCENDLOGI("aicNumBlocks is %u, aivNumBlocks is %u, aivNumBlocksOffset is %u.\n", aicNumBlocks, aivNumBlocks,
@@ -670,26 +669,26 @@ uint32_t LaunchAscendKernelForVectorCore(const char* opType, void* handle, const
 
     uint64_t launchMainBeginTime = 0;
     uint64_t launchSubBeginTime = 0;
-    if (enbaleProf) {
+    if (enableProf) {
         launchMainBeginTime = MsprofSysCycleTime();
     }
 
     // aicore kernel launch
     ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorLaunchKernel(handle, key, aicNumBlocks, args, size, stream));
 
-    if (enbaleProf) {
+    if (enableProf) {
         ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorPreportProfiling(
             opType, aicNumBlocks, MSPROF_GE_TASK_TYPE_AI_CORE, launchMainBeginTime));
     }
     ASCENDLOGI("Main stream launch sucess.\n");
 
-    if (enbaleProf) {
+    if (enableProf) {
         launchSubBeginTime = MsprofSysCycleTime();
     }
     // vector core kernel launch
     ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorVectorCoreLaunchKernel(handle, key, aivNumBlocks,
         args, size, ascBaseStream.stream, aivNumBlocksOffset));
-    if (enbaleProf) {
+    if (enableProf) {
         ASCENDC_ASSERT_RTOK_RETVAL(AscendCExecutorPreportProfiling(
             opType, aivNumBlocks, MSPROF_GE_TASK_TYPE_AIV, launchSubBeginTime));
     }

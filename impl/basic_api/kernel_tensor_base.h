@@ -17,6 +17,7 @@
 #include <cstdint>
 #include "kernel_utils.h"
 #include "kernel_operator_layout.h"
+#include "kernel_operator_tensor_trait.h"
 
 namespace AscendC {
 using TBufHandle = uint8_t*;
@@ -135,7 +136,7 @@ public:
                     KERNEL_LOG_INTERNAL(KERNEL_ERROR, "logicPos can not be gm when init buffer"));
         auto positionHardMap = ConstDefiner::Instance().positionHardMap;
         ASCENDC_DEBUG_ASSERT((positionHardMap.count(AscendC::TPosition(this->address_.logicPos)) != 0),
-                    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal logis pos %d", this->address_.logicPos));
+                    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal logic pos %d", this->address_.logicPos));
         if constexpr (IsSameType<PrimType, int4b_t>::value) {
             ASCENDC_DEBUG_ASSERT((bufferOffset + bufferSize * INT4_BIT_NUM / ONE_BYTE_BIT_SIZE <=
             ConstDefiner::Instance().bufferInitLen.at(positionHardMap.at(

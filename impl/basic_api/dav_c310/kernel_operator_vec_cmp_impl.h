@@ -16,6 +16,9 @@
 #define ASCENDC_MODULE_OPERATOR_VEC_CMP_IMPL_H
 
 #include "kernel_utils.h"
+#include "kernel_tpipe.h"
+#include "kernel_operator_vec_template_impl.h"
+#include "micro_api/kernel_micro_intf.h"
 
 namespace AscendC {
 namespace CmpInternal {
@@ -238,7 +241,7 @@ __aicore__ inline void VcmpImpl(
     AscendCUtils::FreeTemporaryBuffer<uint64_t>(tempBuf);
 }
 
-// Compare::Level 0 - bit mode / Continious mode support b16/b32
+// Compare::Level 0 - bit mode / Continuous mode support b16/b32
 template <typename T, typename U, CMPMODE cmpMode>
 __simd_vf__ inline void CompareLevel0CounterMode(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1, const uint64_t mask,
     const BinaryRepeatParams repeatParams)
@@ -262,7 +265,7 @@ __simd_vf__ inline void CompareLevel0CounterMode(__ubuf__ U *dst, __ubuf__ T *sr
     MicroAPI::StoreUnAlignPost<U, MicroAPI::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
 }
 
-// Compare::Level 0 - bit mode / Continious mode support b8/b16/b32
+// Compare::Level 0 - bit mode / Continuous mode support b8/b16/b32
 template <typename T, typename U, CMPMODE cmpMode, bool isBitMapMode>
 __simd_vf__ inline void CompareLevel0NormalMode(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *src1,
     const uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams repeatParams)
@@ -444,7 +447,7 @@ __aicore__ inline void VcmpvImpl(__ubuf__ U *dst, __ubuf__ T *src0, __ubuf__ T *
 /* ***************************************************************************************
  * ************************************** CompareScalar ****************************************
  * ************************************************************************************** */
-// CompareScalar::Level 0 - bit mode / continious mode
+// CompareScalar::Level 0 - bit mode / continuous mode
 template <typename T, typename U, CMPMODE cmpMode, bool isSetMask>
 __simd_vf__ inline void CompareScalarLevel0CounterMode(__ubuf__ U *dst, __ubuf__ T *src0, const T src1, const uint64_t mask, __ubuf__ uint64_t *tempBuf,
     const UnaryRepeatParams repeatParams)
@@ -759,7 +762,7 @@ __aicore__ inline void VcmpvsImpl(
 /* ***************************************************************************************
  * ************************************** CompareScalar src0 scalar****************************************
  * ************************************************************************************** */
-// CompareScalar::Level 0 - bit mode / continious mode
+// CompareScalar::Level 0 - bit mode / continuous mode
 template <typename T, typename U, CMPMODE cmpMode, bool isSetMask>
 __simd_vf__ inline void CompareSrc0ScalarLevel0CounterMode(__ubuf__ U *dst, const T src0, __ubuf__ T *src1, const uint64_t mask,
     __ubuf__ uint64_t *tempBuf, const UnaryRepeatParams repeatParams)
@@ -1078,7 +1081,7 @@ __aicore__ inline void VcmpvsImpl(
 /* ***************************************************************************************
  * ************************************** CompareScalar Both Tensor****************************************
  * ************************************************************************************** */
-// CompareScalar::Level 0 - bit mode / continious mode
+// CompareScalar::Level 0 - bit mode / continuous mode
 
 template <typename T, typename U, CMPMODE cmpMode, uint8_t scalarIdx, MicroAPI::LoadDist pattern>
 __simd_vf__ inline void CompareScalarBothTensorLevel2(

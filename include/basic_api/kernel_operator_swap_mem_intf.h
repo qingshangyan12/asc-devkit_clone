@@ -16,9 +16,12 @@
 #ifndef ASCENDC_MODULE_SWAP_MEM_INTF_H
 #define ASCENDC_MODULE_SWAP_MEM_INTF_H
 
-#include "kernel_reg.h"
-#include "kernel_process_lock.h"
-#include "kernel_operator_tensor_trait.h"
+#include "kernel_macros.h"
+
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#include <cstdint>
+#include "stub_def.h"
+#endif
 
 #ifndef WORKSPACE_PARAM_OFFSET
 #define WORKSPACE_PARAM_OFFSET 0xffffffff
@@ -33,7 +36,7 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetSysWorkSpacePtr()
 {
     // kernel launch
 #if defined(__NPU_DEVICE__) && defined(__NPU_ARCH__)
-    if constexpr (__NPU_ARCH__ ==  2201) {
+    if constexpr (__NPU_ARCH__ ==  2201 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510) {
         return __get_kfc_workspace_addr();
     } else {
         return g_sysWorkspaceReserved;
@@ -49,4 +52,14 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetSysWorkSpacePtr()
 }
 #endif
 
+#if defined(ASCENDC_CPU_DEBUG)
+__aicore__ void SetSysWorkSpacePtr(__gm__ uint8_t* workspace);
+#else
+[[deprecated(
+    "NOTICE: SetSysWorkSpacePtr has been deprecated and will be removed in the next version.")]]
+__aicore__ inline void SetSysWorkSpacePtr(__gm__ uint8_t* workspace)
+{
+    g_sysWorkspaceReserved = workspace;
+}
+#endif
 #endif // ASCENDC_KERNEL_SWAP_MEM_INTF_H

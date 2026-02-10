@@ -17,6 +17,7 @@
 
 #include "kernel_macros.h"
 #include "kfc_comm.h"
+#include "kernel_tpipe.h"
 
 namespace AscendC {
 class KfcCommClient {
@@ -77,7 +78,7 @@ public:
             }
 #endif
             ubStart = GetUBMapAddr(workspace, subBlockID);
-            ubAvalidTail = GetUBAvaliedAddr(workspace, subBlockID);
+            ubAvalidTail = GetUBAvailableAddr(workspace, subBlockID);
             head = 0;
             tail = 0;
         }

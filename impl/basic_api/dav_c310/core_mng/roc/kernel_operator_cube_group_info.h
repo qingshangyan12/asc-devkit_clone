@@ -14,6 +14,9 @@
  */
 #ifndef ASCENDC_MODULE_OPERATOR_CUBE_GROUP_INFO_H
 #define ASCENDC_MODULE_OPERATOR_CUBE_GROUP_INFO_H
+
+#include "utils/kernel_utils_constants.h"
+
 namespace AscendC {
 
 constexpr uint32_t MAX_MSG_PER_AIV = 4;   // for 1 aic and 1 aiv, table stores at most 4 message
@@ -38,7 +41,7 @@ struct CubeGroupMsgHead {                                 // 2B
 
 struct BarrierInfo {
     volatile uint32_t head;  // counter value for Arrive / Wait
-    uint32_t buffer[15];     // gurantee 64B aligned
+    uint32_t buffer[15];     // guarantee 64B aligned
 };
 
 // method to update arrive / wait counter

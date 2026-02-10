@@ -10,8 +10,9 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_REDUCE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCE_IMPL_H
 
-#include "micro_api/kernel_micro_intf.h"
 #include "kernel_operator_vec_template_impl.h"
+#include "kernel_pop_stack_buffer.h"
+#include "micro_api/kernel_micro_intf.h"
 
 namespace AscendC {
 
@@ -400,10 +401,10 @@ __aicore__ inline void WholeReduceMaxImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcL
     // 124 indicating this is a max call, this value also works as a parity for GetReduceMaxMinCountImpl
     uint16_t maxMinParity = 124;
     // similarly, 110 indicating this is a bitwise mask
-    uint16_t bitNonbitParity = 110;
+    uint16_t bitNonBitParity = 110;
     uint64_t packed_value = 0;
     packed_value |= (static_cast<uint64_t>(maxMinParity) << 48);
-    packed_value |= (static_cast<uint64_t>(bitNonbitParity) << 32);
+    packed_value |= (static_cast<uint64_t>(bitNonBitParity) << 32);
     packed_value |= (static_cast<uint64_t>(isSetMask) << 16);
     packed_value |= static_cast<uint64_t>(repeat);
     popBuffer.SetValue(0, packed_value);
@@ -437,10 +438,10 @@ __aicore__ inline void WholeReduceMaxImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcL
     // 124 indicating this is a max call, this value also works as a parity for GetReduceMaxMinCountImpl
     uint32_t maxMinParity = 124;
     // similarly, 111 indicating this is a continuous mask
-    uint32_t bitNonbitParity = 111;
+    uint32_t bitNonBitParity = 111;
     uint64_t packed_value = 0;
     packed_value |= (static_cast<uint64_t>(maxMinParity) << 48);
-    packed_value |= (static_cast<uint64_t>(bitNonbitParity) << 32);
+    packed_value |= (static_cast<uint64_t>(bitNonBitParity) << 32);
     packed_value |= (static_cast<uint64_t>(isSetMask) << 16);
     packed_value |= static_cast<uint64_t>(repeat);
     popBuffer.SetValue(0, packed_value);
@@ -473,10 +474,10 @@ __aicore__ inline void WholeReduceMinImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcL
     // 123 indicating this is a min call, this value also works as a parity for GetReduceMaxMinCountImpl
     uint32_t maxMinParity = 123;
     // similarly, 110 indicating this is a bitwise mask
-    uint32_t bitNonbitParity = 110;
+    uint32_t bitNonBitParity = 110;
     uint64_t packed_value = 0;
     packed_value |= (static_cast<uint64_t>(maxMinParity) << 48);
-    packed_value |= (static_cast<uint64_t>(bitNonbitParity) << 32);
+    packed_value |= (static_cast<uint64_t>(bitNonBitParity) << 32);
     packed_value |= (static_cast<uint64_t>(isSetMask) << 16);
     packed_value |= static_cast<uint64_t>(repeat);
     popBuffer.SetValue(0, packed_value);
@@ -510,10 +511,10 @@ __aicore__ inline void WholeReduceMinImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcL
     // 123 indicating this is a min call, this value also works as a parity for GetReduceMaxMinCountImpl
     uint32_t maxMinParity = 123;
     // similarly, 111 indicating this is a continuous mask
-    uint32_t bitNonbitParity = 111;
+    uint32_t bitNonBitParity = 111;
     uint64_t packed_value = 0;
     packed_value |= (static_cast<uint64_t>(maxMinParity) << 48);
-    packed_value |= (static_cast<uint64_t>(bitNonbitParity) << 32);
+    packed_value |= (static_cast<uint64_t>(bitNonBitParity) << 32);
     packed_value |= (static_cast<uint64_t>(isSetMask) << 16);
     packed_value |= static_cast<uint64_t>(repeat);
     popBuffer.SetValue(0, packed_value);
@@ -1337,7 +1338,7 @@ __aicore__ inline bool isMasked(uint32_t inRepeatIndex, uint64_t mask0, uint64_t
 
 template <typename T>
 __aicore__ inline void IterateSrc(__ubuf__ T* src, uint32_t repeat, uint32_t srcRepStride, uint32_t srcBlkStride, uint64_t mask0, uint64_t mask1,
-    bool isCounterMode, bool bitwiseMask, bool isMax, uint32_t &maxMinInd, T &maxMinValue)
+    bool isCounterMode, bool bitwiseMask, bool isMax, uint32_t &maxMinIndex, T &maxMinValue)
 {
     constexpr uint32_t blockLen = 32 / sizeof(T);
     uint32_t blockCount = 8;
@@ -1367,19 +1368,19 @@ __aicore__ inline void IterateSrc(__ubuf__ T* src, uint32_t repeat, uint32_t src
                     }
                 }
 
-                if (maxMinInd == -1) { // first number in mask
+                if (maxMinIndex == -1) { // first number in mask
                     maxMinValue = src[realIndex];
-                    maxMinInd = realIndex;
+                    maxMinIndex = realIndex;
                 } else {
                     if (isMax) {
                         if (src[realIndex] > maxMinValue) {
                             maxMinValue = src[realIndex];
-                            maxMinInd = realIndex;
+                            maxMinIndex = realIndex;
                         }
                     } else {
                         if (src[realIndex] < maxMinValue) {
                             maxMinValue = src[realIndex];
-                            maxMinInd = realIndex;
+                            maxMinIndex = realIndex;
                         }
                     }
                 }
@@ -1449,8 +1450,8 @@ __aicore__ inline void GetReduceMaxMinCountImpl(T &maxMinValue, T &maxMinIndex)
 template <typename T>
 __aicore__ inline void GetReduceMaxMinCountImpl(T &maxMinValue)
 {
-    T maxMinInd;
-    GetReduceMaxMinCountImpl(maxMinValue, maxMinInd);
+    T maxMinIndex;
+    GetReduceMaxMinCountImpl(maxMinValue, maxMinIndex);
 }
 
 template <typename T>
