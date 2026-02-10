@@ -262,3 +262,103 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_init](misc/asc_init.md)| 初始化NPU状态。 |
+
+
+## 寄存数据器搬运
+
+|   API名称   |   说明   |
+|----------|-----------|
+| [asc_loadalign_v1](reg/reg_load/asc_loadalign/asc_loadalign_v1.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口不传入偏移，需要由用户自行更新源操作数的地址。 |
+| [asc_loadalign_v2](reg/reg_load/asc_loadalign/asc_loadalign_v2.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口通过地址寄存器传入偏移，用户可以选择更新偏移或者更新源操作数的地址。 |
+| [asc_loadalign_v3](reg/reg_load/asc_loadalign/asc_loadalign_v3.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口通过int32_t传入偏移，用户可以选择更新偏移或者更新源操作数的地址。 |
+| [asc_loadalign_v4](reg/reg_load/asc_loadalign/asc_loadalign_v4.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口通过int32_t传入偏移，同时设置成硬件自动Post Update，用户不用更新偏移或者更新源操作数的地址。 |
+| [asc_loadalign_v5](reg/reg_load/asc_loadalign/asc_loadalign_v5.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口使用repeat stride模式。 |
+| [asc_storealign_v1](reg/reg_store/asc_storealign/asc_storealign_v1.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口不传入偏移，需要由用户自行更新目的操作数的地址。 |
+| [asc_storealign_v2](reg/reg_store/asc_storealign/asc_storealign_v2.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址。 |
+| [asc_storealign_v3](reg/reg_store/asc_storealign/asc_storealign_v3.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过int32_t传入偏移，用户可以选择更新偏移或者更新目的操作数的地址。 |
+| [asc_storealign_v4](reg/reg_store/asc_storealign/asc_storealign_v4.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过int32_t传入偏移，同时设置成硬件自动Post Update，用户不用更新偏移或者更新目的操作数的地址。 |
+| [asc_storealign_v5](reg/reg_store/asc_storealign/asc_storealign_v5.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，接口使用repeat stride模式。 |
+| [asc_gather](reg/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |
+| [asc_gather_datablock](reg/reg_load/asc_gather_datablock.md) | 给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。 |
+| [asc_get_mask_spr](reg/reg_load/asc_get_mask_spr.md) | 从特殊寄存器SPR{MASK1, MASK0}读取mask值并根据数据类型格式返回对应的mask数据，MASK0、MASK1均为64bit的寄存器。 |
+| [asc_load](reg/reg_load/asc_load.md) | reg计算数据搬运接口，支持从UB非32字节对齐的源地址src搬运至矢量数据寄存器，搬运量为VL。 |
+| [asc_loadunalign](reg/reg_load/asc_loadunalign.md) | reg计算数据搬运接口，适用于从UB非32B对齐的起始地址连续搬入矢量数据寄存器的场景。 |
+| [asc_loadunalign_pre](reg//reg_load/asc_loadunalign_pre.md) | 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](./asc_loadunalign.md)接口使用。 |
+| [asc_store](reg/reg_store/asc_store.md) | reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，应尽量避免使用该接口。 |
+| [asc_storeunalign](reg/reg_store/asc_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
+| [asc_storeunalign_postupdate](reg/reg_store/asc_storeunalign_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
+
+## 寄存器计算
+
+|   API名称   |   说明   |
+|----------|-----------|
+| [asc_abs](reg/reg_vector/asc_abs.md) | 按元素取绝对值。 |
+| [asc_add](reg/reg_vector/asc_add.md) | 按照元素对应位置执行矢量加法运算，计算过程为ZEROING模式（未被mask掩码的元素在目的操作数中中置0）。 |
+| [asc_addc](reg/reg_vector/asc_addc.md) | 基于掩码mask，对输入数据src0、src1及进位数据src2执行元素逐位相加操作，相加结果写入dst1。 |
+| [asc_add_scalar](reg/reg_vector/asc_add_scalar.md) | 执行矢量和标量的加法运算。 |
+| [asc_and](reg/reg_vector/asc_and.md) | 执行矢量与运算。 |
+| [asc_arange](reg/reg_vector/asc_arange.md) | 以传入的value为起始值，生成递增/递减的索引，并将生成的索引保存在dst中。 |
+| [asc_axpy](reg/reg_vector/asc_axpy.md) | 根据mask对源操作数src、value进行按元素做乘加操作，将结果写入目的操作数dst。 |
+| [asc_bfloat162float](reg/reg_vector/asc_bfloat162float.md) | 将bfloat16_t类型转化为float类型，无舍入模式。 |
+| [asc_bfloat162int32](reg/reg_vector/asc_bfloat162int32.md) | 将bfloat16_t类型数据转换为int32_t，并支持多种舍入模式。 |
+| [asc_cumulative_histogram](reg/reg_vector/asc_cumulative_histogram.md) | 对直方图数据进行累计统计。 |
+| [asc_deintlv](reg/reg_vector/asc_deintlv.md) | 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。 |
+| [asc_div](reg/reg_vector/asc_div.md) | 按元素求商。 |
+| [asc_e5m22float](reg/reg_vector/asc_e5m22float.md) | 将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。 |
+| [asc_exp](reg/reg_vector/asc_exp.md) | 计算e的x次幂。 |
+| [asc_exp_sub](reg/reg_vector/asc_exp_sub.md) | 将src0与src1相减，差值作为e的指数计算 |
+| [asc_float2bfloat16](reg/reg_vector/asc_float2bfloat16.md) | - RINT舍入模式：四舍六入五成双舍入。 |
+| [asc_frequency_histogram](reg/reg_vector/asc_frequency_histogram.md) | 对直方图数据进行频率统计。 |
+| [asc_ge](reg/reg_vector/asc_ge.md) | 对源操作数执行逐元素比较。对于src0 >= src1，若条件成立则目的操作数对应结果位为1，否则为0。 |
+| [asc_ge_scalar](reg/reg_vector/asc_ge_scalar.md) | 对源操作数与标量执行逐元素比较。对于src0 >= value，若条件成立则目的操作数对应结果位为1，否则为0。 |
+| [asc_half2bf16](reg/reg_vector/asc_half2bfloat16.md) | 将half类型数据转为bfloat16类型，并支持多种舍入模式。 |
+| [asc_half2hif8](reg/reg_vector/asc_half2hif8.md) | 将half类型转化为hifloat8_t类型，并支持多种舍入模式。 |
+| [asc_half2int16](reg/reg_vector/asc_half2int16.md) | 将half类型数据转换为int16_t，并支持多种舍入模式。 |
+| [asc_half2int32](reg/reg_vector/asc_half2int32.md) | - RINT舍入模式：四舍六入五成双舍入。 |
+| [asc_half2int4x2](reg/reg_vector/asc_half2int4x2.md) | 将half类型数据转为int4x2类型，并支持多种舍入模式。 |
+| [asc_half2int8](reg/reg_vector/asc_half2int8.md) | 将half类型转化为int8_t类型，并支持多种舍入模式。 |
+| [asc_hif82half](reg/reg_vector/asc_hif82half.md) | 将hifloat8_t类型数据转换为half类型。 |
+| [asc_int162int32](reg/reg_vector/asc_int162int32.md) | 将int16_t类型数据转换为int32_t类型。 |
+| [asc_int162uint32](reg/reg_vector/asc_int162uint32.md) | 将int16_t类型转化为uint32_t类型，无舍入模式。 |
+| [asc_int322float](reg/reg_vector/asc_int322float.md) | 将int32_t类型转化为float类型，并支持多种舍入模式。 |
+| [asc_int322int64](reg/reg_vector/asc_int322int64.md) | 将vector_int32_t类型的源操作数以256B为单位分为两部分，读取其中一部分元素，将其转换成vector_int64_t类型并写入目的操作数。 |
+| [asc_int322uint16](reg/reg_vector/asc_int322uint16.md) | 将vector_int32_t类型转换成vector_uint16_t类型，写入目的操作数的上半部分或下半部分，并支持不同的饱和模式。 |
+| [asc_int4x22bfloat16](reg/reg_vector/asc_int4x22bfloat16.md) | 将int4x2_t类型转化为bfloat16_t类型，无舍入模式。 |
+| [asc_int642float](reg/reg_vector/asc_int642float.md) | 将int64_t类型数据转换为float，并支持多种舍入模式。 |
+| [asc_int642int32](reg/reg_vector/asc_int642int32.md) | - asc_int642int32：不饱和模式，写入目的操作数的上半部分。 |
+| [asc_int82half](reg/reg_vector/asc_int82half.md) | 将int8_t类型数据转换为half类型。 |
+| [asc_intlv](reg/reg_vector/asc_intlv.md) | 将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。 |
+| [asc_le](reg/reg_vector/asc_le.md) | 对源操作数执行逐元素比较。对于src0 <= src1，若条件成立则目的操作数对应结果位为1，否则为0。 |
+| [asc_le_scalar](reg/reg_vector/asc_le_scalar.md) | 对源操作数与标量执行逐元素比较。对于src0 <= value，若条件成立则目的操作数对应结果位为1，否则为0。 |
+| [asc_ln](reg/reg_vector/asc_ln.md) | 计算自然对数。 |
+| [asc_lt](reg/reg_vector/asc_lt.md) | 对源操作数执行逐元素比较。对于src0 < src1，若条件成立则目的操作数对应结果位为1，否则为0。 |
+| [asc_lt_scalar](reg/reg_vector/asc_lt_scalar.md) | 对源操作数与标量执行逐元素比较。对于src0 < value，若条件成立则目的操作数对应结果位为1，否则为0。 |
+| [asc_madd](reg/reg_vector/asc_madd.md) | madd（multiply-add），对源操作数执行逐元素乘法和加法。 |
+| [asc_max](reg/reg_vector/asc_max.md) | 根据mask对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。 |
+| [asc_max_scalar](reg/reg_vector/asc_max_scalar.md) | 矢量src的逐个元素与标量value比较大小，接着按照对应的比特位将最大值存入dst中。 |
+| [asc_min](reg/reg_vector/asc_min.md) | 根据mask对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 |
+| [asc_min_scalar](reg/reg_vector/asc_min_scalar.md) | 矢量src的逐个元素与标量value比较大小，接着按照对应的比特位将最小值存入dst中。 |
+| [asc_mull](reg/reg_vector/asc_mull.md) | 无符号整数乘法，将src0和src1对应元素相乘，结果写入dst。 |
+| [asc_ne](reg/reg_vector/asc_ne.md) | 对源操作数执行逐元素比较。对于src0 != src1，若条件成立则目的操作数对应结果位为1，否则为0。 |
+| [asc_neg](reg/reg_vector/asc_neg.md) | 根据mask对源操作数src进行取相反数操作，将结果写入目的操作数dst。 |
+| [asc_ne_scalar](reg/reg_vector/asc_ne_scalar.md) |  对源操作数与标量执行逐元素比较。对于src0 != value，若条件成立则目的操作数对应结果位为1，否则为0。 |
+| [asc_not](reg/reg_vector/asc_not.md) | 执行矢量非运算。 |
+| [asc_pack](reg/reg_vector/asc_pack.md) | 将源操作数中的元素选取低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的低半部分或高半部分。 |
+| [asc_pair_reduce_sum](reg/reg_vector/asc_pair_reduce_sum.md) | 相邻两个（奇偶）元素求和，结果写入dst。 |
+| [asc_reduce_add](reg/reg_vector/asc_reduce_add.md) | 归约求和功能，用于将src中的所有参与计算的元素求和，得到的结果保存在dst中。 |
+| [asc_reduce_add_datablock](reg/reg_vector/asc_reduce_add_datablock.md) | 归约求和功能，用于将src每个DataBlock(32B)中参与计算的元素求和，得到的结果依次保存在dst中。 |
+| [asc_reduce_max](reg/reg_vector/asc_reduce_max.md) | 根据mask对源操作数src进行归约最大值操作，将结果写入目的操作数dst。 |
+| [asc_reduce_min](reg/reg_vector/asc_reduce_min.md) | 根据mask对源操作数src进行归约最小值操作，将结果写入目的操作数dst。 |
+| [asc_reduce_min_datablock](reg/reg_vector/asc_reduce_min_datablock.md) | 根据mask将每个DataBlock(32B)中的最小值，依次保存在dst中的最低位。 |
+| [asc_shiftleft](reg/reg_vector/asc_shiftleft.md) | 根据掩码mask对输入数据src0，按照src1对应元素进行左移操作，完成后将结果写入dst中。 |
+| [asc_shiftright](reg/reg_vector/asc_shiftright.md) | 根据掩码mask对输入数据src0，按照src1对应元素进行右移操作，完成后将结果写入dst中。 |
+| [asc_squeeze](reg/reg_vector/asc_squeeze.md) | 将src中被mask选择的有效元素依次复制到dst，有效元素从低到高连续排列。 |
+| [asc_uint162uint32](reg/reg_vector/asc_uint162uint32.md) | 将uint16_t类型数据转为uint32_t类型。 |
+| [asc_uint162uint8](reg/reg_vector/asc_uint162uint8.md) | 将uint16_t类型转化为uint8_t类型，无舍入模式。 |
+| [asc_uint322int16](reg/reg_vector/asc_uint322int16.md) | 将uint32_t类型数据转为int16_t类型。 |
+| [asc_uint322uint8](reg/reg_vector/asc_uint322uint8.md) | 将uint32_t类型数据转换为uint8_t类型。 |
+| [asc_uint82half](reg/reg_vector/asc_uint82half.md) | 将uint8_t类型数据转为half类型。 |
+| [asc_uint82uint16](reg/reg_vector/asc_uint82uint16.md) | 将vector_uint8_t类型的源操作数以256B为单位分为两部分，读取其中一部分元素，将其转换成vector_uint16_t类型并写入目的操作数。 |
+| [asc_unpack](reg/reg_vector/asc_unpack.md) | 矢量解包操作。 |
+| [asc_unsqueeze](reg/reg_vector/asc_unsqueeze.md) | 根据mask进行解压缩，将生成的数据输出到dst。 |
+| [asc_update_mask](reg/reg_vector/asc_update_mask.md) | 根据value大小生成对应的掩码寄存器中的值。 |
