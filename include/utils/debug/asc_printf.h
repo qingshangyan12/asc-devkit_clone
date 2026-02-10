@@ -22,7 +22,6 @@
 #endif
 
 #include "simt_api/device_types.h"
-#include "impl/utils/debug/asc_utils_macros.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 

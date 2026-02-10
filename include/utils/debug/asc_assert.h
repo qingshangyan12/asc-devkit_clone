@@ -29,7 +29,6 @@
 #endif
 
 #include "impl/utils/debug/asc_assert_simt_impl.h"
-#include "impl/utils/debug/asc_utils_macros.h"
 
 namespace __asc_simt_vf {
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
