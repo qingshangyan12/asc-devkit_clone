@@ -798,6 +798,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ll2half_rna(const long long int x) 
     return __cvt_half<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(f);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __half22float2(const half2 x)
+{
+    return __cvt_float2<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(__ubuf__ half *address, half val)

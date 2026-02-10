@@ -273,6 +273,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ull2half_ru(const unsigned long lon
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ull2half_rna(const unsigned long long int x);
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __half22float2(const half2 x);
+
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(__ubuf__ half *address, half val);
 
