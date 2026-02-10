@@ -2,7 +2,7 @@
 
 ## 🔥Latest News
 - [2026/01] 优化样例、融合编译性能等；
-  - 迁移高阶API样例[ascendc-api-adv](https://gitee.com/ascend/ascendc-api-adv)到本仓，并使用[<<<>>>调用方式](https://gitcode.com/ascendhjh/asc-devkit/tree/master/examples/03_libraries)；
+  - 迁移高阶API样例[ascendc-api-adv](https://gitee.com/ascend/ascendc-api-adv)到本仓，并使用[<<<>>>调用方式](https://gitcode.com/asc-devkit/tree/master/examples/03_libraries)；
   - 联合毕昇编译器，优化融合编译性能；
 - [2025/12] Ascend C项目新增对Kirin X90和Kirin 9030处理器的支持。鸿蒙开发者基于Ascend C的实践案例可参考：[cann-recipes-harmony-infer](https://gitcode.com/cann/cann-recipes-harmony-infer)。
 - [2025/11] Ascend C项目基于Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品全面开源开放，包含以下新特性：
