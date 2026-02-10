@@ -263,21 +263,14 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |----------|-----------|
 | [asc_init](misc/asc_init.md)| 初始化NPU状态。 |
 
+<cann-filter npu_type="950">
 
 ## 寄存器数据搬运
 
 |   API名称   |   说明   |
 |----------|-----------|
-| [asc_loadalign_v1](reg/reg_load/asc_loadalign/asc_loadalign_v1.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口不传入偏移，需要由用户自行更新源操作数的地址。 |
-| [asc_loadalign_v2](reg/reg_load/asc_loadalign/asc_loadalign_v2.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口通过地址寄存器传入偏移，用户可以选择更新偏移或者更新源操作数的地址。 |
-| [asc_loadalign_v3](reg/reg_load/asc_loadalign/asc_loadalign_v3.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口通过int32_t传入偏移，用户可以选择更新偏移或者更新源操作数的地址。 |
-| [asc_loadalign_v4](reg/reg_load/asc_loadalign/asc_loadalign_v4.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口通过int32_t传入偏移，同时设置成硬件自动Post Update，用户不用更新偏移或者更新源操作数的地址。 |
-| [asc_loadalign_v5](reg/reg_load/asc_loadalign/asc_loadalign_v5.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口使用repeat stride模式。 |
-| [asc_storealign_v1](reg/reg_store/asc_storealign/asc_storealign_v1.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口不传入偏移，需要由用户自行更新目的操作数的地址。 |
-| [asc_storealign_v2](reg/reg_store/asc_storealign/asc_storealign_v2.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址。 |
-| [asc_storealign_v3](reg/reg_store/asc_storealign/asc_storealign_v3.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过int32_t传入偏移，用户可以选择更新偏移或者更新目的操作数的地址。 |
-| [asc_storealign_v4](reg/reg_store/asc_storealign/asc_storealign_v4.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过int32_t传入偏移，同时设置成硬件自动Post Update，用户不用更新偏移或者更新目的操作数的地址。 |
-| [asc_storealign_v5](reg/reg_store/asc_storealign/asc_storealign_v5.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，接口使用repeat stride模式。 |
+| [asc_loadalign](reg/reg_load/asc_loadalign/) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式。 |
+| [asc_storealign](reg/reg_store/asc_storealign/) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
 | [asc_gather](reg/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |
 | [asc_gather_datablock](reg/reg_load/asc_gather_datablock.md) | 给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。 |
 | [asc_get_mask_spr](reg/reg_load/asc_get_mask_spr.md) | 从特殊寄存器SPR{MASK1, MASK0}读取mask值并根据数据类型格式返回对应的mask数据，MASK0、MASK1均为64bit的寄存器。 |
@@ -362,3 +355,5 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_unpack](reg/reg_vector/asc_unpack.md) | 矢量解包操作。 |
 | [asc_unsqueeze](reg/reg_vector/asc_unsqueeze.md) | 根据mask进行解压缩，将生成的数据输出到dst。 |
 | [asc_update_mask](reg/reg_vector/asc_update_mask.md) | 根据value大小生成对应的掩码寄存器中的值。 |
+
+</cann-filter>
