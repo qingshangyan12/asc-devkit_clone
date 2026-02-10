@@ -14,7 +14,6 @@
 
 ## 函数原型
 
-- 前n个数据计算
 ```cpp
 // 数据写入索引为偶数的位置
 __simd_callee__ inline void asc_uint82half(vector_half& dst, vector_uint8_t src, vector_bool mask)    
