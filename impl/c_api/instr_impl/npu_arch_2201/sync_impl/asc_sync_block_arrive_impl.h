@@ -20,8 +20,9 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, uint64_t config)
+__aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, uint8_t mode, int64_t flagID)
 {
+    uint64_t config = 0x1ULL | (static_cast<uint64_t>(mode) << 4) | (static_cast<uint64_t>(flagID) << 8);
     ffts_cross_core_sync(pipe, config);
 }
 

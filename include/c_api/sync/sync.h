@@ -31,7 +31,7 @@ __aicore__ inline void asc_sync_mte2(int id);
 
 __aicore__ inline void asc_sync();
 
-__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint64_t config);
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint8_t mode, int64_t flagID);
 
 __aicore__ inline void asc_sync_block_wait(int64_t flagID);
 
