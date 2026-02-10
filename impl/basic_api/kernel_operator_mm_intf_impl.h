@@ -53,7 +53,7 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(const LocalTensor<T>& dst, 
     LoadDataImpl(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const Load2DBitModeParam& loadDataParams)
@@ -87,7 +87,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     LoadDataImpl(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, typename U>
 __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
     const LocalTensor<fp8_e8m0_t>& srcMx, const LoadData2DParamsV2& loadDataParams,
@@ -197,7 +197,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
     LoadDataImpl<T, defaultConfig>(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const Load3DBitModeParam& loadDataParams)
@@ -325,7 +325,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
@@ -464,7 +464,7 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
     SetFmatrixImpl(l1H, l1W, padList, fmatrixMode);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
     SetFmatrixImpl(param, fmatrixMode);
@@ -529,7 +529,7 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(const LocalTensor<T
     ASCENDC_CHECK_VALUE_RANGE(loadDataParams.leftPadSize, 0, 32, "leftPadSize", "LoadImageToLocal");
     ASCENDC_CHECK_VALUE_RANGE(loadDataParams.rightPadSize, 0, 32, "rightPadSize", "LoadImageToLocal");
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     if (dstScope == Hardware::UB) {
         LoadImageToLocalCal((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), loadDataParams);
     } else {
