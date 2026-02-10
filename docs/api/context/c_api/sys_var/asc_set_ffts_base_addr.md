@@ -9,7 +9,10 @@
 
 ## 功能说明
 
-在WaitEvent和NotifyEvent之前使用，设置核间同步寄存器的基地址。
+在[asc_sync_block_wait](../sync/asc_sync_block_wait.md)和[asc_sync_block_arrive](../sync/asc_sync_block_arrive.md)之前使用，设置核间同步寄存器的基地址。需要在Host侧调用rtGetC2cCtrlAddr获取，并作为算子参数传入。
+```cpp
+void rtGetC2cCtrlAddr(uint64_t& ffts_address, uint32_t& ffts_len);
+```
 
 ## 函数原型
 
@@ -21,7 +24,7 @@ __aicore__ inline void asc_set_ffts_base_addr(uint64_t config)
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| config | 输入 | 核间同步的基地址。由Kernel外部RTS接口获取，通过Kernel传入。 |
+| config | 输入 | 核间同步的基地址。取值范围[0, 2^48-1]。 |
 
 ## 返回值说明
 
@@ -33,8 +36,7 @@ PIPE_S
 
 ## 约束说明
 
-- 在使用WaitEvent和NotifyEvent之前必须使用本接口设置基地址。
-- CPU Debug过程中通过GmAlloc创建至少2400B的共享内存传入。
+- 在使用[asc_sync_block_wait](../sync/asc_sync_block_wait.md)和[asc_sync_block_arrive](../sync/asc_sync_block_arrive.md)之前必须使用本接口设置基地址。
 
 ## 调用示例
 
