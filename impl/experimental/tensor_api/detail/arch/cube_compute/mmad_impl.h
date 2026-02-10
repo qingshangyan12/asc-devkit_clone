@@ -22,19 +22,19 @@ namespace Te {
 
 template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S>
 __aicore__ inline typename Std::enable_if<VerifyingMmadTemplate<T, U, S>, void>::type 
-Mmad(const T& dst, const U& fm, const S& filter)
+Mmad(const T& dst, const U& fm, const S& filter, uint8_t unitFlag, bool cmatrixInitVal)
 {
    constexpr Hardware dstPos = GetHardPos<T>();
    constexpr Hardware fmPos = GetHardPos<U>();
    constexpr Hardware filterPos = GetHardPos<S>();
    using Tensor2Tensor = typename MmadTensor2Tensor<dstPos, fmPos, filterPos, Hardware::MAX, 
       CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
-   Tensor2Tensor{}.template Run<trait>(dst, fm, filter);
+   Tensor2Tensor{}.template Run<trait>(dst, fm, filter, unitFlag, cmatrixInitVal);
 }
 
 template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V>
 __aicore__ inline typename Std::enable_if<VerifyingMmadWithBiasTemplate<T, U, S, V>, void>::type 
-Mmad(const T& dst, const U& fm, const S& filter, const V& bias)
+Mmad(const T& dst, const U& fm, const S& filter, const V& bias, uint8_t unitFlag, bool cmatrixInitVal)
 {
    constexpr Hardware dstPos = GetHardPos<T>();
    constexpr Hardware fmPos = GetHardPos<U>();
@@ -42,7 +42,7 @@ Mmad(const T& dst, const U& fm, const S& filter, const V& bias)
    constexpr Hardware biasPos = GetHardPos<V>();
    using Tensor2Tensor = typename MmadTensor2Tensor<dstPos, fmPos, filterPos, biasPos, 
       CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
-   Tensor2Tensor{}.template Run<trait>(dst, fm, filter, bias);
+   Tensor2Tensor{}.template Run<trait>(dst, fm, filter, bias, unitFlag, cmatrixInitVal);
 }
 } // namespace Te
 } // namespace AscendC

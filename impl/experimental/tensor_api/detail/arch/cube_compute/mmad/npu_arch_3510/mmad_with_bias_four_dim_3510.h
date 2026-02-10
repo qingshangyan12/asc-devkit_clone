@@ -24,9 +24,9 @@ class MmadWithBiasGenParams3510
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
-    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const V& bias)
+    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const V& bias, uint8_t unitFlag, bool cmatrixInitVal)
     {
-        return GenParamsImpl<trait, T, U, S, V>(dst, fm, filter, bias);
+        return GenParamsImpl<trait, T, U, S, V>(dst, fm, filter, bias, unitFlag, cmatrixInitVal);
     }
 private:
     template <typename T>
@@ -134,7 +134,7 @@ private:
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
-    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter, const V& bias)
+    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter, const V& bias, uint8_t unitFlag, bool cmatrixInitVal)
     {
         CheckTemplate<trait, T, U, S, V>();
         using fmType = typename U::elementType;
@@ -149,9 +149,8 @@ private:
         if (biasPos == Hardware::BIAS) {
             cmatrixSource = true;
         }
-        bool disableGemv = false;
-        auto params = Std::make_tuple(m, k, n, trait.unitFlag, disableGemv, cmatrixSource, 
-            trait.cmatrixInitVal);
+        auto params = Std::make_tuple(m, k, n, unitFlag, trait.disableGemv, cmatrixSource, 
+            cmatrixInitVal);
         return params;
     }
 };
