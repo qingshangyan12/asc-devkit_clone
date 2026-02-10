@@ -21,9 +21,9 @@ protected:
 };
 
 namespace {
-void asc_sync_block_arrive_stub(pipe_t pipe, uint8_t mode, int64_t flagID)
+void asc_sync_block_arrive_stub(pipe_t pipe, uint64_t config)
 {
-    EXPECT_EQ(33U, config);
+    EXPECT_EQ(273, config);
 }
 }
 
@@ -31,8 +31,9 @@ TEST_F(TestSyncBlkArrive, sync_block_arrive_Succ)
 {
     uint8_t mode = 1;
     int64_t flagID = 1;
+    uint64_t config = 273;
     pipe_t pipe = PIPE_S;
-    MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint8_t, int64_t))
+    MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))
             .times(1)
             .will(invoke(asc_sync_block_arrive_stub));
 
