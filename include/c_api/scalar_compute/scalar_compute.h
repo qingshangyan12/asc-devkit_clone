@@ -20,7 +20,7 @@
 
 #include "instr_impl/npu_arch_2201/scalar_compute_impl.h"
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 #include "instr_impl/npu_arch_3510/scalar_compute_impl.h"
 
