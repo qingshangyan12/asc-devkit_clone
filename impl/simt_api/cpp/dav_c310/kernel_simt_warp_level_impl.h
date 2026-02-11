@@ -14,11 +14,11 @@
 #if defined(ASCENDC_CPU_DEBUG)
 #include <cmath>
 
-#include "kernel_utils.h"
+#include "impl/basic_api/kernel_utils.h"
 #include "simt_api/cpp/kernel_simt_utils.h"
 #include "stub_def.h"
 #endif
-#include "kernel_simt_common_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_common_impl.h"
 namespace AscendC {
 namespace Simt {
 
