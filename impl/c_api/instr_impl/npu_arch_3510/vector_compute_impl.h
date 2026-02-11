@@ -210,17 +210,17 @@
 // ==========asc_create_iter_reg(b8/b16/b32)=========
 __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset)
 {
-    asc_create_iter_reg_b32_impl(offset);
+    return asc_create_iter_reg_b32_impl(offset);
 }
 
 __simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset)
 {
-    asc_create_iter_reg_b16_impl(offset);
+    return asc_create_iter_reg_b16_impl(offset);
 }
 
 __simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset)
 {
-    asc_create_iter_reg_b8_impl(offset);
+    return asc_create_iter_reg_b8_impl(offset);
 }
 
 // ==========asc_add(u8/s8/u16/s18/u32/s32)=========
@@ -4996,7 +4996,7 @@ __simd_callee__ inline void asc_mull(vector_int32_t& dst0, vector_int32_t& dst1,
     asc_mull_impl(dst0, dst1, src0, src1, mask);
 }
 
-__aicore__ inline void asc_clear_ar_spr()
+__simd_callee__ inline void asc_clear_ar_spr()
 {
     asc_clear_ar_spr_impl();
 }

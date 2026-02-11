@@ -153,6 +153,7 @@
 #include "instr_impl/npu_arch_2201/vector_compute_impl/asc_transto5hd_impl.h"
 #include "instr_impl/npu_arch_2201/vector_compute_impl/asc_get_rsvd_cnt_impl.h"
 #include "instr_impl/npu_arch_2201/vector_compute_impl/asc_set_va_reg_impl.h"
+#include "instr_impl/npu_arch_2201/vector_compute_impl/asc_pair_reduce_sum_impl.h"
 
 // ==========asc_add(half/float/int16_t/int32_t)==========
 __aicore__ inline void asc_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
@@ -1922,6 +1923,12 @@ __aicore__ inline void asc_min_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32
 __aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool sign_mode)
 {
     asc_set_deq_scale_impl(scale, offset, sign_mode);
+}
+
+__aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* tmp, float scale_arr[ASC_VDEQ_SIZE],
+                int16_t offset_arr[ASC_VDEQ_SIZE], bool sign_mode_arr[ASC_VDEQ_SIZE])
+{
+    asc_set_deq_scale_impl(tmp, scale_arr, offset_arr, sign_mode_arr);
 }
 
 __aicore__ inline void asc_set_deq_scale(half scale)
@@ -5058,6 +5065,39 @@ __aicore__ inline void asc_brcb_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* 
 __aicore__ inline int64_t asc_get_rsvd_count()
 {
     return asc_get_rsvd_count_impl();
+}
+
+//==========asc_pair_reduce_sum(half/float)============
+__aicore__ inline void asc_pair_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride,
+                                           uint16_t src_block_stride, uint16_t src_repeat_stride)
+{
+    asc_pair_reduce_sum_impl(dst, src, repeat, dst_repeat_stride, src_block_stride, src_repeat_stride);
+}
+
+__aicore__ inline void asc_pair_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+{
+    asc_pair_reduce_sum_impl(dst, src, count);
+}
+
+__aicore__ inline void asc_pair_reduce_sum_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+{
+    asc_pair_reduce_sum_sync_impl(dst, src, count);
+}
+
+__aicore__ inline void asc_pair_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride,
+                                           uint16_t src_block_stride, uint16_t src_repeat_stride)
+{
+    asc_pair_reduce_sum_impl(dst, src, repeat, dst_repeat_stride, src_block_stride, src_repeat_stride);
+}
+
+__aicore__ inline void asc_pair_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
+{
+    asc_pair_reduce_sum_impl(dst, src, count);
+}
+
+__aicore__ inline void asc_pair_reduce_sum_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
+{
+    asc_pair_reduce_sum_sync_impl(dst, src, count);
 }
 
 

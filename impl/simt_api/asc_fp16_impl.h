@@ -386,24 +386,88 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_rn(const float x) {
     return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_rn_sat(const float x) {
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_rz(const float x) {
     return __cvt_half<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_rz_sat(const float x) {
+    return __cvt_half<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_rd(const float x) {
     return __cvt_half<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_rd_sat(const float x) {
+    return __cvt_half<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_ru(const float x) {
     return __cvt_half<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_ru_sat(const float x) {
+    return __cvt_half<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_rna(const float x) {
     return __cvt_half<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_rna_sat(const float x) {
+    return __cvt_half<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_ro(const float x) {
     return __cvt_half<ROUND::O, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __float2half_ro_sat(const float x) {
+    return __cvt_half<ROUND::O, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rn_sat(const float2 x) {
+    return __cvt_half2<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rz_sat(const float2 x) {
+    return __cvt_half2<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rd(const float2 x) {
+    return __cvt_half2<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rd_sat(const float2 x) {
+    return __cvt_half2<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_ru(const float2 x) {
+    return __cvt_half2<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_ru_sat(const float2 x) {
+    return __cvt_half2<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rna(const float2 x) {
+    return __cvt_half2<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rna_sat(const float2 x) {
+    return __cvt_half2<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_ro(const float2 x) {
+    return __cvt_half2<ROUND::O, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_ro_sat(const float2 x) {
+    return __cvt_half2<ROUND::O, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __half2float(const half x) {
@@ -538,44 +602,104 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int __half2ll_rna(const half x) 
     return __cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x_fp32);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __half2half_rn(const half x) {
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __half2half_rz(const half x) {
+    return __cvt_half<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __half2half_rd(const half x) {
+    return __cvt_half<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __half2half_ru(const half x) {
+    return __cvt_half<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __half2half_rna(const half x) {
+    return __cvt_half<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_rn(const unsigned int x) {
     return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_rn_sat(const unsigned int x) {
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_rz(const unsigned int x) {
     return __cvt_half<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_rz_sat(const unsigned int x) {
+    return __cvt_half<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_rd(const unsigned int x) {
     return __cvt_half<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_rd_sat(const unsigned int x) {
+    return __cvt_half<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_ru(const unsigned int x) {
     return __cvt_half<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_ru_sat(const unsigned int x) {
+    return __cvt_half<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_rna(const unsigned int x) {
     return __cvt_half<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __uint2half_rna_sat(const unsigned int x) {
+    return __cvt_half<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rn(const int x) {
     return __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rn_sat(const int x) {
+    return __cvt_half<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rz(const int x) {
     return __cvt_half<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rz_sat(const int x) {
+    return __cvt_half<ROUND::Z, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rd(const int x) {
     return __cvt_half<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rd_sat(const int x) {
+    return __cvt_half<ROUND::F, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_ru(const int x) {
     return __cvt_half<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_ru_sat(const int x) {
+    return __cvt_half<ROUND::C, RoundingSaturation::RS_ENABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rna(const int x) {
     return __cvt_half<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rna_sat(const int x) {
+    return __cvt_half<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ull2half_rn(const unsigned long long int x) {
@@ -638,6 +762,86 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ll2half_rna(const long long int x) 
     return __cvt_half<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(f);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __floats2half2_rn(const float x, const float y)
+{
+    half2 tmp;
+    tmp.x = __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp.y = __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rn(const float2 x)
+{
+    return __cvt_half2<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __low2float(const half2 x)
+{
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x.x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __low2half(const half2 x)
+{
+    return x.x;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __low2half2(const half2 x)
+{
+    half2 tmp;
+    tmp.x = x.x;
+    tmp.y = x.x;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __lowhigh2highlow(const half2 x)
+{
+    half2 tmp;
+    tmp.x = x.y;
+    tmp.y = x.x;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __high2float(const half2 x)
+{
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x.y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __high2half(const half2 x)
+{
+    return x.y;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __high2half2(const half2 x)
+{
+    half2 tmp;
+    tmp.x = x.y;
+    tmp.y = x.y;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __highs2half2(const half2 x, const half2 y)
+{
+    half2 tmp;
+    tmp.x = x.y;
+    tmp.y = y.y;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __lows2half2(const half2 x, const half2 y)
+{
+    half2 tmp;
+    tmp.x = x.x;
+    tmp.y = y.x;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __halves2half2(const half x, const half y)
+{
+    half2 tmp;
+    tmp.x = x;
+    tmp.y = y;
+    return tmp;
+}
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(__ubuf__ half *address, half val)
@@ -940,6 +1144,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_reduce_min(half val)
     tmp.x = x;
     tmp.y = y;
     return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ushort_as_half(const unsigned short int x)
+{
+    union Data {
+        unsigned short int i;
+        half f;
+    };
+    union Data data = {.i = x};
+    return data.f;
 }
 #endif
 
