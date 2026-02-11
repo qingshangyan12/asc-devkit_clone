@@ -77,7 +77,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_gather](vector_compute/asc_gather.md) | 将源操作数按照给定的偏移按元素收集到目的操作数中。 |
 | [asc_min_scalar](vector_compute/asc_min_scalar.md) | 源操作数矢量逐元素与标量相比，取较小值。 |
 | [asc_gt](vector_compute/asc_gt.md) | 按元素比较两个矢量的大小关系，若比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
-| [asc_vdeq_int162b8](vector_compute/asc_vdeq_int162b8.md) | 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。 |
+| [asc_vdeq_int162b8](vector_compute/asc_vdeq_int162b8.md) | 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。 |
 | [asc_int322float](vector_compute/asc_int322float.md) | 将int32_t类型数据转换为float类型。 |
 | [asc_abs](vector_compute/asc_abs.md) | 按元素取绝对值 |
 | [asc_add_relu](vector_compute/asc_add_relu.md) | 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
@@ -286,40 +286,40 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_abs](reg/reg_vector/asc_abs.md) | 按元素取绝对值。 |
-| [asc_add](reg/reg_vector/asc_add.md) | 按照元素对应位置执行矢量加法运算，计算过程为ZEROING模式（未被mask掩码的元素在目的操作数中中置0）。 |
-| [asc_addc](reg/reg_vector/asc_addc.md) | 基于掩码mask，对输入数据src0、src1及进位数据src2执行元素逐位相加操作，相加结果写入dst1。 |
+| [asc_add](reg/reg_vector/asc_add.md) | 按照元素对应位置执行矢量加法运算。 |
+| [asc_addc](reg/reg_vector/asc_addc.md) | 对输入数据src0、src1及进位数据src2执行元素逐位相加操作，相加结果写入dst1。 |
 | [asc_add_scalar](reg/reg_vector/asc_add_scalar.md) | 执行矢量和标量的加法运算。 |
 | [asc_and](reg/reg_vector/asc_and.md) | 执行矢量与运算。 |
 | [asc_arange](reg/reg_vector/asc_arange.md) | 以传入的value为起始值，生成递增/递减的索引，并将生成的索引保存在dst中。 |
 | [asc_axpy](reg/reg_vector/asc_axpy.md) | 根据mask对源操作数src、value进行按元素做乘加操作，将结果写入目的操作数dst。 |
-| [asc_bfloat162float](reg/reg_vector/asc_bfloat162float.md) | 将bfloat16_t类型转化为float类型，无舍入模式。 |
-| [asc_bfloat162int32](reg/reg_vector/asc_bfloat162int32.md) | 将bfloat16_t类型数据转换为int32_t，并支持多种舍入模式。 |
+| [asc_bfloat162float](reg/reg_vector/asc_bfloat162float.md) | 将bfloat16_t数据类型的矢量逐元素转换为float类型。 |
+| [asc_bfloat162int32](reg/reg_vector/asc_bfloat162int32.md) | 将bfloat16_t数据类型的矢量逐元素转换为int32_t类型。 |
 | [asc_cumulative_histogram](reg/reg_vector/asc_cumulative_histogram.md) | 对直方图数据进行累计统计。 |
 | [asc_deintlv](reg/reg_vector/asc_deintlv.md) | 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。 |
 | [asc_div](reg/reg_vector/asc_div.md) | 按元素求商。 |
-| [asc_e5m22float](reg/reg_vector/asc_e5m22float.md) | 将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。 |
+| [asc_e5m22float](reg/reg_vector/asc_e5m22float.md) | 将fp8_e5m2_t数据类型的矢量逐元素转换为float类型。 |
 | [asc_exp](reg/reg_vector/asc_exp.md) | 计算e的x次幂。 |
 | [asc_exp_sub](reg/reg_vector/asc_exp_sub.md) | 将src0与src1相减，差值作为e的指数计算 |
-| [asc_float2bfloat16](reg/reg_vector/asc_float2bfloat16.md) | - RINT舍入模式：四舍六入五成双舍入。 |
+| [asc_float2bfloat16](reg/reg_vector/asc_float2bfloat16.md) | 将float数据类型的矢量逐元素转换为bfloat16_t类型。 |
 | [asc_frequency_histogram](reg/reg_vector/asc_frequency_histogram.md) | 对直方图数据进行频率统计。 |
 | [asc_ge](reg/reg_vector/asc_ge.md) | 对源操作数执行逐元素比较。对于src0 >= src1，若条件成立则目的操作数对应结果位为1，否则为0。 |
 | [asc_ge_scalar](reg/reg_vector/asc_ge_scalar.md) | 对源操作数与标量执行逐元素比较。对于src0 >= value，若条件成立则目的操作数对应结果位为1，否则为0。 |
-| [asc_half2bf16](reg/reg_vector/asc_half2bfloat16.md) | 将half类型数据转为bfloat16类型，并支持多种舍入模式。 |
-| [asc_half2hif8](reg/reg_vector/asc_half2hif8.md) | 将half类型转化为hifloat8_t类型，并支持多种舍入模式。 |
-| [asc_half2int16](reg/reg_vector/asc_half2int16.md) | 将half类型数据转换为int16_t，并支持多种舍入模式。 |
-| [asc_half2int32](reg/reg_vector/asc_half2int32.md) | - RINT舍入模式：四舍六入五成双舍入。 |
-| [asc_half2int4x2](reg/reg_vector/asc_half2int4x2.md) | 将half类型数据转为int4x2类型，并支持多种舍入模式。 |
-| [asc_half2int8](reg/reg_vector/asc_half2int8.md) | 将half类型转化为int8_t类型，并支持多种舍入模式。 |
-| [asc_hif82half](reg/reg_vector/asc_hif82half.md) | 将hifloat8_t类型数据转换为half类型。 |
-| [asc_int162int32](reg/reg_vector/asc_int162int32.md) | 将int16_t类型数据转换为int32_t类型。 |
-| [asc_int162uint32](reg/reg_vector/asc_int162uint32.md) | 将int16_t类型转化为uint32_t类型，无舍入模式。 |
-| [asc_int322float](reg/reg_vector/asc_int322float.md) | 将int32_t类型转化为float类型，并支持多种舍入模式。 |
-| [asc_int322int64](reg/reg_vector/asc_int322int64.md) | 将vector_int32_t类型的源操作数以256B为单位分为两部分，读取其中一部分元素，将其转换成vector_int64_t类型并写入目的操作数。 |
-| [asc_int322uint16](reg/reg_vector/asc_int322uint16.md) | 将vector_int32_t类型转换成vector_uint16_t类型，写入目的操作数的上半部分或下半部分，并支持不同的饱和模式。 |
-| [asc_int4x22bfloat16](reg/reg_vector/asc_int4x22bfloat16.md) | 将int4x2_t类型转化为bfloat16_t类型，无舍入模式。 |
-| [asc_int642float](reg/reg_vector/asc_int642float.md) | 将int64_t类型数据转换为float，并支持多种舍入模式。 |
-| [asc_int642int32](reg/reg_vector/asc_int642int32.md) | - asc_int642int32：不饱和模式，写入目的操作数的上半部分。 |
-| [asc_int82half](reg/reg_vector/asc_int82half.md) | 将int8_t类型数据转换为half类型。 |
+| [asc_half2bf16](reg/reg_vector/asc_half2bfloat16.md) | 将half数据类型的矢量逐元素转换为bfloat16_t类型。 |
+| [asc_half2hif8](reg/reg_vector/asc_half2hif8.md) | 将half数据类型的矢量逐元素转换为hifloat8_t类型。 |
+| [asc_half2int16](reg/reg_vector/asc_half2int16.md) | 将half数据类型的矢量逐元素转换为int16_t类型。 |
+| [asc_half2int32](reg/reg_vector/asc_half2int32.md) | 将half数据类型的矢量逐元素转换为int32_t类型。 |
+| [asc_half2int4x2](reg/reg_vector/asc_half2int4x2.md) | 将half数据类型的矢量逐元素转换为int4x2_t类型。 |
+| [asc_half2int8](reg/reg_vector/asc_half2int8.md) | 将half数据类型的矢量逐元素转换为int8_t类型。 |
+| [asc_hif82half](reg/reg_vector/asc_hif82half.md) | 将hifloat8_t数据类型的矢量逐元素转换为half类型。 |
+| [asc_int162int32](reg/reg_vector/asc_int162int32.md) | 将int16_t数据类型的矢量逐元素转换为int32_t类型。 |
+| [asc_int162uint32](reg/reg_vector/asc_int162uint32.md) | 将int16_t数据类型的矢量逐元素转换为uint32_t类型。 |
+| [asc_int322float](reg/reg_vector/asc_int322float.md) | 将int32_t数据类型的矢量逐元素转换为float类型。 |
+| [asc_int322int64](reg/reg_vector/asc_int322int64.md) | 将int32_t数据类型的矢量逐元素转换为int64_t类型。 |
+| [asc_int322uint16](reg/reg_vector/asc_int322uint16.md) | 将int32_t数据类型的矢量逐元素转换为uint16_t类型。 |
+| [asc_int4x22bfloat16](reg/reg_vector/asc_int4x22bfloat16.md) | 将int4x2_t数据类型的矢量逐元素转换为bfloat16_t类型。 |
+| [asc_int642float](reg/reg_vector/asc_int642float.md) | 将int64_t数据类型的矢量逐元素转换为float类型。 |
+| [asc_int642int32](reg/reg_vector/asc_int642int32.md) | 将int64_t数据类型的矢量逐元素转换为int32_t类型。 |
+| [asc_int82half](reg/reg_vector/asc_int82half.md) | 将int8_t数据类型的矢量逐元素转换为half类型。 |
 | [asc_intlv](reg/reg_vector/asc_intlv.md) | 将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。 |
 | [asc_le](reg/reg_vector/asc_le.md) | 对源操作数执行逐元素比较。对于src0 <= src1，若条件成立则目的操作数对应结果位为1，否则为0。 |
 | [asc_le_scalar](reg/reg_vector/asc_le_scalar.md) | 对源操作数与标量执行逐元素比较。对于src0 <= value，若条件成立则目的操作数对应结果位为1，否则为0。 |
@@ -346,12 +346,12 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_shiftleft](reg/reg_vector/asc_shiftleft.md) | 根据掩码mask对输入数据src0，按照src1对应元素进行左移操作，完成后将结果写入dst中。 |
 | [asc_shiftright](reg/reg_vector/asc_shiftright.md) | 根据掩码mask对输入数据src0，按照src1对应元素进行右移操作，完成后将结果写入dst中。 |
 | [asc_squeeze](reg/reg_vector/asc_squeeze.md) | 将src中被mask选择的有效元素依次复制到dst，有效元素从低到高连续排列。 |
-| [asc_uint162uint32](reg/reg_vector/asc_uint162uint32.md) | 将uint16_t类型数据转为uint32_t类型。 |
-| [asc_uint162uint8](reg/reg_vector/asc_uint162uint8.md) | 将uint16_t类型转化为uint8_t类型，无舍入模式。 |
-| [asc_uint322int16](reg/reg_vector/asc_uint322int16.md) | 将uint32_t类型数据转为int16_t类型。 |
-| [asc_uint322uint8](reg/reg_vector/asc_uint322uint8.md) | 将uint32_t类型数据转换为uint8_t类型。 |
-| [asc_uint82half](reg/reg_vector/asc_uint82half.md) | 将uint8_t类型数据转为half类型。 |
-| [asc_uint82uint16](reg/reg_vector/asc_uint82uint16.md) | 将vector_uint8_t类型的源操作数以256B为单位分为两部分，读取其中一部分元素，将其转换成vector_uint16_t类型并写入目的操作数。 |
+| [asc_uint162uint32](reg/reg_vector/asc_uint162uint32.md) | 将uint16_t数据类型的矢量逐元素转换为uint32_t类型。 |
+| [asc_uint162uint8](reg/reg_vector/asc_uint162uint8.md) | 将uint16_t数据类型的矢量逐元素转换为uint8_t类型。 |
+| [asc_uint322int16](reg/reg_vector/asc_uint322int16.md) | 将uint32_t数据类型的矢量逐元素转换为int16_t类型。 |
+| [asc_uint322uint8](reg/reg_vector/asc_uint322uint8.md) | 将uint32_t数据类型的矢量逐元素转换为uint8_t类型。 |
+| [asc_uint82half](reg/reg_vector/asc_uint82half.md) | 将uint8_t数据类型的矢量逐元素转换为half类型。 |
+| [asc_uint82uint16](reg/reg_vector/asc_uint82uint16.md) | 将uint8_t数据类型的矢量逐元素转换为uint16_t类型。 |
 | [asc_unpack](reg/reg_vector/asc_unpack.md) | 矢量解包操作。 |
 | [asc_unsqueeze](reg/reg_vector/asc_unsqueeze.md) | 根据mask进行解压缩，将生成的数据输出到dst。 |
 | [asc_update_mask](reg/reg_vector/asc_update_mask.md) | 根据value大小生成对应的掩码寄存器中的值。 |

@@ -19,6 +19,7 @@
 ## 函数原型
 
 ```cpp
+// 
 // FLOOR舍入模式，
 __simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2int4x2_rd_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
