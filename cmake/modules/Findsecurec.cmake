@@ -14,11 +14,11 @@ if (securec_FOUND)
 endif()
 
 set(C_SEC_HEAD_SEARCH_PATHS
-  ${ASCEND_DIR}/${SYSTEM_PREFIX}/include
+  ${ASCEND_CANN_PACKAGE_PATH}/${CMAKE_SYSTEM_PROCESSOR}-linux/include
   # ${TOP_DIR}/abl/libc_sec/include             # compile with ci
 )
 
-set(C_SEC_LIB_SEARCH_PATHS ${ASCEND_DIR}/${SYSTEM_PREFIX})
+set(C_SEC_LIB_SEARCH_PATHS ${ASCEND_CANN_PACKAGE_PATH}/${CMAKE_SYSTEM_PROCESSOR}-linux)
 
 find_path(C_SEC_INCLUDE NAMES securec.h PATHS ${C_SEC_HEAD_SEARCH_PATHS})
 if(WIN32)
