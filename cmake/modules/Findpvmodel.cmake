@@ -44,6 +44,7 @@ unset(_cmake_targets_defined)
 unset(_cmake_targets_not_defined)
 unset(_cmake_expected_targets)
 
+message(STATUS "the ASCEND_DIR is ${ASCEND_DIR}")
 find_library(ascend910_LIBRARY
     NAMES lib_pvmodel.so
     PATHS ${ASCEND_DIR}/*/simulator/Ascend910A/lib
