@@ -21,29 +21,32 @@ namespace AscendC {
 namespace Te {
 
 struct MmadTrait {
-    int32_t fmOffset = 0;
-    bool enSsparse = false;
-    bool enWinogradA = false;
-    bool enWinogradB = false;
-    int8_t unitFlag = 0;
-    bool kDirectionAlign = false;
-    bool cmatrixSource = false;
-    bool cmatrixInitVal = true;
+   int32_t fmOffset = 0;
+   bool kDirectionAlign = false;
+   bool cmatrixSource = false;
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+   bool disableGemv;
+#endif
 
    __aicore__ constexpr MmadTrait () {};
 
-   __aicore__ constexpr MmadTrait (int32_t fmOffsetIn, bool enSsparseIn, bool enWinogradAIn, bool enWinogradBIn, 
-      int8_t unitFlagIn, bool kDirectionAlignIn, bool cmatrixSourceIn, bool cmatrixInitValIn) 
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+   __aicore__ constexpr MmadTrait (int32_t fmOffsetIn, bool kDirectionAlignIn, bool cmatrixSourceIn,
+      bool disableGemvIn) 
    {
       fmOffset = fmOffsetIn;
-      enSsparse = enSsparseIn;
-      enWinogradA = enWinogradAIn;
-      enWinogradB = enWinogradBIn;
-      unitFlag = unitFlagIn;
       kDirectionAlign = kDirectionAlignIn;
       cmatrixSource = cmatrixSourceIn;
-      cmatrixInitVal = cmatrixInitValIn;
+      disableGemv = disableGemvIn;
    };
+#else
+   __aicore__ constexpr MmadTrait (int32_t fmOffsetIn, bool kDirectionAlignIn, bool cmatrixSourceIn) 
+   {
+      fmOffset = fmOffsetIn;
+      kDirectionAlign = kDirectionAlignIn;
+      cmatrixSource = cmatrixSourceIn;
+   };
+#endif
 };
 constexpr MmadTrait DEFAULT_MMAD_TRAIT; 
 

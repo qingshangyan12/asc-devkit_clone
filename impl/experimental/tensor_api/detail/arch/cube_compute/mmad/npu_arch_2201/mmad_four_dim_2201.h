@@ -23,9 +23,9 @@ class MmadGenParams2201
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S>
-    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter)
+    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, uint8_t unitFlag, bool cmatrixInitVal)
     {
-        return GenParamsImpl<trait, T, U, S>(dst, fm, filter);
+        return GenParamsImpl<trait, T, U, S>(dst, fm, filter, unitFlag, cmatrixInitVal);
     }
 private:
     template<typename T>
@@ -96,7 +96,7 @@ private:
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S>
-    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter)
+    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter, uint8_t unitFlag, bool cmatrixInitVal)
     {
         CheckTemplate<trait, T, U, S>();
         using fmType = typename U::elementType;
@@ -106,8 +106,8 @@ private:
         uint16_t m = GetEleFromLayout<decltype(fmLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(fmLayout) * FRACTAL_FIXED;
         uint16_t k = GetEleFromLayout<decltype(fmLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(fmLayout) * C0_SIZE / sizeof(fmType);
         uint16_t n = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) * FRACTAL_FIXED;
-        auto params = Std::make_tuple(m, k, n, trait.unitFlag, trait.kDirectionAlign, trait.cmatrixSource, 
-            trait.cmatrixInitVal);
+        auto params = Std::make_tuple(m, k, n, unitFlag, trait.kDirectionAlign, trait.cmatrixSource, 
+            cmatrixInitVal);
         return params;
     }
 };
