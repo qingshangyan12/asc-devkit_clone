@@ -46,6 +46,7 @@ def compile_pre_process(op_info: OpInfo, compile_options: list):
     op_debug_config_val = get_current_build_config(op_debug_config)
     compile_options.append("--cce-disable-kernel-global-attr-check")
     global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+    global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
     global_var_storage.set_variable("ascendc_sub_super_kernel_params", "")
     global_var_storage.set_variable("ascendc_sub_super_kernel_type", "")
     global_var_storage.set_variable("ascendc_sub_super_kernel_fun_names", {})
