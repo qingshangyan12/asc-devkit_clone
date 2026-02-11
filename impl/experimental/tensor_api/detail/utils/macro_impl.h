@@ -15,6 +15,59 @@
 #ifndef IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
 #define IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
 
+#if defined(ASCENDC_CPU_DEBUG)
+#include <iostream>
+#include <string>
+#include <cxxabi.h>
+
+inline void __print_type_hierarchy(const std::string& type_str) {
+    int indent_level = 1;
+    const int indent_spaces = 4; // 每层缩进的空格数
+    for (int s = 0; s < indent_level * indent_spaces; ++s) std::cout << " ";
+    for (size_t i = 0; i < type_str.size(); ++i) {
+        char c = type_str[i];
+        if (c == '<') {
+            // 遇到 <，换行并增加缩进
+            std::cout << c << "\n";
+            indent_level++;
+            // 打印缩进
+            for (int s = 0; s < indent_level * indent_spaces; ++s) std::cout << " ";
+        }
+        else if (c == ',' && indent_level > 0) {
+            // 遇到逗号，换行并保持当前缩进
+            std::cout << c << "\n";
+            for (int s = 0; s < indent_level * indent_spaces - 1; ++s) std::cout << " ";
+        }
+        else if (c == '>') {
+            // 遇到 >，先换行，减少缩进，再打印 >
+            std::cout << "\n";
+            indent_level--;
+            for (int s = 0; s < indent_level * indent_spaces; ++s) std::cout << " ";
+            std::cout << c;
+        }
+        else {
+            // 普通字符直接打印
+            std::cout << c;
+        }
+    }
+    std::cout << std::endl;
+}
+
+template<typename T>
+inline void PrintTypeHierarchy(const char* type_name = nullptr) {
+    std::cout << "Type Hierarchy for: " << type_name << ": " << std::endl;
+    std::string raw_name = typeid(T).name();
+    int status = -4;
+    char* res = abi::__cxa_demangle(raw_name.c_str(), NULL, NULL, &status);
+    std::string ret = (status == 0) ? res : raw_name;
+    if (status == 0) std::free(res);
+    __print_type_hierarchy(ret);
+}
+#else
+template<typename T>
+__aicore__ inline void PrintTypeHierarchy(const char* type_name = nullptr) {}
+#endif
+
 #if !defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
     using fp4x2_e2m1_t = float4_e2m1x2_t;
