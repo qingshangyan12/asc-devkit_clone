@@ -43,17 +43,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline hifloat8x2_t __half22hif82_rna_sat(const h
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __hif822float2(const hifloat8x2_t x);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __hif822float2_sat(const hifloat8x2_t x);
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __hif822half2(const hifloat8x2_t x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __e4m3x22float2(const float8_e4m3x2_t x);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __e4m3x22float2_sat(const float8_e4m3x2_t x);
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __e5m2x22float2(const float8_e5m2x2_t x);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __e5m2x22float2_sat(const float8_e5m2x2_t x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline __asc_fp8x2_storage_t
 __asc_cvt_float2_to_fp8x2(const float2 x, const __asc_saturation_t saturate,
