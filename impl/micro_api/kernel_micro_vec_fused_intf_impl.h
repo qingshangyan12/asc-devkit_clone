@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T0 = DefaultType, typename T1 = DefaultType, typename T2, RegLayout layout = RegLayout::ZERO,
           typename T3, typename T4>
 __simd_callee__ inline void FusedMulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, MaskReg& mask)
@@ -72,7 +72,7 @@ __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 {
     FusedMulDstAddImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_VEC_FUSED_INTERFACE_IMPL_H

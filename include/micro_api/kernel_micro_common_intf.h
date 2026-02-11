@@ -20,7 +20,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 using MaskReg = vector_bool;
 using UnalignRegForLoad = vector_align;
 using UnalignRegForStore = vector_align;
@@ -29,7 +29,7 @@ using UnalignReg = vector_align;
 
 #define __local_mem__ __ubuf__
 
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_MICRO_COMMON_INTERFACE_H

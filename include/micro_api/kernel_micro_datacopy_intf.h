@@ -19,7 +19,7 @@
 #include "kernel_micro_utils.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 // vld
 template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T* srcAddr);
@@ -163,7 +163,7 @@ __simd_callee__ inline void StoreAlign(__ubuf__ T*& dstAddr, MaskReg& mask, int3
 template <typename T>
 __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, UnalignRegForStore& ureg);
 
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_datacopy_intf_impl.h"

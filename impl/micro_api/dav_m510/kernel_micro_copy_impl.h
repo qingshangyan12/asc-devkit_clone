@@ -18,7 +18,7 @@
 #include "kernel_micro_common_impl.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::MERGING, typename U>
 __simd_callee__ inline void CopyImpl(U& dstReg, U& srcReg, MaskReg mask)
 {
@@ -70,6 +70,6 @@ __simd_callee__ inline void CopyImpl(U& dstReg, U& srcReg)
         }
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_COPY_IMPL_H

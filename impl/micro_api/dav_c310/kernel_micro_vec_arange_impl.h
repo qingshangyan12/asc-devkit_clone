@@ -18,7 +18,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <IndexOrder order = IndexOrder::INCREASE_ORDER, typename T, typename U>
 __simd_callee__ inline void ArangeB64Impl(U& dstReg, T scalarValue)
 {
@@ -26,7 +26,7 @@ __simd_callee__ inline void ArangeB64Impl(U& dstReg, T scalarValue)
     static_assert((SupportType<ActualT, int64_t>()), "ArangeB64Impl only support B64 data type");
     constexpr auto orderMode = std::integral_constant<::Order, static_cast<::Order>(order)>();
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "ArangeB64Impl only support RegTraitNumTwo");
-    MaskReg maskReg = AscendC::MicroAPI::CreateMask<uint8_t, AscendC::MicroAPI::MaskPattern::ALL>();
+    MaskReg maskReg = AscendC::Reg::CreateMask<uint8_t, AscendC::Reg::MaskPattern::ALL>();
     Duplicate((RegTensor<int32_t>&)dstReg.reg[1], int32_t(0), maskReg);
     Arange<DefaultType, order>((RegTensor<int32_t>&)dstReg.reg[0], int32_t(0));
     Adds(dstReg, dstReg, scalarValue, maskReg);
@@ -56,6 +56,6 @@ __simd_callee__ inline void ArangeImpl(S& dstReg, U scalarValue)
         }
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_ARANGE_IMPL_H

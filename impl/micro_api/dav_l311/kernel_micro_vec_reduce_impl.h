@@ -17,7 +17,7 @@
 
 #include "kernel_micro_common_impl.h"
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
     typename DstRegT, typename SrcRegT>
 __simd_callee__ inline void ReduceSumImpl(DstRegT &dstReg, SrcRegT srcReg, MaskReg mask)
@@ -102,6 +102,6 @@ __simd_callee__ inline void PairReduceSumImpl(RegT &dstReg, RegT srcReg, MaskReg
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcpadd(dstReg, srcReg, mask, modeValue);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_REDUCE_IMPL_H

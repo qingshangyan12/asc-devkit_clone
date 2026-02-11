@@ -21,7 +21,7 @@
 #include "../../../include/utils/std/type_traits.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 namespace Internal {
 __aicore__ inline constexpr SqrtSpecificMode GetSqrtSpecificMode(MaskMergeMode mrgMode)
 {
@@ -323,7 +323,7 @@ __simd_callee__ inline void SqrtFastInverseImpl(U& dstReg, U& srcReg, MaskReg& m
     constexpr SqrtSpecificMode sprMode = Internal::GetSqrtSpecificMode(mode);
     constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
     /*
-    * Improves MicroAPI with high precision mode by using fast_inverse approach with following formula.
+    * Improves Reg with high precision mode by using fast_inverse approach with following formula.
     * bool p;
     * p = (b < 1);
     * if (p)
@@ -413,16 +413,16 @@ __simd_callee__ inline void SqrtImpl(U& dstReg, U& srcReg, MaskReg& mask)
 
     if constexpr (sprMode.precisionMode) {
         static_assert(SupportType<T, float>(),
-                      "MicroAPI Sqrt for high precision mode by using fast_inverse approach only supports float.");
+                      "Reg Sqrt for high precision mode by using fast_inverse approach only supports float.");
         SqrtFastInverseImpl<T, mode, U>(dstReg, srcReg, mask);
     } else {
         if constexpr (sprMode.algo == SqrtAlgo::PRECISION_0ULP_FTZ_FALSE) {
             static_assert(SupportType<T, float>(),
-                          "MicroAPI Sqrt for high precision mode by using fast_inverse approach only supports float.");
+                          "Reg Sqrt for high precision mode by using fast_inverse approach only supports float.");
             SqrtFastInverseImpl<T, mode, U>(dstReg, srcReg, mask);
         } else if constexpr (sprMode.algo == SqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
             static_assert(SupportType<T, half>(),
-                          "MicroAPI Sqrt for PRECISION_1ULP_FTZ_FALSE only supports half.");
+                          "Reg Sqrt for PRECISION_1ULP_FTZ_FALSE only supports half.");
             HalfUnion multiplyFactor0;
             multiplyFactor0.i = 0x6C00;
             HalfUnion multiplyFactor1;
@@ -513,10 +513,10 @@ __simd_callee__ inline void LogImpl(U& dstReg, U& srcReg, MaskReg& mask)
         static_assert(SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
                       "current Ln api only supports Mode ZEROING on current device!");
         if constexpr (sprMode.algo == LnAlgo::PRECISION_1ULP_FTZ_FALSE) {
-            static constexpr AscendC::MicroAPI::LogSpecificMode logMode = {MaskMergeMode::ZEROING, LogAlgo::PRECISION_1ULP_FTZ_FALSE};
+            static constexpr AscendC::Reg::LogSpecificMode logMode = {MaskMergeMode::ZEROING, LogAlgo::PRECISION_1ULP_FTZ_FALSE};
             LnCompute<T, U, &logMode>(dstReg, srcReg, mask);
         } else {
-            static constexpr AscendC::MicroAPI::LogSpecificMode logMode = {MaskMergeMode::ZEROING, LogAlgo::INTRINSIC};
+            static constexpr AscendC::Reg::LogSpecificMode logMode = {MaskMergeMode::ZEROING, LogAlgo::INTRINSIC};
             LnCompute<T, U, &logMode>(dstReg, srcReg, mask);
         }
     } else {
@@ -536,9 +536,9 @@ __simd_callee__ inline void LogXImpl(RegTensor<half>& dstReg, RegTensor<half>& s
     vector_bool MaskLow;
     vector_bool MaskHigh;
     vector_f16 tmpReg;
-    constexpr auto patAll = std::integral_constant<::Pat, static_cast<::Pat>(MicroAPI::MaskPattern::ALL)>();
+    constexpr auto patAll = std::integral_constant<::Pat, static_cast<::Pat>(Reg::MaskPattern::ALL)>();
     vector_bool maskAll = pset_b32(patAll);
-    constexpr auto patVal = std::integral_constant<::Pat, static_cast<::Pat>(MicroAPI::MaskPattern::H)>();
+    constexpr auto patVal = std::integral_constant<::Pat, static_cast<::Pat>(Reg::MaskPattern::H)>();
     vector_bool selMask = pset_b16(patVal);
     constexpr auto partModeEvenVal = std::integral_constant<::Part, static_cast<::Part>(RegLayout::ZERO)>();
     constexpr auto satModeValue =
@@ -767,6 +767,6 @@ __simd_callee__ inline void NotImpl(U& dstReg, U& srcReg, MaskReg& mask)
         }
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_UNARY_IMPL_H

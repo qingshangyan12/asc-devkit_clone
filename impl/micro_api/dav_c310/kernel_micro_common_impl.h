@@ -20,7 +20,7 @@
 #include "../../../include/micro_api/kernel_micro_maskreg_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, StoreDist dist> __aicore__ inline constexpr StoreDist GetStoreDist()
 {
     if constexpr (dist == StoreDist::DIST_NORM) {
@@ -182,6 +182,6 @@ __simd_callee__ inline void B32TraitTwoToTraitOne(T& dstReg, U& srcReg)
 {
     TraitTwoToTraitOneTmpl<T, U, uint16_t>(dstReg, srcReg);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_COMMON_IMPL_H
