@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, typename U, typename S>
 __simd_callee__ inline void Duplicate(S& dstReg, U scalarValue)
 {
@@ -56,7 +56,7 @@ __simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& 
 {
     DeInterleaveImpl<T, U>(dstReg0, dstReg1, srcReg0, srcReg1);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_VEC_DUPLICATE_INTERFACE_IMPL_H

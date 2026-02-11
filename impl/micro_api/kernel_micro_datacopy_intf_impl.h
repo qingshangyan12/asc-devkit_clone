@@ -30,7 +30,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 // vld
 template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
 __simd_callee__ inline void DataCopy(U& dstReg, __ubuf__ T* srcAddr)
@@ -475,6 +475,6 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
     return DataCopyUnAlignImpl<T>(dstAddr, mask, ureg);
 }
 
-}  // namespace MicroAPI
+}  // namespace Reg
 }  // namespace AscendC
 #endif  // ASCENDC_KERNEL_MICRO_DATACOPY_INTERFACE_IMPL_H

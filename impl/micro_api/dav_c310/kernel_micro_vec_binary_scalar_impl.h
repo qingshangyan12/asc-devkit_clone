@@ -20,7 +20,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_binary_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
 __simd_callee__ inline void AddsComplexTraitTwoImpl(S& dstReg, S& srcReg, const U& scalarValue, MaskReg& mask)
 {
@@ -357,6 +357,6 @@ __simd_callee__ inline void LeakyReluImpl(S& dstReg, S& srcReg, U scalarValue, M
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vlrelu(dstReg, srcReg, scalarValue, mask, modeValue);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_BINARY_SCALAR_IMPL_H

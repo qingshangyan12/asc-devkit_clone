@@ -16,7 +16,7 @@
 #define ASCENDC_KERNEL_MICRO_STRUCT_INTERFACE_IMPL_H
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 
 template <typename T, const RegTrait& regTrait>
 __aicore__ void RegTensor<T, regTrait>::Print() const
@@ -80,7 +80,7 @@ __aicore__ void RegTensor<T, regTrait>::Print() const
 #endif
 }
 
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_STRUCT_INTERFACE_IMPL_H

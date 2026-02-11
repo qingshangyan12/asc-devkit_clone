@@ -124,7 +124,7 @@ struct RsqrtConfig {
 
 constexpr RsqrtConfig DEFAULT_RSQRT_CONFIG = {RsqrtAlgo::INTRINSIC};
 
-namespace MicroAPI {
+namespace Reg {
 enum class RegLayout {
     UNKNOWN = -1,
     ZERO,
@@ -368,7 +368,7 @@ enum class ReduceType {
 enum class PairReduce {
     SUM = 0,
 };
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_MICRO_UTILS_H

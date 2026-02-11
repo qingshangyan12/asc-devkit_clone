@@ -20,7 +20,7 @@
 #include "../../../include/utils/std/type_traits.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <CMPMODE mode = CMPMODE::EQ, typename T>
 __simd_callee__ inline void CompareUint64Impl(MaskReg& dst, T& srcReg0, T& srcReg1, MaskReg& mask)
 {
@@ -216,6 +216,6 @@ __simd_callee__ inline void SelectImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
         }
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_CMPSEL_IMPL_H

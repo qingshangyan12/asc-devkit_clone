@@ -29,7 +29,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, MaskMergeMode mode, typename U>
 __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
@@ -167,7 +167,7 @@ __simd_callee__ inline void SubC(MaskReg& carry, U& dstReg, U& srcReg0, U& srcRe
 {
     SubCarryOutsImpl<T, U>(carry, dstReg, srcReg0, srcReg1, carrySrc, mask);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_VEC_BINARY_INTERFACE_IMPL_H
