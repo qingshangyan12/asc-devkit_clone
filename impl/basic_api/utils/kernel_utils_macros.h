@@ -328,6 +328,31 @@ struct FunLevelMixCoreType {
     struct FunMetaMixCoreType mixCoreType;
 };
 
+struct SknlMapInfo {
+    uint64_t cap;
+    void* globalFunc;
+    void* sknlFunc[4];
+};
+
+struct FuncMetaSknlMap {
+    BaseTlv head;
+    uint32_t reserved;
+    SknlMapInfo sknlMeta;
+};
+
+template <uint64_t cap, auto GF, auto SK0 = 0xffffffffffffffff, auto SK1 = 0xffffffffffffffff, auto SK2 = 0xffffffffffffffff, auto SK3 = 0xffffffffffffffff>
+struct SknlKernelMap {
+    static constexpr SknlMapInfo value = {cap, (void*)GF, {(void*)SK0, (void*)SK1, (void*)SK2, (void*)SK3}};
+};
+
+#define SK_BIND_NAME_CONCAT_IMPL(a, b) a##b
+#define SK_BIND_NAME_CONCAT(a, b) SK_BIND_NAME_CONCAT_IMPL(a, b)
+
+#define SK_BIND(...)                                                                    \
+__attribute__((used, __section__(".ascend.meta")))                                      \
+static const FuncMetaSknlMap SK_BIND_NAME_CONCAT(g_sknl_map_, __COUNTER__) =            \
+{{20 /* F_TYPE_SKNL_MAP */, sizeof(uint32_t) + sizeof(SknlMapInfo)}, 0, SknlKernelMap<__VA_ARGS__>::value}
+
 // In order to pass __COUNTER__ to variable name, need 3 times of MACRO to pass argument
 #define TILING_STRUCT_SECTION_INIT_BASE(counter, val)                                                                \
     static const uint64_t __ascendc_tiling_struct_##counter __attribute__((used, section(".ascendc_tiling."#val))) = \
