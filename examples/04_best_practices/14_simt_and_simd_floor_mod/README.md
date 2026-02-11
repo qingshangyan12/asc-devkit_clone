@@ -12,7 +12,7 @@
 ## 目录结构
 
 ```
-├── simt_and_simd_floor_mod
+├── 14_simt_and_simd_floor_mod
 │   ├── CMakeLists.txt         # cmake编译文件
 │   ├── floor_mod.asc    # Ascend C算子实现 & 调用样例
 |   └── README.md
@@ -46,12 +46,10 @@
   本例中，float场景使用SIMD方式完成算子功能，而在整型场景，通过SIMD完成数据搬入搬出，SIMT方式实现计算功能。
 
 - 数据切分：  
-  本例中算子输入index的形状为6400，每个核处理数据量为1024，因此核数为6。
-  - SIMT场景，设置每个核实际启动的线程数THREAD_COUNT为256，每个线程负责处理一部分数据，那么每个线程处理的数据个数为 1024 / 256 = 4个。每个线程处理的首元素数据位置是通过threadIdx进行索引，后续按照总线程数进行步进索引，例如，0号线程处理索引为（0, 256, 512, 768）上的4个数据，1号线程处理索引号为（1, 257, 513, 769）。
+  本例中算子输入index的形状为6400，每个核处理数据量为1024，因此核数为7。
+  - SIMT场景，设置每个核实际启动的线程数THREAD_COUNT为1024，每个线程负责处理一个元素。每个线程处理的数据位置是通过threadIdx进行索引，后续按照总线程数进行步进索引。
     ```cpp
-    for(uint32_t index = threadIdx.x; index < input_total_length; index += blockDim.x) {
-          ...
-      }
+    uint32_t index = threadIdx.x;
     ```
   - SIMD场景，受限于微指令计算的Reg大小受限，单次只能处理256B数据，因此需要分多次循环处理1024个单核数据量。
 
@@ -63,10 +61,13 @@
 
   floor_mod_simt负责整型场景的若干个元素的计算。
   ```cpp
-  for(uint32_t index = threadIdx.x; index < input_total_length; index += blockDim.x) {
-        auto rem = self[index] % other[index];
-        ...
-        out[index] = ...
+    uint32_t index = threadIdx.x;
+    auto rem = self[index] % other[index];
+    bool signs_differ = ((rem < 0) != (other[index] < 0));
+    if (signs_differ && (rem != 0)) {
+        out[index] = rem + other[index];
+    } else {
+        out[index] = rem;
     }
   ```
 
