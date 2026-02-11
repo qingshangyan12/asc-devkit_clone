@@ -240,9 +240,9 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t
                           unit_flag, k_direction_align, is_weight_offset, c_matrix_source, c_matrix_init_val);
 }
 
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag)
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t reluPre, uint64_t quantPre, bool enableUnitFlag)
 {
-    asc_set_l0c2gm_config_impl(reluPre, quantPre, isUnitFlag);
+    asc_set_l0c2gm_config_impl(reluPre, quantPre, enableUnitFlag);
 }
 
 #endif

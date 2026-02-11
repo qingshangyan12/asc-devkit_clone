@@ -27,6 +27,8 @@
 
 #endif
 
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t reluPre, uint64_t quantPre, bool enableUnitFlag);
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 // asc_mmad(float-bfloat16_t)
@@ -123,15 +125,7 @@ __aicore__ inline void asc_enable_hf32();
 
 __aicore__ inline void asc_set_fp32_mode();
 
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t reluPre, uint64_t quantPre, bool isUnitFlag);
-
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-
-__aicore__ inline void asc_set_l0c2gm_relu(uint64_t relu);
-
-__aicore__ inline void asc_set_l0c2gm_relu(uint64_t quant);
-
-__aicore__ inline void asc_set_l0c2gm_unitflag(bool unitflag);
 
 __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
 
