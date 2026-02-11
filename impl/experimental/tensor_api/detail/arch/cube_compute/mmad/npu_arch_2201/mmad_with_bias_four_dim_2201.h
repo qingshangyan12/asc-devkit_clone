@@ -24,9 +24,9 @@ class MmadWithBiasGenParams2201
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
-    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const V& bias)
+    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params)
     {
-        return GenParamsImpl<trait, T, U, S, V>(dst, fm, filter, bias);
+        return GenParamsImpl<trait, T, U, S, V>(dst, fm, filter, bias, params);
     }
 private:
     template<typename T>
@@ -127,7 +127,7 @@ private:
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
-    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter, const V& bias)
+    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params)
     {
         CheckTemplate<trait, T, U, S, V>();
         using fmType = typename U::elementType;
@@ -142,9 +142,9 @@ private:
         if (biasPos == Hardware::BIAS) {
             cmatrixSource = true;
         }
-        auto params = Std::make_tuple(m, k, n, trait.unitFlag, trait.kDirectionAlign, cmatrixSource, 
-            trait.cmatrixInitVal);
-        return params;
+        auto genParams = Std::make_tuple(m, k, n, params.unitFlag, trait.kDirectionAlign, cmatrixSource, 
+            params.cmatrixInitVal);
+        return genParams;
     }
 };
 
@@ -152,7 +152,7 @@ class MmadWithBiasCore2201
 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename K, size_t... Is>
-    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const K& tupleParams, Std::index_sequence<Is...>)
+    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params, const K& tupleParams, Std::index_sequence<Is...>)
     {
         // MTE2
         MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(), 

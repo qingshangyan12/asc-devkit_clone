@@ -22,11 +22,11 @@ namespace Te {
 
 template <const MmadTrait& trait, typename T, typename U, typename S>
 __aicore__ inline typename Std::enable_if<VerifyingMmadTemplate<T, U, S>, void>::type 
-Mmad(const T& dst, const U& fm, const S& filter);
+Mmad(const T& dst, const U& fm, const S& filter, const MmadParams& params);
 
 template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
 __aicore__ inline typename Std::enable_if<VerifyingMmadWithBiasTemplate<T, U, S, V>, void>::type 
-Mmad(const T& dst, const U& fm, const S& filter, const V& bias);
+Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params);
 
 } // namespace Te
 } // namespace AscendC
