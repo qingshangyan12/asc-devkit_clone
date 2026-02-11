@@ -512,42 +512,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __half2float(const half x) {
     return d1.f;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __half2float_rn(const half x) {
-    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __half2float_rz(const half x) {
-    return __cvt_float<ROUND::Z, RoundingSaturation::RS_DISABLE_VALUE>(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __half2float_rd(const half x) {
-    return __cvt_float<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __half2float_ru(const half x) {
-    return __cvt_float<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __half2float_rna(const half x) {
-    return __cvt_float<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __half22float2_rn(const half2 x) {
-    return __cvt_float2<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __half22float2_rd(const half2 x) {
-    return __cvt_float2<ROUND::F, RoundingSaturation::RS_DISABLE_VALUE>(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __half22float2_ru(const half2 x) {
-    return __cvt_float2<ROUND::C, RoundingSaturation::RS_DISABLE_VALUE>(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float2 __half22float2_rna(const half2 x) {
-    return __cvt_float2<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(x);
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __half2uint_rn(const half x) {
     return __cvt_uint32_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
@@ -798,6 +762,86 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ll2half_rna(const long long int x) 
     return __cvt_half<ROUND::A, RoundingSaturation::RS_DISABLE_VALUE>(f);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __floats2half2_rn(const float x, const float y)
+{
+    half2 tmp;
+    tmp.x = __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp.y = __cvt_half<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(y);
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rn(const float2 x)
+{
+    return __cvt_half2<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __low2float(const half2 x)
+{
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x.x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __low2half(const half2 x)
+{
+    return x.x;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __low2half2(const half2 x)
+{
+    half2 tmp;
+    tmp.x = x.x;
+    tmp.y = x.x;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __lowhigh2highlow(const half2 x)
+{
+    half2 tmp;
+    tmp.x = x.y;
+    tmp.y = x.x;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __high2float(const half2 x)
+{
+    return __cvt_float<ROUND::R, RoundingSaturation::RS_DISABLE_VALUE>(x.y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __high2half(const half2 x)
+{
+    return x.y;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __high2half2(const half2 x)
+{
+    half2 tmp;
+    tmp.x = x.y;
+    tmp.y = x.y;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __highs2half2(const half2 x, const half2 y)
+{
+    half2 tmp;
+    tmp.x = x.y;
+    tmp.y = y.y;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __lows2half2(const half2 x, const half2 y)
+{
+    half2 tmp;
+    tmp.x = x.x;
+    tmp.y = y.x;
+    return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __halves2half2(const half x, const half y)
+{
+    half2 tmp;
+    tmp.x = x;
+    tmp.y = y;
+    return tmp;
+}
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(__ubuf__ half *address, half val)
@@ -1100,6 +1144,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_reduce_min(half val)
     tmp.x = x;
     tmp.y = y;
     return tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ushort_as_half(const unsigned short int x)
+{
+    union Data {
+        unsigned short int i;
+        half f;
+    };
+    union Data data = {.i = x};
+    return data.f;
 }
 #endif
 
