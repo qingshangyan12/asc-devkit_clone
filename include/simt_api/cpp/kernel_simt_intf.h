@@ -15,16 +15,16 @@
 #ifndef ASCENDC_MODULE_SIMT_INTERFACE_H
 #define ASCENDC_MODULE_SIMT_INTERFACE_H
 
-#include "kernel_tensor.h"
-#include "kernel_tpipe.h"
-#include "kernel_utils.h"
-#include "kernel_common.h"
-#include "kernel_operator_data_copy_intf.h"
-#include "kernel_operator_vec_binary_scalar_intf.h"
+#include "basic_api/kernel_tensor.h"
+#include "basic_api/kernel_tpipe.h"
+#include "impl/basic_api/kernel_utils.h"
+#include "basic_api/kernel_common.h"
+#include "basic_api/kernel_operator_data_copy_intf.h"
+#include "basic_api/kernel_operator_vec_binary_scalar_intf.h"
 #if (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_common_impl.h"
+#include "impl/basic_api/dav_m510/kernel_operator_common_impl.h"
 #else
-#include "dav_c310/kernel_operator_common_impl.h"
+#include "impl/basic_api/dav_c310/kernel_operator_common_impl.h"
 #endif
 
 #ifdef ASCENDC_CPU_DEBUG
@@ -32,15 +32,15 @@
 #endif
 
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
-#include "kernel_simt_common_intf.h"
-#include "kernel_simt_atomic_intf.h"
-#include "kernel_simt_cast_intf.h"
-#include "kernel_simt_cmp_intf.h"
-#include "kernel_simt_print_intf.h"
-#include "kernel_simt_math_intf.h"
-#include "kernel_simt_transcendental_intf.h"
-#include "kernel_simt_warp_level_intf.h"
-#include "kernel_simt_bessel_intf.h"
+#include "simt_api/cpp/kernel_simt_common_intf.h"
+#include "simt_api/cpp/kernel_simt_atomic_intf.h"
+#include "simt_api/cpp/kernel_simt_cast_intf.h"
+#include "simt_api/cpp/kernel_simt_cmp_intf.h"
+#include "simt_api/cpp/kernel_simt_print_intf.h"
+#include "simt_api/cpp/kernel_simt_math_intf.h"
+#include "simt_api/cpp/kernel_simt_transcendental_intf.h"
+#include "simt_api/cpp/kernel_simt_warp_level_intf.h"
+#include "simt_api/cpp/kernel_simt_bessel_intf.h"
 #include "utils/debug/asc_assert.h"
 #endif
 
