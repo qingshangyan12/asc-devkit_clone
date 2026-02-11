@@ -18,7 +18,6 @@
 #include "include/experimental/tensor_api/algorithm/algorithm.h"
 #include "include/experimental/tensor_api/arch/arch.h"
 #include "include/experimental/tensor_api/atom/atom.h"
-#include "include/experimental/tensor_api/tensor/local_tensor.h"
 #include "include/experimental/tensor_api/tensor/make.h"
 #include "include/experimental/tensor_api/utils/utils.h"
 
