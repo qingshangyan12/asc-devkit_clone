@@ -1,14 +1,16 @@
-# asc_uint82half_reg
+# asc_uint82half
 
 ## 产品支持情况
 
 |产品|是否支持|
 | :------------ | :------------: |
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
-将regtensor的uint8_t类型数据转为half类型。
+将uint8_t类型数据转为half类型。
+
+
 
 ## 函数原型
 
@@ -39,6 +41,8 @@ __simd_callee__ inline void asc_uint82half_v2(vector_half& dst, vector_uint8_t s
 PIPE_V
 
 ## 约束说明
+
+无
 
 ## 调用示例
 

@@ -1,14 +1,14 @@
-# asc_half2bfloat16_reg
+# asc_half2bfloat16
 
 ## 产品支持情况
 
 |产品|是否支持|
 | :------------ | :------------: |
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
-将regtensor的half类型数据转为bfloat16类型，并支持多种舍入模式。
+将half类型数据转为bfloat16类型，并支持多种舍入模式。
 
 - RINT舍入模式：四舍六入五成双舍入
 - ROUND舍入模式：四舍五入舍入
@@ -18,7 +18,6 @@
 
 ## 函数原型
 
-- 前n个数据计算
 ```cpp
 // FLOOR舍入模式
 __simd_callee__ inline void asc_half2bfloat16_rd(vector_bfloat16_t& dst, vector_half src, vector_bool mask)

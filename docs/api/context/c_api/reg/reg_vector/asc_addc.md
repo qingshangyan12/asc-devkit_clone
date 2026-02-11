@@ -4,7 +4,7 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
@@ -25,7 +25,8 @@ __simd_callee__ inline void asc_addc(vector_bool& dst0, vector_int32& dst1, vect
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst0 | 输出 | 目的操作数（矢量数据寄存器）。类型为vector_bool。 |
+| dst0 | 输出 | 目的操作数（掩码寄存器）。用来存储加法计算后的进位数据。 |
+| dst1 | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src0 | 输入 | 源操作数（矢量数据寄存器）。|
 | src1 | 输入 | 源操作数（矢量数据寄存器）。|
 | src2 | 输入 | 源操作数（矢量）的，进位值。|
@@ -43,6 +44,7 @@ PIPE_V
 
 ## 约束说明
 
+无
 
 ## 调用示例
 

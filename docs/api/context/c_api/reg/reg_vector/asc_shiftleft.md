@@ -4,7 +4,7 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
@@ -41,6 +41,8 @@ __simd_callee__ inline void asc_shiftleft(vector_int32& dst, vector_int32 src0, 
 PIPE_V
 
 ## 约束说明
+
+无
 
 ## 调用示例
 
