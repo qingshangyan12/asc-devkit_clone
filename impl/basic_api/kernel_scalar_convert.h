@@ -77,11 +77,17 @@ __aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
     return Cast(fVal);
 }
 
-template <typename T>
-__aicore__ constexpr inline float Cast(const T& bVal)
+template <typename T, typename U = float,
+          typename = std::enable_if_t<
+          (std::is_same<T, bfloat16_t>::value || std::is_same<T, hifloat8_t>::value ||
+           std::is_same<T, fp8_e5m2_t>::value || std::is_same<T, fp8_e4m3fn_t>::value ||
+           std::is_same<T, fp4x2_e1m2_t>::value || std::is_same<T, fp4x2_e2m1_t>::value), 
+          void>>
+__aicore__ constexpr inline U Cast(T bVal)
 {
     static_assert(SupportType<T, bfloat16_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, fp4x2_e1m2_t, fp4x2_e2m1_t>(),
-        "ToFloat only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
+        "Cast to float only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
+    static_assert(SupportType<U, float>(), "Cast to float only support return float");
     uint8_t uiNum = 0;
     uint32_t result = 0;
     float fNum = 0;
@@ -116,8 +122,8 @@ template <typename T>
 __aicore__ constexpr inline float ToFloat(const T& bVal)
 {
     static_assert(SupportType<T, bfloat16_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, fp4x2_e1m2_t, fp4x2_e2m1_t>(),
-        "Cast to float only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
-    return Cast<T>(bVal);
+        "ToFloat only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
+    return Cast<T, float>(bVal);
 }
 #else
 __aicore__ inline bfloat16_t Cast(const float& fVal)
