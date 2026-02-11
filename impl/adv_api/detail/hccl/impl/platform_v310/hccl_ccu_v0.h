@@ -220,7 +220,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForOp(const Hc
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
     uint8_t algorithmType = 0;
-    for (uint8_t i = 0; i < 8; ++i) {
+    for (uint32_t i = 0; i < MAX_CC_TILING_NUM; ++i) {
         if (hcclContext_->opType[i] == static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType)) {
             algorithmType = hcclContext_->algorithmType[i];
             break;
