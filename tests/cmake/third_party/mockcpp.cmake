@@ -3,7 +3,6 @@
 set(open_source_target_name mockcpp)
 set(MOCKCPP_DOWNLOAD_PATH ${CANN_3RD_LIB_PATH}/pkg)
 set(MOCKCPP_SRC_PATH ${CANN_3RD_LIB_PATH}/mockcpp)
-set(mockcpp_SOURCE_DIR ${MOCKCPP_SRC_PATH}/mockcpp)
 
 if (CMAKE_HOST_SYSTEM_PROCESSOR  STREQUAL "aarch64")
     set(mockcpp_CXXFLAGS "-fPIC")
@@ -25,6 +24,7 @@ endif()
 
 set(BOOST_INCLUDE_DIRS ${BOOST_SRC_PATH})
 if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
+    message("11111111111111111 not use cache mock tar")
     set(PATCH_FILE ${MOCKCPP_DOWNLOAD_PATH}/mockcpp-2.7_py3.patch)
     set(REQ_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h1/mockcpp-2.7.tar.gz")
     set(MOCKCPP_LOCAL_SRC "${CANN_3RD_LIB_PATH}/../llt/third_party/mockcpp_src")
@@ -47,8 +47,10 @@ if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
             BUILD_COMMAND make install -j 16
         )
     else()
+        message("11111111111111111 not use cache mock111")
         message("No local mockcpp source, downloading from ${REQ_URL}")
         if (NOT EXISTS ${PATCH_FILE})
+            message("11111111111111111 not use cache mock222")
             set(PATCH_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h1/mockcpp-2.7_py3.patch")
             file(DOWNLOAD
                 ${PATCH_URL}
