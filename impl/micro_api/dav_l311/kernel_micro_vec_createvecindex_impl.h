@@ -18,7 +18,7 @@
 #include "kernel_micro_common_impl.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, IndexOrder order = IndexOrder::INCREASE_ORDER, typename T1, typename RegT>
 __simd_callee__ inline void ArangeImpl(RegT &dstReg, T1 scalarValue)
 {
@@ -39,6 +39,6 @@ __simd_callee__ inline void ArangeWithPatternImpl(RegT &dstReg, T1 scalarValue)
     "unsupported datatype on current device!");
     vcp(dstReg, (ActualT)scalarValue);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_CREATEVECINDEX_IMPL_H

@@ -18,7 +18,7 @@
 #include "kernel_micro_common_impl.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <int outputNum, LoadDist dist>
 __simd_callee__ inline void CheckLoadDist()
 {
@@ -430,6 +430,6 @@ __simd_callee__ inline void DataCopyImpl(U& dstReg, __ubuf__ T*& srcAddr, uint32
         }
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_DATACOPY_LOAD_IMPL_H

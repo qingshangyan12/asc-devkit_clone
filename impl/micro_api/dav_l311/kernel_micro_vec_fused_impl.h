@@ -18,7 +18,7 @@
 #include "kernel_micro_common_impl.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 
 template <typename T, typename U, typename ScalarT, RegLayout layout, typename RegT, typename RegU>
 __simd_callee__ inline void FusedMulsCastImpl(RegT &dstReg, RegU &srcReg, ScalarT scalar, MaskReg &mask)

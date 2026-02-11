@@ -19,7 +19,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_binary_scalar_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
 __simd_callee__ inline void AxpyImpl(S& dstReg, S& srcReg, const U scalarValue, MaskReg& mask)
 {
@@ -41,6 +41,6 @@ __simd_callee__ inline void AxpyImpl(S& dstReg, S& srcReg, const U scalarValue, 
         Add<ActualT, mode, S>(dstReg, midReg, dstReg, mask);
     }
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_IMPL_H

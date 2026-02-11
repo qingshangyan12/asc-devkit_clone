@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, typename U, HighLowPart part, typename S, typename V>
 __simd_callee__ inline void Pack(S& dstReg, V& srcReg)
 {
@@ -38,7 +38,7 @@ __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 {
     UnPackImpl<T, U, part, S, V>(dstReg, srcReg);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_PACK_INTERFACE_IMPL_H

@@ -30,7 +30,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 
 struct RegTrait {
     int REG_NUM = 1;
@@ -56,7 +56,7 @@ struct RegTensor {
     __simd_callee__ void Print() const;
 };
 
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_struct_intf_impl.h"

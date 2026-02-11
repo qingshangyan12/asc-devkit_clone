@@ -26,7 +26,7 @@
 #endif
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename U>
 __simd_callee__ inline void GatherMask(U& dstReg, U& srcReg, MaskReg& mask)
 {
@@ -66,7 +66,7 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 {
     GatherImpl<T, U, S, V>(dstReg, srcReg, indexReg);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_MICRO_COPY_INTERFACE_IMPL_H

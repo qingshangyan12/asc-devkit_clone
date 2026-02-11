@@ -22,7 +22,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
           typename S, typename V>
 __simd_callee__ inline void ReduceSumImpl(S& dstReg, V srcReg, MaskReg mask)
@@ -73,14 +73,14 @@ __simd_callee__ inline void ReduceSumB64Impl(T& dstReg, T srcReg, MaskReg mask)
     // srcreg[1] for high 32 bit, tmpReg1 for mid 16 bit, tmpReg0 for low 16 bit
     vand(lowReg, lowFReg, (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
     vcadd(lowReg, lowReg, mask, modeValue);
-    MicroAPI::ShiftRights(midReg, (RegTensor<uint32_t>&)srcReg.reg[0], (int16_t)16, mask);
+    Reg::ShiftRights(midReg, (RegTensor<uint32_t>&)srcReg.reg[0], (int16_t)16, mask);
     vcadd(midReg, midReg, mask, modeValue);
     vcadd((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
     // add low carry to mid
-    MicroAPI::ShiftRights(tmpReg, lowReg, (int16_t)16, mask);
+    Reg::ShiftRights(tmpReg, lowReg, (int16_t)16, mask);
     vadd(midReg, midReg, tmpReg, mask, modeValue);
     // add mid carry to high
-    MicroAPI::ShiftRights(tmpReg, midReg, (int16_t)16, mask);
+    Reg::ShiftRights(tmpReg, midReg, (int16_t)16, mask);
     vadd((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)dstReg.reg[1], tmpReg, mask, modeValue);
 
     vand(lowReg, lowReg, lowFReg, mask, modeValue);
@@ -275,6 +275,6 @@ __simd_callee__ inline void PairReduceSumImpl(U& dstReg, U srcReg, MaskReg mask)
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vcpadd(dstReg, srcReg, mask, modeValue);
 }
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_VEC_REDUCE_IMPL_H

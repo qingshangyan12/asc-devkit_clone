@@ -20,7 +20,7 @@
 #include "kernel_micro_common_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <typename T, const RegTrait& regTrait = RegTraitNumOne>
 __simd_callee__ inline MaskReg UpdateMask(uint32_t& scalarValue);
 
@@ -58,7 +58,7 @@ __simd_callee__ inline void UnPack(MaskReg& dst, MaskReg& src);
 
 template <typename T>
 __simd_callee__ inline MaskReg MoveMask();
-} // namespace MicroAPI
+} // namespace Reg
 } // namespace AscendC
 
 #include "impl/micro_api/kernel_micro_maskreg_intf_impl.h"

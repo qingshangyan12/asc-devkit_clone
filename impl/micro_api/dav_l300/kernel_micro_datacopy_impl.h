@@ -20,7 +20,7 @@
 #include "../../../include/micro_api/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
-namespace MicroAPI {
+namespace Reg {
 template <int OutputNum, LoadDist dist>
 __simd_callee__ inline void CheckLoadDist()
 {
@@ -303,7 +303,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T *dstUbAddr, RegT &srcReg0, R
     if constexpr (sizeof(T) == 4 && dist == StoreDist::DIST_INTLV_B32) {
         vector_f32 tmpVreg0;
         vector_f32 tmpVreg1;
-        constexpr auto patAll = std::integral_constant<::Pat, static_cast<::Pat>(MicroAPI::MaskPattern::ALL)>();
+        constexpr auto patAll = std::integral_constant<::Pat, static_cast<::Pat>(Reg::MaskPattern::ALL)>();
         vector_bool maskAll = pset_b32(patAll);
         constexpr auto distValueNorm =
             std::integral_constant<::DistVST, static_cast<::DistVST>(StoreDist::DIST_NORM_B32)>();
@@ -793,6 +793,6 @@ __simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg)
     constexpr uint32_t count = GetVecLen() / sizeof(T);
     StoreImpl(dstAddr, srcReg, count);
 }
-}  // namespace MicroAPI
+}  // namespace Reg
 }  // namespace AscendC
 #endif  // ASCENDC_MODULE_MICRO_DATACOPY_IMPL_H
