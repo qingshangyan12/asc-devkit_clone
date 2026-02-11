@@ -21,7 +21,7 @@
 namespace AscendC {
 namespace Te {
 struct ArchVersion {
-    static constexpr uint32_t V3510 = 3510;
+    static constexpr uint32_t V3510 = 3101;
     static constexpr uint32_t V2201 = 2201;
 };
 
