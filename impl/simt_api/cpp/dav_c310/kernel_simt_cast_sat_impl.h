@@ -15,7 +15,7 @@
 #ifndef ASCENDC_MODULE_SIMT_CAST_SAT_IMPL_H
 #define ASCENDC_MODULE_SIMT_CAST_SAT_IMPL_H
 
-#include "kernel_utils.h"
+#include "impl/basic_api/kernel_utils.h"
 
 namespace AscendC {
 namespace Simt {
