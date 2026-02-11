@@ -20,7 +20,6 @@ __global__ __aicpu__ uint32_t MyAicpuKernel1(void *arg)
 {
     KernelInfo::KernelArgs* cfg = (KernelInfo::KernelArgs*)arg;
     AscendC::printf("MyAicpuKernel1 inited\n");
-    cfg->ti->lock = 1;
     cfg->ti->type = 1;
     cfg->ti->mode = 2;
     cfg->ti->len = 4;
@@ -33,7 +32,6 @@ __global__ __aicpu__ uint32_t MyAicpuKernel2(void *arg)
 {
     KernelInfo::KernelArgs* cfg = (KernelInfo::KernelArgs*)arg;
     AscendC::printf("MyAicpuKernel2 inited\n");
-    cfg->ti->lock = 1;
     cfg->ti->type = 0;
     cfg->ti->mode = 1;
     cfg->ti->len = 2;
