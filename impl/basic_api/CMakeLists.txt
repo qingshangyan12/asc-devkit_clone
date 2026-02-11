@@ -56,23 +56,17 @@ if(BUILD_OPEN_PROJECT)
   )
 endif()
 
-install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/basic_api/reg_compute
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/basic_api OPTIONAL
+install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/basic_api
+  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include OPTIONAL
 )
 install(DIRECTORY ${ASCENDC_IMPL_DIR}/basic_api
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
 )
 
-install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/basic_api/reg_compute
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/basic_api OPTIONAL
-)
 install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/simt_api
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include OPTIONAL
 )
 
-install(DIRECTORY ${ASCENDC_IMPL_DIR}/basic_api/reg_compute
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/basic_api OPTIONAL
-)
 install(DIRECTORY ${ASCENDC_IMPL_DIR}/simt_api
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
 )
@@ -249,16 +243,12 @@ if(NOT BUILD_OPEN_PROJECT)
         TARGETS tikcfw_headers
         DIRECTORY ${ASCENDC_DIR}/impl/basic_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
-        DIRECTORY ${ASCENDC_DIR}/impl/basic_api/reg_compute
-        DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
         DIRECTORY ${ASCENDC_DIR}/impl/simt_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
         DIRECTORY ${ASCENDC_DIR}/impl/c_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
 
         DIRECTORY ${ASCENDC_DIR}/include/basic_api
-        DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include
-        DIRECTORY ${ASCENDC_DIR}/include/basic_api/reg_compute
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include
         DIRECTORY ${ASCENDC_DIR}/include/simt_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include
