@@ -15,31 +15,15 @@
 #ifndef ASCENDC_MODULE_SIMT_IMPL_H
 #define ASCENDC_MODULE_SIMT_IMPL_H
 
-#include "kernel_tensor.h"
-#include "kernel_tpipe.h"
-#include "kernel_utils.h"
-#include "kernel_common.h"
-#include "kernel_operator_data_copy_intf.h"
-#include "kernel_operator_vec_binary_scalar_intf.h"
-#if __NPU_ARCH__ == 5102
-    #include "dav_m510/kernel_operator_common_impl.h"
-#else 
-    #include "dav_c310/kernel_operator_common_impl.h"
-#endif
-
-#ifdef ASCENDC_CPU_DEBUG
-#include "kernel_simt_cpu.h"
-#endif
-
-#include "kernel_simt_atomic_impl.h"
-#include "kernel_simt_cast_impl.h"
-#include "kernel_simt_cmp_impl.h"
-#include "kernel_simt_common_impl.h"
-#include "kernel_simt_constant.h"
-#include "kernel_simt_math_impl.h"
-#include "kernel_simt_transcendental_impl.h"
-#include "kernel_simt_warp_level_impl.h"
-#include "kernel_simt_bessel_impl.h"
-#include "kernel_simt_cast_sat_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_atomic_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_cast_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_cmp_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_common_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_constant.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_math_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_transcendental_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_warp_level_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_bessel_impl.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_cast_sat_impl.h"
 
 #endif  // ASCENDC_MODULE_SIMT_IMPL_H
