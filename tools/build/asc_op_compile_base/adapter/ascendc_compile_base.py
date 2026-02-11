@@ -46,6 +46,8 @@ def compile_pre_process(op_info: OpInfo, compile_options: list):
     op_debug_config_val = get_current_build_config(op_debug_config)
     compile_options.append("--cce-disable-kernel-global-attr-check")
     global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+    global_var_storage.set_variable("ascendc_sk_double_compile", False)
+    global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
     global_var_storage.set_variable("ascendc_sub_super_kernel_params", "")
     global_var_storage.set_variable("ascendc_sub_super_kernel_type", "")
     global_var_storage.set_variable("ascendc_sub_super_kernel_fun_names", {})
@@ -145,6 +147,16 @@ def link_relocatable_meta_file(bin_file_path, meta_file_path, compile_log_path=N
                 "%s" % bin_file_path,
                 '-q',
                 ]
+    CommonUtility.run_cmd_inner(link_cmd, CompileStage.LINKRELOCATE, compile_log_path)
+
+
+def link_sk_norm_combine(sk_bin_file, norm_bin_file, sk_bind_dst_file, compile_log_path=None):
+    link_cmd = ["ar", "crs", sk_bin_file, norm_bin_file]
+    CommonUtility.run_cmd_inner(link_cmd, CompileStage.LINKRELOCATE, compile_log_path)
+    link_cmd = [CCECInfo.get_exe("ld.lld"), "-r", "-o", sk_bin_file, "--whole-archive", sk_bin_file, sk_bind_dst_file]
+    CommonUtility.run_cmd_inner(link_cmd, CompileStage.LINKRELOCATE, compile_log_path)
+    link_cmd = [CCECInfo.get_exe("ld.lld"), "-m", "aicorelinux", "-Ttext=0", sk_bin_file, "-static",
+        "-o", sk_bin_file, "-q"]
     CommonUtility.run_cmd_inner(link_cmd, CompileStage.LINKRELOCATE, compile_log_path)
 
 
