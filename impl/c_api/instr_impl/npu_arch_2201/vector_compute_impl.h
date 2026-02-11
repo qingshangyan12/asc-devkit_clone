@@ -153,7 +153,7 @@
 #include "instr_impl/npu_arch_2201/vector_compute_impl/asc_transto5hd_impl.h"
 #include "instr_impl/npu_arch_2201/vector_compute_impl/asc_get_rsvd_cnt_impl.h"
 #include "instr_impl/npu_arch_2201/vector_compute_impl/asc_set_va_reg_impl.h"
-#include "instr_impl/npu_arch_2201/vector_compute_impl/asc_pair_reduce_sum.h"
+#include "instr_impl/npu_arch_2201/vector_compute_impl/asc_pair_reduce_sum_impl.h"
 
 // ==========asc_add(half/float/int16_t/int32_t)==========
 __aicore__ inline void asc_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)

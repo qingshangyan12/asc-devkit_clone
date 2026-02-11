@@ -27,7 +27,7 @@ void asc_sync_block_wait_stub(int64_t flagID)
 }
 }
 
-TEST_F(TestSyncBlkWait, sync_block_arrive_Succ)
+TEST_F(TestSyncBlkWait, sync_block_wait_Succ)
 {
     int64_t flagID = 33;
     MOCKER_CPP(wait_flag_dev, void(int64_t))

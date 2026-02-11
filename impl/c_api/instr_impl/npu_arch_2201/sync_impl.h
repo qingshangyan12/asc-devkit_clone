@@ -34,7 +34,7 @@
 #include "sync_impl/asc_pipe_barrier_impl.h"
 #include "sync_impl/asc_sync_data_barrier_impl.h"
 #include "sync_impl/asc_sync_block_arrive_impl.h"
-#include "sync_impl/asc_sync_block_wait_imply.h"
+#include "sync_impl/asc_sync_block_wait_impl.h"
 
 __aicore__ inline void asc_sync_vec()
 {

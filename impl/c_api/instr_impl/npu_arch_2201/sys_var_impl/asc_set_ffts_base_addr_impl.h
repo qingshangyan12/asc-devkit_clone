@@ -22,7 +22,7 @@
 
 __aicore__ inline void asc_set_ffts_base_addr_impl(uint64_t config)
 {
-    return set_ffts_base_addr(config);
+    set_ffts_base_addr(config);
 }
 
 #endif
