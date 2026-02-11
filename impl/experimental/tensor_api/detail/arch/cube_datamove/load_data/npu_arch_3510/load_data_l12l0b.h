@@ -111,7 +111,7 @@ private:
     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
     {
         // MTE2
-        LoadL1ToL0BAlignV2<!trait.transposed>(dst.Data().Get(), src.Data().Get(),
+        LoadL1ToL0BAlignV2<trait.transposed>(dst.Data().Get(), src.Data().Get(),
             Std::get<Is>(tupleParams)...);
     }
 
