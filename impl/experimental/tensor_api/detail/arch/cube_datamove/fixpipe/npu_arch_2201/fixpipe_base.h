@@ -24,33 +24,6 @@ namespace Te {
 constexpr uint32_t MAIN_LOOP_N_SIZE_2201 = 512;
 constexpr uint32_t CBURST_NUM_2201 = MAIN_LOOP_N_SIZE_2201 / FRACTAL_FIXED;
 
-template <typename T, typename U, typename Coord>
-__aicore__ inline void CheckCoord(const T& dst, const U& src, const Coord& coord)
-{
-    auto coordRow = Std::get<0>(coord);
-    auto coordCol = Std::get<1>(coord);
-    auto dstLayout = dst.Layout();
-    auto srcLayout = src.Layout();
-    uint32_t dstRow1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
-    uint32_t dstCol1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
-    uint32_t srcRow1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
-    uint32_t srcCol1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
-    ASSERT((coordRow >= 0) && (coordCol >= 0) && (coordRow <= dstRow1 - srcRow1) && (coordCol <= dstCol1 - srcCol1));
-}
-
-template <typename T, typename Coord>
-__aicore__ inline auto MakeTensorWithCoord(const T& oldTensor, const Coord& coord, uint32_t offset = 0)
-{
-    auto oldTensorLayout = oldTensor.Layout();
-    auto index = Crd2Idx(coord, oldTensorLayout);
-    using oldTensorType = typename T::elementType;
-    constexpr Hardware oldTensorPos = GetHardPos<T>();
-    auto oldTensorIterator = MakeMemPtr<oldTensorPos>(reinterpret_cast<oldTensorType *>(oldTensor.Data().Get() + offset + index));
-    auto oldTensorMatrixLayout = MakeLayout(oldTensorLayout.Shape(), oldTensorLayout.Stride());
-    auto newTensor = MakeTensor(oldTensorIterator, oldTensorMatrixLayout); 
-    return newTensor;
-} 
-
 class Copy2201DeqTensorToFbuf {
 public:
     template <typename T>
