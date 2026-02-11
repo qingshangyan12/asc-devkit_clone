@@ -9,13 +9,13 @@
 */
 
 /*!
- * \file make_pointer.h
+ * \file pointer.h
  * \brief
  */
-#ifndef INCLUDE_TENSOR_API_TENSOR_MAKE_POINTER_H
-#define INCLUDE_TENSOR_API_TENSOR_MAKE_POINTER_H
+#ifndef INCLUDE_TENSOR_API_TENSOR_POINTER_H
+#define INCLUDE_TENSOR_API_TENSOR_POINTER_H
 
-#include "impl/experimental/tensor_api/detail/tensor/make_pointer_impl.h"
+#include "impl/experimental/tensor_api/detail/tensor/pointer_impl.h"
 
 // algorithm
 namespace AscendC {
@@ -48,4 +48,4 @@ __aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter);
 } // namespace Te
 } // namespace AscendC
 
-#endif // INCLUDE_TENSOR_API_TENSOR_MAKE_POINTER_H
+#endif // INCLUDE_TENSOR_API_TENSOR_POINTER_H

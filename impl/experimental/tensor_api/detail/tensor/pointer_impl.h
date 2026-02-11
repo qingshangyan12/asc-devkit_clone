@@ -9,18 +9,18 @@
 */
 
 /*!
-* \file hardware_pointer.h
+* \file pointer_impl.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_TENSOR_HARDWARE_POINTER_H
-#define IMPL_TENSOR_API_TENSOR_HARDWARE_POINTER_H
+#ifndef IMPL_TENSOR_API_TENSOR_POINTER_IMPL_H
+#define IMPL_TENSOR_API_TENSOR_POINTER_IMPL_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
 
-// pointer_impl.h
 namespace AscendC {
 namespace Te {
 
+// struct hardware_pointer
 template <typename Iterator, typename DerivedType>
 struct IterAdaptor
 {
@@ -95,7 +95,94 @@ struct IsHardwareMem<hardPos, Pointer, void_t<typename Pointer::iterator>> : IsH
 template <Hardware hardPos, typename Pointer>
 constexpr bool IsHardwareMemV = IsHardwareMem<hardPos, Pointer>::value;
 
+// struct engine
+template <typename Iterator>
+struct ViewEngine
+{
+    using iterator     = Iterator;
+    using reference    = typename IterRef<iterator>::type; // T&
+    using elementType = typename IterEle<iterator>::type; // rm_ref
+    using valueType   = typename IterVal<iterator>::type; // rm_cvf
+    __aicore__ inline constexpr iterator const& Begin() const {
+        return storage;
+    }
+
+    __aicore__ inline constexpr iterator& Begin() {
+        return storage;
+    }
+    __aicore__ inline constexpr ViewEngine(iterator storage = {}) : storage(storage) {}
+private:
+    iterator storage;
+};
+
+template <typename Iterator>
+struct ConstViewEngine
+{
+    using iterator     = Iterator;
+    using reference    = typename IterRef<iterator>::type; // T&
+    using elementType = typename IterEle<iterator>::type; // rm_ref
+    using valueType   = typename IterVal<iterator>::type; // rm_cvf
+
+    __aicore__ inline constexpr iterator const& Begin() const {
+        return storage;
+    }
+    __aicore__ inline constexpr ConstViewEngine(iterator storage = {}) : storage(storage) {}
+private:
+    iterator storage;
+};
+
+// pointer.h
+template <Hardware hardPos, typename Iterator>
+__aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
+{
+    if constexpr (IsHardwareMem<hardPos, Iterator>::value) {
+        return iter;
+    } else {
+        return HardwareMemPtr<hardPos, Iterator>{iter};
+    }
+}
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter) {
+    return MakeMemPtr<Hardware::GM, Iterator>(iter);
+}
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeUBmemPtr(Iterator iter) {
+    return MakeMemPtr<Hardware::UB, Iterator>(iter);
+}
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeL1memPtr(Iterator iter) {
+    return MakeMemPtr<Hardware::L1, Iterator>(iter);
+}
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeL0AmemPtr(Iterator iter) {
+    return MakeMemPtr<Hardware::L0A, Iterator>(iter);
+}
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeL0BmemPtr(Iterator iter) {
+    return MakeMemPtr<Hardware::L0B, Iterator>(iter);
+}
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeL0CmemPtr(Iterator iter) {
+    return MakeMemPtr<Hardware::L0C, Iterator>(iter);
+}
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeBiasmemPtr(Iterator iter) {
+    return MakeMemPtr<Hardware::BIAS, Iterator>(iter);
+}
+
+template <typename Iterator>
+__aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter) {
+    return MakeMemPtr<Hardware::FIXBUF, Iterator>(iter);
+}
+
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_TENSOR_HARDWARE_POINTER_H
+#endif // IMPL_TENSOR_API_TENSOR_POINTER_IMPL_H

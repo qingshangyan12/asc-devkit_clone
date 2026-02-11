@@ -15,8 +15,8 @@
 #ifndef INCLUDE_TENSOR_API_TENSOR_MAKE_H
 #define INCLUDE_TENSOR_API_TENSOR_MAKE_H
 
-#include "include/experimental/tensor_api/tensor/make_layout.h"
-#include "include/experimental/tensor_api/tensor/make_pointer.h"
-#include "include/experimental/tensor_api/tensor/make_tensor.h"
+#include "include/experimental/tensor_api/tensor/layout.h"
+#include "include/experimental/tensor_api/tensor/pointer.h"
+#include "include/experimental/tensor_api/tensor/local_tensor.h"
 
 #endif // INCLUDE_TENSOR_API_TENSOR_MAKE_H
