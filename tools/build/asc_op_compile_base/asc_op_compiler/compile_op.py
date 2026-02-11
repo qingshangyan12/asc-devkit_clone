@@ -55,7 +55,8 @@ from .ascendc_compile_gen_json import _gen_mix_json_from_seperate_json, \
     _gen_static_json_for_no_mix_v200, _gen_non_mix_sub_json, _gen_static_json_for_mix_v200, \
     _gen_dynamic_json_for_v200, _generate_final_json, _get_simt_type_in_staic
 from .ascendc_compile_base import compile_multi_tilingkey, link_relocatable, fatbin_objs, \
-    SingleTilingKeyCompileParams, get_actual_kernel_type, compile_pre_process, link_relocatable_meta_file
+    SingleTilingKeyCompileParams, get_actual_kernel_type, compile_pre_process, link_relocatable_meta_file, \
+    link_sk_norm_combine
 from .super_kernel_sub_op_compile import gen_sub_kernel_name, split_sub_kernel_objs, \
     gen_sub_super_kernel_compile_options, add_sub_super_kernel_info
 from .super_kernel_constants import SuperKernelStreamFusionMode
@@ -335,7 +336,7 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
     dfx_generator = DFXSectionGenerator()
     func_params = []
     super_kernel_params = []
-    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (CommonUtility.is_c310() or 
+    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (CommonUtility.is_c310() or
                                                                     CommonUtility.is_m510())
     workspace_idx = 0
     if needs_ffts:
@@ -1005,6 +1006,127 @@ def _update_compile_option(kernel_name: str, compile_options: list, extend_optio
         compile_options.append(extend_options.get('opp_kernel_hidden_dat_path'))
 
 
+def handle_sk_codegen_options(compile_info: CompileInfo, infered_info_from_ifile: InferChannelParamsFromIFile):
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        compile_info.super_kernel_early_start_set_flag = infered_info_from_ifile.super_kernel_early_start_set_flag
+        compile_info.super_kernel_early_start_wait_flag = infered_info_from_ifile.super_kernel_early_start_wait_flag
+        sp_info = get_context().get_addition("super_kernel_sub_info")
+        if sp_info is not None:
+            compile_info.super_kernel_info["sp_options"] = \
+                parse_super_kernel_options(sp_info.get("super_kernel_options", ""))
+        else:
+            compile_info.super_kernel_info["sp_options"] = {}
+
+
+def gen_op_stub_kernel_func(compile_info: CompileInfo, op_info: OpInfo, compile_option_tuple,
+                               tiling_info: TilingInfo, distinct_tag, kernel_meta_dir):
+    # generate kernel fun for ffts_addr, overflow, workspace
+    msg_info = "<{}> <{}> generate kernel stub start".format(compile_info.op_type, compile_info.tiling_key_list)
+    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+    file_name_tag = distinct_tag + "_kernel.cpp"
+
+    # for aclnn sk sub operator combine norm workflow, generate norm kernel file
+    if global_var_storage.get_variable("ascendc_sk_sub_combine_norm_workflow") is True:
+        file_name_tag = distinct_tag + "_norm_kernel.cpp"
+    compile_info.gen_kernel_func_file = os.path.join(kernel_meta_dir, op_info.kernel_name + file_name_tag)
+
+    if CommonUtility.is_c310():
+        gen_meta_info_section(compile_info, op_info)
+    workspace_idx = gen_kernel_fun(compile_info, compile_info.origin_func_name, op_info, tiling_info,
+        compile_option_tuple)
+
+    msg_info = "<{}> <{}> generate kernel stub end".format(compile_info.op_type, compile_info.tiling_key_list)
+    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+    return workspace_idx
+
+
+def handle_compile_options(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo, workspace_idx):
+    # no dump and no superkernel
+    if CommonUtility.is_support_workspace_offset() and \
+        (not global_var_storage.get_variable("ascendc_enable_dump_workspace")) and \
+        (global_var_storage.get_variable("ascendc_enable_super_kernel") is False):
+        compile_option_tuple.compile_options.append(f'-DWORKSPACE_PARAM_OFFSET={workspace_idx}')
+
+    # generate compile option for sub operator when enable super kernel
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        gen_sub_super_kernel_compile_options(compile_option_tuple, tiling_info, compile_info)
+
+    # check whether ccec_O0 or ccec_g opend in compile context
+    compile_info.is_debug = CommonUtility.check_debug_options(compile_option_tuple.compile_options)
+    compile_option_tuple.compile_options.append('-DONE_CORE_DUMP_SIZE=' + str(compile_info.dump_info["dump_size"]))
+    if global_var_storage.get_variable("ascendc_recognize_simtvf") is True:
+        compile_option_tuple.compile_options.append('-DASCENDC_RECOGNIZE_SIMT_VF')
+
+    if global_var_storage.get_variable("ascendc_enable_sanitizer") is False and \
+        global_var_storage.get_variable("ascendc_debug_compile_options") is False:
+        compile_option_tuple.compile_options.append('-DL2_CACHE_HINT')
+
+    if tiling_info.static_shape_flag:
+        compile_option_tuple.compile_options.append('-DCONST_TILING')
+
+
+def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_option_tuple, tiling_info: TilingInfo):
+    CommonUtility.print_compile_log(op_info.kernel_name, "start to compile cce file...", AscendCLogLevel.LOG_INFO)
+    msg_info = "<{}> <{}> compile kernel start".format(compile_info.op_type, compile_info.tiling_key_list)
+    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+
+    DFXSectionGenerator().generate_dfx_binary(compile_info, op_info, tiling_info)
+
+    if CommonUtility.is_v220() or CommonUtility.is_c310():
+        if compile_info.no_set_kernel_type is True:
+            _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
+        else:
+            _compile_ascendc_cce_v220_with_kernel_type(compile_info, compile_option_tuple, tiling_info)
+    elif CommonUtility.is_m510():
+        compile_info.code_channel = CORE_TYPE_CUBE
+        compile_info.hard_sync = False
+        _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
+    elif CommonUtility.is_regbase():
+        _compile_ascendc_cce_regbase(compile_info, compile_option_tuple, tiling_info)
+    elif CommonUtility.is_v200() and compile_info.no_set_kernel_type is False:
+        _compile_ascendc_cce_v200_with_kernel_type(compile_info, compile_option_tuple, tiling_info)
+    else:
+        _compile_ascendc_cce(compile_info, compile_option_tuple, tiling_info)
+
+    # get tiling struct and size in .asendc.tiling section and generate meta_info.o when using REGISTER_NONE_TILING
+    if global_var_storage.get_variable("ascendc_tiling_no_register"):
+        tiling_key_struct_size_map = _get_tiling_struct_without_register_size(compile_info)
+        gen_tiling_struct_size_and_dfx_section_file(compile_info, tiling_info, tiling_key_struct_size_map)
+        chip_version = CommonUtility.get_chip_version()
+        if CommonUtility.is_c310() or CommonUtility.is_v220():
+            arch = f"dav-{chip_version}-vec"
+        else:
+            arch = f"dav-{chip_version}"
+        compile_cmd = gen_compile_cmd_for_meta_info(compile_info.tiling_and_dfx_utils_file, \
+            compile_info.tiling_and_dfx_utils_bin_path, compile_option_tuple, arch)
+        CommonUtility.run_cmd_inner(compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path)
+    msg_info = "<{}> <{}> compile kernel end".format(compile_info.op_type, compile_info.tiling_key_list)
+    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+    CommonUtility.print_compile_log(op_info.kernel_name, "compile cce file success", AscendCLogLevel.LOG_INFO)
+
+
+def link_kernel_obj(compile_info: CompileInfo, op_info: OpInfo, tiling_info: TilingInfo):
+    msg_info = "<{}> <{}> link kernel start".format(compile_info.op_type, compile_info.tiling_key_list)
+    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+    if global_var_storage.get_variable("ascendc_enable_sanitizer"):
+        _mssanitizer_link(compile_info.dst_file, compile_info.dst_file, compile_info.compile_log_path)
+    # split .o 4
+    split_sub_kernel_objs(compile_info.dst_file, tiling_info, compile_info)
+    CommonUtility.print_compile_log(op_info.kernel_name, \
+        "start to link relocatable for dst obj...", AscendCLogLevel.LOG_INFO)
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is False:
+        if not global_var_storage.get_variable("ascendc_tiling_no_register"):
+            link_relocatable(compile_info.dst_file, compile_info.compile_log_path)
+        else:
+            link_relocatable_meta_file(compile_info.dst_file, compile_info.tiling_and_dfx_utils_bin_path, \
+                compile_info.compile_log_path)
+            if not global_var_storage.get_variable("ascendc_compile_debug_config"):
+                CommonUtility.remove_temp_file(compile_info.tiling_and_dfx_utils_bin_path)
+    msg_info = "<{}> <{}> link kernel end".format(compile_info.op_type, compile_info.tiling_key_list)
+    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+    CommonUtility.print_compile_log(op_info.kernel_name, "link relocatable success", AscendCLogLevel.LOG_INFO)
+
+
 def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_option_tuple,
                            infered_info_from_ifile: InferChannelParamsFromIFile, extend_options: dict):
     value_depend_dict = extend_options.get("valueDepend")
@@ -1066,7 +1188,20 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         CommonUtility.print_compile_log(op_info.kernel_name, \
             "get kernel type by infer channel success", AscendCLogLevel.LOG_INFO)
 
-    default_dump_info = {'dump_type': '', 'dump_size': 1024}
+    # generate tiling struct size, dfx section
+    if global_var_storage.get_variable("ascendc_tiling_no_register"):
+        file_name_tag = distinct_tag + "_meta_info.cpp"
+        compile_info.tiling_and_dfx_utils_file = os.path.join(kernel_meta_dir, op_info.kernel_name + \
+            file_name_tag)
+        file_name_tag = distinct_tag + "_meta_info.o"
+        compile_info.tiling_and_dfx_utils_bin_path = os.path.join(kernel_meta_dir, op_info.kernel_name + \
+            file_name_tag)
+
+    LogUtil.detail_log_print(
+        op_info.kernel_name,
+        COMPILE_STAGE_MSG_INFO["generate_tiling_end"],
+        AscendCLogLevel.LOG_INFO
+    )
 
     compile_info = CompileInfo()
     compile_info.src_file = cce_file
@@ -1087,148 +1222,62 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     compile_info.dump_info = infered_info_from_ifile.dump_info \
         if (infered_info_from_ifile.dump_info.get('dump_type') is not None
             and infered_info_from_ifile.dump_info.get('dump_size') is not None) \
-        else default_dump_info
+        else {'dump_type': '', 'dump_size': 1024}
     compile_info.template_tiling_info = infered_info_from_ifile.template_tiling_info
     compile_info.tiling_key_struct_map = infered_info_from_ifile.tiling_key_struct_map
     compile_info.register_tiling_struct = infered_info_from_ifile.register_tiling_struct
     compile_info.tpl_tiling_struct = infered_info_from_ifile.tpl_tiling_struct
 
-    set_dump_assert_flag(compile_info)
-
-    # if enable super kernel, get super kernel option to compile info
-    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
-        compile_info.super_kernel_early_start_set_flag = infered_info_from_ifile.super_kernel_early_start_set_flag
-        compile_info.super_kernel_early_start_wait_flag = infered_info_from_ifile.super_kernel_early_start_wait_flag
-        sp_info = get_context().get_addition("super_kernel_sub_info")
-        if sp_info is not None:
-            compile_info.super_kernel_info["sp_options"] = \
-                parse_super_kernel_options(sp_info.get("super_kernel_options", ""))
-        else:
-            compile_info.super_kernel_info["sp_options"] = {}
-    LogUtil.detail_log_print(
-        op_info.kernel_name,
-        COMPILE_STAGE_MSG_INFO["generate_tiling_end"],
-        AscendCLogLevel.LOG_INFO
-    )
-    # generate kernel fun for ffts_addr, overflow, workspace
-    msg_info = "<{}> <{}> generate kernel stub start".format(compile_info.op_type, compile_info.tiling_key_list)
-    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
-    file_name_tag = distinct_tag + "_kernel.cpp"
-    compile_info.gen_kernel_func_file = os.path.join(kernel_meta_dir, op_info.kernel_name + file_name_tag)
-
-    # generate tiling struct size, dfx section
-    if global_var_storage.get_variable("ascendc_tiling_no_register"):
-        file_name_tag = distinct_tag + "_meta_info.cpp"
-        compile_info.tiling_and_dfx_utils_file = os.path.join(kernel_meta_dir, op_info.kernel_name + \
-            file_name_tag)
-        file_name_tag = distinct_tag + "_meta_info.o"
-        compile_info.tiling_and_dfx_utils_bin_path = os.path.join(kernel_meta_dir, op_info.kernel_name + \
-            file_name_tag)
-
-    ascendc_dump_on = "-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options
-    dump_info = compile_info.dump_info["dump_type"] != "" and ascendc_dump_on
-    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
-    if (CommonUtility.is_c310()) and dump_info:
-        tiling_key_kernel_type = compile_info.tiling_key_kernel_type
-        for tiling_key in tiling_key_kernel_type:
-            if tiling_key_kernel_type[tiling_key] == KernelMetaType.KERNEL_TYPE_AIC_ONLY:
-                tiling_key_kernel_type[tiling_key] = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+    compile_info_origin = CompileInfo()
+    compile_option_tuple_origin = None
+    if get_context().get_addition("super_kernel_sub_combine") and \
+        global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        compile_info_origin = copy.deepcopy(compile_info)
+        compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
 
     # dump function determins how kernel wrapper will be, must be handle early
     handle_dump_options(compile_info, compile_option_tuple)
 
-    # dump or acc or timestamp or recognize_simtvf will need extra workspace
-    ascendc_enable_dump_workspace = ("-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options) or \
-        ("assert" == compile_info.dump_info["dump_type"]) or \
-        (global_var_storage.get_variable("ascendc_time_stamp_compile_options") is True) or \
-        "-DASCENDC_ACC_DUMP" in compile_option_tuple.compile_options or \
-        (global_var_storage.get_variable("ascendc_recognize_simtvf") is True)
-    global_var_storage.set_variable("ascendc_enable_dump_workspace", ascendc_enable_dump_workspace)
+    # get super kernel option to compile info when enable super kernel
+    handle_sk_codegen_options(compile_info, infered_info_from_ifile)
 
-    if CommonUtility.is_c310():
-        gen_meta_info_section(compile_info, op_info)
-    workspace_idx = gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, compile_option_tuple)
-    # no dump and no superkernel
-    if CommonUtility.is_support_workspace_offset() and (not ascendc_enable_dump_workspace) and \
-        (global_var_storage.get_variable("ascendc_enable_super_kernel") is False):
-        compile_option_tuple.compile_options.append(f'-DWORKSPACE_PARAM_OFFSET={workspace_idx}')
+    # stub kernel func generation
+    workspace_idx = gen_op_stub_kernel_func(compile_info, op_info, compile_option_tuple, tiling_info, distinct_tag,
+                                       kernel_meta_dir)
+    # handle compile options
+    handle_compile_options(compile_info, compile_option_tuple, tiling_info, workspace_idx)
 
-    # generate compile option for sub operator, when enable super kernel
-    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
-        gen_sub_super_kernel_compile_options(compile_option_tuple, tiling_info, compile_info)
+    # compile cce file and set meta info in .o
+    compile_kernel_and_meta(compile_info, op_info, compile_option_tuple, tiling_info)
 
-    # check whether ccec_O0 or ccec_g opend in compile context
-    compile_info.is_debug = CommonUtility.check_debug_options(compile_option_tuple.compile_options)
-    compile_option_tuple.compile_options.append('-DONE_CORE_DUMP_SIZE=' + str(compile_info.dump_info["dump_size"]))
-    if global_var_storage.get_variable("ascendc_recognize_simtvf") is True:
-        compile_option_tuple.compile_options.append('-DASCENDC_RECOGNIZE_SIMT_VF')
+    # link kernel obj
+    link_kernel_obj(compile_info, op_info, tiling_info)
 
+    # aclnn sk combine compile workflow
+    if get_context().get_addition("super_kernel_sub_combine") is True and \
+        global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        # reset sk opt
+        global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+        global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
+        DFXSectionGenerator().update_is_support(op_info)
+        compile_info_origin.dst_file = os.path.join(kernel_meta_dir, op_info.kernel_name + "_norm.o")
 
-    if global_var_storage.get_variable("ascendc_enable_sanitizer") is False and \
-        global_var_storage.get_variable("ascendc_debug_compile_options") is False:
-        compile_option_tuple.compile_options.append('-DL2_CACHE_HINT')
+        handle_dump_options(compile_info_origin, compile_option_tuple_origin)
+        handle_sk_codegen_options(compile_info_origin, infered_info_from_ifile)
+        workspace_idx = gen_op_stub_kernel_func(compile_info_origin, op_info, compile_option_tuple_origin, tiling_info,
+                                                distinct_tag, kernel_meta_dir)
+        handle_compile_options(compile_info_origin, compile_option_tuple_origin, tiling_info, workspace_idx)
+        compile_kernel_and_meta(compile_info_origin, op_info, compile_option_tuple_origin, tiling_info)
+        link_kernel_obj(compile_info_origin, op_info, tiling_info)
 
-    if tiling_info.static_shape_flag:
-        compile_option_tuple.compile_options.append('-DCONST_TILING')
+        # link norm.o and sk.o
+        link_sk_norm_combine(compile_info.dst_file, compile_info_origin.dst_file, compile_info.compile_log_path)
 
-    msg_info = "<{}> <{}> generate kernel stub end".format(compile_info.op_type, compile_info.tiling_key_list)
-    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
-    CommonUtility.print_compile_log(op_info.kernel_name, "start to compile cce file...", AscendCLogLevel.LOG_INFO)
-    msg_info = "<{}> <{}> compile kernel start".format(compile_info.op_type, compile_info.tiling_key_list)
-    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
+        DFXSectionGenerator().update_is_support(op_info)
 
-    DFXSectionGenerator().generate_dfx_binary(compile_info, op_info, tiling_info)
-
-    if CommonUtility.is_v220() or CommonUtility.is_c310():
-        if compile_info.no_set_kernel_type is True:
-            _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
-        else:
-            _compile_ascendc_cce_v220_with_kernel_type(compile_info, compile_option_tuple, tiling_info)
-    elif CommonUtility.is_m510():
-        compile_info.code_channel = CORE_TYPE_CUBE
-        compile_info.hard_sync = False
-        _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
-    elif CommonUtility.is_regbase():
-        _compile_ascendc_cce_regbase(compile_info, compile_option_tuple, tiling_info)
-    elif CommonUtility.is_v200() and compile_info.no_set_kernel_type is False:
-        _compile_ascendc_cce_v200_with_kernel_type(compile_info, compile_option_tuple, tiling_info)
-    else:
-        _compile_ascendc_cce(compile_info, compile_option_tuple, tiling_info)
-
-    # get tiling struct and size in .asendc.tiling section and generate meta_info.o when using REGISTER_NONE_TILING
-    if global_var_storage.get_variable("ascendc_tiling_no_register"):
-        tiling_key_struct_size_map = _get_tiling_struct_without_register_size(compile_info)
-        gen_tiling_struct_size_and_dfx_section_file(compile_info, tiling_info, tiling_key_struct_size_map)
-        chip_version = CommonUtility.get_chip_version()
-        if CommonUtility.is_c310() or CommonUtility.is_v220():
-            arch = f"dav-{chip_version}-vec"
-        else:
-            arch = f"dav-{chip_version}"
-        compile_cmd = gen_compile_cmd_for_meta_info(compile_info.tiling_and_dfx_utils_file, \
-            compile_info.tiling_and_dfx_utils_bin_path, compile_option_tuple, arch)
-        CommonUtility.run_cmd_inner(compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path)
-    msg_info = "<{}> <{}> compile kernel end".format(compile_info.op_type, compile_info.tiling_key_list)
-    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
-    CommonUtility.print_compile_log(op_info.kernel_name, "compile cce file success", AscendCLogLevel.LOG_INFO)
-    msg_info = "<{}> <{}> link kernel start".format(compile_info.op_type, compile_info.tiling_key_list)
-    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
-    if global_var_storage.get_variable("ascendc_enable_sanitizer"):
-        _mssanitizer_link(compile_info.dst_file, compile_info.dst_file, compile_info.compile_log_path)
-    # split .o 4
-    split_sub_kernel_objs(compile_info.dst_file, tiling_info, compile_info)
-    CommonUtility.print_compile_log(op_info.kernel_name, \
-        "start to link relocatable for dst obj...", AscendCLogLevel.LOG_INFO)
-    if global_var_storage.get_variable("ascendc_enable_super_kernel") is False:
-        if not global_var_storage.get_variable("ascendc_tiling_no_register"):
-            link_relocatable(compile_info.dst_file, compile_info.compile_log_path)
-        else:
-            link_relocatable_meta_file(compile_info.dst_file, compile_info.tiling_and_dfx_utils_bin_path, \
-                compile_info.compile_log_path)
-            if not global_var_storage.get_variable("ascendc_compile_debug_config"):
-                CommonUtility.remove_temp_file(compile_info.tiling_and_dfx_utils_bin_path)
-    msg_info = "<{}> <{}> link kernel end".format(compile_info.op_type, compile_info.tiling_key_list)
-    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
-    CommonUtility.print_compile_log(op_info.kernel_name, "link relocatable success", AscendCLogLevel.LOG_INFO)
+    # generate opinfo json
     _json_post_process(compile_info, op_info, tiling_info, input_gen_placehoder, \
                        output_gen_placehoder, compile_log_path)
     if not global_var_storage.get_variable("ascendc_compile_debug_config"):
@@ -1342,7 +1391,23 @@ def compile_op_with_customized_config(cce_file: str, origin_func_name: str, op_i
                             extend_options)
 
 
-def handle_dump_options(compile_info, compile_option_tuple):
+def handle_dump_options(compile_info: CompileInfo, compile_option_tuple):
+    # dump ktype handle
+    ascendc_dump_on = "-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options
+    dump_info = compile_info.dump_info["dump_type"] != "" and ascendc_dump_on
+    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
+    if (CommonUtility.is_c310()) and dump_info:
+        tiling_key_kernel_type = compile_info.tiling_key_kernel_type
+        for tiling_key in tiling_key_kernel_type:
+            if tiling_key_kernel_type[tiling_key] == KernelMetaType.KERNEL_TYPE_AIC_ONLY:
+                tiling_key_kernel_type[tiling_key] = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
+
+    # check assert only
+    if compile_info.dump_info["dump_type"] == "assert":
+        compile_option_tuple.compile_options.append('-DASCENDC_DUMP_ASSERT_ONLY')
+        global_var_storage.set_variable("ascendc_dump_assert_only", True)
+
+    # handle dump macro
     if "assert" not in compile_info.dump_info["dump_type"] and "printf" not in compile_info.dump_info["dump_type"]:
         compile_option_tuple.compile_options.append('-DASCENDC_DUMP=0')
         length_before = len(compile_option_tuple.compile_options)
@@ -1353,13 +1418,13 @@ def handle_dump_options(compile_info, compile_option_tuple):
                 "-DASCENDC_DUMP=1 is deleted because the feature is not used internally in src file", \
                 AscendCLogLevel.LOG_WARNING)
 
-    if "assert" == compile_info.dump_info["dump_type"]:
-        compile_option_tuple.compile_options.append('-DASCENDC_DUMP_ASSERT_ONLY')
-
-
-def set_dump_assert_flag(compile_info):
-    if compile_info.dump_info["dump_type"] == "assert":
-        global_var_storage.set_variable("ascendc_dump_assert_only", True)
+    # dump or acc or timestamp or recognize_simtvf will need extra workspace
+    ascendc_enable_dump_workspace = ("-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options) or \
+        ("assert" == compile_info.dump_info["dump_type"]) or \
+        (global_var_storage.get_variable("ascendc_time_stamp_compile_options") is True) or \
+        "-DASCENDC_ACC_DUMP" in compile_option_tuple.compile_options or \
+        (global_var_storage.get_variable("ascendc_recognize_simtvf") is True)
+    global_var_storage.set_variable("ascendc_enable_dump_workspace", ascendc_enable_dump_workspace)
 
 
 def _compile_single_tiling(tiling_key, compile_info, tiling_info, compile_option_tuple):
