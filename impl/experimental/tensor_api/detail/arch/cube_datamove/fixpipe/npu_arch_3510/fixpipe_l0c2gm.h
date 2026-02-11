@@ -24,8 +24,10 @@ class FixpipetNz2NzBase3510 : public CopyMatrixCcToGmBase3510 {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        CheckCoord<T, U, Coord>(dst, src, coord);
         auto params = GenFixpipeParams<trait, T, U>(dst, src);
-        DataCopy<trait, T, U, decltype(params)>(dst, src, params);
+        auto dstNzTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
+        DataCopy<trait, T, U, decltype(params)>(dstNzTensor, src, params);
     }
 
 private:
@@ -69,12 +71,13 @@ private:
         uint32_t mSize = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout)
             * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
         uint32_t srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
-        uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
+        uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) /
+            sizeof(typename T::elementType) / C0_SIZE;
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
 
-        bool reluEn = false;
-        uint8_t unitFlag = 0;
-        bool isChannelSplit = false;
+        bool reluEn = trait.enableRelu;
+        uint8_t unitFlag = trait.unitFlag;
+        bool isChannelSplit = trait.enableChannleSplit;
         bool nz2ndEn = false;
         bool nz2dnEn = false;
         auto params = Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit,
@@ -87,10 +90,12 @@ class FixpipetNz2NdBase3510 : public CopyMatrixCcToGmBase3510, public SetRegiste
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        CheckCoord<T, U, Coord>(dst, src, coord);
         auto loop3Params = GenRegisterParams<trait, T, U>(dst, src);
         SetRegister<decltype(loop3Params)>(loop3Params);
         auto params = GenFixpipeParams<trait, T, U>(dst, src);
-        DataCopy<trait, T, U, decltype(params)>(dst, src, params);
+        auto dstNDTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
+        DataCopy<trait, T, U, decltype(params)>(dstNDTensor, src, params);
     }
 
 private:
@@ -162,9 +167,9 @@ private:
         uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
 
-        bool reluEn = false;
-        uint8_t unitFlag = 0;
-        bool isChannelSplit = false;
+        bool reluEn = trait.enableRelu;
+        uint8_t unitFlag = trait.unitFlag;
+        bool isChannelSplit = trait.enableChannleSplit;
         bool nz2ndEn = true;
         bool nz2dnEn = false;
         auto params = Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit,
@@ -178,10 +183,12 @@ class FixpipetNz2DnBase3510 : public CopyMatrixCcToGmBase3510, public SetRegiste
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        CheckCoord<T, U, Coord>(dst, src, coord);
         auto loop3Params = GenRegisterParams<trait, T, U>(dst, src);
         SetRegister<decltype(loop3Params)>(loop3Params);
         auto params = GenFixpipeParams<trait, T, U>(dst, src);
-        DataCopy<trait, T, U, decltype(params)>(dst, src, params);
+        auto dstDNTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
+        DataCopy<trait, T, U, decltype(params)>(dstDNTensor, src, params);
     }
 
 private:
@@ -254,9 +261,9 @@ private:
         uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
 
-        bool reluEn = false;
-        uint8_t unitFlag = 0;
-        bool isChannelSplit = false;
+        bool reluEn = trait.enableRelu;
+        uint8_t unitFlag = trait.unitFlag;
+        bool isChannelSplit = trait.enableChannleSplit;
         bool nz2ndEn = false;
         bool nz2dnEn = true;
         auto params = Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit,
