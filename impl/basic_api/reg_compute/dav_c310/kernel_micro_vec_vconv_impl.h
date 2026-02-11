@@ -15,7 +15,7 @@
 #ifndef ASCENDC_MODULE_MICRO_VEC_VCONV_IMPL_H
 #define ASCENDC_MODULE_MICRO_VEC_VCONV_IMPL_H
 
-#include "../../../include/basic_api/reg_compute/kernel_micro_vec_duplicate_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
 namespace Reg {

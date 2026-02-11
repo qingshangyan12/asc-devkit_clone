@@ -16,8 +16,8 @@
 #define ASCENDC_MODULE_MICRO_DATACOPY_IMPL_H
 
 #include "kernel_micro_common_impl.h"
-#include "../../../include/basic_api/kernel_operator_sys_var_intf.h"
-#include "../../../include/basic_api/reg_compute/kernel_micro_vec_duplicate_intf.h"
+#include "../../../../include/basic_api/kernel_operator_sys_var_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
 namespace Reg {

@@ -15,7 +15,7 @@
 #ifndef ASCENDC_MODULE_MICRO_GATHER_MASK_IMPL_H
 #define ASCENDC_MODULE_MICRO_GATHER_MASK_IMPL_H
 
-#include "../../../include/basic_api/reg_compute/kernel_micro_struct_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_struct_intf.h"
 
 namespace AscendC {
 namespace Reg {

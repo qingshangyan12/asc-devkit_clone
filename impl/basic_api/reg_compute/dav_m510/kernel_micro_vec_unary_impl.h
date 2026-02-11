@@ -16,9 +16,9 @@
 #define ASCENDC_MODULE_MICRO_VEC_UNARY_IMPL_H
 
 #include "kernel_micro_common_impl.h"
-#include "../../../include/basic_api/reg_compute/kernel_micro_struct_intf.h"
-#include "../../../include/basic_api/reg_compute/kernel_micro_vec_binary_intf.h"
-#include "../../../include/utils/std/type_traits.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_struct_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_vec_binary_intf.h"
+#include "../../../../include/utils/std/type_traits.h"
 
 namespace AscendC {
 namespace Reg {

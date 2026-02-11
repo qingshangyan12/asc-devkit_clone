@@ -15,7 +15,7 @@
 #ifndef ASCENDC_MODULE_MICRO_DATACOPY_STORE_IMPL_H
 #define ASCENDC_MODULE_MICRO_DATACOPY_STORE_IMPL_H
 
-#include "../../../include/basic_api/kernel_operator_sys_var_intf.h"
+#include "../../../../include/basic_api/kernel_operator_sys_var_intf.h"
 
 namespace AscendC {
 namespace Reg {

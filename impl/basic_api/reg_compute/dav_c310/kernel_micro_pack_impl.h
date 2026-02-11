@@ -15,9 +15,9 @@
 #ifndef ASCENDC_MODULE_MICRO_PACK_IMPL_H
 #define ASCENDC_MODULE_MICRO_PACK_IMPL_H
 
-#include "../../../include/basic_api/reg_compute/kernel_micro_copy_intf.h"
-#include "../../../include/basic_api/reg_compute/kernel_micro_vec_binary_scalar_intf.h"
-#include "../../../include/basic_api/reg_compute/kernel_micro_vec_duplicate_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_copy_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_vec_binary_scalar_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_vec_duplicate_intf.h"
 
 namespace AscendC {
 namespace Reg {

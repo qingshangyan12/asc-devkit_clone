@@ -17,8 +17,8 @@
 
 #include "basic_api/reg_compute/kernel_micro_utils.h"
 #include "kernel_micro_common_impl.h"
-#include "../../../include/basic_api/reg_compute/kernel_micro_struct_intf.h"
-#include "../../../include/utils/std/type_traits.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_struct_intf.h"
+#include "../../../../include/utils/std/type_traits.h"
 
 namespace AscendC {
 namespace Reg {

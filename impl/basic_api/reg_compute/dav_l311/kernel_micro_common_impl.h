@@ -16,8 +16,8 @@
 #define ASCENDC_MODULE_MICRO_COMMON_IMPL_H
 
 #include "basic_api/reg_compute/kernel_micro_utils.h"
-#include "../../../include/basic_api/reg_compute/kernel_micro_struct_intf.h"
-#include "../../../include/basic_api/reg_compute/kernel_micro_maskreg_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_struct_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_maskreg_intf.h"
 
 namespace AscendC {
 namespace Reg {

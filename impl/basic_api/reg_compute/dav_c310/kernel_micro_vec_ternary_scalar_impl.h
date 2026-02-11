@@ -15,8 +15,8 @@
 #ifndef ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_IMPL_H
 #define ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_IMPL_H
 
-#include "../../../include/basic_api/reg_compute/kernel_micro_vec_binary_intf.h"
-#include "../../../include/basic_api/reg_compute/kernel_micro_vec_binary_scalar_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_vec_binary_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_vec_binary_scalar_intf.h"
 
 namespace AscendC {
 namespace Reg {
