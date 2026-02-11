@@ -25,7 +25,7 @@ __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplate<T, U>, void>
 LoadData(const T& dst, const U& src)
 {
     LoadData<trait, T, U>(dst, src, 
-        MakeCoord(MakeCoord(Std::Int<0>{}, Std::Int<0>{}), MakeCoord(Std::Int<0>{}, Std::Int<0>{})));
+        MakeCoord(Std::Int<0>{}, Std::Int<0>{}));
 }
 
 template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>
