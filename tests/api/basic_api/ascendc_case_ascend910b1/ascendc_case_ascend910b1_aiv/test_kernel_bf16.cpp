@@ -68,3 +68,31 @@ TEST_P(TestBf16Suite, TestBf16Cases)
     tmp = sum1.val;
     EXPECT_EQ(tmp, param.dataOut4);
 }
+
+TEST_P(TestBf16Suite, TestBf16CastCases)
+{
+    auto param = GetParam();
+    bfloat16_t m = param.dataIn1;
+    float res = Cast(m);
+    EXPECT_EQ(res, param.dataOut1);
+
+    bfloat16_t n = param.dataIn1;
+    EXPECT_EQ(n, param.dataOut1);
+
+    bfloat16_t s;
+    s.val = param.dataIn2;
+    float sFloat = Cast(s);
+    uint32_t tmp = *(reinterpret_cast<uint32_t *>(&sFloat));
+    EXPECT_EQ(tmp, param.dataOut2);
+
+    bfloat16_t sum0 = param.dataIn3 + param.dataIn4;
+    EXPECT_EQ(sum0, param.dataOut3);
+    bfloat16_t sum1 = param.dataIn3;
+    sum1 += param.dataIn4;
+    EXPECT_EQ(sum1, param.dataOut3);
+    sum1.val = param.dataIn5;
+    sum0.val = param.dataIn6;
+    sum1 += sum0;
+    tmp = sum1.val;
+    EXPECT_EQ(tmp, param.dataOut4);
+}
