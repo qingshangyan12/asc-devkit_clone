@@ -438,15 +438,6 @@ __aicore__ constexpr uint32_t AlignTlvLen(const uint32_t& dataLen)
     return ((dataLen + num) & ~num) + num + 1;
 }
 
-template <typename... Args>
-__aicore__ inline uint32_t GetPrintTlvLen(uint32_t& argsNum, __gm__ const char* fmt, Args&&... args)
-{
-    constexpr uint32_t printInfoLen = sizeof(PrintTlvInfoHead);
-    const uint32_t& fmtLen = GetStringLength(fmt);
-    const uint32_t& argsLen = GetPrintArgsLen(argsNum, args...);
-    return AlignTlvLen(printInfoLen + argsLen + fmtLen); // gm need 8 byte align
-}
-
 __aicore__ inline void WriteRingBufTlvHead(
     DumpType printType, __gm__ PrintTlvInfoHead* printTlv, const uint32_t& tlvLen, const uint32_t& argsNum)
 {

@@ -16,7 +16,7 @@
 #define ASCENDC_KERNEL_MACROS_H
 
 #include <cstdint>
-#include "impl/utils/debug/asc_utils_macros.h"g
+#include "impl/utils/debug/asc_utils_macros.h"
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #define ASSERT(x) assert(x)
 #define DEBUG_CODE(T) T

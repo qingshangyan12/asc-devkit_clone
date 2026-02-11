@@ -38,7 +38,7 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(cons
 namespace __asc_aicore {
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
-}
+}   // namespace __asc_aicore
 #endif
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3101)
