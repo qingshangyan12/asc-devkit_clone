@@ -1,7 +1,7 @@
 # function(create_opensource target_name suffix_name product_side install_prefix toolchain_file)
 
 set(open_source_target_name mockcpp)
-set(MOCKCPP_DOWNLOAD_PATH ${CANN_3RD_LIB_PATH}/pkg)
+set(MOCKCPP_DOWNLOAD_PATH ${CANN_3RD_LIB_PATH}/mockcpp-2.7)
 set(MOCKCPP_SRC_PATH ${CANN_3RD_LIB_PATH}/mockcpp)
 set(mockcpp_SOURCE_DIR ${MOCKCPP_SRC_PATH}/mockcpp)
 
@@ -25,8 +25,6 @@ endif()
 
 set(BOOST_INCLUDE_DIRS ${BOOST_SRC_PATH})
 if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
-    set(PATCH_FILE ${MOCKCPP_DOWNLOAD_PATH}/mockcpp-2.7_py3.patch)
-    set(REQ_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h1/mockcpp-2.7.tar.gz")
     set(MOCKCPP_LOCAL_SRC "${CANN_3RD_LIB_PATH}/../llt/third_party/mockcpp_src")
     set(MOCKCPP_OPTS
         -DCMAKE_CXX_FLAGS=${mockcpp_CXXFLAGS}
@@ -47,16 +45,20 @@ if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
             BUILD_COMMAND make install -j 16
         )
     else()
-        message("No local mockcpp source, downloading from ${REQ_URL}")
-        if (NOT EXISTS ${PATCH_FILE})
-            set(PATCH_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h1/mockcpp-2.7_py3.patch")
-            file(DOWNLOAD
-                ${PATCH_URL}
-                ${PATCH_FILE}
-                TIMEOUT 60
-                EXPECTED_HASH SHA256=f1e9091992bf5c340af7d8c2f800b8d43d198fe4a8130f7bcd3f7cba1b0a324b
-            )
+        set(PATCH_FILE ${MOCKCPP_DOWNLOAD_PATH}/mockcpp-2.7_py3.patch)
+        set(PATCH_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h1/mockcpp-2.7_py3.patch")
+        file(DOWNLOAD
+            ${PATCH_URL}
+            ${PATCH_FILE}
+            TIMEOUT 60
+            EXPECTED_HASH SHA256=f1e9091992bf5c340af7d8c2f800b8d43d198fe4a8130f7bcd3f7cba1b0a324b
+        )
+        if (EXISTS ${MOCKCPP_DOWNLOAD_PATH}/mockcpp-2.7.tar.gz)
+            set(REQ_URL ${MOCKCPP_DOWNLOAD_PATH}/mockcpp-2.7.tar.gz)
+        else()
+            set(REQ_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h1/mockcpp-2.7.tar.gz")
         endif()
+        message("No local mockcpp source, downloading from ${REQ_URL}")
         ExternalProject_Add(mockcpp
             URL ${REQ_URL}
             URL_HASH SHA256=73ab0a8b6d1052361c2cebd85e022c0396f928d2e077bf132790ae3be766f603
