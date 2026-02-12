@@ -462,14 +462,22 @@ void SetModelScatterDst0Tensor(uint64_t dst0, const uint32_t length);
 
 #endif // ASCENDC_CPU_DEBUG
 
-#if !defined(__ASC_NPU_HOST__)
-
+#if defined(__ASC_NPU_HOST__)
+struct fp8_e8m0_t {
+    uint8_t value;
+    explicit fp8_e8m0_t(uint8_t v) : value(v) {}
+    explicit operator uint8_t() const { return value; }
+};
+#else
 #if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)))
-using fp8_e8m0_t = uint8_t;
+struct fp8_e8m0_t {
+    uint8_t value;
+    explicit fp8_e8m0_t(uint8_t v) : value(v) {}
+    explicit operator uint8_t() const { return value; }
+};
 #elif !defined(ASCENDC_CPU_DEBUG)
 using fp8_e8m0_t = float8_e8m0_t;
 #endif
-
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
