@@ -21,7 +21,7 @@
 #include "platform_ascendc_log.h"
 #include "platform/platform_infos_def.h"
 #include "platform_ascendc.h"
-#include "acl/acl_rt.h"
+#include "acl_rt.h"
 
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
