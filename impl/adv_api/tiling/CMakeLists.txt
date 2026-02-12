@@ -17,7 +17,6 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${ASCENDC_DIR}>
     $<BUILD_INTERFACE:${ASCENDC_DIR}/include>
-    $<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/adv_api>>
     $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}>>
     $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include>>
@@ -184,6 +183,7 @@ add_library(
 
 target_include_directories(tiling_api PRIVATE
   ${KERNEL_TILING_DIR}
+  ${ASCEND_CANN_PACKAGE_PATH}/include
   ${ASCENDC_DIR}/include/utils/context
   ${ASCENDC_DIR}/include/utils/tiling/platform
   ${ASCENDC_DIR}/include/utils
