@@ -432,6 +432,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rn_sat(const float2 x
     return __cvt_half2<__get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rz(const float2 x) {
+    return __cvt_half2<__get_round<__RoundMode::CAST_TRUNC>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rz_sat(const float2 x) {
     return __cvt_half2<__get_round<__RoundMode::CAST_TRUNC>(), RoundingSaturation::RS_ENABLE_VALUE>(x);
 }
