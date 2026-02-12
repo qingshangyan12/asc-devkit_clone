@@ -24,7 +24,6 @@ class FixpipetNz2Nz2201Base : public Copy2201MatrixCcToGmBase {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        std::cout << "fixpipe_four_dim_2201_l0c_gm.h Run" << std::endl;
         CheckCoord<T, U, Coord>(dst, src, coord);
         auto params = GenFixpipeParams<trait, T, U>(dst, src); 
         auto dstNzTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
