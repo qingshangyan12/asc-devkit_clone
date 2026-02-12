@@ -34,7 +34,7 @@ static const char *g_core_type_list = "AICore,VectorCore";
 static const char *g_chip_version = "Ascend310P";
 static const char *g_npu_arch = "2202";
 static uint32_t g_core_num = 10;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 static const char *g_core_num_aic = "24";
 static const char *g_core_num_aiv = "48";
 static const char *g_core_num_cub = "24";

@@ -55,7 +55,7 @@ private:
         static_assert(Std::is_same_v<srcType, dstType>, "The source data and target data have inconsistent data types.");
         CheckNZTemplate<T>();
         CheckNZTemplate<U>();
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<srcType, half, bfloat16_t, uint32_t, int32_t, float, uint8_t, int8_t,
             fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>, "The source data type is not supported.");
 #endif
