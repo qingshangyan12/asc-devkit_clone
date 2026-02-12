@@ -27,6 +27,7 @@ asc-devkit:
       - tools/**/*.h
       - impl/**/dav_l300/*.h
       - impl/**/dav_l311/*.h
+      - impl/micro_api/**/kernel_micro_datatype_impl.h
   llt:
     ut_check: true
     st_check: false
