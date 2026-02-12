@@ -65,7 +65,6 @@ def deqf16(data, quant_pre, relu_pre):
     """
     quant_alpha, offset, sign, n_shift, mode_control_bit = extract_quant_params(quant_pre)
     # sign = 0
-    #print(quant_alpha, offset, sign, n_shift, mode_control_bit)
     relu_alpha = extract_relu_params(relu_pre)
     if mode_control_bit == 1:
         data = data >> n_shift
@@ -75,12 +74,9 @@ def deqf16(data, quant_pre, relu_pre):
         data = data * quant_alpha
     else:
         data = data * relu_alpha
-    # print(quant_alpha, relu_alpha)
     quant_data = saturation(data, np.finfo(np.float16).min, np.finfo(np.float16).max, np.float16) + offset
-    if sign:
-        return saturation(quant_data, np.finfo(np.float16).min, np.finfo(np.float16).max, np.float16)
-    else:
-        return saturation(quant_data, np.finfo(np.float16).min, np.finfo(np.float16).max, np.float16)
+
+    return saturation(quant_data, np.finfo(np.float16).min, np.finfo(np.float16).max, np.float16)
 
 def pre_quant_relu(golden, dst_type, m, n, pre_quant_mode, pre_relu_mode):
     quant_scalar = 2
@@ -128,7 +124,6 @@ def gen_golden_data(output_format, pre_quant_mode, pre_relu_mode):
     if output_format == 2:
         block_cols = 16
         golden = golden.reshape((int(M / 16), 16, int(N / block_cols), block_cols)).transpose(2, 0, 1, 3).astype(output_type)
-    print(golden)
 
     if kRound > 1:
         # 将K轴外移
