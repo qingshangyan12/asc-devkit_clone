@@ -198,6 +198,11 @@ target_include_directories(tiling_api PRIVATE
 
 target_include_directories(tiling_api PUBLIC ${ASCEND_CANN_PACKAGE_PATH}/include)
 
+message(STATUS "=== Debug ASCEND_CANN_PACKAGE_PATH ===")
+message(STATUS "ASCEND_CANN_PACKAGE_PATH = ${ASCEND_CANN_PACKAGE_PATH}")
+message(STATUS "ASCENDC_DIR = ${ASCENDC_DIR}")
+message(STATUS "=======================================")
+
 target_compile_options(
   tiling_api
   PRIVATE -fvisibility=hidden
