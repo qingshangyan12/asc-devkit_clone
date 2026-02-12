@@ -50,17 +50,17 @@ TEST_F(Tensor_Api_Mad_Atom, Mmadperation)
     auto BiasTensor = MakeTensor(MakeBiasmemPtr(BiasBuffer), MakeLayout(biasShape, biasStride));
 
     auto atomMad = MakeMad(MmadOperation{}, MmadTraitDefault{});
-    atomMad.Call(L0CTensor, L0BTensor, L0ATensor);
+    atomMad.Call(L0CTensor, L0BTensor, L0ATensor, defualtMmadParams);
 
-    atomMad.Call(L0CTensor, L0BTensor, L0ATensor, BiasTensor);
+    atomMad.Call(L0CTensor, L0BTensor, L0ATensor, BiasTensor, defualtMmadWithBiasParams);
 
-    MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}.Call(L0CTensor, L0BTensor, L0ATensor);
+    MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}.Call(L0CTensor, L0BTensor, L0ATensor, defualtMmadParams);
 
-    MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}.Call(L0CTensor, L0BTensor, L0ATensor, BiasTensor);
+    MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}.Call(L0CTensor, L0BTensor, L0ATensor, BiasTensor, defualtMmadWithBiasParams);
 
-    Mad(MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}, L0CTensor, L0BTensor, L0ATensor);
+    Mad(MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}, L0CTensor, L0BTensor, L0ATensor, defualtMmadParams);
 
-    Mad(MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}, L0CTensor, L0BTensor, L0ATensor, BiasTensor);
+    Mad(MmadAtom<MmadTraits<MmadOperation, MmadTraitDefault>>{}, L0CTensor, L0BTensor, L0ATensor, BiasTensor, defualtMmadWithBiasParams);
 
     EXPECT_EQ(L0CBuffer[0], 0);
 }
