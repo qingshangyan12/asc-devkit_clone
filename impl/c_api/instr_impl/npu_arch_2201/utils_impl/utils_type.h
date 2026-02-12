@@ -18,8 +18,7 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_UTILS_C_API_TYPE_H
 #define IMPL_C_API_C_API_INSTR_IMPL_UTILS_C_API_IMPL_UTILS_C_API_TYPE_H
 
-#include "impl/utils/sys_constants.h"
-#include "impl/utils/sys_macros.h"
+constexpr uint32_t ASC_C_API_INT4_BIT_NUM = 4;
 
 template <bool condition, class T1, class T2>
 struct Conditional {
@@ -94,7 +93,7 @@ struct integer_sub_type {
     }
 };
 
-using int4b_t = integer_sub_type<INT4_BIT_NUM, true>;
+using int4b_t = integer_sub_type<ASC_C_API_INT4_BIT_NUM, true>;
 
 #endif
 

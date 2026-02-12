@@ -121,9 +121,6 @@ constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
 constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
 constexpr int32_t CAST_MODE_BIT = 59;
 
-using ::MIX;
-using ::AIC;
-using ::AIV;
 } // namespace AscendC
 
 #if defined(ASCENDC_CPU_DEBUG)
