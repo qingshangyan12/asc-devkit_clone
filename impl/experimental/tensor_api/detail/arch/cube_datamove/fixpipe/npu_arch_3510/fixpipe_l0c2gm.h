@@ -25,7 +25,8 @@ public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
         auto params = GenFixpipeParams<trait, T, U>(dst, src);
-        DataCopy<trait, T, U, decltype(params)>(dst, src, params);
+        auto dstNzTensor = dst(coord, dst.Layout().Shape());
+        DataCopy<trait, T, U, decltype(params)>(dstNzTensor, src, params);
     }
 
 private:
@@ -72,9 +73,9 @@ private:
         uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
 
-        bool reluEn = false;
-        uint8_t unitFlag = 0;
-        bool isChannelSplit = false;
+        bool reluEn = trait.enableRelu;
+        uint8_t unitFlag = trait.unitFlag;
+        bool isChannelSplit = trait.enableChannleSplit;
         bool nz2ndEn = false;
         bool nz2dnEn = false;
         auto params = Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit,
@@ -90,7 +91,8 @@ public:
         auto loop3Params = GenRegisterParams<trait, T, U>(dst, src);
         SetRegister<decltype(loop3Params)>(loop3Params);
         auto params = GenFixpipeParams<trait, T, U>(dst, src);
-        DataCopy<trait, T, U, decltype(params)>(dst, src, params);
+        auto dstNDTensor = dst(coord, dst.Layout().Shape());
+        DataCopy<trait, T, U, decltype(params)>(dstNDTensor, src, params);
     }
 
 private:
@@ -162,9 +164,9 @@ private:
         uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
 
-        bool reluEn = false;
-        uint8_t unitFlag = 0;
-        bool isChannelSplit = false;
+        bool reluEn = trait.enableRelu;
+        uint8_t unitFlag = trait.unitFlag;
+        bool isChannelSplit = trait.enableChannleSplit;
         bool nz2ndEn = true;
         bool nz2dnEn = false;
         auto params = Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit,
@@ -181,7 +183,8 @@ public:
         auto loop3Params = GenRegisterParams<trait, T, U>(dst, src);
         SetRegister<decltype(loop3Params)>(loop3Params);
         auto params = GenFixpipeParams<trait, T, U>(dst, src);
-        DataCopy<trait, T, U, decltype(params)>(dst, src, params);
+        auto dstDNTensor = dst(coord, dst.Layout().Shape());
+        DataCopy<trait, T, U, decltype(params)>(dstDNTensor, src, params);
     }
 
 private:
@@ -254,9 +257,9 @@ private:
         uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
 
-        bool reluEn = false;
-        uint8_t unitFlag = 0;
-        bool isChannelSplit = false;
+        bool reluEn = trait.enableRelu;
+        uint8_t unitFlag = trait.unitFlag;
+        bool isChannelSplit = trait.enableChannleSplit;
         bool nz2ndEn = false;
         bool nz2dnEn = true;
         auto params = Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit,
