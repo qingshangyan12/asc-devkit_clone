@@ -15,17 +15,17 @@
 #ifndef ASCENDC_KERNEL_MICRO_VEC_BINARY_INTERFACE_IMPL_H
 #define ASCENDC_KERNEL_MICRO_VEC_BINARY_INTERFACE_IMPL_H
 
-#include "basic_api/reg_compute/kernel_micro_vec_unary_intf.h"
-#include "basic_api/reg_compute/kernel_micro_vec_binary_scalar_intf.h"
+#include "../../../include/basic_api/reg_compute/kernel_micro_vec_unary_intf.h"
+#include "../../../include/basic_api/reg_compute/kernel_micro_vec_binary_scalar_intf.h"
 
 #if __NPU_ARCH__ == 3003
-#include "basic_api/reg_compute/dav_l300/kernel_micro_vec_binary_impl.h"
+#include "../../basic_api/reg_compute/dav_l300/kernel_micro_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "basic_api/reg_compute/dav_l311/kernel_micro_vec_binary_impl.h"
+#include "../../basic_api/reg_compute/dav_l311/kernel_micro_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 5102
-#include "basic_api/reg_compute/dav_m510/kernel_micro_vec_binary_impl.h"
+#include "../../basic_api/reg_compute/dav_m510/kernel_micro_vec_binary_impl.h"
 #else
-#include "basic_api/reg_compute/dav_c310/kernel_micro_vec_binary_impl.h"
+#include "../../basic_api/reg_compute/dav_c310/kernel_micro_vec_binary_impl.h"
 #endif
 
 namespace AscendC {
