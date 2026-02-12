@@ -117,8 +117,8 @@ def gen_golden_data(output_format, pre_quant_mode, pre_relu_mode):
     x1_gm = np.random.randint(-3, 3, [M, K]).astype(input_type)
     x2_gm = np.random.randint(-3, 3, [K, N]).astype(input_type)
     golden = np.matmul(x1_gm.astype(np.int32), x2_gm.astype(np.int32)).astype(np.int32)
-    os.system("mkdir -p input")
-    os.system("mkdir -p output")
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
 
     golden = pre_quant_relu(golden, output_type, M, N, pre_quant_mode, pre_relu_mode)
     if output_format == 2:
