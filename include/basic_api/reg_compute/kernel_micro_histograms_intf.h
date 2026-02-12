@@ -26,5 +26,5 @@ __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask);
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_histograms_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_histograms_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_HISTOGRAMS_INTERFACE_H

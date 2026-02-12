@@ -30,5 +30,5 @@ __simd_callee__ inline void UnPack(S& dstReg, V& srcReg);
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_pack_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_pack_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_PACK_INTERFACE_H

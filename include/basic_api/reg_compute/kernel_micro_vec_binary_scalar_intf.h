@@ -43,5 +43,5 @@ __simd_callee__ inline void LeakyRelu(S& dstReg, S& srcReg, U scalarValue, MaskR
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_vec_binary_scalar_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_vec_binary_scalar_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_VEC_BINARY_SCALAR_INTERFACE_H

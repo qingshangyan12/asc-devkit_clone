@@ -39,5 +39,5 @@ __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, 
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_addrreg_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_addrreg_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_ADDRREG_INTERFACE_H

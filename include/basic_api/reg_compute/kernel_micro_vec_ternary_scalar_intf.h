@@ -24,5 +24,5 @@ __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, Mask
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_vec_ternary_scalar_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_vec_ternary_scalar_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_INTERFACE_H

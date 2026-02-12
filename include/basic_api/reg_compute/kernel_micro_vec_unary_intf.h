@@ -56,5 +56,5 @@ __simd_callee__ inline void Not(U& dstReg, U& srcReg, MaskReg& mask);
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_vec_unary_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_vec_unary_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_VEC_SINGLE_INTERFACE_H

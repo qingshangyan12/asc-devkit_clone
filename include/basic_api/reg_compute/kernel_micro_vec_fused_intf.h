@@ -35,5 +35,5 @@ __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_vec_fused_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_vec_fused_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_VEC_FUSED_INTERFACE_H

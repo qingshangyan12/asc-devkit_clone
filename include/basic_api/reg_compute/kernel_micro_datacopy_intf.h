@@ -166,5 +166,5 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_datacopy_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_datacopy_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_DATACOPY_INTERFACE_H

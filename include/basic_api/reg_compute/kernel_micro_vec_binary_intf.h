@@ -80,5 +80,5 @@ __simd_callee__ inline void Sub(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_vec_binary_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_vec_binary_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_VEC_BINARY_INTERFACE_H

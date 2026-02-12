@@ -61,5 +61,5 @@ __simd_callee__ inline MaskReg MoveMask();
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_maskreg_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_maskreg_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_MASKREG_INTERFACE_H
