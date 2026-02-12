@@ -34,13 +34,13 @@ constexpr bool VerifyingLoadDataTemplate = IsTileTensorV<U> && IsTileTensorV<T>;
 template <typename T, typename U, typename Coord>
 constexpr bool VerifyingLoadDataTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingLoadDataTemplate<T, U>;
 
-template <typename T, typename U, typename S>
+template <typename T, typename U, typename S, typename Params>
 static constexpr bool VerifyingMmadTemplate = (IsTileTensorV<T> && IsTileTensorV<U> 
-    && IsTileTensorV<S>);
+    && IsTileTensorV<S> && Std::is_one_of_v<Params, MmadParams>);
 
-template <typename T, typename U, typename S, typename V>
+template <typename T, typename U, typename S, typename V, typename Params>
 static constexpr bool VerifyingMmadWithBiasTemplate = (IsTileTensorV<T> && IsTileTensorV<U> 
-    && IsTileTensorV<S> && IsTileTensorV<V>);
+    && IsTileTensorV<S> && IsTileTensorV<V> && Std::is_one_of_v<Params, MmadParams>);
 
 template <typename T, typename U>
 static constexpr bool VerifyingFixpipeTemplate = (IsTileTensorV<T> && IsTileTensorV<U>);
