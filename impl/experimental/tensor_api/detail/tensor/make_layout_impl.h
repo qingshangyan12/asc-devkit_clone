@@ -568,6 +568,16 @@ private:
         return MakeTensorImpl(tensor.Engine().Begin(), fourDimLayout);
     }
 };
+
+template <typename T>
+__aicore__ inline auto PreProcess(const T& tensor) {
+    using  tensorShape = Std::remove_cvref_t<decltype(tensor.Shape())>;
+    if constexpr (nesting_depth_v<tensorShape> == TWO_DIM_DATA) {
+        return DimConversion{}.Run(src);
+    } else {
+        return src;
+    }
+}
 } // namespace Te
 } // namespace AscendC
 

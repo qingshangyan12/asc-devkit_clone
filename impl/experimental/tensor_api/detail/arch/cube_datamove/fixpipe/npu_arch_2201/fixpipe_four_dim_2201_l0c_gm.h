@@ -176,21 +176,11 @@ class FixpipeFourDim2201L0C2GM : public FixpipetNz2Nz2201Base, public FixpipetNz
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        auto checkDst = PreProcess(dst, src);
+        auto checkDst = PreProcess(dst);
         Execute<trait, decltype(checkDst), U, Coord>(checkDst, src, coord);
     }
 
 private:
-    template <typename T, typename U>
-    __aicore__ inline auto PreProcess(const T& dst, const U& src) {
-        constexpr bool flag = CheckDim<decltype(GetShape(dst.Layout())), decltype(GetShape(src.Layout()))>();
-        if constexpr (!flag) {
-            return DimConversion{}.Run(dst);
-        } else {
-            return dst;
-        }
-    }
-
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
         if constexpr (IsL0cNZFormat<U>::value && IsL0cNZFormat<T>::value) {
