@@ -59,5 +59,5 @@ struct RegTensor {
 } // namespace Reg
 } // namespace AscendC
 
-#include "impl/basic_api/reg_compute/kernel_micro_struct_intf_impl.h"
+#include "../../impl/basic_api/reg_compute/kernel_micro_struct_intf_impl.h"
 #endif // ASCENDC_MODULE_MICRO_STRUCT_INTERFACE_H
