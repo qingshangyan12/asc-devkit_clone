@@ -34,25 +34,10 @@ constexpr uint32_t C_API_AIC_TYPE = AIC;
 constexpr uint32_t C_API_AIV_TYPE = AIV;
 constexpr uint32_t C_API_MIX_TYPE = MIX;
 
-#if defined(ASCENDC_CPU_DEBUG)
-extern uint32_t g_c_api_core_type;
 #define ASC_IS_AIV ASCEND_IS_AIV
 #define ASC_IS_AIC ASCEND_IS_AIC
 #define ASC_IS_NOT_AIV ASCEND_IS_NOT_AIV
 #define ASC_IS_NOT_AIC ASCEND_IS_NOT_AIC
-#else
-#if defined(SPLIT_CORE_CUBE)
-constexpr uint32_t g_c_api_core_type = C_API_AIC_TYPE;
-#elif defined(SPLIT_CORE_VEC)
-constexpr uint32_t g_c_api_core_type = C_API_AIV_TYPE;
-#else
-constexpr uint32_t g_c_api_core_type = C_API_MIX_TYPE;
-#endif
-#define ASC_IS_AIV ASCEND_IS_AIV
-#define ASC_IS_AIC ASCEND_IS_AIC
-#define ASC_IS_NOT_AIV ASCEND_IS_NOT_AIV
-#define ASC_IS_NOT_AIC ASCEND_IS_NOT_AIC
-#endif
 
 struct asc_c_api_default_repeat {
     uint8_t U8 = 1;
