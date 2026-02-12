@@ -15,7 +15,7 @@
 #ifndef ASCENDC_MODULE_MICRO_MEMBAR_IMPL_H
 #define ASCENDC_MODULE_MICRO_MEMBAR_IMPL_H
 
-#include "../../../../inlcude/basic_api/reg_compute/kernel_micro_utils.h"
+#include "../../../../include/basic_api/reg_compute/kernel_micro_utils.h"
 
 namespace AscendC {
 namespace Reg {
