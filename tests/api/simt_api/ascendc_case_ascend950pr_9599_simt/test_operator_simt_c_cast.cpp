@@ -12,6 +12,7 @@
 #include "simt_compiler_stub.h"
 #include "kernel_operator.h"
 #include "simt_api/asc_bf16.h"
+#include "simt_api/asc_fp8.h"
 using namespace std;
 using namespace AscendC;
 using namespace AscendC::Simt;
@@ -414,6 +415,39 @@ TEST_F(TypeCastApiBfloat16Testsuite, TypeCastApiBfloat16Test)
 
     int64_t result5 = __bfloat162ll_rna(bfx1);
     int64_t expect5 = static_cast<int64_t>(round(float(bfx1)));
+
+    x1 = 1.0f;
+    EXPECT_EQ(x1, 1.0f);
+}
+// ================================ Test type cast(bfloat16) end ==================================
+
+// ================================ Test type cast(hif82) start ==================================
+struct TypeCastApiHif82Params {
+    int32_t mode;
+};
+
+class TypeCastApiHif82Testsuite : public testing::Test, public testing::WithParamInterface<TypeCastApiHif82Params> {
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
+
+TEST_F(TypeCastApiHif82Testsuite, TypeCastApiHif82Test)
+{
+    float x1 = static_cast<float>(rand()) / RAND_MAX;
+    half x2 = half(x1);
+    float2 f2x1 = make_float2(x1, x1);
+    half2 h2x2 = {x2, x2};
+
+    hifloat8x2_t result1 = __float22hif82_rna(f2x1);
+    result1 = __float22hif82_rna_sat(f2x1);
+    result1 = __float22hif82_rh(f2x1);
+    result1 = __float22hif82_rh_sat(f2x1);
+
+    hifloat8x2_t result2 = __half22hif82_rna(h2x2);
+    hifloat8x2_t result2 = __half22hif82_rna_sat(h2x2);
+    hifloat8x2_t result2 = __half22hif82_rh(h2x2);
+    hifloat8x2_t result2 = __half22hif82_rh_sat(h2x2);
 
     x1 = 1.0f;
     EXPECT_EQ(x1, 1.0f);
