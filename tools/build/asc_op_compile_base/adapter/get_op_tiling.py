@@ -584,7 +584,7 @@ def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
             f"convert_from_bytes<tiling_struct>(__ascendc_arr_##tiling_data); \n\n"
 
         class_body += "#define GET_TILING_DATA_MEMBER(tiling_type, member, var, tiling)                            \\\n"
-        class_body += "    REGISTER_TILINGDATA_SIZE(tiling_struct, __COUNTER__);                                  \\\n"
+        class_body += "    REGISTER_TILINGDATA_SIZE(tiling_type, __COUNTER__);                                  \\\n"
         class_body += f"    const uint8_t __ascendc_arr_##var[{tiling_size}] = {{{tiling_arr_data_str}}}; \\\n"
         class_body += \
             f"    const tiling_type __ascendc_point##var = convert_from_bytes<tiling_type>(__ascendc_arr_##var);\\\n"
