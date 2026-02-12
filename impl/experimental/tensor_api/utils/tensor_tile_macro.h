@@ -15,6 +15,8 @@
 #ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_MACRO_H
 #define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_MACRO_H
 
+#include "impl/utils/sys_constants.h"
+
 #define GM_ADDR __gm__ uint8_t*
 
 #include <cstdint>
@@ -148,10 +150,6 @@ constexpr int32_t HF32_TRANS_MODE_BIT = 47;
 constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
 constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
 constexpr int32_t CAST_MODE_BIT = 59;
-
-constexpr int32_t MIX = 0;
-constexpr int32_t AIC = 1;
-constexpr int32_t AIV = 2;
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
