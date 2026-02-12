@@ -570,12 +570,12 @@ private:
 };
 
 template <typename T>
-__aicore__ inline auto DimCheck(const T& tensor) {
+__aicore__ inline auto PreProcess(const T& tensor) {
     using  tensorShape = Std::remove_cvref_t<decltype(tensor.Shape())>;
     if constexpr (nesting_depth_v<tensorShape> == TWO_DIM_DATA) {
         return DimConversion{}.Run(tensor);
     } else {
-        static_assert(nesting_depth_v<tensorShape> == FOUR_DIM_DATA, "only support two or four dim LayoutType");
+        static_assert(nesting_depth_v<tensorShape> == FOUR_DIM_DATA, "Only support two or four dim LayoutType");
         return tensor;
     }
 }
