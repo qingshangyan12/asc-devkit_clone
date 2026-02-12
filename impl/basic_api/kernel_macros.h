@@ -17,7 +17,6 @@
 
 #include "impl/utils/sys_macros.h"
 #include "impl/utils/sys_constants.h"
-#include "impl/utils/common_types.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #define ASSERT(x) assert(x)
@@ -58,10 +57,6 @@
 #define __BLOCK_LOCAL__ [[block_local]]
 #endif // __BLOCK_LOCAL__
 #endif // ASCENDC_CPU_DEBUG
-
-#ifndef K_MAX_SHAPE_DIM
-#define K_MAX_SHAPE_DIM 8
-#endif
 
 #ifndef QBUF_MAX_LEN
 #define QBUF_MAX_LEN 64
@@ -121,9 +116,6 @@ constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
 constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
 constexpr int32_t CAST_MODE_BIT = 59;
 
-using ::MIX;
-using ::AIC;
-using ::AIV;
 } // namespace AscendC
 
 #if defined(ASCENDC_CPU_DEBUG)
