@@ -31,22 +31,24 @@
 - 算子功能：  
   softmaxflashv2单算子，将输入tensor[m0, m1, ...mt, n]（t大于等于0）的非尾轴长度相乘的结果看作m，则输入tensor的shape看作[m, n]。对输入tensor[m, n]按行做如下计算，不同的update值对应不同的计算公式，其中x、inmax和insum为输入，M、S、E均为输出。
   update为false：  
-  $$
-  \begin{align*}
-  M&=\text{rowmax}(x_i)\\
-  \text{SoftmaxFlashV2}(z_i)&=\exp(x_i - M)\\
-  S&=\sum_{i}^{n} \exp(x_i - M)
-  \end{align*}
-  $$
+
+  $$M = rowmax(x_i)$$
+
+  $$SoftmaxFlashV2(z_i) = exp(x_i - M)$$
+
+  $$S=\sum_{i}^{n} \exp(x_i - M)$$
+
   update为true：  
-  $$
-  \begin{align*}
-  M&=\max(\text{rowmax}(x_i), \text{inmax})\\
-  \text{SoftmaxFlashV2}(z_i)&=\exp(x_i - M)\\
-  E&=\exp(\text{inmax}_i - M)\\
-  S&=\sum_{i}^{n} \exp(x_i - M)+E \cdot \text{insum}
-  \end{align*}
-  $$
+
+  $$M = max(rowmax(x_i), inmax)$$
+
+  $$SoftmaxFlashV2(z_i) = exp(x_i - M)$$
+
+  $$E = exp(inmax_i - M)$$
+
+  $$S = sum_{i}^{n} exp(x_i - M) + E \cdot insum$$
+
+
 - 算子规格：  
 <table>
 <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">SoftmaxflashCustom</td></tr>
@@ -65,13 +67,13 @@
 - 算子实现：  
   本样例中实现的是固定shape为输入x [960, 960], 输出max[960, 8], sum[960, 8]的softmaxflashv2算子。
 
-  - kernel实现
+  - Kernel实现
 
   计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用SoftmaxFlashV2高阶API接口完成softmaxflashv2计算，得到最终结果，再搬出到外部存储上。
 
   softmaxflashv2算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm搬运至Local Memory，存储在xLocal，Compute任务负责对xLocal执行softmaxflashv2计算，计算结果存储在maxLocal和sumLocal中，CopyOut任务负责将输出数据maxLocal和sumLocal搬运至Global Memory上的输出Tensor maxGm和sumGm中。
 
-- tiling实现
+- Tiling实现
 
   softmaxflashv2算子的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用SoftmaxFlashV2高阶API的tiling函数获取API所需tiling参数，尾核计算所需的高阶API的tiling由kernel侧自行计算。
 
@@ -79,6 +81,7 @@
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行  
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
