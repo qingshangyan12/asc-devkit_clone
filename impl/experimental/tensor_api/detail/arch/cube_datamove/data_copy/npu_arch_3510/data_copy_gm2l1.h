@@ -338,7 +338,17 @@ public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
         auto params = GenDataCopyParams<trait, T, U>(dst, src);
-        DataCopyImpl<trait, T, U, decltype(params)>(dst, src, params, tuple_sequence<decltype(params)>{});
+
+        auto oldTensorLayout = src.Layout();
+        uint64_t srcOffset = Std::get<0>(coord) *
+            GetEleFromLayout<decltype(oldTensorLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(oldTensorLayout) + Std::get<1>(coord);
+        using oldTensorType = typename U::elementType;
+        constexpr Hardware oldTensorPos = GetHardPos<U>();
+        auto oldTensorIterator = MakeMemPtr<oldTensorPos>(reinterpret_cast<oldTensorType *>(src.Data().Get() + srcOffset));
+        auto oldTensorMatrixLayout = MakeLayout(oldTensorLayout.Shape(), oldTensorLayout.Stride());
+        auto newTensor = MakeTensor(oldTensorIterator, oldTensorMatrixLayout);
+
+        DataCopyImpl<trait, T, U, decltype(params)>(dst, newTensor, params, tuple_sequence<decltype(params)>{});
     }
 
 private:
