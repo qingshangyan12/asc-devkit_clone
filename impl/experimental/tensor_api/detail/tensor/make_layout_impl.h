@@ -16,7 +16,8 @@
 #define IMPL_TENSOR_API_TENSOR_MAKE_LAYOUT_IMPL_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
-#include "include/experimental/tensor_api/tensor/local_tensor.h"
+#include "include/experimental/tensor_api/tensor/engine.h"
+#include "include/experimental/tensor_api/tensor/layout.h"
 
 namespace AscendC {
 namespace Te {
@@ -549,6 +550,40 @@ __aicore__ inline decltype(auto) MakeZNLayout(size_t row, size_t column) {
 template <typename T>
 __aicore__ inline decltype(auto) MakeZZLayout(size_t row, size_t column) {
     return MakeLayoutForZZ<T>(row, column);
+}
+
+template <typename Layout, typename TileShape>
+__aicore__ inline decltype(auto) MakeTileLayout(const Layout& layout, const TileShape& tileShape) {
+    static_assert(Std::is_tuple_v<TileShape>);
+
+    using OriginShape = Std::remove_cvref_t<decltype(layout.Shape())>;
+    if constexpr (nesting_depth_v<TileShape> == nesting_depth_v<OriginShape>
+                  && Std::tuple_size_v<TileShape> == Std::tuple_size_v<OriginShape>) {
+        return MakeLayout(tileShape, layout.Stride());
+    } else {
+        // TODO: nesting_depth_v实现有问题
+        // static_assert(nesting_depth_v<TileShape> == 1 && Std::tuple_size_v<TileShape> == 2);
+        const uint32_t rows = Std::get<0>(tileShape);
+        const uint32_t cols = Std::get<1>(tileShape);
+
+        const auto& innerRow = Std::get<0>(Std::get<0>(layout.Shape()));
+        const auto& innerCol = Std::get<0>(Std::get<1>(layout.Shape()));
+
+        using InnerRowType = Std::remove_cvref_t<decltype(innerRow)>;
+        using InnerColType = Std::remove_cvref_t<decltype(innerCol)>;
+
+        if constexpr (IsIntegralConstantV<InnerRowType> && IsIntegralConstantV<InnerColType>) {
+            return MakeLayout(
+                MakeShape(MakeShape(Std::Int<InnerRowType::value>{}, CeilDivision(rows, InnerRowType::value)),
+                          MakeShape(Std::Int<InnerColType::value>{}, CeilDivision(cols, InnerColType::value))),
+                layout.Stride());
+        } else {
+            return MakeLayout(
+                MakeShape(MakeShape(innerRow, CeilDivision(rows, innerRow)),
+                                        MakeShape(innerCol, CeilDivision(cols, innerCol))),
+                layout.Stride());
+        }
+    }
 }
 
 } // namespace Te
