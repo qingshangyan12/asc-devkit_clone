@@ -48,7 +48,7 @@ namespace AscendC {
  * ************************************************************************************************* */
 /*
  * @ingroup Fixpipe
- * @brief After calculation, process the results
+ * @brief After calculation, 
  * @param [out] dst output GlobalTensor
  * @param [in] src input LocalTensor
  * @param [in] intriParams.cburstNum number of burst
