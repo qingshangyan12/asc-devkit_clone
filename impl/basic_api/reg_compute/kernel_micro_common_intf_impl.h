@@ -17,7 +17,7 @@
 
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || defined(__ASC_NPU_HOST__)
-#include "../../basic_api/reg_compute/kernel_micro_maskreg_intf.h"
+#include "../../../include/basic_api/reg_compute/kernel_micro_maskreg_intf.h"
 #if __NPU_ARCH__ == 3003
 #include "../../basic_api/reg_compute/dav_l300/kernel_micro_common_impl.h"
 #elif __NPU_ARCH__ == 3113
