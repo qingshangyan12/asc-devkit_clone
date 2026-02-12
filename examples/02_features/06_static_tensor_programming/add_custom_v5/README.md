@@ -2,7 +2,7 @@
 
 ## 概述
 
-使用静态Tensor编程方法进行add算子的编程，体现SetFlag/WaitFlag循环内外依赖。
+使用静态Tensor编程方法进行add算子的编程，实现SetFlag/WaitFlag同步指令的循环内外依赖。
 
 ## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -22,7 +22,7 @@
 
 ## 算子描述
 
-算子固定shape为[72, 4096], 通过9次循环累加实现。
+算子固定shape为[72, 1024], 通过9次循环实现输入数据累加9次。
 
 计算公式为：
 
@@ -39,7 +39,7 @@ z = 9 * x
 <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
 </tr>
 <tr><td rowspan="1" align="center"></td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-tr><td rowspan="1" align="center">算子输入</td><td align="center">y</td><td align="center">72 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
+tr><td rowspan="1" align="center">算子输入</td><td align="center">x</td><td align="center">72 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
 </tr>
 </tr>
 <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">72 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
@@ -57,7 +57,7 @@ tr><td rowspan="1" align="center">算子输入</td><td align="center">y</td><td 
 
   计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成输入参数累加，得到最终结果，再搬出到外部存储上。
 
-  Add算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm搬运到Local Memory，存储在xLocal中；Compute任务负责执行9次循环，每次循环完成一次矢量加法：zLocal = zLocal + xLocal，循环结束后，zLocal 中存储了9倍xLocal的结果。CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
+  该算子的实现流程：将Global Memory上的输入Tensor xGm搬运到Local Memory，存储在xLocal中；完成9次循环，每次循环完成一次矢量加法：zLocal = zLocal + xLocal，循环结束后，zLocal 中存储了9倍xLocal的结果；最后将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
 
 ## 编译运行
 
