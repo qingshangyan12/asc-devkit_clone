@@ -94,7 +94,7 @@ struct integer_sub_type {
     }
 };
 
-using int4b_t = integer_sub_type<INT4_BIT_NUM, true>;
+using int4b_t = integer_sub_type<AscendC::INT4_BIT_NUM, true>;
 
 #endif
 
