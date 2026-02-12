@@ -58,3 +58,7 @@ target_include_directories(kernel_tiling_headers INTERFACE
     $<BUILD_INTERFACE:${TEMPLATE_ARG}>
     $<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include/acl>
 )
+
+target_link_libraries(kernel_tiling_headers PRIVATE
+    ${ASCEND_CANN_PACKAGE_PATH}/lib64/libacl_rt.so
+)
