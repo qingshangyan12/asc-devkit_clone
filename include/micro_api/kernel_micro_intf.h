@@ -49,6 +49,7 @@
 
 namespace AscendC {
 namespace MicroAPI {
-}
-}
+
+} // namespace MicroAPI
+} // namespace AscendC
 #endif // ASCENDC_MODULE_MICRO_INTERFACE_H
