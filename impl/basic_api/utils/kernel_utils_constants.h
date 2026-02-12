@@ -465,6 +465,7 @@ void SetModelScatterDst0Tensor(uint64_t dst0, const uint32_t length);
 #if defined(__ASC_NPU_HOST__)
 struct fp8_e8m0_t {
     uint8_t value;
+    fp8_e8m0_t() = default;
     explicit fp8_e8m0_t(uint8_t v) : value(v) {}
     explicit operator uint8_t() const { return value; }
 };
@@ -472,6 +473,7 @@ struct fp8_e8m0_t {
 #if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)))
 struct fp8_e8m0_t {
     uint8_t value;
+    fp8_e8m0_t() = default;
     explicit fp8_e8m0_t(uint8_t v) : value(v) {}
     explicit operator uint8_t() const { return value; }
 };
