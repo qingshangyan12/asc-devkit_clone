@@ -33,7 +33,7 @@
 
 namespace __asc_aicore {
 
-template <Hardware hardware, typename T, typename U>
+template <AscendC::Hardware hardware, typename T, typename U>
 __aicore__ inline void set_dump_tlv_info(U src, __gm__ DumpTensorTlv* dumpTlv, uint32_t alignDumpLen, uint32_t desc, uint32_t dumpSize)
 {
     dumpTlv->type = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
@@ -53,7 +53,7 @@ __aicore__ inline void set_dump_tlv_info(U src, __gm__ DumpTensorTlv* dumpTlv, u
     asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(dumpTlv));
 }
 
-template <Hardware hardware, typename T, typename U>
+template <AscendC::Hardware hardware, typename T, typename U>
 __aicore__ inline void set_dump_tlv_data(U src, __gm__ DumpTensorTlv* dumpTlv, uint32_t alignDumpLen, uint32_t dumpSize)
 {
     __gm__ T* dumpDstAddr = reinterpret_cast<__gm__ T*>(dumpTlv + 1);
@@ -63,21 +63,21 @@ __aicore__ inline void set_dump_tlv_data(U src, __gm__ DumpTensorTlv* dumpTlv, u
     }
     sync_all();
     uint32_t dumpLen = 0;
-    if constexpr (hardware == Hardware::GM) {
+    if constexpr (hardware == AscendC::Hardware::GM) {
         dumpLen = dumpSize * sizeof(T);
         mem_copy_gm_to_gm(reinterpret_cast<__gm__ uint8_t*>(dumpDstAddr), reinterpret_cast<__gm__ const uint8_t*>(src), dumpLen);
-    } else if constexpr (hardware == Hardware::UB) {
+    } else if constexpr (hardware == AscendC::Hardware::UB) {
         dumpLen = alignDumpLen / ASC_ONE_DATABLOCK_SIZE;
         mem_copy_ub_to_gm_impl(dumpDstAddr, src, static_cast<uint16_t>(dumpLen));
-    } else if constexpr (hardware == Hardware::L1) {
+    } else if constexpr (hardware == AscendC::Hardware::L1) {
         mem_copy_l1buf_to_gm_impl(dumpDstAddr, (__cbuf__ U*)src, alignDumpLen);
-    } else if constexpr (hardware == Hardware::L0C) {
+    } else if constexpr (hardware == AscendC::Hardware::L0C) {
         mem_copy_cbuf_to_gm_impl(dumpDstAddr, src, alignDumpLen);
     }
     sync_all();
 }
 
-template <Hardware hardware, typename T, typename U>
+template <AscendC::Hardware hardware, typename T, typename U>
 __aicore__ inline void asc_dump_impl(U src, uint32_t desc, uint32_t dumpSize)
 {
     static_assert((get_dump_datatype<T>() != DumpTensorDataType::ACL_MAX), "dump tensor is not supported this data type\n");
@@ -107,7 +107,7 @@ __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dump
     set_atomic_none();
     enable_asc_diagnostics();
     if (g_sysPrintFifoSpace != nullptr) {
-        asc_dump_impl<Hardware::GM, T>(input, desc, dumpSize);
+        asc_dump_impl<AscendC::Hardware::GM, T>(input, desc, dumpSize);
     }
     set_ctrl(ctrlValue);
 }
@@ -119,7 +119,7 @@ __aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t 
     set_atomic_none();
     enable_asc_diagnostics();
     if (g_sysPrintFifoSpace != nullptr) {
-        asc_dump_impl<Hardware::UB, T>(input, desc, dumpSize);
+        asc_dump_impl<AscendC::Hardware::UB, T>(input, desc, dumpSize);
     }
     set_ctrl(ctrlValue);
 }
@@ -131,7 +131,7 @@ __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t du
     set_atomic_none();
     enable_asc_diagnostics();
     if (g_sysPrintFifoSpace != nullptr) {
-        asc_dump_impl<Hardware::L0C, T>(input, desc, dumpSize);
+        asc_dump_impl<AscendC::Hardware::L0C, T>(input, desc, dumpSize);
     }
     set_ctrl(ctrlValue);
 }
@@ -143,7 +143,7 @@ __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t
     set_atomic_none();
     enable_asc_diagnostics();
     if (g_sysPrintFifoSpace != nullptr) {
-        asc_dump_impl<Hardware::L1, T>(input, desc, dumpSize);
+        asc_dump_impl<AscendC::Hardware::L1, T>(input, desc, dumpSize);
     }
     set_ctrl(ctrlValue);
 }

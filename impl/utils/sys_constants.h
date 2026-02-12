@@ -15,10 +15,12 @@
 #ifndef IMPL_UTILS_SYS_CONSTANTS_H
 #define IMPL_UTILS_SYS_CONSTANTS_H
 
+namespace AscendC {
 constexpr uint32_t INT4_BIT_NUM = 4;
 
 constexpr int32_t MIX = 0;
 constexpr int32_t AIC = 1;
 constexpr int32_t AIV = 2;
+} // namespace AscendC
 
 #endif
