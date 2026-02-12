@@ -59,8 +59,9 @@ target_include_directories(kernel_tiling_headers INTERFACE
     $<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include/acl>
 )
 
-add_library(tiling_api INTERFACE)
-target_include_directories(tiling_api INTERFACE
-    $<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include>
-    $<INSTALL_INTERFACE:include>
-)
+if(TARGET tiling_api)
+    target_include_directories(tiling_api INTERFACE
+            $<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include>
+            $<INSTALL_INTERFACE:include>
+    )
+endif()
