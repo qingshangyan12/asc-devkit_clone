@@ -21,6 +21,8 @@
 #include "impl/utils/sys_constants.h"
 #include "impl/utils/sys_macros.h"
 
+constexpr uint32_t INT4_BIT_NUM = 4;
+
 template <bool condition, class T1, class T2>
 struct Conditional {
     using type = T1;

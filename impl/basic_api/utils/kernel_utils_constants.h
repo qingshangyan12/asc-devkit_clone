@@ -16,6 +16,7 @@
 #define ASCENDC_MODULE_UTILS_CONSTANTS_H
 #include "utils/kernel_utils_ceil_oom_que.h"
 #include "utils/kernel_utils_dump_constants.h"
+#include "impl/utils/sys_constants.h"
 
 namespace AscendC {
 const int32_t DEFAULT_BLK_NUM = 8;
@@ -71,7 +72,6 @@ constexpr uint32_t POWER_INT32_BITS = 32;
 
 // int4b_t param
 constexpr uint32_t INT4_TWO = 2;
-constexpr uint32_t INT4_BIT_NUM = 4;
 
 #if (__NPU_ARCH__ == 5102)
 // int2b_t param
