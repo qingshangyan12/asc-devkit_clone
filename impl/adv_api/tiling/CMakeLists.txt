@@ -196,7 +196,9 @@ target_include_directories(tiling_api PRIVATE
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:$<BUILD_INTERFACE:${TOP_DIR}/metadef/pkg_inc>>
 )
 
-target_include_directories(tiling_api PUBLIC ${ASCEND_CANN_PACKAGE_PATH}/include)
+# target_include_directories(tiling_api PUBLIC ${ASCEND_CANN_PACKAGE_PATH}/include)
+target_include_directories(tiling_api PUBLIC /include
+  ${ASCENDC_DIR}/include)
 
 target_compile_options(
   tiling_api
