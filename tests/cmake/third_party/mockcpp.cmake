@@ -25,8 +25,6 @@ endif()
 set(BOOST_INCLUDE_DIRS ${BOOST_SRC_PATH})
 if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
     message("11111111111111111 not use cache mock tar")
-    set(PATCH_FILE ${MOCKCPP_DOWNLOAD_PATH}/mockcpp-2.7_py3.patch)
-    set(REQ_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h1/mockcpp-2.7.tar.gz")
     set(MOCKCPP_LOCAL_SRC "${CANN_3RD_LIB_PATH}/../llt/third_party/mockcpp_src")
     set(MOCKCPP_OPTS
         -DCMAKE_CXX_FLAGS=${mockcpp_CXXFLAGS}
@@ -48,7 +46,7 @@ if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
         )
     else()
         message("11111111111111111 not use cache mock111")
-        message("No local mockcpp source, downloading from ${REQ_URL}")
+        set(PATCH_FILE ${CANN_3RD_LIB_PATH}/mockcpp/mockcpp-2.7_py3.patch)
         if (NOT EXISTS ${PATCH_FILE})
             message("11111111111111111 not use cache mock222")
             set(PATCH_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h1/mockcpp-2.7_py3.patch")
@@ -58,7 +56,12 @@ if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/mockcpp/lib/libmockcpp.a")
                 TIMEOUT 60
                 EXPECTED_HASH SHA256=f1e9091992bf5c340af7d8c2f800b8d43d198fe4a8130f7bcd3f7cba1b0a324b
             )
+        else ()
+            message("11111111111111111 use cache patch")
         endif()
+        set(REQ_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h1/mockcpp-2.7.tar.gz")
+        message("No local mockcpp source, downloading from ${REQ_URL}")
+        message("11111111111111111 start use mock zip")
         ExternalProject_Add(mockcpp
             URL ${REQ_URL}
             URL_HASH SHA256=73ab0a8b6d1052361c2cebd85e022c0396f928d2e077bf132790ae3be766f603

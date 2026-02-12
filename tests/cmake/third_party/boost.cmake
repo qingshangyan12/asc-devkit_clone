@@ -4,6 +4,7 @@ set(BOOST_SRC_PATH ${CANN_3RD_LIB_PATH}/boost)
 message("1111111111111 BOOST_SRC_PATH: ${BOOST_SRC_PATH}, CANN_3RD_LIB_PATH:${CANN_3RD_LIB_PATH}")
 # 默认配置的boost不存在则下载
 if (NOT EXISTS "${BOOST_SRC_PATH}/boost/config.hpp")
+message("11111111111111111 not use cache boost")
     set(BOOST_URL "https://gitcode.com/cann-src-third-party/boost/releases/download/v1.87.0/boost_1_87_0.tar.gz")
     message(STATUS "Downloading ${BOOST_NAME} from ${BOOST_URL}")
 
