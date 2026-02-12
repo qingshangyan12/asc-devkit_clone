@@ -16,6 +16,7 @@
 #define INCLUDE_TENSOR_API_ATOM_ATOM_H
 
 #include "impl/experimental/tensor_api/detail/atom/copy_atom_impl.h"
+#include "impl/experimental/tensor_api/detail/atom/mad_atom_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -25,6 +26,12 @@ struct CopyTraits;
 
 template <typename... Args>
 struct CopyAtom;
+
+template <typename MadOperation, typename... MadOpArgs>
+struct MmadTraits;
+
+template <typename... Args>
+struct MmadAtom;
 
 }
 }
