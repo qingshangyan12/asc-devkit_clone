@@ -203,3 +203,108 @@ TEST_F(Tensor_Api_Layout, StaticLayoutOperation)
                                         AscendC::Std::tuple<AscendC::Std::Int<2>, AscendC::Std::Int<3>>>;
     EXPECT_EQ((StaticLayoutSize<FourDimT, FourDimU>::size), 20);
 }
+
+TEST_F(Tensor_Api_Layout, GetOperation)
+{
+    using namespace AscendC::Te;
+
+    Shape<int, int, int> shape = MakeShape(10, 20, 30);
+    Stride<int, int, int> stride = MakeStride(1, 100, 200);
+    auto layout = MakeLayout(shape, stride);
+
+    auto getAll = Get(layout);
+    auto getShapeAll = GetShape(getAll);
+    auto getStrideAll = GetStride(getAll);
+    EXPECT_EQ(AscendC::Std::get<0>(getShapeAll), 10);
+    EXPECT_EQ(AscendC::Std::get<0>(getStrideAll), 1);
+
+    auto get1 = Get<1>(layout);
+    auto get1Shape = GetShape(get1);
+    auto get1Stride = GetStride(get1);
+    EXPECT_EQ(AscendC::Std::get<0>(get1Shape), 20);
+    EXPECT_EQ(AscendC::Std::get<0>(get1Stride), 100);
+
+    auto nestedShape = MakeShape(MakeShape(2, 3), MakeShape(4, 5));
+    auto nestedStride = MakeStride(MakeStride(1, 2), MakeStride(3, 4));
+    auto nestedLayout = MakeLayout(nestedShape, nestedStride);
+
+    auto nestedGetAll = Get(nestedLayout);
+    auto nestedGetShape = GetShape(nestedGetAll);
+    auto nestedGetStride = GetStride(nestedGetAll);
+    auto nestedGetShape0 = AscendC::Std::get<0>(nestedGetShape);
+    auto nestedGetStride1 = AscendC::Std::get<1>(nestedGetStride);
+    EXPECT_EQ(AscendC::Std::get<0>(nestedGetShape0), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(nestedGetShape0), 3);
+    EXPECT_EQ(AscendC::Std::get<0>(nestedGetStride1), 3);
+    EXPECT_EQ(AscendC::Std::get<1>(nestedGetStride1), 4);
+
+    auto nestedGet1 = Get<1>(nestedLayout);
+    auto nestedGet1Shape = GetShape(nestedGet1);
+    auto nestedGet1Stride = GetStride(nestedGet1);
+    auto nestedGet1Shape0 = AscendC::Std::get<0>(nestedGet1Shape);
+    auto nestedGet1Stride0 = AscendC::Std::get<0>(nestedGet1Stride);
+    EXPECT_EQ(AscendC::Std::get<0>(nestedGet1Shape0), 4);
+    EXPECT_EQ(AscendC::Std::get<0>(nestedGet1Stride0), 3);
+}
+
+TEST_F(Tensor_Api_Layout, SelectOperation)
+{
+    using namespace AscendC::Te;
+
+    Shape<int,int,int> shape = MakeShape(10, 20, 30);
+    Stride<int,int,int> stride = MakeStride(1, 100, 200);
+    auto layout = MakeLayout(shape, stride);
+
+    auto selectAll = Select(layout);
+    auto selectAllShape = GetShape(selectAll);
+    auto selectAllStride = GetStride(selectAll);
+    EXPECT_EQ(AscendC::Std::get<0>(selectAllShape), 10);
+    EXPECT_EQ(AscendC::Std::get<2>(selectAllStride), 200);
+
+    auto select1 = Select<1>(layout);
+    auto select1Shape = GetShape(select1);
+    auto select1Stride = GetStride(select1);
+    EXPECT_EQ(AscendC::Std::get<0>(select1Shape), 20);
+    EXPECT_EQ(AscendC::Std::get<0>(select1Stride), 100);
+
+    auto select12 = Select<1, 2>(layout);
+    auto select12Shape = GetShape(select12);
+    auto select12Stride = GetStride(select12);
+    EXPECT_EQ(AscendC::Std::get<1>(select12Shape), 30);
+    EXPECT_EQ(AscendC::Std::get<1>(select12Stride), 200);
+
+    auto nestedShape = MakeShape(MakeShape(2, 3), MakeShape(4, 5));
+    auto nestedStride = MakeStride(MakeStride(1, 2), MakeStride(3, 4));
+    auto nestedLayout = MakeLayout(nestedShape, nestedStride);
+
+    auto nestedSelectAll = Select(nestedLayout);
+    auto nestedSelectAllShape = GetShape(nestedSelectAll);
+    auto nestedSelectAllStride = GetStride(nestedSelectAll);
+    auto nestedSelectAllShape0 = AscendC::Std::get<0>(nestedSelectAllShape);
+    auto nestedSelectAllShape1 = AscendC::Std::get<1>(nestedSelectAllShape);
+    auto nestedSelectAllStride0 = AscendC::Std::get<0>(nestedSelectAllStride);
+    auto nestedSelectAllStride1 = AscendC::Std::get<1>(nestedSelectAllStride);
+
+    EXPECT_EQ(AscendC::Std::get<0>(nestedSelectAllShape0), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(nestedSelectAllShape1), 4);
+    EXPECT_EQ(AscendC::Std::get<1>(nestedSelectAllStride0), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(nestedSelectAllStride1), 4);
+
+    auto nestedSelect0 = Select<0>(nestedLayout);
+    auto nestedSelect0Shape = GetShape(nestedSelect0);
+    auto nestedSelect0Stride = GetStride(nestedSelect0);
+    EXPECT_EQ(AscendC::Std::get<0>(nestedSelect0Shape), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(nestedSelect0Stride), 2);
+
+    auto nestedSelect01 = Select<0, 1>(nestedLayout);
+    auto nestedSelect01Shape = GetShape(nestedSelect01);
+    auto nestedSelect01Stride = GetStride(nestedSelect01);
+    auto nestedSelect01Shape0 = AscendC::Std::get<0>(nestedSelect01Shape);
+    auto nestedSelect01Shape1 = AscendC::Std::get<1>(nestedSelect01Shape);
+    auto nestedSelect01Stride0 = AscendC::Std::get<0>(nestedSelect01Stride);
+    auto nestedSelect01Stride1 = AscendC::Std::get<1>(nestedSelect01Stride);
+    EXPECT_EQ(AscendC::Std::get<0>(nestedSelect01Shape0), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(nestedSelect01Shape1), 4);
+    EXPECT_EQ(AscendC::Std::get<1>(nestedSelect01Stride0), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(nestedSelect01Stride1), 4);
+}

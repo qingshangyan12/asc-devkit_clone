@@ -21,6 +21,9 @@
 namespace AscendC {
 namespace Te {
 
+template <typename... Ts>
+__aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts&... t);
+
 template <typename EngineType, typename LayoutType>
 struct TensorAttribute {};
 
