@@ -183,6 +183,10 @@ add_library(
 
 target_include_directories(tiling_api PRIVATE
   ${KERNEL_TILING_DIR}
+  ${ASCENDC_DIR}/include
+  ${ASCEND_CANN_PACKAGE_PATH}/include
+  ${ASCEND_CANN_PACKAGE_PATH}/include/sfsfsffsfs
+  ${TOP_DIR}/runtime/include/external
   ${ASCENDC_DIR}/include/utils/context
   ${ASCENDC_DIR}/include/utils/tiling/platform
   ${ASCENDC_DIR}/include/utils
@@ -196,7 +200,10 @@ target_include_directories(tiling_api PRIVATE
   $<$<AND:$<STREQUAL:${PRODUCT_SIDE},device>,$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>>:$<BUILD_INTERFACE:${TOP_DIR}/metadef/pkg_inc>>
 )
 
-target_include_directories(tiling_api PUBLIC ${ASCEND_CANN_PACKAGE_PATH}/include)
+# target_include_directories(tiling_api PUBLIC ${ASCEND_CANN_PACKAGE_PATH}/include)
+target_include_directories(tiling_api PUBLIC 
+  ${ASCEND_CANN_PACKAGE_PATH}/include
+  ${ASCENDC_DIR}/include)
 
 target_compile_options(
   tiling_api
@@ -225,6 +232,7 @@ target_link_libraries(
           $<BUILD_INTERFACE:slog_headers>
           -Wl,--no-as-needed
           c_sec
+          acl_rt
           -Wl,--as-needed
           $<$<STREQUAL:${PRODUCT_SIDE},host>:platform>
           $<$<STREQUAL:${PRODUCT_SIDE},host>:exe_graph>
