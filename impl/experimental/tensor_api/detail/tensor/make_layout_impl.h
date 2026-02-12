@@ -575,7 +575,7 @@ __aicore__ inline auto DimCheck(const T& tensor) {
     if constexpr (nesting_depth_v<tensorShape> == TWO_DIM_DATA) {
         return DimConversion{}.Run(tensor);
     } else {
-        statiac_assert(nesting_depth_v<tensorShape> == FOUR_DIM_DATA, "only support two or four dim LayoutType");
+        static_assert(nesting_depth_v<tensorShape> == FOUR_DIM_DATA, "only support two or four dim LayoutType");
         return tensor;
     }
 }
