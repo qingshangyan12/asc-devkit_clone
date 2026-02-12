@@ -132,7 +132,7 @@ public:
     template <const FixpipeTrait& trait, typename T, typename U, typename S, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const S& quant, const Coord& coord)
     {
-        auto checkDst = PreProcess(dst);
+        auto checkDst = DimCheck(dst);
         Execute<trait, decltype(checkDst), U, S, Coord>(checkDst, src, quant, coord);
     }
 

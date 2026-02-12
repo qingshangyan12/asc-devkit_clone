@@ -464,7 +464,7 @@ class DataCopyFourDim3510GM2L1 : public CopyGmToCbufMultiNd2nzBase, public CopyG
 public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        auto checkSrc = PreProcess(src);
+        auto checkSrc = DimCheck(src);
         Execute<trait, T, decltype(checkSrc), Coord>(dst, checkSrc, coord);
     }
 
