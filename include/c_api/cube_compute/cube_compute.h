@@ -27,7 +27,7 @@
 
 #endif
 
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t reluPre, uint64_t quantPre, bool enableUnitFlag);
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
@@ -109,11 +109,11 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t
     bool c_matrix_source, bool c_matrix_init_val);
 
 __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k,
-                                       uint16_t n, uint8_t unitFlag, bool cmatrixSource, bool cmatrixInitVal);
+                                       uint16_t n, uint8_t unit_flag, bool cmatrix_source, bool cmatrix_init_val);
 
 __aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m,
-                                            uint16_t k, uint16_t n, uint8_t unitFlag, bool cmatrixSource,
-                                            bool cmatrixInitVal);
+                                            uint16_t k, uint16_t n, uint8_t unit_flag, bool cmatrix_source,
+                                            bool cmatrix_init_val);
 
 __aicore__ inline void asc_set_mmad_direction_m();
 

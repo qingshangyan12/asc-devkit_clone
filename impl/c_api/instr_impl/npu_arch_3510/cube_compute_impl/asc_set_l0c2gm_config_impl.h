@@ -10,7 +10,7 @@
 
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
-#warning "c_api/instr_impl/cube_compute_impl/asc_set_l0c2gm_relu_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
+#warning "c_api/instr_impl/cube_compute_impl/asc_set_l0c2gm_config_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."  
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif    
@@ -20,14 +20,14 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t reluPre, uint64_t quantPre, bool enableUnitFlag)
+__aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
 { 
     if ASC_IS_AIC {
         asc_capi_fpc_reg_config config;
         config.config = 0;
-        config.relu_units = reluPre;
-        config.quant_units = quantPre;
-        config.unit_flag = enableUnitFlag;
+        config.relu_units = relu_pre;
+        config.quant_units = quant_pre;
+        config.unit_flag = enable_unit_flag;
         set_fpc(config.config);
     }
 }
