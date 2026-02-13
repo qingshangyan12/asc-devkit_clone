@@ -173,4 +173,9 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define ASCEND_IS_NOT_AIC constexpr(g_coreType != AscendC::AIC)
 #endif
 
+namespace AscendC {
+namespace Reg {
+} // namespace Reg
+namespace MicroAPI = Reg;
+} // namespace AscendC
 #endif // ASCENDC_KERNEL_MACROS_H
