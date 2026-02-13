@@ -16,10 +16,48 @@
 #define IMPL_TENSOR_API_UTILS_FORMAT_IMPL_H
 
 #include "include/experimental/tensor_api/tensor/make.h"
-#include "impl/experimental/tensor_api/detail/utils/constant_impl.h"
+#include "include/experimental/tensor_api/utils/constant.h"
+#include "include/experimental/tensor_api/utils/macro.h"
+#include "include/utils/std/tuple.h"
+#include "include/utils/std/type_traits.h"
 
 namespace AscendC {
 namespace Te {
+template <typename T, typename U>
+constexpr bool VerifyingDataCopyTemplate =
+    ((IsTileTensorV<U> && IsTileTensorV<T>) ||
+    (IsTileTensorV<U> && IsTileTensorV<T>));
+
+template <typename T, typename U, typename Coord>
+constexpr bool VerifyingDataCopyTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingDataCopyTemplate<T, U>;
+
+template <typename T, typename U>
+constexpr bool VerifyingLoadDataTemplate = IsTileTensorV<U> && IsTileTensorV<T>;
+
+template <typename T, typename U, typename Coord>
+constexpr bool VerifyingLoadDataTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingLoadDataTemplate<T, U>;
+
+template <typename T, typename U, typename S>
+static constexpr bool VerifyingMmadTemplate = (IsTileTensorV<T> && IsTileTensorV<U> 
+    && IsTileTensorV<S>);
+
+template <typename T, typename U, typename S, typename V>
+static constexpr bool VerifyingMmadWithBiasTemplate = (IsTileTensorV<T> && IsTileTensorV<U> 
+    && IsTileTensorV<S> && IsTileTensorV<V>);
+
+template <typename T, typename U>
+static constexpr bool VerifyingFixpipeTemplate = (IsTileTensorV<T> && IsTileTensorV<U>);
+
+template <typename T, typename U, typename V>
+static constexpr bool VerifyingFixpipeQuantTemplate = (IsTileTensorV<T> && IsTileTensorV<U>
+    && (IsTileTensorV<V> || Std::is_same_v<V, uint64_t>)); 
+
+template <typename T, typename U, typename Coord>
+constexpr bool VerifyingFixpipeTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingFixpipeTemplate<T, U>;
+
+template <typename T, typename U, typename V, typename Coord>
+constexpr bool VerifyingFixpipeQuantTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingFixpipeQuantTemplate<T, U, V>;
+
 struct ArchVersion {
     static constexpr uint32_t V3510 = 3510;
     static constexpr uint32_t V2201 = 2201;

@@ -15,13 +15,20 @@
 #ifndef INCLUDE_TENSOR_API_UTILS_CONSTANT_H
 #define INCLUDE_TENSOR_API_UTILS_CONSTANT_H
 
-#include "impl/experimental/tensor_api/detail/utils/constant_impl.h"
+#include <cstdint>
 
 namespace AscendC {
 namespace Te {
-
 enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
 
+constexpr size_t TWO_DIM_DATA = 2;
+constexpr size_t FOUR_DIM_DATA = 4;
+constexpr size_t C0_SIZE = 32;
+constexpr size_t FRACTAL_FIXED = 16;
+constexpr size_t DISABLE_COORD = 0;
+constexpr size_t ENABLE_COORD = 1;
+constexpr size_t SHIFT_LEFT_16 = 0x00010000;
+constexpr size_t L2_CACHE_OFFSET = 60;
 } // namespace Te
 } // namespace AscendC
 

@@ -15,7 +15,9 @@
 #ifndef IMPL_TENSOR_API_UTILS_EXTRA_IMPL_H
 #define IMPL_TENSOR_API_UTILS_EXTRA_IMPL_H
 
-#include "impl/experimental/tensor_api/detail/utils/constant_impl.h"
+#include <utility>
+#include "include/utils/std/type_traits.h"
+#include "include/utils/std/utility.h"
 
 namespace AscendC {
 namespace Te {
