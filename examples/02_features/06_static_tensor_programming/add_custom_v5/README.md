@@ -27,11 +27,11 @@
 计算公式为：
 
 ```python
-z = 9 * x
+y = 9 * x
 ```
 
 - x：输入，形状为\[72, 1024]，数据类型为float；
-- z：输出，形状为\[72, 1024]，数据类型为float；
+- y：输出，形状为\[72, 1024]，数据类型为float；
 
 ## 算子规格描述
 
@@ -42,7 +42,7 @@ z = 9 * x
 <tr><td rowspan="1" align="center">算子输入</td><td align="center">x</td><td align="center">72 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
 </tr>
 </tr>
-<tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">72 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">算子输出</td><td align="center">y</td><td align="center">72 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
 </tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom_v5</td></tr>
 </table>
@@ -52,12 +52,12 @@ z = 9 * x
   数学表达式为：
 
   ```
-  z = 9 * x
+  y = 9 * x
   ```
 
   计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成输入参数累加，得到最终结果，再搬出到外部存储上。
 
-  该算子的实现流程：将Global Memory上的输入Tensor xGm搬运到Local Memory，存储在xLocal中；完成9次循环，每次循环完成一次矢量加法：zLocal = zLocal + xLocal，循环结束后，zLocal 中存储了9倍xLocal的结果；最后将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
+  该算子的实现流程：将Global Memory上的输入Tensor xGm搬运到Local Memory，存储在xLocal中；完成9次循环，每次循环完成一次矢量加法：yLocal = yLocal + xLocal，循环结束后，yLocal 中存储了9倍xLocal的结果；最后将输出数据从yLocal搬运至Global Memory上的输出Tensor yGm中。
 
 ## 编译运行
 
