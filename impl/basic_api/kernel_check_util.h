@@ -13,6 +13,13 @@
  * \brief
  */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/kernel_check_util.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_operator_list_tensor_intf.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_UTIL_H
+#endif
+
 #ifndef ASCENDC_CHECK_UTIL_H
 #define ASCENDC_CHECK_UTIL_H
 #if ASCENDC_CPU_DEBUG
@@ -27,4 +34,8 @@
 #include "utils/kernel_check_cube_util.h"
 
 #endif
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_UTIL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_UTIL_H
 #endif

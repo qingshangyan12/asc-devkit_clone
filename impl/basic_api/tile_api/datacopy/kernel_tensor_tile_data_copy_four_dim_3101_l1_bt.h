@@ -12,6 +12,13 @@
  * \file kernel_tensor_tile_data_copy_four_dim_3101_l1_bt.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/tile_api/datacopy/kernel_tensor_tile_data_copy_four_dim_3101_l1_bt.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_operator_data_copy_intf.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_TILE_DATA_COPY_FOUR_DIM_3101_L1_BT_H
+#endif
+
 #ifndef IMPL_TENSOR_TILE_API_KERNEL_TENSOR_TILE_DATA_COPY_FOUR_DIM_3101_L1_BT_H
 #define IMPL_TENSOR_TILE_API_KERNEL_TENSOR_TILE_DATA_COPY_FOUR_DIM_3101_L1_BT_H
 
@@ -109,3 +116,7 @@ private:
 } // namespace AscendC
 
 #endif // IMPL_TENSOR_TILE_API_KERNEL_TENSOR_TILE_DATA_COPY_FOUR_DIM_3101_L1_BT_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_TILE_DATA_COPY_FOUR_DIM_3101_L1_BT_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_TILE_DATA_COPY_FOUR_DIM_3101_L1_BT_H
+#endif

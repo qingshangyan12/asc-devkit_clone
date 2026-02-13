@@ -12,6 +12,13 @@
  * \file kernel_operator_gemm_base_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/kernel_operator_gemm_base_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_operator_gemm_intf.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_GEMM_BASE_IMPL_H
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_GEMM_BASE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_GEMM_BASE_IMPL_H
 #if ASCENDC_CPU_DEBUG
@@ -525,3 +532,7 @@ __aicore__ inline void GemmExecMn(const LocalTensor<T>& l0c, const LocalTensor<U
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_GEMM_BASE_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_GEMM_BASE_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_GEMM_BASE_IMPL_H
+#endif

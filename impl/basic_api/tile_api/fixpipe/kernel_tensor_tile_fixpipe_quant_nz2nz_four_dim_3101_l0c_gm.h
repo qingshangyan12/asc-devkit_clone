@@ -11,6 +11,13 @@
  * \file kernel_tensor_tile_fixpipe_quant_nz2nz_four_dim_3101_l0c_gm.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/tile_api/fixpipe/kernel_tensor_tile_fixpipe_quant_nz2nz_four_dim_3101_l0c_gm.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_operator_fixpipe_intf.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_TILE_FIXPIPE_QUANT_NZ2NZ_FOUR_DIM_3101_L0C_GM_H
+#endif
+
 #ifndef IMPL_TENSOR_TILE_API_KERNEL_TENSOR_TILE_FIXPIPE_QUANT_NZ2NZ_FOUR_DIM_3101_L0C_GM_H
 #define IMPL_TENSOR_TILE_API_KERNEL_TENSOR_TILE_FIXPIPE_QUANT_NZ2NZ_FOUR_DIM_3101_L0C_GM_H
 
@@ -228,3 +235,8 @@ private:
 }  // namespace AscendC
 
 #endif  // IMPL_TENSOR_TILE_API_KERNEL_TENSOR_TILE_FIXPIPE_QUANT_NZ2NZ_FOUR_DIM_3101_L0C_GM_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_TILE_FIXPIPE_QUANT_NZ2NZ_FOUR_DIM_3101_L0C_GM_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_TILE_FIXPIPE_QUANT_NZ2NZ_FOUR_DIM_3101_L0C_GM_H
+#endif

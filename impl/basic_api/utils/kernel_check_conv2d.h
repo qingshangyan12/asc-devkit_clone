@@ -12,6 +12,13 @@
  * \file kernel_check_conv2d.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/utils/kernel_check_conv2d.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tensor.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_CONV2D_H
+#endif
+
 #ifndef ASCENDC_MODULE_CHECK_CONV2D_H
 #define ASCENDC_MODULE_CHECK_CONV2D_H
 
@@ -150,4 +157,8 @@ __aicore__ inline bool CheckConv2DParams(const LocalTensor<T> &dst, const LocalT
 }  // namespace AscendC
 #endif
 
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_CONV2D_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_CONV2D_H
 #endif
