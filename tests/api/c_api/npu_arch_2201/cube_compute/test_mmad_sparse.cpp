@@ -24,7 +24,7 @@ protected:
 };
 
 namespace {
-void mad_sp_Stub(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unitFlag, bool cmatrixSource, bool cmatrixInitVal)
+void mad_sp_Stub(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool cmatrix_source, bool cmatrix_init_val)
 {
     EXPECT_EQ(c, reinterpret_cast<__cc__ int32_t*>(1));
     EXPECT_EQ(a, reinterpret_cast<__ca__ int8_t*>(2));
