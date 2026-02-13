@@ -280,17 +280,17 @@ TEST_F(Tensor_Api_Layout, TestShapeStride)
     EXPECT_EQ(AscendC::Std::get<0>(layoutStride), 1);
     EXPECT_EQ(AscendC::Std::get<1>(layoutStride), 4);
 
-    Shape<int,int,int> shape2 = MakeShape(Std::Int<7>{}, Std::Int<3>{}, Std::Int<6>{});
-    Stride<int,int,int> stride2 = MakeStride(Std::Int<2>{}, Std::Int<1>{}, Std::Int<5>{});
+    Shape<int,int,int> shape2 = MakeShape(AscendC::Std::Int<7>{}, AscendC::Std::Int<3>{}, AscendC::Std::Int<6>{});
+    Stride<int,int,int> stride2 = MakeStride(AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}, AscendC::Std::Int<5>{});
     const auto constLayoutObj = MakeLayout(shape2, stride2);
     auto constLayoutShape = constLayoutObj.Shape();
     auto constLayoutStride = constLayoutObj.Stride();
-    EXPECT_EQ(AscendC::Std::get<0>(constLayoutShape), 7);
-    EXPECT_EQ(AscendC::Std::get<1>(constLayoutShape), 3);
-    EXPECT_EQ(AscendC::Std::get<2>(constLayoutShape), 6);
-    EXPECT_EQ(AscendC::Std::get<0>(constLayoutStride), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(constLayoutStride), 1);
-    EXPECT_EQ(AscendC::Std::get<2>(constLayoutStride), 5);
+    EXPECT_EQ(AscendC::Std::get<0>(constLayoutShape), AscendC::Std::Int<7>{});
+    EXPECT_EQ(AscendC::Std::get<1>(constLayoutShape), AscendC::Std::Int<3>{});
+    EXPECT_EQ(AscendC::Std::get<2>(constLayoutShape), AscendC::Std::Int<6>{});
+    EXPECT_EQ(AscendC::Std::get<0>(constLayoutStride), AscendC::Std::Int<2>{});
+    EXPECT_EQ(AscendC::Std::get<1>(constLayoutStride), AscendC::Std::Int<1>{});
+    EXPECT_EQ(AscendC::Std::get<2>(constLayoutStride), AscendC::Std::Int<5>{});
 }
 
 // operator()方法: 基于coord, shape与stride来计算实际idx下标
