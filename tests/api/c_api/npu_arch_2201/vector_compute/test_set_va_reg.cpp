@@ -23,14 +23,14 @@ namespace {
 void asc_set_va_reg_stub(ub_addr8_t addr, uint64_t* src_array)
 { 
     EXPECT_EQ(addr, ub_addr8_t::VA0);
-    EXPECT_EQ(src_array, reinterpret_cast<uint64_t*>(11));
+    EXPECT_EQ(src_array, reinterpret_cast<uint64_t*>(reinterpret_cast<__ubuf__ half*>(11)));
 }
 }
 
 TEST_F(TestSetVaRegCAPI, c_api_set_va_reg_Succ)
 {
     ub_addr8_t addr = ub_addr8_t::VA0;
-    uint64_t* src_array = reinterpret_cast<uint64_t*>(11);
+    uint64_t* src_array = reinterpret_cast<uint64_t*>(reinterpret_cast<__ubuf__ half*>(11));
     __ubuf__ half* src[8] = {reinterpret_cast<__ubuf__ half*>(11)};
     MOCKER_CPP(set_va_reg_sb, void(ub_addr8_t, uint64_t*))
             .times(1)
