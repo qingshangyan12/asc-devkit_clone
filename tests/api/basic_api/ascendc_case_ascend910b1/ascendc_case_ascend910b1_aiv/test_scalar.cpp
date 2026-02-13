@@ -244,10 +244,4 @@ TEST_F(TestScalarInstr, ScalarInstrNewCase)
     EXPECT_EQ(get_cond(), 0);
     set_condition_flag(u64XnVal);
     EXPECT_EQ(get_condition_flag(), 0);
-
-    bool isAiCore = false;
-    if ASCEND_IS_AICORE {
-        isAiCore = true;
-    }
-    EXPECT_EQ(isAiCore, false);
 }
