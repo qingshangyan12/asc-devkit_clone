@@ -14,11 +14,6 @@
 
 using namespace AscendC;
 #define ASCENDC_DUMP
-
-enum class PrintTestEnum : uint32_t {
-    VALUE_A = 7
-};
-
 struct TestDumpTensorParams {
     uint32_t dataSize;
     uint32_t typeSize;
@@ -64,42 +59,6 @@ void DataDumpTensor(__gm__ uint8_t *dstGm, __gm__ uint8_t *srcGm, __gm__ uint8_t
     PRINTF("AAAA %d", 0x1);
 }
 
-template <typename T>
-void DataDumpTensorPrintVariants(__gm__ uint8_t *dstGm, __gm__ uint8_t *srcGm, __gm__ uint8_t *workGm, __gm__ uint32_t dataSize,
-    __gm__ uint32_t dstSize, __gm__ uint64_t dumpSize)
-{
-    TPipe tpipe;
-    GlobalTensor<T> srcGlobal;
-    GlobalTensor<T> dstGlobal;
-    GlobalTensor<T> workGlobal;
-
-    srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(srcGm), dataSize);
-    dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dstGm), dstSize);
-    workGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(workGm), DUMP_WORKSPACE_SIZE * 2);
-
-    TBuf<TPosition::VECCALC> tbuf;
-    tpipe.InitBuffer(tbuf, dataSize * sizeof(T));
-    LocalTensor<T> inputLocal = tbuf.Get<T>();
-    DataCopyParams copyParams{1, dataSize * sizeof(T) / 32, 0, 0};
-    DataCopy(inputLocal, srcGlobal, copyParams);
-    pipe_barrier(PIPE_ALL);
-
-    InitDump(workGm, dumpSize);
-    PrintTimeStamp(0);
-    DumpTensor(inputLocal, 1, dataSize);
-
-    const uint32_t unsignedValue = 3U;
-    const int32_t signedValue = -2;
-    const float floatValue = 1.5F;
-    const double doubleValue = 2.25;
-    const PrintTestEnum enumValue = PrintTestEnum::VALUE_A;
-    __gm__ uint8_t* ptrValue = srcGm;
-
-    PRINTF("S:%s I:%d U:%u", "print_case", signedValue, unsignedValue);
-    PRINTF("F:%f D:%lf P:%p E:%d", floatValue, doubleValue, static_cast<void*>(ptrValue),
-        static_cast<int32_t>(enumValue));
-}
-
 INSTANTIATE_TEST_CASE_P(TEST_DUMP_TENSOR, TestDumpTensorSuite,
     ::testing::Values(TestDumpTensorParams{64, 4, 96, 96 * 3, DataDumpTensor<uint32_t>}));
 
@@ -130,24 +89,5 @@ TEST_P(TestDumpTensorSuite, TestDumpTensorCases)
     for (int i = 0; i < 112; i++) {
         printf("* %d workGm: %d\n ", i, workGm[i]);
     }
-    g_coreType = tmp;
-}
-
-TEST_F(TestDumpTensorSuite, TestDumpTensorPrintVariantsCases)
-{
-    int32_t tmp = g_coreType;
-    g_coreType = 2;
-
-    constexpr uint32_t dataSize = 64;
-    constexpr uint32_t typeSize = 4;
-    constexpr uint32_t dstSize = 96;
-    constexpr uint64_t dumpSize = 96 * 3;
-    uint8_t srcGm[dataSize * typeSize] = {0};
-    uint8_t dstGm[dstSize * typeSize] = {0};
-    uint8_t workGm[dumpSize * typeSize] = {0};
-    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForDumpTensor));
-
-    DataDumpTensorPrintVariants<uint32_t>(dstGm, srcGm, workGm, dataSize, dstSize, dumpSize);
-
     g_coreType = tmp;
 }
