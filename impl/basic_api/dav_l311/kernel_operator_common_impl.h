@@ -12,6 +12,13 @@
  * \file kernel_operator_common_impl.h
  * \brief AscendC l311 support common api.
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/dav_l311/kernel_operator_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tensor.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #include "kernel_struct_mm.h"
@@ -1508,3 +1515,7 @@ __aicore__ static inline void ResetCtrlSprImpl()
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H
+#endif

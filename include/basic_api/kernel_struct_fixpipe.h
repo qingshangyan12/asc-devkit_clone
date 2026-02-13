@@ -12,6 +12,11 @@
  * \file kernel_struct_fixpipe.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H
+#endif
+
 #ifndef ASCENDC_MODULE_STRUCT_FIXPIPE_H
 #define ASCENDC_MODULE_STRUCT_FIXPIPE_H
 
@@ -203,4 +208,27 @@ using FixpipeParamsM300 = FixpipeParamsV220;
 using FixpipeParamsM310 = FixpipeParamsV220;
 } // namespace AscendC
 
+<<<<<<< HEAD
 #endif // ASCENDC_MODULE_STRUCT_FIXPIPE_H
+=======
+/* **************************************************************************************************
+ * Fixpipe(Layout) API Level2                                              *
+ * ************************************************************************************************* */
+namespace AscendC {
+
+struct FixpipeTrait {
+    QuantMode_t quantPre = QuantMode_t::NoQuant;
+    bool enableRelu = false;
+    bool enableChannleSplit = false;
+    uint8_t unitFlag = false;
+    uint8_t dualDstCtl = false;
+};
+constexpr FixpipeTrait DEFAULT_FIXPIPE_TRAIT;
+
+}
+#endif // ASCENDC_MODULE_STRUCT_FIXPIPE_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H
+#endif
+>>>>>>> 92df65f4 (添加头文件告警提示)

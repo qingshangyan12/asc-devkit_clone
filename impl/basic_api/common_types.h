@@ -12,6 +12,13 @@
  * \file common_types.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/common_types.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tensor.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_TYPES_H
+#endif
+
 #ifndef AICORE_BASIS_API_COMMON_TYPES_H
 #define AICORE_BASIS_API_COMMON_TYPES_H
 
@@ -42,3 +49,8 @@ enum class TPosition : uint8_t {
 } // namespace AscendC
 
 #endif // AICORE_BASIS_API_COMMON_TYPES_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_TYPES_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_COMMON_TYPES_H
+#endif

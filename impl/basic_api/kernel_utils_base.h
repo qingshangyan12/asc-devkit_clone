@@ -12,6 +12,13 @@
  * \file kernel_utils_base.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/kernel_utils_base.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tensor.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_BASE_H
+#endif
+
 #ifndef ASCENDC_MODULE_UTILS_BASE_H
 #define ASCENDC_MODULE_UTILS_BASE_H
 #include "utils/kernel_utils_macros.h"
@@ -474,3 +481,7 @@ public:
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_UTILS_BASE_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_BASE_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_BASE_H
+#endif

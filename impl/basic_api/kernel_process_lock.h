@@ -12,6 +12,13 @@
  * \file kernel_process_lock.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/kernel_process_lock.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tpipe.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_PROCESS_LOCK_H
+#endif
+
 #ifndef __KERNEL_PROCESS_LOCK_H__
 #define __KERNEL_PROCESS_LOCK_H__
 #ifdef ASCENDC_CPU_DEBUG
@@ -48,3 +55,8 @@ private:
 } // namespace AscendC
 #endif
 #endif // __KERNEL_PROCESS_LOCK_H__
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_PROCESS_LOCK_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_PROCESS_LOCK_H
+#endif
