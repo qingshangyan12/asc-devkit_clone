@@ -270,8 +270,8 @@ TEST_F(Tensor_Api_Layout, TestLayout)
 TEST_F(Tensor_Api_Layout, TestShapeStride)
 {
     using namespace AscendC::Te;
-    Shape<int,int> shape1 = MakeShape(3, 2);
-    Stride<int,int> stride1 = MakeStride(1, 4);
+    auto shape1 = MakeShape(3, 2);
+    auto stride1 = MakeStride(1, 4);
     auto layoutObj = MakeLayout(shape1, stride1);
     auto layoutShape = layoutObj.Shape();
     auto layoutStride = layoutObj.Stride();
@@ -280,17 +280,17 @@ TEST_F(Tensor_Api_Layout, TestShapeStride)
     EXPECT_EQ(AscendC::Std::get<0>(layoutStride), 1);
     EXPECT_EQ(AscendC::Std::get<1>(layoutStride), 4);
 
-    Shape<int,int,int> shape2 = MakeShape(AscendC::Std::Int<7>{}, AscendC::Std::Int<3>{}, AscendC::Std::Int<6>{});
-    Stride<int,int,int> stride2 = MakeStride(AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}, AscendC::Std::Int<5>{});
+    auto shape2 = MakeShape(Int<7>{}, Int<3>{}, Int<6>{});
+    auto stride2 = MakeStride(Int<2>{}, Int<1>{}, Int<5>{});
     const auto constLayoutObj = MakeLayout(shape2, stride2);
     auto constLayoutShape = constLayoutObj.Shape();
     auto constLayoutStride = constLayoutObj.Stride();
-    EXPECT_EQ(AscendC::Std::get<0>(constLayoutShape), AscendC::Std::Int<7>{});
-    EXPECT_EQ(AscendC::Std::get<1>(constLayoutShape), AscendC::Std::Int<3>{});
-    EXPECT_EQ(AscendC::Std::get<2>(constLayoutShape), AscendC::Std::Int<6>{});
-    EXPECT_EQ(AscendC::Std::get<0>(constLayoutStride), AscendC::Std::Int<2>{});
-    EXPECT_EQ(AscendC::Std::get<1>(constLayoutStride), AscendC::Std::Int<1>{});
-    EXPECT_EQ(AscendC::Std::get<2>(constLayoutStride), AscendC::Std::Int<5>{});
+    EXPECT_EQ(AscendC::Std::get<0>(constLayoutShape), Int<7>{});
+    EXPECT_EQ(AscendC::Std::get<1>(constLayoutShape), Int<3>{});
+    EXPECT_EQ(AscendC::Std::get<2>(constLayoutShape), Int<6>{});
+    EXPECT_EQ(AscendC::Std::get<0>(constLayoutStride), Int<2>{});
+    EXPECT_EQ(AscendC::Std::get<1>(constLayoutStride), Int<1>{});
+    EXPECT_EQ(AscendC::Std::get<2>(constLayoutStride), Int<5>{});
 }
 
 // operator()方法: 基于coord, shape与stride来计算实际idx下标
@@ -389,18 +389,18 @@ TEST_F(Tensor_Api_Layout, TestMakeShapeStride)
     auto stride2 = MakeStride(Int<3>{}, Int<7>{}, Int<5>{});
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape2)>, true);
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride2)>, true);
-    EXPECT_EQ(GetShape<0>(shape2), Int<11>{});
-    EXPECT_EQ(GetShape<1>(shape2), Int<23>{});
-    EXPECT_EQ(GetShape<2>(shape2), Int<37>{});
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(shape2)), Int<11>{});
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(shape2)), Int<23>{});
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<2>(shape2)), Int<37>{});
 
     auto shape3 = MakeShape(MakeShape(Int<11>{}, Int<22>{}), MakeShape(Int<33>{}, Int<44>{}));
     auto stride3 = MakeStride(MakeShape(Int<55>{}, Int<66>{}), MakeShape(Int<77>{}, Int<88>{}));
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape3)>, true);
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride3)>, true);
-    EXPECT_EQ((GetShape<0,0>(shape3)), Int<11>{});
-    EXPECT_EQ((GetShape<0,1>(shape3)), Int<22>{});
-    EXPECT_EQ((GetShape<1,0>(shape3)), Int<33>{});
-    EXPECT_EQ((GetShape<1,1>(shape3)), Int<44>{});
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0,0>(shape3)), Int<11>{});
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0,1>(shape3)), Int<22>{});
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1,0>(shape3)), Int<33>{});
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1,1>(shape3)), Int<44>{});
 }
 
 // MakeTile构造Tile对象
@@ -453,33 +453,33 @@ TEST_F(Tensor_Api_Layout, TestMakeLayout)
     auto shape1 = MakeShape(3, 2);
     auto stride1 = MakeStride(1, 4);
     auto layout1 = MakeLayout(shape1, stride1);
-    EXPECT_EQ(GetShape<0>(layout1), 3);
-    EXPECT_EQ(GetShape<1>(layout1), 2);
-    EXPECT_EQ(GetStride<0>(layout1), 1);
-    EXPECT_EQ(GetStride<1>(layout1), 4);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(layout1)), 3);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(layout1)), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<0>(layout1)), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<1>(layout1)), 4);
 
     // 此时最内侧stride为1，次内侧为13，外侧为13 * 11 = 143
     auto shape2 = MakeShape(7, 11, 13);
     auto layout2 = MakeLayout(shape2);
-    EXPECT_EQ(GetShape<0>(layout2), 7);
-    EXPECT_EQ(GetShape<1>(layout2), 11);
-    EXPECT_EQ(GetShape<2>(layout2), 13);
-    EXPECT_EQ(GetStride<0>(layout2), 143);
-    EXPECT_EQ(GetStride<1>(layout2), 13);
-    EXPECT_EQ(GetStride<2>(layout2), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(layout2)), 7);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(layout2)), 11);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<2>(layout2)), 13);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<0>(layout2)), 143);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<1>(layout2)), 13);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<2>(layout2)), 1);
 
     // stride[0][0] = 1; stride[0][1] = 2 * 3 * 1 = 6;
     // stride[1][0] = 1 * 2 = 2; stride[1][1] = 3 * 6 = 18;
     auto shape3 = MakeShape(MakeShape(2, 3), MakeShape(3, 6));
     auto layout3 = MakeLayout(shape3);
-    EXPECT_EQ((GetShape<0,0>(layout3)), 2);
-    EXPECT_EQ((GetShape<0,1>(layout3)), 3);
-    EXPECT_EQ((GetShape<1,0>(layout3)), 3);
-    EXPECT_EQ((GetShape<1,1>(layout3)), 6);
-    EXPECT_EQ((GetStride<0,0>(layout3)), 1);
-    EXPECT_EQ((GetStride<0,1>(layout3)), 6);
-    EXPECT_EQ((GetStride<1,0>(layout3)), 2);
-    EXPECT_EQ((GetStride<1,1>(layout3)), 18);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(GetStride<0>(layout3))), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(GetStride<1>(layout3))), 3);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(GetStride<0>(layout3))), 3);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(GetStride<1>(layout3))), 6);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<0>(GetStride<0>(layout3))), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<0>(GetStride<1>(layout3))), 6);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<1>(GetStride<0>(layout3))), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<1>(GetStride<1>(layout3))), 18);
 }
 
 // MakeNZLayout根据row和col构造Layout
