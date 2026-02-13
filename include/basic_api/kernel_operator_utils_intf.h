@@ -58,6 +58,10 @@ __aicore__ void Async(Args... args)
         }
     }
 }
+
+namespace Reg {
+} // namespace Reg
+namespace MicroAPI = Reg;
 } // namespace AscendC
 
 #endif // KERNEL_UTILS_INTF_H
