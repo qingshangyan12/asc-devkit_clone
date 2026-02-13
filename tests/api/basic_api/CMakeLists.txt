@@ -230,3 +230,47 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
         TASK_NUM 1
     )
 endforeach()
+
+add_executable(ascendc_ut_printf_ascend950pr_9599_AIV_BASIC
+    ${ASCENDC_DIR}/tests/main_global.cpp
+    ${ASCENDC_TEST_COMMON_SRC_FILES}
+    ../common/k3_pvwrap.cpp
+    ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aiv_basic/test_printf.cpp
+)
+
+target_compile_definitions(ascendc_ut_printf_ascend950pr_9599_AIV_BASIC PRIVATE
+    UT_TEST
+    ASCENDC_OOM=1
+    ASCENDC_DUMP=1
+    __NPU_ARCH__=3101
+    __DAV_C310__
+    __DAV_C310_VEC__
+    __disable_kernel_type_autoinfer__=
+)
+
+target_include_directories(ascendc_ut_printf_ascend950pr_9599_AIV_BASIC PRIVATE
+    ${ASCENDC_TEST_HEADER_FILES}
+    ${ASCEND_CANN_PACKAGE_PATH}/include/base/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/metadef/
+)
+
+target_compile_options(ascendc_ut_printf_ascend950pr_9599_AIV_BASIC PRIVATE
+    -fno-access-control
+    -Werror
+)
+
+target_link_libraries(ascendc_ut_printf_ascend950pr_9599_AIV_BASIC PRIVATE
+    $<BUILD_INTERFACE:intf_llt_pub_basic>
+    kernel_tiling
+    tikicpulib::ascend950pr_9599
+    -Wl,--no-as-needed
+    error_manager
+    mmpa
+    c_sec
+    -Wl,--as-needed
+)
+
+run_llt_test(
+    TARGET ascendc_ut_printf_ascend950pr_9599_AIV_BASIC
+    TASK_NUM 1
+)
