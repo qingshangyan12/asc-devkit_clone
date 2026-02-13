@@ -24,7 +24,7 @@ class FixpipetNz2Nz2201Base : public Copy2201MatrixCcToGmBase {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        std::cout << "fixpipe_four_dim_2201_l0c_gm.h" << std::endl;
+        std::cout << "fixpipe_four_dim_2201_l0c_gm.h Run" << std::endl;
         CheckCoord<T, U, Coord>(dst, src, coord);
         auto params = GenFixpipeParams<trait, T, U>(dst, src); 
         auto dstNzTensor = MakeTensorWithCoord<T, Coord>(dst, coord, 0);
@@ -47,21 +47,6 @@ private:
         static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>, "Fixpipe Layout->Stride->Column->ZeroDim, is not Std::Int<1> type!");
     }
 
-    template <typename T>
-    __aicore__ inline constexpr void CheckNZTemplate()
-    {
-        using type = typename T::elementType;
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<FRACTAL_FIXED>>, "Layout->Shape->Row->ZeroDim, is not Std::Int<16> type!");
-        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<C0_SIZE / sizeof(type)>>, "Layout->Shape->Column->ZeroDim, is not Std::Int<C0Size/Type> type!");
-
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<StrideRow0, Std::Int<C0_SIZE / sizeof(type)>>, "Layout->Stride->Row->ZeroDim, is not Std::Int<C0Size/Type> type!");
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>, "Layout->Stride->Column->ZeroDim, is not Std::Int<1> type!");
-    }
-
     template <const FixpipeTrait& trait, typename T, typename U>
     __aicore__ inline constexpr void CheckTemplate()
     {
@@ -71,7 +56,7 @@ private:
         static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ float, __cc__ float>,
             Std::tuple<__gm__ int32_t, __cc__ int32_t>>, "The data type is not supported.");
 #endif
-        CheckNZTemplate<T>();
+        CheckL0CNZTemplate<T>();
         CheckL0CNZTemplate<U>();
     }
 
@@ -199,11 +184,9 @@ public:
 private:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
-        if constexpr (IsL0cNZFormat<U>::value && IsNZFormat<T>::value) {
-            std::cout << "route to NZ2NZ" << std::endl;
+        if constexpr (IsL0cNZFormat<U>::value && IsL0cNZFormat<T>::value) {
             FixpipetNz2Nz2201Base::Run<trait, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsL0cNZFormat<U>::value && IsNDFormat<T>::value) {
-            std::cout << "route to NZ2ND" << std::endl;
             FixpipetNz2Nd2201Base::Run<trait, T, U, Coord>(dst, src, coord);
         }
     }
