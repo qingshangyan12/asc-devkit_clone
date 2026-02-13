@@ -22,7 +22,7 @@
 
 ## 算子描述
 
-算子固定shape为[72, 1024], 实现输入累加5次。
+算子固定shape为[80, 1024], 实现输入累加5次。
 
 计算公式为：
 
@@ -30,8 +30,8 @@
 y = 5 * x
 ```
 
-- x：输入，形状为\[72, 1024]，数据类型为float；
-- y：输出，形状为\[72, 1024]，数据类型为float；
+- x：输入，形状为\[80, 1024]，数据类型为float；
+- y：输出，形状为\[80, 1024]，数据类型为float；
 
 ## 算子规格描述
 
@@ -39,10 +39,10 @@ y = 5 * x
 <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
 </tr>
 <tr><td rowspan="1" align="center"></td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<td rowspan="1" align="center">算子输入</td><td align="center">x</td><td align="center">72 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
+<td rowspan="1" align="center">算子输入</td><td align="center">x</td><td align="center">80 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
 </tr>
 </tr>
-<tr><td rowspan="1" align="center">算子输出</td><td align="center">y</td><td align="center">72 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">算子输出</td><td align="center">y</td><td align="center">80 * 1024</td><td align="center">float</td><td align="center">ND</td></tr>
 </tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom_v6</td></tr>
 </table>
