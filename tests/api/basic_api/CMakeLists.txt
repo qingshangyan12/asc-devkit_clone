@@ -172,7 +172,7 @@ foreach(product_type ${BASIC_UT_PRODUCT_TYPE_LIST})
     target_compile_definitions(ascendc_ut_basic_api_${product_type} PRIVATE
         UT_TEST
         ASCENDC_OOM=1
-        ASCENDC_DUMP=0
+        ASCENDC_DUMP=1
         $<$<STREQUAL:${product_type},ascend910>:__NPU_ARCH__=1001;__DAV_C100__>
         $<$<STREQUAL:${product_type},ascend310p>:__NPU_ARCH__=2002;__DAV_M200__>
         $<$<STREQUAL:${product_type},ascend610>:__NPU_ARCH__=2002;__DAV_M200__>
