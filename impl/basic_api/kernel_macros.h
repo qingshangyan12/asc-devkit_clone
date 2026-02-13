@@ -173,7 +173,7 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define ASCEND_IS_NOT_AIC constexpr(g_coreType != AscendC::AIC)
 #endif
 
-// Expose the MicroAPI namespace to all versions visible so that user code can be onetrack.
+// Make the MicroAPI namespace to all versions visible so that user code can be onetrack.
 namespace AscendC {
 namespace MicroAPI {
 
