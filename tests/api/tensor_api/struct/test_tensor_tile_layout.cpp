@@ -236,7 +236,6 @@ TEST_F(Tensor_Api_Layout, TestCapacity)
     int stride4 = 17;
     EXPECT_EQ(GetCapacity(shape4, stride4), 119);
 
-    // 2*2维度的layout
     // 按维度乘积为{{3, 60}, {40, 480}}
     auto shape5 = MakeShape(MakeShape(3, 4), MakeShape(5, 8));
     auto stride5 = MakeShape(MakeShape(1, 15), MakeShape(8, 60));
@@ -250,17 +249,14 @@ TEST_F(Tensor_Api_Layout, TestCapacity)
 TEST_F(Tensor_Api_Layout, TestLayout)
 {
     using namespace AscendC::Te;
-    // 两个维度的layout
     Shape<int,int> shape1 = MakeShape(3, 2);
     Stride<int,int> stride1 = MakeStride(3, 4);
 
-    // 测试layout方法返回非const对象
     auto layoutObj = MakeLayout(shape1, stride1);
     auto& layoutRes = layoutObj.layout();
     EXPECT_EQ(&layoutObj, &layoutRes);
     static_assert(std::is_same_v<decltype(layoutRes), Layout<Shape<int,int>, Stride<int,int>>&>);
 
-    // 测试const对象调用layout方法返回const对象
     const auto constLayoutObj = MakeLayout(shape1, stride1);
     auto& constLayoutRes = constLayoutObj.layout();
     EXPECT_EQ(&constLayoutObj, &constLayoutRes);
@@ -274,7 +270,6 @@ TEST_F(Tensor_Api_Layout, TestLayout)
 TEST_F(Tensor_Api_Layout, TestShapeStride)
 {
     using namespace AscendC::Te;
-    // 两个维度的layout，构造非const类型的layout
     Shape<int,int> shape1 = MakeShape(3, 2);
     Stride<int,int> stride1 = MakeStride(1, 4);
     auto layoutObj = MakeLayout(shape1, stride1);
@@ -285,9 +280,8 @@ TEST_F(Tensor_Api_Layout, TestShapeStride)
     EXPECT_EQ(AscendC::Std::get<0>(layoutStride), 1);
     EXPECT_EQ(AscendC::Std::get<1>(layoutStride), 4);
 
-    // 测试const对象调用layout方法返回const对象
-    Shape<int,int,int> shape2 = MakeShape(7, 3, 6);
-    Stride<int,int,int> stride2 = MakeStride(2, 1, 5);
+    Shape<int,int,int> shape2 = MakeShape(Std::Int<7>{}, Std::Int<3>{}, Std::Int<6>{});
+    Stride<int,int,int> stride2 = MakeStride(Std::Int<2>{}, Std::Int<1>{}, Std::Int<5>{});
     const auto constLayoutObj = MakeLayout(shape2, stride2);
     auto constLayoutShape = constLayoutObj.Shape();
     auto constLayoutStride = constLayoutObj.Stride();
@@ -309,7 +303,6 @@ TEST_F(Tensor_Api_Layout, TestShapeStride)
 TEST_F(Tensor_Api_Layout, TestOperator)
 {
     using namespace AscendC::Te;
-    // 两个维度的layout，构造tuple tuple tuple类型的Crd2IdxImpl
     // 输出为1 * 1 + 2 * 4 = 9
     Coord<int,int> coord1 = MakeCoord(1, 2);
     Shape<int,int> shape1 = MakeShape(3, 2);
@@ -317,7 +310,6 @@ TEST_F(Tensor_Api_Layout, TestOperator)
     auto layoutObj1 = MakeLayout(shape1, stride1);
     EXPECT_EQ(layoutObj1(coord1), 9);
 
-    // 三个维度的layout，构造int tuple tuple类型的Crd2IdxImpl
     // 首轴: div = 30 / 7 = 4, mod = 30 % 7 = 2, res = 2 * 2 = 4
     // 第2轴: div = 4 / 3 = 1, mod = 4 % 3 = 1, res = 4 + 1 * 1 = 5
     // 末轴: res = 5 + 1 * 5 = 10
@@ -327,7 +319,6 @@ TEST_F(Tensor_Api_Layout, TestOperator)
     auto layoutObj2 = MakeLayout(shape2, stride2);
     EXPECT_EQ(layoutObj2(coord2), 10);
 
-    // int int int类型的Crd2IdxImpl(无法直接构造非tuple类型的Layout)
     // 输出为7 * 5 = 35
     auto coord3 = AscendC::Std::Int<7>{};
     auto shape3 = AscendC::Std::Int<2>{};
@@ -339,16 +330,13 @@ TEST_F(Tensor_Api_Layout, TestOperator)
     auto shape4 = MakeShape(MakeShape(3, 4), MakeShape(5, 8));
     auto stride4 = MakeShape(MakeShape(1, 15), MakeShape(8, 60));
     auto layoutObj4 = MakeLayout(shape4, stride4);
-    // 构造与stride一一对应的一个coord
     // 输出为1 * 1 + 2 * 15 + 8 * 3 + 60 * 4 = 295
     auto coord4 = MakeCoord(MakeCoord(1, 2), MakeCoord(3, 4));
     EXPECT_EQ(layoutObj4(coord4), 295);
-    // 构造与外部维度一一对应的一个coord
     // stride[0]与coord[0]的idx: 首轴: div=8, mod=1, res=1; 第2轴: remain=8, res=8*15+1=121
     // stride[1]与coord[1]的idx: 首轴: div=6, mod=0, res=0; 第2轴: remain=6, res=360
     auto coord5 = MakeCoord(25, 30);
     EXPECT_EQ(layoutObj4(coord5), 481);
-    // 构造一个单维的Coord
     // 首轴: prod=12, div=40, mod=11, 首轴: div=3, mod=2, res=2; 第2轴: remain=3, res=3*15+2=47
     // 第2轴: 使用40，首轴: div=8, mod=0, res=0; 第2轴: remain=8, res=8*60=480
     auto coord6 = AscendC::Std::Int<491>{};
@@ -361,21 +349,18 @@ TEST_F(Tensor_Api_Layout, TestOperator)
 TEST_F(Tensor_Api_Layout, TestRankSize)
 {
     using namespace AscendC::Te;
-    // 二个维度的layout
     Shape<int,int> shape1 = MakeShape(3, 2);
     Stride<int,int> stride1 = MakeStride(1, 4);
     auto layoutObj1 = MakeLayout(shape1, stride1);
     EXPECT_EQ(layoutObj1.Size(), 6);
     EXPECT_EQ(layoutObj1.Rank(), 2);
 
-    // 三个维度的layout
     Shape<int,int,int> shape2 = MakeShape(7, 3, 6);
     Stride<int,int,int> stride2 = MakeStride(2, 1, 5);
     auto layoutObj2 = MakeLayout(shape2, stride2);
     EXPECT_EQ(layoutObj2.Size(), 126);
     EXPECT_EQ(layoutObj2.Rank(), 3);
 
-    // 2*2维度的layout
     auto shape3 = MakeShape(MakeShape(3, 4), MakeShape(5, 8));
     auto stride3 = MakeShape(MakeShape(1, 15), MakeShape(8, 60));
     auto layoutObj3 = MakeLayout(shape3, stride3);
@@ -393,7 +378,6 @@ TEST_F(Tensor_Api_Layout, TestRankSize)
 TEST_F(Tensor_Api_Layout, TestMakeShapeStride)
 {
     using namespace AscendC::Te;
-    // 二个维度的shape与stride, 使用常量
     auto shape1 = MakeShape(3, 2);
     auto stride1 = MakeStride(1, 4);
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape1)>, true);
@@ -401,20 +385,13 @@ TEST_F(Tensor_Api_Layout, TestMakeShapeStride)
     EXPECT_EQ(AscendC::Std::get<0>(GetShape(shape1)), 3);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape(shape1)), 2);
 
-    // 三个维度的shape与stride, 使用变量
-    auto shape2Dim0 = Int<11>{};
-    auto shape2Dim1 = Int<23>{};
-    auto shape2Dim2 = Int<37>{};
-    auto stride2Dim0 = Int<3>{};
-    auto stride2Dim1 = Int<7>{};
-    auto stride2Dim2 = Int<5>{};
-    auto shape2 = MakeShape(shape2Dim0, shape2Dim1, shape2Dim2);
-    auto stride2 = MakeStride(stride2Dim0, stride2Dim1, stride2Dim2);
+    auto shape2 = MakeShape(Int<11>{}, Int<23>{}, Int<37>{});
+    auto stride2 = MakeStride(Int<3>{}, Int<7>{}, Int<5>{});
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape2)>, true);
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride2)>, true);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape(shape2)), shape2Dim0);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape(shape2)), shape2Dim1);
-    EXPECT_EQ(AscendC::Std::get<2>(GetShape(shape2)), shape2Dim2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape(shape2)), Int<11>{});
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape(shape2)), Int<23>{});
+    EXPECT_EQ(AscendC::Std::get<2>(GetShape(shape2)), Int<37>{});
 }
 
 // MakeTile构造Tile对象
@@ -464,7 +441,6 @@ TEST_F(Tensor_Api_Layout, TestMakeTileCoord)
 TEST_F(Tensor_Api_Layout, TestMakeLayout)
 {
     using namespace AscendC::Te;
-    // 二个维度的shape与stride
     auto shape1 = MakeShape(3, 2);
     auto stride1 = MakeStride(1, 4);
     auto layout1 = MakeLayout(shape1, stride1);
@@ -473,7 +449,7 @@ TEST_F(Tensor_Api_Layout, TestMakeLayout)
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(layout1)), 1);
     EXPECT_EQ(AscendC::Std::get<1>(GetStride(layout1)), 4);
 
-    // 三个维度的shape, 只传Shape，此时最内侧stride为1，次内侧为13，外侧为13 * 11 = 143
+    // 此时最内侧stride为1，次内侧为13，外侧为13 * 11 = 143
     auto shape2 = MakeShape(7, 11, 13);
     auto layout2 = MakeLayout(shape2);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape(layout2)), 7);
@@ -483,7 +459,6 @@ TEST_F(Tensor_Api_Layout, TestMakeLayout)
     EXPECT_EQ(AscendC::Std::get<1>(GetStride(layout2)), 13);
     EXPECT_EQ(AscendC::Std::get<2>(GetStride(layout2)), 1);
 
-    // 四个维度的shape, 只传Shape
     // stride[0][0] = 1; stride[0][1] = 2 * 3 * 1 = 6;
     // stride[1][0] = 1 * 2 = 2; stride[1][1] = 3 * 6 = 18;
     auto shape3 = MakeShape(MakeShape(2, 3), MakeShape(3, 6));
@@ -508,9 +483,6 @@ TEST_F(Tensor_Api_Layout, TestMakeLayout)
 TEST_F(Tensor_Api_Layout, TestMakeNZLayout)
 {
     using namespace AscendC::Te;
-    // 构造一个float类型的nzlayout, row为256，col为16
-    // Shape为{{16, 16}, {8, 2}}
-    // Stride为{{8, 128}, {1, 128}}
     size_t row1 = 256UL;
     size_t col1 = 16UL;
     auto layout1 = MakeNZLayout<float>(row1, col1);
@@ -527,9 +499,6 @@ TEST_F(Tensor_Api_Layout, TestMakeNZLayout)
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 2048);
     
-    // 构造一个uint8类型的nzlayout, row为128，col为65536
-    // Shape为{{16, 8}, {32, 2048}}
-    // Stride为{{32, 512}, {1, 4096}}
     size_t row2 = 128UL;
     size_t col2 = 65536UL;
     auto layout2 = MakeNZLayout<uint8_t>(row2, col2);
@@ -553,9 +522,6 @@ TEST_F(Tensor_Api_Layout, TestMakeNZLayout)
 TEST_F(Tensor_Api_Layout, TestMakeL0CLayout)
 {
     using namespace AscendC::Te;
-    // 构造一个row为128，col为32的layout
-    // Shape为{{16, 8}, {16, 2}}
-    // Stride为{{16, 256}, {1, 2048}}
     size_t row1 = 128UL;
     size_t col1 = 32UL;
     auto layout1 = MakeL0CLayout(row1, col1);
@@ -572,9 +538,6 @@ TEST_F(Tensor_Api_Layout, TestMakeL0CLayout)
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 2048);
     
-    // 构造一个row为2048，col为1024的layout
-    // Shape为{{16, 128}, {16, 64}}
-    // Stride为{{16, 256}, {1, 32768}}
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeL0CLayout(row2, col2);
@@ -598,9 +561,6 @@ TEST_F(Tensor_Api_Layout, TestMakeL0CLayout)
 TEST_F(Tensor_Api_Layout, TestMakeRowMajorLayout)
 {
     using namespace AscendC::Te;
-    // 构造一个row为128，col为32的layout
-    // Shape为{{1, 128}, {1, 32}}
-    // Stride为{{0, 32}, {0, 1}}
     size_t row1 = 128UL;
     size_t col1 = 32UL;
     auto layout1 = MakeRowMajorLayout<uint32_t>(row1, col1);
@@ -617,9 +577,6 @@ TEST_F(Tensor_Api_Layout, TestMakeRowMajorLayout)
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 0);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 1);
     
-    // 构造一个row为2048，col为1024的layout
-    // Shape为{{1, 2048}, {1, 1024}}
-    // Stride为{{0, 1024}, {0, 1}}
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeRowMajorLayout<float>(row2, col2);
@@ -643,9 +600,6 @@ TEST_F(Tensor_Api_Layout, TestMakeRowMajorLayout)
 TEST_F(Tensor_Api_Layout, TestMakeColumnMajorLayout)
 {
     using namespace AscendC::Te;
-    // 构造一个row为128，col为32的layout
-    // Shape为{{1, 128}, {1, 32}}
-    // Stride为{{0, 1}, {0, 128}}
     size_t row1 = 128UL;
     size_t col1 = 32UL;
     auto layout1 = MakeColumnMajorLayout<uint32_t>(row1, col1);
@@ -662,9 +616,6 @@ TEST_F(Tensor_Api_Layout, TestMakeColumnMajorLayout)
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 0);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 128);
     
-    // 构造一个row为2048，col为1024的layout
-    // Shape为{{1, 2048}, {1, 1024}}
-    // Stride为{{0, 1}, {0, 2048}}
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeColumnMajorLayout<float>(row2, col2);
@@ -688,9 +639,6 @@ TEST_F(Tensor_Api_Layout, TestMakeColumnMajorLayout)
 TEST_F(Tensor_Api_Layout, TestMakeZNLayout)
 {
     using namespace AscendC::Te;
-    // 构造一个row为32，col为64的uint32_t类型的layout
-    // Shape为{{8, 4}, {16, 4}}
-    // Stride为{{1, 512}, {8, 128}}
     size_t row1 = 32UL;
     size_t col1 = 64UL;
     auto layout1 = MakeZNLayout<uint32_t>(row1, col1);
@@ -707,9 +655,6 @@ TEST_F(Tensor_Api_Layout, TestMakeZNLayout)
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 8);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 128);
     
-    // 构造一个row为2048，col为1024的float类型的layout
-    // Shape为{{8, 256}, {16, 64}}
-    // Stride为{{1, 8192}, {8, 128}}
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeZNLayout<float>(row2, col2);
@@ -733,9 +678,6 @@ TEST_F(Tensor_Api_Layout, TestMakeZNLayout)
 TEST_F(Tensor_Api_Layout, TestMakeZZLayout)
 {
     using namespace AscendC::Te;
-    // 构造一个row为32，col为64的uint32_t类型的layout
-    // Shape为{{16, 2}, {8, 8}}
-    // Stride为{{8, 1024}, {1, 128}}
     size_t row1 = 32UL;
     size_t col1 = 64UL;
     auto layout1 = MakeZZLayout<uint32_t>(row1, col1);
@@ -752,9 +694,6 @@ TEST_F(Tensor_Api_Layout, TestMakeZZLayout)
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 128);
     
-    // 构造一个row为2048，col为1024的float类型的layout
-    // Shape为{{16, 128}, {8, 128}}
-    // Stride为{{8, 16384}, {1, 128}}
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeZZLayout<float>(row2, col2);
@@ -772,19 +711,15 @@ TEST_F(Tensor_Api_Layout, TestMakeZZLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 128);
 }
 
-// Layout所包含的Attributes
 TEST_F(Tensor_Api_Layout, TestAttributes)
 {
     using namespace AscendC::Te;
-    // 两个维度的layout
     auto shape1 = MakeShape(3, 2);
     auto stride1 = MakeStride(7, 1);
     auto layoutObj1 = MakeLayout(shape1, stride1);
-    // 三个维度的layout
     auto shape2 = MakeShape(7, 3, 11);
     auto stride2 = MakeStride(34, 11, 1);
     auto layoutObj2 = MakeLayout(shape2, stride2);
-    // 2*2个维度的layout
     auto shape3 = MakeShape(MakeShape(2, 3), MakeShape(3, 6));
     auto stride3 = MakeShape(MakeShape(1, 6), MakeShape(6, 18));
     auto layoutObj3 = MakeLayout(shape3, stride3);
