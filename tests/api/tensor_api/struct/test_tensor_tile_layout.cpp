@@ -397,10 +397,10 @@ TEST_F(Tensor_Api_Layout, TestMakeShapeStride)
     auto stride3 = MakeStride(MakeShape(Int<55>{}, Int<66>{}), MakeShape(Int<77>{}, Int<88>{}));
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape3)>, true);
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride3)>, true);
-    EXPECT_EQ(GetShape<0,0>(shape3), Int<11>{});
-    EXPECT_EQ(GetShape<0,1>(shape3), Int<22>{});
-    EXPECT_EQ(GetShape<1,0>(shape3), Int<33>{});
-    EXPECT_EQ(GetShape<1,1>(shape3), Int<44>{});
+    EXPECT_EQ((GetShape<0,0>(shape3)), Int<11>{});
+    EXPECT_EQ((GetShape<0,1>(shape3)), Int<22>{});
+    EXPECT_EQ((GetShape<1,0>(shape3)), Int<33>{});
+    EXPECT_EQ((GetShape<1,1>(shape3)), Int<44>{});
 }
 
 // MakeTile构造Tile对象
@@ -472,14 +472,14 @@ TEST_F(Tensor_Api_Layout, TestMakeLayout)
     // stride[1][0] = 1 * 2 = 2; stride[1][1] = 3 * 6 = 18;
     auto shape3 = MakeShape(MakeShape(2, 3), MakeShape(3, 6));
     auto layout3 = MakeLayout(shape3);
-    EXPECT_EQ(GetShape<0,0>(layout3), 2);
-    EXPECT_EQ(GetShape<0,1>(layout3), 3);
-    EXPECT_EQ(GetShape<1,0>(layout3), 3);
-    EXPECT_EQ(GetShape<1,1>(layout3), 6);
-    EXPECT_EQ(GetStride<0,0>(layout3), 1);
-    EXPECT_EQ(GetStride<0,1>(layout3), 6);
-    EXPECT_EQ(GetStride<1,0>(layout3), 2);
-    EXPECT_EQ(GetStride<1,1>(layout3), 18);
+    EXPECT_EQ((GetShape<0,0>(layout3)), 2);
+    EXPECT_EQ((GetShape<0,1>(layout3)), 3);
+    EXPECT_EQ((GetShape<1,0>(layout3)), 3);
+    EXPECT_EQ((GetShape<1,1>(layout3)), 6);
+    EXPECT_EQ((GetStride<0,0>(layout3)), 1);
+    EXPECT_EQ((GetStride<0,1>(layout3)), 6);
+    EXPECT_EQ((GetStride<1,0>(layout3)), 2);
+    EXPECT_EQ((GetStride<1,1>(layout3)), 18);
 }
 
 // MakeNZLayout根据row和col构造Layout
