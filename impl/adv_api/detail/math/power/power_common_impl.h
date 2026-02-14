@@ -12,6 +12,13 @@
  * \file power_common_impl.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/math/power/power_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/math/power.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_POWER_POWER_COMMON_IMPL_H
+#endif
 #ifndef IMPL_MATH_POWER_POWER_COMMON_IMPL_H
 #define IMPL_MATH_POWER_POWER_COMMON_IMPL_H
 #include "kernel_basic_intf.h"
@@ -473,3 +480,8 @@ __aicore__ inline void PowerCommonImpl(const LocalTensor<T>& dstTensor, const Lo
 }
 }  // namespace AscendC
 #endif // IMPL_MATH_POWER_POWER_COMMON_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_POWER_POWER_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_POWER_POWER_COMMON_IMPL_H
+#endif
