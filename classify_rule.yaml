@@ -32,6 +32,7 @@ asc-devkit:
       - impl/utils/**/*.h
       - impl/experimental/tensor_api/utils/*.h
       - impl/c_api/instr_impl/npu_arch_2201/utils_impl/**/*.h
+      - impl/adv_api/detail/**/*.h
   llt:
     ut_check: true
     st_check: false

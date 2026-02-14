@@ -12,6 +12,13 @@
  * \file hccl_inner_def.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/hccl/common/hccl_inner_def.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/hccl/hccl.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_INNER_DEF_H
+#endif
+
 #ifndef IMPL_HCCL_HCCL_INNER_DEF_H
 #define IMPL_HCCL_HCCL_INNER_DEF_H
 
@@ -202,3 +209,8 @@ constexpr uint64_t CCU_MSG_EXT_RANK_OFFSET = sizeof(CCUMsgExt) * HCCL_MAX_RANK_N
 constexpr uint64_t CCU_MSG_EXT_MAX_OFFSET = CCU_MSG_EXT_RANK_OFFSET * HCCL_MSG_CNT;
 } // namespace AscendC
 #endif // IMPL_HCCL_HCCL_INNER_DEF_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_INNER_DEF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_INNER_DEF_H
+#endif

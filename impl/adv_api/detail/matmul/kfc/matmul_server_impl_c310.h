@@ -169,7 +169,7 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         }
     }
 
-    // Now release UB, actual is gmï¼Œ gm->l1
+    // Now release UB, actual is gmï¼?gm->l1
     if constexpr ((ToMatmulConfig(MM_CFG).iterateMode & IterateMode::ITERATE_MODE_ALL) != 0) {
         if (sync || body.waitIterateAll) {
             ASSERT(funID == KFC_Enum::MMFUN_ITERATE_ALL);

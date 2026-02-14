@@ -7,6 +7,15 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/reduce/reduce_common_ar_reuse_align_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/reduce/sum.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_REDUCE_COMMON_AR_REUSE_ALIGN_C310_IMPL_H
+#endif
+
+
 #ifndef IMPL_REDUCE_REDUCE_COMMON_AR_REUSE_ALIGN_C310_IMPL_H
 #define IMPL_REDUCE_REDUCE_COMMON_AR_REUSE_ALIGN_C310_IMPL_H
 
@@ -519,3 +528,8 @@ __aicore__ inline void ReduceARImpl(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr, __
 }
 } // namespace AscendC
 #endif // IMPL_REDUCE_REDUCE_COMMON_AR_REUSE_ALIGN_C310_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_REDUCE_COMMON_AR_REUSE_ALIGN_C310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_REDUCE_COMMON_AR_REUSE_ALIGN_C310_IMPL_H
+#endif
