@@ -10,6 +10,8 @@
 #include <gtest/gtest.h>
 #include <type_traits>
 #include "kernel_operator.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_constant.h"
+#include "impl/simt_api/cpp/dav_c310/kernel_simt_cast_sat_impl.h"
 
 using namespace std;
 using namespace AscendC;
