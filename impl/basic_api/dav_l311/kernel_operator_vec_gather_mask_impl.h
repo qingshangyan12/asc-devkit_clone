@@ -12,6 +12,12 @@
  * \file kernel_operator_vec_gather_mask_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/dav_l311/kernel_operator_vec_gather_mask_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_vec_intf.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_MASK_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_REDUCEV2_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCEV2_IMPL_H
 #include "kernel_struct_gather.h"
@@ -343,3 +349,7 @@ REGISTER_GATHER_MASK_SOLID_B32(uint32_t, u32)
 REGISTER_GATHER_MASK_SOLID_B32(int32_t, s32)
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_REDUCEV2_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_MASK_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_MASK_IMPL_H
+#endif

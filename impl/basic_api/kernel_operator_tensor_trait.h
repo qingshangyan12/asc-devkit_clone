@@ -12,6 +12,12 @@
  * \file kernel_operator_tensor_trait.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/kernel_operator_tensor_trait.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tensor.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_TENSOR_TRAIT_H
+#endif
 #ifndef TIKCFW_IMPL_KERNEL_OPERATOR_TENSOR_TRAIT_H
 #define TIKCFW_IMPL_KERNEL_OPERATOR_TENSOR_TRAIT_H
 
@@ -21,7 +27,8 @@
 namespace AscendC {
 
 /* \brief the TensorTrait of tensor;
- * \note this struct contains primitive type of tensor;
+ * 
+ote this struct contains primitive type of tensor;
  * info:
  * LiteType: the tensor's primitive type
  * If the layout type is used, the type must be specified and cannot be implicitly deduced.
@@ -88,4 +95,8 @@ template <typename T>
 constexpr bool is_tensorTrait_v = is_tensorTrait<T>::value;
 
 } // namespace AscendC
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_TENSOR_TRAIT_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_TENSOR_TRAIT_H
 #endif
