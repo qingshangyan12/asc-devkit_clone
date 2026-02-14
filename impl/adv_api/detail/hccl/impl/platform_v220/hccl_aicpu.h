@@ -12,6 +12,13 @@
  * \file hccl_aicpu.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/hccl/impl/platform_v220/hccl_aicpu.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/hccl/hccl.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_AICPU_V220_H
+#endif
+
 #ifndef IMPL_V220_HCCL_AICPU_H
 #define IMPL_V220_HCCL_AICPU_H
 
@@ -456,4 +463,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
 }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_AICPU_V220_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_AICPU_V220_H
 #endif

@@ -12,10 +12,22 @@
  * \file hccl_v310_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/hccl/impl/hccl_v310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/hccl/hccl.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_V310_IMPL_H
+#endif
+
 #ifndef IMPL_HCCL_HCCL_V310_IMPL_H
 #define IMPL_HCCL_HCCL_V310_IMPL_H
 
 #include "platform_v310/hccl_aicpu_def.h"
 #include "platform_v310/hccl_ccu_v0_def.h"
 
+#endif
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_V310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_V310_IMPL_H
 #endif

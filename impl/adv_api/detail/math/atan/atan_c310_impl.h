@@ -12,6 +12,15 @@
  * \file atan_c310_impl.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/math/atan/atan_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/math/atan.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ATAN_ATAN_C310_IMPL_H
+#endif
+
+
 #ifndef IMPL_MATH_ATAN_ATAN_C310_IMPL_H
 #define IMPL_MATH_ATAN_ATAN_C310_IMPL_H
 
@@ -128,7 +137,7 @@ __simd_callee__ inline void AtanCompute(
     TaylorExpand(tmpReg2, tmpReg, squareReg, TAYLOR_COUNT_FOUR, preg);
     MicroAPI::Adds(tmpReg2, tmpReg2, piByEight, preg);
     MicroAPI::Min(dstReg, dstReg, tmpReg2, preg);
-    // x in (tan(pi/4), +âˆž), atan(x) = pi/4 + atan((x-1)/(x+1))
+    // x in (tan(pi/4), +âˆ?, atan(x) = pi/4 + atan((x-1)/(x+1))
     // calculate |(x-1)/(x+1)|, normalize x to (0, tan(pi/4))
     // find the minimum value between atan(|(x-1)/(x+1)|) calculate in (0, tan(pi/8)) and (tan(pi/8), tan(pi/4))
     MicroAPI::Adds(tmpReg2, absReg, 1.0f, preg);
@@ -186,7 +195,7 @@ __simd_vf__ inline void AtanTaylorVFImpl(
 //  when x < 0, Atan(x) = atan(-x)
 //  when x belongs to (0, tan(pi/8)), Atan(x) = atan(x)
 //  when x belongs to (tan(pi/8), tan(pi/4)), Atan(x) = pi/8 + atan((x- tan(pi/8)) / (1+ x*tan(pi/8)))
-//  when x belongs to (tan(pi/4), +âˆž), Atan(x) = pi/4 + atan((x-1)/(x+1))
+//  when x belongs to (tan(pi/4), +âˆ?, Atan(x) = pi/4 + atan((x-1)/(x+1))
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void AtanTaylorImpl(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
@@ -338,3 +347,8 @@ __aicore__ inline void AtanImpl(const LocalTensor<T>& dstTensor, const LocalTens
 } // namespace AscendC
 
 #endif // IMPL_MATH_ATAN_ATAN_C310_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ATAN_ATAN_C310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ATAN_ATAN_C310_IMPL_H
+#endif

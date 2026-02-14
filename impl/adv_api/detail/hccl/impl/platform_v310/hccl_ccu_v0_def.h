@@ -12,6 +12,13 @@
  * \file hccl_ccu_v0_def.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0_def.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/hccl/hccl.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_CCU_V0_DEF_H
+#endif
+
 #ifndef IMPL_V310_HCCL_CCU_D100_DEF_H
 #define IMPL_V310_HCCL_CCU_D100_DEF_H
 
@@ -128,7 +135,7 @@ private:
     uint8_t workingFlag_ = false;
     bool needResetDataType_ = false;
     bool isInited_ = false;
-    __gm__ uint64_t *finishCntGM_; // 软同步使用
+    __gm__ uint64_t *finishCntGM_; // 软同步使�?
     uint64_t finishNum_;
     uint64_t finishNumTemp_;
 
@@ -163,4 +170,9 @@ private:
 };
 } // namespace AscendC
 
+#endif
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_CCU_V0_DEF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_CCU_V0_DEF_H
 #endif

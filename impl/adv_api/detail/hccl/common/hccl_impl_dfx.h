@@ -13,6 +13,13 @@
  * \brief
  */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/hccl/common/hccl_impl_dfx.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/hccl/hccl.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_IMPL_DFX_H
+#endif
+
 #ifndef IMPL_HCCL_HCCL_DFX_H
 #define IMPL_HCCL_HCCL_DFX_H
 namespace AscendC {
@@ -165,3 +172,8 @@ private:
 }  // namespace AscendC
 
 #endif  // IMPL_HCCL_HCCL_DFX_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_IMPL_DFX_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_IMPL_DFX_H
+#endif

@@ -12,6 +12,13 @@
  * \file hccl_ccu_d100.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/hccl/hccl.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_CCU_V0_H
+#endif
+
 #ifndef IMPL_V310_HCCL_CCU_D100_H
 #define IMPL_V310_HCCL_CCU_D100_H
 
@@ -492,7 +499,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     while(true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
         if (waitCke != 0) {
-            if (workingFlag_) { // 0核
+            if (workingFlag_) { // 0�?
                 finishNumTemp_++;
 
                 WriteHBMData(finishCntGM_, finishNumTemp_);
@@ -500,7 +507,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
             }
             break;
         }
-        if (!workingFlag_) { // 非0核
+        if (!workingFlag_) { // �?�?
             uint64_t finshCnt = ReadHBMData(finishCntGM_);
             if (finshCnt > finishNum_) {
                 break;
@@ -516,10 +523,10 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     globalCurWaitId_ %= CCU_MAX_MSG_NUM;
 
     // 补发消息
-    // 场景1： 同一个handleId需要补发消息
+    // 场景1�?同一个handleId需要补发消�?
     if (handleCommitCnt_[handleId] < handleNeedCommitCnt_[handleId]) {
         CommitMsg(handleId);
-    } else { // 场景2： 下一个handleId需要补发消息
+    } else { // 场景2�?下一个handleId需要补发消�?
         uint32_t nextHandleId = handleId + 1;
         if (nextHandleId < curHandleId_ && (handleCommitCnt_[nextHandleId] < handleNeedCommitCnt_[nextHandleId])) {
             CommitMsg(nextHandleId);
@@ -576,4 +583,9 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::SetReduceDataTypeAbility
     return true;
 }
 }
+#endif
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_CCU_V0_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_CCU_V0_H
 #endif
