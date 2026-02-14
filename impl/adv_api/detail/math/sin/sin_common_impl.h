@@ -12,6 +12,13 @@
  * \file sin_common_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/math/sin/sin_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/math/sin.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_SIN_SIN_COMMON_IMPL_H
+#endif
+
 #ifndef IMPL_MATH_SIN_SIN_COMMON_IMPL_H
 #define IMPL_MATH_SIN_SIN_COMMON_IMPL_H
 
@@ -157,7 +164,7 @@ __aicore__ inline void SinRound(const LocalTensor<float>& inputX, const LocalTen
     /*
     k=round(x/π), x0=x-kπ, x0 belongs to [-π/2, π/2]
     π=π_0+π_1+π_2+π_3 achieve final precision compensation.
-    Final solution：
+    Final solution�?
     k = round(x * invpi)
     x -= k * pi_0
     x -= k * pi_1
@@ -273,3 +280,8 @@ __aicore__ inline void SinImpl(const LocalTensor<T>& dstTensor, const LocalTenso
 }  // namespace AscendC
 
 #endif  // IMPL_MATH_SIN_SIN_COMMON_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_SIN_SIN_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_SIN_SIN_COMMON_IMPL_H
+#endif
