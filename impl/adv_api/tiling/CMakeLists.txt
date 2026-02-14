@@ -229,6 +229,7 @@ target_link_libraries(
           $<$<STREQUAL:${PRODUCT_SIDE},host>:platform>
           $<$<STREQUAL:${PRODUCT_SIDE},host>:exe_graph>
           $<$<STREQUAL:${PRODUCT_SIDE},host>:register>
+          $<$<STREQUAL:${PRODUCT_SIDE},host>:acl_rt>
   PUBLIC $<BUILD_INTERFACE:kernel_tiling_headers>
          $<$<STREQUAL:${PRODUCT_SIDE},host>:metadef_headers> tiling_api_headers)
 
