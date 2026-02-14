@@ -204,9 +204,8 @@ TEST_F(Tensor_Api_Layout, StaticLayoutOperation)
     EXPECT_EQ((StaticLayoutSize<FourDimT, FourDimU>::size), 20);
 }
 
-// Capacity()方法取的是每个维度shape * stride最大值
 // GetCapacity()方法输入Shape与Stride，根据数据类型存在不同的处理方式：
-//    1) 若Shape与Stride均为tuple类型，则同Capacity
+//    1) 若Shape与Stride均为tuple类型，取的是每个维度shape * stride最大值
 //    2) 若为int，则返回乘积
 TEST_F(Tensor_Api_Layout, TestCapacity)
 {
@@ -244,7 +243,6 @@ TEST_F(Tensor_Api_Layout, TestCapacity)
     EXPECT_EQ(GetCapacity(shape5, stride5), 480);
 }
 
-// layout()用于返回layout对象实体本身的引用
 // 对const对象，layout方法会返回const类型的引用
 TEST_F(Tensor_Api_Layout, TestLayout)
 {
@@ -264,9 +262,6 @@ TEST_F(Tensor_Api_Layout, TestLayout)
     static_assert(std::is_const_v<std::remove_reference_t<decltype(constLayoutRes)>>);
 }
 
-// Shape()以tuple形式返回layout对象的Shape成员
-// Stride()以tuple形式返回layout对象的Stride成员
-// GetValue方法用于返回tuple的特定位置的对象
 TEST_F(Tensor_Api_Layout, TestShapeStride)
 {
     using namespace AscendC::Te;
@@ -293,8 +288,6 @@ TEST_F(Tensor_Api_Layout, TestShapeStride)
     EXPECT_EQ(AscendC::Std::get<2>(constLayoutStride), Int<5>{});
 }
 
-// operator()方法: 基于coord, shape与stride来计算实际idx下标
-// 内部的Crd2IdxImpl支持三种形式：
 // 1) tuple tuple tuple:计算coord和stride在每个维度上的乘积之和
 // 2) int tuple tuple:
 //        若只剩最后一个维度：直接计算 coord * stride[0]
@@ -345,7 +338,6 @@ TEST_F(Tensor_Api_Layout, TestOperator)
 
 // Rank()方法:调用GetRank获取Shape的rank信息（维度）
 // Size()方法:调用GetSize获取Shape的size信息（维度的乘积）
-// 使用template可以指定多阶shape的下标
 TEST_F(Tensor_Api_Layout, TestRankSize)
 {
     using namespace AscendC::Te;
@@ -372,9 +364,6 @@ TEST_F(Tensor_Api_Layout, TestRankSize)
     EXPECT_EQ(layoutObj3.Rank<1>(), 2);
 }
 
-// MakeShape构造Shape对象
-// MakeStride构造Stride对象
-// GetShape获取并用tuple构造Shape对象
 TEST_F(Tensor_Api_Layout, TestMakeShapeStride)
 {
     using namespace AscendC::Te;
@@ -403,12 +392,9 @@ TEST_F(Tensor_Api_Layout, TestMakeShapeStride)
     EXPECT_EQ((GetShape<1,1>(shape3)), Int<44>{});
 }
 
-// MakeTile构造Tile对象
-// MakeCoord构造Coord对象
 TEST_F(Tensor_Api_Layout, TestMakeTileCoord)
 {
     using namespace AscendC::Te;
-    // 二个维度的tile与coord, 使用常量
     auto tile1 = MakeTile(3, 2);
     auto coord1 = MakeCoord(1, 4);
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(tile1)>, true);
@@ -418,7 +404,6 @@ TEST_F(Tensor_Api_Layout, TestMakeTileCoord)
     EXPECT_EQ(AscendC::Std::get<0>(coord1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(coord1), 4);
 
-    // 三个维度的tile与coord，使用变量
     auto tile2Dim0 = Int<11>{};
     auto tile2Dim1 = Int<23>{};
     auto tile2Dim2 = Int<37>{};
@@ -437,11 +422,7 @@ TEST_F(Tensor_Api_Layout, TestMakeTileCoord)
     EXPECT_EQ(AscendC::Std::get<2>(coord2), coord2Dim2);
 }
 
-
-// MakeLayout构造Layout对象
 // MakeLayout有两种形式，一种传入Shape与Stride来构造，另一种是传入Shape，Stride自动计算
-// GetShape获取并用tuple构造Layout的Shape对象
-// GetStride获取并用tuple构造Layout的Stride对象
 // stride的计算逻辑:
 //   若shape[0]为tuple(总维度为2且shape[0].size() == shape[1].size())，调用ComputeStride：
 //        stride[0][0] = 1; stride[0][i] = shape[0][i-1]*shape[1][i-1]*stride[0][i-1]
@@ -482,7 +463,6 @@ TEST_F(Tensor_Api_Layout, TestMakeLayout)
     EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(GetStride<1>(layout3))), 18);
 }
 
-// MakeNZLayout根据row和col构造Layout
 // Shape为{{16, row / 16}, {32 / SizeOf(T), col / (32 / SizeOf(T))}}
 // Stride为{{32 / SizeOf(T), 32 / SizeOf(T) * 16}, {1, row * (32 / SizeOf(T))}}
 TEST_F(Tensor_Api_Layout, TestMakeNZLayout)
@@ -522,8 +502,6 @@ TEST_F(Tensor_Api_Layout, TestMakeNZLayout)
 }
 
 // MakeL0CLayout本质上就是构建一个uint16_t类型的NZLayout
-// Shape为{{16, row / 16}, {16, col / 16}}
-// Stride为{{16, 256}, {1, row * 16}}
 TEST_F(Tensor_Api_Layout, TestMakeL0CLayout)
 {
     using namespace AscendC::Te;
@@ -560,7 +538,6 @@ TEST_F(Tensor_Api_Layout, TestMakeL0CLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 32768);
 }
 
-// MakeRowMajorLayout通过MakeLayoutForND构造Layout
 // Shape为{{1, row},{1, column}}
 // Stride为{{0, column}, {0, 1}}
 TEST_F(Tensor_Api_Layout, TestMakeRowMajorLayout)
@@ -599,7 +576,6 @@ TEST_F(Tensor_Api_Layout, TestMakeRowMajorLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 1);
 }
 
-// MakeColumnMajorLayout通过MakeLayoutForDN构造Layout
 // Shape为{{1, row},{1, column}}
 // Stride为{{0, 1}, {0, row}}
 TEST_F(Tensor_Api_Layout, TestMakeColumnMajorLayout)
@@ -638,7 +614,6 @@ TEST_F(Tensor_Api_Layout, TestMakeColumnMajorLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 2048);
 }
 
-// MakeZNLayout通过MakeLayoutForZN构造Layout
 // Shape为{{32 / size, row / (32 / size)},{16, col / 16}}
 // Stride为{{1, 32 / size * col}, {32 / size, 32 / size * 16}}
 TEST_F(Tensor_Api_Layout, TestMakeZNLayout)
@@ -677,7 +652,6 @@ TEST_F(Tensor_Api_Layout, TestMakeZNLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 128);
 }
 
-// MakeZZLayout通过MakeLayoutForZZ构造Layout
 // Shape为{{16, row / 16},{32 / size, col / (32 / size)}}
 // Stride为{{32 / size, 16 * col}, {1, 32 / size * 16}}
 TEST_F(Tensor_Api_Layout, TestMakeZZLayout)
