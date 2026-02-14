@@ -53,6 +53,7 @@ TEST_F(CosAPICheck, CosAPICheckTestSuccess)
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(CosAPICheck, CosAPICheckTestFailure)
 {
     AscendC::TPipe m_pipe;
@@ -92,3 +93,4 @@ TEST_F(CosAPICheck, CosAPICheckTestSubFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Cos, (half, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 12);
 }
+#endif

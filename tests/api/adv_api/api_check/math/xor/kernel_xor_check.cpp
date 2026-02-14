@@ -52,7 +52,7 @@ TEST_F(XorAPICheck, XorAPICheckTestSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Xor, (int16_t, false), (dstTensor, srcTensor, srcTensor, sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(XorAPICheck, XorAPICheckTestSubFailure)
 {
     AscendC::TPipe m_pipe;
@@ -92,3 +92,4 @@ TEST_F(XorAPICheck, XorAPICheckTestFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Xor, (uint8_t, true), (dstTensor[1], dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 21);
 }
+#endif

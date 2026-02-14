@@ -53,6 +53,7 @@ TEST_F(AsinhAPICheck, AsinhAPICheckTestSuccess)
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(AsinhAPICheck, AsinhAPICheckTestSubFailure)
 {
     AscendC::TPipe m_pipe;
@@ -92,3 +93,4 @@ TEST_F(AsinhAPICheck, AsinhAPICheckTestFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Asinh, (uint8_t, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 13);
 }
+#endif

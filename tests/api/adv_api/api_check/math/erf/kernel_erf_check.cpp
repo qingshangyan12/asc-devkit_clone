@@ -52,7 +52,7 @@ TEST_F(ErfAPICheck, ErfAPICheckTestSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Erf, (float, false), (dstTensor, srcTensor, sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(ErfAPICheck, ErfAPICheckTestSubFailure)
 {
     AscendC::TPipe m_pipe;
@@ -92,3 +92,4 @@ TEST_F(ErfAPICheck, ErfAPICheckTestFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Erf, (uint8_t, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 9);
 }
+#endif

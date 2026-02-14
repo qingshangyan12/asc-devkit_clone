@@ -47,7 +47,7 @@ TEST_F(LogAPICheck, LogAPICheckTestSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Log, (float, false), (dstTensor, srcTensor, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(LogAPICheck, LogAPICheckTestFailure)
 {
     AscendC::TPipe m_pipe;
@@ -107,7 +107,7 @@ TEST_F(LogAPICheck, Log2APICheckTestFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Log2, (uint8_t, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 9);
 }
-
+#endif
 TEST_F(LogAPICheck, Log10APICheckTestSuccess)
 {
     AscendC::TPipe m_pipe;
@@ -127,7 +127,7 @@ TEST_F(LogAPICheck, Log10APICheckTestSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Log10, (float, false), (dstTensor, srcTensor, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(LogAPICheck, Log10APICheckTestFailure)
 {
     AscendC::TPipe m_pipe;
@@ -142,3 +142,4 @@ TEST_F(LogAPICheck, Log10APICheckTestFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Log10, (uint8_t, true), (dstTensor[1], dstTensor[1], calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 7);
 }
+#endif

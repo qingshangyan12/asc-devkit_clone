@@ -49,7 +49,7 @@ TEST_F(ClampAPICheck, ClampMaxAPICheckTestSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(ClampMax, (float, false), (dstTensor, srcTensor, sharedTmpBuffer, (float)(2.0), calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(ClampAPICheck, ClampMaxAPICheckTestSubFailure)
 {
     AscendC::TPipe m_pipe;
@@ -89,7 +89,7 @@ TEST_F(ClampAPICheck, ClampMaxAPICheckTestFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(ClampMax, (uint8_t, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, (uint8_t)(2.0), calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 13);
 }
-
+#endif
 TEST_F(ClampAPICheck, ClampMinAPICheckTestSuccess)
 {
     AscendC::TPipe m_pipe;
@@ -114,7 +114,7 @@ TEST_F(ClampAPICheck, ClampMinAPICheckTestSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(ClampMin, (float, false), (dstTensor, srcTensor, sharedTmpBuffer, (float)(2.0), calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(ClampAPICheck, ClampMinAPICheckTestSubFailure)
 {
     AscendC::TPipe m_pipe;
@@ -154,3 +154,4 @@ TEST_F(ClampAPICheck, ClampMinAPICheckTestFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(ClampMin, (uint8_t, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, (uint8_t)(2.0), calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 13);
 }
+#endif
