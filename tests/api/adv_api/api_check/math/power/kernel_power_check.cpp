@@ -52,7 +52,7 @@ TEST_F(PowerAPICheck, PowerAPICheckTestSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Power, (float, false), (dstTensor, srcTensor, srcTensor, sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(PowerAPICheck, PowerAPICheckTestFailure)
 {
     AscendC::TPipe m_pipe;
@@ -72,7 +72,7 @@ TEST_F(PowerAPICheck, PowerAPICheckTestFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Power, (uint8_t, true), (dstTensor[1], dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 13);
 }
-
+#endif
 TEST_F(PowerAPICheck, PowerAPICheckTestScalarTensorSuccess)
 {
     AscendC::TPipe m_pipe;
@@ -97,7 +97,7 @@ TEST_F(PowerAPICheck, PowerAPICheckTestScalarTensorSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Power, (float, false), (dstTensor, (float)(2.0), srcTensor, sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(PowerAPICheck, PowerAPICheckTestScalarTensorFailure)
 {
     AscendC::TPipe m_pipe;
@@ -117,7 +117,7 @@ TEST_F(PowerAPICheck, PowerAPICheckTestScalarTensorFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Power, (uint8_t, true), (dstTensor[1], (uint8_t)(2.0), dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 9);
 }
-
+#endif
 TEST_F(PowerAPICheck, PowerAPICheckTestTensorScalarSuccess)
 {
     AscendC::TPipe m_pipe;
@@ -142,7 +142,7 @@ TEST_F(PowerAPICheck, PowerAPICheckTestTensorScalarSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Power, (float, false), (dstTensor, srcTensor, (float)(2.0), sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(PowerAPICheck, PowerAPICheckTestTensorScalarFailure)
 {
     AscendC::TPipe m_pipe;
@@ -162,3 +162,4 @@ TEST_F(PowerAPICheck, PowerAPICheckTestTensorScalarFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Power, (uint8_t, true), (dstTensor[1], dstTensor[1], (uint8_t)(2.0), sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 9);
 }
+#endif

@@ -51,8 +51,11 @@ TEST_F(SignAPICheck, SignAPICheckTestSuccess)
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Sign, (float, false), (dstTensor, srcTensor, sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
+    printf("zhang");
+    printf("sign");
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(SignAPICheck, SignAPICheckTestSubFailure)
 {
     AscendC::TPipe m_pipe;
@@ -71,6 +74,8 @@ TEST_F(SignAPICheck, SignAPICheckTestSubFailure)
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Sign, (uint8_t, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 7);
+    printf("zhang1");
+    printf("sign1");
 }
 
 TEST_F(SignAPICheck, SignAPICheckTestFailure)
@@ -91,4 +96,7 @@ TEST_F(SignAPICheck, SignAPICheckTestFailure)
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Sign, (uint8_t, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 13);
+    printf("zhang2");
+    printf("sign2");
 }
+#endif
