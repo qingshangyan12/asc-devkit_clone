@@ -18,39 +18,65 @@
 
 ## 🚀概述
 
-Ascend C是[CANN](https://hiascend.com/software/cann) （Compute Architecture for Neural Networks）推出的昇腾AI处理器专用的算子程序开发语言，原生支持C和C++标准规范。Ascend C主要由类库和语言扩展层构成，提供多层级API，满足多维场景算子开发诉求；总体逻辑架构图如下所示：
+[Ascend C](https://www.hiascend.com/cann/ascend-c)是CANN（Compute Architecture for Neural Networks）推出的昇腾AI处理器专用的算子程序开发语言，原生支持C和C++标准规范。作为一门面向多场景的编程语言，Ascend C 不仅致力于**提供芯片完备的编程能力以实现极致性能**，同时通过多层级编程接口设计，让您能够根据项目需求、团队技能与性能目标，灵活选择最合适的 API，在开发效率与运行性能之间取得最佳平衡。
+
+### 设计目标
+
+Ascend C 的设计目标可概括为 **“高性能、完备性、易编程、可调试和兼容性”**，其核心使命是基于昇腾AI处理器开发极致性能的算子。为提升编程易用性，我们通过最小化扩展的方式适配C/C++语言标准，兼顾业界基于指针的C语言开发习惯与基于Tensor的C++编程范式，实现开发体验与现有生态的无缝衔接。
+
+我们秉持以下核心理念：
+- **没有银弹**：不同场景对性能、开发效率的要求各异，单一接口无法最优适配所有场景；
+- **渐进式学习**：新手可从易用性接口入手快速验证算法，专家则可向下钻取、精细调优，借助复杂接口特性充分挖掘硬件潜能。
+
+
+
+### API层级
+基于上述设计目标，Ascend C定义了四个标准接口层级：
+
+| 层级 | 抽象程度 | 目标用户 | 主要用途 |
+|------|----------|----------|----------|
+| 算子模板库 (CATLASS/ATVOSS等) | 最高：算子完整样例 | 算法开发人员 | 基于典型算子实现进行自定义扩展，满足特定场景高性能需求 |
+| 高阶API | 较高：单核算法实现 | 算法开发人员 | 复用通用单核算法，快速完成算法验证 |
+| 基础API | 中等：基于Tensor的单指令抽象 | Tensor/Tile编程算子开发者 | 匹配C++ Tensor/Tile编程开发习惯，可支撑极致性能和一定易用性 |
+| 语言扩展层C API (SIMD & SIMT) | 最低：基于指针计算 | C语言算子开发者 | 匹配C语言编程开发习惯，可支撑极致性能和一定易用性 |
+
+其总体逻辑架构图如下所示：
 
 <img src="docs/figures/architecture.png" alt="架构图"  width="850px" height="580px">
 
-- 语言扩展层C API：纯C接口，支持数组分配内存、基于指针的计算接口，提供与业界一致的C语言编程体验，并开放芯片完备编程能力。Atlas A2/A3支持SIMD的纯C接口；Ascend 950PR/Ascend 950DT将支持与业界类似的纯SIMT编程能力、SIMD/SIMT混合编程能力；
-- 基础API：单指令抽象的C++类库API，一般基于Tensor编程；逐步基于Layout完善Tensor编程能力；
-- 高阶API：基于单核对常见算法进行抽象和封装，提供公共算法的实现；
-- 算子模板库：基于模板提供算子的完整实现参考，简化Tiling开发，支持用户自定义扩展；
-- Python前端：PyAsc基于Python前端，提供芯片底层完备编程能力，并将逐步基于Layout完善Tensor编程能力，新增SIMT编程等能力，实现基于Python接口开发高性能算子；
+- **语言扩展层C API**：纯C接口，支持数组分配内存、基于指针的计算接口，提供与业界一致的C语言编程体验，并开放芯片完备编程能力。Atlas A2/A3支持SIMD的纯C接口；Ascend 950PR/Ascend 950DT将支持与业界类似的纯SIMT编程能力、SIMD/SIMT混合编程能力；
+- **基础API**：单指令抽象的C++类库API，一般基于Tensor编程；逐步基于Layout完善Tensor编程能力；
+- **高阶API**：基于单核对常见算法进行抽象和封装，提供公共算法的实现；
+- **算子模板库**：基于模板提供算子的完整实现参考，简化Tiling开发，支持用户自定义扩展；
+- **Python前端PyAsc**：PyAsc基于Python前端，提供芯片底层完备编程能力，并将逐步基于Layout完善Tensor编程能力，新增SIMT编程等能力，实现基于Python接口开发高性能算子；
 
-本仓主要包含Ascend C编程API和必要的cmake编译脚本，是算子开发所需的核心模块。
+### 如何选择多层级API进行算子开发
+- **基于C/C++语言开发**：详细请参考[Ascend C多级API选择指南](./docs/add_asc_how_to_choose_api.md)
+- **基于Python语言开发，支撑完备编程能力，实现极致性能**：推荐选用Ascend C Python前端[PyAsc](https://gitcode.com/cann/pyasc)
+- **基于Python语言开发，快速开发验证，易用性优先**：推荐选用NPU自研DSL [PyPTO](https://gitcode.com/cann/pypto)
 
 
 ## 🔍目录结构说明
-
-本代码仓目录结构如下：
+本仓主要包含Ascend C编程API和必要的cmake编译脚本，是算子开发所需的核心模块，其目录结构如下：
 
 ```
 ├── cmake                               # Ascend C 构建源代码
 ├── docs                                # 项目文档介绍
 ├── examples                            # Ascend C API样例工程
-├── impl                                # Ascend C API接口实现源代码
-│   ├── adv_api                         # Ascend C 高阶API实现源代码
-│   ├── aicpu_api                       # Ascend C AI CPU API实现源代码
-│   ├── basic_api                       # Ascend C 基础API实现源代码
-│   ├── c_api                           # Ascend C 语言扩展层C API实现源代码
-│   └── utils                           # Ascend C 工具类实现源代码
-├── include                             # Ascend C API接口声明源代码
-│   ├── adv_api                         # Ascend C 高阶API声明源代码
-│   ├── aicpu_api                       # Ascend C AI CPU API声明源代码
-│   ├── basic_api                       # Ascend C 基础API声明源代码
-│   ├── c_api                           # Ascend C 语言扩展层C API声明源代码
-│   └── utils                           # Ascend C 工具类声明源代码
+├── include                             # Ascend C API 对外接口定义 (开发者可直接包含引用的接口)
+│   ├── adv_api                         # Ascend C 高阶API对外接口
+│   ├── aicpu_api                       # Ascend C AI CPU API对外接口定义
+│   ├── basic_api                       # Ascend C 基础API对外接口定义
+│   ├── c_api                           # Ascend C 语言扩展层C API对外接口定义
+│   ├── simt_api                        # Ascend C 语言扩展层SIMT API对外接口定义
+│   └── utils                           # Ascend C 工具类API对外接口定义
+├── impl                                # Ascend C API接口内部实现（开发者不能直接引用，不做兼容性保障）
+│   ├── adv_api                         # Ascend C 高阶API内部实现 (不可直接引用，内部实现可能会变更)
+│   ├── aicpu_api                       # Ascend C AI CPU API内部实现 (不可直接引用，内部实现可能会变更)
+│   ├── basic_api                       # Ascend C 基础API内部实现 (不可直接引用，内部实现可能会变更)
+│   ├── c_api                           # Ascend C 语言扩展层C API内部实现 (不可直接引用，内部实现可能会变更)
+│   ├── simt_api                        # Ascend C 语言扩展层SIMT API内部实现 (不可直接引用，内部实现可能会变更)
+│   └── utils                           # Ascend C 工具类API内部实现 (不可直接引用，内部实现可能会变更)
 ├── scripts                             # 打包相关脚本
 ├── tests                               # Ascend C API的UT用例
 └── tools                               # Ascend C 工具源代码
