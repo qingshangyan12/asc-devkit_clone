@@ -266,4 +266,4 @@ __aicore__ inline T CastNoSat(U x)
 
 }  // namespace Simt
 }  // namespace AscendC
-#endif  // ASCENDC_MODULE_SIMT_CAST_IMPL_H
+#endif  // ASCENDC_MODULE_SIMT_CAST_SAT_IMPL_H
