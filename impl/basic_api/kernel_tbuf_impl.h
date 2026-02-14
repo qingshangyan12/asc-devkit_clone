@@ -12,6 +12,12 @@
  * \file kernel_tbuf_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/kernel_tbuf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tpipe.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TBUF_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_TBUF_IMPL_H
 #define ASCENDC_MODULE_TBUF_IMPL_H
 
@@ -36,7 +42,8 @@ __aicore__ inline __sync_alias__ LocalTensor<T> TBuf<pos>::Get(uint32_t len)
     }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ASCENDC_DEBUG_ASSERT((len > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "buffer length is %u, which should be larger than 0", len));
-    ASCENDC_DEBUG_ASSERT((dataLen % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "buffer length is %u, which should be times of 32 Bytes \n",
+    ASCENDC_DEBUG_ASSERT((dataLen % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "buffer length is %u, which should be times of 32 Bytes 
+",
         len));
     ASCENDC_DEBUG_ASSERT((dataLen <= bufLen),
                    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "len is %u, max buffer len is %u", dataLen, bufLen));
@@ -210,3 +217,7 @@ template <TPosition pos> __aicore__ inline uint32_t TBuf<pos>::GetBufLen() const
 
 }
 #endif // ASCENDC_MODULE_TBUF_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TBUF_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TBUF_IMPL_H
+#endif
