@@ -18,7 +18,7 @@
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_FP8_IMPL__
-#warning "asc_fp8_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "asc_fp8.h" and use public functions or variables defined in interface header files."
+#warning "impl/simt_api/asc_fp8_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "simt_api/asc_fp8.h" and use public functions or variables defined in interface header files."
 #endif
 
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)

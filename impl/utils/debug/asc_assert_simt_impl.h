@@ -19,7 +19,7 @@
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_ASSERT_SIMT_IMPL__
-#warning "asc_assert_simt_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "asc_assert.h" and use public functions or variables defined in interface header files."
+#warning "impl/utils/debug/asc_assert_simt_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "utils/debug/asc_assert.h" and use public functions or variables defined in interface header files."
 #endif
 
 #include "impl/utils/debug/asc_printf_simt_impl.h"
