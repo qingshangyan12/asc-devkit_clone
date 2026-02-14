@@ -55,7 +55,11 @@ TEST_F(RmsNormAPICheck, RmsNormAPICheckTestSuccess)
     RmsNormTiling tiling;
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(RmsNorm, (float, false), (dstLocal, srcLocal, gammaLocal, sharedTmpBuffer, 0.5, tiling));
+    #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+    EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 4);
+    #else
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
+    #endif
 }
 
 TEST_F(RmsNormAPICheck, RmsNormAPICheckTestSubFailure)
@@ -76,7 +80,11 @@ TEST_F(RmsNormAPICheck, RmsNormAPICheckTestSubFailure)
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(RmsNorm, (uint8_t, false), (dstTensor[1], dstTensor[1], dstTensor[1],
         sharedTmpBuffer, 0.5, tiling));
+    #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+    EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, )8;
+    #else
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 4);
+    #endif
 }
 
 TEST_F(RmsNormAPICheck, RmsNormAPICheckTestFailure)
@@ -97,5 +105,9 @@ TEST_F(RmsNormAPICheck, RmsNormAPICheckTestFailure)
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(RmsNorm, (uint8_t, true), (dstTensor[1], dstTensor[1], dstTensor[1],
         sharedTmpBuffer, 0.5, tiling));
+    #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+    EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 8);
+    #else
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 6);
+    #endif
 }

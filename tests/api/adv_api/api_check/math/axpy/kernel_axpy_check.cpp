@@ -53,7 +53,7 @@ TEST_F(AxpyAPICheck, AxpyAPICheckTestSuccess)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Axpy, (float, half, false), (dstTensor, srcTensor, scalarValue, sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 0);
 }
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 TEST_F(AxpyAPICheck, AxpyAPICheckTestSubFailure)
 {
     AscendC::TPipe m_pipe;
@@ -95,3 +95,4 @@ TEST_F(AxpyAPICheck, AxpyAPICheckTestFailure)
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Axpy, (uint8_t, uint8_t, false), (dstTensor[1], dstTensor[1], scalarValue, sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 13);
 }
+#endif

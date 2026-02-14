@@ -255,7 +255,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIC_CASE_SRC_FILES
     matmul/load_buffer/test_matmul_load_to_l0a_gemv_mx.cpp
     matmul/lib/test_matmul_client.cpp
 )
-file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
+file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_PATH_FILES
     #utils
     utils/init_global_memory/test_operator_init_global_memory.cpp
     #activate
@@ -364,6 +364,12 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
     hccl/test_hccl_950.cpp
+)
+
+file(GLOB_RECURSE ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES_API_CHECK api_check/math/*.cpp)
+set(ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
+    ${ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_PATH_FILES}
+    ${ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES_API_CHECK}
 )
 
 # ascend310B1 test cases
