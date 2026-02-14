@@ -12,6 +12,15 @@
  * \file #include "broadcast_common_utils.h"
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/pad/broadcast/broadcast_common_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/pad/broadcast.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H
+#endif
+
+
 #ifndef IMPL_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H
 #define IMPL_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H
 
@@ -180,3 +189,8 @@ __aicore__ inline void LoopBroadCast(const LocalTensor<T> &dstLocal, const Local
 }  // namespace AscendC
 
 #endif  // IMPL_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_UTILS_H
+#endif
