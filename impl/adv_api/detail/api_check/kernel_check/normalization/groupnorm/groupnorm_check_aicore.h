@@ -12,6 +12,13 @@
  * \file groupnorm_check_aicore.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/api_check/kernel_check/normalization/groupnorm/groupnorm_check_aicore.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/normalization/groupnorm.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GROUPNORM_CHECK_AICORE_H
+#endif
+
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_GROUPNORM_GROUPNORM_CHECK_AICORE_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_GROUPNORM_GROUPNORM_CHECK_AICORE_H_
 
@@ -35,3 +42,8 @@ public:
 }
 }
 #endif // IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_GROUPNORM_GROUPNORM_CHECK_AICORE_H_
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GROUPNORM_CHECK_AICORE_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GROUPNORM_CHECK_AICORE_H
+#endif
