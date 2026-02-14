@@ -17,6 +17,7 @@
 
 #include "include/experimental/tensor_api/utils/utils.h"
 #include "impl/experimental/tensor_api/tensor/layout_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -97,12 +98,18 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
-        return Data()[Layout()(coord)];
+        auto layout = Layout();
+        auto index = Crd2Idx(coord, layout);
+        auto iterator = MakeMemPtr<EngineType::iterator::hardPos>(reinterpret_cast<elementType*>(Data().Get() + index));
+        return MakeTensor(iterator, layout);
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
-        return Data()[Layout()(coord)];
+        auto layout = Layout();
+        auto index = Crd2Idx(coord, layout);
+        auto iterator = MakeMemPtr<EngineType::iterator::hardPos>(reinterpret_cast<elementType*>(Data().Get() + index));
+        return MakeTensor(iterator, layout);
     }
 
     template <typename Coord0, typename Coord1, typename... Coords>
