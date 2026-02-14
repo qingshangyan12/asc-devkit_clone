@@ -12,6 +12,12 @@
  * \file kfc_comm_server.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/dav_c220/kfc/kfc_comm_server.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_operator_intf.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_SERVER_H
+#endif
 #ifndef __INTF_KFC_COMM_SERVER_H__
 #define __INTF_KFC_COMM_SERVER_H__
 
@@ -126,3 +132,7 @@ typedef KfcCommServer* KFC_COMM_SERVER_PTR;
 #define KFC_COMM_SERVER KfcCommServer
 } // namespace AscendC
 #endif // __INTF_KFC_COMM_SERVER_H__
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_SERVER_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_SERVER_H
+#endif
