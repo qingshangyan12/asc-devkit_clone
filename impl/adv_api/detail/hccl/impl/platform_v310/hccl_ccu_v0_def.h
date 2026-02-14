@@ -128,7 +128,7 @@ private:
     uint8_t workingFlag_ = false;
     bool needResetDataType_ = false;
     bool isInited_ = false;
-    __gm__ uint64_t *finishCntGM_; // 软同步使用
+    __gm__ uint64_t *finishCntGM_; // ??????
     uint64_t finishNum_;
     uint64_t finishNumTemp_;
 
@@ -150,8 +150,8 @@ private:
 
     __gm__ AlltoAllVParamCcu *allToAllVParam_;
 
-    uint8_t globalCurResId_ = 0; // 全局的消息ID
-    uint8_t globalCurWaitId_ = 0; // 全局的消息ID
+    uint8_t globalCurResId_ = 0; // ?????ID
+    uint8_t globalCurWaitId_ = 0; // ?????ID
 
     uint32_t globalCurCommitCnt_ = 0;
     uint32_t globalCurWaitCnt_ = 0;

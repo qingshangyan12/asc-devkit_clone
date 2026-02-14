@@ -217,7 +217,7 @@ template<const auto &config>
 __aicore__ inline void
 HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForOp(const HcclHandle handleId)
 {
-    ccuUsedXnNum_ = 8; // 算法默认使用的xn num
+    ccuUsedXnNum_ = 8; // ???????xn num
     FlushDataCache(&handleParamGM_[handleId]);
     uint8_t algorithmType = 0;
     for (uint32_t i = 0; i < MAX_CC_TILING_NUM; ++i) {
@@ -400,7 +400,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
     }
 
-    // 循环刷新xn, ccuUsedXnNum_ + 7) / 8 向上取整
+    // ????xn, ccuUsedXnNum_ + 7) / 8 ????
     for (int i = 0; i < ((ccuUsedXnNum_ + 7) / 8); i++) {
         FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
     }
@@ -492,7 +492,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     while(true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
         if (waitCke != 0) {
-            if (workingFlag_) { // 0核
+            if (workingFlag_) { // 0??
                 finishNumTemp_++;
 
                 WriteHBMData(finishCntGM_, finishNumTemp_);
@@ -500,7 +500,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
             }
             break;
         }
-        if (!workingFlag_) { // 非0核
+        if (!workingFlag_) { // ????
             uint64_t finshCnt = ReadHBMData(finishCntGM_);
             if (finshCnt > finishNum_) {
                 break;
@@ -515,11 +515,11 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     globalCurWaitId_++;
     globalCurWaitId_ %= CCU_MAX_MSG_NUM;
 
-    // 补发消息
-    // 场景1： 同一个handleId需要补发消息
+    // ????
+    // ??1?????handleId???????
     if (handleCommitCnt_[handleId] < handleNeedCommitCnt_[handleId]) {
         CommitMsg(handleId);
-    } else { // 场景2： 下一个handleId需要补发消息
+    } else { // ??2?????handleId???????
         uint32_t nextHandleId = handleId + 1;
         if (nextHandleId < curHandleId_ && (handleCommitCnt_[nextHandleId] < handleNeedCommitCnt_[nextHandleId])) {
             CommitMsg(nextHandleId);

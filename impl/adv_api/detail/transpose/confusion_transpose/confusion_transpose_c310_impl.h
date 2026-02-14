@@ -12,6 +12,15 @@
  * \file confusion_transpose_c310_impl.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/transpose/confusion_transpose/confusion_transpose_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/transpose/transdata.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_C310_IMPL_H
+#endif
+
+
 #ifndef IMPL_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_C310_IMPL_H
 #define IMPL_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_C310_IMPL_H
 
@@ -370,7 +379,7 @@ __aicore__ inline void ConfusionTranspose021(
 }
 
 /*
-scene 14ï¼š { shape:[N, H, W], format:"ND"} -->{ shape:[H, N, W], format:"ND"};
+scene 14ï¼?{ shape:[N, H, W], format:"ND"} -->{ shape:[H, N, W], format:"ND"};
 */
 template <typename T>
 __aicore__ inline void ConfusionTranspose102(
@@ -408,7 +417,7 @@ __aicore__ inline void ConfusionTranspose102(
 }
 
 /*
-scene 15ï¼š { shape:[N, H, W], format:"ND"} -->{ shape:[W, H, N], format:"ND"};
+scene 15ï¼?{ shape:[N, H, W], format:"ND"} -->{ shape:[W, H, N], format:"ND"};
 */
 template <typename T>
 __aicore__ inline void ConfusionTranspose210(
@@ -553,3 +562,8 @@ __aicore__ inline void ConfusionTransposeND2NZWithInlvImpl(__ubuf__ T* dstAddr, 
 }
 } // namespace AscendC
 #endif // IMPL_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_C310_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_C310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_C310_IMPL_H
+#endif
