@@ -179,4 +179,9 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define ASCEND_IS_AICORE constexpr(false)
 #endif
 
+namespace AscendC {
+namespace Reg {
+} // namespace Reg
+namespace MicroAPI = Reg;
+} // namespace AscendC
 #endif // ASCENDC_KERNEL_MACROS_H
