@@ -12,6 +12,12 @@
  * \file kernel_operator_scm_data_copy_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/dav_c220/kernel_operator_scm_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_operator_intf.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SCM_DATA_COPY_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_SCM_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_SCM_DATA_COPY_IMPL_H
 #include "kfc/kfc_comm_client.h"
@@ -80,4 +86,8 @@ __aicore__ inline void ScmDataCopyND2NZMsg(__cbuf__ void* dst, __gm__ void* src,
     GetKfcClient()->PostMessage<false>(msg);
 }
 } // namespace AscendC
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SCM_DATA_COPY_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SCM_DATA_COPY_IMPL_H
 #endif
