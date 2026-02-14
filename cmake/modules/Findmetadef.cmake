@@ -208,6 +208,27 @@ else()
   endif()
 endif()
 
+find_library(EXEGRAPH_LIB_DIR
+  NAME acl_rt
+  PATHS ${METADEF_LIB_SEARCH_PATHS}
+  PATH_SUFFIXES lib64
+  NO_CMAKE_SYSTEM_PATH
+  NO_CMAKE_FIND_ROOT_PATH
+)
+
+if(EXEGRAPH_LIB_DIR)
+  get_filename_component(EXEGRAPH_LIB_DIR ${EXEGRAPH_LIB_DIR} REALPATH)
+  add_library(acl_rt SHARED IMPORTED)
+  set_target_properties(acl_rt PROPERTIES
+    IMPORTED_LOCATION ${EXEGRAPH_LIB_DIR}
+  )
+  message(STATUS "Found acl_rt library:${EXEGRAPH_LIB_DIR}")
+else()
+  if(BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG)
+    message(STATUS "Cannot find library acl_rt")
+  endif()
+endif()
+
 # find_package_handle_standard_args(metadef
 #       REQUIRED_VARS METADEF_INC_DIR)
 
