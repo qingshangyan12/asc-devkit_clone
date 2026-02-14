@@ -13,7 +13,7 @@
  * \brief
  */
 #if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#warning                                                                                                               \
+#pragma message                                                                                                               \
     "impl/basic_api/dav_l311/kernel_operator_dump_tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tpipe.h"" and use public functions or variables defined in interface headers files."
 #define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H

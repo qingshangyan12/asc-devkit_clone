@@ -13,7 +13,7 @@
  * \brief
  */
 #if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#warning                                                                                                               \
+#pragma message                                                                                                               \
     "impl/basic_api/kernel_operator_conv2d_base_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_operator_conv2d_intf.h"" and use public functions or variables defined in interface headers files."
 #define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CONV2D_BASE_IMPL_H

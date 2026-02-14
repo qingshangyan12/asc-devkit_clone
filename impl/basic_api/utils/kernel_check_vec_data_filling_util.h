@@ -13,7 +13,7 @@
  * \brief
  */
 #if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#warning                                                                                                               \
+#pragma message                                                                                                               \
     "impl/basic_api/utils/kernel_check_vec_data_filling_util.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_vec_intf.h"" and use public functions or variables defined in interface headers files."
 #define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_VEC_DATA_FILLING_UTIL_H

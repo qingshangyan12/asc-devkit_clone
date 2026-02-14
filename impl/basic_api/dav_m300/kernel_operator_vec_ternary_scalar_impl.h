@@ -13,7 +13,7 @@
  * \brief AscendC v300 support vaxpy level 0/2 api.
  */
 #if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#warning                                                                                                               \
+#pragma message                                                                                                               \
     "impl/basic_api/dav_m300/kernel_operator_vec_ternary_scalar_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tpipe.h"" and use public functions or variables defined in interface headers files."
 #define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TERNARY_SCALAR_IMPL_H
