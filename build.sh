@@ -485,7 +485,7 @@ function build_package(){
 
 function build_test() {
   cmake_config
-  build all
+  build ascendc_ut_tensor_api_NPU_ARCH_2201_AIC
 }
 
 function build_test_part() {
