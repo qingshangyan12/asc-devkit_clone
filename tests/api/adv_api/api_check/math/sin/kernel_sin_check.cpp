@@ -71,6 +71,8 @@ TEST_F(SinAPICheck, SinAPICheckTestSubFailure)
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Sin, (uint8_t, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 5);
+    printf("sin_check");
+    printf("zhang");
 }
 
 TEST_F(SinAPICheck, SinAPICheckTestFailure)
@@ -91,4 +93,6 @@ TEST_F(SinAPICheck, SinAPICheckTestFailure)
     uint64_t startCounts = AscendC::KernelRaise::GetInstance().GetRaiseCount();
     AscendC::CHECK_FUNC_HIGHLEVEL_API(Sin, (uint8_t, true), (dstTensor[1], dstTensor[1], sharedTmpBuffer, calCount));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCounts, 9);
+    printf("sin_check1");
+    printf("zhang2");
 }
