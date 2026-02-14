@@ -12,6 +12,12 @@
  * \file kernel_log.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/kernel_log.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_common.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_LOG_H
+#endif
 #ifndef ASCENDC_MODULE_KERNEL_LOG_INTF_H
 #define ASCENDC_MODULE_KERNEL_LOG_INTF_H
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -169,7 +175,8 @@ inline std::string GenBlockStr()
     do {                                                                                                       \
         std::string coreTypeStr = AscendC::GenCoreTypeStr();                                                   \
         std::string blockStr = AscendC::GenBlockStr();                                                         \
-        printf("[DEBUG][%s][%s][%s:%d][%s][%u] " format "\n", blockStr.c_str(), coreTypeStr.c_str(), __FILE__, \
+        printf("[DEBUG][%s][%s][%s:%d][%s][%u] " format "
+", blockStr.c_str(), coreTypeStr.c_str(), __FILE__, \
             __LINE__, __FUNCTION__, static_cast<uint32_t>(getpid()), ##__VA_ARGS__);                           \
     } while (0)
 
@@ -177,7 +184,8 @@ inline std::string GenBlockStr()
     do {                                                                                                      \
         std::string coreTypeStr = AscendC::GenCoreTypeStr();                                                  \
         std::string blockStr = AscendC::GenBlockStr();                                                        \
-        printf("[INFO][%s][%s][%s:%d][%s][%u] " format "\n", blockStr.c_str(), coreTypeStr.c_str(), __FILE__, \
+        printf("[INFO][%s][%s][%s:%d][%s][%u] " format "
+", blockStr.c_str(), coreTypeStr.c_str(), __FILE__, \
             __LINE__, __FUNCTION__, static_cast<uint32_t>(getpid()), ##__VA_ARGS__);                          \
     } while (0)
 
@@ -185,7 +193,8 @@ inline std::string GenBlockStr()
     do {                                                                                                      \
         std::string coreTypeStr = AscendC::GenCoreTypeStr();                                                  \
         std::string blockStr = AscendC::GenBlockStr();                                                        \
-        printf("[WARN][%s][%s][%s:%d][%s][%u] " format "\n", blockStr.c_str(), coreTypeStr.c_str(), __FILE__, \
+        printf("[WARN][%s][%s][%s:%d][%s][%u] " format "
+", blockStr.c_str(), coreTypeStr.c_str(), __FILE__, \
             __LINE__, __FUNCTION__, static_cast<uint32_t>(getpid()), ##__VA_ARGS__);                          \
     } while (0)
 
@@ -193,7 +202,8 @@ inline std::string GenBlockStr()
     do {                                                                                                       \
         std::string coreTypeStr = AscendC::GenCoreTypeStr();                                                   \
         std::string blockStr = AscendC::GenBlockStr();                                                         \
-        printf("[ERROR][%s][%s][%s:%d][%s][%u] " format "\n", blockStr.c_str(), coreTypeStr.c_str(), __FILE__, \
+        printf("[ERROR][%s][%s][%s:%d][%s][%u] " format "
+", blockStr.c_str(), coreTypeStr.c_str(), __FILE__, \
             __LINE__, __FUNCTION__, static_cast<uint32_t>(getpid()), ##__VA_ARGS__);                           \
     } while (0)
 
@@ -203,7 +213,8 @@ inline std::string GenBlockStr()
     do {                                                                                                      \
         std::string blockStr = "Core_";                                                                       \
         blockStr += std::to_string(block_idx);                                                                \
-        printf("[DEBUG][%s][%s:%d][%s][%u] " format "\n", blockStr.c_str(), __FILE__, __LINE__, __FUNCTION__, \
+        printf("[DEBUG][%s][%s:%d][%s][%u] " format "
+", blockStr.c_str(), __FILE__, __LINE__, __FUNCTION__, \
             static_cast<uint32_t>(getpid()), ##__VA_ARGS__);                                                  \
     } while (0)
 
@@ -211,7 +222,8 @@ inline std::string GenBlockStr()
     do {                                                                                                     \
         std::string blockStr = "Core_";                                                                      \
         blockStr += std::to_string(block_idx);                                                               \
-        printf("[INFO][%s][%s:%d][%s][%u] " format "\n", blockStr.c_str(), __FILE__, __LINE__, __FUNCTION__, \
+        printf("[INFO][%s][%s:%d][%s][%u] " format "
+", blockStr.c_str(), __FILE__, __LINE__, __FUNCTION__, \
             static_cast<uint32_t>(getpid()), ##__VA_ARGS__);                                                 \
     } while (0)
 
@@ -219,7 +231,8 @@ inline std::string GenBlockStr()
     do {                                                                                                     \
         std::string blockStr = "Core_";                                                                      \
         blockStr += std::to_string(block_idx);                                                               \
-        printf("[WARN][%s][%s:%d][%s][%u] " format "\n", blockStr.c_str(), __FILE__, __LINE__, __FUNCTION__, \
+        printf("[WARN][%s][%s:%d][%s][%u] " format "
+", blockStr.c_str(), __FILE__, __LINE__, __FUNCTION__, \
             static_cast<uint32_t>(getpid()), ##__VA_ARGS__);                                                 \
     } while (0)
 
@@ -227,7 +240,8 @@ inline std::string GenBlockStr()
     do {                                                                                                      \
         std::string blockStr = "Core_";                                                                       \
         blockStr += std::to_string(block_idx);                                                                \
-        printf("[ERROR][%s][%s:%d][%s][%u] " format "\n", blockStr.c_str(), __FILE__, __LINE__, __FUNCTION__, \
+        printf("[ERROR][%s][%s:%d][%s][%u] " format "
+", blockStr.c_str(), __FILE__, __LINE__, __FUNCTION__, \
             static_cast<uint32_t>(getpid()), ##__VA_ARGS__);                                                  \
     } while (0)
 
@@ -274,7 +288,8 @@ __host_aicore__ static __attribute__ ((noinline)) void __assert_fail(const __gm_
     const __gm__ char* __file, unsigned int __line, const __gm__ char* __function)
 {
     (void)__function;
-    AscendC::AssertImpl("[ASSERT] %s:%u: Assertion `%s' " "\n", __file, __line, __assertion);
+    AscendC::AssertImpl("[ASSERT] %s:%u: Assertion `%s' " "
+", __file, __line, __assertion);
     trap();
 }
 }
@@ -291,7 +306,8 @@ __aicore__ static __attribute__ ((noinline)) void AssertPrint(__gm__ const char*
 __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ char *assertion, const __gm__ char *file,
                         unsigned int line)
 {
-        AscendC::AssertImpl("[ASSERT] %s:%u: Assertion `%s' " "\n", file, line, assertion);
+        AscendC::AssertImpl("[ASSERT] %s:%u: Assertion `%s' " "
+", file, line, assertion);
         trap();
 }
 #endif // defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
@@ -300,7 +316,8 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
 #define NPU_ASSERT_MSG(expr)                                                                                   \
     do {                                                                                                       \
         if (!(expr)) {                                                                                         \
-            fprintf(stderr, "[ASSERT] %s:%u: Assertion `%s' " "\n", __FILE__, __LINE__, #expr);                \
+            fprintf(stderr, "[ASSERT] %s:%u: Assertion `%s' " "
+", __FILE__, __LINE__, #expr);                \
             abort();                                                                                           \
         }                                                                                                      \
     } while (0)
@@ -390,7 +407,8 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
         __gm__ const char* prompt = "";            \
         if (!(expr)) {                             \
             if (VA_ARGS_IS_EMPTY(__VA_ARGS__)) {   \
-                ASC_ASSERT_MSG__(prompt, expr, "\n");\
+                ASC_ASSERT_MSG__(prompt, expr, "
+");\
             } else {                               \
                 ASC_ASSERT_MSG__(prompt, expr, __VA_ARGS__);\
             }                                      \
@@ -402,10 +420,12 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
     do {                                                                      \
         __gm__ const char* prompt = VA_ARGS_IS_EMPTY(__VA_ARGS__) ? "" :      \
             "[deprecated] NOTICE:assert has been deprecated, "                \
-            "please use ascendc_assert instead! \n";                          \
+            "please use ascendc_assert instead! 
+";                          \
         if (!(expr)) {                                                        \
             if (VA_ARGS_IS_EMPTY(__VA_ARGS__)) {                              \
-                ASC_ASSERT_MSG__(prompt,expr, "\n");                          \
+                ASC_ASSERT_MSG__(prompt,expr, "
+");                          \
             } else {                                                          \
                 ASC_ASSERT_MSG__(prompt, expr, __VA_ARGS__);                  \
             }                                                                 \
@@ -416,12 +436,14 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
     do {                                                                   \
        __gm__ const char* prompt = VA_ARGS_IS_EMPTY(__VA_ARGS__) ? "" :    \
             "[deprecated] NOTICE:assert has been deprecated, "             \
-            "please use ascendc_assert instead! \n";                       \
+            "please use ascendc_assert instead! 
+";                       \
         if (!(expr)) {                                                     \
             ENABLE_ASSERT();                                               \
             ENABLE_ASSERT_DUMP_SIZE();                                     \
             if (VA_ARGS_IS_EMPTY(__VA_ARGS__)) {                           \
-                ASC_ASSERT_MSG__(prompt, expr, "\n");                      \
+                ASC_ASSERT_MSG__(prompt, expr, "
+");                      \
             } else {                                                       \
                 ASC_ASSERT_MSG__(prompt, expr, __VA_ARGS__);               \
             }                                                              \
@@ -450,3 +472,7 @@ namespace AscendC{
 }
 
 #endif // ASCENDC_MODULE_KERNEL_LOG_INTF_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_LOG_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_LOG_H
+#endif

@@ -12,6 +12,12 @@
  * \file kernel_operator_cube_others_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/dav_c220/kernel_operator_cube_others_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_operator_intf.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CUBE_OTHERS_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_CUBE_OTHERS_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_CUBE_OTHERS_IMPL_H
 
@@ -603,3 +609,7 @@ __aicore__ inline void SetQuantPRE(uint64_t config)
 } // namespace AscendC
 #endif
 #endif // ASCENDC_MODULE_OPERATOR_CUBE_OTHERS_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CUBE_OTHERS_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CUBE_OTHERS_IMPL_H
+#endif

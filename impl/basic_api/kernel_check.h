@@ -12,6 +12,14 @@
  * \file kernel_check.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/kernel_check.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_operator_list_tensor_intf.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_H
+#endif
+
 #ifndef ASCENDC_MODULE_CHECK_H
 #define ASCENDC_MODULE_CHECK_H
 
@@ -39,6 +47,11 @@ uint64_t GetLoadDataLocalLen(const uint64_t tensorSize)
         return tensorSize / INT2_FOUR;
     } else if constexpr(IsSameType<PrimT<T>, uint1b_t>::value) {
         return tensorSize / INT1_EIGHT;
+#endif
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_H
 #endif
     } else {
         return tensorSize * sizeof(PrimT<T>);

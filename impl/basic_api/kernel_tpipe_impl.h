@@ -12,6 +12,12 @@
  * \file kernel_tpipe_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/basic_api/kernel_tpipe_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "basic_api/kernel_tpipe.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
@@ -282,7 +288,8 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
     this->g_tpipeImpl.curBufSize_ += num;
     // total buffer num created by InitBuffer must be <= 64
     ASCENDC_DEBUG_ASSERT((this->g_tpipeImpl.curBufSize_ <= QBUF_MAX_LEN && this->g_tpipeImpl.curBufSize_ > 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n",
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]
+",
         this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN));
     ASCENDC_DEBUG_ASSERT(
         (this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr <= this->g_tpipeImpl.tscmBufferPtr_),
@@ -347,7 +354,8 @@ template <TPosition pos> __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf
     this->g_tpipeImpl.curBufSize_ += bufHandleSize;
     // total buffer num created by InitBuffer must be <= 64
     ASCENDC_DEBUG_ASSERT((this->g_tpipeImpl.curBufSize_ <= QBUF_MAX_LEN && this->g_tpipeImpl.curBufSize_ > 0),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n", this->g_tpipeImpl.curBufSize_,
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]
+", this->g_tpipeImpl.curBufSize_,
         QBUF_MAX_LEN));
 #ifdef ASCENDC_TIME_STAMP_ON
     PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
@@ -642,7 +650,8 @@ __aicore__ inline void TPipe::WriteSpmBuffer(const LocalTensor<T>& write, const 
         SetFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
         WaitFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
     } else if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::L1)) {
-        ASCENDC_DEBUG_ASSERT((writeOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "writeOffset is %d, which must be 32B aligned \n",
+        ASCENDC_DEBUG_ASSERT((writeOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "writeOffset is %d, which must be 32B aligned 
+",
             writeOffset));
         DataCopyUB2L1Impl(reinterpret_cast<__cbuf__ T*>(g_tpipeImpl.spmInfo_.spmAddr) + writeOffset,
             reinterpret_cast<__ubuf__ T*>(write.GetPhyAddr()), copyParams);
@@ -677,7 +686,8 @@ __aicore__ inline void TPipe::ReadSpmBuffer(const LocalTensor<T>& read, const Da
         SetFlag<HardEvent::MTE2_MTE3>(eventIDMTE2ToMTE3);
         WaitFlag<HardEvent::MTE2_MTE3>(eventIDMTE2ToMTE3);
     } else if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::L1)) {
-        ASCENDC_DEBUG_ASSERT((readOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "readOffset is %d, which must be 32B aligned \n",
+        ASCENDC_DEBUG_ASSERT((readOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "readOffset is %d, which must be 32B aligned 
+",
             readOffset));
         event_t eventIDVToMTE1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE1));
         event_t eventIDMTE1ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_V));
@@ -721,9 +731,11 @@ __aicore__ inline void TPipe::WriteSpmBuffer(const LocalTensor<T>& write, const 
         SetFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
         WaitFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
     } else if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::L1)) {
-        ASCENDC_DEBUG_ASSERT((writeOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "writeOffset is %d, which must be 32B aligned \n",
+        ASCENDC_DEBUG_ASSERT((writeOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "writeOffset is %d, which must be 32B aligned 
+",
             writeOffset));
-        ASCENDC_DEBUG_ASSERT((writeSize % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "writeSize is %d, which must be 32B aligned \n",
+        ASCENDC_DEBUG_ASSERT((writeSize % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "writeSize is %d, which must be 32B aligned 
+",
             writeSize));
         DataCopyUB2L1Impl(reinterpret_cast<__cbuf__ T*>(g_tpipeImpl.spmInfo_.spmAddr) + writeOffset,
             reinterpret_cast<__ubuf__ T*>(write.GetPhyAddr()), repeatParams);
@@ -761,9 +773,11 @@ __aicore__ inline void TPipe::ReadSpmBuffer(const LocalTensor<T>& read, const in
         SetFlag<HardEvent::MTE2_MTE3>(eventIDMTE2ToMTE3);
         WaitFlag<HardEvent::MTE2_MTE3>(eventIDMTE2ToMTE3);
     } else if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::L1)) {
-        ASCENDC_DEBUG_ASSERT((readOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "readOffset is %d, which must be 32B aligned \n",
+        ASCENDC_DEBUG_ASSERT((readOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "readOffset is %d, which must be 32B aligned 
+",
             readOffset));
-        ASCENDC_DEBUG_ASSERT((readSize % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "readSize is %d, which must be 32B aligned \n", readSize));
+        ASCENDC_DEBUG_ASSERT((readSize % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "readSize is %d, which must be 32B aligned 
+", readSize));
         event_t eventIDVToMTE1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE1));
         event_t eventIDMTE1ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_V));
         event_t eventIDMTE1ToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_MTE3));
@@ -980,7 +994,8 @@ template <class T> __aicore__ inline bool TPipe::TscmInitBuffer(T& que, uint8_t 
     this->g_tpipeImpl.curBufSize_ += num;
     // total buffer num created by InitBuffer must be <= 64
     ASCENDC_DEBUG_ASSERT((this->g_tpipeImpl.curBufSize_ <= QBUF_MAX_LEN && this->g_tpipeImpl.curBufSize_ > 0),
-         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n", this->g_tpipeImpl.curBufSize_,
+         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]
+", this->g_tpipeImpl.curBufSize_,
          QBUF_MAX_LEN));
     return true;
 }
@@ -997,3 +1012,7 @@ __aicore__ inline uint64_t TransUBAddr(uint64_t addr)
 }
 #endif
 #endif // ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_H
+#endif
