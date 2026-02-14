@@ -224,7 +224,7 @@ if(ACL_RT_LIB_DIR)
   )
   message(STATUS "Found acl_rt library:${ACL_RT_LIB_DIR}")
 else()
-  message(STATUS "Cannot find library acl_rt")
+  message(FATAL_ERROR "Cannot find library acl_rt")
 endif()
 
 # find_package_handle_standard_args(metadef
