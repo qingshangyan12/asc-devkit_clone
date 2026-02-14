@@ -12,6 +12,14 @@
  * \file sort_common_utils.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/sort/sort_common_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/sort/topk.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_SORT_COMMON_UTILS_H
+#endif
+
 #ifndef IMPL_SORT_SORT_COMMON_UTILS_H
 #define IMPL_SORT_SORT_COMMON_UTILS_H
 
@@ -124,3 +132,8 @@ __simd_vf__ inline void TwiddleOutData(__ubuf__ U *src, __ubuf__ U *dst, uint32_
 
 } // namespace AscendC
 #endif // IMPL_SORT_SORT_COMMON_UTILS_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_SORT_COMMON_UTILS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_SORT_COMMON_UTILS_H
+#endif
