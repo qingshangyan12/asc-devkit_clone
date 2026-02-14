@@ -16,7 +16,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    vector_add_custom.asc
+    add_broadcast.asc
 )
 
 target_link_libraries(demo PRIVATE
