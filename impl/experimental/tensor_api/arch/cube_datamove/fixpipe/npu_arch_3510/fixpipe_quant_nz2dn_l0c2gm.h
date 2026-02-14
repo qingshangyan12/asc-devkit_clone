@@ -169,13 +169,17 @@ private:
         for (uint16_t i = 0; i < nIterNum; ++i) {
             CopyDeqTensorToFbufImpl(quant, calNSize, i);
             InsertSync();
+            auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * CBURST_NUM_3510));
+            auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * MAIN_LOOP_N_SIZE_3510));
             DataCopy<trait, T, U, decltype(mainLoopParam)>(dst[dstOffset * i], src[srcOffset * i], mainLoopParam);
         }
-        auto tailParam = GenParams<trait, T, U, true>(dst, src);
         if (tailNSize) {
+            auto tailParam = GenParams<trait, T, U, true>(dst, src);
             CopyDeqTensorToFbufImpl(quant, tailNSize, nIterNum);
             InsertSync();
-            DataCopy<trait, T, U, decltype(tailParam)>(dst[dstOffset * nIterNum], src[srcOffset * nIterNum], tailParam);
+            auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * CBURST_NUM_3510));
+            auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * MAIN_LOOP_N_SIZE_3510));
+            DataCopy<trait, T, U, decltype(tailParam)>(dst(dstCoord), src(srcOffset), tailParam);
         }
     }
 };
