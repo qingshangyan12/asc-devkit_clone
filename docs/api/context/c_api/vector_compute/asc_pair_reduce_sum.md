@@ -4,8 +4,8 @@
 
 | 产品   | 是否支持 |
 | ------------|:----:|
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √    |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √    |
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
 
 ## 功能说明
 
@@ -23,10 +23,8 @@
 - 高维切分计算
 
     ```c++
-    __aicore__ inline void asc_pair_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride,
-                                            uint16_t src_block_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_pair_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride,
-                                            uint16_t src_block_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_pair_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_pair_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
