@@ -12,6 +12,15 @@
  * \file batchnorm_check_c310.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/normalization/batchnorm/batchnorm_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/normalization/layernorm.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZATION_BATCHNORM_BATCHNORM_C310_IMPL_H
+#endif
+
+
 #ifndef IMPL_NORMALIZATION_BATCHNORM_BATCHNORM_C310_IMPL_H
 #define IMPL_NORMALIZATION_BATCHNORM_BATCHNORM_C310_IMPL_H
 #include "kernel_tensor.h"
@@ -84,7 +93,7 @@ __simd_callee__ inline void ComputeOutputMean(__ubuf__ T* dstLocal, __ubuf__ T* 
             LoadDataWithT(srcLocal, srcReg, maskFull, bIdx * featureLength + i * oneRepSize);
             // x / N
             MicroAPI::Muls(srcReg, srcReg, firstDimValueBack, maskFull);
-            // ∑(x / N)
+            // �?x / N)
             MicroAPI::Add(dstReg, dstReg, srcReg, maskFull);
         }
         SaveDataWithT(dstLocal, dstReg, maskFull, i * oneRepSize);
@@ -95,7 +104,7 @@ __simd_callee__ inline void ComputeOutputMean(__ubuf__ T* dstLocal, __ubuf__ T* 
             LoadDataWithT(srcLocal, srcReg, maskReg, bIdx * featureLength + mainRepeatTime * oneRepSize);
             // x / N
             MicroAPI::Muls(srcReg, srcReg, firstDimValueBack, maskReg);
-            // ∑(x / N)
+            // �?x / N)
             MicroAPI::Add(dstReg, dstReg, srcReg, maskReg);
         }
         SaveDataWithT(dstLocal, dstReg, maskReg, mainRepeatTime * oneRepSize);
@@ -121,7 +130,7 @@ __simd_callee__ inline void ComputeFloatMean(__ubuf__ float* dstLocal, __ubuf__ 
             LoadDataWithT(srcLocal, srcReg, maskFull, bIdx * featureLength + i * oneRepSize);
             // x / N
             MicroAPI::Muls(srcReg, srcReg, firstDimValueBack, maskFull);
-            // ∑(x / N)
+            // �?x / N)
             MicroAPI::Add(dstReg, dstReg, srcReg, maskFull);
         }
         MicroAPI::StoreAlign(dstLocal + i * oneRepSize, dstReg, maskFull);
@@ -132,7 +141,7 @@ __simd_callee__ inline void ComputeFloatMean(__ubuf__ float* dstLocal, __ubuf__ 
             LoadDataWithT(srcLocal, srcReg, maskReg, bIdx * featureLength + mainRepeatTime * oneRepSize);
             // x / N
             MicroAPI::Muls(srcReg, srcReg, firstDimValueBack, maskReg);
-            // ∑(x / N)
+            // �?x / N)
             MicroAPI::Add(dstReg, dstReg, srcReg, maskReg);
         }
         MicroAPI::StoreAlign(dstLocal + mainRepeatTime * oneRepSize, dstReg, maskReg);
@@ -164,10 +173,10 @@ __simd_callee__ inline void ComputeOutputVariance(__ubuf__ T* dstLocal, __ubuf__
             MicroAPI::Sub(diffReg, srcReg, meanReg, maskFull);
             // step 2: (x - u)²
             MicroAPI::Mul(sqrReg, diffReg, diffReg, maskFull);
-            // step 3: ∑(x - u)²
+            // step 3: �?x - u)²
             MicroAPI::Add(dstReg, dstReg, sqrReg, maskFull);
         }
-        // step 4: ∑(x - u)² / N
+        // step 4: �?x - u)² / N
         MicroAPI::Muls(dstReg, dstReg, firstDimValueBack, maskFull);
         SaveDataWithT(dstLocal, dstReg, maskFull, i * oneRepSize);
     }
@@ -180,10 +189,10 @@ __simd_callee__ inline void ComputeOutputVariance(__ubuf__ T* dstLocal, __ubuf__
             MicroAPI::Sub(diffReg, srcReg, meanReg, maskReg);
             // step 2: (x - u)²
             MicroAPI::Mul(sqrReg, diffReg, diffReg, maskReg);
-            // step 3: ∑(x - u)²
+            // step 3: �?x - u)²
             MicroAPI::Add(dstReg, dstReg, sqrReg, maskReg);
         }
-        // step 4: ∑(x - u)² / N
+        // step 4: �?x - u)² / N
         MicroAPI::Muls(dstReg, dstReg, firstDimValueBack, maskReg);
         SaveDataWithT(dstLocal, dstReg, maskReg, mainRepeatTime * oneRepSize);
     }
@@ -214,10 +223,10 @@ __simd_callee__ inline void ComputeFloatVariance(__ubuf__ float* dstLocal, __ubu
             MicroAPI::Sub(diffReg, srcReg, meanReg, maskFull);
             // step 2: (x - u)²
             MicroAPI::Mul(sqrReg, diffReg, diffReg, maskFull);
-            // step 3: ∑(x - u)²
+            // step 3: �?x - u)²
             MicroAPI::Add(dstReg, dstReg, sqrReg, maskFull);
         }
-        // step 4: ∑(x - u)² / N
+        // step 4: �?x - u)² / N
         MicroAPI::Muls(dstReg, dstReg, firstDimValueBack, maskFull);
         MicroAPI::StoreAlign(dstLocal + i * oneRepSize, dstReg, maskFull);
     }
@@ -230,10 +239,10 @@ __simd_callee__ inline void ComputeFloatVariance(__ubuf__ float* dstLocal, __ubu
             MicroAPI::Sub(diffReg, srcReg, meanReg, maskReg);
             // step 2: (x - u)²
             MicroAPI::Mul(sqrReg, diffReg, diffReg, maskReg);
-            // step 3: ∑(x - u)²
+            // step 3: �?x - u)²
             MicroAPI::Add(dstReg, dstReg, sqrReg, maskReg);
         }
-        // step 4: ∑(x - u)² / N
+        // step 4: �?x - u)² / N
         MicroAPI::Muls(dstReg, dstReg, firstDimValueBack, maskReg);
         MicroAPI::StoreAlign(dstLocal + mainRepeatTime * oneRepSize, dstReg, maskReg);
     }
@@ -363,3 +372,8 @@ __aicore__ inline void BatchNormImpl(const LocalTensor<T>& output, const LocalTe
 } // namespace BatchNormAPI
 } // namespace AscendC
 #endif // IMPL_NORMALIZATION_BATCHNORM_BATCHNORM_C310_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZATION_BATCHNORM_BATCHNORM_C310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZATION_BATCHNORM_BATCHNORM_C310_IMPL_H
+#endif
