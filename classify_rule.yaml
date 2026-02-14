@@ -37,6 +37,7 @@ asc-devkit:
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl/printf_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl.h
       - impl/basic_api/**/*.h
+      - impl/adv_api/detail/**/*.h
   llt:
     ut_check: true
     st_check: false
