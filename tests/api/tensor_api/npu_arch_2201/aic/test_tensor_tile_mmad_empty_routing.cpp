@@ -12,7 +12,7 @@
 #include <mockcpp/mockcpp.hpp>
 #include "include/experimental/tensor_api/tensor.h"
 
-class Tensor_Api_Mmad : public testing::Test {
+class Tensor_Api_Mmad_Empty_Routing : public testing::Test {
 protected:
     void SetUp()
     {
@@ -26,7 +26,7 @@ protected:
 using namespace AscendC::Te;
 
 #define TENSOR_TILE_MMAD_EMPTY_ROUTING_INPUT_POS_DISMATCH(DST_POS, FM_POS, FILTER_POS, DST_TYPE, SRC_TYPE, M, N, K,\
-        UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL)\
+        K_DIRECTION_ALIGN, CMATRIX_SOURCE)\
 uint8_t A2##DST_TYPE##_##SRC_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t B2##DST_TYPE##_##SRC_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t C2##DST_TYPE##_##SRC_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS[256 * 256 * sizeof(DST_TYPE)] = {0};\
@@ -47,23 +47,23 @@ TEST_F(Tensor_Api_Mmad_Empty_Routing, MmadOperationInputPosDismatch##DST_TYPE##_
     auto l0cMatrixLayout = MakeNZLayout<AscendC::Std::ignore_t>(M, N);\
     auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);\
 \
-     MOCKER_CPP(mad, void(__cc__ DST_TYPE *,\
+     MOCKER_CPP(mad, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
                 __cb__ SRC_TYPE *, uint16_t, uint16_t, uint16_t, uint8_t,\
                 bool, bool, bool))\
             .times(0);\
-    static constexpr MmadTrait triat = {0, 0, 0, 0, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL};\
-    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor);\
+    static constexpr MmadTrait triat = {0, K_DIRECTION_ALIGN, CMATRIX_SOURCE, 0};\
+    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor,  defaultMmadParams);\
     GlobalMockObject::verify();\
 }
 
-TENSOR_TILE_MMAD_EMPTY_ROUTING_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, float, half, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, float, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, float, bfloat16_t, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, int32_t, int8_t, 32, 32, 32, 0, 0, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, float, half, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, float, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, float, bfloat16_t, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, int32_t, int8_t, 32, 32, 32, 0, 0)
 
 
 #define TENSOR_TILE_MMAD_EMPTY_ROUTING_OUTPUT_POS_DISMATCH(DST_POS, FM_POS, FILTER_POS, DST_TYPE, SRC_TYPE, M, N, K,\
-        UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL)\
+        K_DIRECTION_ALIGN, CMATRIX_SOURCE)\
 uint8_t A2##DST_TYPE##_##SRC_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t B2##DST_TYPE##_##SRC_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t C2##DST_TYPE##_##SRC_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS[256 * 256 * sizeof(DST_TYPE)] = {0};\
@@ -84,23 +84,23 @@ TEST_F(Tensor_Api_Mmad_Empty_Routing, MmadOperationOutputPosDismatch##DST_TYPE##
     auto l0cMatrixLayout = MakeNZLayout<AscendC::Std::ignore_t>(M, N);\
     auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);\
 \
-     MOCKER_CPP(mad, void(__cc__ DST_TYPE *,\
+     MOCKER_CPP(mad, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
                 __cb__ SRC_TYPE *, uint16_t, uint16_t, uint16_t, uint8_t,\
                 bool, bool, bool))\
             .times(0);\
-    static constexpr MmadTrait triat = {0, 0, 0, 0, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL};\
-    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor);\
+    static constexpr MmadTrait triat = {0, K_DIRECTION_ALIGN, CMATRIX_SOURCE, 0};\
+    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor,  defaultMmadParams);\
     GlobalMockObject::verify();\
 }
 
-TENSOR_TILE_MMAD_EMPTY_ROUTING_OUTPUT_POS_DISMATCH(__ca__, __ca__, __cb__, float, half, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_OUTPUT_POS_DISMATCH(__ca__, __ca__, __cb__, float, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_OUTPUT_POS_DISMATCH(__ca__, __ca__, __cb__, float, bfloat16_t, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_OUTPUT_POS_DISMATCH(__ca__, __ca__, __cb__, int32_t, int8_t, 32, 32, 32, 0, 0, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_OUTPUT_POS_DISMATCH(__ca__, __ca__, __cb__, float, half, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_OUTPUT_POS_DISMATCH(__ca__, __ca__, __cb__, float, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_OUTPUT_POS_DISMATCH(__ca__, __ca__, __cb__, float, bfloat16_t, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_OUTPUT_POS_DISMATCH(__ca__, __ca__, __cb__, int32_t, int8_t, 32, 32, 32, 0, 0)
 
 
 #define TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_INPUT_POS_DISMATCH(DST_POS, FM_POS, FILTER_POS, BIAS_POS, DST_TYPE, SRC_TYPE, BIAS_TYPE,\
-        M, N, K, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL)\
+        M, N, K, K_DIRECTION_ALIGN, CMATRIX_SOURCE)\
 uint8_t A2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t B2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t C2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(DST_TYPE)] = {0};\
@@ -127,28 +127,28 @@ TEST_F(Tensor_Api_Mmad_Empty_Routing, MmadOperationWithBiasInputPosDismatch##DST
     auto biasMatrixLayout =  MakeRowMajorLayout<BIAS_TYPE>(M, N);\
     auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout);\
 \
-     MOCKER_CPP(mad, void(__cc__ DST_TYPE *,\
+     MOCKER_CPP(mad, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
                 __cb__ SRC_TYPE *, uint64_t, uint16_t, uint16_t, uint16_t, uint8_t,\
                 bool, bool, bool))\
             .times(0);\
-    static constexpr MmadTrait triat = {0, 0, 0, 0, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL};\
-    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor);\
+    static constexpr MmadTrait triat = {0, K_DIRECTION_ALIGN, CMATRIX_SOURCE, 0};\
+    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor, defaultMmadWithBiasParams);\
     GlobalMockObject::verify();\
 }
 
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, __cc__, float, float, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, __cc__, float, bfloat16_t, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, __cc__, float, half, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, __cc__, int32_t, int8_t, int32_t, 32, 32, 32, 0, 0, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, __cc__, float, float, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, __cc__, float, bfloat16_t, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, __cc__, float, half, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_INPUT_POS_DISMATCH(__cc__, __cb__, __ca__, __cc__, int32_t, int8_t, int32_t, 32, 32, 32, 0, 0)
 
 
 #define TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_OUTPUT_POS_DISMATCH(DST_POS, FM_POS, FILTER_POS, BIAS_POS, DST_TYPE, SRC_TYPE, BIAS_TYPE,\
-        M, N, K, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL)\
+        M, N, K, K_DIRECTION_ALIGN, CMATRIX_SOURCE)\
 uint8_t A2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t B2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t C2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(DST_TYPE)] = {0};\
 uint8_t BIAS##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(BIAS_TYPE)] = {0};\
-TEST_F(Tensor_Api_Mmad_Empty_Routing, MmadOperationWithBiasInputPosDismatch##DST_TYPE##_##SRC_TYPE)\
+TEST_F(Tensor_Api_Mmad_Empty_Routing, MmadOperationWithBiasOutputPosDismatch##DST_TYPE##_##SRC_TYPE)\
 {\
     auto a2Addr = reinterpret_cast<FM_POS SRC_TYPE*>(A2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS);\
     auto l0aIterator = MakeL0AmemPtr(a2Addr);\
@@ -170,28 +170,28 @@ TEST_F(Tensor_Api_Mmad_Empty_Routing, MmadOperationWithBiasInputPosDismatch##DST
     auto biasMatrixLayout =  MakeRowMajorLayout<BIAS_TYPE>(M, N);\
     auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout);\
 \
-     MOCKER_CPP(mad, void(__cc__ DST_TYPE *,\
+     MOCKER_CPP(mad, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
                 __cb__ SRC_TYPE *, uint64_t, uint16_t, uint16_t, uint16_t, uint8_t,\
                 bool, bool, bool))\
             .times(0);\
-    static constexpr MmadTrait triat = {0, 0, 0, 0, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL};\
-    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor);\
+    static constexpr MmadTrait triat = {0, K_DIRECTION_ALIGN, CMATRIX_SOURCE, 0};\
+    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor, defaultMmadWithBiasParams);\
     GlobalMockObject::verify();\
 }
 
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_OUTPUT_POS_DISMATCH(__cb__, __ca__, __cb__, __cc__, float, float, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_OUTPUT_POS_DISMATCH(__cb__, __ca__, __cb__, __cc__, float, bfloat16_t, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_OUTPUT_POS_DISMATCH(__cb__, __ca__, __cb__, __cc__, float, half, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_OUTPUT_POS_DISMATCH(__cb__, __ca__, __cb__, __cc__, int32_t, int8_t, int32_t, 32, 32, 32, 0, 0, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_OUTPUT_POS_DISMATCH(__cb__, __ca__, __cb__, __cc__, float, float, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_OUTPUT_POS_DISMATCH(__cb__, __ca__, __cb__, __cc__, float, bfloat16_t, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_OUTPUT_POS_DISMATCH(__cb__, __ca__, __cb__, __cc__, float, half, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_OUTPUT_POS_DISMATCH(__cb__, __ca__, __cb__, __cc__, int32_t, int8_t, int32_t, 32, 32, 32, 0, 0)
 
 
 #define TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_BIAS_POS_DISMATCH(DST_POS, FM_POS, FILTER_POS, BIAS_POS, DST_TYPE, SRC_TYPE, BIAS_TYPE,\
-        M, N, K, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL)\
+        M, N, K, K_DIRECTION_ALIGN, CMATRIX_SOURCE)\
 uint8_t A2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t B2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t C2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(DST_TYPE)] = {0};\
 uint8_t BIAS##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS[256 * 256 * sizeof(BIAS_TYPE)] = {0};\
-TEST_F(Tensor_Api_Mmad_Empty_Routing, MmadOperationWithBiasInputPosDismatch##DST_TYPE##_##SRC_TYPE)\
+TEST_F(Tensor_Api_Mmad_Empty_Routing, MmadOperationWithBiasBiasPosDismatch##DST_TYPE##_##SRC_TYPE)\
 {\
     auto a2Addr = reinterpret_cast<FM_POS SRC_TYPE*>(A2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##DST_POS##_##FM_POS##_##FILTER_POS##_##BIAS_POS);\
     auto l0aIterator = MakeL0AmemPtr(a2Addr);\
@@ -213,16 +213,16 @@ TEST_F(Tensor_Api_Mmad_Empty_Routing, MmadOperationWithBiasInputPosDismatch##DST
     auto biasMatrixLayout =  MakeRowMajorLayout<BIAS_TYPE>(M, N);\
     auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout);\
 \
-     MOCKER_CPP(mad, void(__cc__ DST_TYPE *,\
+     MOCKER_CPP(mad, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
                 __cb__ SRC_TYPE *, uint64_t, uint16_t, uint16_t, uint16_t, uint8_t,\
                 bool, bool, bool))\
             .times(0);\
-    static constexpr MmadTrait triat = {0, 0, 0, 0, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL};\
-    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor);\
+    static constexpr MmadTrait triat = {0, K_DIRECTION_ALIGN, CMATRIX_SOURCE, 0};\
+    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor, defaultMmadWithBiasParams);\
     GlobalMockObject::verify();\
 }
 
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_BIAS_POS_DISMATCH(__cc__, __ca__, __cb__, __cb__, float, float, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_BIAS_POS_DISMATCH(__cc__, __ca__, __cb__, __cb__, float, bfloat16_t, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_BIAS_POS_DISMATCH(__cc__, __ca__, __cb__, __cb__, float, half, float, 16, 16, 16, 0, 0, 0, 0)
-TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_BIAS_POS_DISMATCH(__cc__, __ca__, __cb__, __cb__, int32_t, int8_t, int32_t, 32, 32, 32, 0, 0, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_BIAS_POS_DISMATCH(__cc__, __ca__, __cb__, __cb__, float, float, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_BIAS_POS_DISMATCH(__cc__, __ca__, __cb__, __cb__, float, bfloat16_t, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_BIAS_POS_DISMATCH(__cc__, __ca__, __cb__, __cb__, float, half, float, 16, 16, 16, 0, 0)
+TENSOR_TILE_MMAD_EMPTY_ROUTING_WITH_BIAS_BIAS_POS_DISMATCH(__cc__, __ca__, __cb__, __cb__, int32_t, int8_t, int32_t, 32, 32, 32, 0, 0)

@@ -25,7 +25,7 @@ protected:
 };
 using namespace AscendC::Te;
 
-#define MMAD_TEST(DST_TYPE, SRC_TYPE, M, N, K, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL)\
+#define MMAD_TEST(DST_TYPE, SRC_TYPE, M, N, K, K_DIRECTION_ALIGN, CMATRIX_SOURCE)\
 uint8_t A2##DST_TYPE##_##SRC_TYPE[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t B2##DST_TYPE##_##SRC_TYPE[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t C2##DST_TYPE##_##SRC_TYPE[256 * 256 * sizeof(DST_TYPE)] = {0};\
@@ -38,10 +38,10 @@ void MmadTest##DST_TYPE##_##SRC_TYPE(__cc__ DST_TYPE* dst, __ca__ SRC_TYPE* fm, 
     EXPECT_EQ(m, M);\
     EXPECT_EQ(n, N);\
     EXPECT_EQ(k, K);\
-    EXPECT_EQ(unitFlag, UNIT_FLAG);\
+    EXPECT_EQ(unitFlag, defaultMmadParams.unitFlag);\
     EXPECT_EQ(kDirectionAlign, K_DIRECTION_ALIGN);\
     EXPECT_EQ(cmatrixSource, CMATRIX_SOURCE);\
-    EXPECT_EQ(cmatrixInitVal, C_MATRIX_INIT_VAL);\
+    EXPECT_EQ(cmatrixInitVal, defaultMmadParams.cmatrixInitVal);\
 }\
 \
 TEST_F(Tensor_Api_Mmad, MmadOperation##DST_TYPE##_##SRC_TYPE##_##M##_##N##_##K)\
@@ -61,17 +61,17 @@ TEST_F(Tensor_Api_Mmad, MmadOperation##DST_TYPE##_##SRC_TYPE##_##M##_##N##_##K)\
     auto l0cMatrixLayout = MakeNZLayout<AscendC::Std::ignore_t>(M, N);\
     auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);\
 \
-    MOCKER_CPP(mad, void(__cc__ DST_TYPE *,\
+    MOCKER_CPP(mad, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
                 __cb__ SRC_TYPE *, uint16_t, uint16_t, uint16_t, uint8_t,\
                 bool, bool, bool))\
             .times(1)\
             .will(invoke(MmadTest##DST_TYPE##_##SRC_TYPE));\
-    static constexpr MmadTrait triat = {0, 0, 0, 0, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL};\
-    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor);\
+    static constexpr MmadTrait triat = {0, K_DIRECTION_ALIGN, CMATRIX_SOURCE, 0};\
+    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, defaultMmadParams);\
     GlobalMockObject::verify();\
 }
 
-MMAD_TEST(float, half, 16, 16, 16, 0, 0, 0, 0);
-MMAD_TEST(float, float, 16, 16, 16, 0, 0, 0, 0);
-MMAD_TEST(float, bfloat16_t, 16, 16, 16, 0, 0, 0, 0);
-MMAD_TEST(int32_t, int8_t, 32, 32, 32, 0, 0, 0, 0);
+MMAD_TEST(float, half, 16, 16, 16, 0, 0);
+MMAD_TEST(float, float, 16, 16, 16, 0, 0);
+MMAD_TEST(float, bfloat16_t, 16, 16, 16, 0, 0);
+MMAD_TEST(int32_t, int8_t, 32, 32, 32, 0, 0);

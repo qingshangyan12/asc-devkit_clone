@@ -12,7 +12,7 @@
 #include "tensor_api/stub/cce_stub.h"
 #include "include/experimental/tensor_api/tensor.h"
 
-class Tensor_Api_Mmad : public testing::Test {
+class Tensor_Api_Mmad_With_Bias : public testing::Test {
 protected:
     void SetUp()
     {
@@ -25,7 +25,7 @@ protected:
 };
 using namespace AscendC::Te;
 
-#define MMAD_WITH_BIAS_ON_BIAS_TEST(DST_TYPE, SRC_TYPE, BIAS_TYPE, M, N, K, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL)\
+#define MMAD_WITH_BIAS_ON_BIAS_TEST(DST_TYPE, SRC_TYPE, BIAS_TYPE, M, N, K, K_DIRECTION_ALIGN, CMATRIX_SOURCE)\
 uint8_t A2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t B2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t C2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE[256 * 256 * sizeof(DST_TYPE)] = {0};\
@@ -40,10 +40,10 @@ void MmadWithBiasOnBiasTest##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE(__cc__ DST_TYPE
     EXPECT_EQ(m, M);\
     EXPECT_EQ(n, N);\
     EXPECT_EQ(k, K);\
-    EXPECT_EQ(unitFlag, UNIT_FLAG);\
+    EXPECT_EQ(unitFlag, defaultMmadWithBiasParams.unitFlag);\
     EXPECT_EQ(kDirectionAlign, K_DIRECTION_ALIGN);\
     EXPECT_EQ(cmatrixSource, true);\
-    EXPECT_EQ(cmatrixInitVal, C_MATRIX_INIT_VAL);\
+    EXPECT_EQ(cmatrixInitVal, defaultMmadWithBiasParams.cmatrixInitVal);\
 }\
 \
 TEST_F(Tensor_Api_Mmad_With_Bias, MmadOperationWithBiasOnBias##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##M##_##N##_##K)\
@@ -64,27 +64,27 @@ TEST_F(Tensor_Api_Mmad_With_Bias, MmadOperationWithBiasOnBias##DST_TYPE##_##SRC_
     auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);\
 \
     auto biasAddr = reinterpret_cast<__biasbuf__ BIAS_TYPE*>(BIAS##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto biasIterator = MakeBiasmemPtr(BiasAddr);\
+    auto biasIterator = MakeBiasmemPtr(biasAddr);\
     auto biasMatrixLayout = MakeRowMajorLayout<BIAS_TYPE>(M, N);\
     auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout);\
 \
-    MOCKER_CPP(mad, void(__cc__ DST_TYPE *,\
+    MOCKER_CPP(mad, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
                 __cb__ SRC_TYPE *, uint64_t, uint16_t, uint16_t, uint16_t, uint8_t,\
                 bool, bool, bool))\
             .times(1)\
             .will(invoke(MmadWithBiasOnBiasTest##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE));\
-    static constexpr MmadTrait triat = {0, 0, 0, 0, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL};\
-    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor);\
+    static constexpr MmadTrait triat = {0, K_DIRECTION_ALIGN, CMATRIX_SOURCE, 0};\
+    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor, defaultMmadWithBiasParams);\
     GlobalMockObject::verify();\
 }
 
-MMAD_WITH_BIAS_ON_BIAS_TEST(float, float, float, 16, 16, 16, 0, 0, 0, 0);
-MMAD_WITH_BIAS_ON_BIAS_TEST(float, bfloat16_t, float, 16, 16, 16, 0, 0, 0, 0);
-MMAD_WITH_BIAS_ON_BIAS_TEST(float, half, float, 16, 16, 16, 0, 0, 0, 0);
-MMAD_WITH_BIAS_ON_BIAS_TEST(int32_t, int8_t, int32_t, 32, 32, 32, 0, 0, 0, 0);
+MMAD_WITH_BIAS_ON_BIAS_TEST(float, float, float, 16, 16, 16, 0, 0);
+MMAD_WITH_BIAS_ON_BIAS_TEST(float, bfloat16_t, float, 16, 16, 16, 0, 0);
+MMAD_WITH_BIAS_ON_BIAS_TEST(float, half, float, 16, 16, 16, 0, 0);
+MMAD_WITH_BIAS_ON_BIAS_TEST(int32_t, int8_t, int32_t, 32, 32, 32, 0, 0);
 
 
-#define MMAD_WITH_BIAS_ON_L0C_TEST(DST_TYPE, SRC_TYPE, BIAS_TYPE, M, N, K, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL)\
+#define MMAD_WITH_BIAS_ON_L0C_TEST(DST_TYPE, SRC_TYPE, BIAS_TYPE, M, N, K, K_DIRECTION_ALIGN, CMATRIX_SOURCE)\
 uint8_t L0CA2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t L0CB2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE[256 * 256 * sizeof(SRC_TYPE)] = {0};\
 uint8_t L0CC2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE[256 * 256 * sizeof(DST_TYPE)] = {0};\
@@ -99,13 +99,13 @@ void MmadWithBiasOnL0CTest##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE(__cc__ DST_TYPE*
     EXPECT_EQ(m, M);\
     EXPECT_EQ(n, N);\
     EXPECT_EQ(k, K);\
-    EXPECT_EQ(unitFlag, UNIT_FLAG);\
+    EXPECT_EQ(unitFlag, defaultMmadWithBiasParams.unitFlag);\
     EXPECT_EQ(kDirectionAlign, K_DIRECTION_ALIGN);\
-    EXPECT_EQ(cmatrixSource, true);\
-    EXPECT_EQ(cmatrixInitVal, C_MATRIX_INIT_VAL);\
+    EXPECT_EQ(cmatrixSource, false);\
+    EXPECT_EQ(cmatrixInitVal, defaultMmadWithBiasParams.cmatrixInitVal);\
 }\
 \
-TEST_F(Tensor_Api_Mmad_With_Bias, MmadOperationWithBiasOnBias##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##M##_##N##_##K)\
+TEST_F(Tensor_Api_Mmad_With_Bias, MmadOperationWithBiasOnL0C##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE##_##M##_##N##_##K)\
 {\
     auto a2Addr = reinterpret_cast<__ca__ SRC_TYPE*>(L0CA2##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
     auto l0aIterator = MakeL0AmemPtr(a2Addr);\
@@ -123,21 +123,21 @@ TEST_F(Tensor_Api_Mmad_With_Bias, MmadOperationWithBiasOnBias##DST_TYPE##_##SRC_
     auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);\
 \
     auto biasAddr = reinterpret_cast<__cc__ BIAS_TYPE*>(L0CBIAS##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE);\
-    auto biasIterator = MakeL0CmemPtr(BiasAddr);\
+    auto biasIterator = MakeL0CmemPtr(biasAddr);\
     auto biasMatrixLayout = MakeRowMajorLayout<BIAS_TYPE>(M, N);\
     auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout);\
 \
-    MOCKER_CPP(mad, void(__cc__ DST_TYPE *,\
+    MOCKER_CPP(mad, void(__cc__ DST_TYPE *, __ca__ SRC_TYPE *,\
                 __cb__ SRC_TYPE *, uint64_t, uint16_t, uint16_t, uint16_t, uint8_t,\
                 bool, bool, bool))\
             .times(1)\
             .will(invoke(MmadWithBiasOnL0CTest##DST_TYPE##_##SRC_TYPE##_##BIAS_TYPE));\
-    static constexpr MmadTrait triat = {0, 0, 0, 0, UNIT_FLAG, K_DIRECTION_ALIGN, CMATRIX_SOURCE, C_MATRIX_INIT_VAL};\
-    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor);\
+    static constexpr MmadTrait triat = {0, K_DIRECTION_ALIGN, CMATRIX_SOURCE, 0};\
+    Mmad<triat>(l0cTensor, l0aTensor, l0bTensor, biasTensor, defaultMmadWithBiasParams);\
     GlobalMockObject::verify();\
 }
 
-MMAD_WITH_BIAS_ON_L0C_TEST(float, float, float, 16, 16, 16, 0, 0, 0, 0);
-MMAD_WITH_BIAS_ON_L0C_TEST(float, bfloat16_t, float, 16, 16, 16, 0, 0, 0, 0);
-MMAD_WITH_BIAS_ON_L0C_TEST(float, half, float, 16, 16, 16, 0, 0, 0, 0);
-MMAD_WITH_BIAS_ON_L0C_TEST(int32_t, int8_t, int32_t, 32, 32, 32, 0, 0, 0, 0);
+MMAD_WITH_BIAS_ON_L0C_TEST(float, float, float, 16, 16, 16, 0, 0);
+MMAD_WITH_BIAS_ON_L0C_TEST(float, bfloat16_t, float, 16, 16, 16, 0, 0);
+MMAD_WITH_BIAS_ON_L0C_TEST(float, half, float, 16, 16, 16, 0, 0);
+MMAD_WITH_BIAS_ON_L0C_TEST(int32_t, int8_t, int32_t, 32, 32, 32, 0, 0);
