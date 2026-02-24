@@ -13,21 +13,21 @@
 #include "tensor_api/stub/cce_stub.h"
 #include "include/experimental/tensor_api/tensor.h"
 
-enum class MemoryLayout {
+enum MemoryLayout {
     RowMajor,
     NZ,
     ColumnMajor,
     ZN,
 };
 
-enum class Location {
+enum Location {
     GM,
     L1,
     Bias,
     Fixbuf,
 };
 
-enum class Prefix {
+enum Prefix {
     gm,
     cbuf,
     biasbuf,
