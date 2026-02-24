@@ -471,6 +471,17 @@ struct MatmulTiling {
         }
     }
 
+#if ASCENDC_API_VERSION >= 20250330
+    __aicore__ inline int32_t GetNBatchOutNum() const
+    {
+        if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {
+            return (TILING.nBatchOutNum != -1) ? TILING.nBatchOutNum : tiling_->nBatchOutNum;
+        } else {
+            return tiling_->nBatchOutNum;
+        }
+    }
+#endif
+
 private:
     const TCubeTiling* __restrict tiling_;
 };

@@ -475,6 +475,9 @@ struct MatmulApiStaticTiling {
     int32_t CLayoutInfoS2 = -1;     ///< S2-axis information of C matrix layout
     int32_t BatchNum = -1;          ///< batch number of Batch Matmul
     int32_t mxTypePara = -1;        ///< multiple of scaleA/scaleB load size in L1 compared to the load size of A/B matrix in L1
+#if ASCENDC_API_VERSION >= 20250330
+    int32_t nBatchOutNum = -1;      ///< multiple copy out batch number of Batch Matmul
+#endif
     MatmulConfig cfg = CFG_NORM;    ///< MatmulConfig parameter
 };
 
