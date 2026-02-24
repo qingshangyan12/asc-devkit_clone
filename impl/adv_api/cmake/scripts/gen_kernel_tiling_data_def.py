@@ -61,6 +61,7 @@ def gen_tiling(tiling_header_file):
         if struct_def in _LEGACY_TILING_STRUCTS:
             single_legacy_tiling_export += f"using {_NAMESPACE}::{struct_def};\n"
 
+    ascendc_api_version_cond_flag = False
     with open(tiling_header_file, 'r') as fd:
         lines = fd.readlines()
         for line in lines:
@@ -71,6 +72,9 @@ def gen_tiling(tiling_header_file):
                 struct_def = re.findall(pattern, line)[0]
                 single_tiling_source += struct_def + ' {\n'
                 parse_legacy_tiling(struct_def)
+            elif (line.startswith('#if ASCENDC_API_VERSION >=')):
+                single_tiling_source += f"{line}\n"
+                ascendc_api_version_cond_flag = True
             elif (line.startswith('TILING_DATA_FIELD_DEF_ARR')):
                 field_params = re.findall(pattern, line)[0]
                 fds = field_params.split(',')
@@ -83,6 +87,9 @@ def gen_tiling(tiling_header_file):
                 field_params = re.findall(pattern, line)[0]
                 fds = field_params.split(',')
                 single_tiling_source += '    {} {} = 0;\n'.format(fds[0].strip(), fds[1].strip())
+            elif (line.startswith('#endif')) and ascendc_api_version_cond_flag:
+                single_tiling_source += f"{line}\n"
+                ascendc_api_version_cond_flag = False
             elif (line.startswith('END_TILING_DATA_DEF')):
                 single_tiling_source += '};\n'
                 single_tiling_source += '#pragma pack(pop)\n'
