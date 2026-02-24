@@ -28,12 +28,10 @@ __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
 
 __aicore__ inline void EnablePrintf()
 {
-#if defined(__ENABLE_ASCENDC_PRINTF__)
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct BinaryMetaAscFeature __asc_feature_print__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
-#endif // __ENABLE_ASCENDC_PRINTF__
 }
 
 
@@ -614,7 +612,7 @@ __aicore__ inline void UpdateBlockInfo(uint32_t tlvSize)
 template <class... Args>
 __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-#ifdef ASCENDC_DUMP
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     uint8_t blockIdx = GetDumpBlockIdx();
     if (blockIdx >= DUMP_CORE_COUNT) {
         return;
@@ -870,7 +868,7 @@ __aicore__ __gm__ inline uint8_t* GetRingBufTlv(__gm__ BlockRingBufInfo* blockRi
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-#ifdef ASCENDC_DUMP
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     EnablePrintf();
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
     if (blockRingBufInfo == nullptr) {
@@ -1026,7 +1024,7 @@ __aicore__ inline void WriteRingBufTlvData(
 template <template <typename> class Tensor, typename T>
 __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
-#ifdef ASCENDC_DUMP
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     EnablePrintf();
     if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
         ASCENDC_ASSERT((false),
@@ -1190,7 +1188,7 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 {
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     if (g_sysPrintFifoSpace != nullptr) {
         return;
     }
@@ -1202,7 +1200,7 @@ __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 }
 __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
 {
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     if (g_sysPrintFifoSpace != nullptr) {
         return;
     }

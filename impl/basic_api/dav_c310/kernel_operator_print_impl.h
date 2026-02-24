@@ -25,12 +25,10 @@ __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
 
 __aicore__ inline void EnablePrintf()
 {
-#if defined(__ENABLE_ASCENDC_PRINTF__)
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct BinaryMetaAscFeature __asc_feature_print__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
-#endif // __ENABLE_ASCENDC_PRINTF__
 }
 
 __aicore__ inline uint32_t GetArgsNum()
@@ -484,7 +482,7 @@ __aicore__ inline void WriteRingBufTlvData(__gm__ PrintTlvInfoHead* printTlv, __
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-#ifdef ASCENDC_DUMP
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     EnablePrintf();
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
     if (blockRingBufInfo == nullptr) {
