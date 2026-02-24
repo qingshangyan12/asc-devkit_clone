@@ -228,12 +228,7 @@ public:
 
     __aicore__ inline bool IsNeedNBatchOut() const
     {
-        if (batchOutCacheNum_ == nBatchOutNum_) {
-            return true;
-        } else if (batchOutOffsetNum_ + batchOutCacheNum_ == totalBatchNum_) {
-            return true;
-        }
-        return false;
+        return (batchOutCacheNum_ == nBatchOutNum_ || batchOutOffsetNum_ + batchOutCacheNum_ == totalBatchNum_);
     }
 
     __aicore__ inline int32_t GetBatchOutCacheNum() const
