@@ -120,10 +120,10 @@ void copy_gm_to_cbuf_multi_dn2zn_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, ui
     EXPECT_EQ(ndNum, static_cast<uint16_t>(1));
     EXPECT_EQ(srcNdMatrixStride, static_cast<uint16_t>(0));
     EXPECT_EQ(dstNzMatrixStride, static_cast<uint16_t>(0));
-    EXPECT_EQ(nValue, static_cast<uint16_t>(DST_DIM2));
-    EXPECT_EQ(dValue, static_cast<uint16_t>(DST_DIM1));
-    EXPECT_EQ(srcDValue, static_cast<uint16_t>(SRC_DIM1));
-    EXPECT_EQ(dstNzC0Stride, static_cast<uint16_t>(DST_DIM2));
+    EXPECT_EQ(nValue, static_cast<uint16_t>(DST_DIM1));
+    EXPECT_EQ(dValue, static_cast<uint16_t>(DST_DIM2));
+    EXPECT_EQ(srcDValue, static_cast<uint16_t>(SRC_DIM2));
+    EXPECT_EQ(dstNzC0Stride, static_cast<uint16_t>(DST_DIM1));
     EXPECT_EQ(dstNzNStride, static_cast<uint16_t>(1));
 }
 
