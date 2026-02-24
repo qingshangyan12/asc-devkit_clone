@@ -63,9 +63,9 @@ public:
         batchNum_ = batchA_ > batchB_ ? batchA_ : batchB_;
     }
 
-    __aicore__ inline void SetNBatchOutNum(int32_t nBatchOutNum)
+    __aicore__ inline void SetBatchOutNum(int32_t batchOutNum)
     {
-        nBatchOutNum_ = nBatchOutNum;
+        batchOutNum_ = batchOutNum;
     }
 
     // Outer Loop
@@ -232,14 +232,9 @@ public:
         return innerBatchIdx_;
     }
 
-    __aicore__ inline bool IsNeedNBatchOut() const
+    __aicore__ inline bool IsNeedBatchOut() const
     {
-        if (batchOutCacheNum_ == nBatchOutNum_) {
-            return true;
-        } else if (batchOutOffsetNum_ + batchOutCacheNum_ == totalBatchNum_) {
-            return true;
-        }
-        return false;
+        return (batchOutCacheNum_ == batchOutNum_ || batchOutOffsetNum_ + batchOutCacheNum_ == totalBatchNum_);
     }
 
     __aicore__ inline int32_t GetBatchOutCacheNum() const
@@ -353,9 +348,9 @@ protected:
     uint32_t innerIdx_;
     uint32_t innerBatchIdx_; // global view batch index within inner loop
 
-    // nBatchOut params
+    // batchOut params
     int32_t totalBatchNum_;
-    int32_t nBatchOutNum_ = 1;
+    int32_t batchOutNum_ = 1;
     int32_t batchOutCacheNum_ = 0;
     int32_t batchOutOffsetNum_ = 0;
 
