@@ -21,6 +21,7 @@
 #include "micro_api/kernel_micro_intf.h"
 #endif
 #include "kernel_prof_trace_intf.h"
+#include "utils/debug/asc_time.h"
 #include "kernel_operator_data_copy_intf.h"
 #include "kernel_operator_fixpipe_intf.h"
 #include "kernel_operator_dump_tensor_intf.h"
