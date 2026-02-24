@@ -16,6 +16,7 @@
 #define IMPL_MATMUL_SCHEDULER_ITERATOR_BATCH_LOOP_BATCH_LOOP_BASE_H
 
 #include "../../../utils/matmul_module.h"
+#include "include/utils/ascendc_api_version.h"
 
 namespace AscendC {
 namespace Impl {
@@ -49,6 +50,19 @@ public:
         batchB_ = tiling.GetBatchNum();
         totalBatchNum_ = batchA_;
         batchNum_ = batchA_;
+
+        if constexpr (ToMatmulConfig(MM_CFG).bmmOutMode != BatchOutMode::SINGLE_BATCH) {
+            if (batchOutNum_ == 0) {
+#if ASCENDC_API_VERSION >= 20260330
+                if (tiling.GetBatchOutNum() > 1) {
+                    batchOutNum_ = tiling.GetBatchOutNum();
+                }
+#endif
+            }
+        }
+        if (batchOutNum_ == 0) {
+            batchOutNum_ = 1;
+        }
     }
 
     __aicore__ inline void SetBatchNum(int32_t batchNumA, int32_t batchNumB)
@@ -57,9 +71,14 @@ public:
         batchNum_ = batchA_ > batchB_ ? batchA_ : batchB_;
     }
 
-    __aicore__ inline void SetNBatchOutNum(int32_t nBatchOutNum)
+    __aicore__ inline void SetBatchOutNum(int32_t batchOutNum)
     {
-        nBatchOutNum_ = nBatchOutNum;
+        batchOutNum_ = batchOutNum;
+    }
+
+    __aicore__ inline int32_t GetBatchOutNum()
+    {
+        return batchOutNum_;
     }
 
     // Outer Loop
@@ -226,14 +245,9 @@ public:
         return innerBatchIdx_;
     }
 
-    __aicore__ inline bool IsNeedNBatchOut() const
+    __aicore__ inline bool IsNeedBatchOut() const
     {
-        if (batchOutCacheNum_ == nBatchOutNum_) {
-            return true;
-        } else if (batchOutOffsetNum_ + batchOutCacheNum_ == totalBatchNum_) {
-            return true;
-        }
-        return false;
+        return (batchOutCacheNum_ == batchOutNum_ || batchOutOffsetNum_ + batchOutCacheNum_ == totalBatchNum_);
     }
 
     __aicore__ inline int32_t GetBatchOutCacheNum() const
@@ -347,9 +361,9 @@ protected:
     uint32_t innerIdx_;
     uint32_t innerBatchIdx_; // global view batch index within inner loop
 
-    // nBatchOut params
+    // batchOut params
     int32_t totalBatchNum_;
-    int32_t nBatchOutNum_ = 1;
+    int32_t batchOutNum_ = 0;
     int32_t batchOutCacheNum_ = 0;
     int32_t batchOutOffsetNum_ = 0;
 
