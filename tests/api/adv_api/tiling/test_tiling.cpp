@@ -2845,6 +2845,17 @@ TEST_F(TestTiling, TestSetBatch)
     EXPECT_EQ(ret, -1);
 }
 
+TEST_F(TestTiling, TestSetBatchOutCase)
+{
+    MatmulApiTiling tiling;
+    tiling.SetBatchOutNum(1);
+    tiling.SetBatchOutNum(0);
+    optiling::TCubeTiling tilingData;
+    int ret = tiling.GetTiling(tilingData);
+
+    EXPECT_EQ(ret, -1);
+}
+
 TEST_F(TestTiling, BmmNormalFailedCase)
 {
     MatmulApiTiling tiling;
