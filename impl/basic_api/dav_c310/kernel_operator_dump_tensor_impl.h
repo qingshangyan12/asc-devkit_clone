@@ -20,6 +20,7 @@
 #include "kernel_operator_data_copy_impl.h"
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_operator_print_impl.h"
+#include "utils/debug/asc_aicore_dump_impl.h"
 
 namespace AscendC {
 template <typename T>
@@ -360,9 +361,6 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor
     }
 }
 
-template <template <typename> class Tensor, typename T>
-__aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize);
-
 template <typename T>
 __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc,
                                                                 uint32_t dumpSize)
@@ -371,7 +369,21 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize);
+        const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
+        if (position == Hardware::UB) {
+            asc_dump_ubuf(src.GetPhyAddr(), desc, dumpSize);
+        } else if (position == Hardware::L1) {
+            return; // L1 to GM dump not support
+        } else if (position == Hardware::L0C) {
+            if ASCEND_IS_NOT_AIC {
+                return;
+            }
+            asc_dump_cbuf(src.GetPhyAddr(), desc, dumpSize);
+        } else {
+            ASCENDC_ASSERT((false),
+                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+            return;
+        }
     } else {
         DumpTensorLocal2GMEntityImpl(src, desc, dumpSize);
     }
@@ -513,7 +525,7 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize);
+        asc_dump_gm(src.GetPhyAddr(), desc, dumpSize);
     } else {
         DumpTensorGM2GMEntityImpl(src, desc, dumpSize);
     }
@@ -647,16 +659,6 @@ __aicore__ inline void FinalizeL1TensorDump()
 }
 
 template <typename T>
-__aicore__ inline Hardware CheckDumpTensorPosition(const LocalTensor<T>& src)
-{
-    Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
-    if (position != Hardware::UB && position != Hardware::L1 && position != Hardware::L0C) {
-        return Hardware::MAX;
-    }
-    return position;
-}
-
-template <typename T>
 __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType()
 {
     if constexpr (IsSameType<T, bool>::value) {
@@ -698,142 +700,6 @@ __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType()
     } else {
         return Internal::DumpTensorDataType::ACL_MAX;
     }
-}
-
-
-template <template<typename> class Tensor, typename T>
-__aicore__ inline void WriteRingBufTlvHead(const Tensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv,
-    const uint32_t& alignDumpDataLen, const uint32_t& desc, const uint32_t& dumpSize)
-{
-    Hardware position;
-    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
-        position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
-    } else if (IsSameType<Tensor<T>, GlobalTensor<T>>::value) {
-        position = Hardware::GM;
-    }
-    dumpTensorTlv->type = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
-    dumpTensorTlv->length = sizeof(DumpTensorTlvInfoHead) - sizeof(uint32_t[2]) + alignDumpDataLen;
-    dumpTensorTlv->tensorAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr()));
-    dumpTensorTlv->dataType = static_cast<uint32_t>(GetTensorDataType<T>());
-    dumpTensorTlv->desc = desc;
-    dumpTensorTlv->bufferId = static_cast<uint32_t>(0U);
-    dumpTensorTlv->position = static_cast<uint16_t>(position);
-    dumpTensorTlv->blockIdx = static_cast<uint16_t>(GetBlockIdxImpl());
-    dumpTensorTlv->dim = static_cast<uint32_t>(0U);
-    for (uint32_t i = 0; i < K_MAX_SHAPE_DIM; ++i) {
-        dumpTensorTlv->shape[i] = static_cast<uint32_t>(0U);
-    }
-    dumpTensorTlv->resv1 = static_cast<uint32_t>(0U);
-    dumpTensorTlv->dumpSize = dumpSize * sizeof(T);
-    dcci((__gm__ uint64_t*)dumpTensorTlv, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-}
-
-template <typename T>
-__aicore__ inline void SetDumpDataL0C2GM(__gm__ uint8_t* dst, const LocalTensor<T>& src, uint32_t dumpSize)
-{
-    if ASCEND_IS_NOT_AIC {
-        return;
-    }
-    // L0C to GM
-    uint16_t align = (dumpSize % DEFAULT_BLOCK_SIZE == 0) ? 0 : 1;
-    uint16_t countBlks = align + dumpSize / DEFAULT_BLOCK_SIZE;
-
-    uint16_t burstLen = static_cast<uint16_t>(SRC_BURST_LEN_SIZE_ELE * SRC_BURST_LEN_SIZE_ELE
-        * sizeof(float) / ONE_BLK_SIZE);
-    uint16_t n = countBlks * BLOCK_CUBE;
-    uint16_t m = (burstLen * ONE_BLK_SIZE / B32_BYTE_SIZE) / BLOCK_CUBE;
-    copy_matrix_cc_to_gm((__gm__ float *)(dst), (__cc__ float *)(src.GetPhyAddr()),
-        0, n, m, m * BLOCK_CUBE, m, 0,
-        0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant),
-        static_cast<uint8_t>(false), false, false,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true,
-        false, false, false);
-}
-
-template <typename T>
-__aicore__ inline void WriteRingBufTlvData(const LocalTensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv,
-    const uint32_t& alignDumpDataLen, const uint32_t& dumpSize)
-{
-    __gm__ T* dumpDataAddr = reinterpret_cast<__gm__ T*>(dumpTensorTlv + 1);
-    DataCopyParams copyParams = {1, static_cast<uint16_t>(alignDumpDataLen / ONE_BLK_SIZE), 0, 0};
-
-    PipeBarrier<PIPE_ALL>();
-
-    if (dumpTensorTlv->position == static_cast<uint16_t>(Hardware::UB)) {
-        DataCopyUB2GMImpl(dumpDataAddr, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()), copyParams); // UB to GM
-    } else if (dumpTensorTlv->position == static_cast<uint16_t>(Hardware::L0C)) {
-        SetDumpDataL0C2GM(reinterpret_cast<__gm__ uint8_t*>(dumpDataAddr), src, dumpSize); // L0C to GM
-    }
-
-    PipeBarrier<PIPE_ALL>();
-
-    dcci((__gm__ uint64_t*)dumpDataAddr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-}
-
-template <typename T>
-__aicore__ inline void WriteRingBufTlvData(
-    const GlobalTensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv, const uint32_t& dumpSize)
-{
-    PipeBarrier<PIPE_ALL>();
-    __gm__ uint8_t* dst = reinterpret_cast<__gm__ uint8_t*>(dumpTensorTlv + 1);
-    MemCopyGm2Gm(dst, reinterpret_cast<__gm__ const uint8_t*>(src.GetPhyAddr()), dumpSize * sizeof(T));
-}
-
-template <template <typename> class Tensor, typename T>
-__aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize)
-{
-#ifdef ASCENDC_DUMP
-    EnablePrintf();
-    if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
-        ASCENDC_ASSERT((false),
-                   { KERNEL_LOG(KERNEL_ERROR, "dump tensor not support this data type"); });
-        return;
-    }
-
-    if (dumpSize == 0) {
-        return;
-    }
-
-    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
-        Hardware position = CheckDumpTensorPosition(src);
-        // set the head struct value
-        if (position == Hardware::MAX) {
-            ASCENDC_ASSERT((false),
-                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
-            return;
-        } else if (position == Hardware::L0C) {
-            if ASCEND_IS_NOT_AIC {
-                return;
-            }
-        } else if (position == Hardware::L1) {
-            return; // L1 to GM dump not support
-        }
-    }
-
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    uint32_t alignDumpDataLen = AlignUp(dumpSize * sizeof(T), ONE_BLK_SIZE);
-    uint32_t tlvLen = sizeof(DumpTensorTlvInfoHead) + alignDumpDataLen;
-    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
-        return;
-    }
-
-    __gm__ DumpTensorTlvInfoHead* dumpTensorTlv =
-        reinterpret_cast<__gm__ DumpTensorTlvInfoHead*>(GetRingBufTlv(blockRingBufInfo));
-
-    WriteRingBufTlvHead(src, dumpTensorTlv, alignDumpDataLen, desc, dumpSize);
-    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
-        WriteRingBufTlvData(src, dumpTensorTlv, alignDumpDataLen, dumpSize);
-    } else if (IsSameType<Tensor<T>, GlobalTensor<T>>::value) {
-        WriteRingBufTlvData(src, dumpTensorTlv, dumpSize);
-    }
-
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-
-    UpdateWriteInfo(writeInfo, tlvLen);
-#endif // ASCENDC_DUMP
 }
 
 __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)

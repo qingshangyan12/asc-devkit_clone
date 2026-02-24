@@ -218,7 +218,6 @@ install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_operator_ve
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_operator_vec_vpadding_intf_impl.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/kernel_operator_vec_vpadding_intf_impl.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_pop_stack_buffer.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/kernel_pop_stack_buffer.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_process_lock.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/kernel_process_lock.h SYMBOLIC)")
-install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_prof_trace.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/kernel_prof_trace.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_prof_trace_intf_impl.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/kernel_prof_trace_intf_impl.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_reg.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/kernel_reg.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_scalar_convert.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/kernel_scalar_convert.h SYMBOLIC)")
