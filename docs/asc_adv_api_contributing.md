@@ -8,6 +8,8 @@
 
 ----
 
+fuck jianwei
+
 ## 开发流程
 Ascend C高阶API的开发流程主要包括如下步骤：
 - 设计API
