@@ -92,7 +92,7 @@ void copy_gm_to_cbuf_nz2nz_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t si
     EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
     EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM1 * TEST_C0_SIZE));
     EXPECT_EQ(srcStride, static_cast<uint16_t>(SRC_DIM1 * TEST_C0_SIZE));
-    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
+    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM1 * TEST_C0_SIZE));
 }
 
 // ND2NZ: CopyGmToCbufMultiND2NZBase
