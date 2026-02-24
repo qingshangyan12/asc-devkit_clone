@@ -21,7 +21,6 @@
 #include "platform_ascendc_log.h"
 #include "platform/platform_infos_def.h"
 #include "platform_ascendc.h"
-#include "acl/acl_rt.h"
 
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
@@ -476,8 +475,30 @@ fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char *custo
     fe::PlatformInfoManager::Instance().InitRuntimePlatformInfos(socVersion);
     fe::OptionalInfos optionalInfos;
     static fe::PlatFormInfos gPlatformInfo;
-    int32_t deviceId;
-    auto aclRet = aclrtGetDevice(&deviceId);
+    // int32_t deviceId;
+    // auto aclRet = aclrtGetDevice(&deviceId);
+    // 动态获取设备 ID
+    int32_t deviceId = 0;
+    auto getDeviceId = [&]() -> bool {
+        void* handle = dlopen("libacl_rt.so", RTLD_LAZY);
+        if (!handle) return false;
+        
+        using GetDeviceFunc = int(*)(int32_t*);
+        auto func = reinterpret_cast<GetDeviceFunc>(dlsym(handle, "aclrtGetDevice"));
+        if (!func) {
+            dlclose(handle);
+            return false;
+        }
+        
+        int ret = func(&deviceId);
+        dlclose(handle);
+        return (ret == 0);
+    };
+    if (!getDeviceId()) {
+        PF_LOGW("Failed to get device id via aclrtGetDevice, use default deviceId=0");
+        deviceId = 0;
+    }
+
     fe::PlatformInfoManager::Instance().GetRuntimePlatformInfosByDevice(deviceId, gPlatformInfo);
     std::string socVersionStr;
     const auto ret = gPlatformInfo.GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVersionStr);

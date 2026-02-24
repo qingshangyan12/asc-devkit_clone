@@ -230,7 +230,7 @@ target_link_libraries(
           $<$<STREQUAL:${PRODUCT_SIDE},host>:exe_graph>
           $<$<STREQUAL:${PRODUCT_SIDE},host>:register>
   PUBLIC $<BUILD_INTERFACE:kernel_tiling_headers>
-         $<$<STREQUAL:${PRODUCT_SIDE},host>:acl_rt>
+        #  $<$<STREQUAL:${PRODUCT_SIDE},host>:acl_rt>
          $<$<STREQUAL:${PRODUCT_SIDE},host>:metadef_headers> tiling_api_headers)
 
 if(BUILD_OPEN_PROJECT)
