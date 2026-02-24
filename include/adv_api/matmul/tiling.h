@@ -15,6 +15,7 @@
 #ifndef LIB_MATMUL_TILING_H
 #define LIB_MATMUL_TILING_H
 #include "kernel_basic_intf.h"
+#include "../../utils/ascendc_api_version.h"
 #include "../../../impl/adv_api/detail/matmul/utils/matmul_config_impl.h"
 
 /**
@@ -475,6 +476,9 @@ struct MatmulApiStaticTiling {
     int32_t CLayoutInfoS2 = -1;     ///< S2-axis information of C matrix layout
     int32_t BatchNum = -1;          ///< batch number of Batch Matmul
     int32_t mxTypePara = -1;        ///< multiple of scaleA/scaleB load size in L1 compared to the load size of A/B matrix in L1
+#if ASCENDC_API_VERSION >= 20260330
+    int32_t batchOutNum = -1;       ///< multiple copy out batch number of Batch Matmul
+#endif
     MatmulConfig cfg = CFG_NORM;    ///< MatmulConfig parameter
 };
 
