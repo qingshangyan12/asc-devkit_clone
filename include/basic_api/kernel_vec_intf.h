@@ -24,6 +24,7 @@
 #include "kernel_tpipe.h"
 #include "kernel_tensor.h"
 #include "kernel_prof_trace_intf.h"
+#include "utils/debug/asc_time.h"
 #include "kernel_operator_data_copy_intf.h"
 #include "kernel_operator_dump_tensor_intf.h"
 #include "kernel_operator_common_intf.h"
