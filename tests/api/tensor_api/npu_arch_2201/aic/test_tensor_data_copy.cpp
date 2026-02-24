@@ -77,22 +77,22 @@ constexpr int TestCeilDivision(int value, int divisor) {
 template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
 void copy_gm_to_cbuf_nd2nd_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
     uint16_t blockCount, uint16_t blockLen, uint16_t srcStride, uint16_t dstStride, pad_t padValue) {
-    EXPECT_EQ(sid, static_cast<uint16_t>(0));
-    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
-    EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM1 * TEST_C0_SIZE));
-    EXPECT_EQ(srcStride, static_cast<uint16_t>(SRC_DIM1 * TEST_C0_SIZE));
-    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
+    EXPECT_EQ(sid, static_cast<uint8_t>(0));
+    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM1));
+    EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE)));
+    EXPECT_EQ(srcStride, static_cast<uint16_t>(SRC_DIM2 * sizeof(DTYPE)));
+    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE)));
 }
 
 // NZ2NZ: CopyGmToCbufNZBase
 template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
 void copy_gm_to_cbuf_nz2nz_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
     uint16_t blockCount, uint16_t blockLen, uint16_t srcStride, uint16_t dstStride, pad_t padValue) {
-    EXPECT_EQ(sid, static_cast<uint16_t>(0));
-    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM2));
-    EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM1 * sizeof(DTYPE)));
-    EXPECT_EQ(srcStride, static_cast<uint16_t>(1 * sizeof(DTYPE)));
-    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM1 * sizeof(DTYPE)));
+    EXPECT_EQ(sid, static_cast<uint8_t>(0));
+    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
+    EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM1 * TEST_C0_SIZE));
+    EXPECT_EQ(srcStride, static_cast<uint16_t>(SRC_DIM1 * TEST_C0_SIZE));
+    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
 }
 
 // ND2NZ: CopyGmToCbufMultiND2NZBase
@@ -100,7 +100,7 @@ template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
 void copy_gm_to_cbuf_multi_nd2nz_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid,
             uint16_t ndNum, uint16_t nValue, uint16_t dValue, uint16_t srcNdMatrixStride, uint16_t srcDValue,
             uint16_t dstNzC0Stride, uint16_t dstNzNStride, uint16_t dstNzMatrixStride) {
-    EXPECT_EQ(sid, static_cast<uint16_t>(0));
+    EXPECT_EQ(sid, static_cast<uint8_t>(0));
     EXPECT_EQ(ndNum, static_cast<uint16_t>(1));
     EXPECT_EQ(srcNdMatrixStride, static_cast<uint16_t>(0));
     EXPECT_EQ(dstNzMatrixStride, static_cast<uint16_t>(0));
@@ -116,7 +116,7 @@ template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
 void copy_gm_to_cbuf_multi_dn2zn_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid,
             uint16_t ndNum, uint16_t nValue, uint16_t dValue, uint16_t srcNdMatrixStride, uint16_t srcDValue,
             uint16_t dstNzC0Stride, uint16_t dstNzNStride, uint16_t dstNzMatrixStride) {
-    EXPECT_EQ(sid, static_cast<uint16_t>(0));
+    EXPECT_EQ(sid, static_cast<uint8_t>(0));
     EXPECT_EQ(ndNum, static_cast<uint16_t>(1));
     EXPECT_EQ(srcNdMatrixStride, static_cast<uint16_t>(0));
     EXPECT_EQ(dstNzMatrixStride, static_cast<uint16_t>(0));
