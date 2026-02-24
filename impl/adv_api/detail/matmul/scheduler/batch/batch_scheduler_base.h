@@ -15,6 +15,7 @@
 #ifndef IMPL_MATMUL_SCHEDULER_BATCH_BATCH_SCHEDULER_BASE_H
 #define IMPL_MATMUL_SCHEDULER_BATCH_BATCH_SCHEDULER_BASE_H
 
+#include "include/utils/ascendc_api_version.h"
 #include "../../utils/matmul_module.h"
 #include "../../utils/matmul_utils.h"
 
@@ -70,6 +71,7 @@ public:
 
         auto shapeInfo = MATMUL_MODULE(MatmulShapeInfo);
         shapeInfo->InitParams();
+        InitNBatchOutNum();
 
         MATMUL_MODULE(MLoop)->Init(shapeInfo->GetSingleCoreM());
         MATMUL_MODULE(NLoop)->Init(shapeInfo->GetSingleCoreN());
@@ -110,8 +112,22 @@ public:
             MATMUL_MODULE(MatmulQuantProcessor)->Init(tiling.GetBaseN());
         }
 #endif
-
         InitShareBufEnd(var.tpipe_);
+    }
+
+    __aicore__ inline void InitNBatchOutNum()
+    {
+        if constexpr (ToMatmulConfig(MM_CFG).bmmOutMode != BatchOutMode::SINGLE_BATCH) {
+            if (nBatchOutNum_ == 0) {
+                nBatchOutNum_ = 1;
+#if ASCENDC_API_VERSION >= 20251231
+                if (MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetNBatchOutNum() > 1) {
+                    nBatchOutNum_ = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetNBatchOutNum();
+                }
+#endif
+            }
+            MATMUL_MODULE(BatchLoop)->SetNBatchOutNum(nBatchOutNum_);
+        }
     }
 
     __aicore__ inline BatchSchedulerContext PrepareContext()
@@ -568,7 +584,7 @@ private:
 #else
     constexpr static int32_t c0SizeB_ = c0Size_;
 #endif
-    int32_t nBatchOutNum_;
+    int32_t nBatchOutNum_ = 0;
 };
 }  // namespace Detail
 }  // namespace Impl
