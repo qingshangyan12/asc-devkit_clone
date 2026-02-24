@@ -67,7 +67,6 @@ constexpr int TEST_FRACTAL_FIXED = 16;
 constexpr int TEST_C0_SIZE = 32;
 constexpr int TEST_L12BT_UNIT = TEST_C0_SIZE * 2;          // 64
 constexpr int TEST_C2PIPE2GM_UNIT = TEST_C0_SIZE * 4;      // 128
-constexpr int TEST_NZ_BLOCK_SIZE = TEST_C0_SIZE * TEST_FRACTAL_FIXED;  // 512
 
 // ==================== Helper Functions ====================
 constexpr int TestCeilDivision(int value, int divisor) {
@@ -79,10 +78,10 @@ template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
 void copy_gm_to_cbuf_nd2nd_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
     uint16_t blockCount, uint16_t blockLen, uint16_t srcStride, uint16_t dstStride, pad_t padValue) {
     EXPECT_EQ(sid, static_cast<uint16_t>(0));
-    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM1));
-    EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE)));
-    EXPECT_EQ(srcStride, static_cast<uint16_t>(SRC_DIM2 * sizeof(DTYPE)));
-    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE)));
+    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
+    EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM1 * TEST_C0_SIZE));
+    EXPECT_EQ(srcStride, static_cast<uint16_t>(SRC_DIM1 * TEST_C0_SIZE));
+    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
 }
 
 // NZ2NZ: CopyGmToCbufNZBase
