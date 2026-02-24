@@ -16,6 +16,7 @@
 #define ASCENDC_KERNEL_MACROS_H
 
 #include <cstdint>
+#include "utils/debug/asc_utils_macros.h"
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #define ASSERT(x) assert(x)
 #define DEBUG_CODE(T) T
@@ -108,14 +109,6 @@
 #define TPIPE_MAX_TYPE 4
 #endif
 
-#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
-#define SPLIT_CORE_CUBE
-#endif
-
-#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
-#define SPLIT_CORE_VEC
-#endif
-
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #define ASCENDC_MATMUL_AICORE
 #endif
@@ -147,42 +140,9 @@ constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
 constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
 constexpr int32_t CAST_MODE_BIT = 59;
 
-constexpr int32_t MIX = 0;
-constexpr int32_t AIC = 1;
-constexpr int32_t AIV = 2;
+using ::MIX;
+using ::AIC;
+using ::AIV;
 } // namespace AscendC
 
-#if defined(ASCENDC_CPU_DEBUG)
-extern int32_t g_matmulCount;
-extern int32_t g_coreType;
-#define ASCEND_IS_AIV (g_coreType == AscendC::AIV)
-#define ASCEND_IS_AIC (g_coreType == AscendC::AIC)
-#define ASCEND_IS_NOT_AIV (g_coreType != AscendC::AIV)
-#define ASCEND_IS_NOT_AIC (g_coreType != AscendC::AIC)
-#else
-#if defined(SPLIT_CORE_CUBE)
-constexpr int32_t g_coreType = AscendC::AIC;
-#elif defined(SPLIT_CORE_VEC)
-constexpr int32_t g_coreType = AscendC::AIV;
-#else
-constexpr int32_t g_coreType = AscendC::MIX;
-#endif
-#define ASCEND_IS_AIV constexpr(g_coreType == AscendC::AIV)
-#define ASCEND_IS_AIC constexpr(g_coreType == AscendC::AIC)
-#define ASCEND_IS_NOT_AIV constexpr(g_coreType != AscendC::AIV)
-#define ASCEND_IS_NOT_AIC constexpr(g_coreType != AscendC::AIC)
-#endif
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3102)
-#define ASCEND_IS_AICORE constexpr(true)
-#else
-#define ASCEND_IS_AICORE constexpr(false)
-#endif
-
-// Make the MicroAPI namespace to all versions visible so that user code can be onetrack.
-namespace AscendC {
-namespace MicroAPI {
-
-} // namespace MicroAPI
-} // namespace AscendC
 #endif // ASCENDC_KERNEL_MACROS_H
