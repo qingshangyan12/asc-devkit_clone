@@ -21,7 +21,7 @@
 #warning "device_warp_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "device_warp_functions.h" and use public functions or variables defined in interface header files."
 #endif
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 
 // clamp the max source lane, except up mode
 constexpr int32_t MAX_OFFSET_OF_MODE = 0x1f;
