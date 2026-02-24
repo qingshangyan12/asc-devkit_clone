@@ -267,22 +267,22 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B32S(uint32_t, 32, 64, 32, 64)
 #define DATA_COPY_TEST_GM2L1_DN2ZN_B8(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
     TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
     { \
-        #if constexpr (sizeof(DTYPE) == 1) \
+        if constexpr (sizeof(DTYPE) == 1) { \
             MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b8, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
                 uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
                 .times(1) \
                 .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-        #elif constexpr (sizeof(DTYPE) == 2) \
+        } else if constexpr (sizeof(DTYPE) == 2) { \
             MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
                 uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
                 .times(1) \
                 .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-        #elif constexpr (sizeof(DTYPE) == 4) \
+        } else if constexpr (sizeof(DTYPE) == 4) { \
             MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
                 uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
                 .times(1) \
                 .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-        #endif
+        } \
         TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
         GlobalMockObject::verify(); \
     }
