@@ -438,6 +438,11 @@ public:
     */
     int32_t SetBatchNum(int32_t batch);
     /**
+    * @brief Set the batch number of copy out
+    * @param [in] batch: the batch number of copy out to set
+    */
+    int32_t SetBatchOutNum(int32_t batch);
+    /**
     * @brief Enable the bias
     * @param [in] isBiasIn: if true, enable the bias; if false, disable the bias, default is false
     */
@@ -594,6 +599,7 @@ public:
     int32_t cLayoutInfoG = 0;
     int32_t cLayoutInfoS2 = 0;
     int32_t batchNum = 0;
+    int32_t batchOutNum = 0;
 
     int32_t singleM = 0;
     int32_t singleN = 0;
