@@ -620,61 +620,61 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, con
 // make_fractal.h
 template <typename T>
 __aicore__ inline decltype(auto) MakeNzLayout(size_t row, size_t column) {
-    return MakeLayoutForNZ<T>(row, column);
+    return LayoutDispatcher<LayoutFormat::NZ, T>(row, column);
 }
 
 template <>
 __aicore__ inline decltype(auto) MakeNzLayout<Std::ignore_t>(size_t row, size_t column) {
-    return MakeLayoutForNZ<uint16_t>(row, column);
+    return LayoutDispatcher<LayoutFormat::NZ, uint16_t>(row, column);
 }
 
 __aicore__ inline decltype(auto) MakeL0CLayout(size_t row, size_t column) {
-    return MakeNZLayout<Std::ignore_t>(row, column);
+    return LayoutDispatcher<LayoutFormat::NZ, uint16_t>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeNDLayout(size_t row, size_t column) {
-    return MakeLayoutForND<T>(row, column);
+    return LayoutDispatcher<LayoutFormat::ND, T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeDNLayout(size_t row, size_t column) {
-    return MakeLayoutForDN<T>(row, column);
+    return LayoutDispatcher<LayoutFormat::DN, T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeZnLayout(size_t row, size_t column) {
-    return MakeLayoutForZN<T>(row, column);
+    return LayoutDispatcher<LayoutFormat::ZN, T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeZzLayout(size_t row, size_t column) {
-    return MakeLayoutForZZ<T>(row, column);
+    return LayoutDispatcher<LayoutFormat::ZZ, T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeNnLayout(size_t row, size_t column) {
-    return MakeLayoutForNN<T>(row, column);
+    return LayoutDispatcher<LayoutFormat::NN, T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleANDLayout(size_t row, size_t column) {
-    return MakeLayoutForND<T>(row, column);
+    return LayoutDispatcher<LayoutFormat::ND, T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleADNLayout(size_t row, size_t column) {
-    return MakeLayoutForDN<T>(row, column);
+    return LayoutDispatcher<LayoutFormat::DN, T>(row, column);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleBNDLayout(size_t row, size_t column) {
-    return MakeLayoutForND<T>(column, row);
+    return LayoutDispatcher<LayoutFormat::ND, T>(column, row);
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleBDNLayout(size_t row, size_t column) {
-    return MakeLayoutForDN<T>(column, row);
+    return LayoutDispatcher<LayoutFormat::DN, T>(column, row);
 }
 
 class DimConversion {
