@@ -407,18 +407,18 @@ struct LayoutDispatcher<LayoutFormat::ND, T> {
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::ZZ, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor{}(Std::Int<FRACTAL_FIXED>{}, row / FRACTAL_FIXED,
-                                    Std::Int<C0_SIZE / sizeof(T)>{}, column / (C0_SIZE / sizeof(T)),
-                                    Std::Int<C0_SIZE / sizeof(T)>{}, FRACTAL_FIXED * column,
-                                    Std::Int<1>{}, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{});
+        return LayoutConstructor{}(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row / FRACTAL_FIXED),
+                                    Std::Int<CeilDivision(C0_SIZE / sizeof(T))>{}, CeilDivision(column / (C0_SIZE / sizeof(T))),
+                                    Std::Int<CeilDivision(C0_SIZE / sizeof(T))>{}, FRACTAL_FIXED * column,
+                                    Std::Int<1>{}, Std::Int<CeilDivision(C0_SIZE / sizeof(T) * FRACTAL_FIXED)>{});
     }
 };
 
 template <>
 struct LayoutDispatcher<LayoutFormat::ZZ, fp8_e8m0_t> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor{}(Std::Int<FRACTAL_FIXED>{}, row / FRACTAL_FIXED,
-                                    Std::Int<MX_SCALE_K0>{}, column / MX_SCALE_K0,
+        return LayoutConstructor{}(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row / FRACTAL_FIXED),
+                                    Std::Int<MX_SCALE_K0>{}, CeilDivision(column / MX_SCALE_K0),
                                     Std::Int<MX_SCALE_K0>{}, column * FRACTAL_FIXED,
                                     Std::Int<1>{}, Std::Int<C0_SIZE>{});
     }
@@ -427,10 +427,10 @@ struct LayoutDispatcher<LayoutFormat::ZZ, fp8_e8m0_t> {
 template <>
 struct LayoutDispatcher<LayoutFormat::NN, fp8_e8m0_t> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor{}(Std::Int<MX_SCALE_K0>{}, row / MX_SCALE_K0,
+        return LayoutConstructor{}(Std::Int<MX_SCALE_K0>{}, CeilDivision(row / MX_SCALE_K0),
                                     Std::Int<FRACTAL_FIXED>{}, column * MX_SCALE_K0,
                                     Std::Int<FRACTAL_FIXED>{}, FRACTAL_FIXED * MX_SCALE_K0,
-                                    Std::Int<1>{}, row / MX_SCALE_K0);
+                                    Std::Int<1>{}, CeilDivision(row / MX_SCALE_K0));
     }
 };
 
