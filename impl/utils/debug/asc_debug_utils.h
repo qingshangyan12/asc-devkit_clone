@@ -15,12 +15,6 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_DEBUG_UTILS_H
 #define IMPL_UTILS_DEBUG_ASC_DEBUG_UTILS_H
 
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__
-#warning "asc_debug_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
-#endif
-
 #include <type_traits>
 
 #include "impl/utils/sys_macros.h"
