@@ -242,7 +242,7 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B8(uint8_t, 16, 32, 16, 32)
 #define DATA_COPY_TEST_GM2L1_ND2NZ_B16(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
     TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
     { \
-        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ uint16_t*, __gm__ uint16_t*, uint8_t, \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
@@ -259,7 +259,7 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B16(uint16_t, 16, 32, 16, 32)
 #define DATA_COPY_TEST_GM2L1_ND2NZ_B32S(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
     TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
     { \
-        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ uint32_t*, __gm__ uint32_t*, uint8_t, \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
@@ -275,7 +275,7 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B32S(uint32_t, 16, 32, 16, 32)
 #define DATA_COPY_TEST_GM2L1_DN2ZN_B8(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
     TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
     { \
-        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b8, void(__cbuf__ uint8_t*, __gm__ uint8_t*, uint8_t, \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b8, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
@@ -290,7 +290,7 @@ DATA_COPY_TEST_GM2L1_DN2ZN_B8(uint8_t, 16, 32, 16, 32)
 #define DATA_COPY_TEST_GM2L1_DN2ZN_B16(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
     TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
     { \
-        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ uint16_t*, __gm__ uint16_t*, uint8_t, \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
@@ -307,7 +307,7 @@ DATA_COPY_TEST_GM2L1_DN2ZN_B16(uint16_t, 16, 32, 16, 32)
 #define DATA_COPY_TEST_GM2L1_DN2ZN_B32S(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
     TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
     { \
-        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ uint32_t*, __gm__ uint32_t*, uint8_t, \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
