@@ -61,132 +61,132 @@ constexpr int TestCeilDivision(int value, int divisor) {
 }
 
 // ND2ND: CopyGmToCbufNDBase
-template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
+template<typename DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
 __aicore__ inline void copy_gm_to_cbuf_nd2nd_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
     uint16_t blockCount, uint16_t blockLen, uint16_t srcStride, uint16_t dstStride, pad_t padValue) {
-    EXPECT_EQ(sid, static_cast<uint8_t>(0));
-    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM1));
-    EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE)));
-    EXPECT_EQ(srcStride, static_cast<uint16_t>(SRC_DIM2 * sizeof(DTYPE)));
-    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE)));
+    EXPECT_EQ(sid, 0);
+    EXPECT_EQ(blockCount, DST_SIZE1);
+    EXPECT_EQ(blockLen, DST_SIZE2 * sizeof(DTYPE));
+    EXPECT_EQ(srcStride, SRC_SIZE2 * sizeof(DTYPE));
+    EXPECT_EQ(dstStride, DST_SIZE2 * sizeof(DTYPE));
 }
 
 // NZ2NZ: CopyGmToCbufNZBase
-template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
+template<typename DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
 __aicore__ inline void copy_gm_to_cbuf_nz2nz_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
     uint16_t blockCount, uint16_t blockLen, uint16_t srcStride, uint16_t dstStride, pad_t padValue) {
-    EXPECT_EQ(sid, static_cast<uint8_t>(0));
-    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
-    EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM1 * TEST_C0_SIZE));
-    EXPECT_EQ(srcStride, static_cast<uint16_t>(SRC_DIM1 * TEST_C0_SIZE));
-    EXPECT_EQ(dstStride, static_cast<uint16_t>(DST_DIM1 * TEST_C0_SIZE));
+    EXPECT_EQ(sid, 0);
+    EXPECT_EQ(blockCount, DST_SIZE2 * sizeof(DTYPE) / TEST_C0_SIZE);
+    EXPECT_EQ(blockLen, DST_SIZE1 * TEST_C0_SIZE);
+    EXPECT_EQ(srcStride, SRC_SIZE1 * TEST_C0_SIZE);
+    EXPECT_EQ(dstStride, DST_SIZE1 * TEST_C0_SIZE);
 }
 
 // ND2NZ: CopyGmToCbufMultiND2NZBase
-template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
+template<typename DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
 __aicore__ inline void copy_gm_to_cbuf_multi_nd2nz_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid,
             uint16_t ndNum, uint16_t nValue, uint16_t dValue, uint16_t srcNdMatrixStride, uint16_t srcDValue,
             uint16_t dstNzC0Stride, uint16_t dstNzNStride, uint16_t dstNzMatrixStride) {
-    EXPECT_EQ(sid, static_cast<uint8_t>(0));
-    EXPECT_EQ(ndNum, static_cast<uint16_t>(1));
-    EXPECT_EQ(srcNdMatrixStride, static_cast<uint16_t>(0));
-    EXPECT_EQ(dstNzMatrixStride, static_cast<uint16_t>(0));
-    EXPECT_EQ(nValue, static_cast<uint16_t>(DST_DIM1));
-    EXPECT_EQ(dValue, static_cast<uint16_t>(DST_DIM2));
-    EXPECT_EQ(srcDValue, static_cast<uint16_t>(SRC_DIM2));
-    EXPECT_EQ(dstNzC0Stride, static_cast<uint16_t>(DST_DIM1));
-    EXPECT_EQ(dstNzNStride, static_cast<uint16_t>(1));
+    EXPECT_EQ(sid, 0);
+    EXPECT_EQ(ndNum, 1);
+    EXPECT_EQ(srcNdMatrixStride, 0);
+    EXPECT_EQ(dstNzMatrixStride, 0);
+    EXPECT_EQ(nValue, DST_SIZE1);
+    EXPECT_EQ(dValue, DST_SIZE2);
+    EXPECT_EQ(srcDValue, SRC_SIZE2);
+    EXPECT_EQ(dstNzC0Stride, DST_SIZE1);
+    EXPECT_EQ(dstNzNStride, 1);
 }
 
 // DN2ZN: CopyGmToCbufMultiDN2ZNBase
-template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
+template<typename DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
 __aicore__ inline void copy_gm_to_cbuf_multi_dn2zn_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid,
             uint16_t ndNum, uint16_t nValue, uint16_t dValue, uint16_t srcNdMatrixStride, uint16_t srcDValue,
             uint16_t dstNzC0Stride, uint16_t dstNzNStride, uint16_t dstNzMatrixStride) {
-    EXPECT_EQ(sid, static_cast<uint8_t>(0));
-    EXPECT_EQ(ndNum, static_cast<uint16_t>(1));
-    EXPECT_EQ(srcNdMatrixStride, static_cast<uint16_t>(0));
-    EXPECT_EQ(dstNzMatrixStride, static_cast<uint16_t>(0));
-    EXPECT_EQ(nValue, static_cast<uint16_t>(DST_DIM2));
-    EXPECT_EQ(dValue, static_cast<uint16_t>(DST_DIM1));
-    EXPECT_EQ(srcDValue, static_cast<uint16_t>(SRC_DIM1));
-    EXPECT_EQ(dstNzC0Stride, static_cast<uint16_t>(DST_DIM2));
-    EXPECT_EQ(dstNzNStride, static_cast<uint16_t>(1));
+    EXPECT_EQ(sid, 0);
+    EXPECT_EQ(ndNum, 1);
+    EXPECT_EQ(srcNdMatrixStride, 0);
+    EXPECT_EQ(dstNzMatrixStride, 0);
+    EXPECT_EQ(nValue, DST_SIZE2);
+    EXPECT_EQ(dValue, DST_SIZE1);
+    EXPECT_EQ(srcDValue, SRC_SIZE1);
+    EXPECT_EQ(dstNzC0Stride, DST_SIZE2);
+    EXPECT_EQ(dstNzNStride, 1);
 }
 
 // L1 -> BIAS: CopyCbufToBT2201
-template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
+template<typename DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
 __aicore__ inline void copy_cbuf_to_bt_stub(uint64_t dst, __cbuf__ DTYPE* src, uint16_t convControl, uint16_t blockCount, uint16_t blockLen,
                                 uint16_t srcStride, uint16_t dstStride) {
-    EXPECT_EQ(convControl, static_cast<uint16_t>(0));
-    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM1));
-    EXPECT_EQ(blockLen, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_L12BT_UNIT));
-    EXPECT_EQ(srcStride, static_cast<uint16_t>((SRC_DIM2 - DST_DIM2) * sizeof(DTYPE) / TEST_C0_SIZE));
-    EXPECT_EQ(dstStride, static_cast<uint16_t>((DST_DIM2 - DST_DIM2) * sizeof(DTYPE) / TEST_L12BT_UNIT));
+    EXPECT_EQ(convControl, 0);
+    EXPECT_EQ(blockCount, DST_SIZE1);
+    EXPECT_EQ(blockLen, DST_SIZE2 * sizeof(DTYPE) / TEST_L12BT_UNIT);
+    EXPECT_EQ(srcStride, (SRC_SIZE2 - DST_SIZE2) * sizeof(DTYPE) / TEST_C0_SIZE);
+    EXPECT_EQ(dstStride, (DST_SIZE2 - DST_SIZE2) * sizeof(DTYPE) / TEST_L12BT_UNIT);
 }
 
 // L1 -> FIXBUF: CopyCbufToFB2201
-template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
+template<typename DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
 __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void* src, uint16_t blockCount, uint16_t blockLen,
                                 uint16_t srcStride, uint16_t dstStride) {
-    EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM1));
-    EXPECT_EQ(blockLen, static_cast<uint16_t>(TestCeilDivision(DST_DIM2 * sizeof(DTYPE), TEST_C2PIPE2GM_UNIT)));
-    EXPECT_EQ(srcStride, static_cast<uint16_t>(TestCeilDivision(SRC_DIM2 * sizeof(DTYPE), TEST_C0_SIZE)));
-    EXPECT_EQ(dstStride, static_cast<uint16_t>(TestCeilDivision(DST_DIM2 * sizeof(DTYPE), TEST_C2PIPE2GM_UNIT)));
+    EXPECT_EQ(blockCount, DST_SIZE1);
+    EXPECT_EQ(blockLen, TestCeilDivision(DST_SIZE2 * sizeof(DTYPE), TEST_C2PIPE2GM_UNIT));
+    EXPECT_EQ(srcStride, TestCeilDivision(SRC_SIZE2 * sizeof(DTYPE), TEST_C0_SIZE));
+    EXPECT_EQ(dstStride, TestCeilDivision(DST_SIZE2 * sizeof(DTYPE), TEST_C2PIPE2GM_UNIT));
 }
 
 // datacopy move
-#define DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
-    uint8_t srcData[SRC_DIM1 * SRC_DIM2 * sizeof(DTYPE)]; \
-    uint8_t dstData[DST_DIM1 * DST_DIM2 * sizeof(DTYPE)]; \
+#define TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
+    uint8_t srcData[SRC_SIZE1 * SRC_SIZE2 * sizeof(DTYPE)]; \
+    uint8_t dstData[DST_SIZE1 * DST_SIZE2 * sizeof(DTYPE)]; \
     \
     auto src = reinterpret_cast<__##SRC_PREFIX##__ DTYPE*>(srcData); \
     auto srcIterator = Make##SRC_LOCATION##memPtr(src); \
-    auto srcLayout = Make##SRC_LAYOUT##Layout<DTYPE>(SRC_DIM1, SRC_DIM2); \
+    auto srcLayout = Make##SRC_LAYOUT##Layout<DTYPE>(SRC_SIZE1, SRC_SIZE2); \
     auto srcTensor = MakeTensor(srcIterator, srcLayout); \
     \
     auto dst = reinterpret_cast<__##DST_PREFIX##__ DTYPE*>(dstData); \
     auto dstIterator = Make##DST_LOCATION##memPtr(dst); \
-    auto dstLayout = Make##DST_LAYOUT##Layout<DTYPE>(DST_DIM1, DST_DIM2); \
+    auto dstLayout = Make##DST_LAYOUT##Layout<DTYPE>(DST_SIZE1, DST_SIZE2); \
     auto dstTensor = MakeTensor(dstIterator, dstLayout); \
     \
     DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor);
 
 // datacopy move with coord
-#define DATA_COPY_WITH_COORD(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
-    uint8_t srcData[SRC_DIM1 * SRC_DIM2 * sizeof(DTYPE)]; \
-    uint8_t dstData[DST_DIM1 * DST_DIM2 * sizeof(DTYPE)]; \
+#define TEST_DATACOPY_WITH_COORD(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
+    uint8_t srcData[SRC_SIZE1 * SRC_SIZE2 * sizeof(DTYPE)]; \
+    uint8_t dstData[DST_SIZE1 * DST_SIZE2 * sizeof(DTYPE)]; \
     \
     auto src = reinterpret_cast<__##SRC_PREFIX##__ DTYPE*>(srcData); \
     auto srcIterator = Make##SRC_LOCATION##memPtr(src); \
-    auto srcLayout = Make##SRC_LAYOUT##Layout<DTYPE>(SRC_DIM1, SRC_DIM2); \
+    auto srcLayout = Make##SRC_LAYOUT##Layout<DTYPE>(SRC_SIZE1, SRC_SIZE2); \
     auto srcTensor = MakeTensor(srcIterator, srcLayout); \
     \
     auto dst = reinterpret_cast<__##DST_PREFIX##__ DTYPE*>(dstData); \
     auto dstIterator = Make##DST_LOCATION##memPtr(dst); \
-    auto dstLayout = Make##DST_LAYOUT##Layout<DTYPE>(DST_DIM1, DST_DIM2); \
+    auto dstLayout = Make##DST_LAYOUT##Layout<DTYPE>(DST_SIZE1, DST_SIZE2); \
     auto dstTensor = MakeTensor(dstIterator, dstLayout); \
     \
     DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor,  \
                 MakeCoord(MakeCoord(Std::Int<2>{}, Std::Int<2>{}), MakeCoord(Std::Int<2>{}, Std::Int<2>{})));
 
 // ignore branch
-#define DATA_COPY_TEST_IGNORE(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \ 
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_IGNORE_##DTYPE##_SRC_DIM##_##SRC_DIM1##x##SRC_DIM2##_DST_DIM##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_IGNORE(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \ 
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_IGNORE_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
     { \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, cbuf, L1, RowMajor, gm, GM, RowMajor) \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, gm, GM, RowMajor) \
     }
 
 DATA_COPY_TEST_IGNORE(float, 32, 64, 32, 64)
 
 // GM to l1 ND2ND test case
-#define DATA_COPY_TEST_GM2L1_ND2ND(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2ND_##DTYPE##_SRC_DIM##_##SRC_DIM1##x##SRC_DIM2##_DST_DIM##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_GM2L1_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_gm_to_cbuf, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t)) \
             .times(1) \
-            .will(invoke(&copy_gm_to_cbuf_nd2nd_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, gm, GM, RowMajor, cbuf, L1, RowMajor) \
+            .will(invoke(&copy_gm_to_cbuf_nd2nd_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, RowMajor) \
         GlobalMockObject::verify(); \
     }
 
@@ -196,13 +196,13 @@ DATA_COPY_TEST_GM2L1_ND2ND(bfloat16_t, 32, 64, 32, 64)
 DATA_COPY_TEST_GM2L1_ND2ND(int32_t, 32, 64, 32, 64)
 
 // GM to l1 NZ2NZ test case
-#define DATA_COPY_TEST_GM2L1_NZ2NZ(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_NZ2NZ_##DTYPE##_SRC_DIM##_##SRC_DIM1##x##SRC_DIM2##_DST_DIM##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_GM2L1_NZ2NZ(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_NZ2NZ_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_gm_to_cbuf, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t)) \
             .times(1) \
-            .will(invoke(&copy_gm_to_cbuf_nz2nz_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, gm, GM, NZ, cbuf, L1, NZ) \
+            .will(invoke(&copy_gm_to_cbuf_nz2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, NZ, cbuf, L1, NZ) \
         GlobalMockObject::verify(); \
     }
 
@@ -220,14 +220,14 @@ DATA_COPY_TEST_GM2L1_NZ2NZ(int8_t, 32, 64, 32, 64)
 DATA_COPY_TEST_GM2L1_NZ2NZ(uint8_t, 32, 64, 32, 64)
 
 // GM to L1 ND2NZ test case - B8 (1 byte types: int8_t, uint8_t)
-#define DATA_COPY_TEST_GM2L1_ND2NZ_B8(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_GM2L1_ND2NZ_B8(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b8, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
-            .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, gm, GM, RowMajor, cbuf, L1, NZ) \
+            .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
         GlobalMockObject::verify(); \
     }
 
@@ -235,14 +235,14 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B8(int8_t, 32, 64, 32, 64)
 DATA_COPY_TEST_GM2L1_ND2NZ_B8(uint8_t, 32, 64, 32, 64)
 
 // GM to L1 ND2NZ test case - B16 (2 byte types: half, bfloat16_t, int16_t, uint16_t)
-#define DATA_COPY_TEST_GM2L1_ND2NZ_B16(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_GM2L1_ND2NZ_B16(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
-            .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, gm, GM, RowMajor, cbuf, L1, NZ) \
+            .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
         GlobalMockObject::verify(); \
     }
 
@@ -252,14 +252,14 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B16(int16_t, 32, 64, 32, 64)
 DATA_COPY_TEST_GM2L1_ND2NZ_B16(uint16_t, 32, 64, 32, 64)
 
 // GM to L1 ND2NZ test case - B32S (4 byte types: float, int32_t, uint32_t)
-#define DATA_COPY_TEST_GM2L1_ND2NZ_B32S(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_GM2L1_ND2NZ_B32S(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
-            .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, gm, GM, RowMajor, cbuf, L1, NZ) \
+            .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
         GlobalMockObject::verify(); \
     }
 
@@ -268,14 +268,14 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B32S(int32_t, 32, 64, 32, 64)
 DATA_COPY_TEST_GM2L1_ND2NZ_B32S(uint32_t, 32, 64, 32, 64)
 
 // GM to L1 DN2ZN test case - B8 (1 byte types: int8_t, uint8_t)
-#define DATA_COPY_TEST_GM2L1_DN2ZN_B8(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_GM2L1_DN2ZN_B8(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b8, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
-            .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
+            .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
         GlobalMockObject::verify(); \
     }
 
@@ -283,14 +283,14 @@ DATA_COPY_TEST_GM2L1_DN2ZN_B8(int8_t, 32, 64, 32, 64)
 DATA_COPY_TEST_GM2L1_DN2ZN_B8(uint8_t, 32, 64, 32, 64)
 
 // GM to L1 DN2ZN test case - B16 (2 byte types: half, bfloat16_t, int16_t, uint16_t)
-#define DATA_COPY_TEST_GM2L1_DN2ZN_B16(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_GM2L1_DN2ZN_B16(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
-            .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
+            .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
         GlobalMockObject::verify(); \
     }
 
@@ -300,14 +300,14 @@ DATA_COPY_TEST_GM2L1_DN2ZN_B16(int16_t, 32, 64, 32, 64)
 DATA_COPY_TEST_GM2L1_DN2ZN_B16(uint16_t, 32, 64, 32, 64)
 
 // GM to L1 DN2ZN test case - B32S (4 byte types: float, int32_t, uint32_t)
-#define DATA_COPY_TEST_GM2L1_DN2ZN_B32S(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_DIM1##x##SRC_DIM2##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_GM2L1_DN2ZN_B32S(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
-            .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
+            .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
         GlobalMockObject::verify(); \
     }
 
@@ -316,13 +316,13 @@ DATA_COPY_TEST_GM2L1_DN2ZN_B32S(int32_t, 32, 64, 32, 64)
 DATA_COPY_TEST_GM2L1_DN2ZN_B32S(uint32_t, 32, 64, 32, 64)
 
 // L1 to BIAS ND2ND test case
-#define DATA_COPY_TEST_L12BIAS_ND2ND(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_L12BIAS_ND2ND_##DTYPE##_SRC_DIM##_##SRC_DIM1##x##SRC_DIM2##_DST_DIM##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_L12BIAS_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_L12BIAS_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_cbuf_to_bt, void(uint64_t, __cbuf__ DTYPE*, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
-            .will(invoke(&copy_cbuf_to_bt_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, cbuf, L1, RowMajor, biasbuf, Bias, RowMajor) \
+            .will(invoke(&copy_cbuf_to_bt_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, biasbuf, Bias, RowMajor) \
         GlobalMockObject::verify(); \
     }
 
@@ -330,13 +330,13 @@ DATA_COPY_TEST_L12BIAS_ND2ND(float, 32, 64, 32, 64)
 DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 32, 64, 32, 64)
 
 // L1 to FIXBUF ND2ND test case
-#define DATA_COPY_TEST_L12FIXBUF_ND2ND(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
-    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_L12FIXBUF_ND2ND_##DTYPE##_SRC_DIM##_##SRC_DIM1##x##SRC_DIM2##_DST_DIM##_##DST_DIM1##x##DST_DIM2) \
+#define DATA_COPY_TEST_L12FIXBUF_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_L12FIXBUF_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         MOCKER_CPP(copy_cbuf_to_fbuf, void(__fbuf__ void*, __cbuf__ void*, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
-            .will(invoke(&copy_cbuf_to_fbuf_stub<DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2>)); \
-        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, cbuf, L1, RowMajor, fbuf, Fixbuf, RowMajor) \
+            .will(invoke(&copy_cbuf_to_fbuf_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, fbuf, Fixbuf, RowMajor) \
         GlobalMockObject::verify(); \
     }
 
