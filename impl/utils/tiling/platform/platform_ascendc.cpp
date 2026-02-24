@@ -475,9 +475,6 @@ fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char *custo
     fe::PlatformInfoManager::Instance().InitRuntimePlatformInfos(socVersion);
     fe::OptionalInfos optionalInfos;
     static fe::PlatFormInfos gPlatformInfo;
-    // int32_t deviceId;
-    // auto aclRet = aclrtGetDevice(&deviceId);
-    // 动态获取设备 ID
     int32_t deviceId = 0;
     auto getDeviceId = [&]() -> bool {
         void* handle = dlopen("libacl_rt.so", RTLD_LAZY);
