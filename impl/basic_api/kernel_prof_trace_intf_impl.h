@@ -14,24 +14,30 @@
  */
 #ifndef ASCENDC_KERNEL_PROF_TRACE_INTERFACE_IMPL_H
 #define ASCENDC_KERNEL_PROF_TRACE_INTERFACE_IMPL_H
-#include "kernel_prof_trace.h"
+#include "impl/utils/debug/asc_aicore_time_impl.h"
 
 namespace AscendC {
 __aicore__ inline void MetricsProfStart()
 {
-    ProfStartImpl();
+    asc_prof_start();
 }
 
 __aicore__ inline void MetricsProfStop()
 {
-    ProfStopImpl();
+    asc_prof_stop();
 }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
 template<pipe_t pipe, uint16_t index>
 __aicore__ inline void MarkStamp()
 {
-    MarkStampImpl<pipe, index>();
+    asc_mark_stamp<pipe, index>();
+}
+
+template<pipe_t pipe>
+__aicore__ inline void MarkStamp(uint16_t index)
+{
+    asc_mark_stamp<pipe>(index);
 }
 #endif
 } // namespace AscendC
