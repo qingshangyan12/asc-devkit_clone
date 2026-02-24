@@ -132,7 +132,6 @@ public:
             nBatchOutNum = nBatchOutNumIn;
         }
         MATMUL_MODULE(BatchScheduler)->SetNBatchOutNum(nBatchOutNum);
-        MATMUL_MODULE(BatchLoop)->SetNBatchOutNum(nBatchOutNum);
     }
 
     __aicore__ inline void IterateBatch(const GlobalTensor<DstT>& gm,
