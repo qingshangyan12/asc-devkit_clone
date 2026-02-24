@@ -16,6 +16,7 @@
 #define IMPL_MATMUL_TILING_MATMUL_CONSTANT_TILING_STRUCT_H
 
 #include "kernel_basic_intf.h"
+#include "include/utils/ascendc_api_version.h"
 #include "include/adv_api/matmul/tiling.h"
 #include "../../detail/matmul/utils/matmul_utils.h"
 
@@ -470,6 +471,17 @@ struct MatmulTiling {
             return tiling_->mxTypePara;
         }
     }
+
+#if ASCENDC_API_VERSION >= 20250330
+    __aicore__ inline int32_t GetNBatchOutNum() const
+    {
+        if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {
+            return (TILING.nBatchOutNum != -1) ? TILING.nBatchOutNum : tiling_->nBatchOutNum;
+        } else {
+            return tiling_->nBatchOutNum;
+        }
+    }
+#endif
 
 private:
     const TCubeTiling* __restrict tiling_;

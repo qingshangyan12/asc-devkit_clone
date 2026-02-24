@@ -16,6 +16,7 @@
 #ifndef LIB_MATMUL_MATMUL_TILINGDATA_H
 #define LIB_MATMUL_MATMUL_TILINGDATA_H
 #include "register/tilingdata_base.h"
+#include "../../utils/ascendc_api_version.h"
 
 namespace optiling {
 BEGIN_TILING_DATA_DEF(TCubeTiling)
@@ -69,6 +70,10 @@ TILING_DATA_FIELD_DEF(int32_t, CLayoutInfoG);
 TILING_DATA_FIELD_DEF(int32_t, CLayoutInfoS2);
 TILING_DATA_FIELD_DEF(int32_t, BatchNum);
 TILING_DATA_FIELD_DEF(int32_t, mxTypePara);
+#if ASCENDC_API_VERSION >= 20250330
+TILING_DATA_FIELD_DEF(int32_t, nBatchOutNum);
+TILING_DATA_FIELD_DEF(int32_t, reserved);
+#endif
 END_TILING_DATA_DEF;
 }
 
