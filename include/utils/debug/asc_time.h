@@ -27,6 +27,26 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t clock(void);
 } // namespace __asc_simt_vf
 
 #include "impl/utils/debug/asc_time_simt_impl.h"
+#include "impl/utils/debug/asc_aicore_time_impl.h"
+
+namespace __asc_aicore {
+__aicore__ inline void asc_time_stamp(uint32_t desc_id);
+
+__aicore__ inline void asc_prof_start();
+
+__aicore__ inline void asc_prof_stop();
+
+#if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510
+template<pipe_t pipe = PIPE_S>
+__aicore__ inline void asc_mark_stamp(uint16_t idx);
+
+template<pipe_t pipe = PIPE_S, uint16_t idx>
+__aicore__ inline void asc_mark_stamp();
+#endif
+}   // namespase __asc_aicore
+
+#define TRACE_START(...) TRACE_START_IMPL(__VA_ARGS__)
+#define TRACE_STOP(...) TRACE_STOP_IMPL(__VA_ARGS__)
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_TIME_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
