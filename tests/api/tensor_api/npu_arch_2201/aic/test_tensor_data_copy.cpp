@@ -16,18 +16,6 @@
 using namespace AscendC::Te;
 using namespace AscendC::Std;
 
-class TEST_DATACOPY_GM_L1 : public testing::Test {
-protected:
-    void SetUp()
-    {
-        AscendC::SetGCoreType(1);
-    }
-    void TearDown()
-    {
-        AscendC::SetGCoreType(0);
-    }
-};
-
 enum class MemoryLayout {
     RowMajor,
     NZ,
@@ -75,7 +63,7 @@ constexpr int TestCeilDivision(int value, int divisor) {
 
 // ND2ND: CopyGmToCbufNDBase
 template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
-void copy_gm_to_cbuf_nd2nd_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
+__aicore__ inline void copy_gm_to_cbuf_nd2nd_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
     uint16_t blockCount, uint16_t blockLen, uint16_t srcStride, uint16_t dstStride, pad_t padValue) {
     EXPECT_EQ(sid, static_cast<uint8_t>(0));
     EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM1));
@@ -86,7 +74,7 @@ void copy_gm_to_cbuf_nd2nd_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t si
 
 // NZ2NZ: CopyGmToCbufNZBase
 template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
-void copy_gm_to_cbuf_nz2nz_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
+__aicore__ inline void copy_gm_to_cbuf_nz2nz_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
     uint16_t blockCount, uint16_t blockLen, uint16_t srcStride, uint16_t dstStride, pad_t padValue) {
     EXPECT_EQ(sid, static_cast<uint8_t>(0));
     EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM2 * sizeof(DTYPE) / TEST_C0_SIZE));
@@ -97,7 +85,7 @@ void copy_gm_to_cbuf_nz2nz_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t si
 
 // ND2NZ: CopyGmToCbufMultiND2NZBase
 template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
-void copy_gm_to_cbuf_multi_nd2nz_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid,
+__aicore__ inline void copy_gm_to_cbuf_multi_nd2nz_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid,
             uint16_t ndNum, uint16_t nValue, uint16_t dValue, uint16_t srcNdMatrixStride, uint16_t srcDValue,
             uint16_t dstNzC0Stride, uint16_t dstNzNStride, uint16_t dstNzMatrixStride) {
     EXPECT_EQ(sid, static_cast<uint8_t>(0));
@@ -113,7 +101,7 @@ void copy_gm_to_cbuf_multi_nd2nz_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, ui
 
 // DN2ZN: CopyGmToCbufMultiDN2ZNBase
 template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
-void copy_gm_to_cbuf_multi_dn2zn_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid,
+__aicore__ inline void copy_gm_to_cbuf_multi_dn2zn_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid,
             uint16_t ndNum, uint16_t nValue, uint16_t dValue, uint16_t srcNdMatrixStride, uint16_t srcDValue,
             uint16_t dstNzC0Stride, uint16_t dstNzNStride, uint16_t dstNzMatrixStride) {
     EXPECT_EQ(sid, static_cast<uint8_t>(0));
@@ -129,7 +117,7 @@ void copy_gm_to_cbuf_multi_dn2zn_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, ui
 
 // L1 -> BIAS: CopyCbufToBT2201
 template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
-void copy_cbuf_to_bt_stub(uint64_t dst, __cbuf__ DTYPE* src, uint16_t convControl, uint16_t blockCount, uint16_t blockLen,
+__aicore__ inline void copy_cbuf_to_bt_stub(uint64_t dst, __cbuf__ DTYPE* src, uint16_t convControl, uint16_t blockCount, uint16_t blockLen,
                                 uint16_t srcStride, uint16_t dstStride) {
     EXPECT_EQ(convControl, static_cast<uint16_t>(0));
     EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM1));
@@ -140,7 +128,7 @@ void copy_cbuf_to_bt_stub(uint64_t dst, __cbuf__ DTYPE* src, uint16_t convContro
 
 // L1 -> FIXBUF: CopyCbufToFB2201
 template<typename DTYPE, int SRC_DIM1, int SRC_DIM2, int DST_DIM1, int DST_DIM2>
-void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void* src, uint16_t blockCount, uint16_t blockLen,
+__aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void* src, uint16_t blockCount, uint16_t blockLen,
                                 uint16_t srcStride, uint16_t dstStride) {
     EXPECT_EQ(blockCount, static_cast<uint16_t>(DST_DIM1));
     EXPECT_EQ(blockLen, static_cast<uint16_t>(TestCeilDivision(DST_DIM2 * sizeof(DTYPE), TEST_C2PIPE2GM_UNIT)));
@@ -182,6 +170,15 @@ void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void* src, uint16_t blo
     \
     DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor,  \
                 MakeCoord(MakeCoord(Std::Int<2>{}, Std::Int<2>{}), MakeCoord(Std::Int<2>{}, Std::Int<2>{})));
+
+// ignore branch
+#define DATA_COPY_TEST_IGNORE(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \ 
+    TEST_F(TEST_DATA_COPY, TEST_DATACOPY_IGNORE_##DTYPE##_SRC_DIM##_##SRC_DIM1##x##SRC_DIM2##_DST_DIM##_##DST_DIM1##x##DST_DIM2) \
+    { \
+        DATA_COPY(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2, cbuf, L1, RowMajor, gm, GM, RowMajor) \
+    }
+
+DATA_COPY_TEST_IGNORE(float, 32, 64, 32, 64)
 
 // GM to l1 ND2ND test case
 #define DATA_COPY_TEST_GM2L1_ND2ND(DTYPE, SRC_DIM1, SRC_DIM2, DST_DIM1, DST_DIM2) \
