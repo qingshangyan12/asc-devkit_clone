@@ -19,6 +19,7 @@
 
 namespace AscendC {
 namespace Te {
+
 template <typename... Ts>
 using void_t = void;
 
