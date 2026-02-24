@@ -27,13 +27,6 @@ struct GetArchVersion {};
 template <typename T>
 __aicore__ inline uint8_t GetCacheModeFromTensor(__gm__ T* src);
 
-// IsIntegralConstant
-template <typename T>
-struct IsIntegralConstant;
-
-template <typename T>
-constexpr bool IsIntegralConstantV;
-
 template <typename T>
 struct GetTypeFromFourDimTrait;
 

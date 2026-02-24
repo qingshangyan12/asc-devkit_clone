@@ -84,16 +84,6 @@ __aicore__ inline uint8_t GetCacheModeFromTensor(__gm__ T* src) {
     }
 }
 
-// IsIntegralConstant
-template <typename T>
-struct IsIntegralConstant : Std::false_type {};
-
-template <size_t Value>
-struct IsIntegralConstant<Std::Int<Value>> : Std::true_type {};
-
-template <typename T>
-constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
-
 template <typename T>
 struct GetTypeFromFourDimTrait;
 
