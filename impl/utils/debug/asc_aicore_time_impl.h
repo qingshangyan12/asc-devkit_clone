@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -62,25 +62,37 @@ __aicore__ inline void asc_time_stamp(uint32_t desc_id)
 
 __aicore__ inline void asc_prof_start()
 {
+#ifndef ASCENDC_CPU_DEBUG
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510
     bisheng::cce::metrics_prof_start();
+#endif
+#endif
 }
 
 __aicore__ inline void asc_prof_stop()
 {
+#ifndef ASCENDC_CPU_DEBUG
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510
     bisheng::cce::metrics_prof_stop();
+#endif
+#endif
 }
 
 #if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510
 template<pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
+#ifndef ASCENDC_CPU_DEBUG
     bisheng::cce::mark_stamp<pipe>(idx);
+#endif
 }
 
 template<pipe_t pipe, uint16_t idx>
 __aicore__ inline void asc_mark_stamp()
 {
+#ifndef ASCENDC_CPU_DEBUG
     bisheng::cce::mark_stamp<pipe>(idx);
+#endif
 }
 #endif
 } // namespace __asc_aicore
