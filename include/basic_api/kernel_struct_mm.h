@@ -107,7 +107,7 @@ struct LoadData2dTransposeParams {
 };
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
-struct Nd2NzParamsV2 {
+struct LookupTableParams {
     uint64_t lookupTable0 = 0;
     uint64_t lookupTable1 = 0;
 };

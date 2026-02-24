@@ -50,11 +50,11 @@ public:
         loadDataParams.srcStride = DivCeil(mLength, 16);
         loadDataParams.dstStride = DivCeil(mLength, 16);
 
-        Nd2NzParamsV2 nz2ndParams;
-        nz2ndParams.lookupTable0 = 258;
-        nz2ndParams.lookupTable1 = 1027;
+        LookupTableParams lookupTableParams;
+        lookupTableParams.lookupTable0 = 258;
+        lookupTableParams.lookupTable1 = 1027;
 
-        LoadData(tmpL1, aGlobal_, loadDataParams, nz2ndParams);
+        LoadData(tmpL1, aGlobal_, loadDataParams, lookupTableParams);
 
         pipe_barrier(PIPE_ALL);
         DataCopy(tmpUB, tmpL1, mLength * kLength);
