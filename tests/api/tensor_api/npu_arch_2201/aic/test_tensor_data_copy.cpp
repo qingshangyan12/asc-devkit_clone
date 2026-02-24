@@ -56,7 +56,6 @@ constexpr int TEST_C0_SIZE = 32;
 constexpr int TEST_L12BT_UNIT = TEST_C0_SIZE * 2;          // 64
 constexpr int TEST_C2PIPE2GM_UNIT = TEST_C0_SIZE * 4;      // 128
 
-// ==================== Helper Functions ====================
 constexpr int TestCeilDivision(int value, int divisor) {
     return (value + divisor - 1) / divisor;
 }
