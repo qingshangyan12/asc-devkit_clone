@@ -2839,6 +2839,7 @@ TEST_F(TestTiling, TestSetBatch)
     tiling.SetBatchNum(0);
     tiling.SetBatchNum(1);
     tiling.SetBatchInfoForNormal(0, 0, 0, 0, 0);
+    tiling.SetBatchOutNum(1);
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
 
