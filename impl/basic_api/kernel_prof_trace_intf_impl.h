@@ -33,6 +33,12 @@ __aicore__ inline void MarkStamp()
 {
     MarkStampImpl<pipe, index>();
 }
+
+template<pipe_t pipe>
+__aicore__ inline void MarkStamp(uint16_t index)
+{
+    MarkStampImpl<pipe>(index);
+}
 #endif
 } // namespace AscendC
 #endif // ASCENDC_KERNEL_PROF_TRACE_INTERFACE_IMPL_H
