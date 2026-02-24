@@ -61,6 +61,23 @@ public:
     __aicore__ inline BatchScheduler() = default;
     __aicore__ inline ~BatchScheduler() = default;
 
+
+    __aicore__ inline void Init(const TCubeTiling *__restrict cubeTiling, TPipe *tpipe)
+    {
+        if constexpr (ToMatmulConfig(MM_CFG).bmmOutMode != BatchOutMode::SINGLE_BATCH) {
+            if (BASE_MODULE::batchOutNum_ == 0) {
+                BASE_MODULE::batchOutNum_ = 1;
+#if ASCENDC_API_VERSION >= 20260330
+                if (MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBatchOutNum() > 1) {
+                    BASE_MODULE::batchOutNum_ = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBatchOutNum();
+                }
+#endif
+            }
+            MATMUL_MODULE(BatchLoop)->SetBatchOutNum(BASE_MODULE::batchOutNum_);
+        }
+        BASE_MODULE::Init(cubeTiling, tpipe);
+    }
+
     template<class T>
     __aicore__ inline void Schedule(const T& dst, bool enPartialSum, uint8_t enAtomic, bool enSequentialWrite,
         const uint32_t matrixStrideA, const uint32_t matrixStrideB, const uint32_t matrixStrideC)
@@ -451,7 +468,7 @@ private:
     {
         const auto batchLoop = MATMUL_MODULE(BatchLoop);
         if constexpr (ToMatmulConfig(MM_CFG).bmmOutMode != BatchOutMode::SINGLE_BATCH) {
-            if (batchLoop->IsNeedNBatchOut()) {
+            if (batchLoop->IsNeedBatchOut()) {
                 BASE_MODULE::GetBatchResult(dst, ctx, enAtomic, enSequentialWrite);
             } else {
                 auto co1Local = MATMUL_MODULE(CubeOutBuffer)->GetTensor();
@@ -466,7 +483,7 @@ private:
     {
         if constexpr (ToMatmulConfig(MM_CFG).bmmOutMode != BatchOutMode::SINGLE_BATCH) {
             const auto batchLoop = MATMUL_MODULE(BatchLoop);
-            if (batchLoop->IsNeedNBatchOut()) {
+            if (batchLoop->IsNeedBatchOut()) {
                 batchLoop->SetBatchOutOffsetNum(batchLoop->GetBatchOutOffsetNum() + batchLoop->GetBatchOutCacheNum());
                 batchLoop->SetBatchOutCacheNum(0);
             }
