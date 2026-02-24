@@ -283,7 +283,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const
 
 template <typename T, typename U>
 __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T *dst, __gm__ U *src, const LoadData2DParamsV2 &loadDataParam,
-    const Nd2NzParamsV2& nd2nzParams)
+    const LookupTableParams& lookupTableParams)
 {
     static_assert(
         ((IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) ||
@@ -291,7 +291,7 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T *dst, __gm__ U *src, const 
          (IsSameType<T, int8_t>::value && IsSameType<U, int2b_t>::value) ||
          (IsSameType<T, int4b_t>::value && IsSameType<U, uint1b_t>::value)), 
         "LoadData dst type or src type is not supported on current device!");
-    set_mte2_qtable0(nd2nzParams.lookupTable0);
+    set_mte2_qtable0(lookupTableParams.lookupTable0);
     set_mte2_src_para(uint64_t(loadDataParam.srcStride));
     uint8_t decompressMode = 0;
     if constexpr(IsSameType<T, int4b_t>::value && IsSameType<U, int2b_t>::value) {
@@ -301,7 +301,7 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T *dst, __gm__ U *src, const 
     } else if constexpr(IsSameType<T, int4b_t>::value && IsSameType<U, uint1b_t>::value) {
         decompressMode = 0b0110;
     } else if constexpr(IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) {
-        set_mte2_qtable1(nd2nzParams.lookupTable1);
+        set_mte2_qtable1(lookupTableParams.lookupTable1);
         decompressMode = 0b0011;
     }
     load_gm_to_cbuf_2dv2((__cbuf__ int8_t *)dst, (__gm__ int8_t *)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
