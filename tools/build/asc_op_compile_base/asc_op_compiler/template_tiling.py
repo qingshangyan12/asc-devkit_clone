@@ -16,6 +16,7 @@ from enum import Enum, auto
 from dataclasses import dataclass
 from typing import List, Any
 from asc_op_compile_base.common.utils.log_utils import AscendCLogLevel
+from asc_op_compile_base.common.context import get_context
 from .ascendc_common_utility import CommonUtility
 from .get_op_tiling import OpInfo
 
@@ -598,6 +599,13 @@ def extract_decl_param_options(op_info: OpInfo, option_name="dtype"):
 
 
 def decode_tiling(tiling_key: int = None) -> dict:
+    kernel_template_input = get_context().get_addition("kernel_template_input")
+    pairs = kernel_template_input.split(';')
+    kernel_compile_dict = {}
+    for pair in pairs:
+        if '=' in pair:
+            key, value = pair.split('=', 1)
+            kernel_compile_dict[key] = value
     encode_book = dict()
     for param in TILING_DECLARE_MAP:
         encode_book[param.name] = param.get_encodes()
@@ -611,16 +619,22 @@ def decode_tiling(tiling_key: int = None) -> dict:
         reversed_encode_book[k] = reversed_book
     decode_results = dict()
     for tiling_template_select_param in TILING_SELECT_MAP:
-        kernel_index = next((i for i, param in enumerate(tiling_template_select_param) if \
-            param.param_type == TilingParamType.TPL_SHARED_KERNEL_TYPE), -1)
-        decode_result = get_concated_tiling_key(
-            tiling_template_select_param, 0, "", [], reversed_encode_book, \
-                {"dtypeParams": [], "formatParams": []}, kernel_index
-        )
-        length_before = len(decode_result) + len(decode_results)
-        decode_results.update(decode_result)
-        if length_before != len(decode_results):
-            raise RuntimeError("ASCENDC_TPL_SELECT has duplicated definitions!")
+        matched_kernel_template = True
+        for param_item in tiling_template_select_param:
+            if param_item.name in kernel_compile_dict.keys() and str(param_item.values[0]) not in kernel_compile_dict[param_item.name]:
+                matched_kernel_template = False
+                break
+        if matched_kernel_template:
+            kernel_index = next((i for i, param in enumerate(tiling_template_select_param) if \
+                param.param_type == TilingParamType.TPL_SHARED_KERNEL_TYPE), -1)
+            decode_result = get_concated_tiling_key(
+                tiling_template_select_param, 0, "", [], reversed_encode_book, \
+                    {"dtypeParams": [], "formatParams": []}, kernel_index
+            )
+            length_before = len(decode_result) + len(decode_results)
+            decode_results.update(decode_result)
+            if length_before != len(decode_results):
+                raise RuntimeError("ASCENDC_TPL_SELECT has duplicated definitions!")
     if tiling_key is None:
         return decode_results
     if tiling_key not in decode_results.keys():
