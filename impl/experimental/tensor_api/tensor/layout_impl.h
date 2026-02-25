@@ -17,7 +17,7 @@
 
 #include "include/experimental/tensor_api/utils/utils.h"
 #include "impl/experimental/tensor_api/tensor/layout_struct.h"
-#include "impl/experimental/tensor/layout_construct.h"
+#include "impl/experimental/tensor_api/tensor/layout_construct.h"
 
 namespace AscendC {
 namespace Te {
