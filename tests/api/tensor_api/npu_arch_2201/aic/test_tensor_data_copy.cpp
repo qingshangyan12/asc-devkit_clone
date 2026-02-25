@@ -171,10 +171,26 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_IGNORE_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         using namespace AscendC::Te; \
-        MOCKER_CPP(&DataCopyIgnore::Run<DEFAULT_DATA_COPY_TRAIT, LocalTensor, LocalTensor, Coord>, void(const LocalTensor&, const LocalTensor&, const Coord&)) \
+        using namespace AscendC::Std; \
+        __cbuf__ DTYPE srcData[SRC_SIZE1 * SRC_SIZE2 * sizeof(DTYPE)]; \
+        __gm__ DTYPE dstData[DST_SIZE1 * DST_SIZE2 * sizeof(DTYPE)]; \
+        \
+        auto srcIterator = MakeL1memPtr(srcData); \
+        auto srcLayout = MakeRowMajorLayout<DTYPE>(SRC_SIZE1, SRC_SIZE2); \
+        auto srcTensor = MakeTensor(srcIterator, srcLayout); \
+        \
+        auto dstIterator = MakeGMmemPtr(dstData); \
+        auto dstLayout = MakeRowMajorLayout<DTYPE>(DST_SIZE1, DST_SIZE2); \
+        auto dstTensor = MakeTensor(dstIterator, dstLayout); \
+        \
+        auto zeroCoord = MakeCoord(MakeCoord(Int<0>{}, Int<0>{}), MakeCoord(Int<0>{}, Int<0>{})); \
+        using srcTensorType = decltype(srcTensor); \
+        using dstTensorType = decltype(dstTensor); \
+        using testCoord = decltype(zeroCoord); \
+        MOCKER_CPP((&DataCopyIgnore::Run<DEFAULT_DATA_COPY_TRAIT, dstTensorType, srcTensorType, testCoord>)) \
             .times(1) \
-            .will(returnValue(0)); \
-        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, gm, GM, RowMajor) \
+            .will(ignoreReturnValue()); \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
