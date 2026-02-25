@@ -16,16 +16,10 @@ replace_microapi.py
 """
 
 import argparse
-import pathlib
-import shutil
+import os
 import sys
-
-
-
-#--------------------------------------------------------------
-# 配置：默认要处理的文件后缀（可自行增删）
-#--------------------------------------------------------------
-DEFAULT_EXTS = [".c", ".cpp", ".h", ".py"]
+from pathlib import Path
+from typing import List
 
 
 def parse_args() -> argparse.Namespace:
@@ -68,12 +62,12 @@ def collect_target_files(root: Path, recursive: bool)->List[Path]:
     pattern = "*_micro_*"
     files:List[Path] = []
     if recursive:
-        for p in root.rglob([pattern]):
-            if p.if_file():
+        for p in root.rglob(pattern):
+            if p.is_file():
                 files.append(p)
     else:
-        for p in root.glob([pattern]):
-            if p.if_file():
+        for p in root.glob(pattern):
+            if p.is_file():
                 files.append(p)
     return files
 
@@ -83,8 +77,10 @@ def rename_file(old_path: Path, dry_run: bool) -> None:
     new_name = old_path.name.replace("_micro_", "_reg_compute_")
     new_path = old_path.with_name(new_name)
     if new_path.exists():
-        print(f"[SKIP] 目标文件已存在，跳过：{old_path} -> {new_path}",
-              file=sys.stderr,)
+        print(
+            f"[SKIP] 目标文件已存在，跳过：{old_path} -> {new_path}",
+              file=sys.stderr,
+            )
         return
 
     if dry_run:
@@ -94,8 +90,10 @@ def rename_file(old_path: Path, dry_run: bool) -> None:
             old_path.rename(new_path)
             print(f"[RENAME] {old_path} -> {new_path}）")
         except Exception as exc:
-            print(f"[ERROR]重命名失败： {old_path} -> {new_path}\n     {exc}",
-                  file=sys.stderr,)
+            print(
+                f"[ERROR]重命名失败： {old_path} -> {new_path}\n     {exc}",
+                  file=sys.stderr,
+                )
 
     
 
@@ -108,10 +106,10 @@ def main()->None:
         print("[INFO]没有发现文件名中含有'_micro_'的文件。")
         return
     print(f"[INFO]共找到{len(target_files)}个待处理的文件:")
-
+    
+    print("\n开始重命名:")
     for f in target_files:
-        rename_file(
-            f, False)
+        rename_file(f, False)
     print("\n完成")
     if args.dry_run:
         print("已使用 --dry-run，仅做演示，实际未改动")
