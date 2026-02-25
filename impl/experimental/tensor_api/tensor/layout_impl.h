@@ -358,6 +358,7 @@ using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRA
 
 //layout_construct
 struct MakeTupleCons {
+    template <typename... Ts>
     __aicore__ inline decltype(auto) operator()(Ts&&... ts) {
         return Std::make_tuple(Std::forward<Ts>(ts)...);
     }
