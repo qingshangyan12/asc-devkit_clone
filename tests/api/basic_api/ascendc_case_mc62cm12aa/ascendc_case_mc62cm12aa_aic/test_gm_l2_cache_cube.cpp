@@ -76,60 +76,42 @@ uint8_t GetCacheModeValue(CacheMode mode)
 DATA_COPY_L2_CACHE_L1_TEST(uint16_t, CACHE_MODE_NORMAL)
 DATA_COPY_L2_CACHE_L1_TEST(int8_t, CACHE_MODE_DISABLE)
 
-#define LOAD_DATA_L2_CACHE_TEST(T, cacheMode, pos)                                                \
-    TEST_F(DataCopyL2CacheTestSuite, testCaseL1##T##cacheMode##pos)                               \
-    {                                                                                             \
-        uint8_t srcGm[1024]{ 0 };                                                                 \
-        uint32_t dataSize = 1024 / sizeof(T);                                                     \
-                                                                                                  \
-        CacheMode mode = CacheMode::cacheMode;                                                    \
-        const uint8_t expectedMode = GetCacheModeValue(mode);                                     \
-        uint8_t actualMode = 99;                                                                  \
-                                                                                                  \
-        MOCKER(LoadData2DGM2L1Cal, void (*)(T *, T *, const LoadData2DParamsV2 &, const uint8_t)) \
-            .stubs()                                                                              \
-            .with(any(), any(), any(), spy(actualMode));                                          \
-        TPipe tpipe;                                                                              \
-                                                                                                  \
-        GlobalTensor<T> globalTensor;                                                             \
-        globalTensor.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(srcGm), dataSize);              \
-        globalTensor.SetL2CacheHint(mode);                                                        \
-                                                                                                  \
-        TBuf<TPosition::pos> tbuf1;                                                               \
-        tpipe.InitBuffer(tbuf1, dataSize * sizeof(T));                                            \
-        LocalTensor<T> inputLocal = tbuf1.Get<T>();                                               \
-                                                                                                  \
-        LoadData2DParamsV2 param;                                                                 \
-                                                                                                  \
-        LoadData(inputLocal, globalTensor, param);                                                \
-        EXPECT_EQ(expectedMode, actualMode);                                                      \
+#define LOAD_DATA_LUT_TEST(TDst, USrc, pos)                                                        \
+    TEST_F(DataCopyL2CacheTestSuite, testCaseLoadDataLut##TDst##USrc##pos)                         \
+    {                                                                                              \
+        uint8_t srcGm[1024]{ 0 };                                                                  \
+        uint32_t dataSize = 1024 / sizeof(USrc);                                                   \
+                                                                                                   \
+        LookupTableParams expectedLut;                                                             \
+        expectedLut.lookupTable0 = 0x12345678ull;                                                  \
+        expectedLut.lookupTable1 = 0x9abcdef0ull;                                                  \
+                                                                                                   \
+        LookupTableParams actualLut;                                                               \
+        actualLut.lookupTable0 = 0;                                                                \
+        actualLut.lookupTable1 = 0;                                                                \
+                                                                                                   \
+        MOCKER(LoadData2DGM2L1Cal,                                                                 \
+            void (*)(TDst *, USrc *, const LoadData2DParamsV2 &, const LookupTableParams &))       \
+            .stubs()                                                                               \
+            .with(any(), any(), any(), spy(actualLut));                                            \
+                                                                                                   \
+        TPipe tpipe;                                                                               \
+                                                                                                   \
+        GlobalTensor<USrc> globalTensor;                                                           \
+        globalTensor.SetGlobalBuffer(reinterpret_cast<__gm__ USrc *>(srcGm), dataSize);            \
+                                                                                                   \
+        TBuf<TPosition::pos> tbuf1;                                                                \
+        tpipe.InitBuffer(tbuf1, dataSize * sizeof(TDst));                                          \
+        LocalTensor<TDst> inputLocal = tbuf1.Get<TDst>();                                          \
+                                                                                                   \
+        LoadData2DParamsV2 param;                                                                  \
+                                                                                                   \
+        LoadData(inputLocal, globalTensor, param, expectedLut);                                    \
+                                                                                                   \
+        EXPECT_EQ(expectedLut.lookupTable0, actualLut.lookupTable0);                               \
+        EXPECT_EQ(expectedLut.lookupTable1, actualLut.lookupTable1);                               \
     }
+                                                                                                   
+LOAD_DATA_LUT_TEST(int8_t, int4b_t, A1)
+LOAD_DATA_LUT_TEST(int4b_t, int2b_t, A1)
 
-#define LOAD_DATA_TEST(T, U)                                                                      \
-    TEST_F(DataCopyL2CacheTestSuite, testCaseLoadData##T##U)                                      \
-    {                                                                                             \
-        uint8_t srcGm[1024]{ 0 };                                                                 \
-        uint32_t dataSize = 1024 / sizeof(T);                                                     \
-                                                                                                  \
-        MOCKER(LoadData2DGM2L1Cal, void (*)(T *, T *, const LoadData2DParamsV2 &, const LookupTableParams &)) \
-            .stubs()                                                                              \
-            .with(any(), any(), any(), any());                                                    \
-        TPipe tpipe;                                                                              \
-                                                                                                  \
-        GlobalTensor<T> globalTensor;                                                             \
-        globalTensor.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(srcGm), dataSize);              \
-                                                                                                  \
-        TBuf<TPosition::A1> tbuf1;                                                               \
-        tpipe.InitBuffer(tbuf1, dataSize * sizeof(T));                                            \
-        LocalTensor<T> inputLocal = tbuf1.Get<T>();                                               \
-                                                                                                  \
-        LoadData2DParamsV2 param;                                                                 \
-        LookupTableParams lookupTableParams;                                                      \
-                                                                                                  \
-        LoadData(inputLocal, globalTensor, param, lookupTableParams);                             \
-    }
-
-LOAD_DATA_TEST(int8_t, int4b_t)
-LOAD_DATA_TEST(int4b_t, int2b_t)
-LOAD_DATA_TEST(int8_t, int2b_t)
-LOAD_DATA_TEST(int4b_t, uint1b_t)
