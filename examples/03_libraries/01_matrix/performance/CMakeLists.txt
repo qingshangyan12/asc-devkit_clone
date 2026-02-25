@@ -16,7 +16,8 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    performance.asc
+    #load_data_with_transpose.asc
+    load2d.asc
 )
 
 target_compile_definitions(demo PRIVATE
