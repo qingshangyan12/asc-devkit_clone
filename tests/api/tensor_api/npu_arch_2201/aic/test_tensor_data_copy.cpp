@@ -164,7 +164,7 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
     auto dstTensor = MakeTensor(dstIterator, dstLayout); \
     \
     DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor,  \
-                MakeCoord(MakeCoord(Int<2>{}, Int<2>{}), MakeCoord(Int<2>{}, Int<2>{}));
+                MakeCoord(MakeCoord(Int<2>{}, Int<2>{}), MakeCoord(Int<2>{}, Int<2>{})));
 
 // ignore branch
 #define DATA_COPY_TEST_IGNORE(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
