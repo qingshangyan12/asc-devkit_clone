@@ -149,7 +149,7 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
     DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor);
 
 // datacopy move with coord
-#define TEST_TENSOR_API_DATACOPY_WITH_COORD(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
+#define TEST_DATACOPY_WITH_COORD(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
     using namespace AscendC::Te; \
     using namespace AscendC::Std; \
     __##SRC_PREFIX##__ DTYPE srcData[SRC_SIZE1 * SRC_SIZE2 * sizeof(DTYPE)]; \
