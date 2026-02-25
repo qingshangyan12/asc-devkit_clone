@@ -3,7 +3,7 @@
 #include "include/experimental/tensor_api/tensor.h"
 #include <mockcpp/mockcpp.hpp>
 
-class TEST_LOAD_DATA : public testing::Test {
+class TEST_TENSOR_API_LOAD_DATA : public testing::Test {
 protected:
     void SetUp() override {
         AscendC::SetGCoreType(1);
@@ -22,318 +22,128 @@ protected:
     }
 };
 
-// L1 -> L0A
-using namespace AscendC::Te;
-
+// l1 -> l0
 // LoadDataIgnore
-TEST_F(TEST_LOAD_DATA, TestLoadDataRouting_LoadDataIgnoreDoesNothing) {
-    auto destAddr = reinterpret_cast<__ca__ float*>(0);
-    auto l0aIterator = MakeL0AmemPtr(destAddr);
-    auto l0aMatrixLayout = MakeNZLayout<float>(16, 16);
-    auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout);
-
-    auto srcAddr = reinterpret_cast<__cbuf__ float*>(0);
-    auto l1Iterator = MakeL1memPtr(srcAddr);
-    auto l1MatrixLayout = MakeNZLayout<float>(16, 16);
-    auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout);
-
-    // L0A -> L1  Ignore
-    LoadData<DEFAULT_LOAD_DATA_TRAIT>(l1Tensor, l0aTensor);
+#define TEST_TENSOR_API_LOAD_DATA_IGNORE(TYPE, M, N, SRC_FORMAT, DST_FORMAT, SRC_POS, DST_POS, SRC_TAG, DST_TAG, TRANSPOSE)  \
+TEST_F(TEST_TENSOR_API_LOAD_DATA, TestLoadDataRouting_##TYPE##M##N##SRC_FORMAT##DST_FORMAT##SRC_POS##DST_POS##SRC_TAG##DST_TAG##TRANSPOSE##LoadDataIgnoreDoesNothing) {  \
+    using namespace AscendC::Te;  \
+    __##DST_TAG##__ TYPE dst[M * N] = {0};  \
+    auto dstIterator = Make##SRC_POS##memPtr(dst);  \
+    auto dstMatrixLayout = Make##DST_FORMAT##Layout<TYPE>(M, N);  \
+    auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout);  \
+    \
+    __##SRC_TAG##__ TYPE src[M * N] = {0};  \
+    auto srcIterator = Make##SRC_POS##memPtr(src);  \
+    auto srcMatrixLayout = Make##SRC_FORMAT##Layout<TYPE>(M, N);  \
+    auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout);  \
+    \
+    constexpr static LoadDataTrait trait(TRANSPOSE); \
+    LoadData<trait>(dstTensor, srcTensor);  \
+    \
+    EXPECT_FALSE(img2colv2_cbuf_to_##DST_TAG##_call_flag);  \
 }
 
-#define LOAD_DATA_TEST_NZ2ZZ_NoCoord(TYPE, L0_SRC) \
-TEST_F(TEST_LOAD_DATA, TestLoadData_l12l0##L0_SRC##_NZ2ZZ_NoCoord_##TYPE) { \
+TEST_TENSOR_API_LOAD_DATA_IGNORE(float, 16, 16, ZZ, NZ, L0A, L0A, ca, ca, false);
+TEST_TENSOR_API_LOAD_DATA_IGNORE(float, 17, 17, ZZ, NZ, L0B, L0B, cb, cb, true);
+TEST_TENSOR_API_LOAD_DATA_IGNORE(float, 18, 18, ZZ, NZ, L0A, L0B, ca, cb, false);
+
+#define TEST_TENSOR_API_LOAD_DATA(TYPE, M, N, SRC_FORMAT, DST_FORMAT, SRC_POS, DST_POS, SRC_TAG, DST_TAG, TRANSPOSE, COORD_I, COORD_J) \
+TEST_F(TEST_TENSOR_API_LOAD_DATA, TestLoadData_##TYPE##M##N##SRC_FORMAT##DST_FORMAT##SRC_POS##DST_POS##SRC_TAG##DST_TAG##TRANSPOSE##COORD_I##COORD_J) { \
+    using namespace AscendC::Te; \
+    __##DST_TAG##__ TYPE dst[M * N] = {0}; \
+    img2colv2_##SRC_TAG##_to_##DST_TAG##_origin_dst_addr = dst; \
+    auto dstIterator = Make##DST_POS##memPtr(dst); \
+    auto dstMatrixLayout = Make##DST_FORMAT##Layout<TYPE>(M, N); \
+    auto dstTensor = MakeTensor(dstIterator, dstMatrixLayout); \
  \
-    TYPE dest[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto destAddr = reinterpret_cast<__ca__ TYPE*>(dest); \
-    img2colv2_cbuf_to_ca_origin_dst_addr = destAddr; \
-    auto l0Iterator = MakeL0##L0_SRC##memPtr(destAddr); \
-    auto l0MatrixLayout = MakeZZLayout<TYPE>(32, 32); \
-    auto l0Tensor = MakeTensor(l0Iterator, l0MatrixLayout); \
+    __##SRC_TAG##__ TYPE src[M * N] = {0}; \
+    img2colv2_##SRC_TAG##_to_##DST_TAG##_origin_src_addr = src; \
+    auto srcIterator = Make##SRC_POS##memPtr(src); \
+    auto srcMatrixLayout = Make##SRC_FORMAT##Layout<TYPE>(M, N); \
+    auto srcTensor = MakeTensor(srcIterator, srcMatrixLayout); \
  \
-    TYPE src[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto srcAddr = reinterpret_cast<__cbuf__ TYPE*>(src); \
-    img2colv2_cbuf_to_ca_origin_src_addr = srcAddr; \
-    auto l1Iterator = MakeL1memPtr(srcAddr); \
-    auto l1MatrixLayout = MakeNZLayout<TYPE>(32, 32); \
-    auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout); \
+    auto coord = MakeCoord(AscendC::Std::Int<COORD_I>{}, AscendC::Std::Int<COORD_J>{}); \
+    constexpr static LoadDataTrait trait(TRANSPOSE); \
+    LoadData<trait>(dstTensor, srcTensor, coord);  \
  \
-    LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0Tensor, l1Tensor); \
- \
-    mockcpp::GlobalMockObject::reset(); \
-}
-#define LOAD_DATA_TEST_NZ2ZZ_Coord(TYPE, L0_SRC)\
-TEST_F(TEST_LOAD_DATA, TestLoadData_l12l0##L0_SRC##_NZ2ZZ_Coord_##TYPE) { \
- \
-    TYPE dest[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto destAddr = reinterpret_cast<__ca__ TYPE*>(dest); \
-    img2colv2_cbuf_to_ca_origin_dst_addr = destAddr; \
-    auto l0Iterator = MakeL0##L0_SRC##memPtr(destAddr); \
-    auto l0MatrixLayout = MakeZZLayout<TYPE>(32, 32); \
-    auto l0Tensor = MakeTensor(l0Iterator, l0MatrixLayout); \
- \
-    TYPE src[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto srcAddr = reinterpret_cast<__cbuf__ TYPE*>(src); \
-    img2colv2_cbuf_to_ca_origin_src_addr = srcAddr; \
-    auto l1Iterator = MakeL1memPtr(srcAddr); \
-    auto l1MatrixLayout = MakeNZLayout<TYPE>(32, 32); \
-    auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout); \
- \
-    auto coordZero = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<0>{}); \
-    is_mock_img2colv2_cbuf_to_ca = true; \
-    LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0Tensor, l1Tensor, coordZero); \
-    mockcpp::GlobalMockObject::reset(); \
-}
-#define LOAD_DATA_TEST_ZN2ZZ_NoCoord(TYPE, L0_SRC)\
-TEST_F(TEST_LOAD_DATA, TestLoadData_l12l0##L0_SRC##_ZN2ZZ_NoCoord_##TYPE) { \
- \
-    TYPE dest[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto destAddr = reinterpret_cast<__ca__ TYPE*>(dest); \
-    img2colv2_cbuf_to_ca_origin_dst_addr = destAddr; \
-    auto l0Iterator = MakeL0##L0_SRC##memPtr(destAddr); \
-    auto l0MatrixLayout = MakeZZLayout<TYPE>(32, 32); \
-    auto l0Tensor = MakeTensor(l0Iterator, l0MatrixLayout); \
- \
-    TYPE src[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto srcAddr = reinterpret_cast<__cbuf__ TYPE*>(src); \
-    img2colv2_cbuf_to_ca_origin_src_addr = srcAddr; \
-    auto l1Iterator = MakeL1memPtr(srcAddr); \
-    auto l1MatrixLayout = MakeZNLayout<TYPE>(32, 32); \
-    auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout); \
- \
-     constexpr static LoadDataTrait trait(true);\
-    is_mock_img2colv2_cbuf_to_ca = true; \
-    LoadData<trait>(l0Tensor, l1Tensor); \
- \
-    mockcpp::GlobalMockObject::reset(); \
-}
-#define LOAD_DATA_TEST_ZN2ZZ_Coord(TYPE, L0_SRC)\
-TEST_F(TEST_LOAD_DATA, TestLoadData_l12l0##L0_SRC##_ZN2ZZ_Coord_##TYPE) { \
- \
-    TYPE dest[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto destAddr = reinterpret_cast<__ca__ TYPE*>(dest); \
-    img2colv2_cbuf_to_ca_origin_dst_addr = destAddr; \
-    auto l0Iterator = MakeL0##L0_SRC##memPtr(destAddr); \
-    auto l0MatrixLayout = MakeZZLayout<TYPE>(32, 32); \
-    auto l0Tensor = MakeTensor(l0Iterator, l0MatrixLayout); \
- \
-    TYPE src[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto srcAddr = reinterpret_cast<__cbuf__ TYPE*>(src); \
-    img2colv2_cbuf_to_ca_origin_src_addr = srcAddr; \
-    auto l1Iterator = MakeL1memPtr(srcAddr); \
-    auto l1MatrixLayout = MakeZNLayout<TYPE>(32, 32); \
-    auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout); \
- \
-    constexpr static LoadDataTrait trait(true);\
-    auto coordZero = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<0>{}); \
-    is_mock_img2colv2_cbuf_to_ca = true; \
-    LoadData<trait>(l0Tensor, l1Tensor, coordZero); \
- \
-    mockcpp::GlobalMockObject::reset(); \
+    mockcpp::GlobalMockObject::verify(); \
 }
 
-#define LOAD_DATA_TEST_ZN2ZN_NoCoord(TYPE, L0_SRC) \
-TEST_F(TEST_LOAD_DATA, TestLoadData_l12l0##L0_SRC##_ZN2ZN_NoCoord_##TYPE) { \
-    MOCKER_CPP(load_cbuf_to_cb, void(__ca__ bfloat16_t*, __cbuf__ bfloat16_t*, \
-        uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, bool, addr_cal_mode_t)) \
-        .times(1) \
-        .will(invoke(static_cast<void(*)(__ca__ bfloat16_t*, __cbuf__ bfloat16_t*, \
-                        uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, bool, addr_cal_mode_t)>( \
-                [](__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t baseIdx, \
-                uint8_t repeat, uint16_t srcStride, uint16_t dstStride, uint8_t sid, \
-                bool transpose, addr_cal_mode_t addr_cal_mode) { \
-                    std::cout << "hello" << std::endl; \
-                } \
-    ))); \
-    TYPE dest[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto destAddr = reinterpret_cast<__ca__ TYPE*>(dest); \
-    img2colv2_cbuf_to_cb_origin_dst_addr = destAddr; \
-    auto l0Iterator = MakeL0##L0_SRC##memPtr(destAddr); \
-    auto l0MatrixLayout = MakeZNLayout<TYPE>(32, 32); \
-    auto l0Tensor = MakeTensor(l0Iterator, l0MatrixLayout); \
- \
-    TYPE src[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto srcAddr = reinterpret_cast<__cbuf__ TYPE*>(src); \
-    img2colv2_cbuf_to_cb_origin_src_addr = srcAddr; \
-    auto l1Iterator = MakeL1memPtr(srcAddr); \
-    auto l1MatrixLayout = MakeZNLayout<TYPE>(32, 32); \
-    auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout); \
- \
-    LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0Tensor, l1Tensor); \
- \
-    mockcpp::GlobalMockObject::reset(); \
-}
-#define LOAD_DATA_TEST_ZN2ZN_Coord(TYPE, L0_SRC)\
-TEST_F(TEST_LOAD_DATA, TestLoadData_l12l0##L0_SRC##_ZN2ZN_Coord_##TYPE) { \
- \
-    MOCKER_CPP(load_cbuf_to_cb, void(__ca__ bfloat16_t*, __cbuf__ bfloat16_t*, \
-        uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, bool, addr_cal_mode_t)) \
-        .times(1) \
-        .will(invoke(static_cast<void(*)(__ca__ bfloat16_t*, __cbuf__ bfloat16_t*, \
-            uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, bool, addr_cal_mode_t)>( \
-            [](__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t baseIdx, \
-            uint8_t repeat, uint16_t srcStride, uint16_t dstStride, uint8_t sid, \
-            bool transpose, addr_cal_mode_t addr_cal_mode) { \
-             std::cout << "hello" << std::endl; \
-             } \
-    ))); \
-    TYPE dest[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto destAddr = reinterpret_cast<__ca__ TYPE*>(dest); \
-    img2colv2_cbuf_to_cb_origin_dst_addr = destAddr; \
-    auto l0Iterator = MakeL0##L0_SRC##memPtr(destAddr); \
-    auto l0MatrixLayout = MakeZNLayout<TYPE>(32, 32); \
-    auto l0Tensor = MakeTensor(l0Iterator, l0MatrixLayout); \
- \
-    TYPE src[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto srcAddr = reinterpret_cast<__cbuf__ TYPE*>(src); \
-    img2colv2_cbuf_to_cb_origin_src_addr = srcAddr; \
-    auto l1Iterator = MakeL1memPtr(srcAddr); \
-    auto l1MatrixLayout = MakeZNLayout<TYPE>(32, 32); \
-    auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout); \
- \
-    auto coordZero = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<0>{}); \
-    LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0Tensor, l1Tensor, coordZero); \
-    mockcpp::GlobalMockObject::reset(); \
-}
-#define LOAD_DATA_TEST_NZ2ZN_NoCoord(TYPE, L0_SRC)\
-TEST_F(TEST_LOAD_DATA, TestLoadData_l12l0##L0_SRC##_NZ2ZN_NoCoord_##TYPE) { \
- \
-    MOCKER_CPP(load_cbuf_to_cb, void(__ca__ bfloat16_t*, __cbuf__ bfloat16_t*, \
-        uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, bool, addr_cal_mode_t)) \
-        .times(1) \
-        .will(invoke(static_cast<void(*)(__ca__ bfloat16_t*, __cbuf__ bfloat16_t*, \
-            uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, bool, addr_cal_mode_t)>( \
-            [](__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t baseIdx, \
-            uint8_t repeat, uint16_t srcStride, uint16_t dstStride, uint8_t sid, \
-            bool transpose, addr_cal_mode_t addr_cal_mode) { \
-                std::cout << "hello" << std::endl; \
-            } \
-    ))); \
-    TYPE dest[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto destAddr = reinterpret_cast<__ca__ TYPE*>(dest); \
-    img2colv2_cbuf_to_cb_origin_dst_addr = destAddr; \
-    auto l0Iterator = MakeL0##L0_SRC##memPtr(destAddr); \
-    auto l0MatrixLayout = MakeZNLayout<TYPE>(32, 32); \
-    auto l0Tensor = MakeTensor(l0Iterator, l0MatrixLayout); \
- \
-    TYPE src[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto srcAddr = reinterpret_cast<__cbuf__ TYPE*>(src); \
-    img2colv2_cbuf_to_cb_origin_src_addr = srcAddr; \
-    auto l1Iterator = MakeL1memPtr(srcAddr); \
-    auto l1MatrixLayout = MakeNZLayout<TYPE>(32, 32); \
-    auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout); \
- \
-     constexpr static LoadDataTrait trait(true);\
-    LoadData<trait>(l0Tensor, l1Tensor); \
- \
-    mockcpp::GlobalMockObject::reset(); \
-}
-#define LOAD_DATA_TEST_NZ2ZN_Coord(TYPE, L0_SRC)\
-TEST_F(TEST_LOAD_DATA, TestLoadData_l12l0##L0_SRC##_NZ2ZN_Coord_##TYPE) { \
- \
-    MOCKER_CPP(load_cbuf_to_cb, void(__ca__ bfloat16_t*, __cbuf__ bfloat16_t*, \
-        uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, bool, addr_cal_mode_t)) \
-        .times(1) \
-        .will(invoke(static_cast<void(*)(__ca__ bfloat16_t*, __cbuf__ bfloat16_t*, \
-        uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, bool, addr_cal_mode_t)>( \
-        [](__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t baseIdx, \
-        uint8_t repeat, uint16_t srcStride, uint16_t dstStride, uint8_t sid, \
-        bool transpose, addr_cal_mode_t addr_cal_mode) { \
-            std::cout << "hello" << std::endl; \
-        } \
-    ))); \
-    TYPE dest[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto destAddr = reinterpret_cast<__ca__ TYPE*>(dest); \
-    img2colv2_cbuf_to_cb_origin_dst_addr = destAddr; \
-    auto l0Iterator = MakeL0##L0_SRC##memPtr(destAddr); \
-    auto l0MatrixLayout = MakeZNLayout<TYPE>(32, 32); \
-    auto l0Tensor = MakeTensor(l0Iterator, l0MatrixLayout); \
- \
-    TYPE src[32 * 32 * sizeof(TYPE)] = {0}; \
-    auto srcAddr = reinterpret_cast<__cbuf__ TYPE*>(src); \
-    img2colv2_cbuf_to_cb_origin_src_addr = srcAddr; \
-    auto l1Iterator = MakeL1memPtr(srcAddr); \
-    auto l1MatrixLayout = MakeNZLayout<TYPE>(32, 32); \
-    auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout); \
- \
-    constexpr static LoadDataTrait trait(true);\
-    auto coordZero = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<0>{}); \
-    LoadData<trait>(l0Tensor, l1Tensor, coordZero); \
- \
-    mockcpp::GlobalMockObject::reset(); \
-}
 
-LOAD_DATA_TEST_NZ2ZZ_NoCoord(bfloat16_t, A);
-LOAD_DATA_TEST_NZ2ZZ_Coord(bfloat16_t, A);
-LOAD_DATA_TEST_ZN2ZZ_NoCoord(bfloat16_t, A);
-LOAD_DATA_TEST_ZN2ZZ_Coord(bfloat16_t, A);
-LOAD_DATA_TEST_ZN2ZN_NoCoord(bfloat16_t, B);
-LOAD_DATA_TEST_ZN2ZN_Coord(bfloat16_t, B);
-LOAD_DATA_TEST_NZ2ZN_NoCoord(bfloat16_t, B);
-LOAD_DATA_TEST_NZ2ZN_Coord(bfloat16_t, B);
-LOAD_DATA_TEST_NZ2ZZ_NoCoord(half, A);
-LOAD_DATA_TEST_NZ2ZZ_Coord(half, A);
-LOAD_DATA_TEST_ZN2ZZ_NoCoord(half, A);
-LOAD_DATA_TEST_ZN2ZZ_Coord(half, A);
-LOAD_DATA_TEST_ZN2ZN_NoCoord(half, B);
-LOAD_DATA_TEST_ZN2ZN_Coord(half, B);
-LOAD_DATA_TEST_NZ2ZN_NoCoord(half, B);
-LOAD_DATA_TEST_NZ2ZN_Coord(half, B);
-LOAD_DATA_TEST_NZ2ZZ_NoCoord(float, A);
-LOAD_DATA_TEST_NZ2ZZ_Coord(float, A);
-LOAD_DATA_TEST_ZN2ZZ_NoCoord(float, A);
-LOAD_DATA_TEST_ZN2ZZ_Coord(float, A);
-LOAD_DATA_TEST_ZN2ZN_NoCoord(float, B);
-LOAD_DATA_TEST_ZN2ZN_Coord(float, B);
-LOAD_DATA_TEST_NZ2ZN_NoCoord(float, B);
-LOAD_DATA_TEST_NZ2ZN_Coord(float, B);
-LOAD_DATA_TEST_NZ2ZZ_NoCoord(int32_t, A);
-LOAD_DATA_TEST_NZ2ZZ_Coord(int32_t, A);
-LOAD_DATA_TEST_ZN2ZZ_NoCoord(int32_t, A);
-LOAD_DATA_TEST_ZN2ZZ_Coord(int32_t, A);
-LOAD_DATA_TEST_ZN2ZN_NoCoord(int32_t, B);
-LOAD_DATA_TEST_ZN2ZN_Coord(int32_t, B);
-LOAD_DATA_TEST_NZ2ZN_NoCoord(int32_t, B);
-LOAD_DATA_TEST_NZ2ZN_Coord(int32_t, B);
-LOAD_DATA_TEST_NZ2ZZ_NoCoord(uint32_t, A);
-LOAD_DATA_TEST_NZ2ZZ_Coord(uint32_t, A);
-LOAD_DATA_TEST_ZN2ZZ_NoCoord(uint32_t, A);
-LOAD_DATA_TEST_ZN2ZZ_Coord(uint32_t, A);
-LOAD_DATA_TEST_ZN2ZN_NoCoord(uint32_t, B);
-LOAD_DATA_TEST_ZN2ZN_Coord(uint32_t, B);
-LOAD_DATA_TEST_NZ2ZN_NoCoord(uint32_t, B);
-LOAD_DATA_TEST_NZ2ZN_Coord(uint32_t, B);
-LOAD_DATA_TEST_NZ2ZZ_NoCoord(int8_t, A);
-LOAD_DATA_TEST_NZ2ZZ_Coord(int8_t, A);
-LOAD_DATA_TEST_ZN2ZZ_NoCoord(int8_t, A);
-LOAD_DATA_TEST_ZN2ZZ_Coord(int8_t, A);
-LOAD_DATA_TEST_ZN2ZN_NoCoord(int8_t, B);
-LOAD_DATA_TEST_ZN2ZN_Coord(int8_t, B);
-LOAD_DATA_TEST_NZ2ZN_NoCoord(int8_t, B);
-LOAD_DATA_TEST_NZ2ZN_Coord(int8_t, B);
-LOAD_DATA_TEST_NZ2ZZ_NoCoord(uint8_t, A);
-LOAD_DATA_TEST_NZ2ZZ_Coord(uint8_t, A);
-LOAD_DATA_TEST_ZN2ZZ_NoCoord(uint8_t, A);
-LOAD_DATA_TEST_ZN2ZZ_Coord(uint8_t, A);
-LOAD_DATA_TEST_ZN2ZN_NoCoord(uint8_t, B);
-LOAD_DATA_TEST_ZN2ZN_Coord(uint8_t, B);
-LOAD_DATA_TEST_NZ2ZN_NoCoord(uint8_t, B);
-LOAD_DATA_TEST_NZ2ZN_Coord(uint8_t, B);
-/* TODO cann包stub缺少img2colv2_cbuf_to_ca类型支持 */
-LOAD_DATA_TEST_NZ2ZZ_NoCoord(int16_t, A);
-LOAD_DATA_TEST_NZ2ZZ_Coord(int16_t, A);
-LOAD_DATA_TEST_ZN2ZZ_NoCoord(int16_t, A);
-LOAD_DATA_TEST_ZN2ZZ_Coord(int16_t, A);
-LOAD_DATA_TEST_ZN2ZN_NoCoord(int16_t, B);
-LOAD_DATA_TEST_ZN2ZN_Coord(int16_t, B);
-LOAD_DATA_TEST_NZ2ZN_NoCoord(int16_t, B);
-LOAD_DATA_TEST_NZ2ZN_Coord(int16_t, B);
-LOAD_DATA_TEST_NZ2ZZ_NoCoord(uint16_t, A);
-LOAD_DATA_TEST_NZ2ZZ_Coord(uint16_t, A);
-LOAD_DATA_TEST_ZN2ZZ_NoCoord(uint16_t, A);
-LOAD_DATA_TEST_ZN2ZZ_Coord(uint16_t, A);
-LOAD_DATA_TEST_ZN2ZN_NoCoord(uint16_t, B);
-LOAD_DATA_TEST_ZN2ZN_Coord(uint16_t, B);
-LOAD_DATA_TEST_NZ2ZN_NoCoord(uint16_t, B);
-LOAD_DATA_TEST_NZ2ZN_Coord(uint16_t, B);
+// l1 -> l0A NZ2ZZ非转置，覆盖所有TYPE，覆盖传入Coord
+TEST_TENSOR_API_LOAD_DATA(bfloat16_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(bfloat16_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(half, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(half, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(float, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(float, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int32_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int32_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint32_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint32_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int8_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int8_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint8_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint8_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int16_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int16_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint16_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint16_t, 16, 16, NZ, ZZ, L1, L0A, cbuf, ca, false, 1, 1);
+// NZ2ZN转置，覆盖所有TYPE，覆盖传入Coord
+TEST_TENSOR_API_LOAD_DATA(bfloat16_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(bfloat16_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(half, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(half, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(float, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(float, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int32_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int32_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint32_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint32_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int8_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int8_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint8_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint8_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int16_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int16_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint16_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint16_t, 16, 16, NZ, ZN, L1, L0A, cbuf, ca, true, 1, 1);
+// l1 -> l0B ZN2ZN非转置，覆盖所有TYPE，覆盖传入Coord
+TEST_TENSOR_API_LOAD_DATA(bfloat16_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(bfloat16_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(half, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(half, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(float, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(float, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int32_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int32_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint32_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint32_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int8_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int8_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint8_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint8_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int16_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int16_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint16_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint16_t, 16, 16, ZN, ZN, L1, L0B, cbuf, cb, false, 1, 1);
+// l1 -> l0B NZ2ZN转置，覆盖所有TYPE，覆盖传入Coord
+TEST_TENSOR_API_LOAD_DATA(bfloat16_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(bfloat16_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(half, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(half, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(float, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(float, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int32_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int32_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint32_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint32_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int8_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int8_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint8_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint8_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(int16_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(int16_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 1, 1);
+TEST_TENSOR_API_LOAD_DATA(uint16_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 0, 0);
+TEST_TENSOR_API_LOAD_DATA(uint16_t, 16, 16, NZ, ZN, L1, L0B, cbuf, cb, true, 1, 1);
 

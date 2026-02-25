@@ -63,7 +63,6 @@ inline void img2colv2_cbuf_to_cb(__ca__ TYPE* dst, __cbuf__ TYPE* src, \
     bool filterH, bool transpose, bool fmatrixCtrl, uint16_t sizeChannel) { \
     if (is_mock_img2colv2_cbuf_to_cb) { \
         img2colv2_cbuf_to_cb_call_flag = true; \
-        std::cout << "JH: mock_img2colv2_cbuf_to_cb" << std::endl; \
         EXPECT_EQ(img2colv2_cbuf_to_cb_origin_dst_addr, dst); \
         EXPECT_EQ(img2colv2_cbuf_to_cb_origin_src_addr, src); \
     } \
