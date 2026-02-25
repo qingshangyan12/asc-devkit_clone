@@ -15,6 +15,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MM_BASE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_BASE_IMPL_H
 #include "kernel_tensor.h"
+#include "kernel_check.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_mm_impl.h"
@@ -155,9 +156,11 @@ template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D
 __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2<U>& loadDataParams)
 {
-    ASCENDC_DEBUG_ASSERT((CheckFuncLoadData3dv2<T, U>(dst, src, loadDataParams, "LoadData with LoadData3DParamsV2")),
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    ASCENDC_DEBUG_ASSERT(CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadData with LoadData3DParamsV2"),
         ASCENDC_REPORT_CHECK_ERROR_INTERNAL("LoadData with LoadData3DParamsV2", KernelFuncType::NONE_MODE)
     );
+#endif
     if constexpr (defaultConfig.isSetFMatrix) {
         Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
     }
