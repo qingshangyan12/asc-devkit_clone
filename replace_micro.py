@@ -28,18 +28,20 @@ import sys
 DEFAULT_EXTS = [".c", ".cpp", ".h", ".py"]
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Rename files containing '_micro_' to '_reg_compute_'",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "-d", "--dir",
+        "-d",
+        "--dir",
         default=".",
-        help="Root directory to start the search(defult: current directory)",
+        help="Root directory to start the search(default: current directory)",
     )
     parser.add_argument(
-        "-r", "--recursive",
+        "-r",
+        "--recursive",
        action="store_true",
         help="Search recursively in sub-directories(default: recursive)",
     )
@@ -47,12 +49,12 @@ def parse_args():
         "-n",
         "--dry-run",
         action="store_true",
-        help="Show what would be renamed actually renaming",
+        help="Show what would be renamed without actually renaming",
     )
     parser.add_argument(
         "-i",
-        "--ignore-case"
-        action="store_true"
+        "--ignore-case",
+        action="store_true",
         help="Match '_micro_'case-insensitively",
     )
     return parser.parse_args()
@@ -91,9 +93,9 @@ def rename_file(old_path: Path, dry_run: bool) -> None:
         try:
             old_path.rename(new_path)
             print(f"[RENAME] {old_path} -> {new_path}）")
-        except Exception as e:
+        except Exception as exc:
             print(f"[ERROR]重命名失败： {old_path} -> {new_path}\n     {exc}",
-                  file=sys.stderr)
+                  file=sys.stderr,)
 
     
 
