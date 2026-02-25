@@ -28,6 +28,9 @@ asc-devkit:
       - impl/**/dav_l300/*.h
       - impl/**/dav_l311/*.h
       - impl/basic_api/kernel_macros.h
+      - impl/**/dav_m510/*.h
+      - impl/basic_api/reg_compute/kernel_micro_struct_intf_impl.h
+      - impl/basic_api/reg_compute/kernel_micro_common_intf_impl.h
   llt:
     ut_check: true
     st_check: false
