@@ -453,7 +453,7 @@ struct LayoutDispatcher<LayoutFormat::DN, fp8_e8m0_t> {
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::ND, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<1>{}, row, Std::Int<1>{}, column;
+        return LayoutConstructor(Std::Int<1>{}, row, Std::Int<1>{}, column,
                                     Std::Int<0>{}, column, Std::Int<0>{}, Std::Int<1>{});
     }
 };
@@ -679,11 +679,11 @@ __aicore__ inline decltype(auto) MakeNzLayout(size_t row, size_t column) {
 
 template <>
 __aicore__ inline decltype(auto) MakeNzLayout<Std::ignore_t>(size_t row, size_t column) {
-    return LayoutDispatcher<LayoutFormat::NZ, uint16_t>(row, column);
+    return MakeNzLayout<uint16_t>(row, column);
 }
 
 __aicore__ inline decltype(auto) MakeL0CLayout(size_t row, size_t column) {
-    return LayoutDispatcher<LayoutFormat::NZ, uint16_t>(row, column);
+    return MakeNzLayout<uint16_t>(row, column);
 }
 
 template <typename T>
