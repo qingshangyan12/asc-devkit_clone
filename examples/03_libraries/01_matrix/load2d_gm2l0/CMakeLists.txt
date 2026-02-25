@@ -16,14 +16,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    performance.asc
-)
-
-target_compile_definitions(demo PRIVATE
-    M_SIZE=${M_SIZE}
-    K_SIZE=${K_SIZE}
-    N_SIZE=${N_SIZE}
-    SCENARIO_NUM=${SCENARIO_NUM}
+    load2d_gm2l1.asc
 )
 
 target_compile_options(demo PRIVATE
