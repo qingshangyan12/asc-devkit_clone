@@ -42,8 +42,6 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">load2d_gm2l1</td></tr>
   </table>
 - 算子实现：  
-
-  由于LoadData2D指令不支持ND2NZ的数据分型转换，因此使用LoadData2D指令从GM至UB搬运数据需要确保GM为NZ数据分型，这通常是上一次矩阵计算的结果（调用fixpipe指令搬回GM，不使能NZ2ND）。
   本算子的实现流程分为几个基本任务：LoadA，LoadB，SplitA, SplitATranspose，SplitB，SplitBTranspose，Compute，CopyOut。LoadA负责将GM上的NZ分型A矩阵搬运到 L1 中，LoadB负责将GM上的NZ分型B矩阵搬运到 L1 中。SplitA调用LoadData接口将数据进一步搬运L0A，SplitATranspose调用LoadData接口将数据进一步搬运L0A（使能转置），SplitB调用LoadData接口将数据进一步搬运L0B，SplitBTranspose调用LoadData接口将数据进一步搬运L0B（使能转置），Compute任务负责对数据进行矩阵乘运算，计算结果存储在 L0C 中。CopyOut任务负责将输出数据从L0C搬运至GM。
 
 - 调用实现  
