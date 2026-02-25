@@ -16,7 +16,7 @@
 using namespace AscendC::Te;
 using namespace AscendC::Std;
 
-enum class MemoryLayout {
+enum class CubeLayout {
     RowMajor,
     NZ,
     ColumnMajor,
@@ -37,9 +37,20 @@ enum class Prefix {
     fbuf,
 };
 
-struct Test_Params(
-    
-)
+template<typename T> struct TensorInfo {
+    using DTYPE = T;
+    int size1;
+    int size2;
+    CubeLayout layout;
+    Location location;
+    Prefix prefix;
+}
+
+template<typename T> struct TestParam {
+    using DTYPE = T;
+    TensorInfo<T> src_info;
+    TensorInfo<T> dst_info;
+}
 
 
 class TEST_TENSOR_API_DATACOPY : public testing::Test {

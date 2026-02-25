@@ -13,7 +13,7 @@
 #include "tensor_api/stub/cce_stub.h"
 #include "include/experimental/tensor_api/tensor.h"
 
-enum class MemoryLayout {
+enum class CubeLayout {
     RowMajor,
     NZ,
     ColumnMajor,
@@ -176,6 +176,7 @@ DATA_COPY_TEST_IGNORE(float, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_nd2nd_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, RowMajor) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
@@ -193,6 +194,7 @@ DATA_COPY_TEST_GM2L1_ND2ND(int32_t, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_nz2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, NZ, cbuf, L1, NZ) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
@@ -219,6 +221,7 @@ DATA_COPY_TEST_GM2L1_NZ2NZ(uint8_t, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
@@ -235,6 +238,7 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B8(uint8_t, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
@@ -253,6 +257,7 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B16(uint16_t, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
@@ -270,6 +275,7 @@ DATA_COPY_TEST_GM2L1_ND2NZ_B32S(uint32_t, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
@@ -286,6 +292,7 @@ DATA_COPY_TEST_GM2L1_DN2ZN_B8(uint8_t, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
@@ -304,6 +311,7 @@ DATA_COPY_TEST_GM2L1_DN2ZN_B16(uint16_t, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
@@ -320,6 +328,7 @@ DATA_COPY_TEST_GM2L1_DN2ZN_B32S(uint32_t, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_cbuf_to_bt_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, biasbuf, Bias, RowMajor) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
@@ -335,6 +344,7 @@ DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 32, 64, 32, 64)
             .times(1) \
             .will(invoke(&copy_cbuf_to_fbuf_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, fbuf, Fixbuf, RowMajor) \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
