@@ -283,7 +283,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const
 
 template <typename T, typename U>
 __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T *dst, __gm__ U *src, const LoadData2DParamsV2 &loadDataParam,
-    const Nd2NzParamsV2& nd2nzParams)
+    const LookupTableParams& nd2nzParams)
 {
     static_assert(
         ((IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) ||
