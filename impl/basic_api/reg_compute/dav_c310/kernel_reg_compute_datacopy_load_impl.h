@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_datacopy_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_DATACOPY_LOAD_IMPL_H
-#define ASCENDC_MODULE_MICRO_DATACOPY_LOAD_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_DATACOPY_LOAD_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_DATACOPY_LOAD_IMPL_H
 
 #include "kernel_reg_compute_common_impl.h"
 
@@ -432,4 +432,4 @@ __simd_callee__ inline void DataCopyImpl(U& dstReg, __ubuf__ T*& srcAddr, uint32
 }
 } // namespace Reg
 } // namespace AscendC
-#endif // ASCENDC_MODULE_MICRO_DATACOPY_LOAD_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_DATACOPY_LOAD_IMPL_H

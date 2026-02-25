@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_struct_intf_impl.h
  * \brief
  */
-#ifndef ASCENDC_KERNEL_MICRO_STRUCT_INTERFACE_IMPL_H
-#define ASCENDC_KERNEL_MICRO_STRUCT_INTERFACE_IMPL_H
+#ifndef ASCENDC_KERNEL_REG_COMPUTE_STRUCT_INTERFACE_IMPL_H
+#define ASCENDC_KERNEL_REG_COMPUTE_STRUCT_INTERFACE_IMPL_H
 
 namespace AscendC {
 namespace Reg {
@@ -83,4 +83,4 @@ __aicore__ void RegTensor<T, regTrait>::Print() const
 } // namespace Reg
 } // namespace AscendC
 
-#endif // ASCENDC_KERNEL_MICRO_STRUCT_INTERFACE_IMPL_H
+#endif // ASCENDC_KERNEL_REG_COMPUTE_STRUCT_INTERFACE_IMPL_H

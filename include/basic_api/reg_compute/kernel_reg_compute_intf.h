@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_INTERFACE_H
 
 #include "kernel_macros.h"
 
@@ -46,4 +46,4 @@
 #include "kernel_reg_compute_vec_fused_intf.h"
 #include "kernel_reg_compute_histograms_intf.h"
 #endif
-#endif // ASCENDC_MODULE_MICRO_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_INTERFACE_H

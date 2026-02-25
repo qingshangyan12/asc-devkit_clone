@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_histograms_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_HISTOGRAMS_IMPL_H
-#define ASCENDC_MODULE_MICRO_HISTOGRAMS_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_HISTOGRAMS_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_HISTOGRAMS_IMPL_H
 
 #include "kernel_reg_compute_common_impl.h"
 namespace AscendC {
@@ -36,4 +36,4 @@ __simd_callee__ inline void HistogramsImpl(RegU &dstReg, RegT &srcReg, MaskReg &
 }  // namespace Reg
 }  // namespace AscendC
 
-#endif // ASCENDC_MODULE_MICRO_HISTOGRAMS_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_HISTOGRAMS_IMPL_H

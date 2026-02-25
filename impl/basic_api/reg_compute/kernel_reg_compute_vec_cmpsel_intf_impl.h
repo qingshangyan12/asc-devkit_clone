@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_cmpsel_intf_impl.h
  * \brief
  */
-#ifndef ASCENDC_KERNEL_MICRO_VEC_CMPSEL_INTERFACE_IMPL_H
-#define ASCENDC_KERNEL_MICRO_VEC_CMPSEL_INTERFACE_IMPL_H
+#ifndef ASCENDC_KERNEL_REG_COMPUTE_VEC_CMPSEL_INTERFACE_IMPL_H
+#define ASCENDC_KERNEL_REG_COMPUTE_VEC_CMPSEL_INTERFACE_IMPL_H
 
 #if __NPU_ARCH__ == 3003
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_vec_cmpsel_impl.h"
@@ -52,4 +52,4 @@ __simd_callee__ inline void Select(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 } // namespace Reg
 } // namespace AscendC
 
-#endif // ASCENDC_KERNEL_MICRO_VEC_CMPSEL_INTERFACE_IMPL_H
+#endif // ASCENDC_KERNEL_REG_COMPUTE_VEC_CMPSEL_INTERFACE_IMPL_H

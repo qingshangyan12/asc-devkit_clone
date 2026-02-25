@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_reduce_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_VEC_REDUCE_IMPL_H
-#define ASCENDC_MODULE_MICRO_VEC_REDUCE_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_REDUCE_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_VEC_REDUCE_IMPL_H
 
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_copy_intf.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"
@@ -277,4 +277,4 @@ __simd_callee__ inline void PairReduceSumImpl(U& dstReg, U srcReg, MaskReg mask)
 }
 } // namespace Reg
 } // namespace AscendC
-#endif // ASCENDC_MODULE_MICRO_VEC_REDUCE_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_VEC_REDUCE_IMPL_H

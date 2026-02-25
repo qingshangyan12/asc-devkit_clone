@@ -11,8 +11,8 @@
 /* !
  * \file kernel_reg_compute_vec_ternary_scalar_intf.h
  */
-#ifndef ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_INTERFACE_H
 
 #include "kernel_reg_compute_common_intf.h"
 #include "kernel_reg_compute_utils.h"
@@ -25,4 +25,4 @@ __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, Mask
 } // namespace AscendC
 
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_ternary_scalar_intf_impl.h"
-#endif // ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_INTERFACE_H

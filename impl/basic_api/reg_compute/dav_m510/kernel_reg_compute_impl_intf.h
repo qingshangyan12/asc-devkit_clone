@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_impl_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_IMPL_INTF_H
-#define ASCENDC_MODULE_MICRO_IMPL_INTF_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_IMPL_INTF_H
+#define ASCENDC_MODULE_REG_COMPUTE_IMPL_INTF_H
 
 #include "kernel_reg_compute_addrreg_impl.h"
 #include "kernel_reg_compute_common_impl.h"
@@ -33,4 +33,4 @@
 #include "kernel_reg_compute_vec_vconv_impl.h"
 #include "kernel_reg_compute_vec_fused_impl.h"
 #include "kernel_reg_compute_histograms_impl.h"
-#endif // ASCENDC_MODULE_MICRO_IMPL_INTF_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_IMPL_INTF_H

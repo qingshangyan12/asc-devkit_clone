@@ -17,7 +17,7 @@
 #if defined(__NPU_ARCH__) &&                                                                                    \
     ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
-// MICRO API
+// REG_COMPUTE API
 #include "reg_compute/kernel_reg_compute_intf.h"
 #endif
 #include "kernel_prof_trace_intf.h"

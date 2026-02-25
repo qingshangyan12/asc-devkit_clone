@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_common_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_COMMON_IMPL_H
-#define ASCENDC_MODULE_MICRO_COMMON_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_COMMON_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_COMMON_IMPL_H
 
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_utils.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_struct_intf.h"
@@ -184,4 +184,4 @@ __simd_callee__ inline void B32TraitTwoToTraitOne(T& dstReg, U& srcReg)
 }
 } // namespace Reg
 } // namespace AscendC
-#endif // ASCENDC_MODULE_MICRO_COMMON_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_COMMON_IMPL_H

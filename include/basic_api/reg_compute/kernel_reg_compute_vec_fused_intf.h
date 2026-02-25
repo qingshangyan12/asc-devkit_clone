@@ -11,8 +11,8 @@
 /* !
  * \file kernel_reg_compute_vec_fused_impl.h
  */
-#ifndef ASCENDC_MODULE_MICRO_VEC_FUSED_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_VEC_FUSED_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_FUSED_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_VEC_FUSED_INTERFACE_H
 
 #include "kernel_reg_compute_common_intf.h"
 #include "kernel_reg_compute_utils.h"
@@ -36,4 +36,4 @@ __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 } // namespace AscendC
 
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_fused_intf_impl.h"
-#endif // ASCENDC_MODULE_MICRO_VEC_FUSED_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_VEC_FUSED_INTERFACE_H

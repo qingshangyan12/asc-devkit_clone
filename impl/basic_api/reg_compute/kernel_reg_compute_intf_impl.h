@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_intf_impl.h
  * \brief
  */
-#ifndef ASCENDC_KERNEL_MICRO_INTF_IMPL_H
-#define ASCENDC_KERNEL_MICRO_INTF_IMPL_H
+#ifndef ASCENDC_KERNEL_REG_COMPUTE_INTF_IMPL_H
+#define ASCENDC_KERNEL_REG_COMPUTE_INTF_IMPL_H
 
 #if (__NPU_ARCH__ == 3101) || \
     (__NPU_ARCH__ == 3003) || \
@@ -39,4 +39,4 @@
 #include "kernel_reg_compute_histograms_intf_impl.h"
 #endif
 
-#endif // ASCENDC_KERNEL_MICRO_INTF_IMPL_H
+#endif // ASCENDC_KERNEL_REG_COMPUTE_INTF_IMPL_H

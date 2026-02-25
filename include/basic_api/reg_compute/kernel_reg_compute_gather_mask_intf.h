@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_gather_mask_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_GATHER_MASK_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_GATHER_MASK_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_GATHER_MASK_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_GATHER_MASK_INTERFACE_H
 
 #include "kernel_reg_compute_common_intf.h"
 #include "kernel_reg_compute_utils.h"
@@ -38,4 +38,4 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg);
 } // namespace AscendC
 
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_gather_mask_intf_impl.h"
-#endif // ASCENDC_MODULE_MICRO_COPY_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_COPY_INTERFACE_H

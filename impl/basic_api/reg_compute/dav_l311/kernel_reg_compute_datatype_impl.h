@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_datatype_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_DATATYPE_IMPL_H
-#define ASCENDC_MODULE_MICRO_DATATYPE_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_DATATYPE_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_DATATYPE_IMPL_H
 
 #include "../../../basic_api/utils/kernel_utils_macros.h"
 
@@ -62,4 +62,4 @@ template <> struct TypeGet<int4x2_t> {
 };
 } // namespace Reg
 } // namespace AscendC
-#endif // ASCENDC_MODULE_MICRO_DATATYPE_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_DATATYPE_IMPL_H

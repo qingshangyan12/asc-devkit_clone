@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_ternary_scalar_impl.h
  * \brief AscendC c310 support vaxpy level 0/2 api.
  */
-#ifndef ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_IMPL_H
-#define ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_IMPL_H
 #include "kernel_reg_compute_common_impl.h"
 
 namespace AscendC {
@@ -30,4 +30,4 @@ __simd_callee__ inline void AxpyImpl(RegT &dstReg, RegT &srcReg, const ScalarT s
 }
 } // namespace Reg
 } // namespace AscendC
-#endif // ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_IMPL_H

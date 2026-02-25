@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_ternary_scalar_impl.h
  * \brief AscendC m510 support vaxpy level 0/2 api.
  */
-#ifndef ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_IMPL_H
-#define ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_IMPL_H
 
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_binary_scalar_intf.h"
@@ -43,4 +43,4 @@ __simd_callee__ inline void AxpyImpl(S& dstReg, S& srcReg, const U scalarValue, 
 }
 } // namespace Reg
 } // namespace AscendC
-#endif // ASCENDC_MODULE_MICRO_VEC_TERNARY_SCALAR_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_VEC_TERNARY_SCALAR_IMPL_H

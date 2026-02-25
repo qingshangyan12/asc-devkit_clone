@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_datacopy_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_DATACOPY_IMPL_H
-#define ASCENDC_MODULE_MICRO_DATACOPY_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_DATACOPY_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_DATACOPY_IMPL_H
 
 #include "kernel_reg_compute_common_impl.h"
 #include "../../../../include/basic_api/kernel_operator_sys_var_intf.h"
@@ -795,4 +795,4 @@ __simd_callee__ inline void StoreImpl(__ubuf__ T* dstAddr, U& srcReg)
 }
 }  // namespace Reg
 }  // namespace AscendC
-#endif  // ASCENDC_MODULE_MICRO_DATACOPY_IMPL_H
+#endif  // ASCENDC_MODULE_REG_COMPUTE_DATACOPY_IMPL_H

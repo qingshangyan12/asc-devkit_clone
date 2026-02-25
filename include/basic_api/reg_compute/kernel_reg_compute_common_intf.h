@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_common_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_COMMON_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_COMMON_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_COMMON_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_COMMON_INTERFACE_H
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include "stub_def.h"
@@ -32,4 +32,4 @@ using UnalignReg = vector_align;
 } // namespace Reg
 } // namespace AscendC
 
-#endif // ASCENDC_MODULE_MICRO_COMMON_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_COMMON_INTERFACE_H

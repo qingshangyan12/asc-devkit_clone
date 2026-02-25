@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_struct_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_STRUCT_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_STRUCT_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
 
 #if (__NPU_ARCH__ == 3101) || defined(__ASC_NPU_HOST__)
 #include "../../impl/basic_api/reg_compute/dav_c310/kernel_reg_compute_datatype_impl.h"
@@ -60,4 +60,4 @@ struct RegTensor {
 } // namespace AscendC
 
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_struct_intf_impl.h"
-#endif // ASCENDC_MODULE_MICRO_STRUCT_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H

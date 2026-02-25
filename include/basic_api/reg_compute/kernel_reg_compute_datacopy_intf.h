@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_datacopy_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_DATACOPY_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_DATACOPY_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_DATACOPY_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_DATACOPY_INTERFACE_H
 
 #include "kernel_reg_compute_common_intf.h"
 #include "kernel_reg_compute_utils.h"
@@ -167,4 +167,4 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 } // namespace AscendC
 
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_datacopy_intf_impl.h"
-#endif // ASCENDC_MODULE_MICRO_DATACOPY_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_DATACOPY_INTERFACE_H

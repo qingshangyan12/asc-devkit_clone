@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_datacopy_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_DATACOPY_STORE_IMPL_H
-#define ASCENDC_MODULE_MICRO_DATACOPY_STORE_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_DATACOPY_STORE_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_DATACOPY_STORE_IMPL_H
 
 #include "../../../../include/basic_api/kernel_operator_sys_var_intf.h"
 
@@ -513,4 +513,4 @@ template <typename T> __simd_callee__ inline void DataCopyUnAlignPostImpl(__ubuf
 }
 } // namespace Reg
 } // namespace AscendC
-#endif // ASCENDC_MODULE_MICRO_DATACOPY_STORE_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_DATACOPY_STORE_IMPL_H

@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_IMPL_INTF_H
-#define ASCENDC_MODULE_MICRO_IMPL_INTF_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_IMPL_INTF_H
+#define ASCENDC_MODULE_REG_COMPUTE_IMPL_INTF_H
 
 #include "kernel_reg_compute_copy_impl.h"
 #include "kernel_reg_compute_datacopy_impl.h"
@@ -32,4 +32,4 @@
 #include "kernel_reg_compute_histogram_impl.h"
 #include "kernel_reg_compute_gather_mask_impl.h"
 #include "kernel_reg_compute_vec_fused_impl.h"
-#endif // ASCENDC_MODULE_MICRO_IMPL_INTF_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_IMPL_INTF_H

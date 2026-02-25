@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_binary_intf_impl.h
  * \brief
  */
-#ifndef ASCENDC_KERNEL_MICRO_VEC_BINARY_INTERFACE_IMPL_H
-#define ASCENDC_KERNEL_MICRO_VEC_BINARY_INTERFACE_IMPL_H
+#ifndef ASCENDC_KERNEL_REG_COMPUTE_VEC_BINARY_INTERFACE_IMPL_H
+#define ASCENDC_KERNEL_REG_COMPUTE_VEC_BINARY_INTERFACE_IMPL_H
 
 #include "../../../include/basic_api/reg_compute/kernel_reg_compute_vec_unary_intf.h"
 #include "../../../include/basic_api/reg_compute/kernel_reg_compute_vec_binary_scalar_intf.h"
@@ -170,4 +170,4 @@ __simd_callee__ inline void SubC(MaskReg& carry, U& dstReg, U& srcReg0, U& srcRe
 } // namespace Reg
 } // namespace AscendC
 
-#endif // ASCENDC_KERNEL_MICRO_VEC_BINARY_INTERFACE_IMPL_H
+#endif // ASCENDC_KERNEL_REG_COMPUTE_VEC_BINARY_INTERFACE_IMPL_H

@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_utils.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_UTILS_H
-#define ASCENDC_MODULE_MICRO_UTILS_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_UTILS_H
+#define ASCENDC_MODULE_REG_COMPUTE_UTILS_H
 
 #include "utils/kernel_utils_mode.h"
 
@@ -371,4 +371,4 @@ enum class PairReduce {
 } // namespace Reg
 } // namespace AscendC
 
-#endif // ASCENDC_MODULE_MICRO_UTILS_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_UTILS_H

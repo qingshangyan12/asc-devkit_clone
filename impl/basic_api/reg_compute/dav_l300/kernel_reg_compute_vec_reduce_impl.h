@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_reduce_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_VEC_REDUCE_IMPL_H
-#define ASCENDC_MODULE_MICRO_VEC_REDUCE_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_REDUCE_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_VEC_REDUCE_IMPL_H
 
 #include "kernel_reg_compute_common_impl.h"
 namespace AscendC {
@@ -104,4 +104,4 @@ __simd_callee__ inline void PairReduceSumImpl(RegT &dstReg, RegT srcReg, MaskReg
 }
 } // namespace Reg
 } // namespace AscendC
-#endif // ASCENDC_MODULE_MICRO_VEC_REDUCE_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_VEC_REDUCE_IMPL_H

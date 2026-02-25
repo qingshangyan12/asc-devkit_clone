@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_unary_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_VEC_SINGLE_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_VEC_SINGLE_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_SINGLE_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_VEC_SINGLE_INTERFACE_H
 
 #include "kernel_reg_compute_common_intf.h"
 #include "kernel_reg_compute_utils.h"
@@ -57,4 +57,4 @@ __simd_callee__ inline void Not(U& dstReg, U& srcReg, MaskReg& mask);
 } // namespace AscendC
 
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_unary_intf_impl.h"
-#endif // ASCENDC_MODULE_MICRO_VEC_SINGLE_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_VEC_SINGLE_INTERFACE_H

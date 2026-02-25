@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_maskreg_intf_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_MASKREG_INTERFACE_IMPL_H
-#define ASCENDC_MODULE_MICRO_MASKREG_INTERFACE_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_MASKREG_INTERFACE_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_MASKREG_INTERFACE_IMPL_H
 
 #if __NPU_ARCH__ == 3003
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_maskreg_impl.h"
@@ -150,4 +150,4 @@ __simd_callee__ inline MaskReg MoveMask()
 } // namespace Reg
 } // namespace AscendC
 
-#endif // ASCENDC_MODULE_MICRO_MASKREG_INTERFACE_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_MASKREG_INTERFACE_IMPL_H

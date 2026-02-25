@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_membar_intf_impl.h
  * \brief
  */
-#ifndef ASCENDC_KERNEL_MICRO_MEMBAR_INTERFACE_IMPL_H
-#define ASCENDC_KERNEL_MICRO_MEMBAR_INTERFACE_IMPL_H
+#ifndef ASCENDC_KERNEL_REG_COMPUTE_MEMBAR_INTERFACE_IMPL_H
+#define ASCENDC_KERNEL_REG_COMPUTE_MEMBAR_INTERFACE_IMPL_H
 
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 2103) || \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || defined(__ASC_NPU_HOST__)
@@ -44,4 +44,4 @@ __simd_callee__ inline void LocalMemBar()
 } // namespace Reg 
 } // namespace AscendC
 
-#endif // ASCENDC_KERNEL_MICRO_MEMBAR_INTERFACE_IMPL_H
+#endif // ASCENDC_KERNEL_REG_COMPUTE_MEMBAR_INTERFACE_IMPL_H

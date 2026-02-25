@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_copy_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_COPY_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_COPY_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_COPY_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_COPY_INTERFACE_H
 
 #include "kernel_reg_compute_common_intf.h"
 #include "kernel_reg_compute_utils.h"
@@ -29,4 +29,4 @@ __simd_callee__ inline void Move(U& dstReg, U& srcReg);
 } // namespace AscendC
 
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_copy_intf_impl.h"
-#endif // ASCENDC_MODULE_MICRO_COPY_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_COPY_INTERFACE_H

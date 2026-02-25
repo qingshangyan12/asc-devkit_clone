@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_copy_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_COPY_IMPL_H
-#define ASCENDC_MODULE_MICRO_COPY_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_COPY_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_COPY_IMPL_H
 
 #include "kernel_reg_compute_common_impl.h"
 namespace AscendC {

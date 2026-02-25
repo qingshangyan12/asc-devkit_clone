@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_gather_mask_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_GATHER_MASK_IMPL_H
-#define ASCENDC_MODULE_MICRO_GATHER_MASK_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_GATHER_MASK_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_GATHER_MASK_IMPL_H
 
 #include "kernel_reg_compute_common_impl.h"
 namespace AscendC {

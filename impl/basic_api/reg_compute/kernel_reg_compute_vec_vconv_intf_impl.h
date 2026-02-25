@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_vconv_intf_impl.h
  * \brief
  */
-#ifndef ASCENDC_KERNEL_MICRO_VEC_VCONV_INTERFACE_IMPL_H
-#define ASCENDC_KERNEL_MICRO_VEC_VCONV_INTERFACE_IMPL_H
+#ifndef ASCENDC_KERNEL_REG_COMPUTE_VEC_VCONV_INTERFACE_IMPL_H
+#define ASCENDC_KERNEL_REG_COMPUTE_VEC_VCONV_INTERFACE_IMPL_H
 
 #if __NPU_ARCH__ == 3003
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_vec_vconv_impl.h"
@@ -41,4 +41,4 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask) {
 } // namespace Reg
 } // namespace AscendC
 
-#endif // ASCENDC_KERNEL_MICRO_VEC_VCONV_INTERFACE_IMPL_H
+#endif // ASCENDC_KERNEL_REG_COMPUTE_VEC_VCONV_INTERFACE_IMPL_H

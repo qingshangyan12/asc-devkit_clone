@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_duplicate_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_VEC_DUPLICATE_IMPL_H
-#define ASCENDC_MODULE_MICRO_VEC_DUPLICATE_IMPL_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_DUPLICATE_IMPL_H
+#define ASCENDC_MODULE_REG_COMPUTE_VEC_DUPLICATE_IMPL_H
 
 #include "kernel_reg_compute_common_impl.h"
 #include "../../../basic_api/dav_l311/kernel_operator_common_impl.h"
@@ -76,4 +76,4 @@ __simd_callee__ inline void DeInterleaveImpl(RegT &dstReg0, RegT &dstReg1, RegT 
 }
 } // namespace Reg
 } // namespace AscendC
-#endif // ASCENDC_MODULE_MICRO_VEC_DUPLICATE_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_VEC_DUPLICATE_IMPL_H

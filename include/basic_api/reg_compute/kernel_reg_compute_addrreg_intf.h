@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_addrreg_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_ADDRREG_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_ADDRREG_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_ADDRREG_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_ADDRREG_INTERFACE_H
 
 #include "kernel_reg_compute_common_intf.h"
 
@@ -40,4 +40,4 @@ __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, 
 } // namespace AscendC
 
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_addrreg_intf_impl.h"
-#endif // ASCENDC_MODULE_MICRO_ADDRREG_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_ADDRREG_INTERFACE_H

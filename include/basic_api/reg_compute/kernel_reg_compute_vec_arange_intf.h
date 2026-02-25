@@ -12,8 +12,8 @@
  * \file kernel_reg_compute_vec_arange_intf.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_MICRO_VEC_ARANGE_INTERFACE_H
-#define ASCENDC_MODULE_MICRO_VEC_ARANGE_INTERFACE_H
+#ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_ARANGE_INTERFACE_H
+#define ASCENDC_MODULE_REG_COMPUTE_VEC_ARANGE_INTERFACE_H
 
 #include "kernel_reg_compute_struct_intf.h"
 #include "kernel_reg_compute_utils.h"
@@ -26,4 +26,4 @@ __simd_callee__ inline void Arange(S& dstReg, U scalarValue);
 } // namespace AscendC
 
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_arange_intf_impl.h"
-#endif // ASCENDC_MODULE_MICRO_VEC_ARANGE_INTERFACE_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_VEC_ARANGE_INTERFACE_H

@@ -13,8 +13,8 @@
  * \brief
  */
 
-#ifndef ASCENDC_KERNEL_MICRO_HISTOGRAMS_INTERFACE_IMPL_H
-#define ASCENDC_KERNEL_MICRO_HISTOGRAMS_INTERFACE_IMPL_H
+#ifndef ASCENDC_KERNEL_REG_COMPUTE_HISTOGRAMS_INTERFACE_IMPL_H
+#define ASCENDC_KERNEL_REG_COMPUTE_HISTOGRAMS_INTERFACE_IMPL_H
 
 #if __NPU_ARCH__ == 3003
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_histograms_impl.h"
@@ -35,4 +35,4 @@ __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask)
 } // namespace Reg
 } // namespace AscendC
 
-#endif // ASCENDC_MODULE_MICRO_HISTOGRAMS_INTERFACE_IMPL_H
+#endif // ASCENDC_MODULE_REG_COMPUTE_HISTOGRAMS_INTERFACE_IMPL_H
