@@ -76,6 +76,35 @@ uint8_t GetCacheModeValue(CacheMode mode)
 DATA_COPY_L2_CACHE_L1_TEST(uint16_t, CACHE_MODE_NORMAL)
 DATA_COPY_L2_CACHE_L1_TEST(int8_t, CACHE_MODE_DISABLE)
 
+#define LOAD_DATA_L2_CACHE_TEST(T, cacheMode, pos)                                                \
+    TEST_F(DataCopyL2CacheTestSuite, testCaseL1##T##cacheMode##pos)                               \
+    {                                                                                             \
+        uint8_t srcGm[1024]{ 0 };                                                                 \
+        uint32_t dataSize = 1024 / sizeof(T);                                                     \
+                                                                                                  \
+        CacheMode mode = CacheMode::cacheMode;                                                    \
+        const uint8_t expectedMode = GetCacheModeValue(mode);                                     \
+        uint8_t actualMode = 99;                                                                  \
+                                                                                                  \
+        MOCKER(LoadData2DGM2L1Cal, void (*)(T *, T *, const LoadData2DParamsV2 &, const uint8_t)) \
+            .stubs()                                                                              \
+            .with(any(), any(), any(), spy(actualMode));                                          \
+        TPipe tpipe;                                                                              \
+                                                                                                  \
+        GlobalTensor<T> globalTensor;                                                             \
+        globalTensor.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(srcGm), dataSize);              \
+        globalTensor.SetL2CacheHint(mode);                                                        \
+                                                                                                  \
+        TBuf<TPosition::pos> tbuf1;                                                               \
+        tpipe.InitBuffer(tbuf1, dataSize * sizeof(T));                                            \
+        LocalTensor<T> inputLocal = tbuf1.Get<T>();                                               \
+                                                                                                  \
+        LoadData2DParamsV2 param;                                                                 \
+                                                                                                  \
+        LoadData(inputLocal, globalTensor, param);                                                \
+        EXPECT_EQ(expectedMode, actualMode);                                                      \
+    }
+
 #define LOAD_DATA_LUT_TEST(TDst, USrc, pos)                                                        \
     TEST_F(DataCopyL2CacheTestSuite, testCaseLoadDataLut##TDst##USrc##pos)                         \
     {                                                                                              \
