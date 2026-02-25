@@ -599,7 +599,7 @@ def extract_decl_param_options(op_info: OpInfo, option_name="dtype"):
 
 
 def decode_tiling(tiling_key: int = None) -> dict:
-    kernel_template_input = get_context().get_addition("kernel_template_input")
+    kernel_template_input = get_context().get_addition("kernel-template-input")
     pairs = kernel_template_input.split(';')
     kernel_compile_dict = {}
     for pair in pairs:

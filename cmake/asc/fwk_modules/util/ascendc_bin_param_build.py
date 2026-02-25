@@ -488,7 +488,7 @@ grep -q \"None of the given tiling keys are in the supported list\"; then\n"
 
         if self.kernel_template_input:
             kernel_template_input_str = self.kernel_template_input
-            build_cmd_var += f' --kernel_template_input="{kernel_template_input_str}"'
+            build_cmd_var += f' --kernel-template-input="{kernel_template_input_str}"'
 
         build_cmd_var += ")\n"
         build_cmd_var += "\n"
