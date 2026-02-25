@@ -50,7 +50,7 @@ public:
         loadDataParams.srcStride = DivCeil(mLength, 16);
         loadDataParams.dstStride = DivCeil(mLength, 16);
 
-        Nd2NzParamsV2 nz2ndParams;
+        LookupTableParams nz2ndParams;
         nz2ndParams.lookupTable0 = 258;
         nz2ndParams.lookupTable1 = 1027;
 
