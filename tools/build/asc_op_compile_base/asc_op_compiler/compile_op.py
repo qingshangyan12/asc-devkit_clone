@@ -592,6 +592,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
         if '--cce-auto-sync=off' not in compile_options and '--cce-auto-sync' in compile_options:
             gen_func_attributes += " __attribute__((need_auto_sync))"
 
+    compile_info.global_kernel_attribute = gen_func_attributes
     kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {auto_gen_kernel_func}("
     kernel_func_dec_pub = f"__aicore__ inline __attribute__((always_inline)) void ascendc_{auto_gen_kernel_func}("
 
@@ -1127,6 +1128,55 @@ def link_kernel_obj(compile_info: CompileInfo, op_info: OpInfo, tiling_info: Til
     CommonUtility.print_compile_log(op_info.kernel_name, "link relocatable success", AscendCLogLevel.LOG_INFO)
 
 
+def compile_sk_bind(compile_info: CompileInfo, compile_info_origin: CompileInfo, kernel_meta_dir):
+    sk_bind_file = os.path.join(kernel_meta_dir, "sk_bind.cpp")
+    source = """
+namespace {
+struct SknlMapInfo {
+    uint64_t cap;
+    uint64_t globalFunc;
+    uint64_t sknlFunc[4];
+};
+
+struct BaseTlv {
+    uint16_t type;
+    uint16_t len;
+};
+
+struct FuncMetaSknlMap {
+    BaseTlv head;
+    SknlMapInfo sknlMeta;
+};
+
+template <uint64_t cap, auto GF, auto SK0 = 0xffffffffffffffff, auto SK1 = 0xffffffffffffffff, auto SK2 = 0xffffffffffffffff, auto SK3 = 0xffffffffffffffff>
+struct SknlKernelMap {
+    static constexpr SknlMapInfo value = {cap, (uint64_t)GF, {(uint64_t)SK0, (uint64_t)SK1, (uint64_t)SK2, (uint64_t)SK3}};
+};
+}
+
+#define SK_CONCAT_IMPL(a, b) a##b
+#define SK_CONCAT(a, b) SK_CONCAT_IMPL(a, b)
+
+#define SK_BIND(...) __attribute__((used, __section__(".ascend.meta"))) static inline FuncMetaSknlMap SK_CONCAT(g_sknl_map_, __COUNTER__) = {{20, sizeof(SknlMapInfo)}, SknlKernelMap<__VA_ARGS__>::value};
+"""
+    for idx, global_syb  in enumerate(compile_info_origin.global_kernel_symbols):
+        sk_syb = compile_info.global_kernel_symbols[idx]
+        source += f"extern \"C\" {compile_info_origin.global_kernel_attribute} [aicore] void {global_syb};\n"
+        source += f"extern \"C\" {compile_info.global_kernel_attribute} [aicore] void {sk_syb};\n"
+        source += f"extern \"C\" {compile_info.global_kernel_attribute} [aicore] void {sk_syb}_split1;\n"
+        source += f"extern \"C\" {compile_info.global_kernel_attribute} [aicore] void {sk_syb}_split2;\n"
+        source += f"extern \"C\" {compile_info.global_kernel_attribute} [aicore] void {sk_syb}_split3;\n"
+        source += f"SK_BIND(0, {global_syb}, {sk_syb}, {sk_syb}_split1, {sk_syb}_split2, {sk_syb}_split3);\n"
+
+    # write code into file
+    try:
+        with os.fdopen(\
+            os.open(sk_bind_file, os.O_TRUNC | os.O_RDWR | os.O_CREAT, stat.S_IWUSR | stat.S_IRUSR), 'w') as ofd:
+            ofd.write(source)
+    except Exception as err:
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("gen sk bind file failed, reason is:", err))
+
+
 def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_option_tuple,
                            infered_info_from_ifile: InferChannelParamsFromIFile, extend_options: dict):
     value_depend_dict = extend_options.get("valueDepend")
@@ -1269,6 +1319,9 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         handle_compile_options(compile_info_origin, compile_option_tuple_origin, tiling_info, workspace_idx)
         compile_kernel_and_meta(compile_info_origin, op_info, compile_option_tuple_origin, tiling_info)
         link_kernel_obj(compile_info_origin, op_info, tiling_info)
+
+        # compile_sk_bind
+        compile_sk_bind(compile_info, compile_info_origin, kernel_meta_dir)
 
         # link norm.o and sk.o
         link_sk_norm_combine(compile_info.dst_file, compile_info_origin.dst_file, compile_info.compile_log_path)
@@ -1563,6 +1616,7 @@ def _get_compile_cmd_and_section_content(compile_info: CompileInfo, arch: str, \
     compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_key}UL"]
     compile_cmd += [f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey"]
     section_content = _generate_section_content(current_kernel_name, tiling_key, kernel_type, tiling_info, compile_info)
+    compile_info.global_kernel_symbols.append(current_kernel_name)
     return compile_cmd, section_content
 
 
@@ -1588,12 +1642,14 @@ def _compile_ascendc_cce_v220_with_kernel_type_for_static(compile_info: CompileI
         arch = f"dav-{chip_version}-cube"
         compile_cmd, section_content = _get_compile_cmd_and_section_content(cube_compile_info, arch, \
             compile_option_tuple, tiling_info, tiling_info.tiling_key)
+        compile_info.global_kernel_symbols.extend(cube_compile_info.global_kernel_symbols)
         new_sources += section_content
         cmds_list.append(compile_cmd)
         vec_compile_info = _get_sub_compile_info(compile_info, CORE_TYPE_VEC)
         arch = f"dav-{chip_version}-vec"
         compile_cmd, section_content = _get_compile_cmd_and_section_content(vec_compile_info, arch, \
             compile_option_tuple, tiling_info, tiling_info.tiling_key)
+        compile_info.global_kernel_symbols.extend(vec_compile_info.global_kernel_symbols)
         new_sources += section_content
         cmds_list.append(compile_cmd)
         new_sources += global_var_storage.get_variable("ascendc_meta_info")
@@ -1626,6 +1682,7 @@ def _compile_ascendc_cce_v220_with_kernel_type_for_static(compile_info: CompileI
         sub_compile_info = _get_sub_compile_info(compile_info, code_type)
         compile_cmd, section_content = _get_compile_cmd_and_section_content(sub_compile_info, arch, \
             compile_option_tuple, tiling_info, tiling_info.tiling_key)
+        compile_info.global_kernel_symbols.extend(sub_compile_info.global_kernel_symbols)
         new_sources += section_content
         new_sources += global_var_storage.get_variable("ascendc_meta_info")
         new_sources += "#endif\n"
@@ -1684,6 +1741,7 @@ def _compile_ascendc_cce_v220_with_kernel_type_for_dynamic(compile_info: Compile
             arch = f"dav-{chip_version}-cube"
             compile_cmd, section_content = _get_compile_cmd_and_section_content(cube_compile_info, arch, \
                 compile_option_tuple, tiling_info, tiling_key)
+            compile_info.global_kernel_symbols.extend(cube_compile_info.global_kernel_symbols)
             new_sources += section_content
             cmds_list_cube.append(compile_cmd)
             obj_files.append(cube_compile_info.dst_file)
@@ -1693,6 +1751,7 @@ def _compile_ascendc_cce_v220_with_kernel_type_for_dynamic(compile_info: Compile
             arch = f"dav-{chip_version}-vec"
             compile_cmd, section_content = _get_compile_cmd_and_section_content(vec_compile_info, arch, \
                 compile_option_tuple, tiling_info, tiling_key)
+            compile_info.global_kernel_symbols.extend(vec_compile_info.global_kernel_symbols)
             new_sources += section_content
             cmds_list_vec.append(compile_cmd)
             obj_files.append(vec_compile_info.dst_file)
@@ -1708,6 +1767,7 @@ def _compile_ascendc_cce_v220_with_kernel_type_for_dynamic(compile_info: Compile
             sub_compile_info.dst_file = sub_compile_info.dst_file[:-2] + '_%s.o' % tiling_key
             compile_cmd, section_content = _get_compile_cmd_and_section_content(sub_compile_info, arch, \
                 compile_option_tuple, tiling_info, tiling_key)
+            compile_info.global_kernel_symbols.extend(sub_compile_info.global_kernel_symbols)
             new_sources += section_content
             if code_type == CORE_TYPE_CUBE:
                 cmds_list_cube.append(compile_cmd)
@@ -1724,6 +1784,7 @@ def _compile_ascendc_cce_v220_with_kernel_type_for_dynamic(compile_info: Compile
             sub_compile_info.dst_file = sub_compile_info.dst_file[:-2] + '_%s.o' % tiling_key
             compile_cmd, section_content = _get_compile_cmd_and_section_content(sub_compile_info, \
                 arch, compile_option_tuple, tiling_info, tiling_key)
+            compile_info.global_kernel_symbols.extend(sub_compile_info.global_kernel_symbols)
             new_sources += section_content
             if arch == f"dav-{chip_version}-cube":
                 cmds_list_cube.append(compile_cmd)
@@ -1920,12 +1981,14 @@ def _compile_ascendc_cce_v220(compile_info: CompileInfo, compile_option_tuple, t
         arch = f"dav-{chip_version}-cube"
         tiling_key_list = call_bisheng_v220(cube_compile_info, compile_option_tuple, tiling_info, arch, \
             compile_info.code_channel)
+        compile_info.global_kernel_symbols.extend(cube_compile_info.global_kernel_symbols)
         _gen_mix_sub_json(cube_compile_info, tiling_info, CORE_TYPE_CUBE)
         # build vector
         set_soc_spec("VectorCore")
         vec_compile_info = _get_sub_compile_info(compile_info, CORE_TYPE_VEC)
         arch = f"dav-{chip_version}-vec"
         call_bisheng_v220(vec_compile_info, compile_option_tuple, tiling_info, arch, compile_info.code_channel)
+        compile_info.global_kernel_symbols.extend(vec_compile_info.global_kernel_symbols)
         # fatbin 2o->1o
         mix_objs = [cube_compile_info.dst_file, vec_compile_info.dst_file]
         fatbin_objs(mix_objs, dst_file, compile_info.is_debug, compile_info.compile_log_path)
@@ -1939,6 +2002,7 @@ def _compile_ascendc_cce_v220(compile_info: CompileInfo, compile_option_tuple, t
         arch = f"dav-{chip_version}-vec" if compile_info.code_channel == CORE_TYPE_VEC else f"dav-{chip_version}-cube"
         tiling_key_list = call_bisheng_v220(single_side_compile_info, compile_option_tuple, \
             tiling_info, arch, compile_info.code_channel)
+        compile_info.global_kernel_symbols.extend(single_side_compile_info.global_kernel_symbols)
         _gen_mix_sub_json(single_side_compile_info, tiling_info, compile_info.code_channel)
         mix_objs = [single_side_compile_info.dst_file]
         fatbin_objs(mix_objs, dst_file, compile_info.is_debug, compile_info.compile_log_path)
