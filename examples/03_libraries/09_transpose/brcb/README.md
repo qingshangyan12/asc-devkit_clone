@@ -22,8 +22,8 @@
   BrcbCustom算子给定一个输入张量，每一次取输入张量中的8个数填充到结果张量的8个datablock（32Bytes）中去，每个数对应一个datablock。
 - 算子规格：  
   <table>
-  <tr><td rowspan="1" align="center"></td><td colspan="4" align="center"></td></tr>
-
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Brcb</td></tr>
+  </tr>
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">16</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
