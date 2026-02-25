@@ -149,10 +149,10 @@ def link_relocatable_meta_file(bin_file_path, meta_file_path, compile_log_path=N
     CommonUtility.run_cmd_inner(link_cmd, CompileStage.LINKRELOCATE, compile_log_path)
 
 
-def link_sk_norm_combine(sk_bin_file, norm_bin_file, compile_log_path=None):
+def link_sk_norm_combine(sk_bin_file, norm_bin_file, sk_bind_dst_file, compile_log_path=None):
     link_cmd = ["ar", "crs", sk_bin_file, norm_bin_file]
     CommonUtility.run_cmd_inner(link_cmd, CompileStage.LINKRELOCATE, compile_log_path)
-    link_cmd = [CCECInfo.get_exe("ld.lld"), "-r", "-o", sk_bin_file, "--whole-archive", sk_bin_file]
+    link_cmd = [CCECInfo.get_exe("ld.lld"), "-r", "-o", sk_bin_file, "--whole-archive", sk_bin_file, sk_bind_dst_file]
     CommonUtility.run_cmd_inner(link_cmd, CompileStage.LINKRELOCATE, compile_log_path)
 
 
