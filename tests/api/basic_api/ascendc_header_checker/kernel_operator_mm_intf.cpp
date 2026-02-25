@@ -63,13 +63,13 @@ extern "C" __global__ __aicore__ void KernelTestLoadData5() {
 #endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
-// __aicore__ inline __inout_pipe__(MTE2) void LoadData(const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams, const Nd2NzParamsV2& nd2nzParams)
+// __aicore__ inline __inout_pipe__(MTE2) void LoadData(const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams, const LookupTableParams& lookupTableParams)
 extern "C" __global__ __aicore__ void KernelTestLoadData6() {
     AscendC::LocalTensor<int8_t> dst;
     AscendC::GlobalTensor<AscendC::int4b_t> src;
     AscendC::LoadData2DParamsV2 loadDataParams;
-    AscendC::Nd2NzParamsV2 nd2nzParams;
-    AscendC::LoadData(dst, src, loadDataParams, nd2nzParams);
+    AscendC::LookupTableParams lookupTableParams;
+    AscendC::LoadData(dst, src, loadDataParams, lookupTableParams);
 }
 #endif
 

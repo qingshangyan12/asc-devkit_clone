@@ -104,3 +104,43 @@ DATA_COPY_L2_CACHE_L1_TEST(int8_t, CACHE_MODE_DISABLE)
         LoadData(inputLocal, globalTensor, param);                                                \
         EXPECT_EQ(expectedMode, actualMode);                                                      \
     }
+
+#define LOAD_DATA_LUT_TEST(TDst, USrc, pos)                                                        \
+    TEST_F(DataCopyL2CacheTestSuite, testCaseLoadDataLut##TDst##USrc##pos)                         \
+    {                                                                                              \
+        uint8_t srcGm[1024]{ 0 };                                                                  \
+        uint32_t dataSize = 1024 / sizeof(USrc);                                                   \
+                                                                                                   \
+        LookupTableParams expectedLut;                                                             \
+        expectedLut.lookupTable0 = 0x12345678ull;                                                  \
+        expectedLut.lookupTable1 = 0x9abcdef0ull;                                                  \
+                                                                                                   \
+        LookupTableParams actualLut;                                                               \
+        actualLut.lookupTable0 = 0;                                                                \
+        actualLut.lookupTable1 = 0;                                                                \
+                                                                                                   \
+        MOCKER(LoadData2DGM2L1Cal,                                                                 \
+            void (*)(TDst *, USrc *, const LoadData2DParamsV2 &, const LookupTableParams &))       \
+            .stubs()                                                                               \
+            .with(any(), any(), any(), spy(actualLut));                                            \
+                                                                                                   \
+        TPipe tpipe;                                                                               \
+                                                                                                   \
+        GlobalTensor<USrc> globalTensor;                                                           \
+        globalTensor.SetGlobalBuffer(reinterpret_cast<__gm__ USrc *>(srcGm), dataSize);            \
+                                                                                                   \
+        TBuf<TPosition::pos> tbuf1;                                                                \
+        tpipe.InitBuffer(tbuf1, dataSize * sizeof(TDst));                                          \
+        LocalTensor<TDst> inputLocal = tbuf1.Get<TDst>();                                          \
+                                                                                                   \
+        LoadData2DParamsV2 param;                                                                  \
+                                                                                                   \
+        LoadData(inputLocal, globalTensor, param, expectedLut);                                    \
+                                                                                                   \
+        EXPECT_EQ(expectedLut.lookupTable0, actualLut.lookupTable0);                               \
+        EXPECT_EQ(expectedLut.lookupTable1, actualLut.lookupTable1);                               \
+    }
+                                                                                                   
+LOAD_DATA_LUT_TEST(int8_t, int4b_t, A1)
+LOAD_DATA_LUT_TEST(int4b_t, int2b_t, A1)
+

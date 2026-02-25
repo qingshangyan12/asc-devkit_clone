@@ -65,12 +65,12 @@ public:
         loadDataParams.mStep = Ceil(height, BLOCK_CUBE);
         loadDataParams.kStep = Ceil(width, c0Size);
 
-        Nd2NzParamsV2 nd2nzParams;
-        nd2nzParams.lookupTable0 = qtable0;
+        LookupTableParams lookupTableParams;
+        lookupTableParams.lookupTable0 = qtable0;
         if constexpr (DecompMode(MM_CFG) == DecompressionMode::DECOMP_4bitTo8bit) {
-            nd2nzParams.lookupTable1 = qtable1;
+            lookupTableParams.lookupTable1 = qtable1;
         }
-        LoadData(dst, src, loadDataParams, nd2nzParams);
+        LoadData(dst, src, loadDataParams, lookupTableParams);
 #endif
     }
 
