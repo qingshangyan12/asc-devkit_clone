@@ -413,7 +413,7 @@ struct LayoutDispatcher<LayoutFormat::NZ, T> {
             Std::Int<C0_SIZE / sizeof(T)>{}, 
             Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{},
             Std::Int<1>{}, 
-            Std::Int<C0_SIZE / sizeof(T) * row>{}
+            C0_SIZE / sizeof(T) * row
         ); 
     }
 };
