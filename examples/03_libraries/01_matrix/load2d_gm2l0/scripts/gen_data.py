@@ -14,33 +14,40 @@
 
 import os
 import numpy as np
-import argparse
+
 
 fractal_size = 512
 fractal_shape = [16, 16]
 
-def gen_golden_data(scenarioNum=1, m=32, n=32, k=32):
-    src_dtype = None
-    dst_dtype = None
-    if (scenarioNum >= 1 and scenarioNum <= 4):
-        src_dtype = np.float16
-        dst_dtype = np.float32
-    elif (scenarioNum > 4 and scenarioNum <= 6):
-        src_dtype = np.int8
-        dst_dtype = np.int32
-    x1_gm = np.ones([m, k]).astype(src_dtype)
-    x2_gm = np.ones([k, n]).astype(src_dtype)
+# 实现nd2nz
+def nd2nz(src):
+    nSize = src.shape[0]
+    dSize = src.shape[1]
+    dst = np.zeros(src.shape).reshape(-1)
+    for i in range(dSize // fractal_shape[1]):
+        tmp_addr = i * nSize * fractal_shape[1]
+        for j in range(nSize):
+            block_addr = tmp_addr + j * fractal_shape[1]
+            dst[block_addr:block_addr + fractal_shape[1]] = src[j][i * fractal_shape[1]:i * fractal_shape[1] + fractal_shape[1]]
+    return dst
+
+def gen_golden_data():
+    m = 32
+    n = 32
+    k = 32
+    x1_gm = np.random.randint(1, 10, [m, k]).astype(np.float16)
+    x2_gm = np.random.randint(1, 10, [k, n]).astype(np.float16)
+    # A输入矩阵shape为(m,k)，m为外轴，k为内轴；B矩阵输入shape为(k,n)，k为外轴，n为内轴
+    # 由于GM->L0不支持使能转置，该情景为A不转置，B转置
+    golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32).T).astype(np.float32)
+    x1_gm = nd2nz(x1_gm).astype(np.float16)
+    x2_gm = nd2nz(x2_gm).astype(np.float16)
     os.system("mkdir -p input")
     os.system("mkdir -p output")
     x1_gm.tofile("./input/x1_gm.bin")
     x2_gm.tofile("./input/x2_gm.bin")
+    golden.tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 13))
-    parser.add_argument('-m', type=int)
-    parser.add_argument('-k', type=int)
-    parser.add_argument('-n', type=int)
-    args = parser.parse_args()
-    gen_golden_data(args.scenarioNum, args.m, args.n, args.k)
+    gen_golden_data()
