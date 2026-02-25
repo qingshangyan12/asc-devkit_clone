@@ -49,7 +49,7 @@
 #define ASC_TWO_TO_31_F      2147483648.0F
 #define ASC_TWO_TO_32_F      4294967296.0F
 #define ASC_REMQUO_BITS_F    3U
-#define ASC_REMQUO_MASK_F    (~((~0U)<<ASC_REMQUO_BITS_F))
+#define ASC_REMQUO_MASK_F    (~((~0U)<<ASCRT_REMQUO_BITS_F))
 #define ASC_TRIG_PLOSS_F     105615.0F
 
 #define ASCRT_INF_F                            __builtin_inff()
