@@ -104,3 +104,32 @@ DATA_COPY_L2_CACHE_L1_TEST(int8_t, CACHE_MODE_DISABLE)
         LoadData(inputLocal, globalTensor, param);                                                \
         EXPECT_EQ(expectedMode, actualMode);                                                      \
     }
+
+#define LOAD_DATA_TEST(T, U)                                                                      \
+    TEST_F(DataCopyL2CacheTestSuite, testCaseLoadData##T##U)                                      \
+    {                                                                                             \
+        uint8_t srcGm[1024]{ 0 };                                                                 \
+        uint32_t dataSize = 1024 / sizeof(T);                                                     \
+                                                                                                  \
+        MOCKER(LoadData2DGM2L1Cal, void (*)(T *, T *, const LoadData2DParamsV2 &, const LookupTableParams &)) \
+            .stubs()                                                                              \
+            .with(any(), any(), any(), any());                                                    \
+        TPipe tpipe;                                                                              \
+                                                                                                  \
+        GlobalTensor<T> globalTensor;                                                             \
+        globalTensor.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(srcGm), dataSize);              \
+                                                                                                  \
+        TBuf<TPosition::A1> tbuf1;                                                               \
+        tpipe.InitBuffer(tbuf1, dataSize * sizeof(T));                                            \
+        LocalTensor<T> inputLocal = tbuf1.Get<T>();                                               \
+                                                                                                  \
+        LoadData2DParamsV2 param;                                                                 \
+        LookupTableParams lookupTableParams;                                                      \
+                                                                                                  \
+        LoadData(inputLocal, globalTensor, param, lookupTableParams);                             \
+    }
+
+LOAD_DATA_TEST(int8_t, int4b_t)
+LOAD_DATA_TEST(int4b_t, int2b_t)
+LOAD_DATA_TEST(int8_t, int2b_t)
+LOAD_DATA_TEST(int4b_t, uint1b_t)
