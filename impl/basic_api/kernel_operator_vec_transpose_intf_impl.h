@@ -56,9 +56,9 @@ template <typename T> __aicore__ inline void Transpose(const LocalTensor<T>& dst
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecTransposeInfo(dst, src, "Transpose");
 #endif
-    ASCENDC_ASSERT((SupportType<PrimT<T>, int16_t, uint16_t, half>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Transpose, current api support dtype combination is "
-        "src and dst both: int16_t, uint16_t, half");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, int16_t, uint16_t, half>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Transpose, current api support dtype combination is "
+        "src and dst both: int16_t, uint16_t, half"));
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunTranspose(dst, src, "Transpose")) {
         ASCENDC_REPORT_CHECK_ERROR("Transpose", KernelFuncType::NONE_MODE);
@@ -111,12 +111,12 @@ __aicore__ inline void TransDataTo5HD(uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE]
                            (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
         uint64_t srcAddr = (uint8_t *)srcList[i] -
                            (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
-        ASCENDC_ASSERT((dstAddr % ONE_BLK_SIZE == 0),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dst tensor address list alignment in TransDataTo5HD, "
-            "it should be 32B aligned");});
-        ASCENDC_ASSERT((srcAddr % ONE_BLK_SIZE == 0),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check src tensor address list alignment in TransDataTo5HD, "
-            "it should be 32B aligned");});
+        ASCENDC_DEBUG_ASSERT((dstAddr % ONE_BLK_SIZE == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor address list alignment in TransDataTo5HD, "
+            "it should be 32B aligned"));
+        ASCENDC_DEBUG_ASSERT((srcAddr % ONE_BLK_SIZE == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor address list alignment in TransDataTo5HD, "
+            "it should be 32B aligned"));
     }
 #endif
     TransDataTo5HDImpl<T>(dstList, srcList, nchwconvParams);
@@ -137,13 +137,13 @@ __aicore__ inline void Transpose(const LocalTensor<T> &dst, const LocalTensor<T>
     if ((transposeParams.transposeType == TransposeType::TRANSPOSE_ND2ND_B16) &&
         (transposeParams.hSize == NCHW_CONV_ADDR_LIST_SIZE) && (transposeParams.wSize == NCHW_CONV_ADDR_LIST_SIZE)) {
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
-        ASCENDC_ASSERT((SupportType<PrimT<T>, int16_t, uint16_t, half>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_ND2ND_B16, "
-            "current api support dtype combination is src and dst both: int16_t, uint16_t, half");});
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, int16_t, uint16_t, half>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_ND2ND_B16, "
+            "current api support dtype combination is src and dst both: int16_t, uint16_t, half"));
 #else
-        ASCENDC_ASSERT((SupportType<PrimT<T>, uint16_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_ND2ND_B16, "
-            "current api support dtype combination is src and dst both: uint16_t");});
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint16_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_ND2ND_B16, "
+            "current api support dtype combination is src and dst both: uint16_t"));
 #endif
         TransposeImpl((__ubuf__ PrimT<T> *)dst.GetPhyAddr(), (__ubuf__ PrimT<T> *)src.GetPhyAddr());
     } else if (transposeParams.transposeType == TransposeType::TRANSPOSE_NCHW2NHWC ||
@@ -158,9 +158,9 @@ __aicore__ inline void Transpose(const LocalTensor<T> &dst, const LocalTensor<T>
             uint32_t imageSize = transposeParams.hSize * transposeParams.wSize;  // uint16 * uint16
             ASCENDC_CHECK_VALUE_RANGE(transposeParams.cSize, 0, UINT12_MAX, "cSize", "Transpose");
             ASCENDC_CHECK_VALUE_RANGE(imageSize, 0, UINT12_MAX, "hSize * wSize", "Transpose");
-            ASCENDC_ASSERT(((imageSize * sizeof(PrimT<T>)) % ONE_BLK_SIZE == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check "
+            ASCENDC_DEBUG_ASSERT(((imageSize * sizeof(PrimT<T>)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
                 "hSize, wSize value in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / TRANSPOSE_NHWC2NCHW, "
-                "hSize * wSize * sizeof(T) should be 32B aligned, current value is %lu.", imageSize * sizeof(PrimT<T>));});
+                "hSize * wSize * sizeof(T) should be 32B aligned, current value is %lu.", imageSize * sizeof(PrimT<T>)));
 #endif
             Transpose4DImpl(dst, src, sharedTmpBuffer, transposeParams);
         }
