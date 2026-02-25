@@ -18,8 +18,7 @@
 #include "include/experimental/tensor_api/utils/utils.h"
 #include "impl/experimental/tensor_api/tensor/static_layout_size_struct.h"
 #include "impl/experimental/tensor_api/tensor/tuple_impl.h"
-#include "impl/experimental/tensor/layout_construct.h"
-
+#include "impl/experimental/tensor_api/tensor/layout_construct.h"
 namespace AscendC {
 namespace Te {
 
