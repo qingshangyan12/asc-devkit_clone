@@ -357,26 +357,40 @@ template <typename T, size_t row, size_t column>
 using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRACTAL_FIXED * column>>,
     Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
 
+enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
+
 template <LayoutFormat format, typename T>
 struct LayoutDispatcher;
 
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::NZ, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor{}(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row / FRACTAL_FIXED), 
-                                    Std::Int<CeilDivision(C0_SIZE / sizeof(T))>{}, CeilDivision(column / (C0_SIZE / sizeof(T))), 
-                                    Std::Int<CeilDivision(C0_SIZE / sizeof(T)>{}), Std::Int<CeilDivision(C0_SIZE / sizeof(T) * FRACTAL_FIXED)>{},
-                                    Std::Int<1>{}, CeilDivision(C0_SIZE / sizeof(T) * row));
+        return LayoutConstructor{}(
+            Std::Int<FRACTAL_FIXED>{}, 
+            CeilDivision(row / FRACTAL_FIXED), 
+            Std::Int<CeilDivision(C0_SIZE / sizeof(T))>{}, 
+            CeilDivision(column / (C0_SIZE / sizeof(T))), 
+            Std::Int<CeilDivision(C0_SIZE / sizeof(T))>{}, 
+            Std::Int<CeilDivision(C0_SIZE / sizeof(T) * FRACTAL_FIXED)>{},
+            Std::Int<1>{}, 
+            Std::Int<CeilDivision(C0_SIZE / sizeof(T) * row)>{}
+        ); 
     }
 };
 
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::ZN, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor{}(Std::Int<CeilDivision(C0_SIZE / sizeof(T))>{}, CeilDivision(row / (C0_SIZE / sizeof(T))),
-                                    Std::Int<FRACTAL_FIXED>{}, CeilDivision(column / FRACTAL_FIXED),
-                                    Std::Int<1>{}, CeilDivision(C0_SIZE / sizeof(T) * column),
-                                    Std::Int<CeilDivision(C0_SIZE / sizeof(T))>{}, Std::Int<CeilDivision(C0_SIZE / sizeof(T) * FRACTAL_FIXED)>{});
+        return LayoutConstructor{}(
+            Std::Int<CeilDivision(C0_SIZE / sizeof(T))>{}, 
+            CeilDivision(row / (C0_SIZE / sizeof(T))),
+            Std::Int<FRACTAL_FIXED>{}, 
+            CeilDivision(column / FRACTAL_FIXED),
+            Std::Int<1>{}, 
+            CeilDivision(C0_SIZE / sizeof(T) * column),
+            Std::Int<CeilDivision(C0_SIZE / sizeof(T))>{}, 
+            Std::Int<CeilDivision(C0_SIZE / sizeof(T) * FRACTAL_FIXED)>{}
+        );
     }
 };
 

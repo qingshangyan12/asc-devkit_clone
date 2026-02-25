@@ -64,8 +64,6 @@ struct GetTypeFromFourDimTrait<LocalTensor<TensorAttribute<ViewEngine<HardwareMe
 
 enum class AttrInfo : uint8_t {SHAPE, STRIDE, ROW, COLUMN};
 
-enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
-
 template <typename T, AttrInfo info1, AttrInfo info2, size_t dim> 
 struct GetFourDimType;
 
