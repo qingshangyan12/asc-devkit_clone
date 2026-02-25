@@ -15,6 +15,7 @@
 | [load_data_with_transpose_b16](./load_data_with_transpose_b16)                             | 本样例介绍基础API LoadDataWithTranspose b16数据类型下的使用 |
 | [load_data_with_transpose_b32](./load_data_with_transpose_b32)                             | 本样例介绍基础API LoadDataWithTranspose b32数据类型下的使用 |
 | [load2d_gm2l1](./load2d_gm2l1)                                                 | 本样例介绍了在 half 数据类型下，以及左、右矩阵均不转置，相关指令的使用方法，其中 A 和 B 分别表示矩阵乘法的左右输入矩阵，样例重点关注LoadData2D指令GM到L1的数据通路。 |
+| [load2d_gm2l0](./load2d_gm2l0)                                                 | 本样例介绍了在 half 数据类型下，以及左、右矩阵均不使能转置，相关指令的使用方法，其中 A 和 B 分别表示矩阵乘法的左右输入矩阵，样例重点关注LoadData2D指令GM到L0A和GM到L0B的数据通路。 |
 | [batch_matmul](./batch_matmul)                                                             | 本样例介绍了一次完成BatchNum个Matmul矩阵乘法 |
 | [batch_matmul_bias_no_batch](./batch_matmul_bias_no_batch)                                 | 本样例介绍调用Matmul高阶API实现BatchMatmul单算子复用Bias矩阵的场景|
 | [matmul](./matmul)                                                                         | 本样例介绍调用Matmul API实现matmul单算子 |
