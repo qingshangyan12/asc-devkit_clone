@@ -132,14 +132,8 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
     EXPECT_EQ(dstStride, TestCeilDivision(DST_SIZE2 * sizeof(DTYPE), TEST_C2PIPE2GM_UNIT));
 }
 
-// tensor2tensor run method
-template<typename DTYPE, typename T, typename U, typename Coord, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
-__aicore__ inline void tensor2tensor_run_stub(const T& dst, const U& src, const Coord& coord) {
-
-}
-
 // datacopy move
-#define TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
+#define TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
     using namespace AscendC::Te; \
     __##SRC_PREFIX##__ DTYPE srcData[SRC_SIZE1 * SRC_SIZE2 * sizeof(DTYPE)]; \
     __##DST_PREFIX##__ DTYPE dstData[DST_SIZE1 * DST_SIZE2 * sizeof(DTYPE)]; \
@@ -150,7 +144,9 @@ __aicore__ inline void tensor2tensor_run_stub(const T& dst, const U& src, const 
     \
     auto dstIterator = Make##DST_LOCATION##memPtr(dstData); \
     auto dstLayout = Make##DST_LAYOUT##Layout<DTYPE>(DST_SIZE1, DST_SIZE2); \
-    auto dstTensor = MakeTensor(dstIterator, dstLayout); 
+    auto dstTensor = MakeTensor(dstIterator, dstLayout); \
+    \
+    DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor);
 
 // datacopy move with coord
 #define TEST_TENSOR_API_DATACOPY_WITH_COORD(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
@@ -176,7 +172,16 @@ __aicore__ inline void tensor2tensor_run_stub(const T& dst, const U& src, const 
     { \
         using namespace AscendC::Te; \
         using namespace AscendC::Std; \
-        TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, gm, GM, RowMajor); \
+        __cbuf__ DTYPE srcData[SRC_SIZE1 * SRC_SIZE2 * sizeof(DTYPE)]; \
+        __gm__ DTYPE dstData[DST_SIZE1 * DST_SIZE2 * sizeof(DTYPE)]; \
+        \
+        auto srcIterator = MakeL1memPtr(srcData); \
+        auto srcLayout = MakeRowMajorLayout<DTYPE>(SRC_SIZE1, SRC_SIZE2); \
+        auto srcTensor = MakeTensor(srcIterator, srcLayout); \
+        \
+        auto dstIterator = MakeGMmemPtr(dstData); \
+        auto dstLayout = MakeRowMajorLayout<DTYPE>(DST_SIZE1, DST_SIZE2); \
+        auto dstTensor = MakeTensor(dstIterator, dstLayout); \
         \
         auto zeroCoord = MakeCoord(MakeCoord(Int<0>{}, Int<0>{}), MakeCoord(Int<0>{}, Int<0>{})); \
         using srcTensorType = decltype(srcTensor); \
@@ -184,197 +189,197 @@ __aicore__ inline void tensor2tensor_run_stub(const T& dst, const U& src, const 
         using testCoord = decltype(zeroCoord); \
         MOCKER_CPP((&DataCopyIgnore::Run<DEFAULT_DATA_COPY_TRAIT, dstTensorType, srcTensorType, testCoord>)) \
             .times(1) \
-            .will(invoke(&tensor2tensor_run_stub<DTYPE, dstTensorType, srcTensorType, testCoord, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+            .will(ignoreReturnValue()); \
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
 DATA_COPY_TEST_IGNORE(float, 32, 64, 32, 64)
 
-// // GM to l1 ND2ND test case
-// #define DATA_COPY_TEST_GM2L1_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_gm_to_cbuf, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_gm_to_cbuf_nd2nd_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, RowMajor) \
-//         GlobalMockObject::verify(); \
-//     }
+// GM to l1 ND2ND test case
+#define DATA_COPY_TEST_GM2L1_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_gm_to_cbuf, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t)) \
+            .times(1) \
+            .will(invoke(&copy_gm_to_cbuf_nd2nd_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, RowMajor) \
+        GlobalMockObject::verify(); \
+    }
 
-// DATA_COPY_TEST_GM2L1_ND2ND(float, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_ND2ND(half, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_ND2ND(bfloat16_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_ND2ND(int32_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2ND(float, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2ND(half, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2ND(bfloat16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2ND(int32_t, 32, 64, 32, 64)
 
-// // GM to l1 NZ2NZ test case
-// #define DATA_COPY_TEST_GM2L1_NZ2NZ(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_NZ2NZ_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_gm_to_cbuf, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_gm_to_cbuf_nz2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, NZ, cbuf, L1, NZ) \
-//         GlobalMockObject::verify(); \
-//     }
+// GM to l1 NZ2NZ test case
+#define DATA_COPY_TEST_GM2L1_NZ2NZ(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_NZ2NZ_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_gm_to_cbuf, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t)) \
+            .times(1) \
+            .will(invoke(&copy_gm_to_cbuf_nz2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, NZ, cbuf, L1, NZ) \
+        GlobalMockObject::verify(); \
+    }
 
-// // NZ2NZ - 4 byte types
-// DATA_COPY_TEST_GM2L1_NZ2NZ(float, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_NZ2NZ(int32_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_NZ2NZ(uint32_t, 32, 64, 32, 64)
-// // NZ2NZ - 2 byte types
-// DATA_COPY_TEST_GM2L1_NZ2NZ(half, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_NZ2NZ(bfloat16_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_NZ2NZ(int16_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_NZ2NZ(uint16_t, 32, 64, 32, 64)
-// // NZ2NZ - 1 byte types
-// DATA_COPY_TEST_GM2L1_NZ2NZ(int8_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_NZ2NZ(uint8_t, 32, 64, 32, 64)
+// NZ2NZ - 4 byte types
+DATA_COPY_TEST_GM2L1_NZ2NZ(float, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_NZ2NZ(int32_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_NZ2NZ(uint32_t, 32, 64, 32, 64)
+// NZ2NZ - 2 byte types
+DATA_COPY_TEST_GM2L1_NZ2NZ(half, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_NZ2NZ(bfloat16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_NZ2NZ(int16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_NZ2NZ(uint16_t, 32, 64, 32, 64)
+// NZ2NZ - 1 byte types
+DATA_COPY_TEST_GM2L1_NZ2NZ(int8_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_NZ2NZ(uint8_t, 32, 64, 32, 64)
 
-// // GM to L1 ND2NZ test case - B8 (1 byte types: int8_t, uint8_t)
-// #define DATA_COPY_TEST_GM2L1_ND2NZ_B8(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b8, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
-//             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
-//         GlobalMockObject::verify(); \
-//     }
+// GM to L1 ND2NZ test case - B8 (1 byte types: int8_t, uint8_t)
+#define DATA_COPY_TEST_GM2L1_ND2NZ_B8(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b8, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
+            uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
+            .times(1) \
+            .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
+        GlobalMockObject::verify(); \
+    }
 
-// DATA_COPY_TEST_GM2L1_ND2NZ_B8(int8_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_ND2NZ_B8(uint8_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2NZ_B8(int8_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2NZ_B8(uint8_t, 32, 64, 32, 64)
 
-// // GM to L1 ND2NZ test case - B16 (2 byte types: half, bfloat16_t, int16_t, uint16_t)
-// #define DATA_COPY_TEST_GM2L1_ND2NZ_B16(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
-//             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
-//         GlobalMockObject::verify(); \
-//     }
+// GM to L1 ND2NZ test case - B16 (2 byte types: half, bfloat16_t, int16_t, uint16_t)
+#define DATA_COPY_TEST_GM2L1_ND2NZ_B16(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
+            uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
+            .times(1) \
+            .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
+        GlobalMockObject::verify(); \
+    }
 
-// DATA_COPY_TEST_GM2L1_ND2NZ_B16(bfloat16_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_ND2NZ_B16(half, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_ND2NZ_B16(int16_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_ND2NZ_B16(uint16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2NZ_B16(bfloat16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2NZ_B16(half, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2NZ_B16(int16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2NZ_B16(uint16_t, 32, 64, 32, 64)
 
-// // GM to L1 ND2NZ test case - B32S (4 byte types: float, int32_t, uint32_t)
-// #define DATA_COPY_TEST_GM2L1_ND2NZ_B32S(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
-//             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
-//         GlobalMockObject::verify(); \
-//     }
+// GM to L1 ND2NZ test case - B32S (4 byte types: float, int32_t, uint32_t)
+#define DATA_COPY_TEST_GM2L1_ND2NZ_B32S(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_ND2NZ_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
+            uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
+            .times(1) \
+            .will(invoke(&copy_gm_to_cbuf_multi_nd2nz_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, RowMajor, cbuf, L1, NZ) \
+        GlobalMockObject::verify(); \
+    }
 
-// DATA_COPY_TEST_GM2L1_ND2NZ_B32S(float, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_ND2NZ_B32S(int32_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_ND2NZ_B32S(uint32_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2NZ_B32S(float, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2NZ_B32S(int32_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_ND2NZ_B32S(uint32_t, 32, 64, 32, 64)
 
-// // GM to L1 DN2ZN test case - B8 (1 byte types: int8_t, uint8_t)
-// #define DATA_COPY_TEST_GM2L1_DN2ZN_B8(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b8, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
-//             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
-//         GlobalMockObject::verify(); \
-//     }
+// GM to L1 DN2ZN test case - B8 (1 byte types: int8_t, uint8_t)
+#define DATA_COPY_TEST_GM2L1_DN2ZN_B8(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b8, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
+            uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
+            .times(1) \
+            .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
+        GlobalMockObject::verify(); \
+    }
 
-// DATA_COPY_TEST_GM2L1_DN2ZN_B8(int8_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_DN2ZN_B8(uint8_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_DN2ZN_B8(int8_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_DN2ZN_B8(uint8_t, 32, 64, 32, 64)
 
-// // GM to L1 DN2ZN test case - B16 (2 byte types: half, bfloat16_t, int16_t, uint16_t)
-// #define DATA_COPY_TEST_GM2L1_DN2ZN_B16(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
-//             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
-//         GlobalMockObject::verify(); \
-//     }
+// GM to L1 DN2ZN test case - B16 (2 byte types: half, bfloat16_t, int16_t, uint16_t)
+#define DATA_COPY_TEST_GM2L1_DN2ZN_B16(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b16, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
+            uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
+            .times(1) \
+            .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
+        GlobalMockObject::verify(); \
+    }
 
-// DATA_COPY_TEST_GM2L1_DN2ZN_B16(bfloat16_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_DN2ZN_B16(half, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_DN2ZN_B16(int16_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_DN2ZN_B16(uint16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_DN2ZN_B16(bfloat16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_DN2ZN_B16(half, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_DN2ZN_B16(int16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_DN2ZN_B16(uint16_t, 32, 64, 32, 64)
 
-// // GM to L1 DN2ZN test case - B32S (4 byte types: float, int32_t, uint32_t)
-// #define DATA_COPY_TEST_GM2L1_DN2ZN_B32S(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
-//             uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
-//         GlobalMockObject::verify(); \
-//     }
+// GM to L1 DN2ZN test case - B32S (4 byte types: float, int32_t, uint32_t)
+#define DATA_COPY_TEST_GM2L1_DN2ZN_B32S(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_GM2L1_DN2ZN_##DTYPE##_##SRC_SIZE1##x##SRC_SIZE2##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz_b32s, void(__cbuf__ DTYPE*, __gm__ DTYPE*, uint8_t, \
+            uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
+            .times(1) \
+            .will(invoke(&copy_gm_to_cbuf_multi_dn2zn_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, gm, GM, ColumnMajor, cbuf, L1, ZN) \
+        GlobalMockObject::verify(); \
+    }
 
-// DATA_COPY_TEST_GM2L1_DN2ZN_B32S(float, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_DN2ZN_B32S(int32_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_GM2L1_DN2ZN_B32S(uint32_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_DN2ZN_B32S(float, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_DN2ZN_B32S(int32_t, 32, 64, 32, 64)
+DATA_COPY_TEST_GM2L1_DN2ZN_B32S(uint32_t, 32, 64, 32, 64)
 
-// // L1 to BIAS ND2ND test case
-// #define DATA_COPY_TEST_L12BIAS_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_L12BIAS_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_cbuf_to_bt, void(uint64_t, __cbuf__ DTYPE*, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_cbuf_to_bt_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, biasbuf, Bias, RowMajor) \
-//         GlobalMockObject::verify(); \
-//     }
+// L1 to BIAS ND2ND test case
+#define DATA_COPY_TEST_L12BIAS_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_L12BIAS_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_cbuf_to_bt, void(uint64_t, __cbuf__ DTYPE*, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
+            .times(1) \
+            .will(invoke(&copy_cbuf_to_bt_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, biasbuf, Bias, RowMajor) \
+        GlobalMockObject::verify(); \
+    }
 
-// DATA_COPY_TEST_L12BIAS_ND2ND(float, 32, 64, 32, 64)
-// DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 32, 64, 32, 64)
+DATA_COPY_TEST_L12BIAS_ND2ND(float, 32, 64, 32, 64)
+DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 32, 64, 32, 64)
 
-// // L1 to FIXBUF ND2ND test case
-// #define DATA_COPY_TEST_L12FIXBUF_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-//     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_L12FIXBUF_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
-//     { \
-//         using namespace AscendC::Te; \
-//         MOCKER_CPP(copy_cbuf_to_fbuf, void(__fbuf__ void*, __cbuf__ void*, uint16_t, uint16_t, uint16_t, uint16_t)) \
-//             .times(1) \
-//             .will(invoke(&copy_cbuf_to_fbuf_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
-//         TEST_TENSOR_API_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, fbuf, Fixbuf, RowMajor) \
-//         GlobalMockObject::verify(); \
-//     }
+// L1 to FIXBUF ND2ND test case
+#define DATA_COPY_TEST_L12FIXBUF_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_L12FIXBUF_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        MOCKER_CPP(copy_cbuf_to_fbuf, void(__fbuf__ void*, __cbuf__ void*, uint16_t, uint16_t, uint16_t, uint16_t)) \
+            .times(1) \
+            .will(invoke(&copy_cbuf_to_fbuf_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
+        TEST_DATACOPY(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, fbuf, Fixbuf, RowMajor) \
+        GlobalMockObject::verify(); \
+    }
 
-// // FIXBUF - 8 byte types
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(double, 32, 64, 32, 64)
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(int64_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(uint64_t, 32, 64, 32, 64)
-// // FIXBUF - 4 byte types
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(float, 32, 64, 32, 64)
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(int32_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(uint32_t, 32, 64, 32, 64)
-// // FIXBUF - 2 byte types
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(half, 32, 64, 32, 64)
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(bfloat16_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(int16_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(uint16_t, 32, 64, 32, 64)
-// // FIXBUF - 1 byte types
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(int8_t, 32, 64, 32, 64)
-// DATA_COPY_TEST_L12FIXBUF_ND2ND(uint8_t, 32, 64, 32, 64)
+// FIXBUF - 8 byte types
+DATA_COPY_TEST_L12FIXBUF_ND2ND(double, 32, 64, 32, 64)
+DATA_COPY_TEST_L12FIXBUF_ND2ND(int64_t, 32, 64, 32, 64)
+DATA_COPY_TEST_L12FIXBUF_ND2ND(uint64_t, 32, 64, 32, 64)
+// FIXBUF - 4 byte types
+DATA_COPY_TEST_L12FIXBUF_ND2ND(float, 32, 64, 32, 64)
+DATA_COPY_TEST_L12FIXBUF_ND2ND(int32_t, 32, 64, 32, 64)
+DATA_COPY_TEST_L12FIXBUF_ND2ND(uint32_t, 32, 64, 32, 64)
+// FIXBUF - 2 byte types
+DATA_COPY_TEST_L12FIXBUF_ND2ND(half, 32, 64, 32, 64)
+DATA_COPY_TEST_L12FIXBUF_ND2ND(bfloat16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_L12FIXBUF_ND2ND(int16_t, 32, 64, 32, 64)
+DATA_COPY_TEST_L12FIXBUF_ND2ND(uint16_t, 32, 64, 32, 64)
+// FIXBUF - 1 byte types
+DATA_COPY_TEST_L12FIXBUF_ND2ND(int8_t, 32, 64, 32, 64)
+DATA_COPY_TEST_L12FIXBUF_ND2ND(uint8_t, 32, 64, 32, 64)
