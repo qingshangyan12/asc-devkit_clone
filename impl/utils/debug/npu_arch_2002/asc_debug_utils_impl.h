@@ -22,6 +22,8 @@
 #endif
 
 #include "impl/utils/debug/asc_utils_macros.h"
+#include "impl/utils/debug/asc_debug_types.h"
+
 namespace __asc_aicore {
 __aicore__ inline void asc_entire_dcci_impl(__gm__ uint64_t* ptr)
 {
@@ -56,6 +58,15 @@ __aicore__ inline uint64_t asc_debug_get_block_idx_impl()
 {
     return static_cast<uint64_t>(asc_debug_get_core_idx_impl());
 }
+
+__aicore__ inline void sync_all_impl() {}
+
+template <typename T>
+__aicore__ constexpr inline DumpTensorDataType get_dump_datatype_impl()
+{
+    return DumpTensorDataType::ACL_MAX;
+}
+
 } // namespace __asc_aicore
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
