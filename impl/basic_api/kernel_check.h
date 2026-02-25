@@ -23,7 +23,7 @@
 #ifndef ASCENDC_MODULE_CHECK_H
 #define ASCENDC_MODULE_CHECK_H
 
-#if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
+#if ASCENDC_CPU_DEBUG
 #include "utils/kernel_check_copy.h"
 #include "utils/kernel_check_vec_binary.h"
 #include "utils/kernel_check_vec_binary_scalar.h"
@@ -187,7 +187,7 @@ bool CheckFuncLoadData3dv1(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 template <typename T, typename U>
 bool CheckFuncLoadData3dv2(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const LoadData3DParamsV2<U>& loadDataParams, const char* intriName)
+    const LoadData3DParamsV2<U>& loadDataParams, const __gm__ char* intriName)
 {
     check::LoadData3dv2ApiParams chkParams { static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
