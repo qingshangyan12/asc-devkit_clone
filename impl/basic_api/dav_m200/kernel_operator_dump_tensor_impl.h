@@ -760,16 +760,33 @@ __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char *f
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args);
 
-template <class... Args>
-__aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
+template <DumpType PT, class... Args>
+__aicore__ inline void PrintfImpl(__gm__ const char* fmt, Args&&... args)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE);
     if (g_sysPrintFifoSpace != nullptr) {
-        PrintfRingBufImpl(printType, fmt, args...);
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(__NPU_DEVICE__)
+        if constexpr (PT == DumpType::DUMP_SCALAR) {
+            static int headPrint = 0;  // 只在 SCALAR 实例中存在
+            if (headPrint == 0) {
+                headPrint += 1;
+                uint64_t __ascendc_tStamp = 0;
+                uint64_t __ascendc_version = 0;
+                __gm__ char* __ascendc_versionStr = nullptr;
+                GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
+                if (__ascendc_tStamp == 0) {
+                    PrintfRingBufImpl(PT, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
+                } else {
+                    PrintfRingBufImpl(PT, "headPrint: %d, CANN Version: %s, TimeStamp: %u\n", headPrint, (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
+                }
+            }
+        }
+#endif
+        PrintfRingBufImpl(PT, fmt, args...);
     } else {
-        PrintfEntityImpl(printType, fmt, args...);
+        PrintfEntityImpl(PT, fmt, args...);
     }
     set_ctrl(ctrlValue);
 }

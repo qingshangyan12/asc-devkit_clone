@@ -612,12 +612,12 @@ __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char* f
 #endif
 }
 
-template <class... Args>
-__aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
+template <DumpType PT, class... Args>
+__aicore__ inline void PrintfImpl(__gm__ const char* fmt, Args&&... args)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
-    PrintfEntityImpl(printType, fmt, args...);
+    PrintfEntityImpl(PT, fmt, args...);
     set_ctrl(ctrlValue);
 }
 
