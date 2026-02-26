@@ -625,20 +625,24 @@ __aicore__ inline decltype(auto) MakeNnLayout(size_t row, size_t column) {
     return LayoutDispatcher<LayoutFormat::NN, T>::apply(row, column);
 }
 
+template <typename T>
 __aicore__ inline decltype(auto) MakeScaleANDLayout(size_t row, size_t column) {
-    return MakeNDLayout<fp8_e8m0_t>(row, column);
+    return LayoutDispatcher<LayoutFormat::ND, T>::apply(row, column);
 }
 
+template <typename T>
 __aicore__ inline decltype(auto) MakeScaleADNLayout(size_t row, size_t column) {
-    return MakeDNLayout<fp8_e8m0_t>(row, column);
+    return LayoutDispatcher<LayoutFormat::DN, T>::apply(row, column);
 }
 
+template <typename T>
 __aicore__ inline decltype(auto) MakeScaleBNDLayout(size_t row, size_t column) {
-    return MakeNDLayout<fp8_e8m0_t>(column, row);
+    return LayoutDispatcher<LayoutFormat::ND, T>::apply(column, row);
 }
 
+template <typename T>
 __aicore__ inline decltype(auto) MakeScaleBDNLayout(size_t row, size_t column) {
-    return MakeDNLayout<fp8_e8m0_t>(column, row);
+    return LayoutDispatcher<LayoutFormat::DN, T>::apply(column, row);
 }
 
 class DimConversion {
