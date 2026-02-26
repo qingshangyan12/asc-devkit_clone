@@ -144,8 +144,8 @@ private:
             CopyDeqTensorToFbufImpl(quant, calNSize, i);
             InsertSync();
             auto coordZero = MakeCoord(Std::Int<0>{}, Std::Int<0>{});
-            auto srcTensor = MakeTensorWithCoord<U, Coord>(src, coordZero, srcOffset * i);
-            auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, dstOffset * i);
+            auto srcTensor = MakeTensorWithCoord<U>(src, coordZero, srcOffset * i);
+            auto dstTensor = MakeTensorWithCoord<T>(dst, coord, dstOffset * i);
 
             DataCopy<trait, T, U, decltype(mainLoopParam)>(dstTensor, srcTensor, mainLoopParam);
         }
@@ -154,8 +154,8 @@ private:
             CopyDeqTensorToFbufImpl(quant, tailNSize, nIterNum);
             InsertSync();
             auto coordZero = MakeCoord(Std::Int<0>{}, Std::Int<0>{});
-            auto srcTensor = MakeTensorWithCoord<U, Coord>(src, coordZero, srcOffset * nIterNum);
-            auto dstTensor = MakeTensorWithCoord<T, Coord>(dst, coord, dstOffset * nIterNum);
+            auto srcTensor = MakeTensorWithCoord<U>(src, coordZero, srcOffset * nIterNum);
+            auto dstTensor = MakeTensorWithCoord<T>(dst, coord, dstOffset * nIterNum);
 
             DataCopy<trait, T, U, decltype(tailParam)>(dstTensor, srcTensor, tailParam);
         }
