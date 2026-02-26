@@ -81,6 +81,19 @@ ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP = {
     "fp4x2_e2m1_t": 40,
     "fp4x2_e1m2_t": 41
 }
+ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP = {
+    "ASCENDC_TPL_AIV_ONLY": 0,
+    "ASCENDC_TPL_AIC_ONLY": 1,
+    "ASCENDC_TPL_MIX_AIV_1_0": 4,
+    "ASCENDC_TPL_MIX_AIC_1_0": 5,
+    "ASCENDC_TPL_MIX_AIC_1_1": 6,
+    "ASCENDC_TPL_MIX_AIC_1_2": 7,
+    "ASCENDC_TPL_AICORE": 8,
+    "ASCENDC_TPL_VECTORCORE": 9,
+    "ASCENDC_TPL_MIX_AICORE": 10,
+    "ASCENDC_TPL_MIX_VECTOR_CORE": 11,
+    "ASCENDC_TPL_MAX": 12
+}
 ASCENDC_TPL_DATAFORMAT_MAX = 55
 ASCENDC_COMPILE_DATAFORMAT_MAP = {
     "FORMAT_NCHW": ["NCHW", 0],
@@ -631,6 +644,12 @@ def decode_tiling(tiling_key: int = None) -> dict:
             for i in range(len(value_list)):
                 if value_list[i] in ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP.keys():
                     value_list[i] = str(ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP[value_list[i]])
+                elif value_list[i] == 'false':
+                    value_list[i] = '0'
+                elif value_list[i] == 'true':
+                    value_list[i] = '1'
+                elif value_list[i] in ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP.keys():
+                    value_list[i] = str(ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP[value_list[i]])
             kernel_compile_dict[key] = value
     encode_book = dict()
     for param in TILING_DECLARE_MAP:
