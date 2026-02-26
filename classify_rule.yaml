@@ -35,6 +35,7 @@ asc-devkit:
       - impl/experimental/tensor_api/atom/cube_compute/cube_compute_impl.h
       - impl/experimental/tensor_api/utils/extra_impl.h
       - impl/experimental/tensor_api/tensor/static_layout_size_struct.h
+      - impl/basic_api/kernel_macros.h
   llt:
     ut_check: true
     st_check: false
