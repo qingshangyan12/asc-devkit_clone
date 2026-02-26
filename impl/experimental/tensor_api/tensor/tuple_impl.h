@@ -164,7 +164,11 @@ template<size_t index, size_t I, size_t... Is, typename Tuple>
 __aicore__ inline constexpr decltype(auto) GetValue(const Tuple& t)
 {
     auto tupleEle = Std::get<index>(t);
-    return Std::make_tuple(Std::get<I>(tupleEle), Std::get<Is>(tupleEle)...);
+    if constexpr(sizeof...(Is) == 0) {
+        return Std::get<I>(tupleEle);
+    } else {
+        return Std::make_tuple(Std::get<I>(tupleEle), Std::get<Is>(tupleEle)...);
+    }
 }
 
 template<size_t index, typename Tuple>
