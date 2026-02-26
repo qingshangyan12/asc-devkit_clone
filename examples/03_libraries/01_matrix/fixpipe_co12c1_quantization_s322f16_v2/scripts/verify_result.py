@@ -15,7 +15,6 @@ import sys
 import numpy as np
 
 
-# for float32
 relative_tol = 1e-6
 absolute_tol = 1e-9
 error_tol = 1e-4
