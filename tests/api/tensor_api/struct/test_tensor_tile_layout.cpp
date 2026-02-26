@@ -203,3 +203,22 @@ TEST_F(Tensor_Api_Layout, StaticLayoutOperation)
                                         AscendC::Std::tuple<AscendC::Std::Int<2>, AscendC::Std::Int<3>>>;
     EXPECT_EQ((StaticLayoutSize<FourDimT, FourDimU>::size), 20);
 }
+
+TEST_F(Tensor_Api_Layout, MakeMxLayout)
+{
+    using namespace AscendC::Te;
+    
+    auto NnLayout = MakeNnLayout<fp8_e8m0_t>(16, 48);
+    auto Zzlayout = MakeZzLayout<fp8_e8m0_t>(16, 48);
+    auto MxNDLayout = MakeScaleANDLayout<fp8_e8m0_t>(16, 48);
+    auto MxDNLayout = MakeScaleADNLayout<fp8_e8m0_t>(16, 48);
+
+    EXPECT_EQ(Std::get<0>(GetShape<0>(NnLayout)), 2);
+    EXPECT_EQ(Std::get<0>(GetShape<1>(NnLayout)), 16);
+    EXPECT_EQ(Std::get<0>(GetShape<0>(Zzlayout)), 16);
+    EXPECT_EQ(Std::get<0>(GetShape<1>(Zzlayout)), 2);
+    EXPECT_EQ(Std::get<1>(GetShape<0>(MxNDLayout)), 16);
+    EXPECT_EQ(Std::get<1>(GetShape<1>(MxNDLayout)), 48);
+    EXPECT_EQ(Std::get<0>(GetShape<0>(MxDNLayout)), 16);
+    EXPECT_EQ(Std::get<0>(GetShape<1>(MxDNLayout)), 2);
+}
