@@ -28,7 +28,8 @@ PIPE_MTE2/PIPE_MTE3在搬运地址有重叠的情况下需要开发者插入同�
 
     static constexpr uint32_t src1Addr = 256 * sizeof(float); // src1起始地址，长度为256
     static constexpr uint32_t src2Addr = (256 + 128) * sizeof(float); // src2起始地址，长度为256
-样例预期的输出是dst = scr0 + scr1，因此为了保证了搬入的src2的数据不会覆盖src1在重叠区间的值，必须保证先搬入src2，后搬入src1，此时需要在两条数据搬入指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
+    
+样例预期的输出是dst = scr0 + scr1，因此为了保证搬入的src2的数据不会覆盖src1在重叠区间的值，必须保证先搬入src2，后搬入src1，此时需要在两条数据搬入指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
 
     AscendC::DataCopy(src0Local, src0Global, srcDataSize);
     AscendC::DataCopy(src2Local, src2Global, srcDataSize);
@@ -58,9 +59,7 @@ PIPE_MTE2/PIPE_MTE3在搬运地址有重叠的情况下需要开发者插入同�
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake ..;make -j;                # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash
