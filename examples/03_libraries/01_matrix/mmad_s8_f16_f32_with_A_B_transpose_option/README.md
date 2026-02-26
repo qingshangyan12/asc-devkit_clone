@@ -1049,3 +1049,15 @@ B矩阵在GM、L1和L0B上的数据排布分别是ND、NZ和ZN。如下图19所�
   ```bash
   test pass!
   ```
+
+- 性能测试
+  在样例目录的CMakeLists.txt文件中，
+  通过传入TEST_L12L0A宏定义可以测试样例中L1->L0A通路的性能，
+  通过传入TEST_L12L0B宏定义可以测试样例中L1->L0B通路的性能
+  ```bash
+  SCENARIO=1 M=64 K=64 N=64
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake .. -DSCENARIO_NUM=$SCENARIO -DM_SIZE=$M -DK_SIZE=$K -DN_SIZE=$N;make -j;    # 编译工程
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO -m=$M -k=$K -n=$N   # 生成测试输入数据
+  msprof ./demo                    # 执行编译生成的可执行程序，执行样例，使用msprof采集性能数据
+  ```

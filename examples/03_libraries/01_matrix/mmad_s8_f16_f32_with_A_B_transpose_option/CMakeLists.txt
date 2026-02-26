@@ -33,6 +33,8 @@ target_compile_definitions(demo PRIVATE
     K_SIZE=${K_SIZE}
     N_SIZE=${N_SIZE}
     SCENARIO_NUM=${SCENARIO_NUM}
+    # TEST_L12L0A
+    # TEST_L12L0B
 )
 
 target_compile_options(demo PRIVATE
