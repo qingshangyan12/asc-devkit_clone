@@ -213,12 +213,12 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
     auto MxNDLayout = MakeScaleANDLayout(16, 48);
     auto MxDNLayout = MakeScaleADNLayout(16, 48);
 
-    EXPECT_EQ(Std::get<0>(GetShape<0>(NnLayout)), 2);
-    EXPECT_EQ(Std::get<0>(GetShape<1>(NnLayout)), 16);
-    EXPECT_EQ(Std::get<0>(GetShape<0>(Zzlayout)), 16);
-    EXPECT_EQ(Std::get<0>(GetShape<1>(Zzlayout)), 2);
-    EXPECT_EQ(Std::get<1>(GetShape<0>(MxNDLayout)), 16);
-    EXPECT_EQ(Std::get<1>(GetShape<1>(MxNDLayout)), 48);
-    EXPECT_EQ(Std::get<0>(GetShape<0>(MxDNLayout)), 16);
-    EXPECT_EQ(Std::get<0>(GetShape<1>(MxDNLayout)), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(NnLayout)), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(NnLayout)), 16);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(Zzlayout)), 16);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(Zzlayout)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxNDLayout)), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxNDLayout)), 48);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxDNLayout)), 16);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxDNLayout)), 2);
 }
