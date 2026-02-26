@@ -22,7 +22,7 @@
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
 | pipe | 输入 | 设置这条指令所在的流水类型。|
-| mode | 输入 | 核间同步模式，用于指定同步的行为类型。共有三种同步模式：<br/>mode 0：AI Core核间的同步控制。对于AIC场景，同步所有的AIC核，直到所有的AIC核都执行到asc_sync_block_arrive时，asc_sync_block_wait后续的指令才会执行；对于AIV场景，同步所有的AIV核，直到所有的AIV核都执行到asc_sync_block_arrive时，asc_sync_block_wait后续的指令才会执行<br/>mode 1：AI Core内部，AIV核之间的同步控制。如果两个AIV核都运行了asc_sync_block_arrive，asc_sync_block_wait后续的指令才会执行<br/>mode 2：AI Core内部，AIC与AIV之间的同步控制。在AIC核执行了asc_sync_block_arrive之后，两个AIV上的asc_sync_block_wait后续的指令才会继续执行，两个AIV核都执行了asc_sync_block_arrive之后，AIC上的asc_sync_block_wait后续的指令才能执行。|
+| mode | 输入 | 核间同步模式，用于指定同步的行为类型。共有三种同步模式：<br/>mode 0：AI Core核间的同步控制。对于AIC场景，同步所有的AIC核，直到所有的AIC核都执行到asc_sync_block_arrive时，asc_sync_block_wait后续的指令才会执行；对于AIV场景，同步所有的AIV核，直到所有的AIV核都执行到asc_sync_block_arrive时，asc_sync_block_wait后续的指令才会执行。<br/>mode 1：AI Core内部，AIV核之间的同步控制。如果两个AIV核都运行了asc_sync_block_arrive，asc_sync_block_wait后续的指令才会执行。<br/>mode 2：AI Core内部，AIC与AIV之间的同步控制。在AIC核执行了asc_sync_block_arrive之后，两个AIV上的asc_sync_block_wait后续的指令才会继续执行，两个AIV核都执行了asc_sync_block_arrive之后，AIC上的asc_sync_block_wait后续的指令才能执行。|
 | flagID | 输入 | 事件标号，用于标识同一组同步信号。取值范围为[0,10]。|
 
 ## 返回值说明
