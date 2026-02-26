@@ -21,7 +21,7 @@
 #include "kernel_tpipe_impl.h"
 #include "dav_m200/kernel_operator_data_copy_impl.h"
 #include "kernel_pop_stack_buffer.h"
-#include "utils/debug/asc_printf.h"
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -1059,7 +1059,7 @@ __aicore__ inline void WriteRingBufTlvData(__gm__ PrintTlvInfoHead* printTlv, __
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-    __asc_aicore::printf(fmt, args...);
+    __asc_aicore::printf_impl(fmt, args...);
 }
 
 template <typename T>
