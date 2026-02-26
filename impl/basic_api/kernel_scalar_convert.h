@@ -145,6 +145,29 @@ __aicore__ inline float Cast(const bfloat16_t& bVal)
         uint16_t num;
     } u16Union;
     u16Union.uret = bNum;
+
+    constexpr uint16_t FP16_EXP_MASK = 0x7C00;
+    constexpr uint16_t FP16_MAN_MASK = 0x03FF;
+    
+    uint16_t exp16 = u16Union.num & FP16_EXP_MASK;
+    uint16_t man16 = u16Union.num & FP16_MAN_MASK;
+
+    if (exp16 == FP16_EXP_MASK && man16 == 0) {
+        constexpr uint32_t FP32_POS_INF = 0x7F800000;
+        constexpr uint32_t FP32_NEG_INF = 0xFF800000;
+        uint32_t sign = (u16Union.num & 0x8000) ? 1 : 0;
+        uint32_t infVal = sign ? FP32_NEG_INF : FP32_POS_INF;
+        return GetScalarBitcodeValue<uint32_t, float>(infVal);
+    }
+
+    if (exp16 == FP16_EXP_MASK && man16 != 0) {
+        constexpr uint32_t FP32_NAN = 0x7FFFFFFF;
+        constexpr uint32_t FP32_NEG_NAN = 0xFFFFFFFF;
+        uint32_t sign = (u16Union.num & 0x8000) ? 1 : 0;
+        uint32_t nanVal = sign ? FP32_NEG_NAN : FP32_NAN;
+        return GetScalarBitcodeValue<uint32_t, float>(nanVal);
+    }
+
     floatUnion.val = u16Union.num << BF16_TO_FP32_MAN_LEN;
     return floatUnion.fNum;
 }
