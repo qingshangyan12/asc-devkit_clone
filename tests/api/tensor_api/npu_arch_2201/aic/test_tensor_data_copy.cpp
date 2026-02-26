@@ -8,6 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+// TODO 测试纬度： dtype 长度， hardware, layout, 每一步的调用，异常场景
+
+// TODO 正常和异常场景的expect应该不一样吧
+
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tensor_api/stub/cce_stub.h"
@@ -18,13 +22,6 @@ enum class CubeLayout {
     NZ,
     ColumnMajor,
     ZN,
-};
-
-enum class Location {
-    GM,
-    L1,
-    Bias,
-    Fixbuf,
 };
 
 enum class Prefix {
@@ -57,6 +54,7 @@ constexpr int TestCeilDivision(int value, int divisor) {
     return (value + divisor - 1) / divisor;
 }
 
+// ==================== Mocker Method ====================
 // ND2ND: CopyGmToCbufNDBase
 template<typename DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
 __aicore__ inline void copy_gm_to_cbuf_nd2nd_stub(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, \
@@ -132,7 +130,28 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
     EXPECT_EQ(dstStride, TestCeilDivision(DST_SIZE2 * sizeof(DTYPE), TEST_C2PIPE2GM_UNIT));
 }
 
-// datacopy move
+template<typename T, typename DTYPE, int SIZE1, int SIZE2, AscendC::Te::Hardware LOCATION, CubeLayout LAYOUT>
+__aicore__ inline void check_tensor_success(const T& tensor) {
+    using namespace AscendC::Te;
+    Hardware pos = GetHardPos<T>();
+    EXPECT_EQ(pos, LOCATION);
+}
+
+template<typename Coord>
+__aicore__ inline void check_coord_success (const Coord& coord) {
+
+}
+
+// tensor2tensor run method
+template<typename T, typename U, typename Coord, typename DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, \
+                    int DST_SIZE2, AscendC::Te::Hardware SRC_LOCATION, CubeLayout SRC_LAYOUT, AscendC::Te::Hardware DST_LOCATION, CubeLayout DST_LAYOUT>
+__aicore__ inline void tensor2tensor_run_stub(const T& dst, const U& src, const Coord& coord) {
+    check_tensor_success<U, DTYPE, SRC_SIZE1, SRC_SIZE2, SRC_LOCATION, SRC_LAYOUT>(src);
+    check_tensor_success<T, DTYPE, DST_SIZE1, DST_SIZE2, DST_LOCATION, DST_LAYOUT>(dst);
+    check_coord_success<Coord>(coord);
+}
+
+// create tensor
 #define CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
     using namespace AscendC::Te; \
     __##SRC_PREFIX##__ DTYPE srcData[SRC_SIZE1 * SRC_SIZE2 * sizeof(DTYPE)]; \
@@ -146,13 +165,15 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
     auto dstLayout = Make##DST_LAYOUT##Layout<DTYPE>(DST_SIZE1, DST_SIZE2); \
     auto dstTensor = MakeTensor(dstIterator, dstLayout);
 
+
+// ==================== Test case ====================
 // ignore branch
-#define DATA_COPY_TEST_IGNORE(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
-    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_IGNORE_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
+#define DATA_COPY_TEST_ROUTING_IGNORE(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_ROUTING_IGNORE_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         using namespace AscendC::Te; \
         using namespace AscendC::Std; \
-        CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, RowMajor, gm, GM, RowMajor) \
+        CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
         \
         auto zeroCoord = MakeCoord(MakeCoord(Int<0>{}, Int<0>{}), MakeCoord(Int<0>{}, Int<0>{})); \
         using srcTensorType = decltype(srcTensor); \
@@ -160,12 +181,37 @@ __aicore__ inline void copy_cbuf_to_fbuf_stub(__fbuf__ void* dst, __cbuf__ void*
         using testCoord = decltype(zeroCoord); \
         MOCKER_CPP((&DataCopyIgnore::Run<DEFAULT_DATA_COPY_TRAIT, dstTensorType, srcTensorType, testCoord>)) \
             .times(1) \
-            .will(ignoreReturnValue()); \
+            .will(invoke(tensor2tensor_run_stub<dstTensorType, srcTensorType, testCoord, DTYPE, SRC_SIZE1, SRC_SIZE2, \
+                            DST_SIZE1, DST_SIZE2, Hardware::SRC_LOCATION, CubeLayout::SRC_LAYOUT, Hardware::DST_LOCATION, CubeLayout::DST_LAYOUT>)); \
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
 
-DATA_COPY_TEST_IGNORE(float, 32, 64, 32, 64)
+DATA_COPY_TEST_ROUTING_IGNORE(float, 32, 64, 32, 64, cbuf, L1, RowMajor, gm, GM, RowMajor)
+// TODO 增加test case
+
+// DataCopyFourDim2201GM2L1 branch
+#define DATA_COPY_TEST_ROUTING_2201GM2L1(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
+    TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_ROUTING_2201GM2L1_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
+    { \
+        using namespace AscendC::Te; \
+        using namespace AscendC::Std; \
+        CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, SRC_PREFIX, SRC_LOCATION, SRC_LAYOUT, DST_PREFIX, DST_LOCATION, DST_LAYOUT) \
+        \
+        auto zeroCoord = MakeCoord(MakeCoord(Int<0>{}, Int<0>{}), MakeCoord(Int<0>{}, Int<0>{})); \
+        using srcTensorType = decltype(srcTensor); \
+        using dstTensorType = decltype(dstTensor); \
+        using testCoord = decltype(zeroCoord); \
+        MOCKER_CPP((&DataCopyFourDim2201GM2L1::Run<DEFAULT_DATA_COPY_TRAIT, dstTensorType, srcTensorType, testCoord>)) \
+            .times(1) \
+            .will(invoke(tensor2tensor_run_stub<dstTensorType, srcTensorType, testCoord, DTYPE, SRC_SIZE1, SRC_SIZE2, \
+                            DST_SIZE1, DST_SIZE2, Hardware::SRC_LOCATION, CubeLayout::SRC_LAYOUT, Hardware::DST_LOCATION, CubeLayout::DST_LAYOUT>)); \
+        DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
+        GlobalMockObject::verify(); \
+    }
+
+DATA_COPY_TEST_ROUTING_2201GM2L1(float, 32, 64, 32, 64, gm, GM, RowMajor, cbuf, L1, RowMajor)
+
 
 // GM to l1 ND2ND test case
 #define DATA_COPY_TEST_GM2L1_ND2ND(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2) \
@@ -179,6 +225,7 @@ DATA_COPY_TEST_IGNORE(float, 32, 64, 32, 64)
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(dstTensor, srcTensor); \
         GlobalMockObject::verify(); \
     }
+// TODO 每个场景增加run拦截的部分 
 
 DATA_COPY_TEST_GM2L1_ND2ND(float, 32, 64, 32, 64)
 DATA_COPY_TEST_GM2L1_ND2ND(half, 32, 64, 32, 64)
