@@ -210,8 +210,8 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
     
     auto NnLayout = MakeNnLayout<fp8_e8m0_t>(16, 48);
     auto Zzlayout = MakeZzLayout<fp8_e8m0_t>(16, 48);
-    auto MxNDLayout = MakeScaleANDLayout<fp8_e8m0_t>(16, 48);
-    auto MxDNLayout = MakeScaleADNLayout<fp8_e8m0_t>(16, 48);
+    auto MxNDLayout = MakeScaleANDLayout(16, 48);
+    auto MxDNLayout = MakeScaleADNLayout(16, 48);
 
     EXPECT_EQ(Std::get<0>(GetShape<0>(NnLayout)), 2);
     EXPECT_EQ(Std::get<0>(GetShape<1>(NnLayout)), 16);
