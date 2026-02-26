@@ -45,7 +45,7 @@ __aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint8_t mode, int64_t 
 
 __aicore__ inline void asc_sync_block_wait(int64_t flagID);
 
-#define asc_sync_data_barrier(arg) asc_sync_data_barrier_impl(arg)
+__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
 #endif
 
