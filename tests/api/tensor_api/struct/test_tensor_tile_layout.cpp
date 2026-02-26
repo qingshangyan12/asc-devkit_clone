@@ -213,7 +213,7 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
     auto MxANDLayout = MakeScaleANDLayout<fp8_e8m0_t>(16, 48);
     auto MxADNLayout = MakeScaleADNLayout<fp8_e8m0_t>(16, 48); //[m,n]
     auto MxBNDLayout = MakeScaleBNDLayout<fp8_e8m0_t>(16, 48);
-    auto MxBDNLayout = MakeScaleADNLayout<fp8_e8m0_t>(16, 48); //[k,n]
+    auto MxBDNLayout = MakeScaleBDNLayout<fp8_e8m0_t>(16, 48); //[k,n]
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(NnLayout)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(NnLayout)), 16);
@@ -225,6 +225,6 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxADNLayout)), 2);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxBNDLayout)), 48);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxBNDLayout)), 16);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxBDNLayout)), 48);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxBDNLayout)), 16);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxBDNLayout)), 2);
 }
