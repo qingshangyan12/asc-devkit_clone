@@ -535,10 +535,10 @@ def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
     input_param_file = defaultdict(dict)
     kernel_template_input_info = defaultdict(dict)
     if not opc_config_file:
-        return tiling_key_info, op_debug_config, kernel_json_file, input_param_file
+        return tiling_key_info, op_debug_config, kernel_json_file, input_param_file, kernel_template_input_info
 
     if not os.path.exists(opc_config_file):
-        return tiling_key_info, op_debug_config, kernel_json_file, input_param_file
+        return tiling_key_info, op_debug_config, kernel_json_file, input_param_file, kernel_template_input_info
 
     with open(opc_config_file, 'r') as file:
         contents = file.readlines()
