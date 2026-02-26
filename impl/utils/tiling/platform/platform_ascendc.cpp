@@ -489,7 +489,6 @@ fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char *custo
         dlclose(handle);
         return (ret == 0);
     };
-
     if (!getDeviceId()) {
         PF_LOGE("Failed to get device id via aclrtGetDevice, use default deviceId=0");
         deviceId = 0;
