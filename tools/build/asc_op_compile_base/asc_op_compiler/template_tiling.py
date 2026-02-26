@@ -59,6 +59,28 @@ ASCENDC_COMPILE_DATATYPE_MAP = {
     "DT_MAX": ["unknown", ASCENDC_TPL_DATATYPE_MAX],
 }
 ASCENDC_COMPILE_DATATYPE_REVERT_MAP = {v[-1]: v[0] for v in ASCENDC_COMPILE_DATATYPE_MAP.values()}
+ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP = {
+    "float": 0,
+    "half": 1,
+    "int8_t": 2,
+    "int32_t": 3,
+    "uint8_t": 4,
+    "int16_t": 6,
+    "uint16_t": 7,
+    "uint32_t": 8,
+    "int64_t": 9,
+    "uint64_t": 10,
+    "double": 11,
+    "bool": 12,
+    "complex64": 16,
+    "bfloat16_t": 27,
+    "int4b_t": 29,
+    "hifloat8_t": 34,
+    "fp8_e5m2_t": 35,
+    "fp8_e4m3fn_t": 36,
+    "fp4x2_e2m1_t": 40,
+    "fp4x2_e1m2_t": 41
+}
 ASCENDC_TPL_DATAFORMAT_MAX = 55
 ASCENDC_COMPILE_DATAFORMAT_MAP = {
     "FORMAT_NCHW": ["NCHW", 0],
@@ -605,6 +627,10 @@ def decode_tiling(tiling_key: int = None) -> dict:
     for pair in pairs:
         if '=' in pair:
             key, value = pair.split('=', 1)
+            value_list = value.split(',')
+            for i in range(len(value_list)):
+                if value_list[i] in ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP.keys():
+                    value_list[i] = str(ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP[value_list[i]])
             kernel_compile_dict[key] = value
     encode_book = dict()
     for param in TILING_DECLARE_MAP:

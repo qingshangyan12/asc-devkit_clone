@@ -39,6 +39,7 @@ def gen_compile_options(compile_options_file: str, op_type: str, \
     opc_kernel_config = []
     opc_tiling_keys = ""
     input_param_file = ""
+    opc_template_kernel_str = ""
     for opts in compile_options:
         if "oom" in opts:
             if opts == "--oom":
