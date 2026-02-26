@@ -110,6 +110,7 @@ __aicore__ inline decltype(auto) MakeScaleANDLayout(size_t row, size_t column);
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleADNLayout(size_t row, size_t column);
+
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleBNDLayout(size_t row, size_t column);
 
