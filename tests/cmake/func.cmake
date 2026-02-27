@@ -12,7 +12,9 @@ function(run_llt_test)
 
     string(REPLACE "," ";" TARGET_LIST "${TEST_MOD}")
     list(REMOVE_ITEM TARGET_LIST "")
+    message(STATUS "here we at func.cmake 161616")
     if (NOT "${TEST_MOD}" STREQUAL "all" AND NOT ${LLT_TARGET} IN_LIST TARGET_LIST)
+        message(STATUS "here we at func.cmake 171717")
         return()
     endif()
 
@@ -39,7 +41,9 @@ function(run_llt_test)
         )
     endif()
 
+    message(STATUS "here we at func.cmake 4444444")
     if(ENABLE_GCOV)
+        message(STATUS "here we at func.cmake 464646")
         set(_collect_coverage_data_target collect_coverage_data)
 
         get_filename_component(_ops_builtin_bin_path ${CMAKE_BINARY_DIR} DIRECTORY)
