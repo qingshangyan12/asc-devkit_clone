@@ -11,9 +11,9 @@
 
 set -e
 
-SUPPORTED_SHORT_OPTS=("h" "j" "t" "p")
+SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type" "extra-cmake-args"
+    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type" "extra-cmake-args" "changed_file"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -27,6 +27,8 @@ BUILD_TYPE="Release"
 ENABLE_BUILD_DEVICE=ON
 USE_CXX11_ABI=0
 CMAKE_TOOLCHAIN_FILE_VAL=""
+CHANGED_FILES=""
+CI_MODE=FALSE
 
 dotted_line="----------------------------------------------------------------"
 
@@ -105,6 +107,7 @@ usage() {
   echo "    --make_clean         Clean build artifacts"
   echo "    --build-type=<TYPE>"
   echo "                         Specify build type (TYPE options: Release/Debug), Default:Release"
+  echo "    -f, --changed_file   Set the changed files for CI mode, eg: -f change_file.txt"
 }
 
 parse_cmake_extra_args() {
@@ -405,6 +408,16 @@ set_options() {
       check_param_j
       shift 2
       ;;
+    -f)
+      CHANGED_FILES="$2"
+      CI_MODE=TRUE
+      shift 2
+      ;;
+    --changed_file=*)
+      CHANGED_FILES="${1#*=}"
+      CI_MODE=TRUE
+      shift
+      ;;
     --build-type=*)
       BUILD_TYPE="${1#*=}"
       check_param_test_build_type
@@ -486,6 +499,7 @@ function build_package(){
 function build_test() {
   cmake_config
   build all
+  cat CUSTOM_OPTION
 }
 
 function build_test_part() {
@@ -514,6 +528,28 @@ function build_test_part() {
   cmake_config
   cmake --build . ${TARGETS} -j ${THREAD_NUM}
   return 0
+}
+
+set_ci_mode() {
+  log "[INFO] CI mode: changed file path is $CHANGED_FILES"
+  log "[INFO] CI mode: context in changed file: "
+  cat $CHANGED_FILES
+
+  if [[ -n "$CHANGED_FILES" ]]; then
+    log "[INFO] CI mode: processing changed files for CI mode."
+    # 调用 parse_changed_files.py 解析修改的文件
+    local parse_script="${CURRENT_DIR}/scripts/util/parse_changed_files.py"
+    if [[ ! -f "$parse_script" ]]; then
+      log "[ERROR] CI mode: parse_changed_files.py not found at $parse_script"
+      exit 1
+    fi
+
+    SKIP_COMPILE_AND_TEST=$(python3 "$parse_script" "$CHANGED_FILES")   
+    if [[ "${SKIP_COMPILE_AND_TEST}" == "TRUE"]]; then
+      log "[INFO] CI mode: No need to compile and test."
+      exit 200
+    fi
+  fi
 }
 
 main() {
@@ -557,13 +593,24 @@ main() {
 
   cd ${BUILD_DIR}
 
+  if [[ "${CI_MODE}" == "TRUE"]]; then
+    log "[INFO] CI mode: 625625625"
+    set_ci_mode
+    log "[INFO] CI mode: 627627625"
+  fi
+
   if [ -n "${TEST}" ]; then
+    log "[INFO] CI mode: 635635635"
     build_test
   elif [ -n "$TEST_PART" ]; then
+    log "[INFO] CI mode: 638638638"
     build_test_part
   elif [ -n "${PKG}" ]; then
+    log "[INFO] CI mode: 641641641"
+    exit 200
     build_package
   else
+    log "[INFO] CI mode: 6436436"
     cmake_config
     build all
   fi
