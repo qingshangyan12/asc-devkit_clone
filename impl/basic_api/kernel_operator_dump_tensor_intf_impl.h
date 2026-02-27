@@ -79,6 +79,7 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
 #endif
     return;
 }
+
 template <typename T>
 __aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
