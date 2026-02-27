@@ -15,8 +15,8 @@ import re
 from enum import Enum, auto
 from dataclasses import dataclass
 from typing import List, Any
-from .log_utils import AscendCLogLevel
 from tbe.common.context import get_context
+from .log_utils import AscendCLogLevel
 from .ascendc_common_utility import CommonUtility
 from .get_op_tiling import OpInfo
 
@@ -641,16 +641,19 @@ def decode_tiling(tiling_key: int = None) -> dict:
         if '=' in pair:
             key, value = pair.split('=', 1)
             value_list = value.split(',')
-            for i in range(len(value_list)):
-                if value_list[i] in ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP.keys():
-                    value_list[i] = str(ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP[value_list[i]])
-                elif value_list[i] == 'false':
-                    value_list[i] = '0'
-                elif value_list[i] == 'true':
-                    value_list[i] = '1'
-                elif value_list[i] in ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP.keys():
-                    value_list[i] = str(ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP[value_list[i]])
-            kernel_compile_dict[key] = value
+            format_value_list = []
+            for v in value_list:
+                if v in ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP.keys():
+                    format_value_list.append(str(ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP[v]))
+                elif v == 'false':
+                    format_value_list.append('0')
+                elif v == 'true':
+                    format_value_list.append('1')
+                elif v in ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP.keys():
+                    format_value_list.append(str(ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP[v]))
+                else:
+                    format_value_list.append(v)
+            kernel_compile_dict[key] = format_value_list
     encode_book = dict()
     for param in TILING_DECLARE_MAP:
         encode_book[param.name] = param.get_encodes()

@@ -622,7 +622,8 @@ def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str,
     debug_config = defaultdict(set)
     super_config = defaultdict(set)
     op_descs = opdesc_parser.get_op_desc(cfgfile, [], [], BinParamBuilder, ops)
-    tiling_key_info, op_debug_config, kernel_json_file, input_param_file, kernel_template_input_info = parse_op_debug_config(opc_config_file, soc)
+    tiling_key_info, op_debug_config, kernel_json_file, \
+        input_param_file, kernel_template_input_info = parse_op_debug_config(opc_config_file, soc)
     gen_option_config(debug_config, super_config, op_debug_config)
 
     auto_gen_path_dir = os.path.dirname(cfgfile)
