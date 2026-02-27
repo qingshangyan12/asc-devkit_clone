@@ -19,9 +19,6 @@ protected:
     void TearDown() {}
 };
 
-template <size_t v>
-using Int = AscendC::Std::integral_constant<size_t, v>;
-
 TEST_F(Tensor_Api_Tensor, ViewEngineOperation)
 {
     using namespace AscendC::Te;
@@ -78,7 +75,8 @@ TEST_F(Tensor_Api_Tensor, ViewEngineOperationInt)
     constexpr uint32_t TILE_LENGTH = 4;
     __gm__ float data[TILE_LENGTH] = {5, 6, 7, 8};
     auto ptr = MakeGMmemPtr(data);
-    auto layout = MakeLayout(MakeShape(Int<1>{}, Int<4>{}), MakeStride(Int<4>{}, Int<1>{}));
+    auto layout = MakeLayout(MakeShape(AscendC::Std::Int<1>{}, AscendC::Std::Int<4>{}),
+                             MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<1>{}));
     auto tensor = MakeTensor(ptr, layout);
 
     auto engine = tensor.Engine();
@@ -97,7 +95,8 @@ TEST_F(Tensor_Api_Tensor, ViewEngineOperationInt)
     constexpr uint32_t TILE_LENGTH_3D = 8;
     __gm__ float data3d[TILE_LENGTH_3D] = {9, 10, 11, 12, 13, 14, 15, 16};
     auto ptr3d = MakeGMmemPtr(data3d);
-    auto layout3d = MakeLayout(MakeShape(Int<2>{}, Int<2>{}, Int<2>{}), MakeStride(Int<4>{}, Int<2>{}, Int<1>{}));
+    auto layout3d = MakeLayout(MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}),
+                               MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
     auto tensor3d = MakeTensor(ptr3d, layout3d);
 
     auto engine3d = tensor3d.Engine();
@@ -234,7 +233,8 @@ TEST_F(Tensor_Api_Tensor, LocalTensorOperationInt)
     constexpr uint32_t TILE_LENGTH = 6;
     __gm__ float data[TILE_LENGTH] = {6, 7, 8, 9, 10, 11};
     auto ptr = MakeGMmemPtr(data);
-    auto layout = MakeLayout(MakeShape(Int<3>{}, Int<2>{}), MakeStride(Int<2>{}, Int<1>{}));
+    auto layout = MakeLayout(MakeShape(AscendC::Std::Int<3>{}, AscendC::Std::Int<2>{}),
+                             MakeStride(AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
     auto tensor = MakeTensor(ptr, layout);
 
     EXPECT_EQ(tensor.Layout().Size(), 6);
@@ -247,7 +247,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorOperationInt)
     EXPECT_EQ(AscendC::Std::get<0>(stride).value, 2);
     EXPECT_EQ(AscendC::Std::get<1>(stride).value, 1);
 
-    auto coord = MakeCoord(Int<2>{}, Int<1>{});
+    auto coord = MakeCoord(AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{});
     tensor[coord] = 9;
     EXPECT_EQ(data[5], 9);
     EXPECT_EQ(tensor(coord), 9);
@@ -326,7 +326,8 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperationInt)
     constexpr uint32_t TILE_LENGTH = 6;
     __gm__ float data[TILE_LENGTH] = {10, 11, 12, 13, 14, 15};
     auto ptr = MakeGMmemPtr(data);
-    auto layout = MakeLayout(MakeShape(Int<1>{}, Int<6>{}), MakeStride(Int<6>{}, Int<1>{}));
+    auto layout = MakeLayout(MakeShape(AscendC::Std::Int<1>{}, AscendC::Std::Int<6>{}),
+                             MakeStride(AscendC::Std::Int<6>{}, AscendC::Std::Int<1>{}));
     const auto constTensor = MakeTensor(ptr, layout);
 
     EXPECT_EQ(constTensor.Layout().Size(), 6);
@@ -339,7 +340,7 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperationInt)
     EXPECT_EQ(AscendC::Std::get<0>(stride).value, 6);
     EXPECT_EQ(AscendC::Std::get<1>(stride).value, 1);
 
-    auto coord = MakeCoord(Int<0>{}, Int<5>{});
+    auto coord = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<5>{});
     EXPECT_EQ(constTensor[coord], 15);
     EXPECT_EQ(constTensor(coord), 15);
 }
@@ -351,7 +352,8 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperation3D)
     constexpr uint32_t TILE_LENGTH = 8;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
     auto ptr = MakeGMmemPtr(data);
-    auto layout = MakeLayout(MakeShape(Int<2>{}, Int<2>{}, Int<2>{}), MakeStride(Int<4>{}, Int<2>{}, Int<1>{}));
+    auto layout = MakeLayout(MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}),
+                             MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
     const auto constTensor = MakeTensor(ptr, layout);
 
     EXPECT_EQ(constTensor.Tensor().Data(), ptr);
@@ -372,11 +374,11 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperation3D)
     EXPECT_EQ(constTensor.Size(), 8);
     EXPECT_EQ(constTensor.Capacity(), 8);
 
-    auto coord = MakeCoord(Int<1>{}, Int<0>{}, Int<1>{});
+    auto coord = MakeCoord(AscendC::Std::Int<1>{}, AscendC::Std::Int<0>{}, AscendC::Std::Int<1>{});
     constTensor[coord] = 9;
     EXPECT_EQ(data[5], 9);
     EXPECT_EQ(constTensor(coord), 9);
-    EXPECT_EQ(constTensor(Int<1>{}, Int<0>{}, Int<1>{}), 9);
+    EXPECT_EQ(constTensor(AscendC::Std::Int<1>{}, AscendC::Std::Int<0>{}, AscendC::Std::Int<1>{}), 9);
 }
 
 TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperation)
@@ -401,9 +403,10 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt)
     constexpr uint32_t TILE_LENGTH = 6;
     __gm__ float data[TILE_LENGTH] = {10, 11, 12, 13, 14, 15};
     auto ptr = MakeGMmemPtr(data);
-    auto tensor = MakeTensor(ptr, MakeShape(Int<2>{}, Int<3>{}), MakeStride(Int<3>{}, Int<1>{}));
+    auto tensor = MakeTensor(ptr, MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<3>{}),
+                             MakeStride(AscendC::Std::Int<3>{}, AscendC::Std::Int<1>{}));
 
-    auto coord = MakeCoord(Int<0>{}, Int<2>{});
+    auto coord = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<2>{});
     tensor[coord] = 77;
     EXPECT_EQ(data[2], 77);
     EXPECT_EQ(tensor.Layout().Size(), 6);
@@ -416,9 +419,10 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt3D)
     constexpr uint32_t TILE_LENGTH = 8;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
     auto ptr = MakeGMmemPtr(data);
-    auto tensor = MakeTensor(ptr, MakeShape(Int<2>{}, Int<2>{}, Int<2>{}), MakeStride(Int<4>{}, Int<2>{}, Int<1>{}));
+    auto tensor = MakeTensor(ptr, MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}),
+                             MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
 
-    auto coord = MakeCoord(Int<0>{}, Int<1>{}, Int<1>{});
+    auto coord = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<1>{}, AscendC::Std::Int<1>{});
     tensor[coord] = 88;
     EXPECT_EQ(data[3], 88);
     EXPECT_EQ(tensor.Layout().Size(), 8);
