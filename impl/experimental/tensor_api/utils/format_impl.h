@@ -110,15 +110,43 @@ private:
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
 
-        constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
-            && Std::is_constant<C0_SIZE / sizeof(type), ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<C0_SIZE / sizeof(type), StrideRow0>::value 
+        if constexpr (Std::is_same_v<Std::remove_cvref_t<type>, fp8_e8m0_t>) {
+            constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
+            && Std::is_constant<MX_SCALE_K0, ShapeColumn0>::value;
+            constexpr bool isStrideRight = Std::is_constant<MX_SCALE_K0, StrideRow0>::value 
             && Std::is_constant<1, StrideColumn0>::value;
-
-        return (isShapeRight && isStrideRight);
+            return (isShapeRight && isStrideRight);
+        } else {
+            constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
+                && Std::is_constant<C0_SIZE / sizeof(type), ShapeColumn0>::value;
+            constexpr bool isStrideRight = Std::is_constant<C0_SIZE / sizeof(type), StrideRow0>::value 
+                && Std::is_constant<1, StrideColumn0>::value;
+            return (isShapeRight && isStrideRight);
+        }
     }
 public:
     static constexpr bool value = IsFractalZZFormat();
+};
+
+template <typename T>
+struct IsNNFormat {
+private:
+    __aicore__ inline static constexpr bool IsFractalNNFormat() {
+        using type = typename T::elementType;
+        static_assert(Std::is_same_v<Std::remove_cvref_t<type>, fp8_e8m0_t>, "NnFormat Only support fp8_e8m0_t");
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;n
+        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+
+        constexpr bool isShapeRight = Std::is_constant<MX_SCALE_K0, ShapeRow0>::value 
+        && Std::is_constant<FRACTAL_FIXED, ShapeColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<1, StrideRow0>::value 
+        && Std::is_constant<MX_SCALE_K0, StrideColumn0>::value;
+        return (isShapeRight && isStrideRight);
+    }
+public:
+    static constexpr bool value = IsFractalNNFormat();
 };
 
 template <typename T>
