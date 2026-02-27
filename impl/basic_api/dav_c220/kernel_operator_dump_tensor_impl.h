@@ -1102,6 +1102,29 @@ __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
     UpdateWriteInfo(writeInfo, tlvLen);
 }
 
+template <class... Args>
+__aicore__ inline void PrintCommonHead(DumpType printType, __gm__ const char* fmt, Args&&... args)
+{
+    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
+    if (blockRingBufInfo == nullptr) {
+        return;
+    }
+    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
+    if (writeInfo == nullptr || writeInfo->packIdx != 0) {
+        return;
+    }
+
+    uint64_t __ascendc_tStamp = 0;
+    uint64_t __ascendc_version = 0;
+    __gm__ char* __ascendc_versionStr = nullptr;
+    GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
+    if (__ascendc_tStamp == 0) {
+        PrintfRingBufImpl(printType, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
+    } else {
+        PrintfRingBufImpl(printType, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
+    }
+}
+
 template <DumpType PT, class... Args>
 __aicore__ inline void PrintfImpl(__gm__ const char* fmt, Args&&... args)
 {
@@ -1119,25 +1142,6 @@ __aicore__ inline void PrintfImpl(__gm__ const char* fmt, Args&&... args)
         PrintfEntityImpl(PT, fmt, args...);
     }
     set_ctrl(ctrlValue);
-}
-
-template <class... Args>
-__aicore__ inline void PrintCommonHead(DumpType printType, __gm__ const char* fmt, Args&&... args)
-{
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) return;
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-    if (writeInfo == nullptr || writeInfo->packIdx != 0) return;
-
-    uint64_t __ascendc_tStamp = 0;
-    uint64_t __ascendc_version = 0;
-    __gm__ char* __ascendc_versionStr = nullptr;
-    GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
-    if (__ascendc_tStamp == 0) {
-        PrintfRingBufImpl(printType, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
-    } else {
-        PrintfRingBufImpl(printType, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
-    }
 }
 
 __aicore__ inline void WriteTimeStampInfo(uint32_t descId)
