@@ -669,7 +669,8 @@ def decode_tiling(tiling_key: int = None) -> dict:
     for tiling_template_select_param in TILING_SELECT_MAP:
         matched_kernel_template = True
         for param_item in tiling_template_select_param:
-            if param_item.name in kernel_compile_dict.keys() and str(param_item.values[0]) not in kernel_compile_dict[param_item.name]:
+            if param_item.name in kernel_compile_dict.keys() and \
+                str(param_item.values[0]) not in kernel_compile_dict[param_item.name]:
                 matched_kernel_template = False
                 break
         if matched_kernel_template:
