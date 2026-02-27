@@ -15,9 +15,8 @@
 #ifndef INCLUDE_TENSOR_API_UTILS_UTILS_H
 #define INCLUDE_TENSOR_API_UTILS_UTILS_H
 
-#include "include/experimental/tensor_api/utils/constant.h"
-#include "include/experimental/tensor_api/utils/extra.h"
-#include "include/experimental/tensor_api/utils/format.h"
-#include "include/experimental/tensor_api/utils/macro.h"
+#include "impl/experimental/tensor_api/utils/constant_impl.h"
+#include "impl/experimental/tensor_api/utils/extra_impl.h"
+#include "impl/experimental/tensor_api/utils/format_impl.h"
 
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H

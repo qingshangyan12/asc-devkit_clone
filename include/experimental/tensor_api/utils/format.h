@@ -20,40 +20,36 @@
 namespace AscendC {
 namespace Te {
 
-template <typename T, typename U>
-constexpr bool VerifyingDataCopyTemplate =
-    ((IsTileTensorV<U> && IsTileTensorV<T>) ||
-    (IsTileTensorV<U> && IsTileTensorV<T>));
+struct ArchVersion {};
 
-template <typename T, typename U, typename Coord>
-constexpr bool VerifyingDataCopyTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingDataCopyTemplate<T, U>;
+struct GetArchVersion {};
 
-template <typename T, typename U>
-constexpr bool VerifyingLoadDataTemplate = IsTileTensorV<U> && IsTileTensorV<T>;
+template <typename T>
+__aicore__ inline uint8_t GetCacheModeFromTensor(__gm__ T* src);
 
-template <typename T, typename U, typename Coord>
-constexpr bool VerifyingLoadDataTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingLoadDataTemplate<T, U>;
+template <typename T>
+struct GetTypeFromFourDimTrait;
 
-template <typename T, typename U, typename S>
-static constexpr bool VerifyingMmadTemplate = (IsTileTensorV<T> && IsTileTensorV<U> 
-    && IsTileTensorV<S>);
+template <typename T>
+struct IsZZFormat {};
 
-template <typename T, typename U, typename S, typename V>
-static constexpr bool VerifyingMmadWithBiasTemplate = (IsTileTensorV<T> && IsTileTensorV<U> 
-    && IsTileTensorV<S> && IsTileTensorV<V>);
+template <typename T>
+struct IsZNFormat {};
 
-template <typename T, typename U>
-static constexpr bool VerifyingFixpipeTemplate = (IsTileTensorV<T> && IsTileTensorV<U>);
+template <typename T>
+struct IsNZFormat {};
 
-template <typename T, typename U, typename V>
-static constexpr bool VerifyingFixpipeQuantTemplate = (IsTileTensorV<T> && IsTileTensorV<U>
-    && (IsTileTensorV<V> || Std::is_same_v<V, uint64_t>)); 
+template <typename T>
+struct IsL0cNZFormat {};
 
-template <typename T, typename U, typename Coord>
-constexpr bool VerifyingFixpipeTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingFixpipeTemplate<T, U>;
+template <typename T>
+struct IsNDFormat {};
 
-template <typename T, typename U, typename V, typename Coord>
-constexpr bool VerifyingFixpipeQuantTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingFixpipeQuantTemplate<T, U, V>;
+template <typename T>
+struct IsDNFormat {};
+
+template<typename T>
+__aicore__ inline constexpr auto GetHardPos();
 
 } // namespace Te
 } // namespace AscendC

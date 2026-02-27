@@ -17,4 +17,19 @@
 
 #include "impl/experimental/tensor_api/utils/extra_impl.h"
 
+namespace AscendC {
+namespace Te {
+
+template <typename T, typename = void>
+struct IterRef {};
+
+template <typename T, typename = void>
+struct IterEle {};
+
+template <typename T, typename = void>
+struct IterVal {};
+
+} // namespace Te
+} // namespace AscendC
+
 #endif // INCLUDE_TENSOR_API_UTILS_EXTRA_H
