@@ -656,9 +656,15 @@ private:
     template<typename T>
     __aicore__ inline auto ConvertTwoDim2FourDim(const T& tensor) {
         auto layout = tensor.Layout();
-        auto row = Std::get<0>(layout.Shape());
-        auto column = Std::get<1>(layout.Shape());
-        auto fourDimLayout = MakeNDLayout<Std::ignore_t>(row, column);
+        auto shape4Dim = MakeShape(
+            MakeShape(Std::Int<1>{}, layout.Shape<0>()),
+            MakeShape(Std::Int<1>{}, layout.Shape<1>())
+        );
+        auto stride4Dim = MakeStride(
+            MakeStride(Std::Int<0>{}, layout.Stride<0>()),
+            MakeStride(Std::Int<0>{}, layout.Stride<1>())
+        );
+        auto fourDimLayout = MakeLayout(shape4Dim, stride4Dim);
         return MakeTensorImpl(tensor.Engine().Begin(), fourDimLayout);
     }
 };
