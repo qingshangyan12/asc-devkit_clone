@@ -26,7 +26,6 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, uint64_t* src_array)
 __aicore__ inline void asc_transto5hd_b32(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride)
 __aicore__ inline void asc_transto5hd_b16(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
@@ -67,8 +66,45 @@ PIPE_TYPE_V
 ## 调用示例
 
 ```cpp
-__ubuf__ half dst_list[16];
-__ubuf__ half src_list[16];
+const uint32_t SRC_BASE_ADDR = 0x80000000;
+const uint32_t DST_BASE_ADDR = 0x80000100;
+const uint32_t STEP = 2;
+__ubuf__ half* src_list[16] = {
+    (__ubuf__ half*)(SRC_BASE_ADDR + 0 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 1 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 2 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 3 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 4 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 5 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 6 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 7 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 8 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 9 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 10 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 11 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 12 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 13 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 14 * STEP),
+    (__ubuf__ half*)(SRC_BASE_ADDR + 15 * STEP)
+};
+__ubuf__ half* dst_list[16] = {
+    (__ubuf__ half*)(DST_BASE_ADDR + 0 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 1 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 2 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 3 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 4 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 5 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 6 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 7 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 8 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 9 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 10 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 11 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 12 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 13 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 14 * STEP),
+    (__ubuf__ half*)(DST_BASE_ADDR + 15 * STEP)
+};
 const int32_t VA_REG_ARRAY_LEN = 8;
 uint8_t repeat = 16;
 uint16_t dst_stride = 16;
