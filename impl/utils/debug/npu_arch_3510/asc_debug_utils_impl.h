@@ -94,7 +94,7 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype_impl()
         return DumpTensorDataType::ACL_BF16;
     } else if (std::is_same<T, hifloat8_t>::value) {
         return DumpTensorDataType::ACL_HIFLOAT8;
-    } else if (std::is_same<T, float8_e5m2_t>::value) {
+    } else if (std::is_same<T, float8_e5m2x2_t>::value) {
         return DumpTensorDataType::ACL_FLOAT8_E5M2;
     } else if (std::is_same<T, float8_e4m3_t>::value) {
         return DumpTensorDataType::ACL_FLOAT8_E4M3FN;
