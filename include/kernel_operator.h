@@ -20,4 +20,8 @@
 #include "kernel_type.h"
 #include "kernel_operator_intf.h"
 
+#ifdef ASCENDC_CPU_DEBUG
+#include "cpu_debug_launch.h"
+#endif
+
 #endif // ASCENDC_MODULE_OPERATOR_H
