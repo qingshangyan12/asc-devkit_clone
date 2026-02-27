@@ -459,33 +459,33 @@ TEST_F(Tensor_Api_Layout, TestMakeLayout)
     auto shape1 = MakeShape(3, 2);
     auto stride1 = MakeStride(1, 4);
     auto layout1 = MakeLayout(shape1, stride1);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(layout1)), 3);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(layout1)), 2);
-    EXPECT_EQ(AscendC::Std::get<0>(GetStride<0>(layout1)), 1);
-    EXPECT_EQ(AscendC::Std::get<0>(GetStride<1>(layout1)), 4);
+    EXPECT_EQ(GetShape<0>(layout1), 3);
+    EXPECT_EQ(GetShape<1>(layout1), 2);
+    EXPECT_EQ(GetStride<0>(layout1), 1);
+    EXPECT_EQ(GetStride<1>(layout1), 4);
 
     // 此时最内侧stride为1，次内侧为13，外侧为13 * 11 = 143
     auto shape2 = MakeShape(7, 11, 13);
     auto layout2 = MakeLayout(shape2);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(layout2)), 7);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(layout2)), 11);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<2>(layout2)), 13);
-    EXPECT_EQ(AscendC::Std::get<0>(GetStride<0>(layout2)), 143);
-    EXPECT_EQ(AscendC::Std::get<0>(GetStride<1>(layout2)), 13);
-    EXPECT_EQ(AscendC::Std::get<0>(GetStride<2>(layout2)), 1);
+    EXPECT_EQ(GetShape<0>(layout2), 7);
+    EXPECT_EQ(GetShape<1>(layout2), 11);
+    EXPECT_EQ(GetShape<2>(layout2), 13);
+    EXPECT_EQ(GetStride<0>(layout2), 143);
+    EXPECT_EQ(GetStride<1>(layout2), 13);
+    EXPECT_EQ(GetStride<2>(layout2), 1);
 
     // stride[0][0] = 1; stride[0][1] = 2 * 3 * 1 = 6;
     // stride[1][0] = 1 * 2 = 2; stride[1][1] = 3 * 6 = 18;
     auto shape3 = MakeShape(MakeShape(2, 3), MakeShape(3, 6));
     auto layout3 = MakeLayout(shape3);
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(GetShape<0>(layout3))), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(GetShape<0>(layout3))), 3);
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(GetShape<1>(layout3))), 3);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(GetShape<1>(layout3))), 6);
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(GetStride<0>(layout3))), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(GetStride<0>(layout3))), 6);
-    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(GetStride<1>(layout3))), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(GetStride<1>(layout3))), 18);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(layout3)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(layout3)), 3);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(layout3)), 3);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(layout3)), 6);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<0>(layout3)), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(GetStride<0>(layout3)), 6);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<1>(layout3)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetStride<1>(layout3)), 18);
 }
 
 // Shape为{{16, row / 16}, {32 / SizeOf(T), col / (32 / SizeOf(T))}}
