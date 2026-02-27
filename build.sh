@@ -11,9 +11,9 @@
 
 set -e
 
-SUPPORTED_SHORT_OPTS=("h" "j" "t" "p")
+SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type" "extra-cmake-args"
+    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type" "extra-cmake-args" "changed_file"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -27,6 +27,8 @@ BUILD_TYPE="Release"
 ENABLE_BUILD_DEVICE=ON
 USE_CXX11_ABI=0
 CMAKE_TOOLCHAIN_FILE_VAL=""
+CHANGED_FILES=""
+CI_MODE=FALSE
 
 dotted_line="----------------------------------------------------------------"
 
@@ -105,6 +107,7 @@ usage() {
   echo "    --make_clean         Clean build artifacts"
   echo "    --build-type=<TYPE>"
   echo "                         Specify build type (TYPE options: Release/Debug), Default:Release"
+  echo "    -f, --changed_file   Set the changed files for CI mode, eg: -f file1,file.cpp"
 }
 
 parse_cmake_extra_args() {
@@ -405,6 +408,16 @@ set_options() {
       check_param_j
       shift 2
       ;;
+    -f)
+      CHANGED_FILES="$2"
+      CI_MODE=TRUE
+      shift 2
+      ;;
+    --changed_file=*)
+      CHANGED_FILES="${1#*=}"
+      CI_MODE=TRUE
+      shift
+      ;;
     --build-type=*)
       BUILD_TYPE="${1#*=}"
       check_param_test_build_type
@@ -422,6 +435,7 @@ set_options() {
       ;;
     esac
   done
+
 }
 
 set_env() {
@@ -484,36 +498,85 @@ function build_package(){
 }
 
 function build_test() {
-  cmake_config
-  build all
+  # 如果 CI 模式下有 CI_TEST_TARGETS，则只构建指定的测试目标
+  if [[ "$CI_MODE" == "TRUE" && -n "$CI_TEST_TARGETS" ]]; then
+    log "[INFO] Building CI mode test targets: $CI_TEST_TARGETS"
+    cmake_config
+    for target in $CI_TEST_TARGETS; do
+      cmake --build . --target $target -j ${THREAD_NUM}
+    done
+  else
+    cmake_config
+    build all
+  fi
 }
 
 function build_test_part() {
   source ${CURRENT_DIR}/tests/test_parts.sh
-
-  if [ "$TEST_PART" == "adv_test" ]; then
-    TEST_TARGET_LIST=("${adv_test_targets[@]}")
-  elif [ "$TEST_PART" == "basic_test_one" ]; then
-    TEST_TARGET_LIST=("${basic_test_one_targets[@]}")
-  elif [ "$TEST_PART" == "basic_test_two" ]; then
-    TEST_TARGET_LIST=("${basic_test_two_targets[@]}")
-  elif [ "$TEST_PART" == "basic_test_three" ]; then
-    TEST_TARGET_LIST=("${basic_test_three_targets[@]}")
+ 
+  # 如果 CI 模式下有 CI_TEST_TARGETS，则使用解析的测试目标
+  if [[ "$CI_MODE" == "TRUE" && -n "$CI_TEST_TARGETS" ]]; then
+    log "[INFO] Using CI mode test targets: $CI_TEST_TARGETS"
+    # 将空格分隔的测试目标转换为数组
+    TEST_TARGET_LIST=($CI_TEST_TARGETS)
+  else
+    if [ "$TEST_PART" == "adv_test" ]; then
+      TEST_TARGET_LIST=("${adv_test_targets[@]}")
+    elif [ "$TEST_PART" == "basic_test_one" ]; then
+      TEST_TARGET_LIST=("${basic_test_one_targets[@]}")
+    elif [ "$TEST_PART" == "basic_test_two" ]; then
+      TEST_TARGET_LIST=("${basic_test_two_targets[@]}")
+    elif [ "$TEST_PART" == "basic_test_three" ]; then
+      TEST_TARGET_LIST=("${basic_test_three_targets[@]}")
+    fi
   fi
-
+ 
   for tag in "${TEST_TARGET_LIST[@]}"; do
     TARGETS="${TARGETS} --target ${tag}"
     TEST_MOD="${tag},${TEST_MOD}"
   done
-
+ 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=${TEST_MOD}"
   if [ "${COV}" == "true" ]; then
     TARGETS="${TARGETS} --target collect_coverage_data"
   fi
-
+ 
   cmake_config
   cmake --build . ${TARGETS} -j ${THREAD_NUM}
   return 0
+}
+
+set_ci_mode() {
+  cd ${CURRENT_DIR}
+  if [[ -n "$CHANGED_FILES" ]]; then
+    if [[ "$TEST" == "all" || -n "$TEST_PART" ]]; then
+      log "[INFO] CI mode: processing changed files for test mode"
+      # 调用 parse_changed_files.py 解析修改的文件
+      local parse_script="${CURRENT_DIR}/scripts/util/parse_changed_files.py"
+      if [[ ! -f "$parse_script" ]]; then
+        log "[ERROR] parse_changed_files.py not found at $parse_script"
+        exit 1
+      fi
+      
+      CI_TEST_TARGETS=$(python3 "$parse_script" "$CHANGED_FILES" "$CURRENT_DIR")
+      local exit_code=$?
+      
+      if [[ $exit_code -ne 0 ]]; then
+        log "[ERROR] Failed to parse changed files: $CI_TEST_TARGETS"
+        exit 1
+      fi
+      
+      if [[ -z "$CI_TEST_TARGETS" ]]; then
+        log "[WARNING] No test targets found for changed files"
+        exit 0
+      fi
+      
+      log "[INFO] Test targets to run: $CI_TEST_TARGETS"
+    else
+      log "[INFO] CI mode: processing changed files for build mode"
+      CUSTOM_OPTION="${CUSTOM_OPTION} -DCHANGED_FILES=${CHANGED_FILES}"
+    fi
+  fi
 }
 
 main() {
@@ -556,6 +619,10 @@ main() {
   fi
 
   cd ${BUILD_DIR}
+
+  if [ "${CI_MODE}" == "TRUE" ]; then
+    set_ci_mode
+  fi
 
   if [ -n "${TEST}" ]; then
     build_test
