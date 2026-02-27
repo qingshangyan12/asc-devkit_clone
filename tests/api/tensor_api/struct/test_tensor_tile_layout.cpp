@@ -565,12 +565,12 @@ TEST_F(Tensor_Api_Layout, TestMakeL0CLayout)
 
 // Shape为{{1, row},{1, column}}
 // Stride为{{0, column}, {0, 1}}
-TEST_F(Tensor_Api_Layout, TestMakeRowMajorLayout)
+TEST_F(Tensor_Api_Layout, TestMakeNDLayout)
 {
     using namespace AscendC::Te;
     size_t row1 = 128UL;
     size_t col1 = 32UL;
-    auto layout1 = MakeRowMajorLayout<uint32_t>(row1, col1);
+    auto layout1 = MakeNDLayout<uint32_t>(row1, col1);
     auto shapeRow1 = AscendC::Std::get<0>(GetShape(layout1));
     auto shapeCol1 = AscendC::Std::get<1>(GetShape(layout1));
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
@@ -586,7 +586,7 @@ TEST_F(Tensor_Api_Layout, TestMakeRowMajorLayout)
     
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
-    auto layout2 = MakeRowMajorLayout<float>(row2, col2);
+    auto layout2 = MakeNDLayout<float>(row2, col2);
     auto shapeRow2 = AscendC::Std::get<0>(GetShape(layout2));
     auto shapeCol2 = AscendC::Std::get<1>(GetShape(layout2));
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
@@ -603,12 +603,12 @@ TEST_F(Tensor_Api_Layout, TestMakeRowMajorLayout)
 
 // Shape为{{1, row},{1, column}}
 // Stride为{{0, 1}, {0, row}}
-TEST_F(Tensor_Api_Layout, TestMakeColumnMajorLayout)
+TEST_F(Tensor_Api_Layout, TestMakeDNLayout)
 {
     using namespace AscendC::Te;
     size_t row1 = 128UL;
     size_t col1 = 32UL;
-    auto layout1 = MakeColumnMajorLayout<uint32_t>(row1, col1);
+    auto layout1 = MakeDNLayout<uint32_t>(row1, col1);
     auto shapeRow1 = AscendC::Std::get<0>(GetShape(layout1));
     auto shapeCol1 = AscendC::Std::get<1>(GetShape(layout1));
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
@@ -624,7 +624,7 @@ TEST_F(Tensor_Api_Layout, TestMakeColumnMajorLayout)
     
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
-    auto layout2 = MakeColumnMajorLayout<float>(row2, col2);
+    auto layout2 = MakeDNLayout<float>(row2, col2);
     auto shapeRow2 = AscendC::Std::get<0>(GetShape(layout2));
     auto shapeCol2 = AscendC::Std::get<1>(GetShape(layout2));
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
