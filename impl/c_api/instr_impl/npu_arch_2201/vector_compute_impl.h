@@ -5101,7 +5101,7 @@ __aicore__ inline void asc_pair_reduce_sum_sync(__ubuf__ float* dst, __ubuf__ fl
     asc_pair_reduce_sum_sync_impl(dst, src, count);
 }
 
-// ==========asc_get_rsvd_count==========
+// ==========asc_set_va_reg==========
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t* src_array[8])
 {
     asc_set_va_reg_impl(addr, src_array);
