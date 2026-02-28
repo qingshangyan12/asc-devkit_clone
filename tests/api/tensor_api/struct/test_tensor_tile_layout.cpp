@@ -552,13 +552,13 @@ TEST_F(Tensor_Api_Layout, TestMakeL0CLayout)
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
     auto strideCol1 = AscendC::Std::get<1>(GetStride(layout1));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow1), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), 8);
-    EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), 2);
-    EXPECT_EQ(AscendC::Std::get<0>(strideRow1), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 256);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), row1 / 16);
+    EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 32 / sizeof(uint16_t));
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), col1 / (32 / sizeof(uint16_t)));
+    EXPECT_EQ(AscendC::Std::get<0>(strideRow1), 32 / sizeof(uint16_t));
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 32 / sizeof(uint16_t) * 16);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 2048);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), row1 * 32 / sizeof(uint16_t));
     
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
@@ -568,13 +568,13 @@ TEST_F(Tensor_Api_Layout, TestMakeL0CLayout)
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
     auto strideCol2 = AscendC::Std::get<1>(GetStride(layout2));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow2), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), 128);
-    EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), 64);
-    EXPECT_EQ(AscendC::Std::get<0>(strideRow2), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 256);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), row2 / 16);
+    EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 32 / sizeof(uint16_t));
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), col2 / (32 / sizeof(uint16_t)));
+    EXPECT_EQ(AscendC::Std::get<0>(strideRow2), 32 / sizeof(uint16_t));
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 32 / sizeof(uint16_t) * 16);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol2), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 32768);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), row2 * 32 / sizeof(uint16_t));
 }
 
 // Shape为{{1, row},{1, column}}
@@ -590,11 +590,11 @@ TEST_F(Tensor_Api_Layout, TestMakeNDLayout)
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
     auto strideCol1 = AscendC::Std::get<1>(GetStride(layout1));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow1), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), 128);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), row1);
     EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), 32);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), col1);
     EXPECT_EQ(AscendC::Std::get<0>(strideRow1), 0);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 32);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), col1);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 0);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 1);
     
@@ -606,11 +606,11 @@ TEST_F(Tensor_Api_Layout, TestMakeNDLayout)
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
     auto strideCol2 = AscendC::Std::get<1>(GetStride(layout2));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow2), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), 2048);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), row2);
     EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), 1024);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), col2);
     EXPECT_EQ(AscendC::Std::get<0>(strideRow2), 0);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 1024);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), col2);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol2), 0);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 1);
 }
