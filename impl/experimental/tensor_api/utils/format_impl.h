@@ -260,7 +260,7 @@ private:
 
     __aicore__ inline static constexpr bool IsFractalScaleDNFormat() {
         constexpr bool isShapeRight = Std::is_constant<2, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<2, StrideRow0>::value && Std::is_constant<1, StrideRow1>::value;
+        constexpr bool isStrideRight = Std::is_constant<2, StrideRow0>::value && Std::is_constant<1, StrideColumn0>::value;
 
         return (isShapeRight && isStrideRight);
     }
@@ -273,6 +273,7 @@ private:
         return ResultType::value;
     }
 public:
+        using type = typename T::elementType;
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
