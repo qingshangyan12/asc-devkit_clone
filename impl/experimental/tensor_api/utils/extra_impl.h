@@ -51,30 +51,6 @@ template <typename T>
 struct IterVal<T,void_t<typename T::valueType>> {
     using type = typename T::valueType;
 };
-
-template <typename T, typename = void>
-struct RemoveAddressSpace {
-    using type = T;
-};
-
-template <typename T>
-struct RemoveAddressSpace<__ca__ T> {
-    using type = T;
-};
-
-template <typename T>
-struct RemoveAddressSpace<__gm__ T> {
-    using type = T;
-};
-
-template <typename T>
-struct RemoveAddressSpace<__ubuf__ T> {
-    using type = T;
-};
-
-template <typename T>
-using RemoveAddressSpace_t = typename RemoveAddressSpace<T>::type;
-
 } // namespace Te
 } // namespace AscendC
 

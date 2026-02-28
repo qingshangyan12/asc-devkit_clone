@@ -103,28 +103,35 @@ struct GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1> {
 template <typename T>
 struct IsZZFormat {
 private:
-    __aicore__ inline static constexpr bool IsFractalZZFormat() {
-        using type = typename T::elementType;
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-
-        if constexpr (Std::is_same_v<RemoveAddressSpace_t<type>, fp8_e8m0_t>) {
-            constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
-            && Std::is_constant<MX_SCALE_K0, ShapeColumn0>::value;
-            constexpr bool isStrideRight = Std::is_constant<MX_SCALE_K0, StrideRow0>::value 
+    __aicore__ inline static constexpr bool IsFractalZZFormatNormal() {
+        constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
+            && Std::is_constant<C0_SIZE / sizeof(type), ShapeColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<C0_SIZE / sizeof(type), StrideRow0>::value 
             && Std::is_constant<1, StrideColumn0>::value;
-            return (isShapeRight && isStrideRight);
-        } else {
-            constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
-                && Std::is_constant<C0_SIZE / sizeof(type), ShapeColumn0>::value;
-            constexpr bool isStrideRight = Std::is_constant<C0_SIZE / sizeof(type), StrideRow0>::value 
-                && Std::is_constant<1, StrideColumn0>::value;
-            return (isShapeRight && isStrideRight);
-        }
+        return (isShapeRight && isStrideRight);
+    }
+
+    __aicore__ inline static constexpr bool IsFractalScaleZZFormat() {
+        constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
+        && Std::is_constant<MX_SCALE_K0, ShapeColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<MX_SCALE_K0, StrideRow0>::value 
+        && Std::is_constant<1, StrideColumn0>::value;
+        return (isShapeRight && isStrideRight);
+    }
+
+    __aicore__ inline static constexpr bool IsFractalZZFormat() {
+        constexpr bool isScaleType = Std::is_one_of_v<type, __cbuf__ fp8_e8m0_t, __ca__ fp8_e8m0_t>;
+        using ResultType = Std::conditional_t<isScaleType,
+            Std::bool_constant<IsFractalScaleZZFormat()>,
+            Std::bool_constant<IsFractalZZFormatNormal()>>;
+        return ResultType::value;
     }
 public:
+    using type = typename T::elementType;
+    using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+    using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+    using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+    using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
     static constexpr bool value = IsFractalZZFormat();
 };
 
