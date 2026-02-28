@@ -36,11 +36,11 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ half* dst, __ubuf__ int8_t* s
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR,
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                     "illegal input cast mode %d, only support CAST_NONE from int8_t to half on current device",
-                    static_cast<int32_t>(roundMode));
-            });
+                    static_cast<int32_t>(roundMode))
+            );
             break;
     }
 }
@@ -54,11 +54,11 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ half* dst, __ubuf__ uint8_t* 
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR,
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                     "illegal input cast mode %d, only support CAST_NONE from uint8_t to half on current device",
-                    static_cast<int32_t>(roundMode));
-            });
+                    static_cast<int32_t>(roundMode))
+            );
             break;
     }
 }
@@ -92,12 +92,12 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ float* dst, __ubuf__ int32_t*
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from int32_t to float not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from int32_t to float not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -111,11 +111,11 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ float* dst, __ubuf__ half* sr
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR,
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                     "illegal input cast mode %d, only support CAST_NONE from half to float on current device",
-                    static_cast<int32_t>(roundMode));
-            });
+                    static_cast<int32_t>(roundMode))
+            );
             break;
     }
 }
@@ -145,16 +145,16 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int32_t* dst, __ubuf__ half* 
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT((false),
-                           { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from half to int32_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT((false),
+                           KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from half to int32_t not supported on current device"));
             break;
         case RoundMode::CAST_NONE:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_NONE from half to int32_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_NONE from half to int32_t not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -188,12 +188,12 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int8_t* dst, __ubuf__ half* s
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT((false),
-                           { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from half to int8_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT((false),
+                           KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from half to int8_t not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -227,12 +227,12 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ uint8_t* dst, __ubuf__ half* 
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT((false),
-                           { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from half to uint8_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT((false),
+                           KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from half to uint8_t not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -270,8 +270,8 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ half* dst, __ubuf__ float* sr
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -301,16 +301,16 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int32_t* dst, __ubuf__ float*
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from float to int32_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from float to int32_t not supported on current device"));
             break;
         case RoundMode::CAST_NONE:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_NONE from float to int32_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_NONE from float to int32_t not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -340,16 +340,16 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int16_t* dst, __ubuf__ half* 
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT((false),
-                           { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from half to int16_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT((false),
+                           KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from half to int16_t not supported on current device"));
             break;
         case RoundMode::CAST_NONE:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_NONE from half to int16_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_NONE from half to int16_t not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -395,12 +395,12 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ half* dst, __ubuf__ int16_t* 
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT((false),
-                           { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from int16_t to half not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT((false),
+                           KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from int16_t to half not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -430,16 +430,16 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ float* dst, __ubuf__ float* s
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT((false),
-                           { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from float to float not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT((false),
+                           KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from float to float not supported on current device"));
             break;
         case RoundMode::CAST_NONE:
-            ASCENDC_ASSERT((false),
-                           { KERNEL_LOG(KERNEL_ERROR, "CAST_NONE from float to float not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT((false),
+                           KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_NONE from float to float not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -469,18 +469,18 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ bfloat16_t* dst, __ubuf__ flo
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from float to bfloat16_t not supported on current device");
-            });
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from float to bfloat16_t not supported on current device")
+            );
             break;
         case RoundMode::CAST_NONE:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR, "CAST_NONE from float to bfloat16_t not supported on current device");
-            });
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_NONE from float to bfloat16_t not supported on current device")
+            );
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -510,16 +510,16 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int64_t* dst, __ubuf__ float*
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from float to int64_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from float to int64_t not supported on current device"));
             break;
         case RoundMode::CAST_NONE:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_NONE from float to int64_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_NONE from float to int64_t not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -533,11 +533,11 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ float* dst, __ubuf__ bfloat16
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR,
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                     "illegal input cast mode %d, only support CAST_NONE from bfloat16_t to float on current device",
-                    static_cast<int32_t>(roundMode));
-            });
+                    static_cast<int32_t>(roundMode))
+            );
             break;
     }
 }
@@ -567,18 +567,18 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int32_t* dst, __ubuf__ bfloat
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from bfloat16_t to int32_t not supported on current device");
-            });
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from bfloat16_t to int32_t not supported on current device")
+            );
             break;
         case RoundMode::CAST_NONE:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR, "CAST_NONE from bfloat16_t to int32_t not supported on current device");
-            });
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_NONE from bfloat16_t to int32_t not supported on current device")
+            );
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -608,16 +608,16 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int16_t* dst, __ubuf__ float*
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from float to int16_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from float to int16_t not supported on current device"));
             break;
         case RoundMode::CAST_NONE:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_NONE from float to int16_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_NONE from float to int16_t not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -631,11 +631,11 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ float* dst, __ubuf__ int16_t*
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR,
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                     "illegal input cast mode %d, only support CAST_NONE from int16_t to float on current device",
-                    static_cast<int32_t>(roundMode));
-            });
+                    static_cast<int32_t>(roundMode))
+            );
             break;
     }
 }
@@ -649,11 +649,11 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int16_t* dst, __ubuf__ int32_
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR,
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                     "illegal input cast mode %d, only support CAST_NONE from int32_t to int16_t on current device",
-                    static_cast<int32_t>(roundMode));
-            });
+                    static_cast<int32_t>(roundMode))
+            );
             break;
     }
 }
@@ -667,11 +667,11 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int64_t* dst, __ubuf__ int32_
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR,
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                     "illegal input cast mode %d, only support CAST_NONE from int32_t to int64_t on current device",
-                    static_cast<int32_t>(roundMode));
-            });
+                    static_cast<int32_t>(roundMode))
+            );
             break;
     }
 }
@@ -701,16 +701,16 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ float* dst, __ubuf__ int64_t*
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from int64_t to float not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from int64_t to float not supported on current device"));
             break;
         case RoundMode::CAST_NONE:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_NONE from int64_t to float not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_NONE from int64_t to float not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -724,11 +724,11 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int32_t* dst, __ubuf__ int64_
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR,
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                     "illegal input cast mode %d, only support CAST_NONE from int64_t to int32_t on current device",
-                    static_cast<int32_t>(roundMode));
-            });
+                    static_cast<int32_t>(roundMode))
+            );
             break;
     }
 }
@@ -762,12 +762,12 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int4b_t* dst, __ubuf__ half* 
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         case RoundMode::CAST_ODD:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "CAST_ODD from half to int4b_t not supported on current device"); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CAST_ODD from half to int4b_t not supported on current device"));
             break;
         default:
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)); });
+            ASCENDC_DEBUG_ASSERT(
+                (false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal input cast mode %d", static_cast<int32_t>(roundMode)));
             break;
     }
 }
@@ -781,11 +781,11 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ half* dst, __ubuf__ int4b_t* 
                 repeatParams.dstRepStride, repeatParams.srcRepStride);
             break;
         default:
-            ASCENDC_ASSERT((false), {
-                KERNEL_LOG(KERNEL_ERROR,
+            ASCENDC_DEBUG_ASSERT((false),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
                     "illegal input cast mode %d, only support CAST_NONE from int4b_t to half on current device",
-                    static_cast<int32_t>(roundMode));
-            });
+                    static_cast<int32_t>(roundMode))
+            );
             break;
     }
 }
@@ -793,18 +793,18 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ half* dst, __ubuf__ int4b_t* 
 // check Cast  datatype
 template <typename T, typename U>
 __aicore__ static inline void CheckCastDatatype() {
-    ASCENDC_ASSERT((SupportType<Tuple<T, U>, Tuple<int32_t, half>, Tuple<int16_t, half>, Tuple<float, half>,
+    ASCENDC_DEBUG_ASSERT((SupportType<Tuple<T, U>, Tuple<int32_t, half>, Tuple<int16_t, half>, Tuple<float, half>,
         Tuple<int8_t, half>, Tuple<uint8_t, half>, Tuple<int4b_t, half>, Tuple<float, float>, Tuple<int32_t, float>,
         Tuple<half, float>, Tuple<int64_t, float>, Tuple<int16_t, float>,  Tuple<bfloat16_t, float>,
         Tuple<float, bfloat16_t>, Tuple<int32_t, bfloat16_t>, Tuple<half, int4b_t>, Tuple<half, uint8_t>,
         Tuple<half, int8_t>, Tuple<half, int16_t>, Tuple<float, int16_t>, Tuple<float, int32_t>,
         Tuple<int16_t, int32_t>, Tuple<int64_t, int32_t>, Tuple<half, int32_t>, Tuple<int32_t, int64_t>,
-        Tuple<float, int64_t>>()), { KERNEL_LOG(KERNEL_ERROR,
+        Tuple<float, int64_t>>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
         "Failed to check dtype in Cast, current api support dtype combination is src: half, dst: int32_t / int16_t / "
         "float / int8_t / uint8_t / int4b_t; src: float, dst: float / int32_t/ half / int64_t / int16_t / bfloat16_t; "
         "src: bfloat16_t, dst: float / int32_t; src: int4b_t, dst: half; src: uint8_t, dst: half; "
         "src: int8_t, dst: half; src: int16_t, dst: half / float; src: int32_t, dst: float / int16_t / int64_t; "
-        "src: int64_t, dst: int32_t / float / half");});
+        "src: int64_t, dst: int32_t / float / half"));
 }
 
 // Cast::Level 2
@@ -905,9 +905,9 @@ template <typename T, typename U, bool isVecDeq, bool halfBlock>
 __aicore__ inline void CastDeqImpl(__ubuf__ T* dst, __ubuf__ U* src,
     const uint32_t count)
 {
-    ASCENDC_ASSERT((SupportType<Tuple<U, T>, Tuple<int16_t, int8_t>, Tuple<int16_t, uint8_t>, Tuple<int32_t, half>>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CastDeqImpl, current api support dtype combination is src:"
-        "int16_t dst: int8_t/uint8_t , src:int32_t dst:half.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<Tuple<U, T>, Tuple<int16_t, int8_t>, Tuple<int16_t, uint8_t>, Tuple<int32_t, half>>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CastDeqImpl, current api support dtype combination is src:"
+        "int16_t dst: int8_t/uint8_t , src:int32_t dst:half."));
     if ASCEND_IS_AIV {
         set_mask_count();
         set_vector_mask(0, count);
@@ -931,9 +931,9 @@ template <typename T, typename U, bool isSetMask, bool isVecDeq, bool halfBlock>
 __aicore__ inline void CastDeqImpl(__ubuf__ T* dst, __ubuf__ U* src,
     const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((SupportType<Tuple<U, T>, Tuple<int16_t, int8_t>, Tuple<int16_t, uint8_t>, Tuple<int32_t, half>>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CastDeqImpl, current api support dtype combination is src:"
-        "int16_t dst: int8_t/uint8_t , src:int32_t dst:half.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<Tuple<U, T>, Tuple<int16_t, int8_t>, Tuple<int16_t, uint8_t>, Tuple<int32_t, half>>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CastDeqImpl, current api support dtype combination is src:"
+        "int16_t dst: int8_t/uint8_t , src:int32_t dst:half."));
     if ASCEND_IS_AIV {
         AscendCUtils::SetMask<U, isSetMask>(mask[1], mask[0]);
         if constexpr (sizeof(U) == sizeof(int32_t)) {
@@ -953,9 +953,9 @@ template <typename T, typename U, bool isSetMask, bool isVecDeq, bool halfBlock>
 __aicore__ inline void CastDeqImpl(__ubuf__ T* dst, __ubuf__ U* src,
     const int32_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((SupportType<Tuple<U, T>, Tuple<int16_t, int8_t>, Tuple<int16_t, uint8_t>, Tuple<int32_t, half>>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in CastDeqImpl, current api support dtype combination is src:"
-        "int16_t dst: int8_t/uint8_t , src:int32_t dst:half.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<Tuple<U, T>, Tuple<int16_t, int8_t>, Tuple<int16_t, uint8_t>, Tuple<int32_t, half>>()),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in CastDeqImpl, current api support dtype combination is src:"
+        "int16_t dst: int8_t/uint8_t , src:int32_t dst:half."));
     if ASCEND_IS_AIV {
         AscendCUtils::SetMask<U, isSetMask>(mask);
         if constexpr (sizeof(U) == sizeof(int32_t)) {

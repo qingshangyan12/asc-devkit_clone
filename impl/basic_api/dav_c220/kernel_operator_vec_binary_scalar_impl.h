@@ -290,9 +290,9 @@ template <typename T>
 __aicore__ inline void ShiftRightIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ T* src, T scalarValue, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams, bool roundEn)
 {
-    ASCENDC_ASSERT((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to "
+    ASCENDC_DEBUG_ASSERT((SupportType<T, int16_t, uint16_t, int32_t, uint32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
         "check dtype in ShiftRight, current api support dtype combination is src and dst both: int16_t, uint16_t, "
-        "int32_t, uint32_t.");});
+        "int32_t, uint32_t."));
     // B16 must be in range [0, 16]. B32 must be in range [0, 32].
     ASCENDC_CHECK_VALUE_RANGE(scalarValue, 0, sizeof(T) * 8, "scalarValue", "ShiftRight"); // sizeof(T) * 8 as max
 

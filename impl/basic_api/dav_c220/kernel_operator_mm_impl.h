@@ -125,9 +125,9 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(__ca__ T *dst, __cbuf__ T *s
     const LoadData2dTransposeParams &loadDataParam)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadDataWithTranspose when dst position is A2, current "
-            "api support dtype combination is dst: half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadDataWithTranspose when dst position is A2, current "
+            "api support dtype combination is dst: half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t"));
         if constexpr (!IsSameType<T, int4b_t>::value) {
             load_cbuf_to_ca_transpose(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes,
                 loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
@@ -140,10 +140,10 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *s
     const LoadData2dTransposeParams &loadDataParam)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t, int4b_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadDataWithTranspose when dst position is B2, current "
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t, int4b_t>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadDataWithTranspose when dst position is B2, current "
             "api support dtype combination is dst: half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t, "
-            "int4b_t");});
+            "int4b_t"));
         if constexpr (IsSameType<T, int4b_t>::value) {
             load_cbuf_to_cb_transpose_s4((__cb__ void *)dst, (__cbuf__ void *)src, loadDataParam.startIndex,
                 loadDataParam.repeatTimes, loadDataParam.srcStride, loadDataParam.dstGap, inc,
@@ -319,12 +319,12 @@ template <typename T, typename U, typename S>
 __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const MmadParams& mmadParams)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<Tuple<T, U, S>, Tuple<int32_t, int8_t, int8_t>,
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<T, U, S>, Tuple<int32_t, int8_t, int8_t>,
             Tuple<float, half, half>, Tuple<float, float, float>, Tuple<float, bfloat16_t, bfloat16_t>,
-            Tuple<int32_t, int4b_t, int4b_t>>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Mmad, current "
+            Tuple<int32_t, int4b_t, int4b_t>>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Mmad, current "
             "api support dtype combination is dst: int32_t, src0: int8_t, src1: int8_t; dst: float, src0: half, "
             "src1: half; dst: float, src0: float, src1: float; dst: float, src0: bfloat16_t, src1: bfloat16_t; "
-            "dst: int32_t, src0: int4b_t, src1: int4b_t");});
+            "dst: int32_t, src0: int4b_t, src1: int4b_t"));
         bool cmatrixInitVal = mmadParams.cmatrixInitVal && (!mmadParams.isBias);
         if constexpr ((IsSameType<U, int4b_t>::value) && (IsSameType<S, int4b_t>::value)) {
             mad_s4(c, (__ca__ void *)a, (__cb__ void *)b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag,
@@ -553,8 +553,8 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T *dst, const InitConstValuePara
         } else if constexpr (IsSameType<T, float>::value || IsSameType<T, int32_t>::value) {
             create_cbuf_matrix(dst, repeatBit, static_cast<uint32_t>(GetScalarBitcodeValue(initConstValueParams.initValue)));
         } else {
-            ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
-                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float");});
+            ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
+                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float"));
         }
     }
 }
@@ -579,8 +579,8 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T *dst, const InitConstValuePar
         } else if constexpr (IsSameType<T, float>::value || IsSameType<T, int32_t>::value) {
             create_ca_matrix(dst, repeatBit, static_cast<uint32_t>(GetScalarBitcodeValue(initConstValueParams.initValue)));
         } else {
-            ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
-                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float");});
+            ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
+                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float"));
         }
     }
 }
@@ -605,8 +605,8 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T *dst, const InitConstValuePar
         } else if constexpr (IsSameType<T, float>::value || IsSameType<T, int32_t>::value) {
             create_cb_matrix(dst, repeatBit, static_cast<uint32_t>(GetScalarBitcodeValue(initConstValueParams.initValue)));
         } else {
-            ASCENDC_ASSERT(false, {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
-                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float");});
+            ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in InitConstValue, current api "
+                "support dtype combination is dst: half, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float"));
         }
     }
 }
@@ -639,8 +639,8 @@ template <typename T>
 __aicore__ inline void LoadImageToLocalCal(__cbuf__ T *dst, const LoadImageToLocalParams &loadDataParams)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<T, int8_t, half>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-            "LoadImageToLocal, current api support dtype combination is dst: int8_t / half.");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, int8_t, half>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "LoadImageToLocal, current api support dtype combination is dst: int8_t / half."));
         load_image_to_cbuf(dst, static_cast<uint16_t>(loadDataParams.horizSize - 1),
             static_cast<uint16_t>(loadDataParams.vertSize - 1), loadDataParams.horizStartPos,
             loadDataParams.vertStartPos, static_cast<uint16_t>(loadDataParams.srcHorizSize - 1),
