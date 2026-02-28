@@ -110,7 +110,7 @@ private:
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
 
-        if constexpr (Std::is_same_v<type, __cbuf__ fp8_e8m0_t>) {
+        if constexpr (Std::is_same_v<RemoveAddressSpace_t<type>, fp8_e8m0_t>) {
             constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
             && Std::is_constant<MX_SCALE_K0, ShapeColumn0>::value;
             constexpr bool isStrideRight = Std::is_constant<MX_SCALE_K0, StrideRow0>::value 
