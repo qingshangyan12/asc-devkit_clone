@@ -219,10 +219,10 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxANDLayout)), 16);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxADNLayout)), 48);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxADNLayout)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxBNDLayout)), 48);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxBNDLayout)), 16);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxBDNLayout)), 48);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxBDNLayout)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxBNDLayout)), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxBNDLayout)), 8);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxBDNLayout)), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxBDNLayout)), 1);
 }
 
 TEST_F(Tensor_Api_Layout, GetOperation)
