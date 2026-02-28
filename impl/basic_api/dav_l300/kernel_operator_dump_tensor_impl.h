@@ -544,8 +544,8 @@ __aicore__ inline void UpdateBlockInfo(uint32_t tlvSize)
     dcci((__gm__ uint64_t*)blockInfoStart, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 }
 
-template <DumpType PT, class... Args>
-__aicore__ inline void PrintfImpl(__gm__ const char* fmt, Args&&... args)
+template <class... Args>
+__aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
 #ifdef ASCENDC_DUMP
     uint8_t blockIdx = GetDumpBlockIdx();
@@ -569,7 +569,7 @@ __aicore__ inline void PrintfImpl(__gm__ const char* fmt, Args&&... args)
     }
 
     __gm__ uint8_t *tlvAddr = (__gm__ uint8_t *)dumpAddr;
-    WriteTLHead(PT, tlvAddr, paramSize);
+    WriteTLHead(printType, tlvAddr, paramSize);
     __gm__ uint8_t *paramAddr = tlvAddr + ONE_PARAM_SIZE;
     uint32_t offset = paramNum * ONE_PARAM_SIZE;
     WriteString(paramAddr, 0, fmt, offset);

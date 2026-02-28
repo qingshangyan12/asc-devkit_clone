@@ -137,14 +137,14 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl<DumpType::DUMP_SCALAR>(fmt, args...);
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl<DumpType::DUMP_SCALAR>(fmt, args...);
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
 
@@ -168,7 +168,7 @@ template <class... Args>
 inline void PRINTF(const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl<DumpType::DUMP_SCALAR>(fmt, args...);
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
 #endif // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
@@ -178,7 +178,7 @@ template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl<DumpType::DUMP_SCALAR>(fmt, args...);
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
 
@@ -186,7 +186,7 @@ template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl<DumpType::DUMP_SCALAR>(fmt, args...);
+    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
 #endif // ASCENDC_CPU_DEBUG
@@ -213,7 +213,7 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
         InitDump(g_mixFlagAssertOnlyReserved, g_dumpAddrAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
     }
 #endif
-    PrintfImpl<DumpType::DUMP_ASSERT>(fmt, args...);
+    PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
 #else
     return;
 #endif
