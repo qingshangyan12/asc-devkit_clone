@@ -797,9 +797,9 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
     EXPECT_EQ(Size(layoutObj3), shape3Dim00 * shape3Dim01 * shape3Dim10 * shape3Dim11);
 
     // Capacity:作用同layout的方法Capacity
-    EXPECT_EQ(Capacity(layoutObj1), AscendC::Std::max(shape1Dim0 * stride1Dim0, shape1Dim1 * stride1Dim1));
-    EXPECT_EQ(Capacity(layoutObj2), AscendC::Std::max(AscendC::Std::max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
-    EXPECT_EQ(Capacity(layoutObj3), AscendC::Std::max(AscendC::Std::max(AscendC::Std::max(shape3Dim00 * stride3Dim00, shape3Dim01 * stride3Dim01), shape3Dim10 * stride3Dim10), shape3Dim11 * stride3Dim11));
+    EXPECT_EQ(Capacity(layoutObj1), GetMax(shape1Dim0 * stride1Dim0, shape1Dim1 * stride1Dim1));
+    EXPECT_EQ(Capacity(layoutObj2), GetMax(GetMax(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
+    EXPECT_EQ(Capacity(layoutObj3), GetMax(GetMax(GetMax(shape3Dim00 * stride3Dim00, shape3Dim01 * stride3Dim01), shape3Dim10 * stride3Dim10), shape3Dim11 * stride3Dim11));
 
     // Coshape:返回实际Shape空间，可以通过template设置Idx
     // 计算逻辑：逐维度(shape - 1) * stride之和+1
