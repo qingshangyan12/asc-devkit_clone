@@ -694,14 +694,14 @@ TEST_F(Tensor_Api_Layout, TestMakeZnLayout)
     auto shapeCol1 = AscendC::Std::get<1>(GetShape(layout1));
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
     auto strideCol1 = AscendC::Std::get<1>(GetStride(layout1));
-    EXPECT_EQ(AscendC::Std::get<0>(shapeRow1), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), 4);
+    EXPECT_EQ(AscendC::Std::get<0>(shapeRow1), 32 / sizeof(uint32_t));
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), row1 / (32 / sizeof(uint32_t)));
     EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), 4);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), col1 / 16);
     EXPECT_EQ(AscendC::Std::get<0>(strideRow1), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 512);
-    EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 128);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 32 / sizeof(uint32_t) * col1);
+    EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 32 / sizeof(uint32_t));
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 32 / sizeof(uint32_t) * 16);
     
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
@@ -710,14 +710,14 @@ TEST_F(Tensor_Api_Layout, TestMakeZnLayout)
     auto shapeCol2 = AscendC::Std::get<1>(GetShape(layout2));
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
     auto strideCol2 = AscendC::Std::get<1>(GetStride(layout2));
-    EXPECT_EQ(AscendC::Std::get<0>(shapeRow2), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), 256);
+    EXPECT_EQ(AscendC::Std::get<0>(shapeRow2), 32 / sizeof(float));
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), row2 / (32 / sizeof(float)));
     EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), 64);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), col2 / 16);
     EXPECT_EQ(AscendC::Std::get<0>(strideRow2), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 8192);
-    EXPECT_EQ(AscendC::Std::get<0>(strideCol2), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 128);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 32 / sizeof(float) * col2);
+    EXPECT_EQ(AscendC::Std::get<0>(strideCol2), 32 / sizeof(float));
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 32 / sizeof(float) * 16);
 }
 
 // Shape为{{16, row / 16},{32 / size, col / (32 / size)}}
