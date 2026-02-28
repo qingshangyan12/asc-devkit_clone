@@ -635,25 +635,26 @@ def extract_decl_param_options(op_info: OpInfo, option_name="dtype"):
 
 def decode_tiling(tiling_key: int = None) -> dict:
     kernel_template_input = get_context().get_addition("kernel-template-input")
-    pairs = kernel_template_input.split(';')
     kernel_compile_dict = {}
-    for pair in pairs:
-        if '=' in pair:
-            key, value = pair.split('=', 1)
-            value_list = value.split(',')
-            format_value_list = []
-            for v in value_list:
-                if v in ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP.keys():
-                    format_value_list.append(str(ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP[v]))
-                elif v == 'false':
-                    format_value_list.append('0')
-                elif v == 'true':
-                    format_value_list.append('1')
-                elif v in ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP.keys():
-                    format_value_list.append(str(ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP[v]))
-                else:
-                    format_value_list.append(v)
-            kernel_compile_dict[key] = format_value_list
+    if kernel_template_input:
+        pairs = kernel_template_input.split(';')
+        for pair in pairs:
+            if '=' in pair:
+                key, value = pair.split('=', 1)
+                value_list = value.split(',')
+                format_value_list = []
+                for v in value_list:
+                    if v in ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP.keys():
+                        format_value_list.append(str(ASCENDC_KERNEL_TEMPLATE_INPUT_DATATYPE_MAP[v]))
+                    elif v == 'false':
+                        format_value_list.append('0')
+                    elif v == 'true':
+                        format_value_list.append('1')
+                    elif v in ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP.keys():
+                        format_value_list.append(str(ASCENDC_KERNEL_TEMPLATE_INPUT_KERNEL_TYPE_MAP[v]))
+                    else:
+                        format_value_list.append(v)
+                kernel_compile_dict[key] = format_value_list
     encode_book = dict()
     for param in TILING_DECLARE_MAP:
         encode_book[param.name] = param.get_encodes()
