@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include "impl/utils/sys_constants.h"
+#include "c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
 // For ascc preprocess: __global__ should not be replaced
