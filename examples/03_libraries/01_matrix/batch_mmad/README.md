@@ -94,7 +94,7 @@ for循环内部将每次计算得到的C[i]进行偏移后存储到输出tensor�
         // 目的相邻ND矩阵起始地址之间的偏移，单位：element
 ### 5.避免数据占用总内存超过存储空间限制
 
-用户应该保证batch mmad整个过程中的数据所占总的内存超过存储空间限制。
+用户应该保证batch mmad整个过程中的数据所占总的内存不超过存储空间限制。
 用户可以通过PlatformAscendC类成员函数[GetCoreMemSize](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850alpha002/API/ascendcopapi/atlasascendc_api_07_1034.html)，获取获取硬件平台中L1、L0A、L0B、L0C存储空间的内存大小。
 
 
