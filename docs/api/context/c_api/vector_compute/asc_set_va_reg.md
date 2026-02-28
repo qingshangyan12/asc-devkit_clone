@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-用于设置transpose的地址，将操作数地址序列与地址寄存器关联。
+用于设置transpose的16个DataBlock地址，将操作数地址序列与地址寄存器关联，接口要求前8个和后8个地址序列与地址寄存器分别关联。
 
 ## 函数原型
 
@@ -48,7 +48,8 @@ PIPE_V
 ```cpp
 const uint32_t SRC_BASE_ADDR = 0x80000000;
 const uint32_t DST_BASE_ADDR = 0x80000100;
-const uint32_t STEP = 2;
+const uint32_t STEP = 32;
+// src_list和dst_list是16个DataBlock地址的数组
 __ubuf__ half* src_list[16] = {
     (__ubuf__ half*)(SRC_BASE_ADDR + 0 * STEP),
     (__ubuf__ half*)(SRC_BASE_ADDR + 1 * STEP),
@@ -87,6 +88,7 @@ __ubuf__ half* dst_list[16] = {
 };
 const int32_t VA_REG_ARRAY_LEN = 8;
 
+// 接口要求前8个和后8个地址序列与地址寄存器分别关联
 asc_set_va_reg(VA0, dst_list);
 asc_set_va_reg(VA1, dst_list + VA_REG_ARRAY_LEN);
 asc_set_va_reg(VA2, src_list);
