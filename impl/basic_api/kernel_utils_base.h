@@ -60,7 +60,6 @@ public:
         }
     #elif __NPU_ARCH__ == 3101
         set_mask_norm();
-        Internal::g_deqValue = static_cast<half>(1);
         uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
         uint64_t val = 0x1000000000000008 | prevCtrl;
         set_ctrl(val);
@@ -73,6 +72,7 @@ public:
             set_loop_size_outtoub(loopSizePara);
         }
         set_st_atomic_cfg(0b00100100);
+        Internal::g_deqValue = static_cast<half>(1);
     #elif __NPU_ARCH__ == 3002
         set_padding(static_cast<uint64_t>(0));
     #elif (__NPU_ARCH__ == 5102)
