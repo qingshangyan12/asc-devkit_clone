@@ -95,10 +95,31 @@ using IsVectorQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_TENSOR_QUAN
 template <QuantMode_t quantPre>
 using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
 
-using ZeroCoord2DType = AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>;
+template <size_t N, typename = Std::make_index_sequence<N>>
+struct EmptyGenerator;
 
-using EmptyShape = AscendC::Std::tuple<AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>, 
-    AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>>;
+template <size_t N, size_t... Idx>
+struct EmptyGenerator<N, Std::index_sequence<Idx...>>
+{   
+    using type = Std::tuple<Std::Int<Idx * 0>...>;
+};
+
+template <size_t N>
+struct TupleEmptyGenerator
+{   
+    static_assert((N > 0 && (N & 1) == 0), "N must be greater than 0, and must be even.");
+    using type = Std::tuple<typename EmptyGenerator<N / 2>::type, 
+        typename EmptyGenerator<N / 2>::type>;
+};
+
+template <size_t N>
+using EmptyShape = typename TupleEmptyGenerator<N>::type;
+
+template <size_t N>
+using EmptyStride = typename TupleEmptyGenerator<N>::type;
+
+template <size_t N>
+using EmptyCoord = typename TupleEmptyGenerator<N>::type;
 
 // IsIntegralConstant
 template <typename T>
