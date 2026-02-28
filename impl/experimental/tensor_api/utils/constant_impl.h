@@ -38,18 +38,21 @@ constexpr size_t MX_SCALE_K0 = 2;
 
 enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
 
-template <QuantMode_t Value, QuantMode_t... Args>
-struct is_one_of_value : Std::false_type {};
 
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
 
+// std公共函数需要修改
 template <typename T, typename U>
 __aicore__ inline constexpr auto max(const T src0, const U src1)
 {
     static_assert(Std::is_same_v<T, U> || Std::is_integral_v<T>, "Only support compare with same type");
     return (src0 > src1) ? src0 : src1;
 }
+
+// 直接使用std公共函数，删除；使用的地方需要替换
+template <QuantMode_t Value, QuantMode_t... Args>
+struct is_one_of_value : Std::false_type {};
 
 template <QuantMode_t Value, QuantMode_t Head, QuantMode_t... Tail>
 struct is_one_of_value<Value, Head, Tail...>

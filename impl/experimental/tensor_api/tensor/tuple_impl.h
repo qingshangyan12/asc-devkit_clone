@@ -15,7 +15,7 @@
 #ifndef IMPL_TENSOR_API_TENSOR_TUPLE_IMPL_H
 #define IMPL_TENSOR_API_TENSOR_TUPLE_IMPL_H
 
-#include "include/experimental/tensor_api/utils/utils.h"
+#include "impl/experimental/tensor_api/utils/utils_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -53,6 +53,7 @@ __aicore__ inline constexpr auto TransformApply(T0&& t0, T1&& t1, F&& f, G&& g)
     }
 }
 
+// TODO:公共。std是标准库，常用函数；
 __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {
     if (num2 == 0) {

@@ -20,6 +20,8 @@
 namespace AscendC {
 namespace Te {
 
+// TODO:STRUCT LAYOUT
+
 // make_layout.h
 template <typename... Ts>
 __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t);
