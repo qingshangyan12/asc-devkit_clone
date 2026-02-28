@@ -3856,7 +3856,7 @@ Contents of section
 
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
-                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = '1'):
                     compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
 
         binary_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.o')
