@@ -29,9 +29,9 @@ struct FixpipeParamsUtil
     using DstT = typename C_TYPE::T;
     using SrcT = typename GetMmDstType<typename A_TYPE::T>::Type;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-    using TYPE = typename AscendC::Conditional<C_TYPE::format == CubeFormat::NZ, FixpipeParamsC310<CO2Layout::NZ>,
+    using TYPE = typename AscendC::Conditional<C_TYPE::format == CubeFormat::NZ, FixpipeParamsC350<CO2Layout::NZ>,
         typename AscendC::Conditional<C_TYPE::format == CubeFormat::COLUMN_MAJOR,
-            FixpipeParamsC310<CO2Layout::COLUMN_MAJOR>, FixpipeParamsC310<CO2Layout::ROW_MAJOR>>::type>::type;
+            FixpipeParamsC350<CO2Layout::COLUMN_MAJOR>, FixpipeParamsC350<CO2Layout::ROW_MAJOR>>::type>::type;
 #else
     using TYPE = FixpipeParamsV220;
 #endif
