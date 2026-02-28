@@ -4313,9 +4313,11 @@ void add_custom();
             file.write(context)
 
         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
-            self.assertEqual(kernel_info.tiling_key_kernel_type["17435146"], KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2)
-            self.assertEqual(kernel_info.no_set_kernel_type, False)
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                    kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+                    self.assertEqual(kernel_info.tiling_key_kernel_type["17435146"], KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2)
+                    self.assertEqual(kernel_info.no_set_kernel_type, False)
         
         with open(src_file, "w") as file:
             context = """
@@ -4326,8 +4328,10 @@ void add_custom();
             file.write(context)
 
         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
-            self.assertEqual(kernel_info.no_set_kernel_type, True)
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                    kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+                    self.assertEqual(kernel_info.no_set_kernel_type, True)
         
         with open(src_file, "w") as file:
             context = """
@@ -4338,10 +4342,12 @@ void add_custom();
             file.write(context)
 
         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-            try:
-                KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
-            except Exception as e:
-                assert str(e) == "must provide default kernel type", f"msg is :{e}"
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                    try:
+                        KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+                    except Exception as e:
+                        assert str(e) == "must provide default kernel type", f"msg is :{e}"
 
 
     def test_infer_info_from_ifile_key_none_type_exists(self):
