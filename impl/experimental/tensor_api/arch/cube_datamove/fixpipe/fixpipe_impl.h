@@ -29,7 +29,7 @@ Fixpipe(const T& dst, const U& src)
     constexpr Hardware quantPos = Hardware::MAX;
     using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
         CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
-    Tensor2Tensor{}.template Run<trait>(dst, src, ZeroCoord2DType{});
+    Tensor2Tensor{}.template Run<trait>(dst, src, EmptyCoord<2>{});
 }
 
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S>
@@ -41,7 +41,7 @@ Fixpipe(const T& dst, const U& src, const S& quant)
     constexpr Hardware quantPos = Hardware::L1;
     using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
         CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
-    Tensor2Tensor{}.template Run<trait>(dst, src, quant, ZeroCoord2DType{});
+    Tensor2Tensor{}.template Run<trait>(dst, src, quant, EmptyCoord<2>{});
 }
 
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename Coord>
