@@ -200,3 +200,8 @@ TEST_P(CastTestsuite, CastTestCase)
         ASSERT_EQ(expectValues[i], actualValue[i]);
     }
 }
+
+TEST_F(CastTestsuite, CoverTestCase)
+{
+    ASSERT_EQ(1, AscendC::Simt::ConstantsInternal::ONE_INT64);
+}
