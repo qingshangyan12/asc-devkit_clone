@@ -46,45 +46,46 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-const uint32_t SRC_BASE_ADDR = 0x80000000;
-const uint32_t DST_BASE_ADDR = 0x80000100;
-const uint32_t STEP = 32;
+constexpr uint64_t total_length = 256;    // total_length指参与计算的数据长度
+__ubuf__ half src[total_length];
+__ubuf__ half dst[total_length];
+const uint32_t STEP = 16;
 // src_list和dst_list是16个DataBlock地址的数组
 __ubuf__ half* src_list[16] = {
-    (__ubuf__ half*)(SRC_BASE_ADDR + 0 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 1 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 2 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 3 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 4 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 5 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 6 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 7 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 8 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 9 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 10 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 11 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 12 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 13 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 14 * STEP),
-    (__ubuf__ half*)(SRC_BASE_ADDR + 15 * STEP)
+    (__ubuf__ half*)(src + 0 * STEP),
+    (__ubuf__ half*)(src + 1 * STEP),
+    (__ubuf__ half*)(src + 2 * STEP),
+    (__ubuf__ half*)(src + 3 * STEP),
+    (__ubuf__ half*)(src + 4 * STEP),
+    (__ubuf__ half*)(src + 5 * STEP),
+    (__ubuf__ half*)(src + 6 * STEP),
+    (__ubuf__ half*)(src + 7 * STEP),
+    (__ubuf__ half*)(src + 8 * STEP),
+    (__ubuf__ half*)(src + 9 * STEP),
+    (__ubuf__ half*)(src + 10 * STEP),
+    (__ubuf__ half*)(src + 11 * STEP),
+    (__ubuf__ half*)(src + 12 * STEP),
+    (__ubuf__ half*)(src + 13 * STEP),
+    (__ubuf__ half*)(src + 14 * STEP),
+    (__ubuf__ half*)(src + 15 * STEP)
 };
 __ubuf__ half* dst_list[16] = {
-    (__ubuf__ half*)(DST_BASE_ADDR + 0 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 1 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 2 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 3 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 4 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 5 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 6 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 7 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 8 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 9 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 10 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 11 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 12 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 13 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 14 * STEP),
-    (__ubuf__ half*)(DST_BASE_ADDR + 15 * STEP)
+    (__ubuf__ half*)(dst + 0 * STEP),
+    (__ubuf__ half*)(dst + 1 * STEP),
+    (__ubuf__ half*)(dst + 2 * STEP),
+    (__ubuf__ half*)(dst + 3 * STEP),
+    (__ubuf__ half*)(dst + 4 * STEP),
+    (__ubuf__ half*)(dst + 5 * STEP),
+    (__ubuf__ half*)(dst + 6 * STEP),
+    (__ubuf__ half*)(dst + 7 * STEP),
+    (__ubuf__ half*)(dst + 8 * STEP),
+    (__ubuf__ half*)(dst + 9 * STEP),
+    (__ubuf__ half*)(dst + 10 * STEP),
+    (__ubuf__ half*)(dst + 11 * STEP),
+    (__ubuf__ half*)(dst + 12 * STEP),
+    (__ubuf__ half*)(dst + 13 * STEP),
+    (__ubuf__ half*)(dst + 14 * STEP),
+    (__ubuf__ half*)(dst + 15 * STEP)
 };
 const int32_t VA_REG_ARRAY_LEN = 8;
 
