@@ -120,7 +120,7 @@ private:
     }
 
     __aicore__ inline static constexpr bool IsFractalZZFormat() {
-        constexpr bool isScaleType = Std::is_one_of_v<type, __cbuf__ fp8_e8m0_t, __ca__ fp8_e8m0_t>;
+        constexpr bool isScaleType = Std::is_one_of_v<type, __cbuf__ fp8_e8m0_t, __ca__ fp8_e8m0_t, __cb__ fp8_e8m0_t>;
         using ResultType = Std::conditional_t<isScaleType,
             Std::bool_constant<IsFractalScaleZZFormat()>,
             Std::bool_constant<IsFractalZZFormatNormal()>>;
@@ -250,25 +250,57 @@ public:
 template <typename T>
 struct IsDNFormat {
 private:
-    __aicore__ inline static constexpr bool IsFractalDNFormat() {
-        // DN shape (Int<1>, row), (Int<1>, column)
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-
-        // DN stride (Int<0>, Int<1>), (Int<0>, N * row))
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-
+    __aicore__ inline static constexpr bool IsFractalDNFormatNormal() {
         constexpr bool isShapeRight = Std::is_constant<1, ShapeRow0>::value && Std::is_constant<1, ShapeColumn0>::value;
         constexpr bool isStrideRight = Std::is_constant<0, StrideRow0>::value && Std::is_constant<1, StrideRow1>::value
             && Std::is_constant<0, StrideColumn0>::value;
 
         return (isShapeRight && isStrideRight);
     }
+
+    __aicore__ inline static constexpr bool IsFractalScaleDNFormat() {
+        constexpr bool isShapeRight = Std::is_constant<2, ShapeColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<2, StrideRow0>::value && Std::is_constant<1, StrideRow1>::value;
+
+        return (isShapeRight && isStrideRight);
+    }
+
+     __aicore__ inline static constexpr bool IsFractalScaleDNFormat() {
+        constexpr bool isScaleType = Std::is_one_of_v<type, __cbuf__ fp8_e8m0_t, __ca__ fp8_e8m0_t, __cb__ fp8_e8m0_t>;
+        using ResultType = Std::conditional_t<isScaleType,
+            Std::bool_constant<IsFractalScaleDNFormat()>,
+            Std::bool_constant<IsFractalDNFormatNormal()>>;
+        return ResultType::value;
+    }
 public:
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+        using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
+        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
     static constexpr bool value = IsFractalDNFormat();
 };
+
+template <typename T>
+struct IsScaleANDFormat {
+    static constexpr bool value = IsNDFormat<T>::value;
+};
+
+template <typename T>
+struct IsScaleADNFormat {
+    static constexpr bool value = IsDNFormat<T>::value;
+};
+
+template <typename T>
+struct IsScaleBNDFormat {
+    static constexpr bool value = IsDNFormat<T>::value;
+};
+
+template <typename T>
+struct IsScaleBDNFormat {
+    static constexpr bool value = IsNDFormat<T>::value;
+};
+
 
 template <typename T, AttrInfo info1, AttrInfo info2, size_t dim>
 __aicore__ inline constexpr decltype(auto) GetEleFromLayout(const T& layout) {
