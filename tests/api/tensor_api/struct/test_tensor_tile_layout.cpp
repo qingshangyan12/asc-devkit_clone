@@ -278,13 +278,16 @@ TEST_F(Tensor_Api_Layout, TestLayout)
     auto layoutObj = MakeLayout(shape1, stride1);
     auto& layoutRes = layoutObj.layout();
     EXPECT_EQ(&layoutObj, &layoutRes);
-    EXPECT_EQ(std::is_same_v<decltype(layoutRes), Layout<Shape<int,int>, Stride<int,int>>&>);
+    auto checkLayoutType = AscendC::Std::is_same_v<decltype(layoutRes), Layout<Shape<int,int>, Stride<int,int>>&>;
+    EXPECT_TRUE(checkLayoutType);
 
     const auto constLayoutObj = MakeLayout(shape1, stride1);
     auto& constLayoutRes = constLayoutObj.layout();
     EXPECT_EQ(&constLayoutObj, &constLayoutRes);
-    EXPECT_EQ(std::is_same_v<decltype(constLayoutRes), const Layout<Shape<int,int>, Stride<int,int>>&>);
-    EXPECT_EQ(std::is_const_v<std::remove_reference_t<decltype(constLayoutRes)>>);
+    auto checkConstLayoutType = AscendC::Std::is_same_v<decltype(constLayoutRes), const Layout<Shape<int,int>, Stride<int,int>>&>;
+    auto checkConstLayoutConst = AscendC::Std::is_const_v<std::remove_reference_t<decltype(constLayoutRes)>>;
+    EXPECT_TRUE(checkConstLayoutType);
+    EXPECT_TRUE(checkConstLayoutConst);
 }
 
 TEST_F(Tensor_Api_Layout, TestShapeStride)
