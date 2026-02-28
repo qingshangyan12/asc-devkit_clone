@@ -446,6 +446,7 @@ TEST_F(Tensor_Api_Layout, SelectOperationInt)
     EXPECT_EQ(AscendC::Std::get<1>(nestedSelect01Stride0).value, 20);
     EXPECT_EQ(AscendC::Std::get<1>(nestedSelect01Stride1).value, 40);
 }
+
 // GetCapacity()方法输入Shape与Stride，根据数据类型存在不同的处理方式：
 //    1) 若Shape与Stride均为tuple类型，取的是每个维度shape * stride最大值
 //    2) 若为int，则返回乘积
@@ -473,8 +474,10 @@ TEST_F(Tensor_Api_Layout, TestCapacity)
     auto shape2 = MakeShape(shape2Dim0, shape2Dim1, shape2Dim2);
     auto stride2 = MakeStride(stride2Dim0, stride2Dim1, stride2Dim2);
     auto layout2 = MakeLayout(shape2, stride2);
-    EXPECT_EQ(layout2.Capacity(), max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
-    EXPECT_EQ(GetCapacity(shape2, stride2), max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
+    EXPECT_EQ(layout2.Capacity(),
+              max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
+    EXPECT_EQ(GetCapacity(shape2, stride2),
+              max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
 
     int shape3 = 7;
     int stride3 = 17;
@@ -492,27 +495,32 @@ TEST_F(Tensor_Api_Layout, TestCapacity)
     auto shape4 = MakeShape(MakeShape(shape4Dim00, shape4Dim01), MakeShape(shape4Dim10, shape4Dim11));
     auto stride4 = MakeShape(MakeShape(stride4Dim00, stride4Dim01), MakeShape(stride4Dim10, stride4Dim11));
     auto layout4 = MakeLayout(shape4, stride4);
-    EXPECT_EQ(layout4.Capacity(), max(max(max(shape4Dim00 * stride4Dim00, shape4Dim01 * stride4Dim01), shape4Dim10 * stride4Dim10), shape4Dim11 * stride4Dim11));
-    EXPECT_EQ(GetCapacity(shape4, stride4), max(max(max(shape4Dim00 * stride4Dim00, shape4Dim01 * stride4Dim01), shape4Dim10 * stride4Dim10), shape4Dim11 * stride4Dim11));
+    EXPECT_EQ(layout4.Capacity(),
+              max(max(max(shape4Dim00 * stride4Dim00, shape4Dim01 * stride4Dim01), shape4Dim10 * stride4Dim10),
+                  shape4Dim11 * stride4Dim11));
+    EXPECT_EQ(GetCapacity(shape4, stride4),
+              max(max(max(shape4Dim00 * stride4Dim00, shape4Dim01 * stride4Dim01), shape4Dim10 * stride4Dim10),
+                  shape4Dim11 * stride4Dim11));
 }
 
 // 对const对象，layout方法会返回const类型的引用
 TEST_F(Tensor_Api_Layout, TestLayout)
 {
     using namespace AscendC::Te;
-    Shape<int,int> shape1 = MakeShape(3, 2);
-    Stride<int,int> stride1 = MakeStride(3, 4);
+    Shape<int, int> shape1 = MakeShape(3, 2);
+    Stride<int, int> stride1 = MakeStride(3, 4);
 
     auto layoutObj = MakeLayout(shape1, stride1);
     auto& layoutRes = layoutObj.layout();
     EXPECT_EQ(&layoutObj, &layoutRes);
-    auto checkLayoutType = AscendC::Std::is_same_v<decltype(layoutRes), Layout<Shape<int,int>, Stride<int,int>>&>;
+    auto checkLayoutType = AscendC::Std::is_same_v<decltype(layoutRes), Layout<Shape<int, int>, Stride<int, int>>&>;
     EXPECT_TRUE(checkLayoutType);
 
     const auto constLayoutObj = MakeLayout(shape1, stride1);
     auto& constLayoutRes = constLayoutObj.layout();
     EXPECT_EQ(&constLayoutObj, &constLayoutRes);
-    auto checkConstLayoutType = AscendC::Std::is_same_v<decltype(constLayoutRes), const Layout<Shape<int,int>, Stride<int,int>>&>;
+    auto checkConstLayoutType =
+        AscendC::Std::is_same_v<decltype(constLayoutRes), const Layout<Shape<int, int>, Stride<int, int>>&>;
     auto checkConstLayoutConst = AscendC::Std::is_const_v<std::remove_reference_t<decltype(constLayoutRes)>>;
     EXPECT_TRUE(checkConstLayoutType);
     EXPECT_TRUE(checkConstLayoutConst);
@@ -531,17 +539,17 @@ TEST_F(Tensor_Api_Layout, TestShapeStride)
     EXPECT_EQ(AscendC::Std::get<0>(layoutStride), 1);
     EXPECT_EQ(AscendC::Std::get<1>(layoutStride), 4);
 
-    auto shape2 = MakeShape(Int<7>{}, Int<3>{}, Int<6>{});
-    auto stride2 = MakeStride(Int<2>{}, Int<1>{}, Int<5>{});
+    auto shape2 = MakeShape(AscendC::Std::Int<7>{}, AscendC::Std::Int<3>{}, AscendC::Std::Int<6>{});
+    auto stride2 = MakeStride(AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}, AscendC::Std::Int<5>{});
     const auto constLayoutObj = MakeLayout(shape2, stride2);
     auto constLayoutShape = constLayoutObj.Shape();
     auto constLayoutStride = constLayoutObj.Stride();
-    EXPECT_EQ(AscendC::Std::get<0>(constLayoutShape), Int<7>{});
-    EXPECT_EQ(AscendC::Std::get<1>(constLayoutShape), Int<3>{});
-    EXPECT_EQ(AscendC::Std::get<2>(constLayoutShape), Int<6>{});
-    EXPECT_EQ(AscendC::Std::get<0>(constLayoutStride), Int<2>{});
-    EXPECT_EQ(AscendC::Std::get<1>(constLayoutStride), Int<1>{});
-    EXPECT_EQ(AscendC::Std::get<2>(constLayoutStride), Int<5>{});
+    EXPECT_EQ(AscendC::Std::get<0>(constLayoutShape), AscendC::Std::Int<7>{});
+    EXPECT_EQ(AscendC::Std::get<1>(constLayoutShape), AscendC::Std::Int<3>{});
+    EXPECT_EQ(AscendC::Std::get<2>(constLayoutShape), AscendC::Std::Int<6>{});
+    EXPECT_EQ(AscendC::Std::get<0>(constLayoutStride), AscendC::Std::Int<2>{});
+    EXPECT_EQ(AscendC::Std::get<1>(constLayoutStride), AscendC::Std::Int<1>{});
+    EXPECT_EQ(AscendC::Std::get<2>(constLayoutStride), AscendC::Std::Int<5>{});
 }
 
 // 1) tuple tuple tuple:计算coord和stride在每个维度上的乘积之和
@@ -553,9 +561,9 @@ TEST_F(Tensor_Api_Layout, TestOperator)
 {
     using namespace AscendC::Te;
     // 输出为1 * 1 + 2 * 4 = 9
-    Coord<int,int> coord1 = MakeCoord(1, 2);
-    Shape<int,int> shape1 = MakeShape(3, 2);
-    Stride<int,int> stride1 = MakeStride(1, 4);
+    Coord<int, int> coord1 = MakeCoord(1, 2);
+    Shape<int, int> shape1 = MakeShape(3, 2);
+    Stride<int, int> stride1 = MakeStride(1, 4);
     auto layoutObj1 = MakeLayout(shape1, stride1);
     EXPECT_EQ(layoutObj1(coord1), 9);
 
@@ -563,8 +571,8 @@ TEST_F(Tensor_Api_Layout, TestOperator)
     // 第2轴: div = 4 / 3 = 1, mod = 4 % 3 = 1, res = 4 + 1 * 1 = 5
     // 末轴: res = 5 + 1 * 5 = 10
     auto coord2 = AscendC::Std::Int<30>{};
-    Shape<int,int,int> shape2 = MakeShape(7, 3, 6);
-    Stride<int,int,int> stride2 = MakeStride(2, 1, 5);
+    Shape<int, int, int> shape2 = MakeShape(7, 3, 6);
+    Stride<int, int, int> stride2 = MakeStride(2, 1, 5);
     auto layoutObj2 = MakeLayout(shape2, stride2);
     EXPECT_EQ(layoutObj2(coord2), 10);
 
@@ -574,7 +582,7 @@ TEST_F(Tensor_Api_Layout, TestOperator)
     auto stride3 = AscendC::Std::Int<5>{};
     auto idxRes3 = Crd2IdxImpl(coord3, shape3, stride3);
     EXPECT_EQ(idxRes3, 35);
-    
+
     // 2*2维度的layout
     auto shape4 = MakeShape(MakeShape(3, 4), MakeShape(5, 8));
     auto stride4 = MakeShape(MakeShape(1, 15), MakeShape(8, 60));
@@ -648,22 +656,24 @@ TEST_F(Tensor_Api_Layout, TestMakeShapeStride)
     EXPECT_EQ(GetShape<0>(shape1), 3);
     EXPECT_EQ(GetShape<1>(shape1), 2);
 
-    auto shape2 = MakeShape(Int<11>{}, Int<23>{}, Int<37>{});
-    auto stride2 = MakeStride(Int<3>{}, Int<7>{}, Int<5>{});
+    auto shape2 = MakeShape(AscendC::Std::Int<11>{}, AscendC::Std::Int<23>{}, AscendC::Std::Int<37>{});
+    auto stride2 = MakeStride(AscendC::Std::Int<3>{}, AscendC::Std::Int<7>{}, AscendC::Std::Int<5>{});
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape2)>, true);
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride2)>, true);
-    EXPECT_EQ(GetShape<0>(shape2), Int<11>{});
-    EXPECT_EQ(GetShape<1>(shape2), Int<23>{});
-    EXPECT_EQ(GetShape<2>(shape2), Int<37>{});
+    EXPECT_EQ(GetShape<0>(shape2), AscendC::Std::Int<11>{});
+    EXPECT_EQ(GetShape<1>(shape2), AscendC::Std::Int<23>{});
+    EXPECT_EQ(GetShape<2>(shape2), AscendC::Std::Int<37>{});
 
-    auto shape3 = MakeShape(MakeShape(Int<11>{}, Int<22>{}), MakeShape(Int<33>{}, Int<44>{}));
-    auto stride3 = MakeStride(MakeShape(Int<55>{}, Int<66>{}), MakeShape(Int<77>{}, Int<88>{}));
+    auto shape3 = MakeShape(MakeShape(AscendC::Std::Int<11>{}, AscendC::Std::Int<22>{}),
+                            MakeShape(AscendC::Std::Int<33>{}, AscendC::Std::Int<44>{}));
+    auto stride3 = MakeStride(MakeShape(AscendC::Std::Int<55>{}, AscendC::Std::Int<66>{}),
+                              MakeShape(AscendC::Std::Int<77>{}, AscendC::Std::Int<88>{}));
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(shape3)>, true);
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(stride3)>, true);
-    EXPECT_EQ((GetShape<0,0>(shape3)), Int<11>{});
-    EXPECT_EQ((GetShape<0,1>(shape3)), Int<22>{});
-    EXPECT_EQ((GetShape<1,0>(shape3)), Int<33>{});
-    EXPECT_EQ((GetShape<1,1>(shape3)), Int<44>{});
+    EXPECT_EQ((GetShape<0, 0>(shape3)), AscendC::Std::Int<11>{});
+    EXPECT_EQ((GetShape<0, 1>(shape3)), AscendC::Std::Int<22>{});
+    EXPECT_EQ((GetShape<1, 0>(shape3)), AscendC::Std::Int<33>{});
+    EXPECT_EQ((GetShape<1, 1>(shape3)), AscendC::Std::Int<44>{});
 }
 
 TEST_F(Tensor_Api_Layout, TestMakeTileCoord)
@@ -678,12 +688,12 @@ TEST_F(Tensor_Api_Layout, TestMakeTileCoord)
     EXPECT_EQ(AscendC::Std::get<0>(coord1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(coord1), 4);
 
-    auto tile2Dim0 = Int<11>{};
-    auto tile2Dim1 = Int<23>{};
-    auto tile2Dim2 = Int<37>{};
-    auto coord2Dim0 = Int<3>{};
-    auto coord2Dim1 = Int<7>{};
-    auto coord2Dim2 = Int<5>{};
+    auto tile2Dim0 = AscendC::Std::Int<11>{};
+    auto tile2Dim1 = AscendC::Std::Int<23>{};
+    auto tile2Dim2 = AscendC::Std::Int<37>{};
+    auto coord2Dim0 = AscendC::Std::Int<3>{};
+    auto coord2Dim1 = AscendC::Std::Int<7>{};
+    auto coord2Dim2 = AscendC::Std::Int<5>{};
     auto tile2 = MakeTile(tile2Dim0, tile2Dim1, tile2Dim2);
     auto coord2 = MakeCoord(coord2Dim0, coord2Dim1, coord2Dim2);
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(tile2)>, true);
@@ -768,7 +778,7 @@ TEST_F(Tensor_Api_Layout, TestMakeNzLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 32 / sizeof(float) * 16);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), row1 * 32 / sizeof(float));
-    
+
     size_t row2 = 128UL;
     size_t col2 = 65536UL;
     auto layout2 = MakeNzLayout<uint8_t>(row2, col2);
@@ -805,7 +815,7 @@ TEST_F(Tensor_Api_Layout, TestMakeL0CLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 32 / sizeof(uint16_t) * 16);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), row1 * 32 / sizeof(uint16_t));
-    
+
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeL0CLayout(row2, col2);
@@ -843,7 +853,7 @@ TEST_F(Tensor_Api_Layout, TestMakeNDLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideRow1), col1);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 0);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 1);
-    
+
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeNDLayout<float>(row2, col2);
@@ -881,7 +891,7 @@ TEST_F(Tensor_Api_Layout, TestMakeDNLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 1);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 0);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), row1);
-    
+
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeDNLayout<float>(row2, col2);
@@ -919,7 +929,7 @@ TEST_F(Tensor_Api_Layout, TestMakeZnLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 32 / sizeof(uint32_t) * col1);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 32 / sizeof(uint32_t));
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 32 / sizeof(uint32_t) * 16);
-    
+
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeZnLayout<float>(row2, col2);
@@ -957,7 +967,7 @@ TEST_F(Tensor_Api_Layout, TestMakeZzLayout)
     EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 16 * col1);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 32 / sizeof(uint32_t) * 16);
-    
+
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
     auto layout2 = MakeZzLayout<float>(row2, col2);
@@ -1015,8 +1025,11 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
 
     // Capacity:作用同layout的方法Capacity
     EXPECT_EQ(Capacity(layoutObj1), GetMax(shape1Dim0 * stride1Dim0, shape1Dim1 * stride1Dim1));
-    EXPECT_EQ(Capacity(layoutObj2), GetMax(GetMax(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
-    EXPECT_EQ(Capacity(layoutObj3), GetMax(GetMax(GetMax(shape3Dim00 * stride3Dim00, shape3Dim01 * stride3Dim01), shape3Dim10 * stride3Dim10), shape3Dim11 * stride3Dim11));
+    EXPECT_EQ(Capacity(layoutObj2),
+              GetMax(GetMax(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
+    EXPECT_EQ(Capacity(layoutObj3),
+              GetMax(GetMax(GetMax(shape3Dim00 * stride3Dim00, shape3Dim01 * stride3Dim01), shape3Dim10 * stride3Dim10),
+                     shape3Dim11 * stride3Dim11));
 
     // Coshape:返回实际Shape空间，可以通过template设置Idx
     // 计算逻辑：逐维度(shape - 1) * stride之和+1
@@ -1026,7 +1039,8 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
     // layout3[1]的结果: (3 - 1) * 6 + (6 - 1) * 18 + 1 = 103
     // layout3的结果: 13 + 102 + 1 = 116
     EXPECT_EQ(Coshape(layoutObj1), (shape1Dim0 - 1) * stride1Dim0 + (shape1Dim1 - 1) * stride1Dim1 + 1);
-    EXPECT_EQ(Coshape(layoutObj2), (shape2Dim0 - 1) * stride2Dim0 + (shape2Dim1 - 1) * stride2Dim1 + (shape2Dim2 - 1) * stride2Dim2 + 1);
+    EXPECT_EQ(Coshape(layoutObj2),
+              (shape2Dim0 - 1) * stride2Dim0 + (shape2Dim1 - 1) * stride2Dim1 + (shape2Dim2 - 1) * stride2Dim2 + 1);
     EXPECT_EQ(Coshape<0>(layoutObj3), (shape3Dim00 - 1) * stride3Dim00 + (shape3Dim01 - 1) * stride3Dim01 + 1);
     EXPECT_EQ(Coshape<1>(layoutObj3), (shape3Dim10 - 1) * stride3Dim10 + (shape3Dim11 - 1) * stride3Dim11 + 1);
     EXPECT_EQ(Coshape(layoutObj3), (Coshape<0>(layoutObj3) - 1) + (Coshape<1>(layoutObj3) - 1) + 1);
@@ -1039,9 +1053,9 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
     EXPECT_EQ(Cosize(layoutObj3), Coshape(layoutObj3));
 
     // Crd2Idx:等价于operator()
-    auto coord1 = MakeCoord(1,2);
-    auto coord2 = MakeCoord(0,1,2);
-    auto coord3 = MakeCoord(MakeCoord(0,1), MakeCoord(2,3));
+    auto coord1 = MakeCoord(1, 2);
+    auto coord2 = MakeCoord(0, 1, 2);
+    auto coord3 = MakeCoord(MakeCoord(0, 1), MakeCoord(2, 3));
     EXPECT_EQ(Crd2Idx(coord1, layoutObj1), 9);
     EXPECT_EQ(Crd2Idx(coord2, layoutObj2), 13);
     EXPECT_EQ(Crd2Idx(coord3, layoutObj3), 72);
