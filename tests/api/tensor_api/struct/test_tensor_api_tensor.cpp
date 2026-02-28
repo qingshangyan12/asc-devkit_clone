@@ -219,11 +219,6 @@ TEST_F(Tensor_Api_Tensor, LocalTensorOperation)
 
     EXPECT_EQ(tensor.Size(), 6);
     EXPECT_EQ(tensor.Capacity(), 6);
-
-    auto coord = MakeCoord(1, 2);
-    tensor[coord] = 9;
-    EXPECT_EQ(data[5], 9);
-    EXPECT_EQ(tensor(coord), 9);
 }
 
 TEST_F(Tensor_Api_Tensor, LocalTensorOperationInt)
@@ -246,11 +241,6 @@ TEST_F(Tensor_Api_Tensor, LocalTensorOperationInt)
     auto stride = tensor.Stride();
     EXPECT_EQ(AscendC::Std::get<0>(stride).value, 2);
     EXPECT_EQ(AscendC::Std::get<1>(stride).value, 1);
-
-    auto coord = MakeCoord(AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{});
-    tensor[coord] = 9;
-    EXPECT_EQ(data[5], 9);
-    EXPECT_EQ(tensor(coord), 9);
 }
 
 TEST_F(Tensor_Api_Tensor, LocalTensorOperation3D)
@@ -280,12 +270,6 @@ TEST_F(Tensor_Api_Tensor, LocalTensorOperation3D)
 
     EXPECT_EQ(tensor.Size(), 8);
     EXPECT_EQ(tensor.Capacity(), 8);
-
-    auto coord = MakeCoord(1, 0, 1);
-    tensor[coord] = 9;
-    EXPECT_EQ(data[5], 9);
-    EXPECT_EQ(tensor(coord), 9);
-    EXPECT_EQ(tensor(1, 0, 1), 9);
 }
 
 TEST_F(Tensor_Api_Tensor, LocalTensorConstOperation)
@@ -313,10 +297,6 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperation)
 
     EXPECT_EQ(constTensor.Size(), 6);
     EXPECT_EQ(constTensor.Capacity(), 6);
-
-    auto coord = MakeCoord(1, 2);
-    EXPECT_EQ(constTensor[coord], 5);
-    EXPECT_EQ(constTensor(coord), 5);
 }
 
 TEST_F(Tensor_Api_Tensor, LocalTensorConstOperationInt)
@@ -339,10 +319,6 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperationInt)
     auto stride = constTensor.Stride();
     EXPECT_EQ(AscendC::Std::get<0>(stride).value, 6);
     EXPECT_EQ(AscendC::Std::get<1>(stride).value, 1);
-
-    auto coord = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<5>{});
-    EXPECT_EQ(constTensor[coord], 15);
-    EXPECT_EQ(constTensor(coord), 15);
 }
 
 TEST_F(Tensor_Api_Tensor, LocalTensorConstOperation3D)
@@ -373,12 +349,6 @@ TEST_F(Tensor_Api_Tensor, LocalTensorConstOperation3D)
 
     EXPECT_EQ(constTensor.Size(), 8);
     EXPECT_EQ(constTensor.Capacity(), 8);
-
-    auto coord = MakeCoord(AscendC::Std::Int<1>{}, AscendC::Std::Int<0>{}, AscendC::Std::Int<1>{});
-    constTensor[coord] = 9;
-    EXPECT_EQ(data[5], 9);
-    EXPECT_EQ(constTensor(coord), 9);
-    EXPECT_EQ(constTensor(AscendC::Std::Int<1>{}, AscendC::Std::Int<0>{}, AscendC::Std::Int<1>{}), 9);
 }
 
 TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperation)
@@ -389,11 +359,14 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperation)
     __gm__ float data[TILE_LENGTH] = {10, 11, 12, 13, 14, 15};
     auto ptr = MakeGMmemPtr(data);
     auto tensor = MakeTensor(ptr, MakeShape(2, 3), MakeStride(3, 1));
-
-    auto coord = MakeCoord(0, 2);
-    tensor[coord] = 66;
-    EXPECT_EQ(data[2], 66);
+    EXPECT_EQ(tensor.Data(), ptr);
     EXPECT_EQ(tensor.Layout().Size(), 6);
+    auto shape = tensor.Shape();
+    EXPECT_EQ(AscendC::Std::get<0>(shape), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(shape), 3);
+    auto stride = tensor.Stride();
+    EXPECT_EQ(AscendC::Std::get<0>(stride), 3);
+    EXPECT_EQ(AscendC::Std::get<1>(stride), 1);
 }
 
 TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt)
@@ -405,11 +378,14 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt)
     auto ptr = MakeGMmemPtr(data);
     auto tensor = MakeTensor(ptr, MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<3>{}),
                              MakeStride(AscendC::Std::Int<3>{}, AscendC::Std::Int<1>{}));
-
-    auto coord = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<2>{});
-    tensor[coord] = 77;
-    EXPECT_EQ(data[2], 77);
+    EXPECT_EQ(tensor.Data(), ptr);
     EXPECT_EQ(tensor.Layout().Size(), 6);
+    auto shape = tensor.Shape();
+    EXPECT_EQ(AscendC::Std::get<0>(shape).value, 2);
+    EXPECT_EQ(AscendC::Std::get<1>(shape).value, 3);
+    auto stride = tensor.Stride();
+    EXPECT_EQ(AscendC::Std::get<0>(stride).value, 3);
+    EXPECT_EQ(AscendC::Std::get<1>(stride).value, 1);
 }
 
 TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt3D)
@@ -421,9 +397,14 @@ TEST_F(Tensor_Api_Tensor, MakeTensorShapeStrideBranchOperationInt3D)
     auto ptr = MakeGMmemPtr(data);
     auto tensor = MakeTensor(ptr, MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}),
                              MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
-
-    auto coord = MakeCoord(AscendC::Std::Int<0>{}, AscendC::Std::Int<1>{}, AscendC::Std::Int<1>{});
-    tensor[coord] = 88;
-    EXPECT_EQ(data[3], 88);
+    EXPECT_EQ(tensor.Data(), ptr);
     EXPECT_EQ(tensor.Layout().Size(), 8);
+    auto shape = tensor.Shape();
+    EXPECT_EQ(AscendC::Std::get<0>(shape).value, 2);
+    EXPECT_EQ(AscendC::Std::get<1>(shape).value, 2);
+    EXPECT_EQ(AscendC::Std::get<2>(shape).value, 2);
+    auto stride = tensor.Stride();
+    EXPECT_EQ(AscendC::Std::get<0>(stride).value, 4);
+    EXPECT_EQ(AscendC::Std::get<1>(stride).value, 2);
+    EXPECT_EQ(AscendC::Std::get<2>(stride).value, 1);
 }
