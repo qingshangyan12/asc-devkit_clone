@@ -278,13 +278,13 @@ TEST_F(Tensor_Api_Layout, TestLayout)
     auto layoutObj = MakeLayout(shape1, stride1);
     auto& layoutRes = layoutObj.layout();
     EXPECT_EQ(&layoutObj, &layoutRes);
-    static_assert(std::is_same_v<decltype(layoutRes), Layout<Shape<int,int>, Stride<int,int>>&>);
+    EXPECT_EQ(std::is_same_v<decltype(layoutRes), Layout<Shape<int,int>, Stride<int,int>>&>);
 
     const auto constLayoutObj = MakeLayout(shape1, stride1);
     auto& constLayoutRes = constLayoutObj.layout();
     EXPECT_EQ(&constLayoutObj, &constLayoutRes);
-    static_assert(std::is_same_v<decltype(constLayoutRes), const Layout<Shape<int,int>, Stride<int,int>>&>);
-    static_assert(std::is_const_v<std::remove_reference_t<decltype(constLayoutRes)>>);
+    EXPECT_EQ(std::is_same_v<decltype(constLayoutRes), const Layout<Shape<int,int>, Stride<int,int>>&>);
+    EXPECT_EQ(std::is_const_v<std::remove_reference_t<decltype(constLayoutRes)>>);
 }
 
 TEST_F(Tensor_Api_Layout, TestShapeStride)
@@ -512,13 +512,13 @@ TEST_F(Tensor_Api_Layout, TestMakeNzLayout)
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
     auto strideCol1 = AscendC::Std::get<1>(GetStride(layout1));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow1), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), 16);
-    EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), 2);
-    EXPECT_EQ(AscendC::Std::get<0>(strideRow1), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 128);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), row1 / 16);
+    EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 32 / sizeof(float));
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), col1 / (32 / sizeof(float)));
+    EXPECT_EQ(AscendC::Std::get<0>(strideRow1), 32 / sizeof(float));
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 32 / sizeof(float) * 16);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 2048);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), row1 * 32 / sizeof(float));
     
     size_t row2 = 128UL;
     size_t col2 = 65536UL;
@@ -528,13 +528,13 @@ TEST_F(Tensor_Api_Layout, TestMakeNzLayout)
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
     auto strideCol2 = AscendC::Std::get<1>(GetStride(layout2));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow2), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), 8);
-    EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 32);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), 2048);
-    EXPECT_EQ(AscendC::Std::get<0>(strideRow2), 32);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 512);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), row2 / 16);
+    EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 32 / sizeof(uint8_t));
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), col2 / (32 / sizeof(uint8_t)));
+    EXPECT_EQ(AscendC::Std::get<0>(strideRow2), 32 / sizeof(uint8_t));
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 32 / sizeof(uint8_t) * 16);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol2), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 4096);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), row2 * 32 / sizeof(uint8_t));
 }
 
 // MakeL0CLayout本质上就是构建一个uint16_t类型的NZLayout
