@@ -785,21 +785,21 @@ __aicore__ inline void PrintCommonHead(DumpType printType, __gm__ const char* fm
     }
 }
 
-template <DumpType PT, class... Args>
-__aicore__ inline void PrintfImpl(__gm__ const char* fmt, Args&&... args)
+template <class... Args>
+__aicore__ inline void PrintfImpl(Dumptype printType, __gm__ const char* fmt, Args&&... args)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE);
     if (g_sysPrintFifoSpace != nullptr) {
 #if !defined(__NPU_DEVICE__)
-        if constexpr (PT != DumpType::DUMP_ASSERT) {
-            PrintCommonHead(PT, fmt, args...);
+        if (printType != DumpType::DUMP_ASSERT) {
+            PrintCommonHead(printType, fmt, args...);
         }
 #endif
-        PrintfRingBufImpl(PT, fmt, args...);
+        PrintfRingBufImpl(printType, fmt, args...);
     } else {
-        PrintfEntityImpl(PT, fmt, args...);
+        PrintfEntityImpl(printType, fmt, args...);
     }
     set_ctrl(ctrlValue);
 }
