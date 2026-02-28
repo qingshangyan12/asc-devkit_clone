@@ -1341,6 +1341,7 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 {
 #if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
+    printf("[LIUXIN] TEST CHCEKPOINT 2!*****************************************");
     g_dumpWorkspaceReserved = GetSysWorkSpacePtr();
     InitDumpImpl(mixFlag, gmLen);
 #else
@@ -1350,7 +1351,6 @@ __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
 {
 #if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
-    printf("[LIUXIN] TEST CHCEKPOINT 2!*****************************************");
     g_dumpWorkspaceReserved = dumpStartAddr + DUMP_WORKSPACE_SIZE;
     InitDumpImpl(mixFlag, gmLen);
 #else
