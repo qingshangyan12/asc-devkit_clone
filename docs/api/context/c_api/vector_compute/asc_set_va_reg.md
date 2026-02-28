@@ -14,21 +14,21 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t* src_array[16])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t* src_array[16])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t* src_array[16])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t* src_array[16])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half* src_array[16])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t* src_array[16])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t* src_array[16])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float* src_array[16])
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array)
 ```
 
 ## 参数说明
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
-|addr|输出|地址寄存器，类型为ub_addr8_t，可取值为：<br>&bull; VA0<br>&bull; VA1<br>&bull; VA2<br>&bull; VA3<br>&bull; VA4<br>&bull; VA5<br>&bull; VA6<br>&bull; VA7<br>数字代表寄存器顺序，使用方法请参考调用示例|
+|addr|输出|地址寄存器，类型为ub_addr8_t，可取值为：<br>&bull; VA0<br>&bull; VA1<br>&bull; VA2<br>&bull; VA3<br>&bull; VA4<br>&bull; VA5<br>&bull; VA6<br>&bull; VA7<br>数字代表寄存器顺序，每个地址寄存器只能关联8个地址，使用方法请参考调用示例|
 |src_array|输入|操作数地址序列。|
 
 ## 返回值说明
