@@ -32,6 +32,7 @@ from asc_op_compile_base.common.platform import set_current_compile_soc_info, ge
 from asc_op_compile_base.common import register
 from asc_op_compile_base.common import buildcfg
 from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storage
+from asc_op_compile_base.common.context import get_context
 
 def SetCurrentSocInfo(soc: str):
     set_current_compile_soc_info(soc)
@@ -3854,10 +3855,17 @@ Contents of section
                            '-DHIGH_PERFORMANCE=1', '-DDETERMINISTIC_MODE=1']
         op_compile_option = '{}'
 
-        with asc_op_compile_base.common.context.op_context.OpContext():
-            with buildcfg.build_config():
-                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = '1'):
-                    compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
+        real_context = get_context()
+        with mock.patch("asc_op_compile_base.common.context.get_context") as mock_get_ctx:
+            mock_ctx_instance = mock.Mock()
+            mock_ctx_instance.get_addition.side_effect = lambda key: (
+                "" if key == "kernel-template-input"  # 替换为你需要的mock值
+                else real_context.get_addition(key)
+            )
+            mock_get_ctx.return_value = mock_ctx_instance
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with buildcfg.build_config():
+                        compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
 
         binary_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.o')
         json_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.json')
