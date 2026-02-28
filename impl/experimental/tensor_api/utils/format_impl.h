@@ -110,7 +110,7 @@ private:
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
 
-        if constexpr (Std::is_same_v<Std::remove_cvref_t<type>, fp8_e8m0_t>) {
+        if constexpr (Std::is_same_v<type, __cbuf__ fp8_e8m0_t>) {
             constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
             && Std::is_constant<MX_SCALE_K0, ShapeColumn0>::value;
             constexpr bool isStrideRight = Std::is_constant<MX_SCALE_K0, StrideRow0>::value 
@@ -133,7 +133,7 @@ struct IsNNFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalNNFormat() {
         using type = typename T::elementType;
-        static_assert(Std::is_same_v<Std::remove_cvref_t<type>, fp8_e8m0_t>, "NnFormat Only support fp8_e8m0_t");
+        static_assert(Std::is_same_v<type, __cbuf__ fp8_e8m0_t>, "NnFormat Only support fp8_e8m0_t");
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
