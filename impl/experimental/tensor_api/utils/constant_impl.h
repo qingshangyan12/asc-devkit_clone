@@ -34,6 +34,9 @@ constexpr size_t DISABLE_COORD = 0;
 constexpr size_t ENABLE_COORD = 1;
 constexpr size_t SHIFT_LEFT_16 = 0x00010000;
 constexpr size_t L2_CACHE_OFFSET = 60;
+constexpr size_t MX_SCALE_K0 = 2;
+
+enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
 
 template <QuantMode_t Value, QuantMode_t... Args>
 struct is_one_of_value : Std::false_type {};
@@ -93,6 +96,9 @@ template <QuantMode_t quantPre>
 using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
 
 using ZeroCoord2DType = AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>;
+
+using EmptyShape = AscendC::Std::tuple<AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>, 
+    AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>>;
 
 // IsIntegralConstant
 template <typename T>
