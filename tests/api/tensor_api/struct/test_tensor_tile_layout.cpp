@@ -380,24 +380,42 @@ TEST_F(Tensor_Api_Layout, TestOperator)
 TEST_F(Tensor_Api_Layout, TestRankSize)
 {
     using namespace AscendC::Te;
-    Shape<int,int> shape1 = MakeShape(3, 2);
-    Stride<int,int> stride1 = MakeStride(1, 4);
+    auto shape1Dim0 = 3;
+    auto shape1Dim1 = 2;
+    auto stride1Dim0 = 1;
+    auto stride1Dim1 = 4;
+    auto shape1 = MakeShape(shape1Dim0, shape1Dim1);
+    auto stride1 = MakeStride(stride1Dim0, stride1Dim1);
     auto layoutObj1 = MakeLayout(shape1, stride1);
-    EXPECT_EQ(layoutObj1.Size(), 6);
+    EXPECT_EQ(layoutObj1.Size(), shape1Dim0 * shape1Dim1);
     EXPECT_EQ(layoutObj1.Rank(), 2);
 
-    Shape<int,int,int> shape2 = MakeShape(7, 3, 6);
-    Stride<int,int,int> stride2 = MakeStride(2, 1, 5);
+    auto shape2Dim0 = 7;
+    auto shape2Dim1 = 3;
+    auto shape2Dim2 = 6;
+    auto stride2Dim0 = 2;
+    auto stride2Dim1 = 1;
+    auto stride2Dim2 = 5;
+    auto shape2 = MakeShape(shape2Dim0, shape2Dim1, shape2Dim2);
+    auto stride2 = MakeStride(stride2Dim0, stride2Dim1, stride2Dim2);
     auto layoutObj2 = MakeLayout(shape2, stride2);
-    EXPECT_EQ(layoutObj2.Size(), 126);
+    EXPECT_EQ(layoutObj2.Size(), shape2Dim0 * shape2Dim1 * shape2Dim2);
     EXPECT_EQ(layoutObj2.Rank(), 3);
 
-    auto shape3 = MakeShape(MakeShape(3, 4), MakeShape(5, 8));
-    auto stride3 = MakeShape(MakeShape(1, 15), MakeShape(8, 60));
+    auto shape3Dim00 = 3;
+    auto shape3Dim01 = 4;
+    auto shape3Dim10 = 5;
+    auto shape3Dim11 = 8;
+    auto stride3Dim00 = 1;
+    auto stride3Dim01 = 15;
+    auto stride3Dim10 = 8;
+    auto stride3Dim11 = 60;
+    auto shape3 = MakeShape(MakeShape(shape3Dim00, shape3Dim01), MakeShape(shape3Dim10, shape3Dim11));
+    auto stride3 = MakeShape(MakeShape(stride3Dim00, stride3Dim01), MakeShape(stride3Dim10, stride3Dim11));
     auto layoutObj3 = MakeLayout(shape3, stride3);
-    EXPECT_EQ(layoutObj3.Size(), 480);
-    EXPECT_EQ(layoutObj3.Size<0>(), 12);
-    EXPECT_EQ(layoutObj3.Size<1>(), 40);
+    EXPECT_EQ(layoutObj3.Size(), shape3Dim00 * shape3Dim01 * shape3Dim10 * shape3Dim11);
+    EXPECT_EQ(layoutObj3.Size<0>(), shape3Dim00 * shape3Dim01);
+    EXPECT_EQ(layoutObj3.Size<1>(), shape3Dim10 * shape3Dim11);
     EXPECT_EQ(layoutObj3.Rank(), 2);
     EXPECT_EQ(layoutObj3.Rank<0>(), 2);
     EXPECT_EQ(layoutObj3.Rank<1>(), 2);
