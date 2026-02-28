@@ -89,6 +89,7 @@ __aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, ui
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
 #ifdef ASCENDC_DUMP
+    printf("[LIUXIN] TEST CHCEKPOINT 3!*****************************************");
     DumpShapeImpl(shapeInfo);
     DumpTensorLocal2GMImpl(input, desc, dumpSize);
 #endif
