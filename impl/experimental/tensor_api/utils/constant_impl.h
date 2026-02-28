@@ -97,8 +97,24 @@ using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUAN
 
 using ZeroCoord2DType = AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>;
 
-using EmptyShape = AscendC::Std::tuple<AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>, 
-    AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>>;
+template <size_t N, typename = Std::make_index_sequence<N>>
+struct EmptyShapeGenerator;
+
+template <size_t N, size_t... Idx>
+struct EmptyShapeGenerator<N, Std::index_sequence<Idx...>>
+{   
+    using type = Std::tuple<Std::Int<Idx * 0>...>;
+};
+
+template <size_t N>
+static_assert((N > 0 && (N & 1) == 0), "N must be greater than 0, and must be even.");
+using EmptyShape = Std::tuple<typename EmptyShapeGenerator<N / 2>::type, 
+    typename EmptyShapeGenerator<N / 2>::type>;
+
+template <size_t N>
+static_assert((N > 0 && (N & 1) == 0), "N must be greater than 0, and must be even.");
+using EmptyStride = Std::tuple<typename EmptyShapeGenerator<N / 2>::type, 
+    typename EmptyShapeGenerator<N / 2>::type>;
 
 // IsIntegralConstant
 template <typename T>
