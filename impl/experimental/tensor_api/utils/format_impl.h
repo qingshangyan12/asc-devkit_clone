@@ -134,7 +134,7 @@ private:
     __aicore__ inline static constexpr bool IsFractalNNFormat() {
         using type = typename T::elementType;
         static_assert(Std::is_same_v<Std::remove_cvref_t<type>, fp8_e8m0_t>, "NnFormat Only support fp8_e8m0_t");
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;n
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;

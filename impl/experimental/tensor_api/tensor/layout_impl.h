@@ -657,12 +657,12 @@ private:
     __aicore__ inline auto ConvertTwoDim2FourDim(const T& tensor) {
         auto layout = tensor.Layout();
         auto shape4Dim = MakeShape(
-            MakeShape(Std::Int<1>{}, layout.Shape<0>()),
-            MakeShape(Std::Int<1>{}, layout.Shape<1>())
+            MakeShape(Std::Int<1>{}, GetShape<0>(layout)),
+            MakeShape(Std::Int<1>{}, GetShape<1>(layout))
         );
         auto stride4Dim = MakeStride(
-            MakeStride(Std::Int<0>{}, layout.Stride<0>()),
-            MakeStride(Std::Int<0>{}, layout.Stride<1>())
+            MakeStride(Std::Int<0>{}, GetStride<0>(layout)),
+            MakeStride(Std::Int<0>{}, GetStride<1>(layout))
         );
         auto fourDimLayout = MakeLayout(shape4Dim, stride4Dim);
         return MakeTensorImpl(tensor.Engine().Begin(), fourDimLayout);
