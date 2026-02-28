@@ -733,13 +733,13 @@ TEST_F(Tensor_Api_Layout, TestMakeZzLayout)
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
     auto strideCol1 = AscendC::Std::get<1>(GetStride(layout1));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow1), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), 2);
-    EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), 8);
-    EXPECT_EQ(AscendC::Std::get<0>(strideRow1), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 1024);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), row1 / 16);
+    EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 32 / sizeof(uint32_t));
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), col1 / (32 / sizeof(uint32_t)));
+    EXPECT_EQ(AscendC::Std::get<0>(strideRow1), sizeof(uint32_t));
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 16 * col1);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 128);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 32 / sizeof(uint32_t) * 16);
     
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
@@ -749,39 +749,57 @@ TEST_F(Tensor_Api_Layout, TestMakeZzLayout)
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
     auto strideCol2 = AscendC::Std::get<1>(GetStride(layout2));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow2), 16);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), 128);
-    EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), 128);
-    EXPECT_EQ(AscendC::Std::get<0>(strideRow2), 8);
-    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 16384);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), row2 / 16);
+    EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 32 / sizeof(float));
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), col1 / (32 / sizeof(float)));
+    EXPECT_EQ(AscendC::Std::get<0>(strideRow2), sizeof(float));
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 16 * col2);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol2), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 128);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 32 / sizeof(float) * 16);
 }
 
 TEST_F(Tensor_Api_Layout, TestAttributes)
 {
     using namespace AscendC::Te;
-    auto shape1 = MakeShape(3, 2);
-    auto stride1 = MakeStride(7, 1);
+    auto shape1Dim0 = AscendC::Std::Int<3>{};
+    auto shape1Dim1 = AscendC::Std::Int<2>{};
+    auto stride1Dim0 = AscendC::Std::Int<7>{};
+    auto stride1Dim1 = AscendC::Std::Int<1>{};
+    auto shape1 = MakeShape(shape1Dim0, shape1Dim1);
+    auto stride1 = MakeStride(stride1Dim0, stride1Dim1);
     auto layoutObj1 = MakeLayout(shape1, stride1);
-    auto shape2 = MakeShape(7, 3, 11);
-    auto stride2 = MakeStride(34, 11, 1);
+    auto shape2Dim0 = AscendC::Std::Int<7>{};
+    auto shape2Dim1 = AscendC::Std::Int<3>{};
+    auto shape2Dim2 = AscendC::Std::Int<11>{};
+    auto stride2Dim0 = AscendC::Std::Int<34>{};
+    auto stride2Dim1 = AscendC::Std::Int<11>{};
+    auto stride2Dim2 = AscendC::Std::Int<1>{};
+    auto shape2 = MakeShape(shape2Dim0, shape2Dim1, shape2Dim2);
+    auto stride2 = MakeStride(stride2Dim0, stride2Dim1, stride2Dim2);
     auto layoutObj2 = MakeLayout(shape2, stride2);
-    auto shape3 = MakeShape(MakeShape(2, 3), MakeShape(3, 6));
-    auto stride3 = MakeShape(MakeShape(1, 6), MakeShape(6, 18));
+    auto shape3Dim00 = AscendC::Std::Int<2>{};
+    auto shape3Dim01 = AscendC::Std::Int<3>{};
+    auto shape3Dim10 = AscendC::Std::Int<3>{};
+    auto shape3Dim11 = AscendC::Std::Int<6>{};
+    auto stride3Dim00 = AscendC::Std::Int<1>{};
+    auto stride3Dim01 = AscendC::Std::Int<6>{};
+    auto stride3Dim10 = AscendC::Std::Int<6>{};
+    auto stride3Dim11 = AscendC::Std::Int<18>{};
+    auto shape3 = MakeShape(MakeShape(shape3Dim00, shape3Dim01), MakeShape(shape3Dim10, shape3Dim11));
+    auto stride3 = MakeShape(MakeShape(stride3Dim00, stride3Dim01), MakeShape(stride3Dim10, stride3Dim11));
     auto layoutObj3 = MakeLayout(shape3, stride3);
 
     // Size:作用同layout的方法Size
-    EXPECT_EQ(Size(layoutObj1), 6);
-    EXPECT_EQ(Size(layoutObj2), 231);
-    EXPECT_EQ(Size<0>(layoutObj3), 6);
-    EXPECT_EQ(Size<1>(layoutObj3), 18);
-    EXPECT_EQ(Size(layoutObj3), 108);
+    EXPECT_EQ(Size(layoutObj1), shape1Dim0 * shape1Dim1);
+    EXPECT_EQ(Size(layoutObj2), shape2Dim0 * shape2Dim1 * shape2Dim2);
+    EXPECT_EQ(Size<0>(layoutObj3), shape3Dim00 * shape3Dim01);
+    EXPECT_EQ(Size<1>(layoutObj3), shape3Dim10 * shape3Dim11);
+    EXPECT_EQ(Size(layoutObj3), shape3Dim00 * shape3Dim01 * shape3Dim10 * shape3Dim11);
 
     // Capacity:作用同layout的方法Capacity
-    EXPECT_EQ(Capacity(layoutObj1), 21);
-    EXPECT_EQ(Capacity(layoutObj2), 238);
-    EXPECT_EQ(Capacity(layoutObj3), 108);
+    EXPECT_EQ(Capacity(layoutObj1), max(shape1Dim0 * stride1Dim0, shape1Dim1 * stride1Dim1));
+    EXPECT_EQ(Capacity(layoutObj2), max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
+    EXPECT_EQ(Capacity(layoutObj3), max(max(max(shape3Dim00 * stride3Dim00, shape3Dim01 * stride3Dim01), shape3Dim10 * stride3Dim10), shape3Dim11 * stride3Dim11));
 
     // Coshape:返回实际Shape空间，可以通过template设置Idx
     // 计算逻辑：逐维度(shape - 1) * stride之和+1
@@ -790,18 +808,18 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
     // layout3[0]的结果: (2 - 1) * 1 + (3 - 1) * 6 + 1 = 14
     // layout3[1]的结果: (3 - 1) * 6 + (6 - 1) * 18 + 1 = 103
     // layout3的结果: 13 + 102 + 1 = 116
-    EXPECT_EQ(Coshape(layoutObj1), 16);
-    EXPECT_EQ(Coshape(layoutObj2), 237);
-    EXPECT_EQ(Coshape<0>(layoutObj3), 14);
-    EXPECT_EQ(Coshape<1>(layoutObj3), 103);
-    EXPECT_EQ(Coshape(layoutObj3), 116);
+    EXPECT_EQ(Coshape(layoutObj1), (shape1Dim0 - 1) * stride1Dim0 + (shape1Dim1 - 1) * stride1Dim1 + 1);
+    EXPECT_EQ(Coshape(layoutObj2), (shape2Dim0 - 1) * stride2Dim0 + (shape2Dim1 - 1) * stride2Dim1 + (shape2Dim2 - 1) * stride2Dim2 + 1);
+    EXPECT_EQ(Coshape<0>(layoutObj3), (shape3Dim00 - 1) * stride3Dim00 + (shape3Dim01 - 1) * stride3Dim01 + 1);
+    EXPECT_EQ(Coshape<1>(layoutObj3), (shape3Dim10 - 1) * stride3Dim10 + (shape3Dim11 - 1) * stride3Dim11 + 1);
+    EXPECT_EQ(Coshape(layoutObj3), (Coshape<0>(layoutObj3) - 1) + (Coshape<1>(layoutObj3) - 1) + 1);
 
     // Cosize:返回实际占用的内存，由于coshape维度为1，所以等价于cosize
-    EXPECT_EQ(Cosize(layoutObj1), 16);
-    EXPECT_EQ(Cosize(layoutObj2), 237);
-    EXPECT_EQ(Cosize<0>(layoutObj3), 14);
-    EXPECT_EQ(Cosize<1>(layoutObj3), 103);
-    EXPECT_EQ(Cosize(layoutObj3), 116);
+    EXPECT_EQ(Cosize(layoutObj1), Coshape(layoutObj1));
+    EXPECT_EQ(Cosize(layoutObj2), Coshape(layoutObj2));
+    EXPECT_EQ(Cosize<0>(layoutObj3), Coshape<0>(layoutObj3));
+    EXPECT_EQ(Cosize<1>(layoutObj3), Coshape<1>(layoutObj3));
+    EXPECT_EQ(Cosize(layoutObj3), Coshape(layoutObj3));
 
     // Crd2Idx:等价于operator()
     auto coord1 = MakeCoord(1,2);
