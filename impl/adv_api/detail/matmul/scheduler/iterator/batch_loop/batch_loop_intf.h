@@ -13,6 +13,13 @@
  * \brief
  */
 
+ #if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+ #warning                                                                                                               \
+     "impl/adv_api/detail/matmul/scheduler/iterator/batch_loop/batch_loop_intf.h" is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/matmul/matmul.h"" and use public functions or variables defined in interface headers files."
+ #define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+ #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_ITERATOR_BATCH_LOOP_BATCH_LOOP_INTF_H
+ #endif
+
 #ifndef IMPL_MATMUL_SCHEDULER_ITERATOR_BATCH_LOOP_BATCH_LOOP_INTF_H
 #define IMPL_MATMUL_SCHEDULER_ITERATOR_BATCH_LOOP_BATCH_LOOP_INTF_H
 
@@ -83,4 +90,8 @@ class BatchLoop
 }
 }
 } // IMPL_MATMUL_SCHEDULER_ITERATOR_BATCH_LOOP_BATCH_LOOP_INTF_H
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_ITERATOR_BATCH_LOOP_BATCH_LOOP_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_ITERATOR_BATCH_LOOP_BATCH_LOOP_INTF_H
 #endif
