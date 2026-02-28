@@ -27,6 +27,11 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
     asc_datacache_preload_impl(address, offset);
 }
 
+__aicore__ inline void asc_datacache_preload_sync(__gm__ uint64_t* address, int64_t offset)
+{
+    asc_datacache_preload_sync_impl(address, offset);
+}
+
 //==============asc_dcci===============
 __aicore__ inline void asc_dcci_single(__gm__ void* dst)
 {
