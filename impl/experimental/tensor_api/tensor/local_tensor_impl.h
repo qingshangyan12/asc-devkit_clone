@@ -98,12 +98,12 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) {
-        return operator()(coord, EmptyShape{});
+        return operator()(coord, EmptyShape<Std::tuple_size_v<decltype(this->Shape())>>{});
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const {
-        return operator()(coord, EmptyShape{});
+        return operator()(coord, EmptyShape<Std::tuple_size_v<decltype(this->Shape())>>{});
     }
 
     template <typename Coord0, typename Coord1, typename... Coords>
