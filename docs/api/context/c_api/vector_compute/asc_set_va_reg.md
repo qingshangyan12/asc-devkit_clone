@@ -14,14 +14,14 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t* src_array[8])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t* src_array[8])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t* src_array[8])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t* src_array[8])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half* src_array[8])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t* src_array[8])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t* src_array[8])
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float* src_array[8])
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t* src_array[16])
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t* src_array[16])
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t* src_array[16])
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t* src_array[16])
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half* src_array[16])
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t* src_array[16])
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t* src_array[16])
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float* src_array[16])
 ```
 
 ## 参数说明

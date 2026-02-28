@@ -30,10 +30,7 @@ void asc_set_va_reg_stub(ub_addr8_t addr, uint64_t* vaRegArray)
 TEST_F(TestSetVaRegCAPI, c_api_set_va_reg_Succ)
 {
     ub_addr8_t addr = ub_addr8_t::VA0;
-    __ubuf__ half* src[8] = {reinterpret_cast<__ubuf__ half*>(11)};
-
-
-
+    __ubuf__ half* src[16] = {reinterpret_cast<__ubuf__ half*>(11)};
 
     MOCKER_CPP(set_va_reg_sb, void(ub_addr8_t, uint64_t*))
         .times(1)

@@ -20,7 +20,7 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int8_t* src_array[8])
+__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int8_t* src_array[16])
 {
     if ASC_IS_AIV {
         uint64_t vaRegArray[8];
@@ -31,7 +31,7 @@ __aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int8_t* src
     }
 }
 
-__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ uint8_t* src_array[8])
+__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ uint8_t* src_array[16])
 {
     if ASC_IS_AIV {
         uint64_t vaRegArray[8];
@@ -42,7 +42,7 @@ __aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ uint8_t* sr
     }
 }
 
-__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int16_t* src_array[8])
+__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int16_t* src_array[16])
 {
     if ASC_IS_AIV {
         uint64_t vaRegArray[8];
@@ -53,7 +53,7 @@ __aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int16_t* sr
     }
 }
 
-__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ uint16_t* src_array[8])
+__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ uint16_t* src_array[16])
 {
     if ASC_IS_AIV {
         uint64_t vaRegArray[8];
@@ -64,7 +64,7 @@ __aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ uint16_t* s
     }
 }
 
-__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ half* src_array[8])
+__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ half* src_array[16])
 {
     if ASC_IS_AIV {
         uint64_t vaRegArray[8];
@@ -75,7 +75,7 @@ __aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ half* src_a
     }
 }
 
-__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int32_t* src_array[8])
+__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int32_t* src_array[16])
 {
     if ASC_IS_AIV {
         uint64_t vaRegArray[8];
@@ -86,7 +86,7 @@ __aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int32_t* sr
     }
 }
 
-__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ uint32_t* src_array[8])
+__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ uint32_t* src_array[16])
 {
     if ASC_IS_AIV {
         uint64_t vaRegArray[8];
@@ -97,7 +97,7 @@ __aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ uint32_t* s
     }
 }
 
-__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ float* src_array[8])
+__aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ float* src_array[16])
 {
     if ASC_IS_AIV {
         uint64_t vaRegArray[8];
