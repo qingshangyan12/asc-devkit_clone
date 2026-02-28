@@ -17,7 +17,16 @@
 
 #include <cstdint>
 #include "impl/utils/sys_constants.h"
-#include "c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
+
+#if (defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1))
+#include "stub_def.h"
+using float4_e1m2x2_t = fp4x2_e1m2_t;
+using float4_e2m1x2_t = fp4x2_e2m1_t;
+using float8_e4m3_t = fp8_e4m3fn_t;
+using float8_e5m2_t = fp8_e5m2_t;
+using float8_e8m0_t = fp8_e8m0_t;
+#endif
+
 
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
 // For ascc preprocess: __global__ should not be replaced
