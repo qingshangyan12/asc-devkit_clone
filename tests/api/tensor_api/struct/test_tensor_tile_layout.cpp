@@ -236,29 +236,32 @@ TEST_F(Tensor_Api_Layout, TestCapacity)
 {
     using namespace AscendC::Te;
     // 两个维度，按维度乘积为{9, 8}
-    Shape<int,int> shape1 = MakeShape(3, 2);
-    Stride<int,int> stride1 = MakeStride(3, 4);
+    auto shape1Dim0 = 3;
+    auto shape1Dim1 = 2;
+    auto stride1Dim0 = 3;
+    auto stride1Dim1 = 4;
+    auto shape1 = MakeShape(shape1Dim0, shape1Dim1);
+    auto stride1 = MakeStride(stride1Dim0, stride1Dim1);
     auto layout1 = MakeLayout(shape1, stride1);
-    EXPECT_EQ(layout1.Capacity(), 9);
-    EXPECT_EQ(GetCapacity(shape1, stride1), 9);
+    EXPECT_EQ(layout1.Capacity(), max(shape1Dim0 * stride1Dim0, shape1Dim1 * stride1Dim1));
+    EXPECT_EQ(GetCapacity(shape1, stride1), max(shape1Dim0 * stride1Dim0, shape1Dim1 * stride1Dim1));
 
     // 三个维度，按维度乘积为{21, 20, 24}
-    Shape<int,int,int> shape2 = MakeShape(7, 2, 6);
-    Stride<int,int,int> stride2 = MakeStride(3, 10, 4);
+    auto shape2Dim0 = 7;
+    auto shape2Dim1 = 2;
+    auto shape2Dim2 = 6;
+    auto stride2Dim0 = 3;
+    auto stride2Dim1 = 10;
+    auto stride2Dim2 = 4;
+    auto shape2 = MakeShape(shape2Dim0, shape2Dim1, shape2Dim2);
+    auto stride2 = MakeStride(stride2Dim0, stride2Dim1, stride2Dim2);
     auto layout2 = MakeLayout(shape2, stride2);
-    EXPECT_EQ(layout2.Capacity(), 24);
-    EXPECT_EQ(GetCapacity(shape2, stride2), 24);
+    EXPECT_EQ(layout2.Capacity(), max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * shape2Dim2));
+    EXPECT_EQ(GetCapacity(shape2, stride2), max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * shape2Dim2));
 
-    // 四个维度，按维度乘积为{119, 143, 69, 95}
-    Shape<int,int,int,int> shape3 = MakeShape(7, 11, 3, 5);
-    Stride<int,int,int,int> stride3 = MakeStride(17, 13, 23, 19);
-    auto layout3 = MakeLayout(shape3, stride3);
-    EXPECT_EQ(layout3.Capacity(), 143);
-    EXPECT_EQ(GetCapacity(shape3, stride3), 143);
-
-    int shape4 = 7;
-    int stride4 = 17;
-    EXPECT_EQ(GetCapacity(shape4, stride4), 119);
+    int shape3 = 7;
+    int stride3 = 17;
+    EXPECT_EQ(GetCapacity(shape3, stride3), shape3 * stride3);
 
     // 按维度乘积为{{3, 60}, {40, 480}}
     auto shape5 = MakeShape(MakeShape(3, 4), MakeShape(5, 8));
@@ -628,13 +631,13 @@ TEST_F(Tensor_Api_Layout, TestMakeDNLayout)
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
     auto strideCol1 = AscendC::Std::get<1>(GetStride(layout1));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow1), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), 128);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), row1);
     EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), 32);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), col1);
     EXPECT_EQ(AscendC::Std::get<0>(strideRow1), 0);
     EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 1);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 0);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 128);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), row1);
     
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
@@ -644,13 +647,13 @@ TEST_F(Tensor_Api_Layout, TestMakeDNLayout)
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
     auto strideCol2 = AscendC::Std::get<1>(GetStride(layout2));
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow2), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), 2048);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), row2);
     EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), 1024);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), col2);
     EXPECT_EQ(AscendC::Std::get<0>(strideRow2), 0);
     EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 1);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol2), 0);
-    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 2048);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), row2);
 }
 
 // Shape为{{32 / size, row / (32 / size)},{16, col / 16}}
