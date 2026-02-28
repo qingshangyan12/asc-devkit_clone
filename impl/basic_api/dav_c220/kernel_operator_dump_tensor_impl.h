@@ -1029,6 +1029,7 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 {
 #if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+    printf("[LIUXIN] TEST CHCEKPOINT 2!*****************************************");
     if (g_sysPrintFifoSpace != nullptr) {
         return;
     }
