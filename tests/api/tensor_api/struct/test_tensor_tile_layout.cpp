@@ -456,36 +456,47 @@ TEST_F(Tensor_Api_Layout, TestMakeTileCoord)
 TEST_F(Tensor_Api_Layout, TestMakeLayout)
 {
     using namespace AscendC::Te;
-    auto shape1 = MakeShape(3, 2);
-    auto stride1 = MakeStride(1, 4);
+    auto shape1Dim0 = AscendC::Std::Int<3>{};
+    auto shape1Dim1 = AscendC::Std::Int<2>{};
+    auto stride1Dim0 = AscendC::Std::Int<1>{};
+    auto stride1Dim1 = AscendC::Std::Int<4>{};
+    auto shape1 = MakeShape(shape1Dim0, shape1Dim1);
+    auto stride1 = MakeStride(stride1Dim0, stride1Dim1);
     auto layout1 = MakeLayout(shape1, stride1);
-    EXPECT_EQ(GetShape<0>(layout1), 3);
-    EXPECT_EQ(GetShape<1>(layout1), 2);
-    EXPECT_EQ(GetStride<0>(layout1), 1);
-    EXPECT_EQ(GetStride<1>(layout1), 4);
+    EXPECT_EQ(GetShape<0>(layout1), shape1Dim0);
+    EXPECT_EQ(GetShape<1>(layout1), shape1Dim1);
+    EXPECT_EQ(GetStride<0>(layout1), stride1Dim0);
+    EXPECT_EQ(GetStride<1>(layout1), stride1Dim1);
 
     // 此时最内侧stride为1，次内侧为13，外侧为13 * 11 = 143
-    auto shape2 = MakeShape(7, 11, 13);
+    auto shape2Dim0 = AscendC::Std::Int<7>{};
+    auto shape2Dim1 = AscendC::Std::Int<11>{};
+    auto shape2Dim2 = AscendC::Std::Int<13>{};
+    auto shape2 = MakeShape(shape2Dim0, shape2Dim1, shape2Dim2);
     auto layout2 = MakeLayout(shape2);
-    EXPECT_EQ(GetShape<0>(layout2), 7);
-    EXPECT_EQ(GetShape<1>(layout2), 11);
-    EXPECT_EQ(GetShape<2>(layout2), 13);
-    EXPECT_EQ(GetStride<0>(layout2), 143);
-    EXPECT_EQ(GetStride<1>(layout2), 13);
-    EXPECT_EQ(GetStride<2>(layout2), 1);
+    EXPECT_EQ(GetShape<0>(layout2), shape2Dim0);
+    EXPECT_EQ(GetShape<1>(layout2), shape2Dim1);
+    EXPECT_EQ(GetShape<2>(layout2), shape2Dim2);
+    EXPECT_EQ(GetStride<0>(layout2), shape2Dim1 * shape2Dim2);
+    EXPECT_EQ(GetStride<1>(layout2), shape2Dim2);
+    EXPECT_EQ(GetStride<2>(layout2), AscendC::Std::Int<1>{});
 
     // stride[0][0] = 1; stride[0][1] = 2 * 3 * 1 = 6;
     // stride[1][0] = 1 * 2 = 2; stride[1][1] = 3 * 6 = 18;
-    auto shape3 = MakeShape(MakeShape(2, 3), MakeShape(3, 6));
+    auto shape3Dim00 = AscendC::Std::Int<2>{};
+    auto shape3Dim01 = AscendC::Std::Int<3>{};
+    auto shape3Dim10 = AscendC::Std::Int<3>{};
+    auto shape3Dim11 = AscendC::Std::Int<6>{};
+    auto shape3 = MakeShape(MakeShape(shape3Dim00, shape3Dim01), MakeShape(shape3Dim10, shape3Dim11));
     auto layout3 = MakeLayout(shape3);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(layout3)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(layout3)), 3);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(layout3)), 3);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(layout3)), 6);
-    EXPECT_EQ(AscendC::Std::get<0>(GetStride<0>(layout3)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(GetStride<0>(layout3)), 6);
-    EXPECT_EQ(AscendC::Std::get<0>(GetStride<1>(layout3)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(GetStride<1>(layout3)), 18);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(layout3)), shape3Dim00);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(layout3)), shape3Dim01);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(layout3)), shape3Dim10);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(layout3)), shape3Dim11);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<0>(layout3)), AscendC::Std::Int<1>{});
+    EXPECT_EQ(AscendC::Std::get<1>(GetStride<0>(layout3)), shape3Dim00 * shape3Dim01);
+    EXPECT_EQ(AscendC::Std::get<0>(GetStride<1>(layout3)), shape3Dim00 * AscendC::Std::get<0>(GetStride<0>(layout3)));
+    EXPECT_EQ(AscendC::Std::get<1>(GetStride<1>(layout3)), shape3Dim01 * AscendC::Std::get<1>(GetStride<0>(layout3)));
 }
 
 // Shape为{{16, row / 16}, {32 / SizeOf(T), col / (32 / SizeOf(T))}}
