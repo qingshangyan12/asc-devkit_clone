@@ -736,7 +736,7 @@ TEST_F(Tensor_Api_Layout, TestMakeZzLayout)
     EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), row1 / 16);
     EXPECT_EQ(AscendC::Std::get<0>(shapeCol1), 32 / sizeof(uint32_t));
     EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), col1 / (32 / sizeof(uint32_t)));
-    EXPECT_EQ(AscendC::Std::get<0>(strideRow1), sizeof(uint32_t));
+    EXPECT_EQ(AscendC::Std::get<0>(strideRow1), 32 / sizeof(uint32_t));
     EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 16 * col1);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol1), 1);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 32 / sizeof(uint32_t) * 16);
@@ -751,8 +751,8 @@ TEST_F(Tensor_Api_Layout, TestMakeZzLayout)
     EXPECT_EQ(AscendC::Std::get<0>(shapeRow2), 16);
     EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), row2 / 16);
     EXPECT_EQ(AscendC::Std::get<0>(shapeCol2), 32 / sizeof(float));
-    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), col1 / (32 / sizeof(float)));
-    EXPECT_EQ(AscendC::Std::get<0>(strideRow2), sizeof(float));
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), col2 / (32 / sizeof(float)));
+    EXPECT_EQ(AscendC::Std::get<0>(strideRow2), 32 / sizeof(float));
     EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 16 * col2);
     EXPECT_EQ(AscendC::Std::get<0>(strideCol2), 1);
     EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 32 / sizeof(float) * 16);
