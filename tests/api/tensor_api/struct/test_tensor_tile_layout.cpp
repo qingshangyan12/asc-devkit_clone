@@ -256,19 +256,27 @@ TEST_F(Tensor_Api_Layout, TestCapacity)
     auto shape2 = MakeShape(shape2Dim0, shape2Dim1, shape2Dim2);
     auto stride2 = MakeStride(stride2Dim0, stride2Dim1, stride2Dim2);
     auto layout2 = MakeLayout(shape2, stride2);
-    EXPECT_EQ(layout2.Capacity(), max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * shape2Dim2));
-    EXPECT_EQ(GetCapacity(shape2, stride2), max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * shape2Dim2));
+    EXPECT_EQ(layout2.Capacity(), max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
+    EXPECT_EQ(GetCapacity(shape2, stride2), max(max(shape2Dim0 * stride2Dim0, shape2Dim1 * stride2Dim1), shape2Dim2 * stride2Dim2));
 
     int shape3 = 7;
     int stride3 = 17;
     EXPECT_EQ(GetCapacity(shape3, stride3), shape3 * stride3);
 
     // 按维度乘积为{{3, 60}, {40, 480}}
-    auto shape5 = MakeShape(MakeShape(3, 4), MakeShape(5, 8));
-    auto stride5 = MakeShape(MakeShape(1, 15), MakeShape(8, 60));
-    auto layout5 = MakeLayout(shape5, stride5);
-    EXPECT_EQ(layout5.Capacity(), 480);
-    EXPECT_EQ(GetCapacity(shape5, stride5), 480);
+    auto shape4Dim00 = 3;
+    auto shape4Dim01 = 4;
+    auto shape4Dim10 = 5;
+    auto shape4Dim11 = 8;
+    auto stride4Dim00 = 1;
+    auto stride4Dim01 = 15;
+    auto stride4Dim10 = 8;
+    auto stride4Dim11 = 60;
+    auto shape4 = MakeShape(MakeShape(shape4Dim00, shape4Dim01), MakeShape(shape4Dim10, shape4Dim11));
+    auto stride4 = MakeShape(MakeShape(stride4Dim00, stride4Dim01), MakeShape(stride4Dim10, stride4Dim11));
+    auto layout4 = MakeLayout(shape4, stride4);
+    EXPECT_EQ(layout4.Capacity(), max(max(max(shape4Dim00 * stride4Dim00, shape4Dim01 * stride4Dim01), shape4Dim10 * stride4Dim10), shape4Dim11 * stride4Dim11));
+    EXPECT_EQ(GetCapacity(shape4, stride4), max(max(max(shape4Dim00 * stride4Dim00, shape4Dim01 * stride4Dim01), shape4Dim10 * stride4Dim10), shape4Dim11 * stride4Dim11));
 }
 
 // 对const对象，layout方法会返回const类型的引用
