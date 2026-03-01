@@ -284,7 +284,7 @@ init() {
 
 log_file=""
 is_quiet=n
-pylocal=n
+pylocal=y # 子包安装默认将Python包安装到CANN包目录下
 install_path=""
 version_dir=""
 feature_type=""
