@@ -633,12 +633,26 @@ def extract_decl_param_options(op_info: OpInfo, option_name="dtype"):
     return decl_input_options + decl_output_options, deck_select_indexes
 
 
+def check_kernel_template_input(kernel_compile_dict: dict):
+    tiling_map_dict = {item.name: item for item in TILING_DECLARE_MAP}
+    for key, values in kernel_compile_dict:
+        if key not in tiling_map_dict:
+            raise RuntimeError('kernel-template-input key {} is invalid!'.format(key))
+        valid_values = tiling_map_dict[key].values
+        valid_values_str = set(str(v) for v in valid_values)
+        for value in values:
+            if value not in valid_values_str:
+                raise RuntimeError('kernel-template-input key: {} value: {} is invalid!'.format(key, value))
+
+
 def decode_tiling(tiling_key: int = None) -> dict:
     kernel_template_input = get_context().get_addition("kernel-template-input")
     kernel_compile_dict = {}
     if kernel_template_input:
         pairs = kernel_template_input.split(';')
         for pair in pairs:
+            if pair.count("=") > 1:
+                raise RuntimeError('kernel-template-input value has invalid format!')
             if '=' in pair:
                 key, value = pair.split('=', 1)
                 value_list = value.split(',')
@@ -655,6 +669,7 @@ def decode_tiling(tiling_key: int = None) -> dict:
                     else:
                         format_value_list.append(v)
                 kernel_compile_dict[key] = format_value_list
+        check_kernel_template_input(kernel_compile_dict)
     encode_book = dict()
     for param in TILING_DECLARE_MAP:
         encode_book[param.name] = param.get_encodes()
