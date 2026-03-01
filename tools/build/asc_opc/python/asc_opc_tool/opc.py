@@ -524,6 +524,8 @@ class OpcOptionParser:
     
     def check_and_save_kernel_template_input(self):
         kernel_template_input_str = self.get_option(OpcOptions.KERNEL_TEMPLATE_INPUT)
+        if not kernel_template_input_str:
+            logger.warn("No value given for kernel-template-input option.")
         self.set_option(OpcOptions.KERNEL_TEMPLATE_INPUT, kernel_template_input_str)
 
     def check_op_relocatable_cfg(self):
