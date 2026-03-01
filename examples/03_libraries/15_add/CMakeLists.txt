@@ -15,7 +15,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    mmad_load3dv2.asc
+    add.asc
 )
 
 target_link_libraries(demo PRIVATE
