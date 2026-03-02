@@ -15,13 +15,14 @@
 #ifndef ASCENDC_MODULE_KERNEL_PROF_TRACE_INTERFACE_H
 #define ASCENDC_MODULE_KERNEL_PROF_TRACE_INTERFACE_H
 
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#include "stub_def.h"
+#include "stub_fun.h"
+#endif
+
 #include <cstdint>
 #include "kernel_macros.h"
 #include "utils/debug/asc_time.h"
-
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-#include "stub_def.h"
-#endif
 
 namespace AscendC {
 __aicore__ inline void MetricsProfStart();
