@@ -33,6 +33,7 @@ if(tikicpulib_FOUND)
         list(APPEND INCLUDE_PATHS ${TIKICPULIB_INCLUDE_DIRS})
     endif()
 endif()
+list(APPEND INCLUDE_PATHS ${ASCENDC_DIR}/tests/api/stub_include)
 
 # ==========================================
 # 编译配置 (CONFIGS)
