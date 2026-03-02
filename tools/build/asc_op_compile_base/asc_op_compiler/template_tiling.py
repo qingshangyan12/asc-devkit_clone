@@ -647,6 +647,8 @@ def check_kernel_template_input(kernel_compile_dict: dict):
 
 def decode_tiling(tiling_key: int = None) -> dict:
     kernel_template_input = get_context().get_addition("kernel-template-input")
+    if kernel_template_input and "=" not in kernel_template_input:
+        raise RuntimeError('Invalid kernel-template-input format! Please use key value pairs!')
     kernel_compile_dict = {}
     if kernel_template_input:
         pairs = kernel_template_input.split(';')
