@@ -41,16 +41,5 @@ struct ChannelHandle {
     SqContext* sqContext;
 };
 
-struct hns_roce_rc_sq_wqe {
-    uint32_t byte_4;
-    uint32_t msg_len;
-    uint32_t immtdata;
-    uint32_t byte_16;
-    uint32_t byte_20;
-    uint32_t rkey;
-    uint64_t remoteVA;
-};
-
-
 } // namespace AscendC
 #endif // IMPL_HCOMM_HCOMM_INNER_DEF_H

@@ -15,31 +15,29 @@
 #ifndef IMPL_V310_HCOMM_ROCE_H
 #define IMPL_V310_HCOMM_ROCE_H
 
-#include "hcomm_common.h"
-#include "hcomm_utils.h"
-#include "hcomm_inner_def.h"
-
+#include "../../common/hcomm_utils.h"
+#include "../../common/hcomm_inner_def.h"
 
 namespace AscendC {
 
-template <bool commit = true, pipe_t pipe = pipe_mte3>
-__aicore__ inline HcommHandle HcommImpl<commProtocol>::Write(ChannelHandle channelHandle, void* dst, void* src,
-                                                             uint64_t len)
+template <bool commit, pipe_t pipe>
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL::ROCE>::Write(ChannelHandle channelHandle, void* dst, void* src,
+                                                                    uint64_t len)
 {
-    doorBell(channelHandle.rdmaSqContext, dst, src, len);
+    doorBell(channelHandle.sqContext->rdmaSqContext, dst, src, len);
     return 1;
 }
 
-template <bool commit = true, pipe_t pipe = pipe_mte3>
-__aicore__ inline HcommHandle HcommImpl<commProtocol>::Read(ChannelHandle channelHandle, void* dst, void* src,
-                                                            uint64_t len)
+template <bool commit, pipe_t pipe>
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL::ROCE>::Read(ChannelHandle channelHandle, void* dst, void* src,
+                                                                   uint64_t len)
 {
-    doorBell(channelHandle.rdmaSqContext, dst, src, len);
+    doorBell(channelHandle.sqContext->rdmaSqContext, dst, src, len);
     return 1;
 }
 
-__aicore__ inline void HcommImpl<commProtocol>::doorBell(RdmaSqContext rdmaSqContext, GM_ADDR destDmaAddr,
-                                                         GM_ADDR srcDmaAddr, uint64_t messageLen)
+__aicore__ inline void HcommImpl<commProtocol>::doorBell(RdmaSqContext rdmaSqContext, void* destDmaAddr,
+                                                         void* srcDmaAddr, uint64_t messageLen)
 {
     auto qpNum = rdmaSqContext->qpn;
     auto sqBaseAddr = rdmaSqContext->sqVa;
@@ -68,42 +66,39 @@ __aicore__ inline void HcommImpl<commProtocol>::doorBell(RdmaSqContext rdmaSqCon
 
     // Write the WQE to GM
     uint64_t ownBit = (curHead >> shift) & 1U;
-    uint32_t byte_4 = 3U;                       // [0:4] opcode=0x3(RDMA_WRITE)
-    byte_4 |= ((~ownBit) << 7U) & (1U << 7U);   // [7] owner_bit
-    byte_4 |= 1U << 8U;                         // [8:8] IBV_SEND_SIGNALED
+    uint32_t byte_4 = 3U;                     // [0:4] opcode=0x3(RDMA_WRITE)
+    byte_4 |= ((~ownBit) << 7U) & (1U << 7U); // [7] owner_bit
+    byte_4 |= 1U << 8U;                       // [8:8] IBV_SEND_SIGNALED
 
-    *(__gm__ uint32_t*)(wqeAddr) = byte_4;          // Control set by local parameter see above lines
-    *(__gm__ uint32_t*)(wqeAddr + 4) = messageLen;  // message size
-    *(__gm__ uint32_t*)(wqeAddr + 8) = 0;           // immtdata is always 0 till we provide poll CQ flow in AIV
-    *(__gm__ uint32_t*)(wqeAddr + 12) = 1U << 24U;  // [120:127] num_sge = 1
-    *(__gm__ uint32_t*)(wqeAddr + 16) = 0;          // [128:151] start_sge_idx = 0;
+    *(__gm__ uint32_t*)(wqeAddr) = byte_4;         // Control set by local parameter see above lines
+    *(__gm__ uint32_t*)(wqeAddr + 4) = messageLen; // message size
+    *(__gm__ uint32_t*)(wqeAddr + 8) = 0;          // immtdata is always 0 till we provide poll CQ flow in AIV
+    *(__gm__ uint32_t*)(wqeAddr + 12) = 1U << 24U; // [120:127] num_sge = 1
+    *(__gm__ uint32_t*)(wqeAddr + 16) = 0;         // [128:151] start_sge_idx = 0;
 
     *(__gm__ uint64_t*)(wqeAddr + 24) = (uint64_t)destDmaAddr; // destination VA
 
-    __gm__ uint8_t* sgeAddr = wqeAddr + sizeof(hns_roce_rc_sq_wqe);
-    *(__gm__ uint32_t*)(sgeAddr) = messageLen;
+    __gm__ uint8_t* sgeAddr = wqeAddr + 32 * (__gm__ uint32_t*)(sgeAddr) = messageLen;
 
     *(__gm__ uint64_t*)(sgeAddr + 2 * sizeof(uint32_t)) = (uint64_t)srcDmaAddr; // src VA addr memory registered by RNIC
-
 
     FlushDataCache(wqeAddr);
 
     curHead++;
 
     uint64_t doorBellInfo = 0;
-    doorBellInfo |= rdmaSqContext->qpn; // [0:23] DB_TAG (qp_num)
-    doorBellInfo |= 0UL << 24UL; // [24:27] DB_CMD = HNS_ROCE_V2_SQ_DB (0)
-    doorBellInfo |= (curHead % 65536UL) << 32UL; // [32:47] DB_PI = sq.head
+    doorBellInfo |= rdmaSqContext->qpn;                    // [0:23] DB_TAG (qp_num)
+    doorBellInfo |= 0UL << 24UL;                           // [24:27] DB_CMD = HNS_ROCE_V2_SQ_DB (0)
+    doorBellInfo |= (curHead % 65536UL) << 32UL;           // [32:47] DB_PI = sq.head
     doorBellInfo |= (uint64_t)(rdmaSqContext->sl) << 48UL; // [48:50] DB_SL = qp.sl
 
-    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t* )(rdmaSqContext->dbVa);
+    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(rdmaSqContext->dbVa);
 
     ubLocal.SetValue(0, doorBellInfo);
     AscendC::GlobalTensor<uint64_t> DBGlobalTensor;
     DBGlobalTensor.SetGlobalBuffer(doorBellAddr);
     AscendC::DataCopyExtParams copyParams{1, 1 * sizeof(uint64_t), 0, 0, 0};
     AscendC::DataCopyPad(DBGlobalTensor, ubLocal, copyParams);
-
 
     ubLocalHead.SetValue(0, (uint32_t)curHead);
     AscendC::GlobalTensor<uint32_t> HeadGlobalTensor;

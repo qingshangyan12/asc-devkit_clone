@@ -17,8 +17,8 @@
 
 namespace AscendC {
 
-template <COMM_PROTOCOL commProtocol = ROCE>
-class HcommImpl<commProtocol> {
+template <>
+class HcommImpl<COMM_PROTOCOL::ROCE> {
 public:
     template <bool commit = true, pipe_t pipe = pipe_mte3>
     __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, void* dst, void* src, uint64_t len);
@@ -27,11 +27,12 @@ public:
     __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, void* dst, void* src, uint64_t len);
 
 public:
-    __aicore__ inline void doorBell(RdmaSqContext rdmaSqContext, GM_ADDR destDmaAddr, GM_ADDR srcDmaAddr, uint64_t messageLen);
+    __aicore__ inline void doorBell(RdmaSqContext rdmaSqContext, void* destDmaAddr, void* srcDmaAddr,
+                                    uint64_t messageLen);
 
 private:
     LocalTensor<uint64_t> ubLocal;
-
+    LocalTensor<uint32_t> ubLocalHead;
 };
 
 } // namespace AscendC

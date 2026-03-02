@@ -21,19 +21,19 @@
 
 namespace AscendC {
 
-template <COMM_PROTOCOL commProtocol = ROCE>
-template <bool commit>
+template <COMM_PROTOCOL commProtocol>
+template <bool commit, pipe_t pipe>
 __aicore__ inline HcommHandle Hcomm<commProtocol>::Write(ChannelHandle channelHandle, void* dst, void* src,
                                                          uint64_t len)
 {
-    return impl_.template Write<commit>(channelHandle, dst, src, len);
+    return impl_.template Write<commit, pipe>(channelHandle, dst, src, len);
 }
 
-template <COMM_PROTOCOL commProtocol = ROCE>
-template <bool commit>
+template <COMM_PROTOCOL commProtocol>
+template <bool commit, pipe_t pipe>
 __aicore__ inline HcommHandle Hcomm<commProtocol>::Read(ChannelHandle channelHandle, void* dst, void* src, uint64_t len)
 {
-    return impl_.template Read<commit>(channelHandle, dst, src, len);
+    return impl_.template Read<commit, pipe>(channelHandle, dst, src, len);
 }
 
 } // namespace AscendC

@@ -18,7 +18,7 @@
 #include "hcomm_inner_def.h"
 
 namespace AscendC {
-template <COMM_PROTOCOL commProtocol = ROCE>
+template <COMM_PROTOCOL commProtocol>
 class HcommImpl {
 public:
     template <bool commit = true, pipe_t pipe = PIPE_MTE3>
