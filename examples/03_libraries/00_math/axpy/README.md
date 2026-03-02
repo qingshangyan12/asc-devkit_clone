@@ -1,0 +1,194 @@
+# Axpy算子直调样例
+
+## 概述
+
+本样例基于Axpy实现源操作数src中每个元素与标量求积后和目的操作数dst中的对应元素相加的功能。Axpy接口的源操作数和目的操作数的数据类型只能取三种组合：(half, half)、(float, float)、(half, float)。本样例中输入tensor和标量的数据类型为half，输出tensor数据类型为float。
+本样例通过Ascend C编程语言实现了Axpy算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
+下面这份表格主要记录了11种不同的测试场景（scenario），用于评估某种计算系统或处理器在不同条件下的性能表现。
+- 场景 1-3：基础半精度功能测试
+
+  输入输出均为 half。
+
+  覆盖了三种核心计算模式：count、高维切分mask连续模式、高维切分mask逐比特模式。
+
+
+- 场景 4-6：半精度无业务性能测试
+
+  基于场景1的“count模式”，衍生三种场景进行性能对比：
+
+  4 (基础)： 无业务的纯count模式，用于获取理论性能。
+
+  5 (指令拆分)： 测试将复合指令拆解为多条指令对性能的影响。
+
+  6 (操作数重叠)： 测试源操作数与目的操作数重叠对性能的影响。
+
+
+- 场景 7：单精度功能测试
+
+  将输入输出改为 float，执行count模式。
+
+- 场景 8：混合精度功能测试
+
+  输入 half，输出 float，执行count模式。
+
+- 场景 9-11：混合精度性能测试
+
+  与场景4-6类似，但加入了数据类型转换（half->float）。
+
+  测试在混合精度背景下，基础性能、指令拆分、操作数重叠带来的影响。
+<table>
+    <tr>
+        <td>scenarioNum</td>
+        <td>输入数据类型</td>
+        <td>输出数据类型</td>
+        <td>描述</td>
+        <td>无业务性能测试</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>half</td>
+        <td>half</td>
+        <td>count模式计算</td>
+        <td>×</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>half</td>
+        <td>half</td>
+        <td>mask连续模式计算</td>
+        <td>×</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>half</td>
+        <td>half</td>
+        <td>mask逐比特模式计算</td>
+        <td>×</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>half</td>
+        <td>half</td>
+        <td>count模式计算</td>
+        <td>√</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>half</td>
+        <td>half</td>
+        <td>count模式计算，拆分复合指令</td>
+        <td>√</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>half</td>
+        <td>half</td>
+        <td>count模式计算，操作数重叠</td>
+        <td>√</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td>float</td>
+        <td>float</td>
+        <td>count模式计算</td>
+        <td>×</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>half</td>
+        <td>float</td>
+        <td>count模式计算</td>
+        <td>×</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>half</td>
+        <td>float</td>
+        <td>count模式计算</td>
+        <td>√</td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td>half</td>
+        <td>float</td>
+        <td>count模式计算，拆分复合指令</td>
+        <td>√</td>
+    </tr>
+    <tr>
+        <td>11</td>
+        <td>half</td>
+        <td>float</td>
+        <td>count模式计算，操作数重叠</td>
+        <td>√</td>
+    </tr>
+</table>
+
+## 支持的产品
+
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+## 目录结构介绍
+
+```
+├── axpy
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt          // 编译工程文件
+│   ├── data_utils.h            // 数据读入写出函数
+│   └── axpy.asc                // Ascend C算子实现 & 调用样例
+```
+
+## 算子描述
+
+- 算子功能：  
+  Axpy算子实现了源操作数src中每个元素与标量求积后和目的操作数dst中的对应元素相加，并返回计算结果的功能。
+
+  对应的数学表达式为：  
+  ```
+  out = x * scalar + out
+  ```  
+
+- 算子实现：  
+  - Kernel实现   
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成x乘以标量scalar再加上out中的原始值，得到最终结果，再搬出到外部存储上。   
+
+    Axpy算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm搬运至Local Memory，存储在xLocal,Compute任务负责对xLocal执行相关操作，计算结果存储在outLocal中，CopyOut任务负责将输出数据从outLocal搬运至Global Memory上的输出Tensor outGm中。
+
+  - 调用实现  
+    使用内核调用符<<<>>>调用核函数。
+
+## 编译运行
+
+在本样例根目录下执行如下步骤，编译并执行算子。
+- 配置环境变量  
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，root用户安装CANN软件包
+    ```bash
+    source /usr/local/Ascend/cann/set_env.sh
+    ```
+    
+  - 默认路径，非root用户安装CANN软件包
+    ```bash
+    source $HOME/Ascend/cann/set_env.sh
+    ```
+
+  - 指定路径install_path，安装CANN软件包
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
+
+- 样例执行
+  ```bash
+  SCENARIO=1 SIZE=1024
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake .. -DSCENARIO_NUM=$SCENARIO -DSIZE=$SIZE;make -j;    # 编译工程
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO -size=$SIZE   # 生成测试输入数据
+  ./demo                           # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  ```
+  执行结果如下，说明精度对比成功。
+  ```bash
+  test pass!
+  ```
