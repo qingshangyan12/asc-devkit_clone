@@ -27,11 +27,12 @@ public:
     __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
 public:
-    __aicore__ inline void doorBell(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t messageLen);
+    __aicore__ inline void doorBell(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
 private:
-    LocalTensor<uint64_t> ubLocal;
-    LocalTensor<uint32_t> ubLocalHead;
+    HcommHandle curHandleId_ = static_cast<int8_t>(-1);
+    LocalTensor<uint64_t> ubLocal_;
+    LocalTensor<uint32_t> ubLocalHead_;
 };
 
 } // namespace AscendC
