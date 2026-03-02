@@ -10,7 +10,9 @@
 
 add_library(intf_llt_pub_basic INTERFACE)
 
-target_include_directories(intf_llt_pub_basic INTERFACE)
+target_include_directories(intf_llt_pub_basic INTERFACE 
+    ${ASCENDC_DIR}/tests/api/stub_include
+)
 
 target_compile_definitions(intf_llt_pub_basic INTERFACE
     CFG_BUILD_DEBUG
