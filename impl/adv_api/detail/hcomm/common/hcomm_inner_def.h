@@ -193,9 +193,9 @@ struct {
 } RoceWqeDataSeg;
 
 struct RoceWqeEntry {
-    struct RoceWqeCtrlSeg ctrl;
+    RoceWqeCtrlSeg ctrl;
     uint64_t doorbell;
-    struct RoceWqeTaskSeg task;
+    RoceWqeTaskSeg task;
     uint32_t dataLen;
     uint32_t immeData;
     uint32_t firstLast : 1;
@@ -207,7 +207,7 @@ struct RoceWqeEntry {
     uint32_t vaLow32;
     uint32_t rKey;
     uint32_t rsvd1;
-    struct RoceWqeDataSeg data;
+    RoceWqeDataSeg data;
 };
 
 struct {
