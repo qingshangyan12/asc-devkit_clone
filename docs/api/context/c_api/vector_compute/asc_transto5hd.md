@@ -108,9 +108,9 @@ __ubuf__ half* dst_list[16] = {
     (__ubuf__ half*)(dst + 15 * STEP)
 };
 const int32_t VA_REG_ARRAY_LEN = 8;
-uint8_t repeat = 16;
-uint16_t dst_stride = 16;
-uint16_t src_stride = 1;
+uint8_t repeat = 1;
+uint16_t dst_stride = 0;
+uint16_t src_stride = 0;
 
 // asc_set_va_reg接口要求前8个和后8个地址序列与地址寄存器分别关联
 asc_set_va_reg(VA0, dst_list);
