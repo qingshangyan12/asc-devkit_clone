@@ -204,7 +204,13 @@ struct FixpipeParamsC350 {
 };
 
 template <CO2Layout format = CO2Layout::ROW_MAJOR>
-using FixpipeParamsC310 = FixpipeParamsC350<format>;
+struct FixpipeParamsC310 : FixpipeParamsC350<format> {
+    __aicore__ FixpipeParamsC310() : FixpipeParamsC350<format>() {}
+    
+    __aicore__ FixpipeParamsC310(const uint16_t nSizeIn, const uint16_t mSizeIn, 
+                                const uint16_t srcStrideIn, const uint32_t dstStrideIn)
+        : FixpipeParamsC350<format>(nSizeIn, mSizeIn, srcStrideIn, dstStrideIn) {}
+};
 #endif
 
 using FixpipeParamsM300 = FixpipeParamsV220;
