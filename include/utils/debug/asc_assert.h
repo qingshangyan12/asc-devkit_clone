@@ -28,14 +28,27 @@
 #endif
 #endif
 
+#include "impl/utils/sys_macros.h"
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3101)
 #include "impl/utils/debug/asc_assert_simt_impl.h"
+#endif
 
 namespace __asc_simt_vf {
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 } // namespace __asc_simt_vf
 
-#ifndef assert
+namespace __asc_aicore {
+inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
+    const __gm__ char* __function);
+} // namespace __asc_aicore
+
+#ifdef assert
+#undef assert
+#endif
 #define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
+
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3101)
+#include "impl/utils/debug/asc_aicore_assert_impl.h"
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__)
