@@ -532,6 +532,7 @@ ID_LIST = []
 group_map = {}
 kernel_compile_dict = {}
 
+
 def get_concated_tiling_key(template_param_list: List[TilingTemplateParams], \
     index: int, tiling_key: str, tiling_args: List[int], encode_book: dict, data: dict, kernel_index: int) -> dict:
     global ID_LIST
