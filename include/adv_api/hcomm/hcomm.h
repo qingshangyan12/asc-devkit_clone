@@ -35,7 +35,7 @@ namespace AscendC {
  * comm task.
  * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
  */
-template <COMM_PROTOCOL commProtocol = ROCE>
+template <COMM_PROTOCOL commProtocol = COMM_PROTOCOL::ROCE>
 class Hcomm {
 public:
     /*!

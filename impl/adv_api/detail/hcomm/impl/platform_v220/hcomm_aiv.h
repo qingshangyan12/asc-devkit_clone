@@ -39,23 +39,23 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL::ROCE>::Read(ChannelHandle
 __aicore__ inline void HcommImpl<commProtocol>::doorBell(RdmaSqContext rdmaSqContext, void* destDmaAddr,
                                                          void* srcDmaAddr, uint64_t messageLen)
 {
-    auto qpNum = rdmaSqContext->qpn;
-    auto sqBaseAddr = rdmaSqContext->sqVa;
-    auto wqeSize = rdmaSqContext->wqeSize;
+    auto qpNum = rdmaSqContext.qpn;
+    auto sqBaseAddr = rdmaSqContext.sqVa;
+    auto wqeSize = rdmaSqContext.wqeSize;
 
-    auto curHardwareHead = rdmaSqContext->headAddr;
-    FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(curHardwareHead));
+    auto curHardwareHead = rdmaSqContext.headAddr;
+    FlushDataCacheHcomm(reinterpret_cast<__gm__ uint8_t*>(curHardwareHead));
     uint64_t curHead = *(__gm__ uint32_t*)(curHardwareHead);
 
-    auto curHardwareTailAddr = rdmaSqContext->tailAddr;
+    auto curHardwareTailAddr = rdmaSqContext.tailAddr;
     uint64_t shift = 15U;
 
-    auto QP_DEPTH = rdmaSqContext->depth;
+    auto QP_DEPTH = rdmaSqContext.depth;
 
     // Make sure we don't overflow the SQ in an infinite loop - no need to mitigate endless loop as the host
     // will timeout and kill the kernel, same as all2all krenel if it fails to complete (e.g. in case of link loss)
     while (1) {
-        FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(curHardwareTailAddr));
+        FlushDataCacheHcomm(reinterpret_cast<__gm__ uint8_t*>(curHardwareTailAddr));
         if ((curHead - *(__gm__ uint32_t*)(curHardwareTailAddr)) < QP_DEPTH - 1) {
             break;
         }
@@ -78,21 +78,22 @@ __aicore__ inline void HcommImpl<commProtocol>::doorBell(RdmaSqContext rdmaSqCon
 
     *(__gm__ uint64_t*)(wqeAddr + 24) = (uint64_t)destDmaAddr; // destination VA
 
-    __gm__ uint8_t* sgeAddr = wqeAddr + 32 * (__gm__ uint32_t*)(sgeAddr) = messageLen;
+    __gm__ uint8_t* sgeAddr = wqeAddr + 32;
+    *(__gm__ uint32_t*)(sgeAddr) = messageLen;
 
     *(__gm__ uint64_t*)(sgeAddr + 2 * sizeof(uint32_t)) = (uint64_t)srcDmaAddr; // src VA addr memory registered by RNIC
 
-    FlushDataCache(wqeAddr);
+    FlushDataCacheHcomm(wqeAddr);
 
     curHead++;
 
     uint64_t doorBellInfo = 0;
-    doorBellInfo |= rdmaSqContext->qpn;                    // [0:23] DB_TAG (qp_num)
+    doorBellInfo |= rdmaSqContext.qpn;                    // [0:23] DB_TAG (qp_num)
     doorBellInfo |= 0UL << 24UL;                           // [24:27] DB_CMD = HNS_ROCE_V2_SQ_DB (0)
     doorBellInfo |= (curHead % 65536UL) << 32UL;           // [32:47] DB_PI = sq.head
-    doorBellInfo |= (uint64_t)(rdmaSqContext->sl) << 48UL; // [48:50] DB_SL = qp.sl
+    doorBellInfo |= (uint64_t)(rdmaSqContext.sl) << 48UL; // [48:50] DB_SL = qp.sl
 
-    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(rdmaSqContext->dbVa);
+    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(rdmaSqContext.dbVa);
 
     ubLocal.SetValue(0, doorBellInfo);
     AscendC::GlobalTensor<uint64_t> DBGlobalTensor;

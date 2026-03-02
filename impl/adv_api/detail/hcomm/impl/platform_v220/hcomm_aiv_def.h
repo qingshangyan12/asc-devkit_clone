@@ -20,10 +20,10 @@ namespace AscendC {
 template <>
 class HcommImpl<COMM_PROTOCOL::ROCE> {
 public:
-    template <bool commit = true, pipe_t pipe = pipe_mte3>
+    template <bool commit = true, pipe_t pipe = PIPE_MTE3>
     __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, void* dst, void* src, uint64_t len);
 
-    template <bool commit = true, pipe_t pipe = pipe_mte3>
+    template <bool commit = true, pipe_t pipe = PIPE_MTE3>
     __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, void* dst, void* src, uint64_t len);
 
 public:
