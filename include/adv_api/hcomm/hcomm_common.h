@@ -19,6 +19,7 @@
 
 namespace AscendC {
 using HcommHandle = int8_t;
+typedef uint64_t ChannelHandle;
 
 enum class COMM_PROTOCOL {
     ROCE = 0,
