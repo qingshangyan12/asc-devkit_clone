@@ -78,6 +78,7 @@ static inline uint32_t GetCoreNumByType(fe::PlatFormInfos *platformInfo, bool is
 {
     std::string key;
     std::string val;
+    PF_LOGE("GetCoreNumByType: calling GetPlatformResWithLock for LABEL_SPLIT_KEY");
     bool ret = platformInfo->GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_SPLIT_KEY, val);
     if (!ret) {
         PF_LOGE("get platform failed, val is %s", val.c_str());
@@ -100,6 +101,7 @@ uint32_t PlatformAscendC::GetCoreNumVector(void) const
 {
     if (GetSocVersion() == SocVersion::ASCEND310P) {
         std::string val;
+        PF_LOGE("======= is GetCoreNumVector");
         bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_CORE_CNT_VEC, val);
         if (!ret) {
             PF_LOGE("get platform vector num failed, val is %s", val.c_str());
@@ -140,6 +142,7 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size)
 
     if (memType == CoreMemType::FB) {
         std::string sizeStr;
+        PF_LOGE("======= is GetCoreMemSize");
         bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "fb0_size", sizeStr);
         if (!ret) {
             PF_LOGE("platform do not support get CoreMemType::FB size !");
@@ -150,6 +153,7 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size)
  
     if (memType == CoreMemType::BT) {
         std::string sizeStr;
+        PF_LOGE("======= is GetCoreMemSize & memType == CoreMemType::BT");
         bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "bt_size", sizeStr);
         if (!ret) {
             PF_LOGE("platform do not support get CoreMemType::BT size !");
@@ -177,6 +181,7 @@ void PlatformAscendC::ReserveLocalMemory(ReservedSize size)
 SocVersion PlatformAscendC::GetSocVersion(void) const
 {
     std::string socVerStr;
+    PF_LOGE("======= is GetSocVersion");
     bool ret = GetPlatFormInfo()->GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVerStr);
     if (!ret) {
         PF_LOGE("platform do not support get socVersion!");
@@ -188,6 +193,7 @@ SocVersion PlatformAscendC::GetSocVersion(void) const
 NpuArch PlatformAscendC::GetCurNpuArch(void) const
 {
     std::string npuArchStr;
+    PF_LOGE("======= is GetCurNpuArch");
     bool ret = GetPlatFormInfo()->GetPlatformResWithLock(LABEL_VERSION, NPU_ARCH, npuArchStr);
     if (!ret) {
         PF_LOGE("platform do not support get npu arch!");
