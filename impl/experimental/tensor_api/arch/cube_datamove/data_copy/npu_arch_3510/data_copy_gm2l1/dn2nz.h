@@ -1,3 +1,29 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/*!
+ * \file dn2nz.h
+ * \brief
+ */
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_GM2L1_DN2NZ_H
+#define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_GM2L1_DN2NZ_H
+
+#include "impl/experimental/tensor_api/utils/format_impl.h"
+#include "impl/experimental/tensor_api/utils/constant_impl.h"
+#include "impl/experimental/tensor_api/utils/format_impl.h"
+#include "impl/experimental/tensor_api/utils/macro_impl.h"
+#include "include/experimental/tensor_api/arch/cube_datamove/cube_datamove_struct.h"
+
+namespace AscendC{
+namespace Te{
+
 class CopyGmToCbufMultiDn2nzBase {
 public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
@@ -124,3 +150,7 @@ private:
         }
     }
 };
+
+}
+}
+#endif
