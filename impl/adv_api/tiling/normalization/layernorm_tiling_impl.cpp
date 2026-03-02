@@ -10,6 +10,7 @@
  
 
 #include "include/adv_api/normalization/layernorm_tiling.h"
+#include <bits/stdint-uintn.h>
 #include <cmath>
 #include "include/adv_api/normalization/normalize_tiling.h"
 #include "tiling/platform/platform_ascendc.h"
@@ -329,7 +330,7 @@ void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBuf
         uint32_t rLengthWithPadding = (rLength + typeAignSize - 1) / typeAignSize * typeAignSize;
         uint32_t rHeadLength = platform->GetVecRegLen() / sizeof(float);
         ASCENDC_HOST_ASSERT(rHeadLength != 0, return, "rHeadLength can not be 0");
-        uint32_t k = log2(rHeadLength);
+        uint32_t k = static_cast<uint32_t>(log2(rHeadLength));
         for (uint32_t i = 0; i < rLengthWithPadding; i++) {
             if (rHeadLength * LAYERNORM_FOLD_NUM > rLength) {
                 k += i;
