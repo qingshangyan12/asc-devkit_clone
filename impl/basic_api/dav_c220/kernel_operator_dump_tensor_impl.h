@@ -22,6 +22,7 @@
 #include "kernel_operator_sys_var_intf.h"
 #include "kernel_struct_data_copy.h"
 #include "kernel_struct_fixpipe.h"
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
 #include "impl/utils/debug/asc_aicore_time_impl.h"
 
@@ -282,14 +283,14 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
     if (g_sysPrintFifoSpace != nullptr) {
         const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
         if (position == Hardware::UB) {
-            asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize);
+            __asc_aicore::asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize);
         } else if (position == Hardware::L1) {
-            asc_dump_l1buf((__cbuf__ T*)src.GetPhyAddr(), desc, dumpSize);
+            __asc_aicore::asc_dump_l1buf((__cbuf__ T*)src.GetPhyAddr(), desc, dumpSize);
         } else if (position == Hardware::L0C) {
             if ASCEND_IS_NOT_AIC {
                 return;
             }
-            asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize);
+            __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize);
         } else {
             ASCENDC_ASSERT((false),
                     { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
@@ -458,7 +459,7 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize);
+        __asc_aicore::asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize);
     } else {
         DumpTensorGM2GMEntityImpl(src, desc, dumpSize);
     }
@@ -696,15 +697,6 @@ __aicore__ constexpr uint32_t AlignTlvLen(const uint32_t& dataLen)
     return ((dataLen + num) & ~num) + num + 1;
 }
 
-template <typename... Args>
-__aicore__ inline uint32_t GetPrintTlvLen(uint32_t& argsNum, __gm__ const char* fmt, Args&&... args)
-{
-    constexpr uint32_t printInfoLen = sizeof(PrintTlvInfoHead);
-    const uint32_t& fmtLen = GetStringLength(fmt);
-    const uint32_t& argsLen = GetPrintArgsLen(argsNum, args...);
-    return AlignTlvLen(printInfoLen + argsLen + fmtLen); // gm need 8 byte align
-}
-
 __aicore__ __gm__ inline BlockRingBufInfo* GetBlockRingBufInfo()
 {
     uint32_t blockIdx = (get_coreid() & 0x00FF) % DUMP_CORE_COUNT; // & 0x00FF to fix coreid in 910C
@@ -878,32 +870,6 @@ __aicore__ __gm__ inline uint8_t* GetRingBufTlv(__gm__ BlockRingBufInfo* blockRi
     return ringBufAddr + writeInfo->bufOffset;
 }
 
-template <class... Args>
-__aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    EnablePrintf();
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    uint32_t argsNum = 0;
-    const uint32_t& tlvLen = GetPrintTlvLen(argsNum, fmt, args...);
-    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
-        return;
-    }
-
-    __gm__ PrintTlvInfoHead* printTlv = reinterpret_cast<__gm__ PrintTlvInfoHead*>(GetRingBufTlv(blockRingBufInfo));
-
-    WriteRingBufTlvHead(printType, printTlv, tlvLen, argsNum);
-    WriteRingBufTlvData(printTlv, fmt, args...);
-
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-
-    UpdateWriteInfo(writeInfo, tlvLen);
-#endif // ASCENDC_DUMP
-}
-
 template <typename T>
 __aicore__ inline Hardware CheckDumpTensorPosition(const LocalTensor<T>& src)
 {
@@ -1019,9 +985,9 @@ __aicore__ inline void PrintCommonHead(DumpType printType)
     __gm__ char* __ascendc_versionStr = nullptr;
     GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
     if (__ascendc_tStamp == 0) {
-        PrintfRingBufImpl(printType, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
     } else {
-        PrintfRingBufImpl(printType, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
     }
 }
 
@@ -1032,12 +998,13 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
+        __asc_aicore::enable_asc_diagnostics();
 #if !defined(__NPU_DEVICE__)
         if (printType != DumpType::DUMP_ASSERT) {
             PrintCommonHead(printType);
         }
 #endif
-        PrintfRingBufImpl(printType, fmt, args...);
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, fmt, args...);
     } else {
         PrintfEntityImpl(printType, fmt, args...);
     }

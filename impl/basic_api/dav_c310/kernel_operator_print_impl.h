@@ -19,6 +19,7 @@
 #include "kernel_operator_common_impl.h"
 #include "kernel_operator_data_copy_impl.h"
 #include "kernel_pop_stack_buffer.h"
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 namespace AscendC {
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
@@ -233,8 +234,6 @@ __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char* f
     UpdateBlockInfo(tlvSize);
 }
 
-template <class... Args>
-__aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args);
 __aicore__ __gm__ inline BlockRingBufInfo* GetBlockRingBufInfo();
 __aicore__ __gm__ inline RingBufWriteInfo* GetRingBufWriteInfo(__gm__ BlockRingBufInfo* blockRingBufInfo);
 
@@ -255,9 +254,9 @@ __aicore__ inline void PrintCommonHead(DumpType printType)
     __gm__ char* __ascendc_versionStr = nullptr;
     GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
     if (__ascendc_tStamp == 0) {
-        PrintfRingBufImpl(printType, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
     } else {
-        PrintfRingBufImpl(printType, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
     }
 }
 
@@ -274,7 +273,7 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
             PrintCommonHead(printType);
         }
 #endif
-        PrintfRingBufImpl(printType, fmt, args...);
+        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, fmt, args...);
     } else {
         PrintfEntityImpl(printType, fmt, args...);
     }
@@ -475,15 +474,6 @@ __aicore__ constexpr uint32_t AlignTlvLen(const uint32_t& dataLen)
     return ((dataLen + num) & ~num) + num + 1;
 }
 
-template <typename... Args>
-__aicore__ inline uint32_t GetPrintTlvLen(uint32_t& argsNum, __gm__ const char* fmt, Args&&... args)
-{
-    constexpr uint32_t printInfoLen = sizeof(PrintTlvInfoHead);
-    const uint32_t& fmtLen = GetStringLength(fmt);
-    const uint32_t& argsLen = GetPrintArgsLen(argsNum, args...);
-    return AlignTlvLen(printInfoLen + argsLen + fmtLen); // gm need 8 byte align
-}
-
 __aicore__ inline void WriteRingBufTlvHead(
     DumpType printType, __gm__ PrintTlvInfoHead* printTlv, const uint32_t& tlvLen, const uint32_t& argsNum)
 {
@@ -508,33 +498,6 @@ __aicore__ inline void WriteRingBufTlvData(__gm__ PrintTlvInfoHead* printTlv, __
     uint32_t strParamOffset = printTlv->fmtOffset + strLen;
     SetParam(paramAddr, 0, strParamOffset, args...);
 }
-
-template <class... Args>
-__aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    EnablePrintf();
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    uint32_t argsNum = 0;
-    const uint32_t& tlvLen = GetPrintTlvLen(argsNum, fmt, args...);
-    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
-        return;
-    }
-
-    __gm__ PrintTlvInfoHead* printTlv = reinterpret_cast<__gm__ PrintTlvInfoHead*>(GetRingBufTlv(blockRingBufInfo));
-
-    WriteRingBufTlvHead(printType, printTlv, tlvLen, argsNum);
-    WriteRingBufTlvData(printTlv, fmt, args...);
-
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-
-    UpdateWriteInfo(writeInfo, tlvLen);
-#endif // ASCENDC_DUMP
-}
-
 
 }  // namespace AscendC
 #endif

@@ -15,12 +15,6 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_PRINTF_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_PRINTF_IMPL_H
 
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_PRINTF_IMPL__
-#warning "asc_aicore_printf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
-#endif
-
 #include "impl/utils/debug/asc_debug_utils.h"
 
 #if __NPU_ARCH__ == 2002
@@ -186,7 +180,7 @@ __aicore__ inline void scalar_printf_impl(DumpType debugType, __gm__ const char*
 }
 
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
