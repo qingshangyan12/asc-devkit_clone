@@ -197,7 +197,7 @@ public:
                     quitSize++;
                     switchPoll = true;
 
-#ifdef #ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
                     if (quitSize == 2) {
                         // AIC
                         auto secondMsgStartPos = ptr->GetSecondBuffStart();
