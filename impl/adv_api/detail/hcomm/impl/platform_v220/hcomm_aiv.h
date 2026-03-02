@@ -21,7 +21,7 @@
 namespace AscendC {
 
 template <bool commit, pipe_t pipe>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL::ROCE>::Write(ChannelHandle channelHandle, void* dst, void* src,
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL::ROCE>::Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src,
                                                                     uint64_t len)
 {
     doorBell(channelHandle.sqContext->rdmaSqContext, dst, src, len);
@@ -29,16 +29,16 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL::ROCE>::Write(ChannelHandl
 }
 
 template <bool commit, pipe_t pipe>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL::ROCE>::Read(ChannelHandle channelHandle, void* dst, void* src,
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL::ROCE>::Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src,
                                                                    uint64_t len)
 {
     doorBell(channelHandle.sqContext->rdmaSqContext, dst, src, len);
     return 1;
 }
 
-__aicore__ inline void HcommImpl<COMM_PROTOCOL::ROCE>::doorBell(RdmaSqContext rdmaSqContext, void* destDmaAddr,
-                                                         void* srcDmaAddr, uint64_t messageLen)
+__aicore__ inline void HcommImpl<COMM_PROTOCOL::ROCE>::doorBell(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t messageLen)
 {
+    RdmaSqContext rdmaSqContext = channelHandle.sqContext->rdmaSqContext;
     auto qpNum = rdmaSqContext.qpn;
     auto sqBaseAddr = rdmaSqContext.sqVa;
     auto wqeSize = rdmaSqContext.wqeSize;
@@ -75,12 +75,13 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL::ROCE>::doorBell(RdmaSqContext rd
     *(__gm__ uint32_t*)(wqeAddr + 8) = 0;          // immtdata is always 0 till we provide poll CQ flow in AIV
     *(__gm__ uint32_t*)(wqeAddr + 12) = 1U << 24U; // [120:127] num_sge = 1
     *(__gm__ uint32_t*)(wqeAddr + 16) = 0;         // [128:151] start_sge_idx = 0;
-
+    *(__gm__ uint32_t*)(wqeAddr + 20) = rkey;
     *(__gm__ uint64_t*)(wqeAddr + 24) = (uint64_t)destDmaAddr; // destination VA
 
     __gm__ uint8_t* sgeAddr = wqeAddr + 32;
     *(__gm__ uint32_t*)(sgeAddr) = messageLen;
 
+    *(__gm__ uint32_t*)(sgeAddr + sizeof(uint32_t)) = lkey;
     *(__gm__ uint64_t*)(sgeAddr + 2 * sizeof(uint32_t)) = (uint64_t)srcDmaAddr; // src VA addr memory registered by RNIC
 
     FlushDataCacheHcomm(wqeAddr);

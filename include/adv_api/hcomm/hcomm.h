@@ -52,7 +52,7 @@ public:
      * @note Must be called after channel initialization.
      */
     template <bool commit = true, pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, void* dst, void* src, uint64_t len);
+    __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
      * @class Hcomm
@@ -68,7 +68,7 @@ public:
      * @note Must be called after channel initialization.
      */
     template <bool commit = true, pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, void* dst, void* src, uint64_t len);
+    __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
 private:
     HcommImpl<commProtocol> impl_;

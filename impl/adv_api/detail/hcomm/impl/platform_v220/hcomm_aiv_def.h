@@ -21,14 +21,13 @@ template <>
 class HcommImpl<COMM_PROTOCOL::ROCE> {
 public:
     template <bool commit = true, pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, void* dst, void* src, uint64_t len);
+    __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     template <bool commit = true, pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, void* dst, void* src, uint64_t len);
+    __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
 public:
-    __aicore__ inline void doorBell(RdmaSqContext rdmaSqContext, void* destDmaAddr, void* srcDmaAddr,
-                                    uint64_t messageLen);
+    __aicore__ inline void doorBell(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t messageLen);
 
 private:
     LocalTensor<uint64_t> ubLocal;
