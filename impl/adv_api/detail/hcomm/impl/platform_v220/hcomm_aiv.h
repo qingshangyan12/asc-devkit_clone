@@ -36,7 +36,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL::ROCE>::Read(ChannelHandle
     return 1;
 }
 
-__aicore__ inline void HcommImpl<commProtocol>::doorBell(RdmaSqContext rdmaSqContext, void* destDmaAddr,
+__aicore__ inline void HcommImpl<COMM_PROTOCOL::ROCE>::doorBell(RdmaSqContext rdmaSqContext, void* destDmaAddr,
                                                          void* srcDmaAddr, uint64_t messageLen)
 {
     auto qpNum = rdmaSqContext.qpn;
