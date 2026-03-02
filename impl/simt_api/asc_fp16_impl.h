@@ -46,13 +46,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __habs(half x)
     return *reinterpret_cast<half*>(&bits);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __internal_ispositiveinf(half x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __internal_is_positive_inf(half x)
 {
     uint16_t* int_x = reinterpret_cast<uint16_t*>(&x);
     return *int_x == __INTERNAL_HALF_INF;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __internal_isnegativeinf(half x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __internal_is_negative_inf(half x)
 {
     uint16_t* int_x = reinterpret_cast<uint16_t*>(&x);
     return *int_x == __INTERNAL_HALF_NEG_INF;
@@ -65,19 +65,19 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hmax(half x, half y)
     } else if (__hisnan(y)) {
         return x;
     }
-    if (__internal_ispositiveinf(x)) {
+    if (__internal_is_positive_inf(x)) {
         return x;
-    } else if (__internal_ispositiveinf(y)) {
+    } else if (__internal_is_positive_inf(y)) {
         return y;
     }
-    if (__internal_isnegativeinf(x)) {
+    if (__internal_is_negative_inf(x)) {
         return y;
-    } else if (__internal_isnegativeinf(y)) {
+    } else if (__internal_is_negative_inf(y)) {
         return x;
     }
     if (x == (half)0 && y == (half)0) {
-        bool sign_bitx = ((uint16_t&)x) & 0x8000;
-        bool sign_bity = ((uint16_t&)y) & 0x8000;
+        bool sign_bitx = reinterpret_cast<uint16_t&>(x) & 0x8000;
+        bool sign_bity = reinterpret_cast<uint16_t&>(y) & 0x8000;
         if (sign_bitx) {
             return y;
         } else if (sign_bity) {
@@ -98,19 +98,19 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __hmin(half x, half y)
     } else if (__hisnan(y)) {
         return x;
     }
-    if (__internal_isnegativeinf(x)) {
+    if (__internal_is_negative_inf(x)) {
         return x;
-    } else if (__internal_isnegativeinf(y)) {
+    } else if (__internal_is_negative_inf(y)) {
         return y;
     }
-    if (__internal_ispositiveinf(x)) {
+    if (__internal_is_positive_inf(x)) {
         return y;
-    } else if (__internal_ispositiveinf(y)) {
+    } else if (__internal_is_positive_inf(y)) {
         return x;
     }
     if (x == (half)0 && y == (half)0) {
-        bool sign_bitx = ((uint16_t&)x) & 0x8000;
-        bool sign_bity = ((uint16_t&)y) & 0x8000;
+        bool sign_bitx = reinterpret_cast<uint16_t&>(x) & 0x8000;
+        bool sign_bity = reinterpret_cast<uint16_t&>(y) & 0x8000;
         if (sign_bitx) {
             return x;
         } else if (sign_bity) {
@@ -295,20 +295,20 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2sqrt(half2 x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2rsqrt(half2 x)
 {
-    half tmp1 = (half)1.0 / __sqrtf(x.x);
-    half tmp2 = (half)1.0 / __sqrtf(x.y);
+    half tmp1 = static_cast<half>(1.0) / __sqrtf(x.x);
+    half tmp2 = static_cast<half>(1.0) / __sqrtf(x.y);
     return {tmp1, tmp2};
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hrcp(half x)
 {
-    return (half)1.0 / x;
+    return static_cast<half>(1.0) / x;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2rcp(half2 x)
 {
-    half tmp1 = (half)1.0 / x.x;
-    half tmp2 = (half)1.0 / x.y;
+    half tmp1 = static_cast<half>(1.0) / x.x;
+    half tmp2 = static_cast<half>(1.0) / x.y;
     return {tmp1, tmp2};
 }
 
@@ -350,7 +350,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2ceil(half2 x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half htrunc(half x)
 {
-    if (x > (half)0) {
+    if (x > static_cast<half>(0)) {
         return __floorf(x);
     } else {
         return __ceilf(x);
@@ -361,12 +361,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2trunc(half2 x)
 {
     half tmp1 = x.x;
     half tmp2 = x.y;
-    if (x.x > (half)0) {
+    if (x.x > static_cast<half>(0)) {
         tmp1 = __floorf(tmp1);
     } else {
         tmp1 = __ceilf(tmp1);
     }
-    if (x.y > (half)0) {
+    if (x.y > static_cast<half>(0)) {
         tmp2 = __floorf(tmp2);
     } else {
         tmp2 = __ceilf(tmp2);
@@ -945,8 +945,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldcg(__gm__ half* address)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_ldcg(__gm__ half2* address)
 {
-    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((__gm__ int32_t*)address);
-    return (half2&)t;
+    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(reinterpret_cast<__gm__ int32_t*>(address));
+    return reinterpret_cast<half2&>(t);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldca(__gm__ half* address)
@@ -956,8 +956,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldca(__gm__ half* address)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_ldca(__gm__ half2* address)
 {
-    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((__gm__ int32_t*)address);
-    return (half2&)t;
+    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(reinterpret_cast<__gm__ int32_t*>(address));
+    return reinterpret_cast<half2&>(t);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ half* address, half val)
@@ -967,7 +967,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ half* address, half v
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ half2* address, half2 val)
 {
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((__gm__ int32_t*)address, (int32_t&)val);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(reinterpret_cast<__gm__ int32_t*>(address), reinterpret_cast<int32_t&>(val));
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ half* address, half val)
@@ -977,7 +977,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ half* address, half v
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ half2* address, half2 val)
 {
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((__gm__ int32_t*)address, (int32_t&)val);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(reinterpret_cast<__gm__ int32_t*>(address), reinterpret_cast<int32_t&>(val));
 }
 
 #else
@@ -1036,8 +1036,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldcg(half* address)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_ldcg(half2* address)
 {
-    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int32_t*)address);
-    return (half2&)t;
+    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(reinterpret_cast<int32_t*>(address));
+    return reinterpret_cast<half2&>(t);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldca(half* address)
@@ -1047,8 +1047,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_ldca(half* address)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_ldca(half2* address)
 {
-    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int32_t*)address);
-    return (half2&)t;
+    int32_t t = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(reinterpret_cast<int32_t*>(address));
+    return reinterpret_cast<half2&>(t);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(half* address, half val)
@@ -1058,7 +1058,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(half* address, half val)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(half2* address, half2 val)
 {
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>((int32_t*)address, (int32_t&)val);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(reinterpret_cast<int32_t*>(address), reinterpret_cast<int32_t&>(val));
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(half* address, half val)
@@ -1068,7 +1068,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(half* address, half val)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(half2* address, half2 val)
 {
-    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>((int32_t*)address, (int32_t&)val);
+    __stg<ST_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::CACHEABLE>(reinterpret_cast<int32_t*>(address), reinterpret_cast<int32_t&>(val));
 }
 #endif
 
