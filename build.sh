@@ -513,7 +513,8 @@ function build_test_part() {
   fi
 
   cmake_config
-  cmake --build . ${TARGETS} -j ${THREAD_NUM}
+  # cmake --build . ${TARGETS} -j ${THREAD_NUM}
+  cmake --build . ${TARGETS} -j ${THREAD_NUM} -- -DASCENDC_DUMP=0
   return 0
 }
 

@@ -9,6 +9,10 @@
 # ----------------------------------------------------------------------------------------------------------
 add_compile_options(-Werror)
 
+if(DEFINED ASCENDC_DUMP)
+    add_compile_definitions(ASCENDC_DUMP=${ASCENDC_DUMP})
+endif()
+
 add_subdirectory(aicpu_api)
 add_subdirectory(adv_api)
 add_subdirectory(basic_api)
