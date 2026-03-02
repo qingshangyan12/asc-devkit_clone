@@ -118,12 +118,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rsqrtf(float x)
     return 1.0f / sqrtf(x);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool is_inf(float x)
-{
-    uint32_t* intX = (uint32_t*)&x;
-    return (*intX == 0x7F800000) || (*intX == 0xFF800000);
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdfinvf(float x)
 {
     float double_x = x + x;
@@ -187,7 +181,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float modff(float x, float &n)
         union Data dataY{.i = y_bits};
         result = dataY.f;
     } else {
-        if (is_inf(abs_x)) {
+        if (isinf(abs_x)) {
             union Data data {.f = x};
             uint32_t u32 = data.i;
             uint32_t y_bits = u32 & 0x80000000;
@@ -227,17 +221,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdimf(float x, float y)
     return (x > y) ? (x - y) : 0;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float set_neg_x(float abs_x)
-{
-    return -abs_x;
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sub_set_res_pos(float abs_x, float abs_y)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sub_set_res_pos(float abs_x, float abs_y)
 {
     return (abs_x < abs_y) ? abs_x - abs_y : abs_y - abs_x;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void set_quo(int32_t *quo, int32_t n_sign)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_set_quo(int32_t *quo, int32_t n_sign)
 {
     int32_t neg_e = -8;
     int32_t max_s32 = 0xffffffff;
@@ -253,7 +242,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void set_quo(int32_t *quo, int32_t n_sign)
     }
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float x_le_y(float abs_x, float tmp_val, float abs_y, bool is_x_pos, uint32_t sign_flag, float res,
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_x_le_y(float abs_x, float tmp_val, float abs_y, bool is_x_pos, uint32_t sign_flag, float res,
                              int32_t *quo, int32_t n_sign)
 {
     float double_x = abs_x + abs_x;
@@ -261,24 +250,24 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float x_le_y(float abs_x, float tmp_val, f
 
     if (double_x > abs_y) {
         *quo += 1;
-        set_quo(quo, n_sign);
-        return sign * sub_set_res_pos(abs_x, abs_y);
+        __internal_set_quo(quo, n_sign);
+        return sign * __internal_sub_set_res_pos(abs_x, abs_y);
     }
 
     if ((double_x != abs_y) | (sign_flag == 0)) {
-        set_quo(quo, n_sign);
+        __internal_set_quo(quo, n_sign);
         if (is_x_pos) {
             return res;
         } else {
-            return set_neg_x(abs_x);
+            return -abs_x;
         }
     }
     *quo += 1;
-    set_quo(quo, n_sign);
-    return sign * sub_set_res_pos(abs_x, abs_y);
+    __internal_set_quo(quo, n_sign);
+    return sign * __internal_sub_set_res_pos(abs_x, abs_y);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void  cal_remquo(float &abs_x, float &n_x_y_val, uint32_t &sign_flag, float &abs_y, float &tmp_val,
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_cal_remquo(float &abs_x, float &n_x_y_val, uint32_t &sign_flag, float &abs_y, float &tmp_val,
                              int32_t *quo)
 {
     bool is_x_lt_xy = abs_x < n_x_y_val;
@@ -336,15 +325,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, int32_t *q
     uint32_t sign_flag = 0;
     if (abs_x < abs_y) {
         res = x;
-        return x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, quo, n_sign);
+        return __internal_x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, quo, n_sign);
     }
 
-    uint32_t *u_abs_y = (uint32_t *)(&abs_y);
+    uint32_t *u_abs_y = reinterpret_cast<uint32_t *>(&abs_y);
     uint32_t u_y = (*u_abs_y) & ASCRT_MAN_BIT_FLOAT_U;
-    uint32_t *u_abs_x = (uint32_t *)(&abs_x);
+    uint32_t *u_abs_x = reinterpret_cast<uint32_t *>(&abs_x);
     uint32_t u_x = (*u_abs_x) & ASCRT_EXP_BIT_FLOAT_U;
     float x_y_val = 0.0;
-    uint32_t *uf26 = (uint32_t *)(&x_y_val);
+    uint32_t *uf26 = reinterpret_cast<uint32_t *>(&x_y_val);
     *uf26 = u_y | u_x;
     bool is_gt_abs_x = x_y_val > abs_x && !isnan(x_y_val);
     res = 0.0;
@@ -357,17 +346,17 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, int32_t *q
     res = abs_x;
     *quo = 0;
     if (n_x_y_val < abs_y || isnan(n_x_y_val)) {
-        return x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, quo, n_sign);
+        return __internal_x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, quo, n_sign);
     }
-    cal_remquo(abs_x, n_x_y_val, sign_flag, abs_y, tmp_val, quo);
+    __internal_cal_remquo(abs_x, n_x_y_val, sign_flag, abs_y, tmp_val, quo);
     res = abs_x;
 
-    return x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, quo, n_sign);
+    return __internal_x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, quo, n_sign);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float set_res_mod_neg(float mod_res)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_set_res_mod_neg(float mod_res)
 {
-    uint32_t *u_mod_res = (uint32_t *)(&mod_res);
+    uint32_t *u_mod_res = reinterpret_cast<uint32_t *>(&mod_res);
     *u_mod_res = (*u_mod_res) | ASCRT_NEG_SIGN_BIT_U;
     return mod_res;
 }
@@ -392,14 +381,14 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
         return (lt_zero_or_nan) ? (xy_val + x) : xy_val;
     }
 
-    uint32_t *uabs_y = (uint32_t *)&abs_y;
+    uint32_t *uabs_y = reinterpret_cast<uint32_t *>(&abs_y);
     uint32_t y_man_bits = (*uabs_y) & ASCRT_MAN_BIT_FLOAT_U;
-    uint32_t *uabs_x = (uint32_t *)(&abs_x);
+    uint32_t *uabs_x = reinterpret_cast<uint32_t *>(&abs_x);
     uint32_t x_exp_bits = (*uabs_x) & ASCRT_EXP_BIT_FLOAT_U;
     uint32_t xy_bits = y_man_bits | x_exp_bits;
 
     float xy_val = 0;
-    uint32_t *uxy_val = (uint32_t *)&xy_val;
+    uint32_t *uxy_val = reinterpret_cast<uint32_t *>(&xy_val);
     *uxy_val = xy_bits;
     bool is_gt_x = (xy_val > abs_x) && !isnan(xy_val) && !is_x_nan;
     float half_xy_val = xy_val * 0.5f;
@@ -408,7 +397,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
 
     if (xy_val < abs_y || isnan(xy_val) || is_y_nan) {
         if (!is_x_pos) {
-            return set_res_mod_neg(mod_res);
+            return __internal_set_res_mod_neg(mod_res);
         }
         return mod_res;
     }
@@ -423,7 +412,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
         xy_val_ge_y = (xy_val >= abs_y) || isnan(xy_val) || is_y_nan;
     }
     if (!is_x_pos) {
-        return set_res_mod_neg(mod_res);
+        return __internal_set_res_mod_neg(mod_res);
     }
     return mod_res;
 }
@@ -449,7 +438,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nearbyintf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nextafterf(float x, float y)
 {
-    uint32_t *f = (uint32_t *)&x;
+    uint32_t *f = reinterpret_cast<uint32_t *>(&x);
     if (x > 0) {
         if (x < y) {  // when x < src, x bit +1
             (*f)++;
@@ -519,7 +508,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fminf(float x, float y)
     return __fminf(x, y);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float payne_hanek_radian_reduction(float x, int *output_quadrant)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_payne_hanek_radian_reduction(float x, int *output_quadrant)
 {
     // Step 1: Extract raw bits of the input angle
     uint32_t input_bits = reinterpret_cast<uint32_t &>(x);
@@ -585,7 +574,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float payne_hanek_radian_reduction(float x
     return reduced_angle;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cody_waite_radian_reduction(float x, int *quadrant)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cody_waite_radian_reduction(float x, int *quadrant)
 {
     float y = fmaf(x, 0.636619747f, 12582912.0f);    // 0.636619747f: 2/pi
     *quadrant = reinterpret_cast<int &>(y);
@@ -595,17 +584,17 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cody_waite_radian_reduction(float x,
     return fmaf(y, -5.39030253e-15f, x);             // 5.39030253e-15f: low of pi/2
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float trig_radian_reduction(float x, float threshold, int *quadrant)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_trig_radian_reduction(float x, float threshold, int *quadrant)
 {
     x = fmaf(x, 0.0f, x);
     if (fabsf(x) > threshold) {
-        return payne_hanek_radian_reduction(x, quadrant);
+        return __internal_payne_hanek_radian_reduction(x, quadrant);
     } else {
-        return cody_waite_radian_reduction(x, quadrant);
+        return __internal_cody_waite_radian_reduction(x, quadrant);
     }
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tan_poly(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_tan_poly(float x)
 {
     x = x * x;
     float y = fmaf(x, 4.38117981e-3f, 8.94600598e-5f);  // 4.38117981e-3f: 8.94600598e-5f:
@@ -621,10 +610,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanf(float x)
 {
     // Step 1: Reduce the angle to the range [0, pi/2) and determine the quadrant
     int quadrant;
-    float y = trig_radian_reduction(x, 252.898206f, &quadrant);  // 252.898206f: Threshold for reduction algorithm
+    float y = __internal_trig_radian_reduction(x, 252.898206f, &quadrant);  // 252.898206f: Threshold for reduction algorithm
 
     // Step 2: Compute the tangent using polynomial approximation
-    float t = tan_poly(y);
+    float t = __internal_tan_poly(y);
 
     // Step 3: Compute the initial approximation of tan(y)
     float z = fmaf(t, y, y);
@@ -652,7 +641,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanpif(float x)
     return tanf(x * ASCRT_PI_F);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void taylor_expand(float &dst, float &src, float &square_v, uint32_t expand_level, float *factor)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_taylor_expand(float &dst, float &src, float &square_v, uint32_t expand_level, float *factor)
 {
     square_v = src * src;
     dst = src * src;
@@ -665,7 +654,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void taylor_expand(float &dst, float &src,
     dst = dst * src;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void taylor_expand(float &dst, float &src, float &square_v, uint32_t expand_level)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_taylor_expand(float &dst, float &src, float &square_v, uint32_t expand_level)
 {
     float factor[] = {1,
                       -0.3333333333333333,
@@ -674,10 +663,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void taylor_expand(float &dst, float &src,
                       0.1111111111111111,
                       -0.09090909090909091,
                       0.07692307692307693};
-    taylor_expand(dst, src, square_v, expand_level, factor);
+    __internal_taylor_expand(dst, src, square_v, expand_level, factor);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void atan_expand(float &dst, float &src, float &tmp, float trans_factor)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_atan_expand(float &dst, float &src, float &tmp, float trans_factor)
 {
     dst = src * trans_factor;
     dst = dst + 1.0f;
@@ -686,7 +675,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void atan_expand(float &dst, float &src, f
     dst = fabsf(dst);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void Sign(float &dst, float &src, float &denominator)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_sign(float &dst, float &src, float &denominator)
 {
     dst = src * 4611686018427387904.0f; //4611686018427387904 : ATAN_FP32_MAX
     denominator = fabsf(dst);
@@ -708,9 +697,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
     float tmp = 0;
     float tmp2 = 0;
 
-    taylor_expand(dst, abs_v, square_v, 4); //4 : Taylor expansion count
-    atan_expand(tmp, abs_v, tmp2, 0.4142135623730950); // 0.4142135623730950 : TAN_PI_OF_8
-    taylor_expand(tmp2, tmp, square_v, 4); //4 : Taylor expansion count
+    __internal_taylor_expand(dst, abs_v, square_v, 4); //4 : Taylor expansion count
+    __internal_atan_expand(tmp, abs_v, tmp2, 0.4142135623730950); // 0.4142135623730950 : TAN_PI_OF_8
+    __internal_taylor_expand(tmp2, tmp, square_v, 4); //4 : Taylor expansion count
 
     tmp2 = tmp2 + ASCRT_PIO8_F;
     dst = fminf(dst, tmp2);
@@ -720,18 +709,18 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
     tmp = tmp / tmp2;
     tmp = fabsf(tmp);
 
-    taylor_expand(tmp2, tmp, square_v, 4); //4 : Taylor expansion count
+    __internal_taylor_expand(tmp2, tmp, square_v, 4); //4 : Taylor expansion count
     tmp2 = tmp2 + ASCRT_PIO4_F;
     dst = fminf(dst, tmp2);
 
-    atan_expand(tmp2, tmp, square_v, 0.4142135623730950); // 0.4142135623730950 : TAN_PI_OF_8
-    taylor_expand(tmp, tmp2, square_v, 6); //6 : Taylor expansion count
+    __internal_atan_expand(tmp2, tmp, square_v, 0.4142135623730950); // 0.4142135623730950 : TAN_PI_OF_8
+    __internal_taylor_expand(tmp, tmp2, square_v, 6); //6 : Taylor expansion count
 
     tmp = tmp + ASCRT_PIO8_F;
     tmp = tmp + ASCRT_PIO4_F;
     dst = fminf(dst, tmp);
 
-    Sign(tmp, clip, tmp2);
+    __internal_sign(tmp, clip, tmp2);
 
     dst = dst * tmp;
     return dst;
@@ -779,7 +768,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanhf(float x)
     return logf((1.0f + x) / (1.0f - x)) / 2.0f;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cos_poly(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cos_poly(float x)
 {
     x = x * x;
     float y = fmaf(x, 2.44677067e-5f, -1.38877297e-3f); // 2.44677067e-5f: 1/8! -1.38877297e-3f: -1/6!
@@ -788,7 +777,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cos_poly(float x)
     return fmaf(x, y, 1.00000000e+0f); //  1.00000000e+0f: 1
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sin_poly(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sin_poly(float x)
 {
     float y = x * x;
     float m = fmaf(x, y, 0.0f);
@@ -804,11 +793,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cosf(float x)
 {
     // Step 1: Reduce the angle to the range [0, pi/2) and determine the quadrant
     int quadrant;
-    float y = trig_radian_reduction(x, 71476.0625f, &quadrant);  // 71476.0625f: Threshold for reduction algorithm
+    float y = __internal_trig_radian_reduction(x, 71476.0625f, &quadrant);  // 71476.0625f: Threshold for reduction algorithm
 
     // Step 2: Compute cosine and sine of the reduced angle using polynomial approximations
-    float c = cos_poly(y);
-    float s = sin_poly(y);
+    float c = __internal_cos_poly(y);
+    float s = __internal_sin_poly(y);
 
     // Step 3: Adjust the cosine value based on the quadrant
     if (quadrant & 2) {  // Quadrants 2 and 3: cos(pi + x) = -cos(x)
@@ -854,15 +843,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x)
         0.01396484375,
     };
     if (fabsf(x) <= 0.7071067811865476f) { // 0.7071067811865476 : SCALAR_ACOS_MAX_LIMIT
-        taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
+        __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
         return dst;
     } else if (x < -0.7071067811865476f) { // -0.7071067811865476 : SCALAR_ACOS_MIN_LIMIT
         src = sqrtf(1.0f - x * x);
-        taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
+        __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
         return dst - ASCRT_PIO2_F;
     } else {
         src = sqrtf(1.0f - x * x);
-        taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
+        __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
         return ASCRT_PIO2_F - dst;
     }
 }
@@ -883,11 +872,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinf(float x)
 {
     int quadrant;
-    float y = trig_radian_reduction(x, 71476.0625f, &quadrant);  // 71476.0625f: Threshold for reduction algorithm
+    float y = __internal_trig_radian_reduction(x, 71476.0625f, &quadrant);  // 71476.0625f: Threshold for reduction algorithm
 
     // Step 2: Compute cosine and sine of the reduced angle using polynomial approximations
-    float s = sin_poly(y);
-    float c = cos_poly(y);
+    float s = __internal_sin_poly(y);
+    float c = __internal_cos_poly(y);
 
     // Step 3: Adjust the sine value based on the quadrant
     if (quadrant & 2) {  // Quadrants 2 and 3: sin(pi + x) = -sin(x)
@@ -915,7 +904,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinhf(float x)
                           0.0001984126984126984,
                           2.7557319223985893e-06,
                           2.505210838544172e-08};
-        taylor_expand(dst, src, square_v, 5, factor); // 5: Taylor expansion count
+        __internal_taylor_expand(dst, src, square_v, 5, factor); // 5: Taylor expansion count
         return dst;
     }
 }
@@ -943,7 +932,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
             0.01735276442307692307692307692308,
             -0.01396484375,
         };
-        taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
+        __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
         return dst;
     }
 }
@@ -952,9 +941,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float &s, float &c)
 {
     int quadrant;
     float t;
-    float y = trig_radian_reduction(x, 71476.0625f, &quadrant);  // 71476.0625f: threshold for reduce algorithm
-    float cos = cos_poly(y);
-    float sin = sin_poly(y);
+    float y = __internal_trig_radian_reduction(x, 71476.0625f, &quadrant);  // 71476.0625f: threshold for reduce algorithm
+    float cos = __internal_cos_poly(y);
+    float sin = __internal_sin_poly(y);
     if (quadrant & 2) {  // 2: sin(pi+x) = -sin(x), cos(pi+x) = -cos(x)
         sin = -sin;
         cos = -cos;
@@ -995,7 +984,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool is_positive_inf_impl(float x)
 {
-    uint32_t* int_x = (uint32_t*)&x;
+    uint32_t* int_x = reinterpret_cast<uint32_t*>(&x);
     return *int_x == ASCRT_INF_U;
 }
 
@@ -1204,7 +1193,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logbf(float x)
     uint32_t fp32_decimal_bit = 23;
     uint32_t fp32_sign_bit = 256;
     uint32_t fp32_exponent_h = 127;
-    uint32_t *exponent = (uint32_t *)&x;
+    uint32_t *exponent = reinterpret_cast<uint32_t *>(&x);
     (*exponent) >>= fp32_decimal_bit;
     uint32_t sign = fp32_sign_bit;
     if ((*exponent) > sign) {
@@ -1359,7 +1348,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erff(float x)
     }
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cal_poly(float abs_x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cal_poly(float abs_x)
 {
     float term1 = abs_x + -4.0f;
     float term2 = abs_x + 4.0f;
@@ -1387,7 +1376,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcf(float x)
 {
     float abs_x = fabsf(x);
 
-    float poly = cal_poly(abs_x);
+    float poly = __internal_cal_poly(abs_x);
 
     float tmp2 = fmaf(2.0f, abs_x, 1.0f);
     float inv_tmp2 = 1.0f / tmp2;
@@ -1506,7 +1495,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcxf(float x)
     }
     float abs_x = fabsf(x);
     if (abs_x < 10.055f) {
-        float poly = cal_poly(abs_x);
+        float poly = __internal_cal_poly(abs_x);
         float term3 = fmaf(2.0f, abs_x, 1.0f);
         float inv_term3 = 1.0f / term3;
         float q = poly * inv_term3;
@@ -1549,7 +1538,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcxf(float x)
     }
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float compute_sinpi(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_compute_sinpi(float x)
 {
     float double_x = x * 2;
 
@@ -1798,7 +1787,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float stirling_and_euler_reflection(float 
         y6 = (y6 + 1);
 
         //  sin(pi*|x|)
-        float sinpi = compute_sinpi(abs_x);
+        float sinpi = __internal_compute_sinpi(abs_x);
 
         //  (y6 * x * sinpi)'s Error value
         float y_diff = fmaf(y6 * x, sinpi, -y6 * x * sinpi);
@@ -1978,7 +1967,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float lgammaf(float x)
             //  = ln(pi) - ln(|sin(pi*x)|) - ln(gamma(|x|)) - ln(|x|)
             //  = ln(pi) - ln(|sin(pi*x)|) - ln(gamma(|x|)) - ln(|x|)
             //  = ln(pi) - ln(|sin(pi*|x|)|*|x|]) - ln(gamma(|x|))
-            float sinpi = compute_sinpi(abs_x);
+            float sinpi = __internal_compute_sinpi(abs_x);
             float ln_x_sinpi = compute_ln(abs_x * fabsf(sinpi));
             float y = 1.14472985f - ln_x_sinpi;   //  1.1447298f : ln(pi)
             result = fmaf(y, 1.0f, -result);
