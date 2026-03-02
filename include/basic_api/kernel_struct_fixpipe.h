@@ -203,8 +203,8 @@ struct FixpipeParamsC350 {
     bool isChannelSplit = false;
 };
 
-template <CO2Layout layout>
-using FixpipeParamsC310 = FixpipeParamsC350<layout>;
+template <CO2Layout format = CO2Layout::ROW_MAJOR>
+using FixpipeParamsC310 = FixpipeParamsC350<format>;
 #endif
 
 using FixpipeParamsM300 = FixpipeParamsV220;
