@@ -359,8 +359,8 @@ struct LayoutDispatcher<LayoutFormat::DN, T> {
 template <>
 struct LayoutDispatcher<LayoutFormat::DN, fp8_e8m0_t> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(row, Std::Int<1>{}, Std::Int<2>{}, column / MX_SCALE_K0,
-                                    Std::Int<MX_SCALE_K0>{}, row * column, Std::Int<1>{}, MX_SCALE_K0 * row);
+        return LayoutConstructor(Std::Int<1>{}, row, Std::Int<2>{}, column / MX_SCALE_K0,
+                                    Std::Int<0>{}, Std::Int<MX_SCALE_K0>{}, Std::Int<1>{}, MX_SCALE_K0 * row);
     }
 };
 
@@ -369,6 +369,14 @@ struct LayoutDispatcher<LayoutFormat::ND, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
         return LayoutConstructor(Std::Int<1>{}, row, Std::Int<1>{}, column,
                                     Std::Int<0>{}, column, Std::Int<0>{}, Std::Int<1>{});
+    }
+};
+
+template <typename T>
+struct LayoutDispatcher<LayoutFormat::ND, fp8_e8m0_t> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return LayoutConstructor(Std::Int<2>{}, row / MX_SCALE_K0, Std::Int<1>{}, column,
+                                    Std::Int<1>{}, MX_SCALE_K0 * column, Std::Int<0>{}, Std::Int<MX_SCALE_K0>{});
     }
 };
 
@@ -627,7 +635,7 @@ __aicore__ inline decltype(auto) MakeNnLayout(size_t row, size_t column) {
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleANDLayout(size_t row, size_t column) { // 不转置(m, scaleK)
-    return LayoutDispatcher<LayoutFormat::ND, T>::apply(row, column); // (m, scaleK)
+    return LayoutDispatcher<LayoutFormat::ND, uint16_t>::apply(row, column); // (m, scaleK)
 }
 
 template <typename T>
@@ -637,12 +645,12 @@ __aicore__ inline decltype(auto) MakeScaleADNLayout(size_t row, size_t column) {
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleBNDLayout(size_t row, size_t column) { // 不转置(scaleK, n)
-    return LayoutDispatcher<LayoutFormat::DN, T>::apply(column, row); // (n, scaleK)
+    return LayoutDispatcher<LayoutFormat::ND, T>::apply(row, column); // (scaleK, n)
 }
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleBDNLayout(size_t row, size_t column) { // 转置(scaleK, n)
-    return LayoutDispatcher<LayoutFormat::ND, T>::apply(column, row); // (n, scaleK)
+    return LayoutDispatcher<LayoutFormat::DN, uint16_t>::apply(row, column); // (scaleK, n)
 }
 
 class DimConversion {

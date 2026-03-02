@@ -120,7 +120,7 @@ private:
     }
 
     __aicore__ inline static constexpr bool IsFractalZZFormat() {
-        constexpr bool isScaleType = Std::is_one_of_v<type, __cbuf__ fp8_e8m0_t, __ca__ fp8_e8m0_t, __cb__ fp8_e8m0_t>;
+        constexpr bool isScaleType = is_scale_type_v<type>;
         using ResultType = Std::conditional_t<isScaleType,
             Std::bool_constant<IsFractalScaleZZFormat()>,
             Std::bool_constant<IsFractalZZFormatNormal()>>;
@@ -266,7 +266,7 @@ private:
     }
 
      __aicore__ inline static constexpr bool IsFractalDNFormat() {
-        constexpr bool isScaleType = Std::is_one_of_v<type, __cbuf__ fp8_e8m0_t, __ca__ fp8_e8m0_t, __cb__ fp8_e8m0_t>;
+        constexpr bool isScaleType = is_scale_type_v<type>;
         using ResultType = Std::conditional_t<isScaleType,
             Std::bool_constant<IsFractalScaleDNFormat()>,
             Std::bool_constant<IsFractalDNFormatNormal()>>;

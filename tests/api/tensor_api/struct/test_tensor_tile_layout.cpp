@@ -213,16 +213,33 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(NnLayout)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(NnLayout)), 16);
+
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(Zzlayout)), 16);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(Zzlayout)), 2);
+
+    // shape = ((1, row), (1, col)) stride = ((0, col),(0, 1))
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxANDLayout)), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxANDLayout)), 1);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxANDLayout)), 48);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxANDLayout)), 16);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxADNLayout)), 48);
+
+    // shape = ((1, row), (2, col/2)) stride = ((0, 2), (1, row*2))
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxADNLayout)), 1);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxADNLayout)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxBNDLayout)), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxBNDLayout)), 8);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxADNLayout)), 48);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxADNLayout)), 8);
+
+    // shape = ((2, row/2), (1, col)) stride = ((1, 2*col), (0, 2))
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxBNDLayout)), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxBNDLayout)), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxBNDLayout)), 8);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxBNDLayout)), 48);
+
+    // shape = ((1, row), (1, col)) stride = ((0, 1), (0, row))
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxBDNLayout)), 1);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxBDNLayout)), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxBDNLayout)), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxBDNLayout)), 48);
 }
 
 TEST_F(Tensor_Api_Layout, GetOperation)
