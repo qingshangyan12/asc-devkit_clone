@@ -19,5 +19,5 @@ add_executable(c_api_add_example
 )
 
 target_compile_options(c_api_add_example PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3101>
 )
