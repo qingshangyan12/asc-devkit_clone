@@ -635,7 +635,7 @@ def extract_decl_param_options(op_info: OpInfo, option_name="dtype"):
 
 def check_kernel_template_input(kernel_compile_dict: dict):
     tiling_map_dict = {item.name: item for item in TILING_DECLARE_MAP}
-    for key, values in kernel_compile_dict:
+    for key, values in kernel_compile_dict.items():
         if key not in tiling_map_dict:
             raise RuntimeError('kernel-template-input key {} is invalid!'.format(key))
         valid_values = tiling_map_dict[key].values
