@@ -15,28 +15,84 @@
 import os
 import numpy as np
 
+# def saturation(value, min_val, max_val, target_type):
+#     """
+#     将输入的浮点数进行饱和处理，并转换为目标类型
+    
+#     参数:
+#         value: 输入值（标量或数组）
+#         min_val: 最小值
+#         max_val: 最大值
+#         target_type: 目标数据类型
+        
+#     返回:
+#         饱和处理并转换类型后的值
+#     """
+#     x_clamped = np.clip(value, min_val, max_val)
+#     return np.round(x_clamped).astype(target_type)
 
-def gen_golden_data_simple():
-    dtype = np.float16
+def get_range_by_dtype(input_type):
+    """
+    根据NumPy数据类型获取其数值范围（最小值和最大值）
+    
+    参数:
+        input_type: NumPy数据类型或类型对象
+        
+    返回:
+        tuple: (最小值, 最大值)
+    """
+    try:
+        if input_type == np.float16 or input_type == np.float32 or input_type == np.float64:
+            return np.finfo(input_type).min, np.finfo(input_type).max
+        else:
+            return np.iinfo(input_type).min, np.iinfo(input_type).max
+    except ValueError as e:
+        print(f"Unsupported data type: {input_type}")
+        raise e
+
+def gen_golden_data():
+    input_type = np.float16
+    output_type = input_type
     src_shape = [8192]
+    
+    # 设置随机种子保证可重复性
     np.random.seed(0)
-    input_dtype = dtype
+    
     cal_count = 8192
-    # is_high_preci = 0
-    min_num, max_num = input_dtype(-10), input_dtype(10)
-    # element_num = 1
-    # for a in src_shape:
-        # element_num *= a
-    src = np.random.uniform(min_num, max_num, src_shape).astype(input_dtype)
-    # if is_high_preci == 1:
-    #     src = src.astype(np.float32)
-    src_exp = src[:cal_count]
-    src_ori = np.zeros(src.size - cal_count).astype(src.dtype)
-    src_exp = np.exp(src_exp)
-    golden = np.concatenate((src_exp, src_ori), axis=None)
-
-    if input_dtype != np.float32:
-        golden = golden.astype(np.float16)
+    
+    # # 方法1: 在安全范围内生成输入数据（推荐）
+    # safe_min, safe_max = get_safe_exp_range(input_type)
+    # src = np.random.uniform(safe_min, safe_max, src_shape).astype(input_type)
+    
+    # 方法2: 在全范围内生成数据，然后使用saturation处理（替代方案）
+    # 获取数据类型完整范围
+    min_val, max_val = get_range_by_dtype(input_type)
+    src = np.random.uniform(min_val, max_val, src_shape).astype(input_type)
+    
+    # 分割数据
+    src_exp_input = src[:cal_count].copy()
+    src_ori = np.zeros(src.size - cal_count, dtype=input_type)
+    
+    # 计算指数，忽略溢出警告
+    with np.errstate(over='ignore', under='ignore'):
+        src_exp_result = np.exp(src_exp_input)
+    # src_exp_result = np.exp(src_exp_input)
+    
+    # 使用saturation函数处理溢出
+    # 获取输出类型的范围
+    output_min, output_max = get_range_by_dtype(output_type)
+    
+    # 对指数计算结果进行饱和处理
+    src_exp_saturated = src_exp_result # 不能进行饱和处理
+    # src_exp_saturated = saturation(
+    #     src_exp_result, 
+    #     output_min, 
+    #     output_max, 
+    #     output_type
+    # )
+    
+    # 组合结果
+    golden = np.concatenate((src_exp_saturated, src_ori), axis=None).astype(output_type)
 
     os.makedirs("input", exist_ok=True)
     src.tofile("./input/input_x.bin")
@@ -44,4 +100,4 @@ def gen_golden_data_simple():
     golden.tofile("./output/golden.bin")
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    gen_golden_data()
