@@ -100,7 +100,7 @@ __aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t ind
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
 #endif
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
     if (countOff > input.GetSize()) {
         ASCENDC_ASSERT((false),
             { KERNEL_LOG(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
@@ -119,7 +119,7 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
 #endif
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
     if (countOff > input.GetSize()) {
         ASCENDC_ASSERT((false),
             { KERNEL_LOG(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
