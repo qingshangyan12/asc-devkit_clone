@@ -507,6 +507,7 @@ function build_test_part() {
   done
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=${TEST_MOD}"
+  CUSTOM_OPTION="${CUSTOM_OPTION} -DASCENDC_DUMP=0"
   if [ "${COV}" == "true" ]; then
     TARGETS="${TARGETS} --target collect_coverage_data"
   fi
