@@ -8,6 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
+
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 
@@ -993,3 +998,8 @@ __simd_callee__ inline void asc_half2float(vector_float& dst, vector_half src, v
 __simd_callee__ inline void asc_half2float_v2(vector_float& dst, vector_half src, vector_bool mask);
 
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#endif   
