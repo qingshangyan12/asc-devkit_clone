@@ -635,7 +635,7 @@ __aicore__ inline decltype(auto) MakeNnLayout(size_t row, size_t column) {
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleANDLayout(size_t row, size_t column) { // 不转置(m, scaleK)
-    return LayoutDispatcher<LayoutFormat::ND, uint16_t>::apply(row, column); // (m, scaleK)
+    return LayoutDispatcher<LayoutFormat::ND, Std::ignore_t>::apply(row, column); // (m, scaleK)
 }
 
 template <typename T>
@@ -650,7 +650,7 @@ __aicore__ inline decltype(auto) MakeScaleBNDLayout(size_t row, size_t column) {
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleBDNLayout(size_t row, size_t column) { // 转置(scaleK, n)
-    return LayoutDispatcher<LayoutFormat::DN, uint16_t>::apply(row, column); // (scaleK, n)
+    return LayoutDispatcher<LayoutFormat::DN, Std::ignore_t>::apply(row, column); // (scaleK, n)
 }
 
 class DimConversion {
