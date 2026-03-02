@@ -530,6 +530,7 @@ def extract_template_tiling_params(tiling_param_list: List[str], bit_map: dict =
 GROUP_ID = 0
 ID_LIST = []
 group_map = {}
+kernel_compile_dict = {}
 
 
 def get_concated_tiling_key(template_param_list: List[TilingTemplateParams], \
@@ -537,6 +538,7 @@ def get_concated_tiling_key(template_param_list: List[TilingTemplateParams], \
     global ID_LIST
     global GROUP_ID
     global group_map
+    global kernel_compile_dict
     result = dict()
     if index == len(template_param_list):
         data.update({"paramArgs": tiling_args})
@@ -555,6 +557,9 @@ def get_concated_tiling_key(template_param_list: List[TilingTemplateParams], \
         return result
     template_param = template_param_list[index]
     for val in template_param.values:
+        if kernel_compile_dict and template_param.name in kernel_compile_dict \
+            and str(val) not in kernel_compile_dict[template_param.name]:
+            continue
         if template_param.param_type == TilingParamType.TPL_TILING_STRUCT:
             data["tilingStruct"] = template_param.name
             encode_ = ""
@@ -646,11 +651,14 @@ def check_kernel_template_input(kernel_compile_dict: dict):
 
 
 def decode_tiling(tiling_key: int = None) -> dict:
+    global kernel_compile_dict
     kernel_template_input = get_context().get_addition("kernel-template-input")
     if kernel_template_input and "=" not in kernel_template_input:
         raise RuntimeError('Invalid kernel-template-input format! Please use key value pairs!')
     kernel_compile_dict = {}
     if kernel_template_input:
+        if kernel_template_input.startswith("'") and kernel_template_input.endswith("'"):
+            kernel_template_input = kernel_template_input[1:-1]
         pairs = kernel_template_input.split(';')
         for pair in pairs:
             if pair.count("=") > 1:
