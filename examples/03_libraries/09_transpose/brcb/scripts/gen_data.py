@@ -13,7 +13,9 @@
 
 
 import os
+import argparse
 import numpy as np
+np.random.seed(9)
 
 
 def get_range_by_dtype(input_type):
@@ -25,7 +27,7 @@ def get_range_by_dtype(input_type):
     except ValueError:
         print(f"Unsupported data type:{input_type}")
 
-def gen_golden_data_simple():
+def gen_golden_data_simple(scenarioNum=1):
     input_type = np.dtype("uint16")
     output_type = input_type
     min_val, max_val = get_range_by_dtype(input_type)
@@ -36,9 +38,15 @@ def gen_golden_data_simple():
     output_shape = [block_length]
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
     golden = np.zeros(output_shape).astype(output_type)
-    for i in range(len(input_x)):
-        golden[i * (one_data_block_size // input_type.itemsize) : 
-        (i + 1) * (one_data_block_size // input_type.itemsize)] = input_x[i]
+    if scenarioNum == 1:
+        for i in range(len(input_x)):
+            golden[i * (one_data_block_size // input_type.itemsize) : 
+            (i + 1) * (one_data_block_size // input_type.itemsize)] = input_x[i]
+    else :
+        for i in range (len(input_x) // 8):
+            for j in range (8):
+                golden[(i * 8 + j) * (one_data_block_size // input_type.itemsize) : 
+                (i * 8 + 1 + j) * (one_data_block_size // input_type.itemsize)] = input_x[i * 8 + j]
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
@@ -46,4 +54,7 @@ def gen_golden_data_simple():
 
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 3))
+    args = parser.parse_args()
+    gen_golden_data_simple(args.scenarioNum)
