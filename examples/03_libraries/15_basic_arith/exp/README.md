@@ -7,13 +7,13 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── reduce_max
+├── exp
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── reduce_max.asc      // Ascend C算子实现 & 调用样例
+│   └── exp.asc      // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
@@ -29,7 +29,7 @@
   <tr><td rowspan="2" align="center">算子输出</td></tr>
   <tr><td align="center">y</td><td align="center">16</td><td align="center">half</td><td align="center">ND</td></tr>
 
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_max_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">exp_custom</td></tr>
   </table>
 
 - 算子实现：  
