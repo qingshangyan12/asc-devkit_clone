@@ -372,7 +372,7 @@ struct LayoutDispatcher<LayoutFormat::ND, T> {
     }
 };
 
-template <typename T>
+template <>
 struct LayoutDispatcher<LayoutFormat::ND, fp8_e8m0_t> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
         return LayoutConstructor(Std::Int<2>{}, row / MX_SCALE_K0, Std::Int<1>{}, column,
