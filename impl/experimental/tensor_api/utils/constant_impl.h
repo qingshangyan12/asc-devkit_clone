@@ -58,9 +58,9 @@ struct is_one_of_value<Value, Head, Tail...>
 template <QuantMode_t Value, QuantMode_t... Args>
 inline constexpr bool is_one_of_value_v = is_one_of_value<Value, Args...>::value;
 
-template <typename type>
-inline constexpr bool is_scale_type_v = Std::is_one_of_v<type, __gm__ fp8_e8m0_t, __cbuf__ fp8_e8m0_t, __ca__ fp8_e8m0_t, 
-                                                        __cb__ fp8_e8m0_t, __cc__ fp8_e8m0_t, __biasbuf__ fp8_e8m0_t, __fbuf__ fp8_e8m0_t>;
+template <typename type, typename DType>
+inline constexpr bool is_scale_type_v = Std::is_one_of_v<type, __gm__ DType, __cbuf__ DType, __ca__ DType, 
+                                                        __cb__ DType, __cc__ DType, __biasbuf__ DType, __fbuf__ DType>;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define SCALAR_QUANT_MODE QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8,\
