@@ -16,41 +16,32 @@ import os
 import numpy as np
 
 
-def get_range_by_dtype(input_type):
-    try:
-        if input_type == np.float16 or input_type == np.float32 or input_type == np.float64:
-            return np.finfo(input_type).min, np.finfo(input_type).max
-        else:
-            return np.iinfo(input_type).min, np.iinfo(input_type).max
-    except ValueError:
-        print(f"Unsupported data type:{input_type}")
-
-# 返回结果中索引index数据是按照dst的数据类型进行存储的，比如dst使用half类型时，
-# index按照half类型进行存储，如果按照half格式进行读取，index的值是不对的，因此index的读取需要使用reinterpret_cast方法转换到整数类型。
-# 若输入数据类型是half，需要使用reinterpret_cast<uint16_t*>，若输入是float，需要使用reinterpret_cast<uint32_t*>
 def gen_golden_data_simple():
-    input_type = np.float16
-    output_type = input_type
-    max_index_type = np.uint16 #与half对应
-    block_length = 288
+    dtype = np.float16
+    src_shape = [8192]
+    np.random.seed(0)
+    input_dtype = dtype
+    cal_count = 8192
+    # is_high_preci = 0
+    min_num, max_num = input_dtype(-10), input_dtype(10)
+    # element_num = 1
+    # for a in src_shape:
+        # element_num *= a
+    src = np.random.uniform(min_num, max_num, src_shape).astype(input_dtype)
+    # if is_high_preci == 1:
+    #     src = src.astype(np.float32)
+    src_exp = src[:cal_count]
+    src_ori = np.zeros(src.size - cal_count).astype(src.dtype)
+    src_exp = np.exp(src_exp)
+    golden = np.concatenate((src_exp, src_ori), axis=None)
 
-    min_val, max_val = get_range_by_dtype(input_type)
-    input_shape = [block_length]
-    output_shape = [16] #true：同时获取最大值和最大值索引。
-    input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
-    golden = np.zeros(output_shape,dtype=output_type)
-    #获取最大值
-    golden[0] = np.max(input_x)
-    #获取最大值的下标，并且强制转换为half类型
-    max_index = np.argmax(input_x)
-    #max_index的数据类型默认是int64_t，view方法只支持位宽不变
-    max_index = np.uint16(max_index)
-    golden[1] = np.float16(max_index.view(np.float16))
+    if input_dtype != np.float32:
+        golden = golden.astype(np.float16)
+
     os.makedirs("input", exist_ok=True)
+    src.tofile("./input/input_x.bin")
     os.makedirs("output", exist_ok=True)
-    input_x.tofile("./input/input_x.bin")
     golden.tofile("./output/golden.bin")
-
 
 if __name__ == "__main__":
     gen_golden_data_simple()
