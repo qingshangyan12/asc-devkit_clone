@@ -34,6 +34,8 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "dav_l300/kernel_operator_dump_tensor_impl.h"
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_dump_tensor_impl.h"
+#elif (__NPU_ARCH__ == 3102)
+#include "dav_m310/kernel_operator_dump_tensor_impl.h"
 #endif
 
 #ifdef ASCENDC_CPU_DEBUG
