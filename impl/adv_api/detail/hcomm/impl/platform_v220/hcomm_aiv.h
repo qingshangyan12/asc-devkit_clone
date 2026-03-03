@@ -9,11 +9,11 @@
  */
 
 /*!
- * \file hcomm_roce.h
+ * \file hcomm_AIV.h
  * \brief
  */
-#ifndef IMPL_V310_HCOMM_ROCE_H
-#define IMPL_V310_HCOMM_ROCE_H
+#ifndef IMPL_V220_HCOMM_AIV_H
+#define IMPL_V220_HCOMM_AIV_H
 
 #include "../../common/hcomm_utils.h"
 #include "../../common/hcomm_inner_def.h"
@@ -115,4 +115,4 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL::ROCE>::doorBell(ChannelHandle ch
 
 } // namespace AscendC
 
-#endif // IMPL_V310_HCOMM_ROCE_H
+#endif // IMPL_V220_HCOMM_AIV_H
