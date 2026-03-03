@@ -115,22 +115,6 @@ private:
     iterator storage;
 };
 
-template <typename Iterator>
-struct ConstViewEngine
-{
-    using iterator     = Iterator;
-    using reference    = typename IterRef<iterator>::type; // T&
-    using elementType = typename IterEle<iterator>::type; // rm_ref
-    using valueType   = typename IterVal<iterator>::type; // rm_cvf
-
-    __aicore__ inline constexpr iterator const& Begin() const {
-        return storage;
-    }
-    __aicore__ inline constexpr ConstViewEngine(iterator storage = {}) : storage(storage) {}
-private:
-    iterator storage;
-};
-
 // pointer.h
 template <Hardware hardPos, typename Iterator>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
@@ -180,6 +164,41 @@ __aicore__ inline constexpr auto MakeBiasmemPtr(Iterator iter) {
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter) {
     return MakeMemPtr<Hardware::FIXBUF, Iterator>(iter);
+}
+
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeUBmemPtr(const U& byteOffset) {
+    return MakeUBmemPtr(reinterpret_cast<__ubuf__ T*>(get_imm(0) + byteOffset));
+}
+
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeL1memPtr(const U& byteOffset) {
+    return MakeL1memPtr(reinterpret_cast<__cbuf__ T*>(get_imm(0) + byteOffset));
+}
+
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeL0AmemPtr(const U& byteOffset) {
+    return MakeL0AmemPtr(reinterpret_cast<__ca__ T*>(get_imm(0) + byteOffset));
+}
+
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeL0BmemPtr(const U& byteOffset) {
+    return MakeL0BmemPtr(reinterpret_cast<__cb__ T*>(get_imm(0) + byteOffset));
+}
+
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeL0CmemPtr(const U& byteOffset) {
+    return MakeL0CmemPtr(reinterpret_cast<__cc__ T*>(get_imm(0) + byteOffset));
+}
+
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeBiasmemPtr(const U& byteOffset) {
+    return MakeBiasmemPtr(reinterpret_cast<__biasbuf__ T*>(get_imm(0) + byteOffset));
+}
+
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeFixbufmemPtr(const U& byteOffset) {
+    return MakeFixbufmemPtr(reinterpret_cast<__fbuf__ T*>(get_imm(0) + byteOffset));
 }
 
 } // namespace Te
