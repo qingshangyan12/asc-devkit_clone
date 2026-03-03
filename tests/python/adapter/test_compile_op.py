@@ -4948,7 +4948,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
             lines = file.readlines()  # 读取所有行，返回列表
             lines = " ".join(lines)
             self.assertNotEqual(lines.find(" __attribute__((aligned(512))) "), -1)
-            self.assertNotEqual(lines.find(" __attribute__((need_auto_sync)) "), -1)
+            self.assertNotEqual(lines.find(" __sk__"), -1)
         os.remove(compile_info.gen_kernel_func_file)
         global_var_storage.global_storage_reset()
 
@@ -5082,6 +5082,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         compile_option_tuple.mllvm_options.append('-mllvm')
         compile_option_tuple.mllvm_options.append('-cce-aicore-dcci-before-kernel-end=')
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, compile_option_tuple)
+        global_var_storage.global_storage_reset()
     
 
     def test_delete_tiling_section(self):
