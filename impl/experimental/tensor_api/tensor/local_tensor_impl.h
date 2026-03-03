@@ -27,7 +27,7 @@ template <typename EngineType, typename LayoutType>
 struct TensorAttribute {};
 
 template <typename T>
-struct LocalTensor {};
+struct LocalTensor;
 
 template <typename EngineType, typename LayoutType>
 struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
