@@ -12,8 +12,8 @@
  * \file hcomm_roce.h
  * \brief
  */
-#ifndef IMPL_V310_HCOMM_AIV_H
-#define IMPL_V310_HCOMM_AIV_H
+#ifndef IMPL_V310_HCOMM_ROCE_H
+#define IMPL_V310_HCOMM_ROCE_H
 
 #include "hcomm_aiv_def.h"
 #include "../../common/hcomm_utils.h"
@@ -73,19 +73,15 @@ __aicore__ inline Hcomm<COMM_PROTOCOL::ROCE, pipe>::~Hcomm()
     wqeBuf_.FreeTensor(doorBell_);
 }
 
-template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
-__aicore__ inline HcommHandle Hcomm<COMM_PROTOCOL::ROCE, pipe> Write(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
+template <bool commit, pipe_t pipe>
+__aicore__ inline Handle Hcomm<COMM_PROTOCOL::ROCE, pipe> Write(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
                                                                 uint64_t len)
-{
-    return 0;
-}
+{}
 
-template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
-__aicore__ inline HcommHandle Hcomm<COMM_PROTOCOL::ROCE, pipe> Read(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
+template <bool commit, pipe_t pipe>
+__aicore__ inline Handle Hcomm<COMM_PROTOCOL::ROCE, pipe> Read(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
                                                                uint64_t len)
-{
-    return 0;
-}
+{}
 
 template <typename T>
 __aicore__ inline void Gm2Ub(const LocalTensor<T>& dstLocal, const GlobalTensor<T>& srcGlobal, int32_t length)
@@ -113,7 +109,7 @@ __aicore__ inline void Ub2Gm(const GlobalTensor<T>& dstGlobal, const LocalTensor
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t Hcomm<pipe> Commit(HcommHandle handle)
+__aicore__ inline int32_t Hcomm<pipe> Commit(Handle handle)
 {
     Channel* channel = channelList_[handle]; // 获取channel
     Gm2Ub(sqPI_, channel->sqContextAddr->cxt.rdmaSqContext.headAddr, 1);
@@ -135,7 +131,7 @@ __aicore__ inline int32_t Hcomm<pipe> Commit(HcommHandle handle)
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t Hcomm<pipe> Wait(HcommHandle handle)
+__aicore__ inline int32_t Hcomm<pipe> Wait(Handle handle)
 {
     Channel* channel = channelList_[handle]; // 获取channel
     auto sqCIAddr = channel->sqContextAddr->cxt.rdmaSqContext.tailAddr;

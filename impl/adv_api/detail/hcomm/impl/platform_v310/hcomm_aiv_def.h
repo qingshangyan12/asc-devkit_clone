@@ -9,25 +9,25 @@
  */
 
 /*!
- * \file hcomm_aiv_def.h
+ * \file hcomm_urma.h
  * \brief
  */
-#ifndef IMPL_V310_HCOMM_AIV_DEF_H
-#define IMPL_V310_HCOMM_AIV_DEF_H
+#ifndef IMPL_V310_HCOMM_URMA_DEF_H
+#define IMPL_V310_HCOMM_URMA_DEF_H
 
 namespace AscendC {
 
-template <>
-class HcommImpl<COMM_ENGINE_AIV, COMM_PROTOCOL::ROCE> {
+template <COMM_PROTOCAL::ROCE>
+class Hcomm {
 public:
-    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE>
-    __aicore__ inline HcommHandle Write(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
-    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE>
-    __aicore__ inline HcommHandle Read(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    template <bool commit = true, pipe_t pipe = pipe_mte3>
+    __aicore__ inline Hanle Write(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    template <bool commit = true, pipe_t pipe = pipe_mte3>
+    __aicore__ inline Hanle Read(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
     template <pipe_t pipe = pipe_mte3>
-    __aicore__ inline int32_t Commit(HcommHandle handleId);
+    __aicore__ inline int32_t Commit(Handle handle);
     template <pipe_t pipe = pipe_mte3>
-    __aicore__ inline int32_t Wait(HcommHandle handleId);
+    __aicore__ inline int32_t Wait(Handle handle);
 
 private:
     TPipe pipe;
