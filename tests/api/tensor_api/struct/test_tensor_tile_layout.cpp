@@ -1108,3 +1108,18 @@ TEST_F(Tensor_Api_Layout, IsMxLayout)
     EXPECT_EQ(IsZZFormat<decltype(MxZzTensor)>, true);
     EXPECT_EQ(IsNnFormat<decltype(MxNnTensor)>, true);
 }
+
+TEST_F(Tensor_Api_Layout, TestTileLayout)
+{
+    using namespace AscendC::Te;
+    // MxBNDLayout shape  = ((Std::Int<2>{}, 8),(Std::Int<1>{}, 48)) 
+    auto MxBNDLayout = MakeScaleBNDLayout<fp8_e8m0_t>(16, 48); // (scaleK, n) 不转置
+    auto MxBDNLayout = MakeScaleBDNLayout<fp8_e8m0_t>(16, 48); // (scaleK, n) 转置
+    // 输入二维shape，输出四维Layout ---> tileLayout shape = ((Std::Int<2>{}, 2),(Std::Int<1>, 8))
+    auto tileLayout = MakeTileLayout(MxBNDLayout, MakeShape(4,8));
+
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(tileLayout)), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(tileLayout)), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(tileLayout)), 1);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(tileLayout)), 8);
+}
