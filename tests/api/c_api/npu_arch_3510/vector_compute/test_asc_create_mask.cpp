@@ -31,7 +31,7 @@ TEST_F(TestVectorCompute##class_name##_CApi, c_api_name##_Succ)       \
         .times(1)                                                                               \
         .will(invoke(cce_name##_Stub));                                           \
                                                                                                 \
-    c_api_name(Pat::VL1);                                                                \
+    c_api_name(PAT_VL16);                                                                \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
