@@ -227,24 +227,36 @@ public:
 template <typename T>
 struct IsNDFormat {
 private:
-    __aicore__ inline static constexpr bool IsFractalNDFormat() {
-        // ND shape (Int<1>, row), (Int<1>, column)
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-
-        // ND stride (Int<0>, N * column), (Int<0>, Int<1>))
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
-
+    __aicore__ inline static constexpr bool IsFractalNDFormatNormal() {
         constexpr bool isShapeRight = Std::is_constant<1, ShapeRow0>::value && Std::is_constant<1, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<0, StrideRow0>::value && Std::is_constant<0, StrideColumn0>::value
-            && Std::is_constant<1, StrideColumn1>::value;
+        constexpr bool isStrideRight = Std::is_constant<0, StrideRow0>::value && Std::is_constant<0, StrideColumn0>::value;
 
         return (isShapeRight && isStrideRight);
     }
+
+    __aicore__ inline static constexpr bool IsFractalScaleNDFormat() {
+        constexpr bool isShapeRight = Std::is_constant<2, ShapeRow0>::value && Std::is_constant<1, ShapeColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<1, StrideRow0>::value && Std::is_constant<0, StrideColumn0>::value;
+
+        return (isShapeRight && isStrideRight);
+    }
+
+    __aicore__ inline static constexpr bool IsFractalNDFormat() {
+        constexpr bool isScaleType = is_scale_type_v<type, fp8_e8m0_t>;
+        using ResultType = Std::conditional_t<isScaleType,
+            Std::bool_constant<IsFractalScaleDNFormat()>,
+            Std::bool_constant<IsFractalDNFormatNormal()>>;
+        return ResultType::value;
+    }
 public:
+    using type = typename T::elementType;
+    using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+    using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+
+    using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+    using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
     static constexpr bool value = IsFractalNDFormat();
+    static constexpr bool normalValue = IsFractalNDFormatNormal();
 };
 
 template <typename T>
@@ -252,8 +264,7 @@ struct IsDNFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalDNFormatNormal() {
         constexpr bool isShapeRight = Std::is_constant<1, ShapeRow0>::value && Std::is_constant<1, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<0, StrideRow0>::value && Std::is_constant<1, StrideRow1>::value
-            && Std::is_constant<0, StrideColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<0, StrideRow0>::value && Std::is_constant<0, StrideColumn0>::value;
 
         return (isShapeRight && isStrideRight);
     }
@@ -277,14 +288,14 @@ public:
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
     static constexpr bool value = IsFractalDNFormat();
+    static constexpr bool normalValue = IsFractalDNFormatNormal();
 };
 
 template <typename T>
 struct IsScaleANDFormat {
-    static constexpr bool value = IsNDFormat<T>::value;
+    static constexpr bool value = IsNDFormat<T>::normalValue;
 };
 
 template <typename T>
@@ -299,7 +310,7 @@ struct IsScaleBNDFormat {
 
 template <typename T>
 struct IsScaleBDNFormat {
-    static constexpr bool value = IsNDFormat<T>::value;
+    static constexpr bool value = IsNDFormat<T>::normalValue;
 };
 
 
