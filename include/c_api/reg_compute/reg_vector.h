@@ -8,6 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
+
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
 
@@ -1193,7 +1198,19 @@ __simd_callee__ inline void asc_xor(vector_bool& dst, vector_bool src0, vector_b
 __simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
 __simd_callee__ inline void asc_prelu(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
+<<<<<<< HEAD
 
 //===================asc_clear_ar_spr=====================
 __simd_callee__ inline void asc_clear_ar_spr();
 #endif
+=======
+
+//===================asc_clear_ar_spr=====================
+__simd_callee__ inline void asc_clear_ar_spr();
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#endif   
+>>>>>>> master

@@ -19,6 +19,7 @@ protected:
     void TearDown() {}
 };
 
+<<<<<<< HEAD
 namespace {
 void icache_preload_Stub(const void* addr)
 {
@@ -37,6 +38,8 @@ TEST_F(TestCacheCtrlIcachePreload3510, icache_preload_voidptr_Succ)
     GlobalMockObject::verify();
 }
 
+=======
+>>>>>>> master
 class TestCacheCtrlIcachePreloadPrefetch3510 : public testing::Test { 
 protected:
     void SetUp() {}

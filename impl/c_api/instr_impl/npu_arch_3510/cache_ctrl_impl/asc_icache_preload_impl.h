@@ -13,11 +13,14 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl.h"
 
+<<<<<<< HEAD
 __aicore__ inline void asc_icache_preload_impl(const void* addr)
 {
     preload(addr);
 }
 
+=======
+>>>>>>> master
 __aicore__ inline void asc_icache_preload_impl(const void* addr, int64_t prefetch_len)
 {
     preload(addr, prefetch_len);

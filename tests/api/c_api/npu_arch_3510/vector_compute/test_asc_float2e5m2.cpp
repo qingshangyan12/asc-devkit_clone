@@ -9,6 +9,7 @@
 */
 
 #include "tests/api/c_api/npu_arch_3510/utils/test_vcvt_instr_utils.h"
+<<<<<<< HEAD
 
 //================asc_float2e5m2_rd================
 // TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rd, asc_float2e5m2_rd, vcvt, vector_f8e5m2, vector_float, 0);
@@ -59,3 +60,14 @@ TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rn_sat_v4, asc_float2e5m2_rn_sat_v4, vcvt,
 // TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz_sat_v2, asc_float2e5m2_rz_sat_v2, vcvt, vector_f8e5m2, vector_float, 37);
 // TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz_sat_v3, asc_float2e5m2_rz_sat_v3, vcvt, vector_f8e5m2, vector_float, 38);
 // TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz_sat_v4, asc_float2e5m2_rz_sat_v4, vcvt, vector_f8e5m2, vector_float, 39);
+=======
+//================asc_float2e5m2_rn================
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rn, asc_float2e5m2_rn, vcvt, vector_f8e5m2, vector_float, 1);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rn_v2, asc_float2e5m2_rn_v2, vcvt, vector_f8e5m2, vector_float, 2);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rn_v3, asc_float2e5m2_rn_v3, vcvt, vector_f8e5m2, vector_float, 3);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rn_v4, asc_float2e5m2_rn_v4, vcvt, vector_f8e5m2, vector_float, 4);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rn_sat, asc_float2e5m2_rn_sat, vcvt, vector_f8e5m2, vector_float, 5);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rn_sat_v2, asc_float2e5m2_rn_sat_v2, vcvt, vector_f8e5m2, vector_float, 6);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rn_sat_v3, asc_float2e5m2_rn_sat_v3, vcvt, vector_f8e5m2, vector_float, 7);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rn_sat_v4, asc_float2e5m2_rn_sat_v4, vcvt, vector_f8e5m2, vector_float, 8);
+>>>>>>> master

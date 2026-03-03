@@ -440,9 +440,9 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
  * @param [in] srcBlkStride src block stride
  * @param [in] srcRepStride src repeat stride
  */
-template <typename T, bool isSetMask>
-__aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src,
-    const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
+template <typename T, bool isSetMask, typename MaskType>
+__aicore__ inline void WholeReduceMinCommon(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    MaskType mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
     const int32_t srcRepStride, ReduceOrder order)
 {
 #ifdef __MSTX_DFX_REPORT__
@@ -464,13 +464,6 @@ __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTens
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMin");
 #endif
-#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOtherWhl(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        order, "WholeReduceMin")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMin", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
 #if ASCENDC_CPU_DEBUG && __NPU_ARCH__ == 3002
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -480,6 +473,24 @@ __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTens
 #endif
     WholeReduceMinImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+}
+
+template <typename T, bool isSetMask>
+__aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
+    const int32_t srcRepStride, ReduceOrder order)
+{
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecReduceInfo(dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMin");
+#endif
+#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+    MaskSetter::Instance().SetMask(isSetMask);
+    if (!CheckFunVecReduceOtherWhl(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
+        order, "WholeReduceMin")) {
+        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMin", KernelFuncType::MASK_BIT_MODE);
+    }
+#endif
+    WholeReduceMinCommon<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
@@ -565,6 +576,7 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
     WholeReduceMaxImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
+
 template <typename T, bool isSetMask>
 __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
@@ -572,6 +584,7 @@ __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTens
 {
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMin");
+<<<<<<< HEAD
 #endif
     using PrimType = PrimT<T>;
 #if !((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
@@ -588,6 +601,8 @@ __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTens
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMin");
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMin");
+=======
+>>>>>>> master
 #endif
 #if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     MaskSetter::Instance().SetMask(isSetMask);
@@ -596,15 +611,7 @@ __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTens
         ASCENDC_REPORT_CHECK_ERROR("WholeReduceMin", KernelFuncType::MASK_COUNT_MODE);
     }
 #endif
-#if ASCENDC_CPU_DEBUG && __NPU_ARCH__ == 3002
-    MaskSetter::Instance().SetMask(isSetMask);
-    if (!CheckFunVecReduceOther(dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
-        "WholeReduceMax")) {
-        ASCENDC_REPORT_CHECK_ERROR("WholeReduceMax", KernelFuncType::MASK_BIT_MODE);
-    }
-#endif
-    WholeReduceMinImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-        mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
+    WholeReduceMinCommon<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
 /* **************************************** Reduce Interface ****************************************** */

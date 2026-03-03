@@ -5,7 +5,11 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
+<<<<<<< HEAD
 | Ascend 950PR/Ascend 950DT | √ |
+=======
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
+>>>>>>> master
 
 ## 功能说明
 

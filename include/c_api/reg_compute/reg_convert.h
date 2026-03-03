@@ -8,6 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
+
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 
@@ -971,6 +976,7 @@ __simd_callee__ inline void asc_int82int32_v3(vector_int32_t& dst, vector_int8_t
 __simd_callee__ inline void asc_int82int32_v4(vector_int32_t& dst, vector_int8_t src, vector_bool mask);
 
 //================asc_float2e5m2================
+<<<<<<< HEAD
 // __simd_callee__ inline void asc_float2e5m2_rd(vector_f8e5m2& dst, vector_float src, vector_bool mask);
 
 // __simd_callee__ inline void asc_float2e5m2_rd_v2(vector_f8e5m2& dst, vector_float src, vector_bool mask);
@@ -987,6 +993,8 @@ __simd_callee__ inline void asc_int82int32_v4(vector_int32_t& dst, vector_int8_t
 
 // __simd_callee__ inline void asc_float2e5m2_rd_sat_v4(vector_f8e5m2& dst, vector_float src, vector_bool mask);
 
+=======
+>>>>>>> master
 __simd_callee__ inline void asc_float2e5m2_rn(vector_f8e5m2& dst, vector_float src, vector_bool mask);
 
 __simd_callee__ inline void asc_float2e5m2_rn_v2(vector_f8e5m2& dst, vector_float src, vector_bool mask);
@@ -995,6 +1003,7 @@ __simd_callee__ inline void asc_float2e5m2_rn_v3(vector_f8e5m2& dst, vector_floa
 
 __simd_callee__ inline void asc_float2e5m2_rn_v4(vector_f8e5m2& dst, vector_float src, vector_bool mask);
 
+<<<<<<< HEAD
 // __simd_callee__ inline void asc_float2e5m2_rn_sat(vector_f8e5m2& dst, vector_float src, vector_bool mask);
 
 // __simd_callee__ inline void asc_float2e5m2_rn_sat_v2(vector_f8e5m2& dst, vector_float src, vector_bool mask);
@@ -1050,6 +1059,15 @@ __simd_callee__ inline void asc_float2e5m2_rn_v4(vector_f8e5m2& dst, vector_floa
 // __simd_callee__ inline void asc_float2e5m2_rz_sat_v3(vector_f8e5m2& dst, vector_float src, vector_bool mask);
 
 // __simd_callee__ inline void asc_float2e5m2_rz_sat_v4(vector_f8e5m2& dst, vector_float src, vector_bool mask);
+=======
+__simd_callee__ inline void asc_float2e5m2_rn_sat(vector_f8e5m2& dst, vector_float src, vector_bool mask);
+
+__simd_callee__ inline void asc_float2e5m2_rn_sat_v2(vector_f8e5m2& dst, vector_float src, vector_bool mask);
+
+__simd_callee__ inline void asc_float2e5m2_rn_sat_v3(vector_f8e5m2& dst, vector_float src, vector_bool mask);
+
+__simd_callee__ inline void asc_float2e5m2_rn_sat_v4(vector_f8e5m2& dst, vector_float src, vector_bool mask);
+>>>>>>> master
 
 //================asc_half2float==============
 __simd_callee__ inline void asc_half2float(vector_float& dst, vector_half src, vector_bool mask);
@@ -1057,3 +1075,8 @@ __simd_callee__ inline void asc_half2float(vector_float& dst, vector_half src, v
 __simd_callee__ inline void asc_half2float_v2(vector_float& dst, vector_half src, vector_bool mask);
 
 #endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#endif   
