@@ -98,7 +98,7 @@ constexpr uint16_t KFC_SYNC_ID = 15;
 
 #ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
 // the max cnt of matmul object in superkernel mode
-cconstexpr int MAX_MATMUL_OBJ_CNT = 4;
+constexpr int MAX_MATMUL_OBJ_CNT = 4;
 struct SuperKernelWaitEventCnt {
     uint32_t eventId[MAX_MATMUL_OBJ_CNT] = {0};
     int32_t eventCnt[MAX_MATMUL_OBJ_CNT] = {0};
