@@ -628,14 +628,14 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e8m0_t& dst,
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
-        vld(dst, src_align_32b, offset, BRC);
+        vld(dst, src_align_32b, offset, BLK);
     }
 }
 
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
-        vld(dst, src_align_32b, offset, BRC);
+        vld(dst, src_align_32b, offset, BLK);
     }
 }
 

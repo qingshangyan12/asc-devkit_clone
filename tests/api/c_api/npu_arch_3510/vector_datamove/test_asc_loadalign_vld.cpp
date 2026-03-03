@@ -185,7 +185,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vl
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_bfloat16_t, bfloat16_t);
-TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_half, vector_half);
+TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_half, half);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_uint32_t, uint32_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_int32_t, int32_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_float, float);
