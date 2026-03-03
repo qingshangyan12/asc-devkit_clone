@@ -1077,3 +1077,34 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
     EXPECT_EQ(Crd2Idx(coord2, layoutObj2), 13);
     EXPECT_EQ(Crd2Idx(coord3, layoutObj3), 72);
 }
+
+TEST_F(Tensor_Api_Layout, IsMxLayout)
+{
+    using namespace AscendC::Te;
+    
+    auto NnLayout = MakeNnLayout<fp8_e8m0_t>(16, 48); // (scaleK, n)
+    auto Zzlayout = MakeZzLayout<fp8_e8m0_t>(48, 16); // (m, scaleK)
+    auto MxANDLayout = MakeScaleANDLayout<fp8_e8m0_t>(48, 16); // (m, scaleK) 不转置
+    auto MxADNLayout = MakeScaleADNLayout<fp8_e8m0_t>(48, 16); // (m, scaleK) 转置
+    auto MxBNDLayout = MakeScaleBNDLayout<fp8_e8m0_t>(16, 48); // (scaleK, n) 不转置
+    auto MxBDNLayout = MakeScaleBDNLayout<fp8_e8m0_t>(16, 48); // (scaleK, n) 转置
+
+    constexpr uint32_t TILE_LENGTH = 128;
+    __cbuf__ fp8_e8m0_t srcL1[TILE_LENGTH] = {0};
+    __ca__ fp8_e8m0_t srcL0A[TILE_LENGTH] = {0};
+    __cb__ fp8_e8m0_t srcL0B[TILE_LENGTH] = {0};
+
+    auto MxANDTensor = MakeTensor(MakeL1memPtr(srcL1), MxANDLayout);
+    auto MxADNTensor = MakeTensor(MakeL1memPtr(srcL1), MxADNLayout);
+    auto MxBNDTensor = MakeTensor(MakeL1memPtr(srcL1), MxBNDLayout);
+    auto MxBDNTensor = MakeTensor(MakeL1memPtr(srcL1), MxBDNLayout);
+    EXPECT_EQ(IsScaleANDFormat<decltype(MxANDTensor)>, true);
+    EXPECT_EQ(IsScaleADNFormat<decltype(MxADNTensor)>, true);
+    EXPECT_EQ(IsScaleBNDFormat<decltype(MxBNDTensor)>, true);
+    EXPECT_EQ(IsScaleBDNFormat<decltype(MxBDNTensor)>, true);
+    
+    auto MxZzTensor = MakeTensor(MakeL1memPtr(srcL0A), Zzlayout);
+    auto MxNnTensor = MakeTensor(MakeL1memPtr(srcL0B), NnLayout);
+    EXPECT_EQ(IsZZFormat<decltype(MxZzTensor)>, true);
+    EXPECT_EQ(IsNnFormat<decltype(MxNnTensor)>, true);
+}
