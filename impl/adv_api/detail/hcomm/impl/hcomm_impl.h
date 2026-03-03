@@ -17,6 +17,8 @@
 
 #if __NPU_ARCH__ == 2201
 #include "platform_v220/hcomm_aiv.h"
+#elif __NPU_ARCH__ == 3101
+#include "platform_v310/hcomm_aiv.h"
 #endif
 
 namespace AscendC {
@@ -37,6 +39,19 @@ __aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::Read(ChannelHandl
     return impl_.template Read<commit, commit_pipe, req_pipe>(channelHandle, dst, src, len);
 }
 
+template <uint8_t commEngine, COMM_PROTOCOL commProtocol>
+template <pipe_t pipe>
+__aicore__ inline int32_t Commit(HcommHandle handleId)
+{
+    return impl_.template Commit<pipe>(handleId);
+}
+
+template <uint8_t commEngine, COMM_PROTOCOL commProtocol>
+template <pipe_t pipe>
+__aicore__ inline int32_t Wait(HcommHandle handleId)
+{
+    return impl_.template Wait<pipe>(handleId);
+}
 } // namespace AscendC
 
 #endif // IMPL_HCOMM_HCOMM_IMPL_H

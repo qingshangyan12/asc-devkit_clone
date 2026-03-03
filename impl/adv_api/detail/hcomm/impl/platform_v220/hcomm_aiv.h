@@ -9,7 +9,7 @@
  */
 
 /*!
- * \file hcomm_AIV.h
+ * \file hcomm_aiv.h
  * \brief
  */
 #ifndef IMPL_V220_HCOMM_AIV_H
