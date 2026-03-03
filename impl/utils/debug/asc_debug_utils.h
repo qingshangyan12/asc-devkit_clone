@@ -15,12 +15,6 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_DEBUG_UTILS_H
 #define IMPL_UTILS_DEBUG_ASC_DEBUG_UTILS_H
 
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__
-#warning "asc_debug_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
-#endif
-
 #include <type_traits>
 
 #include "impl/utils/sys_macros.h"
@@ -39,12 +33,10 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 namespace __asc_aicore {
 __aicore__ inline void enable_asc_diagnostics()
 {
-#if defined(__ENABLE_ASCENDC_PRINTF__)
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct AscTlv __asc_debug_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
-#endif // __ENABLE_ASCENDC_PRINTF__
 }
 
 template <typename T, typename U, typename... Args>
