@@ -13,40 +13,22 @@
 
 
 import sys
+from pathlib import Path
 import numpy as np
-import tensorflow as tf
 
+CUR = Path(__file__).resolve()
+REPO_ROOT = next(parent for parent in CUR.parents if (parent / ".git").exists())
+sys.path.insert(0, str(REPO_ROOT / "examples"))
+from common_verify import verify_result_file
 
-float32 = tf.float32.as_numpy_dtype
 RELATIVE_TOL = 1e-3
 ABSOLUTE_TOL = 1e-5
 ERROR_TOL = 1e-3
-data_type = float32
+DATA_TYPE = np.float32
+
 
 def verify_result(output, golden):
-    output = np.fromfile(output, dtype=data_type).reshape(-1)
-    golden = np.fromfile(golden, dtype=data_type).reshape(-1)
-    different_element_results = np.isclose(output,
-                                           golden,
-                                           rtol=RELATIVE_TOL,
-                                           atol=ABSOLUTE_TOL, 
-                                           equal_nan=True)
-    different_element_indexes = np.where(different_element_results == False)[0]
-    for index in range(len(different_element_indexes)):
-        real_index = different_element_indexes[index]
-        golden_data = golden[real_index]
-        output_data = output[real_index]
-        print(
-            "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f" %
-            (real_index, golden_data, output_data,
-            abs(output_data - golden_data) / golden_data))
-        if index == 100:
-            break
-    print("golden_data : ", golden)
-    print("output : ", output)
-    error_ratio = float(different_element_indexes.size) / golden.size
-    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, ERROR_TOL))
-    return error_ratio <= ERROR_TOL
+    return verify_result_file(output, golden, DATA_TYPE, RELATIVE_TOL, ABSOLUTE_TOL, ERROR_TOL, print_arrays=True)
 
 
 if __name__ == '__main__':
@@ -54,8 +36,7 @@ if __name__ == '__main__':
         res = verify_result(sys.argv[1], sys.argv[2])
         if not res:
             raise ValueError("[ERROR] result error")
-        else:
-            print("test pass!")
+        print("test pass!")
     except Exception as e:
         print(e)
         sys.exit(1)

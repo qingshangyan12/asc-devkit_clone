@@ -36,14 +36,10 @@ CPU Debug介绍
   Add算子：  
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
-  </tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">8 * 2048</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">y</td><td align="center">8 * 2048</td><td align="center">half</td><td align="center">ND</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">8 * 2048</td><td align="center">half</td><td align="center">ND</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
   </table>
 
@@ -85,7 +81,8 @@ CPU Debug介绍
 
   ```bash
   # 选择芯片型号
-  soc_version=${1:-soc_version}
+  # 示例: Ascend910B 或 Ascend310P
+  soc_version=${1:-Ascend910B}
   ```
   - soc_version：昇腾AI处理器型号，如果无法确定具体的soc_version，则在安装昇腾AI处理器的服务器执行npu-smi info命令进行查询，在查询到的“Name”前增加Ascend信息，例如“Name”对应取值为xxxyy，实际配置的soc_version值为Ascendxxxyy。
 

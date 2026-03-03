@@ -1,4 +1,4 @@
-# optimize_vf_continious_align样例
+# optimize_vf_continious_align样例（continuous align）
 
 ## 概述
 本样例演示了SIMD场景下，基于连续非对齐搬运接口LoadUnAlign/StoreUnAlign进行搬运优化的算子实现。主要有以下两点优化：

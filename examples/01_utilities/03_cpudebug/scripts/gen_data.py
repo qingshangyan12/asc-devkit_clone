@@ -14,7 +14,8 @@
 import numpy as np
 
 
-def gen_golden_data_simple():
+def gen_golden_data_simple(seed=0):
+    np.random.seed(seed)
     input_x = np.random.uniform(1, 100, [8, 2048]).astype(np.float16)
     input_y = np.random.uniform(1, 100, [8, 2048]).astype(np.float16)
     golden = (input_x + input_y).astype(np.float16)

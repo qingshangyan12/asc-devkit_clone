@@ -11,37 +11,25 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+
 import sys
+from pathlib import Path
 import numpy as np
 
+CUR = Path(__file__).resolve()
+REPO_ROOT = next(parent for parent in CUR.parents if (parent / ".git").exists())
+sys.path.insert(0, str(REPO_ROOT / "examples"))
+from common_verify import verify_result_file
+
 # for float16
-relative_tol = 1e-3
-absolute_tol = 1e-5
-error_tol = 1e-3
+RELATIVE_TOL = 1e-3
+ABSOLUTE_TOL = 1e-5
+ERROR_TOL = 1e-3
+DATA_TYPE = np.float16
 
 
 def verify_result(output, golden):
-    output = np.fromfile(output, dtype=np.float16).reshape(-1)
-    golden = np.fromfile(golden, dtype=np.float16).reshape(-1)
-    different_element_results = np.isclose(output,
-                                           golden,
-                                           rtol=relative_tol,
-                                           atol=absolute_tol,
-                                           equal_nan=True)
-    different_element_indexes = np.where(different_element_results == False)[0]
-    for index in range(len(different_element_indexes)):
-        real_index = different_element_indexes[index]
-        golden_data = golden[real_index]
-        output_data = output[real_index]
-        print(
-            "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f" %
-            (real_index, golden_data, output_data,
-             abs(output_data - golden_data) / golden_data))
-        if index == 100:
-            break
-    error_ratio = float(different_element_indexes.size) / golden.size
-    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, error_tol))
-    return error_ratio <= error_tol
+    return verify_result_file(output, golden, DATA_TYPE, RELATIVE_TOL, ABSOLUTE_TOL, ERROR_TOL)
 
 
 if __name__ == '__main__':
@@ -49,8 +37,7 @@ if __name__ == '__main__':
         res = verify_result(sys.argv[1], sys.argv[2])
         if not res:
             raise ValueError("[ERROR] result error")
-        else:
-            print("test pass!")
+        print("test pass!")
     except Exception as e:
         print(e)
         sys.exit(1)
