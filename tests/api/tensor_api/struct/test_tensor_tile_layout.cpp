@@ -1098,15 +1098,15 @@ TEST_F(Tensor_Api_Layout, IsMxLayout)
     auto MxADNTensor = MakeTensor(MakeL1memPtr(srcL1), MxADNLayout);
     auto MxBNDTensor = MakeTensor(MakeL1memPtr(srcL1), MxBNDLayout);
     auto MxBDNTensor = MakeTensor(MakeL1memPtr(srcL1), MxBDNLayout);
-    EXPECT_EQ(IsScaleANDFormat<decltype(MxANDTensor)>, true);
-    EXPECT_EQ(IsScaleADNFormat<decltype(MxADNTensor)>, true);
-    EXPECT_EQ(IsScaleBNDFormat<decltype(MxBNDTensor)>, true);
-    EXPECT_EQ(IsScaleBDNFormat<decltype(MxBDNTensor)>, true);
+    EXPECT_EQ(IsScaleANDFormat<decltype(MxANDTensor)>::value, true);
+    EXPECT_EQ(IsScaleADNFormat<decltype(MxADNTensor)>::value, true);
+    EXPECT_EQ(IsScaleBNDFormat<decltype(MxBNDTensor)>::value, true);
+    EXPECT_EQ(IsScaleBDNFormat<decltype(MxBDNTensor)>::value, true);
     
     auto MxZzTensor = MakeTensor(MakeL1memPtr(srcL0A), Zzlayout);
     auto MxNnTensor = MakeTensor(MakeL1memPtr(srcL0B), NnLayout);
-    EXPECT_EQ(IsZZFormat<decltype(MxZzTensor)>, true);
-    EXPECT_EQ(IsNNFormat<decltype(MxNnTensor)>, true);
+    EXPECT_EQ(IsZZFormat<decltype(MxZzTensor)>::value, true);
+    EXPECT_EQ(IsNNFormat<decltype(MxNnTensor)>::value, true);
 }
 
 TEST_F(Tensor_Api_Layout, TestTileLayout)
