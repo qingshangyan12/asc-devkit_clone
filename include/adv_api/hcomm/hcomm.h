@@ -72,6 +72,10 @@ public:
     template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE>
     __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
+    template <pipe_t pipe = pipe_mte3>
+    __aicore__ inline int32_t Commit(HcommHandle handleId);
+    template <pipe_t pipe = pipe_mte3>
+    __aicore__ inline int32_t Wait(HcommHandle handleId);
 private:
     HcommImpl<commProtocol> impl_;
 };
