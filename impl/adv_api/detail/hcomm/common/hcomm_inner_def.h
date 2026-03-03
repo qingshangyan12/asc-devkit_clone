@@ -137,6 +137,8 @@ typedef struct {   // channel 本身一片内存
     uint8_t reserve[1024];
 } Channel;
 
+
+// 宏隔离
 typedef struct {
     // Control Segment
     union {

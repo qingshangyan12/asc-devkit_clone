@@ -33,6 +33,7 @@ public:
         return -1;
     }
 
+    // 这里加个宏隔离
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(HcommHandle handleId)
     {
