@@ -33,20 +33,31 @@ template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typen
 __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplate<T, U>, void>::type 
 LoadData(const T& dst, const U& src)
 {
-    LoadData<trait, T, U>(dst, src, ZeroCoord2DType{});
+    constexpr Hardware dstPos = GetHardPos<T>();
+    constexpr Hardware srcPos = GetHardPos<U>();
+    using Tensor2Tensor = typename LoadDataTensor2Tensor<dstPos, srcPos, 
+        CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
+    Tensor2Tensor{}.template Run<trait, T, U>(dst, src);
 }
 
 template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>
 __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplateWithCoord<T, U, Coord>, void>::type 
 LoadData(const T& dst, const U& src, const Coord& coord)
 {
+    auto sliceTensor = src(coord, src.Shape());
+    LoadData<trait>(dst, sliceTensor);
+}
+
+template<const LoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U, class Coord>
+__aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplateWithCoord<T, U, Coord>, void>::type 
+LoadDataWithCoord(const T& dst, const U& src, const Coord& coord)
+{
     constexpr Hardware dstPos = GetHardPos<T>();
     constexpr Hardware srcPos = GetHardPos<U>();
-    using Tensor2Tensor = typename LoadDataTensor2Tensor<dstPos, srcPos, 
+    using Tensor2Tensor = typename LoadDataTensor2TensorWithCoord<dstPos, srcPos, 
         CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
     Tensor2Tensor{}.template Run<trait, T, U, Coord>(dst, src, coord);
 }
-
 } // namespace Te
 } // namespace AscendC
 #endif // IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_LOAD_DATA_IMPL_H
