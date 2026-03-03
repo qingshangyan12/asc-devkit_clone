@@ -31,6 +31,9 @@ static const std::set<uint32_t> SUPPORT_TYPESIZE = { GE_GELU_HALF_SIZE, GE_GELU_
 static constexpr const char GE_GELU_GET_MAX_MIN[] = "GetGeGLUMaxMinTmpSize";
 static constexpr const char GE_GELU_GET_TMP_BUFFER[] = "GetGeGLUTmpBufferFactorSize";
 
+
+
+
 inline uint32_t GetGeGLUMaxTmpSize(const uint32_t inputSize, const uint32_t typeSize)
 {
     const uint32_t calcPro = typeSize == sizeof(float) ? GEGLU_FLOAT_CALC_FAC : GEGLU_HALF_CALC_FAC;
