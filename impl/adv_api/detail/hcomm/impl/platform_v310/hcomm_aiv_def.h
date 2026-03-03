@@ -20,7 +20,7 @@
 namespace AscendC {
 
 template <>
-class HcommImpl<COMM_ENGINE_AIV, COMM_PROTOCOL::ROCE> {
+class HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE> {
 public:
     template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE3>
     __aicore__ inline HcommHandle Write(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
@@ -47,7 +47,7 @@ private:
     LocalTensor<uint32_t> doorBell_;
     ChannelHandle channelList_[HCOMM_MAX_HANDLE_ID] = {nullptr};
     HcommHandle curHandleId_ = INVALID_HANDLE_ID;
-}
+};
 } // namespace AscendC
 
 #endif

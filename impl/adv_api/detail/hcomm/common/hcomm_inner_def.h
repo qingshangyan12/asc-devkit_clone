@@ -240,7 +240,7 @@ typedef struct {
             uint32_t resv       : 8;
             uint32_t pi         : 8;
         } bs;
-        uint32_t value;
+        uint64_t value;
     } dw0;
 } RoceDbEntry;
 
