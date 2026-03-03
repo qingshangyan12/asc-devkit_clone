@@ -78,7 +78,7 @@ public:
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Wait(HcommHandle handleId);
 private:
-    HcommImpl<commProtocol> impl_;
+    HcommImpl<commEngine, commProtocol> impl_;
 };
 } // namespace AscendC
 
