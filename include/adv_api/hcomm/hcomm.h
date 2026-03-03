@@ -35,7 +35,7 @@ namespace AscendC {
  * comm task.
  * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
  */
-template <uint8_t commEngine = COMM_ENGINE_AIV, COMM_PROTOCOL commProtocol = COMM_PROTOCOL::ROCE>
+template <COMM_ENGINE commEngine = COMM_ENGINE::AIV, COMM_PROTOCOL commProtocol = COMM_PROTOCOL::ROCE>
 class Hcomm {
 public:
     /*!
@@ -52,7 +52,7 @@ public:
      * @return The identifier(handleId) of Write task. HandleId >= 0 when successful, otherwise return -1.
      * @note Must be called after channel initialization.
      */
-    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE>
+    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE3>
     __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
@@ -69,7 +69,7 @@ public:
      * @return The identifier(handleId) of Read task. HandleId >= 0 when successful, otherwise return -1.
      * @note Must be called after channel initialization.
      */
-    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE>
+    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE3>
     __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
 private:

@@ -21,7 +21,11 @@ namespace AscendC {
 using HcommHandle = int8_t;
 typedef uint64_t ChannelHandle;
 
-constexpr uint8_t COMM_ENGINE_AIV = 3; 
+enum class COMM_ENGINE {
+    AIV = 0,
+    AICPU,
+    CCU,
+};
 
 enum class COMM_PROTOCOL {
     ROCE = 0,

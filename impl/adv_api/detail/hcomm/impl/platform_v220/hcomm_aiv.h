@@ -21,7 +21,7 @@
 namespace AscendC {
 
 template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
-__aicore__ inline HcommHandle HcommImpl<COMM_ENGINE_AIV, COMM_PROTOCOL::ROCE>::Write(ChannelHandle channelHandle,
+__aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Write(ChannelHandle channelHandle,
                                                                                      GM_ADDR dst, GM_ADDR src,
                                                                                      uint64_t len)
 {
@@ -31,7 +31,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE_AIV, COMM_PROTOCOL::ROCE>::W
 }
 
 template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
-__aicore__ inline HcommHandle HcommImpl<COMM_ENGINE_AIV, COMM_PROTOCOL::ROCE>::Read(ChannelHandle channelHandle,
+__aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Read(ChannelHandle channelHandle,
                                                                                     GM_ADDR dst, GM_ADDR src,
                                                                                     uint64_t len)
 {
