@@ -1,18 +1,10 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 # asc_mull
 
 ## 产品支持情况
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-<<<<<<< HEAD
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
-=======
 | <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
->>>>>>> master
 
 ### 功能说明
 

@@ -227,22 +227,14 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForOp(const Hc
         }
     }
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
-<<<<<<< HEAD
-        if (hcclContext_->algorithmType == static_cast<uint8_t>(AlgorithmType::CcuAllGatherMeshMem2Mem1D)) {
-=======
         if (algorithmType == static_cast<uint8_t>(AlgorithmType::CcuAllGatherMeshMem2Mem1D)) {
->>>>>>> master
             ccuUsedXnNum_ = 9;
             CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
         } else {
             CcuPrepareForAllGather(&handleParamGM_[handleId]);
         }
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
-<<<<<<< HEAD
-        if (hcclContext_->algorithmType == static_cast<uint8_t>(AlgorithmType::CcuAllReduceMeshMem2Mem1D)) {
-=======
         if (algorithmType == static_cast<uint8_t>(AlgorithmType::CcuAllReduceMeshMem2Mem1D)) {
->>>>>>> master
             ccuUsedXnNum_ = 15;
             CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
         } else {
@@ -258,11 +250,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForOp(const Hc
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) { 
-<<<<<<< HEAD
-        if (hcclContext_->algorithmType == static_cast<uint8_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1D)) {
-=======
         if (algorithmType == static_cast<uint8_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1D)) {
->>>>>>> master
             ccuUsedXnNum_ = 13;
             CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
         } else {

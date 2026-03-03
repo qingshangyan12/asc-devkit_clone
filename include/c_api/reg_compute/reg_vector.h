@@ -1198,12 +1198,6 @@ __simd_callee__ inline void asc_xor(vector_bool& dst, vector_bool src0, vector_b
 __simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
 __simd_callee__ inline void asc_prelu(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
-<<<<<<< HEAD
-
-//===================asc_clear_ar_spr=====================
-__simd_callee__ inline void asc_clear_ar_spr();
-#endif
-=======
 
 //===================asc_clear_ar_spr=====================
 __simd_callee__ inline void asc_clear_ar_spr();
@@ -1213,4 +1207,3 @@ __simd_callee__ inline void asc_clear_ar_spr();
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
 #endif   
->>>>>>> master

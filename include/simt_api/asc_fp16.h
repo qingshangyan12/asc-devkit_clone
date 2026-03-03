@@ -21,8 +21,6 @@
 
 #if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
 
-<<<<<<< HEAD
-=======
 #define ASCRT_INF_FP16 __ushort_as_half((unsigned short)0x7C00U)
 #define ASCRT_MAX_NORMAL_FP16 __ushort_as_half((unsigned short)0x7BFFU)
 #define ASCRT_MIN_DENORM_FP16 __ushort_as_half((unsigned short)0x0001U)
@@ -31,7 +29,6 @@
 #define ASCRT_ONE_FP16 __ushort_as_half((unsigned short)0x3C00U)
 #define ASCRT_ZERO_FP16 __ushort_as_half((unsigned short)0x0000U)
 
->>>>>>> master
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hisnan(half x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __hisinf(half x);

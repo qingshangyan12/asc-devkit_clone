@@ -31,19 +31,11 @@
 
   <tr><td rowspan="7" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<<<<<<< HEAD
-  <tr><td align="center">inputX</td><td align="center">8*64</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td align="center">inputNormalize</td><td align="center">8</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">inputVariance</td><td align="center">8</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">gamma</td><td align="center">64</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td align="center">beta</td><td align="center">64</td><td align="center">half/float</td><td align="center">ND</td></tr>
-=======
   <tr><td align="center">inputX</td><td align="center">8*64</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">inputMean</td><td align="center">8</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">inputVariance</td><td align="center">8</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">gamma</td><td align="center">64</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">beta</td><td align="center">64</td><td align="center">float</td><td align="center">ND</td></tr>
->>>>>>> master
 
   <tr><td rowspan="3" align="center">算子输出</td></tr>
   <tr><td align="center">outputRstd</td><td align="center">8</td><td align="center">float</td><td align="center">ND</td></tr>

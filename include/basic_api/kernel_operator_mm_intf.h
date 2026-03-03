@@ -456,21 +456,6 @@ __aicore__ inline void SetMMRowMajor();
  * @note This function sets the CUBE output to column major format (N direction first, then M direction)
  */
 __aicore__ inline void SetMMColumnMajor();
-<<<<<<< HEAD
-
-
-/*
- * @brief Sets the priority direction (M or N) for Mmad/MmadWithSparse computation
- * @param [in] mmLayoutMode Control parameter for Mmad/MmadWithSparse priority direction
- * @note When mmLayoutMode is true, CUBE generates results first through N direction then M direction; when false, first
- * through M direction then N direction
- */
-// SetMMLayoutTransform has been updated, please use SetMMRowMajor/SetMMColumnMajor instead.
-__aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode);
-
-} // namespace AscendC
-=======
->>>>>>> master
 
 
 /*

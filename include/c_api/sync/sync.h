@@ -16,13 +16,10 @@
 
 #ifndef INCLUDE_C_API_SYNC_SYNC_H
 #define INCLUDE_C_API_SYNC_SYNC_H
-<<<<<<< HEAD
-=======
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 #include "instr_impl/npu_arch_2201/sync_impl.h"
->>>>>>> master
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
 
@@ -44,23 +41,11 @@ __aicore__ inline void asc_sync_mte2(int id);
 
 __aicore__ inline void asc_sync();
 
-<<<<<<< HEAD
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
-#include "instr_impl/npu_arch_2201/sync_impl.h"
-
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-
-#include "instr_impl/npu_arch_3510/sync_impl.h"
-
-#endif
-=======
 __aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint8_t mode, int64_t flagID);
 
 __aicore__ inline void asc_sync_block_wait(int64_t flagID);
 
 __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
->>>>>>> master
 
 #endif
 

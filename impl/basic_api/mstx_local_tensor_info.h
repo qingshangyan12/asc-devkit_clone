@@ -1809,19 +1809,6 @@ __aicore__ inline void GetMstxDataCopyPadInfo(const GlobalTensor<T>& dst, const 
 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_DATA_COPY_PAD), sizeof(mstxDataCopyPadDesc), &mstxDataCopyPadDesc);
 }
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-
-
-=======
->>>>>>> master
 }
 }
 #endif //__MSTX_DFX_REPORT__

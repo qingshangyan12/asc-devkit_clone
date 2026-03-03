@@ -615,12 +615,6 @@ def gen_static_shape(tiling_def, tiling_raw_data, struct_tiling_def_base, all_dy
     class_body += "{\n"
     class_body += "public:\n"
     has_arr = False
-<<<<<<< HEAD
-    if len(field_list) != len(tilingdata):
-        msg = "size not match: field_info_list = %s, tilingdata = %s:\n" % (str(field_list), str(tilingdata))
-        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, (msg))
-=======
->>>>>>> master
     for field in field_list:
         if field.class_type == 0:
             class_body += f"    {field.dtype} {field.name};\n"
