@@ -35,7 +35,7 @@ namespace AscendC {
  * comm task.
  * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
  */
-template <COMM_PROTOCOL commProtocol = COMM_PROTOCOL::ROCE>
+template <uint8_t commEngine = COMM_ENGINE_AIV, COMM_PROTOCOL commProtocol = COMM_PROTOCOL::ROCE>
 class Hcomm {
 public:
     /*!
@@ -43,7 +43,8 @@ public:
      * @brief The task launching interface of the Write point-to-point communication operator, returns the identifier
      *        handleId. (task content: Write data of length len from src to dst through the specified channel.)
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
-     * @tparam pipe: The pipe type to use for communication, PIPE_MTE3 supported as default.
+     * @tparam commit_pipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
+     * @tparam req_pipe: The pipe type to use for req, PIPE_MTE supported as default.
      * @param [in] channelHandle: The handle of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
@@ -51,7 +52,7 @@ public:
      * @return The identifier(handleId) of Write task. HandleId >= 0 when successful, otherwise return -1.
      * @note Must be called after channel initialization.
      */
-    template <bool commit = true, pipe_t pipe = PIPE_MTE3>
+    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE>
     __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
@@ -59,7 +60,8 @@ public:
      * @brief The task launching interface of the Read point-to-point communication operator, returns the identifier
      *        handleId. (task content: Read data of length len from src to dst through the specified channel.)
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
-     * @tparam pipe: The pipe type to use for communication, PIPE_MTE3 supported as default.
+     * @tparam commit_pipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
+     * @tparam req_pipe: The pipe type to use for req, PIPE_MTE supported as default.
      * @param [in] channelHandle: The handle of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
@@ -67,7 +69,7 @@ public:
      * @return The identifier(handleId) of Read task. HandleId >= 0 when successful, otherwise return -1.
      * @note Must be called after channel initialization.
      */
-    template <bool commit = true, pipe_t pipe = PIPE_MTE3>
+    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE>
     __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
 private:

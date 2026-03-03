@@ -18,16 +18,16 @@
 #include "hcomm_inner_def.h"
 
 namespace AscendC {
-template <COMM_PROTOCOL commProtocol>
+template <uint8_t commEngine, COMM_PROTOCOL commProtocol>
 class HcommImpl {
 public:
-    template <bool commit = true, pipe_t pipe = PIPE_MTE3>
+    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE>
     __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
     {
         return -1;
     }
 
-    template <bool commit = true, pipe_t pipe = PIPE_MTE3>
+    template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE>
     __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len)
     {
         return -1;

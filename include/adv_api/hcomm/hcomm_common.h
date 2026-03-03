@@ -21,6 +21,8 @@ namespace AscendC {
 using HcommHandle = int8_t;
 typedef uint64_t ChannelHandle;
 
+constexpr uint8_t COMM_ENGINE_AIV = 3; 
+
 enum class COMM_PROTOCOL {
     ROCE = 0,
     URMA,

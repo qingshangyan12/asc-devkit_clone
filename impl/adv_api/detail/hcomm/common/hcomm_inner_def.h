@@ -137,5 +137,121 @@ typedef struct {   // channel 本身一片内存
     uint8_t reserve[1024];
 } Channel;
 
+typedef struct {
+    // Control Segment
+    union {
+        struct {
+            uint32_t o : 1;     // Owner
+            uint32_t ctrlSl : 2;
+            uint32_t csl : 2;
+            uint32_t difSl : 3;
+            uint32_t cr : 1;
+            uint32_t df : 1;
+            uint32_t va : 1;
+            uint32_t tsl : 5;
+            uint32_t cf : 1;
+            uint32_t wf : 1;
+            uint32_t rsvd0 : 4;
+            uint32_t rrvSl : 2;
+            uint32_t bdsLen : 8;
+        } bs;
+        uint32_t value;
+    } dw0;
+    union {
+        struct {
+            uint32_t cl : 4;
+            uint32_t rsvd1 : 8;
+            uint32_t maskPi : 20;
+        } bs;
+        uint32_t value;
+    } dw1;
+} RoceWqeCtrlSeg;
+
+typedef struct {
+    // Task Segment
+    union {
+        struct {
+            uint32_t se : 1;
+            uint32_t f : 1;
+            uint32_t c : 1;
+            uint32_t opType : 5;
+            uint32_t so : 1;
+            uint32_t rsvd0 : 3;
+            uint32_t dif : 1;
+            uint32_t ext : 1;
+            uint32_t xrcSrqn : 18;
+        } bs;
+        uint32_t value;
+    } dw0;
+} RoceWqeTaskSeg;
+
+typedef struct {
+    uint32_t bufAddrHigh32;
+    uint32_t bufAddrLow32;
+    uint32_t rLen;
+    uint32_t leKey;
+} RoceWqeDataSeg;
+
+typedef struct {
+    RoceWqeCtrlSeg ctrl;
+    uint64_t doorbell;
+    RoceWqeTaskSeg task;
+    uint32_t dataLen;
+    uint32_t immeData;
+    uint32_t firstLast  : 1;
+    uint32_t nxtEthHdr  : 7;
+    uint32_t cmdLen     : 8;
+    uint32_t rsvd0      : 8;
+    uint32_t lastExtLen : 8;
+    uint32_t vaHigh32;
+    uint32_t vaLow32;
+    uint32_t rKey;
+    uint32_t rsvd1;
+    RoceWqeDataSeg data;
+} RoceWqeEntry;
+
+typedef struct {
+    uint32_t cqe0;
+    uint32_t cqe1;
+    uint32_t cqe2;
+    uint32_t cqe3;
+    uint32_t cqe4;
+    uint32_t cqe5;
+    uint32_t cqe6;
+    uint32_t cqe7;
+} RoceCqeEntry;
+
+typedef struct {
+    union {
+        struct {
+            uint32_t type       : 5;
+            uint32_t cos        : 3;
+            uint32_t c          : 1;
+            uint32_t n          : 1;
+            uint32_t cntxSize   : 2;
+            uint32_t qpn        : 20;
+            uint32_t queueId    : 4;
+            uint32_t sgidIndex  : 7;
+            uint32_t mtuShift   : 3;
+            uint32_t vxlan      : 1;
+            uint32_t xrcvld     : 1;
+            uint32_t resv       : 8;
+            uint32_t pi         : 8;
+        } bs;
+        uint32_t value;
+    } dw0;
+} RoceDbEntry;
+
+#define BDSL_OFFSET 0
+#define TSL_OFFSET 16
+#define VA_OFFSET 21
+#define CR_OFFSET 23
+#define CTRLSL_OFFSET 29
+#define CL_OFFSET 28
+#define OWNER_OFFSET 31
+#define OP_TYPE_OFFSET 24
+#define C_OFFSET 29
+#define F_OFFSET 30
+
 } // namespace AscendC
 #endif // IMPL_HCOMM_HCOMM_INNER_DEF_H
