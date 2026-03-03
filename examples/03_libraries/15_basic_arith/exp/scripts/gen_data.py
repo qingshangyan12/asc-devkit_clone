@@ -53,12 +53,13 @@ def get_range_by_dtype(input_type):
 def gen_golden_data():
     input_type = np.float16
     output_type = input_type
-    src_shape = [8192]
+
+    input_size = 42 * 1024
+    src_shape = [input_size]
+    cal_count = input_size
     
     # 设置随机种子保证可重复性
     np.random.seed(0)
-    
-    cal_count = 8192
     
     # # 方法1: 在安全范围内生成输入数据（推荐）
     # safe_min, safe_max = get_safe_exp_range(input_type)
@@ -67,6 +68,8 @@ def gen_golden_data():
     # 方法2: 在全范围内生成数据，然后使用saturation处理（替代方案）
     # 获取数据类型完整范围
     min_val, max_val = get_range_by_dtype(input_type)
+    # print("min_val = {}".format(min_val))
+    # print("max_val = {}".format(max_val))
     src = np.random.uniform(min_val, max_val, src_shape).astype(input_type)
     
     # 分割数据
