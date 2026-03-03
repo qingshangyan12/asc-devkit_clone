@@ -16,6 +16,6 @@
 #define IMPL_HCCL_HCCL_V310_IMPL_H
 
 #include "platform_v310/hccl_aicpu_def.h"
-#include "platform_v310/hccl_ccu_v0_def.h"
+#include "platform_v310/hccl_ccu_def.h"
 
 #endif
