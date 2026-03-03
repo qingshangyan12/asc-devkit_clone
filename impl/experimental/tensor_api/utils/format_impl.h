@@ -244,8 +244,8 @@ private:
     __aicore__ inline static constexpr bool IsFractalNDFormat() {
         constexpr bool isScaleType = is_scale_type_v<type, fp8_e8m0_t>;
         using ResultType = Std::conditional_t<isScaleType,
-            Std::bool_constant<IsFractalScaleDNFormat()>,
-            Std::bool_constant<IsFractalDNFormatNormal()>>;
+            Std::bool_constant<IsFractalScaleNDFormat()>,
+            Std::bool_constant<IsFractalNDFormatNormal()>>;
         return ResultType::value;
     }
 public:
