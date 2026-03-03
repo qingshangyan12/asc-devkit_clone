@@ -26,13 +26,24 @@ namespace Te {
 
 class LoadDataIgnore {
 public:
-    template<const LoadDataTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {}
+    template<const LoadDataTrait& trait, typename T, typename U>
+    __aicore__ inline void Run(const T& dst, const U& src) {}
 };
 
 template <Hardware dstPos, Hardware srcPos, uint32_t Version, size_t dimension>
 struct LoadDataTensor2Tensor {
     using type = LoadDataIgnore;
+};
+
+class LoadDataIgnoreWithCoord {
+public:
+    template<const LoadDataTrait& trait, typename T, typename U, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {}
+};
+
+template <Hardware dstPos, Hardware srcPos, uint32_t Version, size_t dimension>
+struct LoadDataTensor2TensorWithCoord {
+    using type = LoadDataIgnoreWithCoord;
 };
 
 template <>
@@ -57,6 +68,18 @@ template <>
 struct LoadDataTensor2Tensor<Hardware::L0B, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA>
 {
     using type = LoadDataFourDim3510L12L0B;
+};
+
+template <>
+struct LoadDataTensor2TensorWithCoord<Hardware::L0A, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA>
+{
+    using type = LoadDataFourDim3510L12L0AWithCoord;
+};
+
+template <>
+struct LoadDataTensor2TensorWithCoord<Hardware::L0B, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA>
+{
+    using type = LoadDataFourDim3510L12L0BWithCoord;
 };
 } // namespace Te
 } // namespace AscendC
