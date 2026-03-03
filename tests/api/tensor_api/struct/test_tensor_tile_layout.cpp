@@ -1106,7 +1106,7 @@ TEST_F(Tensor_Api_Layout, IsMxLayout)
     auto MxZzTensor = MakeTensor(MakeL1memPtr(srcL0A), Zzlayout);
     auto MxNnTensor = MakeTensor(MakeL1memPtr(srcL0B), NnLayout);
     EXPECT_EQ(IsZZFormat<decltype(MxZzTensor)>, true);
-    EXPECT_EQ(IsNnFormat<decltype(MxNnTensor)>, true);
+    EXPECT_EQ(IsNNFormat<decltype(MxNnTensor)>, true);
 }
 
 TEST_F(Tensor_Api_Layout, TestTileLayout)
