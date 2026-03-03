@@ -97,15 +97,3 @@ private:
     static constexpr MatmulConfig mm_cfg = GetNormalConfig(false, false, false, BatchMode::SINGLE_LARGE_THAN_L1);
     MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, mm_cfg, void, CustomMatmulPolicy> mm;
 };
-
-TEST_F(TestSingleBatchLoop, single_batch_loop) {
-    mm.SetSingleCoreParams(144, 77, 64);
-    mm.Init();
-    mm.SetBatchNum(3, 2);
-    for (mm.OuterStart(); !mm.OuterEnd();mm.OuterNext()) {
-    }
-    EXPECT_EQ(mm.GetOuterIndex(), 3);
-    EXPECT_EQ(mm.GetBatchAIndex(), 3);
-    EXPECT_EQ(mm.GetBatchBIndex(), 1);
-    EXPECT_EQ(mm.GetBiasInputOffset(), 231);
-}

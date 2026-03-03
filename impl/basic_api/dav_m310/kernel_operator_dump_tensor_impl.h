@@ -8,23 +8,30 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+/*!
+ * \file kernel_operator_dump_tensor_impl.h
+ * \brief
+ */
+#ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
+#define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif     
+#include "kernel_utils.h"
+#include "kernel_tensor.h"
+#include "kernel_operator_common_impl.h"
 
-#ifndef INCLUDE_UTILS_DEBUG_ASC_ASSERT_H
-#define INCLUDE_UTILS_DEBUG_ASC_ASSERT_H
+namespace AscendC {
+template <typename T>
+__aicore__ void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t size)
+{
+}
 
-#include "instr_impl/npu_arch_2201/debug_impl.h"
+template <typename T>
+__aicore__ void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t size)
+{
+}
 
-#define assert(expr) asc_assert_impl(expr)
-
+__aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
+{
+}
+}  // namespace AscendC
 #endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif    
-
