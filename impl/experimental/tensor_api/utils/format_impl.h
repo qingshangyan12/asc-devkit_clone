@@ -270,8 +270,8 @@ private:
     }
 
     __aicore__ inline static constexpr bool IsFractalScaleDNFormat() {
-        constexpr bool isShapeRight = Std::is_constant<2, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<2, StrideRow0>::value && Std::is_constant<1, StrideColumn0>::value;
+        constexpr bool isShapeRight = Std::is_constant<1, ShapeRow0>::value && Std::is_constant<2, ShapeColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<0, StrideRow0>::value && Std::is_constant<1, StrideColumn0>::value;
 
         return (isShapeRight && isStrideRight);
     }
@@ -294,23 +294,23 @@ public:
 };
 
 template <typename T>
-struct IsScaleANDFormat {
+struct IsScaleANDFormat { // shape = ((1, row),(1,col)) stride = ((0, col),(0, 1))
     static constexpr bool value = IsNDFormat<T>::normalValue;
 };
 
 template <typename T>
-struct IsScaleADNFormat {
+struct IsScaleADNFormat { // shape = ((1, row),(2,col/2)) stride = ((0, 2),(1, row*2))
     static constexpr bool value = IsDNFormat<T>::value;
 };
 
 template <typename T>
-struct IsScaleBNDFormat {
-    static constexpr bool value = IsDNFormat<T>::value;
+struct IsScaleBNDFormat { // shape = ((2, row/2),(1,col)) stride = ((1, 2*col),(0, 2))
+    static constexpr bool value = IsNDFormat<T>::value;
 };
 
 template <typename T>
-struct IsScaleBDNFormat {
-    static constexpr bool value = IsNDFormat<T>::normalValue;
+struct IsScaleBDNFormat { // shape = ((1, row),(1,col)) stride = ((0, 1),(0, row))
+    static constexpr bool value = IsDNFormat<T>::normalValue;
 };
 
 
