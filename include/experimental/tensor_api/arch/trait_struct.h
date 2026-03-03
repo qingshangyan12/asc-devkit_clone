@@ -59,14 +59,14 @@ struct FixpipeTrait {
     ) :
         quantPre(quantPreIn),
         enableRelu(enableReluIn),
-        enableChannleSplit(enableChannelSplitIn),
+        enableChannelSplit(enableChannelSplitIn),
         unitFlag(unitFlagIn),
         dualDstCtl(dualDstCtlIn)
     {}
 
     QuantMode_t quantPre = QuantMode_t::NoQuant;
     bool enableRelu = false;
-    bool enableChannleSplit = false;
+    bool enableChannelSplit = false;
     uint8_t unitFlag = false;
     uint8_t dualDstCtl = false;
 };
