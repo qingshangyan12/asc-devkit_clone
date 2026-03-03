@@ -100,3 +100,4 @@ __aicore__ inline void GeGLUImpl(const LocalTensor<T>& dstTensor, const LocalTen
 
 } // namespace AscendC
 #endif // IMPL_ACTIVATION_GEGLU_GEGLU_IMPL_C310_H
+
