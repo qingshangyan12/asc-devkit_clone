@@ -11,11 +11,11 @@
 cmake_minimum_required(VERSION 3.16)
 
 # 从 version.info 读取版本号
-file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/version.info" VERSION_LINE REGEX "^Version=")
-string(REGEX REPLACE "Version=(.*)" "\\1" PROJECT_VERSION "${VERSION_LINE}")
-if(NOT PROJECT_VERSION)
-    message(FATAL_ERROR "Failed to read version from version.info")
-endif()
+# file(STRINGS "${CMAKE_BINARY_DIR}/version.asc-devkit.info" VERSION_LINE REGEX "^Version=")
+# string(REGEX REPLACE "Version=(.*)" "\\1" PROJECT_VERSION "${VERSION_LINE}")
+# if(NOT PROJECT_VERSION)
+#     message(FATAL_ERROR "Failed to read version from version.info")
+# endif()
 
 function(parse_semantic_version version_str out_major out_minor out_patch out_prerelease out_version_num out_timestamp)
     # 解析主/次/补丁版本（格式：MAJOR.MINOR.PATCH）
@@ -78,7 +78,7 @@ endfunction()
 # 3. 调用函数解析版本号
 # --------------------------
 parse_semantic_version(
-    ${PROJECT_VERSION}
+    ${CANN_VERSION_asc-devkit_VERSION}
     MAJOR
     MINOR
     PATCH
