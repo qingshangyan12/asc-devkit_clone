@@ -161,16 +161,18 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
 1. 编译
 
-   本开源仓提供一键式编译安装能力，进入本开源仓代码根目录，执行如下命令：
+   本开源仓提供一键式编译安装能力
+
+   方式一：进入本开源仓代码根目录，执行如下命令：
 
    ```bash
    bash build.sh --pkg
    ```
 
-   客户也可使用离线下载功能，下载[makeself源码包](https://gitcode.com/cann-src-third-party/makeself/releases/download/release-2.5.0-patch1.0/makeself-release-2.5.0-patch1.tar.gz)存放至自定义目录，使用如下命令进行编译：
+   方式二：用户也可使用离线下载功能，下载[makeself源码包](https://gitcode.com/cann-src-third-party/makeself/releases/download/release-2.5.0-patch1.0/makeself-release-2.5.0-patch1.tar.gz)存放至自定义目录，进入本开源仓代码根目录，执行如下命令：
 
    ```bash
-   bash build.sh --pkg --cann_3rd_lib_path={PATH_TO_DOWNLOAD} # 以PATH_TO_DOWNLOAD为自定义下载目录为例
+   bash build.sh --pkg --cann_3rd_lib_path={PATH_TO_DOWNLOAD} # PATH_TO_DOWNLOAD为自定义下载目录
    ```
 
    编译完成后会在`build_out`目录下生成cann-asc-devkit_*<cann_version>*_linux-*\<arch\>*.run软件包。
@@ -231,7 +233,7 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
     ```
 
 ### 执行
-在开源仓根目录执行下列命令，将按各模块依次批跑tests目录下的用例，得到结果日志，用于看护编译是否正常。
+方式一：在开源仓根目录执行下列命令，将按各模块依次批跑tests目录下的用例，得到结果日志，用于看护编译是否正常。
 
 ```bash
 bash build.sh --adv_test                         # 批跑tests目录下adv_api里的用例
@@ -240,7 +242,7 @@ bash build.sh --basic_test_two                   # 批跑tests目录下basic_api
 bash build.sh --basic_test_three                 # 批跑tests目录下basic_api part-three里的用例
 ```
 
-客户也可使用离线下载功能，下载三方库源码包存放至自定义目录，使用如下命令进行编译：
+方式二：用户也可使用离线下载功能，下载三方库源码包存放至自定义目录，在开源仓根目录执行下列命令：
 
 ```bash
 # 以PATH_TO_DOWNLOAD为自定义下载目录为例
