@@ -33,15 +33,9 @@ void vsts(vector_f4e2m1x2 src0, vector_f4e2m1x2 src1, __ubuf__ fp4x2_e2m1_t* bas
 void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 
 #if defined(__DAV_CUBE__)
-<<<<<<< HEAD
-    inline uint32_t g_c_api_core_type = 1;
-#else
-    inline uint32_t g_c_api_core_type = 2;
-=======
     inline int32_t g_coreType = 1;
 #else
     inline int32_t g_coreType = 2;
->>>>>>> master
 #endif
 
 typedef std::integral_constant<Pos, Pos::LOWEST> Lowest_Type;

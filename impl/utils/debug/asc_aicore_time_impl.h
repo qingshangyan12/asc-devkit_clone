@@ -23,11 +23,7 @@
 
 #include "impl/utils/debug/asc_debug_utils.h"
 
-<<<<<<< HEAD
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3501 || __NPU_ARCH__ == 3101
-=======
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3101
->>>>>>> master
 namespace __asc_aicore {
 __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
 {
@@ -74,11 +70,7 @@ __aicore__ inline void asc_prof_stop()
     bisheng::cce::metrics_prof_stop();
 }
 
-<<<<<<< HEAD
-#if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3501
-=======
 #if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510
->>>>>>> master
 template<pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
@@ -123,11 +115,7 @@ __aicore__ inline void prof_mark_event(void)
 #define TRACE_STOP_INTERNAL(N, ...) TRACE_STOP_FUNC(N, __VA_ARGS__)
 #define TRACE_STOP_FUNC(N, ...) TRACE_STOP_##N(__VA_ARGS__)
 #define TRACE_STOP_IMPL(...) TRACE_STOP_INTERNAL(GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-<<<<<<< HEAD
-#if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3501
-=======
 #if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510
->>>>>>> master
 #define TRACE_START_2(pipe, idx) asc_mark_stamp<pipe>(idx)
 #define TRACE_STOP_2(pipe, idx) asc_mark_stamp<pipe>(idx)
 #else

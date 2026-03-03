@@ -18,17 +18,10 @@
 class TestCubeDatamove##class_name##data_type##CApi : public testing::Test {                    \
 protected:                                                                                      \
     void SetUp() {                                                                              \
-<<<<<<< HEAD
-        g_c_api_core_type = C_API_AIC_TYPE;                                                     \
-    }                                                                                           \
-    void TearDown() {                                                                           \
-        g_c_api_core_type = C_API_AIV_TYPE;                                                     \
-=======
         g_coreType = C_API_AIC_TYPE;                                                     \
     }                                                                                           \
     void TearDown() {                                                                           \
         g_coreType = C_API_AIV_TYPE;                                                     \
->>>>>>> master
     }                                                                                           \
 };                                                                                              \
                                                                                                 \

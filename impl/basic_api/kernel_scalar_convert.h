@@ -126,37 +126,8 @@ template <typename T>
 __aicore__ constexpr inline float ToFloat(const T& bVal)
 {
     static_assert(SupportType<T, bfloat16_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, fp4x2_e1m2_t, fp4x2_e2m1_t>(),
-<<<<<<< HEAD
-        "Cast to float only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
-    return Cast<T>(bVal);
-}
-#else
-__aicore__ inline bfloat16_t Cast(const float& fVal)
-{
-    float fNum = fVal;
-    union ToBfloat16Union {
-        __aicore__ ToBfloat16Union() {}
-        uint16_t val;
-        bfloat16_t bNum;
-    } bf16Union;
-    union FloattoInt32Union {
-        __aicore__ FloattoInt32Union() {}
-        float ftmp;
-        uint32_t uret;
-    } int32Union;
-    int32Union.ftmp = fNum;
-    bf16Union.val = int32Union.uret >> BF16_TO_FP32_MAN_LEN;
-    return bf16Union.bNum;
-}
-
-// ToBfloat16 has been updated, please use Cast instead.
-__aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
-{
-    return Cast(fVal);
-=======
         "ToFloat only support bfloat16_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/fp4x2_e1m2_t/fp4x2_e2m1_t data type on current device!");
     return Cast<T, float>(bVal);
->>>>>>> master
 }
 
 #else

@@ -20,8 +20,6 @@
 #include "simt_api/device_sync_functions.h"
 #include "simt_api/device_warp_functions.h"
 #include "simt_api/device_atomic_functions.h"
-<<<<<<< HEAD
-=======
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rn(const float x);
 
@@ -32,7 +30,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rd(const float x);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_ru(const float x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __float2float_rna(const float x);
->>>>>>> master
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __float2uint_rn(const float x);
 

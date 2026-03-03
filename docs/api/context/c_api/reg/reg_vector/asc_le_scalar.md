@@ -4,19 +4,11 @@
 
 |产品|是否支持|
 | :------------ | :------------: |
-<<<<<<< HEAD
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
-
-## 功能说明
-
-按元素判断src <= value是否成立，若成立则输出结果为1，否则为0。
-=======
 | <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
 按元素判断src_i <= value是否成立，若成立则输出结果为1，否则为0。
->>>>>>> master
 
 ## 函数原型
 

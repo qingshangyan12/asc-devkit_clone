@@ -15,6 +15,9 @@
 #ifndef IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
 #define IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
 
+#include "impl/utils/sys_constants.h"
+#include "impl/utils/sys_macros.h"
+
 #if !defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
     using fp4x2_e2m1_t = float4_e2m1x2_t;
@@ -30,9 +33,6 @@
     using fp8_e8m0_t = uint8_t;
 #endif
 #endif
-
-#include "impl/utils/sys_constants.h"
-#include "impl/utils/sys_macros.h"
 
 #define GM_ADDR __gm__ uint8_t*
 
@@ -51,7 +51,7 @@
 #if (__CCE__)
 #define _ASCENDC_HAS_BISHENG_COMPILER 1
 #endif
-
+ 
 #if (_ASCENDC_HAS_BISHENG_COMPILER)
 #define ASCENDC_HOST __host__
 #define ASCENDC_AICORE __aicore__
@@ -104,7 +104,6 @@
 #define TPIPE_MAX_TYPE 4
 #endif
 
-<<<<<<< HEAD:impl/experimental/tensor_api/utils/macro_impl.h
 #if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
 #define SPLIT_CORE_CUBE
 #endif
@@ -113,8 +112,6 @@
 #define SPLIT_CORE_VEC
 #endif
 
-=======
->>>>>>> master:impl/experimental/tensor_api/utils/tensor_tile_macro.h
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #define ASCENDC_MATMUL_AICORE
 #endif
@@ -146,15 +143,7 @@ constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
 constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
 constexpr int32_t CAST_MODE_BIT = 59;
 
-<<<<<<< HEAD:impl/experimental/tensor_api/utils/macro_impl.h
-constexpr int32_t MIX = 0;
-constexpr int32_t AIC = 1;
-constexpr int32_t AIV = 2;
-
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
-=======
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || \
->>>>>>> master:impl/experimental/tensor_api/utils/tensor_tile_macro.h
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
 __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {

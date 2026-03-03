@@ -21,10 +21,6 @@
 #endif
 #include "utils/base/sys_macros.h"
 
-#ifndef __aicore__
-#define __aicore__ [aicore]
-#endif
-
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
 #else
