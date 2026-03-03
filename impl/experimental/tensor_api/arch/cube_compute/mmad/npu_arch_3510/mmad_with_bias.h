@@ -1,0 +1,43 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/*!
+ * \file mmad_with_bias.h
+ * \brief
+ */
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_WITH_BIAS_H
+#define IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_WITH_BIAS_H
+
+#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad/bias.h"
+#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad/mx_bias.h"
+
+namespace AscendC {
+namespace Te {
+
+class MmadWithBias3510 : public MmadBias, public MmadMxBias {
+public:
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
+    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) 
+    {   
+        Execute<trait, T, U, S, V>(dst, fm, filter, bias, params);
+    }
+
+private:
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
+    __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) {
+        // TODO if type ...
+        MmadBias::Run<trait, T, U, S, V>(dst, fm, filter, bias, params);
+    }
+};
+
+} // namespace Te
+} // namespace AscendC
+
+#endif // IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_GM2L1_H
