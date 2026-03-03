@@ -606,10 +606,14 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
         align_size = compile_info.super_kernel_info["sp_options"].get('func-align', 512)
         gen_func_attributes = gen_func_align_attribute(align_size)
         if '--cce-auto-sync=off' not in compile_options and '--cce-auto-sync' in compile_options:
-            gen_func_attributes += " __attribute__((need_auto_sync))"
+            gen_func_attributes += " __sk__"
+            kernel_func_dec = f"extern \"C\" {gen_func_attributes} void {auto_gen_kernel_func}("
+        else:
+            kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {auto_gen_kernel_func}("
+    else:
+        kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {auto_gen_kernel_func}("
 
     compile_info.global_kernel_attribute = gen_func_attributes
-    kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {auto_gen_kernel_func}("
     kernel_func_dec_pub = f"__aicore__ inline __attribute__((always_inline)) void ascendc_{auto_gen_kernel_func}("
 
     source_declare_pub, workspace_idx, called_func_params, called_func_params_type = \
