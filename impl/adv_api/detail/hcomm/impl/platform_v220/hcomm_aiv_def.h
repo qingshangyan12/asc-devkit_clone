@@ -26,6 +26,12 @@ public:
     template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE3>
     __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
+    template <pipe_t pipe = PIPE_MTE3>
+    __aicore__ inline int32_t Commit(HcommHandle handleId) {return 0;}
+
+    template <pipe_t pipe = PIPE_MTE3>
+    __aicore__ inline int32_t Wait(HcommHandle handleId) {return 0;}
+
 public:
     __aicore__ inline void doorBell(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
