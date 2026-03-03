@@ -31,12 +31,12 @@ public:
 
 private:
     TPipe pipe;
-    TQue<TPosition::VECCALC> wqeBuf_;
-    TQue<TPosition::VECCALC> cqeBuf_;
-    TQue<TPosition::VECCALC> sqPIBuf_;
-    TQue<TPosition::VECCALC> sqCIBuf_;
-    TQue<TPosition::VECCALC> cqCIBuf_;
-    TQue<TPosition::VECCALC> doorBellBuf_;
+    TQue<TPosition::VECCALC, 1> wqeBuf_;
+    TQue<TPosition::VECCALC, 1> cqeBuf_;
+    TQue<TPosition::VECCALC, 1> sqPIBuf_;
+    TQue<TPosition::VECCALC, 1> sqCIBuf_;
+    TQue<TPosition::VECCALC, 1> cqCIBuf_;
+    TQue<TPosition::VECCALC, 1> doorBellBuf_;
     LocalTensor<uint8_t> wqeItem_;
     LocalTensor<uint64_t> cqeItem_;
     LocalTensor<uint32_t> sqPI_;

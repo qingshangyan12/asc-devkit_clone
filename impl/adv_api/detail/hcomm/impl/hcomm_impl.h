@@ -39,6 +39,7 @@ __aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::Read(ChannelHandl
     return impl_.template Read<commit, commit_pipe, req_pipe>(channelHandle, dst, src, len);
 }
 
+// 宏隔离
 template <uint8_t commEngine, COMM_PROTOCOL commProtocol>
 template <pipe_t pipe>
 __aicore__ inline int32_t Commit(HcommHandle handleId)
