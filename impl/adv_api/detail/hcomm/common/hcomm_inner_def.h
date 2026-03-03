@@ -254,6 +254,7 @@ typedef struct {
 #define OP_TYPE_OFFSET 24
 #define C_OFFSET 29
 #define F_OFFSET 30
+#define HCOMM_MAX_HANDLE_ID 1024
 
 } // namespace AscendC
 #endif // IMPL_HCOMM_HCOMM_INNER_DEF_H

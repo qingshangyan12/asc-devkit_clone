@@ -15,6 +15,8 @@
 #ifndef IMPL_V310_HCOMM_AIV_DEF_H
 #define IMPL_V310_HCOMM_AIV_DEF_H
 
+#include "../../common/hcomm_inner_def.h"
+
 namespace AscendC {
 
 template <>

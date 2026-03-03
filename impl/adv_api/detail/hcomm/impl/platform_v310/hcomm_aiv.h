@@ -27,17 +27,17 @@ namespace AscendC {
 __aicore__ inline uint64_t GetDbValue(uint32_t qpn)
 {
     RoceDbEntry dbEntry = {0};
-    dbEntry.bs.type = ROCE_SQ_DOORBELL_TYPE;
-    dbEntry.bs.c = 0;
-    dbEntry.bs.r = 0;
-    dbEntry.bs.cntx_size = 1;
-    dbEntry.bs.qpn = qpn;
-    dbEntry.bs.sub_type = 0;
-    dbEntry.bs.resv = 0;
-    dbEntry.bs.pi = 0;
-    dbEntry.bs.sgid_index = ROCE_INIT_SQ_DB_SGIT_IDX;
-    dbEntry.bs.cos = 0x7;
-    return dbEntry.value;
+    dbEntry.dw0.bs.type = ROCE_SQ_DOORBELL_TYPE;
+    dbEntry.dw0.bs.c = 0;
+    dbEntry.dw0.bs.r = 0;
+    dbEntry.dw0.bs.cntx_size = 1;
+    dbEntry.dw0.bs.qpn = qpn;
+    dbEntry.dw0.bs.sub_type = 0;
+    dbEntry.dw0.bs.resv = 0;
+    dbEntry.dw0.bs.pi = 0;
+    dbEntry.dw0.bs.sgid_index = ROCE_INIT_SQ_DB_SGIT_IDX;
+    dbEntry.dw0.bs.cos = 0x7;
+    return dbEntry.dw0.value;
 }
 
 __aicore__ inline uint32_t HtoNL(uint32_t x)
@@ -74,14 +74,14 @@ __aicore__ inline Hcomm<COMM_PROTOCOL::ROCE, pipe>::~Hcomm()
 }
 
 template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
-__aicore__ inline HcommHandle Hcomm<COMM_PROTOCOL::ROCE, pipe> Write(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
+__aicore__ inline HcommHandle Hcomm<COMM_ENGINE_AIV, COMM_PROTOCOL::ROCE> Write(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
                                                                 uint64_t len)
 {
     return 1;
 }
 
 template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
-__aicore__ inline HcommHandle Hcomm<COMM_PROTOCOL::ROCE, pipe> Read(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
+__aicore__ inline HcommHandle Hcomm<COMM_ENGINE_AIV, COMM_PROTOCOL::ROCE> Read(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
                                                                uint64_t len)
 {
     return 0;
