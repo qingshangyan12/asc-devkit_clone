@@ -115,6 +115,23 @@ private:
     iterator storage;
 };
 
+template <typename Iterator> 
+struct ConstViewEngine 
+{ 
+    using iterator     = Iterator; 
+    using reference    = typename IterRef<iterator>::type; // T& 
+    using elementType = typename IterEle<iterator>::type; // rm_ref 
+    using valueType   = typename IterVal<iterator>::type; // rm_cvf 
+
+
+    __aicore__ inline constexpr iterator const& Begin() const { 
+        return storage; 
+    } 
+    __aicore__ inline constexpr ConstViewEngine(iterator storage = {}) : storage(storage) {} 
+private: 
+    iterator storage; 
+};
+
 // pointer.h
 template <Hardware hardPos, typename Iterator>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
