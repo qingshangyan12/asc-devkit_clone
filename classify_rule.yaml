@@ -32,6 +32,10 @@ asc-devkit:
       - impl/utils/**/*.h
       - impl/experimental/tensor_api/utils/*.h
       - impl/c_api/instr_impl/npu_arch_2201/utils_impl/**/*.h
+      - impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_def.h
+      - impl/adv_api/detail/hccl/impl/platform_v220/hccl_aicpu_def.h
+      - impl/adv_api/detail/hccl/common/hccl_inner_def.h
+      - mpl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v1.h
   llt:
     ut_check: true
     st_check: false
