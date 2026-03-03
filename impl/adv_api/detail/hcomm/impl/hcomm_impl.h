@@ -39,7 +39,7 @@ __aicore__ inline HcommHandle Hcomm<commEngine, commProtocol>::Read(ChannelHandl
     return impl_.template Read<commit, commit_pipe, req_pipe>(channelHandle, dst, src, len);
 }
 
-// 宏隔离
+#if __NPU_ARCH__ == 3101
 template <uint8_t commEngine, COMM_PROTOCOL commProtocol>
 template <pipe_t pipe>
 __aicore__ inline int32_t Commit(HcommHandle handleId)
@@ -53,6 +53,7 @@ __aicore__ inline int32_t Wait(HcommHandle handleId)
 {
     return impl_.template Wait<pipe>(handleId);
 }
+#endif
 } // namespace AscendC
 
 #endif // IMPL_HCOMM_HCOMM_IMPL_H
