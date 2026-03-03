@@ -89,8 +89,9 @@ install(FILES ${LATEST_MANGER_FILES}
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/package/latest_manager/scripts/
     DESTINATION latest_manager
 )
-install(FILES ${ASC_DEVKIT_VERSION_FILE}
-    DESTINATION .
+install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
+    DESTINATION asc-devkit
+    RENAME version.info
 )
 # install(DIRECTORY ${CMAKE_BINARY_DIR}/packages/${ARCH}-linux/ascendc DESTINATION ascendc)
 # install(DIRECTORY ${CMAKE_BINARY_DIR}/packages/${ARCH}-linux/asc DESTINATION asc)
