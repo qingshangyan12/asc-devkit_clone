@@ -63,7 +63,7 @@ __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
 
 __aicore__ inline int32_t CeilAlign(int32_t num1, int32_t num2)
 {
-    static_assert(num2 > 0, "Only support num2 > 0");
+    ASSERT(num2 > 0);
     return CeilDivision(num1, num2) * num2;
 }
 
