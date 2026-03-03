@@ -1135,7 +1135,7 @@ def generate_func_impl_code_cpu(func_sign: FuncSign,
     elif any(has_mode_func(mode) for mode in aic_conditions):
         kernelType = "AIC_MODE"
     elif has_mode_func(CodeMode.KERNEL_TYPE_MIX_AIC_1_1):
-        kernelType = "MIX_AIC_1_1"
+        kernelType = "MIX_MODE_1_1"
     elif any(has_mode_func(mode) for mode in mix_mode_conditions):
         kernelType = "MIX_MODE"
     else:
