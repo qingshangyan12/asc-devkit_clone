@@ -9,30 +9,13 @@
 */
 
 /*!
- * \file hccl_ccu_v0_def.h
- * \brief
+ * \file hccl_ccu_def.h
+ * \brief CCU class definition
  */
-#ifndef IMPL_V310_HCCL_CCU_D100_DEF_H
-#define IMPL_V310_HCCL_CCU_D100_DEF_H
+#ifndef IMPL_V310_HCCL_CCU_DEF_H
+#define IMPL_V310_HCCL_CCU_DEF_H
 
 namespace AscendC {
-
-enum class AlgorithmType: uint8_t {
-    CcuAllGatherMesh1D = 0,
-    CcuAllGatherMeshMem2Mem1D,
-    CcuAllGatherMesh2D,
-    CcuReduceScatterMesh1D,
-    CcuReduceScatterMeshMem2Mem1D,
-    CcuReduceScatterMesh2D,
-    CcuAllReduceMesh1D,
-    CcuAllReduceMeshMem2Mem1D,
-    CcuAllReduceMesh2DOneShot,
-    CcuReduceMesh1D,
-    CcuReduceMesh2D,
-    CcuAlltoAllMesh1D,
-    CcuAlltoAllVMesh1D,
-    CcuHalfAll2AllVMesh1D
-};
 
 template<const auto &config>
 class HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config> {
@@ -73,7 +56,8 @@ public:
 
     __aicore__ inline void Commit(HcclHandle handleId);
 
-    __aicore__ inline int32_t Wait(HcclHandle handleId);
+    template<pipe_t pipe = PIPE_S>
+    __aicore__ inline int32_t Wait(HcclHandle handleId); 
 
     template <bool sync = true>
     __aicore__ inline void Finalize();
@@ -101,6 +85,8 @@ private:
 
     __aicore__ inline bool IsFinish(uint8_t reqId);
 
+    __aicore__ inline void FlushDataCacheForCopy(GM_ADDR gmAddr, uint32_t size);
+
     __aicore__ inline void InitHandleInfo(uint8_t handleId);
 
     __aicore__ inline void InitCcuParam(const HcclHandle handleId);
@@ -117,9 +103,6 @@ private:
         __gm__ AlltoAllVParamCcu *allToAllVParam);
     __aicore__ inline void CcuPrepareForAllToAllVWrite(__gm__ CommonPrepareParamCcu *commParam);
     __aicore__ inline void CcuPrepareForReduceScatter(__gm__ CommonPrepareParamCcu *commParam);
-    __aicore__ inline void CcuPrepareForAllReduceM2M(__gm__ CommonPrepareParamCcu *commParam);
-    __aicore__ inline void CcuPrepareForAllGatherM2M(__gm__ CommonPrepareParamCcu *commParam);
-    __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu *commParam);
 
 private:
     __gm__ HcclCombineOpParam *hcclContext_;
@@ -143,6 +126,7 @@ private:
     uint8_t handleReqId_[HCCL_MAX_HANDLE_ID];
     uint8_t handleRepeatCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleCommitCnt_[HCCL_MAX_HANDLE_ID];
+    uint8_t handleWaitCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleFinishCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleNeedCommitCnt_[HCCL_MAX_HANDLE_ID];
 
@@ -157,6 +141,7 @@ private:
     uint32_t globalCurWaitCnt_ = 0;
 
     uint8_t ccuUsedXnNum_ = 0;
+    uint64_t sizeOfXnMsg_ = 0;
 
     bool msgQueueIsAvailable_[CCU_MAX_MSG_NUM];
     uint64_t xnData_[CCU_USED_XN_NUM];
