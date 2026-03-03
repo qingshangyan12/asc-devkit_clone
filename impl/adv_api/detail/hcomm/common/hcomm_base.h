@@ -32,6 +32,19 @@ public:
     {
         return -1;
     }
+
+    template <pipe_t pipe = pipe_mte3>
+    __aicore__ inline int32_t Commit(HcommHandle handleId)
+    {
+        return -1;
+    }
+
+    template <pipe_t pipe = pipe_mte3>
+    __aicore__ inline int32_t Wait(HcommHandle handleId)
+    {
+        return -1;
+    }
+
 };
 } // namespace AscendC
 
