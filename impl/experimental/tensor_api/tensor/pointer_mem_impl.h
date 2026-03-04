@@ -9,72 +9,16 @@
 */
 
 /*!
-* \file pointer_impl.h
+* \file pointer_mem_impl.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_TENSOR_POINTER_IMPL_H
-#define IMPL_TENSOR_API_TENSOR_POINTER_IMPL_H
+#ifndef IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
+#define IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
 
-#include "impl/experimental/tensor_api/utils/utils_impl.h"
+#include "impl/experimental/tensor_api/tensor/adaptor_pointer_impl.h"
 
 namespace AscendC {
 namespace Te {
-
-// struct hardware_pointer
-template <typename Iterator, typename DerivedType>
-struct IterAdaptor
-{
-    using iterator     = Iterator;
-    using reference    = typename IterRef<iterator>::type; // T&
-    using elementType = typename IterEle<iterator>::type; // rm_ref
-    using valueType   = typename IterVal<iterator>::type; // rm_cvf
-
-    __aicore__ inline constexpr IterAdaptor(iterator ptr = {}) : ptr(ptr) {}
-
-    __aicore__ inline constexpr reference operator*() const {
-        return *ptr;
-    }
-
-    template <typename Index>
-    __aicore__ inline constexpr reference operator[](const Index& i) const {
-        return ptr[i];
-    }
-
-    template <typename Index>
-    __aicore__ inline constexpr DerivedType operator+(const Index& i) const {
-        return {ptr + i};
-    }
-
-    __aicore__ inline constexpr iterator Get() const {
-        return ptr; 
-    }
-
-    __aicore__ inline constexpr friend bool operator==(const DerivedType& x, const DerivedType& y) {
-        return x.ptr == y.ptr;
-    }
-
-    __aicore__ inline constexpr friend bool operator!=(const DerivedType& x, const DerivedType& y) {
-        return x.ptr != y.ptr;
-    }
-
-    __aicore__ inline constexpr friend bool operator< (const DerivedType& x, const DerivedType& y) {
-        return x.ptr <  y.ptr; 
-    }
-
-    __aicore__ inline constexpr friend bool operator<=(const DerivedType& x, const DerivedType& y) {
-        return x.ptr <= y.ptr; 
-    }
-
-    __aicore__ inline constexpr friend bool operator> (const DerivedType& x, const DerivedType& y) {
-        return x.ptr >  y.ptr; 
-    }
-
-    __aicore__ inline constexpr friend bool operator>=(const DerivedType& x, const DerivedType& y) {
-        return x.ptr >= y.ptr; 
-    }
-private:
-    iterator ptr; // u8*
-};
 
 template <Hardware hPos, typename Pointer>
 struct HardwareMemPtr : IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>> {
@@ -95,43 +39,6 @@ struct IsHardwareMem<hardPos, Pointer, void_t<typename Pointer::iterator>> : IsH
 template <Hardware hardPos, typename Pointer>
 constexpr bool IsHardwareMemV = IsHardwareMem<hardPos, Pointer>::value;
 
-// struct engine
-template <typename Iterator>
-struct ViewEngine
-{
-    using iterator     = Iterator;
-    using reference    = typename IterRef<iterator>::type; // T&
-    using elementType = typename IterEle<iterator>::type; // rm_ref
-    using valueType   = typename IterVal<iterator>::type; // rm_cvf
-    __aicore__ inline constexpr iterator const& Begin() const {
-        return storage;
-    }
-
-    __aicore__ inline constexpr iterator& Begin() {
-        return storage;
-    }
-    __aicore__ inline constexpr ViewEngine(iterator storage = {}) : storage(storage) {}
-private:
-    iterator storage;
-};
-
-template <typename Iterator>
-struct ConstViewEngine
-{
-    using iterator     = Iterator;
-    using reference    = typename IterRef<iterator>::type; // T&
-    using elementType = typename IterEle<iterator>::type; // rm_ref
-    using valueType   = typename IterVal<iterator>::type; // rm_cvf
-
-    __aicore__ inline constexpr iterator const& Begin() const {
-        return storage;
-    }
-    __aicore__ inline constexpr ConstViewEngine(iterator storage = {}) : storage(storage) {}
-private:
-    iterator storage;
-};
-
-// pointer.h
 template <Hardware hardPos, typename Iterator>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iter) 
 {
@@ -220,4 +127,4 @@ __aicore__ inline constexpr auto MakeFixbufmemPtr(const U& byteOffset) {
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_TENSOR_POINTER_IMPL_H
+#endif // IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
