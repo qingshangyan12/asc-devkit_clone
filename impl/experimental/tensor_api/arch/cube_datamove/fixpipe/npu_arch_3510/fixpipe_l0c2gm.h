@@ -20,7 +20,7 @@
 namespace AscendC {
 namespace Te {
 
-class FixpipetNz2NzBase3510 : public CopyMatrixCcToGmBase3510 {
+class Fixpipe2GmNz2NzBase3510 : public CopyMatrixCcToGmBase3510 {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
@@ -88,7 +88,7 @@ private:
     }
 };
 
-class FixpipetNz2NdBase3510 : public CopyMatrixCcToGmBase3510, public SetRegisterBase3510 {
+class Fixpipe2GmNz2NdBase3510 : public CopyMatrixCcToGmBase3510, public SetRegisterBase3510 {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
@@ -184,7 +184,7 @@ private:
     }
 };
 
-class FixpipetNz2DnBase3510 : public CopyMatrixCcToGmBase3510, public SetRegisterBase3510 {
+class Fixpipe2GmNz2DnBase3510 : public CopyMatrixCcToGmBase3510, public SetRegisterBase3510 {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
@@ -281,7 +281,7 @@ private:
     }
 };
 
-class FixpipeFourDimL0C2GM3510 : public FixpipetNz2NzBase3510, public FixpipetNz2NdBase3510, public FixpipetNz2DnBase3510 {
+class FixpipeFourDimL0C2GM3510 : public Fixpipe2GmNz2NzBase3510, public Fixpipe2GmNz2NdBase3510, public Fixpipe2GmNz2DnBase3510 {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
@@ -293,11 +293,11 @@ private:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
         if constexpr (IsL0cNZFormat<U>::value && IsL0cNZFormat<T>::value) {
-            FixpipetNz2NzBase3510::Run<trait, T, U, Coord>(dst, src, coord);
+            Fixpipe2GmNz2NzBase3510::Run<trait, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsL0cNZFormat<U>::value && IsNDFormat<T>::value) {
-            FixpipetNz2NdBase3510::Run<trait, T, U, Coord>(dst, src, coord);
+            Fixpipe2GmNz2NdBase3510::Run<trait, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsL0cNZFormat<U>::value && IsDNFormat<T>::value) {
-            FixpipetNz2DnBase3510::Run<trait, T, U, Coord>(dst, src, coord);
+            Fixpipe2GmNz2DnBase3510::Run<trait, T, U, Coord>(dst, src, coord);
         }
     }
 };
