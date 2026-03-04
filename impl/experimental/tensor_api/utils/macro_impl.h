@@ -155,19 +155,19 @@ namespace AscendC {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||           \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) ||           \
     (__NPU_ARCH__ == 5102)) // Available for V200 and V210
-constexpr int32_t QUE_MAX_EVENT = 8;
+// constexpr int32_t QUE_MAX_EVENT = 8;
 #else
-constexpr int32_t QUE_MAX_EVENT = 4;
+// constexpr int32_t QUE_MAX_EVENT = 4;
 #endif
-constexpr int32_t HF32_MODE_BIT = 46;
-constexpr int32_t HF32_TRANS_MODE_BIT = 47;
-constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
-constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
-constexpr int32_t CAST_MODE_BIT = 59;
+// constexpr int32_t HF32_MODE_BIT = 46;
+// constexpr int32_t HF32_TRANS_MODE_BIT = 47;
+// constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
+// constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
+// constexpr int32_t CAST_MODE_BIT = 59;
 
-constexpr int32_t MIX = 0;
-constexpr int32_t AIC = 1;
-constexpr int32_t AIV = 2;
+// constexpr int32_t MIX = 0;
+// constexpr int32_t AIC = 1;
+// constexpr int32_t AIV = 2;
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
@@ -183,45 +183,45 @@ __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 #endif
 }
 #else
-__aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
-{
-    if (num2 == 0) {
-        return 0;
-    }
-    return (num1 + num2 - 1) / num2;
-}
+// __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
+// {
+//     if (num2 == 0) {
+//         return 0;
+//     }
+//     return (num1 + num2 - 1) / num2;
+// }
 #endif
 
 #if !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
 
 #ifndef ASCC_PARAM_BLOCK_CUBE
 #define ASCC_PARAM_BLOCK_CUBE
-const int32_t BLOCK_CUBE = 16;
+// const int32_t BLOCK_CUBE = 16;
 #endif
 
 #else // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
 
 #ifndef ASCC_PARAM_BLOCK_CUBE
 #define ASCC_PARAM_BLOCK_CUBE
-constexpr uint32_t BLOCK_CUBE = 16;
+// constexpr uint32_t BLOCK_CUBE = 16;
 #endif
 #endif // !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
 } // namespace AscendC
 
 #if defined(ASCENDC_CPU_DEBUG)
-extern int32_t g_matmulCount;
-extern int32_t g_coreType;
+// extern int32_t g_matmulCount;
+// extern int32_t g_coreType;
 #define ASCEND_IS_AIV (g_coreType == AscendC::AIV)
 #define ASCEND_IS_AIC (g_coreType == AscendC::AIC)
 #define ASCEND_IS_NOT_AIV (g_coreType != AscendC::AIV)
 #define ASCEND_IS_NOT_AIC (g_coreType != AscendC::AIC)
 #else
 #if defined(SPLIT_CORE_CUBE)
-constexpr int32_t g_coreType = AscendC::AIC;
+// constexpr int32_t g_coreType = AscendC::AIC;
 #elif defined(SPLIT_CORE_VEC)
-constexpr int32_t g_coreType = AscendC::AIV;
+// constexpr int32_t g_coreType = AscendC::AIV;
 #else
-constexpr int32_t g_coreType = AscendC::MIX;
+// constexpr int32_t g_coreType = AscendC::MIX;
 #endif
 #define ASCEND_IS_AIV constexpr(g_coreType == AscendC::AIV)
 #define ASCEND_IS_AIC constexpr(g_coreType == AscendC::AIC)
