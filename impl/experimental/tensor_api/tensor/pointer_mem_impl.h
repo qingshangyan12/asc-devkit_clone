@@ -15,7 +15,7 @@
 #ifndef IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
 #define IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
 
-#include "impl/experimental/tensor_api/tensor/adaptor_pointer_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -47,81 +47,6 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
     } else {
         return HardwareMemPtr<hardPos, Iterator>{iter};
     }
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter) {
-    return MakeMemPtr<Hardware::GM, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeUBmemPtr(Iterator iter) {
-    return MakeMemPtr<Hardware::UB, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeL1memPtr(Iterator iter) {
-    return MakeMemPtr<Hardware::L1, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeL0AmemPtr(Iterator iter) {
-    return MakeMemPtr<Hardware::L0A, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeL0BmemPtr(Iterator iter) {
-    return MakeMemPtr<Hardware::L0B, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeL0CmemPtr(Iterator iter) {
-    return MakeMemPtr<Hardware::L0C, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeBiasmemPtr(Iterator iter) {
-    return MakeMemPtr<Hardware::BIAS, Iterator>(iter);
-}
-
-template <typename Iterator>
-__aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter) {
-    return MakeMemPtr<Hardware::FIXBUF, Iterator>(iter);
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeUBmemPtr(const U& byteOffset) {
-    return MakeUBmemPtr(reinterpret_cast<__ubuf__ T*>(get_imm(0) + byteOffset));
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeL1memPtr(const U& byteOffset) {
-    return MakeL1memPtr(reinterpret_cast<__cbuf__ T*>(get_imm(0) + byteOffset));
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeL0AmemPtr(const U& byteOffset) {
-    return MakeL0AmemPtr(reinterpret_cast<__ca__ T*>(get_imm(0) + byteOffset));
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeL0BmemPtr(const U& byteOffset) {
-    return MakeL0BmemPtr(reinterpret_cast<__cb__ T*>(get_imm(0) + byteOffset));
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeL0CmemPtr(const U& byteOffset) {
-    return MakeL0CmemPtr(reinterpret_cast<__cc__ T*>(get_imm(0) + byteOffset));
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeBiasmemPtr(const U& byteOffset) {
-    return MakeBiasmemPtr(reinterpret_cast<__biasbuf__ T*>(get_imm(0) + byteOffset));
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto MakeFixbufmemPtr(const U& byteOffset) {
-    return MakeFixbufmemPtr(reinterpret_cast<__fbuf__ T*>(get_imm(0) + byteOffset));
 }
 
 } // namespace Te
