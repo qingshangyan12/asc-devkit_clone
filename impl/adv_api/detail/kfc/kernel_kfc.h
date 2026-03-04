@@ -196,6 +196,19 @@ public:
                 } else if (funID == KFC_Enum::SERVICE_QUIT) {
                     quitSize++;
                     switchPoll = true;
+
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+                    if (quitSize == 2) {
+                        // AIC
+                        auto secondMsgStartPos = ptr->GetSecondBuffStart();
+                        // scalar write the GM, dcci write back to GM
+                        dcci(reinterpret_cast<__gm__ int64_t *>(secondMsgStartPos), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+                        SetFlag<HardEvent::S_MTE3>(EVENT_ID0);
+                        WaitFlag<HardEvent::S_MTE3>(EVENT_ID0);
+                        NotifyEvent<PIPE_MTE3>(KFC_SYNC_ID);
+                    }
+#endif
+
                     if(msg->ubAddr == 1) {
                         quitSize++;
                         TRACE_STOP(TraceId::KFC_SERVER_RUN);
