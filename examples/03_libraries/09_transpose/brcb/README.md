@@ -1,6 +1,56 @@
 # Brcb样例
 ## 概述
-本样例介绍了在 uint16_t 数据类型下，目的操作数连续 / 非连续场景中，Brcb指令及相关参数的使用方法。
+本样例基于Brcb实现数据填充的功能，可用于输入一个张量，每一次取输入张量中的8个数填充到结果张量的8个DataBlock中。
+本样例通过Ascend C编程语言实现了Brcb算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
+下面主要记录了5种不同的测试场景（scenario），用于评估某种计算系统或处理器在不同条件下的性能表现。
+- 场景 1-2：基础半精度功能测试
+
+  输入输出均为 half。
+
+  覆盖了两种目的操作数写出模式：连续写出模式、非连续写出模式。
+
+
+- 场景 3-4：半精度无业务性能测试
+
+  基于场景1-2，衍生两种场景进行性能对比：
+
+  3 (基础)： 无业务的纯连续写出模式，用于获取理论性能。
+
+  4 (bank conflict)： 测试非连续写出模式触发bank conflict的场景，用于测试性能劣化情况。
+
+
+<table>
+    <tr>
+        <td>scenarioNum</td>
+        <td>数据类型</td>
+        <td>描述</td>
+        <td>无业务性能测试</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>half</td>
+        <td>目的操作数连续写出模式</td>
+        <td>×</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>half</td>
+        <td>目的操作数非连续写出模式</td>
+        <td>×</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>half</td>
+        <td>目的操作数连续写出模式</td>
+        <td>√</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>half</td>
+        <td>bank conflict的场景</td>
+        <td>√</td>
+    </tr>
+</table>
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT //TBD
@@ -18,35 +68,27 @@
 ```
 
 ## 算子描述  
-   BrcbCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责从srcLocal每一次取输入张量中的8个数填充到dstLocal的8个datablock（32Bytes）中去，每个数分别对应一个datablock，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+- 算子功能：  	 
+   BrcbCustom算子给定一个输入张量，每一次取输入张量中的8个数填充到结果张量的8个DataBlock（32Bytes）中去，每个数对应一个DataBlock。	 
+ 
+  对应的伪代码如下：
 
-  本样例中实现的是数据类型为uint16_t，固定shape为输入x[16]，输出y[256]的BrcbCustom算子，算子规格信息如下表1所示：
-
-<table border="2" align="center">
-<caption>表1：目的操作数连续算子规格信息</caption>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Brcb</td></tr>
-  <tr><td rowspan="3" align="center">算子输入</td></tr>
-  <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">16</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">y</td><td align="center">256</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
-
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">brcb_custom</td></tr>
-  </table>
-
-  对于不同数据类型，配置参数均以DataBlock为单位，可以共用一套配置，因此下面两个小节的描述不仅仅适用于输入为uint6_t类型，也适用于输入为Brcb的其他任意支持类型。
-
-### 一.目的操作数 迭代内连续且迭代间连续
-  配置BrcbRepeatParams结构体的成员使得目的操作数 迭代内连续且迭代间连续时，dstBlkStride和dstRepStride的单位为32字节，参数取值为DataBlock间步长和迭代内DataBlock的数目。
-
-            brcbRepeatParams.dstBlkStride = 1;
-            brcbRepeatParams.dstRepStride = 8;
-
-### 二.目的操作数 迭代内非连续但迭代间连续
-  配置BrcbRepeatParams结构体的成员使得目的操作数 迭代内非连续但迭代间连续时，dstBlkStride和dstRepStride的单位为32字节，参数取值为迭代次数和DataBlock间步长。
-
-            brcbRepeatParams.dstBlkStride = 2;
-            brcbRepeatParams.dstRepStride = 1;
+ 
+ - 算子实现：  	 
+   本样例中实现的是固定shape为输入x[16]，输出y[256]的BrcbCustom算子。 
+ 
+ 
+   - Kernel实现	 
+ 
+     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Brcb基础API接口完成计算，得到最终结果，再搬出到外部存储上。	 
+ 
+     BrcbCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责从srcLocal每一次取输入张量中的8个数填充到dstLocal的8个DataBlock（32Bytes）中去，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。	 
+ 
+ 
+   - 调用实现   
+     使用内核调用符<<<>>>调用核函数。 
+ 
+ 
 
 
 ## 编译运行  

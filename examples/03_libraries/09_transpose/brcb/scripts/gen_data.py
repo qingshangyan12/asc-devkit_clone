@@ -31,22 +31,39 @@ def gen_golden_data_simple(scenarioNum=1):
     input_type = np.dtype("uint16")
     output_type = input_type
     min_val, max_val = get_range_by_dtype(input_type)
-    block_length = 256
     one_data_block_size = 32 # 一个datablock能处理32B数据
-    
-    input_shape = [block_length * input_type.itemsize // one_data_block_size]
-    output_shape = [block_length]
-    input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
     golden = np.zeros(output_shape).astype(output_type)
     if scenarioNum == 1:
-        for i in range(len(input_x)):
-            golden[i * (one_data_block_size // input_type.itemsize) : 
-            (i + 1) * (one_data_block_size // input_type.itemsize)] = input_x[i]
-    else :
-        for i in range (len(input_x) // 8):
-            for j in range (8):
-                golden[(i * 8 + j) * (one_data_block_size // input_type.itemsize) : 
-                (i * 8 + 1 + j) * (one_data_block_size // input_type.itemsize)] = input_x[i * 8 + j]
+        repeat_time = 2
+        block_length = 256
+        dst_blk_stride = 1
+        dst_rep_stride = 8
+    elif scenarioNum == 2:
+        repeat_time = 2
+        block_length = 512
+        dst_blk_stride = 2
+        dst_rep_stride = 16
+    elif scenarioNum == 3:
+        repeat_time = 64
+        block_length = 8192
+        dst_blk_stride = 1
+        dst_rep_stride = 8
+    elif scenarioNum == 4:
+        repeat_time = 2
+        block_length = 1024
+        dst_blk_stride = 4
+        dst_rep_stride = 32
+
+    input_shape = [block_length // dst_blk_stride * input_type.itemsize // one_data_block_size]
+    output_shape = [block_length]
+    input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
+    
+    for i in range(repeat_time):
+        for j in range(8):
+            src_ele_index = i * 8 + j
+            dst_blk_index = (one_data_block_size * i * dst_rep_stride + one_data_block_size * j * dst_blk_stride) / input_type.itemsize
+            golden[dst_blk_index : dst_blk_index + 31] = input_x[src_ele_index]
+
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
