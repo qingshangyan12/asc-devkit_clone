@@ -201,8 +201,8 @@ __global__ __aicore__ void MainAllReduceSimple(__gm__ uint8_t* __restrict__ srcG
 
     switch (level) {
         case 2:
-            // ReduceMax<T>(outputLocal, inputLocal, workLocal, srcDataSize, false);
-            // ReduceMax<T>(outputLocal, inputLocal, workLocal, srcDataSize, true);
+            ReduceMax<T>(outputLocal, inputLocal, workLocal, srcDataSize, false);
+            ReduceMax<T>(outputLocal, inputLocal, workLocal, srcDataSize, true);
             ReduceSum<T>(outputLocal, inputLocal, workLocal, srcDataSize);
             break;
         default:
