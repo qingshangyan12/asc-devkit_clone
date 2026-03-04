@@ -28,6 +28,8 @@
 #include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_maskreg_impl.h"
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_maskreg_impl.h"
+#elif __NPU_ARCH__ == 3102
+#include "../../basic_api/reg_compute/dav_m310/kernel_reg_compute_maskreg_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_c310/kernel_reg_compute_maskreg_impl.h"
 #endif
