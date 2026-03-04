@@ -4,123 +4,92 @@
 
 本样例基于Axpy实现源操作数src中每个元素与标量求积后和目的操作数dst中的对应元素相加的功能。Axpy接口的源操作数和目的操作数的数据类型只能取三种组合：(half, half)、(float, float)、(half, float)。本样例中输入tensor和标量的数据类型为half，输出tensor数据类型为float。
 本样例通过Ascend C编程语言实现了Axpy算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
-下面主要记录了11种不同的测试场景（scenario），用于评估某种计算系统或处理器在不同条件下的性能表现。
-- 场景 1-3：基础半精度功能测试
-
-  输入输出均为 half。
-
-  覆盖了三种核心计算模式：count、高维切分mask连续模式、高维切分mask逐比特模式。
-
-
-- 场景 4-6：半精度无业务性能测试
-
-  基于场景1的“count模式”，衍生三种场景进行性能对比：
-
-  4 (基础)： 无业务的纯count模式，用于获取理论性能。
-
-  5 (指令拆分)： 测试将复合指令拆解为多条指令对性能的影响。
-
-  6 (操作数重叠)： 测试源操作数与目的操作数重叠对性能的影响。
-
-
-- 场景 7：单精度功能测试
-
-  将输入输出改为 float，执行count模式。
-
-- 场景 8：混合精度功能测试
-
-  输入 half，输出 float，执行count模式。
-
-- 场景 9-11：混合精度性能测试
-
-  与场景4-6类似，但加入了数据类型转换（half->float）。
-
-  测试在混合精度背景下，基础性能、指令拆分、操作数重叠带来的影响。
+下面主要记录了11种不同的测试场景（scenario）。
 <table>
-    <tr>
-        <td>scenarioNum</td>
-        <td>输入数据类型</td>
-        <td>输出数据类型</td>
-        <td>描述</td>
-        <td>无业务性能测试</td>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>half</td>
-        <td>half</td>
-        <td>count模式计算</td>
-        <td>×</td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>half</td>
-        <td>half</td>
-        <td>mask连续模式计算</td>
-        <td>×</td>
-    </tr>
-    <tr>
-        <td>3</td>
-        <td>half</td>
-        <td>half</td>
-        <td>mask逐比特模式计算</td>
-        <td>×</td>
-    </tr>
-    <tr>
-        <td>4</td>
-        <td>half</td>
-        <td>half</td>
-        <td>count模式计算</td>
-        <td>√</td>
-    </tr>
-    <tr>
-        <td>5</td>
-        <td>half</td>
-        <td>half</td>
-        <td>count模式计算，拆分复合指令</td>
-        <td>√</td>
-    </tr>
-    <tr>
-        <td>6</td>
-        <td>half</td>
-        <td>half</td>
-        <td>count模式计算，操作数重叠</td>
-        <td>√</td>
-    </tr>
-    <tr>
-        <td>7</td>
-        <td>float</td>
-        <td>float</td>
-        <td>count模式计算</td>
-        <td>×</td>
-    </tr>
-    <tr>
-        <td>8</td>
-        <td>half</td>
-        <td>float</td>
-        <td>count模式计算</td>
-        <td>×</td>
-    </tr>
-    <tr>
-        <td>9</td>
-        <td>half</td>
-        <td>float</td>
-        <td>count模式计算</td>
-        <td>√</td>
-    </tr>
-    <tr>
-        <td>10</td>
-        <td>half</td>
-        <td>float</td>
-        <td>count模式计算，拆分复合指令</td>
-        <td>√</td>
-    </tr>
-    <tr>
-        <td>11</td>
-        <td>half</td>
-        <td>float</td>
-        <td>count模式计算，操作数重叠</td>
-        <td>√</td>
-    </tr>
+	<tr>
+		<td>scenarioNum</td>
+		<td>输入数据类型</td>
+		<td>输出数据类型</td>
+		<td>描述</td>
+		<td>无业务性能测试</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>half</td>
+		<td>half</td>
+		<td>【基础半精度功能测试】count模式计算</td>
+		<td>×</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>half</td>
+		<td>half</td>
+		<td>【基础半精度功能测试】mask连续模式计算（高维切分）</td>
+		<td>×</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>half</td>
+		<td>half</td>
+		<td>【基础半精度功能测试】mask逐比特模式计算（高维切分）</td>
+		<td>×</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>half</td>
+		<td>half</td>
+		<td>【半精度无业务性能测试】纯count模式，用于获取理论性能</td>
+		<td>√</td>
+	</tr>
+	<tr>
+		<td>5</td>
+		<td>half</td>
+		<td>half</td>
+		<td>【半精度无业务性能测试】count模式，测试将复合指令拆解为多条指令对性能的影响</td>
+		<td>√</td>
+	</tr>
+	<tr>
+		<td>6</td>
+		<td>half</td>
+		<td>half</td>
+		<td>【半精度无业务性能测试】count模式，测试源操作数与目的操作数重叠对性能的影响</td>
+		<td>√</td>
+	</tr>
+	<tr>
+		<td>7</td>
+		<td>float</td>
+		<td>float</td>
+		<td>【单精度功能测试】count模式计算</td>
+		<td>×</td>
+	</tr>
+	<tr>
+		<td>8</td>
+		<td>half</td>
+		<td>float</td>
+		<td>【混合精度功能测试】count模式计算（输入half，输出float）</td>
+		<td>×</td>
+	</tr>
+	<tr>
+		<td>9</td>
+		<td>half</td>
+		<td>float</td>
+		<td>【混合精度无业务性能测试】纯count模式，获取理论性能（含数据类型转换）</td>
+		<td>√</td>
+	</tr>
+	<tr>
+		<td>10</td>
+		<td>half</td>
+		<td>float</td>
+		<td>【混合精度无业务性能测试】count模式，测试将复合指令拆解为多条指令对性能的影响（含数据类型转换）</td>
+		<td>√</td>
+	</tr>
+	<tr>
+		<td>11</td>
+		<td>half</td>
+		<td>float</td>
+		<td>【混合精度无业务性能测试】count模式，测试源操作数与目的操作数重叠对性能的影响（含数据类型转换）</td>
+		<td>√</td>
+	</tr>
 </table>
 
 ## 支持的产品
