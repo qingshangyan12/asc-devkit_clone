@@ -20,12 +20,11 @@
 namespace AscendC {
 namespace Te {
 
-class CopyL12FPBase : public CopyL12FPInstr {
+class CopyL12FPBase {
 public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        auto params = GenDataCopyParams<trait, T, U>(dst, src);
-        DataCopy<T, U, decltype(params)>(dst, src, params, tuple_sequence<decltype(params)>{});
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {ss
+        DataCopyImpl<trait, T, U>(dst, src);
     }
 
 private:
@@ -67,7 +66,7 @@ private:
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline auto GenDataCopyParams(const T& dst, const U& src)
+    __aicore__ inline auto DataCopyImpl(const T& dst, const U& src)
     {
         constexpr uint32_t C2PIPE2GM_UNIT = C0_SIZE * 2;
         CheckTemplate<trait, T, U>();
@@ -87,7 +86,8 @@ private:
         uint16_t srcStride = CeilDivision(srcRow * sizeof(srcType), C0_SIZE);
         uint16_t dstStride = CeilDivision(dstRow * sizeof(dstType), C2PIPE2GM_UNIT);
 
-        return Std::make_tuple(blockCount, blockLen, srcStride, dstStride);
+        CopyL12FPInstr copyInstr;
+        copyInstr.DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
 };
 
