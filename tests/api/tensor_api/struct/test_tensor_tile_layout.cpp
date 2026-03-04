@@ -580,7 +580,7 @@ TEST_F(Tensor_Api_Layout, TestOperator)
     auto coord3 = AscendC::Std::Int<7>{};
     auto shape3 = AscendC::Std::Int<2>{};
     auto stride3 = AscendC::Std::Int<5>{};
-    auto idxRes3 = Crd2IdxImpl(coord3, shape3, stride3);
+    auto idxRes3 = Crd2Idx(coord3, shape3, stride3);
     EXPECT_EQ(idxRes3, 35);
 
     // 2*2维度的layout

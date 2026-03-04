@@ -18,7 +18,6 @@
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_impl.h"
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
-#include "impl/experimental/tensor_api/tensor/engine_impl.h"
 
 namespace AscendC {
 namespace Te {
