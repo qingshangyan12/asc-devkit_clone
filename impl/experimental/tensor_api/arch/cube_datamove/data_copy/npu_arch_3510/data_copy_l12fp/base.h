@@ -20,12 +20,11 @@
 namespace AscendC {
 namespace Te {
 
-class CopyL12FPBase : public CopyL12FPInstr {
+class CopyL12FPBase {
 public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        auto params = GenDataCopyParams<trait, T, U>(dst, src);
-        DataCopy<T, U, decltype(params)>(dst, src, params, tuple_sequence<decltype(params)>{});
+        DataCopyImpl<trait, T, U>(dst, src);
     }
 
 private:
@@ -44,6 +43,23 @@ private:
         static_assert(Std::is_same_v<StrideColumn0, Std::Int<0>>, "CopyCbufToFB Layout->Stride->Column->ZeroDim, is not Std::Int<0> type!");
         static_assert(Std::is_same_v<StrideColumn1, Std::Int<1>>, "CopyCbufToFB Layout->Stride->Column->OneDim, is not Std::Int<1> type!");
     }
+
+    template <typename T>
+    __aicore__ inline constexpr void CheckNDFp8Template()
+    {
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<2>>, "CopyCbufToFB Layout->Shape->Row->ZeroDim, is not Std::Int<1> type!");
+        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<1>>, "CopyCbufToFB Layout->Shape->Column->ZeroDim, is not Std::Int<1> type!");
+
+        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+        using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
+        static_assert(Std::is_same_v<StrideRow0, Std::Int<1>>, "CopyCbufToFB Layout->Stride->Row->ZeroDim, is not Std::Int<0> type!");
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<0>>, "CopyCbufToFB Layout->Stride->Column->ZeroDim, is not Std::Int<0> type!");
+        static_assert(Std::is_same_v<StrideColumn1, Std::Int<MX_SCALE_K0>>, "CopyCbufToFB Layout->Stride->Column->OneDim, is not Std::Int<1> type!");
+    }
+    
     template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline constexpr void CheckTemplate()
     {
@@ -64,10 +80,19 @@ private:
             Std::tuple<__fbuf__ uint64_t, __cbuf__ uint64_t>, Std::tuple<__fbuf__ double, __cbuf__ double>>, 
             "The data type is not supported.");
 #endif
+
+        constexpr bool isFp8 = Std::is_same_v<dstType, __fbuf__ fp8_e8m0_t> && Std::is_same_v<srcType, __cbuf__ fp8_e8m0_t>;
+        if constexpr (isFp8) {
+            CheckNDFp8Template<T>();
+            CheckNDFp8Template<U>();
+        } else {
+            CheckNDTemplate<T>();
+            CheckNDTemplate<U>();
+        }S
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline auto GenDataCopyParams(const T& dst, const U& src)
+    __aicore__ inline auto DataCopyImpl(const T& dst, const U& src)
     {
         constexpr uint32_t C2PIPE2GM_UNIT = C0_SIZE * 2;
         CheckTemplate<trait, T, U>();
@@ -87,7 +112,8 @@ private:
         uint16_t srcStride = CeilDivision(srcRow * sizeof(srcType), C0_SIZE);
         uint16_t dstStride = CeilDivision(dstRow * sizeof(dstType), C2PIPE2GM_UNIT);
 
-        return Std::make_tuple(blockCount, blockLen, srcStride, dstStride);
+        CopyL12FPInstr copyInstr;
+        copyInstr.DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
 };
 
