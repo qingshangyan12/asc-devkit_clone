@@ -16,7 +16,7 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_DEFINITION_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
-#include "impl/experimental/tensor_api/tensor/layout_size_impl.h"
+#include "impl/experimental/tensor_api/tensor/layout_size.h"
 #include "impl/experimental/tensor_api/tensor/tuple_impl.h"
 
 namespace AscendC {
