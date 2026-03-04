@@ -16,11 +16,17 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_DEFINITION_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
-#include "impl/experimental/tensor_api/tensor/layout_size_impl.h"
+#include "impl/experimental/tensor_api/tensor/layout_size.h"
 #include "impl/experimental/tensor_api/tensor/tuple_impl.h"
 
 namespace AscendC {
 namespace Te {
+
+template <typename T, typename U>
+struct Layout;
+
+template <typename T, typename U, typename S>
+__aicore__ inline constexpr auto Crd2Idx(const T& coord, const Layout<U, S>& layout);
 
 // struct layout
 template <typename... Shapes>
