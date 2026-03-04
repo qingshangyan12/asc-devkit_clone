@@ -9,24 +9,23 @@
 */
 
 /*!
- * \file base.h
+ * \file normal.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_BASE_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_BASE_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_NORMAL_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_NORMAL_H
 
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/instruction.h"
 
 namespace AscendC {
 namespace Te {
 
-class MmadBase : public MmadInstr {
+class MmadNormal {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>    
     __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
-    {
-        auto genParams = GenParams<trait>(dst, fm, filter, params);
-        Mmad<trait, T, U, S>(dst, fm, filter, genParams, tuple_sequence<decltype(genParams)>{});
+    {   
+        MmadImpl<trait, T, U, S>(dst, fm, filter, params);
     }
 
 private:
@@ -90,16 +89,21 @@ private:
         CheckZNTemplate<S>();
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<Std::tuple<dstDataType, fmDataType, filterDataType>,
-            Std::tuple<__cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, Std::tuple<__cc__ float, __ca__ half, __cb__ half>, 
-            Std::tuple<__cc__ fp8_e4m3fn_t, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, Std::tuple<__cc__ fp8_e5m2_t, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
-            Std::tuple<__cc__ fp8_e4m3fn_t, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, Std::tuple<__cc__ fp8_e5m2_t, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, 
-            Std::tuple<__cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, Std::tuple<__cc__ float, __ca__ float, __cb__ float>>, 
+            Std::tuple<__cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, 
+            Std::tuple<__cc__ float, __ca__ half, __cb__ half>, 
+            Std::tuple<__cc__ float, __ca__ float, __cb__ float>,
+            Std::tuple<__cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, 
+            Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
+            Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>, 
+            Std::tuple<__cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>, 
+            Std::tuple<__cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, 
+            Std::tuple<__cc__ float, __ca__ hifloat8_t, __cb__ hifloat8_t>>, 
             "The data type is not supported.");
 #endif
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const Params& params)
+    __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
     {
         CheckTemplate<trait, T, U, S>();
         using fmType = typename U::elementType;
@@ -109,9 +113,10 @@ private:
         uint16_t m = GetEleFromLayout<decltype(fmLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(fmLayout) * FRACTAL_FIXED;
         uint16_t k = GetEleFromLayout<decltype(fmLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(fmLayout) * C0_SIZE / sizeof(fmType);
         uint16_t n = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) * FRACTAL_FIXED;
-        auto genParams = Std::make_tuple(m, k, n, params.unitFlag, trait.disableGemv, trait.cmatrixSource, 
+
+        MmadInstr mmadInstr;
+        mmadInstr.Mmad(dst, fm, filter, m, k, n, params.unitFlag, trait.disableGemv, trait.cmatrixSource, 
             params.cmatrixInitVal);
-        return genParams;
     }
 };
 
