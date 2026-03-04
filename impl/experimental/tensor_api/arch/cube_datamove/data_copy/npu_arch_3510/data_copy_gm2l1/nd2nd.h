@@ -57,7 +57,7 @@ private:
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, 
             Std::tuple<__cbuf__ half, __gm__ half>, Std::tuple<__cbuf__ float, __gm__ float>, 
-            Std::tuple<__cbuf__ int32_t, __gm__ int32_t>>, "The data type is not supported.");
+            Std::tuple<__cbuf__ int32_t, __gm__ int32_t>, Std::tuple<__cbuf__ fp4x2_e2m1_t, __gm__ fp4x2_e2m1_t>>, "The data type is not supported.");
 #endif
     }
 

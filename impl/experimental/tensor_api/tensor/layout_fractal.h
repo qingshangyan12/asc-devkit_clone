@@ -24,11 +24,11 @@ namespace Te {
 // NZ
 template <typename T, size_t row, size_t column>
 using NZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row / FRACTAL_FIXED>>,
-    Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<column / (C0_SIZE / sizeof(T))>>>;
+    Shape<Std::Int<C0_ELEMS<T>>, Std::Int<column / C0_ELEMS<T>>>>;
 
 template <typename T, size_t row, size_t column>
-using NZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>,
-    Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * row>>>;
+using NZStrideFormat = Stride<Stride<Std::Int<C0_ELEMS<T>>, Std::Int<C0_ELEMS<T> * FRACTAL_FIXED>>,
+    Stride<Std::Int<1>, Std::Int<C0_ELEMS<T> * row>>>;
 
 // ND
 template <typename T, size_t row, size_t column>
@@ -46,19 +46,19 @@ using DNStrideFormat = Stride<Stride<Std::Int<0>, Std::Int<1>>, Stride<Std::Int<
 
 // ZN
 template <typename T, size_t  row, size_t  column>
-using ZNShapeFormat = Shape<Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<row / (C0_SIZE / sizeof(T))>>,
+using ZNShapeFormat = Shape<Shape<Std::Int<C0_ELEMS<T>>, Std::Int<row / C0_ELEMS<T>>>,
     Shape<Std::Int<FRACTAL_FIXED>, Std::Int<column / FRACTAL_FIXED>>>;
 template <typename T, size_t  row, size_t  column>
-using ZNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * column>>,
-    Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
+using ZNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_ELEMS<T> * column>>,
+    Stride<Std::Int<C0_ELEMS<T>>, Std::Int<C0_ELEMS<T> * FRACTAL_FIXED>>>;
 
 // ZZ
 template <typename T, size_t row, size_t column>
 using ZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row / FRACTAL_FIXED>>,
-    Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<column / (C0_SIZE / sizeof(T))>>>;
+    Shape<Std::Int<C0_ELEMS<T>>, Std::Int<column / C0_ELEMS<T>>>>;
 template <typename T, size_t row, size_t column>
-using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRACTAL_FIXED * column>>,
-    Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
+using ZZStrideFormat = Stride<Stride<Std::Int<C0_ELEMS<T>>, Std::Int<FRACTAL_FIXED * column>>,
+    Stride<Std::Int<1>, Std::Int<C0_ELEMS<T> * FRACTAL_FIXED>>>;
 
 template <typename T>
 __aicore__ inline decltype(auto) MakeNzLayout(size_t row, size_t column) {
