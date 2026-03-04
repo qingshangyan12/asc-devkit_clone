@@ -53,6 +53,9 @@ void DataDumpTensor(__gm__ uint8_t *dstGm, __gm__ uint8_t *srcGm, __gm__ uint8_t
     DataCopy(inputLocal, srcGlobal, copyParams);
     pipe_barrier(PIPE_ALL);
 
+    InitDump(workGm, dumpSize);
+    PrintTimeStamp(0);
+    DumpTensor(inputLocal, 0, dataSize);
     PRINTF("AAAA %d", 0x1);
 }
 

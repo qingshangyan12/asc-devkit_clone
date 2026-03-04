@@ -44,6 +44,28 @@ int32_t RaiseStubForDump(int32_t input)
     return 0;
 }
 
+TEST_F(TestCpuDebugApiCheck, CpuDebugDisableDumpCase)
+{
+    MOCKER(DumpTensorWrapper).expects(once());
+    MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForDump));
+    int tmp = 0;
+
+    printf("123, 456");
+    PRINTF("tmp = %d.\n", tmp);
+
+    LocalTensor<float> tensor;
+    DumpTensor(tensor, 0, 1);
+    DumpTensorWrapper(tensor, 0, 1);
+
+    DumpAccChkPoint(tensor, 0, 0, 1);
+    AscendC::DumpAccChkPoint(tensor, 0, 0, 1);
+
+    assert(tmp == 0);
+    assert(tmp != 0);
+    assert(assert_flag);
+    EXPECT_NO_THROW(GlobalMockObject::verify());
+}
+
 TEST_F(TestCpuDebugApiCheck, CpuDebugApiCheckCase)
 {
     int idx = 4;
