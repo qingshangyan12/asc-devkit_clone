@@ -152,6 +152,39 @@ TEST_F(TestMatmulServerC310, GetOffsetSizeDefault) {
     mmServer.GetOffsetSize(&body, funID, sync, offsetSize, enSequentialWrite, hasSetWorkspace);
 }
 
+TEST_F(TestMatmulServerC310, IterateSetMessage) {
+    using A_TYPE_NORMAL_SCALAR_t = MatmulType<AscendC::TPosition::GM, CubeFormat::SCALAR, half, true, LayoutMode::NORMAL>;
+    static constexpr MatmulConfig IterateCFG = GetN_BATCH_Config();
+    MatmulService<A_TYPE_NORMAL_SCALAR_t, B_TYPE_NORMAL_SCALAR, C_TYPE, BIAS_TYPE, IterateCFG, MatmulCallBackFunc<nullptr, nullptr, nullptr>, BatchCustomMatmulPolicy> mmIteServer;
+    TilingParams tilingParams = {1, 384, 2048, 192, 384, 2048, 192, 128, 256, 64, 2, 8, 3, 2, 3, 3, 0, 1};
+    TCubeTiling tilingIterate;
+    tilingParams.GetTiling(tilingIterate);
+
+    KfcMsg kfcInitMsgI;
+    MSG_POS TilingInfo *tilingSSbuf = reinterpret_cast<MSG_POS TilingInfo *>(GetTilingAddr(GetSubBlockIdxImpl()));
+    tilingSSbuf->valid = 1;
+    auto tempTilingSSbuf = reinterpret_cast<MSG_POS uint64_t*>(&(tilingSSbuf->tCubeTiling));
+    auto tempTiling = reinterpret_cast<uint64_t*>(&tilingIterate);
+    for (int i = 0; i < sizeof(TCubeTiling) / sizeof(uint64_t); ++i, ++tempTilingSSbuf, ++tempTiling) {
+        *tempTilingSSbuf = *tempTiling;
+    }
+    mmIteServer.Init(&kfcInitMsgI);
+
+    KfcMsg kfcMsg;
+    uint8_t cGM[2048] = {0};
+    kfcMsg.body.cAddr = (uint64_t)(cGM);
+    bool isTransposeA = true;
+    kfcMsg.body.isTransA = static_cast<uint32_t>(isTransposeA);
+    kfcMsg.body.setTensorA = 1;
+    kfcMsg.body.isFirstIter = 1;
+    MatmulConfigParams bodyI = kfcMsg.body;
+    bodyI.singleM = tilingParams.singleCoreM_;
+    bodyI.singleN = tilingParams.singleCoreN_;
+    bodyI.singleK = tilingParams.singleCoreK_;
+    bodyI.setTail = 0;
+    mmIteServer.IterateSetMessage(&kfcMsg, &bodyI);
+}
+
 TEST_F(TestMatmulServerC310, GetLocalTensor) {
     MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> mmServer;
     uint64_t ubAddr = 0x1111;
