@@ -42,10 +42,16 @@ inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm_
     const __gm__ char* __function);
 } // namespace __asc_aicore
 
+#if defined(__NPU_DEVICE__)
 #ifdef assert
 #undef assert
 #endif
 #define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
+#else
+#ifndef assert
+#define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
+#endif
+#endif
 
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3101)
 #include "impl/utils/debug/asc_aicore_assert_impl.h"
