@@ -9,32 +9,33 @@
 */
 
 /*!
- * \file data_copy_l12fp_normal.h
+ * \file data_copy_l12fb_normal.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12FP_NORMAL_H
-#define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12FP_NORMAL_H
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12FB_NORMAL_H
+#define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12FB_NORMAL_H
 
-#include "include/experimental/tensor_api/utils/utils.h"
+#include "impl/experimental/tensor_api/arch/arch_utils.h"
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
+#include "impl/experimental/tensor_api/tensor/layout_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_l12fp/base.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_l12fb/base.h"
 
 namespace AscendC {
 namespace Te {
 
-class DataCopyFourDim3510L12FP : public CopyL12FPBase {
+class DataCopyFourDim3510L12FB {
 public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        auto fourDimSrc = PreProcess(src);
-        Execute<trait>(dst, fourDimSrc, coord);
+        Execute<trait>(dst, src, coord);
     }
 
 private:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
-        CopyL12FPBase::Run<trait, T, U, Coord>(dst, src, coord);
+        CopyL12FBBase fpStrategy;
+        fpStrategy.Run<trait, T, U, Coord>(dst, src, coord);
     }
 };
 

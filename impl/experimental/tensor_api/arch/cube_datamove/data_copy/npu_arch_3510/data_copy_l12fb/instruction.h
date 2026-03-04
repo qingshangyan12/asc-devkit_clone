@@ -12,8 +12,8 @@
  * \file instruction.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12FP_INSTRUCTION_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12FP_INSTRUCTION_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12FB_INSTRUCTION_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12FB_INSTRUCTION_H
 
 #include "include/experimental/tensor_api/utils/utils.h"
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
@@ -22,17 +22,17 @@
 namespace AscendC {
 namespace Te {
 
-class CopyL12FPInstr {
+class CopyL12FBInstr {
 public:
 
-    template <typename T, typename U, typename Params, size_t... Is>
-    __aicore__ inline void DataCopy(const T& dst, const U& src, const Params& params, Std::index_sequence<Is...>) {
-        CopyL12FP(reinterpret_cast<uint64_t>(dst.Data().Get()), src.Data().Get(), Std::get<Is>(params)...);
+    template <typename T, typename U, typename... Params>
+    __aicore__ inline void DataCopy(const T& dst, const U& src, const Params& ...params) {
+        CopyL12FB(reinterpret_cast<uint64_t>(dst.Data().Get()), src.Data().Get(), params...);
     }
 
 private:
     template <typename T>
-    __aicore__ inline void CopyL12FP(uint64_t dst, __cbuf__ T* src, uint16_t blockCount, uint16_t blockLen,
+    __aicore__ inline void CopyL12FB(uint64_t dst, __cbuf__ T* src, uint16_t blockCount, uint16_t blockLen,
         uint16_t srcStride, uint16_t dstStride)
     {
         if ASCEND_IS_AIV {
