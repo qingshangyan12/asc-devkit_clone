@@ -88,11 +88,17 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) {
+        if (is_tensor_type_v<fp4x2_e2m1_t>) {
+            return Data()[Layout()(coord) >> 1];
+        }
         return Data()[Layout()(coord)];
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const {
+        if (is_tensor_type_v<fp4x2_e2m1_t>) {
+            return Data()[Layout()(coord) >> 1];
+        }
         return Data()[Layout()(coord)];
     }
 
@@ -118,6 +124,12 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
 	template <typename Coord, typename Shape>
  	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) {
+        if (AscendC::IsSameType<elementType, __gm__ fp4x2_e2m1_t>::value ||
+            AscendC::IsSameType<elementType, __cbuf__ fp4x2_e2m1_t>::value) {
+            auto iter = Data() + (Layout()(coord) >> 1);
+            auto tileLayout = MakeTileLayout(Layout(), shape);
+            return MakeTensor(iter, tileLayout);
+        }
  	    auto iter = Data() + Layout()(coord);
  	    auto tileLayout = MakeTileLayout(Layout(), shape);
  	    return MakeTensor(iter, tileLayout);
@@ -125,6 +137,12 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
  	 
  	template <typename Coord, typename Shape>
  	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) const {
+        if (AscendC::IsSameType<elementType, __gm__ fp4x2_e2m1_t>::value ||
+            AscendC::IsSameType<elementType, __cbuf__ fp4x2_e2m1_t>::value) {
+            auto iter = Data() + (Layout()(coord) >> 1);
+            auto tileLayout = MakeTileLayout(Layout(), shape);
+            return MakeTensor(iter, tileLayout);
+        }
  	    auto iter = Data() + Layout()(coord);
  	    auto tileLayout = MakeTileLayout(Layout(), shape);
  	    return MakeTensor(iter, tileLayout);
