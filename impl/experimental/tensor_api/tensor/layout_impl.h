@@ -9,15 +9,17 @@
 */
 
 /*!
- * \file make_layout_impl.h
+ * \file layout_impl.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_TENSOR_MAKE_LAYOUT_IMPL_H
-#define IMPL_TENSOR_API_TENSOR_MAKE_LAYOUT_IMPL_H
+#ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_IMPL_H
+#define IMPL_TENSOR_API_TENSOR_LAYOUT_IMPL_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
-#include "impl/experimental/tensor_api/tensor/layout_definition.h"
 #include "impl/experimental/tensor_api/tensor/layout_method.h"
+#include "impl/experimental/tensor_api/tensor/layout_fractal.h"
+#include "impl/experimental/tensor_api/tensor/layout_size.h"
+#include "impl/experimental/tensor_api/tensor/coord_index.h"
 
 namespace AscendC {
 namespace Te {
