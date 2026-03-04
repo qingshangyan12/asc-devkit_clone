@@ -17,7 +17,8 @@
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_utils.h"
 #include "impl/experimental/tensor_api/arch/arch_utils.h"
-#include "impl/experimental/tensor_api/tensor/pointer_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_mem_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 
 namespace AscendC {

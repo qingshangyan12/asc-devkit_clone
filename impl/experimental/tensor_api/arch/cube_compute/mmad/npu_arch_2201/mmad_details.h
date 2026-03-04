@@ -14,7 +14,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_DETAILS_H
 #define IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_2201_MMAD_DETAILS_H
 
-#include "impl/experimental/tensor_api/tensor/pointer_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_mem_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 #include "impl/experimental/tensor_api/arch/arch_utils.h"
 
