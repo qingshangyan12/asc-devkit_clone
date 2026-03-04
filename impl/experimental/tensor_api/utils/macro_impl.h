@@ -34,6 +34,29 @@
 #endif
 #endif
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+using mx_fp8_e5m2_t = struct {};
+using mx_fp8_e4m3_t = struct {};
+using mx_fp8_e8m0_t = struct {};
+
+template <typename T>
+struct GetDstType {
+    using Type = T;
+};
+
+template <> struct GetDstType<mx_fp8_e5m2_t> {
+    using Type = fp8_e5m2_t;
+};
+
+template <> struct GetDstType<mx_fp8_e4m3_t> {
+    using Type = fp8_e4m3fn_t;
+};
+
+template <> struct GetDstType<mx_fp8_e8m0_t> {
+    using Type = fp8_e8m0_t;
+};
+#endif
+
 #define GM_ADDR __gm__ uint8_t*
 
 #include <cstdint>
