@@ -41,7 +41,7 @@ def gen_golden_data_simple(scenarioNum, size):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 14))
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 12))
     parser.add_argument('-size', type=int)
     args = parser.parse_args()
     gen_golden_data_simple(args.scenarioNum, args.size)
