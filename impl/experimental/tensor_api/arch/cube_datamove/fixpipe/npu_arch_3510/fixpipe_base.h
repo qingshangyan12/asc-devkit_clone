@@ -53,6 +53,17 @@ public:
         DataCopyImpl<trait, T, U, V>(dst, src, params, tuple_sequence<decltype(params)>{});
     }
 
+    template <typename T>
+    __aicore__ inline void SetAtomicAdd()
+    {
+        SetAtomicAddImpl<T>();
+    }
+
+    __aicore__ inline void SetAtomicNone()
+    {
+        SetAtomicNoneImpl();
+    }
+
 private:
     template <const FixpipeTrait& trait, typename T, typename U, typename V, size_t... Is>
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
@@ -72,6 +83,34 @@ private:
             copy_matrix_cc_to_gm(dst, src, 0, nSize, mSize, dstStride, srcStride, cacheMode, 0, unitFlag, static_cast<uint64_t>(quantPre),
                 reluEn, isChannelSplit, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false, 
                 nz2dnEn); 
+        }
+    }
+
+    __aicore__ inline void SetAtomicNoneImpl()
+    {
+        set_atomic_none();
+    }
+
+    template <typename T>
+    __aicore__ inline void SetAtomicAddImpl()
+    {
+        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            static_assert(Std::is_one_of_v<T, float, half, int16_t, int32_t, int8_t, bfloat16_t>,
+                "Error type for SetAtomicAdd.");
+            if constexpr (Std::is_same_v<T, float>) {
+                set_atomic_f32(); //float
+            } else if constexpr (Std::is_same_v<T, half>) {
+                set_atomic_f16(); // half
+            } else if constexpr (Std::is_same_v<T, int16_t>) {
+                set_atomic_s16(); // int16_t
+            } else if constexpr (Std::is_same_v<T, int32_t>) {
+                set_atomic_s32(); // int32_t
+            } else if constexpr (Std::is_same_v<T, int8_t>) {
+                set_atomic_s8(); // int8_t
+            } else {
+                set_atomic_bf16(); // bfloat16
+            }
+            set_atomic_add();
         }
     }
 };
@@ -141,6 +180,71 @@ private:
             set_channel_para(channelPara);
         }
     }
+};
+
+class FormatCheckUtils3510 {
+public:
+    template <typename T>
+    __aicore__ inline constexpr void CheckL0CNZTemplate()
+    {
+        using type = typename T::elementType;
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<FRACTAL_FIXED>>,
+            "Fixpipe Layout->Shape->Row->ZeroDim, is not Std::Int<16> type!");
+        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<FRACTAL_FIXED>>,
+            "Fixpipe Layout->Shape->Column->ZeroDim, is not Std::Int<16> type!");
+
+        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+        static_assert(Std::is_same_v<StrideRow0, Std::Int<FRACTAL_FIXED>>,
+            "Fixpipe Layout->Stride->Row->ZeroDim, is not Std::Int<16> type!");
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>,
+            "Fixpipe Layout->Stride->Column->ZeroDim, is not Std::Int<1> type!");
+    }
+
+    template <typename T>
+    __aicore__ inline constexpr void CheckNDTemplate()
+    {
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<1>>,
+            "Fixpipe Src Layout->Shape->Row->ZeroDim, is not Std::Int<1> type!");
+        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<1>>,
+            "Fixpipe Src Layout->Shape->Column->ZeroDim, is not Std::Int<1> type!");
+
+        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+        using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
+        static_assert(Std::is_same_v<StrideRow0, Std::Int<0>>,
+            "Fixpipe Src Layout->Stride->Row->ZeroDim, is not Std::Int<0> type!");
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<0>>,
+            "Fixpipe Src Layout->Stride->Column->ZeroDim, is not Std::Int<0> type!");
+        static_assert(Std::is_same_v<StrideColumn1, Std::Int<1>>,
+            "Fixpipe Src Layout->Stride->Column->OneDim, is not Std::Int<1> type!");
+    }
+
+    template <typename T>
+    __aicore__ inline constexpr void CheckDNTemplate()
+    {
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<1>>,
+            "Fixpipe Src->Layout->Shape->Row->ZeroDim, is not Std::Int<1> type!");
+        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<1>>,
+            "Fixpipe Src->Layout->Shape->Column->ZeroDim, is not Std::Int<1> type!");
+
+        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+        using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
+        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+        static_assert(Std::is_same_v<StrideRow0, Std::Int<0>>,
+            "Fixpipe Src->Layout->Stride->Row->ZeroDim, is not Std::Int<0> type!");
+        static_assert(Std::is_same_v<StrideRow1, Std::Int<1>>,
+            "Fixpipe Src->Layout->Stride->Row->OneDim, is not Std::Int<1> type!");
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<0>>,
+            "Fixpipe Src->Layout->Stride->Column->ZeroDim, is not Std::Int<0> type!");
+    }
+
 };
 
 }
