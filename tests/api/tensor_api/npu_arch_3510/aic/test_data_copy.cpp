@@ -125,7 +125,11 @@ __aicore__ inline void copy_cbuf_to_bt_stub(uint64_t dst, __cbuf__ DTYPE* src, u
 template<typename SRC_DTYPE, typename DST_DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
 __aicore__ inline void copy_cbuf_to_bt_two_type_stub(uint64_t dst, __cbuf__ SRC_DTYPE* src, uint16_t convControl, uint16_t blockCount, uint16_t blockLen,
                                 uint16_t srcStride, uint16_t dstStride) {
-    EXPECT_EQ(convControl, 0);
+    if constexpr (std::is_same_v<SRC_DTYPE, half>) {
+        EXPECT_EQ(convControl, 1);
+    } else {
+        EXPECT_EQ(convControl, 0);
+    }
     EXPECT_EQ(blockCount, DST_SIZE1);
     EXPECT_EQ(blockLen, DST_SIZE2 * sizeof(DST_DTYPE) / TEST_L12BT_UNIT);
     EXPECT_EQ(srcStride, (SRC_SIZE2 - DST_SIZE2) * sizeof(SRC_DTYPE) / TEST_C0_SIZE);
@@ -224,8 +228,8 @@ DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 32, 64, 32, 64)
         GlobalMockObject::verify(); \
     }
 
-DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(float, 32, 64, bfloat16_t, 32, 64)
-DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(int32_t, 32, 64, half, 32, 64)
+DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(bfloat16_t, 32, 64, float, 32, 64)
+DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(half, 32, 64, float, 32, 64)
 
 
 // L1 to BIAS ND2ND test case

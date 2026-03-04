@@ -23,7 +23,7 @@
 namespace AscendC {
 namespace Te {
 
-class DataCopyFourDim3510L12FP : public CopyL12FPBase {
+class DataCopyFourDim3510L12FP {
 public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
@@ -34,7 +34,8 @@ public:
 private:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
-        CopyL12FPBase::Run<trait, T, U, Coord>(dst, src, coord);
+        CopyL12FPBase fpStrategy;
+        fpStrategy.Run<trait, T, U, Coord>(dst, src, coord);
     }
 };
 
