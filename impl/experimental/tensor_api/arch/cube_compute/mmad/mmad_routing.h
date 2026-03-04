@@ -18,9 +18,6 @@
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_2201/mmad_details.h"
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_2201/mmad_with_bias_details.h"
 
-#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad_details.h"
-#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad_with_bias_details.h"
-
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad.h"
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad_with_bias.h"
 
