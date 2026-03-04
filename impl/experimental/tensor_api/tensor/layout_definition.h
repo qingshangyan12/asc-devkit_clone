@@ -16,7 +16,7 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_DEFINITION_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
-#include "impl/experimental/tensor_api/tensor/layout_size_impl.h"
+#include "impl/experimental/tensor_api/tensor/layout_size.h"
 #include "impl/experimental/tensor_api/tensor/tuple_impl.h"
 
 namespace AscendC {
@@ -116,6 +116,61 @@ struct is_layout<Layout<T, U>> : Std::true_type {};
 
 template <typename T>
 constexpr bool is_layout_v = is_layout<T>::value;
+
+template <typename T, typename U, typename S>
+__aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
+
+template <typename T, typename U, typename S, size_t... Is>
+__aicore__ inline constexpr auto Crd2IdxTTT(const T& coord, const U& shape, const S& stride,
+    Std::index_sequence<Is...>)
+{
+    return (... + Crd2Idx(Std::get<Is>(coord), Std::get<Is>(shape), Std::get<Is>(stride)));
+}
+
+template <typename T, typename U, typename S, size_t I0, size_t... Is>
+__aicore__ inline constexpr auto Crd2IdxITT(const T& coord, const U& shape, const S& stride,
+    Std::index_sequence<I0,Is...>)
+{
+    if constexpr (sizeof...(Is) == 0) {  // Avoid recursion and mod on single/last iter
+        return Crd2Idx(coord, Std::get<I0>(shape), Std::get<I0>(stride));
+    } else if constexpr (Std::is_constant<0, T>::value) {
+        return Crd2Idx(Std::Int<0>{}, Std::get<I0>(shape), Std::get<I0>(stride)) +
+            (Std::Int<0>{} + ... + Crd2Idx(Std::Int<0>{}, Std::get<Is>(shape), Std::get<Is>(stride)));
+    } else { // General case
+        auto prod = Product{}(Std::get<I0>(shape));
+        auto div = coord / prod;
+        auto mod = coord % prod;
+        return Crd2Idx(mod, Std::get<I0>(shape), Std::get<I0>(stride)) +
+            Crd2IdxITT(div, shape, stride, Std::index_sequence<Is...>{});
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride)
+{
+    if constexpr (Std::is_tuple_v<T>) {
+        if constexpr (Std::is_tuple_v<U>) { // tuple tuple tuple
+            static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "Shape and Coord Mismatched Ranks");
+            static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<S>, "Stride and Coord Mismatched Ranks");
+            return Crd2IdxTTT(coord, shape, stride, tuple_sequence<T>{});
+        } else { // tuple "int" "int"
+            static_assert(sizeof(T) == 0, "Invalid parameters, U is not tuple!");
+        }
+    } else {
+        if constexpr (Std::is_tuple_v<U>) { // "int" tuple tuple
+            static_assert(Std::tuple_size_v<U> == Std::tuple_size_v<S>, "Shape and Stride Mismatched Ranks");
+            return Crd2IdxITT(coord, shape, stride, tuple_sequence<U>{});
+        } else { // "int" "int" "int"
+            return coord * stride;
+        }
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline constexpr auto Crd2Idx(const T& coord, const Layout<U, S>& layout)
+{
+    return Crd2Idx(coord, layout.Shape(), layout.Stride());
+}
 
 } // namespace Te
 } // namespace AscendC
