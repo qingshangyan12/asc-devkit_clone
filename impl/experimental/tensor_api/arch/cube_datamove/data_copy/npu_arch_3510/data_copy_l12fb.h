@@ -46,14 +46,29 @@ private:
         static_assert(Std::is_same_v<StrideColumn0, Std::Int<0>>, "CopyCbufToFB Layout->Stride->Column->ZeroDim, is not Std::Int<0> type!");
         static_assert(Std::is_same_v<StrideColumn1, Std::Int<1>>, "CopyCbufToFB Layout->Stride->Column->OneDim, is not Std::Int<1> type!");
     }
+
+        __aicore__ inline constexpr void CheckNDFp8Template()
+    {
+        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<2>>, "CopyCbufToFB Layout->Shape->Row->ZeroDim, is not Std::Int<1> type!");
+        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<1>>, "CopyCbufToFB Layout->Shape->Column->ZeroDim, is not Std::Int<1> type!");
+
+        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+        using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
+        static_assert(Std::is_same_v<StrideRow0, Std::Int<1>>, "CopyCbufToFB Layout->Stride->Row->ZeroDim, is not Std::Int<0> type!");
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<0>>, "CopyCbufToFB Layout->Stride->Column->ZeroDim, is not Std::Int<0> type!");
+        static_assert(Std::is_same_v<StrideColumn1, Std::Int<MX_SCALE_K0>>, "CopyCbufToFB Layout->Stride->Column->OneDim, is not Std::Int<1> type!");
+    }
+
     template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline constexpr void CheckTemplate()
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
 
-        CheckNDTemplate<T>();
-        CheckNDTemplate<U>();
+
 #if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__fbuf__ bool, __cbuf__ bool>, 
             Std::tuple<__fbuf__ int8_t, __cbuf__ int8_t>, Std::tuple<__fbuf__ uint8_t, __cbuf__ uint8_t>, 
@@ -66,6 +81,14 @@ private:
             Std::tuple<__fbuf__ uint64_t, __cbuf__ uint64_t>, Std::tuple<__fbuf__ double, __cbuf__ double>>, 
             "The data type is not supported.");
 #endif
+
+        if (Std::is_same_v<srcType, fp8_e8m0_t>) {
+            CheckNDFp8Template<T>();
+            CheckNDFp8Template<U>();
+        } else {
+            CheckNDTemplate<T>();
+            CheckNDTemplate<U>();
+        }
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
