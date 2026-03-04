@@ -227,6 +227,7 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/scheduler/bias_scheduler/test_bias_scheduler_v220.cpp
     matmul/scheduler/batch_scheduler/test_batch_scheduler.cpp
     matmul/scheduler/batch_scheduler/test_batch_scheduler_single.cpp
+    matmul/kfc/test_matmul_server_c220.cpp
 )
 
 # ascend950pr_9599 test cases
