@@ -15,7 +15,7 @@
 #ifndef IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
 #define IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
 
-#include "impl/experimental/tensor_api/tensor/adaptor_pointer_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
 
 namespace AscendC {
 namespace Te {
