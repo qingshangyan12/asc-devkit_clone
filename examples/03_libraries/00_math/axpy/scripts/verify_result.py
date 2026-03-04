@@ -14,7 +14,6 @@
 import sys
 import argparse
 import numpy as np
-import tensorflow as tf
 
 
 relative_tol = 1e-6
@@ -23,9 +22,9 @@ error_tol = 1e-4
 
 
 def verify_result(scenarioNum, output, golden):
-    if scenarioNum >= 1 and scenarioNum <= 3:
+    if scenarioNum in [1, 2, 3]:
         output_type = np.float16
-    elif scenarioNum == 7 or scenarioNum == 8:
+    elif scenarioNum in [7, 8, 9, 13, 14, 15]:
         output_type = np.float32
     else:
         return True
@@ -54,7 +53,7 @@ def verify_result(scenarioNum, output, golden):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 14))
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 18))
     parser.add_argument('output', type=str)
     parser.add_argument('golden', type=str)
     args = parser.parse_args()
