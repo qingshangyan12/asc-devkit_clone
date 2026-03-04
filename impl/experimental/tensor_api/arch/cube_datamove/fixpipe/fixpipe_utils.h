@@ -47,6 +47,41 @@ __aicore__ inline void SetFpc(const T& deqTensorTempBuf)
  	}
 }
 
+enum class Format3510 : uint8_t { None, NZ, ND, DN };
+enum class QuantMode3510 : uint8_t { None, Scalar, Vector, Direct };
+
+template <typename T>
+__aicore__ inline constexpr Format3510 GetDataFormat()
+{
+    if constexpr (IsL0cNZFormat<T>::value) {
+        return Format3510::NZ;
+    } else if constexpr (IsNDFormat<T>::value) {
+        return Format3510::ND;
+    } else if constexpr (IsDNFormat<T>::value) {
+        return Format3510::DN;
+    }
+    return Format3510::None;
+}
+
+template <const FixpipeTrait& trait>
+__aicore__ inline constexpr QuantMode3510 GetQuantMode()
+{
+    if constexpr (IsVectorQuantMode<trait.quantPre>()) {
+        return QuantMode3510::Vector;
+    } else if constexpr (IsScalarQuantMode<trait.quantPre>()) {
+        return QuantMode3510::Scalar;
+    } else if constexpr (IsDirectQuantMode<trait.quantPre>()) {
+        return QuantMode3510::Direct;
+    }
+    return QuantMode3510::None;
+}
+
+class FormatRegistorIgnore3510 {
+public:
+    template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord) {}
+};
+
 } // namespace Te
 } // namespace AscendC
 
