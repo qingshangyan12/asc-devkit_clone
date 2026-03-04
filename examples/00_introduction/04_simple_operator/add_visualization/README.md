@@ -29,10 +29,9 @@
   <tr><td align="center">x</td><td align="center">640 * 270</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">y</td><td align="center">640 * 270</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
-  </tr>
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">640 * 270</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_simple_kernel</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_simple_kernel</td>
   </table>
 - 算子实现：  
   计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。  
