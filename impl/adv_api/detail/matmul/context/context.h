@@ -12,6 +12,12 @@
  * \file context.h
  * \brief
  */
+ #if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+ #warning                                                                                                               \
+     "impl/adv_api/detail/matmul/context/context.h is an internal header file. Include chain: adv_api/matmul/matmul.h -> policy/matmul_policy.h -> context/context.h"
+ #define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+ #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATMUL_CONTEXT_H
+ #endif
 
 #ifndef IMPL_MATMUL_CONTEXT_CONTEXT_H
 #define IMPL_MATMUL_CONTEXT_CONTEXT_H
@@ -36,3 +42,7 @@ public:
 }  // namespace AscendC
 
 #endif //IMPL_MATMUL_CONTEXT_CONTEXT_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATMUL_CONTEXT_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATMUL_CONTEXT_H
+#endif

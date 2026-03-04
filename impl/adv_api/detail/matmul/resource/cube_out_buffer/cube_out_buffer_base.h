@@ -12,6 +12,13 @@
 * \file cube_out_buffer_base.h
 * \brief
 */
+ #if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+ #warning                                                                                                               \
+     "impl/adv_api/detail/matmul/resource/cube_out_buffer/cube_out_buffer_base.h" is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/matmul/matmul.h"" and use public functions or variables defined in interface headers files."
+ #define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+ #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_CUBE_OUT_BUFFER_CUBE_OUT_BUFFER_BASE_H
+ #endif
+
 #ifndef IMPL_MATMUL_RESOURCE_CUBE_OUT_BUFFER_CUBE_OUT_BUFFER_BASE_H
 #define IMPL_MATMUL_RESOURCE_CUBE_OUT_BUFFER_CUBE_OUT_BUFFER_BASE_H
 
@@ -45,4 +52,8 @@ struct L0cType<false> {
 }  // namespace Detail
 }  // namespace Impl
 }  // namespace AscendC
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_CUBE_OUT_BUFFER_CUBE_OUT_BUFFER_BASE_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_CUBE_OUT_BUFFER_CUBE_OUT_BUFFER_BASE_H
 #endif // IMPL_MATMUL_RESOURCE_CUBE_OUT_BUFFER_CUBE_OUT_BUFFER_BASE_H
