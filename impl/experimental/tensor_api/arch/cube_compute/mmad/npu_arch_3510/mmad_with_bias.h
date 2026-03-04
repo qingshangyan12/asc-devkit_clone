@@ -21,7 +21,7 @@
 namespace AscendC {
 namespace Te {
 
-class MmadWithBias3510 : public MmadBias, public MmadMxBias {
+class MmadWithBias3510 : public MmadBias{
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
     __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) 

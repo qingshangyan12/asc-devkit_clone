@@ -26,7 +26,7 @@ public:
     __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
     {
         auto genParams = GenParams<trait>(dst, fm, filter, params);
-        Mmad<trait, T, U, S>(dst, fm, filter, genParams, tuple_sequence<decltype(genParams)>{});
+        Mmad<T, U, S>(dst, fm, filter, genParams, tuple_sequence<decltype(genParams)>{});
     }
 
 private:
@@ -90,10 +90,23 @@ private:
         CheckZNTemplate<S>();
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<Std::tuple<dstDataType, fmDataType, filterDataType>,
-            Std::tuple<__cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, Std::tuple<__cc__ float, __ca__ half, __cb__ half>, 
-            Std::tuple<__cc__ fp8_e4m3fn_t, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, Std::tuple<__cc__ fp8_e5m2_t, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
-            Std::tuple<__cc__ fp8_e4m3fn_t, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, Std::tuple<__cc__ fp8_e5m2_t, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, 
-            Std::tuple<__cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, Std::tuple<__cc__ float, __ca__ float, __cb__ float>>, 
+            Std::tuple<__cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, 
+            Std::tuple<__cc__ float, __ca__ half, __cb__ half>, 
+            Std::tuple<__cc__ float, __ca__ float, __cb__ float>,
+            Std::tuple<__cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, 
+            Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
+            Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>, 
+            Std::tuple<__cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>, 
+            Std::tuple<__cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, 
+            Std::tuple<__cc__ float, __ca__ hifloat8_t, __cb__ hifloat8_t>,
+            Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
+            Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
+            Std::tuple<__cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
+            Std::tuple<__cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
+            Std::tuple<__cc__ float, __ca__ mx_fp8_e4m3_t, __cb__ mx_fp8_e4m3_t>,
+            Std::tuple<__cc__ float, __ca__ mx_fp8_e4m3_t, __cb__ mx_fp8_e5m2_t>,
+            Std::tuple<__cc__ float, __ca__ mx_fp8_e5m2_t, __cb__ mx_fp8_e4m3_t>,
+            Std::tuple<__cc__ float, __ca__ mx_fp8_e5m2_t, __cb__ mx_fp8_e5m2_t>>, 
             "The data type is not supported.");
 #endif
     }
