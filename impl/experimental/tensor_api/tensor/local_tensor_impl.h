@@ -88,11 +88,19 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) {
+        if (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value ||
+            AscendC::IsSameType<type, __cbuf__ fp4x2_e2m1_t>::value) {
+            return Data()[Layout()(coord) >> 1];
+        }
         return Data()[Layout()(coord)];
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const {
+        if (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value ||
+            AscendC::IsSameType<type, __cbuf__ fp4x2_e2m1_t>::value) {
+            return Data()[Layout()(coord) >> 1];
+        }
         return Data()[Layout()(coord)];
     }
 
@@ -118,6 +126,12 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
 	template <typename Coord, typename Shape>
  	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) {
+        if (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value ||
+            AscendC::IsSameType<type, __cbuf__ fp4x2_e2m1_t>::value) {
+            auto iter = Data() + (Layout()(coord) >> 1);
+            auto tileLayout = MakeTileLayout(Layout(), shape);
+            return MakeTensor(iter, tileLayout);
+        }
  	    auto iter = Data() + Layout()(coord);
  	    auto tileLayout = MakeTileLayout(Layout(), shape);
  	    return MakeTensor(iter, tileLayout);
@@ -125,6 +139,12 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
  	 
  	template <typename Coord, typename Shape>
  	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) const {
+        if (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value ||
+            AscendC::IsSameType<type, __cbuf__ fp4x2_e2m1_t>::value) {
+            auto iter = Data() + (Layout()(coord) >> 1);
+            auto tileLayout = MakeTileLayout(Layout(), shape);
+            return MakeTensor(iter, tileLayout);
+        }
  	    auto iter = Data() + Layout()(coord);
  	    auto tileLayout = MakeTileLayout(Layout(), shape);
  	    return MakeTensor(iter, tileLayout);
