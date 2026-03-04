@@ -16,7 +16,7 @@
 #define IMPL_HCCL_CCU_V0_PREEPARE_H
  
 #include "hccl_ccu_xn_utils.h"
-#include "../impl/platform_v310/hccl_ccu_v0_def.h"
+#include "../impl/platform_v310/hccl_ccu_def.h"
  
 namespace AscendC {
 template<const auto &config>
@@ -110,9 +110,15 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduce(_
     auto dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commParam->dataType)];
     xnData_[3] = (commParam->strideCount == 0) ? tmpCount * dataSize * ccuParam_.rankId : 
                 (commParam->strideCount * dataSize * ccuParam_.rankId); // 3 is index of xnData
+#if __NPU_ARCH__ == 9201
+    xnData_[4] = m;
+    xnData_[5] = n;
+    xnData_[6] = sliceSize % loopSize;
+#else
     xnData_[4] = loopSize * m; // 4 is index of xnData
     xnData_[5] = m; // 5 is index of xnData
     CalcLoopGroupParam(xnData_, m, n, p);
+#endif
 }
  
 template<const auto &config>
