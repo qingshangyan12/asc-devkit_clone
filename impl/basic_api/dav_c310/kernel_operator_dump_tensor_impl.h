@@ -560,7 +560,7 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     g_dumpWorkspaceReserved = GetSysWorkSpacePtr();
     if (g_dumpWorkspaceReserved == nullptr) {
         ASCENDC_ASSERT((false),
@@ -580,7 +580,7 @@ __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 }
 __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     g_dumpWorkspaceReserved = dumpStartAddr;
     if (g_dumpWorkspaceReserved == nullptr) {
         ASCENDC_ASSERT((false),
@@ -782,7 +782,7 @@ __aicore__ inline void WriteRingBufTlvData(
 template <template <typename> class Tensor, typename T>
 __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     EnablePrintf();
     if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
         ASCENDC_ASSERT((false),

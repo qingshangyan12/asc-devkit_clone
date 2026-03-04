@@ -25,10 +25,12 @@ __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
 
 __aicore__ inline void EnablePrintf()
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_TIME_STAMP_ON)
+#if defined(__ENABLE_ASCENDC_PRINTF__)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct BinaryMetaAscFeature __asc_feature_print__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#endif // __ENABLE_ASCENDC_PRINTF__
 }
 
 __aicore__ inline uint32_t GetArgsNum()
@@ -235,31 +237,6 @@ __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char* f
 
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args);
-__aicore__ __gm__ inline BlockRingBufInfo* GetBlockRingBufInfo();
-__aicore__ __gm__ inline RingBufWriteInfo* GetRingBufWriteInfo(__gm__ BlockRingBufInfo* blockRingBufInfo);
-
-template <class... Args>
-__aicore__ inline void PrintCommonHead(DumpType printType)
-{
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-    if (writeInfo == nullptr || writeInfo->packIdx != 0) {
-        return;
-    }
-
-    uint64_t __ascendc_tStamp = 0;
-    uint64_t __ascendc_version = 0;
-    __gm__ char* __ascendc_versionStr = nullptr;
-    GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
-    if (__ascendc_tStamp == 0) {
-        PrintfRingBufImpl(printType, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
-    } else {
-        PrintfRingBufImpl(printType, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
-    }
-}
 
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
@@ -269,11 +246,6 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE,
         dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-#if !defined(__NPU_DEVICE__)
-        if (printType != DumpType::DUMP_ASSERT) {
-            PrintCommonHead(printType);
-        }
-#endif
         PrintfRingBufImpl(printType, fmt, args...);
     } else {
         PrintfEntityImpl(printType, fmt, args...);
@@ -512,7 +484,7 @@ __aicore__ inline void WriteRingBufTlvData(__gm__ PrintTlvInfoHead* printTlv, __
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     EnablePrintf();
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
     if (blockRingBufInfo == nullptr) {
