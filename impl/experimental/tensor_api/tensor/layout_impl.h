@@ -247,11 +247,11 @@ __aicore__ inline constexpr auto CosizeImpl(const Layout<ShapeType, StrideType>&
 // NZ
 template <typename T, size_t row, size_t column>
 using NZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row / FRACTAL_FIXED>>,
-    Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<column / (C0_SIZE / sizeof(T))>>>;
+    Shape<Std::Int<C0_ELEMS<T>>, Std::Int<column / C0_ELEMS<T>>>>;
 
 template <typename T, size_t row, size_t column>
-using NZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>,
-    Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * row>>>;
+using NZStrideFormat = Stride<Stride<Std::Int<C0_ELEMS<T>>, Std::Int<C0_ELEMS<T> * FRACTAL_FIXED>>,
+    Stride<Std::Int<1>, Std::Int<C0_ELEMS<T> * row>>>;
 
 // ND
 template <typename T, size_t row, size_t column>
@@ -269,19 +269,19 @@ using DNStrideFormat = Stride<Stride<Std::Int<0>, Std::Int<1>>, Stride<Std::Int<
 
 // ZN
 template <typename T, size_t  row, size_t  column>
-using ZNShapeFormat = Shape<Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<row / (C0_SIZE / sizeof(T))>>,
+using ZNShapeFormat = Shape<Shape<Std::Int<C0_ELEMS<T>>, Std::Int<row / C0_ELEMS<T>>>,
     Shape<Std::Int<FRACTAL_FIXED>, Std::Int<column / FRACTAL_FIXED>>>;
 template <typename T, size_t  row, size_t  column>
-using ZNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * column>>,
-    Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
+using ZNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_ELEMS<T> * column>>,
+    Stride<Std::Int<C0_ELEMS<T>>, Std::Int<C0_ELEMS<T> * FRACTAL_FIXED>>>;
 
 // ZZ
 template <typename T, size_t row, size_t column>
 using ZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row / FRACTAL_FIXED>>,
-    Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<column / (C0_SIZE / sizeof(T))>>>;
+    Shape<Std::Int<C0_ELEMS<T>>, Std::Int<column / C0_ELEMS<T>>>>;
 template <typename T, size_t row, size_t column>
-using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRACTAL_FIXED * column>>,
-    Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
+using ZZStrideFormat = Stride<Stride<Std::Int<C0_ELEMS<T>>, Std::Int<FRACTAL_FIXED * column>>,
+    Stride<Std::Int<1>, Std::Int<C0_ELEMS<T> * FRACTAL_FIXED>>>;
 
 // layout_construct.h
 struct MakeTupleCons {
@@ -332,39 +332,19 @@ template <typename T>
 struct LayoutDispatcher<LayoutFormat::NZ, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
         return LayoutConstructor(Std::Int<FRACTAL_FIXED>{},  CeilDivision(row, FRACTAL_FIXED), 
-                                Std::Int<C0_SIZE / sizeof(T)>{},  CeilDivision(column, (C0_SIZE / sizeof(T))), 
-                                Std::Int<C0_SIZE / sizeof(T)>{},  Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{},
-                                Std::Int<1>{},  C0_SIZE / sizeof(T) * CeilAlign(row, FRACTAL_FIXED)); 
-    }
-};
-
-template <>
-struct LayoutDispatcher<LayoutFormat::NZ, fp4x2_e2m1_t> {
-    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<FRACTAL_FIXED>{},  CeilDivision(row, FRACTAL_FIXED), 
-                                Std::Int<64>{},  CeilDivision(column, (64)), 
-                                Std::Int<64>{},  Std::Int<64 * FRACTAL_FIXED>{},
-                                Std::Int<1>{},  64 * CeilAlign(row, FRACTAL_FIXED)); 
+                                Std::Int<C0_ELEMS<T>>{},  CeilDivision(column, C0_ELEMS<T>), 
+                                Std::Int<C0_ELEMS<T>>{},  Std::Int<C0_ELEMS<T> * FRACTAL_FIXED>{},
+                                Std::Int<1>{},  C0_ELEMS<T> * CeilAlign(row, FRACTAL_FIXED)); 
     }
 };
 
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::ZN, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<C0_SIZE / sizeof(T)>{},  CeilDivision(row, (C0_SIZE / sizeof(T))),
+        return LayoutConstructor(Std::Int<C0_ELEMS<T>>{},  CeilDivision(row, C0_ELEMS<T>),
                                 Std::Int<FRACTAL_FIXED>{},  CeilDivision(column, FRACTAL_FIXED),
-                                Std::Int<1>{},  C0_SIZE / sizeof(T) * CeilAlign(column, FRACTAL_FIXED),
-                                Std::Int<C0_SIZE / sizeof(T)>{},  Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{});
-    }
-};
-
-template <>
-struct LayoutDispatcher<LayoutFormat::ZN, fp4x2_e2m1_t> {
-    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<64>{},  CeilDivision(row, 64),
-                                Std::Int<FRACTAL_FIXED>{},  CeilDivision(column, FRACTAL_FIXED),
-                                Std::Int<1>{},  64 * CeilAlign(column, FRACTAL_FIXED),
-                                Std::Int<64>{},  Std::Int<64 * FRACTAL_FIXED>{});
+                                Std::Int<1>{},  C0_ELEMS<T> * CeilAlign(column, FRACTAL_FIXED),
+                                Std::Int<C0_ELEMS<T>>{},  Std::Int<C0_ELEMS<T> * FRACTAL_FIXED>{});
     }
 };
 
@@ -404,9 +384,9 @@ template <typename T>
 struct LayoutDispatcher<LayoutFormat::ZZ, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
         return LayoutConstructor(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row, FRACTAL_FIXED),
-                                    Std::Int<C0_SIZE / sizeof(T)>{}, CeilDivision(column, (C0_SIZE / sizeof(T))),
-                                    Std::Int<C0_SIZE / sizeof(T)>{}, FRACTAL_FIXED * CeilAlign(column, (C0_SIZE / sizeof(T))),
-                                    Std::Int<1>{}, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{});
+                                    Std::Int<C0_ELEMS<T>>{}, CeilDivision(column, C0_ELEMS<T>),
+                                    Std::Int<C0_ELEMS<T>>{}, FRACTAL_FIXED * CeilAlign(column, C0_ELEMS<T>),
+                                    Std::Int<1>{}, Std::Int<C0_ELEMS<T> * FRACTAL_FIXED>{});
     }
 };
 
