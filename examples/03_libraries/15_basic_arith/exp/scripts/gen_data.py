@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -13,23 +13,8 @@
 
 
 import os
+import argparse
 import numpy as np
-
-# def saturation(value, min_val, max_val, target_type):
-#     """
-#     将输入的浮点数进行饱和处理，并转换为目标类型
-    
-#     参数:
-#         value: 输入值（标量或数组）
-#         min_val: 最小值
-#         max_val: 最大值
-#         target_type: 目标数据类型
-        
-#     返回:
-#         饱和处理并转换类型后的值
-#     """
-#     x_clamped = np.clip(value, min_val, max_val)
-#     return np.round(x_clamped).astype(target_type)
 
 def get_range_by_dtype(input_type):
     """
@@ -50,57 +35,39 @@ def get_range_by_dtype(input_type):
         print(f"Unsupported data type: {input_type}")
         raise e
 
-def gen_golden_data():
+
+def gen_golden_data(scenario_num=1, input_size=1024):
     input_type = np.float16
     output_type = input_type
-
-    input_size = 42 * 1024
     src_shape = [input_size]
-    cal_count = input_size
-    
-    # 设置随机种子保证可重复性
-    np.random.seed(0)
-    
-    # # 方法1: 在安全范围内生成输入数据（推荐）
-    # safe_min, safe_max = get_safe_exp_range(input_type)
-    # src = np.random.uniform(safe_min, safe_max, src_shape).astype(input_type)
-    
-    # 方法2: 在全范围内生成数据，然后使用saturation处理（替代方案）
-    # 获取数据类型完整范围
+    np.random.seed(9)
     min_val, max_val = get_range_by_dtype(input_type)
-    # print("min_val = {}".format(min_val))
-    # print("max_val = {}".format(max_val))
-    src = np.random.uniform(min_val, max_val, src_shape).astype(input_type)
-    
-    # 分割数据
-    src_exp_input = src[:cal_count].copy()
-    src_ori = np.zeros(src.size - cal_count, dtype=input_type)
+    if scenario_num == 1:
+        print("[INFO] gen_golden_data, scenario_num = {}".format(scenario_num))
+        x1_gm = np.random.uniform(min_val, max_val, src_shape).astype(input_type)
+
+        # 分割数据
+        cal_count = input_size
+        src_exp_input = x1_gm[:cal_count].copy()
+        src_ori = np.zeros(x1_gm.size - cal_count, dtype=input_type)
+    else:
+        pass
     
     # 计算指数，忽略溢出警告
     with np.errstate(over='ignore', under='ignore'):
         src_exp_result = np.exp(src_exp_input)
-    # src_exp_result = np.exp(src_exp_input)
-    
-    # 使用saturation函数处理溢出
-    # 获取输出类型的范围
-    output_min, output_max = get_range_by_dtype(output_type)
-    
-    # 对指数计算结果进行饱和处理
-    src_exp_saturated = src_exp_result # 不能进行饱和处理
-    # src_exp_saturated = saturation(
-    #     src_exp_result, 
-    #     output_min, 
-    #     output_max, 
-    #     output_type
-    # )
     
     # 组合结果
-    golden = np.concatenate((src_exp_saturated, src_ori), axis=None).astype(output_type)
+    golden = np.concatenate((src_exp_result, src_ori), axis=None).astype(output_type)
 
     os.makedirs("input", exist_ok=True)
-    src.tofile("./input/input_x.bin")
+    x1_gm.tofile("./input/input_x.bin")
     os.makedirs("output", exist_ok=True)
     golden.tofile("./output/golden.bin")
 
 if __name__ == "__main__":
-    gen_golden_data()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 14))
+    parser.add_argument('-inputSize', type=int)
+    args = parser.parse_args()
+    gen_golden_data(args.scenarioNum, args.inputSize)
