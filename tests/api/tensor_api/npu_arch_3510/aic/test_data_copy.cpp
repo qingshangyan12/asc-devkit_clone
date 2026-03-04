@@ -125,7 +125,11 @@ __aicore__ inline void copy_cbuf_to_bt_stub(uint64_t dst, __cbuf__ DTYPE* src, u
 template<typename SRC_DTYPE, typename DST_DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
 __aicore__ inline void copy_cbuf_to_bt_two_type_stub(uint64_t dst, __cbuf__ SRC_DTYPE* src, uint16_t convControl, uint16_t blockCount, uint16_t blockLen,
                                 uint16_t srcStride, uint16_t dstStride) {
-    EXPECT_EQ(convControl, 0);
+    if constexpr (std::is_same_v<SRC_DTYPE, half>) {
+        EXPECT_EQ(convControl, 1);
+    } else {
+        EXPECT_EQ(convControl, 0);
+    }
     EXPECT_EQ(blockCount, DST_SIZE1);
     EXPECT_EQ(blockLen, DST_SIZE2 * sizeof(DST_DTYPE) / TEST_L12BT_UNIT);
     EXPECT_EQ(srcStride, (SRC_SIZE2 - DST_SIZE2) * sizeof(SRC_DTYPE) / TEST_C0_SIZE);
@@ -208,8 +212,8 @@ __aicore__ inline void tensor2tensor_run_stub(const T& dst, const U& src, const 
         GlobalMockObject::verify(); \
     }
 
-DATA_COPY_TEST_L12BIAS_ND2ND(float, 32, 64, 32, 64)
-DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 32, 64, 32, 64)
+DATA_COPY_TEST_L12BIAS_ND2ND(float, 1, 64, 1, 64)
+DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 1, 64, 1, 64)
 
 // L1 to BIAS two data type  test case
 #define DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(SRC_DTYPE, SRC_SIZE1, SRC_SIZE2, DST_DTYPE, DST_SIZE1, DST_SIZE2) \
@@ -224,8 +228,8 @@ DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 32, 64, 32, 64)
         GlobalMockObject::verify(); \
     }
 
-DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(float, 32, 64, bfloat16_t, 32, 64)
-DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(int32_t, 32, 64, half, 32, 64)
+DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(bfloat16_t, 1, 64, float, 1, 64)
+DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(half, 1, 64, float, 1, 64)
 
 
 // L1 to BIAS ND2ND test case
@@ -241,19 +245,19 @@ DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(int32_t, 32, 64, half, 32, 64)
         GlobalMockObject::verify(); \
     }
 
-DATA_COPY_TEST_L12FP_ND2ND(bool, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(int8_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(uint8_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(hifloat8_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(fp8_e5m2_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(fp8_e4m3fn_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(fp8_e8m0_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(uint16_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(half, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(float, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(bfloat16_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(int32_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(uint32_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(int64_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(uint64_t, 32, 64, 32, 64)
-DATA_COPY_TEST_L12FP_ND2ND(double, 32, 64, 32, 64)
+DATA_COPY_TEST_L12FP_ND2ND(bool, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(int8_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(uint8_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(hifloat8_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(fp8_e5m2_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(fp8_e4m3fn_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(fp8_e8m0_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(uint16_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(half, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(float, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(bfloat16_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(int32_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(uint32_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(int64_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(uint64_t, 1, 64, 1, 64)
+DATA_COPY_TEST_L12FP_ND2ND(double, 1, 64, 1, 64)
