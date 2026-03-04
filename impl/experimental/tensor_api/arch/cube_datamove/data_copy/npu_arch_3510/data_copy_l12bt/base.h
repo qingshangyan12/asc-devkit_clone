@@ -20,12 +20,11 @@
 namespace AscendC {
 namespace Te {
 
-class CopyL12BTBase : public CopyL12BTInstr {
+class CopyL12BTBase {
 public:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        auto params = GenDataCopyParams<trait, T, U>(dst, src);
-        DataCopy<T, U, decltype(params)>(dst, src, params, tuple_sequence<decltype(params)>{});
+        DataCopyImpl<trait, T, U>(dst, src);
     }
 
 private:
@@ -62,7 +61,7 @@ private:
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline auto GenDataCopyParams(const T& dst, const U& src)
+    __aicore__ inline auto DataCopyImpl(const T& dst, const U& src)
     {
         CheckTemplate<trait, T, U>();
 
@@ -86,7 +85,8 @@ private:
         uint16_t srcStride = (srcRow - srcCol) * sizeof(srcType) / C0_SIZE;
         uint16_t dstStride = (dstRow - srcCol) * sizeof(dstType) / C0_SIZE;
 
-        return Std::make_tuple(convControl, blockCount, blockLen, srcStride, dstStride);
+        CopyL12BTInstr copyInstr;
+        copyInstr.DataCopy(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
     }
 };
 
