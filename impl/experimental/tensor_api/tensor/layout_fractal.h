@@ -16,6 +16,7 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_FRACTAL_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
+#include "impl/experimental/tensor_api/utils/layout_dispatch.h"
 
 namespace AscendC {
 namespace Te {

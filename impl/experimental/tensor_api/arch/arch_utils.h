@@ -14,7 +14,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_ARCH_UTILS_H
 #define IMPL_TENSOR_API_ARCH_ARCH_UTILS_H
 
-#include "impl/experimental/tensor_api/tensor/pointer_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_mem_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 #include "impl/experimental/tensor_api/utils/constant_impl.h"
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
