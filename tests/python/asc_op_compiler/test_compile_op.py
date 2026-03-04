@@ -3858,7 +3858,7 @@ Contents of section
         
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
-                    compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
+                compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
 
         binary_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.o')
         json_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.json')
