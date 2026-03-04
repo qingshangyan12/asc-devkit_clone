@@ -9,16 +9,23 @@
 */
 
 /*!
-* \file layout_disptach.h
+* \file layout_dispatch.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_DISPTACH_H
-#define IMPL_TENSOR_API_TENSOR_LAYOUT_DISPTACH_H
+#ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_DISPATCH_H
+#define IMPL_TENSOR_API_TENSOR_LAYOUT_DISPATCH_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 
 namespace AscendC {
 namespace Te {
+
+__aicore__ inline int64_t CeilAlign(int64_t a, int64_t b) {
+    if (b == 0) {
+        return 0;
+    }
+    return (a + b - 1) / b * b;
+}
 
 struct MakeTupleCons {
     template <typename... Ts>
@@ -60,7 +67,7 @@ __aicore__ inline decltype(auto) Make2Params2Tuple(F&& f, T0&& t0, T1&& t1, Ts&&
     return Make2Params2Tuple(f, tuple1, tuple2);
 }
 
-// layout_disptach.h
+// layout_dispatch.h
 template <LayoutFormat format, typename T>
 struct LayoutDispatcher;
 
