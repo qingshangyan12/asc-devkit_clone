@@ -54,8 +54,7 @@ namespace __cce_scalar {
         }                                                                                                         \
     } while (0)
 
-#if defined(__ENABLE_ASCENDC_PRINTF__)
-#if defined (ASCENDC_DUMP) && (ASCENDC_DUMP == 1)
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
 #define asc_assert_impl(expr)                      \
     do {                                           \
         __gm__ const char* prompt = "";            \
@@ -63,7 +62,6 @@ namespace __cce_scalar {
             asc_assert_msg__(prompt, expr, "\n");  \
         }                                          \
     } while (0)
-#endif
 #endif
 
 #endif
