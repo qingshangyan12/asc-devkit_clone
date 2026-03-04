@@ -43,22 +43,22 @@ template <size_t... Is, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Rank(const Layout<Shape, Stride>& layout);
 
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto GetShape(const Layout<Shape, Stride>& layout);
+__aicore__ inline constexpr decltype(auto) GetShape(const Layout<Shape, Stride>& layout);
 
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto GetShape(Layout<Shape, Stride>& layout);
+__aicore__ inline constexpr decltype(auto) GetShape(Layout<Shape, Stride>& layout);
 
 template <typename Tuple>
-__aicore__ inline constexpr auto GetShape(const Tuple& shape);
+__aicore__ inline constexpr decltype(auto) GetShape(const Tuple& shape);
 
 template <size_t I, size_t... Is, typename Tuple>
-__aicore__ inline constexpr auto GetShape(const Tuple& shape);
+__aicore__ inline constexpr decltype(auto) GetShape(const Tuple& shape);
 
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto GetStride(const Layout<Shape, Stride>& layout);
+__aicore__ inline constexpr decltype(auto) GetStride(const Layout<Shape, Stride>& layout);
 
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto GetStride(Layout<Shape, Stride>& layout);
+__aicore__ inline constexpr decltype(auto) GetStride(Layout<Shape, Stride>& layout);
 
 template <size_t... Is, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Select(const Layout<Shape, Stride>& layout);

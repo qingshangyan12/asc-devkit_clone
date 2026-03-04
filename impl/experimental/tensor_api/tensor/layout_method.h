@@ -148,21 +148,21 @@ __aicore__ inline constexpr auto Rank(const Layout<ShapeType, StrideType>& layou
 }
 
 template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetShape(const Layout<ShapeType, StrideType>& layout)
+__aicore__ inline constexpr decltype(auto) GetShape(const Layout<ShapeType, StrideType>& layout)
 {
     static_assert(Std::is_tuple_v<ShapeType> && Std::is_tuple_v<StrideType>, "ShapeType or StrideType is not tuple!");
     return layout.template Shape<Is...>();
 }
 
 template<typename T>
-__aicore__ inline constexpr auto GetShape(const T& shape)
+__aicore__ inline constexpr decltype(auto) GetShape(const T& shape)
 {
     static_assert(Std::is_tuple_v<T> || Std::is_integral_v<T>, "shape is not a tuple or integer");
     return shape;
 }
 
 template<size_t I, size_t... Is, typename Tuple>
-__aicore__ inline constexpr auto GetShape(const Tuple& shape)
+__aicore__ inline constexpr decltype(auto) GetShape(const Tuple& shape)
 {
     if constexpr (Std::is_tuple_v<Tuple>) {
         return GetShape<Is...>(Std::get<I>(shape));
@@ -172,14 +172,14 @@ __aicore__ inline constexpr auto GetShape(const Tuple& shape)
 }
 
 template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetStride(const Layout<ShapeType, StrideType>& layout)
+__aicore__ inline constexpr decltype(auto) GetStride(const Layout<ShapeType, StrideType>& layout)
 {
     static_assert(Std::is_tuple_v<ShapeType> && Std::is_tuple_v<StrideType>, "ShapeType or StrideType is not tuple!");
     return layout.template Stride<Is...>();
 }
 
 template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto Get(const Layout<ShapeType, StrideType>& layout)
+__aicore__ inline constexpr      Get(const Layout<ShapeType, StrideType>& layout)
 {
     static_assert(Std::is_tuple_v<ShapeType> && Std::is_tuple_v<StrideType>, "ShapeType or StrideType is not tuple!");
     return MakeLayout(GetTuple<Is...>(layout.Shape()),
