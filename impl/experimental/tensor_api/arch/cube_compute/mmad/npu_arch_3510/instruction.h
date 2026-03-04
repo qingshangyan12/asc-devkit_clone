@@ -24,16 +24,16 @@ namespace Te {
 
 class MmadInstr {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params, typename TupleParams, size_t... Is>
-    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const Params& params, const TupleParams& tupleParams, Std::index_sequence<Is...>)
+    template <typename T, typename U, typename S, typename... Params>
+    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const Params& ...params)
     {
         // MTE2
-        MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(), Std::get<Is>(tupleParams)...);
+        MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(), params...);
     }
 private:
     template <typename T, typename U, typename S>
     __aicore__ inline void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t k, uint16_t n,
-        int8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal) {
+        uint8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal) {
         if ASCEND_IS_AIV {
             return;
         }
@@ -45,12 +45,12 @@ private:
 
 class MmadBiasInstr {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params, typename TupleParams, size_t... Is>
-    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params, const TupleParams& tupleParams, Std::index_sequence<Is...>)
+    template <typename T, typename U, typename S, typename V, typename... Params>
+    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const Params& ...params)
     {
         // MTE2
         MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(), 
-            reinterpret_cast<uint64_t>(bias.Data().Get()), Std::get<Is>(tupleParams)...);
+            reinterpret_cast<uint64_t>(bias.Data().Get()), params...);
     }
 private:
     template <typename T, typename U, typename S>
@@ -67,43 +67,43 @@ private:
 
 class MmadMxInstr {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params, typename TupleParams, size_t... Is>
-    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const Params& params, const TupleParams& tupleParams, Std::index_sequence<Is...>)
+    template <typename T, typename U, typename S, typename... Params>
+    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const Params& ...params)
     {
         // MTE2
-        MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(), Std::get<Is>(tupleParams)...);
+        MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(), params...);
     }
 private:
     template <typename T, typename U, typename S>
     __aicore__ inline void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t k, uint16_t n,
-        int8_t unitFlag, bool disableGemv, bool btBufCtrl, bool cmatrixInitVal) {
+        uint8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal) {
         if ASCEND_IS_AIV {
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            mad_mx(dst, fm, filter, m, k, n, unitFlag, disableGemv, btBufCtrl, cmatrixInitVal);
+            mad_mx(dst, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
         }
     }
 };
 
 class MmadMxBiasInstr {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params, typename TupleParams, size_t... Is>
-    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params, const TupleParams& tupleParams, Std::index_sequence<Is...>)
+    template <typename T, typename U, typename S, typename V, typename... Params>
+    __aicore__ inline void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const Params& ...params)
     {
         // MTE2
         MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(), 
-            reinterpret_cast<float8_e5m2x2_t>(bias.Data().Get()), Std::get<Is>(tupleParams)...);
+            reinterpret_cast<uint64_t>(bias.Data().Get()), params...);
     }
 private:
     template <typename T, typename U, typename S>
-    __aicore__ inline void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, float8_e5m2x2_t bias, uint16_t m, uint16_t k, uint16_t n,
-        int8_t unitFlag, bool disableGemv, bool btBufCtrl, bool cmatrixInitVal) {
+    __aicore__ inline void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
+        int8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal) {
         if ASCEND_IS_AIV {
             return;
         }
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            mad_mx(dst, fm, filter, bias, m, k, n, unitFlag, disableGemv, btBufCtrl, cmatrixInitVal);
+            mad_mx(dst, fm, filter, bias, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
         }
     }
 };
