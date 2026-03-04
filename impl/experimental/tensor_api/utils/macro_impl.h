@@ -34,6 +34,7 @@
 #endif
 #endif
 
+
 #define GM_ADDR __gm__ uint8_t*
 
 #include <cstdint>
