@@ -20,7 +20,7 @@
 namespace AscendC {
 namespace Te {
 
-class FixpipeNZ2NZSimpleQuant3510 : public CopyMatrixCcToGmBase3510, public SetRegisterBase3510 {
+class Fixpipe2GmNZ2NZSimpleQuant3510 : public CopyMatrixCcToGmBase3510, public SetRegisterBase3510 {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord)
@@ -92,7 +92,7 @@ private:
 };
 
 
-class FixpipeNZ2NZVectorBase3510 : public CopyMatrixCcToGmBase3510, public CopyDeqTensorToFbuf3510 {
+class Fixpipe2GmNZ2NZVectorBase3510 : public CopyMatrixCcToGmBase3510, public CopyDeqTensorToFbuf3510 {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename V, typename S>
     __aicore__ inline void FixpipeNZ2NZVectorEntrance(const T& dst, const U& src, const V& quant, const S& params)
@@ -162,7 +162,7 @@ private:
     }
 };
 
-class FixpipeNZ2NZVectorQuant3510 : public FixpipeNZ2NZVectorBase3510 {
+class Fixpipe2GmNZ2NZVectorQuant3510 : public Fixpipe2GmNZ2NZVectorBase3510 {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord)

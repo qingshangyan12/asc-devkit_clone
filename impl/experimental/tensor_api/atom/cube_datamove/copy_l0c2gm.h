@@ -18,15 +18,12 @@
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_impl.h"
+#include "impl/experimental/tensor_api/atom/cube_datamove/copy_fixpipe_traits.h"
 #include "impl/experimental/tensor_api/atom/copy_traits_impl.h"
 
 namespace AscendC {
 namespace Te {
 
-struct FixpipeTraitDefault {
-    using TraitType = FixpipeTrait;
-    static constexpr const TraitType value = DEFAULT_FIXPIPE_TRAIT;
-};
 
 struct CopyL0C2GM {
     template <typename Tp, const Tp& traits, typename... Args>
