@@ -16,12 +16,11 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_WITH_BIAS_H
 
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad/bias.h"
-#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad/mx_bias.h"
 
 namespace AscendC {
 namespace Te {
 
-class MmadWithBias3510 : public MmadBias, public MmadMxBias {
+class MmadWithBias3510 : public MmadBias{
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
     __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) 
@@ -32,8 +31,8 @@ public:
 private:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
     __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) {
-        // TODO if type ...
-        MmadBias::Run<trait, T, U, S, V>(dst, fm, filter, bias, params);
+        MmadBias biasStrategy;
+        biasStrategy.Run<trait, T, U, S, V>(dst, fm, filter, bias, params);
     }
 };
 

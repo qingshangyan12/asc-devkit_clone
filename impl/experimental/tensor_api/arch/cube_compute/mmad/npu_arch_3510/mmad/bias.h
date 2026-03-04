@@ -20,13 +20,12 @@
 namespace AscendC {
 namespace Te {
 
-class MmadBias : public MmadBiasInstr {
+class MmadBias {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>    
     __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) 
     {
-        auto genParams = GenParams<trait>(dst, fm, filter, bias, params);
-        Mmad<trait, T, U, S, V>(dst, fm, filter, genParams, tuple_sequence<decltype(genParams)>{});
+        MmadImpl<trait, T, U, S, V>(dst, fm, filter, bias, params);
     }
 
 private:
@@ -95,6 +94,54 @@ private:
         static_assert(Std::is_same_v<StrideColumn1, Std::Int<1>>, "Bias Layout->Stride->Column->OneDim, is not Std::Int<1> type!");
     }
 
+    template<Hardware biasPos, typename biasDataType, typename dstDataType, typename fmDataType, typename filterDataType>
+    __aicore__ inline constexpr void CheckMmadTypes()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510     
+    if constexpr (biasPos == Hardware::BIAS) {
+        static_assert(Std::is_one_of_v<Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
+            Std::tuple<__biasbuf__ int32_t, __cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, 
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ half, __cb__ half>, 
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ float, __cb__ float>,
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, 
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>, 
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>, 
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, 
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ hifloat8_t, __cb__ hifloat8_t>,
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ mx_fp8_e4m3_t, __cb__ mx_fp8_e4m3_t>,
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ mx_fp8_e4m3_t, __cb__ mx_fp8_e5m2_t>,
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ mx_fp8_e5m2_t, __cb__ mx_fp8_e4m3_t>,
+            Std::tuple<__biasbuf__ float, __cc__ float, __ca__ mx_fp8_e5m2_t, __cb__ mx_fp8_e5m2_t>>, 
+            "The data type is not supported for BIAS position.");
+    } else if constexpr (biasPos == Hardware::L0C) {
+        static_assert(Std::is_one_of_v<Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
+            Std::tuple<__cc__ int32_t, __cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, 
+            Std::tuple<__cc__ float, __cc__ float, __ca__ half, __cb__ half>, 
+            Std::tuple<__cc__ float, __cc__ float, __ca__ float, __cb__ float>,
+            Std::tuple<__cc__ float, __cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, 
+            Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
+            Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>, 
+            Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>, 
+            Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, 
+            Std::tuple<__cc__ float, __cc__ float, __ca__ hifloat8_t, __cb__ hifloat8_t>,
+            Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
+            Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
+            Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
+            Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
+            Std::tuple<__cc__ float, __cc__ float, __ca__ mx_fp8_e4m3_t, __cb__ mx_fp8_e4m3_t>,
+            Std::tuple<__cc__ float, __cc__ float, __ca__ mx_fp8_e4m3_t, __cb__ mx_fp8_e5m2_t>,
+            Std::tuple<__cc__ float, __cc__ float, __ca__ mx_fp8_e5m2_t, __cb__ mx_fp8_e4m3_t>,
+            Std::tuple<__cc__ float, __cc__ float, __ca__ mx_fp8_e5m2_t, __cb__ mx_fp8_e5m2_t>>, 
+            "The data type is not supported for L0C position.");
+    }
+#endif
+    }
+
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
     __aicore__ inline constexpr void CheckTemplate()
     {
@@ -107,35 +154,13 @@ private:
         CheckL0CNZTemplate<T>();
         CheckNZTemplate<U>();
         CheckZNTemplate<S>();
-        CheckNDTemplate<V>();
-        
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510     
-        if constexpr (biasPos == Hardware::BIAS) {
-            static_assert(Std::is_one_of_v<Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
-                Std::tuple<__biasbuf__ int32_t, __cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, 
-                Std::tuple<__biasbuf__ float, __cc__ float, __ca__ half, __cb__ half>, 
-                Std::tuple<__biasbuf__ float, __cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, 
-                Std::tuple<__biasbuf__ fp8_e4m3fn_t, __cc__ fp8_e4m3fn_t, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
-                Std::tuple<__biasbuf__ fp8_e5m2_t, __cc__ fp8_e5m2_t, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
-                Std::tuple<__biasbuf__ fp8_e5m2_t, __cc__ fp8_e5m2_t, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, 
-                Std::tuple<__biasbuf__ fp8_e4m3fn_t, __cc__ fp8_e4m3fn_t, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, 
-                Std::tuple<__biasbuf__ float, __cc__ float, __ca__ float, __cb__ float>>, "The data type is not supported.");
-        } else if constexpr (biasPos == Hardware::L0C) {
-            static_assert(Std::is_one_of_v<Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
-                Std::tuple<__cc__ int32_t, __cc__ int32_t, __ca__ int8_t, __cb__ int8_t>, 
-                Std::tuple<__cc__ float, __cc__ float, __ca__ half, __cb__ half>, 
-                Std::tuple<__cc__ float, __cc__ float, __ca__ bfloat16_t, __cb__ bfloat16_t>, 
-                Std::tuple<__cc__ fp8_e4m3fn_t, __cc__ fp8_e4m3fn_t, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
-                Std::tuple<__cc__ fp8_e5m2_t, __cc__ fp8_e5m2_t, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>, 
-                Std::tuple<__cc__ fp8_e5m2_t, __cc__ fp8_e5m2_t, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>, 
-                Std::tuple<__cc__ fp8_e4m3fn_t, __cc__ fp8_e4m3fn_t, __ca__ fp8_e5m2_t, __cb__ fp8_e5m2_t>,
-                Std::tuple<__cc__ float, __cc__ float, __ca__ float, __cb__ float>>, "The data type is not supported.");
-        }
-#endif
+        CheckNDTemplate<V>();        
+        CheckMmadTypes<biasPos, biasDataType, dstDataType, fmDataType, filterDataType>();
+
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
+    __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
     {
         CheckTemplate<trait, T, U, S, V>();
         using fmType = typename U::elementType;
@@ -150,9 +175,9 @@ private:
         if (biasPos == Hardware::BIAS) {
             cmatrixSource = true;
         }
-        auto genParams = Std::make_tuple(m, k, n, params.unitFlag, trait.disableGemv, cmatrixSource, 
+        MmadBiasInstr mmadBiasInstr;
+        mmadBiasInstr.Mmad(dst, fm, filter, bias, m, k, n, params.unitFlag, trait.disableGemv, cmatrixSource, 
             params.cmatrixInitVal);
-        return genParams;
     }
 };
 
