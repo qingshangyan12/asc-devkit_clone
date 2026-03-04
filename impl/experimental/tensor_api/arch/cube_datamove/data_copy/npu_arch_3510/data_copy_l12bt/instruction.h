@@ -24,9 +24,9 @@ namespace Te {
 
 class CopyL12BTInstr {
 public:
-    template <typename T, typename U, typename Params, size_t... Is>
-    __aicore__ inline void DataCopy(const T& dst, const U& src, const Params& params, Std::index_sequence<Is...>) {
-        CopyL12BT(reinterpret_cast<uint64_t>(dst.Data().Get()), src.Data().Get(), Std::get<Is>(params)...);
+    template <typename T, typename U, typename... Params>
+    __aicore__ inline void DataCopy(const T& dst, const U& src, const Params& ...params) {
+        CopyL12BT(reinterpret_cast<uint64_t>(dst.Data().Get()), src.Data().Get(), params...);
     }
 
 private:
