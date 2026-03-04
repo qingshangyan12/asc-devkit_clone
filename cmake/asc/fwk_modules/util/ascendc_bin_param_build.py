@@ -593,10 +593,13 @@ def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
                     json_file = ""
                 input_param_file[op_type] = json_file
             if "--kernel-template-input" in options:
-                first_equal_index = options.find('=')
-                kernel_template_input = options[first_equal_index + 1:]
-                if kernel_template_input:
-                    kernel_template_input_info[op_type] = kernel_template_input
+                first_index = options.find('=')
+                if first_index != -1:
+                    kernel_template_input = options[first_index + 1:]
+                else:
+                    kernel_template_input = ""
+                kernel_template_input_info[op_type] = kernel_template_input
+
     return tiling_key_info, op_debug_config, kernel_json_file, input_param_file, kernel_template_input_info
 
 

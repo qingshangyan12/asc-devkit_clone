@@ -62,7 +62,7 @@ def gen_compile_options(compile_options_file: str, op_type: str, \
             opc_tiling_keys = keys_str
         elif "--kernel-template-input" in opts:
             if "=" not in opts:
-                raise RuntimeError('Invalid --kernel-template-format option format!')
+                raise RuntimeError('Invalid --kernel-template-input option format!')
             input_value = opts.split("=", 1)
             if not input_value[1]:
                 raise RuntimeError('No value given for --kernel-template-input option!')

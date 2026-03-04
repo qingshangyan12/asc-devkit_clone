@@ -655,7 +655,6 @@ def decode_tiling(tiling_key: int = None) -> dict:
     kernel_template_input = get_context().get_addition("kernel-template-input")
     if kernel_template_input and "=" not in kernel_template_input:
         raise RuntimeError('Invalid kernel-template-input format! Please use key value pairs!')
-    kernel_compile_dict = {}
     if kernel_template_input:
         if kernel_template_input.startswith("'") and kernel_template_input.endswith("'"):
             kernel_template_input = kernel_template_input[1:-1]
@@ -679,6 +678,7 @@ def decode_tiling(tiling_key: int = None) -> dict:
                     else:
                         format_value_list.append(v)
                 kernel_compile_dict[key] = format_value_list
+        check_kernel_template_input(kernel_compile_dict)
     encode_book = dict()
     for param in TILING_DECLARE_MAP:
         encode_book[param.name] = param.get_encodes()
