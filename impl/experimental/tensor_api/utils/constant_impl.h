@@ -133,6 +133,11 @@ struct IsIntegralConstant<Std::Int<Value>> : Std::true_type {};
 template <typename T>
 constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
 
+template<typename type, typename DType>
+inline constexpr bool is_tensor_type_v = Std::is_one_of_v<type, DType, __gm__ DType, __cbuf__ DType, __ca__ DType, __cb__ DType, __cc__ DType>;
+template <typename T>
+constexpr auto C0_ELEMS = is_tensor_type_v<T, fp4x2_e2m1_t> ? 64 : C0_SIZE / sizeof(T);
+
 } // namespace Te
 } // namespace AscendC
 

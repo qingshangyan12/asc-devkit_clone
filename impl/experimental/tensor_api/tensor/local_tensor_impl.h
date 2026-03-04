@@ -88,8 +88,7 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) {
-        if (AscendC::IsSameType<elementType, __gm__ fp4x2_e2m1_t>::value ||
-            AscendC::IsSameType<elementType, __cbuf__ fp4x2_e2m1_t>::value) {
+        if (is_tensor_type_v<fp4x2_e2m1_t>) {
             return Data()[Layout()(coord) >> 1];
         }
         return Data()[Layout()(coord)];
@@ -97,8 +96,7 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const {
-        if (AscendC::IsSameType<elementType, __gm__ fp4x2_e2m1_t>::value ||
-            AscendC::IsSameType<elementType, __cbuf__ fp4x2_e2m1_t>::value) {
+        if (is_tensor_type_v<fp4x2_e2m1_t>) {
             return Data()[Layout()(coord) >> 1];
         }
         return Data()[Layout()(coord)];
