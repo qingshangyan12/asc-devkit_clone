@@ -385,7 +385,8 @@ template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&
 #endif
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+    (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
