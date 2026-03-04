@@ -16,6 +16,7 @@
 #define IMPL_TENSOR_API_TENSOR_COORD_INDEX_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
+#include "impl/experimental/tensor_api/tensor/layout_impl.h"
 
 namespace AscendC {
 namespace Te {
