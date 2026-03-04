@@ -28,10 +28,12 @@ __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
 
 __aicore__ inline void EnablePrintf()
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_TIME_STAMP_ON)
+#if defined(__ENABLE_ASCENDC_PRINTF__)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct BinaryMetaAscFeature __asc_feature_print__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#endif // __ENABLE_ASCENDC_PRINTF__
 }
 
 
@@ -612,7 +614,7 @@ __aicore__ inline void UpdateBlockInfo(uint32_t tlvSize)
 template <class... Args>
 __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     uint8_t blockIdx = GetDumpBlockIdx();
     if (blockIdx >= DUMP_CORE_COUNT) {
         return;
@@ -868,7 +870,7 @@ __aicore__ __gm__ inline uint8_t* GetRingBufTlv(__gm__ BlockRingBufInfo* blockRi
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     EnablePrintf();
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
     if (blockRingBufInfo == nullptr) {
@@ -1024,7 +1026,7 @@ __aicore__ inline void WriteRingBufTlvData(
 template <template <typename> class Tensor, typename T>
 __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef ASCENDC_DUMP
     EnablePrintf();
     if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
         ASCENDC_ASSERT((false),
@@ -1103,40 +1105,12 @@ __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
 }
 
 template <class... Args>
-__aicore__ inline void PrintCommonHead(DumpType printType)
-{
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-    if (writeInfo == nullptr || writeInfo->packIdx != 0) {
-        return;
-    }
-
-    uint64_t __ascendc_tStamp = 0;
-    uint64_t __ascendc_version = 0;
-    __gm__ char* __ascendc_versionStr = nullptr;
-    GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
-    if (__ascendc_tStamp == 0) {
-        PrintfRingBufImpl(printType, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
-    } else {
-        PrintfRingBufImpl(printType, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
-    }
-}
-
-template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-#if !defined(__NPU_DEVICE__)
-        if (printType != DumpType::DUMP_ASSERT) {
-            PrintCommonHead(printType);
-        }
-#endif
         PrintfRingBufImpl(printType, fmt, args...);
     } else {
         PrintfEntityImpl(printType, fmt, args...);
@@ -1216,7 +1190,7 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     if (g_sysPrintFifoSpace != nullptr) {
         return;
     }
@@ -1228,7 +1202,7 @@ __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 }
 __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     if (g_sysPrintFifoSpace != nullptr) {
         return;
     }
