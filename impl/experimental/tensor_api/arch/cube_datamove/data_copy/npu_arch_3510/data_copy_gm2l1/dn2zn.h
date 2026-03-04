@@ -49,15 +49,15 @@ private:
         using type = typename T::elementType;
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<C0_SIZE / sizeof(type)>>, "Dst Layout->Shape->Column->ZeroDim, is not Std::Int<C0Size/Type> type!");
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<C0_ELEMS<type>>>, "Dst Layout->Shape->Column->ZeroDim, is not Std::Int<C0Size/Type> type!");
         static_assert(Std::is_same_v<ShapeColumn0, Std::Int<FRACTAL_FIXED>>, "Dst Layout->Shape->Row->ZeroDim, is not Std::Int<16> type!");
 
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
         using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
         static_assert(Std::is_same_v<StrideRow0, Std::Int<1>>, "Dst Layout->Stride->Column->ZeroDim, is not Std::Int<1> type!");
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_SIZE / sizeof(type)>>, "Dst Layout->Stride->Row->ZeroDim, is not Std::Int<C0Size/Type> type!");
-        static_assert(Std::is_same_v<StrideColumn1, Std::Int<C0_SIZE / sizeof(type) * FRACTAL_FIXED>>,
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_ELEMS<type>>>, "Dst Layout->Stride->Row->ZeroDim, is not Std::Int<C0Size/Type> type!");
+        static_assert(Std::is_same_v<StrideColumn1, Std::Int<C0_ELEMS<type> * FRACTAL_FIXED>>,
             "Dst Layout->Stride->Column->OneDim, is not Std::Int<C0_SIZE / sizeof(type) * FRACTAL_FIXED> type!");
     }
 
@@ -73,7 +73,8 @@ private:
             Std::tuple<__cbuf__ half, __gm__ half>, Std::tuple<__cbuf__ float, __gm__ float>,
             Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, Std::tuple<__cbuf__ int32_t, __gm__ int32_t>,
             Std::tuple<__cbuf__ int8_t, __gm__ int8_t>, Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>,
-            Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>>,
+            Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
+            Std::tuple<__cbuf__ fp4x2_e2m1_t, __gm__ fp4x2_e2m1_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -89,22 +90,39 @@ private:
         uint16_t ndNum = 1;
         uint16_t nValue = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
         uint32_t dValue = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+        if constexpr (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value) {
+            dValue = CeilDivision(dValue, 2);
+        }
         uint64_t srcNdMatrixStride = 0;
 
         auto srcRowStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
         uint64_t srcDValue = srcRowStride;
+        if constexpr (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value) {
+            srcDValue = CeilDivision(srcRowStride, 2);
+        }
         uint16_t dstNzC0Stride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout) * sizeof(type) / C0_SIZE;
-        
+        if constexpr (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value) {
+            dstNzC0Stride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout) / 64;
+        }
         uint16_t dstNzNStride = 1;
         uint32_t dstNzMatrixStride = 0;
 
         uint64_t loop1SrcStride = srcDValue * sizeof(type);
+        if constexpr (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value) {
+            loop1SrcStride = CeilDivision(srcRowStride, 2);
+        }
         uint64_t loop4SrcStride = srcNdMatrixStride * sizeof(type);
+        if constexpr (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value) {
+            loop4SrcStride = CeilDivision(srcNdMatrixStride, 2);
+        }
 
         uint16_t loop2DstStride = dstNzNStride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3DstStride = dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_stride
         // loop4_dst_stride : dst_nz_matrix_stride * size_of_dst_type / C0_SIZE
         uint16_t loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride * sizeof(type) / C0_SIZE);
+        if constexpr (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value) {
+            loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride / 64);
+        }
 
         uint8_t cacheMode = GetCacheModeFromTensor(src.Data().Get());
         CopyGmToCbufMultiNd2nzInstr copy_gm_to_cbuf_multi_nd2nz;
