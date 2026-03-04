@@ -133,51 +133,51 @@ namespace AscendC {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||           \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) ||           \
     (__NPU_ARCH__ == 5102)) // Available for V200 and V210
-constexpr int32_t QUE_MAX_EVENT = 8;
+// constexpr int32_t QUE_MAX_EVENT = 8;
 #else
-constexpr int32_t QUE_MAX_EVENT = 4;
+// constexpr int32_t QUE_MAX_EVENT = 4;
 #endif
-constexpr int32_t HF32_MODE_BIT = 46;
-constexpr int32_t HF32_TRANS_MODE_BIT = 47;
-constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
-constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
-constexpr int32_t CAST_MODE_BIT = 59;
+// constexpr int32_t HF32_MODE_BIT = 46;
+// constexpr int32_t HF32_TRANS_MODE_BIT = 47;
+// constexpr int32_t MM_LAYOUT_MODE_BIT = 51;
+// constexpr int32_t LEAKY_RELU_MODE_BIT = 50;
+// constexpr int32_t CAST_MODE_BIT = 59;
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
-__aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
-{
-    if (num2 == 0) {
-        return 0;
-    }
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 || !defined(SPLIT_CORE_VEC)
-    return (num1 + num2 - 1) / num2;
+// __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
+// {
+//     if (num2 == 0) {
+//         return 0;
+//     }
+// #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 || !defined(SPLIT_CORE_VEC)
+//     return (num1 + num2 - 1) / num2;
+// #else
+//     return get_repeat_ceiling(num1, num2);
+// #endif
+// }
 #else
-    return get_repeat_ceiling(num1, num2);
-#endif
-}
-#else
-__aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
-{
-    if (num2 == 0) {
-        return 0;
-    }
-    return (num1 + num2 - 1) / num2;
-}
+// __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
+// {
+//     if (num2 == 0) {
+//         return 0;
+//     }
+//     return (num1 + num2 - 1) / num2;
+// }
 #endif
 
 #if !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
 
 #ifndef ASCC_PARAM_BLOCK_CUBE
 #define ASCC_PARAM_BLOCK_CUBE
-const int32_t BLOCK_CUBE = 16;
+// const int32_t BLOCK_CUBE = 16;
 #endif
 
 #else // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
 
 #ifndef ASCC_PARAM_BLOCK_CUBE
 #define ASCC_PARAM_BLOCK_CUBE
-constexpr uint32_t BLOCK_CUBE = 16;
+// constexpr uint32_t BLOCK_CUBE = 16;
 #endif
 #endif // !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
 } // namespace AscendC
