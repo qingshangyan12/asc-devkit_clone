@@ -23,7 +23,7 @@ namespace AscendC {
 namespace Te {
 
 struct ArchVersion {
-    static constexpr uint32_t V3510 = 3510;
+    static constexpr uint32_t V3510 = 3101;
     static constexpr uint32_t V2201 = 2201;
 };
 
@@ -167,12 +167,22 @@ private:
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
 
-        constexpr bool isShapeRight = Std::is_constant<C0_SIZE / sizeof(type), ShapeRow0>::value 
-            && Std::is_constant<FRACTAL_FIXED, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<1, StrideRow0>::value 
-            && Std::is_constant<C0_SIZE / sizeof(type), StrideColumn0>::value;
+        if (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value ||
+            AscendC::IsSameType<type, __cbuf__ fp4x2_e2m1_t>::value) {
+            constexpr bool isShapeRight = Std::is_constant<64, ShapeRow0>::value 
+                && Std::is_constant<FRACTAL_FIXED, ShapeColumn0>::value;
+            constexpr bool isStrideRight = Std::is_constant<1, StrideRow0>::value 
+                && Std::is_constant<64, StrideColumn0>::value;
 
-        return (isShapeRight && isStrideRight);
+            return (isShapeRight && isStrideRight);
+        } else {
+            constexpr bool isShapeRight = Std::is_constant<C0_SIZE / sizeof(type), ShapeRow0>::value 
+                && Std::is_constant<FRACTAL_FIXED, ShapeColumn0>::value;
+            constexpr bool isStrideRight = Std::is_constant<1, StrideRow0>::value 
+                && Std::is_constant<C0_SIZE / sizeof(type), StrideColumn0>::value;
+
+            return (isShapeRight && isStrideRight);
+        }
     }
 public:
     static constexpr bool value = IsFractalZNFormat();
@@ -190,12 +200,22 @@ private:
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
 
-        constexpr bool isStrideRight = Std::is_constant<C0_SIZE / sizeof(type), StrideRow0>::value 
-            && Std::is_constant<1, StrideColumn0>::value;
-        constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
-            && Std::is_constant<C0_SIZE / sizeof(type), ShapeColumn0>::value;
+        if (AscendC::IsSameType<type, __gm__ fp4x2_e2m1_t>::value ||
+            AscendC::IsSameType<type, __cbuf__ fp4x2_e2m1_t>::value) {
+            constexpr bool isStrideRight = Std::is_constant<64, StrideRow0>::value 
+                && Std::is_constant<1, StrideColumn0>::value;
+            constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
+                && Std::is_constant<64, ShapeColumn0>::value;
 
-        return (isShapeRight && isStrideRight);
+            return (isShapeRight && isStrideRight);
+        } else {
+            constexpr bool isStrideRight = Std::is_constant<C0_SIZE / sizeof(type), StrideRow0>::value 
+                && Std::is_constant<1, StrideColumn0>::value;
+            constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
+                && Std::is_constant<C0_SIZE / sizeof(type), ShapeColumn0>::value;
+
+            return (isShapeRight && isStrideRight);
+        }
     }
 public:
     static constexpr bool value = IsFractalNZFormat();
