@@ -15,7 +15,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_2201_LOAD_DATA_L12L0A_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_2201_LOAD_DATA_L12L0A_H
 
-#include "impl/experimental/tensor_api/tensor/pointer_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
+#include "impl/experimental/tensor_api/tensor/pointer_mem_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 #include "impl/experimental/tensor_api/arch/arch_utils.h"
 
