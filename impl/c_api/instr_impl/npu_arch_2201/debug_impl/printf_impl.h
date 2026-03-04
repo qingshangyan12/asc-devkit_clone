@@ -360,7 +360,7 @@ __aicore__ inline void simd_printf_compute(DumpType print_type, __gm__ const cha
 template <class... Args>
 static __attribute__((noinline)) __aicore__ void simd_printf_impl(DumpType print_type, __gm__ const char* fmt, Args&&... args)
 {
-#if defined (ASCENDC_DUMP) && (ASCENDC_DUMP == 1)
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     simd_printf_compute(print_type, fmt, args...);
 #endif
 }
