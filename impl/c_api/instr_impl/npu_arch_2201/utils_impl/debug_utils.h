@@ -120,9 +120,11 @@ struct BinaryMetaVersion {
 
 __aicore__ inline void enable_printf()
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#ifdef __ENABLE_ASCENDC_PRINTF__
+#if defined (ASCENDC_DUMP) && (ASCENDC_DUMP == 1)
     static const struct BinaryMetaAscFeature __asc_feature_print__ __attribute__ ((used, section (".ascend.meta"))) =
         {4, 4, 1};
+#endif
 #endif
 }
 
