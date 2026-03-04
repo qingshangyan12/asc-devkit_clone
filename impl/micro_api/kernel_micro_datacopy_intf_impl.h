@@ -23,6 +23,10 @@
 #include "micro_api/dav_m510/kernel_micro_datacopy_impl.h"
 #include "micro_api/dav_m510/kernel_micro_datacopy_load_impl.h"
 #include "micro_api/dav_m510/kernel_micro_datacopy_store_impl.h"
+#elif __NPU_ARCH__ == 3102
+#include "micro_api/dav_m310/kernel_micro_datacopy_impl.h"
+#include "micro_api/dav_c310/kernel_micro_datacopy_load_impl.h"
+#include "micro_api/dav_c310/kernel_micro_datacopy_store_impl.h"
 #else
 #include "micro_api/dav_c310/kernel_micro_datacopy_impl.h"
 #include "micro_api/dav_c310/kernel_micro_datacopy_load_impl.h"
