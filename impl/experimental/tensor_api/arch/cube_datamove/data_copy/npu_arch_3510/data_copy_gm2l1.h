@@ -56,6 +56,8 @@ private:
         } else if constexpr (IsNZFormat<U>::value && IsNZFormat<T>::value) {
             CopyGmToCbufAlignV2NZBase nz2nzStrategy;
             nz2nzStrategy.Run<trait, T, U, Coord>(dst, src, coord);
+        } else {
+            static_assert(Std::always_false_v<T>)
         }
     }
 };
