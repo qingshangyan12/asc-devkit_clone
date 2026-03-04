@@ -15,13 +15,13 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_H
 #define IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_H
 
-#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad/base.h"
+#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad/normal.h"
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad/mx.h"
 
 namespace AscendC {
 namespace Te {
 
-class Mmad3510 : public MmadBase, public MmadMx {
+class Mmad3510{
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
     __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
@@ -32,8 +32,29 @@ public:
 private:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
     __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const Params& params) {
-        // TODO if type ...
-        MmadBase::Run<trait, T, U, S, Params>(dst, fm, filter, params);
+        using dstType = typename T::elementType;
+        using fmType = typename U::elementType;
+        using filterType = typename S::elementType;
+
+        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            constexpr bool isMx = Std::is_one_of_v<Std::tuple<dstType, fmType, filterType>,
+                Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
+                Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
+                Std::tuple<__cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
+                Std::tuple<__cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
+                Std::tuple<__cc__ float, __ca__ mx_fp8_e4m3_t, __cb__ mx_fp8_e4m3_t>,
+                Std::tuple<__cc__ float, __ca__ mx_fp8_e4m3_t, __cb__ mx_fp8_e5m2_t>,
+                Std::tuple<__cc__ float, __ca__ mx_fp8_e5m2_t, __cb__ mx_fp8_e4m3_t>,
+                Std::tuple<__cc__ float, __ca__ mx_fp8_e5m2_t, __cb__ mx_fp8_e5m2_t>>;
+            if constexpr (isMx) {
+                MmadMx mxStrategy;
+                mxStrategy.Run<trait, T, U, S, Params>(dst, fm, filter, params);
+            } else {
+                MmadNormal normalStrategy;
+                normalStrategy.Run<trait, T, U, S, Params>(dst, fm, filter, params);
+            }
+        }
+
     }
 };
 
