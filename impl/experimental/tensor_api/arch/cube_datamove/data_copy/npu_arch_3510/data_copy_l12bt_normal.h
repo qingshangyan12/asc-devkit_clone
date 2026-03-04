@@ -34,7 +34,8 @@ public:
 private:
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
-        CopyL12BTBase::Run<trait, T, U, Coord>(dst, src, coord);
+        CopyL12BTBase btStrategy;
+        btStrategy.Run<trait, T, U, Coord>(dst, src, coord);
     }
 };
 
