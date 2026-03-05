@@ -8,6 +8,10 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+<<<<<<< HEAD
+<<<<<<< HEAD:impl/c_api/instr_impl/npu_arch_3510/misc_impl.h
+=======
+>>>>>>> master
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_MISC_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_MISC_IMPL_H
 
@@ -16,6 +20,20 @@
 __aicore__ inline void asc_init()
 {
     asc_init_soc_state_impl();
+<<<<<<< HEAD
+=======
+#ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_ATOMIC_IMPL_ASC_SET_ATOMIC_ADD_FLOAT16_IMPL_H
+#define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_ATOMIC_IMPL_ASC_SET_ATOMIC_ADD_FLOAT16_IMPL_H
+
+#include "instr_impl/npu_arch_3510/utils_impl.h"
+
+__aicore__ inline void asc_set_atomic_add_float16_impl()
+{
+    set_atomic_add();
+    set_atomic_f16();
+>>>>>>> master:impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_add_float16_impl.h
+=======
+>>>>>>> master
 }
 
 #endif

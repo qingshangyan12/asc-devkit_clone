@@ -19,6 +19,7 @@
 #include "instr_impl/npu_arch_3510/vector_compute_impl.h"
 
 /*
+<<<<<<< HEAD
 *   vector_bool asc_create_mask_b8(Pat mode);
 *   vector_bool asc_create_mask_b16(Pat mode);
 *   vector_bool asc_create_mask_b32(Pat mode);
@@ -43,9 +44,32 @@
 *       Q, // The lowest quarter elements
 *       ALLF = 15 // All elements are set to False
 *   };
+=======
+*   asc_create_mask_b8(pat_mode);
+*   asc_create_mask_b16(pat_mode);
+*   asc_create_mask_b32(pat_mode);
+*
+*   The parameter pat_mode is defined as follows:
+*
+*    PAT_ALL, // All elements are set to True
+*    PAT_VL1, // The lowest element
+*    PAT_VL2, // The lowest 2 element
+*    PAT_VL3, // The lowest 3 element
+*    PAT_VL4, // The lowest 4 element
+*    PAT_VL8, // The lowest 8 element
+*    PAT_VL16, // The lowest 16 element
+*    PAT_VL32, // The lowest 32 element
+*    PAT_VL64, // The lowest 64 element
+*    PAT_VL128, // The lowest 128 element
+*    PAT_M3, // Multiples of 3
+*    PAT_M4, // Multiples of 4
+*    PAT_H, // The lowest half elements
+*    PAT_Q, // The lowest quarter elements
+*    PAT_ALLF = 15 // All elements are set to False
+>>>>>>> master
 *
 *   usage example:
-*       vector_bool mask = asc_create_mask_b8(Pat::VL1);
+*       vector_bool mask = asc_create_mask_b8(PAT_VL1);
 */
 #define asc_create_mask_b8 pset_b8
 #define asc_create_mask_b16 pset_b16

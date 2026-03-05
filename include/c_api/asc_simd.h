@@ -36,7 +36,11 @@
 #include "c_api/utils/debug/asc_printf.h"
 #include "c_api/utils/debug/asc_assert.h"
 
+<<<<<<< HEAD
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+=======
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+>>>>>>> master
 #include "c_api/atomic/atomic.h"
 #include "c_api/cache_ctrl/cache_ctrl.h"
 #include "c_api/cube_compute/cube_compute.h"
