@@ -41,6 +41,13 @@ private:
 TEST_F(HcommCommonTestSuite, Aiv_Read)
 {
     Channel channel;
+    // 初始化类型
+    channel.type = 0; // RDMA
+
+    // 为 SQ 相关字段分配内存并设置
+    channel.sqNum = 1;
+    channel.sqContextAddr = new SqContext();
+    channel.sqContextAddr->type = 0; // RDMA
     channel.sqContextAddr->ctx.rdmaSqContext.qpn = 1;
     channel.sqContextAddr->ctx.rdmaSqContext.sqVa = 0x1000;
     channel.sqContextAddr->ctx.rdmaSqContext.wqeSize = 10;
@@ -50,9 +57,27 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
     channel.sqContextAddr->ctx.rdmaSqContext.sl = 1;
     channel.sqContextAddr->ctx.rdmaSqContext.dbVa = 0x4000;
     channel.sqContextAddr->ctx.rdmaSqContext.dbMode = 0;
+
+    // 为 Buffer 相关字段分配内存并设置
+    channel.remoteBufferNum = 1;
+    channel.remoteBufferAddr = new ProtectionInfo();
+    channel.remoteBufferAddr->type = 0; // RDMA
     channel.remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey = 123456;
+
+    channel.localBufferNum = 1;
+    channel.localBufferAddr = new ProtectionInfo();
+    channel.localBufferAddr->type = 0; // RDMA
     channel.localBufferAddr->pti.rdmaMemProtectionInfo.lkey = 654321;
 
+    Hcomm hcomm;
+    // ChannelHandle channelHandle = static_cast<ChannelHandle>((uint64_t)&channel);
+    // HcommHandle handleId =
+    //     hcomm.Read(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 10);
 
+    // EXPECT_EQ(handleId, 0);
 
+    // 使用完毕后释放内存
+    delete channel.sqContextAddr;
+    delete channel.remoteBufferAddr;
+    delete channel.localBufferAddr;
 }
