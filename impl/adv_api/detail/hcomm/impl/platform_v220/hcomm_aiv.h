@@ -60,13 +60,6 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
 
     // Make sure we don't overflow the SQ in an infinite loop - no need to mitigate endless loop as the host
     // will timeout and kill the kernel, same as all2all krenel if it fails to complete (e.g. in case of link loss)
-    // while (1) {
-    //     FlushGmDataCache(reinterpret_cast<__gm__ uint8_t*>(curHardwareTailAddr));
-    //     uint64_t curTail = *(__gm__ uint32_t*)(curHardwareTailAddr);
-    //     if (curHead - curTail < qpDepth - 1) {
-    //         break;
-    //     }
-    // }
 
     __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % qpDepth));
 
