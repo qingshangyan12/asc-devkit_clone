@@ -27,6 +27,7 @@
 #include "exe_graph/runtime/tiling_context.h"
 #include "base/context_builder/op_kernel_run_context_builder.h"
 #include "base/context_builder/op_tiling_context_builder.h"
+#include "platform/platform_infos_def.h"
 
 namespace context_ascendc {
 class ContextBuilderImpl;
@@ -113,6 +114,8 @@ public:
     std::shared_ptr<KernelRunContextHolder> BuildTilingContext();
 
 private:
+    void InitOptionalInfo(const std::string &soc_version, PlatFormInfos &platform_infos, OptionalInfo &optional_info,
+                          OptionalInfos &optional_infos) const;
     std::unique_ptr<ContextBuilderImpl> impl_;
 };
 }  // namespace context_ascendc
