@@ -216,7 +216,7 @@ def _json_post_process(compile_info: CompileInfo, op_info: OpInfo, tiling_info: 
             f"The operator {op_info.op_type} has not been adapted to superkernel. Therefore, \
 the superkernel cannot be integrated with the operator.", \
             AscendCLogLevel.LOG_WARNING)
-    if CommonUtility.is_c310():
+    if CommonUtility.is_c310() and global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
         if tiling_info.local_memory_size > 0 or _get_simt_type_in_staic(tiling_info, compile_info, obj_path):
             js["supportSuperKernel"] = 0
             CommonUtility.print_compile_log(compile_info.kernel_name, \
