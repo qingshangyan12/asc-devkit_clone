@@ -40,7 +40,6 @@ private:
 
 TEST_F(HcommCommonTestSuite, Aiv_Read)
 {
-
     Channel channel;
     channel.sqContextAddr->ctx.rdmaSqContext.qpn = 1;
     channel.sqContextAddr->ctx.rdmaSqContext.sqVa = 0x1000;
@@ -51,12 +50,11 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
     channel.sqContextAddr->ctx.rdmaSqContext.sl = 1;
     channel.sqContextAddr->ctx.rdmaSqContext.dbVa = 0x4000;
     channel.sqContextAddr->ctx.rdmaSqContext.dbMode = 0;
-
-    channel->remoteBuffAddr->pti.rdmaMemProtectionInfo.rkey = 123456;
-    channel->localBuffAddr->pti.rdmaMemProtectionInfo.lkey = 654321;
+    channel.remoteBuffAddr->pti.rdmaMemProtectionInfo.rkey = 123456;
+    channel.localBuffAddr->pti.rdmaMemProtectionInfo.lkey = 654321;
 
     Hcomm hcomm;
-    ChannelHandle channelHandle = static_cast<ChannelHandle>(&channel);
+    ChannelHandle channelHandle = static_cast<ChannelHandle>((uint64_t)&channel);
     HcommHandle handleId =
         hcomm.Read(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 10);
 
