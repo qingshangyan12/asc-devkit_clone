@@ -456,7 +456,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     if (unlikely(handleId >= HCCL_MAX_HANDLE_ID || handleId <= INVALID_HANDLE_ID)) {
         KERNEL_LOG(KERNEL_ERROR,  "Call Commit failed, handleId[%u] is invalid.", handleId);
-        return HCCL_FAILED;
+        return;
     }
 
     handleNeedCommitCnt_[handleId]++;
