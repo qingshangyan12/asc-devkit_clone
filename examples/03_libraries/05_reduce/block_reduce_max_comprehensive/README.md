@@ -1,11 +1,20 @@
+# BlockReduceMax样例
 ## 概述
+本样例基于BlockReduceMax实现最大值归约，可用于对每个datablock内所有元素求最大值。
 
 ## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
 ## 目录结构介绍
-
+```
+├── block_reduce_max
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt                      // 编译工程文件
+│   ├── data_utils.h                        // 数据读入写出函数
+│   └── block_reduce_max_custom.asc  // Ascend C算子实现 & 调用样例
+```
 
 ## 算子描述
 
@@ -13,27 +22,23 @@
 
 提供四种场景
 
-| 场景 | 类型 | EnableCounterMask |
+| 场景 | 类型 | Mask模式 |
 |------|------|-------|
-| 1 | half | false |
-| 2 | half | true |
-| 3 | float | false |
-| 4 | float | true |
-
-<!-- 设计一些测试数据，参数说明 -->
-<!-- 
-| 场景 | 类型 | repeatTime | tailMask | srcBlkStride | dstRepStride | srcRepStride | 输入 | 输出 | 说明 |
+| 1 | half | Normal |
+| 2 | half | Counter |
+| 3 | float | Normal |
+| 4 | float | Counter |
+---------------------
+**样例参数**
+| 场景 | 类型 | repeatTime | tailMask | srcBlkStride | dstRepStride | srcRepStride | 输入数据大小(32位对齐) | 输出数据大小(32位对齐) | 说明 |
 |------|------|-----------|------|--------------|--------------|--------------|-------|------|------|
-| 1 | half | 2 | 85 | 1 | 1 | 8 | 341(256 + 85)=>352(32位对齐) | 22(16 + 6)=>32(32位对齐) | 2个repeat+非对齐的mask，连续数据 |
-| 2 | half | 1 | 341 | 1 | 1 | 8 | 341(256 + 85) | 22(16 + 6) | 2个repeat+非对齐的mask，连续数据 |
-| 3 | float | 2 | 12 | 1 | 1 | 8 | 140(128 + 12)=>144 | 18(16 + 2)=>24 | float基础场景, 2个repeat+非对齐的mask，连续数据 |
-| 4 | float | 1 | 140 | 1 | 1 | 8 | 140=>144 | 18=>24 | float基础场景, 2个repeat+非对齐的mask，连续数据 |
+| 1 | half | 2 | 85 | 1 | 1 | 8 | 352 | 32 | 2个repeat+非对齐的mask，连续数据 |
+| 2 | half | 1 | 341 | 1 | 1 | 8 | 352 | 32 | 2个repeat+非对齐的mask，连续数据 |
+| 3 | float | 2 | 12 | 1 | 1 | 8 | 144 | 24 | float基础场景, 2个repeat+非对齐的mask，连续数据 |
+| 4 | float | 1 | 140 | 1 | 1 | 8 | 144 | 24 | float基础场景, 2个repeat+非对齐的mask，连续数据 |
 | 1 | half | 2 | 0 | 2 | 1 | 8 | 384 | 16 | block间有gap |
-| 1 | half | 2 | 0 | 1 | 2 | 8 | 256 | 24=>32 | 输出repeat间有gap |
+| 1 | half | 2 | 0 | 1 | 2 | 8 | 256 | 32 | 输出repeat间有gap |
 | 1 | half | 2 | 0 | 1 | 1 | 16 | 384 | 16 | src repeat间有gap | 
--->
-
----
 
 ## 编译运行
 
@@ -59,7 +64,7 @@
 ### 样例执行
 
 ```bash
-# 选择场景（1-11）
+# 选择场景（1-4）
 SCENARIO=1
 REPEAT_TIME=2
 TAIL_MASK=85

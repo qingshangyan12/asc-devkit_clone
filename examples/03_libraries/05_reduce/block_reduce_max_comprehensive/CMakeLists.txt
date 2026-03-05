@@ -19,7 +19,7 @@ set(SCENARIO_NUM 1 CACHE STRING "Scenario number (1-11)")
 message(STATUS "Building BlockReduceMax comprehensive example")
 
 add_executable(demo
-    block_reduce_max_comprehensive.asc
+    block_reduce_max_custom.asc
 )
 
 target_link_libraries(demo PRIVATE

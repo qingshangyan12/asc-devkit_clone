@@ -8,7 +8,6 @@ import struct
 import argparse
 import os
 
-
 def block_reduce_max_golden(src, dst, dtype, repeat, tailMask, srcBlkStride, dstRepStride, srcRepStride, enabelCounterMask=False):
     """Compute golden result for BlockReduceMax"""
 
