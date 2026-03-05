@@ -22,6 +22,8 @@
 #include "utils/context/context_builder.h"
 #include "utils/context/context_builder_impl.h"
 
+extern void platfrom_stub_set_chip_version(const char *num);
+
 class TestTiling : public testing::Test {
 protected:
     static void SetUpTestCase() {}
@@ -53,6 +55,8 @@ TEST_F(TestTiling, TestPlatformAscendCReserveLocalMemory)
 {
     fe::PlatFormInfos platform_info;
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
+    platfrom_stub_set_chip_version("MC32DM11A");
+    EXPECT_EQ(plat.GetSocVersion(), platform_ascendc::SocVersion::MC32DM11A);
 
     MOCKER_CPP(&fe::PlatFormInfos::GetPlatformResWithLock,
         bool(fe::PlatFormInfos::*)(const std::string &, const std::string &, std::string &))
@@ -181,6 +185,8 @@ TEST_F(TestTiling, TestPlatformAscendC)
     EXPECT_EQ(plat.GetResGroupBarrierWorkSpaceSize(), static_cast<uint32_t>(-1));
     EXPECT_EQ(plat.GetSocVersion(), platform_ascendc::SocVersion::ASCEND910);
     EXPECT_EQ(plat.GetCoreNumVector(), 0);
+    platfrom_stub_set_chip_version("MC32DM11A");
+    EXPECT_EQ(plat.GetSocVersion(), platform_ascendc::SocVersion::MC32DM11A);
     platfrom_stub_set_chip_version("Ascend950");
     platfrom_stub_set_npuarch("3510");
     EXPECT_EQ(plat.GetLibApiWorkSpaceSize(), 16 * 1024 * 1024);
