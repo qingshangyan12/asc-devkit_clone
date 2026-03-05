@@ -454,6 +454,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     ASCENDC_HCCL_API_ASSERT(handleId > INVALID_HANDLE_ID && handleId < HCCL_MAX_HANDLE_ID, { return; },
         "Call Commit failed, handleId is[%d], expected in range of [0, %d).", handleId, HCCL_MAX_HANDLE_ID);
 
+    if (unlikely(handleId >= HCCL_MAX_HANDLE_ID || handleId <= INVALID_HANDLE_ID)) {
+        KERNEL_LOG(KERNEL_ERROR,  "Call Commit failed, handleId[%u] is invalid.", handleId);
+        return HCCL_FAILED;
+    }
+
     handleNeedCommitCnt_[handleId]++;
     if (msgQueueIsAvailable_[globalCurResId_] == false) {
         KERNEL_LOG(KERNEL_ERROR, "Call Commit failed, the th msg is not avaliable! handleId = %d", globalCurResId_, handleId);
