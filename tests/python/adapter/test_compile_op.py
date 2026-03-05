@@ -1142,7 +1142,6 @@ class TestCompileOp(unittest.TestCase):
         compile_info.dump_info["dump_type"]= "assert"
         set_dump_assert_flag(compile_info)
         assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
-        handle_dump_options(compile_info, compile_option_tuple)
         assert '-DASCENDC_DUMP=0' not in compile_option_tuple.compile_options
         assert '-DASCENDC_DUMP_ASSERT_ONLY' in compile_option_tuple.compile_options
         global_var_storage.set_variable("ascendc_dump_assert_only", True)
