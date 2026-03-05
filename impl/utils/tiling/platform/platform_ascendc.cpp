@@ -22,7 +22,7 @@
 #include "platform_ascendc_log.h"
 #include "platform/platform_infos_def.h"
 #include "platform_ascendc.h"
-
+#include "platform_stub.h"
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
 const static uint32_t WORK_SPACE_SIZE_910B = 16 * 1024 * 1024;
@@ -78,7 +78,8 @@ static inline SocVersion SocVersionStrMap(const char *socVersionStr)
 uint32_t PlatformAscendC::GetVecRegLen(void) const 
 {
     std::string sizeStr; 
-    bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "vector_reg_width", sizeStr);
+    // bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "vector_reg_width", sizeStr);
+    bool ret = GetPlatformResWithLock("AICoreSpec", "vector_reg_width", sizeStr);
     if(!ret){
         PF_LOGE("platform do not support get vector_reg_width size !");
         return 0u;
@@ -104,7 +105,8 @@ static inline uint32_t GetCoreNumByType(fe::PlatFormInfos *platformInfo, bool is
 {
     std::string key;
     std::string val;
-    bool ret = platformInfo->GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_SPLIT_KEY, val);
+    // bool ret = platformInfo->GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_SPLIT_KEY, val);
+    bool ret = GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_SPLIT_KEY, val);
     if (!ret) {
         PF_LOGE("get platform failed, val is %s", val.c_str());
     }
@@ -115,7 +117,8 @@ static inline uint32_t GetCoreNumByType(fe::PlatFormInfos *platformInfo, bool is
     } else {
         key = LABEL_CORE_CNT_CUB;
     }
-    ret = platformInfo->GetPlatformResWithLock(LABEL_SOC_INFO, key, val);
+    // ret = platformInfo->GetPlatformResWithLock(LABEL_SOC_INFO, key, val);
+    ret = GetPlatformResWithLock(LABEL_SOC_INFO, key, val);
     if (!ret) {
         PF_LOGE("get platform failed, key is %s, val is %s", key.c_str(), val.c_str());
     }
@@ -126,7 +129,8 @@ uint32_t PlatformAscendC::GetCoreNumVector(void) const
 {
     if (GetSocVersion() == SocVersion::ASCEND310P) {
         std::string val;
-        bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_CORE_CNT_VEC, val);
+        // bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_CORE_CNT_VEC, val);
+        bool ret = GetPlatformResWithLock(LABEL_SOC_INFO, LABEL_CORE_CNT_VEC, val);
         if (!ret) {
             PF_LOGE("get platform vector num failed, val is %s", val.c_str());
         }
@@ -166,7 +170,8 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size)
 
     if (memType == CoreMemType::FB) {
         std::string sizeStr;
-        bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "fb0_size", sizeStr);
+        // bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "fb0_size", sizeStr);
+        bool ret = GetPlatformResWithLock("AICoreSpec", "fb0_size", sizeStr);
         if (!ret) {
             PF_LOGE("platform do not support get CoreMemType::FB size !");
             return;
@@ -176,7 +181,8 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType &memType, uint64_t &size)
  
     if (memType == CoreMemType::BT) {
         std::string sizeStr;
-        bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "bt_size", sizeStr);
+        // bool ret = this->GetPlatFormInfo()->GetPlatformResWithLock("AICoreSpec", "bt_size", sizeStr);
+        bool ret = GetPlatformResWithLock("AICoreSpec", "bt_size", sizeStr);
         if (!ret) {
             PF_LOGE("platform do not support get CoreMemType::BT size !");
             return;
@@ -214,7 +220,8 @@ SocVersion PlatformAscendC::GetSocVersion(void) const
 NpuArch PlatformAscendC::GetCurNpuArch(void) const
 {
     std::string npuArchStr;
-    bool ret = GetPlatFormInfo()->GetPlatformResWithLock(LABEL_VERSION, NPU_ARCH, npuArchStr);
+    // bool ret = GetPlatFormInfo()->GetPlatformResWithLock(LABEL_VERSION, NPU_ARCH, npuArchStr);
+    bool ret = GetPlatformResWithLock(LABEL_VERSION, NPU_ARCH, npuArchStr);
     if (!ret) {
         PF_LOGE("platform do not support get npu arch!");
         return NpuArch::DAV_RESV;
@@ -511,7 +518,8 @@ fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char *custo
     fe::PlatformInfoManager::GeInstance().GetPlatformInfos(socVersion,
         gPlatformInfo, optionalInfos);
     std::string socVersionStr;
-    const auto ret = gPlatformInfo.GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVersionStr);
+    // const auto ret = gPlatformInfo.GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVersionStr);
+    const auto ret = GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVersionStr);
     if (!ret) {
         PF_LOGE("get platform short version failed by fe, socVersion is %s", socVersion.c_str());
     }
