@@ -42,10 +42,10 @@
   Matmul算子的实现流程分为几个基本任务：CopyIn，Split，Compute，CopyUB，CopyOut。CopyIn任务负责将Global Memory上的输入inputGM搬运到Local Memory A1/B1中，搬运过程中进行ND至NZ分形转换。Split调用LoadData接口将数据进一步搬运至接口所要求Local Memory A2/B2，Compute任务负责对数据进行矩阵乘运算，计算结果存储在Local Memory CO1中。CopyUB任务负责将输出数据从CO1搬运至Local Memory UB上的输出outputUb。CopyOut任务负责将输出数据从UB搬运至Global Memory上的输出outputGm。
   ```
   // 使用Load3D将左矩阵从A1搬运至A2
-  LoadData3DParamsV1<FM_T> load3dParamsV1(padList, H, W, 0, 0, 0, -1, -1, strideW, strideH, Kw, Kh, dilationW, dilationH, 1, 0, fmRepeat, 0, (FM_T)(0));
+  AscendC::LoadData3DParamsV1<FM_T> load3dParamsV1(padList, H, W, 0, 0, 0, -1, -1, strideW, strideH, Kw, Kh, dilationW, dilationH, 1, 0, fmRepeat, 0, (FM_T)(0));
   AscendC::LoadData(featureMapA2, featureMapA1, load3dParamsV1);
   // 使用Load2D将右矩阵从B1搬运至B2
-  LoadData2DParams load2dParams(0, weRepeat, 1, 0, 0, false, 0);
+  AscendC::LoadData2DParams load2dParams(0, weRepeat, 1, 0, 0, false, 0);
   AscendC::LoadData(weightB2, weightB1, load2dParams);
   ```
 
