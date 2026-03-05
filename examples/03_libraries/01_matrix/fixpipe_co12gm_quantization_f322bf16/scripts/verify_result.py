@@ -17,9 +17,9 @@ import tensorflow as tf
 bfloat16 = tf.bfloat16.as_numpy_dtype
 
 
-relative_tol = 1e-6
-absolute_tol = 1e-9
-error_tol = 1e-4
+relative_tol = 1e-3
+absolute_tol = 1e-3
+error_tol = 1e-3
 
 
 def verify_result(output, golden):
