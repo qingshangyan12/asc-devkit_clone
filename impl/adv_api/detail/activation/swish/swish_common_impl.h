@@ -12,6 +12,12 @@
  * \file swish_common_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/activation/swish/swish_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/activation/swish.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWISH_COMMON_IMPL_H
+#endif
 #ifndef IMPL_ACTIVATION_SWISH_SWISH_COMMON_IMPL_H
 #define IMPL_ACTIVATION_SWISH_SWISH_COMMON_IMPL_H
 
@@ -100,3 +106,7 @@ __aicore__ inline __inout_pipe__(V) void SwishCompute(
 }
 }  // namespace AscendC
 #endif  // IMPL_ACTIVATION_SWISH_SWISH_COMMON_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWISH_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWISH_COMMON_IMPL_H
+#endif
