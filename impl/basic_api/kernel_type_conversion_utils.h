@@ -55,11 +55,7 @@ __aicore__ inline constexpr bool IsBf16NeedRound(uint64_t man)
     return (truncHighBit && (truncLeft || lastBit));
 }
 
-<<<<<<< HEAD
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-=======
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
->>>>>>> master
 namespace FPTranslation {
 // HiFloat8 -> Fp32
 #define HIF8_SIGN_INDEX (7)

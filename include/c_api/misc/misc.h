@@ -19,11 +19,7 @@
  
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "instr_impl/npu_arch_2201/misc_impl.h"
-<<<<<<< HEAD
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-=======
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
->>>>>>> master
 #include "instr_impl/npu_arch_3510/misc_impl.h"
 #endif
  

@@ -19,32 +19,6 @@
 #include "instr_impl/npu_arch_3510/vector_compute_impl.h"
 
 /*
-<<<<<<< HEAD
-*   vector_bool asc_create_mask_b8(Pat mode);
-*   vector_bool asc_create_mask_b16(Pat mode);
-*   vector_bool asc_create_mask_b32(Pat mode);
-*
-*   The parameter mode is of the enum class type Pat,
-*   which is defined as follows:
-*
-*   enum class Pat {
-*       ALL, // All elements are set to True
-*       VL1, // The lowest element
-*       VL2, // The lowest 2 element
-*       VL3, // The lowest 3 element
-*       VL4, // The lowest 4 element
-*       VL8, // The lowest 8 element
-*       VL16, // The lowest 16 element
-*       VL32, // The lowest 32 element
-*       VL64, // The lowest 64 element
-*       VL128, // The lowest 128 element
-*       M3, // Multiples of 3
-*       M4, // Multiples of 4
-*       H, // The lowest half elements
-*       Q, // The lowest quarter elements
-*       ALLF = 15 // All elements are set to False
-*   };
-=======
 *   asc_create_mask_b8(pat_mode);
 *   asc_create_mask_b16(pat_mode);
 *   asc_create_mask_b32(pat_mode);
@@ -66,7 +40,6 @@
 *    PAT_H, // The lowest half elements
 *    PAT_Q, // The lowest quarter elements
 *    PAT_ALLF = 15 // All elements are set to False
->>>>>>> master
 *
 *   usage example:
 *       vector_bool mask = asc_create_mask_b8(PAT_VL1);

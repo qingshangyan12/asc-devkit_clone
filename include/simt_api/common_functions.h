@@ -27,11 +27,7 @@
 #endif
 #endif
 
-<<<<<<< HEAD
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
-=======
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
->>>>>>> master
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 using dim3 = cce::dim3;
 

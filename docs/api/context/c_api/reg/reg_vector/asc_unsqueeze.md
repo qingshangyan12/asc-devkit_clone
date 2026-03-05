@@ -53,10 +53,6 @@ PIPE_V
 
 ```cpp
 vector_int8_t dst;
-<<<<<<< HEAD
-vector_bool mask = asc_create_mask_b8(Pat::ALL);
-=======
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
->>>>>>> master
 asc_squeeze(dst, mask);
 ```

@@ -90,11 +90,7 @@ uint32_t PlatformAscendC::GetVecRegLen(void) const
             PF_LOGE("The bit width exceeds the maximum value of uint32!");
             return 0u;
         }
-<<<<<<< HEAD
-        if(!size){
-=======
         if(size == 0){
->>>>>>> master
             PF_LOGE("The bit width equals zero!");
         }
         return static_cast<uint32_t>(size);

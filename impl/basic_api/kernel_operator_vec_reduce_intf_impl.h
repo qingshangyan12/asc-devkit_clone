@@ -490,11 +490,7 @@ __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTens
     WholeReduceMinCommon<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
-<<<<<<< HEAD
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-=======
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
->>>>>>> master
 template <typename T, bool isSetMask, typename U>
 __aicore__ inline void WholeReduceSum(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,

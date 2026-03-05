@@ -21,11 +21,7 @@
 
 #include "instr_impl/npu_arch_2201/cube_datamove_impl.h"
 
-<<<<<<< HEAD
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-=======
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
->>>>>>> master
 
 #include "instr_impl/npu_arch_3510/cube_datamove_impl.h"
 
@@ -673,11 +669,7 @@ __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
 
 __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride);
 
-<<<<<<< HEAD
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-=======
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
->>>>>>> master
 
 // ==========asc_l0c2l1_l0c2l1===========
 // half  float
