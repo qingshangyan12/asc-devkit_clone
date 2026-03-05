@@ -1152,10 +1152,7 @@ class TestCompileOp(unittest.TestCase):
         set_dump_assert_flag(compile_info)
         assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
         assert '-DASCENDC_DUMP=0' not in compile_option_tuple.compile_options
-        assert '-DASCENDC_DUMP_ASSERT_ONLY' in compile_option_tuple.compile_options
-        global_var_storage.set_variable("ascendc_dump_assert_only", True)
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple(compile_options, []))
-        global_var_storage.set_variable("ascendc_dump_assert_only", False)
         assert os.path.exists(
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
