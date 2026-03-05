@@ -31,6 +31,7 @@
 #include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_fill_l1_impl.h"
 #include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_l12fb_impl.h"
 #include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_gm2l1_impl.h"
+#include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_l12gm_impl.h"
 #include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_gm2l1_nd2nz_impl.h"
 #include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_l0c2l1_impl.h"
 #include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_l12l0a_2d_impl.h"
@@ -1730,6 +1731,19 @@ __aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ uint8_t* dst, __cc__ int32_
 __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config)
 {
     asc_set_l13d_fmatrix_impl(config);
+}
+
+// ==========asc_copy_l12gm==========
+__aicore__ inline void asc_copy_l12gm(__gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, 
+                                    uint16_t src_stride, uint16_t dst_stride)
+{
+    asc_copy_l12gm_impl(dst, src, n_burst, len_burst, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_l12gm_sync(__gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, 
+                                        uint16_t src_stride, uint16_t dst_stride)
+{
+    asc_copy_l12gm_sync_impl(dst, src, n_burst, len_burst, src_stride, dst_stride);
 }
 #endif
 
