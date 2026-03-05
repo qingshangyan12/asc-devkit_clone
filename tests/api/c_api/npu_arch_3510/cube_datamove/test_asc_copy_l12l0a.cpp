@@ -16,7 +16,7 @@
 template <typename DTYPE>
 __aicore__ inline void img2colv2_cbuf_to_ca_stub(__ca__ DTYPE* dst, __cbuf__ DTYPE* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
                                                 uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
-                                                uint8_t dilation_h, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel, bm_t enable_dual_src) {
+                                                uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel, bm_t enable_dual_src) {
     EXPECT_EQ(dst, reinterpret_cast<__cbuf__ DTYPE *>(11));
     EXPECT_EQ(src, reinterpret_cast<__cc__ DTYPE *>(22));
     EXPECT_EQ(step_k, static_cast<uint16_t>(33));
@@ -29,6 +29,7 @@ __aicore__ inline void img2colv2_cbuf_to_ca_stub(__ca__ DTYPE* dst, __cbuf__ DTY
     EXPECT_EQ(h_k, static_cast<uint8_t>(12));
     EXPECT_EQ(dilation_w, static_cast<uint8_t>(13));
     EXPECT_EQ(dilation_h, static_cast<uint8_t>(14));
+    EXPECT_EQ(filter_w, static_cast<bool>(true));
     EXPECT_EQ(filter_h, static_cast<bool>(true));
     EXPECT_EQ(transpose, static_cast<bool>(true));
     EXPECT_EQ(fmatrix_ctrl, static_cast<bool>(true));
@@ -52,7 +53,7 @@ TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_##dtype)               \
 {                                                                                     \
     MOCKER_CPP(img2colv2_cbuf_to_ca, void(__ca__ dtype*, __cbuf__ dtype*, uint16_t, uint16_t, uint16_t,                    \
                                         uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,                    \
-                                        bool, bool, bool, uint16_t, bm_t))                    \
+                                        bool, bool, bool, bool, uint16_t, bm_t))                    \
             .times(1)                                                                           \
             .will(invoke(img2colv2_cbuf_to_ca_stub<dtype>));                               \
                                                                                                 \
@@ -69,6 +70,7 @@ TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_##dtype)               \
     uint8_t h_k = static_cast<uint8_t>(12);                                                 \
     uint8_t dilation_w = static_cast<uint8_t>(13);                                          \
     uint8_t dilation_h = static_cast<uint8_t>(14);                                          \
+    bool filter_w = static_cast<bool>(true);                                          \
     bool filter_h = static_cast<bool>(true);                                          \
     bool transpose = static_cast<bool>(true);                                          \
     bool fmatrix_ctrl = static_cast<bool>(true);                                          \
@@ -76,7 +78,7 @@ TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_##dtype)               \
     bm_t enable_dual_src = static_cast<bm_t>(BM_DISABLE);                                          \
                                                                                                     \
     asc_copy_l12l0a(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,    \
-                            dilation_h, filter_h, transpose, fmatrix_ctrl, size_channel, enable_dual_src);                                          \
+                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel, enable_dual_src);                                          \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -84,7 +86,7 @@ TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_SYNC_##dtype)                   
 {                                                                                              \
     MOCKER_CPP(img2colv2_cbuf_to_ca, void(__ca__ dtype*, __cbuf__ dtype*, uint16_t, uint16_t, uint16_t,                    \
                                         uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,                    \
-                                        bool, bool, bool, uint16_t, bm_t))                    \
+                                        bool, bool, bool, bool, uint16_t, bm_t))                    \
             .times(1)                                                                           \
             .will(invoke(img2colv2_cbuf_to_ca_stub<dtype>));                               \
                                                                                                 \
@@ -101,6 +103,7 @@ TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_SYNC_##dtype)                   
     uint8_t h_k = static_cast<uint8_t>(12);                                                 \
     uint8_t dilation_w = static_cast<uint8_t>(13);                                          \
     uint8_t dilation_h = static_cast<uint8_t>(14);                                          \
+    bool filter_w = static_cast<bool>(true);                                          \
     bool filter_h = static_cast<bool>(true);                                          \
     bool transpose = static_cast<bool>(true);                                          \
     bool fmatrix_ctrl = static_cast<bool>(true);                                          \
@@ -108,7 +111,7 @@ TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_SYNC_##dtype)                   
     bm_t enable_dual_src = static_cast<bm_t>(BM_DISABLE);                                          \
                                                                                                     \
     asc_copy_l12l0a_sync(dst, src, step_k, step_m, pos_k, pos_m, stride_w, stride_h, w_k, h_k, dilation_w,    \
-                            dilation_h, filter_h, transpose, fmatrix_ctrl, size_channel, enable_dual_src);                                          \
+                            dilation_h, filter_w, filter_h, transpose, fmatrix_ctrl, size_channel, enable_dual_src);                                          \
     GlobalMockObject::verify();                                                                 \
 }    
 
