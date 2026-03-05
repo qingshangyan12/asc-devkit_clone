@@ -38,7 +38,7 @@ protected:
                                                                                       \
 TEST_F(TEST_COPY_L1_TO_L0C, TEST_COPY_L1_TO_L0C_##src_dtype##dst_dtype)               \
 {                                                                                     \
-    MOCKER_CPP(copy_matrix_cbuf_to_cc_stub, void(__cc__ dst_dtype *, __cbuf__ src_dtype *,      \
+    MOCKER_CPP(copy_matrix_cbuf_to_cc, void(__cc__ dst_dtype *, __cbuf__ src_dtype *,      \
                uint16_t, uint16_t, uint16_t, uint16_t))                                          \
             .times(1)                                                                           \
             .will(invoke(copy_matrix_cbuf_to_cc_stub<dst_dtype, src_dtype>));                    \
@@ -57,7 +57,7 @@ TEST_F(TEST_COPY_L1_TO_L0C, TEST_COPY_L1_TO_L0C_##src_dtype##dst_dtype)         
                                                                                                 \
 TEST_F(TEST_COPY_L1_TO_L0C, TEST_COPY_L1_TO_L0C_SYNC_##src_dtype##dst_dtype)               \
 {                                                                                     \
-    MOCKER_CPP(copy_matrix_cbuf_to_cc_stub, void(__cc__ dst_dtype *, __cbuf__ src_dtype *,      \
+    MOCKER_CPP(copy_matrix_cbuf_to_cc, void(__cc__ dst_dtype *, __cbuf__ src_dtype *,      \
                uint16_t, uint16_t, uint16_t, uint16_t))                                          \
             .times(1)                                                                           \
             .will(invoke(copy_matrix_cbuf_to_cc_stub<dst_dtype, src_dtype>));                    \
