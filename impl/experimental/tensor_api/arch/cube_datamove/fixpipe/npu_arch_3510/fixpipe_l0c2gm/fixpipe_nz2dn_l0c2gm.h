@@ -1,0 +1,93 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/*!
+ * \file fixpipe_nz2dn_l0c2gm.h
+ * \brief
+ */
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_L0C2GM_FIXPIPE_NZ2DN_L0C2GM_H
+#define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_L0C2GM_FIXPIPE_NZ2DN_L0C2GM_H
+
+#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_base.h"
+
+namespace AscendC {
+namespace Te {
+
+class FixpipeNz2DnBase3510 : public CopyMatrixCcToGmBase3510, public SetRegisterBase3510, public FormatCheckUtils3510 {
+public:
+    template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        auto loop3Params = GenRegisterParams<trait, T, U>(dst, src);
+        SetRegister<decltype(loop3Params)>(loop3Params);
+        auto params = GenFixpipeParams<trait, T, U, Coord>(dst, src, coord);
+        auto dstDNTensor = dst(coord, dst.Layout().Shape());
+        DataCopy<trait, T, U, decltype(params)>(dstDNTensor, src, params);
+    }
+
+private:
+    template <const FixpipeTrait& trait, typename T, typename U>
+    __aicore__ inline constexpr void CheckTemplate()
+    {
+        using srcType = typename U::elementType;
+        using dstType = typename T::elementType;
+        CheckDNTemplate<T>();
+        CheckL0CNZTemplate<U>();
+#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
+        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ float, __cc__ float>, 
+            Std::tuple<__gm__ int32_t, __cc__ int32_t>>, "The data type is not supported.");
+#endif
+    }
+
+    template <const FixpipeTrait& trait, typename T, typename U>
+    __aicore__ inline auto GenRegisterParams(const T& dst, const U& src)
+    {
+        uint32_t dnNum = 1;
+        uint32_t srcNzMatrixStride = 0;
+        uint32_t dstDnMatrixStride = 0;
+        uint32_t srcNzC0Stride = 1;
+        auto params = Std::make_tuple(dnNum, dstDnMatrixStride, srcNzMatrixStride, srcNzC0Stride);
+        return params;
+    }
+
+    template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
+    __aicore__ inline auto GenFixpipeParams(const T& dst, const U& src, const Coord& coord)
+    {
+        CheckTemplate<trait, T, U>();
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+        uint32_t nSize = Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout)
+            * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout),
+            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
+            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) - Std::get<1>(coord));
+        uint32_t mSize = Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout)
+            * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout),
+            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
+            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) - Std::get<0>(coord));
+        uint32_t srcStride =
+            GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
+        uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
+        uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
+
+        bool reluEn = trait.enableRelu;
+        uint8_t unitFlag = trait.unitFlag;
+        bool isChannelSplit = trait.enableChannelSplit;
+        bool nz2ndEn = false;
+        bool nz2dnEn = true;
+        auto params = Std::make_tuple(nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit,
+            nz2ndEn, nz2dnEn);
+
+        return params;
+    }
+};
+
+} // namespace Te
+} // namespace AscendC
+
+#endif // IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_L0C2GM_FIXPIPE_NZ2DN_L0C2GM_H
