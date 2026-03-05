@@ -22,6 +22,9 @@
 #include "kernel_operator_scm_data_copy_impl.h"
 #include "kernel_common.h"
 #include "kernel_process_lock.h"
+// #if defined(ASCENDC_DEBUG)
+// #include "kernel_tpipe_impl.h"
+// #endif
 namespace AscendC {
 // DataCopyParams:    uint16_t blockCount, uint16_t blockLen
 // DataCopyExtParams: uint16_t blockCount, uint32_t blockLen
