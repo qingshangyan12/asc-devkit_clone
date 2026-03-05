@@ -20,7 +20,6 @@
 #include "base/registry/op_impl_space_registry_v2.h"
 #include "securec.h"
 #include "platform/platform_info.h"
-#include "platform/platform_infos_def.h"
 #include "context_builder_impl.h"
 #include "context_ascendc_log.h"
 #include "exe_graph/runtime/extended_kernel_context.h"
@@ -259,6 +258,42 @@ ContextBuilder &ContextBuilder::PlatformInfo(void *platformInfo)
     return *this;
 }
 
+void ContextBuilder::InitOptionalInfo(const std::string &soc_version, fe::PlatFormInfos &platform_infos,
+                                      fe::OptionalInfo &optional_info,
+                                      fe::OptionalInfos &optional_infos) const {
+  optional_info.soc_version = soc_version;
+  optional_infos.SetSocVersion(soc_version);
+  CXT_ASCENDC_LOGD("Soc version for platform's optional information is [%s].", soc_version.c_str());
+  std::string core_type = "AiCore";
+
+  CXT_ASCENDC_LOGD("Core type for platform's optional info is set to [%s].", core_type.c_str());
+  optional_info.core_type = core_type;
+  optional_infos.SetCoreType(core_type);
+
+  // l1_fusion_flag
+  std::string l1_flag_str = "false";
+  CXT_ASCENDC_LOGD("L1 fusion flag for platform's optional info is set to [%s].", l1_flag_str.c_str());
+  optional_info.l1_fusion_flag = l1_flag_str;
+  optional_infos.SetL1FusionFlag(l1_flag_str);
+
+  // aicore cnt from platform
+  int32_t ai_core_cnt = 1;
+  std::string ai_core_cnt_str;
+  if (platform_infos.GetPlatformResWithLock("SoCInfo", "ai_core_cnt", ai_core_cnt_str)) {
+    CXT_ASCENDC_LOGD("Ai core count in SoCInfo from platform is [%s].", ai_core_cnt_str.c_str());
+    ai_core_cnt = static_cast<int32_t>(std::atoi(ai_core_cnt_str.c_str()));
+    if (ai_core_cnt <= 0) {
+      CXT_ASCENDC_LOGE("Ai core count [%d] for soc version [%s] is invalid.", ai_core_cnt, soc_version.c_str());
+      return;
+    }
+  }
+
+  FE_LOGD("AI core number for platform's optional info is [%d].", ai_core_cnt);
+  optional_info.ai_core_num = static_cast<uint32_t>(ai_core_cnt);
+  optional_infos.SetAICoreNum(static_cast<uint32_t>(ai_core_cnt));
+  return;
+}
+
 ContextBuilder &ContextBuilder::AddPlatformInfo(const char *customSocVersion)
 {
     static std::map<std::string, SocVersion> convertMap = {
@@ -301,11 +336,18 @@ ContextBuilder &ContextBuilder::AddPlatformInfo(const char *customSocVersion)
     }
 
     static fe::PlatFormInfos platformInfoIns;
-    fe::PlatformInfoManager::GeInstance().InitRuntimePlatformInfos(std::string(socVersion));
-    fe::OptionalInfos optionalInfos;
-    fe::PlatformInfoManager::GeInstance().GetPlatformInfos(std::string(socVersion), platformInfoIns, optionalInfos);
+    fe::PlatformInfoManager::Instance().InitRuntimePlatformInfos(std::string(socVersion));
+    CXT_ASCENDC_LOGD("hwx1072830 socVersion is %s.", socVersion);
+    fe::OptionalInfo optional_info;
+    fe::OptionalInfos optional_infos;
+
+    fe::PlatformInfoManager::Instance().GetPlatformInstanceByDevice(0, platformInfoIns);
+    CXT_ASCENDC_LOGD("hwx1072830 platformInfoIns address is %p.", (void*)&platformInfoIns);
+    InitOptionalInfo(std::string(socVersion), platformInfoIns, optional_info, optional_infos);
     std::string socVersionStr;
     const auto retCode = platformInfoIns.GetPlatformResWithLock(labelVersion, labelShortSocVersion, socVersionStr);
+    CXT_ASCENDC_LOGD("hwx1072830 labelVersion is %s, labelShortSocVersion is %s, socVersionStr is %s.",
+                     labelVersion.c_str(), labelShortSocVersion.c_str(), socVersionStr.c_str());
     if (!retCode) {
         ASCENDC_ASSERT(
             false, return *this, CXT_ASCENDC_LOGE("get platform short version failed, socVersion is %s", socVersion));
