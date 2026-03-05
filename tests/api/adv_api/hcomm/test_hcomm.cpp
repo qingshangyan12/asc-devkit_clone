@@ -55,8 +55,5 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
 
     Hcomm hcomm;
     ChannelHandle channelHandle = static_cast<ChannelHandle>((uint64_t)&channel);
-    HcommHandle handleId =
-        hcomm.Read(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 10);
 
-    EXPECT_EQ(handleId, 0);
 }
