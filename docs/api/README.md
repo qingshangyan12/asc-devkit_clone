@@ -2634,11 +2634,6 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 <td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p119172054133314"><a name="p119172054133314"></a><a name="p119172054133314"></a>获取输入数据x与2的n次方的乘积。</p>
 </td>
 </tr>
-<tr id="row178323439144"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p7832443201414"><a name="p7832443201414"></a><a name="p7832443201414"></a><a href="context\zh-cn_topic_0000002501758908.md">modff</a></p>
-</td>
-<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p883214361417"><a name="p883214361417"></a><a name="p883214361417"></a><span>将输入数据分解为小数部分和整数部分</span>。</p>
-</td>
-</tr>
 </tbody>
 </table>
 
