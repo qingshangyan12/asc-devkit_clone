@@ -51,8 +51,8 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
     channel.sqContextAddr->ctx.rdmaSqContext.sl = 1;
     channel.sqContextAddr->ctx.rdmaSqContext.dbVa = 0x4000;
     channel.sqContextAddr->ctx.rdmaSqContext.dbMode = 0;
-    channel.remoteBuffAddr->pti.rdmaMemProtectionInfo.rkey = 123456;
-    channel.localBuffAddr->pti.rdmaMemProtectionInfo.lkey = 654321;
+    channel.remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey = 123456;
+    channel.localBufferAddr->pti.rdmaMemProtectionInfo.lkey = 654321;
 
     Hcomm hcomm;
     ChannelHandle channelHandle = static_cast<ChannelHandle>((uint64_t)&channel);
