@@ -25,7 +25,7 @@
 
 - 算子功能：  
 
-  本样例中实现的是[M, N, K]固定为[128, 128, 256]的Matmul乘算子，对应的数学表达式为：
+  本样例中实现的是[M, N, K]固定为[128, 256, 128]的Matmul乘算子，对应的数学表达式为：
   ```
   C = A * B
   ```
@@ -41,7 +41,7 @@
   <tr><td align="center">B</td><td align="center">(128, 256)</td><td align="center">half</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">C</td><td align="center">(128, 128)</td><td align="center">int8_t</td><td align="center">ND/NZ</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">C</td><td align="center">(128, 256)</td><td align="center">int8_t</td><td align="center">ND/NZ</td></tr>
   </table>
 此用例支持配置使用AscendC提供的组合AIP Fixpipe或基础API DataCopy，用户可以通过配置USEDATACOPY=true使能基础API DataCopy实现矩阵搬出，与此同时此样例支持FIXPIPE指令多种随路能力组合：<br>
 配置OUTPUTFORMAT=1设置C矩阵为ND输出，即使能FIXPIPE指令随路NZ2ND能力；<br>
