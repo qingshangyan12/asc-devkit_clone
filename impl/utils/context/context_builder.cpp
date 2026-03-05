@@ -301,9 +301,11 @@ ContextBuilder &ContextBuilder::AddPlatformInfo(const char *customSocVersion)
     }
 
     static fe::PlatFormInfos platformInfoIns;
-    fe::PlatformInfoManager::GeInstance().InitRuntimePlatformInfos(std::string(socVersion));
+    fe::PlatformInfoManager::Instance().InitRuntimePlatformInfos(std::string(socVersion));
     fe::OptionalInfos optionalInfos;
-    fe::PlatformInfoManager::GeInstance().GetPlatformInfos(std::string(socVersion), platformInfoIns, optionalInfos);
+
+    fe::PlatformInfoManager::Instance().GetPlatformInstanceByDevice(0, platformInfoIns);
+    CXT_ASCENDC_LOGD("hwx1072830 platformInfoIns address is %p.", (void*)&platformInfoIns);
     std::string socVersionStr;
     const auto retCode = platformInfoIns.GetPlatformResWithLock(labelVersion, labelShortSocVersion, socVersionStr);
     if (!retCode) {
