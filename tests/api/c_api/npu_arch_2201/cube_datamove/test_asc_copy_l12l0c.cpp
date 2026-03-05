@@ -51,7 +51,7 @@ TEST_F(TEST_COPY_L1_TO_L0C, TEST_COPY_L1_TO_L0C_##src_dtype##dst_dtype)         
     uint16_t srcStride = static_cast<uint16_t>(55);                                             \
     uint16_t dstStride = static_cast<uint16_t>(66);                                             \
                                                                                                 \
-    asc_copy_l12l0c(dst, src, start_index, repeat, src_stride, dst_gap);                        \
+    asc_copy_l12l0c(dst, src, nBurst, lenBurst, srcStride, dstStride);                        \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                 \
@@ -70,7 +70,7 @@ TEST_F(TEST_COPY_L1_TO_L0C, TEST_COPY_L1_TO_L0C_SYNC_##src_dtype##dst_dtype)    
     uint16_t srcStride = static_cast<uint16_t>(55);                                             \
     uint16_t dstStride = static_cast<uint16_t>(66);                                             \
                                                                                                 \
-    asc_copy_l12l0c_sync(dst, src, start_index, repeat, src_stride, dst_gap);                        \
+    asc_copy_l12l0c_sync(dst, src, nBurst, lenBurst, srcStride, dstStride);                        \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
