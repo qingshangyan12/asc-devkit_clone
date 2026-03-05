@@ -13,6 +13,12 @@
  * \brief
  */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/math/isfinite/is_finite_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/math/is_finite.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ISFINITE_IS_FINITE_COMMON_IMPL_H
+#endif
 #ifndef LIB_MATH_IS_FINITE_IMPL_H
 #define LIB_MATH_IS_FINITE_IMPL_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
@@ -120,3 +126,8 @@ __aicore__ inline void IsFiniteImpl(const LocalTensor<U>& dst, const LocalTensor
 }  // namespace AscendC
 #endif
 #endif  // IMPL_MATH_ISFINITE_ISFINITE_COMMON_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ISFINITE_IS_FINITE_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ISFINITE_IS_FINITE_COMMON_IMPL_H
+#endif
