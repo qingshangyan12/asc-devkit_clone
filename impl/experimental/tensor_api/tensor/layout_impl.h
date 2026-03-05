@@ -17,9 +17,8 @@
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_method.h"
-#include "impl/experimental/tensor_api/tensor/layout_fractal.h"
-#include "impl/experimental/tensor_api/tensor/layout_size.h"
 #include "impl/experimental/tensor_api/tensor/coord_index.h"
+#include "impl/experimental/tensor_api/tensor/layout_fractal.h"
 
 namespace AscendC {
 namespace Te {

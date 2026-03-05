@@ -17,6 +17,7 @@
 
 #include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
 #include "impl/experimental/tensor_api/tensor/pointer_mem_impl.h"
+#include "impl/experimental/tensor_api/tensor/engine_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -96,6 +97,7 @@ __aicore__ inline constexpr auto MakeFixbufmemPtr(const U& byteOffset) {
     return MakeFixbufmemPtr(reinterpret_cast<__fbuf__ T*>(get_imm(0) + byteOffset));
 }
 
-}
-}
-#endif
+} // namespace Te
+} // namespace AscendC
+
+#endif // IMPL_TENSOR_API_TENSOR_POINTER_IMPL_H
