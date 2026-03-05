@@ -15,9 +15,9 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_QUANT_L0C2GM_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_QUANT_L0C2GM_H
 
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_nz2dn_l0c2gm.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_nz2nd_l0c2gm.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_nz2nz_l0c2gm.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2gm/fixpipe_quant_nz2dn_l0c2gm.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2gm/fixpipe_quant_nz2nd_l0c2gm.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2gm/fixpipe_quant_nz2nz_l0c2gm.h"
 
 namespace AscendC {
 namespace Te {
