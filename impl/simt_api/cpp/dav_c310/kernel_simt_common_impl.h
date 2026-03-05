@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
  * \file kernel_simt_common_impl.h
  * \brief
  */
-#ifndef ASCENDC_MODULE_SIMT_COMMON_IMPL_H
-#define ASCENDC_MODULE_SIMT_COMMON_IMPL_H
+#ifndef IMPL_SIMT_API_CPP_DAV_C310_KERNEL_SIMT_COMMON_IMPL_H
+#define IMPL_SIMT_API_CPP_DAV_C310_KERNEL_SIMT_COMMON_IMPL_H
 
 #include "impl/simt_api/cpp/dav_c310/kernel_simt_cmp_impl.h"
 
@@ -108,7 +108,7 @@ __aicore__ inline uint32_t GetBf16U16(float f32, uint32_t u16, uint32_t u32, uin
     uint32_t carryOutBit = 0x10000;
     uint32_t topU32 = (u32 & ConstantsInternal::HIGH_16_BIT) + carryOutBit;
     uint32_t botU32 = (u32 & ConstantsInternal::HIGH_16_BIT);
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     if (rnd == RoundMode::CAST_EVEN) {
         if (topU32 - u32 > u32 - botU32) {
             u16 = botU32 >> ConstantsInternal::U16_BIT;
@@ -136,7 +136,7 @@ __aicore__ inline uint32_t GetBf16U16(float f32, uint32_t u16, uint32_t u32, uin
         } else {
             u16 = botU32 >> ConstantsInternal::U16_BIT;
         }
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     } else if (rnd == RoundMode::CAST_ZERO) {
         u16 = botU32 >> ConstantsInternal::U16_BIT;
 #endif
@@ -199,7 +199,7 @@ __aicore__ inline half F32Tof16(float f32, RoundMode rnd)
     uint32_t botManU32 = (f32ManU32 >> disBitLen) << disBitLen;
     uint32_t topManU32 = botManU32 + (1 << disBitLen);
     bool isCarryOut = false;
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     if (rnd == RoundMode::CAST_EVEN) {
         uint32_t midBit = 1 << (disBitLen - 1);
         if (topManU32 - f32ManU32 < midBit) {
@@ -499,11 +499,11 @@ template <typename DstType, typename SrcType>
 __aicore__ inline DstType Rint_(SrcType x)
 {
     if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<bfloat16_t, float>>()) {
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         return F32ToBf16(x, RoundMode::CAST_EVEN, false);
 #endif
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         return F32Tof16(x, RoundMode::CAST_EVEN);
 #endif
     } else {
@@ -538,11 +538,11 @@ template <typename DstType, typename SrcType>
 __aicore__ inline DstType Rint_(SrcType x)
 {
     if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<bfloat16_t, float>>()) {
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         return F32ToBf16(x, RoundMode::CAST_EVEN, false);
 #endif
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         return F32Tof16(x, RoundMode::CAST_EVEN);
 #endif
     } else {
@@ -652,11 +652,11 @@ template <typename DstType, typename SrcType>
 __aicore__ inline DstType Trunc_(SrcType x)
 {
     if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<bfloat16_t, float>>()) {
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         return F32ToBf16(x, RoundMode::CAST_ZERO, false);
 #endif
     } else if constexpr (SupportType<Tuple<DstType, SrcType>, Tuple<half, float>>()) {
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         return F32Tof16(x, RoundMode::CAST_ZERO);
 #endif
     } else {
@@ -704,4 +704,4 @@ __aicore__ inline DstType CastNone_(SrcType x)
 
 }  // namespace Simt
 }  // namespace AscendC
-#endif  // ASCENDC_MODULE_SIMT_COMMON_IMPL_H
+#endif  // IMPL_SIMT_API_CPP_DAV_C310_KERNEL_SIMT_COMMON_IMPL_H

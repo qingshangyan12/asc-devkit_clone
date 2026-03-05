@@ -114,6 +114,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_shiftleft](vector_compute/asc_shiftleft.md) | 将所有元素左移distance位。 |
 | [asc_sub_relu](vector_compute/asc_sub_relu.md) | 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
 | [asc_transto5hd](vector_compute/asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
+| [asc_pair_reduce_sum](vector_compute/asc_pair_reduce_sum.md) | 对输入数据做归约操作，得到数据总和。 |
 | [asc_copy](vector_compute/asc_copy.md) | 将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。 |
 
 
@@ -144,9 +145,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_l13d_padding](cube_datamove/asc_set_l13d_padding.md)           | 设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。 |
 | [asc_copy_ub2ub](vector_datamove/asc_copy_ub2ub.md) | 将数据从Unified Buffer搬运到Unified Buffer。 |
 | [asc_copy_gm2ub](vector_datamove/asc_copy_gm2ub.md)                     | 将数据从Global Memory搬运到 Unified Buffer。 |
-| [asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align.md)         | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到 Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
+| [asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align)         | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到 Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
 | [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm.md)                     | 将数据从Unified Buffer搬运到 Global Memory。 |
-| [asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align.md)         | 将数据从Unified Buffer搬运到 Global Memory，支持8位/16位/32位分块拷贝操作。 |
+| [asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align)         | 将数据从Unified Buffer搬运到 Global Memory，支持8位/16位/32位分块拷贝操作。 |
 
 ## 维测接口
 |   API名称   |   说明   |
@@ -200,6 +201,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sync_mte3](sync/asc_sync_mte3.md)| 等待PIPE_MTE3流水完成。 |
 | [asc_sync_mte2](sync/asc_sync_mte2.md)| 等待PIPE_MTE2流水完成。 |
 | [asc_sync_data_barrier](sync/asc_sync_data_barrier.md) | 用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。 |
+| [asc_sync_block_arrive](sync/asc_sync_block_arrive.md) | 该指令用于发送同步信息数据到核间同步寄存器，设置同步点。 |
+| [asc_sync_block_wait](sync/asc_sync_block_wait.md) | 和[asc_sync_block_arrive](asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。 |
 
 
 ## 系统变量
@@ -219,6 +222,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_get_system_cycle](sys_var/asc_get_system_cycle.md) | 获取当前系统cycle数。 |
 | [asc_get_arch_ver](sys_var/asc_get_arch_ver.md) | 获取当前AI处理器架构版本号。 |
 | [asc_get_program_counter](sys_var/asc_get_program_counter.md) | 获取程序计数器的指针，程序计数器用于记录当前程序执行的位置。 |
+| [asc_get_ffts_base_addr](sys_var/asc_get_ffts_base_addr.md) | 获取核间同步寄存器的基地址。 |
+| [asc_set_ffts_base_addr](sys_var/asc_set_ffts_base_addr.md) | 在[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)和[asc_sync_block_wait](sync/asc_sync_block_wait.md)之前使用，设置核间同步寄存器的基地址。 |
 
 
 ## 缓存控制

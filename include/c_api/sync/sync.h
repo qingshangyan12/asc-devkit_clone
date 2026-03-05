@@ -21,7 +21,7 @@
 
 #include "instr_impl/npu_arch_2201/sync_impl.h"
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 #include "instr_impl/npu_arch_3510/sync_impl.h"
 
@@ -44,6 +44,8 @@ __aicore__ inline void asc_sync();
 __aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint8_t mode, int64_t flagID);
 
 __aicore__ inline void asc_sync_block_wait(int64_t flagID);
+
+__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
 #endif
 

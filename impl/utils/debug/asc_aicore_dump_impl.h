@@ -21,13 +21,14 @@
 #warning "asc_aicore_dump_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
 #endif
 
-#include "impl/utils/debug/asc_utils_macros.h"
+#include "impl/utils/sys_macros.h"
+#include "impl/utils/common_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
 #include "impl/utils/debug/asc_debug_utils.h"
 
 #if __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_dump_utils.h"
-#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
 #endif
 
