@@ -16,7 +16,7 @@
 template <typename DTYPE>
 __aicore__ inline void copy_matrix_cc_to_cbuf_b4_stub(__cbuf__ void* dst, __cc__ DTYPE* src, uint8_t sid, uint16_t NSize,
                                                     uint16_t MSize, uint32_t dstStride_dst_D, uint16_t srcStride,
-                                                    uint8_t UintFlagMode, uint64_t QuantPRE, uint8_t ReLUPRE,
+                                                    uint8_t UintFlagMode, QuantMode_t QuantPRE, uint8_t ReLUPRE,
                                                     bool channelSplit, bool NZ2ND_EN) {
     EXPECT_EQ(dst, reinterpret_cast<__cbuf__ void *>(11));
     EXPECT_EQ(src, reinterpret_cast<__cc__ DTYPE *>(22));
@@ -47,7 +47,7 @@ protected:
 TEST_F(TEST_COPY_L0C_TO_L1, TEST_COPY_L0C_TO_L1_##dtype)               \
 {                                                                                     \
     MOCKER_CPP(copy_matrix_cc_to_cbuf_b4, void(__cbuf__ void*, __cc__ dtype*, uint8_t, uint16_t,  \
-                uint16_t, uint32_t, uint16_t, uint8_t, uint64_t, uint8_t, bool, bool))          \
+                uint16_t, uint32_t, uint16_t, uint8_t, QuantMode_t, uint8_t, bool, bool))          \
             .times(1)                                                                           \
             .will(invoke(copy_matrix_cc_to_cbuf_b4_stub<dtype>));                               \
                                                                                                 \
@@ -59,7 +59,7 @@ TEST_F(TEST_COPY_L0C_TO_L1, TEST_COPY_L0C_TO_L1_##dtype)               \
     uint32_t dstStride_dst_D = static_cast<uint32_t>(55);                                      \
     uint16_t srcStride = static_cast<uint16_t>(66);                                             \
     uint8_t UintFlagMode = static_cast<uint8_t>(77);                                            \
-    uint16_t QuantPRE = static_cast<uint16_t>(88);                                               \
+    QuantMode_t QuantPRE = static_cast<QuantMode_t>(88);                                               \
     uint8_t ReLUPRE = static_cast<uint8_t>(99);                                                 \
     bool channelSplit = static_cast<bool>(true);                                                 \
     bool NZ2ND_EN = static_cast<bool>(true);                                                    \
@@ -72,7 +72,7 @@ TEST_F(TEST_COPY_L0C_TO_L1, TEST_COPY_L0C_TO_L1_##dtype)               \
 TEST_F(TEST_COPY_L0C_TO_L1, TEST_COPY_L0C_TO_L1_SYNC_##dtype)                                       \
 {                                                                                              \
     MOCKER_CPP(copy_matrix_cc_to_cbuf_b4, void(__cbuf__ void*, __cc__ dtype*, uint8_t, uint16_t,  \
-                uint16_t, uint32_t, uint16_t, uint8_t, uint64_t, uint8_t, bool, bool))          \
+                uint16_t, uint32_t, uint16_t, uint8_t, QuantMode_t, uint8_t, bool, bool))          \
             .times(1)                                                                           \
             .will(invoke(copy_matrix_cc_to_cbuf_b4_stub<dtype>));                               \
                                                                                                 \
@@ -84,7 +84,7 @@ TEST_F(TEST_COPY_L0C_TO_L1, TEST_COPY_L0C_TO_L1_SYNC_##dtype)                   
     uint32_t dstStride_dst_D = static_cast<uint32_t>(55);                                      \
     uint16_t srcStride = static_cast<uint16_t>(66);                                             \
     uint8_t UintFlagMode = static_cast<uint8_t>(77);                                            \
-    uint16_t QuantPRE = static_cast<uint16_t>(88);                                               \
+    QuantMode_t QuantPRE = static_cast<QuantMode_t>(88);                                               \
     uint8_t ReLUPRE = static_cast<uint8_t>(99);                                                 \
     bool channelSplit = static_cast<bool>(true);                                                 \
     bool NZ2ND_EN = static_cast<bool>(true);                                                    \
