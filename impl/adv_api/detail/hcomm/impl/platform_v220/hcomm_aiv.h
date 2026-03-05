@@ -26,7 +26,6 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
                                                                                       uint64_t len)
 {
     HcommHandle handleId = ++curHandleId_;
-    doorBell(channelHandle, dst, src, len);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Write finish handleId:%u", handleId);
     return handleId;
 }
@@ -37,7 +36,6 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
                                                                                      uint64_t len)
 {
     HcommHandle handleId = ++curHandleId_;
-    doorBell(channelHandle, dst, src, len);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Read finish andleId:%u", handleId);
     return handleId;
 }
