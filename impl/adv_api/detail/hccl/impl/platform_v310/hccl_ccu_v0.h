@@ -450,9 +450,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     ASCENDC_HCCL_API_ASSERT(isInited_, { return; },
     "Call Commit failed, please ensure Hccl::Init func has been called successfully already!");
 
-    ASCENDC_HCCL_API_ASSERT(handleId > INVALID_HANDLE_ID && handleId < HCCL_MAX_HANDLE_ID, { return; },
-        "Call Commit failed, handleId is[%d], expected in range of [0, %d).", handleId, HCCL_MAX_HANDLE_ID);
-
     if (unlikely(handleId >= HCCL_MAX_HANDLE_ID || handleId <= INVALID_HANDLE_ID)) {
         KERNEL_LOG(KERNEL_ERROR,  "Call Commit failed, handleId[%u] is invalid.", handleId);
         return;
@@ -474,8 +471,6 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         "Call Wait failed, please ensure Hccl::Init func has been called successfully already!");
     ASCENDC_HCCL_API_ASSERT(handleCommitCnt_[handleId] > 0, { return HCCL_FAILED; },
         "Call Wait failed,  commitCnt [%u] is invalid.", handleCommitCnt_[handleId]);
-    ASCENDC_HCCL_API_ASSERT(handleId >INVALID_HANDLE_ID && handleId < HCCL_MAX_HANDLE_ID, { return HCCL_FAILED; },
-        "Call Wait failed,  chandleId is[%d], expected in range of [0, %d).", handleId, HCCL_MAX_HANDLE_ID);
     ASCENDC_HCCL_API_ASSERT(handleId < curHandleId_, { return HCCL_FAILED; },
         "Call Wait failed,  handleId = %u is invalid please call Preapre Interface before Wait.", handleId);
 

@@ -384,7 +384,7 @@ TEST_F(HcclSuiteAIC, AllReduce_CcuAllReduceMeshMem2Mem1D)
     Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
     hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
     HcclHandle handleId = hccl.AllReduce(reinterpret_cast<__gm__ uint8_t*>(0x11),
-                                         reinterpret_cast<__gm__ uint8_t*>(0x11), 100,
+                                         reinterpret_cast<__gm__ uint8_t*>(0x11), 4,
                                          HcclDataType::HCCL_DATA_TYPE_INT8,
                                          HcclReduceOp::HCCL_REDUCE_SUM, 1);
     hccl.Commit(handleId);
