@@ -50,13 +50,24 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
     channel.sqContextAddr = sqContext.get();
     channel.sqContextAddr->type = 0; // RDMA
     channel.sqContextAddr->ctx.rdmaSqContext.qpn = 1;
-    channel.sqContextAddr->ctx.rdmaSqContext.sqVa = 0x1000;
+    
+    // 分配实际内存
+    uint8_t* sqBuffer = new uint8_t[10 * 10]; // 10个wqe，每个wqe大小为10
+    channel.sqContextAddr->ctx.rdmaSqContext.sqVa = reinterpret_cast<uint64_t>(sqBuffer);
     channel.sqContextAddr->ctx.rdmaSqContext.wqeSize = 10;
     channel.sqContextAddr->ctx.rdmaSqContext.depth = 10;
-    channel.sqContextAddr->ctx.rdmaSqContext.headAddr = 0x2000;
-    channel.sqContextAddr->ctx.rdmaSqContext.tailAddr = 0x3000;
+    
+    // 分配head和tail内存
+    uint32_t* head = new uint32_t(0);
+    uint32_t* tail = new uint32_t(0);
+    channel.sqContextAddr->ctx.rdmaSqContext.headAddr = reinterpret_cast<uint64_t>(head);
+    channel.sqContextAddr->ctx.rdmaSqContext.tailAddr = reinterpret_cast<uint64_t>(tail);
+    
     channel.sqContextAddr->ctx.rdmaSqContext.sl = 1;
-    channel.sqContextAddr->ctx.rdmaSqContext.dbVa = 0x4000;
+    
+    // 分配doorbell内存
+    uint64_t* dbBuffer = new uint64_t(0);
+    channel.sqContextAddr->ctx.rdmaSqContext.dbVa = reinterpret_cast<uint64_t>(dbBuffer);
     channel.sqContextAddr->ctx.rdmaSqContext.dbMode = 0;
 
     // 为 Buffer 相关字段分配内存并设置
@@ -81,4 +92,10 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
                                      1);
 
     EXPECT_EQ(handleId, 0);
+    
+    // 释放内存
+    delete[] sqBuffer;
+    delete head;
+    delete tail;
+    delete dbBuffer;
 }

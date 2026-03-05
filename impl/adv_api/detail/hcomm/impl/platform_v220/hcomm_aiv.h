@@ -48,9 +48,26 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
 {
     __gm__ Channel* channelPtr = (__gm__ Channel*)channelHandle;
     auto qpNum = channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn;
+    auto sqBaseAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.sqVa;
+    auto wqeSize = channelPtr->sqContextAddr->ctx.rdmaSqContext.wqeSize;
+    auto curHardwareHead = channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr;
+    cacheWriteThrough(reinterpret_cast<__gm__ uint8_t*>(curHardwareHead), 8);
+    uint64_t curHead = *(__gm__ uint32_t*)(curHardwareHead);
 
+    auto curHardwareTailAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr;
+    uint64_t shift = 15U;
+    auto qpDepth = channelPtr->sqContextAddr->ctx.rdmaSqContext.depth;
 
+    KERNEL_LOG(KERNEL_ERROR, "Hcomm doorBell qpNum = %d, sqBaseAddr = %p, wqeSize = %d, curHead = %d, qpDepth = %d",
+               qpNum, sqBaseAddr, wqeSize, curHead, qpDepth);
 
+    // Make sure we don't overflow the SQ in an infinite loop - no need to mitigate endless loop as the host
+    // will timeout and kill the kernel, same as all2all krenel if it fails to complete (e.g. in case of link loss)
+
+    __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % qpDepth));
+    KERNEL_LOG(KERNEL_ERROR, "Hcomm doorBell wqeAddr = %p", wqeAddr);
+
+    
 }
 
 } // namespace AscendC
