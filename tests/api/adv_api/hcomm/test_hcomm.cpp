@@ -53,7 +53,6 @@ TEST_F(HcommCommonTestSuite, Aiv_Read)
     channel.remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey = 123456;
     channel.localBufferAddr->pti.rdmaMemProtectionInfo.lkey = 654321;
 
-    Hcomm hcomm;
-    ChannelHandle channelHandle = static_cast<ChannelHandle>((uint64_t)&channel);
+
 
 }
