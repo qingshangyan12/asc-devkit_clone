@@ -29,9 +29,5 @@ target_link_libraries(demo PRIVATE
 message(STATUS "[INFO] DT_MODE is ${DT_MODE}")
 
 target_compile_options(demo PRIVATE
-<<<<<<< HEAD
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3101>
-=======
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
->>>>>>> master
 )

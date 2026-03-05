@@ -321,11 +321,7 @@ public:
     uint8_t* cpuL0C = nullptr;
     uint8_t* cpuBIAS = nullptr;
     uint8_t* cpuFIXBUF = nullptr;
-<<<<<<< HEAD
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-=======
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
->>>>>>> master
     uint8_t* cpuSSbuf = nullptr;
 #endif
     std::map<Hardware, uint8_t*> hardwareCpuBufferMap;
@@ -334,30 +330,6 @@ private:
     std::set<Hardware> allocatorUsed;
 
     ConstDefiner()
-<<<<<<< HEAD
-    {
-        if (cpuGM == nullptr) {
-            Allocate();
-        }
-        hardwareCpuBufferMap = {
-            { Hardware::UB, cpuUB }, { Hardware::L1, cpuL1 }, { Hardware::L0A, cpuL0A },
-            { Hardware::L0B, cpuL0B }, { Hardware::L0C, cpuL0C }, { Hardware::BIAS, cpuBIAS },
-            { Hardware::FIXBUF, cpuFIXBUF }
-        };
-    }
-
-    ~ConstDefiner()
-    {
-        Free();
-    }
-
-public:
-#if defined(__NPU_ARCH__) &&                                                                                    \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
-	 (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101))
-    void Allocate()
-=======
->>>>>>> master
     {
         if (cpuGM == nullptr) {
             Allocate();
@@ -474,11 +446,7 @@ public:
         safeDelete(cpuL0C);
         safeDelete(cpuBIAS);
         safeDelete(cpuFIXBUF);
-<<<<<<< HEAD
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-=======
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
->>>>>>> master
         if (cpuSSbuf != nullptr) {
             if (g_kernelMode == KernelMode::MIX_MODE) {
                 if (g_coreType == AscendC::MIX && block_idx == 0 && sub_block_idx == 0) {

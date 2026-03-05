@@ -73,11 +73,7 @@ public:
     {
         FreeMessageImpl(msg);
     }
-<<<<<<< HEAD
- 
-=======
 
->>>>>>> master
     // 310没有L1-GM通道, 改为scalar写gm，dcci
     __aicore__ inline void FreeUB(int32_t addr)
     {

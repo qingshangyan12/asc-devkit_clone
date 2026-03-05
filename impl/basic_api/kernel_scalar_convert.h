@@ -21,11 +21,7 @@
 namespace AscendC {
 #if defined(__NPU_ARCH__) &&                                    \
         ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||    \
-<<<<<<< HEAD
-         (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-=======
          (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
->>>>>>> master
 __aicore__ inline bfloat16_t Cast(const float& fVal)
 {
     constexpr uint32_t fp32SignIdx = 31;
@@ -83,11 +79,7 @@ __aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
     return Cast(fVal);
 }
 
-<<<<<<< HEAD
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-=======
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
->>>>>>> master
 template <typename T, typename U = float,
           typename = Std::enable_if_t<
           (Std::is_same<T, bfloat16_t>::value || Std::is_same<T, hifloat8_t>::value ||

@@ -225,11 +225,7 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
 }
 
 #if ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||            \
-<<<<<<< HEAD
-     (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
-=======
      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
->>>>>>> master
 // cce compiler process load3d bfloat16_t using B8, so use the half dtype instead
 template <const IsResetLoad3dConfig& defaultConfig>
 [[deprecated("NOTICE: LoadData<IsResetLoad3dConfig> has been deprecated and will be removed in the next version."

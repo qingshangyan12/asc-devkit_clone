@@ -21,11 +21,7 @@
 
 #include "instr_impl/npu_arch_2201/cache_ctrl_impl.h"
 
-<<<<<<< HEAD
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-=======
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
->>>>>>> master
 
 #include "instr_impl/npu_arch_3510/cache_ctrl_impl.h"
 
@@ -59,11 +55,7 @@ __aicore__ inline void asc_dcci_single_ub(__gm__ void* dst);
 
 __aicore__ inline void asc_dcci_entire_ub(__gm__ void* dst);
 
-<<<<<<< HEAD
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
-=======
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
->>>>>>> master
 
 #endif
 

@@ -118,15 +118,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rsqrtf(float x)
     return 1.0f / sqrtf(x);
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool is_inf(float x)
-{
-    uint32_t* intX = (uint32_t*)&x;
-    return (*intX == 0x7F800000) || (*intX == 0xFF800000);
-}
-
-=======
->>>>>>> master
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdfinvf(float x)
 {
     float double_x = x + x;
@@ -170,9 +161,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdfinvf(float x)
     return result;
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float modff(float x, float &n)
-=======
 #define __INTERNAL_MODFF(x, n)                                  \
     do {                                                        \
         float abs_x = fabsf(x);                                 \
@@ -217,7 +205,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float modff(float x, float *n)
 #ifdef __NPU_ARCH__
 #ifndef ASCENDC_CPU_DEBUG
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float modff(float x, __ubuf__ float *n)
->>>>>>> master
 {
     __INTERNAL_MODFF(x, n);
 }
@@ -570,11 +557,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fminf(float x, float y)
     return __fminf(x, y);
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float payne_hanek_radian_reduction(float x, int *output_quadrant)
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_payne_hanek_radian_reduction(float x, int *output_quadrant)
->>>>>>> master
 {
     // Step 1: Extract raw bits of the input angle
     uint32_t input_bits = reinterpret_cast<uint32_t &>(x);
@@ -640,11 +623,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_payne_hanek_radian_reduct
     return reduced_angle;
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cody_waite_radian_reduction(float x, int *quadrant)
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cody_waite_radian_reduction(float x, int *quadrant)
->>>>>>> master
 {
     float y = fmaf(x, 0.636619747f, 12582912.0f);    // 0.636619747f: 2/pi
     *quadrant = reinterpret_cast<int &>(y);
@@ -664,11 +643,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_trig_radian_reduction(flo
     }
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float tan_poly(float x)
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_tan_poly(float x)
->>>>>>> master
 {
     x = x * x;
     float y = fmaf(x, 4.38117981e-3f, 8.94600598e-5f);  // 4.38117981e-3f: 8.94600598e-5f:
@@ -842,11 +817,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanhf(float x)
     return logf((1.0f + x) / (1.0f - x)) / 2.0f;
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cos_poly(float x)
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cos_poly(float x)
->>>>>>> master
 {
     x = x * x;
     float y = fmaf(x, 2.44677067e-5f, -1.38877297e-3f); // 2.44677067e-5f: 1/8! -1.38877297e-3f: -1/6!
@@ -855,11 +826,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cos_poly(float x)
     return fmaf(x, y, 1.00000000e+0f); //  1.00000000e+0f: 1
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sin_poly(float x)
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sin_poly(float x)
->>>>>>> master
 {
     float y = x * x;
     float m = fmaf(x, y, 0.0f);
@@ -1019,9 +986,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
     }
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float &s, float &c)
-=======
 #define __INTERNAL_SINCOSF(x, s, c)                                                 \
     do {                                                                            \
         int quadrant;                                                               \
@@ -1043,14 +1007,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float &s, float &c)
     } while (0)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float *s, float *c)
->>>>>>> master
 {
     __INTERNAL_SINCOSF(x, s, c);
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, float &s, float &c)
-=======
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifdef __NPU_ARCH__
 #ifndef ASCENDC_CPU_DEBUG
@@ -1090,7 +1050,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, __ubuf__ float *s, _
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, __ubuf__ float *s, __gm__ float *c)
->>>>>>> master
 {
     __INTERNAL_SINCOSF(x, s, c);
 }
@@ -1208,11 +1167,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, __ubuf__ int *exp)
     __INTERNAL_FREXPF(x, exp);
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, int &exp)
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, __gm__ int *exp)
->>>>>>> master
 {
     __INTERNAL_FREXPF(x, exp);
 }
@@ -1327,8 +1282,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, 
     return 1.0f / norm4df(a, b, c, d);
 }
 
-<<<<<<< HEAD
-=======
 #define __INTERNAL_NORMF(n, a)                              \
     do {                                                    \
         if ((n) <= 0) {                                     \
@@ -1364,7 +1317,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, float* a)
     __INTERNAL_NORMF(n, a);
 }
 
->>>>>>> master
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifdef __NPU_ARCH__
 #ifndef ASCENDC_CPU_DEBUG
@@ -1849,11 +1801,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_compute_ln(float x)
     return y;
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float euler_gamma_function(float x)
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_euler_gamma_function(float x)
->>>>>>> master
 {
     float frac = x - nearbyintf(x);
     //  1/gamma(x + 1)
@@ -1936,11 +1884,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cal_y(float abs_x, float 
     return y;
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float stirling_and_euler_reflection(float x)
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_stirling_and_euler_reflection(float x)
->>>>>>> master
 {
     float abs_x = __internal_cal_abs_x(x);
 
@@ -3017,54 +2961,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y)
     return x / y;
 }
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline long int labs(long int x)
-{
-    return abs(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llabs(long long int x)
-{
-    return abs(x);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llmax(const long long int x, const long long int y)
-{
-    return max(x, y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int ullmax(const unsigned long long int x, const unsigned long long int y)
-{
-    return max(x, y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int umax(const unsigned int x, const unsigned int y)
-{
-    return max(x, y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llmin(const long long int x, const long long int y)
-{
-    return min(x, y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int ullmin(const unsigned long long int x, const unsigned long long int y)
-{
-    return min(x, y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int umin(const unsigned int x, const unsigned int y)
-{
-    return min(x, y);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y)
-{
-    return x / y;
-}
-
-=======
->>>>>>> master
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int signbit(float x)
 {
     return signbitf(x);

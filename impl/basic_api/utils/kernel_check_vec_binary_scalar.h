@@ -240,11 +240,7 @@ bool CheckFunVecBinaryScalar(const LocalTensor<T>& dst, const LocalTensor<T>& sr
     return CheckFunVecBinaryScalarImpl(chkParams, intriName);
 }
 
-<<<<<<< HEAD
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
-=======
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
->>>>>>> master
 template <const BinaryConfig &config, typename T, typename S>
 check::VecBinaryScalarApiParams BuildVecUnaryParamsPos0(const T& dstLocal, const S& src1,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)

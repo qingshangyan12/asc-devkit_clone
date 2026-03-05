@@ -123,11 +123,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x);
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float &s, float &c);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, float &s, float &c);
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float *s, float *c);
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincosf(float x, float *s, __ubuf__ float *c);
@@ -151,7 +146,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, __gm__ float *s, f
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, __gm__ float *s, __ubuf__ float *c);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, __gm__ float *s, __gm__ float *c);
 #endif
->>>>>>> master
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x);
 
@@ -159,15 +153,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x);
 
-<<<<<<< HEAD
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, int &exp);
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, int *exp);
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, __ubuf__ int *exp);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, __gm__ int *exp);
 #endif
->>>>>>> master
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp);
 
@@ -183,19 +173,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, f
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, float d);
 
-<<<<<<< HEAD
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, float* a);
->>>>>>> master
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, __ubuf__ float* a);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, __gm__ float* a);
 #endif
 
-<<<<<<< HEAD
-=======
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, float* a);
->>>>>>> master
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, __ubuf__ float* a);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, __gm__ float* a);

@@ -19,7 +19,7 @@
 #include "impl/utils/sys_macros.h"
 
 #if !defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     using fp4x2_e2m1_t = float4_e2m1x2_t;
     using fp4x2_e1m2_t = float4_e1m2x2_t;
     using fp8_e5m2_t = float8_e5m2_t;
@@ -33,9 +33,6 @@
     using fp8_e8m0_t = uint8_t;
 #endif
 #endif
-
-#include "impl/utils/sys_constants.h"
-#include "impl/utils/sys_macros.h"
 
 #define GM_ADDR __gm__ uint8_t*
 
@@ -107,7 +104,6 @@
 #define TPIPE_MAX_TYPE 4
 #endif
 
-<<<<<<< HEAD:impl/experimental/tensor_api/utils/macro_impl.h
 #if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
 #define SPLIT_CORE_CUBE
 #endif
@@ -116,8 +112,6 @@
 #define SPLIT_CORE_VEC
 #endif
 
-=======
->>>>>>> master:impl/experimental/tensor_api/utils/tensor_tile_macro.h
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #define ASCENDC_MATMUL_AICORE
 #endif

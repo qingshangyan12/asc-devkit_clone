@@ -45,19 +45,11 @@
 #define K_MAX_SHAPE_DIM 8
 #endif
 
-<<<<<<< HEAD
-#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
-#define SPLIT_CORE_CUBE
-#endif
-
-#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
-=======
 #if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
 #define SPLIT_CORE_CUBE
 #endif
 
 #if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
->>>>>>> master
 #define SPLIT_CORE_VEC
 #endif
 
