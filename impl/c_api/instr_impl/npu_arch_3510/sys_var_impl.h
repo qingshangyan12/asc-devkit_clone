@@ -17,6 +17,9 @@
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_block_num_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_system_cycle_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ctrl_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_channel_para_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l3d_rpt_b_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l12ub_loop1_stride_impl.h"
 
 __simd_callee__ inline int64_t asc_get_ar_spr()
 {
@@ -46,5 +49,20 @@ __aicore__ inline void asc_set_ctrl(uint64_t config)
 __aicore__ inline int64_t asc_get_ctrl()
 {
     return asc_get_ctrl_impl();
+}
+
+__aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config)
+{
+    asc_set_l0c2gm_channel_para_impl(config);
+}
+
+__aicore__ inline void asc_set_l3d_rpt_b(uint64_t config)
+{
+    asc_set_l3d_rpt_b_impl(config);
+}
+
+__aicore__ inline void asc_set_l12ub_loop1_stride(uint64_t config)
+{
+    asc_set_l12ub_loop1_stride_impl(config);
 }
 #endif

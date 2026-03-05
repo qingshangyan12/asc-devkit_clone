@@ -1,0 +1,37 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+#include <gtest/gtest.h>
+#include <mockcpp/mockcpp.hpp>
+#include "tests/api/c_api/stub/cce_stub.h"
+#include "include/c_api/asc_simd.h"
+
+class TestSysVarSetLoop1StrideL1toout : public testing::Test { 
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
+
+namespace {
+void set_loop1_stride_l1toout_stub(uint64_t config) {
+    EXPECT_EQ(config, 135);
+}
+}
+
+TEST_F(TestSysVarSetLoop1StrideL1toout, c_api_get_set_loop1_stride_l1toout_Succ)
+{
+    int64_t input = 135;
+    MOCKER_CPP(set_loop1_stride_l1toout, void(uint64_t)) 
+            .times(1)
+            .will(invoke(set_loop1_stride_l1toout_stub));
+    asc_set_l12ub_loop1_stride(input);
+    asc_init();
+    GlobalMockObject::verify();
+}
