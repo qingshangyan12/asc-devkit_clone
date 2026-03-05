@@ -49,6 +49,16 @@ TEST_F(TestTiling, GetShapeSize)
     EXPECT_EQ(ge::Shape({INT64_MIN, INT64_MAX}).GetShapeSize(), 0);
 }
 
+extern void platfrom_stub_set_chip_version(const char *num);
+
+TEST_F(TestTiling, TestPlatformAscendCMC32DM11A)
+{
+    fe::PlatFormInfos platform_info;
+    auto plat = platform_ascendc::PlatformAscendC(&platform_info);
+    platfrom_stub_set_chip_version("MC32DM11A");
+    EXPECT_EQ(plat.GetSocVersion(), platform_ascendc::SocVersion::MC32DM11A);
+}
+
 TEST_F(TestTiling, TestPlatformAscendCReserveLocalMemory)
 {
     fe::PlatFormInfos platform_info;
