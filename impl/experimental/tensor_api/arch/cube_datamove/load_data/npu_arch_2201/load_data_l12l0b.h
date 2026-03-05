@@ -173,8 +173,8 @@ private:
 
         auto srcRow = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout) * FRACTAL_FIXED;
         auto srcCol = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout) * C0_SIZE / sizeof(DstType);
-        auto indexRow = Std::get<1>(Std::get<0>(coord)) * FRACTAL_FIXED;
-        auto indexCol = Std::get<1>(Std::get<1>(coord)) * C0_SIZE / sizeof(DstType);
+        auto indexRow = Std::get<1>(coord) * FRACTAL_FIXED;
+        auto indexCol = Std::get<1>(coord) * C0_SIZE / sizeof(DstType);
         constexpr uint16_t fracNum = 2;
         uint16_t srcColNum = srcCol * sizeof(DstType) >> SHIFT_BLOCK_BYTE;
         uint16_t srcRowNum = srcRow >> (SHIFT_BLOCK_LEN + fracNum - 1);
