@@ -9,41 +9,14 @@
 */
 
 /*!
- * \file fixpipe_base.h
+ * \file instruction.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_BASE_H
-#define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_BASE_H
-
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_utils.h"
-#include "impl/experimental/tensor_api/arch/arch_utils.h"
-#include "impl/experimental/tensor_api/tensor/pointer_impl.h"
-#include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_INSTRUCTION_H
+#define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_INSTRUCTION_H
 
 namespace AscendC {
 namespace Te {
-constexpr uint32_t MAIN_LOOP_N_SIZE_3510 = 512;
-constexpr uint32_t CBURST_NUM_3510 = MAIN_LOOP_N_SIZE_3510 / BLOCK_CUBE;
-
-class CopyDeqTensorToFbuf3510 {
-public:
-    template <typename T>
-    __aicore__ inline void CopyDeqTensorToFbufImpl(const T& src, uint16_t calNSize, uint16_t nIterIndex)
-    {
-        auto dstAddr = reinterpret_cast<__fbuf__ uint64_t*>(AllocTempBuf(calNSize));
-        auto dst = MakeTensor(MakeFixbufmemPtr(dstAddr), src.Layout());
-        auto tileSrc = TileSrcTensor(src, calNSize, nIterIndex);
-        DataCopy(dst, tileSrc);
-        SetFpc(dstAddr);
-    }
-private:
-    template <typename T>
-    __aicore__ inline decltype(auto) TileSrcTensor(const T& src, uint16_t calNSize, uint16_t nIterIndex) {
-        auto coord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterIndex * MAIN_LOOP_N_SIZE_3510));
-        auto shape = MakeShape(1, calNSize);
-        return src(coord, shape);
-    }
-};
 
 class CopyMatrixCcToGmBase3510 {
 public:
@@ -146,4 +119,4 @@ private:
 }
 }
 
-#endif // IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_BASE_H
+#endif // IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_INSTRUCTION_H
