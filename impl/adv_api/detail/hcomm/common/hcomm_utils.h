@@ -16,20 +16,6 @@
 #define IMPL_HCOMM_UTIL_H
 
 namespace AscendC {
-__aicore__ inline void FlushGmDataCache(GlobalTensor<int64_t>& globalHcclMsgArea, __gm__ void* gmAddr)
-{
-    AscendC::Barrier();
-    globalHcclMsgArea.SetGlobalBuffer((__gm__ int64_t*)gmAddr);
-    __asm__("NOP");
-    DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(globalHcclMsgArea);
-    DataSyncBarrier<MemDsbT::ALL>();
-}
-
-__aicore__ inline void FlushGmDataCache(__gm__ void* gmAddr)
-{
-    GlobalTensor<int64_t> globalHcclMsgArea;
-    FlushGmDataCache(globalHcclMsgArea, gmAddr);
-}
 
 __aicore__ inline void CacheWriteThrough(__gm__ uint8_t* sourceAddr, uint64_t length)
 {
