@@ -33,6 +33,7 @@ typedef enum __asc_saturation_t {
 
 typedef unsigned short int __asc_fp8x2_storage_t;
 
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline hifloat8x2_t __float22hif82_rna(const float2 x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline hifloat8x2_t __float22hif82_rna_sat(const float2 x);
