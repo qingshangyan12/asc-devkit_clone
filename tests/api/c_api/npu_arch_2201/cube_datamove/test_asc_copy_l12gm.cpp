@@ -36,7 +36,6 @@ protected:
 
 TEST_F(TEST_COPY_L1_TO_GM, TEST_COPY_L1_TO_GM)
 {
-    using namespace AscendC::Te;
     MOCKER_CPP(copy_cbuf_to_gm, void(__gm__ void *, __cbuf__ void *, uint8_t, uint16_t,
              uint16_t, uint16_t, uint16_t))
             .times(1)
@@ -56,7 +55,6 @@ TEST_F(TEST_COPY_L1_TO_GM, TEST_COPY_L1_TO_GM)
 
 TEST_F(TEST_COPY_L1_TO_GM, TEST_COPY_L1_TO_GM_SYNC)
 {
-    using namespace AscendC::Te;
     MOCKER_CPP(copy_cbuf_to_gm, void(__gm__ void *, __cbuf__ void *, uint8_t, uint16_t,
              uint16_t, uint16_t, uint16_t))
             .times(1)
