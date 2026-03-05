@@ -113,6 +113,8 @@ public:
     std::shared_ptr<KernelRunContextHolder> BuildTilingContext();
 
 private:
+    void InitOptionalInfo(const std::string &soc_version, PlatFormInfos &platform_infos, OptionalInfo &optional_info,
+                          OptionalInfos &optional_infos) const;
     std::unique_ptr<ContextBuilderImpl> impl_;
 };
 }  // namespace context_ascendc
