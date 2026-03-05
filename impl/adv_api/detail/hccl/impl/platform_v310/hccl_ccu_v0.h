@@ -119,6 +119,24 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
 
 template<const auto &config>
 __aicore__ inline void
+HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitForSPR()
+{
+    if (workingFlag_) {
+        uint64_t phyAddr = 0;
+        if (g_coreType == AscendC::AIV) {
+            phyAddr = HW_BASE_ADDR + get_only_coreid() * HW_CORE_OFFSET +
+                HW_AIV_ADDR_OFFSET + HW_CORE_SUB_OFFSET + SPR_ID * SPR_OFFSET;
+        } else {
+            phyAddr = HW_BASE_ADDR + get_only_coreid() * HW_CORE_OFFSET + HW_CORE_SUB_OFFSET + SPR_ID * SPR_OFFSET;
+        }
+        set_ipc_scb_15(0x0);
+        WriteHBMData(hcclContext_->sprOffset, phyAddr);
+        WriteHBMData(hcclContext_->sprOffset + sizeof(uint64_t), HSCB_ADD);
+ 	}
+}
+
+template<const auto &config>
+__aicore__ inline void
 HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitInner(GM_ADDR context, HcclTilingVersion version)
 {
     ASCENDC_HCCL_API_ASSERT(context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
@@ -158,6 +176,10 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitInner(GM_ADDR contex
     for (uint8_t i = 0; i < CCU_MAX_MSG_NUM; ++i) {
         msgQueueIsAvailable_[i] = true;
     }
+
+#if __NPU_ARCH__ == 9201
+    InitForSPR();
+#endif
 
     isInited_ = true;
     KERNEL_LOG(KERNEL_INFO, "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx",
@@ -323,6 +345,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     handleRepeatCnt_[handleId] = 0;
     handleNeedCommitCnt_[handleId] = 0;
     handleCommitCnt_[handleId] = 0;
+    handleWaitCnt_[handleId] = 0;
     handleFinishCnt_[handleId] = 0;
 }
 
@@ -464,6 +487,25 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 }
 
 template<const auto &config>
+__aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::WaitSprStatus(HcclHandle handleId)
+{
+    do {
+        uint64_t fCnt = handleId == 0 ? handleWaitCnt_[handleId] :
+            handleFinishCnt_[handleId - 1] + handleWaitCnt_[handleId];
+        if (!workingFlag_) {
+            if (ReadHBMData(finishCntGM_) >= fCnt) {
+                break;
+            }
+        }
+        if (workingFlag_) {
+            __wait_ast_scb(SPR_ID, fCnt, pipe);
+            finishNumTemp_++;
+            WriteHBMData(finishCntGM_, finishNumTemp_);
+            break;
+        }
+    } while (true);
+}
+template<const auto &config>
 __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::Wait(HcclHandle handleId)
 {
     ASCENDC_HCCL_API_ASSERT(isInited_, { return HCCL_FAILED; },
@@ -490,6 +532,10 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
 
 #ifndef __CCE_KT_TEST__ 
+#if __NPU_ARCH__ == 9201
+    handleWaitCnt_[handleId]++;
+    WaitSprStatus(handleId);
+#else
     while(true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
         if (waitCke != 0) {
@@ -507,7 +553,8 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
                 break;
             }
         }
-    }   
+    }
+#endif  
 #endif
 
     msgQueueIsAvailable_[reqId] = true;

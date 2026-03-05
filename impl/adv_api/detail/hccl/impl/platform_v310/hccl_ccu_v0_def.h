@@ -73,6 +73,7 @@ public:
 
     __aicore__ inline void Commit(HcclHandle handleId);
 
+    template<pipe_t pipe = PIPE_S>
     __aicore__ inline int32_t Wait(HcclHandle handleId);
 
     template <bool sync = true>
@@ -87,6 +88,8 @@ public:
 
 private:
     __aicore__ inline void InitWorkingFlag();
+
+    __aicore__ inline void InitForSpr();
 
     template <bool commit = false>
     __aicore__ inline HcclHandle CommonPrepareImpl(const CommonPrepareParam &param);
@@ -144,6 +147,7 @@ private:
     uint8_t handleRepeatCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleCommitCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleFinishCnt_[HCCL_MAX_HANDLE_ID];
+    uint8_t handleWaitCnt_[HCCL_MAX_HANDLE_ID];
     uint8_t handleNeedCommitCnt_[HCCL_MAX_HANDLE_ID];
 
     __gm__ CommonPrepareParamCcu *handleParamGM_;
