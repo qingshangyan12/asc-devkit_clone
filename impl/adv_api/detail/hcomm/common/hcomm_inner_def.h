@@ -62,7 +62,7 @@ typedef struct {
             int8_t dbMode; // 0-hw/1-sw
         } rdmaSqContext;   // 46 Bytes
         int8_t reserve[128];
-    } cxt;
+    } ctx;
 } SqContext;
 
 typedef struct {
@@ -254,6 +254,9 @@ typedef struct {
 #define OP_TYPE_OFFSET 24
 #define C_OFFSET 29
 #define F_OFFSET 30
+
+constexpr int32_t HCOMM_FAILED = -1;
+constexpr int32_t HCOMM_SUCCESS = 0;
 
 } // namespace AscendC
 #endif // IMPL_HCOMM_HCOMM_INNER_DEF_H

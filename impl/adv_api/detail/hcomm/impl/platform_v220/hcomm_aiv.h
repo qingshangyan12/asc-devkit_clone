@@ -46,27 +46,20 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
 {
     __gm__ Channel* channelPtr = (__gm__ Channel*)channelHandle;
 
-    auto qpNum = channelPtr->sqContextAddr->cxt.rdmaSqContext.qpn;
-    auto sqBaseAddr = channelPtr->sqContextAddr->cxt.rdmaSqContext.sqVa;
-    auto wqeSize = channelPtr->sqContextAddr->cxt.rdmaSqContext.wqeSize;
+    auto qpNum = channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn;
+    auto sqBaseAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.sqVa;
+    auto wqeSize = channelPtr->sqContextAddr->ctx.rdmaSqContext.wqeSize;
 
-    auto curHardwareHead = channelPtr->sqContextAddr->cxt.rdmaSqContext.headAddr;
+    auto curHardwareHead = channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr;
     FlushGmDataCache(reinterpret_cast<__gm__ uint8_t*>(curHardwareHead));
     uint64_t curHead = *(__gm__ uint32_t*)(curHardwareHead);
 
-    auto curHardwareTailAddr = channelPtr->sqContextAddr->cxt.rdmaSqContext.tailAddr;
+    auto curHardwareTailAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr;
     uint64_t shift = 15U;
-    auto qpDepth = channelPtr->sqContextAddr->cxt.rdmaSqContext.depth;
+    auto qpDepth = channelPtr->sqContextAddr->ctx.rdmaSqContext.depth;
 
     // Make sure we don't overflow the SQ in an infinite loop - no need to mitigate endless loop as the host
     // will timeout and kill the kernel, same as all2all krenel if it fails to complete (e.g. in case of link loss)
-    // while (1) {
-    //     FlushGmDataCache(reinterpret_cast<__gm__ uint8_t*>(curHardwareTailAddr));
-    //     uint64_t curTail = *(__gm__ uint32_t*)(curHardwareTailAddr);
-    //     if (curHead - curTail < qpDepth - 1) {
-    //         break;
-    //     }
-    // }
 
     __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % qpDepth));
 
@@ -94,12 +87,12 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
     curHead++;
 
     uint64_t doorBellInfo = 0;
-    doorBellInfo |= channelPtr->sqContextAddr->cxt.rdmaSqContext.qpn; // [0:23] DB_TAG (qp_num)
+    doorBellInfo |= channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn; // [0:23] DB_TAG (qp_num)
     doorBellInfo |= 0UL << 24UL;                                      // [24:27] DB_CMD = HNS_ROCE_V2_SQ_DB (0)
     doorBellInfo |= (curHead % 65536UL) << 32UL;                      // [32:47] DB_PI = sq.head
-    doorBellInfo |= (uint64_t)(channelPtr->sqContextAddr->cxt.rdmaSqContext.sl) << 48UL; // [48:50] DB_SL = qp.sl
+    doorBellInfo |= (uint64_t)(channelPtr->sqContextAddr->ctx.rdmaSqContext.sl) << 48UL; // [48:50] DB_SL = qp.sl
 
-    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(channelPtr->sqContextAddr->cxt.rdmaSqContext.dbVa);
+    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.dbVa);
 
     ubLocal_.SetValue(0, doorBellInfo);
     AscendC::GlobalTensor<uint64_t> DBGlobalTensor;
