@@ -20,17 +20,11 @@
 #define __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__
 #endif
 
-#ifndef __SIMT_DEVICE_FUNCTIONS_DECL__
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
-#else
-#define __SIMT_DEVICE_FUNCTIONS_DECL__ __simt_callee__
-#endif
-#endif
-
+#include "simt_api/device_types.h"
 #include "impl/utils/sys_macros.h"
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #include "impl/utils/debug/asc_assert_simt_impl.h"
+#endif
 
 namespace __asc_simt_vf {
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
@@ -46,11 +40,7 @@ inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm_
 #ifdef assert
 #undef assert
 #endif
-#define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
-#else
-#ifndef assert
-#define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
-#endif
+#define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, __func__))
 #endif
 
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
