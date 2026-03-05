@@ -389,26 +389,22 @@ if [ $? -ne 0 ];then
 fi
 
 # set the set_env.bash
-if [ -n "${INSTALL_PATH}" ] && [ -d ${INSTALL_PATH} ]; then
-    _ASCEND_CUSTOM_OPP_PATH=${targetdir}/${vendordir}
-    bin_path="${_ASCEND_CUSTOM_OPP_PATH}/bin"
-    set_env_variable="#!/bin/bash\nexport ASCEND_CUSTOM_OPP_PATH=${_ASCEND_CUSTOM_OPP_PATH}:\${ASCEND_CUSTOM_OPP_PATH}\nexport LD_LIBRARY_PATH=${_ASCEND_CUSTOM_OPP_PATH}/op_api/lib/:\${LD_LIBRARY_PATH}"
-    if [ ! -d ${bin_path} ]; then
-        create_dir "${bin_path}" "750" "${INSTALL_FOR_ALL}"
-        if [ $? -ne 0 ]; then
-            exit 1
-        fi
-    fi
-    echo -e ${set_env_variable} > ${bin_path}/set_env.bash
+_ASCEND_CUSTOM_OPP_PATH=${targetdir}/${vendordir}
+bin_path="${_ASCEND_CUSTOM_OPP_PATH}/bin"
+set_env_variable="#!/bin/bash\nexport ASCEND_CUSTOM_OPP_PATH=${_ASCEND_CUSTOM_OPP_PATH}:\${ASCEND_CUSTOM_OPP_PATH}\nexport LD_LIBRARY_PATH=${_ASCEND_CUSTOM_OPP_PATH}/op_api/lib/:\${LD_LIBRARY_PATH}"
+if [ ! -d ${bin_path} ]; then
+    create_dir "${bin_path}" "750" "${INSTALL_FOR_ALL}"
     if [ $? -ne 0 ]; then
-        log "[ERROR] write ASCEND_CUSTOM_OPP_PATH to set_env.bash failed"
         exit 1
-    else
-        log "[INFO] using requirements: when custom module install finished or before you run the custom module, \
-        execute the command [ source ${bin_path}/set_env.bash ] to set the environment path"
     fi
-else
-    _ASCEND_CUSTOM_OPP_PATH=${targetdir}/${vendordir}
+fi
+echo -e ${set_env_variable} > ${bin_path}/set_env.bash
+if [ $? -ne 0 ]; then
+    log "[ERROR] write ASCEND_CUSTOM_OPP_PATH to set_env.bash failed"
+    exit 1
+fi
+
+if [ ! -n "${INSTALL_PATH}" ] || [ ! -d ${INSTALL_PATH} ]; then
     config_file=${targetdir}/vendors/config.ini
     if [ ! -f ${config_file} ]; then
         touch ${config_file}
@@ -427,9 +423,9 @@ else
         fi
     fi
     apply_chmod "${config_file}" "750" "${INSTALL_FOR_ALL}"
-    log "[INFO] using requirements: when custom module install finished or before you run the custom module, \
-        execute the command [ export LD_LIBRARY_PATH=${_ASCEND_CUSTOM_OPP_PATH}/op_api/lib/:\${LD_LIBRARY_PATH} ] to set the environment path"
 fi
+log "[INFO] using requirements: when custom module install finished or before you run the custom module, \
+    execute the command [ source ${bin_path}/set_env.bash ] to set the environment path"
 
 if [ -d ${targetdir}/$vendordir/op_impl/cpu/aicpu_kernel/impl/ ]; then
     chmod -R 444 ${targetdir}/$vendordir/op_impl/cpu/aicpu_kernel/impl/* >/dev/null 2>&1
