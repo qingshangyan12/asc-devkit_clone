@@ -12,9 +12,15 @@
  * \file lgamma_common_utils.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#warning                                                                                                               \
+    "impl/adv_api/detail/math/lgamma/lgamma_common_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "adv_api/math/lgamma.h"" and use public functions or variables defined in interface headers files."
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H
+#endif
 #ifndef IMPL_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H
 #define IMPL_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H
-
 #include "kernel_basic_intf.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || \
@@ -294,3 +300,8 @@ __simd_callee__ inline void LgammaLoadData(MicroAPI::RegTensor<float>& dstReg,
 }  // namespace AscendC
 #endif
 #endif  // IMPL_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H
+#endif
