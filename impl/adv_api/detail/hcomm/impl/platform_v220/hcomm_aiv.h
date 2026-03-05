@@ -62,10 +62,10 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
     // will timeout and kill the kernel, same as all2all krenel if it fails to complete (e.g. in case of link loss)
     while (1) {
         FlushGmDataCache(reinterpret_cast<__gm__ uint8_t*>(curHardwareTailAddr));
-        if ((curHead - *(__gm__ uint32_t*)(curHardwareTailAddr)) < QP_DEPTH - 1) {
+        uint64_t curTail = *(__gm__ uint32_t*)(curHardwareTailAddr);
+        if (curHead - curTail < QP_DEPTH - 1) {
             break;
         }
-        int64_t systemCycleAfter = AscendC::GetSystemCycle(); // add this line to solve slow poll CQ issue
     }
 
     __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % QP_DEPTH));
