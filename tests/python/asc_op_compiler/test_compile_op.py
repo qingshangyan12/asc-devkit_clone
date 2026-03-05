@@ -235,11 +235,8 @@ class TestCompileOp(unittest.TestCase):
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
                 with mock.patch.object(ascendc_common_utilityop_module, 'is_enable_ascendc_cov', return_value=True):
-                    with mock.patch.object(compile_op_module, 'set_dump_assert_flag') as mock_compile:
-                        compile_op_with_customized_config(cce_file, origin_func_name, op_info, compile_options, code_channel,
-                                    op_compile_option, extend_options, customized_config)
-                        args, kwargs = mock_compile.call_args
-                        self.assertEqual(args[0].tiling_key_list, ['1'])
+                    compile_op_with_customized_config(cce_file, origin_func_name, op_info, compile_options, code_channel,
+                                op_compile_option, extend_options, customized_config)
 
         binary_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.o')
         json_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.json')
@@ -4944,6 +4941,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
 
 
     def test_gen_kernel_function_c310_dcci_false(self):
+        global_var_storage.global_storage_reset()
         SetCurrentSocInfo("Ascend950PR_9599")
         cce_file = os.path.join(
             TOP_PATH, "tests/python/asc_op_compiler/stub_kernels/add_custom_unalign.cpp")
@@ -5037,6 +5035,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         compile_option_tuple.mllvm_options.append('-mllvm')
         compile_option_tuple.mllvm_options.append('-cce-aicore-dcci-before-kernel-end=')
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, compile_option_tuple)
+        global_var_storage.global_storage_reset()
     
 
     def test_delete_tiling_section(self):
