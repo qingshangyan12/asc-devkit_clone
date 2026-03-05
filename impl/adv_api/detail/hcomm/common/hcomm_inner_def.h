@@ -62,7 +62,7 @@ typedef struct {
             int8_t dbMode; // 0-hw/1-sw
         } rdmaSqContext;   // 46 Bytes
         int8_t reserve[128];
-    } cxt;
+    } ctx;
 } SqContext;
 
 typedef struct {

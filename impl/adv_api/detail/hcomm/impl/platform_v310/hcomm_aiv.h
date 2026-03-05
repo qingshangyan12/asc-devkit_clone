@@ -96,16 +96,16 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
     GM_ADDR dst, GM_ADDR src, uint32_t len, uint32_t opType)
 {
     __gm__ Channel *channelPtr = (__gm__ Channel *)(channel);
-    auto sqPIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->cxt.rdmaSqContext.headAddr);
+    auto sqPIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr);
     GlobalTensor<uint32_t> sqPIGlobal;
     sqPIGlobal.SetGlobalBuffer(sqPIAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);
     uint32_t sqHead = sqPI_.GetValue(0);
 
-    auto sqCIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->cxt.rdmaSqContext.tailAddr);
+    auto sqCIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr);
     GlobalTensor<uint32_t> sqCIGlobal;
     sqCIGlobal.SetGlobalBuffer(sqCIAddr);
-    uint32_t sqDepth = channelPtr->sqContextAddr->cxt.rdmaSqContext.depth;
+    uint32_t sqDepth = channelPtr->sqContextAddr->ctx.rdmaSqContext.depth;
     while(1) {
         Gm2Ub(sqCI_, sqCIGlobal, 1);
         uint32_t sqTail = sqCI_.GetValue(0);
@@ -139,9 +139,9 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
     wqePtr->data.rLen(len);
     uint32_t lKey = channelPtr->localBufferAddr->pti.rdmaMemProtectionInfo.lKey;
     wqePtr->data.leKey = HtoNL(1 << 31 | lKey);
-    __gm__ uint8_t *sqBaseAddr = channelPtr->sqContextAddr->cxt.rdmaSqContext.sqVa;
+    __gm__ uint8_t *sqBaseAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.sqVa;
     uint32_t sqPIMask = sqDepth - 1;
-    uint32_t wqeSize = channelPtr->sqContextAddr->cxt.rdmaSqContext.wqeSize;
+    uint32_t wqeSize = channelPtr->sqContextAddr->ctx.rdmaSqContext.wqeSize;
     GlobalTensor<uint8_t> sqGlobal;
     sqGlobal.SetGlobalBuffer((__gm__ uint8_t*)(sqBaseAddr  + (sqHead & sqPIMa) * wqeSize));
 
@@ -179,16 +179,16 @@ __aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Comm
 {
     __gm__ Channel* channel = (__gm__ Channel*)channelList_[handle]; // 获取channel
     GlobalTensor<uint32_t> sqPIGlobalTensor;
-    sqPIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)channel->sqContextAddr->cxt.rdmaSqContext.headAddr);
+    sqPIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)channel->sqContextAddr->ctx.rdmaSqContext.headAddr);
     Gm2Ub(sqPI_, sqPIGlobalTensor, 1);
     uint32_t sqHead = sqPI_.GetValue(static_cast<uint32_t>(0)); // 获取当前channel对应的sq pi
 
     GlobalTensor<uint64_t> dbGlobalTensor;
     __gm__ uint64_t* doorBellAddr =
-        (__gm__ uint64_t*)(channel->sqContextAddr->cxt.rdmaSqContext.dbVa + (sqHead >> 8) & 0xff);
+        (__gm__ uint64_t*)(channel->sqContextAddr->ctx.rdmaSqContext.dbVa + (sqHead >> 8) & 0xff);
     dbGlobalTensor.SetGlobalBuffer((__gm__ uint64_t*)doorBellAddr);
 
-    uint64_t dbValue = GetDbValue(channel->sqContextAddr->cxt.rdmaSqContext.qpn);
+    uint64_t dbValue = GetDbValue(channel->sqContextAddr->ctx.rdmaSqContext.qpn);
     uint32_t* dbUB = (uint32_t*)(doorBell_.GetPhyAddr());
     *(dbUB + 0) = (dbValue & 0xffffffff);
     *(dbUB + 1) = (dbValue >> 32) | ((sqHead >> 8) & 0xff);
@@ -202,7 +202,7 @@ template <pipe_t pipe>
 __aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Wait(HcommHandle handle)
 {
     __gm__ Channel* channel = (__gm__ Channel*)channelList_[handle]; // 获取channel
-    auto sqCIAddr = channel->sqContextAddr->cxt.rdmaSqContext.tailAddr;
+    auto sqCIAddr = channel->sqContextAddr->ctx.rdmaSqContext.tailAddr;
     GlobalTensor<uint32_t> sqCiGlobalTensor;
     sqCiGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)sqCIAddr); // 获取Sq CI对应的global tensor
 
