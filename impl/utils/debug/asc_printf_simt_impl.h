@@ -21,6 +21,8 @@
 #warning "impl/utils/debug/asc_printf_simt_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "utils/debug/asc_printf.h" and use public functions or variables defined in interface header files."
 #endif
 
+#include "impl/utils/sys_macros.h"
+
 #ifndef __SIMT_DEVICE_FUNCTIONS_DECL__
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
@@ -28,38 +30,6 @@
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __simt_callee__
 #endif
 #endif
-
-#ifdef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-#define __gm__ 
-#endif
-
-#ifndef __host_aicore__
-#define __host_aicore__ [host, aicore]
-#endif // __host_aicore__
-
-#if (_ASCENDC_HAS_BISHENG_COMPILER)
-#ifndef ASCENDC_HOST
-#define ASCENDC_HOST __host__
-#endif
-#ifndef ASCENDC_AICORE
-#define ASCENDC_AICORE __aicore__
-#endif
-#ifndef ASCENDC_HOST_AICORE
-#define ASCENDC_HOST_AICORE __host_aicore__
-#endif
-#else
-#ifndef ASCENDC_HOST
-#define ASCENDC_HOST
-#endif
-#ifndef ASCENDC_AICORE
-#define ASCENDC_AICORE
-#endif
-#ifndef ASCENDC_HOST_AICORE
-#define ASCENDC_HOST_AICORE
-#endif
-#endif
-
-#include "impl/utils/std/type_traits/is_same.h"
 
 inline __gm__ uint8_t* __gm__ g_sysSimtPrintFifoSpace = nullptr;
 
@@ -340,15 +310,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void write_scalar(__gm__ BlockRingBufInfo*
     uint32_t write_ptr, T scalar)
 {
     TypeToByte8 tmp{0};
-    if constexpr (AscendC::Std::is_same_v<T, half> || AscendC::Std::is_same_v<T, float>) {
+    if constexpr (std::is_same_v<T, half> || std::is_same_v<T, float>) {
         tmp.value_f32 = static_cast<float>(scalar);
-    } else if constexpr (AscendC::Std::is_same_v<T, double>) {
-        tmp.value_f64 = static_cast<double>(scalar);
     } else if constexpr (std::is_signed<T>::value) {
         tmp.value_s64 = static_cast<int64_t>(scalar);
     } else if constexpr (std::is_unsigned<T>::value) {
         tmp.value_u64 = static_cast<uint64_t>(scalar);
-    } else if constexpr (AscendC::Std::is_same_v<T, bfloat16_t>) {
+    } else if constexpr (std::is_same_v<T, bfloat16_t>) {
         tmp.value_f32 = bf16_to_float(scalar);
     } else if constexpr (std::is_pointer<T>::value) {
         tmp.value_u64 = (uintptr_t)scalar;
@@ -465,11 +433,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl(DumpType print_type,
     uint32_t write_ptr = static_cast<uint32_t>(start_offset);
     write_ring_buf_tlv_head(block_ring_buf_info, write_ptr, tlv_len, args_num);
     write_ring_buf_tlv_data(block_ring_buf_info, write_ptr, args_num, fmt, args...);
-    __cce_scalar::dcci(reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info->ringBufAddr + start_offset), 1, 1);
 
     __threadfence();
     write_finish(block_ring_buf_info, start_offset, print_type);
-    __cce_scalar::dcci(reinterpret_cast<__gm__ uint8_t*>(block_ring_buf_info->ringBufAddr + start_offset), 0, 1);
     if (print_type == DumpType::DUMP_SIMT_ASSERT) {
         __sync_workitems();
     }
