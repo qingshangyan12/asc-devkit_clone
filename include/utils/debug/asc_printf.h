@@ -36,7 +36,9 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(cons
 
 #endif
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #include "impl/utils/debug/asc_printf_simt_impl.h"
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
