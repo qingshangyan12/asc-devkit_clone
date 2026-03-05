@@ -1743,7 +1743,7 @@ __aicore__ inline void asc_copy_l12gm(__gm__ void* dst, __cbuf__ void* src, uint
 __aicore__ inline void asc_copy_l12gm_sync(__gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, 
                                         uint16_t src_stride, uint16_t dst_stride)
 {
-    asc_copy_l12g_syncm_impl(dst, src, n_burst, len_burst, src_stride, dst_stride);
+    asc_copy_l12gm_sync_impl(dst, src, n_burst, len_burst, src_stride, dst_stride);
 }
 #endif
 
