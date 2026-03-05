@@ -17,8 +17,8 @@ template <typename DTYPE>
 __aicore__ inline void img2colv2_cbuf_to_ca_stub(__ca__ DTYPE* dst, __cbuf__ DTYPE* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
                                                 uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
                                                 uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel, bm_t enable_dual_src) {
-    EXPECT_EQ(dst, reinterpret_cast<__cbuf__ DTYPE *>(11));
-    EXPECT_EQ(src, reinterpret_cast<__cc__ DTYPE *>(22));
+    EXPECT_EQ(dst, reinterpret_cast<__ca__ DTYPE *>(11));
+    EXPECT_EQ(src, reinterpret_cast<__cbuf__ DTYPE *>(22));
     EXPECT_EQ(step_k, static_cast<uint16_t>(33));
     EXPECT_EQ(step_m, static_cast<uint16_t>(44));
     EXPECT_EQ(pos_k, static_cast<uint16_t>(55));
@@ -57,8 +57,8 @@ TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_##dtype)               \
             .times(1)                                                                           \
             .will(invoke(img2colv2_cbuf_to_ca_stub<dtype>));                               \
                                                                                                 \
-    __ca__ dtype *dst = reinterpret_cast<__cbuf__ dtype *>(11);                                 \
-    __cbuf__ dtype *src = reinterpret_cast<__cc__ dtype *>(22);                                   \
+    __ca__ dtype *dst = reinterpret_cast<__ca__ dtype *>(11);                                 \
+    __cbuf__ dtype *src = reinterpret_cast<__cbuf__ dtype *>(22);                                   \
                                                                                                 \
     uint16_t step_k = static_cast<uint16_t>(33);                                                \
     uint16_t step_m = static_cast<uint16_t>(44);                                                \
@@ -90,8 +90,8 @@ TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_SYNC_##dtype)                   
             .times(1)                                                                           \
             .will(invoke(img2colv2_cbuf_to_ca_stub<dtype>));                               \
                                                                                                 \
-    __ca__ dtype *dst = reinterpret_cast<__cbuf__ dtype *>(11);                                 \
-    __cbuf__ dtype *src = reinterpret_cast<__cc__ dtype *>(22);                                   \
+    __ca__ dtype *dst = reinterpret_cast<__ca__ dtype *>(11);                                 \
+    __cbuf__ dtype *src = reinterpret_cast<__cbuf__ dtype *>(22);                                   \
                                                                                                 \
     uint16_t step_k = static_cast<uint16_t>(33);                                                \
     uint16_t step_m = static_cast<uint16_t>(44);                                                \
