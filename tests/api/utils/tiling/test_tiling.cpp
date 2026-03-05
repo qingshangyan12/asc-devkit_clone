@@ -49,6 +49,8 @@ TEST_F(TestTiling, GetShapeSize)
     EXPECT_EQ(ge::Shape({INT64_MIN, INT64_MAX}).GetShapeSize(), 0);
 }
 
+extern void platfrom_stub_set_chip_version(const char *num);
+
 TEST_F(TestTiling, TestPlatformAscendCReserveLocalMemory)
 {
     fe::PlatFormInfos platform_info;
@@ -754,4 +756,17 @@ TEST_F(TestTiling, TestPlatformCustomSocVersion)
 
     auto ret4 = platform_ascendc::PlatformAscendCManager::GetInstance("Ascend910B1");
     EXPECT_EQ(nullptr, ret4);
+}
+
+
+TEST_F(TestTiling, TestPlatformAscendCMC32DM11A)
+{
+    fe::PlatFormInfos platform_info;
+    MOCKER_CPP(&fe::PlatFormInfos::GetPlatformResWithLock,
+        bool(fe::PlatFormInfos::*)(const std::string &, const std::string &, std::string &))
+        .stubs()
+        .will(returnValue(true));
+    auto plat = platform_ascendc::PlatformAscendC(&platform_info);
+    platfrom_stub_set_chip_version("MC32DM11A");
+    EXPECT_EQ(plat.GetSocVersion(), platform_ascendc::SocVersion::MC32DM11A);
 }
