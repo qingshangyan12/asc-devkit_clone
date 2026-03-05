@@ -203,7 +203,21 @@ void PlatformAscendC::ReserveLocalMemory(ReservedSize size)
 SocVersion PlatformAscendC::GetSocVersion(void) const
 {
     std::string socVerStr;
-    bool ret = GetPlatFormInfo()->GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVerStr);
+    fe::PlatFormInfos* platformInfos = GetPlatFormInfo();
+    PF_LOGW("hwx1072830 platformInfos address is %p", platformInfos);
+
+    auto core_cnt = platformInfos->GetCoreNum();
+    PF_LOGW("hwx1072830 platformInfos core_cnt is %u", core_cnt);
+
+    std::string normalNumStr;
+    std::string aic_version_str;
+
+    (void)platformInfos->GetPlatformRes("SoCInfo", "normal_stream_num", normalNumStr);
+    PF_LOGW("hwx1072830 platformInfos normalNumStr is %s", normalNumStr);
+    (void)platformInfos->GetPlatformRes("version", "AIC_version", aic_version_str);
+    PF_LOGW("hwx1072830 platformInfos aic_version_str is %s", aic_version_str);
+    
+    bool ret = platformInfos->GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVerStr);
     if (!ret) {
         PF_LOGE("platform do not support get socVersion!");
         return SocVersion::RESERVED_VERSION;
