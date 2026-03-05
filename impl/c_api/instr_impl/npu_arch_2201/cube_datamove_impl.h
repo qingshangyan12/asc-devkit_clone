@@ -41,7 +41,6 @@
 #include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_l13d_fmatrix_impl.h"
 #include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_l12gm_impl.h"
 #include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_l12l0c_impl.h"
-#include "instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_l12l0a_impl.h"
 
 __aicore__ inline void asc_copy_l12l0b_sparse(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index,
                                               uint16_t start_index, uint8_t repeat)
