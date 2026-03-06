@@ -80,13 +80,13 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Layout& layout, const Tile
 
         if constexpr (IsIntegralConstantV<InnerRowType> && IsIntegralConstantV<InnerColType>) {
             return MakeLayout(
-                MakeShape(MakeShape(Std::Int<InnerRowType::value>{}, CeilDivision(rows, InnerRowType::value)),
-                          MakeShape(Std::Int<InnerColType::value>{}, CeilDivision(cols, InnerColType::value))),
+                MakeShape(MakeShape(Std::Int<InnerRowType::value>{}, Std::CeilDivision(rows, InnerRowType::value)),
+                          MakeShape(Std::Int<InnerColType::value>{}, Std::CeilDivision(cols, InnerColType::value))),
                 layout.Stride());
         } else {
             return MakeLayout(
-                MakeShape(MakeShape(innerRow, CeilDivision(rows, innerRow)),
-                                        MakeShape(innerCol, CeilDivision(cols, innerCol))),
+                MakeShape(MakeShape(innerRow, Std::CeilDivision(rows, innerRow)),
+                                        MakeShape(innerCol, Std::CeilDivision(cols, innerCol))),
                 layout.Stride());
         }
     }
