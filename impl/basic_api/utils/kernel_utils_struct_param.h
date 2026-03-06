@@ -283,18 +283,6 @@ struct DumpShapeTlvInfo {
     uint32_t resv;
 };
 
-struct TimeStampTlvInfo {
-    uint32_t type = static_cast<uint32_t>(DumpType::DUMP_TIME_STAMP); // DumpType = DUMP_TIME_STAMP
-    uint32_t length = 0U;      // Length of (descId resv cycle pc entry)
-    uint32_t descId = 0U;          // Usr id
-    uint16_t blockIdx = 0U;        // blockIdx
-    uint16_t resv = 0U;            // reserved
-    uint64_t cycle = 0U;           // system cycle
-    uint64_t pc = 0U;              // get pc
-    uint64_t entry = 0U;           // entry system cycle
-    uint32_t resvMem[2];          // reserved
-};
-
 struct DumpMeta {
     uint32_t typeId = static_cast<uint32_t>(DumpType::DUMP_META);
     uint32_t len = 8;
