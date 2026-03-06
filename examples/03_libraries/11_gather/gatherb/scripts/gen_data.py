@@ -13,10 +13,29 @@
 
 
 import os
+import argparse
 import numpy as np
 
 
-def gen_golden_data_simple():
+def gen_golden_data_simple(scenarioNum):
+    if scenarioNum >= 1 and scenarioNum <= 3:
+        count = 128
+        input_type = np.dtype("float16")
+        input_x = np.arange(0, count, 1, np.float16)
+        input_y = np.arange(0, count * input_type.itemsize, input_type.itemsize, np.uint32)
+        input_y = np.flipud(input_y)
+        golden = np.flipud(input_x)
+    elif scenarioNum == 4:
+        count = 1024 * 16
+        src_base_addr = 0
+        input_type = np.dtype("float16")
+        input_x = np.arange(0, count, 1, np.float16)
+        input_y = np.arange(0, count * input_type.itemsize, input_type.itemsize, np.uint32)
+        input_y = np.flipud(input_y)
+        golden = np.zeros(count, dtype=input_type)
+        for i in range(count):
+            golden[i] = input_x[(src_base_addr + input_y[i]) // input_type.itemsize]
+
     input_x = np.arange(128).astype(np.uint16)
     input_y = np.arange(8)[::-1] * 32
     input_y = input_y.astype(np.uint32)
