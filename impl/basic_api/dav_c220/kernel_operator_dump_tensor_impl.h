@@ -286,7 +286,7 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
         const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
 #ifdef ASCENDC_DUMP
         if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
-            ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_LOG(KERNEL_ERROR, "dump tensor is not supported this data type\n"));});
+            ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "dump tensor is not supported this data type\n");});
             return;
         }
 #endif
