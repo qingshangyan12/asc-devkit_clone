@@ -20,6 +20,10 @@ namespace AscendC {
 template <>
 class HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE> {
 public:
+    // __aicore__ inline HcommImpl();
+
+    // __aicore__ inline ~HcommImpl();
+
     template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE3>
     __aicore__ inline HcommHandle Write(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
@@ -37,6 +41,7 @@ public:
 
 private:
     HcommHandle curHandleId_ = static_cast<int8_t>(-1);
+    TPipe pipe_;
     LocalTensor<uint64_t> ubLocal_;
     LocalTensor<uint32_t> ubLocalHead_;
 };
