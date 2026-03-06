@@ -44,7 +44,7 @@ protected:
 TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_##dtype)               \
 {                                                                                     \
     MOCKER_CPP(copy_gm_to_cbuf_align_v2, void(__cbuf__ dtype*, __gm__ dtype*, uint8_t, uint32_t, uint32_t, uint8_t,          \
-                        uint8_t, bool, uint8_t, uint64_t, uint64_t))                    \
+                        uint8_t, bool, uint8_t, uint64_t, uint32_t))                    \
             .times(1)                                                                           \
             .will(invoke(copy_gm_to_cbuf_align_v2_stub<dtype>));                               \
                                                                                                 \
@@ -58,7 +58,7 @@ TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_##dtype)              
     bool data_select_bit = static_cast<bool>(true);                                            \
     uint8_t l2_cache_ctl = static_cast<uint8_t>(77);                                               \
     uint64_t burst_src_stride = static_cast<uint64_t>(88);                                                 \
-    uint64_t burst_src_stride = static_cast<uint64_t>(99);                                                 \
+    uint32_t burst_dst_stride = static_cast<uint32_t>(99);                                                 \
                                                                                                     \
     asc_copy_gm2l1_align(dst, src, burst_num, burst_len, left_padding_count, right_padding_count, \
                             data_select_bit, l2_cache_ctl, burst_src_stride, burst_dst_stride);         \
@@ -68,7 +68,7 @@ TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_##dtype)              
 TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_SYNC_##dtype)                                       \
 {                                                                                              \
     MOCKER_CPP(copy_gm_to_cbuf_align_v2, void(__cbuf__ dtype*, __gm__ dtype*, uint8_t, uint32_t, uint32_t, uint8_t,          \
-                        uint8_t, bool, uint8_t, uint64_t, uint64_t))                    \
+                        uint8_t, bool, uint8_t, uint64_t, uint32_t))                    \
             .times(1)                                                                           \
             .will(invoke(copy_gm_to_cbuf_align_v2_stub<dtype>));                               \
                                                                                                 \
@@ -82,7 +82,7 @@ TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_SYNC_##dtype)         
     bool data_select_bit = static_cast<bool>(true);                                            \
     uint8_t l2_cache_ctl = static_cast<uint8_t>(77);                                               \
     uint64_t burst_src_stride = static_cast<uint64_t>(88);                                                 \
-    uint64_t burst_src_stride = static_cast<uint64_t>(99);                                                 \
+    uint32_t burst_dst_stride = static_cast<uint32_t>(99);                                                 \
                                                                                                     \
     asc_copy_gm2l1_align_sync(dst, src, burst_num, burst_len, left_padding_count, right_padding_count, \
                             data_select_bit, l2_cache_ctl, burst_src_stride, burst_dst_stride);         \
