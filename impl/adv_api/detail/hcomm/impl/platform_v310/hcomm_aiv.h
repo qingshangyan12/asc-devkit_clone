@@ -64,7 +64,8 @@ __aicore__ inline void Ub2Gm(const GlobalTensor<T>& dstGlobal, const LocalTensor
     PipeBarrier<PIPE_ALL>();
 }
 
-__aicore__ inline HcommImpl::HcommImpl()
+template <COMM_ENGINE commEngine, COMM_PROTOCOL commProtocol>
+__aicore__ inline HcommImpl<commEngine, commProtocol>::HcommImpl()
 {
     pipe_.InitBuffer(wqeBuf_, 1, DEFAULT_WQE_ITEM_SIZE);
     pipe_.InitBuffer(cqeBuf_, 1, ONE_BLOCK_SIZE);
@@ -81,7 +82,8 @@ __aicore__ inline HcommImpl::HcommImpl()
     doorBell_ = doorBellBuf_.AllocTensor<uint64_t>();
 }
 
-__aicore__ inline HcommImpl::~HcommImpl()
+template <COMM_ENGINE commEngine, COMM_PROTOCOL commProtocol>
+__aicore__ inline HcommImpl<commEngine, commProtocol>::~HcommImpl()
 {
     wqeBuf_.FreeTensor(wqeItem_);
     wqeBuf_.FreeTensor(cqeItem_);
@@ -196,6 +198,7 @@ __aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Comm
     SetAtomicAdd<uint64_t>();
     Ub2Gm(dbGlobalTensor, doorBell_, 1);
     SetAtomicNone();
+    return HCOMM_SUCCESS;
 }
 
 template <pipe_t pipe>
@@ -249,6 +252,7 @@ __aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Wait
     sqCI_.SetValue(0, sqTail);
 
     Ub2Gm(sqCiGlobalTensor, sqCI_, 1); // 更新 Sq CI 到 gm
+    return HCOMM_SUCCESS;
 }
 } // namespace AscendC
 
