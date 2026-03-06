@@ -15,34 +15,14 @@
 #ifndef ASCENDC_KERNEL_PROF_TRACE_IMPL_H
 #define ASCENDC_KERNEL_PROF_TRACE_IMPL_H
 #include "kernel_utils.h"
+#include "impl/utils/debug/asc_aicore_time_impl.h"
 
 namespace AscendC {
-#ifdef ASCENDC_TRACE_ON
-constexpr uint32_t PROF_START_EVENT = 0x80000000;
-constexpr uint32_t PROF_STOP_EVENT = 0xc0000000;
-
-__aicore__ inline void ProfMarkEvent(void)
-{
-    if (g_coreType == AIV) {
-        __asm__ volatile("NOP_BAR.V");
-    } else if (g_coreType == AIC) {
-        __asm__ volatile("NOP_BAR.M");
-        __asm__ volatile("NOP_BAR.MTE1");
-    } else {
-        __asm__ volatile("NOP_BAR.V");
-        __asm__ volatile("NOP_BAR.M");
-        __asm__ volatile("NOP_BAR.MTE1");
-    }
-    __asm__ volatile("NOP_BAR.MTE2");
-    __asm__ volatile("NOP_BAR.MTE3");
-}
-#endif
-
 __aicore__ inline void ProfStartImpl()
 {
 #ifndef ASCENDC_CPU_DEBUG
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
-    bisheng::cce::metrics_prof_start();
+    asc_prof_start();
 #else
     ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "MetricsProfStart is not supported on current device\n"));
 #endif
@@ -53,7 +33,7 @@ __aicore__ inline void ProfStopImpl()
 {
 #ifndef ASCENDC_CPU_DEBUG
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
-    bisheng::cce::metrics_prof_stop();
+    asc_prof_stop();
 #else
     ASCENDC_DEBUG_ASSERT(false, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "MetricsProfStart is not supported on current device\n"));
 #endif
@@ -65,7 +45,15 @@ template<pipe_t pipe, uint16_t index>
 __aicore__ inline void MarkStampImpl()
 {
 #ifndef ASCENDC_CPU_DEBUG
-    bisheng::cce::mark_stamp<pipe, index>();
+    asc_mark_stamp<pipe, index>();
+#endif
+}
+
+template<pipe_t pipe>
+__aicore__ inline void MarkStampImpl(uint16_t index)
+{
+#ifndef ASCENDC_CPU_DEBUG
+    asc_mark_stamp<pipe>(index);
 #endif
 }
 #endif
