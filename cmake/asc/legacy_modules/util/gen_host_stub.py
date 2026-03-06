@@ -69,11 +69,6 @@ def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool, du
 ''')
     buff.write('\n')
 
-    buff.write(r'''#ifndef ASCENDC_DUMP
-#define ASCENDC_DUMP 1
-#endif
-''')
-
     if dump_assert:
         buff.write(r'''
 #ifdef ASCENDC_DUMP
