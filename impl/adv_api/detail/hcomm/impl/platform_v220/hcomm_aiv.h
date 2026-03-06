@@ -20,21 +20,18 @@
 
 namespace AscendC {
 
-__aicore__ inline HcommImpl::HcommImpl()
+__aicore__ inline HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::HcommImpl()
 {
     TBuf<TPosition::VECOUT> rdmaInBuf;
     pipe_.InitBuffer(rdmaInBuf, 32);
-    ubLocal_= rdmaInBuf.Get<uint64_t>();   
+    ubLocal_ = rdmaInBuf.Get<uint64_t>();
 
     TBuf<TPosition::VECOUT> rdmaInBuf2;
     pipe_.InitBuffer(rdmaInBuf2, 32);
     ubLocalHead_ = rdmaInBuf2.Get<uint32_t>();
 }
 
-__aicore__ inline HcommImpl::~HcommImpl()
-{
-
-}
+__aicore__ inline HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::~HcommImpl() {}
 
 template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
 __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Write(ChannelHandle channelHandle,
@@ -58,7 +55,25 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
     return handleId;
 }
 
-__aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBell(ChannelHandle channelHandle,
+__aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBell(__gm__ Channel* channelPtr)
+{
+    uint64_t doorBellInfo = 0;
+    doorBellInfo |= channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn; // [0:23] DB_TAG (qp_num)
+    doorBellInfo |= 0UL << 24UL;                                      // [24:27] DB_CMD = HNS_ROCE_V2_SQ_DB (0)
+    doorBellInfo |= (curHead % 65536UL) << 32UL;                      // [32:47] DB_PI = sq.head
+    doorBellInfo |= (uint64_t)(channelPtr->sqContextAddr->ctx.rdmaSqContext.sl) << 48UL; // [48:50] DB_SL = qp.sl
+
+    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.dbVa);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell doorBellAddr = %p", doorBellAddr);
+
+    ubLocal_.SetValue(0, doorBellInfo);
+    AscendC::GlobalTensor<uint64_t> DBGlobalTensor;
+    DBGlobalTensor.SetGlobalBuffer(doorBellAddr);
+    AscendC::DataCopyExtParams copyParams{1, 1 * sizeof(uint64_t), 0, 0, 0};
+    AscendC::DataCopyPad(DBGlobalTensor, ubLocal_, copyParams);
+}
+
+__aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::postSend(ChannelHandle channelHandle,
                                                                                   GM_ADDR dst, GM_ADDR src,
                                                                                   uint64_t len)
 {
@@ -78,7 +93,13 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
                qpNum, sqBaseAddr, wqeSize, curHead, qpDepth);
 
     // Make sure we don't overflow the SQ in an infinite loop - no need to mitigate endless loop as the host
-    // will timeout and kill the kernel, same as all2all krenel if it fails to complete (e.g. in case of link loss)
+    // will timeout and kill the kernel, same as all2all kernel if it fails to complete (e.g. in case of link loss)
+    while (1) {
+        cacheWriteThrough((__gm__ uint8_t*)curHardwareTailAddr, CACHEWRITESIZE);
+        if ((curHead - *(__gm__ uint32_t*)(curHardwareTailAddr)) < qpDepth - 1) {
+            break;
+        }
+    }
 
     __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % qpDepth));
     KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell wqeAddr = %p", wqeAddr);
@@ -107,20 +128,8 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
 
     curHead++;
 
-    uint64_t doorBellInfo = 0;
-    doorBellInfo |= channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn; // [0:23] DB_TAG (qp_num)
-    doorBellInfo |= 0UL << 24UL;                                      // [24:27] DB_CMD = HNS_ROCE_V2_SQ_DB (0)
-    doorBellInfo |= (curHead % 65536UL) << 32UL;                      // [32:47] DB_PI = sq.head
-    doorBellInfo |= (uint64_t)(channelPtr->sqContextAddr->ctx.rdmaSqContext.sl) << 48UL; // [48:50] DB_SL = qp.sl
-
-    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.dbVa);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell doorBellAddr = %p", doorBellAddr);
-
-    ubLocal_.SetValue(0, doorBellInfo);
-    AscendC::GlobalTensor<uint64_t> DBGlobalTensor;
-    DBGlobalTensor.SetGlobalBuffer(doorBellAddr);
-    AscendC::DataCopyExtParams copyParams{1, 1 * sizeof(uint64_t), 0, 0, 0};
-    AscendC::DataCopyPad(DBGlobalTensor, ubLocal_, copyParams);
+    // Post doorbell
+    doorBell(channelPtr);
 
     ubLocalHead_.SetValue(0, (uint32_t)curHead);
     AscendC::GlobalTensor<uint32_t> HeadGlobalTensor;
