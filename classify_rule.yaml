@@ -37,6 +37,11 @@ asc-devkit:
       - impl/basic_api/reg_compute/kernel_reg_compute_common_intf_impl.h
       - impl/basic_api/reg_compute/kernel_reg_compute_intf_impl.h
       - impl/basic_api/reg_compute/dav_c310/kernel_reg_compute_datatype_impl.h
+      - impl/basic_api/dav_m310/kernel_operator_dump_tensor_impl.h
+      - impl/basic_api/dav_m200/kernel_operator_dump_tensor_impl.h
+      - impl/basic_api/dav_c220/kernel_operator_dump_tensor_impl.h
+      - impl/c_api/instr_impl/npu_arch_2201/debug_impl/printf_impl.h
+      - impl/c_api/instr_impl/npu_arch_2201/debug_impl.h
   llt:
     ut_check: true
     st_check: false

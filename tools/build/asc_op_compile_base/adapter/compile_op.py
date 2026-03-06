@@ -1160,9 +1160,6 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
             if tiling_key_kernel_type[tiling_key] == KernelMetaType.KERNEL_TYPE_AIC_ONLY:
                 tiling_key_kernel_type[tiling_key] = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2
 
-    # dump function determins how kernel wrapper will be, must be handle early
-    handle_dump_options(compile_info, compile_option_tuple)
-
     # dump or acc or timestamp or recognize_simtvf will need extra workspace
     ascendc_enable_dump_workspace = ("-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options) or \
         ("assert" == compile_info.dump_info["dump_type"]) or \
@@ -1368,21 +1365,6 @@ def compile_op_with_customized_config(cce_file: str, origin_func_name: str, op_i
 
     compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
                             extend_options)
-
-
-def handle_dump_options(compile_info, compile_option_tuple):
-    if "assert" not in compile_info.dump_info["dump_type"] and "printf" not in compile_info.dump_info["dump_type"]:
-        compile_option_tuple.compile_options.append('-DASCENDC_DUMP=0')
-        length_before = len(compile_option_tuple.compile_options)
-        CommonUtility.remove_options(compile_option_tuple.compile_options, ['-DASCENDC_DUMP', '-DASCENDC_DUMP=1'])
-        length_after = len(compile_option_tuple.compile_options)
-        if length_before != length_after:
-            CommonUtility.print_compile_log(compile_info.kernel_name, \
-                "-DASCENDC_DUMP=1 is deleted because the feature is not used internally in src file", \
-                AscendCLogLevel.LOG_WARNING)
-
-    if "assert" == compile_info.dump_info["dump_type"]:
-        compile_option_tuple.compile_options.append('-DASCENDC_DUMP_ASSERT_ONLY')
 
 
 def set_dump_assert_flag(compile_info):
