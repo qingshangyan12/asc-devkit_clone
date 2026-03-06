@@ -35,11 +35,11 @@
 
 | 源流水\目标流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
 |:---------------:|:------:|:------:|:---------:|:---------:|:---------:|:--------:|
-| PIPE_S          | DataSyncBarrier | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag |
+| PIPE_S          | DataSyncBarrier | AscendC待支持 | AscendC待支持  | SetFlag/WaitFlag | SetFlag/WaitFlag | AscendC待支持  |
 | PIPE_M          | SetFlag/WaitFlag | PipeBarrier | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag |
-| PIPE_MTE1       | SetFlag/WaitFlag | SetFlag/WaitFlag | PipeBarrier | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag |
+| PIPE_MTE1       | AscendC待支持  | SetFlag/WaitFlag | PipeBarrier | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag |
 | PIPE_MTE2       | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag | PipeBarrier | SetFlag/WaitFlag | SetFlag/WaitFlag |
-| PIPE_MTE3       | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag | PipeBarrier | SetFlag/WaitFlag |
+| PIPE_MTE3       | SetFlag/WaitFlag | AscendC待支持 | SetFlag/WaitFlag | SetFlag/WaitFlag | PipeBarrier | AscendC待支持  |
 | PIPE_FIX        | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag | SetFlag/WaitFlag | PipeBarrier |
 
 
@@ -58,7 +58,7 @@
 **表3：核内自动同步情况**
 | 是否开启编译器autosync | 使用TPipe/TQue编程方式 | 使用静态Tensor编程方式 |
 |:---------------------:|:------:|:------:|
-| 是                    | 单流水：编译器自动插入PIPE_V，在搬运地址由重叠的情况下需要开发者手动插入同步<br>多流水： 编译器自动插入PIPE_S分别于PIPE_V、PIPE_MTE2、PIPE_MTE3之间的双向同步（6种），涉及PIPE_S的同步由开发者插入，其余同步由AscendC框架自动插入。| auto sync不生效，所有同步均需要开发者手动插入 |
+| 是                    | 单流水：编译器自动插入PIPE_V，在搬运地址由重叠的情况下需要开发者手动插入同步<br>多流水： 编译器自动插入PIPE_S分别于PIPE_V、PIPE_MTE2、PIPE_MTE3之间的双向同步（6种），涉及PIPE_S的同步由开发者插入，其余同步由AscendC框架自动插入。| 待确认 |
 | 否                    | 单流水：所有同步均由开发者插入<br>多流水：涉及PIPE_S的同步由开发者插入，其余同步由AscendC框架自动插入| 所有同步均需要开发者手动插入  |
 
 根据表1、表2、表3，在TPipe/TQue编程模型下，AIC和AIV不同流水线的同步情况可总结为表4、表5。<br><br>
@@ -66,12 +66,12 @@
 
 | 源流水\目标流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
 |:---------------:|:------:|:------:|:---------:|:---------:|:---------:|:--------:|
-| PIPE_S          | 需要手动插入 | AscendC待支持 | AscendC待支持 | 编译器自动插入 | 编译器自动插入 | AscendC待支持 |
-| PIPE_M          | 需要手动插入 | 需要手动插入 | AscendC框架自动插入 | AscendC框架自动插入 | AscendC待支持 | AscendC框架自动插入 |
+| PIPE_S          | 需要手动插入 | 暂无使用场景 | AscendC待支持 | 编译器自动插入 | 编译器自动插入 | 暂无使用场景 |
+| PIPE_M          | 暂无使用场景 | 需要手动插入 | AscendC框架自动插入 | AscendC框架自动插入 | AscendC待支持 | AscendC框架自动插入 |
 | PIPE_MTE1       | AscendC待支持 | AscendC框架自动插入 | 需要手动插入 | AscendC框架自动插入 | AscendC框架自动插入 | AscendC框架自动插入 |
 | PIPE_MTE2       | 编译器自动插入 | AscendC框架自动插入 | AscendC框架自动插入 | 需要手动插入 | AscendC框架自动插入 | AscendC框架自动插入 |
 | PIPE_MTE3       | 编译器自动插入 | AscendC待支持 | AscendC框架自动插入 | AscendC框架自动插入 | 需要手动插入 | AscendC待支持 |
-| PIPE_FIX        | 需要手动插入 | AscendC框架自动插入 | AscendC框架自动插入 | AscendC框架自动插入 | AscendC框架自动插入 | 需要手动插入 |
+| PIPE_FIX        | 暂无使用场景 | AscendC框架自动插入 | AscendC框架自动插入 | AscendC框架自动插入 | AscendC框架自动插入 | 需要手动插入 |
 
 
 **表5：在TPipe/TQue编程模型下，不同流水的同步情况（AIV）**
@@ -86,7 +86,7 @@
 
 
 ### 三、AIC和AIV之间不支持的同步情况
-上述合法的同步均为AIC或AIV的核内同步，为了测试不同核间调用SetFlag/WaitFlag的情况，本样例设计了表4中的6种场景。
+上述合法的同步均为AIC或AIV的核内同步，为了测试AIC和AIV核间调用SetFlag/WaitFlag的情况，本样例设计了表4中的6种场景。
 
 **表4：AIC和AIV之间不支持的同步（本样例测试场景）**
 
