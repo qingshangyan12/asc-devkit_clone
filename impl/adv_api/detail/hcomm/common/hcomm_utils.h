@@ -17,16 +17,6 @@
 
 namespace AscendC {
 
-__aicore__ inline void cacheWriteThrough(__gm__ uint8_t* sourceAddr, uint64_t length)
-{
-    __gm__ uint8_t* start = (__gm__ uint8_t*)((uint64_t)sourceAddr / CACHE_LINE_SIZE * CACHE_LINE_SIZE);
-    __gm__ uint8_t* end = (__gm__ uint8_t*)(((uint64_t)sourceAddr + length) / CACHE_LINE_SIZE * CACHE_LINE_SIZE);
-    GlobalTensor<uint8_t> global;
-    global.SetGlobalBuffer(start);
-    for (uint32_t i = 0; i < end - start; i += CACHE_LINE_SIZE) {
-        DataCacheCleanAndInvalid<uint8_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(global[i]);
-    }
-}
 } // namespace AscendC
 
 #endif
