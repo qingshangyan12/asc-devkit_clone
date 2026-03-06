@@ -290,8 +290,8 @@ private:
         constexpr uint16_t CUBE_BLOCK_SIZE = 512;
         auto srcRow = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout) * C0_SIZE / sizeof(DstType);
         auto srcCol = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout) * FRACTAL_FIXED;
-        auto indexRow = Std::get<1>(Std::get<0>(coord)) * C0_SIZE / sizeof(DstType);
-        auto indexCol = Std::get<1>(Std::get<1>(coord)) * FRACTAL_FIXED;
+        auto indexRow = Std::get<1>(coord) * C0_SIZE / sizeof(DstType);
+        auto indexCol = Std::get<1>(coord) * FRACTAL_FIXED;
         constexpr int32_t c0Size = BLOCK_BYTE_SIZE / sizeof(DstType);
         uint16_t dstRowNum = (dstRow * sizeof(DstType)) >> SHIFT_BLOCK_BYTE;
         uint16_t dstColNum = dstCol >> SHIFT_BLOCK_LEN;

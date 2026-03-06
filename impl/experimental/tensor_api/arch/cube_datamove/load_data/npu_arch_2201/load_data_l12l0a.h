@@ -227,8 +227,8 @@ private:
         // ZN
         auto srcRow = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout) * C0_SIZE / sizeof(DstType);
         auto srcCol = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout) * FRACTAL_FIXED;
-        auto indexRow = Std::get<1>(Std::get<0>(coord)) * C0_SIZE / sizeof(DstType);
-        auto indexCol = Std::get<1>(Std::get<1>(coord)) * FRACTAL_FIXED;
+        auto indexRow = Std::get<1>(coord) * C0_SIZE / sizeof(DstType);
+        auto indexCol = Std::get<1>(coord) * FRACTAL_FIXED;
         constexpr const uint32_t SHIFT_BLOCK_LEN = 4;
         constexpr const uint32_t SHIFT_BLOCK_BYTE = 5;
         constexpr uint16_t CUBE_BLOCK_SIZE = 512;
