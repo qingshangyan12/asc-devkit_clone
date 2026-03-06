@@ -341,7 +341,6 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_max](reg/reg_vector/asc_max.md) | 根据mask对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。 |
 | [asc_max_scalar](reg/reg_vector/asc_max_scalar.md) | 矢量src的逐个元素与标量value比较大小，接着按照对应的比特位将最大值存入dst中。 |
 | [asc_min](reg/reg_vector/asc_min.md) | 根据mask对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 |
-| [asc_min_scalar](reg/reg_vector/asc_min_scalar.md) | 矢量src的逐个元素与标量value比较大小，接着按照对应的比特位将最小值存入dst中。 |
 | [asc_mull](reg/reg_vector/asc_mull.md) | 无符号整数乘法，将src0和src1对应元素相乘，结果写入dst。 |
 | [asc_ne](reg/reg_vector/asc_ne.md) | 对源操作数执行逐元素比较。对于src0 != src1，若条件成立则目的操作数对应结果位为1，否则为0。 |
 | [asc_neg](reg/reg_vector/asc_neg.md) | 根据mask对源操作数src进行取相反数操作，将结果写入目的操作数dst。 |
