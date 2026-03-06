@@ -21,6 +21,7 @@ constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
 constexpr uint32_t DEFAULT_WQE_ITEM_SIZE = 64;
 constexpr uint32_t ROCE_SQ_DOORBELL_TYPE = 2;
 constexpr uint32_t ROCE_INIT_SQ_DB_SGIT_IDX = 1;
+constexpr uint32_t HCOMM_MEM_BLOCK_SIZE = 32;
 
 template <>
 class HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE> {
@@ -38,16 +39,16 @@ public:
 
 private:
     template <bool commit = true, pipe_t commit_pipe = PIPE_MTE3, pipe_t req_pipe = PIPE_MTE3>
-    __aicore__ inline HcommHandle Operate(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint32_t len,
+    __aicore__ inline HcommHandle Operate(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
         uint32_t opType);
 private:
     TPipe pipe_;
-    TQue<TPosition::VECCALC, 1> wqeBuf_;
-    TQue<TPosition::VECCALC, 1> cqeBuf_;
-    TQue<TPosition::VECCALC, 1> sqPIBuf_;
-    TQue<TPosition::VECCALC, 1> sqCIBuf_;
-    TQue<TPosition::VECCALC, 1> cqCIBuf_;
-    TQue<TPosition::VECCALC, 1> doorBellBuf_;
+    TBuf<TPosition::VECIN> wqeInBuf;
+    TBuf<TPosition::VECIN> cqeInBuf;
+    TBuf<TPosition::VECIN> sqPIInBuf;
+    TBuf<TPosition::VECIN> sqCIInBuf;
+    TBuf<TPosition::VECIN> cqCIInBuf;
+    TBuf<TPosition::VECIN> dbInBuf;
     LocalTensor<uint8_t> wqeItem_;
     LocalTensor<uint32_t> cqeItem_;
     LocalTensor<uint32_t> sqPI_;
