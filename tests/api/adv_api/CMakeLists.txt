@@ -188,7 +188,7 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/test_matmul_shape_info.cpp
     matmul/test_matmul_shape_info_left.cpp
     hccl/test_hccl.cpp
-    hcomm/test_hcomm.cpp
+    hcomm/test_hcomm_950.cpp
     matmul/copy_cube_in/test_copy_cube_in_norm.cpp
     matmul/copy_cube_in/test_copy_cube_in_mdl.cpp
     matmul/copy_cube_in/test_copy_cube_in_params.cpp
