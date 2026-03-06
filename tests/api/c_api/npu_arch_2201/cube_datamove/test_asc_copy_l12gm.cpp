@@ -41,8 +41,8 @@ TEST_F(TEST_COPY_L1_TO_GM, TEST_COPY_L1_TO_GM)
             .times(1)
             .will(invoke(copy_cbuf_to_gm_stub));
 
-    __gm__ void *dst = reinterpret_cast<__cbuf__ void *>(11);
-    __cbuf__ void *src = reinterpret_cast<__gm__ void *>(22);
+    __gm__ void *dst = reinterpret_cast<__gm__ void *>(11);
+    __cbuf__ void *src = reinterpret_cast<__cbuf__ void *>(22);
 
     uint16_t nBurst = static_cast<uint16_t>(33);
     uint16_t lenBurst = static_cast<uint16_t>(44);
@@ -60,8 +60,8 @@ TEST_F(TEST_COPY_L1_TO_GM, TEST_COPY_L1_TO_GM_SYNC)
             .times(1)
             .will(invoke(copy_cbuf_to_gm_stub));
 
-    __gm__ void *dst = reinterpret_cast<__cbuf__ void *>(11);
-    __cbuf__ void *src = reinterpret_cast<__gm__ void *>(22);
+    __gm__ void *dst = reinterpret_cast<__gm__ void *>(11);
+    __cbuf__ void *src = reinterpret_cast<__cbuf__ void *>(22);
 
     uint16_t nBurst = static_cast<uint16_t>(33);
     uint16_t lenBurst = static_cast<uint16_t>(44);

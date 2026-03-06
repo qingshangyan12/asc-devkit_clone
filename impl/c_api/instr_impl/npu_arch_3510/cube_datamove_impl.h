@@ -25,6 +25,7 @@
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_gm2l1_align_impl.h"
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_gm2l1_dn2nz_impl.h"
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_gm2l1_nd2nz_impl.h"
+#include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_gm2l1_impl.h"
 
 // ==========asc_copy_l0c2l1===========
 // half  float
@@ -865,5 +866,18 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint8_t* dst, __gm__ u
                                                 uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     asc_copy_gm2l1_nd2nz_sync_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+}
+
+// ==========asc_copy_gm2l1==========
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
+                                    uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2l1_impl(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
+                                        uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2l1_sync_impl(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
 }
 #endif
