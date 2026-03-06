@@ -146,7 +146,6 @@ public:
         auto btTensor = MakeTensor(btIterator, btMatrixLayout); 
 
         auto coord = MakeCoord(
-            MakeCoord(Int<0>{}, Int<0>{}),
             MakeCoord(Int<0>{}, Int<0>{})
         );
 
@@ -167,7 +166,6 @@ public:
         auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
 
         auto coord = MakeCoord(
-            MakeCoord(Int<0>{}, Int<0>{}),
             MakeCoord(Int<0>{}, Int<0>{})
         );
 
@@ -188,7 +186,6 @@ public:
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
 
         auto coord = MakeCoord(
-            MakeCoord(Int<0>{}, Int<0>{}),
             MakeCoord(Int<0>{}, Int<0>{})
         );
 
