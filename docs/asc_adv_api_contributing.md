@@ -297,7 +297,7 @@ UT测试使用gTest作为测试框架，一般验证接口编译是否正常，�
 ##### UT编码
 ###### Kernel侧
 
-在UT目录[tests/unit/adv_api/math](../tests/unit/adv_api/math)下新增目录`axpy`、文件[test_operator_axpy.cpp](../tests/unit/adv_api/math/axpy/test_operator_axpy.cpp)。UT实现主要包括如下三部分：
+在UT目录[tests/api/adv_api/math](../tests/api/adv_api/math)下新增目录`axpy`、文件[test_operator_axpy.cpp](../tests/api/adv_api/math/axpy/test_operator_axpy.cpp)。UT实现主要包括如下三部分：
 1. 引入头文件
     ```c++
     #include <gtest/gtest.h>
@@ -391,7 +391,7 @@ UT测试使用gTest作为测试框架，一般验证接口编译是否正常，�
         ```
 ###### Tiling侧
 
-Tiling接口的UT目前统一在[tests/unit/adv_api/tiling/test_tiling.cpp](../tests/unit/adv_api/tiling/test_tiling.cpp)文件中，在该文件中添加相应测试函数即可。
+Tiling接口的UT目前统一在[tests/api/adv_api/tiling/test_tiling.cpp](../tests/api/adv_api/tiling/test_tiling.cpp)文件中，在该文件中添加相应测试函数即可。
 ```c++
 TEST_F(TestTiling, TestAxpyTiling)
 {
@@ -406,7 +406,7 @@ TEST_F(TestTiling, TestAxpyTiling)
 }
 ```
 ##### 修改cmake文件
-在执行UT用例前，需要修改[CMakeLists.txt](../tests/unit/adv_api/CMakeLists.txt)文件，由于Kernel侧和Tiling侧的UT执行对象不同，需要在不同的target下添加测试文件。以Kernel侧验证Atlas A2 训练系列产品/Atlas A2 推理系列产品的UT为例，将UT测试文件路径添加到用例的源文件列表`ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES`中，即新增文件路径`${ASCENDC_TESTS_DIR}/math/axpy/test_operator_axpy.cpp`。Tiling侧同理，需要将测试文件添加到`ASCENDC_TILING_TEST_SRC_FILES`列表。
+在执行UT用例前，需要修改[CMakeLists.txt](../tests/api/adv_api/CMakeLists.txt)文件，由于Kernel侧和Tiling侧的UT执行对象不同，需要在不同的target下添加测试文件。以Kernel侧验证Atlas A2 训练系列产品/Atlas A2 推理系列产品的UT为例，将UT测试文件路径添加到用例的源文件列表`ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES`中，即新增文件路径`${ASCENDC_TESTS_DIR}/math/axpy/test_operator_axpy.cpp`。Tiling侧同理，需要将测试文件添加到`ASCENDC_TILING_TEST_SRC_FILES`列表。
 ##### 执行UT
 - 执行全量UT用例
   
@@ -416,7 +416,7 @@ TEST_F(TestTiling, TestAxpyTiling)
   ```
 - 仅运行新增UT用例
 
-  打开[tests/unit/adv_api/main_global.cpp](../tests/unit/adv_api/main_global.cpp)和[tests/unit/adv_api/tiling/main.cpp](../tests/unit/adv_api/tiling/main.cpp)文件，在main函数中return前的最后一行添加下面的代码，利用gTest的过滤器根据单元测试的单元名字过滤测试用例。
+  打开[tests/api/adv_api/main_global.cpp](../tests/api/adv_api/main_global.cpp)和[tests/api/adv_api/tiling/main.cpp](../tests/api/adv_api/tiling/main.cpp)文件，在main函数中return前的最后一行添加下面的代码，利用gTest的过滤器根据单元测试的单元名字过滤测试用例。
     ```c++
     ::testing::GTEST_FLAG(filter) = "*Axpy*";
     ```
