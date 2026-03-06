@@ -23,7 +23,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ bfloat16_t* dst, __gm_
                                                 uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -38,7 +38,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ float8_e4m3_t* dst, __
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -53,7 +53,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ float8_e5m2_t* dst, __
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -68,7 +68,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ half* dst, __gm__ half
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -83,7 +83,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ float* dst, __gm__ flo
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -98,7 +98,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ hifloat8_t* dst, __gm_
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -113,7 +113,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ int16_t* dst, __gm__ i
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -128,7 +128,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ int32_t* dst, __gm__ i
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -143,7 +143,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ int8_t* dst, __gm__ in
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -158,7 +158,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ uint16_t* dst, __gm__ 
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -173,7 +173,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ uint32_t* dst, __gm__ 
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
@@ -188,7 +188,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(__cbuf__ uint8_t* dst, __gm__ u
                                             uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
 {
     if ASC_IS_AIC {
-        copy_gm_to_cbuf_multi_dn2nz_v2(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+        copy_gm_to_cbuf_multi_dn2nz(dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
     }
 }
 
