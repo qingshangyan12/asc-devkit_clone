@@ -23,8 +23,8 @@ namespace Te {
 
 class CopyGmToCbufMultiDn2ZnBase {
 public:
-    template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+    template <const DataCopyTrait& trait, typename T, typename U>
+    __aicore__ inline void Run(const T& dst, const U& src) {
         DataCopyImpl<trait>(dst, src);
     }
 

@@ -23,16 +23,9 @@ namespace Te {
 
 class CopyGmToCbufMultiNd2znBase {
 public:
-    template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        auto shape = MakeShape(
-            GetEleFromLayout<decltype(dst.Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dst.Layout()) *
-            GetEleFromLayout<decltype(dst.Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dst.Layout()),
-            GetEleFromLayout<decltype(dst.Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dst.Layout()) *
-            GetEleFromLayout<decltype(dst.Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dst.Layout())
-            );
-        auto sliceTensor = src(coord, shape);
-        DataCopyImpl<trait>(dst, sliceTensor);
+    template <const DataCopyTrait& trait, typename T, typename U>
+    __aicore__ inline void Run(const T& dst, const U& src) {
+        DataCopyImpl<trait>(dst, src);
     }
 
 private:
