@@ -101,6 +101,6 @@ TEST_F(HcommCommonTestSuite, Aiv_Write)
     Hcomm hcomm;
     ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel);
     HcommHandle handleId =
-        hcomm.Aiv_Write(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
+        hcomm.Write(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
     EXPECT_EQ(handleId, 0);
 }
