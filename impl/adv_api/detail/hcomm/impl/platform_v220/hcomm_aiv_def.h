@@ -45,7 +45,7 @@ public:
 private:
     __aicore__ inline void postSend(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
-    __aicore__ inline void doorBell(__gm__ Channel* channelPtr);
+    __aicore__ inline void doorBell(__gm__ Channel* channelPtr, uint64_t curHead);
 
 private:
     HcommHandle curHandleId_ = static_cast<int8_t>(-1);

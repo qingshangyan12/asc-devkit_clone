@@ -38,9 +38,10 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
                                                                                       GM_ADDR dst, GM_ADDR src,
                                                                                       uint64_t len)
 {
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Write channelHandle:%llu, dst:%p, src:%p, len:%llu", channelHandle, dst, src, len);
     HcommHandle handleId = ++curHandleId_;
     postSend(channelHandle, dst, src, len);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Write finish handleId:%u", handleId);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Write complete handleId:%u", handleId);
     return handleId;
 }
 
@@ -49,13 +50,14 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
                                                                                      GM_ADDR dst, GM_ADDR src,
                                                                                      uint64_t len)
 {
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Read channelHandle:%llu, dst:%p, src:%p, len:%llu", channelHandle, dst, src, len);
     HcommHandle handleId = ++curHandleId_;
     postSend(channelHandle, dst, src, len);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Read finish andleId:%u", handleId);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Read complete handleId:%u", handleId);
     return handleId;
 }
 
-__aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBell(__gm__ Channel* channelPtr)
+__aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBell(__gm__ Channel* channelPtr, uint64_t curHead)
 {
     uint64_t doorBellInfo = 0;
     doorBellInfo |= channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn; // [0:23] DB_TAG (qp_num)
@@ -64,7 +66,7 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
     doorBellInfo |= (uint64_t)(channelPtr->sqContextAddr->ctx.rdmaSqContext.sl) << 48UL; // [48:50] DB_SL = qp.sl
 
     __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.dbVa);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell doorBellAddr = %p", doorBellAddr);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell doorBellAddr:%p, doorBellInfo:%llu", doorBellAddr, doorBellInfo);
 
     ubLocal_.SetValue(0, doorBellInfo);
     AscendC::GlobalTensor<uint64_t> DBGlobalTensor;
@@ -89,14 +91,14 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::postSen
     uint64_t shift = 15U;
     auto qpDepth = channelPtr->sqContextAddr->ctx.rdmaSqContext.depth;
 
-    KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell qpNum = %d, sqBaseAddr = %p, wqeSize = %d, curHead = %d, qpDepth = %d",
-               qpNum, sqBaseAddr, wqeSize, curHead, qpDepth);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell qpNum:%d, sqBaseAddr:%p, wqeSize:%d, curHead:%d, qpDepth:%d", qpNum,
+               sqBaseAddr, wqeSize, curHead, qpDepth);
 
     // Make sure we don't overflow the SQ in an infinite loop - no need to mitigate endless loop as the host
     // will timeout and kill the kernel, same as all2all kernel if it fails to complete (e.g. in case of link loss)
 
     __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % qpDepth));
-    KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell wqeAddr = %p", wqeAddr);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm postSend wqeAddr:%p", wqeAddr);
 
     // Write the WQE to GM
     uint64_t ownBit = (curHead >> shift) & 1U;
@@ -113,7 +115,7 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::postSen
     *(__gm__ uint64_t*)(wqeAddr + 24) = (uint64_t)dst; // destination VA
 
     __gm__ uint8_t* sgeAddr = wqeAddr + 32;
-    KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell sgeAddr = %p", sgeAddr);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm postSend sgeAddr:%p", sgeAddr);
     *(__gm__ uint32_t*)(sgeAddr) = len;
     *(__gm__ uint32_t*)(sgeAddr + sizeof(uint32_t)) = channelPtr->localBufferAddr->pti.rdmaMemProtectionInfo.lkey;
     *(__gm__ uint64_t*)(sgeAddr + 2 * sizeof(uint32_t)) = (uint64_t)src; // src VA addr memory registered by RNIC
@@ -130,7 +132,7 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::postSen
     HeadGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)curHardwareHead);
     AscendC::DataCopyExtParams copyParamsHead{1, 1 * sizeof(uint32_t), 0, 0, 0};
     AscendC::DataCopyPad(HeadGlobalTensor, ubLocalHead_, copyParamsHead);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell finish.");
+    KERNEL_LOG(KERNEL_INFO, "Hcomm postSend finish");
 }
 
 } // namespace AscendC
