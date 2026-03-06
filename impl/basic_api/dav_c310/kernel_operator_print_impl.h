@@ -19,6 +19,7 @@
 #include "kernel_operator_common_impl.h"
 #include "kernel_operator_data_copy_impl.h"
 #include "kernel_pop_stack_buffer.h"
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 namespace AscendC {
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
@@ -241,16 +242,16 @@ __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* 
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-    uint64_t ctrlValue = get_ctrl();
-    set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE,
         dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         PrintfRingBufImpl(printType, fmt, args...);
     } else {
+        uint64_t ctrlValue = get_ctrl();
+        set_atomic_none();
         PrintfEntityImpl(printType, fmt, args...);
+        set_ctrl(ctrlValue);
     }
-    set_ctrl(ctrlValue);
 }
 
 template <uint64_t timeoutCycle = 15 * 1000 * 1000> // 20ms * 15
@@ -447,15 +448,6 @@ __aicore__ constexpr uint32_t AlignTlvLen(const uint32_t& dataLen)
     return ((dataLen + num) & ~num) + num + 1;
 }
 
-template <typename... Args>
-__aicore__ inline uint32_t GetPrintTlvLen(uint32_t& argsNum, __gm__ const char* fmt, Args&&... args)
-{
-    constexpr uint32_t printInfoLen = sizeof(PrintTlvInfoHead);
-    const uint32_t& fmtLen = GetStringLength(fmt);
-    const uint32_t& argsLen = GetPrintArgsLen(argsNum, args...);
-    return AlignTlvLen(printInfoLen + argsLen + fmtLen); // gm need 8 byte align
-}
-
 __aicore__ inline void WriteRingBufTlvHead(
     DumpType printType, __gm__ PrintTlvInfoHead* printTlv, const uint32_t& tlvLen, const uint32_t& argsNum)
 {
@@ -484,27 +476,7 @@ __aicore__ inline void WriteRingBufTlvData(__gm__ PrintTlvInfoHead* printTlv, __
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-#ifdef ASCENDC_DUMP
-    EnablePrintf();
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    uint32_t argsNum = 0;
-    const uint32_t& tlvLen = GetPrintTlvLen(argsNum, fmt, args...);
-    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
-        return;
-    }
-
-    __gm__ PrintTlvInfoHead* printTlv = reinterpret_cast<__gm__ PrintTlvInfoHead*>(GetRingBufTlv(blockRingBufInfo));
-
-    WriteRingBufTlvHead(printType, printTlv, tlvLen, argsNum);
-    WriteRingBufTlvData(printTlv, fmt, args...);
-
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-
-    UpdateWriteInfo(writeInfo, tlvLen);
-#endif // ASCENDC_DUMP
+    __asc_aicore::printf_impl(fmt, args...);
 }
 
 
