@@ -53,7 +53,7 @@ TEST_F(TEST_COPY_GM_TO_L1_DN2NZ, TEST_COPY_GM_TO_L1_DN2NZ_##dtype)              
     uint8_t l2_cache_ctl = static_cast<uint8_t>(44);                                                \
     uint16_t n_value = static_cast<uint16_t>(55);                                              \
     uint32_t d_value = static_cast<uint32_t>(66);                                             \
-    uint64_t loop4_src_stride = uint64_t<uint8_t>(77);                                               \
+    uint64_t loop4_src_stride = static_cast<uint64_t>(77);                                               \
     bool smallc0_en = static_cast<bool>(true);                                            \
                                                                                                     \
     asc_copy_gm2l1_dn2nz(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);         \
@@ -74,7 +74,7 @@ TEST_F(TEST_COPY_GM_TO_L1_DN2NZ, TEST_COPY_GM_TO_L1_DN2NZ_SYNC_##dtype)         
     uint8_t l2_cache_ctl = static_cast<uint8_t>(44);                                                \
     uint16_t n_value = static_cast<uint16_t>(55);                                              \
     uint32_t d_value = static_cast<uint32_t>(66);                                             \
-    uint64_t loop4_src_stride = uint64_t<uint8_t>(77);                                               \
+    uint64_t loop4_src_stride = static_cast<uint64_t>(77);                                               \
     bool smallc0_en = static_cast<bool>(true);                                            \
                                                                                                     \
     asc_copy_gm2l1_dn2nz_sync(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);         \
