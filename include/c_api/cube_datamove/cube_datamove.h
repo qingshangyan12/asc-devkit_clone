@@ -31,6 +31,23 @@ __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config);
 
 __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config);
 
+// ==========asc_copy_l12fb==========
+__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_num, uint16_t burst_len,
+                                      uint16_t src_gap_size, uint16_t dst_gap_size);
+
+__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
+
+__aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
+
+//=============asc_copy_l12bt===============
+// void -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size);
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size);
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 // ==========asc_copy_gm2l1==========
@@ -172,14 +189,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ uint32_t* dst, __gm__ uint3
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t nd_num,
     uint16_t n_value, uint16_t d_value, uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride,
     uint16_t dst_nz_n_stride, uint16_t dst_nz_matrix_stride);
-
-// ==========asc_copy_l12fb==========
-__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_num, uint16_t burst_len,
-                                      uint16_t src_gap_size, uint16_t dst_gap_size);
-
-__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
-
-__aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
 
 // ==========asc_copy_l12l0b, 2D, int4b_t/uint8_t/int8_t/half/bfloat16_t/uint32_t/int32_t/float==========
 __aicore__ inline void asc_copy_l12l0b(__cb__ int4b_t* dst, __cbuf__ int4b_t* src,
@@ -658,13 +667,6 @@ __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, bfloat16_t value, c
 
 __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
-__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst,
-                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
-
-__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size);
-
-__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size);
-
 __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
 
 __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride);
@@ -748,6 +750,39 @@ __aicore__ inline void asc_set_gm2l1_loop1_stride(uint64_t loop1_src_stride, uin
 __aicore__ inline void asc_set_gm2l1_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride);
 
 __aicore__ inline void asc_set_gm2l1_pad(uint32_t pad_val);
+
+//=============asc_copy_l12bt===============
+// bfloat16_t -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size);
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size);
+
+// half -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint32_t size);
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uint32_t size);
+
+// float -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint32_t size);
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, uint32_t size);
+
+// int32_t -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap);
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint32_t size);
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, uint32_t size);
 
 #endif
 
