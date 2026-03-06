@@ -88,44 +88,6 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
      sudo yum install patch
      ```
 
-   - lcov >= 1.16（可选，仅执行UT时依赖）
-   
-     下载[lcov源码](https://gitcode.com/cann-src-third-party/lcov/releases/download/v1.16/lcov-1.16.tar.gz)后，执行以下命令安装：
-     ```bash
-     tar -xf lcov-1.16.tar.gz
-     cd lcov-1.16
-     make install                         # root用户安装
-     # sudo make install                  # 非root用户安装
-     ```
-
-   - pytest >= 8.0.0（可选，仅执行UT时依赖）
-
-     执行以下命令安装：
-     ```bash
-     pip3 install pytest
-     ```
-   
-   - coverage >= 4.5.4（可选，仅执行UT时依赖）
-
-     执行以下命令安装：
-     ```bash
-     pip3 install coverage
-     ```
-
-   - googletest（可选，仅执行UT时依赖，建议版本[release-1.14.0](https://gitcode.com/cann-src-third-party/googletest/releases/v1.14.0)）
-
-     下载[googletest源码](https://gitcode.com/cann-src-third-party/googletest/releases/download/v1.14.0/googletest-1.14.0.tar.gz)后，执行以下命令安装：
-
-     ```bash
-     tar -xf googletest-1.14.0.tar.gz
-     cd googletest-1.14.0
-     mkdir temp && cd temp                # 在googletest源码根目录下创建临时目录并进入
-     cmake .. -DCMAKE_CXX_FLAGS="-fPIC -D_GLIBCXX_USE_CXX11_ABI=0"
-     make
-     make install                         # root用户安装googletest
-     # sudo make install                  # 非root用户安装googletest
-     ```
-
 2. **安装驱动与固件（运行态依赖）**
 
    运行算子时必须安装驱动与固件，若仅编译算子，可跳过本操作，安装指导详见《[CANN 软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstSoftware)》。
@@ -134,7 +96,7 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
 本项目支持由源码编译，进行源码编译前，请根据如下步骤完成相关环境准备。
 
-1. **安装社区尝鲜版CANN toolkit包**
+1. **安装社区CANN toolkit包**
 
     根据实际环境，下载对应`Ascend-cann-toolkit_${cann_version}_linux-${arch}.run`包，下载链接为[toolkit x86_64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/x86_64/Ascend-cann-toolkit_9.0.0_linux-x86_64.run)、[toolkit aarch64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/aarch64/Ascend-cann-toolkit_9.0.0_linux-aarch64.run)。
 
@@ -199,10 +161,18 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
 1. 编译
 
-   本开源仓提供一键式编译安装能力，进入本开源仓代码根目录，执行如下命令：
+   本开源仓提供一键式编译安装能力。
+
+   方式一：进入本开源仓代码根目录，执行如下命令：
 
    ```bash
    bash build.sh --pkg
+   ```
+
+   方式二：用户也可使用离线下载功能，手动下载[makeself源码包](https://gitcode.com/cann-src-third-party/makeself/releases/download/release-2.5.0-patch1.0/makeself-release-2.5.0-patch1.tar.gz)存放至自定义目录PATH_TO_DOWNLOAD，进入本开源仓代码根目录，执行如下命令：
+
+   ```bash
+   bash build.sh --pkg --cann_3rd_lib_path={PATH_TO_DOWNLOAD} # PATH_TO_DOWNLOAD为自定义下载目录
    ```
 
    编译完成后会在`build_out`目录下生成cann-asc-devkit_*<cann_version>*_linux-*\<arch\>*.run软件包。
@@ -221,7 +191,35 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
 ## UT验证
 
-在开源仓根目录执行下列命令，将按各模块依次批跑tests目录下的用例，得到结果日志，用于看护编译是否正常。
+
+
+### 安装依赖
+- pytest >= 8.0.0
+
+    执行以下命令安装：
+    ```bash
+    pip3 install pytest
+    ```
+
+- coverage >= 4.5.4
+
+    执行以下命令安装：
+    ```bash
+    pip3 install coverage
+    ```
+
+- lcov >= 1.16(仅在执行覆盖率统计场景需要)
+
+    下载[lcov源码](https://gitcode.com/cann-src-third-party/lcov/releases/download/v1.16/lcov-1.16.tar.gz)后，执行以下命令安装：
+    ```bash
+    tar -xf lcov-1.16.tar.gz
+    cd lcov-1.16
+    make install                         # root用户安装
+    # sudo make install                  # 非root用户安装
+    ```
+
+### 执行
+方式一：在开源仓根目录执行下列命令，将按各模块依次批跑tests目录下的用例，得到结果日志，用于看护编译是否正常。
 
 ```bash
 bash build.sh --adv_test                         # 批跑tests目录下adv_api里的用例
@@ -229,3 +227,24 @@ bash build.sh --basic_test_one                   # 批跑tests目录下basic_api
 bash build.sh --basic_test_two                   # 批跑tests目录下basic_api part-two里的用例
 bash build.sh --basic_test_three                 # 批跑tests目录下basic_api part-three里的用例
 ```
+
+方式二：用户也可使用离线下载功能，手动下载[三方库源码包](#开源第三方软件依赖)存放至自定义目录PATH_TO_DOWNLOAD，在开源仓根目录执行下列命令，同时批跑执行各模块的用例。
+
+```bash
+# 以PATH_TO_DOWNLOAD为自定义下载目录为例
+bash build.sh --adv_test --cann_3rd_lib_path={PATH_TO_DOWNLOAD}          # 批跑tests目录下adv_api里的用例
+bash build.sh --basic_test_one --cann_3rd_lib_path={PATH_TO_DOWNLOAD}    # 批跑tests目录下basic_api part-one里的用例
+bash build.sh --basic_test_two --cann_3rd_lib_path={PATH_TO_DOWNLOAD}    # 批跑tests目录下basic_api part-two里的用例
+bash build.sh --basic_test_three --cann_3rd_lib_path={PATH_TO_DOWNLOAD}  # 批跑tests目录下basic_api part-three里的用例
+```
+
+### 开源第三方软件依赖
+
+在执行ut时，依赖的第三方开源软件列表如下：
+
+| 开源软件 | 版本 | 下载地址 |
+|---|---|---|
+| googletest | 1.14.0 | [googletest-1.14.0.tar.gz](https://gitcode.com/cann-src-third-party/googletest/releases/download/v1.14.0/googletest-1.14.0.tar.gz) |
+| boost | 1.87.0 | [boost_1_87_0.tar.gz](https://gitcode.com/cann-src-third-party/boost/releases/download/v1.87.0/boost_1_87_0.tar.gz) |
+| mockcpp | 2.7 | [makeself-release-2.5.0-patch1.tar.gz](https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h3/mockcpp-2.7.tar.gz) |
+| mockcpp_patch | 2.7 | [mockcpp-2.7_py3-h3.patch](https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h3/mockcpp-2.7_py3-h3.patch) |
