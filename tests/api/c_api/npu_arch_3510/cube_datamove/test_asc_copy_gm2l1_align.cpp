@@ -89,7 +89,7 @@ TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_SYNC_##dtype)         
     GlobalMockObject::verify();                                                                 \
 }    
 
-// ==========asc_copy_l12l0b==========
+// ==========asc_copy_gm2l1_align==========
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(bfloat16_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(half);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(float);
