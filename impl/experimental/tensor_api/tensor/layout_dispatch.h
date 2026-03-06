@@ -74,20 +74,21 @@ struct LayoutDispatcher;
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::NZ, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<FRACTAL_FIXED>{},  CeilDivision(row, FRACTAL_FIXED), 
-                                Std::Int<C0_SIZE / sizeof(T)>{},  CeilDivision(column, (C0_SIZE / sizeof(T))), 
-                                Std::Int<C0_SIZE / sizeof(T)>{},  Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{},
-                                Std::Int<1>{},  C0_SIZE / sizeof(T) * CeilAlign(row, FRACTAL_FIXED)); 
+        constexpr auto c0Size = Std::is_one_of_v<T, fp4x2_e1m2_t, fp4x2_e2m1_t> ? C0_SIZE * 2 : C0_SIZE / sizeof(T);
+        return LayoutConstructor(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row, FRACTAL_FIXED), Std::Int<c0Size>{},
+                                 CeilDivision(column, (c0Size)), Std::Int<c0Size>{}, Std::Int<c0Size * FRACTAL_FIXED>{},
+                                 Std::Int<1>{}, c0Size * CeilAlign(row, FRACTAL_FIXED));
     }
 };
 
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::ZN, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<C0_SIZE / sizeof(T)>{},  CeilDivision(row, (C0_SIZE / sizeof(T))),
+        constexpr auto c0Size = Std::is_one_of_v<T, fp4x2_e1m2_t, fp4x2_e2m1_t> ? C0_SIZE * 2 : C0_SIZE / sizeof(T);
+        return LayoutConstructor(Std::Int<c0Size>{},  CeilDivision(row, (c0Size)),
                                 Std::Int<FRACTAL_FIXED>{},  CeilDivision(column, FRACTAL_FIXED),
-                                Std::Int<1>{},  C0_SIZE / sizeof(T) * CeilAlign(column, FRACTAL_FIXED),
-                                Std::Int<C0_SIZE / sizeof(T)>{},  Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{});
+                                Std::Int<1>{},  c0Size * CeilAlign(column, FRACTAL_FIXED),
+                                Std::Int<c0Size>{},  Std::Int<c0Size * FRACTAL_FIXED>{});
     }
 };
 
