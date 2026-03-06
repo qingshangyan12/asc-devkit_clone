@@ -88,11 +88,19 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) {
+        if constexpr (Std::is_one_of_v<elementType, __gm__ fp4x2_e1m2_t, __gm__ fp4x2_e2m1_t> ||
+                      Std::is_one_of_v<elementType, __cbuf__ fp4x2_e1m2_t, __cbuf__ fp4x2_e2m1_t>) {
+            return Data()[Layout()(coord) >> 1];
+        }
         return Data()[Layout()(coord)];
     }
 
     template <typename Coord>
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const {
+        if constexpr (Std::is_one_of_v<elementType, __gm__ fp4x2_e1m2_t, __gm__ fp4x2_e2m1_t> ||
+                      Std::is_one_of_v<elementType, __cbuf__ fp4x2_e1m2_t, __cbuf__ fp4x2_e2m1_t>) {
+            return Data()[Layout()(coord) >> 1];
+        }
         return Data()[Layout()(coord)];
     }
 
