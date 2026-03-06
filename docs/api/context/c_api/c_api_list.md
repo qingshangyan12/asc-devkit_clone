@@ -7,7 +7,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |-----------------------|-----------------------|
 | [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | Load3Dv2接口的repeat参数 |
 | [asc_store_atomic_config](struct/asc_store_atomic_config.md) | 原子操作使能位与原子操作类型的值 |
-| [asc_fill_value_config](struct/asc_fill_value_config.md) | fill_value的初始化参数结构体，包含[asc_fill_l0a_value](cube_datamove/asc_fill_l0a_value.md)/[asc_fill_l0b_value](cube_datamove/asc_fill_l0b_value.md)/[asc_fill_l1_value](cube_datamove/asc_fill_l1_value.md)接口需要配置的各种初始化参数。 |
+| [asc_fill_value_config](struct/asc_fill_value_config.md) | fill_value的初始化参数结构体，包含[asc_fill_l0a](cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。 |
 
 ## 矢量计算
 
@@ -202,7 +202,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sync_mte2](sync/asc_sync_mte2.md)| 等待PIPE_MTE2流水完成。 |
 | [asc_sync_data_barrier](sync/asc_sync_data_barrier.md) | 用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。 |
 | [asc_sync_block_arrive](sync/asc_sync_block_arrive.md) | 该指令用于发送同步信息数据到核间同步寄存器，设置同步点。 |
-| [asc_sync_block_wait](sync/asc_sync_block_wait.md) | 和[asc_sync_block_arrive](asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。 |
+| [asc_sync_block_wait](sync/asc_sync_block_wait.md) | 和[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。 |
 
 
 ## 系统变量
@@ -287,7 +287,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_get_mask_spr](reg/reg_load/asc_get_mask_spr.md) | 从特殊寄存器SPR{MASK1, MASK0}读取mask值并根据数据类型格式返回对应的mask数据，MASK0、MASK1均为64bit的寄存器。 |
 | [asc_load](reg/reg_load/asc_load.md) | reg计算数据搬运接口，支持从UB非32字节对齐的源地址src搬运至矢量数据寄存器，搬运量为VL。 |
 | [asc_loadunalign](reg/reg_load/asc_loadunalign.md) | reg计算数据搬运接口，适用于从UB非32B对齐的起始地址连续搬入矢量数据寄存器的场景。 |
-| [asc_loadunalign_pre](reg//reg_load/asc_loadunalign_pre.md) | 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](./asc_loadunalign.md)接口使用。 |
+| [asc_loadunalign_pre](reg//reg_load/asc_loadunalign_pre.md) | 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](reg/reg_load/asc_loadunalign.md)接口使用。 |
 | [asc_store](reg/reg_store/asc_store.md) | reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，应尽量避免使用该接口。 |
 | [asc_storeunalign](reg/reg_store/asc_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 | [asc_storeunalign_postupdate](reg/reg_store/asc_storeunalign_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
@@ -315,7 +315,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_frequency_histogram](reg/reg_vector/asc_frequency_histogram.md) | 对直方图数据进行频率统计。 |
 | [asc_ge](reg/reg_vector/asc_ge.md) | 对源操作数执行逐元素比较。对于src0 >= src1，若条件成立则目的操作数对应结果位为1，否则为0。 |
 | [asc_ge_scalar](reg/reg_vector/asc_ge_scalar.md) | 对源操作数与标量执行逐元素比较。对于src0 >= value，若条件成立则目的操作数对应结果位为1，否则为0。 |
-| [asc_half2bf16](reg/reg_vector/asc_half2bfloat16.md) | 将half数据类型的矢量逐元素转换为bfloat16_t类型。 |
+| [asc_half2bf16](reg/reg_vector/asc_half2bf16.md) | 将half数据类型的矢量逐元素转换为bfloat16_t类型。 |
 | [asc_half2hif8](reg/reg_vector/asc_half2hif8.md) | 将half数据类型的矢量逐元素转换为hifloat8_t类型。 |
 | [asc_half2int16](reg/reg_vector/asc_half2int16.md) | 将half数据类型的矢量逐元素转换为int16_t类型。 |
 | [asc_half2int32](reg/reg_vector/asc_half2int32.md) | 将half数据类型的矢量逐元素转换为int32_t类型。 |
