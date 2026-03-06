@@ -22,89 +22,55 @@
 namespace AscendC {
 namespace Te {
 
-enum class Format3510 : uint8_t { None, NZ, ND, DN };
-enum class QuantMode3510 : uint8_t { None, Scalar, Vector, Direct };
-
-template <typename T>
-__aicore__ inline constexpr Format3510 GetDataFormat()
-{
-    if constexpr (IsL0cNZFormat<T>::value || IsNZFormat<T>::value) {
-        return Format3510::NZ;
-    } else if constexpr (IsNDFormat<T>::value) {
-        return Format3510::ND;
-    } else if constexpr (IsDNFormat<T>::value) {
-        return Format3510::DN;
-    }
-    return Format3510::None;
-}
-
-template <const FixpipeTrait& trait>
-__aicore__ inline constexpr QuantMode3510 GetQuantMode()
-{
-    if constexpr (IsVectorQuantMode<trait.quantPre>()) {
-        return QuantMode3510::Vector;
-    } else if constexpr (IsScalarQuantMode<trait.quantPre>()) {
-        return QuantMode3510::Scalar;
-    } else if constexpr (IsDirectQuantMode<trait.quantPre>()) {
-        return QuantMode3510::Direct;
-    }
-    return QuantMode3510::None;
-}
-
-class FormatRegistorIgnore3510 {
-public:
-    template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord) {}
-};
 
 template <Format3510 dstFormat, Format3510 srcFormat, QuantMode3510 QuantMode3510>
-struct FormatRegistor3510 {
+struct FormatRegistorFixpipe2Gm3510 {
     using type = FormatRegistorIgnore3510;
 };
 
 template <>
-struct FormatRegistor3510<Format3510::NZ, Format3510::NZ, QuantMode3510::Direct> {
-    using type = FixpipeNZ2NZSimpleQuant3510;
+struct FormatRegistorFixpipe2Gm3510<Format3510::NZ, Format3510::NZ, QuantMode3510::Direct> {
+    using type = Fixpipe2GmNZ2NZSimpleQuant3510;
 };
 
 template <>
-struct FormatRegistor3510<Format3510::ND, Format3510::NZ, QuantMode3510::Direct> {
-    using type = FixpipeNZ2NDSimpleQuant3510;
+struct FormatRegistorFixpipe2Gm3510<Format3510::ND, Format3510::NZ, QuantMode3510::Direct> {
+    using type = Fixpipe2GmNZ2NDSimpleQuant3510;
 };
 
 template <>
-struct FormatRegistor3510<Format3510::DN, Format3510::NZ, QuantMode3510::Direct> {
-    using type = FixpipeNZ2DNSimpleQuant3510;
+struct FormatRegistorFixpipe2Gm3510<Format3510::DN, Format3510::NZ, QuantMode3510::Direct> {
+    using type = Fixpipe2GmNZ2DNSimpleQuant3510;
 };
 
 template <>
-struct FormatRegistor3510<Format3510::NZ, Format3510::NZ, QuantMode3510::Scalar> {
-    using type = FixpipeNZ2NZSimpleQuant3510;
+struct FormatRegistorFixpipe2Gm3510<Format3510::NZ, Format3510::NZ, QuantMode3510::Scalar> {
+    using type = Fixpipe2GmNZ2NZSimpleQuant3510;
 };
 
 template <>
-struct FormatRegistor3510<Format3510::ND, Format3510::NZ, QuantMode3510::Scalar> {
-    using type = FixpipeNZ2NDSimpleQuant3510;
+struct FormatRegistorFixpipe2Gm3510<Format3510::ND, Format3510::NZ, QuantMode3510::Scalar> {
+    using type = Fixpipe2GmNZ2NDSimpleQuant3510;
 };
 
 template <>
-struct FormatRegistor3510<Format3510::DN, Format3510::NZ, QuantMode3510::Scalar> {
-    using type = FixpipeNZ2DNSimpleQuant3510;
+struct FormatRegistorFixpipe2Gm3510<Format3510::DN, Format3510::NZ, QuantMode3510::Scalar> {
+    using type = Fixpipe2GmNZ2DNSimpleQuant3510;
 };
 
 template <>
-struct FormatRegistor3510<Format3510::NZ, Format3510::NZ, QuantMode3510::Vector> {
-    using type = FixpipeNZ2NZVectorQuant3510;
+struct FormatRegistorFixpipe2Gm3510<Format3510::NZ, Format3510::NZ, QuantMode3510::Vector> {
+    using type = Fixpipe2GmNZ2NZVectorQuant3510;
 };
 
 template <>
-struct FormatRegistor3510<Format3510::ND, Format3510::NZ, QuantMode3510::Vector> {
-    using type = FixpipeNZ2NDVectorQuant3510;
+struct FormatRegistorFixpipe2Gm3510<Format3510::ND, Format3510::NZ, QuantMode3510::Vector> {
+    using type = Fixpipe2GmNZ2NDVectorQuant3510;
 };
 
 template <>
-struct FormatRegistor3510<Format3510::DN, Format3510::NZ, QuantMode3510::Vector> {
-    using type = FixpipeNZ2DNVectorQuant3510;
+struct FormatRegistorFixpipe2Gm3510<Format3510::DN, Format3510::NZ, QuantMode3510::Vector> {
+    using type = Fixpipe2GmNZ2DNVectorQuant3510;
 };
 
 template <const FixpipeTrait& trait, typename T, typename U>
@@ -180,7 +146,7 @@ private:
     {
         CheckFixpipeQuantParams<trait, T, U>();
         using FixpipeQuantL0C2GM =
-            typename FormatRegistor3510<GetDataFormat<T>(), GetDataFormat<U>(), GetQuantMode<trait>()>::type;
+            typename FormatRegistorFixpipe2Gm3510<GetDataFormat<T>(), GetDataFormat<U>(), GetQuantMode<trait>()>::type;
         FixpipeQuantL0C2GM{}.template Run<trait, T, U, V, Coord>(dst, src, quant, coord);
     }
 };
