@@ -67,6 +67,39 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
     __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % qpDepth));
     KERNEL_LOG(KERNEL_ERROR, "Hcomm doorBell wqeAddr = %p", wqeAddr);
 
+    // Write the WQE to GM
+    uint64_t ownBit = (curHead >> shift) & 1U;
+    uint32_t byte_4 = 3U;                     // [0:4] opcode=0x3(RDMA_WRITE)
+    byte_4 |= ((~ownBit) << 7U) & (1U << 7U); // [7] owner_bit
+    byte_4 |= 1U << 8U;                       // [8:8] IBV_SEND_SIGNALED
+
+    *(__gm__ uint32_t*)(wqeAddr) = byte_4;         // Control set by local parameter see above lines
+    *(__gm__ uint32_t*)(wqeAddr + 4) = len;        // message size
+    *(__gm__ uint32_t*)(wqeAddr + 8) = 0;          // immtdata is always 0 till we provide poll CQ flow in AIV
+    *(__gm__ uint32_t*)(wqeAddr + 12) = 1U << 24U; // [120:127] num_sge = 1
+    *(__gm__ uint32_t*)(wqeAddr + 16) = 0;         // [128:151] start_sge_idx = 0;
+    *(__gm__ uint32_t*)(wqeAddr + 20) = channelPtr->remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey;
+    *(__gm__ uint64_t*)(wqeAddr + 24) = (uint64_t)dst; // destination VA
+
+    __gm__ uint8_t* sgeAddr = wqeAddr + 32;
+    KERNEL_LOG(KERNEL_ERROR, "Hcomm doorBell sgeAddr = %p", sgeAddr);
+    *(__gm__ uint32_t*)(sgeAddr) = len;
+    *(__gm__ uint32_t*)(sgeAddr + sizeof(uint32_t)) = channelPtr->localBufferAddr->pti.rdmaMemProtectionInfo.lkey;
+    *(__gm__ uint64_t*)(sgeAddr + 2 * sizeof(uint32_t)) = (uint64_t)src; // src VA addr memory registered by RNIC
+
+    cacheWriteThrough(wqeAddr, 48);
+
+    curHead++;
+
+    uint64_t doorBellInfo = 0;
+    doorBellInfo |= channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn; // [0:23] DB_TAG (qp_num)
+    doorBellInfo |= 0UL << 24UL;                                      // [24:27] DB_CMD = HNS_ROCE_V2_SQ_DB (0)
+    doorBellInfo |= (curHead % 65536UL) << 32UL;                      // [32:47] DB_PI = sq.head
+    doorBellInfo |= (uint64_t)(channelPtr->sqContextAddr->ctx.rdmaSqContext.sl) << 48UL; // [48:50] DB_SL = qp.sl
+
+    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.dbVa);
+    KERNEL_LOG(KERNEL_ERROR, "Hcomm doorBell doorBellAddr = %p", doorBellAddr);
+
     
 }
 
