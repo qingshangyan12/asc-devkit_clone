@@ -100,7 +100,7 @@ __aicore__ inline void asc_set_atomic_add_int()
     asc_set_atomic_add_int_impl();
 }
 
-// ==========asc_set_atomic_add_int16==========
+// ==========asc_set_atomic_add_int8==========
 __aicore__ inline void asc_set_atomic_add_int8()
 {
     asc_set_atomic_add_int8_impl();
