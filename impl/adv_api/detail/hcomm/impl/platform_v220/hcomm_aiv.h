@@ -95,7 +95,13 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::postSen
                sqBaseAddr, wqeSize, curHead, qpDepth);
 
     // Make sure we don't overflow the SQ in an infinite loop - no need to mitigate endless loop as the host
-    // will timeout and kill the kernel, same as all2all kernel if it fails to complete (e.g. in case of link loss)
+    // will timeout and kill the kernel, same as all2all kernel if it fails to complete (e.g. in case of link loss) 
+    while(1) {
+        cacheWriteThrough((__gm__ uint8_t*)curHardwareTailAddr, 8); // Flush the tail to make sure it is visible to the host
+        if ((curHead - *(__gm__ uint32_t*)(curHardwareTailAddr)) < qpDepth - 1) {
+            break;
+        }
+    }
 
     __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % qpDepth));
     KERNEL_LOG(KERNEL_INFO, "Hcomm postSend wqeAddr:%p", wqeAddr);
@@ -125,7 +131,7 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::postSen
     curHead++;
 
     // Post doorbell
-    doorBell(channelPtr);
+    doorBell(channelPtr, curHead);
 
     ubLocalHead_.SetValue(0, (uint32_t)curHead);
     AscendC::GlobalTensor<uint32_t> HeadGlobalTensor;
