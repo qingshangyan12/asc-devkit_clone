@@ -33,7 +33,7 @@ Ascend C是[CANN](https://hiascend.com/software/cann) （Compute Architecture fo
 
 ## 🔍目录结构说明
 
-本代码仓目录结构如下：
+本代码仓目录结构如下： 
 
 ```
 ├── cmake                               # Ascend C 构建源代码
