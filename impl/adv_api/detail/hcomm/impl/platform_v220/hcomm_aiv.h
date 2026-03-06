@@ -39,7 +39,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
                                                                                       uint64_t len)
 {
     HcommHandle handleId = ++curHandleId_;
-    doorBell(channelHandle, dst, src, len);
+    postSend(channelHandle, dst, src, len);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Write finish handleId:%u", handleId);
     return handleId;
 }
@@ -50,7 +50,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
                                                                                      uint64_t len)
 {
     HcommHandle handleId = ++curHandleId_;
-    doorBell(channelHandle, dst, src, len);
+    postSend(channelHandle, dst, src, len);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Read finish andleId:%u", handleId);
     return handleId;
 }
@@ -94,12 +94,6 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::postSen
 
     // Make sure we don't overflow the SQ in an infinite loop - no need to mitigate endless loop as the host
     // will timeout and kill the kernel, same as all2all kernel if it fails to complete (e.g. in case of link loss)
-    while (1) {
-        cacheWriteThrough((__gm__ uint8_t*)curHardwareTailAddr, CACHEWRITESIZE);
-        if ((curHead - *(__gm__ uint32_t*)(curHardwareTailAddr)) < qpDepth - 1) {
-            break;
-        }
-    }
 
     __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % qpDepth));
     KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell wqeAddr = %p", wqeAddr);
