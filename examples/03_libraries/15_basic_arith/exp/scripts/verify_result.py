@@ -21,10 +21,11 @@ ABSOLUTE_TOL = 1e-9
 ERROR_TOL = 1e-4
 
 
-def verify_result(output, golden):
+def verify_result(output, golden, input):
     output_type = np.float16
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
+    input = np.fromfile(input, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=RELATIVE_TOL,
@@ -35,9 +36,10 @@ def verify_result(output, golden):
         real_index = different_element_indexes[index]
         golden_data = golden[real_index]
         output_data = output[real_index]
+        input_data = input[real_index]
         print(
-            "data index: %06d, expected: %-.9f, actual: %-.9f" %
-            (real_index, golden_data, output_data))
+            "data index: %06d, expected: %-.9f, actual: %-.9f, input: %-.9f" %
+            (real_index, golden_data, output_data, input_data))
         if index == 100:
             break
     error_ratio = float(different_element_indexes.size) / golden.size
@@ -47,7 +49,7 @@ def verify_result(output, golden):
 
 if __name__ == '__main__':
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        res = verify_result(sys.argv[1], sys.argv[2], sys.argv[3])
         if not res:
             raise ValueError("[ERROR] result error")
         else:
