@@ -196,6 +196,7 @@ __aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Comm
     SetAtomicAdd<uint64_t>();
     Ub2Gm(dbGlobalTensor, doorBell_, 1);
     SetAtomicNone();
+    return HCOMM_SUCCESS;
 }
 
 template <pipe_t pipe>
@@ -249,6 +250,7 @@ __aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Wait
     sqCI_.SetValue(0, sqTail);
 
     Ub2Gm(sqCiGlobalTensor, sqCI_, 1); // 更新 Sq CI 到 gm
+    return HCOMM_SUCCESS;
 }
 } // namespace AscendC
 
