@@ -100,7 +100,27 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::doorBel
     __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.dbVa);
     KERNEL_LOG(KERNEL_ERROR, "Hcomm doorBell doorBellAddr = %p", doorBellAddr);
 
-    
+    TPipe tpipe;
+
+    TBuf<TPosition::VECOUT> rdmaInBuf;
+    tpipe.InitBuffer(rdmaInBuf, 32);
+    ubLocal_= rdmaInBuf.Get<uint64_t>();
+
+    ubLocal_.SetValue(0, doorBellInfo);
+    AscendC::GlobalTensor<uint64_t> DBGlobalTensor;
+    DBGlobalTensor.SetGlobalBuffer(doorBellAddr);
+    AscendC::DataCopyExtParams copyParams{1, 1 * sizeof(uint64_t), 0, 0, 0};
+    AscendC::DataCopyPad(DBGlobalTensor, ubLocal_, copyParams);
+
+    TBuf<TPosition::VECOUT> rdmaInBuf2;
+    tpipe.InitBuffer(rdmaInBuf2, 32);
+    ubLocalHead_ = rdmaInBuf2.Get<uint32_t>();
+
+    ubLocalHead_.SetValue(0, (uint32_t)curHead);
+    AscendC::GlobalTensor<uint32_t> HeadGlobalTensor;
+    HeadGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)curHardwareHead);
+    AscendC::DataCopyExtParams copyParamsHead{1, 1 * sizeof(uint32_t), 0, 0, 0};
+    AscendC::DataCopyPad(HeadGlobalTensor, ubLocalHead_, copyParamsHead);
 }
 
 } // namespace AscendC
