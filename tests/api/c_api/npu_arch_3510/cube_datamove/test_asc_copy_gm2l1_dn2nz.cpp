@@ -41,8 +41,8 @@ protected:
                                                                                       \
 TEST_F(TEST_COPY_GM_TO_L1_DN2NZ, TEST_COPY_GM_TO_L1_DN2NZ_##dtype)               \
 {                                                                                     \
-    MOCKER_CPP(copy_gm_to_cbuf_multi_dn2nz, void(__cbuf__ dtype*, __gm__ dtype*, uint8_t, uint32_t, uint32_t, uint8_t,          \
-                        uint8_t, bool, uint8_t, uint64_t, uint32_t))                    \
+    MOCKER_CPP(copy_gm_to_cbuf_multi_dn2nz, void(__cbuf__ dtype*, __gm__ dtype*, uint8_t, uint64_t, uint8_t, uint16_t,          \
+                        uint32_t, uint64_t, bool))                    \
             .times(1)                                                                           \
             .will(invoke(copy_gm_to_cbuf_multi_dn2nz_stub<dtype>));                               \
                                                                                                 \
@@ -62,8 +62,8 @@ TEST_F(TEST_COPY_GM_TO_L1_DN2NZ, TEST_COPY_GM_TO_L1_DN2NZ_##dtype)              
                                                                                                 \
 TEST_F(TEST_COPY_GM_TO_L1_DN2NZ, TEST_COPY_GM_TO_L1_DN2NZ_SYNC_##dtype)                                       \
 {                                                                                              \
-    MOCKER_CPP(copy_gm_to_cbuf_multi_dn2nz, void(__cbuf__ dtype*, __gm__ dtype*, uint8_t, uint32_t, uint32_t, uint8_t,          \
-                        uint8_t, bool, uint8_t, uint64_t, uint32_t))                    \
+    MOCKER_CPP(copy_gm_to_cbuf_multi_dn2nz, void(__cbuf__ dtype*, __gm__ dtype*, uint8_t, uint64_t, uint8_t, uint16_t,          \
+                        uint32_t, uint64_t, bool))                    \
             .times(1)                                                                           \
             .will(invoke(copy_gm_to_cbuf_multi_dn2nz_stub<dtype>));                               \
                                                                                                 \
