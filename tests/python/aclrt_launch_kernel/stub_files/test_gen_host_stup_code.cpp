@@ -18,10 +18,6 @@
 #include <dlfcn.h>
 #include <securec.h>
 
-#ifndef ASCENDC_DUMP
-#define ASCENDC_DUMP 1
-#endif
-
 static char ascendcErrMsg[1024] = {0};
 
 static void *g_kernel_handle_aiv = nullptr;
