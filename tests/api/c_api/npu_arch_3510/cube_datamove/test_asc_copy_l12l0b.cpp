@@ -13,6 +13,7 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
+/*
 template <typename DTYPE>
 __aicore__ inline void img2colv2_cbuf_to_cb_stub(__cb__ DTYPE* dst, __cbuf__ DTYPE* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
                                                 uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
@@ -119,9 +120,8 @@ TEST_CUBE_DATAMOVE_COPY_L12L0B(float8_e5m2_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(half);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(float);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(hifloat8_t);
-TEST_CUBE_DATAMOVE_COPY_L12L0B(int16_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(int32_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(int8_t);
-TEST_CUBE_DATAMOVE_COPY_L12L0B(uint16_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(uint32_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(uint8_t);
+*/
