@@ -133,6 +133,21 @@ struct IsIntegralConstant<Std::Int<Value>> : Std::true_type {};
 template <typename T>
 constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
 
+#if !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
+
+#ifndef ASCC_PARAM_BLOCK_CUBE
+#define ASCC_PARAM_BLOCK_CUBE
+const int32_t BLOCK_CUBE = 16;
+#endif
+
+#else // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
+
+#ifndef ASCC_PARAM_BLOCK_CUBE
+#define ASCC_PARAM_BLOCK_CUBE
+constexpr uint32_t BLOCK_CUBE = 16;
+#endif
+#endif // !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
+
 } // namespace Te
 } // namespace AscendC
 

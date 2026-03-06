@@ -106,9 +106,9 @@ private:
         auto layout = src.Layout();
         uint16_t colLength = GetEleFromLayout<decltype(layout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(layout);
         uint16_t rowStride = GetEleFromLayout<decltype(layout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(layout);
-        uint16_t blockCount = CeilDivision(calNSize, colLength);
-        uint16_t blockLen = CeilDivision(colLength * sizeof(srcType), fbufBurstLenUnit);
-        uint16_t srcStride = CeilDivision(rowStride * sizeof(srcType), C0_SIZE);
+        uint16_t blockCount = Std::CeilDivision(calNSize, colLength);
+        uint16_t blockLen = Std::CeilDivision(colLength * sizeof(srcType), fbufBurstLenUnit);
+        uint16_t srcStride = Std::CeilDivision(rowStride * sizeof(srcType), C0_SIZE);
         uint16_t dstStride = blockLen;
         uint32_t deqValueOffset = MAIN_LOOP_N_SIZE_2201 / colLength * rowStride * nIterIndex;
 

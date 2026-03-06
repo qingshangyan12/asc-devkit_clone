@@ -85,9 +85,9 @@ private:
         using dstType = typename T::elementType;
 
         uint16_t blockCount = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
-        uint16_t blockLen = CeilDivision(srcCol * sizeof(srcType), C2PIPE2GM_UNIT);
-        uint16_t srcStride = CeilDivision(srcRow * sizeof(srcType), C0_SIZE);
-        uint16_t dstStride = CeilDivision(dstRow * sizeof(dstType), C2PIPE2GM_UNIT);
+        uint16_t blockLen = AscendC::Std::CeilDivision(srcCol * sizeof(srcType), C2PIPE2GM_UNIT);
+        uint16_t srcStride = AscendC::Std::CeilDivision(srcRow * sizeof(srcType), C0_SIZE);
+        uint16_t dstStride = AscendC::Std::CeilDivision(dstRow * sizeof(dstType), C2PIPE2GM_UNIT);
 
         return Std::make_tuple(blockCount, blockLen, srcStride, dstStride);
     }
