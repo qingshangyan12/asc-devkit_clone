@@ -14,7 +14,7 @@
 #include "c_api/asc_simd.h"
 
 template <typename DTYPE>
-__aicore__ inline void copy_gm_to_cbuf_align_v2_stub(__cbuf__ int16_t* dst, __gm__ int16_t* src, uint8_t sid, uint32_t burst_num, uint32_t burst_len, uint8_t left_padding_count,
+__aicore__ inline void copy_gm_to_cbuf_align_v2_stub(__cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid, uint32_t burst_num, uint32_t burst_len, uint8_t left_padding_count,
                                                 uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint64_t burst_dst_stride) {
     EXPECT_EQ(dst, reinterpret_cast<__cbuf__ DTYPE *>(11));
     EXPECT_EQ(src, reinterpret_cast<__gm__ DTYPE *>(22));
