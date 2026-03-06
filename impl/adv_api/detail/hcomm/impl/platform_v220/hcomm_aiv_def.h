@@ -27,16 +27,14 @@ public:
     __aicore__ inline HcommHandle Read(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Commit(HcommHandle handleId) {return 0;}
+    __aicore__ inline int32_t Commit(HcommHandle handleId) {return -1;}
 
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Wait(HcommHandle handleId) {return 0;}
-
-public:
-    __aicore__ inline void doorBell(ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline int32_t Wait(HcommHandle handleId) {return -1;}
 
 private:
     HcommHandle curHandleId_ = static_cast<int8_t>(-1);
+    TPipe pipe_;
     LocalTensor<uint64_t> ubLocal_;
     LocalTensor<uint32_t> ubLocalHead_;
 };
