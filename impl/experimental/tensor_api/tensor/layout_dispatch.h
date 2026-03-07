@@ -144,6 +144,32 @@ struct LayoutDispatcher<LayoutFormat::NN, fp8_e8m0_t> {
     }
 };
 
+template <typename T0, typename T1, typename T2, typename T3>
+__aicore__ inline decltype(auto) ShapeConstructor(T0&& t0, T1&& t1, T2&& t2, T3&& t3) {
+    auto shape = Make2Params2Tuple(MakeTupleCons{}, t0, t1, t2, t3);
+    return Shape(shape);
+}
+
+// shape_dispatch.h
+template <LayoutFormat format, typename T>
+struct ShapeDispatcher;
+
+template <typename T>
+struct ShapeDispatcher<LayoutFormat::ND, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return ShapeConstructor(Std::Int<FRACTAL_FIXED>{},  CeilDivision(row, FRACTAL_FIXED), 
+                                Std::Int<C0_SIZE / sizeof(T)>{},  CeilDivision(column, (C0_SIZE / sizeof(T)))); 
+    }
+};
+
+template <typename T>
+struct ShapeDispatcher<LayoutFormat::DN, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return ShapeConstructor(Std::Int<FRACTAL_FIXED>{},  CeilDivision(row, FRACTAL_FIXED), 
+                                Std::Int<C0_SIZE / sizeof(T)>{},  CeilDivision(column, (C0_SIZE / sizeof(T)))); 
+    }
+};
+
 } // namespace Te
 } // namespace AscendC
 
