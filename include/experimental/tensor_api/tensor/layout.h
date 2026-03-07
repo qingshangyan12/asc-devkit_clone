@@ -148,6 +148,41 @@ using L0CLayoutFormat = NZLayoutFormat<Std::ignore_t, row, column>;
  template <typename Layout, typename TileShape>
 __aicore__ inline decltype(auto) MakeTileLayout(const Layout& layout, const TileShape& tileShape);
 
+template <typename T>
+__aicore__ inline decltype(auto) MakeNzShape(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeZnShape(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeDNShape(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeNDShape(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeZzShape(size_t row, size_t column);
+
+// make stride 
+template <typename T>
+__aicore__ inline decltype(auto) MakeNzStride(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeZnStride(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeDNStride(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeNDStride(size_t row, size_t column);
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeZzStride(size_t row, size_t column);
+
+// make coord
+template <typename T>
+__aicore__ inline decltype(auto) MakeFractalCoord(size_t row, size_t column);
+
 } // namespace Te
 } // namespace AscendC
 
