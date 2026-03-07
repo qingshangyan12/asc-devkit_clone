@@ -20,7 +20,12 @@ add_executable(demo
 )
 
 message(STATUS "[INFO] SIZE is ${SIZE}")
-message(SCENARIO_NUM "[INFO] SCENARIO_NUM IS ${SCENARIO_NUM}")
+message(STATUS "[INFO] SCENARIO_NUM IS ${SCENARIO_NUM}")
+
+target_compile_definitions(demo PRIVATE
+    SIZE=${SIZE}
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
 
 target_link_libraries(demo PRIVATE
     tiling_api
@@ -28,11 +33,6 @@ target_link_libraries(demo PRIVATE
     platform
     m
     dl
-)
-
-target_compile_options(demo PRIVATE
-    SIZE=${SIZE}
-    SCENARIO_NUM=${SCENARIO_NUM}
 )
 
 # ======================================================================================

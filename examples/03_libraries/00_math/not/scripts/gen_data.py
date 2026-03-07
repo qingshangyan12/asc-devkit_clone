@@ -15,12 +15,13 @@
 import os
 import sys
 import numpy as np
+import argparse
 
 
-def gen_golden_data_simple():
-    dtype = np.int32
-    src_shape = [1024]
-    dst_shape = [1024]
+def gen_golden_data_simple(scenarioNum, size):
+    dtype = np.int16
+    src_shape = [size]
+    dst_shape = [size]
 
     np.set_printoptions(threshold=sys.maxsize, suppress=False)
 
@@ -35,4 +36,8 @@ def gen_golden_data_simple():
     golden.tofile("./output/golden.bin")
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser()
+ 	parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 15))
+ 	parser.add_argument('-size', type=int)
+ 	args = parser.parse_args()
+    gen_golden_data_simple(scenarioNum, size)
