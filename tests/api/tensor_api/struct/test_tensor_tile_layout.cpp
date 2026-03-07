@@ -204,12 +204,12 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
 {
     using namespace AscendC::Te;
     
-    auto NnLayout = MakeNnLayout<fp8_e8m0_t>(16, 48); // (scaleK, n)
-    auto Zzlayout = MakeZzLayout<fp8_e8m0_t>(48, 16); // (m, scaleK)
-    auto MxANDLayout = MakeScaleANDLayout<fp8_e8m0_t>(48, 16); // (m, scaleK) 不转置
-    auto MxADNLayout = MakeScaleADNLayout<fp8_e8m0_t>(48, 16); // (m, scaleK) 转置
+    auto NnLayout = MakeNnLayout<fp8_e8m0_t>{}(16, 48); // (scaleK, n)
+    auto Zzlayout = MakeZzLayout<fp8_e8m0_t>{}(48, 16); // (m, scaleK)
+    auto MxANDLayout = MakeScaleANDLayout<fp8_e8m0_t>{}(48, 16); // (m, scaleK) 不转置
+    auto MxADNLayout = MakeScaleADNLayout<fp8_e8m0_t>{}(48, 16); // (m, scaleK) 转置
     auto MxBNDLayout = MakeScaleBNDLayout<fp8_e8m0_t>(16, 48); // (scaleK, n) 不转置
-    auto MxBDNLayout = MakeScaleBDNLayout<fp8_e8m0_t>(16, 48); // (scaleK, n) 转置
+    auto MxBDNLayout = MakeScaleBDNLayout<fp8_e8m0_t>{}(16, 48); // (scaleK, n) 转置
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(NnLayout)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(NnLayout)), 16);
@@ -765,7 +765,7 @@ TEST_F(Tensor_Api_Layout, TestMakeNzLayout)
     using namespace AscendC::Te;
     size_t row1 = 256UL;
     size_t col1 = 16UL;
-    auto layout1 = MakeNzLayout<float>(row1, col1);
+    auto layout1 = MakeNzLayout<float>{}(row1, col1);
     auto shapeRow1 = AscendC::Std::get<0>(GetShape(layout1));
     auto shapeCol1 = AscendC::Std::get<1>(GetShape(layout1));
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
@@ -781,7 +781,7 @@ TEST_F(Tensor_Api_Layout, TestMakeNzLayout)
 
     size_t row2 = 128UL;
     size_t col2 = 65536UL;
-    auto layout2 = MakeNzLayout<uint8_t>(row2, col2);
+    auto layout2 = MakeNzLayout<uint8_t>{}(row2, col2);
     auto shapeRow2 = AscendC::Std::get<0>(GetShape(layout2));
     auto shapeCol2 = AscendC::Std::get<1>(GetShape(layout2));
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
@@ -840,7 +840,7 @@ TEST_F(Tensor_Api_Layout, TestMakeNDLayout)
     using namespace AscendC::Te;
     size_t row1 = 128UL;
     size_t col1 = 32UL;
-    auto layout1 = MakeNDLayout<uint32_t>(row1, col1);
+    auto layout1 = MakeNDLayout<uint32_t>{}(row1, col1);
     auto shapeRow1 = AscendC::Std::get<0>(GetShape(layout1));
     auto shapeCol1 = AscendC::Std::get<1>(GetShape(layout1));
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
@@ -856,7 +856,7 @@ TEST_F(Tensor_Api_Layout, TestMakeNDLayout)
 
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
-    auto layout2 = MakeNDLayout<float>(row2, col2);
+    auto layout2 = MakeNDLayout<float>{}(row2, col2);
     auto shapeRow2 = AscendC::Std::get<0>(GetShape(layout2));
     auto shapeCol2 = AscendC::Std::get<1>(GetShape(layout2));
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
@@ -878,7 +878,7 @@ TEST_F(Tensor_Api_Layout, TestMakeDNLayout)
     using namespace AscendC::Te;
     size_t row1 = 128UL;
     size_t col1 = 32UL;
-    auto layout1 = MakeDNLayout<uint32_t>(row1, col1);
+    auto layout1 = MakeDNLayout<uint32_t>{}(row1, col1);
     auto shapeRow1 = AscendC::Std::get<0>(GetShape(layout1));
     auto shapeCol1 = AscendC::Std::get<1>(GetShape(layout1));
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
@@ -894,7 +894,7 @@ TEST_F(Tensor_Api_Layout, TestMakeDNLayout)
 
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
-    auto layout2 = MakeDNLayout<float>(row2, col2);
+    auto layout2 = MakeDNLayout<float>{}(row2, col2);
     auto shapeRow2 = AscendC::Std::get<0>(GetShape(layout2));
     auto shapeCol2 = AscendC::Std::get<1>(GetShape(layout2));
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
@@ -916,7 +916,7 @@ TEST_F(Tensor_Api_Layout, TestMakeZnLayout)
     using namespace AscendC::Te;
     size_t row1 = 32UL;
     size_t col1 = 64UL;
-    auto layout1 = MakeZnLayout<uint32_t>(row1, col1);
+    auto layout1 = MakeZnLayout<uint32_t>{}(row1, col1);
     auto shapeRow1 = AscendC::Std::get<0>(GetShape(layout1));
     auto shapeCol1 = AscendC::Std::get<1>(GetShape(layout1));
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
@@ -932,7 +932,7 @@ TEST_F(Tensor_Api_Layout, TestMakeZnLayout)
 
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
-    auto layout2 = MakeZnLayout<float>(row2, col2);
+    auto layout2 = MakeZnLayout<float>{}(row2, col2);
     auto shapeRow2 = AscendC::Std::get<0>(GetShape(layout2));
     auto shapeCol2 = AscendC::Std::get<1>(GetShape(layout2));
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));
@@ -954,7 +954,7 @@ TEST_F(Tensor_Api_Layout, TestMakeZzLayout)
     using namespace AscendC::Te;
     size_t row1 = 32UL;
     size_t col1 = 64UL;
-    auto layout1 = MakeZzLayout<uint32_t>(row1, col1);
+    auto layout1 = MakeZzLayout<uint32_t>{}(row1, col1);
     auto shapeRow1 = AscendC::Std::get<0>(GetShape(layout1));
     auto shapeCol1 = AscendC::Std::get<1>(GetShape(layout1));
     auto strideRow1 = AscendC::Std::get<0>(GetStride(layout1));
@@ -970,7 +970,7 @@ TEST_F(Tensor_Api_Layout, TestMakeZzLayout)
 
     size_t row2 = 2048UL;
     size_t col2 = 1024UL;
-    auto layout2 = MakeZzLayout<float>(row2, col2);
+    auto layout2 = MakeZzLayout<float>{}(row2, col2);
     auto shapeRow2 = AscendC::Std::get<0>(GetShape(layout2));
     auto shapeCol2 = AscendC::Std::get<1>(GetShape(layout2));
     auto strideRow2 = AscendC::Std::get<0>(GetStride(layout2));

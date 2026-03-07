@@ -77,11 +77,11 @@ public:
         using namespace AscendC::Te;
 
         auto gmIterator = MakeGMmemPtr(gmA);
-        auto gmMatrixLayout = MakeNDLayout<SrcT>(mLength, kLength);
+        auto gmMatrixLayout = MakeNDLayout<SrcT>{}(mLength, kLength);
         auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
         auto aIterator = MakeL1memPtr(a1Addr);
-        auto aMatrixLayout = MakeNzLayout<SrcT>(mLength, kLength);
+        auto aMatrixLayout = MakeNzLayout<SrcT>{}(mLength, kLength);
         auto aTensor = MakeTensor(aIterator, aMatrixLayout);
 
         auto coord = MakeCoord(
@@ -98,11 +98,11 @@ public:
         using namespace AscendC::Te;
 
         auto gmIterator = MakeGMmemPtr(gmB);
-        auto gmMatrixLayout = MakeNDLayout<Src1T>(kLength, nLength);
+        auto gmMatrixLayout = MakeNDLayout<Src1T>{}(kLength, nLength);
         auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
 
         auto bIterator = MakeL1memPtr(b1Addr);
-        auto bMatrixLayout = MakeNzLayout<Src1T>(kLength, nLength);
+        auto bMatrixLayout = MakeNzLayout<Src1T>{}(kLength, nLength);
         auto bTensor = MakeTensor(bIterator, bMatrixLayout);
 
         auto coord = MakeCoord(
@@ -119,11 +119,11 @@ public:
         using namespace AscendC::Te;
 
         auto a1Iterator = MakeL1memPtr(a1Addr);
-        auto a1MatrixLayout = MakeNDLayout<SrcT>(mLength, kLength);
+        auto a1MatrixLayout = MakeNDLayout<SrcT>{}(mLength, kLength);
         auto a1Tensor = MakeTensor(a1Iterator, a1MatrixLayout);
 
         auto fbIterator = MakeFixbufmemPtr(fbAddr);
-        auto fbMatrixLayout = MakeNDLayout<SrcT>(mLength, kLength);
+        auto fbMatrixLayout = MakeNDLayout<SrcT>{}(mLength, kLength);
         auto fbTensor = MakeTensor(fbIterator, fbMatrixLayout); 
 
         auto coord = MakeCoord(
@@ -140,11 +140,11 @@ public:
         using namespace AscendC::Te;
 
         auto l1Iterator = MakeL1memPtr(l1Addr);
-        auto l1MatrixLayout = MakeNDLayout<DstT>(mLength, kLength);
+        auto l1MatrixLayout = MakeNDLayout<DstT>{}(mLength, kLength);
         auto l1Tensor = MakeTensor(l1Iterator, l1MatrixLayout);
 
         auto btIterator = MakeBiasmemPtr(btAddr);
-        auto btMatrixLayout = MakeNDLayout<DstT>(mLength, kLength);
+        auto btMatrixLayout = MakeNDLayout<DstT>{}(mLength, kLength);
         auto btTensor = MakeTensor(btIterator, btMatrixLayout); 
 
         auto coord = MakeCoord(
@@ -161,11 +161,11 @@ public:
         using namespace AscendC::Te;
 
         auto a1Iterator = MakeL1memPtr(a1Addr);
-        auto a1MatrixLayout = MakeNzLayout<SrcT>(mLength, kLength);
+        auto a1MatrixLayout = MakeNzLayout<SrcT>{}(mLength, kLength);
         auto a1Tensor = MakeTensor(a1Iterator, a1MatrixLayout);
 
         auto l0aIterator = MakeL0AmemPtr(l0aAddr);
-        auto l0aMatrixLayout = MakeZzLayout<SrcT>(mLength, kLength);
+        auto l0aMatrixLayout = MakeZzLayout<SrcT>{}(mLength, kLength);
         auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
 
         auto coord = MakeCoord(
@@ -182,11 +182,11 @@ public:
         using namespace AscendC::Te;
 
         auto b1Iterator = MakeL1memPtr(b1Addr);
-        auto b1MatrixLayout = MakeNzLayout<Src1T>(kLength, nLength);
+        auto b1MatrixLayout = MakeNzLayout<Src1T>{}(kLength, nLength);
         auto b1Tensor = MakeTensor(b1Iterator, b1MatrixLayout);
 
         auto l0bIterator = MakeL0BmemPtr(l0bAddr);
-        auto l0bMatrixLayout = MakeZnLayout<Src1T>(kLength, nLength);
+        auto l0bMatrixLayout = MakeZnLayout<Src1T>{}(kLength, nLength);
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
 
         auto coord = MakeCoord(
@@ -205,19 +205,19 @@ public:
         using namespace AscendC::Te;
 
         auto l0aIterator = MakeL0AmemPtr(l0aAddr);
-        auto l0aMatrixLayout = MakeZzLayout<SrcT>(mLength, kLength);
+        auto l0aMatrixLayout = MakeZzLayout<SrcT>{}(mLength, kLength);
         auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
 
         auto l0bIterator = MakeL0BmemPtr(l0bAddr);
-        auto l0bMatrixLayout = MakeZnLayout<Src1T>(kLength, nLength);
+        auto l0bMatrixLayout = MakeZnLayout<Src1T>{}(kLength, nLength);
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
 
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNzLayout<ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNzLayout<ignore_t>{}(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         auto biasIterator = MakeL0CmemPtr(btAddr);
-        auto biasMatrixLayout = MakeNDLayout<BiasT>(1, nLength);
+        auto biasMatrixLayout = MakeNDLayout<BiasT>{}(1, nLength);
         auto biasTensor = MakeTensor(biasIterator, biasMatrixLayout); 
 
         Mmad(l0cTensor, l0aTensor, l0bTensor, biasTensor, defaultMmadWithBiasParams);
@@ -229,15 +229,15 @@ public:
         using namespace AscendC::Te;
 
         auto l0aIterator = MakeL0AmemPtr(l0aAddr);
-        auto l0aMatrixLayout = MakeZzLayout<SrcT>(mLength, kLength);
+        auto l0aMatrixLayout = MakeZzLayout<SrcT>{}(mLength, kLength);
         auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
 
         auto l0bIterator = MakeL0BmemPtr(l0bAddr);
-        auto l0bMatrixLayout = MakeZnLayout<Src1T>(kLength, nLength);
+        auto l0bMatrixLayout = MakeZnLayout<Src1T>{}(kLength, nLength);
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
 
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNzLayout<ignore_t>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNzLayout<ignore_t>{}(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
         Mmad(l0cTensor, l0aTensor, l0bTensor, defaultMmadParams);
     }
@@ -247,11 +247,11 @@ public:
         using namespace AscendC::Te;
         
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeNzLayout<DstT>(mLength, nLength);
+        auto l0cMatrixLayout = MakeNzLayout<DstT>{}(mLength, nLength);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout); 
 
         auto gmIterator = MakeGMmemPtr(gmC);
-        auto gmMatrixLayout = MakeNzLayout<DstT>(mLength, kLength);
+        auto gmMatrixLayout = MakeNzLayout<DstT>{}(mLength, kLength);
         auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout); 
     }
 

@@ -90,7 +90,7 @@ public:
             Fixpipe<trait>(gmTensor, l0cTensor);
         } else {
             auto qIterator = MakeL1memPtr(qAddr);
-            auto qMatrixLayout = MakeNDLayout<uint64_t>(1, nLength_);
+            auto qMatrixLayout = MakeNDLayout<uint64_t>{}(1, nLength_);
             auto qTensor = MakeTensor(qIterator, qMatrixLayout);
             Fixpipe<trait>(gmTensor, l0cIterator, qTensor);
         }
@@ -109,15 +109,15 @@ private:
     {
         auto gmIterator = MakeGMmemPtr(gmC_);
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
-            auto gmMatrixLayout = MakeNzLayout<DstT>(mLength_, nLength_);
+            auto gmMatrixLayout = MakeNzLayout<DstT>{}(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         } else if constexpr (C_TYPE::format == CubeFormat::DN) {
-            auto gmMatrixLayout = MakeDNLayout<DstT>(mLength_, nLength_);
+            auto gmMatrixLayout = MakeDNLayout<DstT>{}(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         } else {
-            auto gmMatrixLayout = MakeNDLayout<DstT>(mLength_, nLength_);
+            auto gmMatrixLayout = MakeNDLayout<DstT>{}(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         }
