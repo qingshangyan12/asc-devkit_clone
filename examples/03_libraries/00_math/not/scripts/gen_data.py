@@ -32,7 +32,7 @@ def gen_golden_data_simple(scenarioNum, size):
         golden = ~src
     elif scenarioNum == 1:
         for i in range(size):
-            if i % 2 = 0:
+            if i % 2 == 0:
                 golden[i] = ~src[i]
     elif scenarioNum == 2:
         for i in range(size):
