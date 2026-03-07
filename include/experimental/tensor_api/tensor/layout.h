@@ -148,6 +148,66 @@ using L0CLayoutFormat = NZLayoutFormat<Std::ignore_t, row, column>;
  template <typename Layout, typename TileShape>
 __aicore__ inline decltype(auto) MakeTileLayout(const Layout& layout, const TileShape& tileShape);
 
+// shape
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeNzShape(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeZnShape(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeDNShape(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeNDShape(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeZzShape(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleANDShape(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleADNShape(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleBNDShape(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleBDNShape(U row, S column);
+
+// make stride 
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeNzStride(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeZnStride(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeDNStride(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeNDStride(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeZzStride(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleANDStride(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleADNStride(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleBNDStride(U row, S column);
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleBDNStride(U row, S column);
+
+// make coord
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeFractalCoord(U point1, S point2);
+
 } // namespace Te
 } // namespace AscendC
 

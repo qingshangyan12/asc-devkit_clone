@@ -217,10 +217,10 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(Zzlayout)), 2);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxANDLayout)), 48);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxANDLayout)), 16);
-    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxADNLayout)), 1); // 48
+    EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxADNLayout)), 1);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxADNLayout)), 2);
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxBNDLayout)), 8); // 1
-    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxBNDLayout)), 48); // 8
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(MxBNDLayout)), 8);
+    EXPECT_EQ(AscendC::Std::get<1>(GetShape<1>(MxBNDLayout)), 48);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(MxBDNLayout)), 1);
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxBDNLayout)), 1);
 }
@@ -1059,4 +1059,150 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
     EXPECT_EQ(Crd2Idx(coord1, layoutObj1), 9);
     EXPECT_EQ(Crd2Idx(coord2, layoutObj2), 13);
     EXPECT_EQ(Crd2Idx(coord3, layoutObj3), 72);
+}
+
+TEST_F(Tensor_Api_Layout, TestMakeXxShape)
+{
+    using namespace AscendC::Te;
+    size_t row = 16UL;
+    size_t column = 48UL;
+    // ((1, 16),(1, 48))
+    auto shape1 = MakeNDShape<uint16_t>(row, column);
+    auto shapeRow1 = AscendC::Std::get<0>(shape1);
+    auto shapeCol1 = AscendC::Std::get<1>(shape1);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow1), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol1), 48);
+    // 常量版本
+    auto shape11 = MakeNDShape<uint16_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<48>{});
+    auto shapeRow11 = AscendC::Std::get<0>(shape1);
+    auto shapeCol11 = AscendC::Std::get<1>(shape1);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow11), AscendC::Std::Int<16>{});
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol11), AscendC::Std::Int<48>{});
+
+    auto shape2 = MakeNzShape<uint16_t>(row, column);
+    auto shapeRow2 = AscendC::Std::get<0>(shape2);
+    auto shapeCol2 = AscendC::Std::get<1>(shape2);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow2), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol2), 48);
+    // 常量版本
+    auto shape21 = MakeNDShape<uint16_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<48>{});
+    auto shapeRow21 = AscendC::Std::get<0>(shape21);
+    auto shapeCol21 = AscendC::Std::get<1>(shape21);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow21), AscendC::Std::Int<16>{});
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol21), AscendC::Std::Int<48>{});
+
+    auto shape3 = MakeNzShape<uint16_t>(row, column);
+    auto shapeRow3 = AscendC::Std::get<0>(shape3);
+    auto shapeCol3 = AscendC::Std::get<1>(shape3);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow3), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol3), 48);
+
+    auto shape4 = MakeZnShape<uint16_t>(row, column);
+    auto shapeRow4 = AscendC::Std::get<0>(shape4);
+    auto shapeCol4 = AscendC::Std::get<1>(shape4);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow4), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol4), 48);
+
+    auto shape5 = MakeDNShape<uint16_t>(row, column);
+    auto shapeRow5 = AscendC::Std::get<0>(shape5);
+    auto shapeCol5 = AscendC::Std::get<1>(shape5);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow5), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol5), 48);
+
+    auto shape6 = MakeZzShape<uint16_t>(row, column);
+    auto shapeRow6 = AscendC::Std::get<0>(shape6);
+    auto shapeCol6 = AscendC::Std::get<1>(shape6);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow6), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol6), 48);
+
+    auto shape7 = MakeScaleANDShape<uint16_t>(row, column);
+    auto shapeRow7 = AscendC::Std::get<0>(shape7);
+    auto shapeCol7 = AscendC::Std::get<1>(shape7);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow7), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol7), 48);
+
+    auto shape8 = MakeScaleADNShape<uint16_t>(row, column);
+    auto shapeRow8 = AscendC::Std::get<0>(shape8);
+    auto shapeCol8 = AscendC::Std::get<1>(shape8);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow8), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol8), 48);
+
+    auto shape9 = MakeScaleBNDShape<uint16_t>(row, column);
+    auto shapeRow9 = AscendC::Std::get<0>(shape9);
+    auto shapeCol9 = AscendC::Std::get<1>(shape9);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow9), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol9), 48);
+
+    auto shape10 = MakeScaleBDNShape<uint16_t>(row, column);
+    auto shapeRow10 = AscendC::Std::get<0>(shape10);
+    auto shapeCol10 = AscendC::Std::get<1>(shape10);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeRow10), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(shapeCol10), 48);
+}
+
+TEST_F(Tensor_Api_Layout, TestMakeXxStride)
+{
+    using namespace AscendC::Te;
+    size_t row = 16UL;
+    size_t column = 48UL;
+
+    auto stride1 = MakeNzStride<uint16_t>(row, column);
+    auto strideRow1 = AscendC::Std::get<0>(stride1);
+    auto strideCol1 = AscendC::Std::get<1>(stride1);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow1), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol1), 48);
+
+    auto stride2 = MakeZnStride<uint16_t>(row, column);
+    auto strideRow2 = AscendC::Std::get<0>(stride2);
+    auto strideCol2 = AscendC::Std::get<1>(stride2);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow2), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol2), 48);
+
+    auto stride3 = MakeDNStride<uint16_t>(row, column);
+    auto strideRow3 = AscendC::Std::get<0>(stride3);
+    auto strideCol3 = AscendC::Std::get<1>(stride3);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow3), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol3), 48);
+
+    auto stride4 = MakeNDStride<uint16_t>(row, column);
+    auto strideRow4 = AscendC::Std::get<0>(stride4);
+    auto strideCol4 = AscendC::Std::get<1>(stride4);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow4), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol4), 48);
+
+    auto stride5 = MakeZzStride<uint16_t>(row, column);
+    auto strideRow5 = AscendC::Std::get<0>(stride5);
+    auto strideCol5 = AscendC::Std::get<1>(stride5);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow5), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol5), 48);
+
+    auto stride6 = MakeScaleANDStride<uint16_t>(row, column);
+    auto strideRow6 = AscendC::Std::get<0>(stride6);
+    auto strideCol6 = AscendC::Std::get<1>(stride6);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow6), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol6), 48);
+
+    auto stride7 = MakeScaleADNStride<uint16_t>(row, column);
+    auto strideRow7 = AscendC::Std::get<0>(stride7);
+    auto strideCol7 = AscendC::Std::get<1>(stride7);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow7), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol7), 48);
+
+    auto stride8 = MakeScaleBNDStride<uint16_t>(row, column);
+    auto strideRow8 = AscendC::Std::get<0>(stride8);
+    auto strideCol8 = AscendC::Std::get<1>(stride8);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow8), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol8), 48);
+
+    auto stride9 = MakeScaleBDNStride<uint16_t>(row, column);
+    auto strideRow9 = AscendC::Std::get<0>(stride9);
+    auto strideCol9 = AscendC::Std::get<1>(stride9);
+    EXPECT_EQ(AscendC::Std::get<1>(strideRow9), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(strideCol9), 48);
+
+    auto coord = MakeFractalCoord<uint16_t>(row, column);
+    auto coordRow = AscendC::Std::get<0>(coord);
+    auto coordCol = AscendC::Std::get<1>(coord);
+    EXPECT_EQ(AscendC::Std::get<1>(coordRow), 16);
+    EXPECT_EQ(AscendC::Std::get<1>(coordCol), 48);
 }
