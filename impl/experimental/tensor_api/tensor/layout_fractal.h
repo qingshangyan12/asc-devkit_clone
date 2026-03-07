@@ -119,6 +119,16 @@ __aicore__ inline decltype(auto) MakeScaleBDNLayout(size_t row, size_t column) {
     return LayoutDispatcher<LayoutFormat::DN, Std::ignore_t>::apply(row, column); // (scaleK, n)
 }
 
+template <typename T>
+__aicore__ inline decltype(auto) MakeNDShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::ND, T>::apply(row, column);
+}
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeDNShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::DN, T>::apply(row, column);
+}
+
 } // namespace Te
 } // namespace AscendC
 
