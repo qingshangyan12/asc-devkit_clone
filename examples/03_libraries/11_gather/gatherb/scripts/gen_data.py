@@ -60,15 +60,6 @@ def gen_golden_data_simple(scenarioNum):
         dst_rep_stride = 8
 
     offset_size = block_length // dst_blk_stride * input_type.itemsize // one_data_block_size
-    # output_shape = [block_length]
-    # multiples = np.random.randint(0, 1000, size=offset_size)
-    # input_y = multiples * one_data_block_size
-    # input_y = input_y.astype(np.uint32)
-    # max_val_y = input_y.max()
-    # input_shape = [(max_val_y + one_data_block_size) // input_type.itemsize]
-    # input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
-    # golden = np.zeros(output_shape).astype(output_type)
-
     input_y = np.arange(0, offset_size * input_type.itemsize * 2, input_type.itemsize * 2, np.uint32)
     input_shape = [block_length // dst_blk_stride * 2]
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
