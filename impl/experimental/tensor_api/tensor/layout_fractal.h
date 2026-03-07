@@ -60,6 +60,7 @@ template <typename T, size_t row, size_t column>
 using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRACTAL_FIXED * column>>,
     Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
 
+// ========== MakeXXLayout ==========
 template <typename T>
 __aicore__ inline decltype(auto) MakeNzLayout(size_t row, size_t column) {
     return LayoutDispatcher<LayoutFormat::NZ, T>::apply(row, column);
@@ -117,6 +118,47 @@ __aicore__ inline decltype(auto) MakeScaleBNDLayout(size_t row, size_t column) {
 template <typename T>
 __aicore__ inline decltype(auto) MakeScaleBDNLayout(size_t row, size_t column) { // 转置(scaleK, n)
     return LayoutDispatcher<LayoutFormat::DN, Std::ignore_t>::apply(row, column); // (scaleK, n)
+}
+
+// ========== MakeXXShape ==========
+template <typename T>
+__aicore__ inline decltype(auto) MakeNzShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::NZ, T>::apply(row, column);
+}
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeNDShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::ND, T>::apply(row, column);
+}
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeDNShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::DN, T>::apply(row, column);
+}
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeZnShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::ZN, T>::apply(row, column);
+}
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeZzShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::ZZ, T>::apply(row, column);
+}
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeNnShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::NN, T>::apply(row, column);
+}
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeScakeANDShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::ND, T>::apply(row, column);
+}
+
+template <typename T>
+__aicore__ inline decltype(auto) MakeScakeBNDShape(size_t row, size_t column) {
+    return ShapeDispatcher<LayoutFormat::ND, T>::apply(row, column);
 }
 
 } // namespace Te

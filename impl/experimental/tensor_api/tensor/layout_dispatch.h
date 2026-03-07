@@ -144,6 +144,61 @@ struct LayoutDispatcher<LayoutFormat::NN, fp8_e8m0_t> {
     }
 };
 
+// shape_dispatch.h
+template <typename T0, typename T1, typename T2, typename T3>
+__aicore__ inline decltype(auto) ShapeConstructor(T0&& t0, T1&& t1, T2&& t2, T3&& t3) {
+    return Make2Params2Tuple(MakeTupleCons{}, t0, t1, t2, t3);
+}
+
+template <LayoutFormat format, typename T>
+struct ShapeDispatcher;
+
+template <typename T>
+struct ShapeDispatcher<LayoutFormat::NZ, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return ShapeConstructor(Std::Int<FRACTAL_FIXED>{},  CeilDivision(row, FRACTAL_FIXED), 
+                                Std::Int<C0_SIZE / sizeof(T)>{},  CeilDivision(column, (C0_SIZE / sizeof(T))));
+    }
+};
+
+template <typename T>
+struct ShapeDispatcher<LayoutFormat::ND, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return ShapeConstructor(Std::Int<1>{}, row, Std::Int<1>{}, column);
+    }
+};
+
+template <typename T>
+struct ShapeDispatcher<LayoutFormat::DN, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return ShapeConstructor(Std::Int<1>{}, row, Std::Int<1>{}, column);
+    }
+};
+
+template <typename T>
+struct ShapeDispatcher<LayoutFormat::ZN, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return ShapeConstructor(Std::Int<C0_SIZE / sizeof(T)>{},  CeilDivision(row, (C0_SIZE / sizeof(T))),
+                                Std::Int<FRACTAL_FIXED>{},  CeilDivision(column, FRACTAL_FIXED));
+    }
+};
+
+template <typename T>
+struct ShapeDispatcher<LayoutFormat::ZZ, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return ShapeConstructor(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row, FRACTAL_FIXED),
+                                Std::Int<C0_SIZE / sizeof(T)>{}, CeilDivision(column, (C0_SIZE / sizeof(T))));
+    }
+};
+
+template <typename T>
+struct ShapeDispatcher<LayoutFormat::NN, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return ShapeConstructor(Std::Int<2>{}, Std::Int<row / 2>{}, Std::Int<16>{}, Std::Int<column / 16>{});
+    }
+};
+
+
 } // namespace Te
 } // namespace AscendC
 
