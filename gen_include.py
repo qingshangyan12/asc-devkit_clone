@@ -77,15 +77,15 @@ def process_file(file_path: str, prefix_template: str, suffix_template: str):
 def main():  
     target_dir = "m:/Users/g00954368/Desktop/code/code_marco/asc-devkit-dev/include/" 
 
-    prefix_template = """#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADRS_)  
-#define _ASCENDC_INCLUDE_INTERNAL_HEADRS_  
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADRS_replaceUpper_H__  
+    prefix_template = """#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)  
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_  
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_replaceUpper_H__  
 #endif    
 """  
  	 
-    suffxi_template = """#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADRS_replaceUpper_H__)  
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADRS_  
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADRS_replaceUpper_H__  
+    suffxi_template = """#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_replaceUpper_H__)  
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_  
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_replaceUpper_H__  
 #endif  
 """  
     if not os.path.isdir(target_dir):  

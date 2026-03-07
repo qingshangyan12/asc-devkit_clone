@@ -77,16 +77,16 @@ def process_file(file_path: str, prefix_template: str, suffix_template: str):
 def main():  
     target_dir = "m:/Users/g00954368/Desktop/code/code_marco/asc-devkit-dev/include/" 
 
-    prefix_template = """#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADRS_)
+    prefix_template = """#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
 #pragma message("replaceFileNameString is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use kernel_reg_compute_intf.h and use public functions or variables defined in interface headers files.")   
-#define _ASCENDC_INCLUDE_INTERNAL_HEADRS_  
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADRS_replaceUpper__  
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_  
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_replaceUpper__  
 #endif    
 """  
  	 
-    suffxi_template = """#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADRS_replaceUpper__)  
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADRS_  
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADRS_replaceUpper__  
+    suffxi_template = """#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_replaceUpper__)  
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_  
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_replaceUpper__  
 #endif  
 """  
     if not os.path.isdir(target_dir):  
