@@ -54,15 +54,15 @@ def process_file(file_path: str, prefix_template: str, suffix_template: str):
             else:  
                 print(f"[提示] {file_path}中未找到#ifndef，跳过前缀插入")  
 
-            if lines:  
-                if not lines[-1].endswith("\n"):  
-                    lines[-1] += "\n"  
-            lines.append("\n")  
-            lines.append(f"{actual_suffix}\n")  
+        if lines:  
+            if not lines[-1].endswith("\n"):  
+                lines[-1] += "\n"  
+        lines.append("\n")  
+        lines.append(f"{actual_suffix}\n")  
  	 
-            with open(file_path, "w", encoding=FILE_ENCODING) as f:  
-                f.writelines(lines)  
-            print(f"[成功] 处理完成：{file_path}\n")  
+        with open(file_path, "w", encoding=FILE_ENCODING) as f:  
+            f.writelines(lines)  
+        print(f"[成功] 处理完成：{file_path}\n")  
  	 
  	 
  	 
@@ -104,15 +104,15 @@ def main():
  	 
  	 
  	 
-        print(f"共找到{len(file_list)} 个待处理文件，开始处理...\n")  
-        for file_path in file_list:  
-            process_file(file_path, prefix_template, suffxi_template)  
+    print(f"共找到{len(file_list)} 个待处理文件，开始处理...\n")  
+    for file_path in file_list:  
+        process_file(file_path, prefix_template, suffxi_template)  
  	 
  	 
  	 
  	 
-        print("所有文件处理完成！")  
-        print(f"注：源文件已备份为 {BAK_SUFFIX} 后缀，确认无误后可手动删除备份文件")  
+    print("所有文件处理完成！")  
+    print(f"注：源文件已备份为 {BAK_SUFFIX} 后缀，确认无误后可手动删除备份文件")  
  	 
  	 
 if __name__ == "__main__":  
