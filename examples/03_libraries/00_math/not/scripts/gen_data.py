@@ -28,7 +28,16 @@ def gen_golden_data_simple(scenarioNum, size):
     src = np.random.uniform(-1000, 1000, src_shape).astype(dtype)
     golden = np.zeros(dst_shape).astype(dtype)
 
-    golden = ~src
+    if scenarioNum == 0:
+        golden = ~src
+    elif scenarioNum == 1:
+        for i in range(size):
+            if i % 2 = 0:
+                golden[i] = ~src[i]
+    elif scenarioNum == 2:
+        for i in range(size):
+            if i % 128 < 64:
+                golden[i] = ~src[i]
 
     os.makedirs("input", exist_ok=True)
     src.tofile("./input/input_src.bin")
@@ -37,7 +46,7 @@ def gen_golden_data_simple(scenarioNum, size):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
- 	parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 15))
- 	parser.add_argument('-size', type=int)
- 	args = parser.parse_args()
-    gen_golden_data_simple(scenarioNum, size)
+    parser.add_argument('-scenarioNum', type=int)
+    parser.add_argument('-size', type=int)
+    args = parser.parse_args()
+    gen_golden_data_simple(args.scenarioNum, args.size)
