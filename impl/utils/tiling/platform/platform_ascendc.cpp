@@ -254,7 +254,7 @@ uint32_t PlatformAscendC::CalcTschNumBlocks(uint32_t sliceNum, uint32_t aicCoreN
     uint32_t numBlocks = (sliceNum + (ration - 1)) / ration;
     // in mix case: 910B1(ration = 2), numBlocks should not be greater than physical aic core num
     if ((ration == MIX_AIC_AIV_RATION_910B1) && (numBlocks > aicCoreNum)) {
-        PF_LOGE("CalcTschBlockDim failed, calc numBlocks %u should not be greater than aicCoreNum %u", numBlocks,
+        PF_LOGE("CalcTschNumBlocks failed, calc numBlocks %u should not be greater than aicCoreNum %u", numBlocks,
             aicCoreNum);
         return 0;
     }
