@@ -13,18 +13,21 @@
 
 
 import sys
+import argparse
 import numpy as np
-import tensorflow as tf
-
 
 relative_tol = 1e-3
 absolute_tol = 1e-5
 error_tol = 1e-3
 
 
-def verify_result(output, golden):
-    output = np.fromfile(output, dtype=np.float16).reshape(-1)
-    golden = np.fromfile(golden, dtype=np.float16).reshape(-1)
+def verify_result(scenarioNum, output, golden):
+    if scenarioNum >= 1 and scenarioNum <= 4:
+        output_type = np.float16
+    elif scenarioNum == 5:
+        output_type = np.float32
+    output = np.fromfile(output, dtype=output_type).reshape(-1)
+    golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=relative_tol,
@@ -47,8 +50,13 @@ def verify_result(output, golden):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 5))
+    parser.add_argument('output', type=str)
+    parser.add_argument('golden', type=str)
+    args = parser.parse_args()
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        res = verify_result(args.scenarioNum, args.output, args.golden)
         if not res:
             raise ValueError("[ERROR] result error")
         else:

@@ -28,7 +28,10 @@ def get_range_by_dtype(input_type):
         print(f"Unsupported data type:{input_type}")
 
 def gen_golden_data_simple(scenarioNum=1):
-    input_type = np.dtype("float16")
+    if scenarioNum >= 1 and scenarioNum <= 4:
+        input_type = np.dtype("float16")
+    elif scenarioNum == 5:
+        input_type = np.dtype("float32")
     output_type = input_type
     min_val, max_val = get_range_by_dtype(input_type)
     one_data_block_size = 32 # 一个datablock能处理32B数据

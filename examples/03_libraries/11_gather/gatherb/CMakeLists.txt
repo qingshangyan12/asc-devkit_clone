@@ -27,6 +27,12 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+ 	 
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
+
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
 )
