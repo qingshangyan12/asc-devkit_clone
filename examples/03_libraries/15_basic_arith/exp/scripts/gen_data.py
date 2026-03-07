@@ -20,12 +20,12 @@ def get_dtype_limits(data_type):
     return {
         'min': finfo.min,
         'max': finfo.max,
-        # 'tiny': finfo.tiny,
         'pos_zero': np.array(+0.0, dtype=data_type),
         'neg_zero': np.array(-0.0, dtype=data_type),
         'nan': np.array(np.nan, dtype=data_type),
         'pos_inf': np.array(np.inf, dtype=data_type),
         'neg_inf': np.array(-np.inf, dtype=data_type),
+        # 'tiny': finfo.tiny,
     }
 
 
@@ -38,12 +38,12 @@ def construct_boundary_inputs(data_type, repeat=32):
     special_values = [
         limits['min'],
         limits['max'],
-        # limits['tiny'],
         limits['pos_zero'],
         limits['neg_zero'],
         limits['nan'],
         limits['pos_inf'],
         limits['neg_inf'],
+        # limits['tiny'],
     ]
     # 每种值重复 repeat 次
     pattern = np.concatenate([[v] * repeat for v in special_values]).astype(data_type)
@@ -76,6 +76,8 @@ def gen_golden_data(input_type=1, repeat=32):
     save_bin(input_array, f"./input/input_x.bin")
     save_bin(golden_array, f"./output/golden.bin")
 
+    # print("\n[gen_data.py] len(golden) = {}, len(input) = {}".format(len(golden_array), len(input_array)))
+
     # 打印每种特殊值及其对应的 exp 结果
     special_names = ['min', 'max', '+0', '-0', 'NaN', '+INF', '-INF']
     print(f"Constructed input ({len(input_array)} elements, {repeat} each):\n")
@@ -83,7 +85,7 @@ def gen_golden_data(input_type=1, repeat=32):
         idx = i * repeat
         inp_val = input_array[idx]
         out_val = golden_array[idx]
-        print(f"input({name}) = {inp_val} --> output = {out_val}")
+        print(f"input({name}) = {inp_val} --> golden output = {out_val}")
 
 
 if __name__ == "__main__":

@@ -17,4 +17,4 @@ echo ">>>>>>>>>>>>>>>>>> start run kernel"
 
 
 echo ">>>>>>>>>>>>>>>>>> start compare result" 
-python3 ../scripts/verify_result.py output/output.bin output/golden.bin input/input_x.bin # 验证输出结果是否正确，确认算法逻辑正确
+python3 ../scripts/verify_result.py -output_type=${INPUT_TYPE} -output=output/output.bin -golden=output/golden.bin -input=input/input_x.bin # 验证输出结果是否正确，确认算法逻辑正确

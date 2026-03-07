@@ -13,16 +13,21 @@
 
 
 import sys
+import argparse
 import numpy as np
 
 
+# for float32
 RELATIVE_TOL = 1e-6
 ABSOLUTE_TOL = 1e-9
 ERROR_TOL = 1e-4
 
 
-def verify_result(output, golden, input):
-    output_type = np.float16
+def verify_result(output_type, output, golden, input):
+    if output_type == 1:
+        output_type = np.float16
+    else:
+        output_type = np.float32
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     input = np.fromfile(input, dtype=output_type).reshape(-1)
@@ -48,8 +53,14 @@ def verify_result(output, golden, input):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-output_type', type=int, default=1, choices=[1, 2])
+    parser.add_argument('-output', type=str)
+    parser.add_argument('-golden', type=str)
+    parser.add_argument('-input', type=str)
+    args = parser.parse_args()
     try:
-        res = verify_result(sys.argv[1], sys.argv[2], sys.argv[3])
+        res = verify_result(args.output_type, args.output, args.golden, args.input)
         if not res:
             raise ValueError("[ERROR] result error")
         else:
