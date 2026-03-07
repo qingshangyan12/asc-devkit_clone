@@ -82,10 +82,7 @@ public:
         auto aMatrixLayout = MakeNzLayout<SrcT>(mLength, kLength);
         auto aTensor = MakeTensor(aIterator, aMatrixLayout);
 
-        auto coord = MakeCoord(
-            MakeCoord(Int<0>{}, Int<0>{}),
-            MakeCoord(Int<0>{}, Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(aTensor, gmTensor, coord);
     }
@@ -103,10 +100,7 @@ public:
         auto bMatrixLayout = MakeNzLayout<Src1T>(kLength, nLength);
         auto bTensor = MakeTensor(bIterator, bMatrixLayout);
 
-        auto coord = MakeCoord(
-            MakeCoord(Int<0>{}, Int<0>{}),
-            MakeCoord(Int<0>{}, Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(bTensor, gmTensor, coord);
     }
@@ -124,10 +118,7 @@ public:
         auto fbMatrixLayout = MakeNDLayout<SrcT>(mLength, kLength);
         auto fbTensor = MakeTensor(fbIterator, fbMatrixLayout); 
 
-        auto coord = MakeCoord(
-            MakeCoord(Int<0>{}, Int<0>{}),
-            MakeCoord(Int<0>{}, Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(fbTensor, a1Tensor, coord);
     }
@@ -145,10 +136,7 @@ public:
         auto btMatrixLayout = MakeNDLayout<DstT>(mLength, kLength);
         auto btTensor = MakeTensor(btIterator, btMatrixLayout); 
 
-        auto coord = MakeCoord(
-            MakeCoord(Int<0>{}, Int<0>{}),
-            MakeCoord(Int<0>{}, Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         DataCopy<DEFAULT_DATA_COPY_TRAIT>(btTensor, l1Tensor, coord);
     }
@@ -166,10 +154,7 @@ public:
         auto l0aMatrixLayout = MakeZzLayout<SrcT>(mLength, kLength);
         auto l0aTensor = MakeTensor(l0aIterator, l0aMatrixLayout); 
 
-        auto coord = MakeCoord(
-            MakeCoord(Int<0>{}, Int<0>{}),
-            MakeCoord(Int<0>{}, Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         LoadData<DEFAULT_LOAD_DATA_TRAIT>(l0aTensor, a1Tensor, coord);
     }
@@ -187,10 +172,7 @@ public:
         auto l0bMatrixLayout = MakeZnLayout<Src1T>(kLength, nLength);
         auto l0bTensor = MakeTensor(l0bIterator, l0bMatrixLayout); 
 
-        auto coord = MakeCoord(
-            MakeCoord(Int<0>{}, Int<0>{}),
-            MakeCoord(Int<0>{}, Int<0>{})
-        );
+        auto coord = MakeCoord(Int<0>{}, Int<0>{});
 
         static constexpr LoadDataTrait triat = {true};
 
