@@ -15,6 +15,7 @@
 | [fixpipe_co12c1_tensor_quantization_s322f16](./fixpipe_co12c1_tensor_quantization_s322f16) | 本样例介绍如何使用基础API Fixpipe将矩阵乘的结果从CO1搬入C1，并使能随路tensor量化将矩阵乘结果由int32_t类型数据量化为half类型 |
 | [fixpipe_nz2dn_tensor_quantization_f322f16](./fixpipe_nz2dn_tensor_quantization_f322f16)   | 本样例介绍如何使用基础API的Fixpipe将矩阵乘的结果从CO1搬入GM，完成NZ2DN分形转换，并使能随路量化将矩阵乘结果由float类型数据量化为half类型 |
 | [load_data](./load_data)                                                                   | 本样例介绍基于基础API LoadData实现A1至A2和B1至B2的数据搬运，其中A1至A2使用Load3D搬运，B1至B2使用Load2D搬运 |
+| [load2d](./load2d)                                                                   | 本样例展示了9种不同的数据搬运与转置配置场景（暂不支持非对齐场景），主要用于说明在矩阵运算中，使用load2d作为搬运指令，数据如何在不同的存储层级（GM、L1、L0A、L0B）之间流动，以及是否启用了随路转置功能。 |
 | [load_data_with_transpose_b8](./load_data_with_transpose_b8)                               | 本样例介绍基础API LoadDataWithTranspose b8数据类型下的使用 |
 | [load_data_with_transpose_b16](./load_data_with_transpose_b16)                             | 本样例介绍基础API LoadDataWithTranspose b16数据类型下的使用 |
 | [load_data_with_transpose_b32](./load_data_with_transpose_b32)                             | 本样例介绍基础API LoadDataWithTranspose b32数据类型下的使用 |
