@@ -19,10 +19,10 @@ import argparse
 def gen_golden_data_simple(scenarioNum, size):
     src_dtype = None
     dst_dtype = None
-    if scenarioNum >= 1 and scenarioNum <= 6:
+    if scenarioNum >= 1 and scenarioNum <= 7:
         src_dtype = np.float16
         dst_dtype = np.float16
-    elif scenarioNum >= 7 and scenarioNum <= 9:
+    elif scenarioNum >= 8 and scenarioNum <= 14:
         src_dtype = np.float32
         dst_dtype = np.float32
     else:
