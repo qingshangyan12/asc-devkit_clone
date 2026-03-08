@@ -23,9 +23,9 @@ error_tol = 1e-4
 
 
 def verify_result(scenarioNum, output, golden):
-    if scenarioNum >= 1 and scenarioNum <= 4:
+    if scenarioNum in [1, 2, 3, 4]:
         output_type = np.float16
-    elif scenarioNum >= 7 and scenarioNum <= 12:
+    elif scenarioNum in [8, 9, 10, 11, 15, 16, 17, 18]:
         output_type = np.float32
     else:
         return True
