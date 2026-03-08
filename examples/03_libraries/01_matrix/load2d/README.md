@@ -138,55 +138,145 @@
 ## 算子描述
 
 输入A矩阵为Nz数据分形，shape为(m,k)，其中m为外轴，k为内轴
-输入B矩阵为Nz数据分形，shape为(k,n)，其中k为外轴，n为内轴
-根据传入scenarioNum取值的不同，算子会改变执行的逻辑，具体可参考下表：
-<table>
-    <thead>
-        <tr>
-            <th>scenario_num</th>
-            <th>介绍</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><strong>1</strong></td>
-            <td><strong>int8_t矩阵乘法</strong>：A、B矩阵均为int8类型，计算结果为int32。数据流路径为GM→L1→L0A/L0B，不启用矩阵转置。适用于需要高精度累积结果的低精度计算场景。</td>
-        </tr>
-        <tr>
-            <td><strong>2</strong></td>
-            <td><strong>int8_t直通模式</strong>：与场景1相同的数据类型组合(int8_t→int32_t)，但数据流路径为GM→L0A/L0B直通，跳过L1缓存。适用于对延迟敏感或L1资源受限的场景。</td>
-        </tr>
-        <tr>
-            <td><strong>3</strong></td>
-            <td><strong>half精度B矩阵转置</strong>：A、B矩阵均为half类型，计算结果为float。数据流路径GM→L1→L0，仅B矩阵启用转置。适用于输入B矩阵需要转置参与计算的情况。</td>
-        </tr>
-        <tr>
-            <td><strong>4</strong></td>
-            <td><strong>half精度A矩阵转置</strong>：A、B矩阵均为half类型，计算结果为float。数据流路径GM→L1→L0，仅A矩阵启用转置。适用于输入A矩阵需要转置参与计算的情况。</td>
-        </tr>
-        <tr>
-            <td><strong>5</strong></td>
-            <td><strong>half精度基础模式</strong>：A、B矩阵均为half类型，计算结果为float。数据流路径GM→L1→L0，双矩阵均不转置。是最常用的半精度矩阵乘法配置。</td>
-        </tr>
-        <tr>
-            <td><strong>6</strong></td>
-            <td><strong>half精度双转置</strong>：A、B矩阵均为half类型，计算结果为float。数据流路径GM→L1→L0，A和B矩阵同时启用转置。适用于输入A、B都需要转置的特殊计算需求。</td>
-        </tr>
-        <tr>
-            <td><strong>7</strong></td>
-            <td><strong>half精度直通模式</strong>：与场景5相同的数据类型组合(half→float)，但数据流路径为GM→L0A/L0B直通，跳过L1缓存。验证直通路径在半精度下的性能表现。</td>
-        </tr>
-        <tr>
-            <td><strong>8</strong></td>
-            <td><strong>float精度基础模式</strong>：A、B矩阵均为float类型，计算结果为float。数据流路径GM→L1→L0，不启用转置。适用于单精度浮点矩阵乘法标准场景。</td>
-        </tr>
-        <tr>
-            <td><strong>9</strong></td>
-            <td><strong>float精度直通模式</strong>：与场景8相同的数据类型组合(float→float)，但数据流路径为GM→L0A/L0B直通，跳过L1缓存。验证浮点计算在直通路径下的正确性与性能。</td>
-        </tr>
-    </tbody>
-</table>
-  
+输入B矩阵为Nz数据分形，shape为(k,n)，其中k为外轴，n为内轴  
+算子包含以下场景：
+- 一、输入数据类型为b8，数据流路径为GM→L1→L0A/L0B，A矩阵不转置（不使能矩阵转置），B矩阵转置（不使能矩阵转置）
+- 二、输入数据类型为b8，数据流路径为GM→L0A/L0B，A矩阵不转置（不使能矩阵转置），B矩阵转置（不使能矩阵转置）
+- 三、输入数据类型为b16，数据流路径为GM→L1→L0，A矩阵不转置（不使能矩阵转置），B矩阵不转置（使能矩阵转置）
+- 四、输入数据类型为b16，数据流路径为GM→L1→L0，A矩阵转置（使能矩阵转置），B矩阵转置（不使能矩阵转置）
+- 五、输入数据类型为b16，数据流路径为GM→L1→L0，A矩阵不转置（不使能矩阵转置），B矩阵不转置（使能矩阵转置）
+- 六、输入数据类型为b16，数据流路径为GM→L1→L0，A矩阵转置（使能矩阵转置），B矩阵转置（使能矩阵转置）
+- 七、输入数据类型为b16，数据流路径为GM→L0A/L0B，A矩阵不转置（不使能矩阵转置），B矩阵转置（不使能矩阵转置）
+- 八、输入数据类型为b32，数据流路径为GM→L1→L0，A矩阵不转置（不使能矩阵转置），B矩阵转置（不使能矩阵转置）
+- 九、输入数据类型为b32，数据流路径为GM→L0A/L0B，A矩阵不转置（不使能矩阵转置），B矩阵转置（不使能矩阵转置）
+
+算子中主要涉及的通路有GM->L1，GM->L0A/L0B，L1->L0A/L0B，下面将结合代码介绍：
+
+### GM->L1
+
+从GM加载A矩阵到L1
+```c++
+uint32_t dstOffset = fractalSize;
+uint32_t srcOffset = fractalSize;
+AscendC::LoadData2DParams loadDataParams;
+loadDataParams.repeatTimes = CeilDivision(k, fractalShape[1]);
+loadDataParams.srcStride = CeilDivision(m, fractalShape[0]);
+loadDataParams.dstGap = CeilDivision(m, fractalShape[0]) - 1;
+for (uint16_t i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
+    AscendC::LoadData(a1Local[i * dstOffset], aGM[i * srcOffset], loadDataParams);
+}
+```
+从GM加载B矩阵到L1
+```c++
+uint32_t dstOffset = fractalSize;
+uint32_t srcOffset = fractalSize;
+AscendC::LoadData2DParams loadDataParams;
+loadDataParams.repeatTimes = CeilDivision(n, fractalShape[1]);
+loadDataParams.srcStride = CeilDivision(k, fractalShape[0]);
+loadDataParams.dstGap = CeilDivision(k, fractalShape[0]) - 1;
+for (uint16_t i = 0; i < CeilDivision(k, fractalShape[0]); ++i) {
+    AscendC::LoadData(b1Local[i * dstOffset], bGM[i * srcOffset], loadDataParams);
+}
+```
+### GM->L0A
+
+从GM加载A矩阵到L0A
+```c++
+uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize;
+uint32_t srcOffset = fractalSize;
+AscendC::LoadData2DParams loadDataParams;
+loadDataParams.repeatTimes = CeilDivision(k, fractalShape[1]);
+loadDataParams.srcStride = CeilDivision(m, fractalShape[0]);
+loadDataParams.dstGap = 0;
+loadDataParams.ifTranspose = false;
+for (int i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
+    AscendC::LoadData(a2Local[i * dstOffset], aGM[i * srcOffset], loadDataParams);
+}
+```
+
+### GM->L0B
+
+从GM加载B矩阵到L0B
+```c++
+uint32_t dstOffset = CeilDivision(n, fractalShape[0]) * fractalSize;
+uint32_t srcOffset = CeilDivision(n, fractalShape[0]) * fractalSize;
+AscendC::LoadData2DParams loadDataParams;
+loadDataParams.repeatTimes = CeilDivision(n, fractalShape[0]);
+loadDataParams.srcStride = 1;
+loadDataParams.dstGap = 0;
+loadDataParams.ifTranspose = false;
+for (int i = 0; i < CeilDivision(k, fractalShape[1]); ++i) {
+    AscendC::LoadData(b2Local[i * dstOffset], bGM[i * srcOffset], loadDataParams);
+}
+```
+
+### L1->L0A
+
+从L1加载A矩阵到L0A，不使能转置
+```c++
+uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize;
+uint32_t srcOffset = fractalSize;
+AscendC::LoadData2DParams loadDataParams;
+loadDataParams.repeatTimes = CeilDivision(k, fractalShape[1]);
+loadDataParams.srcStride = CeilDivision(m, fractalShape[0]);
+loadDataParams.dstGap = 0;
+loadDataParams.ifTranspose = false;
+for (int i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
+    AscendC::LoadData(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+}
+```
+
+从L1加载A矩阵到L0A，使能转置
+```c++
+AscendC::LocalTensor<T> a1Local = inQueueA1.DeQue<T>();
+AscendC::LocalTensor<T> a2Local = inQueueA2.AllocTensor<T>();
+uint32_t dstOffset = CeilDivision(k, fractalShape[0]) * fractalSize;
+uint32_t srcOffset = CeilDivision(k, fractalShape[0]) * fractalSize;
+// Nz -> Zz
+AscendC::LoadData2DParams loadDataParams;
+// 迭代次数，每个迭代可以处理512B数据
+loadDataParams.repeatTimes = CeilDivision(k, fractalShape[0]);
+// 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位：512B
+loadDataParams.srcStride = 1;
+// 相邻迭代间，目的操作数前一个分形结束地址与后一个分形起始地址的间隔，单位：512B
+loadDataParams.dstGap = 0;
+// 是否启用转置功能，对每个分形矩阵进行转置，默认为false
+loadDataParams.ifTranspose = true;
+for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
+    AscendC::LoadData(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+}
+```
+
+### L1->L0B
+
+从L1加载B矩阵到L0B，不使能转置
+```c++
+uint32_t dstOffset = CeilDivision(n, fractalShape[0]) * fractalSize;
+uint32_t srcOffset = CeilDivision(n, fractalShape[0]) * fractalSize;
+AscendC::LoadData2DParams loadDataParams;
+loadDataParams.repeatTimes = CeilDivision(n, fractalShape[0]);
+loadDataParams.srcStride = 1;
+loadDataParams.dstGap = 0;
+loadDataParams.ifTranspose = false;
+for (int i = 0; i < CeilDivision(k, fractalShape[1]); ++i) {
+    AscendC::LoadData(b2Local[i * dstOffset], b1Local[i * srcOffset], loadDataParams);
+}
+```
+
+从L1加载B矩阵到L0B，不使能转置
+```c++
+uint32_t dstOffset = CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
+uint32_t srcOffset = fractalSize * fractalNum;
+// Nz -> Zn
+AscendC::LoadData2DParams loadDataParams;
+loadDataParams.repeatTimes = CeilDivision(n, fractalShape[0] * fractalNum);
+loadDataParams.srcStride = CeilDivision(k, fractalShape[0] * fractalNum);
+loadDataParams.dstGap = 0;
+loadDataParams.ifTranspose = true;
+for (int i = 0; i < CeilDivision(k, fractalShape[0] * fractalNum); ++i) {
+    AscendC::LoadData(b2Local[i * dstOffset], b1Local[i * srcOffset], loadDataParams);
+}
+```
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
