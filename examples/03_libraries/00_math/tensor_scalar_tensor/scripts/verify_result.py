@@ -21,13 +21,9 @@ absolute_tol = 1e-9
 error_tol = 1e-4
 
 
-def verify_result(scenarioNum, output, golden):
-    if scenarioNum in [1, 2, 3, 4]:
-        output_type = np.float16
-    elif scenarioNum in [8, 9, 10, 11, 15, 16, 17, 18]:
-        output_type = np.float32
-    else:
-        return True
+def verify_result(output, golden):
+    # 数据类型需要用户根据实际情况修改
+    output_type = np.float16
 
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
@@ -53,12 +49,11 @@ def verify_result(scenarioNum, output, golden):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 18))
     parser.add_argument('output', type=str)
     parser.add_argument('golden', type=str)
     args = parser.parse_args()
     try:
-        res = verify_result(args.scenarioNum, args.output, args.golden)
+        res = verify_result(args.output, args.golden)
         if not res:
             raise ValueError("[ERROR] result error")
         else:
