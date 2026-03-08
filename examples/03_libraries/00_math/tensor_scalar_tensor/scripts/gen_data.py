@@ -16,23 +16,17 @@ import os
 import numpy as np
 import argparse
 
-def gen_golden_data_simple(scenarioNum, size):
-    src_dtype = None
-    dst_dtype = None
-    if scenarioNum >= 1 and scenarioNum <= 7:
-        src_dtype = np.float16
-        dst_dtype = np.float16
-    elif scenarioNum >= 8 and scenarioNum <= 14:
-        src_dtype = np.float32
-        dst_dtype = np.float32
-    else:
-        src_dtype = np.float16
-        dst_dtype = np.float32
+def gen_golden_data_simple(size):
+    # 数据类型需要根据情况修改
+    src_dtype = np.float16
+    dst_dtype = np.float16
     
     input_x = np.random.uniform(1, 100, [size]).astype(src_dtype)
     value  = 2.0
     dst = np.zeros(size, dtype = dst_dtype)
+
     golden = (input_x * value + dst).astype(dst_dtype)
+    
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
@@ -41,7 +35,6 @@ def gen_golden_data_simple(scenarioNum, size):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 21))
     parser.add_argument('-size', type=int)
     args = parser.parse_args()
-    gen_golden_data_simple(args.scenarioNum, args.size)
+    gen_golden_data_simple(args.size)
