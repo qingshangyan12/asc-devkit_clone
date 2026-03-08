@@ -9,14 +9,14 @@
 */
 
 /*!
-* \file copy_l0c2gm.h
+* \file copy_l0c2out.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2GM_H
-#define IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2GM_H
+#ifndef IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2OUT_H
+#define IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2OUT_H
+
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
-
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_impl.h"
 #include "impl/experimental/tensor_api/atom/copy_traits_impl.h"
 
@@ -28,7 +28,7 @@ struct FixpipeTraitDefault {
     static constexpr const TraitType value = DEFAULT_FIXPIPE_TRAIT;
 };
 
-struct CopyL0C2GM {
+struct CopyL0C2Out {
     template <typename Tp, const Tp& traits, typename... Args>
     __aicore__ inline static void Copy(const Args& ...args)
     {
@@ -36,35 +36,16 @@ struct CopyL0C2GM {
     }
 };
 
-struct CopyL0C2GMWith {
-    template <typename Tp, const Tp& traits, typename... Args>
-    __aicore__ inline static void Copy(const Args& ...args, uint8_t unitFlag)
-    {
-        // custom function Fixpipe<traits, Args...>(args..., unitFlag)
-    }
-};
-
-template <typename TraitStruct>
-struct CopyTraits<CopyL0C2GMWith, TraitStruct>
-{
-    using TraitType = typename TraitStruct::TraitType;
-    static constexpr const TraitType defaultTrait = TraitStruct::value;
-
-    template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void CopyUnpack(const Args& ...args) const {
-      CopyL0C2GMWith::Copy<TraitType, trait, Args...>(args..., unitFlag);
-    }
-
-    uint8_t unitFlag = 0;
-};
-
 template <typename Traits>
-struct CopyTraits<CopyL0C2GM, Traits> : public CopyTraits<CopyL0C2GM, Traits, CopyL0C2GMWith, FixpipeTraitDefault> {};
+struct CopyTraits<CopyL0C2Out, Traits> : public CopyTraits<CopyL0C2Out, Traits, CopyL0C2Out, FixpipeTraitDefault> {};
 
 template <>
-struct CopyTraits<CopyL0C2GM> : public CopyTraits<CopyL0C2GM, FixpipeTraitDefault> {};
+struct CopyTraits<CopyL0C2Out> : public CopyTraits<CopyL0C2Out, FixpipeTraitDefault> {};
+
+using CopyL0C2GM = CopyL0C2Out;
+using CopyL0C2UB = CopyL0C2Out;
 
 }
 }
 
-#endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2GM_H
+#endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2OUT_H
