@@ -9,14 +9,16 @@
 */
 
 /*!
-* \file copy_l0c2gm.h
+* \file copy_l0c2gm_ub.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2GM_H
-#define IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2GM_H
+#ifndef IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2GM_UB_H
+#define IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2GM_UB_H
 
+#include "copy_l0c2ub.h"
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 
+#include "impl/experimental/tensor_api/atom/cube_datamove/copy_fixpipe_traits.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_impl.h"
 #include "impl/experimental/tensor_api/atom/copy_traits_impl.h"
 
@@ -28,7 +30,7 @@ struct FixpipeTraitDefault {
     static constexpr const TraitType value = DEFAULT_FIXPIPE_TRAIT;
 };
 
-struct CopyL0C2GM {
+struct CopyL0C2Next {
     template <typename Tp, const Tp& traits, typename... Args>
     __aicore__ inline static void Copy(const Args& ...args)
     {
@@ -36,7 +38,7 @@ struct CopyL0C2GM {
     }
 };
 
-struct CopyL0C2GMWith {
+struct CopyL0C2NextWith {
     template <typename Tp, const Tp& traits, typename... Args>
     __aicore__ inline static void Copy(const Args& ...args, uint8_t unitFlag)
     {
@@ -45,26 +47,31 @@ struct CopyL0C2GMWith {
 };
 
 template <typename TraitStruct>
-struct CopyTraits<CopyL0C2GMWith, TraitStruct>
+struct CopyTraits<CopyL0C2NextWith, TraitStruct>
 {
     using TraitType = typename TraitStruct::TraitType;
     static constexpr const TraitType defaultTrait = TraitStruct::value;
 
     template <const TraitType& trait = defaultTrait, typename... Args>
     __aicore__ inline void CopyUnpack(const Args& ...args) const {
-      CopyL0C2GMWith::Copy<TraitType, trait, Args...>(args..., unitFlag);
+      CopyL0C2NextWith::Copy<TraitType, trait, Args...>(args..., unitFlag);
     }
 
     uint8_t unitFlag = 0;
 };
 
 template <typename Traits>
-struct CopyTraits<CopyL0C2GM, Traits> : public CopyTraits<CopyL0C2GM, Traits, CopyL0C2GMWith, FixpipeTraitDefault> {};
+struct CopyTraits<CopyL0C2Next, Traits> : public CopyTraits<CopyL0C2Next, Traits, CopyL0C2NextWith, FixpipeTraitDefault> {};
 
 template <>
-struct CopyTraits<CopyL0C2GM> : public CopyTraits<CopyL0C2GM, FixpipeTraitDefault> {};
+struct CopyTraits<CopyL0C2Next> : public CopyTraits<CopyL0C2Next, FixpipeTraitDefault> {};
+
+using CopyL0C2GM = CopyL0C2Next;
+using CopyL0C2GMWith = CopyL0C2NextWith;
+using CopyL0C2UB = CopyL0C2Next;
+using CopyL0C2UBWith = CopyL0C2NextWith;
 
 }
 }
 
-#endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2GM_H
+#endif // IMPL_TENSOR_API_ATOM_CUBE_DATAMOVE_COPY_L0C2GM_UB_H
