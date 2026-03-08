@@ -4,119 +4,133 @@
 
 本样例基于MulAddDst实现源操作数src0中每个元素与源操作数src1每个元素求积后和目的操作数dst中的对应元素相加的功能。MulAddDst接口的源操作数和目的操作数的数据类型只能取三种组合：(half, half)、(float, float)、(half, float)。本样例中输入tensor和标量的数据类型为half，输出tensor数据类型为float。
 本样例通过Ascend C编程语言实现了MulAddDst算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
-下面主要记录了15种不同的测试场景（scenario）。
+下面主要记录了20种不同的测试场景（scenario）。
 <table>
     <tr>
         <td>scenarioNum</td>
         <td>输入数据类型</td>
         <td>输出数据类型</td>
         <td>描述</td>
-        <td>无业务</td>
     </tr>
     <tr>
         <td>1</td>
         <td>half</td>
         <td>half</td>
         <td>count模式计算</td>
-        <td>×</td>
     </tr>
     <tr>
         <td>2</td>
         <td>half</td>
         <td>half</td>
         <td>mask连续模式计算（高维切分）</td>
-        <td>×</td>
     </tr>
     <tr>
         <td>3</td>
         <td>half</td>
         <td>half</td>
         <td>mask逐比特模式计算（高维切分）</td>
-        <td>×</td>
     </tr>
     <tr>
         <td>4</td>
         <td>half</td>
         <td>half</td>
-        <td>count模式计算</td>
-        <td>√</td>
+        <td>count模式计算，复合指令拆解</td>
     </tr>
     <tr>
         <td>5</td>
         <td>half</td>
         <td>half</td>
-        <td>count模式计算，测试将复合指令拆解为多条指令对性能的影响</td>
-        <td>√</td>
+        <td>count模式计算，测试性能</td>
     </tr>
     <tr>
         <td>6</td>
         <td>half</td>
         <td>half</td>
-        <td>count模式计算，测试源操作数与目的操作数重叠对性能的影响</td>
-        <td>√</td>
+        <td>count模式计算，复合指令拆解，测试性能</td>
     </tr>
     <tr>
         <td>7</td>
         <td>float</td>
         <td>float</td>
-        <td>count模式计算</td>
-        <td>×</td>
+        <td>count模式计算，操作数重叠，测试性能</td>
     </tr>
     <tr>
         <td>8</td>
         <td>float</td>
         <td>float</td>
-        <td>mask连续模式计算（高维切分）</td>
-        <td>×</td>
+        <td>count模式计算</td>
     </tr>
     <tr>
         <td>9</td>
         <td>float</td>
         <td>float</td>
-        <td>mask逐比特模式计算（高维切分）</td>
-        <td>×</td>
+        <td>mask连续模式计算（高维切分）</td>
     </tr>
     <tr>
         <td>10</td>
-        <td>half</td>
         <td>float</td>
-        <td>count模式计算</td>
-        <td>×</td>
+        <td>float</td>
+        <td>mask逐比特模式计算（高维切分）</td>
     </tr>
     <tr>
         <td>11</td>
-        <td>half</td>
         <td>float</td>
-        <td>mask连续模式计算（高维切分）</td>
-        <td>×</td>
+        <td>float</td>
+        <td>count模式计算，复合指令拆解</td>
     </tr>
     <tr>
         <td>12</td>
-        <td>half</td>
         <td>float</td>
-        <td>mask逐比特模式计算（高维切分）</td>
-        <td>×</td>
+        <td>float</td>
+        <td>count模式计算，测试性能</td>
     </tr>
     <tr>
         <td>13</td>
         <td>half</td>
         <td>float</td>
-        <td>cout模式计算</td>
-        <td>√</td>
+        <td>count模式计算，复合指令拆解，测试性能</td>
     </tr>
     <tr>
         <td>14</td>
         <td>half</td>
         <td>float</td>
-        <td>count模式计算，测试将复合指令拆解为多条指令对性能的影响</td>
-        <td>√</td>
+        <td>count模式计算，操作数重叠，测试性能</td>
     </tr>
     <tr>
         <td>15</td>
         <td>half</td>
         <td>float</td>
-        <td>count模式计算，测试源操作数与目的操作数重叠对性能的影响</td>
-        <td>√</td>
+        <td>count模式计算</td>
+    </tr>
+    <tr>
+        <td>16</td>
+        <td>half</td>
+        <td>float</td>
+        <td>maks连续模式计算（高维切分）</td>
+    </tr>
+    <tr>
+        <td>17</td>
+        <td>half</td>
+        <td>float</td>
+        <td>mask逐比特模式计算（高维切分）</td>
+    </tr>
+    <tr>
+        <td>18</td>
+        <td>half</td>
+        <td>float</td>
+        <td>count模式计算，复合指令拆解</td>
+    </tr>
+    <tr>
+        <td>19</td>
+        <td>half</td>
+        <td>float</td>
+        <td>count模式计算，测试性能</td>
+    </tr>
+    <tr>
+        <td>20</td>
+        <td>half</td>
+        <td>float</td>
+        <td>count模式计算，复合指令拆解，测试性能</td>
     </tr>
 </table>
 
@@ -140,7 +154,7 @@
 ## 算子描述
 
 - 算子功能：  
-  Axpy算子实现了源操作数src0中每个元素与src1中每个元素求积后和目的操作数dst中的对应元素相加，并返回计算结果的功能。
+  MulAddDst算子实现了源操作数src0中每个元素与src1中每个元素求积后和目的操作数dst中的对应元素相加，并返回计算结果的功能。
 
   对应的数学表达式为：  
   ```
