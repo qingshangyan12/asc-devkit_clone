@@ -14,5 +14,16 @@
 #include "instr_impl/npu_arch_3510/sync_impl/asc_sync_notify_impl.h"
 #include "instr_impl/npu_arch_3510/sync_impl/asc_sync_wait_impl.h"
 #include "instr_impl/npu_arch_3510/sync_impl/asc_sync_pipe_impl.h"
+#include "instr_impl/npu_arch_3510/sync_impl/asc_sync_intra_wait_impl.h"
 
+// ==========asc_sync_intra_wait==========
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint8_t sync_id)
+{
+    asc_sync_intra_wait_impl(pipe, sync_id);
+}
+
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id)
+{
+    asc_sync_intra_wait_impl(pipe, sync_id);
+}
 #endif
