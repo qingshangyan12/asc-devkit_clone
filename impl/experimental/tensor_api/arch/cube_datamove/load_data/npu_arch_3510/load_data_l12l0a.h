@@ -17,28 +17,68 @@
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0a/nz2nz.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0a/zn2nz.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0a/zn2nzb8.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0a/zn2nzb8b4.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0a/nz2nz_with_coord.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0a/zn2nz_with_coord.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0a/zn2nzb8b4_with_coord.h"
 
 namespace AscendC {
 namespace Te {
-
-class LoadDataFourDim3510L12L0A : public LoadDataFourDim3510L12L0ANZ2NZ, public LoadDataFourDim3510L12L0AZN2NZB8,
-    public LoadDataFourDim3510L12L0AZN2NZ {
+class LoadDataFourDim3510L12L0A {
 public:
-    template <const LoadDataTrait& trait, typename T, typename U, class Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+    template <const LoadDataTrait& trait, typename T, typename U>
+    __aicore__ inline void Run(const T& dst, const U& src) {
+        Execute<trait>(dst, src);
+    }
+
+private:
+    template<const LoadDataTrait& trait, bool transpose>
+    struct TraitHolder {
+        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
+    };
+
+    template <const LoadDataTrait& trait, typename T, typename U>
+    __aicore__ inline void Execute(const T& dst, const U& src) {
         if constexpr (IsNZFormat<U>::value && IsNZFormat<T>::value) {
-            LoadDataFourDim3510L12L0ANZ2NZ::Run<trait, T, U, Coord>(dst, src, coord);
+            LoadDataFourDim3510L12L0ANZ2NZ nz2nzStrategy;
+            nz2nzStrategy.Run<TraitHolder<trait, false>::traitTransposed, T, U>(dst, src);
         } else if constexpr (IsZNFormat<U>::value && IsNZFormat<T>::value && (sizeof(typename U::elementType) == 1)) {
-            LoadDataFourDim3510L12L0AZN2NZB8::Run<trait, T, U, Coord>(dst, src, coord);
+            LoadDataFourDim3510L12L0AZN2NZB8B4 zn2nzb8Strategy;
+            zn2nzb8Strategy.Run<TraitHolder<trait, true>::traitTransposed, T, U>(dst, src);
         } else if constexpr (IsZNFormat<U>::value && IsNZFormat<T>::value) {
-            LoadDataFourDim3510L12L0AZN2NZ::Run<trait, T, U, Coord>(dst, src, coord);
-        } else {
-            static_assert(Std::always_false_v<T>);
+            LoadDataFourDim3510L12L0AZN2NZ zn2nzStrategy;
+            zn2nzStrategy.Run<TraitHolder<trait, true>::traitTransposed, T, U>(dst, src);
         }
     }
 };
 
+class LoadDataFourDim3510L12L0AWithCoord {
+public:
+    template <const LoadDataTrait& trait, typename T, typename U, class Coord>
+    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        Execute<trait>(dst, src, coord);
+    }
+
+private:
+    template<const LoadDataTrait& trait, bool transpose>
+    struct TraitHolder {
+        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
+    };
+
+    template <const LoadDataTrait& trait, typename T, typename U, class Coord>
+    __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
+        if constexpr (IsNZFormat<U>::value && IsNZFormat<T>::value) {
+            LoadDataFourDim3510L12L0ANZ2NZWithCoord nz2nzStrategy;
+            nz2nzStrategy.Run<TraitHolder<trait, false>::traitTransposed, T, U, Coord>(dst, src, coord);
+        } else if constexpr (IsZNFormat<U>::value && IsNZFormat<T>::value && (sizeof(typename U::elementType) == 1)) {
+            LoadDataFourDim3510L12L0AZN2NZB8B4WithCoord zn2nzb8Strategy;
+            zn2nzb8Strategy.Run<TraitHolder<trait, true>::traitTransposed, T, U, Coord>(dst, src, coord);
+        } else if constexpr (IsZNFormat<U>::value && IsNZFormat<T>::value) {
+            LoadDataFourDim3510L12L0AZN2NZWithCoord zn2nzStrategy;
+            zn2nzStrategy.Run<TraitHolder<trait, true>::traitTransposed, T, U, Coord>(dst, src, coord);
+        }
+    }
+};
 } // namespace Te
 } // namespace AscendC
 
