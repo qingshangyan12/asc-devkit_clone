@@ -13,9 +13,9 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/matmul/stage/copy_cube_out/quant/quant_processor_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_COPY_CUBE_OUT_QUANT_QUANT_PROCESSOR_UTILS_H
 #endif
 
@@ -58,6 +58,6 @@ __aicore__ inline constexpr static bool IsQuantSenario()
 }  // namespace AscendC
 #endif
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_COPY_CUBE_OUT_QUANT_QUANT_PROCESSOR_UTILS_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_COPY_CUBE_OUT_QUANT_QUANT_PROCESSOR_UTILS_H
 #endif // IMPL_MATMUL_STAGE_COPY_CUBE_OUT_QUANT_QUANT_PROCESSOR_UTILS_H

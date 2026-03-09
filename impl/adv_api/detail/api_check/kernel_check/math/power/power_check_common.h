@@ -12,9 +12,9 @@
  * \file power_check_common.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/api_check/kernel_check/math/power/power_check_common.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/power.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_CHECK_COMMON_H
 #endif
 
@@ -100,6 +100,6 @@ public:
 #endif // IMPL_API_CHECK_KERNEL_CHECK_MATH_POWER_POWER_CHECK_COMMON_H_
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_CHECK_COMMON_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_CHECK_COMMON_H
 #endif

@@ -12,9 +12,9 @@
  * \file swiglu_check.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/api_check/kernel_check/activation/swiglu/swiglu_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/swiglu.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWIGLU_CHECK_H
 #endif
 
@@ -52,6 +52,6 @@ __aicore__ inline void CheckFuncSwiGLU(__gm__ const char *apiName, const LocalTe
 #endif // IMPL_API_CHECK_KERNEL_CHECK_ACTIVATION_SWIGLU_SWIGLU_CHECK_H_
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWIGLU_CHECK_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SWIGLU_CHECK_H
 #endif

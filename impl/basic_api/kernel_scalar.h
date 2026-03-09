@@ -12,9 +12,9 @@
  * \file kernel_scalar.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_scalar.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_scalar_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_SCALAR_H
 #endif
 #ifndef ASCENDC_KERNEL_SCALAR_IMPL_H
@@ -224,6 +224,6 @@ __aicore__ inline U ScalarCastImpl(T valueIn)
 } // namespace AscendC
 #endif // ASCENDC_KERNEL_SCALAR_IMPL_H
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_SCALAR_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_SCALAR_H
 #endif

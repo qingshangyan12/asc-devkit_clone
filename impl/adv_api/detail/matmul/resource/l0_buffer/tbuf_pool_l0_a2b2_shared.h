@@ -12,9 +12,9 @@
  * \file tbuf_pool_l0_a2b2_shared.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/matmul/resource/l0_buffer/tbuf_pool_l0_a2b2_shared.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_L0_BUFFER_TBUF_POOL_L0_A2B2_SHARED_H
 #endif
 
@@ -101,6 +101,6 @@ public:
 #endif // IMPL_MATMUL_RESOURCE_L0_BUFFER_TBUF_POOL_L0_A2B2_SHARED_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_L0_BUFFER_TBUF_POOL_L0_A2B2_SHARED_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_L0_BUFFER_TBUF_POOL_L0_A2B2_SHARED_H
 #endif

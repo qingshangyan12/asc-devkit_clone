@@ -13,9 +13,9 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/activation/silu/silu_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/silu.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SILU_C310_IMPL_H
 #endif
 
@@ -70,6 +70,6 @@ __aicore__ inline void SiluCompute(const LocalTensor<T>& dstLocal, const LocalTe
 #endif  // IMPL_MATH_SILU_SILU_C310_IMPL_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SILU_C310_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SILU_C310_IMPL_H
 #endif
