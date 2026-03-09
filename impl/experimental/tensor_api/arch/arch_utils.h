@@ -285,7 +285,7 @@ public:
 
 template <typename T>
 struct IsScaleANDFormat {
-    static constexpr bool value = IsNDFormat<T>::value;
+    static constexpr bool value = IsNDFormat<T>::normalValue;
 };
 
 template <typename T>
@@ -295,12 +295,12 @@ struct IsScaleADNFormat {
 
 template <typename T>
 struct IsScaleBNDFormat {
-    static constexpr bool value = IsDNFormat<T>::value;
+    static constexpr bool value = IsNDFormat<T>::value;
 };
 
 template <typename T>
 struct IsScaleBDNFormat {
-    static constexpr bool value = IsNDFormat<T>::value;
+    static constexpr bool value = IsDNFormat<T>::normalValue;
 };
 
 
