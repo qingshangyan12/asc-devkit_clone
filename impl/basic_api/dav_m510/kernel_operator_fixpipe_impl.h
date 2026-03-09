@@ -175,7 +175,7 @@ __aicore__ inline void CopyReluTensorToFbuf(const FixpipeTiling &fixpipeTiling, 
     // L1 -> FB
     constexpr uint16_t fbufBurstLenUnit = 64;
     uint16_t fbufBurstLen = deqDataSize / fbufBurstLenUnit; // copy from cbuf to fbuf, burst_len unit is 64Bytes
-    copy_cbuf_to_fbuf(deqTensorTempBuf, (__cbuf__ uint64_t*)intriParams.vectorRelu + deqValueOffset, 1, fbufBurstLen, 0, 0);
+    copy_cbuf_to_fbuf(deqTensorTempBuf, (__cbuf__ uint64_t*)intriParams.vectorRelu + deqValueOffset, 1, fbufBurstLen / 2, 0, 0);
     uint64_t deqTensorAddr = ((uint64_t)deqTensorTempBuf) >> (uint64_t)6;
     set_fpc(deqTensorAddr);
     AscendCUtils::FreeTemporaryFbBuffer<uint64_t>(deqTensorTempBuf);
@@ -203,10 +203,10 @@ __aicore__ inline void CopyDeqTensorToFbuf(
     }
     if (intriParams.preReluMode == ReluMode::VECTOR_RELU) {
         __fbuf__ uint64_t *reluTensorTempBuf =
-            AscendCUtils::GetTemporaryFbBufferAddr<uint64_t>(1024, deqDataSize / sizeof(uint64_t));
+            AscendCUtils::GetTemporaryFbBufferAddr<uint64_t>(0, deqDataSize / sizeof(uint64_t));
         constexpr uint64_t memBlockType = 65536;
         reluTensorTempBuf = (__fbuf__ uint64_t*)((uint64_t)reluTensorTempBuf | memBlockType);
-        copy_cbuf_to_fbuf(reluTensorTempBuf, (__cbuf__ uint64_t*)intriParams.vectorRelu + deqValueOffset, 1, fbufBurstLen, 0, 0);
+        copy_cbuf_to_fbuf(reluTensorTempBuf, (__cbuf__ uint64_t*)intriParams.vectorRelu + deqValueOffset, 1, fbufBurstLen / 2, 0, 0);
         deqTensorAddr = deqTensorAddr | (((uint64_t)reluTensorTempBuf) << (uint64_t)50) >> 56;
         AscendCUtils::FreeTemporaryFbBuffer<uint64_t>(reluTensorTempBuf);
         set_fpc(deqTensorAddr);
