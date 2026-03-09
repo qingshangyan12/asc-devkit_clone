@@ -377,14 +377,18 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
     if (g_sysPrintFifoSpace != nullptr) {
         const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
         if (position == Hardware::UB) {
+#ifndef ASCENDC_CPU_DEBUG
             __asc_aicore::asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize);
+#endif
         } else if (position == Hardware::L1) {
             return; // L1 to GM dump not support
         } else if (position == Hardware::L0C) {
             if ASCEND_IS_NOT_AIC {
                 return;
             }
+#ifndef ASCENDC_CPU_DEBUG
             __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize);
+#endif
         } else {
             ASCENDC_ASSERT((false),
                     { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
@@ -531,7 +535,9 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
+#ifndef ASCENDC_CPU_DEBUG
         __asc_aicore::asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize);
+#endif
     } else {
         DumpTensorGM2GMEntityImpl(src, desc, dumpSize);
     }
@@ -561,7 +567,9 @@ __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
 {
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
+#ifndef ASCENDC_CPU_DEBUG
         __asc_aicore::asc_time_stamp(descId);
+#endif
     } else {
         WriteTimeStampInfo(descId);
     }
