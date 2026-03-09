@@ -40,7 +40,7 @@
 #include "dav_m510/kernel_operator_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_binary_impl.h"
-#elif __NPU_ARCH__ == 3113 
+#elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_binary_impl.h"
 #endif
 #pragma begin_pipe(V)
@@ -339,7 +339,7 @@ __aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, mask, repeatTime, repeatParams, isSetMask, "Div");
 #endif
-    DivImpl<PrimType, isSetMask, config>((__ubuf__ PrimType *)dst.GetPhyAddr(), 
+    DivImpl<PrimType, isSetMask, config>((__ubuf__ PrimType *)dst.GetPhyAddr(),
         (__ubuf__ PrimType *)src0.GetPhyAddr(),
         (__ubuf__ PrimType *)src1.GetPhyAddr(), mask, repeatTime, repeatParams);
 }
@@ -857,7 +857,7 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
         KERNEL_LOG(KERNEL_ERROR,
                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
     });
-    ShiftLeftImpl<Src0PrimType, Src1PrimType>((__ubuf__ Src0PrimType*)dst.GetPhyAddr(), 
+    ShiftLeftImpl<Src0PrimType, Src1PrimType>((__ubuf__ Src0PrimType*)dst.GetPhyAddr(),
         (__ubuf__ Src0PrimType*)src0.GetPhyAddr(), (__ubuf__ Src1PrimType*)src1.GetPhyAddr(), count);
 }
 
@@ -1476,7 +1476,7 @@ __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& 
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T> &src0, 
+__aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T> &src0,
     const LocalTensor<T> &src1, const uint32_t count)
 {
     using PrimType = PrimT<T>;
@@ -1496,7 +1496,7 @@ __aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T> &sr
  * ************************************************************************************************* */
 /*
  * @ingroup Mull Level 2
- * @brief Multiply input data src0 and src1 by element based on the mask, write the result to 
+ * @brief Multiply input data src0 and src1 by element based on the mask, write the result to
         dst0, and write the overflow part to dst1.
  * @param [out] dst0 output LocalTensor
  * @param [out] dst1 output LocalTensor
@@ -1505,7 +1505,7 @@ __aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T> &sr
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T> &dst1, 
+__aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T> &dst1,
     const LocalTensor<T> &src0, const LocalTensor<T> &src1, const uint32_t count)
 {
     using PrimType = PrimT<T>;
@@ -1515,11 +1515,11 @@ __aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T> &ds
     CheckTensorPos<T>(src1, Hardware::UB, "src1", "VECIN / VECCALC / VECOUT", "Mull");
     ASCENDC_ASSERT((count <= src0.GetSize() && count <= src1.GetSize() &&
                     count <= dst0.GetSize() && count <= dst1.GetSize()), {
-        KERNEL_LOG(KERNEL_ERROR, 
+        KERNEL_LOG(KERNEL_ERROR,
             "count is %u, which should not larger than tensor size of dst0 / dst1 / src0 / src1"
             , count);
     });
-    MullImpl((__ubuf__ PrimType *)dst0.GetPhyAddr(), (__ubuf__ PrimType *)dst1.GetPhyAddr(), 
+    MullImpl((__ubuf__ PrimType *)dst0.GetPhyAddr(), (__ubuf__ PrimType *)dst1.GetPhyAddr(),
         (__ubuf__ PrimType *)src0.GetPhyAddr(), (__ubuf__ PrimType *)src1.GetPhyAddr(), count);
 }
 
@@ -1535,7 +1535,7 @@ __aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T> &ds
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
+__aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
     const LocalTensor<T> &src1, const uint32_t count)
 {
     using PrimType = PrimT<T>;
@@ -1546,13 +1546,13 @@ __aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &s
         KERNEL_LOG(KERNEL_ERROR,
                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
     });
-    FusedAbsSubImpl((__ubuf__ PrimType *)dst.GetPhyAddr(), (__ubuf__ PrimType *)src0.GetPhyAddr(), 
+    FusedAbsSubImpl((__ubuf__ PrimType *)dst.GetPhyAddr(), (__ubuf__ PrimType *)src0.GetPhyAddr(),
         (__ubuf__ PrimType *)src1.GetPhyAddr(), count);
 }
 
 // FusedAbsSub has been updated, please use AbsSub instead.
 template <typename T>
-__aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
+__aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
     const LocalTensor<T> &src1, const uint32_t count)
 {
     using PrimType = PrimT<T>;
@@ -1563,7 +1563,7 @@ __aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<
         KERNEL_LOG(KERNEL_ERROR,
                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
     });
-    FusedAbsSubImpl((__ubuf__ PrimType *)dst.GetPhyAddr(), (__ubuf__ PrimType *)src0.GetPhyAddr(), 
+    FusedAbsSubImpl((__ubuf__ PrimType *)dst.GetPhyAddr(), (__ubuf__ PrimType *)src0.GetPhyAddr(),
         (__ubuf__ PrimType *)src1.GetPhyAddr(), count);
 }
 
@@ -1579,7 +1579,7 @@ __aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
-__aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
+__aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
     const LocalTensor<U> &src1, const uint32_t count)
 {
     using DstPrimType = PrimT<T>;
@@ -1595,16 +1595,16 @@ __aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &s
     static_assert(SupportType<Tuple<DstPrimType, SrcPrimType>, Tuple<float, half>, Tuple<float, float>>(), "Failed to check dtype in "
         "ExpSub, current api support dtype combination is src : half / float, dst: float.");
 #else
-    static_assert(SupportType<Tuple<DstPrimType, SrcPrimType>, Tuple<half, half>, Tuple<float, float>>(), "Failed to check dtype in " 
+    static_assert(SupportType<Tuple<DstPrimType, SrcPrimType>, Tuple<half, half>, Tuple<float, float>>(), "Failed to check dtype in "
         "ExpSub, current api support dtype combination is src and dst both: half / float.");
 #endif
-    FusedExpSubImpl<DstPrimType, SrcPrimType>((__ubuf__ DstPrimType *)dst.GetPhyAddr(), (__ubuf__ SrcPrimType *)src0.GetPhyAddr(), 
+    FusedExpSubImpl<DstPrimType, SrcPrimType>((__ubuf__ DstPrimType *)dst.GetPhyAddr(), (__ubuf__ SrcPrimType *)src0.GetPhyAddr(),
         (__ubuf__ SrcPrimType *)src1.GetPhyAddr(), count);
 }
 
 // FusedExpSub has been updated, please use ExpSub instead.
 template <typename T, typename U>
-__aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
+__aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
     const LocalTensor<U> &src1, const uint32_t count)
 {
     using DstPrimType = PrimT<T>;
@@ -1616,7 +1616,7 @@ __aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<
         KERNEL_LOG(KERNEL_ERROR,
                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
     });
-    FusedExpSubImpl<DstPrimType, SrcPrimType>((__ubuf__ DstPrimType *)dst.GetPhyAddr(), (__ubuf__ SrcPrimType *)src0.GetPhyAddr(), 
+    FusedExpSubImpl<DstPrimType, SrcPrimType>((__ubuf__ DstPrimType *)dst.GetPhyAddr(), (__ubuf__ SrcPrimType *)src0.GetPhyAddr(),
         (__ubuf__ SrcPrimType *)src1.GetPhyAddr(), count);
 }
 
