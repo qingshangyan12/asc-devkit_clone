@@ -13,8 +13,8 @@
  * \brief SoftmaxFlash api of AscendC, this api will be deprecated, please use SoftmaxFlashV2 api instead
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAXFLASH_H
 #endif
 
@@ -198,6 +198,6 @@ __aicore__ inline void SoftmaxFlash(const LocalTensor<half>& dstTensor, const Lo
 #endif // LIB_SOFTMAX_SOFTMAXFLASHV2_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAXFLASH_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAXFLASH_H
 #endif

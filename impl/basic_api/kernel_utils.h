@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -210,17 +210,17 @@ __aicore__ inline void DataCopyWithAtomic(__gm__ int32_t* dst, __ubuf__ int32_t*
 #endif
 #endif // ASCENDC_CPU_DEBUG
 
-/***************内部定义time stamp id**************************
-定义值范围: 0x000 - 0xfff
+/***************�ڲ�����time stamp id**************************
+����ֵ��Χ: 0x000 - 0xfff
 
-time stamp id按块分组，快说明如下:
-TIME_STAMP_WRAP: NPU套壳函数中的时间戳打点
-TIME_STAMP_TPIPE/BUFFER: TPIPE、BUFFER中的时间戳打点
-TIME_STAMP_MATMUL: MATMUL相关时间戳打点
-TIME_STAMP_TILING_DATA: TILING DATA模块时间戳打点
-TIME_STAMP_MC2_START/END: MC2模块使用打点id范围
+time stamp id������飬��˵������:
+TIME_STAMP_WRAP: NPU�׿Ǻ����е�ʱ������
+TIME_STAMP_TPIPE/BUFFER: TPIPE��BUFFER�е�ʱ������
+TIME_STAMP_MATMUL: MATMUL���ʱ������
+TIME_STAMP_TILING_DATA: TILING DATAģ��ʱ������
+TIME_STAMP_MC2_START/END: MC2ģ��ʹ�ô��id��Χ
 
-TimeStampId更新原则：每个分组新增ID不可改变原有定义的ID值！
+TimeStampId����ԭ��ÿ����������ID���ɸı�ԭ�ж����IDֵ��
 
 ***************************************************************/
 enum class TimeStampId : uint32_t {

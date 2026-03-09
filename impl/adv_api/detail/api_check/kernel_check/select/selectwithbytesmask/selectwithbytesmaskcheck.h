@@ -13,9 +13,9 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/api_check/kernel_check/select/selectwithbytesmask/selectwithbytesmaskcheck.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SELECTWITHBYTESMASKCHECK_H
 #endif
 
@@ -46,6 +46,6 @@ __aicore__ inline void CheckFuncSelectWithBytesMask(__gm__ const char *apiName, 
 #endif // IMPL_API_CHECK_KERNEL_CHECK_SELECT_SELECTWITHBYTESMAKS_SELECTWITHBYTESMAKS_CHECK_H_
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SELECTWITHBYTESMASKCHECK_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SELECTWITHBYTESMASKCHECK_H
 #endif

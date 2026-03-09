@@ -13,9 +13,9 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/activation/softmax/regbase/v300/simple_softmax_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/simplesoftmax.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIMPLE_SOFTMAX_IMPL_H
 #endif
 
@@ -168,6 +168,6 @@ __aicore__ inline void SimpleSoftMaxNDImpl(const LocalTensor<half>& dst, const L
 }
 #endif // IMPL_ACTIVATION_SOFTMAX_V300_SIMPLE_SOFTMAX_IMPL_H
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIMPLE_SOFTMAX_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIMPLE_SOFTMAX_IMPL_H
 #endif
