@@ -13,9 +13,9 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/activation/gelu/gelu_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/gelu.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GELU_C310_IMPL_H
 #endif
 
@@ -359,6 +359,6 @@ __aicore__ inline void FasterGeluV2Impl(const LocalTensor<T>& dstLocal, const Lo
 #endif // IMPL_ACTIVATION_GELU_GELU_IMPL_C310_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GELU_C310_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GELU_C310_IMPL_H
 #endif

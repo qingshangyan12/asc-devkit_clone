@@ -8,9 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/math/trunc/trunc_v220_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/trunc.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_TRUNC_TRUNC_V220_IMPL_H
 #endif
 #ifndef IMPL_MATH_TRUNC_TRUNC_V220_IMPL_H
@@ -30,6 +30,6 @@ __aicore__ inline void TruncCastForTrunc(const LocalTensor<float>& dstTensor, co
 #endif // IMPL_MATH_TRUNC_TRUNC_V220_IMPL_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_TRUNC_TRUNC_V220_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_TRUNC_TRUNC_V220_IMPL_H
 #endif

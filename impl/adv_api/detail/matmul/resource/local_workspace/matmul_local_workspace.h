@@ -12,9 +12,9 @@
 * \file matmul_local_workspace.h
 * \brief matmul local workspace manager
 */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/matmul/resource/local_workspace/matmul_local_workspace.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_LOCAL_WORKSPACE_MATMUL_LOCAL_WORKSPACE_H
 #endif
 
@@ -334,6 +334,6 @@ private:
 }  // namespace AscendC
 #endif
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_LOCAL_WORKSPACE_MATMUL_LOCAL_WORKSPACE_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_LOCAL_WORKSPACE_MATMUL_LOCAL_WORKSPACE_H
 #endif // _MATMUL_LOCAL_WORKSPACE_H_

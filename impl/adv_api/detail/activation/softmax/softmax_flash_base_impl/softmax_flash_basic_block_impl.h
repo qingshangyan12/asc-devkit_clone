@@ -13,9 +13,9 @@
  * \brief
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/activation/softmax/softmax_flash_base_impl/softmax_flash_basic_block_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/softmaxflash.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_FLASH_BASIC_BLOCK_IMPL_H
 #endif
 #ifndef IMPL_ACTIVATION_SOFTMAX_SOFTMAX_FLASH_BASIC_BLOCK_IMPL_H
@@ -443,6 +443,6 @@ __aicore__ inline void SoftmaxFlashBasicBlock(const LocalTensor<half>& dst, cons
 }
 #endif // IMPL_ACTIVATION_SOFTMAX_SOFTMAX_FLASH_BASIC_BLOCK_IMPL_H
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_FLASH_BASIC_BLOCK_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_FLASH_BASIC_BLOCK_IMPL_H
 #endif
