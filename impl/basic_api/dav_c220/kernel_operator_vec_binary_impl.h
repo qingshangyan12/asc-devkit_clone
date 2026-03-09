@@ -1,4 +1,4 @@
-Ôªø/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_vec_binary_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c220/kernel_operator_vec_binary_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BINARY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_IMPL_H
@@ -526,39 +526,39 @@ template <bool isSetMask = true>
 __aicore__ inline void AddDeqReluCompute(__ubuf__ half *dst, __ubuf__ int32_t *src0, __ubuf__ int32_t *src1,
     __ubuf__ int32_t *sharedTmpBuffer, AddDeqReluParams &params)
 {
-    // 1„ÄÅsrc1+src2(int32_t)
+    // 1°¢src1+src2(int32_t)
     vadd(sharedTmpBuffer, src0, src1, params.repeat, DEFAULT_BLK_STRIDE, params.src0BlkStride,
         params.src1BlkStride, DEFAULT_REPEAT_STRIDE, params.src0RepStride, params.src1RepStride);
     pipe_barrier(PIPE_V);
-    // 2„ÄÅcast: int32_t->float
+    // 2°¢cast: int32_t->float
     __ubuf__ float *src0FloatTmp = reinterpret_cast<__ubuf__ float *>(src0);
     vconv_s322f32(src0FloatTmp, sharedTmpBuffer, params.repeat, static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
         static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_REPEAT_STRIDE),
         static_cast<uint16_t>(DEFAULT_REPEAT_STRIDE));
     pipe_barrier(PIPE_V);
-    // 3„ÄÅMuls: castRes * (1/m)
+    // 3°¢Muls: castRes * (1/m)
     vmuls(src0FloatTmp, src0FloatTmp, static_cast<float>(DEQ_SHIFT_RIGHT_17_BIT), params.repeat,
         static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
         static_cast<uint16_t>(DEFAULT_REPEAT_STRIDE), static_cast<uint16_t>(DEFAULT_REPEAT_STRIDE));
     pipe_barrier(PIPE_V);
-    // 4„ÄÅMuls: MulsRes * static_cast<float>(DeqScale)
+    // 4°¢Muls: MulsRes * static_cast<float>(DeqScale)
     vmuls(src0FloatTmp, src0FloatTmp, static_cast<float>(g_deqValue), params.repeat,
         static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
         static_cast<uint16_t>(DEFAULT_REPEAT_STRIDE), static_cast<uint16_t>(DEFAULT_REPEAT_STRIDE));
     pipe_barrier(PIPE_V);
-    // 5„ÄÅMuls: MulsRes * static_cast<float>(m)
+    // 5°¢Muls: MulsRes * static_cast<float>(m)
     vmuls(src0FloatTmp, src0FloatTmp, static_cast<float>(DEQ_SHIFT_LEFT_17_BIT), params.repeat,
         static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
         static_cast<uint16_t>(DEFAULT_REPEAT_STRIDE), static_cast<uint16_t>(DEFAULT_REPEAT_STRIDE));
     pipe_barrier(PIPE_V);
-    // 6„ÄÅcast: float->half
+    // 6°¢cast: float->half
     if constexpr (isSetMask) {
         SetAddDeqReluMaskCal(params);
     }
     __ubuf__ half *src1HalfTmp = reinterpret_cast<__ubuf__ half *>(src1);
     vconv_f322f16(src1HalfTmp, src0FloatTmp, params.repeat, 1, 1, HALF_DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE);
     pipe_barrier(PIPE_V);
-    // 7„ÄÅDuplicate: 0
+    // 7°¢Duplicate: 0
     __ubuf__ half *tmpBufferHalf = reinterpret_cast<__ubuf__ half *>(sharedTmpBuffer);
     if (params.maskMode != 0) {
         set_mask_count();
@@ -571,7 +571,7 @@ __aicore__ inline void AddDeqReluCompute(__ubuf__ half *dst, __ubuf__ int32_t *s
         set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
     }
     pipe_barrier(PIPE_V);
-    // 8„ÄÅMax(castRes, DupRes)
+    // 8°¢Max(castRes, DupRes)
     if constexpr (isSetMask) {
         SetAddDeqReluMaskCal(params);
     }
@@ -927,7 +927,7 @@ __aicore__ inline void SubReluImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BINARY_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_IMPL_H__
 #endif

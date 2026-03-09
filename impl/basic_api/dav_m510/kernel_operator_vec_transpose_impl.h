@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_vec_transpose_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_m510/kernel_operator_vec_transpose_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TRANSPOSE_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TRANSPOSE_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_TRANSPOSE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_TRANSPOSE_IMPL_H
@@ -289,7 +289,7 @@ template <typename T> struct Transpose4dParams {
     uint32_t dstAllBlockNum = 0;
     uint32_t imageBlockNum = 0;
 
-    // mainï¼šsrc->tmp1
+    // main£ºsrc->tmp1
     TransDataTo5HDParams transDataParams1;
 
     __ubuf__ T* dstList1[NCHW_CONV_ADDR_LIST_SIZE];
@@ -298,7 +298,7 @@ template <typename T> struct Transpose4dParams {
     DataCopyParams dataCopyParams1;
     DataCopyParams dataCopyParams2;
 
-    // mainï¼štmp2->tmp3
+    // main£ºtmp2->tmp3
     TransDataTo5HDParams transDataParams2;
 
     __ubuf__ T* dstList2[NCHW_CONV_ADDR_LIST_SIZE];
@@ -521,7 +521,7 @@ __aicore__ inline void Transpose2HwcCal(const LocalTensor<T> &dstLocal, const Lo
     LocalTensor<T> tempTensorC = sharedTmpBuffer[(transposeParams.cSize + 1) * params.preTmpLen];
 
     while (params.dstNeedBlockNum != 0) {
-        // 1ã€transdataTo5hd: src->tmp1
+        // 1¡¢transdataTo5hd: src->tmp1
         if (params.tmp1RemainRowCount == 0) {
             TransBroadCastCal(tempTensorA, srcLocal, params);
             // update the start address of src
@@ -537,7 +537,7 @@ __aicore__ inline void Transpose2HwcCal(const LocalTensor<T> &dstLocal, const Lo
             }
         }
         PipeBarrier<PIPE_V>();
-        // 2ã€datacopy:tmp1->tmp2: jump to carry one block from each C dimension and splice them
+        // 2¡¢datacopy:tmp1->tmp2: jump to carry one block from each C dimension and splice them
         while (params.tmp2NeedRowCount != 0) {
             params.dataCopyParams1.blockCount = 1;
             params.dataCopyParams1.blockLen = 1;
@@ -555,14 +555,14 @@ __aicore__ inline void Transpose2HwcCal(const LocalTensor<T> &dstLocal, const Lo
             }
             PipeBarrier<PIPE_V>();
         }
-        // 3ã€transdataTo5hd:tmp2->tmp3
+        // 3¡¢transdataTo5hd:tmp2->tmp3
         if (params.tmp2NeedRowCount == 0) {
             TransFracCal(tempTensorC, tempTensorB, params);
             // update params
             UpdateTransToTmp3ParamCal(params, transposeParams.cSize, TransposeType::TRANSPOSE_NCHW2NHWC);
         }
         PipeBarrier<PIPE_V>();
-        // 4ã€dataCopy tmp3->dst
+        // 4¡¢dataCopy tmp3->dst
         params.dataCopyParams1.blockCount = 1;
         params.dataCopyParams1.blockLen = params.tmp3RemainRowCount;
         CopyFirstBlockCal(dstLocal, tempTensorC, transposeParams, params, params.dataCopyParams1);
@@ -642,7 +642,7 @@ __aicore__ inline void Transpose2ChwCal(const LocalTensor<T> &dstLocal, const Lo
             UpdateTransToTmp1ParamCal(params);
         }
         PipeBarrier<PIPE_V>();
-        // 2ã€datacopy:tmp1->tmp2:transfer one block in each C dimension from src to dst.
+        // 2¡¢datacopy:tmp1->tmp2:transfer one block in each C dimension from src to dst.
         while (params.tmp1RemainRowCount != 0) {
             params.dataCopyParams1.blockCount = 1;
             params.dataCopyParams1.blockLen = 1;
@@ -659,7 +659,7 @@ __aicore__ inline void Transpose2ChwCal(const LocalTensor<T> &dstLocal, const Lo
             }
             PipeBarrier<PIPE_V>();
         }
-        // 3ã€transdataTo5hd:tmp2->tmp3
+        // 3¡¢transdataTo5hd:tmp2->tmp3
         if (params.tmp2NeedRowCount == 0) {
             if ((params.imageSize % NCHW_CONV_ADDR_LIST_SIZE != 0) && (params.dstNeedBlockNum == 1)) {
                 for (int16_t k = 0; k < transposeParams.cSize; k++) {
@@ -673,7 +673,7 @@ __aicore__ inline void Transpose2ChwCal(const LocalTensor<T> &dstLocal, const Lo
             UpdateTransToTmp3ParamCal(params, transposeParams.cSize, TransposeType::TRANSPOSE_NHWC2NCHW);
         }
         PipeBarrier<PIPE_V>();
-        // 4ã€dataCopy tmp3->dst
+        // 4¡¢dataCopy tmp3->dst
         CopyTodstForChwCal(dstLocal, tempTensorC, transposeParams.cSize, params);
     }
 }
@@ -766,7 +766,7 @@ __aicore__ inline void Transpose4DImpl(const LocalTensor<T> &dstLocal, const Loc
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_TRANSPOSE_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TRANSPOSE_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TRANSPOSE_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TRANSPOSE_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TRANSPOSE_IMPL_H__
 #endif

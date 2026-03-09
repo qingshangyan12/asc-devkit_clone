@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kfc_comm_client.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_m510/kfc/kfc_comm_client.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_H__
 #endif
 #ifndef __KERNEL_KFC_COMM_CLIENT_H__
 #define __KERNEL_KFC_COMM_CLIENT_H__
@@ -28,9 +28,9 @@ __BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient;
 
 class KfcCommClient {
 public:
-    // å‘é€æ¶ˆæ¯é˜Ÿåˆ—ç»´æŠ¤
-    MSG_POS KfcMsg *msgSendHead;   // æ¶ˆæ¯å¤´
-    uint8_t msgSendPos;  // ç”¨äºŽå¾ªçŽ¯é˜Ÿåˆ—çš„ç´¢å¼•
+    // ·¢ËÍÏûÏ¢¶ÓÁÐÎ¬»¤
+    MSG_POS KfcMsg *msgSendHead;   // ÏûÏ¢Í·
+    uint8_t msgSendPos;  // ÓÃÓÚÑ­»·¶ÓÁÐµÄË÷Òý
     int8_t enableHardPoll;
     int8_t enableMixDualMaster;
 public:
@@ -76,7 +76,7 @@ __aicore__ inline KfcCommClient::KfcCommClient(GM_ADDR workspace, int subBlockID
         ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
         ASCENDC_ASSERT((GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN) != nullptr),
                        { KERNEL_LOG(KERNEL_ERROR, "vecin base addr can not be nullptr"); });
-        this->msgSendHead = (MSG_POS KfcMsg *)GetMsgHead(subBlockID); // æ³¨æ„aicå’Œaivçš„åœ°å€æ˜¯äº¤æ¢çš„
+        this->msgSendHead = (MSG_POS KfcMsg *)GetMsgHead(subBlockID); // ×¢ÒâaicºÍaivµÄµØÖ·ÊÇ½»»»µÄ
         this->msgSendPos = 0;
         this->enableHardPoll = enableHardPoll;
         this->enableMixDualMaster = enableMixDualMaster;
@@ -112,7 +112,7 @@ __aicore__ inline void SendSSbufData(uint64_t *ptr, MSG_POS uint64_t *ptrMsg)
 }
 }  // namespace AscendC
 #endif  // __KERNEL_KFC_COMM_CLIENT_H__
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_CLIENT_H__
 #endif
