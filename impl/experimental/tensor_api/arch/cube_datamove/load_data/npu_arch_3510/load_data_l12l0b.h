@@ -17,23 +17,65 @@
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0b/zn2zn.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0b/nz2zn.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0b/nz2znb8.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0b/nz2znb8b4.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0b/zn2zn_with_coord.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0b/nz2zn_with_coord.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/load_data_l12l0b/nz2znb8b4_with_coord.h"
 
 namespace AscendC {
 namespace Te {
-class LoadDataFourDim3510L12L0B : public LoadDataFourDim3510L12L0BZN2ZN, public LoadDataFourDim3510L12L0BNZ2ZNB8,
-    public LoadDataFourDim3510L12L0BNZ2ZN {
+class LoadDataFourDim3510L12L0B {
+public:
+    template <const LoadDataTrait& trait, typename T, typename U>
+    __aicore__ inline void Run(const T& dst, const U& src) {
+        Execute<trait>(dst, src);
+    }
+
+private:
+    template<const LoadDataTrait& trait, bool transpose>
+    struct TraitHolder {
+        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
+    };
+
+    template <const LoadDataTrait& trait, typename T, typename U>
+    __aicore__ inline void Execute(const T& dst, const U& src) {
+        if constexpr (IsZNFormat<U>::value && IsZNFormat<T>::value) {
+            LoadDataFourDim3510L12L0BZN2ZN zn2znStrategy;
+            zn2znStrategy.Run<TraitHolder<trait, false>::traitTransposed, T, U>(dst, src);
+        } else if constexpr (IsNZFormat<U>::value && IsZNFormat<T>::value && (sizeof(typename U::elementType) == 1)) {
+            LoadDataFourDim3510L12L0BNZ2ZNB8B4 nz2znb8Strategy;
+            nz2znb8Strategy.Run<TraitHolder<trait, true>::traitTransposed, T, U>(dst, src);
+        } else if constexpr (IsNZFormat<U>::value && IsZNFormat<T>::value) {
+            LoadDataFourDim3510L12L0BNZ2ZN nz2znStrategy;
+            nz2znStrategy.Run<TraitHolder<trait, true>::traitTransposed, T, U>(dst, src);
+        }
+    }
+};
+
+class LoadDataFourDim3510L12L0BWithCoord {
 public:
     template <const LoadDataTrait& trait, typename T, typename U, class Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+        Execute<trait>(dst, src, coord);
+    }
+
+private:
+    template<const LoadDataTrait& trait, bool transpose>
+    struct TraitHolder {
+        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
+    };
+
+    template <const LoadDataTrait& trait, typename T, typename U, class Coord>
+    __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
         if constexpr (IsZNFormat<U>::value && IsZNFormat<T>::value) {
-            LoadDataFourDim3510L12L0BZN2ZN::Run<trait, T, U, Coord>(dst, src, coord);
+            LoadDataFourDim3510L12L0BZN2ZNWithCoord zn2znStrategy;
+            zn2znStrategy.Run<TraitHolder<trait, false>::traitTransposed, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsNZFormat<U>::value && IsZNFormat<T>::value && (sizeof(typename U::elementType) == 1)) {
-            LoadDataFourDim3510L12L0BNZ2ZNB8::Run<trait, T, U, Coord>(dst, src, coord);
+            LoadDataFourDim3510L12L0BNZ2ZNB8B4WithCoord nz2znb8Strategy;
+            nz2znb8Strategy.Run<TraitHolder<trait, true>::traitTransposed, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsNZFormat<U>::value && IsZNFormat<T>::value) {
-            LoadDataFourDim3510L12L0BNZ2ZN::Run<trait, T, U, Coord>(dst, src, coord);
-        } else {
-            static_assert(Std::always_false_v<T>);
+            LoadDataFourDim3510L12L0BNZ2ZNWithCoord nz2znStrategy;
+            nz2znStrategy.Run<TraitHolder<trait, true>::traitTransposed, T, U, Coord>(dst, src, coord);
         }
     }
 };
