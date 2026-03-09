@@ -18,7 +18,7 @@
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_DATAMOVE_IMPL_ASC_COPY_GM2L1_IMPL_H
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
-
+/*
 __aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
                                             uint64_t src_stride, uint32_t dst_stride)
 {
@@ -33,6 +33,7 @@ __aicore__ inline void asc_copy_gm2l1_sync_impl(__cbuf__ void* dst, __gm__ void*
     asc_copy_gm2l1_impl(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
     asc_sync_post_process();
 }
+*/
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

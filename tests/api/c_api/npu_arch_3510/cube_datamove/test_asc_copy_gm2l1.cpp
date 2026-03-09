@@ -34,7 +34,7 @@ protected:
         g_coreType = C_API_AIV_TYPE;
     }
 };
-
+/*
 TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1)
 {
     MOCKER_CPP(copy_gm_to_cbuf_v2, void(__cbuf__ void*, __gm__ void*, uint8_t, uint32_t, uint32_t, uint8_t,
@@ -74,3 +74,4 @@ TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_SYNC)
     asc_copy_gm2l1_sync(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
     GlobalMockObject::verify();
 }
+*/
