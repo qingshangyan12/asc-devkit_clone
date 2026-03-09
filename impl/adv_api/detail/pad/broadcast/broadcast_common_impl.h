@@ -12,6 +12,12 @@
  * \file broadcast_common_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/pad/broadcast/broadcast_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/pad/broadcast.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H
+#endif
+
 #ifndef IMPL_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H
 #define IMPL_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H
 
@@ -22,7 +28,7 @@
 #include "../../api_check/kernel_check/pad/broadcast/broadcast_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "broadcast_c310_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
@@ -30,14 +36,14 @@
 #else
 #include "broadcast_v200_impl.h"
 #endif
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 ||  __NPU_ARCH__ == 5102 || \
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 ||  __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 
 namespace AscendC {
 constexpr uint32_t TWO_DIM = 2;
 constexpr uint32_t HALF_ONE_BLK_SIZE = 16;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 struct BroadcastTiling {
     uint32_t oriRank;
@@ -383,7 +389,7 @@ template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
 __aicore__ inline void BroadCast(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
     const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<uint8_t> &sharedTmpBuffer);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
 __aicore__ inline void BroadCastCommon(const LocalTensor<T> &dstLocal, const LocalTensor<T> &srcLocal,
@@ -514,3 +520,8 @@ __aicore__ inline void BroadCast(const LocalTensor<T> &dstLocal, const LocalTens
 }  // namespace AscendC
 #endif
 #endif  // IMPL_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_COMMON_IMPL_H
+#endif

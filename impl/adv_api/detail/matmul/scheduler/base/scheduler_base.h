@@ -12,6 +12,12 @@
  * \file scheduler_base.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/matmul/scheduler/base/scheduler_base.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_BASE_H
+#endif
+
 #ifndef IMPL_MATMUL_SCHEDULER_BASE_SCHEDULER_BASE_H
 #define IMPL_MATMUL_SCHEDULER_BASE_SCHEDULER_BASE_H
 
@@ -102,14 +108,14 @@ public:
                                                  : tiling.GetBaseM() * tiling.GetBaseN();
 
         uint32_t lenFactor = 1;
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         if constexpr (MdlInitScene<MM_CFG> && ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT) {
             lenFactor = DOUBLE_SIZE;
         }
 #endif
         MATMUL_MODULE(CubeOutBuffer)->Init(baseMN, lenFactor);
         if constexpr (NormInitScene<MM_CFG>) {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             MATMUL_MODULE(BiasScheduler)->Init();
 #endif
         } else {
@@ -500,4 +506,9 @@ protected:
 }  // namespace Detail
 }  // namespace Impl
 }  // namespace AscendC
+#endif
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_BASE_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_BASE_H
 #endif

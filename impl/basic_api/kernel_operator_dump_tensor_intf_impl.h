@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,11 +12,17 @@
  * \file kernel_operator_dump_tensor_intf_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/kernel_operator_dump_tensor_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_dump_tensor_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
-
-inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
+#include "impl/utils/debug/asc_debug_utils.h"
+#endif
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_dump_tensor_impl.h"
@@ -26,7 +32,7 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "dav_c220/kernel_operator_dump_tensor_impl.h"
 #elif __NPU_ARCH__ == 3002
 #include "dav_m300/kernel_operator_dump_tensor_impl.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "dav_c310/kernel_operator_dump_tensor_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_dump_tensor_impl.h"
@@ -257,3 +263,7 @@ __aicore__ inline void PrintTimeStamp(uint32_t descId)
 
 }  // namespace AscendC
 #endif  // END OF ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H
+#endif

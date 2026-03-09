@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,6 +12,11 @@
  * \file kfc_comm_gm.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/dav_c310/kfc/kfc_comm_gm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H
+#endif
 #ifndef KFC_COMM_GM_H
 #define KFC_COMM_GM_H
  
@@ -95,7 +100,16 @@ constexpr int32_t QUIT_CNT = 4;
 constexpr int32_t MAX_SYNC_COUNT = 100000000;
 constexpr int32_t MMCNT_L1_RESERVERD_SIZE = 64; // Reserved L1 64B for MMCNT Query
 constexpr uint16_t KFC_SYNC_ID = 15;
- 
+
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+// the max cnt of matmul object in superkernel mode
+constexpr int MAX_MATMUL_OBJ_CNT = 4;
+struct SuperKernelWaitEventCnt {
+    uint32_t eventId[MAX_MATMUL_OBJ_CNT] = {0};
+    int32_t eventCnt[MAX_MATMUL_OBJ_CNT] = {0};
+};
+#endif
+
 struct TilingInfo {
     GM_ADDR tilingAddr;  // the GM address of the tiling.
 };
@@ -540,3 +554,7 @@ __aicore__ inline void RollBackMsgImpl(__gm__ KfcMsg *&msgRcvHead, uint8_t &msgR
  
 }  // namespace AscendC
 #endif  // __KFC_COMM_GM_H__
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H
+#endif

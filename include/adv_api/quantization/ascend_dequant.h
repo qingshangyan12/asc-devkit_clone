@@ -12,10 +12,16 @@
  * \file ascend_dequant.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASCEND_DEQUANT_H
+#endif
+
 #ifndef LIB_QUANTIZATION_ASCEND_DEQUANT_H
 #define LIB_QUANTIZATION_ASCEND_DEQUANT_H
 #include "include/adv_api/quantization/ascend_dequant_utils.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/quantization/dequant/ascend_dequant_common_impl.h"
@@ -240,7 +246,7 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
     AscendDequantScalarImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, params);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 template <typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
                                      const LocalTensor<scaleT> &scaleTensor, const LocalTensor<scaleT> &offsetTensor,
@@ -261,3 +267,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
 } // namespace AscendC
 #endif
 #endif // LIB_QUANTIZATION_ASCEND_DEQUANT_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASCEND_DEQUANT_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASCEND_DEQUANT_H
+#endif

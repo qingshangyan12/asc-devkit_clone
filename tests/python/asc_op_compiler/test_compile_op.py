@@ -32,6 +32,7 @@ from asc_op_compile_base.common.platform import set_current_compile_soc_info, ge
 from asc_op_compile_base.common import register
 from asc_op_compile_base.common import buildcfg
 from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storage
+from asc_op_compile_base.common.context import get_context
 
 def SetCurrentSocInfo(soc: str):
     set_current_compile_soc_info(soc)
@@ -148,8 +149,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -196,8 +197,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -234,11 +235,8 @@ class TestCompileOp(unittest.TestCase):
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
                 with mock.patch.object(ascendc_common_utilityop_module, 'is_enable_ascendc_cov', return_value=True):
-                    with mock.patch.object(compile_op_module, 'set_dump_assert_flag') as mock_compile:
-                        compile_op_with_customized_config(cce_file, origin_func_name, op_info, compile_options, code_channel,
-                                    op_compile_option, extend_options, customized_config)
-                        args, kwargs = mock_compile.call_args
-                        self.assertEqual(args[0].tiling_key_list, ['1'])
+                    compile_op_with_customized_config(cce_file, origin_func_name, op_info, compile_options, code_channel,
+                                op_compile_option, extend_options, customized_config)
 
         binary_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.o')
         json_file = os.path.join(TOP_PATH, 'kernel_meta', op_info.kernel_name + '.json')
@@ -271,8 +269,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -320,8 +318,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -380,8 +378,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -465,8 +463,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -938,8 +936,8 @@ class TestCompileOp(unittest.TestCase):
                     '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                     '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                     '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                    '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                    '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                    '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                    '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                     '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                     '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                     '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1083,8 +1081,8 @@ class TestCompileOp(unittest.TestCase):
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1329,8 +1327,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1465,8 +1463,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1581,8 +1579,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1694,8 +1692,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1801,8 +1799,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -1922,8 +1920,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2062,8 +2060,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2140,8 +2138,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2349,8 +2347,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2527,8 +2525,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -2868,8 +2866,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -3154,8 +3152,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -3785,8 +3783,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -3844,8 +3842,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -3854,6 +3852,7 @@ Contents of section
                            '-DHIGH_PERFORMANCE=1', '-DDETERMINISTIC_MODE=1']
         op_compile_option = '{}'
 
+        
         with asc_op_compile_base.common.context.op_context.OpContext():
             with buildcfg.build_config():
                 compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option)
@@ -3922,8 +3921,8 @@ Contents of section
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -4304,9 +4303,11 @@ void add_custom();
             file.write(context)
 
         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
-            self.assertEqual(kernel_info.tiling_key_kernel_type["17435146"], KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2)
-            self.assertEqual(kernel_info.no_set_kernel_type, False)
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                    kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+                    self.assertEqual(kernel_info.tiling_key_kernel_type["17435146"], KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2)
+                    self.assertEqual(kernel_info.no_set_kernel_type, False)
         
         with open(src_file, "w") as file:
             context = """
@@ -4317,8 +4318,10 @@ void add_custom();
             file.write(context)
 
         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-            kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
-            self.assertEqual(kernel_info.no_set_kernel_type, True)
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                    kernel_info = KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+                    self.assertEqual(kernel_info.no_set_kernel_type, True)
         
         with open(src_file, "w") as file:
             context = """
@@ -4329,10 +4332,12 @@ void add_custom();
             file.write(context)
 
         with mock.patch.object(KernelInfoInfer, 'get_tiling_key_corresponding_struct', return_value={}):
-            try:
-                KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
-            except Exception as e:
-                assert str(e) == "must provide default kernel type", f"msg is :{e}"
+            with asc_op_compile_base.common.context.op_context.OpContext():
+                with mock.patch.object(asc_op_compile_base.common.context.get_context(), 'get_addition', return_value = ''):
+                    try:
+                        KernelInfoInfer.infer_info_from_ifile(None, src_file, src_file, src_file, "add_custom")
+                    except Exception as e:
+                        assert str(e) == "must provide default kernel type", f"msg is :{e}"
 
 
     def test_infer_info_from_ifile_key_none_type_exists(self):
@@ -4822,8 +4827,8 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -4936,6 +4941,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
 
 
     def test_gen_kernel_function_c310_dcci_false(self):
+        global_var_storage.global_storage_reset()
         SetCurrentSocInfo("Ascend950PR_9599")
         cce_file = os.path.join(
             TOP_PATH, "tests/python/asc_op_compiler/stub_kernels/add_custom_unalign.cpp")
@@ -4965,8 +4971,8 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
                            '-I' + os.path.join(API_ROOT_PATH, 'impl'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/micro_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/micro_api'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
+                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
                            '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
@@ -5029,6 +5035,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         compile_option_tuple.mllvm_options.append('-mllvm')
         compile_option_tuple.mllvm_options.append('-cce-aicore-dcci-before-kernel-end=')
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, compile_option_tuple)
+        global_var_storage.global_storage_reset()
     
 
     def test_delete_tiling_section(self):

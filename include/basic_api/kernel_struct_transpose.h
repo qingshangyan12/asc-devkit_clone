@@ -12,6 +12,11 @@
  * \file kernel_struct_transpose.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_TRANSPOSE_H
+#endif
+
 #ifndef ASCENDC_MODULE_STRUCT_TRANSPOSE_H
 #define ASCENDC_MODULE_STRUCT_TRANSPOSE_H
 
@@ -49,7 +54,7 @@ enum class TransposeType : uint8_t {
     TRANSPOSE_ND2ND_B16,     // { shape:[16, 16], format:"ND", dataType: B16} -->{ shape:[16, 16], format:"ND"}
     TRANSPOSE_NCHW2NHWC,     // [ N, C, H, W] -> [N, H, W, C]
     TRANSPOSE_NHWC2NCHW,      // [ N, H, W, C] -> [N, C, H, W]
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     TRANSPOSE_ND2ND_021,     // [H, W]->[W, H], [N, H, W]->[N, W, H]
     TRANSPOSE_ND2ND_102,     // [N, H, W]->[H, N, W]
     TRANSPOSE_ND2ND_210,      // [N, H, W]->[W, H, N]
@@ -96,3 +101,8 @@ struct TransposeParamsExt {
 };
 } // namespace AscendC
 #endif // ASCENDC_MODULE_STRUCT_TRANSPOSE_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_TRANSPOSE_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_TRANSPOSE_H
+#endif

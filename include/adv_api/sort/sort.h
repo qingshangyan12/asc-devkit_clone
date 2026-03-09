@@ -13,11 +13,17 @@
  * \brief
  */
 
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_H
+#endif
+
 #ifndef LIB_SORT_SORT_H
 #define LIB_SORT_SORT_H
 
 #include "kernel_basic_intf.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/sort/sort/sort_impl.h"
@@ -37,7 +43,7 @@
  *     const LocalTensor<uint32_t>& indexLocal, LocalTensor<T>& tmpLocal, const int32_t repeatTimes);
 */
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -65,7 +71,7 @@ template <typename T, typename U, bool isReuseSource = false, const SortConfig& 
 __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<U>& srcIndexTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
-    MicroAPI::internal::SortImpl<T, U, isReuseSource, config>(
+    Reg::internal::SortImpl<T, U, isReuseSource, config>(
         dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, sharedTmpBuffer, calCount);
 }
 
@@ -88,7 +94,7 @@ template <typename T, typename U, bool isReuseSource = false, const SortConfig& 
 __aicore__ inline void Sort(const LocalTensor<T>& dstTensor, const LocalTensor<U>& dstIndexTensor,
     const LocalTensor<T>& srcTensor, const LocalTensor<U>& srcIndexTensor, const uint32_t calCount)
 {
-    MicroAPI::internal::SortImpl<T, U, isReuseSource, config>(
+    Reg::internal::SortImpl<T, U, isReuseSource, config>(
         dstTensor, dstIndexTensor, srcTensor, srcIndexTensor, calCount);
 }
 
@@ -113,7 +119,7 @@ template <typename T, bool isReuseSource = false, const SortConfig& config = DEF
 __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
-    MicroAPI::internal::SortImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+    Reg::internal::SortImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
 /* !
@@ -131,7 +137,7 @@ __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& src
 template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
 __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
-    MicroAPI::internal::SortImpl<T, isReuseSource, config>(dstTensor, srcTensor, calCount);
+    Reg::internal::SortImpl<T, isReuseSource, config>(dstTensor, srcTensor, calCount);
 }
 
 /* !
@@ -156,7 +162,7 @@ template <typename T, bool isReuseSource = false, const SortConfig& config = DEF
 __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor,
     const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
-    MicroAPI::internal::SortImpl<T, isReuseSource, config>(
+    Reg::internal::SortImpl<T, isReuseSource, config>(
         dstTensor, dstIndexTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
@@ -177,10 +183,15 @@ template <typename T, bool isReuseSource = false, const SortConfig& config = DEF
 __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor,
     const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
-    MicroAPI::internal::SortImpl<T, isReuseSource, config>(dstTensor, dstIndexTensor, srcTensor, calCount);
+    Reg::internal::SortImpl<T, isReuseSource, config>(dstTensor, dstIndexTensor, srcTensor, calCount);
 }
 
 #pragma end_pipe
 } // namespace AscendC
 #endif
 #endif // LIB_SORT_SORT_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SORT_H
+#endif

@@ -8,6 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_RMSNORM_H
+#endif
+
 #ifndef LIB_NORMALIZATION_RMSNORM_H
 #define LIB_NORMALIZATION_RMSNORM_H
 #include "kernel_tensor.h"
@@ -16,10 +22,10 @@
 #include "kernel_tiling/kernel_tiling.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/normalization/rmsnorm/rmsnorm_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/normalization/rmsnorm/rmsnorm_c310_impl.h"
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -78,3 +84,8 @@ __aicore__ inline void RmsNorm(const LocalTensor<T>& dstLocal, const LocalTensor
 } // namespace AscendC
 #endif
 #endif // LIB_NORMALIZATION_RMSNORM_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_RMSNORM_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_RMSNORM_H
+#endif

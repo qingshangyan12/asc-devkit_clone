@@ -12,6 +12,12 @@
  * \file layernorm_check.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/api_check/kernel_check/normalization/layernorm/layernorm_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/normalization/layernorm.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LAYERNORM_CHECK_H
+#endif
+
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_LAYERNORM_LAYERNORM_CHECK_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_LAYERNORM_LAYERNORM_CHECK_H_
 
@@ -20,7 +26,7 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "layernorm_check_common.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "layernorm_check_310.h"
 #else
 #include "layernorm_check_aicore.h"
@@ -53,3 +59,8 @@ __aicore__ inline void CheckFuncLayerNorm(__gm__ const char *apiName, const Loca
 }
 }
 #endif // IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_LAYERNORM_LAYERNORM_CHECK_H_
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LAYERNORM_CHECK_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LAYERNORM_CHECK_H
+#endif

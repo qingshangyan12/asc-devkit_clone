@@ -12,6 +12,12 @@
  * \file matmul_server_impl_c220.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/matmul/kfc/matmul_server_impl_c220.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul_client.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_KFC_MATMUL_SERVER_IMPL_C220_H
+#endif
+
 #ifndef IMPL_MATMUL_KFC_MATMUL_SERVER_IMPL_C220_H
 #define IMPL_MATMUL_KFC_MATMUL_SERVER_IMPL_C220_H
 
@@ -95,6 +101,9 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
             if (cntIterator < INC_PROCESS_CHECK && funID == KFC_Enum::MMFUN_ITERATE) {
                 uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
                 NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+                SuperKernelEventCount(eventID);
+#endif
             }
         }
         offset += offsetSize;
@@ -316,6 +325,9 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
             if (funID == KFC_Enum::MMFUN_ITERATE_ALL) { // fake msg
                 uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + kfcCommSrv->subBlockID);
                 NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+                SuperKernelEventCount(eventID);
+#endif
                 return true;
             }
         }
@@ -342,12 +354,35 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
     if (sync || msg->body.waitIterateAll) {
         ASSERT(funID == KFC_Enum::MMFUN_ITERATE_ALL);
         NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+        SuperKernelEventCount(eventID);
+#endif
     } else if (cntIterator >= INC_PROCESS_CHECK && funID == KFC_Enum::MMFUN_ITERATE) {
         NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+        SuperKernelEventCount(eventID);
+#endif
     }
     mul.End();
     TRACE_STOP(TraceId::MatMul_CALC);
     return true;
 }
+
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+    MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
+__aicore__ inline void MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SuperKernelEventCount(uint16_t eventID)
+{
+    auto msgRcvStart = reinterpret_cast<__gm__ int64_t *>(kfcCommSrv->GetSecondBuffStart());
+    auto superKernelEvent = reinterpret_cast<__gm__ SuperKernelWaitEventCnt *>(msgRcvStart);
+    int32_t count = superKernelEvent->eventCnt[this->devEvtID] + 1;
+    superKernelEvent->eventId[this->devEvtID] = eventID;
+    superKernelEvent->eventCnt[this->devEvtID] = count;
+}
+#endif
 } // namespace AscendC
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_KFC_MATMUL_SERVER_IMPL_C220_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_KFC_MATMUL_SERVER_IMPL_C220_H
 #endif // IMPL_MATMUL_KFC_MATMUL_SERVER_IMPL_C220_H

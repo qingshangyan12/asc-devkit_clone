@@ -12,9 +12,14 @@
  * \file cumsum_c310_impl.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/math/cumsum/regbase/c310/cumsum_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/cumsum.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_CUMSUM_REGBASE_C310_CUMSUM_C310_IMPL_H
+#endif
 #ifndef IMPL_MATH_CUMSUM_CUMSUM_IMPL_C310_H
 #define IMPL_MATH_CUMSUM_CUMSUM_IMPL_C310_H
-
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
 #include "include/adv_api/math/cumsum_utils.h"
@@ -33,12 +38,12 @@ __simd_vf__ inline void CumSumCopyLastRowVF(__ubuf__ T* dst, __ubuf__ T* src, ui
     uint32_t count = len;
     uint16_t repeatTimes = CeilDivision(count, sregLower);
 
-    MicroAPI::RegTensor<T> srcReg;
-    MicroAPI::MaskReg preg;
+    Reg::RegTensor<T> srcReg;
+    Reg::MaskReg preg;
     for (uint16_t i = 0; i < repeatTimes; i++) {
-        preg = MicroAPI::UpdateMask<T>(count);
-        MicroAPI::LoadAlign(srcReg, src + i * sregLower);
-        MicroAPI::StoreAlign(dst + i * sregLower, srcReg, preg);
+        preg = Reg::UpdateMask<T>(count);
+        Reg::LoadAlign(srcReg, src + i * sregLower);
+        Reg::StoreAlign(dst + i * sregLower, srcReg, preg);
     }
 }
 
@@ -199,3 +204,8 @@ __aicore__ inline void CumSumImpl(LocalTensor<T>& dstTensor, LocalTensor<T>& las
 }
 } // namespace AscendC
 #endif // IMPL_MATH_CUMSUM_CUMSUM_IMPL_C310_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_CUMSUM_REGBASE_C310_CUMSUM_C310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_CUMSUM_REGBASE_C310_CUMSUM_C310_IMPL_H
+#endif

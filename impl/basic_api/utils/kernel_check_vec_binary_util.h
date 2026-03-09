@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -13,6 +13,11 @@
  * \brief
  */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/utils/kernel_check_vec_binary_util.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_VEC_BINARY_UTIL_H
+#endif
 #ifndef ASCENDC_CHECK_VEC_BINARY_UTIL_H
 #define ASCENDC_CHECK_VEC_BINARY_UTIL_H
 #if ASCENDC_CPU_DEBUG
@@ -141,7 +146,7 @@ struct VecBinaryScalarApiParams {
         calCount = count;
     }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     VecBinaryScalarApiParams(uint64_t dstAddrIn, uint64_t src0AddrIn, uint8_t repeatIn, uint16_t dstBlockStrideIn,
         uint16_t src0BlockStrideIn, uint16_t dstRepeatStrideIn, uint16_t src0RepeatStrideIn, uint32_t dstDtypeBytesIn,
         uint32_t src0DtypeBytesIn, uint64_t dstSizeIn, uint64_t src0SizeIn, uint8_t dstPosIn, uint8_t src0PosIn, uint8_t scalarPosIn)
@@ -202,7 +207,7 @@ struct VecBinaryScalarApiParams {
     uint8_t src0LogicPos = 0;
     uint32_t calCount = 0;
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     uint8_t scalarPos = 1;
     uint8_t enableFlexibleScalar = 0;
 #endif
@@ -227,4 +232,8 @@ bool CheckFunVecBinaryScalarImpl(VecBinaryScalarApiParams& chkParams, const char
 } // namespace check
 } // namespace AscendC
 #endif
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_VEC_BINARY_UTIL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_VEC_BINARY_UTIL_H
 #endif

@@ -12,6 +12,11 @@
  * \file kernel_operator_limits_intf.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIMITS_INTF_H
+#endif
+
 #ifndef ASCENDC_KERNEL_OPERATOR_LIMITS_INTF_H
 #define ASCENDC_KERNEL_OPERATOR_LIMITS_INTF_H
 
@@ -27,7 +32,7 @@
 #include "kernel_bf16.h"
 #endif
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 namespace AscendC {
 template <typename T>
 struct NumericLimits {
@@ -223,3 +228,8 @@ public:
 }  // namespace AscendC
 #endif
 #endif  // ASCENDC_KERNEL_OPERATOR_LIMITS_INTF_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIMITS_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIMITS_INTF_H
+#endif

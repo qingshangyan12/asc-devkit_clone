@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,6 +12,11 @@
  * \file kfc_comm_server.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/dav_c220/kfc/kfc_comm_server.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_SERVER_H
+#endif
 #ifndef __INTF_KFC_COMM_SERVER_H__
 #define __INTF_KFC_COMM_SERVER_H__
 
@@ -27,6 +32,11 @@ public:
     __gm__ KfcMsg* msgRcvHead;
     __gm__ KfcMsg* msgRcvStart;
 
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+    // The KFC's second queue serves as the matmul count in the superkernel mode
+    __gm__ KfcMsg* msgCntStart;
+#endif
+
     GM_ADDR ubAvalidTail;
 
     uint8_t msgSendPos; // for the subBlockID of the AIC core
@@ -39,6 +49,13 @@ public:
         // the Rcv on the server is the same as the Send on the client. The addresses of aic and aiv are swap.
         this->msgRcvStart = (__gm__ KfcMsg*)GetMsgHead(workspace, i);
         this->msgSendStart = this->msgRcvStart + MAX_MSG_COUNT;
+
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+        // vec0 stores the sendEvent and eventId of the vec1, and the vec1 same as vec0.
+        // Therefore, the address position of the other party is taken for writing
+        uint8_t mapId = i != 0 ? 0 : 1;
+        this->msgCntStart = (__gm__ KfcMsg*)GetMsgHead(workspace, mapId) + MAX_MSG_COUNT;
+#endif
 
         this->msgSendHead = this->msgSendStart;
         this->msgSendPos = 0;
@@ -96,6 +113,13 @@ public:
         return msg;
     }
 
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+    __aicore__ inline __gm__ KfcMsg* GetSecondBuffStart()
+    {
+        return this->msgCntStart;
+    }
+#endif
+
     __aicore__ inline void RollBackMsg()
     {
         RollBackMsgImpl(this->msgRcvHead, this->msgRcvPos);
@@ -107,3 +131,7 @@ typedef KfcCommServer* KFC_COMM_SERVER_PTR;
 #define KFC_COMM_SERVER KfcCommServer
 } // namespace AscendC
 #endif // __INTF_KFC_COMM_SERVER_H__
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_SERVER_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_SERVER_H
+#endif

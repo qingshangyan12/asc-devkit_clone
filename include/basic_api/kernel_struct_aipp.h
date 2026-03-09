@@ -12,6 +12,11 @@
  * \file kernel_struct_aipp.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_AIPP_H
+#endif
+
 #ifndef ASCENDC_MODULE_STRUCT_AIPP_H
 #define ASCENDC_MODULE_STRUCT_AIPP_H
 
@@ -87,7 +92,7 @@ struct AippColorSpaceConvParams {
 
 #if defined(__NPU_ARCH__) &&                                                   \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) ||                       \
-     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T> struct AippParams {
     AippPaddingParams<T> paddingParams;
     AippSwapParams swapParams;
@@ -99,3 +104,8 @@ template <typename T> struct AippParams {
 #endif // (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002)
 } // namespace AscendC
 #endif // ASCENDC_MODULE_STRUCT_AIPP_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_AIPP_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_AIPP_H
+#endif

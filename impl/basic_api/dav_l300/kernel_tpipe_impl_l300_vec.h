@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,6 +12,11 @@
  * \file kernel_tpipe_impl_c310.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/dav_l300/kernel_tpipe_impl_l300_vec.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_L300_VEC_H
+#endif
 #ifndef ASCENDC_MODULE_TPIPE_IMPL_L300_H
 #define ASCENDC_MODULE_TPIPE_IMPL_L300_H
 #include "kernel_tpipe.h"
@@ -1540,7 +1545,7 @@ __aicore__ inline void InitShareBufStart(
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0B)].maxAddr = 0;
     // v100 Shouldn't Use Bias Table
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::BIAS)].maxAddr = 0;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     tpipe->g_tpipeImpl.sharedEvtId_ = tpipe->g_tpipeImpl.bufIdPool_;
 #endif
     return;
@@ -1558,7 +1563,7 @@ __aicore__ inline void InitShareBufEnd(TPipe *tpipe)
         tpipe->g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::UB)];
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     tpipe->g_tpipeImpl.bufIdPool_ = tpipe->g_tpipeImpl.sharedEvtId_;
 #endif
     return;
@@ -2275,3 +2280,7 @@ __aicore__ inline uint64_t GetTQueHeadAddr(const T &que)
 }
 }  // namespace AscendC
 #endif  // ASCENDC_MODULE_TPIPE_IMPL_L300_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_L300_VEC_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_L300_VEC_H
+#endif

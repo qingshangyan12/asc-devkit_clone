@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_scatter_intf_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/kernel_operator_vec_scatter_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_scatter_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_SCATTER_INTF_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_SCATTER_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_SCATTER_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
@@ -27,7 +32,7 @@
 #include "dav_m300/kernel_operator_vec_scatter_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_scatter_impl.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "dav_c310/kernel_operator_vec_scatter_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_scatter_impl.h"
@@ -43,12 +48,12 @@ template <typename T>
 __aicore__ inline void ScatterCheck()
 {
     using PrimType = PrimT<T>;
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t,
         int32_t, uint64_t, int64_t>()), {KERNEL_LOG(KERNEL_ERROR,
         "Failed to check dtype in Scatter, current api support dtype combination is src and dst both: "
         "uint8 / int8 / half / bfloat16_t / uint16_t / int16_t / float / uint32_t / int32_t, uint64_t, int64_t");});
-#elif ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101))
+#elif ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510))
     ASCENDC_ASSERT((SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t,
         int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
         "Failed to check dtype in Scatter, current api support dtype combination is src and "
@@ -137,7 +142,7 @@ __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& 
     using PrimType = PrimT<T>;
     ScatterCheck<T>();
     uint32_t vectorRegWidth = 256;
-#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     ScatterImpl((__ubuf__ PrimType *)dst.GetPhyAddr(), (__ubuf__ PrimType *)src.GetPhyAddr(),
         (__ubuf__ uint32_t *)dstOffset.GetPhyAddr(), dstBaseAddr, count);
 #else
@@ -185,3 +190,7 @@ __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& 
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_SCATTER_INTERFACE_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_SCATTER_INTF_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_SCATTER_INTF_IMPL_H
+#endif

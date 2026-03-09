@@ -39,16 +39,22 @@
  *  R2 = 61.20362572811089435388
  *  R3 = -24.8048928861126769186219
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TAN_H
+#endif
+
 #ifndef LIB_MATH_TAN_H
 #define LIB_MATH_TAN_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 
 #include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/tan/tan_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/math/tan/tan_c310_impl.h"
 #endif
@@ -142,3 +148,8 @@ __aicore__ inline void Tan(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 #endif
 
 #endif // LIB_MATH_TAN_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TAN_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TAN_H
+#endif

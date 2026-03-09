@@ -12,13 +12,19 @@
  * \file mean.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MEAN_H
+#endif
+
 #ifndef LIB_REDUCE_MEAN_H
 #define LIB_REDUCE_MEAN_H
 
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 #include "include/adv_api/reduce/mean_utils.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/reduce/mean/mean_c310_impl.h"
 #else
 #include "../../../impl/adv_api/detail/reduce/mean/mean_common_impl.h"
@@ -84,3 +90,8 @@ __aicore__ inline void Mean(
 }  // namespace AscendC
 
 #endif  // LIB_REDUCE_MEAN_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MEAN_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MEAN_H
+#endif

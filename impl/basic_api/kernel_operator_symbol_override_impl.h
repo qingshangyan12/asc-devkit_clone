@@ -12,6 +12,11 @@
  * \file kernel_operator_symbol_override_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/kernel_operator_symbol_override_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYMBOL_OVERRIDE_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_SYM_OVERRIDE_H
 #define ASCENDC_MODULE_OPERATOR_SYM_OVERRIDE_H
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -31,19 +36,19 @@
 #include "dav_m300/kernel_operator_vec_binary_continuous_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_binary_continuous_impl.h"
-#elif __NPU_ARCH__ == 3101
-#include "micro_api/kernel_micro_intf.h"
+#elif __NPU_ARCH__ == 3510
+#include "reg_compute/kernel_reg_compute_intf.h"
 #include "dav_c310/kernel_operator_vec_binary_continuous_impl.h"
 #include "dav_c310/kernel_operator_vec_compare_continuous_impl.h"
 #elif (__NPU_ARCH__ == 5102)
-#include "micro_api/kernel_micro_intf.h"
+#include "reg_compute/kernel_reg_compute_intf.h"
 #include "dav_m510/kernel_operator_vec_binary_continuous_impl.h"
 #include "dav_m510/kernel_operator_vec_compare_continuous_impl.h"
 #elif __NPU_ARCH__ == 3003
-#include "micro_api/kernel_micro_intf.h"
+#include "reg_compute/kernel_reg_compute_intf.h"
 #include "dav_l300/kernel_operator_vec_binary_continuous_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "micro_api/kernel_micro_intf.h"
+#include "reg_compute/kernel_reg_compute_intf.h"
 #include "dav_l311/kernel_operator_vec_binary_continuous_impl.h"
 #endif
 #pragma begin_pipe(V)
@@ -214,3 +219,7 @@ private:
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_SYM_OVERRIDE_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYMBOL_OVERRIDE_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYMBOL_OVERRIDE_IMPL_H
+#endif

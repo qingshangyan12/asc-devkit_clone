@@ -13,9 +13,14 @@
  * \brief
  */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/math/logical_or/logical_or_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/logical_or.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOGICAL_OR_LOGICAL_OR_COMMON_IMPL_H
+#endif
 #ifndef LIB_MATH_LOGICAL_OR_IMPL_H
 #define LIB_MATH_LOGICAL_OR_IMPL_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 #include "../logical_template/logical_template.h"
@@ -38,10 +43,15 @@ __aicore__ inline void LogicalOrImpl(const LocalTensor<T>& dst, const LocalTenso
         return;
     }
     CHECK_FUNC_HIGHLEVEL_API(LogicalOr, (T, U, config.isReuseSource), (dst, src0, src1, count));
-    auto constexpr func = MicroAPI::MaskOr;
+    auto constexpr func = Reg::MaskOr;
     LogicalTemplateImpl<func, T, U>(dst, src0, src1, count);
 }
 
 }
 #endif
 #endif  // IMPL_MATH_LOGICAL_OR_LOGICAL_OR_COMMON_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOGICAL_OR_LOGICAL_OR_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LOGICAL_OR_LOGICAL_OR_COMMON_IMPL_H
+#endif

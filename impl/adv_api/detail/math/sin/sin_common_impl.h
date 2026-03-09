@@ -12,9 +12,13 @@
  * \file sin_common_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/math/sin/sin_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/sin.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_SIN_SIN_COMMON_IMPL_H
+#endif
 #ifndef IMPL_MATH_SIN_SIN_COMMON_IMPL_H
 #define IMPL_MATH_SIN_SIN_COMMON_IMPL_H
-
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
 #include "kernel_pop_stack_buffer.h"
@@ -23,7 +27,7 @@
 #include "../../api_check/kernel_check/math/sin/sin_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "sin_v220_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 #include "sin_v200_impl.h"
@@ -61,7 +65,7 @@ __aicore__ inline void SinSignCompute(const LocalTensor<float>& dstTensor, const
     // kover2
     Muls<float, false>(dstTensor, roundTensor, SIN_POINT_FIVE, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     SinCastFullMask(dstTensor, dstTensor, RoundMode::CAST_FLOOR);
 #else
     SinCast(dstTensor, dstTensor, RoundMode::CAST_FLOOR);
@@ -157,7 +161,7 @@ __aicore__ inline void SinRound(const LocalTensor<float>& inputX, const LocalTen
     /*
     k=round(x/π), x0=x-kπ, x0 belongs to [-π/2, π/2]
     π=π_0+π_1+π_2+π_3 achieve final precision compensation.
-    Final solution：
+    Final solution:
     k = round(x * invpi)
     x -= k * pi_0
     x -= k * pi_1
@@ -167,7 +171,7 @@ __aicore__ inline void SinRound(const LocalTensor<float>& inputX, const LocalTen
     const UnaryRepeatParams unaryParams;
     Muls<float, false>(roundTensor, srcTensor, SIN_PI_FOR_X_TODIV, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     SinCastFullMask(roundTensor, roundTensor, RoundMode::CAST_ROUND);
 #else
     SinCast(roundTensor, roundTensor, RoundMode::CAST_ROUND);
@@ -273,3 +277,8 @@ __aicore__ inline void SinImpl(const LocalTensor<T>& dstTensor, const LocalTenso
 }  // namespace AscendC
 
 #endif  // IMPL_MATH_SIN_SIN_COMMON_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_SIN_SIN_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_SIN_SIN_COMMON_IMPL_H
+#endif
