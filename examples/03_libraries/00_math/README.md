@@ -48,6 +48,7 @@
 | [logicalor](./logicalor)             | 本样例演示了基于LogicalOr高阶API的算子实现。样例按元素进行或操作功能，输入数据类型不是bool时，零被视为False，非零数据被视为True |
 | [logicalors](./logicalors)           | 本样例演示了基于LogicalOrs高阶API的算子实现。样例对输入矢量内的每个元素和标量进行或操作 |
 | [logicalxor](./logicalxor)           | 本样例演示了基于LogicalXor高阶API的算子实现。样例按元素进行异或操作功能，输入数据类型不是bool时，零被视为False，非零数据被视为True |
+| [mask](./mask)                       | 本样例演示了基于Adds基础API实现mask的多个计算场景。样例覆盖了6个计算场景，涵盖接口传参与外部API配置mask场景，支持不同计算模式与数据切分策略 |
 | [power](./power)                     | 本样例演示了基于Power高阶API的算子实现。样例实现按元素做幂运算功能，支持三种功能：指数和底数分别为张量对张量、张量对标量、标量对张量的幂运算 |
 | [rint](./rint)                       | 本样例演示了基于Rint高阶API的算子实现。样例获取与输入数据最接近的整数，若存在两个相同接近的整数，则获取其中的偶数 |
 | [round](./round)                     | 本样例演示了基于Round高阶API的算子实现。样例将输入的元素四舍五入到最接近的整数 |
