@@ -1,4 +1,4 @@
-Ôªø/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_vec_cmpsel_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_m300/kernel_operator_vec_cmpsel_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
@@ -979,7 +979,7 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
             vector_f16 vreg1;
             vector_f16 vreg2;
             vector_bool preg0;
-            plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);  // mask‰ΩçÂÆΩÊâ©Â±ï
+            plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);  // maskŒªøÌ¿©’π
             vector_bool preg1;
             plds(preg1, ((__ubuf__ uint32_t *)sel), 0, US);
             uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
@@ -999,7 +999,7 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
             vector_f16 vreg1;
             vector_f16 vreg2;
             vector_bool preg0;
-            plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);  // mask‰ΩçÂÆΩÊâ©Â±ï
+            plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);  // maskŒªøÌ¿©’π
             vector_bool preg1;
             uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
             uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.src1BlkStride)) << 16);
@@ -1178,7 +1178,7 @@ __aicore__ inline void VselImpl(__ubuf__ float* dst, __ubuf__ T* sel, __ubuf__ f
         vbr(vreg1, src1);
         vector_bool preg0;
         vector_bool preg7;
-        plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);  // mask‰ΩçÂÆΩÊâ©Â±ï
+        plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);  // maskŒªøÌ¿©’π
         punpack(preg7, preg0, LOWER);
         vector_bool preg1;
         vector_bool preg2 = pset_b8(PAT_ALLF);
@@ -1466,7 +1466,7 @@ __aicore__ inline void SetCmpMaskImpl(__ubuf__ T* src)
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__
 #endif

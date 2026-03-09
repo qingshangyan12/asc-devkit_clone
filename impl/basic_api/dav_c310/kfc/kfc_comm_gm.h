@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kfc_comm_gm.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c310/kfc/kfc_comm_gm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H__
 #endif
 #ifndef KFC_COMM_GM_H
 #define KFC_COMM_GM_H
@@ -263,7 +263,7 @@ struct Conv3DForwardConfigParams {
     uint32_t diStartPos;
     uint32_t mStartPos;
     uint32_t ciStartPos;
-    uint32_t res[10]; // Reservedï¼Œfor 120Byte ailgn
+    uint32_t res[10]; // Reserved£¬for 120Byte ailgn
 };
  
 struct MatmulUserDefInfo {
@@ -365,7 +365,7 @@ struct SysWorkspaceDesc {
  
 __aicore__ inline void ClearWorkspaceImpl(__gm__ uint8_t* workspace)
 {
-    // v0 æ¸…é™¤  vec0: 0~size;v1 æ¸…é™¤ vec1:size1 ~ size2; v2 æ¸…é™¤ vec3:size2 ~ size3
+    // v0 Çå³ý  vec0: 0~size;v1 Çå³ý vec1:size1 ~ size2; v2 Çå³ý vec3:size2 ~ size3
     constexpr uint32_t size = BIDIRECTION_NUM * MAX_MSG_COUNT * AlignTo32(sizeof(KfcMsg));
     constexpr uint32_t sizeUbmsg = AlignTo32(sizeof(MsgUBAvailable));
     constexpr uint32_t offsetUbMsg = MAX_AIV_NUM * BIDIRECTION_NUM * MAX_MSG_COUNT *
@@ -392,12 +392,12 @@ __aicore__ inline void ClearWorkspaceImpl(__gm__ uint8_t* workspace)
         *(ubMsg + i) = 0;
     };
     
-    // ç¡¬ä»¶æ—¶é—´ç±»åž‹éœ€ä¿®æ”¹ä¸º S_MTE3
+    // Ó²¼þÊ±¼äÀàÐÍÐèÐÞ¸ÄÎª S_MTE3
     SetFlag<HardEvent::S_MTE3>(EVENT_ID0);
     WaitFlag<HardEvent::S_MTE3>(EVENT_ID0);
  
     for (size_t i = 0; i < block; i++) {
-        // ç¬¬å››å‚æ•°ï¼šblockCount: 16 ; ç¬¬äº”å‚æ•°ï¼š burstLength: 128; ç¬¬ä¸ƒå‚æ•°: dstStride: 128
+        // µÚËÄ²ÎÊý£ºblockCount: 16 ; µÚÎå²ÎÊý£º burstLength: 128; µÚÆß²ÎÊý: dstStride: 128
         copy_ubuf_to_gm_align_v2((__gm__ void *)msgStartAddr, (__ubuf__ void *)ubMsg, 0, 16, 128, 0, 128, 0);
         msgStartAddr += 2048;
     }
@@ -554,7 +554,7 @@ __aicore__ inline void RollBackMsgImpl(__gm__ KfcMsg *&msgRcvHead, uint8_t &msgR
  
 }  // namespace AscendC
 #endif  // __KFC_COMM_GM_H__
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H__
 #endif

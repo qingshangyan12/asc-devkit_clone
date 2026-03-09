@@ -1,4 +1,4 @@
-Ôªø/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_data_copy_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c220/kernel_operator_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
@@ -158,7 +158,7 @@ __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const
         ASCENDC_ASSERT((GetKfcClient() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "kfc client ptr can not be nullptr"); });
         ASCENDC_DEBUG_ASSERT((TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, 
             "src address should be 32B aligned \n"));
-        // 1.Ëé∑ÂèñGMÁöÑÂú∞ÂùÄ
+        // 1.ªÒ»°GMµƒµÿ÷∑
         uint32_t tensorSize = intriParams.blockCount * intriParams.blockLen * 32;
         int32_t ubAddr = -1;
 #if ASCENDC_CPU_DEBUG
@@ -173,12 +173,12 @@ __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const
         event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
-        // 2.ËøõË°åÂØπÁ≠âÊã∑Ë¥ùub->GM
+        // 2.Ω¯––∂‘µ»øΩ±¥ub->GM
         CheckDataCopyParams(intriParams.blockCount, intriParams.blockLen);
         copy_ubuf_to_gm((__gm__ void*)gmAddr, (__ubuf__ void*)src, 0, intriParams.blockCount, intriParams.blockLen,
             intriParams.srcStride, intriParams.srcStride);
 
-        // 3.ÂèëÈÄÅÊ∂àÊÅØ,‰ªéGMÊã∑Ë¥ùËá≥L1
+        // 3.∑¢ÀÕœ˚œ¢,¥”GMøΩ±¥÷¡L1
 #if ASCENDC_CPU_DEBUG
         uint8_t* aicBaseTSCMAddr = GetTPipePtr()->GetBaseAddr(int8_t(TPosition::TSCM));
         ASCENDC_ASSERT((aicBaseTSCMAddr != nullptr),
@@ -208,7 +208,7 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
             "src address should be 32B aligned \n"));
         uint32_t tensorSize = intriParams.nValue * intriParams.dValue;
         int32_t ubAddr = -1;
-        // 1.Ëé∑ÂèñGMÁöÑÂØπÂ∫îÂú∞ÂùÄ,Â∞ÜÁõ∏Â∫îÁöÑÊï∞ÊçÆÊê¨ËøêÂà∞GM, ÈááÁî®ND->NDÁöÑÊñπÂºè
+        // 1.ªÒ»°GMµƒ∂‘”¶µÿ÷∑,Ω´œ‡”¶µƒ ˝æ›∞·‘ÀµΩGM, ≤…”√ND->NDµƒ∑Ω Ω
 #if ASCENDC_CPU_DEBUG
         uint64_t absUbAddr = (uint8_t*)src - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN));
         uint64_t absL1Addr = (uint8_t*)dst - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::TSCM));
@@ -224,10 +224,10 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
         event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
-        // 2.ËøõË°åÂØπÁ≠âÊã∑Ë¥ùub->GM
+        // 2.Ω¯––∂‘µ»øΩ±¥ub->GM
         copy_ubuf_to_gm((__gm__ void*)gmAddr, (__ubuf__ void*)src, 0, 1, tensorSize * sizeof(T) / 32, 0, 0);
 
-        // 3.ÂèëÈÄÅÊ∂àÊÅØ,‰ªéGMÊã∑Ë¥ùËá≥L1
+        // 3.∑¢ÀÕœ˚œ¢,¥”GMøΩ±¥÷¡L1
 #if ASCENDC_CPU_DEBUG
         ScmDataCopyND2NZMsg((__cbuf__ void*)absL1Addr, (__gm__ void*)gmAddr, sizeof(T), intriParams, ubAddr);
 #else
@@ -584,7 +584,7 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
             "aligned.\n"));
         uint32_t tensorSize = nd2nzParams.nValue * nd2nzParams.dValue;
         int32_t ubAddr = -1;
-        // 1.Ëé∑ÂèñGMÁöÑÂØπÂ∫îÂú∞ÂùÄ,Â∞ÜÁõ∏Â∫îÁöÑÊï∞ÊçÆÊê¨ËøêÂà∞GM, ÈááÁî®ND->NDÁöÑÊñπÂºè
+        // 1.ªÒ»°GMµƒ∂‘”¶µÿ÷∑,Ω´œ‡”¶µƒ ˝æ›∞·‘ÀµΩGM, ≤…”√ND->NDµƒ∑Ω Ω
 #if ASCENDC_CPU_DEBUG
         uint64_t absUbAddr = (uint8_t*)src - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN));
         uint64_t absL1Addr = (uint8_t*)dst - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::TSCM));
@@ -601,7 +601,7 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
         event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
-        // 2.ËøõË°åÂØπÁ≠âÊã∑Ë¥ùub->GM
+        // 2.Ω¯––∂‘µ»øΩ±¥ub->GM
         ASCENDC_ASSERT((intriParams.blockCount != 0),
                        { KERNEL_LOG(KERNEL_ERROR, "intriParams.blockCount can not be 0"); });
         ASCENDC_ASSERT((intriParams.blockLen != 0), { KERNEL_LOG(KERNEL_ERROR, "intriParams.blockLen can not be 0"); });
@@ -633,7 +633,7 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
             "aligned.\n"));
         uint32_t tensorSize = nd2nzParams.nValue * nd2nzParams.dValue;
         int32_t ubAddr = -1;
-        // 1.Ëé∑ÂèñGMÁöÑÂØπÂ∫îÂú∞ÂùÄ,Â∞ÜÁõ∏Â∫îÁöÑÊï∞ÊçÆÊê¨ËøêÂà∞GM, ÈááÁî®ND->NDÁöÑÊñπÂºè
+        // 1.ªÒ»°GMµƒ∂‘”¶µÿ÷∑,Ω´œ‡”¶µƒ ˝æ›∞·‘ÀµΩGM, ≤…”√ND->NDµƒ∑Ω Ω
 #if ASCENDC_CPU_DEBUG
         uint64_t absUbAddr = (uint8_t*)src - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN));
         uint64_t absL1Addr = (uint8_t*)dst - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::TSCM));
@@ -650,7 +650,7 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
         event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
-        // 2.ËøõË°åÂØπÁ≠âÊã∑Ë¥ùub->GM
+        // 2.Ω¯––∂‘µ»øΩ±¥ub->GM
         ASCENDC_ASSERT((intriParams.blockCount != 0),
                        { KERNEL_LOG(KERNEL_ERROR, "intriParams.blockCount can not be 0"); });
         ASCENDC_ASSERT((intriParams.blockLen != 0), { KERNEL_LOG(KERNEL_ERROR, "intriParams.blockLen can not be 0"); });
@@ -1065,7 +1065,7 @@ __aicore__ inline void DataCopyPadGM2L1Impl(__cbuf__ T* dst, __gm__ T* src, cons
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__
 #endif

@@ -1,4 +1,4 @@
-Ôªø/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_dump_tensor_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_m200/kernel_operator_dump_tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
@@ -289,17 +289,17 @@ __aicore__ inline void TensorDataLoopCopy(LocalTensor<uint8_t> &tmp,
     dcci((__gm__ uint64_t *)coreHeadPtr->dumpAddr, cache_line_t::ENTIRE_DATA_CACHE);
 }
 
-/***********************************ÊØè‰∏™coreÂÜÖÂ≠òÂàÜÈÖçÁ§∫ÊÑèÂõæ*************************************************
+/***********************************√ø∏ˆcoreƒ⁄¥Ê∑÷≈‰ æ“‚Õº*************************************************
 
 |------------------------------------------------core_0-------- --------------------------------------|
-|---Â∑≤‰ΩøÁî®addr„ÄÅ MAGIC---|---bMsg_1---|---data_1---|---bMsg_2---|---data_2---|///Êú™‰ΩøÁî®///|---backup---|
+|---“— π”√addr°¢ MAGIC---|---bMsg_1---|---data_1---|---bMsg_2---|---data_2---|///Œ¥ π”√///|---backup---|
            |________________________________________________________________^
 
 **********************************************************************************************************/
 template <typename T>
 __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T> &src, uint32_t desc, uint32_t dumpSize)
 {
-    /* offset: ÂÆûÈôÖdataÊï∞ÊçÆÂ§ßÂ∞è copyLen:‰ª•ONE_DUMP_BACKUP_SIZEÂØπÈΩêÁöÑdataÂ§ßÂ∞è */
+    /* offset:  µº data ˝æ›¥Û–° copyLen:“‘ONE_DUMP_BACKUP_SIZE∂‘∆Îµƒdata¥Û–° */
     uint32_t offset = dumpSize * sizeof(T);
     uint32_t padOffset = AlignUp(offset, ONE_BLK_SIZE);
     uint32_t copyLen = GetdataCopyCount(padOffset) * ONE_DUMP_BACKUP_SIZE;
@@ -384,17 +384,17 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
     set_ctrl(ctrlValue);
 }
 
-/***********************************ÊØè‰∏™coreÂÜÖÂ≠òÂàÜÈÖçÁ§∫ÊÑèÂõæ*************************************************
+/***********************************√ø∏ˆcoreƒ⁄¥Ê∑÷≈‰ æ“‚Õº*************************************************
 
 |------------------------------------------------core_0-----------------------------------------------|
-|---Â∑≤‰ΩøÁî®addr„ÄÅ MAGIC---|---bMsg_1---|---data_1---|---bMsg_2---|---data_2---|///Êú™‰ΩøÁî®///|---backup---|
+|---“— π”√addr°¢ MAGIC---|---bMsg_1---|---data_1---|---bMsg_2---|---data_2---|///Œ¥ π”√///|---backup---|
            |________________________________________________________________^
 
 **********************************************************************************************************/
 template <typename T>
 __aicore__ inline void DumpTensorGM2GMEntityImpl(const GlobalTensor<T> &src, uint32_t desc, uint32_t dumpSize)
 {
-    /* offset: ÂÆûÈôÖdataÊï∞ÊçÆÂ§ßÂ∞è copyLen:‰ª•ONE_DUMP_BACKUP_SIZEÂØπÈΩêÁöÑdataÂ§ßÂ∞è */
+    /* offset:  µº data ˝æ›¥Û–° copyLen:“‘ONE_DUMP_BACKUP_SIZE∂‘∆Îµƒdata¥Û–° */
     uint32_t offset = dumpSize * sizeof(T);
     uint32_t padOffset = AlignUp(offset, ONE_BLK_SIZE);
     uint32_t copyLen = GetdataCopyCount(padOffset) * ONE_DUMP_BACKUP_SIZE;
@@ -468,7 +468,7 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
 
 __aicore__ inline void WriteDumpShapeInfo(const ShapeInfo& shapeInfo)
 {
-    /* offset: ÂÆûÈôÖdataÊï∞ÊçÆÂ§ßÂ∞è copyLen:‰ª•ONE_DUMP_BACKUP_SIZEÂØπÈΩêÁöÑdataÂ§ßÂ∞è */
+    /* offset:  µº data ˝æ›¥Û–° copyLen:“‘ONE_DUMP_BACKUP_SIZE∂‘∆Îµƒdata¥Û–° */
     uint32_t offset = sizeof(DumpShapeMessageHead);
     if (offset % ONE_BLK_SIZE != 0) {
         offset = (offset + ONE_BLK_SIZE - 1) / ONE_BLK_SIZE * ONE_BLK_SIZE;
@@ -1356,7 +1356,7 @@ __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gm
 }
 }
 #endif
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__
 #endif

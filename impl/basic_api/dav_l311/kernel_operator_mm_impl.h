@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_mm_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_l311/kernel_operator_mm_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_IMPL_H
@@ -449,7 +449,7 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T *dst, const InitConstValuePara
 {
     if constexpr (2 == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
-        // ç”±äºset_l0_set_value_håªæ”¯æŒhalfç±»å‹ï¼Œæ•…éœ€è¦å°†å…¶å®ƒç±»å‹çš„æ•°æ®çš„äºŒè¿›åˆ¶ç”¨half
+        // ÓÉÓÚset_l0_set_value_hÖ»Ö§³ÖhalfÀàĞÍ£¬¹ÊĞèÒª½«ÆäËüÀàĞÍµÄÊı¾İµÄ¶ş½øÖÆÓÃhalf
         half initValue = *(half*)(&tmpValue);
         set_l0_set_value_h(initValue);
         int64_t config = 0;
@@ -470,7 +470,7 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T *dst, const InitConstValuePar
 {
     if constexpr (2 == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
-        // ç”±äºset_l0_set_value_håªæ”¯æŒhalfç±»å‹ï¼Œæ•…éœ€è¦å°†å…¶å®ƒç±»å‹çš„æ•°æ®çš„äºŒè¿›åˆ¶ç”¨half
+        // ÓÉÓÚset_l0_set_value_hÖ»Ö§³ÖhalfÀàĞÍ£¬¹ÊĞèÒª½«ÆäËüÀàĞÍµÄÊı¾İµÄ¶ş½øÖÆÓÃhalf
         half initValue = *(half*)(&tmpValue);
         set_l0_set_value_h(initValue);
         int64_t config = 0;
@@ -491,7 +491,7 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T *dst, const InitConstValuePar
 {
     if constexpr (2 == sizeof(T)) {
         T tmpValue = initConstValueParams.initValue;
-        // ç”±äºset_l0_set_value_håªæ”¯æŒhalfç±»å‹ï¼Œæ•…éœ€è¦å°†å…¶å®ƒç±»å‹çš„æ•°æ®çš„äºŒè¿›åˆ¶ç”¨half
+        // ÓÉÓÚset_l0_set_value_hÖ»Ö§³ÖhalfÀàĞÍ£¬¹ÊĞèÒª½«ÆäËüÀàĞÍµÄÊı¾İµÄ¶ş½øÖÆÓÃhalf
         half initValue = *(half*)(&tmpValue);
         set_l0_set_value_h(initValue);
         int64_t config = 0;
@@ -527,7 +527,7 @@ __aicore__ inline void SetLoadDataBoundaryCal(uint32_t boundaryValue)
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__
 #endif

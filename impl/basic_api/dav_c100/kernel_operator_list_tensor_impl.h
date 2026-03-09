@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_list_tensor_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c100/kernel_operator_list_tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIST_TENSOR_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIST_TENSOR_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_LIST_TENSOR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_LIST_TENSOR_IMPL_H
@@ -50,26 +50,26 @@ ListTensorDecode(__gm__ void* data, uint32_t length, uint32_t shapeSize)
 {
     ASSERT(data != nullptr);
     __gm__ uint64_t* dataAddr = reinterpret_cast<__gm__ uint64_t *>(data);
-    uint64_t dataPtrOffset = *dataAddr;  // æ•°æ®åœ°å€ç›¸å¯¹äºŽé¦–åœ°å€çš„åç§»é‡
+    uint64_t dataPtrOffset = *dataAddr;  // Êý¾ÝµØÖ·Ïà¶ÔÓÚÊ×µØÖ·µÄÆ«ÒÆÁ¿
 
-    shapeStart_ = dataAddr + 1;  // æŒ‡å‘å­˜æ”¾shapeçš„å¤´æŒ‡é’ˆ
-    dataPtr_ = dataAddr + (dataPtrOffset >> 3);  // å³ç§» 3 ä½è¡¨ç¤ºé™¤ä»¥sizeof(uint64_t)
+    shapeStart_ = dataAddr + 1;  // Ö¸Ïò´æ·ÅshapeµÄÍ·Ö¸Õë
+    dataPtr_ = dataAddr + (dataPtrOffset >> 3);  // ÓÒÒÆ 3 Î»±íÊ¾³ýÒÔsizeof(uint64_t)
 
-    dim_ = *shapeStart_ & 0xffffffff;  // 0xffffffff è¡¨ç¤ºå–ä½Ž32ä½
-    uint32_t offset = *shapeStart_ >> 32;  // å³ç§» 32 ä½è¡¨ç¤ºå–é«˜32ä½
+    dim_ = *shapeStart_ & 0xffffffff;  // 0xffffffff ±íÊ¾È¡µÍ32Î»
+    uint32_t offset = *shapeStart_ >> 32;  // ÓÒÒÆ 32 Î»±íÊ¾È¡¸ß32Î»
 
-    // dim_ = 0æ—¶è¡¨ç¤ºè¾“å…¥æ•°æ®ä»…ä¸ºæ•°æ®æŒ‡é’ˆ, shapeä½¿ç”¨ä¸€ä¸ª0xffffffffå¡«å……, å› æ­¤descStructSize_ä¸º 2
+    // dim_ = 0Ê±±íÊ¾ÊäÈëÊý¾Ý½öÎªÊý¾ÝÖ¸Õë, shapeÊ¹ÓÃÒ»¸ö0xffffffffÌî³ä, Òò´ËdescStructSize_Îª 2
     descStructSize_ = (dim_ == 0) ? 2 : 1 + dim_;
-    curOffset_ = 0;  // å½“å‰shapeç›¸å¯¹äºŽshapeå¤´æŒ‡é’ˆçš„åç§»é‡
-    count_ = (offset != 0) ? offset : (*(dataPtr_ - descStructSize_) >> 32) + 1;  // å³ç§» 32 ä½è¡¨ç¤ºå–é«˜32ä½
-    // dim != 0 æ—¶, ä¸æ”¯æŒç›¸åŒshapeåŽ‹ç¼©å‚¨å­˜
-    // æ•°æ®åœ°å€ç›¸å¯¹äºŽé¦–åœ°å€çš„åç§»é‡ä¸ºå›ºå®šå€¼(2 + 1) * sizeof(uint64_t) = 24
+    curOffset_ = 0;  // µ±Ç°shapeÏà¶ÔÓÚshapeÍ·Ö¸ÕëµÄÆ«ÒÆÁ¿
+    count_ = (offset != 0) ? offset : (*(dataPtr_ - descStructSize_) >> 32) + 1;  // ÓÒÒÆ 32 Î»±íÊ¾È¡¸ß32Î»
+    // dim != 0 Ê±, ²»Ö§³ÖÏàÍ¬shapeÑ¹Ëõ´¢´æ
+    // Êý¾ÝµØÖ·Ïà¶ÔÓÚÊ×µØÖ·µÄÆ«ÒÆÁ¿Îª¹Ì¶¨Öµ(2 + 1) * sizeof(uint64_t) = 24
     ASSERT(((dim_ != 0) && (count_ == ((dataPtrOffset - sizeof(uint64_t)) / (descStructSize_ * sizeof(uint64_t))))) ||
            ((dim_ == 0) && (*(shapeStart_ + 1) == 0xffffffff) && (dataPtrOffset == 24)));
 
     if ((length != 0xffffffff) && (shapeSize != 0xffffffff)) {
         ASSERT(count_ == shapeSize);
-        ASSERT(length == (dataPtrOffset + (count_ << 3)));  // å·¦ç§» 3 ä½è¡¨ç¤ºä¹˜sizeof(uint64_t)
+        ASSERT(length == (dataPtrOffset + (count_ << 3)));  // ×óÒÆ 3 Î»±íÊ¾³Ësizeof(uint64_t)
     }
 }
 
@@ -89,7 +89,7 @@ __aicore__ inline uint32_t ListTensorDescImpl<Sequential>::GetSize()
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_OPERATOR_LIST_TENSOR_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIST_TENSOR_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIST_TENSOR_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIST_TENSOR_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIST_TENSOR_IMPL_H__
 #endif

@@ -1,4 +1,4 @@
-Ôªø/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_vec_cmpsel_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_l311/kernel_operator_vec_cmpsel_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
@@ -1457,13 +1457,13 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
                 DataCopy(vSrc10, src1, 2 * i * sregLower);
                 DataCopy(vSrc01, src0 + sregLower, 2 * i * sregLower);
                 DataCopy(vSrc11, src1 + sregLower, 2 * i * sregLower);
-                PredicateInterleave<uint16_t>(preg2, preg3, preg0, preg1); // u8,u16ÂùáÂèØ‰ª•
+                PredicateInterleave<uint16_t>(preg2, preg3, preg0, preg1); // u8,u16æ˘ø…“‘
                 Select<T>(vDst0, vSrc00, vSrc10, preg2);
                 if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
-                    Select<T>(vDst1, vSrc01, vSrc11, preg2); // SELMODE::VSEL_CMPMASK_SPR‰ΩøÁî®preg2,Âõ∫ÂÆö‰ΩøÁî®Ââç64bit
+                    Select<T>(vDst1, vSrc01, vSrc11, preg2); // SELMODE::VSEL_CMPMASK_SPR π”√preg2,πÃ∂® π”√«∞64bit
                 }
                 else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
-                    Select<T>(vDst1, vSrc01, vSrc11, preg3); // SELMODE::VSEL_TENSOR_TENSOR_MODE‰ΩøÁî®preg3,ËøûÁª≠Ê∂àËÄó
+                    Select<T>(vDst1, vSrc01, vSrc11, preg3); // SELMODE::VSEL_TENSOR_TENSOR_MODE π”√preg3,¡¨–¯œ˚∫ƒ
                 }
                 DataCopy(dst, vDst0, 2 * i * sregLower, dstReg);
                 DataCopy(dst + sregLower, vDst1, 2 * i * sregLower, dstReg);
@@ -1480,7 +1480,7 @@ __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0,
             selMaskOffset = 0;
         }
         else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
-            selMaskOffset = halfRepeatTimes * 2 * sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE; // Âçï‰Ωç‰∏∫ÂÖÉÁ¥†‰∏™Êï∞
+            selMaskOffset = halfRepeatTimes * 2 * sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE; // µ•ŒªŒ™‘™Àÿ∏ˆ ˝
         }
         __ubuf__ U* selTail = (__ubuf__ U *)sel + selMaskOffset;
         __ubuf__ T* dstTail = dst + halfRepeatTimes * sregLower * 2;
@@ -2050,7 +2050,7 @@ __aicore__ inline void VcmpImpl(__ubuf__ T* src0, __ubuf__ T* src1,
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_IMPL_H__
 #endif
