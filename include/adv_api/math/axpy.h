@@ -13,8 +13,8 @@
  * \brief Compute axpy   dst = src * scalar + dst
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AXPY_H
 #endif
 
@@ -62,6 +62,6 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U
 #endif // LIB_MATH_AXPY_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AXPY_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AXPY_H
 #endif

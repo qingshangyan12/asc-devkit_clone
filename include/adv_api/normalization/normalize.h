@@ -13,8 +13,8 @@
  * \brief Given mean and variance, calculate rstd and output.
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H
 #endif
 
@@ -94,6 +94,6 @@ __aicore__ inline void Normalize(const LocalTensor<T>& output, const LocalTensor
 #endif // LIB_NORMALIZATION_NORMALIZE_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H
 #endif
