@@ -9,18 +9,18 @@
  	 */
  	 
  	 /*!
- 	  * \file zn2nz.h
+ 	  * \file zn2nzb8.h
  	  * \brief
  	  */
- 	 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0A_ZN2NZ_H
- 	 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0A_ZN2NZ_H
+ 	 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0A_ZN2NZB8_H
+ 	 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0A_ZN2NZB8_H
  	 
  	 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/instruction.h"
  	 
  	 namespace AscendC {
  	 namespace Te {
  	 
- 	 class LoadDataFourDim3510L12L0AZN2NZ : public LoadDataFourDim3510L12L0ABase {
+ 	 class LoadDataFourDim3510L12L0AZN2NZB8 : public LoadDataFourDim3510L12L0ABase {
  	 
  	 public:
  	     template <const LoadDataTrait& trait, typename T, typename U, typename Coord>
@@ -40,15 +40,43 @@
  	         auto srcLayout = src.Layout();
  	 
  	         uint16_t mStartPosition = Std::get<1>(coord) / FRACTAL_FIXED;
- 	         uint16_t kStartPosition = Std::get<0>(coord) * sizeof(typename U::elementType) / C0_SIZE;
+ 	         uint16_t kStartPosition = Std::get<0>(coord) / C0_ELEMS<DstType>;
  	         auto mStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
  	         auto kStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
  	         // Zn -> Nz
- 	         uint32_t STRIDE_UNIT = FRACTAL_FIXED * (C0_SIZE / sizeof(DstType));
+ 	         uint32_t STRIDE_UNIT = FRACTAL_FIXED * C0_ELEMS<DstType>;
  	         auto srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout) / STRIDE_UNIT;
  	         auto dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) / STRIDE_UNIT;
  	         auto params = Std::make_tuple(mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
  	         return params;
+ 	     }
+ 	 
+ 	     template <const LoadDataTrait& trait, typename T, typename U, typename V, size_t... Is>
+ 	     __aicore__ inline void LoadDataAlignV2Impl(const T& dst, const U& src, const V& tupleParams, Std::index_sequence<Is...>)
+ 	     {
+ 	         // MTE2
+ 	         LoadL1ToL0AImpl<trait.transposed>(dst.Data().Get(), src.Data().Get(),
+ 	             Std::get<Is>(tupleParams)...);
+ 	     }
+ 	 
+ 	     template <bool transpose, typename T>
+ 	     __aicore__ inline void LoadL1ToL0AImpl(__ca__ T* dst, __cbuf__ T* src, uint16_t mStartPosition,
+ 	         uint16_t kStartPosition, uint8_t mStep, uint8_t kStep, int16_t srcStride, uint16_t dstStride)
+ 	     {
+ 	         if ASCEND_IS_AIV {
+ 	             return;
+ 	         }
+ 	 
+ 	         constexpr const int SHIFT_M_STEP_B8 = 1;
+ 	         constexpr const int M_STEP_MIN_VAL_B8 = 2;
+ 	         uint16_t mLoop = mStep >> SHIFT_M_STEP_B8;
+ 	         uint16_t dstAddrStride = mStep * FRACTAL_FIXED * C0_SIZE;
+ 	         mStep = M_STEP_MIN_VAL_B8;
+ 	         for (uint16_t idx = 0; idx < mLoop; ++idx) {
+ 	             LoadL1ToL0AAlignV2<transpose>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+ 	             dst += dstAddrStride;
+ 	             mStartPosition += M_STEP_MIN_VAL_B8;
+ 	         }
  	     }
  	 };
  	 
@@ -56,4 +84,4 @@
  	 } // namespace Te
  	 } // namespace AscendC
  	 
- 	 #endif // IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0A_ZN2NZ_H
+ 	 #endif // IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0A_ZN2NZB8_H
