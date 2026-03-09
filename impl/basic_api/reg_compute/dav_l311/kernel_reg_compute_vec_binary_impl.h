@@ -23,7 +23,7 @@
 #define ASCENDC_MODULE_REG_COMPUTE_VEC_BINARY_IMPL_H
 
 #include "kernel_reg_compute_common_impl.h"
-#include "../../../impl/basic_api/dav_l311/kernel_operator_common_impl.h"
+#include "../../../../impl/basic_api/dav_l311/kernel_operator_common_impl.h"
 
 namespace AscendC {
 namespace Reg {
