@@ -22,13 +22,13 @@
 __aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, uint8_t flag_id)
 {
     uint8_t config = (static_cast<uint8_t>(2) << 8) | flag_id;
-    wait_block_dev(pipe, config);
+    wait_flag_dev(pipe, config);
 }
 
 __aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, uint64_t flag_id)
 {
     uint64_t config = (static_cast<uint64_t>(2) << 8) | flag_id; 
-    wait_block_dev(pipe, config);
+    wait_flag_dev(pipe, config);
 }
 #endif
 
