@@ -23,6 +23,7 @@
 #include "kernel_check.h"
 #include "kernel_struct_binary.h"
 #include "mstx_local_tensor_info.h"
+#include "kernel_npu_debug.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_binary_impl.h"
@@ -113,11 +114,6 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const LocalTensor<T>& src1, const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFuncVecBinary(dst, src0, src1, count, "Add")) {
-        ASCENDC_REPORT_CHECK_ERROR("Add", KernelFuncType::CALCOUNT_MODE);
-    }
-#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, "Add", count);
 #endif
