@@ -57,16 +57,16 @@ private:
         using type = typename T::elementType;
         using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<C0_SIZE / sizeof(type)>>, "Dst Layout->Shape->Column->ZeroDim, is not Std::Int<C0Size/Type> type!");
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<C0_ELEMS<type>>>, "Dst Layout->Shape->Column->ZeroDim, is not Std::Int<C0Size/Type> type!");
         static_assert(Std::is_same_v<ShapeColumn0, Std::Int<FRACTAL_FIXED>>, "Dst Layout->Shape->Row->ZeroDim, is not Std::Int<16> type!");
 
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
         using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
         static_assert(Std::is_same_v<StrideRow0, Std::Int<1>>, "Dst Layout->Stride->Column->ZeroDim, is not Std::Int<1> type!");
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_SIZE / sizeof(type)>>, "Dst Layout->Stride->Row->ZeroDim, is not Std::Int<C0Size/Type> type!");
-        static_assert(Std::is_same_v<StrideColumn1, Std::Int<C0_SIZE / sizeof(type) * FRACTAL_FIXED>>,
-            "Dst Layout->Stride->Column->OneDim, is not Std::Int<C0_SIZE / sizeof(type) * FRACTAL_FIXED> type!");
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_ELEMS<type>>>, "Dst Layout->Stride->Row->ZeroDim, is not Std::Int<C0Size/Type> type!");
+        static_assert(Std::is_same_v<StrideColumn1, Std::Int<C0_ELEMS<type> * FRACTAL_FIXED>>,
+            "Dst Layout->Stride->Column->OneDim, is not Std::Int<C0_ELEMS<type> * FRACTAL_FIXED> type!");
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
@@ -82,7 +82,8 @@ private:
             Std::tuple<__cbuf__ half, __gm__ half>, Std::tuple<__cbuf__ float, __gm__ float>, 
             Std::tuple<__cbuf__ int16_t, __gm__ int16_t>, Std::tuple<__cbuf__ int32_t, __gm__ int32_t>, 
             Std::tuple<__cbuf__ int8_t, __gm__ int8_t>, Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>, 
-            Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>>,
+            Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
+            Std::tuple<__cbuf__ fp4x2_e2m1_t, __gm__ fp4x2_e2m1_t>>,
             "The data type is not supported.");
 #endif
     }
