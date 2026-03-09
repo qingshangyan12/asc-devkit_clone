@@ -14,8 +14,8 @@
  * e.g. Trunc(3.1) = 3, Trunc(-3.1) = -3, Trunc(3.9) = 3, Trunc(-3.9) = -3
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRUNC_H
 #endif
 
@@ -112,6 +112,6 @@ __aicore__ inline void Trunc(const LocalTensor<T>& dstTensor, const LocalTensor<
 #endif // LIB_MATH_TRUNC_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRUNC_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRUNC_H
 #endif

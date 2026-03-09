@@ -12,9 +12,9 @@
  * \file math_constant_util.h
  * \brief defined common used math related constant value.
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/math/math_constant_util.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/round.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_MATH_CONSTANT_UTIL_H
 #endif
 #ifndef IMPL_MATH_MATH_CONSTANT_UTIL_H
@@ -47,6 +47,6 @@ constexpr float kCOEF[] = {
 #endif // IMPL_MATH_MATH_CONSTANT_UTIL_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_MATH_CONSTANT_UTIL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_MATH_CONSTANT_UTIL_H
 #endif
