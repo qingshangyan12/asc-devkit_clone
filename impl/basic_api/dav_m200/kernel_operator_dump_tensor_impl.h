@@ -1064,7 +1064,9 @@ __aicore__ inline void WriteRingBufTlvData(__gm__ PrintTlvInfoHead* printTlv, __
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
+#ifndef ASCENDC_CPU_DEBUG
     __asc_aicore::printf_impl(fmt, args...);
+#endif
 }
 
 template <typename T>

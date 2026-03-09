@@ -15,6 +15,7 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_DUMP_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_DUMP_IMPL_H
 
+#ifndef ASCENDC_CPU_DEBUG
 #include "impl/utils/sys_macros.h"
 #include "impl/utils/common_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
@@ -143,6 +144,7 @@ __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t
 }
 
 }
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_DUMP_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
