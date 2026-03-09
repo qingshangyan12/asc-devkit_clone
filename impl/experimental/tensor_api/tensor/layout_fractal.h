@@ -112,7 +112,7 @@ __aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
 
 struct MakeL0CLayout {
 __aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
-    return MakeNzLayout<uint16_t>(row, column);
+    return LayoutDispatcher<LayoutFormat::NZ, uint16_t>::apply(row, column);
 }
 };
 

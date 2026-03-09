@@ -126,9 +126,6 @@ using DNLayoutFormat = Layout<DNShapeFormat<T, row, column>, DNStrideFormat<T, r
 template <typename T, size_t row, size_t column>
 using ZNLayoutFormat = Layout<ZNShapeFormat<T, row, column>, ZNStrideFormat<T, row, column>>;
 
-template <size_t row, size_t column>
-using L0CLayoutFormat = NZLayoutFormat<Std::ignore_t, row, column>;
-
 template <typename T, size_t row, size_t column, typename Enable = void>
 struct NZLayoutFormatImpl;
 
@@ -144,6 +141,9 @@ struct NZLayoutFormatImpl<T, row, column, typename Std::enable_if<Std::is_same_v
 
 template <typename T, size_t row, size_t column>
 using NZLayoutFormat = typename NZLayoutFormatImpl<T, row, column>::type;
+
+template <size_t row, size_t column>
+using L0CLayoutFormat = NZLayoutFormat<Std::ignore_t, row, column>;
 
 template <typename T, size_t row, size_t column>
 struct ZZLayoutFormatImpl {

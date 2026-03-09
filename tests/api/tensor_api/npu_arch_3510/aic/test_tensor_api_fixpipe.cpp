@@ -57,7 +57,7 @@ public:
         l0cAddr = reinterpret_cast<__cc__ L0cT*>(0);
         constexpr static FixpipeTrait trait(QUANT_MODE, false, false, 0, 0);
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeL0CLayout(mLength_, nLength_);
+        auto l0cMatrixLayout = MakeL0CLayout{}(mLength_, nLength_);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);
         if constexpr (C_TYPE::format == CubeFormat::ND) {
             n_size_global = n;
