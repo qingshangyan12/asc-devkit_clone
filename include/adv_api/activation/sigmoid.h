@@ -14,8 +14,8 @@
  * Mathematical formulas: Sigmoid(x) = 1 / (1 + exp(-x))
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIGMOID_H
 #endif
 
@@ -110,6 +110,6 @@ __aicore__ inline void Sigmoid(const LocalTensor<T>& dstTensor, const LocalTenso
 #endif  // LIB_SIGMOID_SIGMOID_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIGMOID_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIGMOID_H
 #endif

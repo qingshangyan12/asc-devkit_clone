@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ATANH_TILING_H
 #endif
 
@@ -49,6 +49,6 @@ void GetAtanhTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeC
 #endif // LIB_MATH_ATANH_TILING_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ATANH_TILING_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ATANH_TILING_H
 #endif

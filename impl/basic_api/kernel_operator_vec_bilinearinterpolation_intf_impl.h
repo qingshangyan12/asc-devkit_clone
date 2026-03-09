@@ -13,7 +13,8 @@
  * \brief
  */
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BILINEARINTERPOLATION_INTF_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#pragma message("impl/basic_api/kernel_operator_vec_bilinearinterpolation_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use kernel_operator.h and use public functions or variables defined in interface headers files.")
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BILINEARINTERPOLATION_INTF_IMPL_H
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BILINEARINTERPOLATION_INTERFACE_IMPL_H
@@ -114,6 +115,6 @@ __aicore__ inline void BilinearInterpolation(const LocalTensor<T> &dst, const Lo
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BILINEARINTERPOLATION_INTERFACE_IMPL_H
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BILINEARINTERPOLATION_INTF_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BILINEARINTERPOLATION_INTF_IMPL_H
 #endif
