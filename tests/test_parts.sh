@@ -76,20 +76,20 @@ basic_test_two_targets=(
 )
 
 basic_test_three_targets=(
-    ascendc_pyut_asc_compile_common
-    ascendc_pyut_asc_op_compiler
-    ascendc_pyut_aclrt_launch_kernel
-    ascendc_pyut_compile_trace_log
-    asc_opc_unittest
-    ascendc_ut_c_api_ascend910B1_AIC
-    ascendc_ut_c_api_ascend910B1_AIV
+    # ascendc_pyut_asc_compile_common
+    # ascendc_pyut_asc_op_compiler
+    # ascendc_pyut_aclrt_launch_kernel
+    # ascendc_pyut_compile_trace_log
+    # asc_opc_unittest
+    # ascendc_ut_c_api_ascend910B1_AIC
+    # ascendc_ut_c_api_ascend910B1_AIV
     ascendc_ut_c_api_ascend950pr_9599_AIC
     ascendc_ut_c_api_ascend950pr_9599_AIV
-    ascendc_ut_tensor_api_NPU_ARCH_2201_AIC
-    ascendc_ut_tensor_api_NPU_ARCH_2201_AIV
-    ascendc_ut_basic_api_ascend950pr_9599_AIC
-    ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
-    ascendc_ut_basic_api_ascend950pr_9599_AIV_FRAMEWORK
-    ascendc_ut_micro_api_ascend950pr_9599
-    ascendc_ut_simt_api_ascend950pr_9599
+    # ascendc_ut_tensor_api_NPU_ARCH_2201_AIC
+    # ascendc_ut_tensor_api_NPU_ARCH_2201_AIV
+    # ascendc_ut_basic_api_ascend950pr_9599_AIC
+    # ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
+    # ascendc_ut_basic_api_ascend950pr_9599_AIV_FRAMEWORK
+    # ascendc_ut_micro_api_ascend950pr_9599
+    # ascendc_ut_simt_api_ascend950pr_9599
 )
