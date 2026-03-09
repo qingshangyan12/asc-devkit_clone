@@ -44,6 +44,10 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
     printf_impl(fmt, args...);
 }
 }   // namespace __asc_aicore
+
+#if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+using namespace __asc_aicore;
+#endif
 #endif
 
 #if (__NPU_ARCH__ == 3510)

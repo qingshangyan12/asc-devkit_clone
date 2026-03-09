@@ -42,6 +42,10 @@ inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm_
     const __gm__ char* __function);
 } // namespace __asc_aicore
 
+#if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+using namespace __asc_aicore;
+#endif
+
 #if defined (__NPU_DEVICE__)
 #ifdef assert
 #undef assert
