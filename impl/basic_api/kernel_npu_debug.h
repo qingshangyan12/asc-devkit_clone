@@ -1,0 +1,121 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/*!
+ * \file kernel_npu_debug.h
+ * \brief
+ */
+#ifndef ASCENDC_MODULE_OPERATOR_KERNEL_NPU_DEBUG_H
+#define ASCENDC_MODULE_OPERATOR_KERNEL_NPU_DEBUG_H
+
+#include "kernel_log.h"
+#include "utils/kernel_utils_ceil_oom_que.h"
+#include "kernel_tensor.h"
+
+namespace AscendC {
+
+__aicore__ inline __gm__ const char* GetTPositionName(TPosition pos)
+{
+    switch (pos) {
+        case TPosition::GM:
+            return "GM";
+        case TPosition::A1:
+            return "A1";
+        case TPosition::B1:
+            return "B1";
+        case TPosition::C1:
+            return "C1";
+        case TPosition::A2:
+            return "A2";
+        case TPosition::B2:
+            return "B2";
+        case TPosition::C2:
+            return "C2";
+        case TPosition::CO1:
+            return "CO1";
+        case TPosition::CO2:
+            return "CO2";
+        case TPosition::VECIN:
+            return "VECIN";
+        case TPosition::VECOUT:
+            return "VECOUT";
+        case TPosition::VECCALC:
+            return "VECCALC / LCM";
+        case TPosition::SPM:
+            return "SPM / SHM";
+        case TPosition::TSCM:
+            return "TSCM";
+        case TPosition::C2PIPE2GM:
+            return "C2PIPE2GM";
+        case TPosition::C2PIPE2LOCAL:
+            return "C2PIPE2LOCAL";
+        case TPosition::MAX:
+            return "MAX";
+        default:
+            return "UNKNOWN";
+    }
+}
+
+__aicore__ inline void ReportNotSupport(bool isUnsupported, const __gm__ char* apiName)
+{
+    ASCENDC_DEBUG_ASSERT((isUnsupported), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "%s is not supported on current device.\n", 
+        apiName));
+}
+
+template<TPosition... expectedPos, typename T>
+__aicore__ inline void CheckTensorTPosition(const LocalTensor<T>& inputTensor, const __gm__ char* tensorName, 
+    const __gm__ char* posName, const __gm__ char* apiName)
+{
+    TPosition currentPos = static_cast<TPosition>(inputTensor.GetPosition());
+    bool tPosValid = ((currentPos == expectedPos) || ...);
+    ASCENDC_DEBUG_ASSERT((tPosValid), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s tensor TPosition in %s, "
+        "supported TPositions are %s, current TPosition is %s.\n", tensorName, apiName, posName, 
+        GetTPositionName(currentPos)));
+}
+
+template<typename T>
+__aicore__ inline void CheckTensorAlignment(const LocalTensor<T>& inputTensor, uint32_t alignBytes, 
+    const __gm__ char* tensorName,  const __gm__ char* apiName)
+{   
+    uint64_t tensorAddr = inputTensor.GetPhyAddr();
+#ifdef ASCENDC_CPU_DEBUG
+    auto positionHardMap = ConstDefiner::Instance().positionHardMap;
+    int32_t tensorPos = inputTensor.GetPosition();
+    tensorAddr = tensorAddr - 
+        reinterpret_cast<uint64_t>(ConstDefiner::Instance().hardwareCpuBufferMap.at(positionHardMap.at(tensorPos)));
+#endif
+    ASCENDC_DEBUG_ASSERT((tensorAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s start "
+        "address alignment in %s, its start address must align with %u bytes, current start address is %u.\n", 
+        tensorName, apiName, alignBytes, tensorAddr));
+}
+
+template<typename T>
+__aicore__ inline void CheckValueRange(T value, T valueLow, T valueHigh, const __gm__ char* paramName,
+    const __gm__ char* apiName)
+{
+    if constexpr(SupportType<T, int8_t, int16_t, int32_t, int64_t>()) {
+        int64_t castValue = static_cast<int64_t>(value);
+        ASCENDC_DEBUG_ASSERT((value <= valueHigh && value >= valueLow), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
+            "check %s value in %s, its valid range is [%lld, %lld], current value is %lld.\n", paramName, apiName, 
+            valueLow, valueHigh, value));
+    } else if constexpr(SupportType<T, uint8_t, uint16_t, uint32_t, uint64_t>()) {
+        uint64_t castValue = static_cast<uint64_t>(value);
+        ASCENDC_DEBUG_ASSERT((value <= valueHigh && value >= valueLow), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
+            "check %s value in %s, its valid range is [%llu, %llu], current value is %llu.\n", paramName, apiName, 
+            valueLow, valueHigh, value));
+    } else {
+        ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Current dtype is not supported for check "
+            "function CheckValueRange.\n"));
+    }
+}
+
+} // namespace AscendC
+
+#endif // ASCENDC_MODULE_OPERATOR_KERNEL_NPU_DEBUG_H

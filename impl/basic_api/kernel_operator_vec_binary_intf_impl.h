@@ -113,11 +113,6 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const LocalTensor<T>& src1, const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFuncVecBinary(dst, src0, src1, count, "Add")) {
-        ASCENDC_REPORT_CHECK_ERROR("Add", KernelFuncType::CALCOUNT_MODE);
-    }
-#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, "Add", count);
 #endif
