@@ -21,6 +21,7 @@
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_check.h"
+#include "kernel_npu_check.h"
 #include "kernel_struct_unary.h"
 #include "mstx_local_tensor_info.h"
 
@@ -65,6 +66,9 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVecBinaryScalarMaskArrayCommon(dst, src, mask, repeatTime, repeatParams, "Adds");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Adds")) {
