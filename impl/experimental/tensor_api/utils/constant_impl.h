@@ -58,9 +58,9 @@ struct is_one_of_value<Value, Head, Tail...>
 template <QuantMode_t Value, QuantMode_t... Args>
 inline constexpr bool is_one_of_value_v = is_one_of_value<Value, Args...>::value;
 
-template <typename type, typename DType>
-inline constexpr bool is_tensor_type_v = Std::is_one_of_v<type, __gm__ DType, __cbuf__ DType, __ca__ DType, 
-                                                        __cb__ DType, __cc__ DType>;
+template <typename ElementType, typename DataType>
+inline constexpr bool is_one_of_attr_v = Std::is_one_of_v<ElementType, __gm__ DataType, __cbuf__ DataType, __ca__ DataType, 
+                                                        __cb__ DataType, __cc__ DataType>;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define SCALAR_QUANT_MODE QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8,\
@@ -73,7 +73,7 @@ inline constexpr bool is_tensor_type_v = Std::is_one_of_v<type, __gm__ DType, __
 #endif
 
 template <QuantMode_t quantPre>
-using IsScalarQuantMode = is_one_of_value<quantPre, SCALAR_QUANT_MODE>;
+using IsScalarQuantMode = is_one_of_attralue<quantPre, SCALAR_QUANT_MODE>;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define TILE_OP_INTERNAL_TENSOR_QUANT_MODE QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8,\
@@ -86,7 +86,7 @@ using IsScalarQuantMode = is_one_of_value<quantPre, SCALAR_QUANT_MODE>;
 #endif
 
 template <QuantMode_t quantPre>
-using IsVectorQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_TENSOR_QUANT_MODE>;
+using IsVectorQuantMode = is_one_of_attralue<quantPre, TILE_OP_INTERNAL_TENSOR_QUANT_MODE>;
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define TILE_OP_INTERNAL_DIRECT_QUANT_MODE QuantMode_t::F322F16, QuantMode_t::F322BF16
@@ -97,7 +97,7 @@ using IsVectorQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_TENSOR_QUAN
 #endif
 
 template <QuantMode_t quantPre>
-using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
+using IsDirectQuantMode = is_one_of_attralue<quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
 
 using ZeroCoord2DType = AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>;
 
