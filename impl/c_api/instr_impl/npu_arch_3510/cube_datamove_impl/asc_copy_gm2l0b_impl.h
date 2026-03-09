@@ -70,7 +70,7 @@ __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ int32_t* dst, __gm__ int
     asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
-
+/*
 __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ int64_t* dst, __gm__ int64_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -83,7 +83,7 @@ __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ int64_t* dst, __gm__ int
     asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
-
+*/
 __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIC {
