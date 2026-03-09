@@ -94,6 +94,6 @@ __aicore__ inline void asc_set_atomic_min_float16()
 // ==========asc_set_store_atomic_config==========
 __aicore__ inline void asc_set_store_atomic_config(int8_t value, __gm__ int8_t *addr)
 {
-    asc_set_store_atomic_config_impl();
+    asc_set_store_atomic_config_impl(value, addr);
 }
 #endif
