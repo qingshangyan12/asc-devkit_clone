@@ -14,8 +14,8 @@
  * Mathematical formulas: Power(x, y) = x ^ y
  */
 
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H
 #endif
 
@@ -519,6 +519,6 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scala
 #endif  // LIB_MATH_POWER_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H
 #endif
