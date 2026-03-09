@@ -23,7 +23,6 @@
 #include "instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_min_bfloat_impl.h"
 #include "instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_max_bfloat_impl.h"
 #include "instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_min_float16_impl.h"
-#include "instr_impl/npu_arch_3510/atomic_impl/asc_set_strore_atomic_min_float16_impl.h"
 
  // ==========asc_set_atomic_add_float16==========
 __aicore__ inline void asc_set_atomic_add_float16()
