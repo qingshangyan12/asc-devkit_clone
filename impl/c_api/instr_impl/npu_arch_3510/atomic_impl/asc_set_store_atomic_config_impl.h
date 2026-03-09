@@ -34,11 +34,6 @@ __aicore__ inline void asc_set_store_atomic_config_v2_impl(uint16_t type, uint16
     set_st_atomic_cfg(config);
 }
 
-__aicore__ inline void asc_set_store_atomic_config_impl(int8_t value, __gm__ int8_t *addr)
-{
-    st_atomic(value, addr);
-}
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

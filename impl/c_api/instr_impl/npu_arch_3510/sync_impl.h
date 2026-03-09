@@ -26,4 +26,24 @@ __aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id)
 {
     asc_sync_intra_wait_impl(pipe, sync_id);
 }
+
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint8_t flag_id)
+{
+    asc_sync_block_wait_impl(pipe, flag_id);
+}
+
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id)
+{
+    asc_sync_block_wait_impl(pipe, flag_id);
+}
+
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id)
+{
+    asc_sync_inter_wait_impl(pipe, flag_id);
+}
+
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id)
+{
+    asc_sync_inter_wait_impl(pipe, flag_id);
+}
 #endif

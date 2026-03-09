@@ -21,12 +21,8 @@ __aicore__ inline void wait_intra_block_stub(pipe_t pipe, DTYPE sync_id) {
 
 class TEST_ASC_SYNC_INTRA_WAIT : public testing::Test {
 protected:
-    void SetUp() {
-        g_coreType = C_API_AIC_TYPE;
-    }
-    void TearDown() {
-        g_coreType = C_API_AIV_TYPE;
-    }
+    void SetUp() {}
+    void TearDown() {}
 };
 
 #define TEST_ASC_SYNC_INTRA_WAIT(dtype)  \
