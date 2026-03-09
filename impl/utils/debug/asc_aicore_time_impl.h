@@ -15,6 +15,7 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 
+#ifndef ASCENDC_CPU_DEBUG
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
 #include "impl/utils/debug/asc_debug_utils.h"
 
@@ -92,6 +93,7 @@ __aicore__ inline void asc_mark_stamp()
 }
 #endif
 } // namespace __asc_aicore
+#endif
 #endif
 
 #ifdef ASCENDC_TRACE_ON

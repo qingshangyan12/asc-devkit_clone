@@ -24,6 +24,7 @@
 #include "impl/utils/debug/asc_debug_utils.h"
 #endif
 
+#ifndef ASCENDC_CPU_DEBUG
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_dump_tensor_impl.h"
 #elif __NPU_ARCH__ == 2002
@@ -41,8 +42,7 @@
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_dump_tensor_impl.h"
 #endif
-
-#ifdef ASCENDC_CPU_DEBUG
+#else
 #include <cstdio>
 #include <utility>
 #endif
