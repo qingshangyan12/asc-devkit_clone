@@ -28,7 +28,7 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ bfloat16_t* dst, __gm__ bfloa
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride)
 {
-    asc_copy_gm2l1_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
+    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
@@ -41,7 +41,7 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ half* dst, __gm__ half* src, 
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride)
 {
-    asc_copy_gm2l1_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
+    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
@@ -54,7 +54,7 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ float* dst, __gm__ float* src
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride)
 {
-    asc_copy_gm2l1_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
+    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
@@ -67,7 +67,7 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ int32_t* dst, __gm__ int32_t*
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride)
 {
-    asc_copy_gm2l1_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
+    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
@@ -80,7 +80,7 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ int64_t* dst, __gm__ int64_t*
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ int64_t* dst, __gm__ int64_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride)
 {
-    asc_copy_gm2l1_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
+    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
@@ -93,7 +93,7 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ int8_t* dst, __gm__ int8_t* s
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride)
 {
-    asc_copy_gm2l1_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
+    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
@@ -106,7 +106,7 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ uint32_t* dst, __gm__ uint32_
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride)
 {
-    asc_copy_gm2l1_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
+    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
@@ -119,7 +119,7 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ uint8_t* dst, __gm__ uint8_t*
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride)
 {
-    asc_copy_gm2l1_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
+    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
 
@@ -132,7 +132,7 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ int4b_t* dst, __gm__ int4b_t*
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride)
 {
-    asc_copy_gm2l1_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
+    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
 }
 #endif
