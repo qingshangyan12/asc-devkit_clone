@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_dump_tensor_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c310/kernel_operator_dump_tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
@@ -265,9 +265,9 @@ __aicore__ inline void DumpTensorL12GMImpl(const LocalTensor<T>& tensor, uint32_
         // L1 to UB
         DataCopyL12UBImpl(ubAddr,
             reinterpret_cast<__cbuf__ PrimType*>((__cbuf__ uint8_t*)tensor.GetPhyAddr() + idx * L1_DUMP_UB_SIZE), repeatParams);
-        PipeBarrier<PIPE_ALL>(); // set_intra_blockå‰éœ€è¦ä¿è¯æ‰€æœ‰æµæ°´å·²ç»æ‰§è¡Œå®Œæ¯•
+        PipeBarrier<PIPE_ALL>(); // set_intra_blockÇ°ĞèÒª±£Ö¤ËùÓĞÁ÷Ë®ÒÑ¾­Ö´ĞĞÍê±Ï
         set_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID); // notify vector copy UB2GM
-        // ç­‰å¾…AIVä¸Šä¸€æ¬¡æ•°æ®æ¬è¿å®Œæˆ
+        // µÈ´ıAIVÉÏÒ»´ÎÊı¾İ°áÔËÍê³É
         wait_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID);
         needCopyLen -= copyLen;
     }
@@ -490,7 +490,7 @@ __aicore__ inline void DumpTensorGM2GMEntityImpl(const GlobalTensor<T>& tensor, 
         LocalTensor<T> tmpLocal;
         uint64_t gmBackAddr = dumpWorkspaceStart + DUMP_UINTSIZE * (GetDumpBlockIdx() + 1) - ONE_DUMP_BACKUP_SIZE;
 
-        // 1ã€alloc 1k UB 2ã€ backup static GM addr 3ã€loop copy 4ã€recover
+        // 1¡¢alloc 1k UB 2¡¢ backup static GM addr 3¡¢loop copy 4¡¢recover
         PipeBarrier<PIPE_ALL>();
         // BackUp
         InitTmpTensor(tmpLocal, static_cast<uint8_t>(TPosition::VECIN));
@@ -569,7 +569,7 @@ __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
 
 __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 {
-#ifdef ASCENDC_TIME_STAMP_ON  // æ‰“ç‚¹å¼€å…³å®
+#ifdef ASCENDC_TIME_STAMP_ON  // ´òµã¿ª¹Øºê
     DumpTimeStampImpl(descId);
 #endif
 }
@@ -627,13 +627,13 @@ __aicore__ inline void DumpL1TensorTransferByUB()
         if (!IsL1DumpEnable()) {
             break;
         }
-        // ç›‘å¬æ˜¯å¦æ¥æ”¶åˆ°dumpæ•°æ®ä¿¡å·
+        // ¼àÌıÊÇ·ñ½ÓÊÕµ½dumpÊı¾İĞÅºÅ
         if (GetDumpCtrlMsg()->sig == ConstantsInternal::L1_2_UB_DUMP_CTRL_SIGNAL_DUMP) {
-            // ç­‰å¾…AICæ¬è¿å®Œæˆ
+            // µÈ´ıAIC°áÔËÍê³É
             wait_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID);
-            // åˆ·dcci, æ›´æ–°æœ€æ–°gmå†…å®¹
+            // Ë¢dcci, ¸üĞÂ×îĞÂgmÄÚÈİ
             dcci((__gm__ uint64_t*)gmAddr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-            // é‡æ–°è·å–lenä¿¡æ¯ é¿å…ä¿¡æ¯è€åŒ–
+            // ÖØĞÂ»ñÈ¡lenĞÅÏ¢ ±ÜÃâĞÅÏ¢ÀÏ»¯
             uint32_t copyLen = GetDumpCtrlMsg()->len;
             DataCopyParams repeatParams = GetDataCopyParamImpl(copyLen);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -649,7 +649,7 @@ __aicore__ inline void DumpL1TensorTransferByUB()
             UpdateBlockInfo(gmAddr, copyLen);
             dcci((__gm__ uint64_t*)(gmAddr->dumpAddr), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
             dcci((__gm__ uint64_t*)(gmAddr), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-            // æ¸…é™¤dumpæ ‡å¿—ä½ï¼Œé¿å…aivè¯¯è¿›å…¥ä¸‹ä¸€æ¬¡å¾ªç¯ï¼Œå¡åœ¨wait_intra_block
+            // Çå³ıdump±êÖ¾Î»£¬±ÜÃâaivÎó½øÈëÏÂÒ»´ÎÑ­»·£¬¿¨ÔÚwait_intra_block
             SendL12UBDumpCtrlMessage(0, 0);
             PipeBarrier<PIPE_ALL>();
             set_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID); // notify cube core copy again
@@ -735,7 +735,7 @@ __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
 
 }  // namespace AscendC
 #endif
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__
 #endif

@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_common_impl.h
  * \brief AscendC l311 support common api.
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_l311/kernel_operator_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
@@ -1345,9 +1345,9 @@ __simd_callee__ inline void DataCopy(MaskReg &dstReg, LocalMem T *srcUbAddr, int
 template <typename T, PostLiteral post, Dist dist = Dist::DIST_NORM>
 __simd_callee__ inline void DataCopy(MaskReg &dstReg, LocalMem T *&srcUbAddr, int32_t offset)
 {
-    // postä¸ºplds/pstså¯¹åº”çš„å…¥å‚ï¼Œä¸º0æ—¶ï¼ˆNO_POST_UPDATEï¼‰ï¼Œæ¯æ¬¡å­˜åœ¨srcUbAddr+offsetçš„åœ°å€ï¼›
-    // ä¸º1æ—¶ï¼Œå­˜åœ¨srcUbAddrçš„åœ°å€å¹¶å¯¹srcUbAddrè¿›è¡Œ+offset
-    // å› ä¸ºå­˜åœ¨é¢„ç¼–è¯‘çš„é™æ€assertï¼Œè¿™é‡Œç”Ÿæˆçš„postValueå‡ä¸ºpostä¸º1ï¼Œé€šè¿‡åˆ¤æ–­å…¥å‚æ¥ç¡®å®šåˆ°åº•èµ°å“ªä¸ªtemplate
+    // postÎªplds/psts¶ÔÓ¦µÄÈë²Î£¬Îª0Ê±£¨NO_POST_UPDATE£©£¬Ã¿´Î´æÔÚsrcUbAddr+offsetµÄµØÖ·£»
+    // Îª1Ê±£¬´æÔÚsrcUbAddrµÄµØÖ·²¢¶ÔsrcUbAddr½øĞĞ+offset
+    // ÒòÎª´æÔÚÔ¤±àÒëµÄ¾²Ì¬assert£¬ÕâÀïÉú³ÉµÄpostValue¾ùÎªpostÎª1£¬Í¨¹ıÅĞ¶ÏÈë²ÎÀ´È·¶¨µ½µ××ßÄÄ¸ötemplate
     constexpr auto distValue = std::integral_constant<::Dist, static_cast<::Dist>(dist)>();
     constexpr auto postValue = std::integral_constant<::Post, static_cast<::Post>(Post::POST_UPDATE_VALUE)>();
     if (post == PostLiteral::POST_MODE_UPDATE) {
@@ -1513,7 +1513,7 @@ __aicore__ static inline void ResetCtrlSprImpl()
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__
 #endif

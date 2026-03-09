@@ -12,9 +12,9 @@
  * \file log_check.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/api_check/kernel_check/math/log/log_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/log.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOG_CHECK_H
 #endif
 
@@ -68,6 +68,6 @@ __aicore__ inline void CheckFuncLog10(__gm__ const char *apiName, const LocalTen
 #endif // IMPL_API_CHECK_KERNEL_CHECK_MATH_LOG_LOG_CHECK_H_
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOG_CHECK_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOG_CHECK_H
 #endif

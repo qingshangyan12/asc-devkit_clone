@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kfc_comm.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c310/kfc/kfc_comm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_H__
 #endif
 #ifndef __KERNEL_KFC_COMM_H__
 #define __KERNEL_KFC_COMM_H__
@@ -67,14 +67,14 @@ enum class MSG_STATE : uint8_t {
 
 enum class VEC_WAIT_INTRA_Enum : uint16_t {
     UB_L1_L1_L0AB = 0,
-    WAIT_FIXP, // fixpæ¯”è¾ƒç‰¹æ®Šï¼Œæœ‰å¤šæ¡é€šè·¯
+    WAIT_FIXP, // fixp±È½ÏÌØÊâ£¬ÓĞ¶àÌõÍ¨Â·
     MAX
 };
  
 enum class CUBE_WAIT_INTRA_Enum : uint16_t {
     L1_L0AB_UB_L1 = 0,
     GM_L1_UB_GM,
-    WAIT_FIXP, // fixpæ¯”è¾ƒç‰¹æ®Šï¼Œæœ‰å¤šæ¡é€šè·¯
+    WAIT_FIXP, // fixp±È½ÏÌØÊâ£¬ÓĞ¶àÌõÍ¨Â·
     MAX
 };
 #ifdef __MIX_CORE_AIC_RATION__
@@ -83,8 +83,8 @@ constexpr int32_t MIX_NUM = __MIX_CORE_AIC_RATION__;
 constexpr int32_t MIX_NUM = 2; // david 1:2
 #endif
 constexpr int MAX_MSG_MASK = 3;
-constexpr int MAX_MSG_COUNT_C310 = (1 << MAX_MSG_MASK);  // 2KBæ”¯æŒ16ä¸ªæ¶ˆæ¯ï¼Œæ¯ä¸ªæ¶ˆæ¯å¤§å°128Bï¼Œç»™ä¸¤ä¸ªvç”¨ï¼Œæ¯ä¸ªVå¯åˆ†å¾—8ä¸ªæ¶ˆæ¯
-constexpr int BIDIRECTION_NUM = 1;  // å•å‘    
+constexpr int MAX_MSG_COUNT_C310 = (1 << MAX_MSG_MASK);  // 2KBÖ§³Ö16¸öÏûÏ¢£¬Ã¿¸öÏûÏ¢´óĞ¡128B£¬¸øÁ½¸övÓÃ£¬Ã¿¸öV¿É·ÖµÃ8¸öÏûÏ¢
+constexpr int BIDIRECTION_NUM = 1;  // µ¥Ïò    
 constexpr int MAX_MATMUL_OBJ = 4;
 constexpr uint64_t INC_PROCESS_CHECK = 14;
 constexpr uint8_t VALID_ADDR_BITS_NUM = 56;
@@ -177,7 +177,7 @@ struct KfcMsg {
     volatile uint32_t head = 0;
     uint32_t userCustomData;
     union {
-        uint32_t buffer[30]; // ç”¨äºè‡ªå®šä¹‰æ¶ˆæ¯ï¼Œè¿›è¡Œæ ¼å¼åŒ–
+        uint32_t buffer[30]; // ÓÃÓÚ×Ô¶¨ÒåÏûÏ¢£¬½øĞĞ¸ñÊ½»¯
         MatmulConfigParams body;
         MatmulUserDefInfo userDefInfo;
     };
@@ -197,7 +197,7 @@ struct MsgMatmulL1Addr {
 struct TilingInfo {
     volatile uint32_t valid = 0;
     uint32_t res;
-    TCubeTiling tCubeTiling;  // tilingçš„GMåœ°å€
+    TCubeTiling tCubeTiling;  // tilingµÄGMµØÖ·
 };
 
 struct SsbufWorkspaceDesc {
@@ -267,7 +267,7 @@ __aicore__ inline void ClearSSbufImpl()
 }
 }  // namespace AscendC
 #endif  // __KERNEL_KFC_COMM_H__
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_H__
 #endif
