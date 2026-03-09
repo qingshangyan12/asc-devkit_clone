@@ -808,6 +808,12 @@ uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle)
     return 5;  // 5 is KERNEL_TYPE_AIV_ONLY
 }
 
+// int32_t AscendStreamGetSqid(const rtStream_t stream, uint32_t* sqId)
+// {
+//     return rtStreamGetSqid(stream, sqId);
+// }
+
+
 #ifdef __cplusplus
 }
 #endif
