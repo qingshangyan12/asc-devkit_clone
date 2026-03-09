@@ -38,8 +38,7 @@ __aicore__ inline void load_gm_to_cb_s4_stub(__cb__ void* dst, __gm__ void* src,
     EXPECT_EQ(addr_cal_mode, static_cast<addr_cal_mode_t>(addr_cal_mode_t::inc));
 }
 
-
-class TEST_COPY_GM_TO_L1_ALIGN : public testing::Test {
+class TEST_COPY_GM_TO_L0B : public testing::Test {
 protected:
     void SetUp() {
         g_coreType = C_API_AIC_TYPE;
