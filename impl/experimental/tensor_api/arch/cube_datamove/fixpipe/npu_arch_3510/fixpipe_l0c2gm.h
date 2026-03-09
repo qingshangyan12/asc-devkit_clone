@@ -33,13 +33,13 @@ private:
     template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
         if constexpr (IsL0cNZFormat<U>::value && IsNZFormat<T>::value) {
-            FixpipeNz2NzBase3510 nz2NzStrategy;
+            Fixpipe2GmNz2NzBase3510 nz2NzStrategy;
             nz2NzStrategy.Run<trait, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsL0cNZFormat<U>::value && IsNDFormat<T>::value) {
-            FixpipeNz2NdBase3510 nz2NdStrategy;
+            Fixpipe2GmNz2NdBase3510 nz2NdStrategy;
             nz2NdStrategy.Run<trait, T, U, Coord>(dst, src, coord);
         } else if constexpr (IsL0cNZFormat<U>::value && IsDNFormat<T>::value) {
-            FixpipeNz2DnBase3510 nz2DnStrategy;
+            Fixpipe2GmNz2DnBase3510 nz2DnStrategy;
             nz2DnStrategy.Run<trait, T, U, Coord>(dst, src, coord);
         }
     }
