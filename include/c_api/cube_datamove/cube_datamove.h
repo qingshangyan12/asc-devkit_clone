@@ -784,6 +784,14 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint3
 
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, uint32_t size);
 
+// =============asc_copy_l12fb_v2===============
+__aicore__ inline void asc_copy_l12fb_v2(__fbuf__ void * dst, __cbuf__ void * src, uint16_t burst_num, 
+                                            uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride);
+
+__aicore__ inline void asc_copy_l12fb_v2(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
+
+__aicore__ inline void asc_copy_l12fb_v2_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
+
 //=============asc_copy_l0c2l1===============
 __aicore__ inline void asc_copy_l0c2l1(__cbuf__ void *dst_addr, __cc__ float *src_addr, uint16_t n_size, 
             uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre, 
