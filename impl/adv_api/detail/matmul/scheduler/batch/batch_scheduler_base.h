@@ -97,7 +97,7 @@ public:
         }
 
         if constexpr (ToMatmulConfig(MM_CFG).bmmOutMode != BatchOutMode::SINGLE_BATCH) {
-            MATMUL_MODULE(CubeOutBuffer)->Init(tiling.GetBaseM() * tiling.GetBaseN() * nBatchOutNum_, lenFactor);
+            MATMUL_MODULE(CubeOutBuffer)->Init(tiling.GetBaseM() * tiling.GetBaseN() * MATMUL_MODULE(BatchLoop)->GetBatchOutNum(), lenFactor);
         } else {
             MATMUL_MODULE(CubeOutBuffer)->Init(tiling.GetBaseM() * tiling.GetBaseN(), lenFactor);
         }
@@ -116,7 +116,6 @@ public:
             MATMUL_MODULE(MatmulQuantProcessor)->Init(tiling.GetBaseN());
         }
 #endif
-
         InitShareBufEnd(var.tpipe_);
     }
 
@@ -404,9 +403,9 @@ public:
 #endif
     }
 
-    __aicore__ inline void SetNBatchOutNum(int32_t nBatchOutNum)
+    __aicore__ inline void SetBatchOutNum(int32_t batchOutNum)
     {
-        nBatchOutNum_ = nBatchOutNum;
+        MATMUL_MODULE(BatchLoop)->SetBatchOutNum(batchOutNum);
     }
 private:
     __aicore__ inline void InitL0Params(BatchSchedulerContext& ctx)
@@ -574,7 +573,6 @@ private:
 #else
     constexpr static int32_t c0SizeB_ = c0Size_;
 #endif
-    int32_t nBatchOutNum_;
 };
 }  // namespace Detail
 }  // namespace Impl

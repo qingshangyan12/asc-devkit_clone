@@ -131,14 +131,18 @@ public:
         MATMUL_MODULE(BatchLoop)->SetBatchNum(batchA, batchB);
     }
 
-    __aicore__ inline void SetNBatchOutNum(int32_t nBatchOutNumIn)
+    __aicore__ inline void SetNBatchOutNum(int32_t batchOutNumIn)
     {
-        int32_t nBatchOutNum = 1;
+        SetBatchOutNum(batchOutNumIn);
+    }
+
+    __aicore__ inline void SetBatchOutNum(int32_t batchOutNumIn)
+    {
+        int32_t batchOutNum = 1;
         if constexpr (ToMatmulConfig(MM_CFG).bmmOutMode != BatchOutMode::SINGLE_BATCH) {
-            nBatchOutNum = nBatchOutNumIn;
+            batchOutNum = batchOutNumIn;
         }
-        MATMUL_MODULE(BatchScheduler)->SetNBatchOutNum(nBatchOutNum);
-        MATMUL_MODULE(BatchLoop)->SetNBatchOutNum(nBatchOutNum);
+        MATMUL_MODULE(BatchScheduler)->SetBatchOutNum(batchOutNum);
     }
 
     __aicore__ inline void IterateBatch(const GlobalTensor<DstT>& gm,
