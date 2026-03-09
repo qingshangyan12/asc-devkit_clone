@@ -37,15 +37,15 @@ public:
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
         static_assert(Std::is_same_v<ShapeRow0, Std::Int<FRACTAL_FIXED>>,
             "LoadDataFourDim2201L12L0B Layout->Shape->Row->ZeroDim is not Std::Int<16> type!");
-        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<C0_SIZE / sizeof(type)>>,
+        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<C0_ELEMS<type>>>,
             "LoadDataFourDim2201L12L0B Layout->Shape->Column->ZeroDim is not Std::Int<C0Size/Type> type!"); 
 
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
         using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
         using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<StrideRow0, Std::Int<C0_SIZE / sizeof(type)>>,
+        static_assert(Std::is_same_v<StrideRow0, Std::Int<C0_ELEMS<type>>>,
             "LoadDataFourDim2201L12L0B Layout->Stride->Row-ZeroDim is not Std::Int<C0Size/Type> type!");
-        static_assert(Std::is_same_v<StrideRow1, Std::Int<FRACTAL_FIXED * C0_SIZE / sizeof(type)>>,
+        static_assert(Std::is_same_v<StrideRow1, Std::Int<FRACTAL_FIXED * C0_ELEMS<type>>>,
             "LoadDataFourDim2201L12L0B Layout->Stride->Row-ZeroDim is not Std::Int<16*C0Size/Type> type!");
         static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>,
             "LoadDataFourDim2201L12L0B Layout->Stride->Column->ZeroDim is not Std::Int<1> type!");
@@ -59,7 +59,7 @@ public:
         using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
         static_assert(Std::is_same_v<ShapeColumn0, Std::Int<FRACTAL_FIXED>>,
             "LoadDataFourDim2201L12L0B Layout->Shape->Column->ZeroDim is not Std::Int<16> type!");
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<C0_SIZE / sizeof(type)>>,
+        static_assert(Std::is_same_v<ShapeRow0, Std::Int<C0_ELEMS<type>>>,
             "LoadDataFourDim2201L12L0B Layout->Shape->Row->ZeroDim is not Std::Int<C0Size/Type> type!"); 
 
         using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
@@ -68,9 +68,9 @@ public:
 
         static_assert(Std::is_same_v<StrideRow0, Std::Int<1>>,
             "LoadDataFourDim2201L12L0B Layout->Stride->Row->ZeroDim is not Std::Int<1> type!");
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_SIZE / sizeof(type)>>,
+        static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_ELEMS<type>>>,
             "LoadDataFourDim2201L12L0B Layout->Stride->Column-ZeroDim is not Std::Int<C0Size/Type> type!");
-        static_assert(Std::is_same_v<StrideColumn1, Std::Int<FRACTAL_FIXED * C0_SIZE / sizeof(type)>>,
+        static_assert(Std::is_same_v<StrideColumn1, Std::Int<FRACTAL_FIXED * C0_ELEMS<type>>>,
             "LoadDataFourDim2201L12L0B Layout->Stride->Column-ZeroDim is not Std::Int<16*C0Size/Type> type!");
     }
 
