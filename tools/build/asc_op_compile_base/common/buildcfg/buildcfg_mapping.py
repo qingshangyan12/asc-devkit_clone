@@ -122,6 +122,7 @@ enable_vcmaxmin = "tir.enable_vcmaxmin"
 enable_cce_remat_higher_weight = "tir.enable_cce_remat_higher_weight"
 enable_super_kernel = "tir.enable_super_kernel"
 workspace_tensor_size = "tir.workspace_tensor_size"
+deterministic_level = "tir.deterministic_level"
 # ------------------- Pass Config Item, not start with "tir" ---------------------
 sync_mode = "sync_mode"
 sync_opt_for_notail_db = "sync_opt_for_notail_db"
