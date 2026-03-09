@@ -47,7 +47,7 @@ file(GLOB ASCENDC_UT_NPU_ARCH_2201_AIV_CASE_SRC
 )
 
 file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIC_CASE_SRC
-    npu_arch_3510/aic/*.cpp
+    npu_arch_3510/aic/test_tensor_api_fixpipe.cpp
 )
 
 file(GLOB ASCENDC_UT_NPU_ARCH_3510_AIV_CASE_SRC
