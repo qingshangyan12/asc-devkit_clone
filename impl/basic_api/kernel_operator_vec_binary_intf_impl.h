@@ -23,6 +23,7 @@
 #include "kernel_check.h"
 #include "kernel_struct_binary.h"
 #include "mstx_local_tensor_info.h"
+#include "kernel_npu_debug.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_binary_impl.h"
@@ -69,6 +70,19 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+
+#ifdef ASCENDC_DEBUG
+    CheckTensorTPosition<TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC>(dst, "dst", 
+        "VECIN / VECCALC / VECOUT", "Add");
+    CheckTensorTPosition<TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC>(src0, "src0", 
+        "VECIN / VECCALC / VECOUT", "Add");
+    CheckTensorTPosition<TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC>(src1, "src1", 
+        "VECIN / VECCALC / VECOUT", "Add");
+    CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "Add");
+    CheckTensorAlignment(src0, ONE_BLK_SIZE, "src0", "Add");
+    CheckTensorAlignment(src1, ONE_BLK_SIZE, "src1", "Add");
+#endif
+
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Add")) {
