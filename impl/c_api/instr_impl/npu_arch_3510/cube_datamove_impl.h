@@ -20,6 +20,8 @@
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_gm2l1_loop1_stride_impl.h"
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_gm2l1_loop2_stride_impl.h"
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_gm2l1_pad_impl.h"
+#include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_l12fb_impl.h"
+#include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_l12bt_impl.h"
 
 // ==========asc_copy_l0c2l1===========
 // half  float
@@ -168,4 +170,131 @@ __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config)
 {
     asc_set_l13d_fmatrix_impl(config);
 }
+
+// =============asc_copy_l12fb===============
+__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_num, uint16_t burst_len,
+                                      uint16_t src_gap_size, uint16_t dst_gap_size)
+{
+    asc_copy_l12fb_impl(dst, src, burst_num, burst_len, src_gap_size, dst_gap_size);
+}
+
+__aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
+{
+    asc_copy_l12fb_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
+{
+    asc_copy_l12fb_sync_impl(dst, src, size);
+}
+
+//=============asc_copy_l12bt===============
+// void -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+{
+    asc_copy_l12bt_impl(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
+{
+    asc_copy_l12bt_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size)
+{
+    asc_copy_l12bt_sync_impl(dst, src, size);
+}
+
+// bfloat16_t -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+{
+    asc_copy_l12bt_impl(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
+{
+    asc_copy_l12bt_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
+{
+    asc_copy_l12bt_sync_impl(dst, src, size);
+}
+
+// half -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+{
+    asc_copy_l12bt_impl(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint32_t size)
+{
+    asc_copy_l12bt_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uint32_t size)
+{
+    asc_copy_l12bt_sync_impl(dst, src, size);
+}
+
+// float -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+{
+    asc_copy_l12bt_impl(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint32_t size)
+{
+    asc_copy_l12bt_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, uint32_t size)
+{
+    asc_copy_l12bt_sync_impl(dst, src, size);
+}
+
+// int32_t -> uint64_t
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+{
+    asc_copy_l12bt_impl(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
+{
+    asc_copy_l12bt_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
+{
+    asc_copy_l12bt_sync_impl(dst, src, size);
+}
+
+//=============asc_copy_l0c2l1===============
+__aicore__ inline void asc_copy_l0c2l1(__cbuf__ void *dst_addr, __cc__ float *src_addr, uint16_t n_size, 
+            uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre, 
+            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post, 
+            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en, 
+            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2l1_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, l2_cache_ctl, 
+        clip_relu_pre, unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, 
+        loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+}
+
+__aicore__ inline void asc_copy_l0c2l1(__cbuf__ void *dst_addr, __cc__ int32_t *src_addr, uint16_t n_size, 
+            uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre, 
+            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post, 
+            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en, 
+            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2l1_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, l2_cache_ctl, 
+        clip_relu_pre, unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, 
+        loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+}
+
 #endif
