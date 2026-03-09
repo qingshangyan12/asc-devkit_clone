@@ -23,9 +23,9 @@ error_tol = 1e-3
 
 def verify_result(scenarioNum, output, golden):
     if scenarioNum >= 1 and scenarioNum <= 4:
-        output_type = np.float16
+        output_type = np.uint16
     elif scenarioNum == 5:
-        output_type = np.float32
+        output_type = np.uint32
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(output,
