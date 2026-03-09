@@ -22,7 +22,7 @@
 #ifndef ASCENDC_MODULE_REG_COMPUTE_MEMBAR_IMPL_H
 #define ASCENDC_MODULE_REG_COMPUTE_MEMBAR_IMPL_H
 
-#include "../../../../include/reg_compute/kernel_reg_compute_utils.h"
+#include "../../../../include/basic_api/reg_compute/kernel_reg_compute_utils.h"
 
 namespace AscendC {
 namespace Reg {
