@@ -116,6 +116,49 @@ __aicore__ inline void CheckValueRange(T value, T valueLow, T valueHigh, const _
     }
 }
 
+template <typename T, typename U>
+__aicore__ inline void CheckVecBinaryScalarTensorCommon(const LocalTensor<T>& dst, const LocalTensor<U>& src,
+    const __gm__ char* apiName)
+{
+    CheckTensorTPosition<TPosition::VECIN, TPosition::VECCALC, TPosition::VECOUT>(
+        dst, "dst", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorTPosition<TPosition::VECIN, TPosition::VECCALC, TPosition::VECOUT>(
+        src, "src", "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
+    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
+}
+
+template <typename T, typename U>
+__aicore__ inline void CheckVecBinaryScalarMaskArrayCommon(const LocalTensor<T>& dst,
+    const LocalTensor<U>& src, const uint64_t mask[], const uint8_t repeatTime, const __gm__ char* apiName)
+{
+    CheckVecBinaryScalarTensorCommon(dst, src, apiName);
+    ASCENDC_DEBUG_ASSERT((mask != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check mask pointer in %s, mask pointer can not be nullptr.\n", apiName));
+    CheckValueRange<uint8_t>(repeatTime, 1, UINT8_MAX, "repeatTime", apiName);
+}
+
+template <typename T, typename U>
+__aicore__ inline void CheckVecBinaryScalarMaskCountCommon(const LocalTensor<T>& dst,
+    const LocalTensor<U>& src, const uint64_t mask, const uint8_t repeatTime, const __gm__ char* apiName)
+{
+    CheckVecBinaryScalarTensorCommon(dst, src, apiName);
+    ASCENDC_DEBUG_ASSERT((mask > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check mask value in %s, mask value should be larger than 0.\n", apiName));
+    CheckValueRange<uint8_t>(repeatTime, 1, UINT8_MAX, "repeatTime", apiName);
+}
+
+template <typename T, typename U>
+__aicore__ inline void CheckVecBinaryScalarCalCountCommon(const LocalTensor<T>& dst,
+    const LocalTensor<U>& src, const int32_t count, const __gm__ char* apiName)
+{
+    CheckVecBinaryScalarTensorCommon(dst, src, apiName);
+    const uint64_t maxElementCount = (dst.GetSize() < src.GetSize()) ? dst.GetSize() : src.GetSize();
+    const int32_t maxCount = (maxElementCount > static_cast<uint64_t>(INT32_MAX)) ? INT32_MAX :
+        static_cast<int32_t>(maxElementCount);
+    CheckValueRange<int32_t>(count, 1, maxCount, "count", apiName);
+}
+
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_OPERATOR_KERNEL_NPU_DEBUG_H
