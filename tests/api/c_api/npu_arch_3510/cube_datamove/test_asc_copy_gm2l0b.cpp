@@ -14,26 +14,26 @@
 #include "c_api/asc_simd.h"
 
 template <typename DTYPE>
-__aicore__ inline void load_gm_to_cb_stub(__cb__ DTYPE* dst, __gm__ DTYPE* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride,
+__aicore__ inline void load_gm_to_cb_stub(__cb__ DTYPE* dst, __gm__ DTYPE* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
                                         uint16_t sid, addr_cal_mode_t addr_cal_mode) {
     EXPECT_EQ(dst, reinterpret_cast<__cb__ DTYPE *>(11));
     EXPECT_EQ(src, reinterpret_cast<__gm__ DTYPE *>(22));
     EXPECT_EQ(base_idx, static_cast<uint16_t>(33));
     EXPECT_EQ(repeat, static_cast<uint8_t>(44));
     EXPECT_EQ(src_stride, static_cast<uint16_t>(55));
-    EXPECT_EQ(dst_stride, static_cast<uint8_t>(66));
+    EXPECT_EQ(dst_stride, static_cast<uint16_t>(66));
     EXPECT_EQ(sid, static_cast<uint16_t>(0));
     EXPECT_EQ(addr_cal_mode, static_cast<addr_cal_mode_t>(addr_cal_mode_t::inc));
 }
 
-__aicore__ inline void load_gm_to_cb_s4_stub(__cb__ void* dst, __gm__ void* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint8_t dst_stride,
+__aicore__ inline void load_gm_to_cb_s4_stub(__cb__ void* dst, __gm__ void* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
                                             uint16_t sid, addr_cal_mode_t addr_cal_mode) {
     EXPECT_EQ(dst, reinterpret_cast<__cb__ void *>(11));
     EXPECT_EQ(src, reinterpret_cast<__gm__ void *>(22));
     EXPECT_EQ(base_idx, static_cast<uint16_t>(33));
     EXPECT_EQ(repeat, static_cast<uint8_t>(44));
     EXPECT_EQ(src_stride, static_cast<uint16_t>(55));
-    EXPECT_EQ(dst_stride, static_cast<uint8_t>(66));
+    EXPECT_EQ(dst_stride, static_cast<uint16_t>(66));
     EXPECT_EQ(sid, static_cast<uint16_t>(0));
     EXPECT_EQ(addr_cal_mode, static_cast<addr_cal_mode_t>(addr_cal_mode_t::inc));
 }
@@ -52,7 +52,7 @@ protected:
                                                                                       \
 TEST_F(TEST_COPY_GM_TO_L0B, TEST_COPY_GM_TO_L0B_##dtype)               \
 {                                                                                     \
-    MOCKER_CPP(load_gm_to_cb, void(__cb__ dtype*, __gm__ dtype*, uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, addr_cal_mode_t))                    \
+    MOCKER_CPP(load_gm_to_cb, void(__cb__ dtype*, __gm__ dtype*, uint16_t, uint8_t, uint16_t, uint16_t, uint16_t, addr_cal_mode_t))                    \
             .times(1)                                                                           \
             .will(invoke(load_gm_to_cb_stub<dtype>));                               \
                                                                                                 \
@@ -70,7 +70,7 @@ TEST_F(TEST_COPY_GM_TO_L0B, TEST_COPY_GM_TO_L0B_##dtype)               \
                                                                                                 \
 TEST_F(TEST_COPY_GM_TO_L0B, TEST_COPY_GM_TO_L0B_SYNC_##dtype)                                       \
 {                                                                                              \
-    MOCKER_CPP(load_gm_to_cb, void(__cb__ dtype*, __gm__ dtype*, uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, addr_cal_mode_t))                    \
+    MOCKER_CPP(load_gm_to_cb, void(__cb__ dtype*, __gm__ dtype*, uint16_t, uint8_t, uint16_t, uint16_t, uint16_t, addr_cal_mode_t))                    \
             .times(1)                                                                           \
             .will(invoke(load_gm_to_cb_stub<dtype>));                               \
                                                                                                 \
