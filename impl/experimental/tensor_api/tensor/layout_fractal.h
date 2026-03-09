@@ -36,7 +36,7 @@ using ScaleNDShapeFormat = Shape<Shape<Std::Int<MX_SCALE_K0>, Std::Int<row/2>>,
                                     Shape<Std::Int<1>, Std::Int<column>>>;
 
 template <typename T, size_t row, size_t column>
-using ScaleNDStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<MX_SCALE_K0*col>>,
+using ScaleNDStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<MX_SCALE_K0*column>>,
                                     Stride<Std::Int<0>, Std::Int<MX_SCALE_K0>>>;
 
 //  ScaleDN
