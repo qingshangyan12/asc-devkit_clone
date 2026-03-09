@@ -96,64 +96,6 @@ template <typename T, size_t row, size_t column>
 using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRACTAL_FIXED * column>>,
     Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
 
-template <typename T, size_t row, size_t column, typename Enable = void>
-struct NZLayoutFormatImpl;
-
-template <typename T, size_t row, size_t column>
-struct NZLayoutFormatImpl<T, row, column, typename Std::enable_if<!Std::is_same_v<T, Std::ignore_t>>::type> {
-    using type = Layout<NZShapeFormat<T, row, column>, NZStrideFormat<T, row, column>>;
-};
-
-template <typename T, size_t row, size_t column>
-struct NZLayoutFormatImpl<T, row, column, typename Std::enable_if<Std::is_same_v<T, Std::ignore_t>>::type> {
-    using type = Layout<NZShapeFormat<uint16_t, row, column>, NZStrideFormat<uint16_t, row, column>>;
-};
-
-template <typename T, size_t row, size_t column>
-using NZLayoutFormat = typename NZLayoutFormatImpl<T, row, column>::type;
-
-template <typename T, size_t row, size_t column>
-using NDLayoutFormat = Layout<NDShapeFormat<T, row, column>, NDStrideFormat<T, row, column>>;
-
-template <typename T, size_t row, size_t column>
-using DNLayoutFormat = Layout<DNShapeFormat<T, row, column>, DNStrideFormat<T, row, column>>;
-
-template <typename T, size_t row, size_t column>
-using ZNLayoutFormat = Layout<ZNShapeFormat<T, row, column>, ZNStrideFormat<T, row, column>>;
-
-template <typename T, size_t row, size_t column>
-struct ZZLayoutFormatImpl {
-    using type = Layout<ScaleZZShapeFormat<T, row, column>, ScaleZZStrideFormat<T, row, column>>;
-};
-
-template <size_t row, size_t column>
-struct ZZLayoutFormatImpl<fp8_e8m0_t, row, column> {
-    using type = Layout<ScaleZZShapeFormat<fp8_e8m0_t, row, column>, ScaleZZStrideFormat<fp8_e8m0_t, row, column>>;
-};
-
-template <typename T, size_t row, size_t column>
-using ZZLayoutFormat = typename ZZLayoutFormatImpl<T, row, column>::type;
-
-// NN
-template <typename T, size_t row, size_t column>
-using NNLayoutFormat = Layout<ScaleNNShapeFormat<T, row, column>, ScaleNNStrideFormat<T, row, column>>;
-
-// scaleAND
-template <typename T, size_t row, size_t column>
-using ScaleANDLayoutFormat = Layout<NDShapeFormat<T, row, column>, NDStrideFormat<T, row, column>>;
-
-// scaleADN
-template <typename T, size_t row, size_t column>
-using ScaleADNLayoutFormat = Layout<ScaleDNShapeFormat<T, row, column>, ScaleDNStrideFormat<T, row, column>>;
-
-// scaleBND
-template <typename T, size_t row, size_t column>
-using ScaleBNDLayoutFormat = Layout<ScaleNDShapeFormat<T, row, column>, ScaleNDStrideFormat<T, row, column>>;
-
-// scaleBDN
-template <typename T, size_t row, size_t column>
-using ScaleBDNLayoutFormat = Layout<DNShapeFormat<T, row, column>, DNStrideFormat<T, row, column>>;
-
 template <typename T>
 struct MakeNzLayout {
 __aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
