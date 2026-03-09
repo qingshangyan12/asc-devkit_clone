@@ -100,7 +100,7 @@ TEST_F(TEST_COPY_GM_TO_L0B, TEST_COPY_GM_TO_L0B_INT4B_T)               \
 {                                                                                     \
     MOCKER_CPP(load_gm_to_cb_s4, void(__cb__ void*, __gm__ void*, uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, addr_cal_mode_t))                    \
             .times(1)                                                                           \
-            .will(invoke(load_gm_to_cb_s4_stub<dtype>));                               \
+            .will(invoke(load_gm_to_cb_s4_stub));                               \
                                                                                                 \
     __cb__ int4b_t *dst = reinterpret_cast<__cb__ int4b_t *>(11);                                 \
     __gm__ int4b_t *src = reinterpret_cast<__gm__ int4b_t *>(22);                                   \
@@ -118,7 +118,7 @@ TEST_F(TEST_COPY_GM_TO_L0B, TEST_COPY_GM_TO_L0B_SYNC_INT4B_T)                   
 {                                                                                              \
     MOCKER_CPP(load_gm_to_cb_s4, void(__cb__ void*, __gm__ void*, uint16_t, uint8_t, uint16_t, uint16_t, uint8_t, addr_cal_mode_t))                    \
             .times(1)                                                                           \
-            .will(invoke(load_gm_to_cb_s4_stub<dtype>));                               \
+            .will(invoke(load_gm_to_cb_s4_stub));                               \
                                                                                                 \
     __cb__ int4b_t *dst = reinterpret_cast<__cb__ int4b_t *>(11);                                 \
     __gm__ int4b_t *src = reinterpret_cast<__gm__ int4b_t *>(22);                                   \
