@@ -12,6 +12,11 @@
  * \file kernel_operator_utils_intf.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_UTILS_INTF_H
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_UTILS_INTF_H
 #define ASCENDC_MODULE_OPERATOR_UTILS_INTF_H
 
@@ -24,7 +29,7 @@
 #endif
 namespace AscendC {
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <int count = 1>
 __aicore__ inline void Nop()
 {
@@ -61,3 +66,8 @@ __aicore__ void Async(Args... args)
 } // namespace AscendC
 
 #endif // KERNEL_UTILS_INTF_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_UTILS_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_UTILS_INTF_H
+#endif

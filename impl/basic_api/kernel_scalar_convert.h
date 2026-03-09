@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,6 +12,11 @@
  * \file kernel_scalar_convert.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/kernel_scalar_convert.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_scalar_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_SCALAR_CONVERT_H
+#endif
 #ifndef ASCENDC_SCALAR_CONVERT_H
 #define ASCENDC_SCALAR_CONVERT_H
 #include "kernel_type_conversion_utils.h"
@@ -21,7 +26,7 @@
 namespace AscendC {
 #if defined(__NPU_ARCH__) &&                                    \
         ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||    \
-         (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+         (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline bfloat16_t Cast(const float& fVal)
 {
     constexpr uint32_t fp32SignIdx = 31;
@@ -79,7 +84,7 @@ __aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
     return Cast(fVal);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, typename U = float,
           typename = Std::enable_if_t<
           (Std::is_same<T, bfloat16_t>::value || Std::is_same<T, hifloat8_t>::value ||
@@ -189,3 +194,7 @@ __aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
 #endif
 } // namespace AscendC
 #endif // ASCENDC_SCALAR_CONVERT_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_SCALAR_CONVERT_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_SCALAR_CONVERT_H
+#endif

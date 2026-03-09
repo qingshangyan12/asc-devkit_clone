@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,6 +12,11 @@
  * \file kernel_utils_dump_constants.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/utils/kernel_utils_dump_constants.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_DUMP_CONSTANTS_H
+#endif
 #ifndef ASCENDC_MODULE_UTILS_DUMP_CONSTANTS_H
 #define ASCENDC_MODULE_UTILS_DUMP_CONSTANTS_H
 #include "utils/kernel_utils_ceil_oom_que.h"
@@ -47,7 +52,7 @@ const uint32_t DUMP_MESSAGE_HEAD_BUFFERID_POS = 5;
 const uint32_t DUMP_MESSAGE_HEAD_POSITION_POS = 6;
 const uint32_t DUMP_MESSAGE_HEAD_DUMP_SIZE_POS = 7;
 const uint32_t DUMP_SCALAR_POS = 8;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 const uint32_t DUMP_CORE_COUNT = 108;
 #ifdef ASCENDC_RECOGNIZE_SIMT_VF
 constexpr uint32_t DUMP_SIMT_CORE_COUNT = 72;
@@ -100,7 +105,7 @@ enum class DumpTensorDataType : uint32_t {
 };
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 namespace ConstantsInternal {
 // L12UBDumpCtrlMessage signal
 const uint32_t L1_2_UB_DUMP_CTRL_SIGNAL_DUMP = 1;
@@ -129,3 +134,7 @@ int32_t TensorWriteFile(const std::string& fileName, const void* buffer, size_t 
 #endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_UTILS_DUMP_CONSTANTS_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_DUMP_CONSTANTS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_DUMP_CONSTANTS_H
+#endif

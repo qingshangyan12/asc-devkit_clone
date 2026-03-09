@@ -12,14 +12,20 @@
  * \file noramlize.h
  * \brief Given mean and variance, calculate rstd and output.
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H
+#endif
+
 #ifndef LIB_NORMALIZATION_NORMALIZE_H
 #define LIB_NORMALIZATION_NORMALIZE_H
 #include "include/adv_api/normalization/normalize_utils.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/normalization/normalize/normalize_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/normalization/normalize/normalize_c310_impl.h"
 #endif
 namespace AscendC {
@@ -86,3 +92,8 @@ __aicore__ inline void Normalize(const LocalTensor<T>& output, const LocalTensor
 } // namespace AscendC
 #endif
 #endif // LIB_NORMALIZATION_NORMALIZE_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZE_H
+#endif

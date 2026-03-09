@@ -35,12 +35,18 @@
  * S4 = 0.9155653738e2
  * S5 = 0.4380524152e2
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ERFC_H
+#endif
+
 #ifndef LIB_MATH_ERFC_H
 #define LIB_MATH_ERFC_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "kernel_tensor.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/math/erfc/erfc_c310_impl.h"
 #else
@@ -126,3 +132,8 @@ __aicore__ inline void Erfc(const LocalTensor<T>& dstTensor, const LocalTensor<T
 } // namespace AscendC
 #endif
 #endif // LIB_MATH_ERFC_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ERFC_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ERFC_H
+#endif

@@ -12,12 +12,18 @@
  * \file exp.h
  */
 
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_EXP_H
+#endif
+
 #ifndef LIB_MATH_EXP_H
 #define LIB_MATH_EXP_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/exp/exp_c310_impl.h"
 #else
 #include "../../../impl/adv_api/detail/math/exp/exp_common_impl.h"
@@ -87,3 +93,8 @@ __aicore__ inline void Exp(const LocalTensor<T>& dstLocal, const LocalTensor<T>&
 }  // namespace AscendC
 #endif
 #endif  // LIB_MATH_EXP_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_EXP_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_EXP_H
+#endif

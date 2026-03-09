@@ -12,7 +12,11 @@
 * \file mx_matmul_utils.h
 * \brief
 */
-
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/matmul/utils/mx_matmul_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MX_MATMUL_UTILS_H
+#endif
 #ifndef IMPL_MATMUL_UTILS_MX_MATMUL_UTILS_H
 #define IMPL_MATMUL_UTILS_MX_MATMUL_UTILS_H
 
@@ -46,7 +50,7 @@ struct GetL0DataType {
     using Type = T;
 };
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 template <> struct GetMmDstType<fp8_e4m3fn_t> {
     using Type = float;
 };
@@ -90,7 +94,7 @@ __aicore__ inline constexpr static int32_t AuxGetC0Size()
     if (sizeof(SrcT) == sizeof(float)) {
         return Impl::B32_C0SIZE;
     }
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     else if (IsTypeOneOfV<SrcT, uint8_t, int8_t, hifloat8_t, fp8_e4m3fn_t, fp8_e5m2_t, fp8_e8m0_t>)
     {
         return Impl::B8_C0SIZE;
@@ -122,7 +126,7 @@ __aicore__ inline constexpr bool IsSupportB8()
     if (IsSameTypeV<SrcT, int8_t>) {
         return true;
     }
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     if (IsTypeOneOfV<SrcT, hifloat8_t, fp8_e4m3fn_t, fp8_e5m2_t>) {
         return true;
     }
@@ -136,7 +140,7 @@ __aicore__ inline constexpr bool IsSupportB4()
     if (IsSameTypeV<SrcT, int4b_t>) {
         return true;
     }
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     if (IsTypeOneOfV<SrcT, fp4x2_e1m2_t, fp4x2_e2m1_t>) {
         return true;
     }
@@ -147,7 +151,7 @@ __aicore__ inline constexpr bool IsSupportB4()
 template <typename SrcT>
 __aicore__ inline constexpr bool IsSupportMxFp4()
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     if (IsTypeOneOfV<SrcT, fp4x2_e1m2_t, fp4x2_e2m1_t>) {
         return true;
     }
@@ -158,7 +162,7 @@ __aicore__ inline constexpr bool IsSupportMxFp4()
 template <typename SrcT>
 __aicore__ inline constexpr bool IsSupportMxFp8()
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     if (IsTypeOneOfV<SrcT, fp8_e4m3fn_t, fp8_e5m2_t>) {
         return true;
     }
@@ -172,7 +176,7 @@ __aicore__ inline constexpr static bool IsNeedC0Align()
     return IsSupportB8<T>() || IsSupportB4<T>();
 }
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 constexpr uint8_t INTRA_MODE = 4;
 template <typename INPUT_TYPE>
 __aicore__ constexpr bool PhyMxScalePosIsL1()
@@ -211,7 +215,7 @@ __aicore__ constexpr int32_t GetBitSize()
     if constexpr (IsSameTypeV<T, AscendC::int4b_t>) {
         return ONE_BYTE_BIT_SIZE / 2;
     }
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     if constexpr (IsTypeOneOfV<T, fp8_e8m0_t, hifloat8_t, fp8_e4m3fn_t, fp8_e5m2_t>) {
         return ONE_BYTE_BIT_SIZE;
     }
@@ -306,7 +310,7 @@ __aicore__ inline constexpr bool InputPhyPosIsUB()
     }
 }
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 template <typename T>
 constexpr bool SupportMXFP8 = IsTypeOneOfV<T, fp8_e4m3fn_t, fp8_e5m2_t, fp4x2_e2m1_t, fp4x2_e1m2_t>;
 #else
@@ -318,3 +322,7 @@ constexpr bool IsMxDisableUnitFlag = (EnUnitFlag(MM_CFG) && HasScalePosition<ATy
     !BType::isTrans || IsStaticPaddingEnable(MM_CFG)) && SupportMXFP8<typename AType::T>);
 } // namespace AscendC
 #endif // _MATMUL_UTILS_H_
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MX_MATMUL_UTILS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MX_MATMUL_UTILS_H
+#endif

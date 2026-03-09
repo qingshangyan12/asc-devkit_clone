@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_cmpsel_intf.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_INTF_H
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_INTERFACE_H
 
@@ -257,7 +262,7 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& s
  * @param [in] count number Number of data involved in calculation
  */
 // One of src0/src1 should be Scalar
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
           const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
 __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode,
@@ -314,3 +319,8 @@ __aicore__ inline void Select(const T2& dst, const LocalTensor<T1>& selMask, con
 
 #include "../../impl/basic_api/kernel_operator_vec_cmpsel_intf_impl.h"
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_INTERFACE_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CMPSEL_INTF_H
+#endif

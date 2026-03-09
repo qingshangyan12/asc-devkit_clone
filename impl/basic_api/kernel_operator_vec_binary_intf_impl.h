@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_binary_intf_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/kernel_operator_vec_binary_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_binary_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_INTF_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
@@ -29,7 +34,7 @@
 #include "dav_m300/kernel_operator_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_binary_impl.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "dav_c310/kernel_operator_vec_binary_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_binary_impl.h"
@@ -298,7 +303,7 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] intriParams.src0RepStride src0 repeat stride
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, bool isSetMask, const DivConfig &config>
 __aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
     const LocalTensor<T> &src1, uint64_t mask[], const uint8_t repeatTime,
@@ -385,7 +390,7 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, const DivConfig& config>
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, const int32_t& count)
@@ -827,7 +832,7 @@ __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 /* **************************************************************************************************
  * ShiftLeft                                             *
  * ************************************************************************************************* */
@@ -1458,7 +1463,7 @@ __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& 
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 /* **************************************************************************************************
  * Prelu                                             *
  * ************************************************************************************************* */
@@ -1586,8 +1591,13 @@ __aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &s
         KERNEL_LOG(KERNEL_ERROR,
                    "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
     });
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    static_assert(SupportType<Tuple<DstPrimType, SrcPrimType>, Tuple<float, half>, Tuple<float, float>>(), "Failed to check dtype in "
+        "ExpSub, current api support dtype combination is src : half / float, dst: float.");
+#else
     static_assert(SupportType<Tuple<DstPrimType, SrcPrimType>, Tuple<half, half>, Tuple<float, float>>(), "Failed to check dtype in " 
         "ExpSub, current api support dtype combination is src and dst both: half / float.");
+#endif
     FusedExpSubImpl<DstPrimType, SrcPrimType>((__ubuf__ DstPrimType *)dst.GetPhyAddr(), (__ubuf__ SrcPrimType *)src0.GetPhyAddr(), 
         (__ubuf__ SrcPrimType *)src1.GetPhyAddr(), count);
 }
@@ -1614,3 +1624,7 @@ __aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_INTF_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_INTF_IMPL_H
+#endif

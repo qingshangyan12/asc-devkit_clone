@@ -12,9 +12,14 @@
  * \file cos_common_impl.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/math/cos/cos_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/cos.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_COS_COS_COMMON_IMPL_H
+#endif
 #ifndef IMPL_MATH_COS_COS_COMMON_IMPL_H
 #define IMPL_MATH_COS_COS_COMMON_IMPL_H
-
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
@@ -23,7 +28,7 @@
 #include "../../api_check/kernel_check/math/cos/cos_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "cos_v220_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
@@ -106,7 +111,7 @@ __aicore__ inline void CosRound(const LocalTensor<float>& inputX, const LocalTen
     /*
     k=round(x/π + 1/2), x0=x-kπ, x0 belongs to [-π, 0], (x0 + π/2) belongs to [-π/2, π/2]
     π=π_0+π_1+π_2+π_3+π_4 achieve final precision compensation.
-    Final solution：
+    Final solution：  
     k = round(x * invpi + 1/2)
     x -= k * pi_0
     x -= k * pi_1
@@ -122,7 +127,7 @@ __aicore__ inline void CosRound(const LocalTensor<float>& inputX, const LocalTen
     Adds<float, false>(roundTensor, roundTensor, COS_POINT_FIVE, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
     // tie to even
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CosCastFullMask(roundTensor, roundTensor, RoundMode::CAST_RINT);
 #else
@@ -143,7 +148,7 @@ __aicore__ inline void SignCompute(const LocalTensor<float>& dstTensor, const Lo
     Muls<float, false>(dstTensor, roundTensor, COS_POINT_FIVE, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CosCastFullMask(dstTensor, dstTensor, RoundMode::CAST_FLOOR);
 #else
@@ -312,3 +317,8 @@ __aicore__ inline void CosImpl(const LocalTensor<T>& dstTensor, const LocalTenso
 }  // namespace AscendC
 
 #endif  // IMPL_MATH_COS_COS_COMMON_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_COS_COS_COMMON_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_COS_COS_COMMON_IMPL_H
+#endif

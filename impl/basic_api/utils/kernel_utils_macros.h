@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,11 +12,16 @@
  * \file kernel_utils_macros.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/utils/kernel_utils_macros.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H
+#endif
 #ifndef ASCENDC_MODULE_UTILS_MACROS_H
 #define ASCENDC_MODULE_UTILS_MACROS_H
 #define USE_ISA_INS 1
 #define GM_ADDR __gm__ uint8_t*
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 #define UB_ADDR __ubuf__ uint8_t*
 #define SSBUF_ADDR __ssbuf__ uint32_t*
 #endif
@@ -113,7 +118,8 @@ enum BinaryMetaType { // 函数级TLV类型
     B_TYPE_BIN_VERSION_INFO = 0,
     B_TYPE_DEBUG_INFO = 1,
     B_TYPE_DYNAMIC_PARAM = 2,
-    B_TYPE_OPTIONAL_PARAM = 3
+    B_TYPE_OPTIONAL_PARAM = 3,
+    B_TYPE_SK_INFO = 5
 };
 
 struct BaseTlv {  // TLV头部定义
@@ -239,7 +245,7 @@ enum class CacheRwMode {
     RW = 3
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 constexpr uint64_t L2_CACHE_OFFSET = 60;
 constexpr uint64_t L2_CACHE_OFFSET_MASK = (1ul << L2_CACHE_OFFSET) - 1;
 template <class T, CacheRwMode rwMode = CacheRwMode::RW>
@@ -328,6 +334,31 @@ struct FunLevelMixCoreType {
     struct FunMetaMixCoreType mixCoreType;
 };
 
+struct SknlMapInfo {
+    uint64_t cap;
+    void* globalFunc;
+    void* sknlFunc[4];
+};
+
+struct FuncMetaSknlMap {
+    BaseTlv head;
+    uint32_t reserved;
+    SknlMapInfo sknlMeta;
+};
+
+template <auto GF, uint64_t cap, auto SK0 = 0xffffffffffffffff, auto SK1 = 0xffffffffffffffff, auto SK2 = 0xffffffffffffffff, auto SK3 = 0xffffffffffffffff>
+struct SknlKernelMap {
+    static constexpr SknlMapInfo value = {cap, (void*)GF, {(void*)SK0, (void*)SK1, (void*)SK2, (void*)SK3}};
+};
+
+#define SK_BIND_NAME_CONCAT_IMPL(a, b) a##b
+#define SK_BIND_NAME_CONCAT(a, b) SK_BIND_NAME_CONCAT_IMPL(a, b)
+
+#define SK_BIND(...)                                                                    \
+__attribute__((used, __section__(".ascend.meta")))                                      \
+static const FuncMetaSknlMap SK_BIND_NAME_CONCAT(g_sknl_map_, __COUNTER__) =            \
+{{B_TYPE_SK_INFO, sizeof(uint32_t) + sizeof(SknlMapInfo)}, 0, SknlKernelMap<__VA_ARGS__>::value}
+
 // In order to pass __COUNTER__ to variable name, need 3 times of MACRO to pass argument
 #define TILING_STRUCT_SECTION_INIT_BASE(counter, val)                                                                \
     static const uint64_t __ascendc_tiling_struct_##counter __attribute__((used, section(".ascendc_tiling."#val))) = \
@@ -392,7 +423,7 @@ struct int4x2_t {
 #endif
 
 #if !defined(ASCENDC_CPU_DEBUG)
-    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
+    #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
         using fp4x2_e2m1_t = float4_e2m1x2_t;
         using fp4x2_e1m2_t = float4_e1m2x2_t;
         using fp8_e5m2_t = float8_e5m2_t;
@@ -451,7 +482,7 @@ extern uint64_t g_tilingKey;
 #define TILING_KEY_LIST(...) (TILING_KEY_LIST_INOUT(__VA_ARGS__))
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 namespace impl_mode {
 #ifdef SUPPORT_OUT_OF_BOUND_INDEX_
 const uint64_t SUPPORT_OUT_OF_BOUND_INDEX = 1;
@@ -496,3 +527,7 @@ constexpr bool g_gm_overflow_check = false;
 #endif
 
 #endif // ASCENDC_MODULE_UTILS_MACROS_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H
+#endif

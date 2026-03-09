@@ -12,6 +12,12 @@
  * \file round_c310_impl.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/math/round/round_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/round.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ROUND_ROUND_C310_IMPL_H
+#endif
 #ifndef IMPL_MATH_ROUND_ROUND_C310_IMPL_H
 #define IMPL_MATH_ROUND_ROUND_C310_IMPL_H
 #include "kernel_tensor.h"
@@ -24,14 +30,14 @@ __simd_vf__ inline void RoundCompute(__ubuf__ T *dstUb, __ubuf__ T *srcUb, uint3
     const uint16_t repeatTimes)
 {
     constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
-    MicroAPI::RegTensor<T> srcReg;
-    MicroAPI::RegTensor<T> dstReg;
-    MicroAPI::MaskReg maskReg;
+    Reg::RegTensor<T> srcReg;
+    Reg::RegTensor<T> dstReg;
+    Reg::MaskReg maskReg;
     for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTimes); ++i) {
-        maskReg = MicroAPI::UpdateMask<T>(calCount);
-        MicroAPI::LoadAlign<T>(srcReg, srcUb + i * repeatElm);
-        MicroAPI::Truncate<T, RoundMode::CAST_RINT>(dstReg, srcReg, maskReg);
-        MicroAPI::StoreAlign<T>(dstUb + i * repeatElm, dstReg, maskReg);
+        maskReg = Reg::UpdateMask<T>(calCount);
+        Reg::LoadAlign<T>(srcReg, srcUb + i * repeatElm);
+        Reg::Truncate<T, RoundMode::CAST_RINT>(dstReg, srcReg, maskReg);
+        Reg::StoreAlign<T>(dstUb + i * repeatElm, dstReg, maskReg);
     }
 }
 
@@ -71,3 +77,8 @@ __aicore__ inline void RoundImpl(
 }
 } // namespace AscendC
 #endif // IMPL_MATH_ROUND_ROUND_C310_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ROUND_ROUND_C310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_ROUND_ROUND_C310_IMPL_H
+#endif

@@ -12,6 +12,12 @@
  * \file matmul_server.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/matmul/kfc/matmul_server.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul_client.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_KFC_MATMUL_SERVER_H
+#endif
+
 #ifndef IMPL_MATMUL_KFC_MATMUL_SERVER_H
 #define IMPL_MATMUL_KFC_MATMUL_SERVER_H
 
@@ -285,6 +291,9 @@ public:
         uint64_t &offsetSize, uint32_t &enSequentialWrite, bool hasSetWorkspace = false);
     __aicore__ inline bool StartIterate(MsgTmpPos MatmulConfigParams* body, KFC_Enum funID, uint32_t sync, uint32_t &cntIterator);
     __aicore__ inline bool Iterate(MSG_POS KfcMsg* msg, KFC_Enum funID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+    __aicore__ inline void SuperKernelEventCount(uint16_t eventID);
+#endif
     __aicore__ inline void QuantCacheRefresh(__gm__ KfcMsg* msg)
     {
         if constexpr (((IsSameType<SrcT, int4b_t>::value || IsSameType<SrcT, int8_t>::value) && IsSameType<DstT, half>::value) ||
@@ -532,4 +541,8 @@ private:
 #endif
 };
 } // namespace AscendC
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_KFC_MATMUL_SERVER_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_KFC_MATMUL_SERVER_H
 #endif // __MATMUL_SERVER_H__

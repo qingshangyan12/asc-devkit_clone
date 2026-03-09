@@ -12,7 +12,10 @@
  * \file kernel_operator_block_sync_intf.h
  * \brief
  */
-
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_BLOCK_SYNC_INTF_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_BLOCK_SYNC_INTF_H
 #define ASCENDC_MODULE_OPERATOR_BLOCK_SYNC_INTF_H
 
@@ -41,7 +44,7 @@ template <pipe_t pipe>
 __aicore__ inline void PipeBarrier();
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||       \
-    (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) ||       \
+    (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||       \
     (__NPU_ARCH__ == 3003) ||                                 \
     (__NPU_ARCH__ == 3113))
 template <MemDsbT arg0>
@@ -73,7 +76,7 @@ template <bool isAIVOnly = true>
 __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace,
                                  const int32_t usedCores = 0);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
 __aicore__ inline void SyncAll();
 #else
@@ -98,3 +101,7 @@ public:
 
 #include "../../impl/basic_api/kernel_operator_block_sync_intf_impl.h"
 #endif // KERNEL_BLOCK_SYNC_INTF_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_BLOCK_SYNC_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_BLOCK_SYNC_INTF_H
+#endif

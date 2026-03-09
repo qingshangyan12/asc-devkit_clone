@@ -12,6 +12,12 @@
  * \file antiquantize.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ANTIQUANTIZE_H
+#endif
+
 #ifndef LIB_QUANTIZATION_ANTIQUANTIZE_H
 #define LIB_QUANTIZATION_ANTIQUANTIZE_H
 #include "kernel_basic_intf.h"
@@ -20,7 +26,7 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 /*!
  * \ingroup AntiQuantize
  * \brief For AntiQuantizeParams {m, n, groupSize}, m means src tensor has m rows, each row has n num;
@@ -78,3 +84,8 @@ __aicore__ inline void AntiQuantize(const LocalTensor<DstT>& dstTensor, const Lo
 #pragma end_pipe
 } // namespace AscendC
 #endif // LIB_QUANTIZATION_ANTIQUANTIZE_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ANTIQUANTIZE_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ANTIQUANTIZE_H
+#endif

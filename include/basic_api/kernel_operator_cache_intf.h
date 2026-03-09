@@ -12,6 +12,11 @@
  * \file kernel_operator_cache_intf.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CACHE_INTF_H
+#endif
+
 
 #ifndef ASCENDC_MODULE_OPERATOR_CACHE_INTF_H
 #define ASCENDC_MODULE_OPERATOR_CACHE_INTF_H
@@ -35,7 +40,7 @@ template <typename T>
 __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const T cacheOffset);
 
 #if defined(__NPU_ARCH__) &&            \
-    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
 
@@ -45,7 +50,7 @@ __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
 
 #if defined(__NPU_ARCH__) &&                                                            \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) ||      \
-    (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
 #endif
@@ -59,3 +64,7 @@ __aicore__ inline int64_t GetICachePreloadStatus();
 #include "../../impl/basic_api/kernel_operator_cache_intf_impl.h"
 #endif // KERNEL_CACHE_INTF_H
 
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CACHE_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CACHE_INTF_H
+#endif

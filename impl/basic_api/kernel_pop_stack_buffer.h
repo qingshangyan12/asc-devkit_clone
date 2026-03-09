@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,6 +12,11 @@
  * \file kernel_pop_stack_buffer.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/kernel_pop_stack_buffer.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_POP_STACK_BUFFER_H
+#endif
 #ifndef TIKCFW_IMPL_KERNEL_POP_STACK_BUFFER_H
 #define TIKCFW_IMPL_KERNEL_POP_STACK_BUFFER_H
 
@@ -24,7 +29,7 @@ template <TPosition pos> __aicore__ inline uint64_t GetEndAddress()
     // the last 64B reserved for ub kfc msg send
 #if __NPU_ARCH__ == 2201
     return TOTAL_UB_SIZE - sizeof(KfcMsg);
-#elif (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     return TMP_UB_OFFSET;
 #else
     return TOTAL_UB_SIZE;
@@ -84,4 +89,8 @@ template <TPosition pos> __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuf
     return true;
 }
 } // namespace AscendC
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_POP_STACK_BUFFER_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_POP_STACK_BUFFER_H
 #endif

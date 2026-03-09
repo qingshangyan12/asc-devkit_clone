@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_binary_scalar_intf.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_INTF_H
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_INTERFACE_H
 
@@ -62,7 +67,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -92,7 +97,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -133,7 +138,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -163,7 +168,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -204,7 +209,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -234,7 +239,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -275,7 +280,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -305,7 +310,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -465,7 +470,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 /* **************************************************************************************************
  * Subs                                             *
  * ************************************************************************************************* */
@@ -644,3 +649,8 @@ __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &sr
 
 #include "../../impl/basic_api/kernel_operator_vec_binary_scalar_intf_impl.h"
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_INTERFACE_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_INTF_H
+#endif

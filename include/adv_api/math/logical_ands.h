@@ -13,10 +13,16 @@
  * \brief
  */
 
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_ANDS_H
+#endif
+
 #ifndef LIB_MATH_LOGICAL_ANDS_H
 #define LIB_MATH_LOGICAL_ANDS_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/math/logical_ands/logical_ands_common_impl.h"
 
@@ -39,3 +45,8 @@ __aicore__ inline void LogicalAnds(const LocalTensor<T>& dst, const U& src0, con
 } // namespace AscendC
 #endif
 #endif // LIB_MATH_LOGICAL_ANDS_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_ANDS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_ANDS_H
+#endif

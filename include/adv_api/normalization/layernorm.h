@@ -12,15 +12,21 @@
  * \file layernorm.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LAYERNORM_H
+#endif
+
 #ifndef LIB_NORMALIZATION_LAYERNORM_H
 #define LIB_NORMALIZATION_LAYERNORM_H
 #include "include/adv_api/normalization/layernorm_utils.h"
 #include "../../../impl/adv_api/detail/normalization/layernorm/layernorm_normal_config.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/normalization/layernorm/layernorm_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/normalization/layernorm/layernorm_c310_impl.h"
 #include "../../../impl/adv_api/detail/normalization/layernorm/regbase/c310/layernorm_variance_impl.h"
 #endif
@@ -183,3 +189,8 @@ __aicore__ inline void WelfordUpdate(const LocalTensor<U>& outputMean, const Loc
 } // namespace AscendC
 #endif
 #endif // LIB_NORMALIZATION_LAYERNORM_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LAYERNORM_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LAYERNORM_H
+#endif

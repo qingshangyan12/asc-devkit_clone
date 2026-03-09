@@ -18,6 +18,15 @@
 #include <cstdint>
 #include "impl/utils/sys_constants.h"
 
+#if (defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1))
+#include "stub_def.h"
+using float4_e1m2x2_t = fp4x2_e1m2_t;
+using float4_e2m1x2_t = fp4x2_e2m1_t;
+using float8_e4m3_t = fp8_e4m3fn_t;
+using float8_e5m2_t = fp8_e5m2_t;
+using float8_e8m0_t = fp8_e8m0_t;
+#endif
+
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
 // For ascc preprocess: __global__ should not be replaced
 #ifdef __ASCC_PRE__
@@ -45,11 +54,11 @@
 #define K_MAX_SHAPE_DIM 8
 #endif
 
-#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
+#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
 #define SPLIT_CORE_CUBE
 #endif
 
-#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101))
+#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
 #define SPLIT_CORE_VEC
 #endif
 

@@ -12,6 +12,12 @@
  * \file kernel_operator_mm_check.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/kernel_operator_mm_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_mm_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_CHECK_H
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_MM_CHECK_H
 #define ASCENDC_MODULE_OPERATOR_MM_CHECK_H
 
@@ -108,7 +114,7 @@ __aicore__ static inline void CheckLoadData3dv2ChannelSize(const uint16_t channe
     }
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                     \
       (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) ||                     \
-      (__NPU_ARCH__ == 3101))
+      (__NPU_ARCH__ == 3510))
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102 || (__NPU_ARCH__ == 3003) ||  \
     (__NPU_ARCH__ == 3113))
     if constexpr (IsSameType<PrimT<T>, half>::value) {
@@ -180,3 +186,7 @@ __aicore__ static inline void CheckLoadData3dv2MatrixParams(const uint16_t kExte
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_CHECK_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_CHECK_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_CHECK_H
+#endif

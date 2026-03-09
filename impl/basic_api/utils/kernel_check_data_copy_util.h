@@ -12,7 +12,11 @@
  * \file kernel_check_data_copy_util.h
  * \brief
  */
-
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/utils/kernel_check_data_copy_util.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_DATA_COPY_UTIL_H
+#endif
 #ifndef ASCENDC_CHECK_DATA_COPY_UTIL_H
 #define ASCENDC_CHECK_DATA_COPY_UTIL_H
 #if ASCENDC_CPU_DEBUG
@@ -267,7 +271,7 @@ inline std::string GetDstIDString(Hardware dstScope, BlockMode blockMode)
 {
     std::string dstIDString = "";
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                       \
-    (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) ||                       \
+    (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
 	(__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     if ((dstScope == Hardware::UB) || (dstScope == Hardware::L1) || (dstScope == Hardware::GM) ||
         (dstScope == Hardware::BIAS) || (dstScope == Hardware::FIXBUF)) {
@@ -393,4 +397,8 @@ bool CheckFuncDataCopySliceImpl(DataCopySliceApiParams &chkParams, const char* i
 } // namespace check
 } // namespace AscendC
 #endif
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_DATA_COPY_UTIL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_DATA_COPY_UTIL_H
 #endif

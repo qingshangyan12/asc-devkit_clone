@@ -13,6 +13,12 @@
  * \brief
  */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/matmul/stage/split/load_to_l0a/load_to_l0a_load2dV2.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_LOAD_TO_L0A_LOAD2DV2_H
+#endif
+
 #ifndef IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_LOAD2DV2_H
 #define IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_LOAD2DV2_H
 
@@ -141,7 +147,7 @@ private:
      uint16_t aL1K, uint16_t madM, uint16_t madK, uint16_t aL1MOffset, uint16_t aL1KOffset,
      const LocalTensor<AuxDtype> &l1AAuxMatrix, uint16_t aAuxL1K, uint16_t aAuxL1KOffset, uint16_t aAuxL1MOffset) const
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         uint16_t mStep = CeilDiv(madM, HW_M0);
         uint16_t kStep = CeilDiv(madK, c0Size_);
 
@@ -177,7 +183,7 @@ private:
      uint16_t aL1M, uint16_t madM, uint16_t madK, uint16_t aL1MOffset, uint16_t aL1KOffset,
      const LocalTensor<AuxDtype> &l1AAuxMatrix, uint16_t aAuxL1K, uint16_t aAuxL1KOffset, uint16_t aAuxL1MOffset) const
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         uint16_t mStep = CeilDiv(madM, HW_M0);
         uint16_t kStep = CeilDiv(madK, c0Size_);
 
@@ -212,4 +218,8 @@ private:
 }  // namespace Detail
 }  // namespace Impl
 }  // namespace AscendC
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_LOAD_TO_L0A_LOAD2DV2_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_LOAD_TO_L0A_LOAD2DV2_H
 #endif // IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_LOAD2DV2_H

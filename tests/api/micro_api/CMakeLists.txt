@@ -20,11 +20,11 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_DIR}
     ${ASCENDC_DIR}/include
     ${ASCENDC_DIR}/include/basic_api
-    ${ASCENDC_DIR}/include/micro_api
+    ${ASCENDC_DIR}/include/basic_api/reg_compute
     ${ASCENDC_DIR}/include/utils
     ${ASCENDC_DIR}/impl
     ${ASCENDC_DIR}/impl/basic_api
-    ${ASCENDC_DIR}/impl/micro_api
+    ${ASCENDC_DIR}/impl/basic_api/reg_compute
 )
 
 # # ================ micro_api kernel ut ================
@@ -49,7 +49,7 @@ foreach(product_type ${MICRO_PRODUCT_TYPE_LIST})
         UT_TEST
         ASCENDC_OOM=1
         ASCENDC_DUMP=0
-        $<$<STREQUAL:${product_type},ascend950pr_9599>:__NPU_ARCH__=3101;__DAV_C310__;__DAV_C310_VEC__>
+        $<$<STREQUAL:${product_type},ascend950pr_9599>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_VEC__>
         $<$<STREQUAL:${product_type},mc62cm12aa>:__NPU_ARCH__=5102>
     )
 

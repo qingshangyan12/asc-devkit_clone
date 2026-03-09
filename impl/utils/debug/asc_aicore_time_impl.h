@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -15,15 +15,9 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_TIME_IMPL__
-#warning "asc_aicore_time_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
-#endif
-
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
 #include "impl/utils/debug/asc_debug_utils.h"
 
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3101
 namespace __asc_aicore {
 __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
 {
@@ -56,31 +50,45 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
 
 __aicore__ inline void asc_time_stamp(uint32_t desc_id)
 {
+#if defined(ASCENDC_TIME_STAMP_ON) && !defined(ASCENDC_CPU_DEBUG)
     enable_asc_diagnostics();
     asc_time_stamp_impl(desc_id);
+#endif
 }
 
 __aicore__ inline void asc_prof_start()
 {
+#ifndef ASCENDC_CPU_DEBUG
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
     bisheng::cce::metrics_prof_start();
+#endif
+#endif
 }
 
 __aicore__ inline void asc_prof_stop()
 {
+#ifndef ASCENDC_CPU_DEBUG
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
     bisheng::cce::metrics_prof_stop();
+#endif
+#endif
 }
 
-#if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510
 template<pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
+#ifndef ASCENDC_CPU_DEBUG
     bisheng::cce::mark_stamp<pipe>(idx);
+#endif
 }
 
 template<pipe_t pipe, uint16_t idx>
 __aicore__ inline void asc_mark_stamp()
 {
+#ifndef ASCENDC_CPU_DEBUG
     bisheng::cce::mark_stamp<pipe>(idx);
+#endif
 }
 #endif
 } // namespace __asc_aicore
@@ -92,9 +100,9 @@ constexpr uint32_t ASC_PROF_STOP_EVENT = 0xc0000000;
 
 __aicore__ inline void prof_mark_event(void)
 {
-    if (g_coreType == AIV) {
+    if (g_coreType == AscendC::AIV) {
         __asm__ volatile("NOP_BAR.V");
-    } else if (g_coreType == AIC) {
+    } else if (g_coreType == AscendC::AIC) {
         __asm__ volatile("NOP_BAR.M");
         __asm__ volatile("NOP_BAR.MTE1");
     } else {
@@ -115,7 +123,7 @@ __aicore__ inline void prof_mark_event(void)
 #define TRACE_STOP_INTERNAL(N, ...) TRACE_STOP_FUNC(N, __VA_ARGS__)
 #define TRACE_STOP_FUNC(N, ...) TRACE_STOP_##N(__VA_ARGS__)
 #define TRACE_STOP_IMPL(...) TRACE_STOP_INTERNAL(GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510
 #define TRACE_START_2(pipe, idx) asc_mark_stamp<pipe>(idx)
 #define TRACE_STOP_2(pipe, idx) asc_mark_stamp<pipe>(idx)
 #else
@@ -130,7 +138,7 @@ __aicore__ inline void TRACE_STOP_1(TraceId apid)
 {}
 
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
-      (__NPU_ARCH__ == 3113)) || (__NPU_ARCH__ == 3101)
+      (__NPU_ARCH__ == 3113)) || (__NPU_ARCH__ == 3510)
     #define TRACE_START_1(apid)                                          \
     do {                                                           \
         uint32_t v = (ASC_PROF_START_EVENT | static_cast<uint32_t>(apid));                               \

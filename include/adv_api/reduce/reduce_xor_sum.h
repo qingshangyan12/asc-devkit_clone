@@ -12,13 +12,19 @@
  * \file reduce_xor_sum.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_XOR_SUM_H
+#endif
+
 #ifndef LIB_REDUCE_REDUCE_XOR_SUM_H
 #define LIB_REDUCE_REDUCE_XOR_SUM_H
 
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/reduce/reduce_xor_sum/reduce_xor_sum_c310_impl.h"
 #else
 #include "../../../impl/adv_api/detail/reduce/reduce_xor_sum/reduce_xor_sum_common_impl.h"
@@ -28,7 +34,7 @@
 #include <type_traits>
 #endif
 
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102))
 
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -88,3 +94,8 @@ __aicore__ inline void ReduceXorSum(LocalTensor<T>& dstTensor, const LocalTensor
 #endif
 
 #endif  // LIB_REDUCE_XOR_SUM_REDUCE_XOR_SUM_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_XOR_SUM_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_REDUCE_XOR_SUM_H
+#endif

@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -13,6 +13,11 @@
  * \brief
  */
 
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/dav_l311/kernel_operator_vec_createvecindex_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
 #include "kernel_tensor.h"
@@ -44,20 +49,20 @@ __aicore__ inline void VecCreateVecIndexLevel0VFImpl(__ubuf__ T *dst, const T fi
     constexpr uint16_t sreg = GetVecLen() / sizeof(T);
     uint32_t count = VecMicroGetCount<true, isNormalMode, isMaskBitMode>(maskArray, maskCount, maskBuf);
     uint16_t newRepeatTimes = VecMicroGetRepeatTimes<T, isNormalMode>(count, repeatTime);
-    MicroAPI::MaskReg maskReg;
+    Reg::MaskReg maskReg;
     if constexpr (isNormalMode) {
         maskReg = VecMicroGetMaskReg<T, true, isNormalMode, isMaskBitMode>(maskBuf, count);
     }
     constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
-    MicroAPI::RegTensor<T> dstVreg;
-    MicroAPI::Arange(dstVreg, firstValue);
+    Reg::RegTensor<T> dstVreg;
+    Reg::Arange(dstVreg, firstValue);
     for (uint16_t index = 0; index < newRepeatTimes; ++index) {
         if constexpr (!isNormalMode) {
             maskReg = VecMicroGetMaskReg<T, true, isNormalMode, isMaskBitMode>(maskBuf, count);
         }
-        MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+        Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
             dst + index * dstRepStride * ElePerBlkT, dstVreg, dstBlkStride, maskReg);
-        MicroAPI::Adds(dstVreg, dstVreg, static_cast<int32_t>(sreg), maskReg);
+        Reg::Adds(dstVreg, dstVreg, static_cast<int32_t>(sreg), maskReg);
     }
 }
 
@@ -134,3 +139,7 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> dstLocal, const T first
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CREATEVECINDEX_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
+#endif

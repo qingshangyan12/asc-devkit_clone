@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,6 +12,11 @@
  * \file kernel_operator_print_impl.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/dav_c310/kernel_operator_print_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PRINT_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_PRINT_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_PRINT_IMPL_H
 
@@ -19,6 +24,7 @@
 #include "kernel_operator_common_impl.h"
 #include "kernel_operator_data_copy_impl.h"
 #include "kernel_pop_stack_buffer.h"
+#include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 namespace AscendC {
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
@@ -241,16 +247,16 @@ __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* 
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-    uint64_t ctrlValue = get_ctrl();
-    set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE,
         dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         PrintfRingBufImpl(printType, fmt, args...);
     } else {
+        uint64_t ctrlValue = get_ctrl();
+        set_atomic_none();
         PrintfEntityImpl(printType, fmt, args...);
+        set_ctrl(ctrlValue);
     }
-    set_ctrl(ctrlValue);
 }
 
 template <uint64_t timeoutCycle = 15 * 1000 * 1000> // 20ms * 15
@@ -289,8 +295,8 @@ __aicore__ __gm__ inline BlockRingBufInfo* GetBlockRingBufInfo()
     } else {
         ringBufInfo->flag = 0;
     }
-    bisheng::cce::dcci((__gm__ uint64_t*)ringBufInfo, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE,
-        bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)ringBufInfo, cache_line_t::ENTIRE_DATA_CACHE,
+        dcci_dst_t::CACHELINE_OUT);
     return ringBufInfo;
 }
 
@@ -447,15 +453,6 @@ __aicore__ constexpr uint32_t AlignTlvLen(const uint32_t& dataLen)
     return ((dataLen + num) & ~num) + num + 1;
 }
 
-template <typename... Args>
-__aicore__ inline uint32_t GetPrintTlvLen(uint32_t& argsNum, __gm__ const char* fmt, Args&&... args)
-{
-    constexpr uint32_t printInfoLen = sizeof(PrintTlvInfoHead);
-    const uint32_t& fmtLen = GetStringLength(fmt);
-    const uint32_t& argsLen = GetPrintArgsLen(argsNum, args...);
-    return AlignTlvLen(printInfoLen + argsLen + fmtLen); // gm need 8 byte align
-}
-
 __aicore__ inline void WriteRingBufTlvHead(
     DumpType printType, __gm__ PrintTlvInfoHead* printTlv, const uint32_t& tlvLen, const uint32_t& argsNum)
 {
@@ -484,29 +481,13 @@ __aicore__ inline void WriteRingBufTlvData(__gm__ PrintTlvInfoHead* printTlv, __
 template <class... Args>
 __aicore__ inline void PrintfRingBufImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-#ifdef ASCENDC_DUMP
-    EnablePrintf();
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    uint32_t argsNum = 0;
-    const uint32_t& tlvLen = GetPrintTlvLen(argsNum, fmt, args...);
-    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
-        return;
-    }
-
-    __gm__ PrintTlvInfoHead* printTlv = reinterpret_cast<__gm__ PrintTlvInfoHead*>(GetRingBufTlv(blockRingBufInfo));
-
-    WriteRingBufTlvHead(printType, printTlv, tlvLen, argsNum);
-    WriteRingBufTlvData(printTlv, fmt, args...);
-
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-
-    UpdateWriteInfo(writeInfo, tlvLen);
-#endif // ASCENDC_DUMP
+    __asc_aicore::printf_impl(fmt, args...);
 }
 
 
 }  // namespace AscendC
+#endif
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PRINT_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PRINT_IMPL_H
 #endif

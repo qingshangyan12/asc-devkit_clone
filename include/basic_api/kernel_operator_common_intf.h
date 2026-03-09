@@ -12,6 +12,11 @@
  * \file kernel_operator_common_intf.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_H
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_H
 
@@ -62,7 +67,7 @@ __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atom
 
 __aicore__ inline void CheckLocalMemoryIA(const CheckLocalMemoryIAParam& checkParams);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 
 template <int8_t startBit, int8_t endBit>
 __aicore__ static inline void SetCtrlSpr(int64_t value);
@@ -77,3 +82,8 @@ __aicore__ static inline void ResetCtrlSpr();
 
 #include "../../impl/basic_api/kernel_operator_common_intf_impl.h"
 #endif  // ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_H
+#endif

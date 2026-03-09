@@ -12,6 +12,12 @@
 * \file xor_c310_impl.h
 * \brief
 */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/math/xor/xor_c310_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/xor.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_XOR_XOR_C310_IMPL_H
+#endif
 #ifndef IMPL_MATH_XOR_XOR_C310_IMPL_H
 #define IMPL_MATH_XOR_XOR_C310_IMPL_H
 #include "kernel_basic_intf.h"
@@ -26,17 +32,17 @@ template<typename T>
 __simd_vf__ inline void XorCompute(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1,
     uint32_t calCount, uint16_t repeatTimes)
 {
-    MicroAPI::MaskReg mask;
-    MicroAPI::RegTensor<T> dstVreg;
-    MicroAPI::RegTensor<T> src0Vreg;
-    MicroAPI::RegTensor<T> src1Vreg;
+    Reg::MaskReg mask;
+    Reg::RegTensor<T> dstVreg;
+    Reg::RegTensor<T> src0Vreg;
+    Reg::RegTensor<T> src1Vreg;
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
     for (uint16_t i = 0; i < repeatTimes; ++i) {
-        mask = MicroAPI::UpdateMask<T>(calCount);
-        MicroAPI::LoadAlign(src0Vreg, src0 + i * oneRepSize);
-        MicroAPI::LoadAlign(src1Vreg, src1 + i * oneRepSize);
-        MicroAPI::Xor(dstVreg, src0Vreg, src1Vreg, mask);
-        MicroAPI::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
+        mask = Reg::UpdateMask<T>(calCount);
+        Reg::LoadAlign(src0Vreg, src0 + i * oneRepSize);
+        Reg::LoadAlign(src1Vreg, src1 + i * oneRepSize);
+        Reg::Xor(dstVreg, src0Vreg, src1Vreg, mask);
+        Reg::StoreAlign(dst + i * oneRepSize, dstVreg, mask);
     }
 }
 } // namespace XorAPI
@@ -64,3 +70,8 @@ __aicore__ inline void XorImpl(const LocalTensor<T>& dstTensor, const LocalTenso
 }
 } // namespace AscendC
 #endif // IMPL_MATH_XOR_XOR_C310_IMPL_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_XOR_XOR_C310_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_XOR_XOR_C310_IMPL_H
+#endif

@@ -12,6 +12,10 @@
  * \file kernel_struct_data_copy.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_DATA_COPY_H
+#endif
 #ifndef ASCENDC_MODULE_STRUCT_DATA_COPY_H
 #define ASCENDC_MODULE_STRUCT_DATA_COPY_H
 
@@ -73,7 +77,7 @@ enum class DataCopyMVType : uint8_t {
     OUT_TO_UB = 1,
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct NdDmaConfig {
     static constexpr uint16_t unsetPad = 0xffff;
     bool isNearestValueMode = false;
@@ -183,7 +187,7 @@ struct DataCopyPadParams {
     uint64_t paddingValue = 0;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct DataCopyExtParams {
     __aicore__ DataCopyExtParams() {}
 
@@ -223,7 +227,7 @@ struct DataCopyExtParams {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T> struct DataCopyPadExtParams {
     using TYPE = typename GetPadValueType<T>::Type;
     __aicore__ DataCopyPadExtParams()
@@ -266,7 +270,7 @@ struct DataCopyPadExtParams {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct Nd2NzParams {
     __aicore__ Nd2NzParams() {}
 
@@ -344,7 +348,7 @@ struct Nz2NdParamsFull {
     uint16_t dstNdMatrixStride = 1;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct Dn2NzParams {
     __aicore__ Dn2NzParams() {}
 
@@ -442,3 +446,7 @@ struct CopyRepeatParams {
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_STRUCT_DATA_COPY_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_DATA_COPY_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_DATA_COPY_H
+#endif

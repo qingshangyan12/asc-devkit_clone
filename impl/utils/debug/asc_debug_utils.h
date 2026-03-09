@@ -15,12 +15,6 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_DEBUG_UTILS_H
 #define IMPL_UTILS_DEBUG_ASC_DEBUG_UTILS_H
 
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__
-#warning "asc_debug_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
-#endif
-
 #include <type_traits>
 
 #include "impl/utils/sys_macros.h"
@@ -31,7 +25,7 @@
 #include "impl/utils/debug/npu_arch_2002/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
-#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_debug_utils_impl.h"
 #endif
 
@@ -243,6 +237,9 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
     }
     return true;
 }
+
+template <typename T>
+__aicore__ constexpr inline DumpTensorDataType get_dump_datatype_impl();
 
 template <typename T>
 __aicore__ constexpr inline DumpTensorDataType get_dump_datatype()

@@ -12,10 +12,16 @@
  * \file fma_check.h
  * \brief
  */
-#ifndef IMPL_API_CHECK_KERNEL_CHECK_MATH_FMA_FMA_CHECK_H
-#define IMPL_API_CHECK_KERNEL_CHECK_MATH_FMA_FMA_CHECK_H
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/api_check/kernel_check/math/fma/fma_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/fma.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_FMA_CHECK_H
+#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#ifndef IMPL_API_CHECK_KERNEL_CHECK_MATH_FMA_FMA_CHECK_H_
+#define IMPL_API_CHECK_KERNEL_CHECK_MATH_FMA_FMA_CHECK_H_
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "fma_check_common.h"
 #endif
 
@@ -26,11 +32,16 @@ __aicore__ inline void CheckFuncFma(__gm__ const char* name, const LocalTensor<T
     const LocalTensor<T>& src1, const LocalTensor<T>& src2, const LocalTensor<uint8_t>& sharedTmpBuffer, 
     const uint32_t count)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     CheckFuncClassFma<T, isReuseSource> checkFun(name);
     checkFun.VerifyingParameters(dst, src0, src1, src2, sharedTmpBuffer, count);
 #endif
 }
 }
 }
-#endif // IMPL_API_CHECK_KERNEL_CHECK_MATH_FMA_FMA_CHECK_H
+#endif // IMPL_API_CHECK_KERNEL_CHECK_MATH_FMA_FMA_CHECK_H_
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_FMA_CHECK_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_FMA_CHECK_H
+#endif

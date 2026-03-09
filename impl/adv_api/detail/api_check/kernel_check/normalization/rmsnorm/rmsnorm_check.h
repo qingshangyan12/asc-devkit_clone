@@ -12,13 +12,19 @@
  * \file rmsnorm_check.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/adv_api/detail/api_check/kernel_check/normalization/rmsnorm/rmsnorm_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/normalization/rmsnorm.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_RMSNORM_CHECK_H
+#endif
+
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_RMSNORM_RMSNORM_CHECK_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_RMSNORM_RMSNORM_CHECK_H_
 
 #include "kernel_tiling/kernel_tiling.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "rmsnorm_check_common.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #include "rmsnorm_check_c310.h"
 #else
 #include "rmsnorm_check_aicore.h"
@@ -39,3 +45,8 @@ __aicore__ inline void CheckFuncRmsNorm(__gm__ const char *apiName, const LocalT
 }
 }
 #endif // IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_RMSNORM_RMSNORM_CHECK_H_
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_RMSNORM_CHECK_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_RMSNORM_CHECK_H
+#endif

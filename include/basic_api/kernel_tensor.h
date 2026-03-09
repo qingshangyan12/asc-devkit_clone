@@ -12,6 +12,11 @@
  * \file kernel_tensor.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_H
+#endif
+
 #ifndef KERNEL_TENSOR_H
 #define KERNEL_TENSOR_H
 
@@ -185,7 +190,7 @@ public:
     __aicore__ inline void operator = (const SymbolOverrideDiv<T>& symbolOverride);
     __aicore__ inline void operator = (const SymbolOverrideOr<T>& symbolOverride);
     __aicore__ inline void operator = (const SymbolOverrideAnd<T>& symbolOverride);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     template <typename U> __aicore__ inline void operator = (const SymbolOverrideCompare<U>& symbolOverride);
 #else
     __aicore__ inline void operator = (const SymbolOverrideCompare<float>& symbolOverride);
@@ -219,7 +224,7 @@ private:
     __aicore__ inline void CreateTensor(TPosition pos, uint32_t addr, uint32_t tileSize);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     inline void PrintTypicalFloat(uint32_t len, uint32_t dataSize);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     inline void PrintFp4E2M1(uint32_t len) const;
     inline void PrintFp4E1M2(uint32_t len) const;
 #endif
@@ -252,7 +257,7 @@ public:
     __aicore__ inline ShapeInfo GetShapeInfo() const;
     template<CacheRwMode rwMode = CacheRwMode::RW>
     __aicore__ inline void SetL2CacheHint(CacheMode mode);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     template <typename U> __aicore__ inline GlobalTensor<U> ReinterpretCast() const;
 #endif
 
@@ -294,3 +299,8 @@ private:
 
 #include "../../impl/basic_api/kernel_tensor_impl.h"
 #endif // KERNEL_TENSOR_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_H
+#endif

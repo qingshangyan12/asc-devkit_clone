@@ -12,6 +12,12 @@
  * \file dequantize.h
  * \brief
  */
+
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEQUANTIZE_H
+#endif
+
 #ifndef LIB_QUANTIZATION_DEQUANTIZE_H
 #define LIB_QUANTIZATION_DEQUANTIZE_H
 #include "kernel_tensor.h"
@@ -19,7 +25,7 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 /*!
  * \ingroup Dequantize
  * \brief For DequantizeParams {m, n, groupSize}, m means src tensor has m rows, each row has n num;
@@ -77,3 +83,8 @@ __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const Loca
 #pragma end_pipe
 } // namespace AscendC
 #endif // LIB_QUANTIZATION_DEQUANTIZE_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEQUANTIZE_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEQUANTIZE_H
+#endif

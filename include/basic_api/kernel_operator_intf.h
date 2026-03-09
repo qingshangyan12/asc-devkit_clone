@@ -12,13 +12,18 @@
  * \file kernel_operator_intf.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_INTF_H
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_INTERFACE_H
 #if defined(__NPU_ARCH__) &&                                                                                    \
     ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
-     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3101)) || defined(__ASC_NPU_HOST__)
+     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
 // MICRO API
-#include "micro_api/kernel_micro_intf.h"
+#include "reg_compute/kernel_reg_compute_intf.h"
 #endif
 #include "kernel_prof_trace_intf.h"
 #include "kernel_operator_data_copy_intf.h"
@@ -57,12 +62,12 @@
 
 #include "include/adv_api/kernel_api.h"
 
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
 #include "core_mng/roc/kernel_operator_cube_group_intf.h"
 #include "core_mng/roc/kernel_operator_group_barrier_intf.h"
 #endif
 
-#if ((__NPU_ARCH__ != 3102) && (__NPU_ARCH__ != 3101)) && (__NPU_ARCH__ != 5102)
+#if ((__NPU_ARCH__ != 3102) && (__NPU_ARCH__ != 3510)) && (__NPU_ARCH__ != 5102)
 #include "include/adv_api/filter/dropout.h"
 #include "include/adv_api/activation/sigmoid.h"
 #include "include/adv_api/activation/softmax.h"
@@ -127,8 +132,13 @@
 #include "include/adv_api/reduce/reduce_xor_sum.h"
 #include "include/adv_api/math/cumsum.h"
 #endif
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // SIMT API
 #include "simt_api/cpp/kernel_simt_intf.h"
 #endif
 #endif // ASCENDC_MODULE_OPERATOR_INTERFACE_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_INTF_H
+#endif

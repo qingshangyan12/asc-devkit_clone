@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_binary_intf.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_INTF_H
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H
 
@@ -19,8 +24,8 @@
 #include "kernel_tensor.h"
 #include "kernel_struct_binary.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
-#include "micro_api/kernel_micro_utils.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#include "reg_compute/kernel_reg_compute_utils.h"
 #endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -168,7 +173,7 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] repeatParams.src0RepStride src0 repeat stride
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG>
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
@@ -198,7 +203,7 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const DivConfig& config = DEFAULT_DIV_CONFIG>
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, const int32_t& count);
@@ -409,7 +414,7 @@ template <typename T>
 __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                           const LocalTensor<T>& src1, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /* **************************************************************************************************
  * ShiftLeft                                             *
  * ************************************************************************************************* */
@@ -662,7 +667,7 @@ template <typename T>
 __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                const LocalTensor<T>& src1, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /* **************************************************************************************************
  * Prelu                                             *
  * ************************************************************************************************* */
@@ -740,3 +745,8 @@ __aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<
 #pragma end_pipe
 #include "../../impl/basic_api/kernel_operator_vec_binary_intf_impl.h"
 #endif  // ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H
+
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_INTF_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_INTF_H
+#endif

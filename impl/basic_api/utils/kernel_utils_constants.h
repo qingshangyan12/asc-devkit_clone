@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,6 +12,11 @@
  * \file kernel_utils_constants.h
  * \brief
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/utils/kernel_utils_constants.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CONSTANTS_H
+#endif
 #ifndef ASCENDC_MODULE_UTILS_CONSTANTS_H
 #define ASCENDC_MODULE_UTILS_CONSTANTS_H
 #include "utils/kernel_utils_ceil_oom_que.h"
@@ -89,7 +94,7 @@ constexpr uint32_t INT2_FOUR = 4;
 constexpr uint32_t INT2_BIT_NUM = 2;
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 namespace ConstantsInternal {
 constexpr uint32_t ASCENDC_B4_TWO = 2;
 constexpr uint32_t ASCENDC_B4_BIT_NUM = 4;
@@ -157,7 +162,7 @@ const uint32_t SINGLE_MSG_SIZE = 64;
 const uint32_t CACHE_LINE_SIZE = 64;
 const uint32_t TOTAL_L0C_SIZE = 128 * 1024;
 const uint32_t VECTOR_REG_WIDTH = 256;
-#elif (__NPU_ARCH__ == 3101)
+#elif (__NPU_ARCH__ == 3510)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 248 * 1024;
 const uint32_t TOTAL_UB_SIZE = 248 * 1024;
 const uint32_t TMP_UB_OFFSET = 248 * 1024;
@@ -228,7 +233,7 @@ const uint16_t ONE_PARAM_SIZE = 8;
 const int32_t BLOCK_COUT = 16;
 const uint16_t TWO_BLK_SIZE = 64;
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 const uint16_t AIV_CORE_NUM = 72;
 #else
 const uint16_t AIV_CORE_NUM = 50;
@@ -247,7 +252,7 @@ const uint8_t B16_DATA_NUM_PER_BLOCK = 16;
 const int32_t B16_DATA_NUM_PER_REPEAT = 128;
 const int32_t B32_DATA_NUM_PER_REPEAT = 64;
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 const uint32_t B64_DATA_NUM_PER_REPEAT = 32;
 const uint32_t B4_BYTE_SIZE_PER_REPEAT = 64;
 const uint32_t L1_DUMP_UB_SIZE = TOTAL_UB_SIZE - 32 * 1024;
@@ -272,7 +277,7 @@ constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #elif (__NPU_ARCH__ == 3102)
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
 constexpr size_t RESERVED_WORKSPACE = 0;
@@ -300,7 +305,7 @@ const uint32_t MAX_REPEAT_FLOAT_SIZE = ONE_REPEAT_FLOAT_SIZE * MAX_REPEAT_TIMES;
 const uint32_t MAX_REPEAT_HALF_SIZE = ONE_REPEAT_HALF_SIZE * MAX_REPEAT_TIMES;
 const uint32_t ONE_BLK_HALF_NUM = ONE_BLK_SIZE / B16_BYTE_SIZE;
 const uint32_t ONE_BLK_FLOAT_NUM = ONE_BLK_SIZE / B32_BYTE_SIZE;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 namespace ConstantsInternal {
 const uint32_t ONE_BLK_FP4_NUM = 64;
 const uint32_t ONE_BLK_B2_NUM = 128;
@@ -342,7 +347,7 @@ const uint64_t LOAD_FILTER_H = 24;
 const uint64_t LOAD_FILTER_W = 16;
 const uint64_t LOAD_STRIDE_H = 8;
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 namespace Internal {
 constexpr int32_t TSCM_CROSS_SYNC_ID_MAX = 11;
 }
@@ -435,7 +440,7 @@ template <> inline std::string ScalarToString(half scalarValue)
     return std::to_string(scalarValue.ToFloat());
 }
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                      \
-      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <> inline std::string ScalarToString(bfloat16_t scalarValue)
 {
     return std::to_string(scalarValue.ToFloat());
@@ -462,7 +467,7 @@ void SetModelScatterDst0Tensor(uint64_t dst0, const uint32_t length);
 
 #endif // ASCENDC_CPU_DEBUG
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T> struct GetPadValueType {
     using Type = T;
 };
@@ -590,12 +595,12 @@ using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
 using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
 #endif
-#if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)))
+#if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)))
 using fp8_e8m0_t = uint8_t;
 #elif !defined(ASCENDC_CPU_DEBUG)
 using fp8_e8m0_t = float8_e8m0_t;
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 using mx_fp8_e5m2_t = struct {};
 using mx_fp8_e4m3_t = struct {};
 using mx_fp8_e8m0_t = struct {};
@@ -618,7 +623,7 @@ template <> struct GetDstType<mx_fp8_e8m0_t> {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 struct BasicAPIMaskStruct {
     uint64_t maskArray[MASK_ARRAY_SIZE] = { 0 };
 };
@@ -627,7 +632,7 @@ struct BasicAPIMaskStruct {
 template <typename T>
 __aicore__ constexpr bool IsHalfByteDataType()
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     return SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>();
 #else
     return IsSameType<T, int4b_t>::value;
@@ -672,7 +677,7 @@ struct SizeOfBits<uint2b_t> {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <> struct SizeOfBits<fp4x2_e2m1_t> {
     static constexpr uint32_t value = INT4_BIT_NUM;
 };
@@ -701,7 +706,7 @@ __aicore__ inline bool CheckCastOverlappingHigh(const uint64_t dstAddr, const ui
     return true;
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline constexpr uint8_t CalculatesShiftedBit(uint32_t bufferLen)
 {
     uint8_t pos = 0;
@@ -749,3 +754,7 @@ __aicore__ inline void SuperKernelAutoSyncAllDcciBarrier()
 #endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_UTILS_CONSTANTS_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CONSTANTS_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CONSTANTS_H
+#endif

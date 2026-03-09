@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,6 +12,11 @@
  * \file kernel_operator_data_copy_impl.h
  * \brief AscendC l311 support data copy api.
  */
+#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#pragma message("impl/basic_api/dav_l311/kernel_operator_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
+#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #include "kernel_operator_common_impl.h"
@@ -393,21 +398,21 @@ __simd_vf__ inline void VecCopyLevel0VFImpl(__ubuf__ T *dst, __ubuf__ T *src, co
     uint32_t count = Internal::VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArrayStruct.maskArray, maskCount, maskBuf);
     uint16_t newRepeatTimes = 0;
     newRepeatTimes = Internal::VecMicroGetRepeatTimes<T, isNormalMode>(count, repeatTimes);
-    MicroAPI::MaskReg maskReg;
+    Reg::MaskReg maskReg;
     constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
     if constexpr (isNormalMode) {
         maskReg = Internal::VecMicroGetMaskReg<T, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
         for (uint16_t index = 0; index < newRepeatTimes; ++index) {
-            MicroAPI::RegTensor<T> srcVreg;
-            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(srcVreg,
+            Reg::RegTensor<T> srcVreg;
+            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(srcVreg,
                 src + index * repeatParams.srcRepeatSize * ElePerBlkT, repeatParams.srcStride, maskReg);
-            MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>(
+            Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 dst + index * repeatParams.dstRepeatSize * ElePerBlkT, srcVreg, repeatParams.dstStride, maskReg);
         }
     } else {
-        MicroAPI::RegTensor<T> srcReg;
-        MicroAPI::MaskReg maskReg;
+        Reg::RegTensor<T> srcReg;
+        Reg::MaskReg maskReg;
         uint32_t sreg;
         __ubuf__ T *dstTmp = dst;
         __ubuf__ T *srcTmp = src;
@@ -415,11 +420,11 @@ __simd_vf__ inline void VecCopyLevel0VFImpl(__ubuf__ T *dst, __ubuf__ T *src, co
         uint32_t dstRepeatStride = repeatParams.dstStride * DEFAULT_BLK_NUM;
         sreg = static_cast<uint32_t>(count);
         for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
-                maskReg = MicroAPI::UpdateMask<T>(sreg);
-                MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_LOAD>();
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+                maskReg = Reg::UpdateMask<T>(sreg);
+                Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+                Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
                     srcReg, src, repeatParams.srcStride, srcRepeatStride, maskReg);
-                MicroAPI::DataCopy<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_UPDATE>(
+                Reg::DataCopy<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
                     dst, srcReg, repeatParams.dstStride, dstRepeatStride, maskReg);
         }
     }
@@ -749,3 +754,7 @@ __aicore__ inline __in_pipe__(FIX) __out_pipe__(FIX) void DataCopyL12PTIntf(
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
+#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H)
+#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
+#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H
+#endif
