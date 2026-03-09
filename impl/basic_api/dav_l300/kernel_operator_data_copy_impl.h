@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_data_copy_impl.h
  * \brief AscendC l300 support data copy api.
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_l300/kernel_operator_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
@@ -160,7 +160,7 @@ __aicore__ inline void DataCopyL12BTImpl(const uint64_t dst, __cbuf__ T* src, co
 template <typename T>
 __aicore__ inline void DataCopyL12FBImpl(__fbuf__ T* dst, __cbuf__ T* src, const DataCopyParams &intriParams)
 {
-    // è¯¥APIå±äºISASIï¼Œå¹¶ä¸”ä¸æ”¯æŒå¤šæ¬¡åˆ†é…å†…å­˜ï¼Œåªèƒ½è¿›è¡Œä¸€æ¬¡AllocTensoræ“ä½œï¼Œç„¶åæ¬è¿æ‰€æœ‰æ•°æ®åˆ°FBã€‚å› æ­¤ç›´æ¥è®¾ç½®dst = 0ç¡®ä¿æ•°æ®ä»0å¼€å§‹æ’å¸ƒ
+    // ¸ÃAPIÊôÓÚISASI£¬²¢ÇÒ²»Ö§³Ö¶à´Î·ÖÅäÄÚ´æ£¬Ö»ÄÜ½øĞĞÒ»´ÎAllocTensor²Ù×÷£¬È»ºó°áÔËËùÓĞÊı¾İµ½FB¡£Òò´ËÖ±½ÓÉèÖÃdst = 0È·±£Êı¾İ´Ó0¿ªÊ¼ÅÅ²¼
     dst = 0;
 
     // ISA/API: Is the burst number in total.
@@ -265,14 +265,14 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ uint8_t* dst, __gm__ uint
 template <typename T>
 __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams)
 {
-    uint16_t ndNum = intriParams.ndNum;                         // ndçŸ©é˜µæ•°æ®
-    uint16_t nValue = intriParams.nValue;                       // ndçŸ©é˜µè¡Œæ•°
-    uint16_t dValue = intriParams.dValue;                       // ndçŸ©é˜µåˆ—æ•°ï¼Œè¦æ±‚32Bå¯¹é½
-    uint16_t srcNdMatrixStride = intriParams.srcNdMatrixStride; // æºæ“ä½œæ•°ç›¸é‚»ndçŸ©é˜µèµ·å§‹åœ°å€é—´çš„åç§»ï¼Œè¦æ±‚32Bå¯¹é½
-    uint16_t srcDValue = intriParams.srcDValue;                 // æºæ“ä½œæ•°åŒä¸€ndçŸ©é˜µçš„ç›¸é‚»è¡Œèµ·å§‹åœ°å€é—´çš„åç§» (åˆ‡åˆ†åœºæ™¯ï¼Œè¡Œåœ°å€ä¸è¿ç»­)ï¼Œè¦æ±‚32Bå¯¹é½
-    uint16_t dstNzC0Stride = intriParams.dstNzC0Stride;         // ç›®çš„nzçŸ©é˜µä¸­ï¼Œæ¥è‡ªæºæ“ä½œæ•°åŒä¸€è¡Œçš„å¤šè¡Œæ•°æ®ç›¸é‚»è¡Œèµ·å§‹åœ°å€é—´çš„åç§», å•ä½ï¼šblock
-    uint16_t dstNzNStride = intriParams.dstNzNStride;           // ç›®çš„nzçŸ©é˜µä¸­ï¼ŒZå‹çŸ©é˜µç›¸é‚»è¡Œèµ·å§‹åœ°å€ä¹‹é—´çš„åç§»ï¼Œå•ä½ï¼šblock
-    uint16_t dstNzMatrixStride = intriParams.dstNzMatrixStride; // ç›®çš„nzçŸ©é˜µä¸­ï¼Œç›¸é‚»nzçŸ©é˜µèµ·å§‹åœ°å€é—´çš„åç§»ï¼Œè¦æ±‚32Bå¯¹é½
+    uint16_t ndNum = intriParams.ndNum;                         // nd¾ØÕóÊı¾İ
+    uint16_t nValue = intriParams.nValue;                       // nd¾ØÕóĞĞÊı
+    uint16_t dValue = intriParams.dValue;                       // nd¾ØÕóÁĞÊı£¬ÒªÇó32B¶ÔÆë
+    uint16_t srcNdMatrixStride = intriParams.srcNdMatrixStride; // Ô´²Ù×÷ÊıÏàÁÚnd¾ØÕóÆğÊ¼µØÖ·¼äµÄÆ«ÒÆ£¬ÒªÇó32B¶ÔÆë
+    uint16_t srcDValue = intriParams.srcDValue;                 // Ô´²Ù×÷ÊıÍ¬Ò»nd¾ØÕóµÄÏàÁÚĞĞÆğÊ¼µØÖ·¼äµÄÆ«ÒÆ (ÇĞ·Ö³¡¾°£¬ĞĞµØÖ·²»Á¬Ğø)£¬ÒªÇó32B¶ÔÆë
+    uint16_t dstNzC0Stride = intriParams.dstNzC0Stride;         // Ä¿µÄnz¾ØÕóÖĞ£¬À´×ÔÔ´²Ù×÷ÊıÍ¬Ò»ĞĞµÄ¶àĞĞÊı¾İÏàÁÚĞĞÆğÊ¼µØÖ·¼äµÄÆ«ÒÆ, µ¥Î»£ºblock
+    uint16_t dstNzNStride = intriParams.dstNzNStride;           // Ä¿µÄnz¾ØÕóÖĞ£¬ZĞÍ¾ØÕóÏàÁÚĞĞÆğÊ¼µØÖ·Ö®¼äµÄÆ«ÒÆ£¬µ¥Î»£ºblock
+    uint16_t dstNzMatrixStride = intriParams.dstNzMatrixStride; // Ä¿µÄnz¾ØÕóÖĞ£¬ÏàÁÚnz¾ØÕóÆğÊ¼µØÖ·¼äµÄÆ«ÒÆ£¬ÒªÇó32B¶ÔÆë
 
     ASCENDC_DEBUG_ASSERT(((dValue * sizeof(T)) % BYTE_32_ALIGN == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "dValue should be 32B aligned \n"));
     ASCENDC_DEBUG_ASSERT(((srcNdMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "srcNdMatrixStride should be 32B aligned \n"));
@@ -742,7 +742,7 @@ __aicore__ inline __in_pipe__(FIX) __out_pipe__(FIX) void DataCopyL12PTIntf(
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__
 #endif

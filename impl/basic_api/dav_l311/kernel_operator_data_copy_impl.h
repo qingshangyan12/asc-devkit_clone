@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_data_copy_impl.h
  * \brief AscendC l311 support data copy api.
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_l311/kernel_operator_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
@@ -148,7 +148,7 @@ __aicore__ inline void DataCopyUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, const D
 template <typename T>
 __aicore__ inline void DataCopyUB2UBImpl(__ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams)
 {
-    // å½“å‰#1018å®ç°æœ‰é—®é¢˜ï¼Œéœ€è¦æ‰‹åŠ¨æ‹¼1017çš„configå€¼
+    // µ±Ç°#1018ÊµÏÖÓĞÎÊÌâ£¬ĞèÒªÊÖ¶¯Æ´1017µÄconfigÖµ
     uint64_t config = ((uint64_t)intriParams.dstStride << 48) +
         (((uint64_t)intriParams.srcStride) << 32) +
         (((uint64_t)intriParams.blockLen) << 16) +
@@ -188,7 +188,7 @@ __aicore__ inline void DataCopyL12BTImpl(const uint64_t dst, __cbuf__ T* src, co
 template <typename T>
 __aicore__ inline void DataCopyL12FBImpl(__fbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
-    // è¯¥APIå±äºISASIï¼Œå¹¶ä¸”ä¸æ”¯æŒå¤šæ¬¡åˆ†é…å†…å­˜ï¼Œåªèƒ½è¿›è¡Œä¸€æ¬¡AllocTensoræ“ä½œï¼Œç„¶åæ¬è¿æ‰€æœ‰æ•°æ®åˆ°FBã€‚å› æ­¤ç›´æ¥è®¾ç½®dst = 0ç¡®ä¿æ•°æ®ä»0å¼€å§‹æ’å¸ƒ
+    // ¸ÃAPIÊôÓÚISASI£¬²¢ÇÒ²»Ö§³Ö¶à´Î·ÖÅäÄÚ´æ£¬Ö»ÄÜ½øĞĞÒ»´ÎAllocTensor²Ù×÷£¬È»ºó°áÔËËùÓĞÊı¾İµ½FB¡£Òò´ËÖ±½ÓÉèÖÃdst = 0È·±£Êı¾İ´Ó0¿ªÊ¼ÅÅ²¼
     dst = 0;
 
     // ISA/API: Is the burst number in total.
@@ -754,7 +754,7 @@ __aicore__ inline __in_pipe__(FIX) __out_pipe__(FIX) void DataCopyL12PTIntf(
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__
 #endif

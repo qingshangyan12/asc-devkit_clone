@@ -1,4 +1,4 @@
-Ôªø/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file mstx_local_tensor_info.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/mstx_local_tensor_info.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MSTX_LOCAL_TENSOR_INFO_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MSTX_LOCAL_TENSOR_INFO_H__
 #endif
 #ifndef MSTX_TENSOR_INFO_H
 #define MSTX_TENSOR_INFO_H
@@ -645,7 +645,7 @@ __aicore__ inline void GetMstxVecUnaryCastDeqInfo(const LocalTensor<T>& dst, con
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_CASTDEQ), sizeof(mstxVecCastDeqDesc), &mstxVecCastDeqDesc);
 }
 
-//comparescalarÂèåÁõÆÁöÑ
+//comparescalarÀ´ƒøµƒ
 template <typename T, typename U, bool isSetMask>
 __aicore__ inline void GetMstxVecUnaryCmpsInfo(const LocalTensor<T>& dst, const LocalTensor<U>& src, uint64_t mask0, uint64_t mask1,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, __gm__ const char* name)
@@ -1005,7 +1005,7 @@ __aicore__ inline void GetMstxVecIndexInfo(const LocalTensor<T>& dst, uint32_t c
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_VCI), sizeof(mstxVecDupDesc), &mstxVecDupDesc);
 }
 
-//ËΩØ‰ªø
+//»Ì∑¬
 template <typename T, typename U>
 __aicore__ inline void GetMstxVecReduceComplexInfo(const LocalTensor<U>& dst, const LocalTensor<T>& src, 
     const LocalTensor<T>& sharedTmpBuffer, const int32_t mask0, const int32_t mask1,
@@ -1169,7 +1169,7 @@ __aicore__ inline void GetMstxVecBilinearInterpolationInfo(const LocalTensor<T> 
 }
 
 //select
-//Êó†ËΩØ‰ªø
+//Œﬁ»Ì∑¬
 template <typename T, typename U>
 __aicore__ inline void GetMstxVecBinarySelInfo(const LocalTensor<T>& dst, const LocalTensor<U>& selMask,
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask0, uint64_t mask1, const uint8_t repeatTime,
@@ -1452,7 +1452,7 @@ __aicore__ inline void GetMstxVecBinaryCmpInfo(const LocalTensor<T>& dst, const 
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_CMP), sizeof(mstxVecBinaryDesc), &mstxVecBinaryDesc);
 }
 
-//ËΩØ‰ªøÁöÑ
+//»Ì∑¬µƒ
 template <typename T, typename U, typename V>
 __aicore__ inline void GetMstxVecBinaryAddReqReluInfo(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
     const LocalTensor<V>& src1, uint64_t mask0, uint64_t mask1, const uint8_t repeatTime,
@@ -1589,7 +1589,7 @@ __aicore__ inline void GetMstxVecBinaryScalarInfo(const LocalTensor<T>& dst, con
     __mstx_dfx_report_stub(static_cast<uint32_t>(MstxReportType::MSTX_VEC_BINARY_SCALAR), sizeof(mstxVecBinaryDesc), &mstxVecBinaryDesc);
 }
 
-//comparescalarÁöÑ‰∏âÁõÆÁöÑ
+//comparescalarµƒ»˝ƒøµƒ
 template <typename T>
 __aicore__ inline void GetMstxVecBinaryScalarCmpsInfo(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, uint64_t mask0, uint64_t mask1, const uint8_t repeatTime,
@@ -1818,7 +1818,7 @@ __aicore__ inline void GetMstxDataCopyPadInfo(const GlobalTensor<T>& dst, const 
 }
 #endif //__MSTX_DFX_REPORT__
 #endif //MSTX_TENSOR_INFO_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MSTX_LOCAL_TENSOR_INFO_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MSTX_LOCAL_TENSOR_INFO_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MSTX_LOCAL_TENSOR_INFO_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MSTX_LOCAL_TENSOR_INFO_H__
 #endif
