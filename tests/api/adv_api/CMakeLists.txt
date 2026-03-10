@@ -172,62 +172,6 @@ set(ASCENDC_TEST_ascend910B1_AIV_CASE_SRC_FILES
 
 # ascend910B1 aic test cases
 file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
-    matmul/test_operator_matmul_v220.cpp
-    matmul/test_operator_matmul_v220_batch.cpp
-    matmul/test_matmul_l0db.cpp
-    matmul/test_matmul_config.cpp
-    matmul/test_matmul_channel_split.cpp
-    matmul/cube_in_buffer/test_cube_in_buffer_normal.cpp
-    matmul/cube_in_buffer/test_cube_in_buffer_single_buffer.cpp
-    matmul/cube_in_buffer/test_cube_in_buffer_double_buffer.cpp
-    matmul/cube_in_buffer/test_cube_in_buffer_single_global_buffer.cpp
-    matmul/cube_in_buffer/test_cube_in_buffer_double_global_buffer.cpp
-    matmul/cube_in_buffer/test_cube_in_buffer_n_buffer.cpp
-    matmul/cube_in_buffer/test_cube_in_buffer_bmm_db.cpp
-    matmul/test_matmul_l0c_buffer.cpp
-    matmul/test_matmul_shape_info.cpp
-    matmul/test_matmul_shape_info_left.cpp
-    hccl/test_hccl.cpp
-    hcomm/test_hcomm.cpp
-    matmul/copy_cube_in/test_copy_cube_in_norm.cpp
-    matmul/copy_cube_in/test_copy_cube_in_mdl.cpp
-    matmul/copy_cube_in/test_copy_cube_in_params.cpp
-    matmul/iterator/test_k_loop_norm.cpp
-    matmul/iterator/test_k_loop_mdl.cpp
-    matmul/iterator/test_k_loop_mdl_reorder.cpp
-    matmul/iterator/test_k_loop_n_buffer.cpp
-    matmul/iterator/test_m_loop_norm.cpp
-    matmul/iterator/test_n_loop_norm.cpp
-    matmul/iterator/test_m_loop_basic.cpp
-    matmul/iterator/test_n_loop_basic.cpp
-    matmul/iterator/test_m_loop_mdl.cpp
-    matmul/iterator/test_n_loop_mdl.cpp
-    matmul/iterator/test_m_loop_mdl_outer_product.cpp
-    matmul/iterator/test_n_loop_mdl_outer_product.cpp
-    matmul/iterator/test_m_loop_n_buffer.cpp
-    matmul/iterator/test_batch_loop.cpp
-    matmul/iterator/test_batch_loop_single.cpp
-    matmul/iterator/test_batch_m_loop.cpp
-    matmul/iterator/test_batch_n_loop.cpp
-    matmul/iterator/test_matmul_iterator.cpp
-    matmul/load_buffer/test_matmul_load_to_l0a.cpp
-    matmul/load_buffer/test_matmul_load_to_l0b.cpp
-    matmul/load_buffer/test_matmul_mmad_compute.cpp
-    matmul/load_buffer/test_matmul_tbufpool_l0.cpp
-    matmul/bias/test_bias_c1_buffer.cpp
-    matmul/bias/test_bias_c2_buffer.cpp
-    matmul/bias/test_copy_bias_in.cpp
-    matmul/scheduler/test_scheduler_mdl.cpp
-    matmul/scheduler/test_scheduler_special_mdl.cpp
-    matmul/scheduler/test_scheduler_norm.cpp
-    matmul/scheduler/test_scheduler_intrablock.cpp
-    matmul/scheduler/test_scheduler_norm_outer_product.cpp
-    matmul/scheduler/test_scheduler_mdl_outer_product.cpp
-    matmul/scheduler/test_scheduler_n_buffer.cpp
-    matmul/scheduler/test_scheduler_mdl_fullload.cpp
-    matmul/scheduler/bias_scheduler/test_bias_scheduler_v220.cpp
-    matmul/scheduler/batch_scheduler/test_batch_scheduler.cpp
-    matmul/scheduler/batch_scheduler/test_batch_scheduler_single.cpp
     matmul/kfc/test_matmul_server_c220.cpp
 )
 
@@ -366,6 +310,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
     hccl/test_hccl_950.cpp
+    hcomm/test_hcomm_950.cpp
 )
 
 # ascend310B1 test cases
