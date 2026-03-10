@@ -318,13 +318,13 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 /* **************************************************************************************************
  * Axpy                                             *
  * ************************************************************************************************* */
-/*
+/**
  * @ingroup Axpy
  * @brief dst = dst + src * scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
  * @param [in] scalar scalar value
- * @param [in] count number Number of data involved in calculation
+ * @param [in] count Number of data involved in calculation
  */
 template <typename T, typename U>
 __aicore__ inline void Axpy(const LocalTensor<T>& dst,
