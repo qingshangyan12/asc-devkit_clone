@@ -195,6 +195,8 @@ namespace __asc_aicore {
 template <class... Args>
 __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args) {}
 } // namespace __asc_aicore
+
+using namespace __asc_aicore;
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_PRINTF_IMPL__)
