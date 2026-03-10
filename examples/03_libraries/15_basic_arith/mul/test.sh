@@ -1,4 +1,4 @@
-SCENARIO_NUM=1
+SCENARIO_NUM=3
  
 mkdir -p build && cd build;   # 创建并进入build目录 
 

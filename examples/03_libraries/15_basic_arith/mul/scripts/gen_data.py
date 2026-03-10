@@ -16,35 +16,41 @@ import os
 import numpy as np
 import argparse
 
-DATA_TYPE_MAP = {
-        1: np.float16,
-        2: np.float32,
-        3: np.int16,
-        4: np.int32,
-    }
 
-
-def get_range_by_dtype(input_type):
-    try:
-        if input_type == np.float16 or input_type == np.float32 or input_type == np.float64:
-            return np.finfo(input_type).min, np.finfo(input_type).max
-        else:
-            return np.iinfo(input_type).min, np.iinfo(input_type).max
-    except ValueError:
-        print(f"Unsupported data type:{input_type}")
+def get_dtype(scenario_num: int) -> type:
+    if 1 <= scenario_num <= 4:
+        return np.float16
+    elif 5 <= scenario_num <= 8:
+        return np.float32
+    elif 9 <= scenario_num <= 12:
+        return np.int16
+    elif 13 <= scenario_num <= 16:
+        return np.int32
+    else:
+        raise ValueError(f"Invalid scenario number: {scenario_num}")
 
 
 def gen_golden_data(scenario_num):
-    input_type = DATA_TYPE_MAP[scenario_num]
+    total_length = 1024 # 输入数据长度
+    input_type = get_dtype(scenario_num)
     output_type = input_type
-    # min_val, max_val = get_range_by_dtype(input_type)
-    min_val, max_val = -100.0, 100.0
-    block_length = 32768 # 输入数据长度
-    input_shape = [block_length]
-    output_shape = [block_length]
+    if input_type == np.float16 or input_type == np.float32:
+        min_val, max_val = -100.0, 100.0
+    else:
+        min_val, max_val = -100, 100
+    input_shape = [total_length]
+    output_shape = [total_length]
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
     input_y = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
-    golden = np.multiply(input_x, input_y)
+    golden = np.zeros(total_length).astype(output_type)
+    # 根据不同接口调用场景，构造不同真值
+    if scenario_num == 1 or scenario_num == 2 or scenario_num == 5 or scenario_num == 6 or \
+        scenario_num == 9 or scenario_num == 10 or scenario_num == 13 or scenario_num == 14:
+        golden = np.multiply(input_x, input_y)
+    elif scenario_num == 3 or scenario_num == 7 or scenario_num == 11 or scenario_num == 15:
+        golden = np.multiply(input_x, input_y)
+    else:
+        golden = np.multiply(input_x, input_y)
     golden = golden.astype(output_type)
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -55,7 +61,7 @@ def gen_golden_data(scenario_num):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate cartesian product input and golden data for Mul operator.")
-    parser.add_argument('-scenario_num', type=int, default=1, choices=[1, 2, 3, 4])
+    parser.add_argument('-scenario_num', type=int, default=1, choices=list(range(1, 17)))
     args = parser.parse_args()
 
     gen_golden_data(args.scenario_num)

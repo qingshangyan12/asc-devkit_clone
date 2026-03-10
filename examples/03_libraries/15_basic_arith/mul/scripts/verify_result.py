@@ -22,15 +22,21 @@ RELATIVE_TOL = 1e-6
 ABSOLUTE_TOL = 1e-9
 ERROR_TOL = 1e-4
 
-DATA_TYPE_MAP = {
-    1: np.float16,
-    2: np.float32,
-    3: np.int16,
-    4: np.int32,
-}
+
+def get_dtype(scenario_num: int) -> type:
+    if 1 <= scenario_num <= 4:
+        return np.float16
+    elif 5 <= scenario_num <= 8:
+        return np.float32
+    elif 9 <= scenario_num <= 12:
+        return np.int16
+    elif 13 <= scenario_num <= 16:
+        return np.int32
+    else:
+        raise ValueError(f"Invalid scenario number: {scenario_num}")
 
 def verify_result(scenario_num, output, golden, input_x, input_y):
-    output_type = DATA_TYPE_MAP[scenario_num]
+    output_type = get_dtype(scenario_num)
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     input_x = np.fromfile(input_x, dtype=output_type).reshape(-1)
@@ -61,7 +67,7 @@ def verify_result(scenario_num, output, golden, input_x, input_y):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenario_num', type=int, default=1, choices=[1, 2, 3, 4])
+    parser.add_argument('-scenario_num', type=int, default=1, choices=list(range(1, 17)))
     parser.add_argument('-output', type=str)
     parser.add_argument('-golden', type=str)
     parser.add_argument('-input_x', type=str)
