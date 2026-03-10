@@ -22,76 +22,76 @@ namespace Te {
 // struct Layout  
 template <typename T, typename U, typename S>
 struct MakeNzLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
+__aicore__ inline decltype(auto) operator()(U row, S column) {
     return MakeNzLayout<T, U, S>(row, column);
 }
 };
 
 struct MakeL0CLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
+__aicore__ inline decltype(auto) operator()(U row, S column) {
     return MakeL0CLayout(row, column);
 }
 };
 
 template <typename T, typename U, typename S>
 struct MakeNDLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
+__aicore__ inline decltype(auto) operator()(U row, S column) {
     return MakeNDLayout<T, U, S>(row, column);
 }
 };
 
 template <typename T, typename U, typename S>
 struct MakeDNLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
+__aicore__ inline decltype(auto) operator()(U row, S column) {
     return MakeDNLayout<T, U, S>(row, column);
 }
 };
 
 template <typename T, typename U, typename S>
 struct MakeZnLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
+__aicore__ inline decltype(auto) operator()(U row, S column) {
     return MakeZnLayout<T, U, S>(row, column);
 }
 };
 
 template <typename T, typename U, typename S>
 struct MakeZzLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
+__aicore__ inline decltype(auto) operator()(U row, S column) {
     return MakeZzLayout<T, U, S>(row, column);
 }
 };
 
 template <typename T, typename U, typename S>
 struct MakeNnLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
+__aicore__ inline decltype(auto) operator()(U row, S column) {
     return MakeNnLayout<T, U, S>(row, column);
 }
 };
 
 template <typename T, typename U, typename S>
 struct MakeScaleANDLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) { // 不转置(m, scaleK)
+__aicore__ inline decltype(auto) operator()(U row, S column) { // 不转置(m, scaleK)
     return MakeScaleANDLayout<T, U, S>(row, column); // (m, scaleK)
 }
 };
 
 template <typename T, typename U, typename S>
 struct MakeScaleADNLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) { // 转置(m, scaleK)
+__aicore__ inline decltype(auto) operator()(U row, S column) { // 转置(m, scaleK)
     return MakeScaleADNLayout<T, U, S>(row, column); // 转置(m, scaleK)
 }
 };
 
 template <typename T, typename U, typename S>
 struct MakeScaleBNDLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) { // 不转置(scaleK, n)
+__aicore__ inline decltype(auto) operator()(U row, S column) { // 不转置(scaleK, n)
     return MakeScaleBNDLayout<T, U, S>(row, column);  // (scaleK, n)
 }
 };
 
 template <typename T, typename U, typename S>
 struct MakeScaleBDNLayout {
-__aicore__ inline decltype(auto) operator()(size_t row, size_t column) { // 转置(scaleK, n)
+__aicore__ inline decltype(auto) operator()(U row, S column) { // 转置(scaleK, n)
     return MakeScaleBDNLayout<T, U, S>(row, column); // (scaleK, n)
 }
 };
