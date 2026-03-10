@@ -54,6 +54,10 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 #endif
 
+#if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+using namespace __asc_aicore;
+#endif
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__
