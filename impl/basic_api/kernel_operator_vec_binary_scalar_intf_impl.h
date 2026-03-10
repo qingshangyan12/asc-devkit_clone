@@ -21,7 +21,7 @@
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_check.h"
-#include "kernel_npu_check.h"
+#include "kernel_npu_debug.h"
 #include "kernel_struct_unary.h"
 #include "mstx_local_tensor_info.h"
 
@@ -67,7 +67,7 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
 #ifdef ASCENDC_DEBUG
-    CheckVecBinaryScalarMaskArrayCommon(dst, src, mask, repeatTime, repeatParams, "Adds");
+    CheckVecBinaryScalarMaskArrayCommon(dst, src, mask, repeatTime, "Adds");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -1671,7 +1671,7 @@ template <typename T0, typename T1, const BinaryConfig &config, typename T2, typ
 __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count)
 {
     using ActualT = typename T2::PrimType;
-    CheckTensorPos<ActualT>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "MulsCast"); 
+    CheckTensorPos<ActualT>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "MulsCast");
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<T2>());
@@ -1729,7 +1729,7 @@ template <typename T0, typename T1, const BinaryConfig &config, typename T2, typ
 __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count)
 {
     using ActualT = typename T2::PrimType;
-    CheckTensorPos<ActualT>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "FusedMulsCast"); 
+    CheckTensorPos<ActualT>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<T2>());
