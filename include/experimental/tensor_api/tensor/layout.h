@@ -88,6 +88,7 @@ __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, con
 template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeNzLayout(size_t row, size_t column);
 
+template <typename U, typename S>
 __aicore__ inline decltype(auto) MakeL0CLayout(size_t row, size_t column);
 
 template <typename T, typename U, typename S>
