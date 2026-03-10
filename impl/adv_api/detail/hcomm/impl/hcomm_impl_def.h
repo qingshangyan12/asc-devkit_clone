@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm_impl_def.h
- * \brief
+ * \brief Hcomm implementation definition
  */
 #ifndef IMPL_HCOMM_HCOMM_IMPL_DEF_H
 #define IMPL_HCOMM_HCOMM_IMPL_DEF_H
@@ -21,7 +21,7 @@
 #include "hcomm_v220_impl.h"
 #endif
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #include "hcomm_v310_impl.h"
 #endif
 
