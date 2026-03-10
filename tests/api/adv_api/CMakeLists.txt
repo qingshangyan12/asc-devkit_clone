@@ -340,6 +340,9 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     quantization/quantize/test_quantize_per_channel.cpp
     quantization/quantize/test_quantize_per_token.cpp
     quantization/quantize/test_quantize_per_group.cpp
+    # hccl
+    hccl/test_hccl_950.cpp
+    hcomm/test_hcomm_950.cpp
     # reduce
     reduce/reduce_max/test_operator_reduce_max_c310.cpp
     reduce/reduce_min/test_operator_reduce_min_c310.cpp
@@ -364,8 +367,6 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     sort/topk/test_operator_radix_topk.cpp
     # transpose
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
-    # hccl
-    hccl/test_hccl_950.cpp
 )
 
 # ascend310B1 test cases
