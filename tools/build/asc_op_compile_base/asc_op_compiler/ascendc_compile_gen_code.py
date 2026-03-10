@@ -35,6 +35,7 @@ def add_time_stamp_codes(desc_id, space_len: int = 1):
 
 def gen_init_dump_code(is_mix: bool, dump_size: int):
     source = ""
+    source += "    AscendC::SetSysWorkspaceForce(workspace);\n"
     return source
 
 
