@@ -64,7 +64,7 @@ using ScaleZZStrideFormat = Stride<Stride<Std::Int<MX_SCALE_K0>, Std::Int<FRACTA
 // ScaleNN
 template <typename T, size_t row, size_t column>
 using ScaleNNShapeFormat = Shape<Shape<Std::Int<MX_SCALE_K0>, Std::Int<row/MX_SCALE_K0>>, 
-                                    Shape<Std::Int<MX_SCALE_K0>, Std::Int<column/MX_SCALE_K0>>>;
+                                    Shape<Std::Int<FRACTAL_FIXED>, Std::Int<column/FRACTAL_FIXED>>>;
 
 template <typename T, size_t row, size_t column>
 using ScaleNNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_SIZE>>,
