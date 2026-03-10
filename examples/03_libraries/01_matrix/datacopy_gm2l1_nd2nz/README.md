@@ -1,6 +1,6 @@
-# Mmad样例
+# DataCopy GM2L1 ND2NZ样例
 ## 概述
-本样例介绍基于基础API实现矩阵乘Mmad样例。
+本样例介绍基于基础API DataCopy实现Global Memory到L1 Buffer的数据搬运，并在搬运过程中实现ND2NZ格式转换，数据通路为：GM->A1、B1。
 
 ## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -8,44 +8,69 @@
 
 ## 目录结构介绍
 ```
-├── mmad
+├── datacopy_gm2l1_nd2nz
 │   ├── scripts
 │   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── data_utils.h                // 数据读入写出函数
-│   └── mmad.asc                    // Ascend C算子实现 & 调用样例
+│   └── datacopy_gm2l1_nd2nz.asc    // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
-- 算子功能：  
-  本样例中实现的是[m, n, k]固定为[32, 32, 32]的Matmul算子，并使用Ascend C基础Api实现。对应的数学表达式为：
-  ```
-  C = A * B
-  ```
-- 算子规格：
-  <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
-  </tr>
-  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">32 * 32</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">32 * 32</td><td align="center">half</td><td align="center">ND</td></tr>
-  </tr>
-  </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">32 * 32</td><td align="center">float</td><td align="center">ND</td></tr>
-  </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_custom</td></tr>
-  </table>
-- 算子实现：  
-  Mmad算子的数学表达式为：
-  ```
-  C = A * B
-  ```
-  计算逻辑是：Ascend C提供的矩阵乘计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储并进行分形转换，然后使用计算接口完成两个输入参数矩阵乘运算，得到最终结果，再搬出到外部存储上。  
+本样例实现GM到L1的数据搬运，并使用ND2NZ格式转换。ND2NZ结构体参数定义如下：
 
-  Mmad算子的实现流程分为3个基本任务：CopyIn，SplitA, SplitB, Compute，CopyOut。CopyIn任务负责将Global Memory上的输入inputGM搬运到Local Memory A1/B1中，搬运过程中进行ND至NZ分形转换。SplitA/SplitB分别将数据进一步搬运至接口所要求Local Memory A2/B2，Compute任务负责对数据进行矩阵乘运算，计算结果存储在Local Memory CO1中。CopyOut任务负责将输出数据从CO1搬运至Global Memory上的输出outputGm中，同时完成NZ到ND的分形转换。
-  - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+| 参数名称 | 含义 |
+|:--------:|:------:|
+| ndNum | 源矩阵中ND矩阵的数量，取值范围：ndNum∈[0, 4095]<br>注：ndNum = 0表示不执行搬运，即空操作。 |
+| nValue | 源矩阵中ND矩阵的行数，取值范围：nValue∈[0, 16384]<br>注：nValue = 0表示不执行搬运，即空操作。  |
+| dValue | 源矩阵中ND矩阵的列数，取值范围：nValue∈[0, 65535]<br>注：dValue = 0表示不执行搬运，即空操作。当dValue列数不满足32B对齐时，会在搬运后补0对齐到32B  |
+| srcNdMatrixStride | 源矩阵相邻ND矩阵起始地址间的偏移，取值范围：srcNdMatrixStride∈[0, 65535]，单位为元素个数。 |
+| srcDValue | 源矩阵一行中包含的元素，取值范围：srcDValue∈[1, 65535],单位为元素个数 |
+| dstNzC0Stride | ND转换为NZ格式后，目的NZ矩阵中相邻Z矩阵起始地址的偏移，取值范围dstNzC0Stride∈[1, 16384]，单位为C0_SIZE（32B）个数 |
+| dstNzNStride | 目的矩阵中NZ矩阵相邻行起始地址的偏移，取值范围：dstNzNStride∈[1, 16384],单位为C0_SIZE（32B）个数 |
+| dstNzMatrixStride | 目的矩阵中相邻NZ矩阵起始地址的偏移，取值范围：dstNzMatrixStride∈[1, 65535]，单位为元素个数个数 |
+  
+
+本样例使用Ascend C的DataCopy接口实现数据搬运，主要步骤如下：
+  1. 使用DataCopy接口将数据从GM搬运到L1，同时进行ND到NZ的格式转换
+  2. 使用SetFlag和WaitFlag进行流水线同步
+  3. 将转换后的NZ格式数据直接从L1搬运回GM
+
+本样例基于操作数数据类型和dValue是否对齐到32B，提供了以下6种测试场景：
+
+| 场景编号 | 数据类型 | dValue是否对齐到32B |
+|:--------:|:------:|:--------:|
+| SCENARIOMUM=1 | half | 是 |
+| SCENARIOMUM=2 | float | 是 |
+| SCENARIOMUM=3 | int8_t | 是 |
+| SCENARIOMUM=4 | half | 否 |
+| SCENARIOMUM=5 | float | 否 |
+| SCENARIOMUM=6 | int8_t | 否 |
+
+当scenarioNum等于1、2、3时：
+
+
+      // 32x32矩阵
+      intriParams.ndNum = 1;
+      intriParams.nValue = 32;
+      intriParams.dValue = 32;       // dValue对齐到32B
+      intriParams.srcNdMatrixStride = 0;
+      intriParams.srcDValue = 32;
+      intriParams.dstNzC0Stride = 32; 
+      intriParams.dstNzNStride = 1;
+      intriParams.dstNzMatrixStride = 0;
+当scenarioNum等于4、5、6时：
+
+      // 32x30矩阵
+      intriParams.ndNum = 2; // 2个nd矩阵
+      intriParams.nValue = 16;
+      intriParams.dValue = 30; // dValue未对齐到32B
+      intriParams.srcNdMatrixStride = 32 * 16; // 2个nd矩阵，偏移为nValue * srcDValue，待搬运数据连续。
+      intriParams.srcDValue = 32;
+      intriParams.dstNzC0Stride = 32;
+      intriParams.dstNzNStride = 1;
+      intriParams.dstNzMatrixStride = 16 * fractalShape[1]; // 2个nd矩阵，偏移为偏移为nValue * fractalShape[1]，即连续搬搬运。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
@@ -68,13 +93,20 @@
   
 - 样例执行
   ```bash
+  SCENARIONUM=1
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake ..;make -j;                # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  cmake .. -DSCENARIO_NUM=$SCENARIONUM;make -j;   # 编译工程
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIONUM  # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIONUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
   ```
+  SCENARIONUM=6
+  mkdir -p build && cd build;
+  cmake .. -DSCENARIO_NUM=$SCENARIONUM;make -j;
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIONUM
+  ./demo
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIONUM output/output.bin output/golden.bin

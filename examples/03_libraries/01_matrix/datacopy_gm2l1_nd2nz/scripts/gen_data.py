@@ -19,8 +19,8 @@ import argparse
 
 MATRIX_ROW = 32
 MATRIX_COL = 32
-C0_SIZE = 32  # 一个小分形每行的字节数
-FRACTAL_ROWS = 16 # 一个大小分形的行数
+C0_SIZE = 32        # 一个小分形每行的字节数
+FRACTAL_ROWS = 16   # 一个小分形的行数
 
 def gen_golden_data(scenarioNum=1):
     # 根据scenarioNum选择数据类型
@@ -37,17 +37,16 @@ def gen_golden_data(scenarioNum=1):
     input_x = np.arange(1, MATRIX_ROW * MATRIX_COL + 1).reshape(MATRIX_ROW, MATRIX_COL)
     input_x = input_x.astype(input_type)
     if scenarioNum == 4 or scenarioNum == 5 or scenarioNum == 6:
-        # 每行最后两列设为0
+        # 列非对齐情况，每行最后两列设为0
         input_x[:, -2:] = 0
 
     # 计算ND2NZ转换参数
     sizeof_T = input_type.itemsize
+    # 小分形每行的元素个数
     elements_per_C0_SIZE = C0_SIZE // sizeof_T
+    # 小分形作为一个整体，在矩阵中的行数和列数
     fractal_row_count = MATRIX_ROW // FRACTAL_ROWS
     fractal_col_count = MATRIX_COL // elements_per_C0_SIZE
-
-    print(f"Data type: {input_type}, sizeof(T): {sizeof_T}")
-    print(f"fractal_row_count: {fractal_row_count}, fractal_col_count: {fractal_col_count}")
 
     # 按照ND2NZ布局生成golden数据
     golden = []
@@ -62,8 +61,6 @@ def gen_golden_data(scenarioNum=1):
 
     golden = np.array(golden, dtype=output_type)
     
-    print(input_x)
-    print(golden)
     # 创建目录
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
