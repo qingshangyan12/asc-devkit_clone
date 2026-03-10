@@ -1064,16 +1064,16 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
 TEST_F(Tensor_Api_Layout, TestStructLayout)
 {
     using namespace AscendC::Te;
-    auto NDLayout = MakeNDLayoutOp<half>{}(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
-    auto StaticNDLayout = MakeNDLayoutOp<half>{}(AscendC::Std::Int<16>{}, AscendC::Std::Int<16>{});
-    auto DNLayout = MakeDNLayoutOp<half>{}(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
-    auto NzLayout = MakeNzLayoutOp<half>{}(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
-    auto ZnLayout = MakeZnLayoutOp<half>{}(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
-    auto NnLayout = MakeNnLayoutOp<fp8_e8m0_t>{}(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
-    auto scaleANDLayout = MakeScaleANDLayoutOp<fp8_e8m0_t>{}(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
-    auto scaleADNLayout = MakeScaleADNLayoutOp<fp8_e8m0_t>{}(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
-    auto scaleBNDLayout = MakeScaleBNDLayoutOp<fp8_e8m0_t>{}(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
-    auto scaleBDNLayout = MakeScaleBDNLayoutOp<fp8_e8m0_t>{}(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
+    auto NDLayout = MakeNDLayoutOp<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
+    auto StaticNDLayout = MakeNDLayoutOp<half>(AscendC::Std::Int<16>{}, AscendC::Std::Int<16>{});
+    auto DNLayout = MakeDNLayoutOp<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
+    auto NzLayout = MakeNzLayoutOp<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
+    auto ZnLayout = MakeZnLayoutOp<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
+    auto NnLayout = MakeNnLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
+    auto scaleANDLayout = MakeScaleANDLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
+    auto scaleADNLayout = MakeScaleADNLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
+    auto scaleBNDLayout = MakeScaleBNDLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
+    auto scaleBDNLayout = MakeScaleBDNLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
 
     auto NDShape = GetShape<0>(NDLayout);
     auto staticNDShape = GetShape<0>(StaticNDLayout);
