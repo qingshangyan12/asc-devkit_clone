@@ -43,6 +43,7 @@
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_ub2gm_align_impl.h"
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_ub2l1_impl.h"
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_ub2ub_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_ndim_copy_dci_impl.h"
 
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
 // ==========asc_storealign(u8/s8/half/u16/s16/float/u32/s32/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
@@ -5474,6 +5475,10 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e4m3fn_t* dst, __ubuf__ f
             uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
 {
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+//=============asc_ndim_copy_dci===============
+__aicore__ inline void asc_ndim_copy_dci() {
+    asc_ndim_copy_dci_impl();
 }
 
 //=============asc_copy_ub2l1===============
