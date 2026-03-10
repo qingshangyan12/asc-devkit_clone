@@ -9,51 +9,49 @@
 */
 
 /*!
- * \file layout.h
+ * \file layout_struct.h
  * \brief
  */
-#ifndef INCLUDE_TENSOR_API_TENSOR_LAYOUT_H
-#define INCLUDE_TENSOR_API_TENSOR_LAYOUT_H
+#ifndef INCLUDE_TENSOR_API_TENSOR_LAYOUT_STRUCT_H
+#define INCLUDE_TENSOR_API_TENSOR_LAYOUT_STRUCT_H
 
 #include "impl/experimental/tensor_api/tensor/layout_struct.h"
 
 namespace AscendC {
 namespace Te {
 
-// make_fractal.h
-template <typename T, typename U, typename S>
-struct MakeNzLayout;
-
-struct MakeL0CLayout;
+// make_fractal.h: MakeNzLayout 同时有函数 (T,U,S)(row,col) 和仿函数 MakeNzLayout<T>{}(row,col)，前向声明省略以免与函数声明冲突
+template <typename U, typename S>
+struct MakeL0CLayoutOp;
 
 template <typename T, typename U, typename S>
-struct MakeDNLayout;
+struct MakeDNLayoutOp;
 
 template <typename T, typename U, typename S>
-struct MakeNDLayout;
+struct MakeNDLayoutOp;
 
 template <typename T, typename U, typename S>
-struct MakeZnLayout;
+struct MakeZnLayoutOp;
 
 template <typename T, typename U, typename S>
-struct MakeZzLayout;
+struct MakeZzLayoutOp;
 
 template <typename T, typename U, typename S>
-struct MakeNnLayout;
+struct MakeNnLayoutOp;
 
 template <typename T, typename U, typename S>
-struct MakeScaleANDLayout;
+struct MakeScaleANDLayoutOp;
 
 template <typename T, typename U, typename S>
-struct MakeScaleADNLayout;
+struct MakeScaleADNLayoutOp;
 
 template <typename T, typename U, typename S>
-struct MakeScaleBNDLayout;
+struct MakeScaleBNDLayoutOp;
 
 template <typename T, typename U, typename S>
-struct MakeScaleBDNLayout;
+struct MakeScaleBDNLayoutOp;
 
 } // namespace Te
 } // namespace AscendC
 
-#endif // INCLUDE_TENSOR_API_TENSOR_LAYOUT_H
+#endif // INCLUDE_TENSOR_API_TENSOR_LAYOUT_STRUCT_H
