@@ -1091,7 +1091,7 @@ TEST_F(Tensor_Api_Layout, TestStructLayout)
     EXPECT_EQ(AscendC::Std::get<1>(DNShape), 256);
     EXPECT_EQ(AscendC::Std::get<1>(NzShape), 16);
     EXPECT_EQ(AscendC::Std::get<1>(ZnShape), 16);
-    EXPECT_EQ(AscendC::Std::get<0>(NnShape), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(NnShape), 16);
     EXPECT_EQ(AscendC::Std::get<0>(scaleANDShape), 1);
     EXPECT_EQ(AscendC::Std::get<0>(scaleADNShape), 1);
     EXPECT_EQ(AscendC::Std::get<0>(scaleBNDShape), 2);
