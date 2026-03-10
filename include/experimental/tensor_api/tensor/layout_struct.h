@@ -20,35 +20,33 @@
 namespace AscendC {
 namespace Te {
 
-// make_fractal.h: MakeNzLayout 同时有函数 (T,U,S)(row,col) 和仿函数 MakeNzLayout<T>{}(row,col)，前向声明省略以免与函数声明冲突
-template <typename U, typename S>
 struct MakeL0CLayoutOp;
 
-template <typename T, typename U, typename S>
+template <typename T>
 struct MakeDNLayoutOp;
 
-template <typename T, typename U, typename S>
+template <typename T>
 struct MakeNDLayoutOp;
 
-template <typename T, typename U, typename S>
+template <typename T>
 struct MakeZnLayoutOp;
 
-template <typename T, typename U, typename S>
+template <typename T>
 struct MakeZzLayoutOp;
 
-template <typename T, typename U, typename S>
+template <typename T>
 struct MakeNnLayoutOp;
 
-template <typename T, typename U, typename S>
+template <typename T>
 struct MakeScaleANDLayoutOp;
 
-template <typename T, typename U, typename S>
+template <typename T>
 struct MakeScaleADNLayoutOp;
 
-template <typename T, typename U, typename S>
+template <typename T>
 struct MakeScaleBNDLayoutOp;
 
-template <typename T, typename U, typename S>
+template <typename T>
 struct MakeScaleBDNLayoutOp;
 
 } // namespace Te
