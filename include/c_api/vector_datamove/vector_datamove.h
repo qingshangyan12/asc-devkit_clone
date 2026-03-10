@@ -27,6 +27,8 @@
 
 #endif
 
+__aicore__ inline void asc_set_copy_pad_val(uint64_t config);
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,

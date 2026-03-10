@@ -37,6 +37,7 @@
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_ndim_copy_gm2ub_impl.h"
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ndim_pad_count_impl.h"
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ndim_pad_value_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_copy_pad_val_impl.h"
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_store_impl.h"
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_scatter_impl.h"
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_gm2ub_align_impl.h"
@@ -5473,4 +5474,10 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e4m3fn_t* dst, __ubuf__ f
 {
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
+
+__aicore__ inline void asc_set_copy_pad_val(uint64_t config)
+{
+    asc_set_copy_pad_val_impl(config);
+}
+
 #endif

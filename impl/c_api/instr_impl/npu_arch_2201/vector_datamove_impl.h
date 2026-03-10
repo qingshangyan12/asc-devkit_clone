@@ -23,6 +23,7 @@
 #include "instr_impl/npu_arch_2201/vector_datamove_impl/asc_copy_ub2gm_impl.h"
 #include "instr_impl/npu_arch_2201/vector_datamove_impl/asc_copy_gm2ub_align_impl.h"
 #include "instr_impl/npu_arch_2201/vector_datamove_impl/asc_copy_ub2gm_align_impl.h"
+#include "instr_impl/npu_arch_2201/vector_datamove_impl/asc_set_copy_pad_val_impl.h"
 
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
     uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
@@ -408,6 +409,11 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__  uint64_t* dst, __ubuf__ uint
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint32_t size)
 {
     asc_copy_ub2gm_align_sync_impl(dst, src, size);
+}
+
+__aicore__ inline void asc_set_copy_pad_val(uint64_t config)
+{
+    asc_set_copy_pad_val_impl(config);
 }
 
 #endif
