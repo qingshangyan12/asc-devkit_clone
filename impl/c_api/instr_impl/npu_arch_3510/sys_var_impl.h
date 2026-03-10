@@ -17,6 +17,10 @@
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_block_num_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_system_cycle_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ctrl_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_smmu_tag_version_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_phy_stack_base_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_status_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_sys_virtual_base_impl.h"
 
 __aicore__ inline int64_t asc_get_ar_spr()
 {
@@ -47,4 +51,25 @@ __aicore__ inline int64_t asc_get_ctrl()
 {
     return asc_get_ctrl_impl();
 }
+
+__aicore__ inline int64_t asc_get_smmu_tag_version()
+{
+    return asc_get_smmu_tag_version_impl();
+}
+
+__aicore__ inline int64_t asc_get_phy_stack_base()
+{
+    return asc_get_phy_stack_base_impl();
+}
+
+__aicore__ inline int64_t asc_get_status()
+{
+    return asc_get_status_impl();
+}
+
+__aicore__ inline int64_t asc_get_sys_virtual_base()
+{
+    return asc_get_sys_virtual_base_impl();
+}
+
 #endif
