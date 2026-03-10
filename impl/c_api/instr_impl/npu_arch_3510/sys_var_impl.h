@@ -18,6 +18,7 @@
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_system_cycle_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ctrl_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ffts_base_addr_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_phy_buf_addr_impl.h"
 
 __simd_callee__ inline int64_t asc_get_ar_spr()
 {
@@ -52,6 +53,26 @@ __aicore__ inline int64_t asc_get_ctrl()
 __aicore__ inline int64_t asc_get_ffts_base_addr()
 {
     return asc_get_ffts_base_addr_impl();
+}
+
+__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset)
+{
+    return asc_get_phy_buf_addr_impl(offset);
+}
+
+__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset0, uint64_t offset1)
+{
+    return asc_get_phy_buf_addr_impl(offset0, offset1);
+}
+
+__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset0, uint64_t offset1, uint64_t offset2)
+{
+    return asc_get_phy_buf_addr_impl(offset0, offset1, offset2);
+}
+
+__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset0, uint64_t offset1, uint64_t offset2, uint64_t offset3)
+{
+    return asc_get_phy_buf_addr_impl(offset0, offset1, offset2, offset3);
 }
 
 #endif
