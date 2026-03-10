@@ -31,7 +31,7 @@ __aicore__ inline decltype(auto) MakeNzLayout(U row, S column) {
 }
 
 template <typename U, typename S>
-__aicore__ inline decltype(auto) MakeL0CLayout(size_t row, size_t column) {
+__aicore__ inline decltype(auto) MakeL0CLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return L0CLayoutFormat<row, column>{};
     } else {
@@ -40,7 +40,7 @@ __aicore__ inline decltype(auto) MakeL0CLayout(size_t row, size_t column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNDLayout(size_t row, size_t column) {
+__aicore__ inline decltype(auto) MakeNDLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NDLayoutFormat<T, row, column>{};
     } else {
@@ -49,7 +49,7 @@ __aicore__ inline decltype(auto) MakeNDLayout(size_t row, size_t column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeDNLayout(size_t row, size_t column) {
+__aicore__ inline decltype(auto) MakeDNLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return DNLayoutFormat<T, row, column>{};
     } else {
@@ -58,7 +58,7 @@ __aicore__ inline decltype(auto) MakeDNLayout(size_t row, size_t column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZnLayout(size_t row, size_t column) {
+__aicore__ inline decltype(auto) MakeZnLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZNLayoutFormat<T, row, column>{};
     } else {
@@ -67,7 +67,7 @@ __aicore__ inline decltype(auto) MakeZnLayout(size_t row, size_t column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeZzLayout(size_t row, size_t column) {
+__aicore__ inline decltype(auto) MakeZzLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZZLayoutFormat<T, row, column>{};
     } else {
@@ -76,7 +76,7 @@ __aicore__ inline decltype(auto) MakeZzLayout(size_t row, size_t column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeNnLayout(size_t row, size_t column) {
+__aicore__ inline decltype(auto) MakeNnLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NNLayoutFormat<T, row, column>{};
     } else {
@@ -85,7 +85,7 @@ __aicore__ inline decltype(auto) MakeNnLayout(size_t row, size_t column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleANDLayout(size_t row, size_t column) { // 不转置(m, scaleK)
+__aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column) { // 不转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleANDLayoutFormat<T, row, column>{};
     } else {
@@ -94,7 +94,7 @@ __aicore__ inline decltype(auto) MakeScaleANDLayout(size_t row, size_t column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleADNLayout(size_t row, size_t column) { // 转置(m, scaleK)
+__aicore__ inline decltype(auto) MakeScaleADNLayout(U row, S column) { // 转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleADNLayoutFormat<T, row, column>{};
     } else {
@@ -103,7 +103,7 @@ __aicore__ inline decltype(auto) MakeScaleADNLayout(size_t row, size_t column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBNDLayout(size_t row, size_t column) { // 不转置(scaleK, n)
+__aicore__ inline decltype(auto) MakeScaleBNDLayout(U row, S column) { // 不转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleBNDLayoutFormat<T, row, column>{};
     } else {
@@ -112,7 +112,7 @@ __aicore__ inline decltype(auto) MakeScaleBNDLayout(size_t row, size_t column) {
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeScaleBDNLayout(size_t row, size_t column) { // 转置(scaleK, n)
+__aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column) { // 转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleBDNLayoutFormat<T, row, column>{};
     } else {
