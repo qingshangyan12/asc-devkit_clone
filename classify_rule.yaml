@@ -47,8 +47,8 @@ asc-devkit:
       - impl/adv_api/detail/hcomm/impl/hcomm_v310_impl.h
       - impl/adv_api/detail/hcomm/common/hcomm_base.h
       - impl/adv_api/detail/hcomm/common/hcomm_inner_def.h
-      - impl/adv_api/detail/hcomm/platform_v220/hcomm_aiv_def.h
-      - impl/adv_api/detail/hcomm/platform_v310/hcomm_aiv_def.h
+      - impl/adv_api/detail/hcomm/impl/platform_v220/hcomm_aiv_def.h
+      - impl/adv_api/detail/hcomm/impl/platform_v310/hcomm_aiv_def.h
   llt:
     ut_check: true
     st_check: false
