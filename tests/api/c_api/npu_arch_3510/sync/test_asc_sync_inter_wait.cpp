@@ -50,7 +50,7 @@ TEST_F(TEST_ASC_SYNC_INTER_WAIT, TEST_ASC_SYNC_INTER_WAIT_MODE)
             .will(invoke(wait_flag_dev_mode_stub));
 
     pipe_t pipe = static_cast<pipe_t>(pipe_t::PIPE_S);
-    uint8_t flag_id = static_cast<uint8_t>(11);
+    int64_t flag_id = static_cast<int64_t>(11);
 
     asc_sync_inter_wait(pipe, flag_id);
     GlobalMockObject::verify();
