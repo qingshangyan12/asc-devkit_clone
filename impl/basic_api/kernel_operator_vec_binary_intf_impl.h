@@ -65,16 +65,14 @@ namespace AscendC {
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask>
-__aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Add", NamedLocalTensor(dst, "dst"), NamedLocalTensor(src0, "src0"),
-        NamedLocalTensor(src1, "src1"));
+    CheckVectorTensor("Add", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<T>(mask, "Add");
 #endif
-
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Add")) {
@@ -89,10 +87,14 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Add", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<T>(mask, "Add");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Add")) {
@@ -115,13 +117,12 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, const int32_t& count)
+__aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const int32_t& count)
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Add", NamedLocalTensor(dst, "dst"), NamedLocalTensor(src0, "src0"),
-        NamedLocalTensor(src1, "src1"));
+    CheckVectorTensor("Add", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "Add")) {

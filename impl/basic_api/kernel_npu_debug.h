@@ -23,8 +23,8 @@
 namespace AscendC {
 
 template <typename T>
-struct NamedLocalTensor {
-    __aicore__ NamedLocalTensor(const LocalTensor<T>& tensorIn, const __gm__ char* tensorNameIn)
+struct NamedTensor {
+    __aicore__ NamedTensor(const LocalTensor<T>& tensorIn, const __gm__ char* tensorNameIn)
         : tensor(tensorIn), tensorName(tensorNameIn) {}
 
     LocalTensor<T> tensor;
@@ -130,70 +130,35 @@ __aicore__ inline void CheckValueRange(T value, T valueLow, T valueHigh, const _
     }
 }
 
-template <typename T, typename U>
-__aicore__ inline void CheckVecBinaryScalarTensorCommon(const LocalTensor<T>& dst, const LocalTensor<U>& src,
-    const __gm__ char* apiName)
+template <typename T>
+__aicore__ inline void CheckMaskArray(const uint64_t mask[], const __gm__ char* apiName)
 {
-    CheckTensorTPosition<TPosition::VECIN, TPosition::VECCALC, TPosition::VECOUT>(
-        dst, "dst", "VECIN / VECCALC / VECOUT", apiName);
-    CheckTensorTPosition<TPosition::VECIN, TPosition::VECCALC, TPosition::VECOUT>(
-        src, "src", "VECIN / VECCALC / VECOUT", apiName);
-    CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
-    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
+    ASCENDC_DEBUG_ASSERT((mask != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask[] in %s, "
+        "it is nullptr.\n", apiName));
+    if constexpr (sizeof(T) == 2) {
+        ASCENDC_DEBUG_ASSERT(!(mask[0] == 0 && mask[1] == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+            "mask[] value in %s, when sizeof(T) == 2, mask[0] and mask[1] cannot be both 0.\n", apiName));
+    } else if constexpr (sizeof(T) == 4) {
+        ASCENDC_DEBUG_ASSERT((mask[0] != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask[] value in %s, "
+            "when sizeof(T) == 4, mask[0] cannot be 0.\n", apiName));
+    } else if constexpr (sizeof(T) == 8) {
+        ASCENDC_DEBUG_ASSERT((mask[0] != 0 && mask[0] <= UINT32_MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
+            "check mask[] value in %s, when sizeof(T) == 8, mask[0] should be in range (0, UINT32_MAX], current value "
+            "is %llu.\n", apiName, mask[0]));
+    }
 }
 
-template <typename T, typename U>
-__aicore__ inline void CheckVecBinaryScalarMaskArrayCommon(const LocalTensor<T>& dst,
-    const LocalTensor<U>& src, const uint64_t mask[], const uint8_t repeatTime, const __gm__ char* apiName)
+template <typename T>
+__aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* apiName)
 {
-    CheckVecBinaryScalarTensorCommon(dst, src, apiName);
-    ASCENDC_DEBUG_ASSERT((mask != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check mask pointer in %s, mask pointer can not be nullptr.\n", apiName));
-    CheckValueRange<uint8_t>(repeatTime, 1, UINT8_MAX, "repeatTime", apiName);
+    if constexpr (sizeof(T) == 2) {
+        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 2" , apiName);
+    } else if constexpr (sizeof(T) == 4) {
+        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 4" , apiName);
+    } else if constexpr (sizeof(T) == 8) {
+        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 8" , apiName);
+    }
 }
-
-template <typename T, typename U>
-__aicore__ inline void CheckVecBinaryScalarMaskCountCommon(const LocalTensor<T>& dst,
-    const LocalTensor<U>& src, const uint64_t mask, const uint8_t repeatTime, const __gm__ char* apiName)
-{
-    CheckVecBinaryScalarTensorCommon(dst, src, apiName);
-    ASCENDC_DEBUG_ASSERT((mask > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check mask value in %s, mask value should be larger than 0.\n", apiName));
-    CheckValueRange<uint8_t>(repeatTime, 1, UINT8_MAX, "repeatTime", apiName);
-}
-
-template <typename T, typename U>
-__aicore__ inline void CheckVecBinaryScalarCalCountCommon(const LocalTensor<T>& dst,
-    const LocalTensor<U>& src, const int32_t count, const __gm__ char* apiName)
-{
-    CheckVecBinaryScalarTensorCommon(dst, src, apiName);
-    const uint64_t maxElementCount = (dst.GetSize() < src.GetSize()) ? dst.GetSize() : src.GetSize();
-    const int32_t maxCount = (maxElementCount > static_cast<uint64_t>(INT32_MAX)) ? INT32_MAX :
-        static_cast<int32_t>(maxElementCount);
-    CheckValueRange<int32_t>(count, 1, maxCount, "count", apiName);
-}
-template<typename T>
-__aicore__ inline void CheckVecBinary(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
-    const __gm__ char* apiName)
-{
-    CheckTensorTPosition<TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC>(dst, "dst",
-        "VECIN / VECCALC / VECOUT", apiName);
-    CheckTensorTPosition<TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC>(src0, "src0",
-        "VECIN / VECCALC / VECOUT", apiName);
-    CheckTensorTPosition<TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC>(src1, "src1",
-        "VECIN / VECCALC / VECOUT", apiName);
-    CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
-    CheckTensorAlignment(src0, ONE_BLK_SIZE, "src0", apiName);
-    CheckTensorAlignment(src1, ONE_BLK_SIZE, "src1", apiName);
-}
-
-// template <typename T>
-// __aicore__ inline void CheckVectorTensor(const NamedLocalTensor<T>& tensor, const __gm__ char* apiName)
-// {
-//     CheckTensorTPosition<TPosition::VECIN, TPosition::VECCALC, TPosition::VECOUT>(
-//         tensor.tensor, tensor.name, "VECIN / VECCALC / VECOUT", apiName);
-//     CheckTensorAlignment(tensor.tensor, ONE_BLK_SIZE, tensor.name, apiName);
-// }
 
 template <typename... Ts>
 __aicore__ inline void CheckVectorTensor(const __gm__ char* apiName, const Ts& ...tensors)
@@ -202,8 +167,6 @@ __aicore__ inline void CheckVectorTensor(const __gm__ char* apiName, const Ts& .
         "VECIN / VECCALC / VECOUT", apiName), ...);
     (CheckTensorAlignment(tensors.tensor, ONE_BLK_SIZE, tensors.tensorName, apiName), ...);
 }
-
-
 
 } // namespace AscendC
 
