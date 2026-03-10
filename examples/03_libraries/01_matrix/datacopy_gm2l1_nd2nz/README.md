@@ -1,6 +1,6 @@
 # DataCopy GM2L1 ND2NZ样例
 ## 概述
-本样例介绍基于基础API DataCopy实现Global Memory到L1 Buffer的数据搬运，并在搬运过程中实现ND2NZ格式转换，数据通路为：GM->A1、B1。
+本样例基于基础API DataCopy实现Global Memory到L1 Buffer的数据搬运，并在搬运过程中实现ND2NZ格式转换，数据通路为：GM->A1、B1。
 
 ## 支持的产品
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -26,10 +26,10 @@
 | nValue | 源矩阵中ND矩阵的行数，取值范围：nValue∈[0, 16384]<br>注：nValue = 0表示不执行搬运，即空操作。  |
 | dValue | 源矩阵中ND矩阵的列数，取值范围：nValue∈[0, 65535]<br>注：dValue = 0表示不执行搬运，即空操作。当dValue列数不满足32B对齐时，会在搬运后补0对齐到32B  |
 | srcNdMatrixStride | 源矩阵相邻ND矩阵起始地址间的偏移，取值范围：srcNdMatrixStride∈[0, 65535]，单位为元素个数。 |
-| srcDValue | 源矩阵一行中包含的元素，取值范围：srcDValue∈[1, 65535],单位为元素个数 |
+| srcDValue | 源矩阵一行中包含的元素，取值范围：srcDValue∈[1, 65535]，单位为元素个数 |
 | dstNzC0Stride | ND转换为NZ格式后，目的NZ矩阵中相邻Z矩阵起始地址的偏移，取值范围dstNzC0Stride∈[1, 16384]，单位为C0_SIZE（32B）个数 |
-| dstNzNStride | 目的矩阵中NZ矩阵相邻行起始地址的偏移，取值范围：dstNzNStride∈[1, 16384],单位为C0_SIZE（32B）个数 |
-| dstNzMatrixStride | 目的矩阵中相邻NZ矩阵起始地址的偏移，取值范围：dstNzMatrixStride∈[1, 65535]，单位为元素个数个数 |
+| dstNzNStride | 目的矩阵中NZ矩阵相邻行起始地址的偏移，取值范围：dstNzNStride∈[1, 16384]，单位为C0_SIZE（32B）个数 |
+| dstNzMatrixStride | 目的矩阵中相邻NZ矩阵起始地址的偏移，取值范围：dstNzMatrixStride∈[1, 65535]，单位为元素个数 |
   
 
 本样例使用Ascend C的DataCopy接口实现数据搬运，主要步骤如下：
