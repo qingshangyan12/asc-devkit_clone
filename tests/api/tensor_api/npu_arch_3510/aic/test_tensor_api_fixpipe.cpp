@@ -57,7 +57,7 @@ public:
         l0cAddr = reinterpret_cast<__cc__ L0cT*>(0);
         constexpr static FixpipeTrait trait(QUANT_MODE, false, false, 0, 0);
         auto l0cIterator = MakeL0CmemPtr(l0cAddr);
-        auto l0cMatrixLayout = MakeL0CLayout{}(mLength_, nLength_);
+        auto l0cMatrixLayout = MakeL0CLayout(mLength_, nLength_);
         auto l0cTensor = MakeTensor(l0cIterator, l0cMatrixLayout);
         if constexpr (C_TYPE::format == CubeFormat::ND) {
             n_size_global = n;
@@ -90,7 +90,7 @@ public:
             Fixpipe<trait>(gmTensor, l0cTensor);
         } else {
             auto qIterator = MakeL1memPtr(qAddr);
-            auto qMatrixLayout = MakeNDLayout<uint64_t>{}(1, nLength_);
+            auto qMatrixLayout = MakeNDLayout<uint64_t>(1, nLength_);
             auto qTensor = MakeTensor(qIterator, qMatrixLayout);
             Fixpipe<trait>(gmTensor, l0cIterator, qTensor);
         }
@@ -109,15 +109,15 @@ private:
     {
         auto gmIterator = MakeGMmemPtr(gmC_);
         if constexpr (C_TYPE::format == CubeFormat::NZ) {
-            auto gmMatrixLayout = MakeNzLayout<DstT>{}(mLength_, nLength_);
+            auto gmMatrixLayout = MakeNzLayout<DstT>(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         } else if constexpr (C_TYPE::format == CubeFormat::DN) {
-            auto gmMatrixLayout = MakeDNLayout<DstT>{}(mLength_, nLength_);
+            auto gmMatrixLayout = MakeDNLayout<DstT>(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         } else {
-            auto gmMatrixLayout = MakeNDLayout<DstT>{}(mLength_, nLength_);
+            auto gmMatrixLayout = MakeNDLayout<DstT>(mLength_, nLength_);
             auto gmTensor = MakeTensor(gmIterator, gmMatrixLayout);
             return gmTensor;
         }
