@@ -23,14 +23,14 @@
 namespace AscendC {
 namespace Internal {
 // ============================================================================
-// ReduceMaxImpl - float/half 专用的 ReduceMax 实现
+// ReduceMaxV220Impl - float/half 专用的 ReduceMax 实现 (v2版本)
 // 使用 vcgmax 指令进行块内归约
 // ============================================================================
 // 从原路径迁移: asc-devkit/impl/adv_api/detail/reduce/reduce_max/reduce_max_v220_impl.h
 // 功能: float/half 数据类型的 ReduceMax 实现（使用 vcgmax 指令）
 // 支持模式: AR (All-to-Reduce) / RA (Reduce-to-All)
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceMaxImpl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
+__aicore__ inline void ReduceMaxV220Impl(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
                                       const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[],
                                       bool srcInnerPad)
 {
@@ -45,10 +45,10 @@ __aicore__ inline void ReduceMaxImpl(const LocalTensor<T>& dstTensor, const Loca
     LocalTensor<T> tmpTensor = sharedTmpBuffer.ReinterpretCast<T>();
 
     if constexpr (IsSameType<pattern, Pattern::Reduce::AR>::value) {
-        BlockReduceByLastAxis<T, isReuseSource, ApiMode::API_MODE_MAX, Max<T, false>>(
+        BlockReduceByLastAxisV2<T, isReuseSource, ApiModeV2::API_MODE_MAX, Max<T, false>>(
             dstTensor, srcTensor, tmpTensor, first, last, padLast);
     } else {
-        BinaryReduceByFirstAxis<T, isReuseSource, Max<T, false>>(
+        BinaryReduceByFirstAxisV2<T, isReuseSource, Max<T, false>>(
             dstTensor, srcTensor, tmpTensor, first, last, padLast);
     }
     SetMaskNorm();

@@ -61,7 +61,7 @@ __aicore__ inline void ReduceMax(const LocalTensor<T>& dstTensor,
     const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& tmpBuffer,
     const uint32_t srcShape[], bool isReuseSource = false)
 {
-    Internal::ReduceMaxImpl<T, pattern, false>(dstTensor, srcTensor, 
+    Internal::ReduceMaxImplV2<T, pattern, false>(dstTensor, srcTensor, 
                                                tmpBuffer, srcShape, isReuseSource);
 }
 

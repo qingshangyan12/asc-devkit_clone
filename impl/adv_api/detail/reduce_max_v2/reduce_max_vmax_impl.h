@@ -159,7 +159,7 @@ __aicore__ inline void ReduceMaxVMaxImpl(const LocalTensor<T>& dstTensor,
             // 对每一列（lastAxis 个）分别归约 firstAxis 个元素
             // 二分归约：每次将数据对半比较
             LocalTensor<T> workBuf = tmpBuffer.ReinterpretCast<T>();
-            uint32_t k = FindClosestPowerOfTwo(firstAxis);
+            uint32_t k = FindClosestPowerOfTwoV2(firstAxis);
             uint32_t splitK = 1 << k;
             uint32_t remain = firstAxis - splitK;
             

@@ -19,7 +19,7 @@ namespace AscendC {
 namespace Internal {
 
 // ============================================================================
-// ReduceMaxImpl - 统一的 ReduceMax 实现入口
+// ReduceMaxImplV2 - 统一的 ReduceMax 实现入口 (v2版本)
 // 根据 T 的类型自动选择实现：
 //   - int32_t:  使用 vmax 实现（二分归约）
 //   - half/float: 使用 vcgmax 实现（块内归约）
@@ -27,7 +27,7 @@ namespace Internal {
 // 功能: 提供 ReduceMax 的核心实现，支持三种数据类型（half, float, int32_t）
 // 支持模式: AR (All-to-Reduce) / RA (Reduce-to-All)
 template <class T, class pattern, bool isReuseSource = false>
-__aicore__ inline void ReduceMaxImpl(const LocalTensor<T>& dstTensor, 
+__aicore__ inline void ReduceMaxImplV2(const LocalTensor<T>& dstTensor, 
     const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t srcShape[], bool srcInnerPad)
 {
