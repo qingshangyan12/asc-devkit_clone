@@ -20,20 +20,15 @@ protected:
     void TearDown() {}
 };
 
-namespace {
-void set_atomic_add_Stub() {}
-void set_atomic_s32_Stub() {}
-}
-
 TEST_F(TestSimdAtomicSetAtomicAddInt, set_atomic_add_int_Succ)
 {
     MOCKER(set_atomic_add, void(void))
         .times(1)
-        .will(invoke(set_atomic_add_Stub));
+        .will(ignoreReturnValue());
     
     MOCKER(set_atomic_s32, void(void))
         .times(1)
-        .will(invoke(set_atomic_s32_Stub));
+        .will(ignoreReturnValue());
     
     asc_set_atomic_add_int();
     GlobalMockObject::verify();
