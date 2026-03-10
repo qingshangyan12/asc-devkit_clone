@@ -20,21 +20,21 @@
 namespace AscendC {
 namespace Te {
 
-template <const FixpipeTrait& trait, typename T, typename U>
+template <const FixpipeTrait& trait, typename T, typename U, typename Params>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplate<T, U>, void>::type
-Fixpipe(const T& dst, const U& src);
+Fixpipe(const T& dst, const U& src, const Params& params);
 
-template <const FixpipeTrait& trait, typename T, typename U, typename V>
+template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Params>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, V>, void>::type
-Fixpipe(const T& dst, const U& src, const V& quant);
+Fixpipe(const T& dst, const U& src, const V& quant, const Params& params);
 
-template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
+template <const FixpipeTrait& trait, typename T, typename U, typename Coord, typename Params>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplateWithCoord<T, U, Coord>, void>::type
-Fixpipe(const T& dst, const U& src, const Coord& coord);
+Fixpipe(const T& dst, const U& src, const Coord& coord, const Params& params);
 
-template <const FixpipeTrait& trait, typename T, typename U, typename V,  typename Coord>
+template <const FixpipeTrait& trait, typename T, typename U, typename V,  typename Coord, typename Params>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplateWithCoord<T, U, V, Coord>, void>::type
-Fixpipe(const T& dst, const U& src, const V& quant, const Coord& coord);
+Fixpipe(const T& dst, const U& src, const V& quant, const Coord& coord, const Params& params);
 
 } // namespace Te
 } // namespace AscendC
