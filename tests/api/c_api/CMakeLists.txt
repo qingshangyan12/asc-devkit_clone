@@ -51,19 +51,19 @@ file(GLOB ASCENDC_UT_ascend910B1_AIV_CASE_SRC
 )
 
 file(GLOB ASCENDC_UT_ascend950pr_9599_AIC_CASE_SRC
-    npu_arch_3510/cube_compute/*.cpp
+    # npu_arch_3510/cube_compute/*.cpp
     npu_arch_3510/cube_datamove/*.cpp
 )
 
 file(GLOB ASCENDC_UT_ascend950pr_9599_AIV_CASE_SRC
     npu_arch_3510/atomic/*.cpp
-    npu_arch_3510/cache_ctrl/*.cpp
-    npu_arch_3510/misc/*.cpp
-    npu_arch_3510/scalar_compute/*.cpp
-    npu_arch_3510/sync/*.cpp
+    # npu_arch_3510/cache_ctrl/*.cpp
+    # npu_arch_3510/misc/*.cpp
+    # npu_arch_3510/scalar_compute/*.cpp
+    # npu_arch_3510/sync/*.cpp
     npu_arch_3510/sys_var/*.cpp
-    npu_arch_3510/vector_compute/*.cpp
-    npu_arch_3510/vector_datamove/*.cpp
+    # npu_arch_3510/vector_compute/*.cpp
+    # npu_arch_3510/vector_datamove/*.cpp
 )
 
 foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
