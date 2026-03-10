@@ -27,9 +27,10 @@ __aicore__ inline decltype(auto) operator()(U row, S column) {
 }
 };
 
+template <typename U, typename S>
 struct MakeL0CLayout {
 __aicore__ inline decltype(auto) operator()(U row, S column) {
-    return MakeL0CLayout(row, column);
+    return MakeL0CLayout<U, S>(row, column);
 }
 };
 
