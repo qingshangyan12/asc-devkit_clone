@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm_aiv.h
- * \brief
+ * \brief Hcomm AIV implementation for V220
  */
 #ifndef IMPL_V220_HCOMM_AIV_H
 #define IMPL_V220_HCOMM_AIV_H
@@ -93,9 +93,6 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::postSen
 
     KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell qpNum:%d, sqBaseAddr:%p, wqeSize:%d, curHead:%d, qpDepth:%d", qpNum,
                sqBaseAddr, wqeSize, curHead, qpDepth);
-
-    // Make sure we don't overflow the SQ in an infinite loop - no need to mitigate endless loop as the host
-    // will timeout and kill the kernel, same as all2all kernel if it fails to complete (e.g. in case of link loss) 
 
     __gm__ uint8_t* wqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % qpDepth));
     KERNEL_LOG(KERNEL_INFO, "Hcomm postSend wqeAddr:%p", wqeAddr);
