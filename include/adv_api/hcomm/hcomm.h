@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm.h
- * \brief
+ * \brief Hcomm interface
  */
 #ifndef LIB_HCOMM_HCOMM_H
 #define LIB_HCOMM_HCOMM_H
