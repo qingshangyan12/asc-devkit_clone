@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm_inner_def.h
- * \brief
+ * \brief Hcomm inner definition
  */
 #ifndef IMPL_HCOMM_HCOMM_INNER_DEF_H
 #define IMPL_HCOMM_HCOMM_INNER_DEF_H
@@ -254,6 +254,9 @@ typedef struct {
 #define OP_TYPE_OFFSET 24
 #define C_OFFSET 29
 #define F_OFFSET 30
+
+constexpr int32_t HCOMM_FAILED = 1;
+constexpr int32_t HCOMM_SUCCESS = 0;
 
 } // namespace AscendC
 #endif // IMPL_HCOMM_HCOMM_INNER_DEF_H
