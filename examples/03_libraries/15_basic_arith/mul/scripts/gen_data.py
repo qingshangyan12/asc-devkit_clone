@@ -29,6 +29,8 @@ def get_dtype(scenario_num: int) -> type:
     else:
         raise ValueError(f"Invalid scenario number: {scenario_num}")
 
+def get_element_size(dtype: type) -> int:
+    return np.dtype(dtype).itemsize
 
 def gen_golden_data(scenario_num):
     total_length = 1024 # 输入数据长度
@@ -48,9 +50,19 @@ def gen_golden_data(scenario_num):
         scenario_num == 9 or scenario_num == 10 or scenario_num == 13 or scenario_num == 14:
         golden = np.multiply(input_x, input_y)
     elif scenario_num == 3 or scenario_num == 7 or scenario_num == 11 or scenario_num == 15:
-        golden = np.multiply(input_x, input_y)
+        count = 256 / get_element_size(input_type)
+        for index in range(len(input_x)):
+            if (index % count) < (count / 2):
+                golden[index] = input_x[index] * input_y[index]
+            # print("index % count = {}, count / 2 = {}".format(index % 256, count / 2))
+            # print(
+            # "data index: %06d, count: %d, golden: %-.9f, input_x: %-.9f, input_y: %-.9f" %
+            # (index, count, golden[index], input_x[index], input_y[index]))
     else:
-        golden = np.multiply(input_x, input_y)
+        count = 256 / get_element_size(input_type)
+        for index in range(len(input_x)):
+            if index % 2 == 0:
+                golden[index] = input_x[index] * input_y[index]
     golden = golden.astype(output_type)
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
