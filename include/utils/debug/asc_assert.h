@@ -37,10 +37,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 } // namespace __asc_simt_vf
 #endif
 
-namespace __asc_aicore {
-inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
-    const __gm__ char* __function);
-} // namespace __asc_aicore
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#include "impl/utils/debug/asc_aicore_assert_impl.h"
+#endif
 
 #if defined (__NPU_DEVICE__)
 #ifdef assert
@@ -53,8 +52,8 @@ inline __aicore__ void __assert_fail(const __gm__ char* __assertion, const __gm_
 #endif
 #endif
 
-#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
-#include "impl/utils/debug/asc_aicore_assert_impl.h"
+#if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+using namespace __asc_aicore;
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__)
