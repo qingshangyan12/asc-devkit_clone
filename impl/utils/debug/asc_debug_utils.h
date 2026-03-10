@@ -209,6 +209,7 @@ __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo
 
 __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo, const uint32_t& tlvLen)
 {
+#if !(defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1)
     constexpr uint32_t minTlvLen = sizeof(SkipTlv);
 
     __gm__ uint8_t* ringBufAddr = reinterpret_cast<__gm__ uint8_t*>(blockInfo->ringBufAddr);
@@ -236,6 +237,9 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
         return ringbuf_overflow_wait(readInfo, writeInfo, tlvLen);
     }
     return true;
+#else
+    return false;
+#endif
 }
 
 template <typename T>
