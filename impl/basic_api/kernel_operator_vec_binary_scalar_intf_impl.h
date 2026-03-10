@@ -67,7 +67,8 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
 #ifdef ASCENDC_DEBUG
-    CheckVecBinaryScalarMaskArrayCommon(dst, src, mask, repeatTime, "Adds");
+    CheckVectorTensor("Adds", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskArray<T>(mask, "Adds");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -87,6 +88,10 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Adds", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskArray<T>(mask, "Adds");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Adds")) {
@@ -104,6 +109,10 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Adds", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskValue<T>(mask, "Adds");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Adds")) {
@@ -122,6 +131,10 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Adds", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskValue<T>(mask, "Adds");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Adds")) {
@@ -147,6 +160,9 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     const int32_t& count)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Adds", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "Adds")) {
@@ -165,6 +181,9 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Adds", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "Adds")) {
@@ -198,6 +217,10 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Muls", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskArray<T>(mask, "Muls");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Muls")) {
@@ -233,6 +256,10 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Muls", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskValue<T>(mask, "Muls");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Muls")) {
@@ -276,6 +303,9 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     const int32_t& count)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Muls", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "Muls")) {
@@ -327,6 +357,10 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Maxs", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskArray<T>(mask, "Maxs");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Maxs")) {
@@ -362,6 +396,10 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Maxs", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskValue<T>(mask, "Maxs");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Maxs")) {
@@ -405,6 +443,9 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     const int32_t& count)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Maxs", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, count, "Maxs")) {
@@ -456,6 +497,10 @@ template <typename T, bool isSetMask>
 __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Mins", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskArray<T>(mask, "Mins");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, scalarValue, mask, repeatTime, repeatParams, "Mins")) {
