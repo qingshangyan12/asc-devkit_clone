@@ -78,11 +78,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ceilf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fabsf(float x)
 {
-    if (x < 0.0f) {
-        return -x;
-    } else {
-        return x;
-    }
+    return __fabsf(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmaf(float x, float y, float z)
@@ -1282,35 +1278,83 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, 
     return 1.0f / norm4df(a, b, c, d);
 }
 
-#define __INTERNAL_NORMF(n, a)                              \
-    do {                                                    \
-        if ((n) <= 0) {                                     \
-            return fabsf((a)[0]);                           \
-        }                                                   \
-        float m = 0;                                        \
-        int32_t has_nan = 0;                                \
-        for (int i = 0; i < (n); i++) {                     \
-            m = fmaxf(m, fabsf((a)[i]));                    \
-            if (isinf((a)[i])) {                            \
-                return ASCRT_INF_F;                         \
-            }                                               \
-            if (isnan((a)[i])) {                            \
-                has_nan = 1;                                \
-            }                                               \
-        }                                                   \
-        if (has_nan) {                                      \
-            return ASCRT_INF_F / ASCRT_INF_F;               \
-        }                                                   \
-        if (m == 0.0f || isnan(m)) {                        \
-            return m;                                       \
-        }                                                   \
-        float sum = 0.0f;                                   \
-        for (int i = 0; i < (n); i++) {                     \
-            sum = fmaf(((a)[i] / m), ((a)[i] / m), sum);    \
-        }                                                   \
-        return m * sqrtf(sum);                              \
-    } while (0)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4 __internal_to_float4(float* a) {
+    float4* arr = (float4*)a;
+    return *arr;
+}
 
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifdef __NPU_ARCH__
+#ifndef ASCENDC_CPU_DEBUG
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4 __internal_to_float4(__gm__ float* a) {
+    __gm__ float4* arr = (__gm__ float4*)a;
+    return *arr;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float4 __internal_to_float4(__ubuf__ float* a) {
+    __ubuf__ float4* arr = (__ubuf__ float4*)a;
+    return *arr;
+}
+#endif
+#endif
+#endif
+
+#define __INTERNAL_NORMF(n, a)                                                                \
+    do {                                                                                      \
+        if ((n) <= 0) {                                                                       \
+                return fabsf((a)[0]);                                                         \
+            }                                                                                 \
+            float m = 0;                                                                      \
+            int remainder = (n) & 3;                                                          \
+            int end = (n) - remainder;                                                        \
+            if ((n) > 3) {                                                                    \
+_Pragma("unroll 4")                                                                           \
+                for (int i = 0; i < end; i += 4) {                                            \
+                    float4 tmp = __internal_to_float4((a) + i);                               \
+                    if (isinf(tmp.x) || isinf(tmp.y) || isinf(tmp.z) || isinf(tmp.w)) {       \
+                        return ASCRT_INF_F;                                                   \
+                    }                                                                         \
+                    m = __fmaxf(m, fabsf(tmp.x));                                             \
+                    m = __fmaxf(m, fabsf(tmp.y));                                             \
+                    m = __fmaxf(m, fabsf(tmp.z));                                             \
+                    m = __fmaxf(m, fabsf(tmp.w));                                             \
+                }                                                                             \
+            }                                                                                 \
+            if (remainder != 0) {                                                             \
+                for (int i = end; i < n; i++) {                                               \
+                    if (isinf((a)[i])) {                                                      \
+                        return ASCRT_INF_F;                                                   \
+                    }                                                                         \
+                    m = __fmaxf(m, fabsf((a)[i]));                                            \
+                }                                                                             \
+            }                                                                                 \
+            if (m == 0.0f || isnan(m)) {                                                      \
+                return m;                                                                     \
+            }                                                                                 \
+            float sum = 0.0f;                                                                 \
+            float norm = 0.0f;                                                                \
+            if ((n) > 3) {                                                                    \
+_Pragma("unroll 4")                                                                           \
+                for (int i = 0; i < end; i += 4) {                                            \
+                    float4 tmp = __internal_to_float4((a) + i);                               \
+                    norm = tmp.x / m;                                                         \
+                    sum = fmaf(norm, norm, sum);                                              \
+                    norm = tmp.y / m;                                                         \
+                    sum = fmaf(norm, norm, sum);                                              \
+                    norm = tmp.z / m;                                                         \
+                    sum = fmaf(norm, norm, sum);                                              \
+                    norm = tmp.w / m;                                                         \
+                    sum = fmaf(norm, norm, sum);                                              \
+                }                                                                             \
+            }                                                                                 \
+            if (remainder != 0) {                                                             \
+                for (int i = end; i < n; i++) {                                               \
+                    norm = (a)[i] / m;                                                        \
+                    sum = fmaf(norm, norm, sum);                                              \
+                }                                                                             \
+            }                                                                                 \
+            return m * sqrtf(sum);                                                            \
+    } while (0)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, float* a)
 {
@@ -2748,6 +2792,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_yn_case3(int n, float x)
     prev = current;
     current = value;
     k += 1;
+#pragma unroll
     while (k < n) {
         if (fabsf(mult) > 1.0f  && fabsf(current) > 1.0f && k > 2) { // 2 : index
             current = 1.0f;
