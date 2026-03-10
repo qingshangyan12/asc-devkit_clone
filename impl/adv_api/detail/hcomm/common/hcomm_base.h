@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm_base.h
- * \brief
+ * \brief Hcomm base class
  */
 #ifndef IMPL_HCOMM_BASE_H
 #define IMPL_HCOMM_BASE_H
