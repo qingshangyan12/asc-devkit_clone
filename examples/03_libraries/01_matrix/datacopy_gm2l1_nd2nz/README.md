@@ -104,9 +104,3 @@
   ```bash
   test pass!
   ```
-  SCENARIONUM=6
-  mkdir -p build && cd build;
-  cmake .. -DSCENARIO_NUM=$SCENARIONUM;make -j;
-  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIONUM
-  ./demo
-  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIONUM output/output.bin output/golden.bin
