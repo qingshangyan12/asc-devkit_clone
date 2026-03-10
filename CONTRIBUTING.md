@@ -1,6 +1,6 @@
 # 贡献指南
 
-本项目欢迎广大开发者体验并参与贡献，在参与社区贡献之前。请参见[cann-community](https://gitcode.com/cann/community)了解行为准则，进行CLA协议签署，了解源码仓的贡献流程。
+本项目欢迎广大开发者体验并参与贡献，在参与社区贡献之前，请参见[cann-community](https://gitcode.com/cann/community)了解行为准则，进行CLA协议签署，了解源码仓的贡献流程。
 
 开发者准备本地代码与提交PR时需要重点关注如下几点：
 
@@ -13,7 +13,7 @@
 
 ### 1. 高阶API
 
-高阶API基于单核对常见算法进行抽象和封装，实现了一些常用的计算算法，旨在提高编程开发效率。高阶API一般通过调用多种基础API实现。高阶API包数学计算、矩阵计算、激活函数等API。
+高阶API基于单核对常见算法进行抽象和封装，实现了一些常用的计算算法，旨在提高编程开发效率。高阶API一般通过调用多种基础API实现。高阶API包括数学计算、矩阵计算、激活函数等API。
 
 - **适用场景**：常见算法的抽象和封装，提高算子开发效率
 - **贡献指南**：[docs/asc_adv_api_contributing.md](./docs/asc_adv_api_contributing.md)
