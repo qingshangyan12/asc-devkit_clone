@@ -63,7 +63,7 @@ private:
             nz2nzStrategy.Run<trait, T, U>(dst, src);
         } else {
             // assert error
-            static_assert(Std::is_same_v<T, U>, "The data format is not supported.");
+            static_assert(!Std::is_same_v<T, U>, "The data format is not supported.");
         }
     }
 
