@@ -121,6 +121,6 @@ repeatMode =1 的时候 filter 窗口中读取数据的位置保持不变，每�
 
 ```cpp
 __cbuf__ half src[256];
-__cb__ half dst[256];
+__ca__ half dst[256];
 asc_copy_l12l0a(dst, src, 8, 16, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, false, true, 0)
 ```
