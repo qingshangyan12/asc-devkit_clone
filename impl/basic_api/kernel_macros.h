@@ -136,7 +136,7 @@ extern int32_t g_matmulCount;
 namespace AscendC {
 namespace Reg {
 } // namespace Reg
-namespace Reg = Reg;
+namespace MicroAPI = Reg;
 } // namespace AscendC
 #endif // ASCENDC_KERNEL_MACROS_H
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_MACROS_H)
