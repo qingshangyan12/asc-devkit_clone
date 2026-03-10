@@ -17,6 +17,7 @@
 
 #include "kernel_log.h"
 #include "utils/kernel_utils_ceil_oom_que.h"
+#include "utils/kernel_utils_constants.h"
 #include "kernel_tensor.h"
 
 namespace AscendC {
@@ -63,61 +64,65 @@ __aicore__ inline __gm__ const char* GetTPositionName(TPosition pos)
     }
 }
 
-__aicore__ inline void ReportNotSupport(bool isUnsupported, const __gm__ char* apiName)
+__aicore__ inline void ReportNotSupport(bool isSupported, const __gm__ char* apiName)
 {
-    ASCENDC_DEBUG_ASSERT((isUnsupported), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "%s is not supported on current device.\n", 
+    ASCENDC_DEBUG_ASSERT((isSupported), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "%s is not supported on current device.\n",
         apiName));
 }
 
-template<TPosition... expectedPos, typename T>
-__aicore__ inline void CheckTensorTPosition(const LocalTensor<T>& inputTensor, const __gm__ char* tensorName, 
+template <TPosition... expectedPos, typename T>
+__aicore__ inline void CheckTensorTPosition(const LocalTensor<T>& inputTensor, const __gm__ char* tensorName,
     const __gm__ char* posName, const __gm__ char* apiName)
 {
     TPosition currentPos = static_cast<TPosition>(inputTensor.GetPosition());
     bool tPosValid = ((currentPos == expectedPos) || ...);
     ASCENDC_DEBUG_ASSERT((tPosValid), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s tensor TPosition in %s, "
-        "supported TPositions are %s, current TPosition is %s.\n", tensorName, apiName, posName, 
+        "supported TPositions are %s, current TPosition is %s.\n", tensorName, apiName, posName,
         GetTPositionName(currentPos)));
 }
 
-template<typename T>
-__aicore__ inline void CheckTensorAlignment(const LocalTensor<T>& inputTensor, uint32_t alignBytes, 
+template <typename T>
+__aicore__ inline void CheckTensorAlignment(const LocalTensor<T>& inputTensor, uint32_t alignBytes,
     const __gm__ char* tensorName,  const __gm__ char* apiName)
-{   
+{
     uint64_t tensorAddr = inputTensor.GetPhyAddr();
 #ifdef ASCENDC_CPU_DEBUG
     auto positionHardMap = ConstDefiner::Instance().positionHardMap;
     int32_t tensorPos = inputTensor.GetPosition();
-    tensorAddr = tensorAddr - 
+    tensorAddr = tensorAddr -
         reinterpret_cast<uint64_t>(ConstDefiner::Instance().hardwareCpuBufferMap.at(positionHardMap.at(tensorPos)));
 #endif
     ASCENDC_DEBUG_ASSERT((tensorAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s start "
-        "address alignment in %s, its start address must align with %u bytes, current start address is %u.\n", 
+        "address alignment in %s, its start address must align with %u bytes, current start address is %u.\n",
         tensorName, apiName, alignBytes, tensorAddr));
 }
 
-template<typename T>
+template <typename T>
 __aicore__ inline void CheckValueRange(T value, T valueLow, T valueHigh, const __gm__ char* paramName,
     const __gm__ char* apiName)
 {
-    if constexpr(SupportType<T, int8_t, int16_t, int32_t, int64_t>()) {
+    if constexpr (SupportType<T, int8_t, int16_t, int32_t, int64_t>()) {
         int64_t castValue = static_cast<int64_t>(value);
+        int64_t castLow = static_cast<int64_t>(valueLow);
+        int64_t castHigh = static_cast<int64_t>(valueHigh);
         ASCENDC_DEBUG_ASSERT((value <= valueHigh && value >= valueLow), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
-            "check %s value in %s, its valid range is [%lld, %lld], current value is %lld.\n", paramName, apiName, 
-            valueLow, valueHigh, value));
-    } else if constexpr(SupportType<T, uint8_t, uint16_t, uint32_t, uint64_t>()) {
+            "check %s value in %s, its valid range is [%lld, %lld], current value is %lld.\n", paramName, apiName,
+            castLow, castHigh, castValue));
+    } else if constexpr (SupportType<T, uint8_t, uint16_t, uint32_t, uint64_t>()) {
         uint64_t castValue = static_cast<uint64_t>(value);
+        uint64_t castLow = static_cast<uint64_t>(valueLow);
+        uint64_t castHigh = static_cast<uint64_t>(valueHigh);
         ASCENDC_DEBUG_ASSERT((value <= valueHigh && value >= valueLow), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
-            "check %s value in %s, its valid range is [%llu, %llu], current value is %llu.\n", paramName, apiName, 
-            valueLow, valueHigh, value));
+            "check %s value in %s, its valid range is [%llu, %llu], current value is %llu.\n", paramName, apiName,
+            castLow, castHigh, castValue));
     } else {
         ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Current dtype is not supported for check "
             "function CheckValueRange.\n"));
     }
 }
 
-template <typename DstT, typename SrcT>
-__aicore__ inline void CheckVecBinaryScalarTensorCommon(const LocalTensor<DstT>& dst, const LocalTensor<SrcT>& src,
+template <typename T, typename U>
+__aicore__ inline void CheckVecBinaryScalarTensorCommon(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const __gm__ char* apiName)
 {
     CheckTensorTPosition<TPosition::VECIN, TPosition::VECCALC, TPosition::VECOUT>(
@@ -127,31 +132,30 @@ __aicore__ inline void CheckVecBinaryScalarTensorCommon(const LocalTensor<DstT>&
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
 }
-template <typename DstT, typename SrcT, typename RepeatParamsT>
-__aicore__ inline void CheckVecBinaryScalarMaskArrayCommon(const LocalTensor<DstT>& dst,
-    const LocalTensor<SrcT>& src, const uint64_t mask[], const uint8_t repeatTime, const RepeatParamsT& repeatParams,
-    const __gm__ char* apiName)
+
+template <typename T, typename U>
+__aicore__ inline void CheckVecBinaryScalarMaskArrayCommon(const LocalTensor<T>& dst,
+    const LocalTensor<U>& src, const uint64_t mask[], const uint8_t repeatTime, const __gm__ char* apiName)
 {
     CheckVecBinaryScalarTensorCommon(dst, src, apiName);
     ASCENDC_DEBUG_ASSERT((mask != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
         "Failed to check mask pointer in %s, mask pointer can not be nullptr.\n", apiName));
     CheckValueRange<uint8_t>(repeatTime, 1, UINT8_MAX, "repeatTime", apiName);
-    (void)repeatParams;
 }
-template <typename DstT, typename SrcT, typename RepeatParamsT>
-__aicore__ inline void CheckVecBinaryScalarMaskCountCommon(const LocalTensor<DstT>& dst,
-    const LocalTensor<SrcT>& src, const uint64_t mask, const uint8_t repeatTime, const RepeatParamsT& repeatParams,
-    const __gm__ char* apiName)
+
+template <typename T, typename U>
+__aicore__ inline void CheckVecBinaryScalarMaskCountCommon(const LocalTensor<T>& dst,
+    const LocalTensor<U>& src, const uint64_t mask, const uint8_t repeatTime, const __gm__ char* apiName)
 {
     CheckVecBinaryScalarTensorCommon(dst, src, apiName);
     ASCENDC_DEBUG_ASSERT((mask > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
         "Failed to check mask value in %s, mask value should be larger than 0.\n", apiName));
     CheckValueRange<uint8_t>(repeatTime, 1, UINT8_MAX, "repeatTime", apiName);
-    (void)repeatParams;
 }
-template <typename DstT, typename SrcT>
-__aicore__ inline void CheckVecBinaryScalarCalCountCommon(const LocalTensor<DstT>& dst,
-    const LocalTensor<SrcT>& src, const int32_t count, const __gm__ char* apiName)
+
+template <typename T, typename U>
+__aicore__ inline void CheckVecBinaryScalarCalCountCommon(const LocalTensor<T>& dst,
+    const LocalTensor<U>& src, const int32_t count, const __gm__ char* apiName)
 {
     CheckVecBinaryScalarTensorCommon(dst, src, apiName);
     const uint64_t maxElementCount = (dst.GetSize() < src.GetSize()) ? dst.GetSize() : src.GetSize();
@@ -159,6 +163,22 @@ __aicore__ inline void CheckVecBinaryScalarCalCountCommon(const LocalTensor<DstT
         static_cast<int32_t>(maxElementCount);
     CheckValueRange<int32_t>(count, 1, maxCount, "count", apiName);
 }
+template<typename T>
+__aicore__ inline void CheckVecBinary(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const __gm__ char* apiName)
+{
+    CheckTensorTPosition<TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC>(dst, "dst",
+        "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorTPosition<TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC>(src0, "src0",
+        "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorTPosition<TPosition::VECIN, TPosition::VECOUT, TPosition::VECCALC>(src1, "src1",
+        "VECIN / VECCALC / VECOUT", apiName);
+    CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
+    CheckTensorAlignment(src0, ONE_BLK_SIZE, "src0", apiName);
+    CheckTensorAlignment(src1, ONE_BLK_SIZE, "src1", apiName);
+}
+
+
 
 } // namespace AscendC
 

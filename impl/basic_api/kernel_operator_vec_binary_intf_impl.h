@@ -69,6 +69,10 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVecBinary(dst, src0, src1, "Add");
+#endif
+
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Add")) {
