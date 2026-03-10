@@ -42,4 +42,4 @@ TEST_F(TEST_ASC_SYNC_INTRA_WAIT, TEST_ASC_SYNC_INTRA_WAIT_##dtype)              
 
 // ==========asc_sync_intra_wait==========
 TEST_ASC_SYNC_INTRA_WAIT(uint8_t);
-TEST_ASC_SYNC_INTRA_WAIT(int64_t);
+TEST_ASC_SYNC_INTRA_WAIT(uint64_t);

@@ -42,4 +42,4 @@ TEST_F(TEST_ASC_SYNC_INTRA_ARRIVE, TEST_ASC_SYNC_INTRA_ARRIVE_##dtype)          
 
 // ==========asc_sync_intra_arrive==========
 TEST_ASC_SYNC_INTRA_ARRIVE(uint8_t);
-TEST_ASC_SYNC_INTRA_ARRIVE(int64_t);
+TEST_ASC_SYNC_INTRA_ARRIVE(uint64_t);
