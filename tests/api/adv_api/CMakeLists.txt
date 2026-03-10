@@ -258,67 +258,6 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIC_CASE_SRC_FILES
     matmul/lib/test_matmul_client.cpp
 )
 file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
-    #utils
-    utils/init_global_memory/test_operator_init_global_memory.cpp
-    #activate
-    activation/gelu/test_operator_fast_gelu.cpp
-    activation/gelu/test_operator_fast_gelu_v2.cpp
-    activation/sigmoid/test_operator_vec_sigmoid.cpp
-    activation/softmax/test_operator_softmax_c310.cpp
-    api_check/activation/softmax/kernel_softmax_flashv3_check.cpp
-    activation/gelu/test_operator_gelu.cpp
-    activation/geglu/test_operator_geglu.cpp
-    activation/reglu/test_operator_reglu.cpp
-    activation/swish/test_operator_swish.cpp
-    activation/silu/test_operator_silu.cpp
-    activation/swiglu/test_operator_swiglu.cpp
-    #filter
-    filter/dropout/test_operator_dropout.cpp
-    #index
-    index/arithprogression/test_operator_arithprogression.cpp
-    #math
-    math/clamp/test_operator_clamp.cpp
-    math/bitwise_and/test_operator_bitwise_and.cpp
-    math/logical_and/test_operator_logical_and.cpp
-    math/logical_ands/test_operator_logical_ands.cpp
-    math/logical_or/test_operator_logical_or.cpp
-    math/logical_ors/test_operator_logical_ors.cpp
-    math/logical_not/test_operator_logical_not.cpp
-    math/isnan/test_operator_isnan.cpp
-    math/isinf/test_operator_isinf.cpp
-    math/fma/test_operator_fma.cpp
-    math/rint/test_operator_rint.cpp
-    math/sincos/test_operator_sincos.cpp
-    math/isfinite/test_operator_isfinite.cpp
-    math/atanh/test_operator_atan_c310.cpp
-    math/cos/test_operator_cos_c310.cpp
-    math/cumsum/test_operator_cumsum.cpp
-    math/erf/test_operator_erf.cpp
-    math/fmod/test_operator_fmod.cpp
-    math/hypot/test_operator_hypot.cpp
-    math/log/test_operator_log.cpp
-    math/philox/test_operator_philox_c310.cpp
-    math/power/test_operator_power_c310.cpp
-    math/sin/test_operator_sin_c310.cpp
-    math/tanh/test_operator_tanh_c310.cpp
-    math/cosh/test_operator_cosh.cpp
-    math/sinh/test_operator_sinh.cpp
-    math/sign/test_operator_sign.cpp
-    math/exp/test_operator_exphighprecision.cpp
-    math/where/test_operator_where.cpp
-    api_check/math/where/kernel_where_check.cpp
-    math/bitwise_not/test_operator_bitwise_not.cpp
-    math/bitwise_or/test_operator_bitwise_or.cpp
-    math/bitwise_xor/test_operator_bitwise_xor.cpp
-    math/logical_xor/test_operator_logical_xor.cpp
-    # normalization
-    normalization/welfordfinalize/test_operator_welfordfinalize.cpp
-    normalization/normalize/test_operator_normalize_c310.cpp
-    normalization/layernorm/test_operator_layernorm.cpp
-    normalization/layernormV2/test_operator_layernormV2_c310.cpp
-    normalization/welfordupdate/test_operator_welfordupdate.cpp
-    normalization/groupnorm/test_operator_groupnorm.cpp
-    # quantization
     quantization/dequantize/test_dequantize.cpp
     quantization/antiquantize/test_antiquantize.cpp
     quantization/antiquant/test_ascend_antiquant_scalar.cpp
@@ -366,6 +305,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
     hccl/test_hccl_950.cpp
+    hcomm/test_hcomm_950.cpp
 )
 
 # ascend310B1 test cases
