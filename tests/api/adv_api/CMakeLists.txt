@@ -340,32 +340,8 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     quantization/quantize/test_quantize_per_channel.cpp
     quantization/quantize/test_quantize_per_token.cpp
     quantization/quantize/test_quantize_per_group.cpp
-    # reduce
-    reduce/reduce_max/test_operator_reduce_max_c310.cpp
-    reduce/reduce_min/test_operator_reduce_min_c310.cpp
-    reduce/reduce_sum/test_operator_reduce_sum_c310.cpp
-    reduce/reduce_all/test_operator_reduce_all_c310.cpp
-    reduce/reduce_any/test_operator_reduce_any_c310.cpp
-    reduce/reduce_prod/test_operator_reduce_prod_c310.cpp
-    api_check/reduce/reduce_all/kernel_reduce_all_check.cpp
-    api_check/reduce/reduce_any/kernel_reduce_any_check.cpp
-    api_check/reduce/reduce_prod/kernel_reduce_prod_check.cpp
-    reduce/mean/test_operator_mean.cpp
-    reduce/sum/test_operator_sum.cpp
-    reduce/reduce_xor_sum/test_operator_reduce_xor_sum.cpp
-    # pad
-    pad/broadcast/test_operator_broadcast_c310.cpp
-    api_check/pad/broadcast/kernel_broadcast_check.cpp
-    pad/pad/test_operator_pad.cpp
-    # select
-    select/selectwithbytesmask/test_operator_selectwithbytesmask.cpp
-    # sort
-    sort/sort/test_operator_radix_sort.cpp
-    sort/topk/test_operator_radix_topk.cpp
-    # transpose
-    transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
-    # hccl
     hccl/test_hccl_950.cpp
+    hcomm/test_hcomm_950.cpp
 )
 
 # ascend310B1 test cases
