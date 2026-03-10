@@ -22,8 +22,8 @@ namespace AscendC {
 namespace Te {
 // coord
 template <typename T, size_t row, size_t column>
-using CoordFormat = Std::tuple<Std::tuple<Std::Int<FRACTAL_FIXED>, Std::Int<row>>,
-    Std::tuple<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<column>>>;
+using CoordFormat = Std::tuple<Std::tuple<Std::Int<0>, Std::Int<row>>,
+                    Std::tuple<Std::Int<0>, Std::Int<column>>>;
 
 // NZ
 template <typename T, size_t row, size_t column>
