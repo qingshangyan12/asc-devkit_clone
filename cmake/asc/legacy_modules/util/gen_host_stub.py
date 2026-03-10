@@ -67,7 +67,6 @@ def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool, du
 #include <dlfcn.h>
 #include <securec.h>
 ''')
-    buff.write('\n')
 
     if dump_assert:
         buff.write(r'''
