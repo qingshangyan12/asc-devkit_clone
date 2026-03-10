@@ -90,6 +90,4 @@ __aicore__ inline void asc_set_atomic_min_float16()
 {
     asc_set_atomic_min_float16_impl();
 }
-
-
 #endif
