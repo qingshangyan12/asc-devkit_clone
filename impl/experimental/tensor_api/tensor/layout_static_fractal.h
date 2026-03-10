@@ -20,6 +20,10 @@
 
 namespace AscendC {
 namespace Te {
+// coord
+template <typename T, size_t row, size_t column>
+using CoordFormat = Std::tuple<Std::tuple<Std::Int<FRACTAL_FIXED>, Std::Int<row>>,
+    Std::tuple<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<column>>>;
 
 // NZ
 template <typename T, size_t row, size_t column>
@@ -60,7 +64,7 @@ using ScaleZZStrideFormat = Stride<Stride<Std::Int<MX_SCALE_K0>, Std::Int<FRACTA
 // ScaleNN
 template <typename T, size_t row, size_t column>
 using ScaleNNShapeFormat = Shape<Shape<Std::Int<MX_SCALE_K0>, Std::Int<row/MX_SCALE_K0>>, 
-                                    Shape<Std::Int<FRACTAL_FIXED>, Std::Int<column/FRACTAL_FIXED>>>;
+                                    Shape<Std::Int<MX_SCALE_K0>, Std::Int<column/MX_SCALE_K0>>>;
 
 template <typename T, size_t row, size_t column>
 using ScaleNNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_SIZE>>,
