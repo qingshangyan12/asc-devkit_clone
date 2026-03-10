@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm_aiv_def.h
- * \brief
+ * \brief Hcomm AIV definition for V220
  */
 #ifndef IMPL_V220_HCOMM_AIV_DEF_H
 #define IMPL_V220_HCOMM_AIV_DEF_H

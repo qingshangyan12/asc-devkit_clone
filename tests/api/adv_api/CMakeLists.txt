@@ -258,6 +258,9 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIC_CASE_SRC_FILES
     matmul/lib/test_matmul_client.cpp
 )
 file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
+    # hccl
+    hccl/test_hccl_950.cpp
+    hcomm/test_hcomm_950.cpp
     #utils
     utils/init_global_memory/test_operator_init_global_memory.cpp
     #activate
@@ -364,8 +367,6 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     sort/topk/test_operator_radix_topk.cpp
     # transpose
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
-    # hccl
-    hccl/test_hccl_950.cpp
 )
 
 # ascend310B1 test cases
