@@ -94,16 +94,16 @@ template <typename T>
 __aicore__ inline void CheckTensorAlignment(const LocalTensor<T>& inputTensor, uint32_t alignBytes,
     const __gm__ char* tensorName,  const __gm__ char* apiName)
 {
-    uint64_t tensorAddr = inputTensor.GetPhyAddr();
+    uint64_t tensorAddr = reinterpret_cast<uint64_t>(inputTensor.GetPhyAddr());
 #ifdef ASCENDC_CPU_DEBUG
     auto positionHardMap = ConstDefiner::Instance().positionHardMap;
-    int32_t tensorPos = inputTensor.GetPosition();
+    TPosition tensorPos = static_cast<TPosition>(inputTensor.GetPosition());
     tensorAddr = tensorAddr -
         reinterpret_cast<uint64_t>(ConstDefiner::Instance().hardwareCpuBufferMap.at(positionHardMap.at(tensorPos)));
 #endif
     ASCENDC_DEBUG_ASSERT((tensorAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s start "
-        "address alignment in %s, its start address must align with %u bytes, current start address is %u.\n",
-        tensorName, apiName, alignBytes, tensorAddr));
+        "address alignment in %s, its start address must align with %u bytes, current start address is %llu.\n",
+        tensorName, apiName, alignBytes, static_cast<unsigned long long>(tensorAddr)));
 }
 
 template <typename T>
