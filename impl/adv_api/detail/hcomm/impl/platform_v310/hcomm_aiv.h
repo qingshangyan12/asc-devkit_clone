@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm_roce.h
- * \brief
+ * \brief Hcomm AIV implementation for V310
  */
 #ifndef IMPL_V310_HCOMM_AIV_H
 #define IMPL_V310_HCOMM_AIV_H

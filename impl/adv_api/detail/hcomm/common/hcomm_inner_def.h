@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm_inner_def.h
- * \brief
+ * \brief Hcomm inner definition
  */
 #ifndef IMPL_HCOMM_HCOMM_INNER_DEF_H
 #define IMPL_HCOMM_HCOMM_INNER_DEF_H

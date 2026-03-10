@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm_aiv_def.h
- * \brief
+ * \brief Hcomm AIV definition for V310
  */
 #ifndef IMPL_V310_HCOMM_AIV_DEF_H
 #define IMPL_V310_HCOMM_AIV_DEF_H
