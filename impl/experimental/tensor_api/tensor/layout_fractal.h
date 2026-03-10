@@ -25,7 +25,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeNzLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NZLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::NZ, T>::apply(row, column);
     }
 }
@@ -34,7 +34,7 @@ template <typename U, typename S>
 __aicore__ inline decltype(auto) MakeL0CLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return L0CLayoutFormat<row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::NZ, uint16_t>::apply(row, column);
     }
 }
@@ -43,7 +43,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeNDLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NDLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::ND, T>::apply(row, column);
     }
 }
@@ -52,7 +52,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeDNLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return DNLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::DN, T>::apply(row, column);
     }
 }
@@ -61,7 +61,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeZnLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZNLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::ZN, T>::apply(row, column);
     }
 }
@@ -70,7 +70,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeZzLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ZZLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::ZZ, T>::apply(row, column);
     }
 }
@@ -79,7 +79,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeNnLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return NNLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::NN, T>::apply(row, column);
     }
 }
@@ -88,7 +88,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column) { // 不转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleANDLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::ND, Std::ignore_t>::apply(row, column); // (m, scaleK)
     }
 }
@@ -97,7 +97,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeScaleADNLayout(U row, S column) { // 转置(m, scaleK)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleADNLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::DN, T>::apply(row, column); // 转置(m, scaleK)
     }
 }
@@ -106,7 +106,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeScaleBNDLayout(U row, S column) { // 不转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleBNDLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::ND, T>::apply(row, column); // (scaleK, n)
     }
 }
@@ -115,7 +115,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column) { // 转置(scaleK, n)
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleBDNLayoutFormat<T, row, column>{};
-    } else {
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
         return LayoutDispatcher<LayoutFormat::DN, Std::ignore_t>::apply(row, column); // (scaleK, n)
     }
 }
