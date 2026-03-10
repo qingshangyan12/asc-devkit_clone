@@ -30,7 +30,7 @@ protected:
                                                                                       \
 TEST_F(TEST_ASC_RELEASE_BUF, TEST_ASC_RELEASE_BUF_##dtype)               \
 {                                                                                     \
-    MOCKER_CPP(rls_buf_block, void(pipe_t, dtype, bool))                    \
+    MOCKER_CPP(rls_buf, void(pipe_t, dtype, bool))                    \
             .times(1)                                                                           \
             .will(invoke(rls_buf_stub<dtype>));                               \
                                                                                                 \
