@@ -67,7 +67,7 @@ __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
 #ifdef ASCENDC_DEBUG
-    CheckVecBinaryScalarMaskArrayCommon(dst, src, mask, repeatTime, "Adds");
+    
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);

@@ -376,11 +376,14 @@ __aicore__ inline void Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0
 }
 #else
 template <typename T, bool isSetMask>
-__aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Div", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<T>(mask, "Div");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Div")) {
@@ -395,10 +398,14 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Div", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<T>(mask, "Div");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Div")) {
@@ -440,10 +447,13 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 }
 #else
 template <typename T>
-__aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, const int32_t& count)
+__aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Div", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "Div")) {
         ASCENDC_REPORT_CHECK_ERROR("Div", KernelFuncType::CALCOUNT_MODE);
@@ -562,11 +572,14 @@ __aicore__ inline void MulAddDst(const LocalTensor<T>& dst, const LocalTensor<U>
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask>
-__aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Max", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<T>(mask, "Max");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Max")) {
@@ -581,10 +594,14 @@ __aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Max", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<T>(mask, "Max");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Max")) {
@@ -607,10 +624,13 @@ __aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, const int32_t& count)
+__aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Max", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "Max")) {
         ASCENDC_REPORT_CHECK_ERROR("Max", KernelFuncType::CALCOUNT_MODE);
@@ -642,11 +662,14 @@ __aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask>
-__aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Min", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<T>(mask, "Min");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Min")) {
@@ -661,10 +684,14 @@ __aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Min", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<T>(mask, "Min");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Min")) {
@@ -687,10 +714,13 @@ __aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, const int32_t& count)
+__aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Min", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "Min")) {
         ASCENDC_REPORT_CHECK_ERROR("Min", KernelFuncType::CALCOUNT_MODE);
@@ -722,11 +752,14 @@ __aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask>
-__aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+__aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("And", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<T>(mask, "And");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "And")) {
@@ -741,10 +774,14 @@ __aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("And", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<T>(mask, "And");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "And")) {
@@ -767,10 +804,13 @@ __aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, const int32_t& count)
+__aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("And", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "And")) {
         ASCENDC_REPORT_CHECK_ERROR("And", KernelFuncType::CALCOUNT_MODE);
@@ -802,11 +842,14 @@ __aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask>
-__aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Or", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskArray<T>(mask, "Or");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Or")) {
@@ -821,10 +864,14 @@ __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
 }
 
 template <typename T, bool isSetMask>
-__aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+__aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Or", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+    CheckMaskValue<T>(mask, "Or");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFuncVecBinary(dst, src0, src1, mask, repeatTime, repeatParams, "Or")) {
@@ -847,10 +894,13 @@ __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1, const int32_t& count)
+__aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Or", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncVecBinary(dst, src0, src1, count, "Or")) {
         ASCENDC_REPORT_CHECK_ERROR("Or", KernelFuncType::CALCOUNT_MODE);
