@@ -10,7 +10,7 @@
 
 /*!
  * \file hcomm_v220_impl.h
- * \brief
+ * \brief Hcomm implementation for V220
  */
 #ifndef IMPL_HCOMM_HCOMM_V220_IMPL_H
 #define IMPL_HCOMM_HCOMM_V220_IMPL_H
