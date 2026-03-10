@@ -37,6 +37,7 @@ template <typename T, typename U, typename S>
 struct MakeNDLayout {
 __aicore__ inline decltype(auto) operator()(size_t row, size_t column) {
     return MakeNDLayout<T, U, S>(row, column);
+}
 };
 
 template <typename T, typename U, typename S>
@@ -95,7 +96,6 @@ __aicore__ inline decltype(auto) operator()(size_t row, size_t column) { // è½¬ç
 }
 };
 
-}
 } // namespace Te
 } // namespace AscendC
 

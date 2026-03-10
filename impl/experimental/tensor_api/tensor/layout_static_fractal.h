@@ -9,11 +9,11 @@
 */
 
 /*!
-* \file layout_fractal.h
+* \file layout_static_fractal.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_FRACTAL_H
-#define IMPL_TENSOR_API_TENSOR_LAYOUT_FRACTAL_H
+#ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_STATIC_FRACTAL_H
+#define IMPL_TENSOR_API_TENSOR_LAYOUT_STATIC_FRACTAL_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_definition.h"
@@ -160,4 +160,4 @@ using ScaleBDNLayoutFormat = Layout<DNShapeFormat<T, row, column>, DNStrideForma
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_TENSOR_LAYOUT_FRACTAL_H
+#endif // IMPL_TENSOR_API_TENSOR_LAYOUT_STATIC_FRACTAL_H

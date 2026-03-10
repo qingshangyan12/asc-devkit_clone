@@ -30,9 +30,10 @@ __aicore__ inline decltype(auto) MakeNzLayout(U row, S column) {
     }
 }
 
+template <typename U, typename S>
 __aicore__ inline decltype(auto) MakeL0CLayout(size_t row, size_t column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
-        return L0CLayoutFormat<T, row, column>{};
+        return L0CLayoutFormat<row, column>{};
     } else {
         return LayoutDispatcher<LayoutFormat::NZ, uint16_t>::apply(row, column);
     }
