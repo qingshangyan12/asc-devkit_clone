@@ -10,7 +10,7 @@
 
 /*!
  * \file hccl_common.h
- * \brief
+ * \brief Hcomm common definitions
  */
 #ifndef LIB_HCOMM_HCOMM_COMMON_H
 #define LIB_HCOMM_HCOMM_COMMON_H

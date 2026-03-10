@@ -318,6 +318,9 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     normalization/layernormV2/test_operator_layernormV2_c310.cpp
     normalization/welfordupdate/test_operator_welfordupdate.cpp
     normalization/groupnorm/test_operator_groupnorm.cpp
+    # hccl
+    hccl/test_hccl_950.cpp
+    hcomm/test_hcomm_950.cpp
     # quantization
     quantization/dequantize/test_dequantize.cpp
     quantization/antiquantize/test_antiquantize.cpp
@@ -364,8 +367,6 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     sort/topk/test_operator_radix_topk.cpp
     # transpose
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
-    # hccl
-    hccl/test_hccl_950.cpp
 )
 
 # ascend310B1 test cases
