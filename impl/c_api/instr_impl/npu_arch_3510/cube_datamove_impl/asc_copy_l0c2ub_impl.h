@@ -34,6 +34,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ bfloat16_t *dst_addr, __cc_
     }
 }
 
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ bfloat16_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
+}
+
 // half  float
 __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ half *dst_addr, __cc__ float *src_addr, uint16_t n_size, uint16_t m_size,
                             uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
@@ -47,6 +59,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ half *dst_addr, __cc__ floa
                     clip_relu_post, loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
 
     }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ half* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
 }
 
 // float8_e4m3_t  float
@@ -64,6 +88,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e4m3_t *dst_addr, __
     }
 }
 
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e4m3_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
+}
+
 // float8_e5m2_t  float
 __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e5m2_t *dst_addr, __cc__ float *src_addr, uint16_t n_size, uint16_t m_size,
                             uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
@@ -77,6 +113,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e5m2_t *dst_addr, __
                     clip_relu_post, loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
 
     }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e5m2_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
 }
 
 // hifloat8_t  float
@@ -94,6 +142,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ hifloat8_t *dst_addr, __cc_
     }
 }
 
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ hifloat8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
+}
+
 // int8  float
 __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ int8_t *dst_addr, __cc__ float *src_addr, uint16_t n_size, uint16_t m_size,
                             uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
@@ -107,6 +167,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ int8_t *dst_addr, __cc__ fl
                     clip_relu_post, loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
 
     }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ int8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
 }
 
 // uint8  float
@@ -124,6 +196,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ uint8_t *dst_addr, __cc__ f
     }
 }
 
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ uint8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
+}
+
 // float  float
 __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float *dst_addr, __cc__ float *src_addr, uint16_t n_size, uint16_t m_size,
                             uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
@@ -137,6 +221,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float *dst_addr, __cc__ flo
                     clip_relu_post, loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
 
     }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
 }
 
 // bfloat16_t  int32_t
@@ -154,6 +250,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ bfloat16_t *dst_addr, __cc_
     }
 }
 
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ bfloat16_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
+}
+
 // half  int32_t
 __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ half *dst_addr, __cc__ int32_t *src_addr, uint16_t n_size, uint16_t m_size,
                             uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
@@ -167,6 +275,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ half *dst_addr, __cc__ int3
                     clip_relu_post, loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
 
     }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ half* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
 }
 
 // float8_e4m3_t  int32_t
@@ -184,6 +304,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e4m3_t *dst_addr, __
     }
 }
 
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e4m3_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
+}
+
 // float8_e5m2_t  int32_t
 __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e5m2_t *dst_addr, __cc__ int32_t *src_addr, uint16_t n_size, uint16_t m_size,
                             uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
@@ -197,6 +329,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e5m2_t *dst_addr, __
                     clip_relu_post, loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
 
     }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e5m2_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
 }
 
 // hifloat8_t  int32_t
@@ -214,6 +358,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ hifloat8_t *dst_addr, __cc_
     }
 }
 
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ hifloat8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
+}
+
 // int8  int32_t
 __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ int8_t *dst_addr, __cc__ int32_t *src_addr, uint16_t n_size, uint16_t m_size,
                             uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
@@ -227,6 +383,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ int8_t *dst_addr, __cc__ in
                     clip_relu_post, loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
 
     }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ int8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
 }
 
 // uint8  int32_t
@@ -244,6 +412,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ uint8_t *dst_addr, __cc__ i
     }
 }
 
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ uint8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
+}
+
 // int32_t  int32_t
 __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ int32_t *dst_addr, __cc__ int32_t *src_addr, uint16_t n_size, uint16_t m_size,
                             uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
@@ -257,6 +437,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ int32_t *dst_addr, __cc__ i
                     clip_relu_post, loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
 
     }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ int32_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
 }
 
 // void  float
@@ -274,6 +466,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ void *dst_addr, __cc__ floa
     }
 }
 
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ void* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
+}
+
 // void  int32_t
 __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ void *dst_addr, __cc__ int32_t *src_addr, uint16_t n_size, uint16_t m_size,
                             uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
@@ -287,6 +491,18 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ void *dst_addr, __cc__ int3
                     clip_relu_post, loop_enhance_en, eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
 
     }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ void* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size,
+                            uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre,
+                            uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+                            uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+                            bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{
+    asc_copy_l0c2ub_impl(dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+                        unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, loop_enhance_en,
+                        eltwise_op, eltwise_antq_en, loop_enhance_merge_en, C0_pad_en, wino_post_en, broadcast_en, NZ2DN_en);
+    asc_sync_post_process();
 }
 
 #endif
