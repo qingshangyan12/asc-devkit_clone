@@ -50,6 +50,10 @@ __aicore__ inline void asc_mark_stamp();
 #endif
 }   // namespace __asc_aicore
 
+#if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+using namespace __asc_aicore;
+#endif
+
 #define TRACE_START(...) TRACE_START_IMPL(__VA_ARGS__)
 #define TRACE_STOP(...) TRACE_STOP_IMPL(__VA_ARGS__)
 
