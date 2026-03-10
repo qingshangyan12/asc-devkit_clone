@@ -102,209 +102,197 @@ struct GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1> {
 };
 
 template <typename T>
-struct IsZZFormat {
-private:
-    __aicore__ inline static constexpr bool IsFractalZZFormatNormal() {
-        constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
-            && Std::is_constant<C0_SIZE / sizeof(type), ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<C0_SIZE / sizeof(type), StrideRow0>::value 
-            && Std::is_constant<1, StrideColumn0>::value;
-        return (isShapeRight && isStrideRight);
-    }
-
-    __aicore__ inline static constexpr bool IsFractalScaleZZFormat() {
-        constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
-        && Std::is_constant<MX_SCALE_K0, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<MX_SCALE_K0, StrideRow0>::value 
-        && Std::is_constant<1, StrideColumn0>::value;
-        return (isShapeRight && isStrideRight);
-    }
-
-    __aicore__ inline static constexpr bool IsFractalZZFormat() {
-        constexpr bool isScaleType = is_one_of_attr_v<type, fp8_e8m0_t>;
-        using ResultType = Std::conditional_t<isScaleType,
-            Std::bool_constant<IsFractalScaleZZFormat()>,
-            Std::bool_constant<IsFractalZZFormatNormal()>>;
-        return ResultType::value;
-    }
-public:
+struct FormatChecker {
+protected:
     using type = typename T::elementType;
     using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
     using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
     using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+    using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
     using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+    using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
+public:
+
+    template <auto ExpectedValue, typename ActualType>
+    __aicore__ inline static constexpr bool CheckSinglePair() {
+        return Std::is_constant<ExpectedValue, ActualType>::value;
+    }
+
+    template <auto... ExpectedValues, typename... ActualTypes>
+    __aicore__ inline static constexpr bool CheckAllEquals() {
+        static_assert(sizeof...(ExpectedValues) == sizeof...(ActualTypes),
+                      "The number of expected values must match the number of actual types!");
+        return (... && CheckSinglePair<ExpectedValues, ActualTypes>());
+    }
+
+    template <auto ExpectedType, typename ShapeType>
+    __aicore__ inline static constexpr bool CheckShape() {
+        return Std::is_constant<ExpectedType, ShapeType>::value;
+    }
+
+    template <auto ExpectedType, typename StrideType>
+    __aicore__ inline static constexpr bool CheckStride() {
+        return Std::is_constant<ExpectedType, StrideType>::value;
+    }
+
+    __aicore__ inline static constexpr bool IsScaleType() {
+        return Std::is_one_of_v<type, __cbuf__ fp8_e8m0_t, __ca__ fp8_e8m0_t, __cb__ fp8_e8m0_t>;
+    }
+};
+
+template <typename T>
+struct IsZZFormat : FormatChecker<T> {
+private:
+    __aicore__ inline static constexpr bool IsFractalZZFormatNormal() {
+        using Base = FormatChecker<T>;
+        return Base::template CheckAllEquals<
+                FRACTAL_FIXED, typename Base::ShapeRow0,
+                C0_SIZE / sizeof(typename Base::type), typename Base::ShapeColumn0,
+                C0_SIZE / sizeof(typename Base::type), typename Base::StrideRow0,
+                1, typename Base::StrideColumn0>();
+    }
+
+    __aicore__ inline static constexpr bool IsFractalScaleZZFormat() {
+        using Base = FormatChecker<T>;
+        return Base::template CheckAllEquals<
+               FRACTAL_FIXED, typename Base::ShapeRow0,
+               MX_SCALE_K0, typename Base::ShapeColumn0,
+               MX_SCALE_K0, typename Base::StrideRow0,
+               1, typename Base::StrideColumn0>();
+    }
+
+    __aicore__ inline static constexpr bool IsFractalZZFormat() {
+        using ResultType = Std::conditional_t<FormatChecker<T>::IsScaleType(),
+                           Std::bool_constant<IsFractalScaleZZFormat()>,
+                           Std::bool_constant<IsFractalZZFormatNormal()>>;
+        return ResultType::value;
+    }
+public:
     static constexpr bool value = IsFractalZZFormat();
 };
 
 template <typename T>
-struct IsNNFormat {
+struct IsNNFormat : FormatChecker<T> {
 private:
     __aicore__ inline static constexpr bool IsFractalNNFormat() {
-        using type = typename T::elementType;
-        static_assert(Std::is_same_v<type, __cbuf__ fp8_e8m0_t>, "NnFormat Only support fp8_e8m0_t");
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-
-        constexpr bool isShapeRight = Std::is_constant<MX_SCALE_K0, ShapeRow0>::value 
-        && Std::is_constant<FRACTAL_FIXED, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<1, StrideRow0>::value 
-        && Std::is_constant<MX_SCALE_K0, StrideColumn0>::value;
-        return (isShapeRight && isStrideRight);
+        using Base = FormatChecker<T>;
+        static_assert(Std::is_same_v<typename Base::type, __cbuf__ fp8_e8m0_t>, "NnFormat Only support fp8_e8m0_t");
+        return Base::template CheckShape<MX_SCALE_K0, typename Base::ShapeRow0>()
+            && Base::template CheckShape<FRACTAL_FIXED, typename Base::ShapeColumn0>()
+            && Base::template CheckStride<1, typename Base::StrideRow0>()
+            && Base::template CheckStride<MX_SCALE_K0, typename Base::StrideColumn0>();
     }
 public:
     static constexpr bool value = IsFractalNNFormat();
 };
 
 template <typename T>
-struct IsZNFormat {
+struct IsZNFormat : FormatChecker<T> {
 private:
     __aicore__ inline static constexpr bool IsFractalZNFormat() {
-        using type = typename T::elementType;
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        constexpr auto c0Size = is_b4_type<type> ? C0_SIZE * 2 : C0_SIZE / sizeof(type);
-        constexpr bool isShapeRight =
-            Std::is_constant<c0Size, ShapeRow0>::value && Std::is_constant<FRACTAL_FIXED, ShapeColumn0>::value;
-        constexpr bool isStrideRight =
-            Std::is_constant<1, StrideRow0>::value && Std::is_constant<c0Size, StrideColumn0>::value;
-
-        return (isShapeRight && isStrideRight);
+        using Base = FormatChecker<T>;
+        constexpr auto c0Size = is_b4_type<typename Base::type> ? C0_SIZE * 2 : C0_SIZE / sizeof(typename Base::type);
+        return Base::template CheckShape<c0Size, typename Base::ShapeRow0>() 
+            && Base::template CheckShape<FRACTAL_FIXED, typename Base::ShapeColumn0>()
+            && Base::template CheckStride<1, typename Base::StrideRow0>()
+            && Base::template CheckStride<c0Size, typename Base::StrideColumn0>();
     }
 public:
     static constexpr bool value = IsFractalZNFormat();
 };
 
 template <typename T>
-struct IsNZFormat {
+struct IsNZFormat : FormatChecker<T> {
 private:
     __aicore__ inline static constexpr bool IsFractalNZFormat() {
-        using type = typename T::elementType;
-        // NZ shape (Int<16>, row) , (Int<C0Size>, column))
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        // NZ stride (Int<C0Size>, N * C0Size + 16 * Int<C0Size>) , (Int<1>, row * (N * C0Size + 16 * Int<C0Size>)))
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        constexpr auto c0Size = is_b4_type<type> ? C0_SIZE * 2 : C0_SIZE / sizeof(type);
-        constexpr bool isStrideRight =
-            Std::is_constant<c0Size, StrideRow0>::value && Std::is_constant<1, StrideColumn0>::value;
-        constexpr bool isShapeRight =
-            Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value && Std::is_constant<c0Size, ShapeColumn0>::value;
-
-        return (isShapeRight && isStrideRight);
+        using Base = FormatChecker<T>;
+        constexpr auto c0Size = is_b4_type<typename Base::type> ? C0_SIZE * 2 : C0_SIZE / sizeof(typename Base::type);
+        return Base::template CheckShape<FRACTAL_FIXED, typename Base::ShapeRow0>()
+            && Base::template CheckShape<c0Size, typename Base::ShapeColumn0>()
+            && Base::template CheckStride<c0Size, typename Base::StrideRow0>()
+            && Base::template CheckStride<1, typename Base::StrideColumn0>();
     }
 public:
     static constexpr bool value = IsFractalNZFormat();
 };
 
 template <typename T>
-struct IsL0cNZFormat {
+struct IsL0cNZFormat : FormatChecker<T> {
 private:
     __aicore__ inline static constexpr bool IsFractalL0cNZFormat() {
-        using type = typename T::elementType;
-        // NZ shape (Int<16>, row) , (Int<C0Size>, column))
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-
-        // NZ stride (Int<C0Size>, N * C0Size + 16 * Int<C0Size>) , (Int<1>, row * (N * C0Size + 16 * Int<C0Size>)))
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-
-        constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
-            && Std::is_constant<FRACTAL_FIXED, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<FRACTAL_FIXED, StrideRow0>::value 
-            && Std::is_constant<1, StrideColumn0>::value;
-
-        return (isShapeRight && isStrideRight);
+        using Base = FormatChecker<T>;
+        return Base::template CheckShape<FRACTAL_FIXED, typename Base::ShapeRow0>()
+            && Base::template CheckShape<FRACTAL_FIXED, typename Base::ShapeColumn0>()
+            && Base::template CheckStride<FRACTAL_FIXED, typename Base::StrideRow0>() 
+            && Base::template CheckStride<1, typename Base::StrideColumn0>();
     }
 public:
     static constexpr bool value = IsFractalL0cNZFormat();
 };
 
 template <typename T>
-struct IsNDFormat {
+struct IsNDFormat : FormatChecker<T>{
 private:
     __aicore__ inline static constexpr bool IsFractalNDFormatNormal() {
-        // shape = ((1, row),(1,col)) stride = ((0, col),(0, 1))
-        constexpr bool isShapeRight = Std::is_constant<1, ShapeRow0>::value && Std::is_constant<1, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<0, StrideRow0>::value && Std::is_constant<0, StrideColumn0>::value 
-                                                                                && Std::is_constant<1, StrideColumn1>::value;
-
-        return (isShapeRight && isStrideRight);
+        using Base = FormatChecker<T>;
+        return Base::template CheckShape<1, typename Base::ShapeRow0>()
+            && Base::template CheckShape<1, typename Base::ShapeColumn0>()
+            && Base::template CheckStride<0, typename Base::StrideRow0>()
+            && Base::template CheckStride<0, typename Base::StrideColumn0>()
+            && Base::template CheckStride<1, typename Base::StrideColumn1>();
     }
 
     __aicore__ inline static constexpr bool IsFractalScaleNDFormat() {
-        // shape = ((2, row/2),(1,col)) stride = ((1, 2*col),(0, 2))
-        constexpr bool isShapeRight = Std::is_constant<2, ShapeRow0>::value && Std::is_constant<1, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<1, StrideRow0>::value && Std::is_constant<0, StrideColumn0>::value
-                                                                                && Std::is_constant<2, StrideColumn1>::value;
-
-        return (isShapeRight && isStrideRight);
+        using Base = FormatChecker<T>;
+        return Base::template CheckShape<2, typename Base::ShapeRow0>()
+            && Base::template CheckShape<1, typename Base::ShapeColumn0>()
+            && Base::template CheckStride<1, typename Base::StrideRow0>()
+            && Base::template CheckStride<0, typename Base::StrideColumn0>()
+            && Base::template CheckStride<2, typename Base::StrideColumn1>();
     }
 
     __aicore__ inline static constexpr bool IsFractalNDFormat() {
-        constexpr bool isScaleType = is_one_of_attr_v<type, fp8_e8m0_t>;
-        using ResultType = Std::conditional_t<isScaleType,
-            Std::bool_constant<IsFractalScaleNDFormat()>,
-            Std::bool_constant<IsFractalNDFormatNormal()>>;
+        using ResultType = Std::conditional_t<FormatChecker<T>::IsScaleType(),
+                           Std::bool_constant<IsFractalScaleNDFormat()>,
+                           Std::bool_constant<IsFractalNDFormatNormal()>>;
         return ResultType::value;
     }
 public:
-    using type = typename T::elementType;
-    using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-    using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-
-    using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-    using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-    using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
     static constexpr bool value = IsFractalNDFormat();
-    static constexpr bool normalValue = IsFractalNDFormatNormal();
 };
 
 template <typename T>
-struct IsDNFormat {
+struct IsDNFormat : FormatChecker<T> {
 private:
     __aicore__ inline static constexpr bool IsFractalDNFormatNormal() {
-        // shape = ((1, row),(1,col)) stride = ((0, 1),(0, row))
-        constexpr bool isShapeRight = Std::is_constant<1, ShapeRow0>::value && Std::is_constant<1, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<0, StrideRow0>::value && Std::is_constant<1, StrideRow1>::value && Std::is_constant<0, StrideColumn0>::value;
-
-        return (isShapeRight && isStrideRight);
+        using Base = FormatChecker<T>;
+        return Base::template CheckShape<1, typename Base::ShapeRow0>()
+            && Base::template CheckShape<1, typename Base::ShapeColumn0>()
+            && Base::template CheckStride<0, typename Base::StrideRow0>()
+            && Base::template CheckStride<1, typename Base::StrideRow1>()
+            && Base::template CheckStride<0, typename Base::StrideColumn0>();
     }
 
     __aicore__ inline static constexpr bool IsFractalScaleDNFormat() {
-         // shape = ((1, row),(2,col/2)) stride = ((0, 2),(1, row*2))
-        constexpr bool isShapeRight = Std::is_constant<1, ShapeRow0>::value && Std::is_constant<2, ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<0, StrideRow0>::value && Std::is_constant<2, StrideRow1>::value && Std::is_constant<1, StrideColumn0>::value;
-
-        return (isShapeRight && isStrideRight);
+        using Base = FormatChecker<T>;
+        return Base::template CheckShape<2, typename Base::ShapeColumn0>()
+            && Base::template CheckStride<2, typename Base::StrideRow0>()
+            && Base::template CheckStride<1, typename Base::StrideColumn0>();
     }
 
      __aicore__ inline static constexpr bool IsFractalDNFormat() {
-        constexpr bool isScaleType = is_one_of_attr_v<type, fp8_e8m0_t>;
-        using ResultType = Std::conditional_t<isScaleType,
-            Std::bool_constant<IsFractalScaleDNFormat()>,
-            Std::bool_constant<IsFractalDNFormatNormal()>>;
+        using ResultType = Std::conditional_t<FormatChecker<T>::IsScaleType(),
+                           Std::bool_constant<IsFractalScaleDNFormat()>,
+                           Std::bool_constant<IsFractalDNFormatNormal()>>;
         return ResultType::value;
     }
 public:
-        using type = typename T::elementType;
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
     static constexpr bool value = IsFractalDNFormat();
-    static constexpr bool normalValue = IsFractalDNFormatNormal();
 };
 
 template <typename T>
 struct IsScaleANDFormat { // shape = ((1, row),(1,col)) stride = ((0, col),(0, 1))
-    static constexpr bool value = IsNDFormat<T>::normalValue;
+    static constexpr bool value = IsNDFormat<T>::value;
 };
 
 template <typename T>
@@ -319,7 +307,7 @@ struct IsScaleBNDFormat { // shape = ((2, row/2),(1,col)) stride = ((1, 2*col),(
 
 template <typename T>
 struct IsScaleBDNFormat { // shape = ((1, row),(1,col)) stride = ((0, 1),(0, row))
-    static constexpr bool value = IsDNFormat<T>::normalValue;
+    static constexpr bool value = IsDNFormat<T>::value;
 };
 
 template <typename T, AttrInfo info1, AttrInfo info2, size_t dim>
