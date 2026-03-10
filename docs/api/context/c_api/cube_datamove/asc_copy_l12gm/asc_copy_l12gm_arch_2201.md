@@ -52,5 +52,7 @@ PIPE_MTE1
 ## 调用示例
 
 ```cpp
-asc_copy_l12gm(dst, src, n_burst, burst_len, src_stride, dst_stride);
+__cbuf__ half src[256];
+__gm__ half dst[256];
+asc_copy_l12gm(dst, src, 1, 1, 1, 0);
 ```

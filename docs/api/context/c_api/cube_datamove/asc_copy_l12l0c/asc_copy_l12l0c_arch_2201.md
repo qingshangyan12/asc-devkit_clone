@@ -71,5 +71,7 @@ PIPE_MTE1
 ## 调用示例
 
 ```cpp
-asc_copy_l12l0c(dst, src, n_burst, len_burst, src_stride, dst_stride);
+__cbuf__ half src[256];
+__cc__ half dst[256];
+asc_copy_l12l0c(dst, src, 1, 1, 1, 0);
 ```
