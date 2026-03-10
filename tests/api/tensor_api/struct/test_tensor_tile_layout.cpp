@@ -1,7 +1,7 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* Cyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
+* CANN en Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
 * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -20,7 +20,7 @@ protected:
     void TearDown() {}
 };
 
-TEST_F(Tensor_Api_Layout, ShapeAndStrideOperation)
+TEST_F(Tensor_Api_Layout, ShapeAndStrideeration)
 {
     using namespace AscendC::Te;
 
@@ -58,7 +58,7 @@ TEST_F(Tensor_Api_Layout, ShapeAndStrideOperation)
     EXPECT_EQ(AscendC::Std::get<2>(strideMakeInt).value, 666);
 }
 
-TEST_F(Tensor_Api_Layout, IsTupleOperation)
+TEST_F(Tensor_Api_Layout, IsTupleeration)
 {
     using namespace AscendC::Te;
 
@@ -86,7 +86,7 @@ TEST_F(Tensor_Api_Layout, IsTupleOperation)
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(strideMakeInt)>, true);
 }
 
-TEST_F(Tensor_Api_Layout, LayoutOperation)
+TEST_F(Tensor_Api_Layout, Layouteration)
 {
     using namespace AscendC::Te;
 
@@ -126,7 +126,7 @@ TEST_F(Tensor_Api_Layout, LayoutOperation)
     EXPECT_EQ(Cosize(layoutMake), 7710);
 }
 
-TEST_F(Tensor_Api_Layout, IsLayoutOperation)
+TEST_F(Tensor_Api_Layout, IsLayouteration)
 {
     using namespace AscendC::Te;
 
@@ -148,7 +148,7 @@ TEST_F(Tensor_Api_Layout, IsLayoutOperation)
     EXPECT_EQ(is_layout_v<decltype(layoutInit)>, true);
 }
 
-TEST_F(Tensor_Api_Layout, MakeLayoutByShapeOperation)
+TEST_F(Tensor_Api_Layout, MakeLayoutByShapeeration)
 {
     using namespace AscendC::Te;
 
@@ -167,7 +167,7 @@ TEST_F(Tensor_Api_Layout, MakeLayoutByShapeOperation)
     EXPECT_EQ(layoutMake2.Capacity(), 24);
 }
 
-TEST_F(Tensor_Api_Layout, LayoutSizeOperation)
+TEST_F(Tensor_Api_Layout, LayoutSizeeration)
 {
     using namespace AscendC::Te;
 
@@ -185,7 +185,7 @@ TEST_F(Tensor_Api_Layout, LayoutSizeOperation)
     EXPECT_EQ(layoutMake.Size(), 256);
 }
 
-TEST_F(Tensor_Api_Layout, StaticLayoutOperation)
+TEST_F(Tensor_Api_Layout, StaticLayouteration)
 {
     using namespace AscendC::Te;
 
@@ -225,7 +225,7 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxBDNLayout)), 1);
 }
 
-TEST_F(Tensor_Api_Layout, GetOperation)
+TEST_F(Tensor_Api_Layout, Geteration)
 {
     using namespace AscendC::Te;
 
@@ -272,7 +272,7 @@ TEST_F(Tensor_Api_Layout, GetOperation)
     EXPECT_EQ(AscendC::Std::get<0>(nestedGet10Stride), 3);
 }
 
-TEST_F(Tensor_Api_Layout, GetOperationInt)
+TEST_F(Tensor_Api_Layout, GeterationInt)
 {
     using namespace AscendC::Te;
 
@@ -321,7 +321,7 @@ TEST_F(Tensor_Api_Layout, GetOperationInt)
     EXPECT_EQ(AscendC::Std::get<0>(nestedGet11Stride), 400);
 }
 
-TEST_F(Tensor_Api_Layout, SelectOperation)
+TEST_F(Tensor_Api_Layout, Selecteration)
 {
     using namespace AscendC::Te;
 
@@ -383,7 +383,7 @@ TEST_F(Tensor_Api_Layout, SelectOperation)
     EXPECT_EQ(AscendC::Std::get<1>(nestedSelect01Stride1), 4);
 }
 
-TEST_F(Tensor_Api_Layout, SelectOperationInt)
+TEST_F(Tensor_Api_Layout, SelecterationInt)
 {
     using namespace AscendC::Te;
 
@@ -557,7 +557,7 @@ TEST_F(Tensor_Api_Layout, TestShapeStride)
 //        若只剩最后一个维度：直接计算 coord * stride[0]
 //        反之，mod = coord % shape[i], coord = coord / shape[i], res = res + mod * stride[i]
 // 3) int int int: 返回coord * stride
-TEST_F(Tensor_Api_Layout, TestOperator)
+TEST_F(Tensor_Api_Layout, Testerator)
 {
     using namespace AscendC::Te;
     // 输出为1 * 1 + 2 * 4 = 9
@@ -1052,7 +1052,7 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
     EXPECT_EQ(Cosize<1>(layoutObj3), Coshape<1>(layoutObj3));
     EXPECT_EQ(Cosize(layoutObj3), Coshape(layoutObj3));
 
-    // Crd2Idx:等价于operator()
+    // Crd2Idx:等价于erator()
     auto coord1 = MakeCoord(1, 2);
     auto coord2 = MakeCoord(0, 1, 2);
     auto coord3 = MakeCoord(MakeCoord(0, 1), MakeCoord(2, 3));
@@ -1064,16 +1064,16 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
 TEST_F(Tensor_Api_Layout, TestStructLayout)
 {
     using namespace AscendC::Te;
-    auto NDLayout = MakeNDLayoutOp<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
-    auto StaticNDLayout = MakeNDLayoutOp<half>(AscendC::Std::Int<16>{}, AscendC::Std::Int<16>{});
-    auto DNLayout = MakeDNLayoutOp<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
-    auto NzLayout = MakeNzLayoutOp<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
-    auto ZnLayout = MakeZnLayoutOp<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
-    auto NnLayout = MakeNnLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
-    auto scaleANDLayout = MakeScaleANDLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
-    auto scaleADNLayout = MakeScaleADNLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
-    auto scaleBNDLayout = MakeScaleBNDLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
-    auto scaleBDNLayout = MakeScaleBDNLayoutOp<fp8_e8m0_t>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
+    auto NDLayout = MakeNDLayout<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
+    auto StaticNDLayout = MakeNDLayout<half>(AscendC::Std::Int<16>{}, AscendC::Std::Int<16>{});
+    auto DNLayout = MakeDNLayout<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
+    auto NzLayout = MakeNzLayout<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
+    auto ZnLayout = MakeZnLayout<half>(AscendC::Std::Int<256>{}, AscendC::Std::Int<256>{});
+    auto NnLayout = MakeNnLayout<fp8_e8m0_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
+    auto scaleANDLayout = MakeScaleANDLayout<fp8_e8m0_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
+    auto scaleADNLayout = MakeScaleADNLayout<fp8_e8m0_t>(AscendC::Std::Int<16>{}, AscendC::Std::Int<32>{});
+    auto scaleBNDLayout = MakeScaleBNDLayout<fp8_e8m0_t>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
+    auto scaleBDNLayout = MakeScaleBDNLayout<fp8_e8m0_t>(AscendC::Std::Int<32>{}, AscendC::Std::Int<16>{});
 
     auto NDShape = GetShape<0>(NDLayout);
     auto staticNDShape = GetShape<0>(StaticNDLayout);
