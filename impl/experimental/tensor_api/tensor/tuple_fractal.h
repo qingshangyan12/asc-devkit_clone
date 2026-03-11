@@ -9,11 +9,11 @@
 */
 
 /*!
-* \file layout_fractal.h
+* \file tuple_fractal.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_FRACTAL_H
-#define IMPL_TENSOR_API_TENSOR_LAYOUT_FRACTAL_H
+#ifndef IMPL_TENSOR_API_TENSOR_TUPLE_FRACTAL_H
+#define IMPL_TENSOR_API_TENSOR_TUPLE_FRACTAL_H
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_dispatch.h"
