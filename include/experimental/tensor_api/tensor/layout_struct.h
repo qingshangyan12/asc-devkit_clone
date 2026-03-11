@@ -19,7 +19,7 @@
 
 namespace AscendC {
 namespace Te {
-    
+
 template <typename T>
 struct NzLayoutFormat;
 
@@ -28,6 +28,12 @@ struct ZnLayoutFormat;
 
 template <typename T>
 struct L0CLayoutFormat;
+
+template <typename T>
+struct NDLayoutFormat;
+
+template <typename T>
+struct DNLayoutFormat;
 
 template <typename T>
 struct ZzLayoutFormat;
