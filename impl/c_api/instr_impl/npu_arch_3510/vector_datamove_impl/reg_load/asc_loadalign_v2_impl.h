@@ -83,6 +83,13 @@ __simd_callee__ inline void asc_loadalign_impl(vector_float& dst, __ubuf__ float
     }
 }
 
+__simd_callee__ inline void asc_loadalign_impl(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
+{
+    if ASC_IS_AIV {
+        pld(dst, src, offset, NORM);
+    }
+}
+
 __simd_callee__ inline void asc_loadalign_brc_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     if ASC_IS_AIV {
