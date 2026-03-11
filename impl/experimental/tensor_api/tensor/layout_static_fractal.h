@@ -52,15 +52,6 @@ template <typename T, size_t row, size_t column>
 using ScaleDNStrideFormat = Stride<Stride<Std::Int<0>, Std::Int<MX_SCALE_K0>>,
                                     Stride<Std::Int<1>, Std::Int<row*MX_SCALE_K0>>>;
 
-// scaleZZ
-template <typename T, size_t row, size_t column>
-using ScaleZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row/FRACTAL_FIXED>>, 
-                                    Shape<Std::Int<MX_SCALE_K0>, Std::Int<column/MX_SCALE_K0>>>;
-
-template <typename T, size_t row, size_t column>
-using ScaleZZStrideFormat = Stride<Stride<Std::Int<MX_SCALE_K0>, Std::Int<FRACTAL_FIXED * column>>,
-                                    Stride<Std::Int<1>, Std::Int<C0_SIZE>>>;
-
 // ScaleNN
 template <typename T, size_t row, size_t column>
 using ScaleNNShapeFormat = Shape<Shape<Std::Int<MX_SCALE_K0>, Std::Int<row/MX_SCALE_K0>>, 
@@ -88,6 +79,7 @@ using DNStrideFormat = Stride<Stride<Std::Int<0>, Std::Int<1>>, Stride<Std::Int<
 template <typename T, size_t  row, size_t  column>
 using ZNShapeFormat = Shape<Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<row / (C0_SIZE / sizeof(T))>>,
     Shape<Std::Int<FRACTAL_FIXED>, Std::Int<column / FRACTAL_FIXED>>>;
+
 template <typename T, size_t  row, size_t  column>
 using ZNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * column>>,
     Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
@@ -96,9 +88,19 @@ using ZNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) *
 template <typename T, size_t row, size_t column>
 using ZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row / FRACTAL_FIXED>>,
     Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<column / (C0_SIZE / sizeof(T))>>>;
+
 template <typename T, size_t row, size_t column>
 using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRACTAL_FIXED * column>>,
     Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
+
+// scaleZZ
+template <typename T, size_t row, size_t column>
+using ScaleZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row/FRACTAL_FIXED>>, 
+                                    Shape<Std::Int<MX_SCALE_K0>, Std::Int<column/MX_SCALE_K0>>>;
+
+template <typename T, size_t row, size_t column>
+using ScaleZZStrideFormat = Stride<Stride<Std::Int<MX_SCALE_K0>, Std::Int<FRACTAL_FIXED * column>>,
+                                    Stride<Std::Int<1>, Std::Int<C0_SIZE>>>;
 
 template <typename T, size_t row, size_t column>
 using NDFormatLayout = Layout<NDShapeFormat<T, row, column>, NDStrideFormat<T, row, column>>;
