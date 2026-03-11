@@ -24,6 +24,7 @@
 #include "kernel_struct_binary.h"
 #include "kernel_struct_unary.h"
 #include "kernel_struct_vdeq.h"
+#include "kernel_npu_debug.h"
 #include "mstx_local_tensor_info.h"
 
 #if __NPU_ARCH__ == 1001
@@ -70,11 +71,17 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
     const RoundMode& roundMode, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+    using DstPrimType = PrimT<T>;
+    using SrcPrimType = PrimT<U>;
+    using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)),
+        DstPrimType, SrcPrimType>::type;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskArray<MaskCheckType>(mask, "Cast");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams, "Cast");
 #endif
-    using DstPrimType = PrimT<T>;
-    using SrcPrimType = PrimT<U>;
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if constexpr (Std::is_same<DstPrimType, int4b_t>::value) {
@@ -99,11 +106,17 @@ template <typename T, typename U, bool isSetMask>
 __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const RoundMode& roundMode, const uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+    using DstPrimType = PrimT<T>;
+    using SrcPrimType = PrimT<U>;
+    using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)),
+        DstPrimType, SrcPrimType>::type;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckMaskValue<MaskCheckType>(mask, "Cast");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Cast");
 #endif
-    using DstPrimType = PrimT<T>;
-    using SrcPrimType = PrimT<U>;
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if constexpr (Std::is_same<DstPrimType, int4b_t>::value) {
@@ -135,6 +148,9 @@ template <typename T, typename U>
 __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const RoundMode& roundMode, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, true>(dst, src, "Cast", count);
 #endif
