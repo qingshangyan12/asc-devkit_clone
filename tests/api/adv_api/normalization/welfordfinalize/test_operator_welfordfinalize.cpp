@@ -57,7 +57,7 @@ public:
         }
         this->abRec = 1.0f / abLength;
         this->rRec = 1.0f / rLength;
-        this->outLength = 8;
+        this->outLength = CeilDivision(rnLength, 8U) * 8U;
  
         inputMean_global.SetGlobalBuffer(reinterpret_cast<__gm__ dataType *>(inputMean_gm), abLength);
         inputVariance_global.SetGlobalBuffer(reinterpret_cast<__gm__ dataType *>(inputVariance_gm), abLength);
@@ -158,7 +158,6 @@ private:
     TQue<TPosition::VECOUT, 1> outQueueMean;
     TQue<TPosition::VECOUT, 1> outQueueVariance;
     TBuf<TPosition::VECCALC> sharedTmpBuffer;
-
     uint32_t rnLength;
     uint32_t abLength;
     uint32_t rLength;
@@ -178,7 +177,7 @@ template <typename dataType, bool isCounts = false, bool sharedTmp = false>
 __aicore__ void kernel_WelfordFinalize_test(GM_ADDR inMeanGm, GM_ADDR inVarGm, GM_ADDR countsGm, GM_ADDR outMeanGm,
     GM_ADDR outVarGm, uint32_t rnLength, uint32_t abLength, uint32_t head, uint32_t headLength, uint32_t tail, uint32_t tailLength)
 {
-    KernelWelfordFinalize<dataType, isCounts, sharedTmp> op;
+    KernelWelfordFinalize<dataType, false, isCounts, sharedTmp> op;
     op.Init(inMeanGm, inVarGm, countsGm, outMeanGm, outVarGm, rnLength, abLength, head, headLength, tail, tailLength);
     op.Process();
 }
