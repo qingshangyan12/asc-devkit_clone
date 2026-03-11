@@ -28,11 +28,6 @@ public:
     }
 
 private:
-    template<const LoadDataTrait& trait, bool transpose>
-    struct TraitHolder {
-        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
-    };
-
     template<typename T>
     __aicore__ inline constexpr void CheckNZTemplate()
     {
@@ -108,7 +103,7 @@ private:
         auto srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout) / STRIDE_UNIT;
         LoadCbufToCbBase loadCbufToCb;
-        loadCbufToCb.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+        loadCbufToCb.template LoadData<trait, true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
     }
 };
 } // namespace Te

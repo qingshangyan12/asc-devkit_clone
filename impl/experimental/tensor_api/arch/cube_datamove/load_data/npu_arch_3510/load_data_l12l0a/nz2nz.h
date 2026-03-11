@@ -25,15 +25,10 @@ class LoadDataFourDim3510L12L0ANZ2NZ {
 public:
     template <const LoadDataTrait& trait, typename T, typename U>
     __aicore__ inline void Run(const T& dst, const U& src) {
-        LoadDataImpl<TraitHolder<trait, false>::traitTransposed, T, U>(dst, src);
+        LoadDataImpl<trait, T, U>(dst, src);
     }
 
-private:
-    template<const LoadDataTrait& trait, bool transpose>
-    struct TraitHolder {
-        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
-    };
-    
+private:    
     template<typename T>
     __aicore__ inline constexpr void CheckNZTemplate()
     {
@@ -94,11 +89,11 @@ private:
         if constexpr (isFp4Type) {
             constexpr int KHALF = 2;
             LoadCbufToCaS4Base loadCbufToCaS4;
-            loadCbufToCaS4.template LoadData<trait>(dst, src, mStartPosition, kStartPosition / KHALF, 
+            loadCbufToCaS4.template LoadData<trait, false>(dst, src, mStartPosition, kStartPosition / KHALF, 
                                                     mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);    
         } else {
             LoadCbufToCaBase loadCbufToCa;
-            loadCbufToCa.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            loadCbufToCa.template LoadData<trait, false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         }
     }
 };

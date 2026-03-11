@@ -27,12 +27,7 @@ public:
         LoadDataImpl<TraitHolder<trait, true>::traitTransposed, T, U, Coord>(dst, src, coord);
     }
 
-private:
-    template<const LoadDataTrait& trait, bool transpose>
-    struct TraitHolder {
-        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
-    };
-    
+private:   
     template<typename T>
     __aicore__ inline constexpr void CheckNZTemplate()
     {
@@ -108,11 +103,9 @@ private:
         LoadCbufToCbS4Base loadCbufToCbS4;
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
             auto sliceDst = dst(MakeCoord(x, y));
-            loadCbufToCbS4.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
+            loadCbufToCbS4.template LoadData<trait, true>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
                                                     mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);
-            y += kStep * FRACTAL_FIXED;
-            x += (y / Col) * (C0_SIZE * KHALF / sizeof(DstType));
-            y %= Col;
+            x += C0_SIZE * KHALF;
             mStartPosition += M_STEP_MIN_VAL_B4;
         }
     }
@@ -134,10 +127,8 @@ private:
         LoadCbufToCbBase loadCbufToCb;
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
             auto sliceDst = dst(MakeCoord(x, y));
-            loadCbufToCb.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-            y += kStep * FRACTAL_FIXED;
-            x += (y / Col) * (C0_SIZE / sizeof(DstType));
-            y %= Col;
+            loadCbufToCb.template LoadData<trait, true>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            x += C0_SIZE;
             mStartPosition += M_STEP_MIN_VAL_B8;
         }
     }
