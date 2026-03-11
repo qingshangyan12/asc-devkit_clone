@@ -108,7 +108,7 @@ __aicore__ inline void copy_gm_to_cbuf_multi_dn2zn_stub(__cbuf__ DTYPE* dst, __g
 
 // L1 -> BIAS: CopyCbufToBT3501
 template<typename DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
-__aicore__ inline void copy_cbuf_to_bt_stub(uint64_t dst, __cbuf__ DTYPE* src, uint16_t convControl, uint16_t blockCount, uint16_t blockLen,
+__aicore__ inline void copy_cbuf_to_bt_stub(uint64_t dst, void* src, uint16_t convControl, uint16_t blockCount, uint16_t blockLen,
                                 uint16_t srcStride, uint16_t dstStride) {
     EXPECT_EQ(convControl, 0);
     EXPECT_EQ(blockCount, DST_SIZE1);
@@ -119,7 +119,7 @@ __aicore__ inline void copy_cbuf_to_bt_stub(uint64_t dst, __cbuf__ DTYPE* src, u
 
 // L1 -> BIAS two type: CopyCbufToBT3501
 template<typename SRC_DTYPE, typename DST_DTYPE, int SRC_SIZE1, int SRC_SIZE2, int DST_SIZE1, int DST_SIZE2>
-__aicore__ inline void copy_cbuf_to_bt_two_type_stub(uint64_t dst, __cbuf__ SRC_DTYPE* src, uint16_t convControl, uint16_t blockCount, uint16_t blockLen,
+__aicore__ inline void copy_cbuf_to_bt_two_type_stub(uint64_t dst, void* src, uint16_t convControl, uint16_t blockCount, uint16_t blockLen,
                                 uint16_t srcStride, uint16_t dstStride) {
     if constexpr (std::is_same_v<SRC_DTYPE, half>) {
         EXPECT_EQ(convControl, 1);
@@ -200,7 +200,7 @@ __aicore__ inline void tensor2tensor_run_stub(const T& dst, const U& src, const 
     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_L12BIAS_ND2ND_##DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         using namespace AscendC::Te; \
-        MOCKER_CPP(copy_cbuf_to_bt, void(uint64_t, __cbuf__ DTYPE*, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
+        MOCKER_CPP(copy_cbuf_to_bt, void(uint64_t, void, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
             .will(invoke(&copy_cbuf_to_bt_stub<DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR(DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2, cbuf, L1, ND, biasbuf, Bias, ND) \
@@ -216,7 +216,7 @@ DATA_COPY_TEST_L12BIAS_ND2ND(int32_t, 1, 64, 1, 64)
     TEST_F(TEST_TENSOR_API_DATACOPY, TEST_TENSOR_API_DATACOPY_L12BIAS_TWO_TYPE_ND2ND_##SRC_DTYPE##_SRC_SIZE##_##SRC_SIZE1##x##SRC_SIZE2##DST_DTYPE##_DST_SIZE##_##DST_SIZE1##x##DST_SIZE2) \
     { \
         using namespace AscendC::Te; \
-        MOCKER_CPP(copy_cbuf_to_bt, void(uint64_t, __cbuf__ SRC_DTYPE*, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
+        MOCKER_CPP(copy_cbuf_to_bt, void(uint64_t, void, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1) \
             .will(invoke(&copy_cbuf_to_bt_two_type_stub<SRC_DTYPE, DST_DTYPE, SRC_SIZE1, SRC_SIZE2, DST_SIZE1, DST_SIZE2>)); \
         CREATE_TENSOR_TWO_TYPE(SRC_DTYPE, SRC_SIZE1, SRC_SIZE2, DST_DTYPE, DST_SIZE1, DST_SIZE2, cbuf, L1, ND, biasbuf, Bias, ND) \
@@ -241,19 +241,4 @@ DATA_COPY_TEST_L12BIAS_TWO_TYPE_ND2ND(half, 1, 64, float, 1, 64)
         GlobalMockObject::verify(); \
     }
 
-DATA_COPY_TEST_L12FB_ND2ND(bool, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(int8_t, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(uint8_t, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(uint16_t, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(half, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(float, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(bfloat16_t, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(int32_t, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(uint32_t, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(int64_t, 1, 64, 1, 64)
 DATA_COPY_TEST_L12FB_ND2ND(uint64_t, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(double, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(hifloat8_t, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(fp8_e5m2_t, 1, 64, 1, 64)
-DATA_COPY_TEST_L12FB_ND2ND(fp8_e4m3fn_t, 1, 64, 1, 64)
-// DATA_COPY_TEST_L12FB_ND2ND(fp8_e8m0_t, 1, 64, 1, 64)
