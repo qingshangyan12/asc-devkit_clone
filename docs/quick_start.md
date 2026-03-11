@@ -96,7 +96,7 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
 本项目支持由源码编译，进行源码编译前，请根据如下步骤完成相关环境准备。
 
-1. **安装社区CANN toolkit包**
+1. **安装社区版CANN toolkit包**
 
     根据实际环境，下载对应`Ascend-cann-toolkit_${cann_version}_linux-${arch}.run`包，下载链接为[toolkit x86_64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/x86_64/Ascend-cann-toolkit_9.0.0_linux-x86_64.run)、[toolkit aarch64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/aarch64/Ascend-cann-toolkit_9.0.0_linux-aarch64.run)。
 
