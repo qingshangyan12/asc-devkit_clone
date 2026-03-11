@@ -1102,7 +1102,7 @@ TEST_F(Tensor_Api_Layout, TestStructLayout)
 {
     using namespace AscendC::Te;
     auto NDLayout = NDLayoutFormat<half>{}(256, 256);
-    auto StaticNDLayout = NDLayoutFormat<half>{}::type(AscendC::Std::Int<16>{}, AscendC::Std::Int<16>{}){};
+    auto StaticNDLayout = NDLayoutFormat<half>::type<AscendC::Std::Int<16>{}, AscendC::Std::Int<16>{}>{};
     auto DNLayout = DNLayoutFormat<half>{}(256, 256);
     auto NzLayout = NzLayoutFormat<half>{}(256, 256);
     auto ZnLayout = ZnLayoutFormat<half>{}(256, 256);
