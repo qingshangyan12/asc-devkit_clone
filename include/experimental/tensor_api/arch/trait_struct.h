@@ -39,8 +39,8 @@ struct MmadTrait {
 };
 
 struct MmadParams {
-   uint8_t unitFlag;
-   bool cmatrixInitVal;
+   uint8_t unitFlag = 0;
+   bool cmatrixInitVal = true;
 
    __aicore__ MmadParams() {};
 
@@ -56,21 +56,26 @@ struct FixpipeTrait {
         QuantMode_t quantPreIn,
         bool enableReluIn,
         bool enableChannelSplitIn,
-        uint8_t unitFlagIn,
         uint8_t dualDstCtlIn
     ) :
         quantPre(quantPreIn),
         enableRelu(enableReluIn),
         enableChannelSplit(enableChannelSplitIn),
-        unitFlag(unitFlagIn),
         dualDstCtl(dualDstCtlIn)
     {}
 
     QuantMode_t quantPre = QuantMode_t::NoQuant;
     bool enableRelu = false;
     bool enableChannelSplit = false;
-    uint8_t unitFlag = false;
     uint8_t dualDstCtl = false;
+};
+
+struct FixpipeParams {
+   uint8_t unitFlag = 0;
+   __aicore__ FixpipeParams() {};
+
+   __aicore__ constexpr FixpipeParams(uint8_t unitFlagIn) : 
+      unitFlag(unitFlagIn) {};
 };
 
 struct LoadDataTrait {

@@ -36,86 +36,99 @@ constexpr bool VerifyingFixpipeTemplateWithCoord = Std::is_tuple_v<Coord> && Ver
 template <typename T, typename U, typename S, typename Coord>
 constexpr bool VerifyingFixpipeQuantTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingFixpipeQuantTemplate<T, U, S>;
 
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U>
+template <typename T>
+static constexpr bool VerifyingFixpipeParams = Std::is_same_v<T, FixpipeParams>;
+
+template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename Params>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplate<T, U> && VerifyingFixpipeParams<Params>, void>::type
+Fixpipe(const T& dst, const U& src, const Params& params)
+{
+    constexpr Hardware dstPos = GetHardPos<T>();
+    constexpr Hardware srcPos = GetHardPos<U>();
+    constexpr Hardware quantPos = Hardware::MAX;
+    using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
+        CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
+    Tensor2Tensor{}.template Run<trait>(dst, src, params);
+}
+
+template <const FixpipeTrait& trait, typename T, typename U>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplate<T, U>, void>::type
 Fixpipe(const T& dst, const U& src)
 {
-    constexpr Hardware dstPos = GetHardPos<T>();
-    constexpr Hardware srcPos = GetHardPos<U>();
-    constexpr Hardware quantPos = Hardware::MAX;
-    using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
-        CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
-    if constexpr (dstPos == Hardware::GM) {
-        Tensor2Tensor{}.template Run<trait>(dst, src);
-    } else {
-        Tensor2Tensor{}.template Run<trait>(dst, src, ZeroCoord2DType{});
-    }
+    Fixpipe<trait>(dst, src, FixpipeParams{});
 }
 
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, S>, void>::type
-Fixpipe(const T& dst, const U& src, const S& quant)
+template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S, typename Params>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, S> && VerifyingFixpipeParams<Params>, void>::type
+Fixpipe(const T& dst, const U& src, const S& quant, const Params& params)
 {
     constexpr Hardware dstPos = GetHardPos<T>();
     constexpr Hardware srcPos = GetHardPos<U>();
     constexpr Hardware quantPos = Hardware::L1;
     using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
         CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
-    if constexpr (dstPos == Hardware::GM) {
-        Tensor2Tensor{}.template Run<trait>(dst, src, quant);
-    } else {
-        Tensor2Tensor{}.template Run<trait>(dst, src, quant, ZeroCoord2DType{});
-    }
+    Tensor2Tensor{}.template Run<trait>(dst, src, quant, params);
 }
 
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename Coord>
+template <const FixpipeTrait& trait, typename T, typename U, typename V>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplate<T, U, V>, void>::type
+Fixpipe(const T& dst, const U& src, const V& quant)
+{
+    Fixpipe<trait>(dst, src, quant, FixpipeParams{});
+}
+
+template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename Coord, typename Params>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplateWithCoord<T, U, Coord> && VerifyingFixpipeParams<Params>, void>::type
+Fixpipe(const T& dst, const U& src, const Coord& coord, const Params& params)
+{
+    constexpr Hardware dstPos = GetHardPos<T>();
+    constexpr Hardware srcPos = GetHardPos<U>();
+    constexpr Hardware quantPos = Hardware::MAX;
+    using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
+        CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
+    auto dstLayout = dst.Layout();
+    auto shape = MakeShape(
+        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
+        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) - Std::get<0>(coord),
+        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) *
+        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) - Std::get<1>(coord)
+    );
+    auto sliceTensor = dst(coord, shape);
+    Tensor2Tensor{}.template Run<trait>(sliceTensor, src, params);
+}
+
+template <const FixpipeTrait& trait, typename T, typename U, typename Coord>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplateWithCoord<T, U, Coord>, void>::type
 Fixpipe(const T& dst, const U& src, const Coord& coord)
 {
-    constexpr Hardware dstPos = GetHardPos<T>();
-    constexpr Hardware srcPos = GetHardPos<U>();
-    constexpr Hardware quantPos = Hardware::MAX;
-    using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
-        CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
-    if constexpr (dstPos == Hardware::GM) {
-        auto dstLayout = dst.Layout();
-        auto shape = MakeShape(
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) - Std::get<0>(coord),
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) *
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) - Std::get<1>(coord)
-        );
-        auto sliceTensor = dst(coord, shape);
-        Tensor2Tensor{}.template Run<trait>(sliceTensor, src);
-    } else {
-        Tensor2Tensor{}.template Run<trait>(dst, src, coord);
-    }
+    Fixpipe<trait>(dst, src, coord, FixpipeParams{});
 }
 
-template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S,  typename Coord>
-__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplateWithCoord<T, U, S, Coord>, void>::type
-Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord)
+template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U, typename S,  typename Coord, typename Params>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplateWithCoord<T, U, S, Coord> && VerifyingFixpipeParams<Params>, void>::type
+Fixpipe(const T& dst, const U& src, const S& quant, const Coord& coord, const Params& params)
 {
     constexpr Hardware dstPos = GetHardPos<T>();
     constexpr Hardware srcPos = GetHardPos<U>();
     constexpr Hardware quantPos = Hardware::L1;
-    if constexpr (dstPos == Hardware::GM) {
-        auto dstLayout = dst.Layout();
-        auto shape = MakeShape(
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) - Std::get<0>(coord),
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) *
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) - Std::get<1>(coord)
-        );
-        auto sliceTensor = dst(coord, shape);
-        using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
+    auto dstLayout = dst.Layout();
+    auto shape = MakeShape(
+        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
+        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) - Std::get<0>(coord),
+        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) *
+        GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) - Std::get<1>(coord)
+    );
+    auto sliceTensor = dst(coord, shape);
+    using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
             CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
-        Tensor2Tensor{}.template Run<trait>(sliceTensor, src, quant);
-    } else {
-        using Tensor2Tensor = typename FixpipeTensor2Tensor<dstPos, srcPos, quantPos,
-            CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
-        Tensor2Tensor{}.template Run<trait>(dst, src, quant, coord);
-    }
+    Tensor2Tensor{}.template Run<trait>(sliceTensor, src, quant, params);
+}
+
+template <const FixpipeTrait& trait, typename T, typename U, typename V,  typename Coord>
+__aicore__ inline typename Std::enable_if<VerifyingFixpipeQuantTemplateWithCoord<T, U, V, Coord>, void>::type
+Fixpipe(const T& dst, const U& src, const V& quant, const Coord& coord)
+{
+    Fixpipe<trait>(dst, src, quant, coord, FixpipeParams{});
 }
 
 } // namespace Te
