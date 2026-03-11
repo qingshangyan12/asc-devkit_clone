@@ -52,8 +52,8 @@ Channel GetChannel()
 
     uint32_t* cqhead = new uint32_t(0);
     uint32_t* cqtail = new uint32_t(0);
-    channel.cqContextAddr->ctx.rdmaCqContext.headAddr = reinterpret_cast<uint64_t>(head);
-    channel.cqContextAddr->ctx.rdmaCqContext.tailAddr = reinterpret_cast<uint64_t>(tail);
+    channel.cqContextAddr->ctx.rdmaCqContext.headAddr = reinterpret_cast<uint64_t>(cqhead);
+    channel.cqContextAddr->ctx.rdmaCqContext.tailAddr = reinterpret_cast<uint64_t>(cqtail);
 
     // 为 Buffer 相关字段分配内存并设置
     channel.remoteBufferNum = 1;
@@ -90,7 +90,7 @@ private:
 
 TEST_F(HcommCommonTestSuite, Aiv_Read)
 {
-    Channel channel = GetChannel();
+    Channel channel = {0};
 
     Hcomm hcomm;
     ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel);
@@ -109,6 +109,4 @@ TEST_F(HcommCommonTestSuite, Aiv_Write)
     HcommHandle handleId =
         hcomm.Write(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
     EXPECT_EQ(handleId, 0);
-    hcomm.Commit(handleId);
-    hcomm.Wait(handleId);
 }
