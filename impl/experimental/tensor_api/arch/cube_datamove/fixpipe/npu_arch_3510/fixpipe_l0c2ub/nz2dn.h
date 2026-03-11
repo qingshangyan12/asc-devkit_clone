@@ -17,6 +17,8 @@
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_utils.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/instruction.h"
+#include "impl/experimental/tensor_api/arch/utils/check_format.h"
+#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
 
 namespace AscendC {
 namespace Te {
@@ -36,13 +38,10 @@ private:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        FormatCheckUtils3510 formatCheckInst;
-        formatCheckInst.CheckDNTemplate<T>();
-        formatCheckInst.CheckL0CNZTemplate<U>();
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
-        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ float, __cc__ float>, 
-            Std::tuple<__gm__ int32_t, __cc__ int32_t>>, "The data type is not supported.");
-#endif
+        CheckFormat::CheckDNTemplate<T>();
+        CheckFormat::CheckL0CNZTemplate<U>();
+        CheckDataTypeFor3510::CheckFixPipeDataType<dstType, srcType>();
+
     }
 
     template <const FixpipeTrait& trait, typename T, typename U>
