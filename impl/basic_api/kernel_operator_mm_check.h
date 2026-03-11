@@ -60,20 +60,17 @@ __aicore__ static inline void CheckLoadData2dDatatype()
 {
 #if __NPU_ARCH__ == 2002
     ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, uint16_t, int16_t, half, int4b_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to "
-        "check dtype in LoadData with LoadData2DParams, current api support dtype combination is src and dst both: "
-        "uint8_t / int8_t / uint16_t / int16_t / half / int4b_t.");});
+        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData2DParams, current api support dtype "
+        "combination is src and dst both: uint8_t / int8_t / uint16_t / int16_t / half / int4b_t.");});
 #elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t,
-        float, int4b_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData2DParams, current api "
-        "support dtype combination is src and dst both uint8_t / int8_t / uint16_t / int16_t / half / bfloat16_t / "
-        "uint32_t / int32_t / float / int4b_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t,
+        float, int4b_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData2DParams,"
+        " current api support dtype combination is src and dst both: uint8_t / int8_t / uint16_t / int16_t / half / "
+        "bfloat16_t / uint32_t / int32_t / float / int4b_t.\n"));
 #elif __NPU_ARCH__ == 3102
     ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, uint16_t, int16_t, int4b_t>()),
-        {KERNEL_LOG(KERNEL_ERROR,
-        "Failed to check dtype in LoadData with LoadData2DParamsV2, current api support dtype combination is src and "
-        "dst both: uint8_t / int8_t / half / uint16_t / int16_t / int4b_t.");});
+        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData2DParamsV2, current api support "
+        "dtype combination is src and dst both: uint8_t / int8_t / half / uint16_t / int16_t / int4b_t.");});
 #endif
 }
 

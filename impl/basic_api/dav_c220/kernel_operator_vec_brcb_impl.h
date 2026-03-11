@@ -30,6 +30,9 @@ __aicore__ inline void BrcbImpl(__ubuf__ T* dst, __ubuf__ T* src0, const uint8_t
     const BrcbRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        ASCENDC_DEBUG_ASSERT((SupportType<T, int16_t, uint16_t, int32_t, uint32_t, half, bfloat16_t, float>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Brcb, current api support dtype combination is "
+            "src and dst both: int16_t / uint16_t / int32_t / uint32_t / half / bfloat16_t / float.\n"));
         ResetMask();
         if constexpr(sizeof(T) == B16_BYTE_SIZE) {
             vbrcb((__ubuf__ uint16_t*)dst, (__ubuf__ uint16_t*)src0, repeatParams.dstBlkStride,
@@ -37,10 +40,6 @@ __aicore__ inline void BrcbImpl(__ubuf__ T* dst, __ubuf__ T* src0, const uint8_t
         } else if constexpr(sizeof(T) == B32_BYTE_SIZE) {
             vbrcb((__ubuf__ uint32_t*)dst, (__ubuf__ uint32_t*)src0, repeatParams.dstBlkStride,
                 repeatParams.dstRepStride, repeatTime);
-        } else {
-            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Brcb, current api support dtype "
-                "combination is src and dst both: half / bfloat16_t / int16_t / uint16_t / float / int32_t / "
-                "uint32_t.");});
         }
     }
 }
