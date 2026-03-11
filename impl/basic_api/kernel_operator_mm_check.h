@@ -60,21 +60,106 @@ __aicore__ static inline void CheckLoadData2dDatatype()
 {
 #if __NPU_ARCH__ == 2002
     ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, uint16_t, int16_t, half, int4b_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to "
-        "check dtype in LoadData with LoadData2DParams, current api support dtype combination is src and dst both: "
-        "uint8_t / int8_t / uint16_t / int16_t / half / int4b_t.");});
+        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData2DParams, current api support dtype "
+        "combination is src and dst both: uint8_t / int8_t / uint16_t / int16_t / half / int4b_t.");});
 #elif __NPU_ARCH__ == 2201
-    ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t,
-        float, int4b_t>()),
-        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData2DParams, current api "
-        "support dtype combination is src and dst both uint8_t / int8_t / uint16_t / int16_t / half / bfloat16_t / "
-        "uint32_t / int32_t / float / int4b_t.");});
+    ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t,
+        float, int4b_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData2DParams,"
+        " current api support dtype combination is src and dst both: uint8_t / int8_t / uint16_t / int16_t / half / "
+        "bfloat16_t / uint32_t / int32_t / float / int4b_t.\n"));
 #elif __NPU_ARCH__ == 3102
     ASCENDC_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, uint16_t, int16_t, int4b_t>()),
-        {KERNEL_LOG(KERNEL_ERROR,
-        "Failed to check dtype in LoadData with LoadData2DParamsV2, current api support dtype combination is src and "
-        "dst both: uint8_t / int8_t / half / uint16_t / int16_t / int4b_t.");});
+        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadData with LoadData2DParamsV2, current api support "
+        "dtype combination is src and dst both: uint8_t / int8_t / half / uint16_t / int16_t / int4b_t.");});
 #endif
+}
+
+template <typename T>
+__aicore__ static inline void CheckLoadData2dLocal2Local(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const __gm__ char* apiName)
+{
+    CheckTensorTPosition<TPosition::A1, TPosition::B1>(src, "src", "A1 / B1", apiName);
+    if ((TPosition)src.GetPosition() == TPosition::A1) {
+        CheckTensorTPosition<TPosition::A2>(dst, "dst", "A2", apiName);
+    } else {
+        CheckTensorTPosition<TPosition::B2>(dst, "dst", "B2", apiName);
+    }
+    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
+    CheckTensorAlignment(dst, VALUE_512, "dst", apiName);
+}
+
+template <typename T>
+__aicore__ static inline void CheckLoadData2dGlobal2Local(const LocalTensor<T>& dst, const __gm__ char* apiName)
+{
+#if __NPU_ARCH__ == 3510
+    // only support GM -> A1 / B1
+    CheckTensorTPosition<TPosition::A1, TPosition::B1>(dst, "dst", "A1 / B1", apiName);
+    CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
+#else
+    CheckTensorTPosition<TPosition::A1, TPosition::B1, TPosition::A2, TPosition::B2>(dst, "dst", "A1 / B1 / A2 / B2",
+        apiName);
+    if (dstScope == Hardware::L0A || dstScope == Hardware::L0B) {
+        CheckTensorAlignment(dst, VALUE_512, "dst", apiName);
+    } else {
+        CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
+    }
+#endif
+}
+
+template <typename T>
+__aicore__ static inline void CheckLoadData2dParams(const LoadData2DParams& loadDataParams, bool checkTranspose)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckValueRange<uint8_t>(loadDataParams.repeatTimes, 1, UINT8_MAX, "loadDataParams.repeatTimes",
+        "LoadData with LoadData2DParams");
+#endif
+    // Only when A1->A2 / B1->B2 + dtype B16
+    if (loadDataParams.ifTranspose) {
+        if (checkTranspose) {
+            ASCENDC_DEBUG_WARNING((sizeof(T) == 2), KERNEL_LOG_INTERNAL(KERNEL_WARNING, "ifTranspose in "
+                "LoadData2DParams should be enabled only when dtype is uint16_t / int16_t / half / bfloat16_t.\n"));
+        } else {
+            ASCENDC_DEBUG_WARNING((false), KERNEL_LOG_INTERNAL(KERNEL_WARNING, "ifTranspose is effective in LoadData "
+                "with LoadData2DParams when src->dst is A1->A2 / B1->B2.\n"));
+        }
+    }
+}
+
+template <typename T>
+__aicore__ static inline void CheckLoadDataWithTransposeDtype(const __gm__ char* apiName, bool tPosIsA1)
+{
+#if __NPU_ARCH__ == 2201
+    if (tPosIsA1) { // A1 -> A2
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, bfloat16_t, uint32_t, int32_t, float>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in %s, current api support dtype combination is "
+            "src and dst both: uint8_t / int8_t / half / bfloat16_t / uint32_t / int32_t / float when dst TPosition "
+            "is A2.\n", apiName));
+    } else { // B1 -> B2
+        ASCENDC_DEBUG_ASSERT((SupportType<PrimT<T>, uint8_t, int8_t, half, bfloat16_t, uint32_t, int32_t, float,
+            int4b_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in %s, current api support dtype "
+            "combination is src and dst both: uint8_t / int8_t / half / bfloat16_t / uint32_t / int32_t / float / "
+            "int4b_t when dst TPosition is B2.\n", apiName));
+    }
+#endif
+}
+
+template <typename T>
+__aicore__ static inline void CheckLoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const __gm__ char* apiName)
+{
+// dav_c310 + dav_m510 + dav_m310 not support A1 -> A2
+#if __NPU_ARCH__ != 3510 && __NPU_ARCH__ != 5102 && __NPU_ARCH__ != 3102
+    CheckTensorTPosition<TPosition::A1, TPosition::B1>(src, "src", "A1 / B1", apiName);
+    if ((TPosition)src.GetPosition() == TPosition::A1) {
+        CheckTensorTPosition<TPosition::A2>(dst, "dst", "A2 when src TPosition is A1", apiName);
+        CheckLoadDataWithTransposeDtype<T>(apiName, true);
+    } else {
+        CheckTensorTPosition<TPosition::B2>(dst, "dst", "B2 when src TPosition is B1", apiName);
+        CheckLoadDataWithTransposeDtype<T>(apiName, false);
+    }
+#endif
+    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
+    CheckTensorAlignment(dst, VALUE_512, "dst", apiName);
 }
 
 // check LoadData3D params
