@@ -24,8 +24,8 @@ namespace Te {
 
 class CopyL12BTBase {
 public:
-    template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+    template <const DataCopyTrait& trait, typename T, typename U>
+    __aicore__ inline void Run(const T& dst, const U& src) {
         DataCopyImpl<trait, T, U>(dst, src);
     }
 
@@ -51,10 +51,12 @@ private:
 
         uint16_t srcCol = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
         uint16_t srcRow = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
+        uint16_t dstCol = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
         uint16_t dstRow = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
 
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
+
 
         bool convControl = false;
 

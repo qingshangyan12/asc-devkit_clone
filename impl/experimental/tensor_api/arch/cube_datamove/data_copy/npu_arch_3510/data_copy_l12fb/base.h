@@ -24,8 +24,8 @@ namespace Te {
 
 class CopyL12FBBase {
 public:
-    template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+    template <const DataCopyTrait& trait, typename T, typename U>
+    __aicore__ inline void Run(const T& dst, const U& src) {
         DataCopyImpl<trait, T, U>(dst, src);
     }
 
@@ -36,16 +36,10 @@ private:
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
 
+        CheckFormat::CheckNDTemplate<T>();
+        CheckFormat::CheckNDTemplate<U>();
         CheckDataTypeFor3510::CheckL12FbDataType<dstType, srcType>();
 
-        constexpr bool isFp8 = Std::is_same_v<dstType, __fbuf__ fp8_e8m0_t> && Std::is_same_v<srcType, __cbuf__ fp8_e8m0_t>;
-        if constexpr (isFp8) {
-            CheckFormat::CheckNDFp8Template<T>();
-            CheckFormat::CheckNDFp8Template<U>();
-        } else {
-            CheckFormat::CheckNDTemplate<T>();
-            CheckFormat::CheckNDTemplate<U>();
-        }
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
@@ -59,10 +53,14 @@ private:
 
         uint16_t srcCol = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
         uint16_t srcRow = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
+        uint16_t dstCol = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
         uint16_t dstRow = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
 
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
+
+        static_assert(dstCol * sizeof(dstType) % 128 == 0, "CopyCbufToFB col * sizeof(dtype) must be align to 64.");
+        static_assert(dstCol * sizeof(dstType) <= 4096, "CopyCbufToFB dst size exceeds 4KB bias table size.");
 
         uint16_t blockCount = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
         uint16_t blockLen = CeilDivision(srcCol * sizeof(srcType), C2PIPE2GM_UNIT);
