@@ -27,7 +27,7 @@
 
 __simd_callee__ inline int64_t asc_get_ar_spr_impl()
 {
-    return bisheng::cce::get_ar();
+    return get_ar();
 }
 
 #endif
