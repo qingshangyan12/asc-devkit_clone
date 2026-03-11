@@ -24,15 +24,10 @@ class LoadDataFourDim3510L12L0BNZ2ZNB8B4WithCoord {
 public:
     template <const LoadDataTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        LoadDataImpl<TraitHolder<trait, true>::traitTransposed, T, U, Coord>(dst, src, coord);
+        LoadDataImpl<trait, T, U, Coord>(dst, src, coord);
     }
 
-private:
-    template<const LoadDataTrait& trait, bool transpose>
-    struct TraitHolder {
-        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
-    };
-    
+private:   
     template<typename T>
     __aicore__ inline constexpr void CheckNZTemplate()
     {
@@ -108,11 +103,9 @@ private:
         LoadCbufToCbS4Base loadCbufToCbS4;
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
             auto sliceDst = dst(MakeCoord(x, y));
-            loadCbufToCbS4.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
+            loadCbufToCbS4.template LoadData<trait, true>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
                                                     mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);
-            y += kStep * FRACTAL_FIXED;
-            x += (y / Col) * (C0_SIZE * KHALF / sizeof(DstType));
-            y %= Col;
+            x += C0_SIZE * KHALF;
             mStartPosition += M_STEP_MIN_VAL_B4;
         }
     }
@@ -134,10 +127,8 @@ private:
         LoadCbufToCbBase loadCbufToCb;
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
             auto sliceDst = dst(MakeCoord(x, y));
-            loadCbufToCb.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-            y += kStep * FRACTAL_FIXED;
-            x += (y / Col) * (C0_SIZE / sizeof(DstType));
-            y %= Col;
+            loadCbufToCb.template LoadData<trait, true>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            x += C0_SIZE;
             mStartPosition += M_STEP_MIN_VAL_B8;
         }
     }
@@ -151,6 +142,8 @@ private:
         auto srcLayout = src.Layout();
         auto mStartPosition = Std::get<0>(coord) / FRACTAL_FIXED;
         auto kStartPosition = Std::get<1>(coord) * sizeof(DstType) / C0_SIZE;
+        auto n1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
+                GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) / FRACTAL_FIXED;
         auto mStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
                 GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) / FRACTAL_FIXED;
         auto kStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) *
@@ -161,9 +154,21 @@ private:
         auto dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout) / STRIDE_UNIT;
         constexpr bool isFp4Type = std::is_same<T, fp4x2_e2m1_t>::value || std::is_same<T, fp4x2_e1m2_t>::value;
         if constexpr (isFp4Type) {
-            LoadDataImplB4<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            constexpr int KHALF = 2;
+            if ((n1 & 1) == 0) {
+                LoadCbufToCbS4Base loadCbufToCbS4;
+                loadCbufToCbS4.template LoadData<trait, true>(dst, src, mStartPosition, kStartPosition / KHALF, 
+                                                        mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);
+            } else {
+                LoadDataImplB4<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            }
         } else {
-            LoadDataImplB8<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            if ((n1 & 1) == 0) {
+                LoadCbufToCbBase loadCbufToCb;
+                loadCbufToCb.template LoadData<trait, true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            } else {
+                LoadDataImplB8<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            }
         }
     }
 };

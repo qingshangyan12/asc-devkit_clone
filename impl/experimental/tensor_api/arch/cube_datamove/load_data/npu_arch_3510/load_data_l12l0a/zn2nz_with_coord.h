@@ -24,15 +24,10 @@ class LoadDataFourDim3510L12L0AZN2NZWithCoord {
 public:
     template <const LoadDataTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        LoadDataImpl<TraitHolder<trait, true>::traitTransposed, T, U, Coord>(dst, src, coord);
+        LoadDataImpl<trait, T, U, Coord>(dst, src, coord);
     }
 
 private:
-    template<const LoadDataTrait& trait, bool transpose>
-    struct TraitHolder {
-        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
-    };
-
     template<typename T>
     __aicore__ inline constexpr void CheckNZTemplate()
     {
@@ -108,7 +103,7 @@ private:
         auto srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) / STRIDE_UNIT;
         LoadCbufToCaBase loadCbufToCa;
-        loadCbufToCa.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+        loadCbufToCa.template LoadData<trait, true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
     }
 };
 } // namespace Te
