@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-和[asc_sync_block_arrive](asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。
+和[asc_sync_block_arrive](../asc_sync_block_arrive/asc_sync_block_arrive_arch_2201.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。
 
 ## 函数原型
 
