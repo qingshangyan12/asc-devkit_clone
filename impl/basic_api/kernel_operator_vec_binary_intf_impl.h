@@ -69,7 +69,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Add", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskArray<T>(mask, "Add");
 #endif
@@ -91,7 +91,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Add", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<T>(mask, "Add");
 #endif
@@ -121,7 +121,7 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Add", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -159,7 +159,7 @@ __aicore__ inline void Sub(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Sub", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskArray<T>(mask, "Sub");
 #endif
@@ -181,7 +181,7 @@ __aicore__ inline void Sub(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Sub", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<T>(mask, "Sub");
 #endif
@@ -211,7 +211,7 @@ __aicore__ inline void Sub(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Sub", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -249,7 +249,7 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Mul", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskArray<T>(mask, "Mul");
 #endif
@@ -271,7 +271,7 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Mul", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<T>(mask, "Mul");
 #endif
@@ -301,7 +301,7 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Mul", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -380,7 +380,7 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Div", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskArray<T>(mask, "Div");
 #endif
@@ -402,7 +402,7 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Div", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<T>(mask, "Div");
 #endif
@@ -451,7 +451,7 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Div", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -576,7 +576,7 @@ __aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Max", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskArray<T>(mask, "Max");
 #endif
@@ -598,7 +598,7 @@ __aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Max", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<T>(mask, "Max");
 #endif
@@ -628,7 +628,7 @@ __aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Max", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -666,7 +666,7 @@ __aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Min", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskArray<T>(mask, "Min");
 #endif
@@ -688,7 +688,7 @@ __aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Min", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<T>(mask, "Min");
 #endif
@@ -718,7 +718,7 @@ __aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Min", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -756,7 +756,7 @@ __aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("And", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskArray<T>(mask, "And");
 #endif
@@ -778,7 +778,7 @@ __aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("And", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<T>(mask, "And");
 #endif
@@ -808,7 +808,7 @@ __aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("And", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -846,7 +846,7 @@ __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Or", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskArray<T>(mask, "Or");
 #endif
@@ -868,7 +868,7 @@ __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Or", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
     CheckMaskValue<T>(mask, "Or");
 #endif
@@ -898,7 +898,7 @@ __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Or", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
 #endif
 #if ASCENDC_CPU_DEBUG
