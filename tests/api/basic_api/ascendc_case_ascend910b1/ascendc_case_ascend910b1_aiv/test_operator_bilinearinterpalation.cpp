@@ -168,7 +168,7 @@ INSTANTIATE_TEST_CASE_P(TEST_OPEARATION_BILINEARINTERPOLATION, BilinearInterpola
         bilinearInterpolationParams{128, 2, false, 1, 128, 2, false, 2, 2, testBilinearInterpolation<int16_t>},
         bilinearInterpolationParams{64, 2, false, 1, 128, 2, false, 2, 4, testBilinearInterpolation<float>},
         // vROffset范围为[128, 65535] + tensorSize overflow
-        bilinearInterpolationParams{128, 2, false, 1, 100, 2, false, 9, 2, testBilinearInterpolation<half>},
+        bilinearInterpolationParams{128, 2, false, 1, 100, 2, false, 10, 2, testBilinearInterpolation<half>},
         // TensorTrait
         bilinearInterpolationParams{128, 2, false, 1, 128, 2, true, 0, 2, testBilinearInterpolation<AscendC::TensorTrait<half>>},
         bilinearInterpolationParams{128, 2, false, 1, 128, 2, false, 2, 2, testBilinearInterpolation<AscendC::TensorTrait<int16_t>>},
