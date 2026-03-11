@@ -110,9 +110,7 @@ private:
             auto sliceDst = dst(MakeCoord(x, y));
             loadCbufToCaS4.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
                                                     mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);
-            x += mStep * FRACTAL_FIXED;
-            y += (x / Row) * (C0_SIZE * KHALF / sizeof(DstType));
-            x %= Row;
+            y += C0_SIZE * KHALF;
             mStartPosition += M_STEP_MIN_VAL_B4;
         }
     }
@@ -135,9 +133,7 @@ private:
         for (uint16_t idx = 0; idx < mLoop; ++idx) {
             auto sliceDst = dst(MakeCoord(x, y));
             loadCbufToCa.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-            x += mStep * FRACTAL_FIXED;
-            y += (x / Row) * (C0_SIZE / sizeof(DstType));
-            x %= Row;
+            y += C0_SIZE;
             mStartPosition += M_STEP_MIN_VAL_B8;
         }
     }
