@@ -67,6 +67,23 @@ __aicore__ inline void Ub2Gm(const AscendC::GlobalTensor<T>& dstGlobal, const As
 
 __aicore__ inline HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::HcommImpl()
 {
+    pipe_.InitBuffer(wqeInBuf, 32);
+    wqeItem_ = wqeInBuf.Get<uint8_t>();
+
+    pipe_.InitBuffer(cqeInBuf, 32);
+    cqeItem_ = cqeInBuf.Get<uint32_t>();
+
+    pipe_.InitBuffer(sqPIInBuf, 32);
+    sqPI_ = sqPIInBuf.Get<uint32_t>();
+
+    pipe_.InitBuffer(sqCIInBuf, 32);
+    sqCI_ = sqCIInBuf.Get<uint32_t>();
+
+    pipe_.InitBuffer(cqCIInBuf, 32);
+    cqCI_ = cqCIInBuf.Get<uint32_t>();
+
+    pipe_.InitBuffer(dbInBuf, 32);
+    doorBell_ = dbInBuf.Get<uint64_t>();
 }
 
 __aicore__ inline HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::~HcommImpl() {}
@@ -76,7 +93,72 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
                                                                                         GM_ADDR dst, GM_ADDR src,
                                                                                         uint64_t len, uint32_t opType)
 {
-    return 0;
+    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);
+    auto sqPIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr);
+    GlobalTensor<uint32_t> sqPIGlobal;
+    sqPIGlobal.SetGlobalBuffer(sqPIAddr);
+    Gm2Ub(sqPI_, sqPIGlobal, 1);
+    uint32_t sqHead = sqPI_.GetValue(0);
+
+    auto sqCIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr);
+    GlobalTensor<uint32_t> sqCIGlobal;
+    sqCIGlobal.SetGlobalBuffer(sqCIAddr);
+    uint32_t sqDepth = channelPtr->sqContextAddr->ctx.rdmaSqContext.depth;
+
+#if !defined(UT_TEST)
+    while (1) {
+        Gm2Ub(sqCI_, sqCIGlobal, 1);
+        uint32_t sqTail = sqCI_.GetValue(0);
+        if (sqHead - sqTail < sqDepth - 1) {
+            break;
+        }
+    }
+#endif
+
+    __ubuf__ RoceWqeEntry* wqePtr = (__ubuf__ RoceWqeEntry*)(wqeItem_.GetPhyAddr());
+    uint8_t owner = (sqHead & sqDepth) == 0 ? 0 : 1;
+    wqePtr->ctrl.dw0.value = HtoNL(owner << OWNER_OFFSET | 2U << CTRLSL_OFFSET | 1U << CR_OFFSET | 1U << VA_OFFSET
+                                   | 4U << TSL_OFFSET | 2U << BDSL_OFFSET);
+    wqePtr->ctrl.dw1.value = HtoNL(1U << CL_OFFSET);
+    wqePtr->doorbell = 0;
+    wqePtr->task.dw0.value = HtoNL(opType << OP_TYPE_OFFSET | 1U << C_OFFSET);
+    wqePtr->dataLen = HtoNL(len);
+    wqePtr->immeData = 0;
+    wqePtr->firstLast = 0;
+    wqePtr->nxtEthHdr = 0;
+    wqePtr->cmdLen = 0;
+    wqePtr->rsvd0 = 0;
+    wqePtr->lastExtLen = 0;
+    wqePtr->vaHigh32 = HtoNL(((uint64_t)dst + len) >> 32);
+    wqePtr->vaLow32 = HtoNL(((uint64_t)dst + len) & 0xffffffff);
+    uint32_t rKey = channelPtr->remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey;
+    wqePtr->rKey = HtoNL(rKey);
+    wqePtr->rsvd1 = 0;
+    wqePtr->data.bufAddrHigh32 = HtoNL((uint64_t)src >> 32);
+    wqePtr->data.bufAddrLow32 = HtoNL((uint64_t)src & 0xffffffff);
+    wqePtr->data.rLen = (uint32_t)len;
+    uint32_t lKey = channelPtr->localBufferAddr->pti.rdmaMemProtectionInfo.lkey;
+    wqePtr->data.leKey = HtoNL(1 << 31 | lKey);
+    __gm__ uint8_t* sqBaseAddr = (__gm__ uint8_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.sqVa);
+    uint32_t sqPIMask = sqDepth - 1;
+    uint32_t wqeSize = channelPtr->sqContextAddr->ctx.rdmaSqContext.wqeSize;
+    GlobalTensor<uint8_t> sqGlobal;
+    sqGlobal.SetGlobalBuffer((__gm__ uint8_t*)(sqBaseAddr + (sqHead & sqPIMask) * wqeSize));
+
+    PipeBarrier<PIPE_ALL>();
+    DataCopy(sqGlobal, wqeItem_, DEFAULT_WQE_ITEM_SIZE);
+    PipeBarrier<PIPE_ALL>();
+
+    HcommHandle handleId = ++curHandleId_;
+    channelList_[handleId] = channel;
+    sqHead++;
+    sqPI_.SetValue(0, sqHead);
+
+    if constexpr (commit) {
+        Commit<PIPE_MTE3>(handleId);
+    }
+    Ub2Gm<uint32_t>(sqPIGlobal, sqPI_, 1);
+    return handleId;
 }
 
 template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
@@ -96,12 +178,97 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
 template <pipe_t pipe>
 __aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Commit(HcommHandle handle)
 {
+    __gm__ Channel* channel = (__gm__ Channel*)channelList_[handle]; // 获取channel
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Commit handle: %u channelHandle:%llu", handle, channel);
+    AscendC::GlobalTensor<uint32_t> sqPIGlobalTensor;
+    sqPIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)channel->sqContextAddr->ctx.rdmaSqContext.headAddr);
+    Gm2Ub(sqPI_, sqPIGlobalTensor, 1);
+    uint32_t sqHead = sqPI_.GetValue(0); // 获取当前channel对应的sq pi
+    KERNEL_LOG(KERNEL_INFO, "sqHead: %llu", sqHead);
+
+    AscendC::GlobalTensor<uint64_t> dbGlobalTensor;
+    __gm__ uint64_t* doorBellAddr =
+        (__gm__ uint64_t*)(channel->sqContextAddr->ctx.rdmaSqContext.dbVa + (sqHead >> 8) & 0xff);
+    dbGlobalTensor.SetGlobalBuffer((__gm__ uint64_t*)doorBellAddr);
+
+    uint64_t dbValue = GetDbValue(channel->sqContextAddr->ctx.rdmaSqContext.qpn);
+    KERNEL_LOG(KERNEL_INFO, "dbValue: %llu", dbValue);
+    __ubuf__ uint32_t* dbUB = (__ubuf__ uint32_t*)(doorBell_.GetPhyAddr());
+    *(dbUB + 0) = (dbValue & 0xffffffff);
+    *(dbUB + 1) = (dbValue >> 32) | ((sqHead >> 8) & 0xff);
+    KERNEL_LOG(KERNEL_INFO, "doorBell_0: %llu, doorBell_1: %llu", *(dbUB + 0), *(dbUB + 1));
+
+    set_atomic_add();
+    Ub2Gm(dbGlobalTensor, doorBell_, 1);
+    set_atomic_none();
     return HCOMM_SUCCESS;
 }
 
 template <pipe_t pipe>
 __aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Wait(HcommHandle handle)
 {
+    __gm__ Channel* channel = (__gm__ Channel*)channelList_[handle]; // 获取channel
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Wait handle: %u channelHandle:%llu", handle, channel);
+    auto sqCIAddr = channel->sqContextAddr->ctx.rdmaSqContext.tailAddr;
+    AscendC::GlobalTensor<uint32_t> sqCIGlobalTensor;
+    sqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)sqCIAddr); // 获取Sq CI对应的global tensor
+    uint32_t sqCI_0 = sqCIGlobalTensor.GetValue(0);               // 获取当前channel对应的sq pi
+    KERNEL_LOG(KERNEL_INFO, "sqCI_0: %llu", sqCI_0);
+
+    auto cqCIAddr = channel->cqContextAddr->ctx.rdmaCqContext.tailAddr;
+    AscendC::GlobalTensor<uint32_t> cqCIGlobalTensor;
+    cqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)cqCIAddr); // 获取Cq CI对应的global tensor
+
+    uint8_t owner;
+    uint32_t cqTail;
+    uint32_t cqMask;
+    uint32_t cqeSize = channel->cqContextAddr->ctx.rdmaCqContext.cqeSize;
+    uint32_t cqDepth = channel->cqContextAddr->ctx.rdmaCqContext.cqDepth;
+    uint32_t cqn = channel->cqContextAddr->ctx.rdmaCqContext.cqn;
+    __gm__ uint8_t* cqBaseBuf = (__gm__ uint8_t*)(channel->cqContextAddr->ctx.rdmaCqContext.dbVa);
+
+    AscendC::GlobalTensor<uint32_t> cqeGlobalTensor;
+    __ubuf__ RoceCqeEntry* cqeUB = (__ubuf__ RoceCqeEntry*)(cqeItem_.GetPhyAddr());
+
+    do {
+        Gm2Ub(cqCI_, cqCIGlobalTensor, 1);
+        cqTail = cqCI_.GetValue(static_cast<uint32_t>(0));
+
+        owner = (HtoNL(cqTail) & (cqDepth + 1)) == 0 ? 0 : 1;
+        auto cqeAddr = cqBaseBuf + ((HtoNL(cqTail) & cqDepth) * cqeSize);
+        cqeGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)cqeAddr);
+
+        Gm2Ub(cqeItem_, cqeGlobalTensor, 8);
+
+#if defined(UT_TEST)
+        break;
+#else
+        if (((((cqeUB->cqe0) >> 31) & 0x1) == owner) && ((cqeUB->cqe0 & 0xfffff) == cqn)) {
+            break;
+        }
+#endif
+    } while (1);
+
+    cqTail = HtoNL(HtoNL(cqTail) + 1);
+    cqTail += 1;
+    cqCI_.SetValue(0, cqTail);
+
+    Ub2Gm(cqCIGlobalTensor, cqCI_, 1); // 更新 Cq CI 到 gm
+
+    Gm2Ub(sqCI_, sqCIGlobalTensor, 1);
+
+    uint32_t lsqCI_0 = sqCI_.GetValue(0);
+    KERNEL_LOG(KERNEL_INFO, "lsqCI_0: %llu", lsqCI_0);
+    uint32_t sqTail = sqCI_.GetValue(static_cast<uint32_t>(0));
+    sqTail += 1;
+    sqCI_.SetValue(0, sqTail);
+
+    uint32_t lsqCI_1 = sqCI_.GetValue(0);
+    KERNEL_LOG(KERNEL_INFO, "lsqCI_1: %llu", lsqCI_1);
+
+    Ub2Gm(sqCIGlobalTensor, sqCI_, 1);              // 更新 Sq CI 到 gm
+    uint32_t sqCI_1 = sqCIGlobalTensor.GetValue(0); // 获取当前channel对应的sq pi
+    KERNEL_LOG(KERNEL_INFO, "sqCI_1: %llu", sqCI_1);
     return HCOMM_SUCCESS;
 }
 } // namespace AscendC
