@@ -36,7 +36,7 @@ class BaseTlv:
 
     @classmethod
     def from_bytes(cls, data: bytes) -> 'BaseTlv':
-        type_val, length_val = struct.unpack('<HH', data[:4])
+        type_val, length_val = struct.unpack('<HH', data[:4]) # little-endian
         return cls(type_val, length_val)
 
 
@@ -103,12 +103,12 @@ def parse_hexdump_to_tlv(hexdump: str) -> str:
 
         hex_chars = hex_data.replace(' ', '')
         hex_parts = []
-        for i in range(0, len(hex_chars), 8):
+        for i in range(0, len(hex_chars), 8): # 8 bytes per group
             if i + 8 <= len(hex_chars):
                 hex_parts.append(hex_chars[i: i + 8])
         
         formatted_hex = ' '.join(hex_parts)
-        tlv_lines.append(f"{address} {formatted_hex.ljust(39)} {ascii_part}")
+        tlv_lines.append(f"{address} {formatted_hex.ljust(39)} {ascii_part}") # 39 width for hex data
 
     '''
     tlv_lines:
@@ -188,7 +188,7 @@ def _parse_simt_value_from_bytes(data: bytes) -> str:
         str: hex string of SIMT type value, None if not found
     """
     offset = 0
-    while offset + 4 <= len(data):
+    while offset + 4 <= len(data): # 4 bytes for TLV header
         tlv_type, length = _parse_tlv_header_and_check(data, offset)
         
         if tlv_type is None:  
@@ -258,7 +258,7 @@ def _extract_tlv_value(data: bytes, offset: int, length: int) -> str:
         value = 0
         for i in range(min(length, 4)):
             value |= data[value_start + i] << (i * 8)
-    return f"0x{value:08x}"
+    return f"0x{value:08x}" # 8 bytes for uint32 zero-padding
 
 
 def check_op_type_is_simt(object_file_path: str, kernel_name: str):
