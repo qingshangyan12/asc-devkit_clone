@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ absolute_tol = 1e-9
 error_tol = 1e-4
 
 
-def verify_result(scenarioNum, output, golden):
-    if scenarioNum == 1 or scenarioNum == 4:
+def verify_result(scenario_num, output, golden):
+    if scenario_num == 1 or scenario_num == 4:
         output_type = np.float16
-    elif scenarioNum == 2 or scenarioNum == 5:
+    elif scenario_num == 2 or scenario_num == 5:
         output_type = np.float32
-    elif scenarioNum == 3 or scenarioNum == 6:
+    elif scenario_num == 3 or scenario_num == 6:
         output_type = np.int8
 
     output = np.fromfile(output, dtype=output_type).reshape(-1)
@@ -53,12 +53,12 @@ def verify_result(scenarioNum, output, golden):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 7))
+    parser.add_argument('-scenario_num', type=int, default=1, choices=range(1, 7))
     parser.add_argument('output', type=str)
     parser.add_argument('golden', type=str)
     args = parser.parse_args()
     try:
-        res = verify_result(args.scenarioNum, args.output, args.golden)
+        res = verify_result(args.scenario_num, args.output, args.golden)
         if not res:
             raise ValueError("[ERROR] result error")
         else:
