@@ -43,6 +43,12 @@ private:
         uint32_t opType);
 private:
     TPipe pipe_;
+    TBuf<TPosition::VECOUT> wqeInBuf;
+    TBuf<TPosition::VECOUT> cqeInBuf;
+    TBuf<TPosition::VECOUT> sqPIInBuf;
+    TBuf<TPosition::VECOUT> sqCIInBuf;
+    TBuf<TPosition::VECOUT> cqCIInBuf;
+    TBuf<TPosition::VECOUT> dbInBuf;
     LocalTensor<uint8_t> wqeItem_;
     LocalTensor<uint32_t> cqeItem_;
     LocalTensor<uint32_t> sqPI_;
