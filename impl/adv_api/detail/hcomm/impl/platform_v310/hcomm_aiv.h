@@ -48,7 +48,7 @@ __aicore__ inline void Gm2Ub(const AscendC::LocalTensor<T>& dstLocal, const Asce
                              int32_t length)
 {
     AscendC::DataCopyExtParams copyParams{1, (uint32_t)(length * sizeof(T)), 0, 0, 0};
-    AscendC::DataCopyPadExtParams<T> padParams{0, 0, 0, 0};
+    AscendC::DataCopyPadExtParams<T> padParams{true, 0, (ONE_BLOCK_SIZE - sizeof(T)) / sizeof(T), 0};
 
     PipeBarrier<PIPE_ALL>();
     AscendC::DataCopyPad(dstLocal, srcGlobal, copyParams, padParams);
@@ -67,6 +67,13 @@ __aicore__ inline void Ub2Gm(const AscendC::GlobalTensor<T>& dstGlobal, const As
 
 __aicore__ inline HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::HcommImpl()
 {
+    pipe_.InitBuffer(hcommBuf_, HCOMM_TMP_BUF_SIZE);
+    wqeItem_ = hcommBuf_.Get<uint32_t>();
+    cqeItem_ = wqeItem_[16];
+    sqPI_ = cqeItem_[8];
+    sqCI_ = sqPI_[8];
+    cqCI_ = sqCI_[8];
+    doorBell_ = cqCI_[8];
 }
 
 __aicore__ inline HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::~HcommImpl() {}
@@ -76,32 +83,177 @@ __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::
                                                                                         GM_ADDR dst, GM_ADDR src,
                                                                                         uint64_t len, uint32_t opType)
 {
-    return 0;
+    HcommHandle handleId = ++curHandleId_;
+    channelList_[handleId] = channel;
+
+    if constexpr (commit) {
+        Commit(handleId);
+        KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: Commit ok, handleId = %d", handleId);
+    }
+    return handleId;
 }
 
 template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
 __aicore__ inline HcommHandle
 HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Write(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return Operate<true, PIPE_MTE3, PIPE_MTE3>(channel, dst, src, len, 4U);
+    return Operate(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::WRITE));
 }
 
 template <bool commit, pipe_t commit_pipe, pipe_t req_pipe>
 __aicore__ inline HcommHandle HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Read(ChannelHandle channel, GM_ADDR dst,
                                                                                      GM_ADDR src, uint64_t len)
 {
-    return Operate<true, PIPE_MTE3, PIPE_MTE3>(channel, dst, src, len, 8U);
+    return Operate(channel, dst, src, len, static_cast<uint32_t>(HCOMM_OP_TYPE::READ));
+}
+
+template <bool isWait>
+__aicore__ inline bool HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::JudgeHandleId(HcommHandle handleId)
+{
+    // 判断handleId是否合法
+    if (handleId < 0) {
+        KERNEL_LOG(KERNEL_ERROR, "Judge HandleId failed without invalid handleId");
+        return false;
+    }
+    if (channelList_[handleId] == 0) {
+        KERNEL_LOG(KERNEL_ERROR, "Judge HandleId failed without valid channel");
+        return false;
+    }
+    if constexpr (isWait) {
+        // wait操作，拒绝对未进行commit或者已进行wait的handleId进行操作
+        if (!handleCommitList_[handleId]) {
+            KERNEL_LOG(KERNEL_ERROR, "Wait Judge HandleId failed without Commit");
+            return false;
+        }
+        if (handleWaitList_[handleId]) {
+            KERNEL_LOG(KERNEL_ERROR, "Wait Judge HandleId failed with already Wait");
+            return false;
+        }
+    } else {
+        // Commit操作，拒绝对已进行commit的handleId进行操作
+        if (handleCommitList_[handleId]) {
+            KERNEL_LOG(KERNEL_ERROR, "Commit Judge HandleId failed with already Commit");
+            return false;
+        }
+    }
+    return true;
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Commit(HcommHandle handle)
+__aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Commit(HcommHandle handleId)
 {
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = Commit, handleId = %u", handleId);
+    if (!JudgeHandleId<false>(handleId)) {
+        return HCOMM_FAILED;
+    }
+    ChannelHandle channel = channelList_[handleId];
+    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel); // 获取channel
+    AscendC::GlobalTensor<uint32_t> sqPIGlobalTensor;
+    sqPIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr);
+    Gm2Ub(sqPI_, sqPIGlobalTensor, 1);
+    uint32_t sqHead = sqPI_.GetValue(0); // 获取当前channel对应的sq pi
+
+    AscendC::GlobalTensor<uint32_t> dbGlobalTensor;
+    __gm__ uint32_t* doorBellAddr =
+        (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.dbVa + (sqHead >> 8) & 0xff);
+    dbGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)doorBellAddr);
+
+    uint64_t dbValue = GetDbValue(channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn);
+    __ubuf__ uint32_t* dbUB = (__ubuf__ uint32_t*)(doorBell_.GetPhyAddr());
+    *(dbUB + 0) = (dbValue & 0xffffffff);
+    *(dbUB + 1) = (dbValue >> 32) | ((sqHead >> 8) & 0xff);
+
+    // 此处想保证db写入为原子操作，穿刺中未验证操作正确性，是否需要换成SetAtomicAdd
+    set_atomic_add();
+    Ub2Gm(dbGlobalTensor, doorBell_, 2);
+    SetAtomicNone();
+
+    // 从当前handleId向前遍历更新handleCommitList_
+    for (uint32_t i = handleId; i >= 0; i--) {
+        if (channelList_[i] == channel) {
+            if (!handleCommitList_[i]) {
+                handleCommitList_[i] = true;
+            } else {
+                break;
+            }
+        }
+    }
     return HCOMM_SUCCESS;
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Wait(HcommHandle handle)
+__aicore__ inline int32_t HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::Wait(HcommHandle handleId)
 {
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = Wait, handleId = %u", handleId);
+    if (!JudgeHandleId<true>(handleId)) {
+        return HCOMM_FAILED;
+    }
+    ChannelHandle channel = channelList_[handleId];
+    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel); // 获取channel
+    auto sqCIAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr;
+    AscendC::GlobalTensor<uint32_t> sqCIGlobalTensor;
+    sqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)sqCIAddr); // 获取Sq CI对应的global tensor
+
+    auto cqCIAddr = channelPtr->cqContextAddr->ctx.rdmaCqContext.tailAddr;
+    AscendC::GlobalTensor<uint32_t> cqCIGlobalTensor;
+    cqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)cqCIAddr); // 获取Cq CI对应的global tensor
+
+    uint8_t owner;
+    uint32_t cqTail;
+    uint32_t cqMask;
+    uint32_t cqeSize = channelPtr->cqContextAddr->ctx.rdmaCqContext.cqeSize;
+    uint32_t cqDepth = channelPtr->cqContextAddr->ctx.rdmaCqContext.cqDepth;
+    uint32_t cqn = channelPtr->cqContextAddr->ctx.rdmaCqContext.cqn;
+    __gm__ uint8_t* cqBaseBuf = (__gm__ uint8_t*)(channelPtr->cqContextAddr->ctx.rdmaCqContext.dbVa);
+
+    AscendC::GlobalTensor<uint32_t> cqeGlobalTensor;
+    __ubuf__ RoceCqeEntry* cqeUB = (__ubuf__ RoceCqeEntry*)(cqeItem_.GetPhyAddr());
+
+    do {
+        Gm2Ub(cqCI_, cqCIGlobalTensor, 1);
+        cqTail = cqCI_.GetValue(static_cast<uint32_t>(0));
+
+        owner = (HtoNL(cqTail) & (cqDepth + 1)) == 0 ? 0 : 1;
+        auto cqeAddr = cqBaseBuf + ((HtoNL(cqTail) & cqDepth) * cqeSize);
+        cqeGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)cqeAddr);
+
+        PipeBarrier<PIPE_ALL>();
+        DataCopy(cqeItem_, cqeGlobalTensor, 8);
+        PipeBarrier<PIPE_ALL>();
+
+#if defined(UT_TEST)
+        break;
+#else
+        if (((((cqeUB->cqe0) >> 31) & 0x1) == owner) && ((cqeUB->cqe0 & 0xfffff) == cqn)) {
+            break;
+        }
+#endif
+    } while (1);
+
+    cqTail = HtoNL(HtoNL(cqTail) + 1);
+    cqTail += 1;
+    cqCI_.SetValue(0, cqTail);
+
+    Ub2Gm(cqCIGlobalTensor, cqCI_, 1); // 更新 Cq CI 到 gm
+
+    Gm2Ub(sqCI_, sqCIGlobalTensor, 1);
+
+    uint32_t sqTail = sqCI_.GetValue(static_cast<uint32_t>(0));
+    sqTail += 1;
+    sqCI_.SetValue(0, sqTail);
+
+    Ub2Gm(sqCIGlobalTensor, sqCI_, 1); // 更新 Sq CI 到 gm
+
+    // 从当前handleId向前遍历处理handleWaitList_
+    for (uint32_t i = handleId; i >= 0; i--) {
+        if (channelList_[i] == channel) {
+            if (!handleWaitList_[i]) {
+                handleWaitList_[i] = true;
+            } else {
+                break;
+            }
+        }
+    }
     return HCOMM_SUCCESS;
 }
 } // namespace AscendC

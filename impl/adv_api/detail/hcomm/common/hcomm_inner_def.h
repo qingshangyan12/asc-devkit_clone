@@ -226,19 +226,19 @@ typedef struct {
 typedef struct {
     union {
         struct {
-            uint32_t type       : 5;
-            uint32_t cos        : 3;
-            uint32_t c          : 1;
-            uint32_t n          : 1;
-            uint32_t cntxSize   : 2;
-            uint32_t qpn        : 20;
-            uint32_t queueId    : 4;
-            uint32_t sgidIndex  : 7;
-            uint32_t mtuShift   : 3;
-            uint32_t vxlan      : 1;
-            uint32_t xrcvld     : 1;
-            uint32_t resv       : 8;
             uint32_t pi         : 8;
+            uint32_t resv       : 8;
+            uint32_t xrcvld     : 1;
+            uint32_t vxlan      : 1;
+            uint32_t mtuShift   : 3;
+            uint32_t sgidIndex  : 7;
+            uint32_t queueId    : 4;
+            uint32_t qpn        : 20;
+            uint32_t cntxSize   : 2;
+            uint32_t n          : 1;
+            uint32_t c          : 1;
+            uint32_t cos        : 3;
+            uint32_t type       : 5;
         } bs;
         uint64_t value;
     } dw0;
@@ -255,7 +255,7 @@ typedef struct {
 #define C_OFFSET 29
 #define F_OFFSET 30
 
-constexpr int32_t HCOMM_FAILED = 1;
+constexpr int32_t HCOMM_FAILED = -1;
 constexpr int32_t HCOMM_SUCCESS = 0;
 
 } // namespace AscendC
