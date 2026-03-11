@@ -128,7 +128,7 @@ template <typename T, size_t row, size_t column>
 using NZFormatLayout = typename NZLayoutFormatImpl<T, row, column>::type;
 
 template <size_t row, size_t column>
-using L0CFormatLayout = NZLayoutFormat<Std::ignore_t, row, column>;
+using L0CFormatLayout = NZFormatLayout<Std::ignore_t, row, column>;
 
 template <typename T, size_t row, size_t column>
 struct ZZLayoutFormatImpl {
