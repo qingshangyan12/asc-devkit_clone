@@ -24,6 +24,7 @@
 #include "kernel_struct_binary.h"
 #include "kernel_struct_unary.h"
 #include "kernel_struct_vdeq.h"
+#include "kernel_npu_debug.h"
 #include "mstx_local_tensor_info.h"
 
 #if __NPU_ARCH__ == 1001
@@ -70,6 +71,13 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
     const RoundMode& roundMode, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<uint8_t>(repeatTime, 0, UINT8_MAX, "repeatTime", "Cast");
+    CheckValueRange<uint8_t>(repeatParams.dstRepStride, 0, UINT8_MAX, "dstRepStride", "Cast");
+    CheckValueRange<uint8_t>(repeatParams.srcRepStride, 0, UINT8_MAX, "srcRepStride", "Cast");
+    CheckMaskArray<T>(mask, "Cast");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams, "Cast");
 #endif
@@ -99,6 +107,13 @@ template <typename T, typename U, bool isSetMask>
 __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const RoundMode& roundMode, const uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<uint8_t>(repeatTime, 0, UINT8_MAX, "repeatTime", "Cast");
+    CheckValueRange<uint8_t>(repeatParams.dstRepStride, 0, UINT8_MAX, "dstRepStride", "Cast");
+    CheckValueRange<uint8_t>(repeatParams.srcRepStride, 0, UINT8_MAX, "srcRepStride", "Cast");
+    CheckMaskValue<T>(mask, "Cast");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Cast");
 #endif
@@ -135,6 +150,10 @@ template <typename T, typename U>
 __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const RoundMode& roundMode, const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<uint32_t>(count, 0, UINT32_MAX, "count", "Cast");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, true>(dst, src, "Cast", count);
 #endif
