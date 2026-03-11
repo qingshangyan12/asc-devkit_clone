@@ -20,6 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_IMPL_H
 #include "kernel_struct_unary.h"
+#include "kernel_npu_debug.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -243,6 +244,9 @@ __aicore__ inline void ShiftLeftIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ T* src,
     static_assert(SupportType<T, uint16_t, uint32_t, int16_t, int32_t>(), "Failed to check dtype in ShiftLeft, current "
         "api support dtype combination is src and dst both: uint16_t / uint32_t / int16_t / int32_t.");
     // B16 must be in range [0, 16]. B32 must be in range [0, 32].
+#ifdef ASCENDC_DEBUG
+    CheckValueRange<T>(scalarValue, 0, sizeof(T) * 8, "scalarValue", "ShiftLeft")
+#endif
     ASCENDC_CHECK_VALUE_RANGE(scalarValue, 0, sizeof(T) * 8, "scalarValue", "ShiftLeft"); // sizeof(T) * 8 as max
     vshl(dst, src, static_cast<uint32_t>(scalarValue), repeatTime, static_cast<uint16_t>(repeatParams.dstBlkStride),
         static_cast<uint16_t>(repeatParams.srcBlkStride), static_cast<uint16_t>(repeatParams.dstRepStride), static_cast<uint16_t>(repeatParams.srcRepStride));
@@ -299,6 +303,9 @@ __aicore__ inline void ShiftRightIntrinsicsImpl(__ubuf__ T* dst, __ubuf__ T* src
         "check dtype in ShiftRight, current api support dtype combination is src and dst both: int16_t, uint16_t, "
         "int32_t, uint32_t.");});
     // B16 must be in range [0, 16]. B32 must be in range [0, 32].
+#ifdef ASCENDC_DEBUG
+    CheckValueRange<T>(scalarValue, 0, sizeof(T) * 8, "scalarValue", "ShiftRight")
+#endif
     ASCENDC_CHECK_VALUE_RANGE(scalarValue, 0, sizeof(T) * 8, "scalarValue", "ShiftRight"); // sizeof(T) * 8 as max
 
     if (roundEn) {

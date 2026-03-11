@@ -161,6 +161,30 @@ __aicore__ inline void CompareCompute(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf_
     }
 }
 
+
+template <typename T, typename U>
+__aicore__ inline void CheckVcmpvDtype()
+{
+    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, int8_t, uint8_t>()),
+            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, current api support dtype combination is src: "
+            "half / float / int32_t, dst: int8_t / uint8_t.");});
+}
+
+template <typename T>
+__aicore__ inline void CheckVcmpDtype()
+{
+    ASCENDC_ASSERT((SupportType<T, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compare, "
+        "current api support dtype combination is src: half / float.");});
+}
+
+template <typename T, typename U>
+__aicore__ inline void CheckVcmpvsDtype()
+{
+    ASCENDC_ASSERT((SupportType<T, half, float, int32_t>() && SupportType<U, uint8_t>()),
+        {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Compares / CompareScalar, current api support dtype "
+            "combination is src0: half / float / int32_t, dst: uint8_t.");});
+}
+
 // Compare::Level 0 - mask bit mode
 template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode,
@@ -168,6 +192,7 @@ __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* 
 {
     (void)(mask);
     if ASCEND_IS_AIV {
+        CheckVcmpvDtype<T, U>();
         VcmpvIntrinsicsImpl(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode,
             repeatTime, repeatParams);
     }
@@ -178,6 +203,7 @@ __aicore__ inline void VcmpImpl(__ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpM
     const uint64_t mask[], const BinaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        CheckVcmpDtype<T>();
         AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
         VcmpIntrinsicsImpl(src0, src1, cmpMode, repeatParams);
     }
@@ -190,6 +216,7 @@ __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* 
 {
     (void)(mask);
     if ASCEND_IS_AIV {
+        CheckVcmpvDtype<T, U>();
         VcmpvIntrinsicsImpl(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode,
             repeatTime, repeatParams);
     }
@@ -200,6 +227,7 @@ __aicore__ inline void VcmpImpl(__ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpM
     const uint64_t mask, const BinaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        CheckVcmpDtype<T>();
         AscendCUtils::SetMask<T, isSetMask>(mask);
         VcmpIntrinsicsImpl(src0, src1, cmpMode, repeatParams);
     }
@@ -216,6 +244,7 @@ __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* 
                 { KERNEL_LOG(KERNEL_ERROR, "Failed to check CMPMODE in Compare, current api only support "
                     "CMPMODE::EQ, when src dtype is int32_t."); });
         }
+        CheckVcmpvDtype<T, U>();
         CompareCompute(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode, count);
     }
 }
@@ -314,6 +343,7 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, T src1, CMP
 {
     (void)(mask);
     if ASCEND_IS_AIV {
+        CheckVcmpvsDtype<T, U>();
         VcmpvsIntrinsicsImpl(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode,
             repeatTime, repeatParams);
     }
@@ -326,6 +356,7 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, T src1, CMP
 {
     (void)(mask);
     if ASCEND_IS_AIV {
+        CheckVcmpvsDtype<T, U>();
         VcmpvsIntrinsicsImpl(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode,
             repeatTime, repeatParams);
     }
@@ -342,6 +373,7 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U* dst, __ubuf__ T* src0, T src1, CMP
                 { KERNEL_LOG(KERNEL_ERROR, "Failed to check CMPMODE in CompareScalar, current api only support "
                     "CMPMODE::EQ, when src dtype is int32_t."); });
         }
+        CheckVcmpvsDtype<T, U>();
         CompareScalarCompute(reinterpret_cast<__ubuf__ uint8_t*>(dst), src0, src1, cmpMode, count);
     }
 }
