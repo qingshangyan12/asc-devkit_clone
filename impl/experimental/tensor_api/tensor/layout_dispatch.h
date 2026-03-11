@@ -51,7 +51,7 @@ __aicore__ inline decltype(auto) Make2Params2Tuple(F&& f, T0&& t0, T1&& t1, Ts&&
     return Make2Params2Tuple(f, tuple1, tuple2);
 }
 
-template <typename Ts>
+template <typename... Ts>
 __aicore__ inline decltype(auto) GetTuple(Ts&&... ts) {
     return Make2Params2Tuple(MakeTupleCons{}, ts...);
 }
