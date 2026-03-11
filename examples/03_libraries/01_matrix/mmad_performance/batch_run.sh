@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ========================== fixpipe_per_mmad ==============================
+# ========================== mmad_fixpipe_per_mmad ==============================
 rm -rf build
 mkdir -p build
 cd build
@@ -10,7 +10,7 @@ cd ../
 python3 scripts/run_tests.py ./cases/mmad_datasize.csv "aic_mac_time(us)"
 rm -rf PROF*
 
-# =========================== fixpipe_after_all_mmad ===============================
+# =========================== mmad_fixpipe_after_all_mmad ===============================
 rm -rf build
 mkdir -p build
 cd build
@@ -20,7 +20,7 @@ cd ../
 python3 scripts/run_tests.py ./cases/mmad_datasize_v2.csv "aic_mac_time(us)"
 rm -rf PROF*
 
-# =========================== uniflag ==============================
+# =========================== mmad_unitflag ==============================
 rm -rf build
 mkdir -p build
 cd build
