@@ -147,19 +147,19 @@ using NNLayoutFormat = Layout<ScaleNNShapeFormat<T, row, column>, ScaleNNStrideF
 
 // scaleAND
 template <typename T, size_t row, size_t column>
-using ScaleANDLayoutFormat = Layout<NDShapeFormat<T, row, column>, NDStrideFormat<T, row, column>>;
+using ScaleANDFormat = Layout<NDShapeFormat<T, row, column>, NDStrideFormat<T, row, column>>;
 
 // scaleADN
 template <typename T, size_t row, size_t column>
-using ScaleADNLayoutFormat = Layout<ScaleDNShapeFormat<T, row, column>, ScaleDNStrideFormat<T, row, column>>;
+using ScaleADNFormat = Layout<ScaleDNShapeFormat<T, row, column>, ScaleDNStrideFormat<T, row, column>>;
 
 // scaleBND
 template <typename T, size_t row, size_t column>
-using ScaleBNDLayoutFormat = Layout<ScaleNDShapeFormat<T, row, column>, ScaleNDStrideFormat<T, row, column>>;
+using ScaleBNDFormat = Layout<ScaleNDShapeFormat<T, row, column>, ScaleNDStrideFormat<T, row, column>>;
 
 // scaleBDN
 template <typename T, size_t row, size_t column>
-using ScaleBDNLayoutFormat = Layout<DNShapeFormat<T, row, column>, DNStrideFormat<T, row, column>>;
+using ScaleBDNFormat = Layout<DNShapeFormat<T, row, column>, DNStrideFormat<T, row, column>>;
 
 } // namespace Te
 } // namespace AscendC
