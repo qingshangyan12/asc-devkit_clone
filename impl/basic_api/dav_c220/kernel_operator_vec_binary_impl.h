@@ -368,6 +368,9 @@ __aicore__ inline void AndImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* sr
         ASCENDC_DEBUG_ASSERT((SupportType<T, int16_t, uint16_t, uint32_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in And, current api support dtype combination is src and dst both: int16_t / "
             "uint16_t / uint32_t / int32_t.\n"));
+        ASCENDC_DEBUG_WARNING((!SupportType<T, uint32_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_WARNING,
+            "When dtype is int32_t / uint32_t for And with count, it is not recommended to be used. Please use "
+            "int16_t / uint16_t instead.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         // for compatibility, in older version, all dtype reinterpret_cast to int16_t
@@ -421,6 +424,9 @@ __aicore__ inline void OrImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src
         ASCENDC_DEBUG_ASSERT((SupportType<T, int16_t, uint16_t, uint32_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in Or, current api support dtype combination is src and dst both: int16_t / "
             "uint16_t / uint32_t / int32_t.\n"));
+        ASCENDC_DEBUG_WARNING((!SupportType<T, uint32_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_WARNING,
+            "When dtype is int32_t / uint32_t for Or with count, it is not recommended to be used. Please use "
+            "int16_t / uint16_t instead.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         // for compatibility, in older version, all dtype reinterpret_cast to int16_t
