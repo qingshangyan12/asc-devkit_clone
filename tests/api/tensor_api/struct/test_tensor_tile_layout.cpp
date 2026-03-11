@@ -1,7 +1,7 @@
 /**
-* Cyright (c) 2026 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN en Software License Agreement Version 2.0 (the "License").
+* CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
 * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -20,7 +20,7 @@ protected:
     void TearDown() {}
 };
 
-TEST_F(Tensor_Api_Layout, ShapeAndStrideeration)
+TEST_F(Tensor_Api_Layout, ShapeAndStrideOperation)
 {
     using namespace AscendC::Te;
 
@@ -58,7 +58,7 @@ TEST_F(Tensor_Api_Layout, ShapeAndStrideeration)
     EXPECT_EQ(AscendC::Std::get<2>(strideMakeInt).value, 666);
 }
 
-TEST_F(Tensor_Api_Layout, IsTupleeration)
+TEST_F(Tensor_Api_Layout, IsTupleOperation)
 {
     using namespace AscendC::Te;
 
@@ -86,7 +86,7 @@ TEST_F(Tensor_Api_Layout, IsTupleeration)
     EXPECT_EQ(AscendC::Std::is_tuple_v<decltype(strideMakeInt)>, true);
 }
 
-TEST_F(Tensor_Api_Layout, Layouteration)
+TEST_F(Tensor_Api_Layout, LayoutOperation)
 {
     using namespace AscendC::Te;
 
@@ -126,7 +126,7 @@ TEST_F(Tensor_Api_Layout, Layouteration)
     EXPECT_EQ(Cosize(layoutMake), 7710);
 }
 
-TEST_F(Tensor_Api_Layout, IsLayouteration)
+TEST_F(Tensor_Api_Layout, IsLayoutOperation)
 {
     using namespace AscendC::Te;
 
@@ -148,7 +148,7 @@ TEST_F(Tensor_Api_Layout, IsLayouteration)
     EXPECT_EQ(is_layout_v<decltype(layoutInit)>, true);
 }
 
-TEST_F(Tensor_Api_Layout, MakeLayoutByShapeeration)
+TEST_F(Tensor_Api_Layout, MakeLayoutByShapeOperation)
 {
     using namespace AscendC::Te;
 
@@ -167,7 +167,7 @@ TEST_F(Tensor_Api_Layout, MakeLayoutByShapeeration)
     EXPECT_EQ(layoutMake2.Capacity(), 24);
 }
 
-TEST_F(Tensor_Api_Layout, LayoutSizeeration)
+TEST_F(Tensor_Api_Layout, LayoutSizeOperation)
 {
     using namespace AscendC::Te;
 
@@ -185,7 +185,7 @@ TEST_F(Tensor_Api_Layout, LayoutSizeeration)
     EXPECT_EQ(layoutMake.Size(), 256);
 }
 
-TEST_F(Tensor_Api_Layout, StaticLayouteration)
+TEST_F(Tensor_Api_Layout, StaticLayoutOperation)
 {
     using namespace AscendC::Te;
 
@@ -225,7 +225,7 @@ TEST_F(Tensor_Api_Layout, MakeMxLayout)
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<1>(MxBDNLayout)), 1);
 }
 
-TEST_F(Tensor_Api_Layout, Geteration)
+TEST_F(Tensor_Api_Layout, GetOperation)
 {
     using namespace AscendC::Te;
 
@@ -272,7 +272,7 @@ TEST_F(Tensor_Api_Layout, Geteration)
     EXPECT_EQ(AscendC::Std::get<0>(nestedGet10Stride), 3);
 }
 
-TEST_F(Tensor_Api_Layout, GeterationInt)
+TEST_F(Tensor_Api_Layout, GetOperationInt)
 {
     using namespace AscendC::Te;
 
@@ -321,7 +321,7 @@ TEST_F(Tensor_Api_Layout, GeterationInt)
     EXPECT_EQ(AscendC::Std::get<0>(nestedGet11Stride), 400);
 }
 
-TEST_F(Tensor_Api_Layout, Selecteration)
+TEST_F(Tensor_Api_Layout, SelectOperation)
 {
     using namespace AscendC::Te;
 
@@ -383,7 +383,7 @@ TEST_F(Tensor_Api_Layout, Selecteration)
     EXPECT_EQ(AscendC::Std::get<1>(nestedSelect01Stride1), 4);
 }
 
-TEST_F(Tensor_Api_Layout, SelecterationInt)
+TEST_F(Tensor_Api_Layout, SelectOperationInt)
 {
     using namespace AscendC::Te;
 
@@ -557,7 +557,7 @@ TEST_F(Tensor_Api_Layout, TestShapeStride)
 //        若只剩最后一个维度：直接计算 coord * stride[0]
 //        反之，mod = coord % shape[i], coord = coord / shape[i], res = res + mod * stride[i]
 // 3) int int int: 返回coord * stride
-TEST_F(Tensor_Api_Layout, Testerator)
+TEST_F(Tensor_Api_Layout, TestOperator)
 {
     using namespace AscendC::Te;
     // 输出为1 * 1 + 2 * 4 = 9
@@ -1052,7 +1052,7 @@ TEST_F(Tensor_Api_Layout, TestAttributes)
     EXPECT_EQ(Cosize<1>(layoutObj3), Coshape<1>(layoutObj3));
     EXPECT_EQ(Cosize(layoutObj3), Coshape(layoutObj3));
 
-    // Crd2Idx:等价于erator()
+    // Crd2Idx:等价于operator()
     auto coord1 = MakeCoord(1, 2);
     auto coord2 = MakeCoord(0, 1, 2);
     auto coord3 = MakeCoord(MakeCoord(0, 1), MakeCoord(2, 3));
