@@ -329,12 +329,12 @@ template <typename T, typename U, typename S>
 __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const MmadParams& mmadParams)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<Tuple<T, U, S>, Tuple<int32_t, int8_t, int8_t>,
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<T, U, S>, Tuple<int32_t, int8_t, int8_t>,
             Tuple<float, half, half>, Tuple<float, float, float>, Tuple<float, bfloat16_t, bfloat16_t>,
-            Tuple<int32_t, int4b_t, int4b_t>>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Mmad, current "
-            "api support dtype combination is dst: int32_t, src0: int8_t, src1: int8_t; dst: float, src0: half, "
-            "src1: half; dst: float, src0: float, src1: float; dst: float, src0: bfloat16_t, src1: bfloat16_t; "
-            "dst: int32_t, src0: int4b_t, src1: int4b_t");});
+            Tuple<int32_t, int4b_t, int4b_t>>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "Mmad, current api support dtype combination is dst: int32_t, src0: int8_t, src1: int8_t; dst: "
+            "float, src0: half, src1: half; dst: float, src0: float, src1: float; dst: float, src0: "
+            "bfloat16_t, src1: bfloat16_t; dst: int32_t, src0: int4b_t, src1: int4b_t"));
         bool cmatrixInitVal = mmadParams.cmatrixInitVal && (!mmadParams.isBias);
         if constexpr ((IsSameType<U, int4b_t>::value) && (IsSameType<S, int4b_t>::value)) {
             mad_s4(c, (__ca__ void *)a, (__cb__ void *)b, mmadParams.m, mmadParams.k, mmadParams.n, mmadParams.unitFlag,
@@ -351,6 +351,11 @@ __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, uint64_t b
     const MmadParams& mmadParams, bool cmatrixSource)
 {
     if ASCEND_IS_AIC {
+        ASCENDC_DEBUG_ASSERT((SupportType<Tuple<T, U, S>, Tuple<int32_t, int8_t, int8_t>,
+            Tuple<float, half, half>, Tuple<float, float, float>, Tuple<float, bfloat16_t, bfloat16_t>>()),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Mmad, current api support dtype "
+            "combination is dst: int32_t, src0: int8_t, src1: int8_t; dst: float, src0: half, src1: half; dst: "
+            "float, src0: float, src1: float; dst: float, src0: bfloat16_t, src1: bfloat16_t;"));
         if constexpr ((IsSameType<U, int4b_t>::value) && (IsSameType<S, int4b_t>::value)) {
             mad_s4(c, (__ca__ void *)a, (__cb__ void *)b, mmadParams.m, mmadParams.k, mmadParams.n,
                 mmadParams.unitFlag, mmadParams.kDirectionAlign, cmatrixSource,
