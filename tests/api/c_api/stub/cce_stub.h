@@ -330,6 +330,17 @@ inline void load_gm_to_cbuf_2dv2_s4(__cbuf__ void *dst, __gm__ void *src, uint32
     uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
     uint8_t l2_cache_ctl) {}
 
+// ==========copy_cbuf_to_ubuf===========
+inline void copy_cbuf_to_ubuf(__ubuf__ void *dst_addr, __cbuf__ void *src_addr, bool sub_blockid, 
+    uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap) {}
+
+
+inline void create_cbuf_matrix_h(__cbuf__ bfloat16_t *dst, int64_t repeat, half value) {}
+
+inline void create_cbuf_matrix_ui(__cbuf__ bfloat16_t *dst, int64_t repeat, uint32_t value) {}
+
+
+
 #if defined(__DAV_CUBE__)
     inline int32_t g_coreType = 1;
 #else

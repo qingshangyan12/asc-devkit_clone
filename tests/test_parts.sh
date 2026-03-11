@@ -81,7 +81,7 @@ basic_test_three_targets=(
     # ascendc_pyut_aclrt_launch_kernel
     # ascendc_pyut_compile_trace_log
     # asc_opc_unittest
-    # ascendc_ut_c_api_ascend910B1_AIC
+    ascendc_ut_c_api_ascend910B1_AIC
     # ascendc_ut_c_api_ascend910B1_AIV
     ascendc_ut_c_api_ascend950pr_9599_AIC
     ascendc_ut_c_api_ascend950pr_9599_AIV

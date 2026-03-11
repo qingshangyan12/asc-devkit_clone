@@ -25,6 +25,8 @@
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_l12fb_impl.h"
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_l12fb_v2_impl.h"
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_l12bt_impl.h"
+#include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_l12ub_impl.h"
+#include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_fill_l1_impl.h"
 #include "instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_gm2l1_impl.h"
 
 // ==========asc_copy_l0c2l1===========
@@ -207,6 +209,19 @@ __aicore__ inline void asc_copy_l12fb_v2(__fbuf__ void* dst, __cbuf__ void* src,
 __aicore__ inline void asc_copy_l12fb_v2_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
 {
     asc_copy_l12fb_v2_sync_impl(dst, src, size);
+}
+
+// =============asc_copy_l12ub===============
+__aicore__ inline void asc_copy_l12ub(__ubuf__ void * dst_addr, __cbuf__ void * src_addr, bool sub_blockid,
+                        uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+{
+    asc_copy_l12ub_impl(dst_addr, src_addr, sub_blockid, burst_num, burst_len, src_gap, dst_gap);
+}
+
+__aicore__ inline void asc_copy_l12ub_sync(__ubuf__ void * dst_addr, __cbuf__ void * src_addr, bool sub_blockid,
+                        uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+{
+    asc_copy_l12ub_sync_impl(dst_addr, src_addr, sub_blockid, burst_num, burst_len, src_gap, dst_gap);
 }
 
 //=============asc_copy_l12bt===============
@@ -1439,4 +1454,164 @@ __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void *dst, __gm__ void *src,
     asc_copy_gm2l1_sync_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, decomp_mode, l2_cache_ctl);
 }
 
+// ==========asc_fill_l1(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
+__aicore__ inline void asc_fill_l1(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, uint32_t value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, uint32_t value,
+                                              const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, uint32_t value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, uint32_t value,
+                                              const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, uint32_t value,
+                                              const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, uint32_t value,
+                                              const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, bfloat16_t value,
+                                         const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, bfloat16_t value,
+                                              const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, half value,
+                                         const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, half value,
+                                              const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, uint32_t value,
+                                         const asc_fill_value_config& config)
+{
+    asc_fill_l1_impl(dst, value, config);
+}
+
+__aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, uint32_t value,
+                                              const asc_fill_value_config& config)
+{
+    asc_fill_l1_sync_impl(dst, value, config);
+}
 #endif
