@@ -23,10 +23,10 @@ namespace Te {
 
 class Fixpipe2GmNz2NdBase3510 {
 public:
-    template <const FixpipeTrait& trait, typename T, typename U>
-    __aicore__ inline void Run(const T& dst, const U& src) {
+    template <const FixpipeTrait& trait, typename T, typename U, typename Params>
+    __aicore__ inline void Run(const T& dst, const U& src, const Params& params) {
         SetRegisterImpl<trait, T, U>(dst, src);
-        DataCopyImpl<trait, T, U>(dst, src);
+        DataCopyImpl<trait, T, U, Params>(dst, src, params);
     }
 
 private:
@@ -54,8 +54,8 @@ private:
         setRegisterInst.SetRegister(ndNum, dstNdStride, srcNdStride);
     }
 
-    template <const FixpipeTrait& trait, typename T, typename U>
-    __aicore__ inline void DataCopyImpl(const T& dst, const U& src)
+    template <const FixpipeTrait& trait, typename T, typename U, typename Params>
+    __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const Params& params)
     {
         CheckTemplate<trait, T, U>();
         auto dstLayout = dst.Layout();
@@ -74,7 +74,7 @@ private:
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
 
         bool reluEn = trait.enableRelu;
-        uint8_t unitFlag = trait.unitFlag;
+        uint8_t unitFlag = params.unitFlag;
         bool isChannelSplit = trait.enableChannelSplit;
         bool nz2ndEn = true;
         bool nz2dnEn = false;

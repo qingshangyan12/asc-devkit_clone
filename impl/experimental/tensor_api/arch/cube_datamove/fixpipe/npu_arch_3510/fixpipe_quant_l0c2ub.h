@@ -77,19 +77,19 @@ struct FormatRegistorFixpipe2Ub3510<Format3510::DN, Format3510::NZ, QuantMode351
 
 class FixpipeQuantFourDimL0C2UB3510 {
 public:
-    template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord) {
-        Execute<trait>(dst, src, quant, coord);
+    template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Coord, typename Params>
+    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Coord& coord, const Params& params) {
+        Execute<trait>(dst, src, quant, coord, params);
     }
 
 private:
-    template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Coord>
-    __aicore__ inline void Execute(const T& dst, const U& src, const V& quant, const Coord& coord)
+    template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Coord, typename Params>
+    __aicore__ inline void Execute(const T& dst, const U& src, const V& quant, const Coord& coord, const Params& params)
     {
         CheckFixpipeQuantParams<trait, T, U>();
         using FixpipeQuantL0C2UB =
             typename FormatRegistorFixpipe2Ub3510<GetDataFormat<T>(), GetDataFormat<U>(), GetQuantMode<trait>()>::type;
-        FixpipeQuantL0C2UB{}.template Run<trait, T, U, V, Coord>(dst, src, quant, coord);
+        FixpipeQuantL0C2UB{}.template Run<trait, T, U, V, Coord, Params>(dst, src, quant, coord, params);
     }
 };
 }  // namespace Te
