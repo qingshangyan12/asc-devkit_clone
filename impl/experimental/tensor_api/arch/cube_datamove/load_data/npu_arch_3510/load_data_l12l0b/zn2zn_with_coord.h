@@ -24,15 +24,10 @@ class LoadDataFourDim3510L12L0BZN2ZNWithCoord {
 public:
     template <const LoadDataTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        LoadDataImpl<TraitHolder<trait, false>::traitTransposed, T, U, Coord>(dst, src, coord);
+        LoadDataImpl<trait, T, U, Coord>(dst, src, coord);
     }
 
-private:  
-    template<const LoadDataTrait& trait, bool transpose>
-    struct TraitHolder {
-        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
-    };
-    
+private:
     template<typename T>
     __aicore__ inline constexpr void CheckZNTemplate()
     {
@@ -90,12 +85,12 @@ private:
         if constexpr (isFp4Type) {
             constexpr int KHALF = 2;
             LoadCbufToCbS4Base loadCbufToCbS4;
-            loadCbufToCbS4.template LoadData<trait>(dst, src, mStartPosition, kStartPosition / KHALF, 
+            loadCbufToCbS4.template LoadData<trait, false>(dst, src, mStartPosition, kStartPosition / KHALF, 
                                                     mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);   
         }
         else {
             LoadCbufToCbBase loadCbufToCb;
-            loadCbufToCb.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            loadCbufToCb.template LoadData<trait, false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         }
     }
 };
