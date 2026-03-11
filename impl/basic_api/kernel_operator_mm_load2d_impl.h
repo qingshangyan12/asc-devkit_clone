@@ -46,9 +46,20 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
         ASCENDC_REPORT_CHECK_ERROR("LoadData with LoadData2DParams", KernelFuncType::NONE_MODE);
     }
 #endif
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckTensorTPosition<TPosition::A1, TPosition::B1>(src, "src", "A1 / B1", "LoadData with LoadData2DParams");
+    if ((TPosition)src.GetPosition() == TPosition::A1) {
+        CheckTensorTPosition<TPosition::A2>(dst, "dst", "A2", "LoadData with LoadData2DParams");
+    } else {
+        CheckTensorTPosition<TPosition::B2>(dst, "dst", "B2", "LoadData with LoadData2DParams");
+    }
+#endif
+    CheckTensorAlignment(tensors.tensor, ONE_BLK_SIZE, tensors.tensorName, apiName);
+
     CheckTensorPos<T>(src, Hardware::L1, "src", "A1 / B1", "LoadData with LoadData2DParams");
     CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "LoadData with LoadData2DParams");
     CheckTensorAlign<T>(dst, VALUE_512, "dst", "LoadData with LoadData2DParams");
+
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L0A) {
         LoadData2DL12L0ACal((__ca__ PrimT<T>*)dst.GetPhyAddr(),

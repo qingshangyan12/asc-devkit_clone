@@ -50,6 +50,10 @@ __aicore__ inline void GatherMask(const LocalTensor<T>& dst, const LocalTensor<T
     const LocalTensor<U>& src1Pattern, const bool reduceMode, const uint32_t mask,
     const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("GatherMask", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"),
+        NamedTensor(src1Pattern, "src1Pattern"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecGatherMaskInfo(dst, src0, mask, gatherMaskParams, mode, "GatherMask");
 #endif
@@ -74,10 +78,12 @@ __aicore__ inline void GatherMask(const LocalTensor<T>& dst, const LocalTensor<T
 }
 
 template <typename T, GatherMaskMode mode>
-__aicore__ inline void GatherMask(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
-    const uint8_t src1Pattern, const bool reduceMode, const uint32_t mask, const GatherMaskParams& gatherMaskParams,
-    uint64_t& rsvdCnt)
+__aicore__ inline void GatherMask(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const uint8_t src1Pattern,
+    const bool reduceMode, const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckVectorTensor("GatherMask", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"));
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecGatherMaskInfo(dst, src0, mask, gatherMaskParams, mode, "GatherMask");
 #endif
