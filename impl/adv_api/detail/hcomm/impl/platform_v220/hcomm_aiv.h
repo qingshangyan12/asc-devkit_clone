@@ -81,6 +81,7 @@ __aicore__ inline void HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::postSen
 {
     __gm__ Channel* channelPtr = (__gm__ Channel*)channelHandle;
     auto qpNum = channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn;
+    KERNEL_LOG(KERNEL_INFO, "qpn: %llu", qpNum);
     auto sqBaseAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.sqVa;
     auto wqeSize = channelPtr->sqContextAddr->ctx.rdmaSqContext.wqeSize;
     auto curHardwareHead = channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr;
