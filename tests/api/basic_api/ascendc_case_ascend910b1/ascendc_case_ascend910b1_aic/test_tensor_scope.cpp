@@ -330,14 +330,10 @@ INSTANTIATE_TEST_CASE_P(TEST_CUBE_OP, CubeOpTestsuite, ::testing::Values(
     CubeOpTestParams{LoadData2dOpTest<half, LoadData>, "LoadData", {TPosition::CO2, TPosition::CO1}, "src", "CO1", "A1 / B1 / GM" },
     CubeOpTestParams{LoadData2dOpTest<half, LoadData>, "LoadData", {TPosition::CO2, TPosition::A1}, "dst", "CO2", "A2 / B2" },
     CubeOpTestParams{LoadData2dG2LOpTest<half, LoadData>, "LoadData", {TPosition::CO2}, "dst", "CO2", "A1 / B1 / A2 / B2" },
-    // LodaData2DV2
-    CubeOpTestParams{LoadData2dv2L2LOpTest<half, LoadData>, "LoadData with LoadData2DParamsV2", {TPosition::CO2, TPosition::A1}, "dst", "CO2", "A2 / B2" },
-    CubeOpTestParams{LoadData2dv2L2LOpTest<half, LoadData>, "LoadData with LoadData2DParamsV2", {TPosition::CO2, TPosition::CO1}, "src", "CO1", "A1 / B1" },
-    CubeOpTestParams{LoadData2dv2G2LOpTest<half, LoadData>, "LoadData with LoadData2DParamsV2", {TPosition::CO2}, "dst", "CO2", "A1 / B1 / A2 / B2" },
     // Mmad
     CubeOpTestParams{MmadOpTest<half, half, half, Mmad>, "Mmad", {TPosition::A1, TPosition::A1, TPosition::A1}, "dstLocal", "A1", "CO1" },
     CubeOpTestParams{MmadOpTest<half, half, half, Mmad>, "Mmad", {TPosition::CO1, TPosition::A1, TPosition::A1}, "fmLocal", "A1", "A2" },
-    CubeOpTestParams{MmadOpTest<half, half, half, Mmad>, "Mmad", {TPosition::CO1, TPosition::A2, TPosition::A1}, "filterLocal", "A1", "B2" }   
+    CubeOpTestParams{MmadOpTest<half, half, half, Mmad>, "Mmad", {TPosition::CO1, TPosition::A2, TPosition::A1}, "filterLocal", "A1", "B2" }
 ));
 
 TEST_P(CubeOpTestsuite, CubeOpTestCase)

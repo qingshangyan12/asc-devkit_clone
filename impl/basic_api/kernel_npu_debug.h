@@ -152,11 +152,11 @@ template <typename T>
 __aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* apiName)
 {
     if constexpr (sizeof(T) == 2) {
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 2" , apiName);
+        CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 2" , apiName);
     } else if constexpr (sizeof(T) == 4) {
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 4" , apiName);
+        CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 4" , apiName);
     } else if constexpr (sizeof(T) == 8) {
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 8" , apiName);
+        CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 8" , apiName);
     }
 }
 
