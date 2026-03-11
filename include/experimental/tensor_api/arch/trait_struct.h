@@ -75,12 +75,6 @@ struct FixpipeTrait {
 
 struct LoadDataTrait {
     __aicore__ constexpr LoadDataTrait() {}
-
-    __aicore__ constexpr LoadDataTrait(const bool transposedIn) : transposed(transposedIn) {}
-
-    __aicore__ constexpr LoadDataTrait(const LoadDataTrait& trait, const bool transposedIn) : transposed(transposedIn) {}
-
-    bool transposed = false;
 };
 
 } // namespace Te
