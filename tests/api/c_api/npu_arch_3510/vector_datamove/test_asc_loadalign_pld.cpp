@@ -32,7 +32,7 @@ void pld_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Literal
 TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPld_Succ)
 {
     vector_bool dst = static_cast<vector_bool>(11);
-    __ubuf__ uint32_t *src = static_cast<__ubuf__ uint32_t *>(22);
+    __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
     iter_reg offset = static_cast<iter_reg>(33);;
 
     MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))       \
