@@ -20,6 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_UNARY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_UNARY_IMPL_H
 #include "kernel_struct_unary.h"
+#include "kernel_npu_debug.h"
 
 namespace AscendC {
 /* **************************************** Relu ****************************************** */
@@ -136,6 +137,9 @@ __aicore__ inline void ReluImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask,
 template <typename T> __aicore__ inline void ReluImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dtype in Relu, current api support dtype combination is src and dst both: half / "
+            "float / int32_t.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vrelu(dst, src, 1, static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
@@ -171,6 +175,8 @@ __aicore__ inline void ExpImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t 
 template <typename T> __aicore__ inline void ExpImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+            "dtype in Exp, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vexp(dst, src, 1, static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
@@ -206,6 +212,8 @@ __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask, u
 template <typename T> __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+            "dtype in Ln, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vln(dst, src, 1, static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
@@ -237,10 +245,12 @@ __aicore__ inline void AbsImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask, 
     }
 }
 
-// Ln::Level 2
+// Abs::Level 2
 template <typename T> __aicore__ inline void AbsImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+            "dtype in Abs, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vabs(dst, src, 1, static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
@@ -276,6 +286,8 @@ __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t
 template <typename T> __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+            "dtype in Reciprocal, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vrec(dst, src, 1, static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
@@ -311,6 +323,8 @@ __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask
 template <typename T> __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+            "dtype in Rsqrt, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vrsqrt(dst, src, 1, static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
@@ -342,10 +356,12 @@ __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask,
     }
 }
 
-// Rsqrt::Level 2
+// Sqrt::Level 2
 template <typename T> __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
+            "dtype in Sqrt, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vsqrt(dst, src, 1, static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
@@ -381,6 +397,8 @@ __aicore__ inline void NotImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask, 
 template <typename T> __aicore__ inline void NotImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        ASCENDC_DEBUG_ASSERT((SupportType<T, int16_t, uint16_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
+            "check dtype in Sqrt, current api support dtype combination is src and dst both: int16_t / uint16_t.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vnot(dst, src, 1, static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
