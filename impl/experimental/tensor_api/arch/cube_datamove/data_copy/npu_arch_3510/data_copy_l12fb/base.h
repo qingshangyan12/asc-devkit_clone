@@ -36,16 +36,10 @@ private:
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
 
+        CheckFormat::CheckNDTemplate<T>();
+        CheckFormat::CheckNDTemplate<U>();
         CheckDataTypeFor3510::CheckL12FbDataType<dstType, srcType>();
 
-        constexpr bool isFp8 = Std::is_same_v<dstType, __fbuf__ fp8_e8m0_t> && Std::is_same_v<srcType, __cbuf__ fp8_e8m0_t>;
-        if constexpr (isFp8) {
-            CheckFormat::CheckNDFp8Template<T>();
-            CheckFormat::CheckNDFp8Template<U>();
-        } else {
-            CheckFormat::CheckNDTemplate<T>();
-            CheckFormat::CheckNDTemplate<U>();
-        }
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
