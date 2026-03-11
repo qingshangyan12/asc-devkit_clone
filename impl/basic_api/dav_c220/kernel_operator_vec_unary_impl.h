@@ -397,7 +397,7 @@ template <typename T> __aicore__ inline void NotImpl(__ubuf__ T* dst, __ubuf__ T
 {
     if ASCEND_IS_AIV {
         ASCENDC_DEBUG_ASSERT((SupportType<T, int16_t, uint16_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
-            "check dtype in Sqrt, current api support dtype combination is src and dst both: int16_t / uint16_t.\n"));
+            "check dtype in Not, current api support dtype combination is src and dst both: int16_t / uint16_t.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vnot(dst, src, 1, static_cast<uint16_t>(DEFAULT_BLK_STRIDE), static_cast<uint16_t>(DEFAULT_BLK_STRIDE),
