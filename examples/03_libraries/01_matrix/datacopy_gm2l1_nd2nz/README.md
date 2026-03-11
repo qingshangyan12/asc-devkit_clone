@@ -37,16 +37,16 @@
   2. 使用SetFlag和WaitFlag进行流水线同步
   3. 将转换后的NZ格式数据直接从L1搬运回GM
 
-本样例基于操作数数据类型和dValue是否对齐到32B，提供了以下6种测试场景：
+本样例基于操作数数据类型和dValue是否对齐到32B等特性，支持以下6种场景：
 
-| 场景编号 | 数据类型 | dValue是否对齐到32B |
-|:--------:|:------:|:--------:|
-| SCENARIOMUM=1 | half | 是 |
-| SCENARIOMUM=2 | float | 是 |
-| SCENARIOMUM=3 | int8_t | 是 |
-| SCENARIOMUM=4 | half | 否 |
-| SCENARIOMUM=5 | float | 否 |
-| SCENARIOMUM=6 | int8_t | 否 |
+| 场景编号<br>SCENARIONUM | 数据类型 | nd矩阵数量 | nValue | dValue |dValue是否对齐到32B |
+|:--------:|:------:|:--------:|:--------:|:--------:|:--------:|
+| 1 | half | 1 | 32 | 32 | 是|
+| 2 | float | 1 | 32 | 32 | 是 |
+| 3 | int8_t | 1 | 32 | 32 | 是 |
+| 4 | half | 2 | 16 | 30 | 否 |
+| 5 | float | 2 | 16 | 30 | 否 |
+| 6 | int8_t | 2 | 16 | 30 | 否 |
 
 当scenarioNum等于1、2、3时：
 
@@ -70,7 +70,7 @@
       intriParams.srcDValue = 32;
       intriParams.dstNzC0Stride = 32;
       intriParams.dstNzNStride = 1;
-      intriParams.dstNzMatrixStride = 16 * fractalShape[1]; // 2个nd矩阵，偏移为偏移为nValue * fractalShape[1]，即连续搬搬运。
+      intriParams.dstNzMatrixStride = 16 * fractalShape[1]; // 2个nd矩阵，偏移为偏移为nValue * fractalShape[1]，即连续搬运。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
