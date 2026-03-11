@@ -1104,13 +1104,13 @@ TEST_F(Tensor_Api_Layout, TestStructLayout)
     auto NDLayout = NDLayoutFormat<half>{}(256, 256);
     auto StaticNDLayout = NDLayoutFormat<half>{}::type(AscendC::Std::Int<16>{}, AscendC::Std::Int<16>{}){};
     auto DNLayout = DNLayoutFormat<half>{}(256, 256);
-    auto NzLayout = NzLayoutFormat<half>(256, 256);
-    auto ZnLayout = ZnLayoutFormat<half>(256, 256);
-    auto NnLayout = NnLayoutFormat<fp8_e8m0_t>(16, 32);
-    auto scaleANDLayout = ScaleANDLayoutFormat<fp8_e8m0_t>(16, 32);
-    auto scaleADNLayout = ScaleADNLayoutFormat<fp8_e8m0_t>(16, 32);
-    auto scaleBNDLayout = ScaleBNDLayoutFormat<fp8_e8m0_t>(16, 32);
-    auto scaleBDNLayout = ScaleBDNLayoutFormat<fp8_e8m0_t>(16, 32);
+    auto NzLayout = NzLayoutFormat<half>{}(256, 256);
+    auto ZnLayout = ZnLayoutFormat<half>{}(256, 256);
+    auto NnLayout = NnLayoutFormat<fp8_e8m0_t>{}(16, 32);
+    auto scaleANDLayout = ScaleANDLayoutFormat<fp8_e8m0_t>{}(16, 32);
+    auto scaleADNLayout = ScaleADNLayoutFormat<fp8_e8m0_t>{}(16, 32);
+    auto scaleBNDLayout = ScaleBNDLayoutFormat<fp8_e8m0_t>{}(16, 32);
+    auto scaleBDNLayout = ScaleBDNLayoutFormat<fp8_e8m0_t>{}(16, 32);
 
     auto NDShape = GetShape<0>(NDLayout);
     auto staticNDShape = GetShape<0>(StaticNDLayout);
