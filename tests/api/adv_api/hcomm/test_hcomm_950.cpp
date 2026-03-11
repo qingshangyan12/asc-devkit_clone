@@ -50,10 +50,12 @@ Channel GetChannel()
     channel.sqContextAddr->ctx.rdmaSqContext.dbVa = reinterpret_cast<uint64_t>(dbBuffer);
     channel.sqContextAddr->ctx.rdmaSqContext.dbMode = 0;
 
+    std::unique_ptr<CqContext> cqContext(new CqContext());
+    channel.cqContextAddr = cqContext.get();
     uint32_t* cqhead = new uint32_t(0);
     uint32_t* cqtail = new uint32_t(0);
-    channel.cqContextAddr->ctx.rdmaCqContext.headAddr = reinterpret_cast<uint64_t>(head);
-    channel.cqContextAddr->ctx.rdmaCqContext.tailAddr = reinterpret_cast<uint64_t>(tail);
+    channel.cqContextAddr->ctx.rdmaCqContext.headAddr = reinterpret_cast<uint64_t>(cqhead);
+    channel.cqContextAddr->ctx.rdmaCqContext.tailAddr = reinterpret_cast<uint64_t>(cqtail);
 
     // 为 Buffer 相关字段分配内存并设置
     channel.remoteBufferNum = 1;
