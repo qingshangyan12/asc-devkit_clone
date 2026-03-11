@@ -606,10 +606,14 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
         align_size = compile_info.super_kernel_info["sp_options"].get('func-align', 512)
         gen_func_attributes = gen_func_align_attribute(align_size)
         if '--cce-auto-sync=off' not in compile_options and '--cce-auto-sync' in compile_options:
-            gen_func_attributes += " __attribute__((need_auto_sync))"
+            gen_func_attributes += " __sk__"
+        else:
+            gen_func_attributes += " [aicore]"
+    else:
+        gen_func_attributes += " [aicore]"
 
+    kernel_func_dec = f"extern \"C\" {gen_func_attributes} void {auto_gen_kernel_func}("
     compile_info.global_kernel_attribute = gen_func_attributes
-    kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {auto_gen_kernel_func}("
     kernel_func_dec_pub = f"__aicore__ inline __attribute__((always_inline)) void ascendc_{auto_gen_kernel_func}("
 
     source_declare_pub, workspace_idx, called_func_params, called_func_params_type = \
@@ -785,7 +789,7 @@ def gen_kernel_fun_with_tiling_key_slave(compile_info: CompileInfo, tiling_key: 
                         source += f"\n#if {TILING_KEY_MACRO} == {tiling_key}UL && defined({cube_core_type})\n"
                         kernel_name_of_tk = get_kernel_fun_name_with_tiling_key_and_kernel_type(compile_info, \
                             tiling_key_slave)
-                        kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {kernel_name_of_tk}("
+                        kernel_func_dec = f"extern \"C\" {gen_func_attributes} void {kernel_name_of_tk}("
                         source += kernel_func_dec
                         if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
                             source += "uint64_t args_offset) {\n"
@@ -798,7 +802,7 @@ def gen_kernel_fun_with_tiling_key_slave(compile_info: CompileInfo, tiling_key: 
                         kernel_name_of_tk = get_kernel_fun_name_with_tiling_key_and_kernel_type(
                             compile_info, tiling_key_slave)
                         kernel_name_of_tk = kernel_name_of_tk[:-1] + "v"
-                        kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {kernel_name_of_tk}("
+                        kernel_func_dec = f"extern \"C\" {gen_func_attributes} void {kernel_name_of_tk}("
                         source += kernel_func_dec
                         if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
                             source += "uint64_t args_offset) {\n"
@@ -1159,11 +1163,11 @@ def compile_sk_bind(compile_info: CompileInfo, compile_info_origin: CompileInfo,
 
     for idx, global_syb in enumerate(compile_info_origin.global_kernel_symbols):
         sk_syb = compile_info.global_kernel_symbols[idx]
-        source += f"extern \"C\" {compile_info_origin.global_kernel_attribute} [aicore] void {global_syb}();\n"
-        source += f"extern \"C\" {compile_info.global_kernel_attribute} [aicore] void {sk_syb}();\n"
-        source += f"extern \"C\" {compile_info.global_kernel_attribute} [aicore] void {sk_syb}_split1();\n"
-        source += f"extern \"C\" {compile_info.global_kernel_attribute} [aicore] void {sk_syb}_split2();\n"
-        source += f"extern \"C\" {compile_info.global_kernel_attribute} [aicore] void {sk_syb}_split3();\n"
+        source += f"extern \"C\" {compile_info_origin.global_kernel_attribute} void {global_syb}();\n"
+        source += f"extern \"C\" {compile_info.global_kernel_attribute} void {sk_syb}();\n"
+        source += f"extern \"C\" {compile_info.global_kernel_attribute} void {sk_syb}_split1();\n"
+        source += f"extern \"C\" {compile_info.global_kernel_attribute} void {sk_syb}_split2();\n"
+        source += f"extern \"C\" {compile_info.global_kernel_attribute} void {sk_syb}_split3();\n"
         source += f"SK_BIND({global_syb}, {cap_bitmap}, {sk_syb}, {sk_syb}_split1, {sk_syb}_split2, {sk_syb}_split3);\n"
 
     # write code into file
@@ -1482,17 +1486,6 @@ def handle_dump_options(compile_info: CompileInfo, compile_option_tuple):
     if compile_info.dump_info["dump_type"] == "assert":
         compile_option_tuple.compile_options.append('-DASCENDC_DUMP_ASSERT_ONLY')
         global_var_storage.set_variable("ascendc_dump_assert_only", True)
-
-    # handle dump macro
-    if "assert" not in compile_info.dump_info["dump_type"] and "printf" not in compile_info.dump_info["dump_type"]:
-        compile_option_tuple.compile_options.append('-DASCENDC_DUMP=0')
-        length_before = len(compile_option_tuple.compile_options)
-        CommonUtility.remove_options(compile_option_tuple.compile_options, ['-DASCENDC_DUMP', '-DASCENDC_DUMP=1'])
-        length_after = len(compile_option_tuple.compile_options)
-        if length_before != length_after:
-            CommonUtility.print_compile_log(compile_info.kernel_name, \
-                "-DASCENDC_DUMP=1 is deleted because the feature is not used internally in src file", \
-                AscendCLogLevel.LOG_WARNING)
 
     # dump or acc or timestamp or recognize_simtvf will need extra workspace
     ascendc_enable_dump_workspace = ("-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options) or \
