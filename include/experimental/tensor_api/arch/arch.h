@@ -12,8 +12,8 @@
 * \file arch.h
 * \brief
 */
-#ifndef include_TENSOR_API_ARCH_ARCH_H
-#define include_TENSOR_API_ARCH_ARCH_H
+#ifndef INCLUDE_TENSOR_API_ARCH_ARCH_H
+#define INCLUDE_TENSOR_API_ARCH_ARCH_H
 
 #include "include/experimental/tensor_api/arch/trait_struct.h"
 #include "include/experimental/tensor_api/arch/cube_compute/mmad.h"
@@ -21,4 +21,4 @@
 #include "include/experimental/tensor_api/arch/cube_datamove/data_copy.h"
 #include "include/experimental/tensor_api/arch/cube_datamove/fixpipe.h"
 
-#endif // include_TENSOR_API_ARCH_ARCH_H
+#endif // INCLUDE_TENSOR_API_ARCH_ARCH_H

@@ -15,7 +15,7 @@
 #ifndef EXPERIMENTAL_TENSOR_API_ARCH_TRAIT_STRUCT_H
 #define EXPERIMENTAL_TENSOR_API_ARCH_TRAIT_STRUCT_H
 
-#include "impl/utils/sys_macros.h"
+#include "include/utils/base/sys_macros.h"
 
 namespace AscendC {
 namespace Te {
