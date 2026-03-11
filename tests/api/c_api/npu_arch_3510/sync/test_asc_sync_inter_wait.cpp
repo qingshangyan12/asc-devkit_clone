@@ -20,8 +20,7 @@ __aicore__ inline void wait_flag_dev_inter_stub(pipe_t pipe, uint8_t flag_id) {
 
 __aicore__ inline void wait_flag_dev_inter_mode_stub(pipe_t pipe, int64_t flag_id) {
     EXPECT_EQ(pipe, static_cast<pipe_t>(pipe_t::PIPE_S));
-    int64_t expected_config = (static_cast<uint64_t>(0) << 8) | (static_cast<uint64_t>(11));
-    EXPECT_EQ(flag_id, expected_config);
+    EXPECT_EQ(flag_id, static_cast<int64_t>(11));
 }
 
 class TEST_ASC_SYNC_INTER_WAIT : public testing::Test {
