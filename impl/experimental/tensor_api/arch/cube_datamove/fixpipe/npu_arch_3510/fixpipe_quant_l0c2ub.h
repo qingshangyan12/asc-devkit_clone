@@ -19,6 +19,7 @@
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2ub/nz2dn.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2ub/nz2nd.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2ub/nz2nz.h"
+#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
 
 namespace AscendC {
 namespace Te {
@@ -86,7 +87,7 @@ private:
     template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Coord>
     __aicore__ inline void Execute(const T& dst, const U& src, const V& quant, const Coord& coord)
     {
-        constexpr auto quantPre = GetFixpipeQuantPre<trait, T, U, V>();
+        CheckDataTypeFor3510::CheckFixpipeQuantDataType<trait, T, U, V>();
         using FixpipeQuantL0C2UB =
             typename FormatRegistorFixpipe2Ub3510<GetDataFormat<T>(), GetDataFormat<U>(), GetQuantMode<quantPre>()>::type;
         FixpipeQuantL0C2UB{}.template Run<trait, quantPre, T, U, V, Coord>(dst, src, quant, coord);
