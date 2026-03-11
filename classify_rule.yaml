@@ -42,7 +42,6 @@ asc-devkit:
       - impl/adv_api/detail/activation/**/*.h
       - impl/adv_api/detail/normalization/**/*.h
       - impl/adv_api/detail/common/common.h
-
   llt:
     ut_check: true
     st_check: false
