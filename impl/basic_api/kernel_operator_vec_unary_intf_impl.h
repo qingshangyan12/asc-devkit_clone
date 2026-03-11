@@ -68,6 +68,10 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Relu", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskArray<T>(mask, "Relu");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -86,6 +90,10 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Relu", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskValue<T>(mask, "Relu");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -111,6 +119,9 @@ template <typename T>
 __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Relu", NamedTensor("dst", dst), NamedTensor("src", src));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Relu")) {
         ASCENDC_REPORT_CHECK_ERROR("Relu", KernelFuncType::CALCOUNT_MODE);
@@ -178,6 +189,10 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Exp", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskArray<T>(mask, "Exp");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -196,6 +211,10 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Exp", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskValue<T>(mask, "Exp");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -238,6 +257,9 @@ template <typename T>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Exp", NamedTensor("dst", dst), NamedTensor("src", src));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Exp")) {
         ASCENDC_REPORT_CHECK_ERROR("Exp", KernelFuncType::CALCOUNT_MODE);
@@ -304,6 +326,10 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Ln", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskArray<T>(mask, "Ln");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams, "Ln")) {
@@ -321,6 +347,10 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Ln", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskValue<T>(mask, "Ln");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams, "Ln")) {
@@ -362,6 +392,9 @@ template <typename T>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Ln", NamedTensor("dst", dst), NamedTensor("src", src));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Ln")) {
         ASCENDC_REPORT_CHECK_ERROR("Ln", KernelFuncType::CALCOUNT_MODE);
@@ -392,6 +425,10 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Abs", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskArray<T>(mask, "Abs");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -410,6 +447,10 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Abs", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskValue<T>(mask, "Abs");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -435,6 +476,9 @@ template <typename T>
 __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Abs", NamedTensor("dst", dst), NamedTensor("src", src));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Abs")) {
         ASCENDC_REPORT_CHECK_ERROR("Abs", KernelFuncType::CALCOUNT_MODE);
@@ -525,6 +569,10 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Reciprocal", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskArray<T>(mask, "Reciprocal");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -543,6 +591,10 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Reciprocal", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskValue<T>(mask, "Reciprocal");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -587,6 +639,9 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Reciprocal", NamedTensor("dst", dst), NamedTensor("src", src));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Reciprocal")) {
         ASCENDC_REPORT_CHECK_ERROR("Reciprocal", KernelFuncType::CALCOUNT_MODE);
@@ -655,6 +710,10 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Rsqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskArray<T>(mask, "Rsqrt");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -673,6 +732,10 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Rsqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskValue<T>(mask, "Rsqrt");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -715,6 +778,9 @@ template <typename T>
 __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Rsqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Rsqrt")) {
         ASCENDC_REPORT_CHECK_ERROR("Rsqrt", KernelFuncType::CALCOUNT_MODE);
@@ -783,6 +849,10 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Sqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskArray<T>(mask, "Sqrt");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -801,6 +871,10 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Sqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskValue<T>(mask, "Sqrt");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -843,6 +917,9 @@ template <typename T>
 __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Sqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Sqrt")) {
         ASCENDC_REPORT_CHECK_ERROR("Sqrt", KernelFuncType::CALCOUNT_MODE);
@@ -873,6 +950,10 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Not", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskArray<T>(mask, "Not");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -891,6 +972,10 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Not", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckMaskValue<T>(mask, "Not");
+#endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), mask, repeatTime, repeatParams,
@@ -916,6 +1001,9 @@ template <typename T>
 __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
+#ifdef ASCENDC_DEBUG
+    CheckVectorTensor("Not", NamedTensor("dst", dst), NamedTensor("src", src));
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Not")) {
         ASCENDC_REPORT_CHECK_ERROR("Not", KernelFuncType::CALCOUNT_MODE);
