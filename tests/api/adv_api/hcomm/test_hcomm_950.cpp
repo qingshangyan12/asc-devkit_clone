@@ -90,7 +90,7 @@ private:
 
 TEST_F(HcommCommonTestSuite, Aiv_Read)
 {
-    Channel channel = GetChannel();
+    Channel channel = {0};
 
     Hcomm hcomm;
     ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel);
