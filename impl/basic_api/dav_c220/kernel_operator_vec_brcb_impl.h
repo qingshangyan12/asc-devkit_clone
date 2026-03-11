@@ -38,9 +38,9 @@ __aicore__ inline void BrcbImpl(__ubuf__ T* dst, __ubuf__ T* src0, const uint8_t
             vbrcb((__ubuf__ uint32_t*)dst, (__ubuf__ uint32_t*)src0, repeatParams.dstBlkStride,
                 repeatParams.dstRepStride, repeatTime);
         } else {
-            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Brcb, current api support dtype "
-                "combination is src and dst both: half / bfloat16_t / int16_t / uint16_t / float / int32_t / "
-                "uint32_t.");});
+            ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in Brcb, current "
+                "api support dtype combination is src and dst both: half / bfloat16_t / int16_t / uint16_t / float / "
+                "int32_t / uint32_t.\n"));
         }
     }
 }
