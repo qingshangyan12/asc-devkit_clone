@@ -54,11 +54,20 @@ Cbuf内存上的数据打印：
 
 无
 
+## 需要引入的头文件
+使用该接口需要包含"utils/debug/asc_dump.h"头文件。
+```cpp
+#include "utils/debug/asc_dump.h"
+```
+
 ## 约束说明
 
 <cann-filter npu_type="950">
+
 - Ascend 950PR/Ascend 950DT暂时不支持L1上的内存打印。
+
 </cann-filter>
+
 - 使用该接口时，在每个核上dump的数据总量不能超过1M，请开发者自行控制打印的内容数据量，超出则不会打印。
 - 在计算数据量时，若dump的总长度未对齐，需要考虑padding数据的影响。当进行非对齐dump时，如果实际dump的元素长度不满足32字节对齐，
   系统会自动在其末尾补充一定数量的padding数据，以满足对其要求。
