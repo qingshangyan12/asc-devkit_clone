@@ -1033,6 +1033,13 @@ __simd_callee__ inline void asc_loadalign_impl(vector_uint64_t& dst, __ubuf__ ui
     }
 }
 
+__simd_callee__ inline void asc_loadalign_impl(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        plds(dst, src, offset, DIST_NORM);
+    }
+}
+
 // int32_t offset, brc
 __simd_callee__ inline void asc_loadalign_brc_impl(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
@@ -1234,6 +1241,13 @@ __simd_callee__ inline void asc_loadalign_upsample_impl(vector_bfloat16_t& dst, 
     }
 }
 
+__simd_callee__ inline void asc_loadalign_upsample_impl(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        plds(dst, src, offset, DIST_US);
+    }
+}
+
 // int32_t offset, downsample
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
@@ -1323,6 +1337,14 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(vector_bfloat16_t& dst
         vlds(dst, src, offset, DS_B16);
     }
 }
+
+__simd_callee__ inline void asc_loadalign_downsample_impl(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        plds(dst, src, offset, DIST_DS);
+    }
+}
+
 
 // int32_t offset, unpack
 __simd_callee__ inline void asc_loadalign_unpack_impl(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
