@@ -5209,6 +5209,8 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_arra
     asc_set_va_reg_impl(addr, src_array);
 }
 
+
+// =========asc_squeeze=========
 __aicore__ inline void asc_squeeze(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0, __ubuf__ uint16_t *src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
     asc_squeeze_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
@@ -5221,7 +5223,87 @@ __aicore__ inline void asc_squeeze(__ubuf__ uint32_t *dst, __ubuf__ uint32_t *sr
             src0_repeat_stride, src1_repeat_stride);
 }
 
+// =========asc_sub_relu=========
+// 高维切分
+__aicore__ inline void asc_sub_relu_vdeq(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
+        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+{
+    asc_sub_relu_vdeq_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
+            src0_repeat_stride, src1_repeat_stride);  
+}
 
+// 前n个连续
+__aicore__ inline void asc_sub_relu_vdeq(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    asc_sub_relu_vdeq_impl(dst, src0, src1, count);
+}
+
+// 同步类
+__aicore__ inline void asc_sub_relu_vdeq_sync(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    asc_sub_relu_vdeq_sync_impl(dst, src0, src1, count);
+}
+
+// 高维切分
+__aicore__ inline void asc_sub_relu_vdeq(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
+        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+{
+    asc_sub_relu_vdeq_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
+        src0_repeat_stride, src1_repeat_stride);
+}
+
+// 前n个连续
+__aicore__ inline void asc_sub_relu_vdeq(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    asc_sub_relu_vdeq_impl(dst, src0, src1, count);
+}
+
+// 同步类
+__aicore__ inline void asc_sub_relu_vdeq_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    asc_sub_relu_vdeq_sync_impl(dst, src0, src1, count);
+}
+
+// =========asc_add_relu=========
+// 高维切分
+__aicore__ inline void asc_add_relu_vdeq(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
+        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+{
+    asc_add_relu_vdeq_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
+        src0_repeat_stride, src1_repeat_stride);
+}
+
+// 前n个连续
+__aicore__ inline void asc_add_relu_vdeq(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    asc_add_relu_vdeq_impl(dst, src0, src1, count);
+}
+
+// 同步类
+__aicore__ inline void asc_add_relu_vdeq_sync(__ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    asc_add_relu_vdeq_sync_impl(dst, src0, src1, count);
+}
+
+// 高维切分
+__aicore__ inline void asc_add_relu_vdeq(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
+        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+{
+    asc_add_relu_vdeq_impl(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
+        src0_repeat_stride, src1_repeat_stride);
+}
+
+// 前n个连续
+__aicore__ inline void asc_add_relu_vdeq(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    asc_add_relu_vdeq_impl(dst, src0, src1, count);
+}
+
+// 同步类
+__aicore__ inline void asc_add_relu_vdeq_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+{
+    asc_add_relu_vdeq_sync_impl(dst, src0, src1, count);
+}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
