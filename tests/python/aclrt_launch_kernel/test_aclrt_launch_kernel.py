@@ -213,7 +213,7 @@ struct   AddCustomTilingData
             ),
         )
 
-        dump_info ={'dump_type': 'printf','dump_size': 1048576}
+        dump_info ={'dump_type': '','dump_size': 1048576}
         mode = CodeMode.AIV
         base_key =0
 
@@ -250,12 +250,12 @@ struct AddCustomTilingData {{
             f.close()
         self.assertEqual(STUB_CPP_LICENSE + host_stub_code, golden_code)
         
-        dump_info ={'dump_type': 'printf','dump_size': 1048576}
+        dump_info ={'dump_type': '','dump_size': 1048576}
         mode = CodeMode.MIX
         func_signs_list = [FuncSignGroupWithModeBase(file_path, func_signs, dump_info, mode, base_key)]
         host_stub_code = generate_host_stub_code(func_signs_list, type_definition)
 
-        dump_info ={'dump_type': 'assert','dump_size': 1048576}
+        dump_info ={'dump_type': '','dump_size': 1048576}
         mode = CodeMode.MIX_VECTOR_CORE
         func_signs_list = [FuncSignGroupWithModeBase(file_path, func_signs, dump_info, mode, base_key)]
         host_stub_code = generate_host_stub_code(func_signs_list, type_definition)
@@ -292,7 +292,7 @@ struct AddCustomTilingData {{
             ),
         )
 
-        dump_info ={'dump_type': 'printf','dump_size': 1048576}
+        dump_info ={'dump_type': '','dump_size': 1048576}
         mode = CodeMode.AIV
         base_key =0
 
@@ -611,7 +611,7 @@ struct AddCustomTilingData {{
                                 ),
                                 FuncSign('', '', (), '', (), ()),
                             ), 
-                            dump_info={'dump_type': 'assert', 'dump_size': 1048576},
+                            dump_info={'dump_type': '', 'dump_size': 1048576},
                             mode=CodeMode.KERNEL_TYPE_MIX_AIV_1_0,
                             base_key=0
                         ),
@@ -644,7 +644,7 @@ struct AddCustomTilingData {{
                                 ),
                                 FuncSign('', '', (), '', (), ()),
                             ), 
-                            dump_info={'dump_type': 'assert', 'dump_size': 1048576},
+                            dump_info={'dump_type': '', 'dump_size': 1048576},
                             mode=CodeMode.KERNEL_TYPE_AIV_ONLY,
                             base_key=0
                         ),
@@ -714,7 +714,7 @@ struct AddCustomTilingData {{
                     ),
                     FuncSign('', '', (), 'int a', (), ()),
                 ), 
-                dump_info={'dump_type': 'printf', 'dump_size': 1048576},
+                dump_info={'dump_type': '', 'dump_size': 1048576},
                 mode=CodeMode.KERNEL_TYPE_MIX_AIC_1_2,
                 base_key=1
             ),
@@ -749,7 +749,7 @@ struct AddCustomTilingData {{
                     ),
                     FuncSign('', '', (), 'int a', (), ()),
                 ), 
-                dump_info={'dump_type': 'printf', 'dump_size': 1048576},
+                dump_info={'dump_type': '', 'dump_size': 1048576},
                 mode=CodeMode.KERNEL_TYPE_AIV_ONLY,
                 base_key=1
             ),
@@ -1116,11 +1116,11 @@ inline uint32_t hello_world(uint32_t numBlocks, void* hold, void* stream)
         printf_info = "__enable_feature_for_compile_printf = 1 \n"
         assert_buff = "__enable_feature_for_compile_assertBufSize = 4096 \n"
         printf_buff = "__enable_feature_for_compile_printfBufSize = 4096 \n"
-        self.assertEqual(get_dump_info_by_source(assert_info + data), {"dump_type" : "assert", "dump_size" : 1048576})
-        self.assertEqual(get_dump_info_by_source(printf_info + data), {"dump_type" : "printf", "dump_size" : 1048576})
-        self.assertEqual(get_dump_info_by_source(assert_info + printf_info + data), {"dump_type" : "printf,assert", "dump_size" : 1048576})
-        self.assertEqual(get_dump_info_by_source(assert_info + printf_info + assert_buff + data), {"dump_type" : "printf,assert", "dump_size" : 4096})
-        self.assertEqual(get_dump_info_by_source(assert_info + printf_info + printf_buff + data), {"dump_type" : "printf,assert", "dump_size" : 4096})
+        self.assertEqual(get_dump_info_by_source(assert_info + data), {"dump_type" : "", "dump_size" : 1048576})
+        self.assertEqual(get_dump_info_by_source(printf_info + data), {"dump_type" : "", "dump_size" : 1048576})
+        self.assertEqual(get_dump_info_by_source(assert_info + printf_info + data), {"dump_type" : "", "dump_size" : 1048576})
+        self.assertEqual(get_dump_info_by_source(assert_info + printf_info + assert_buff + data), {"dump_type" : "", "dump_size" : 4096})
+        self.assertEqual(get_dump_info_by_source(assert_info + printf_info + printf_buff + data), {"dump_type" : "", "dump_size" : 4096})
 
     @mock.patch('extract_host_stub.get_code_channel')
     def test_get_mode_by_ofile(self, mock_channel):    
