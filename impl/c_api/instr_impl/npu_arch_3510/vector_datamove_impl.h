@@ -1937,7 +1937,12 @@ __simd_callee__ inline void asc_loadalign(vector_int64_t& dst, __ubuf__ int64_t*
     asc_loadalign_impl(dst, src);
 }
 
-__simd_callee__ inline void asc_loadalign(vector_uint64_t& dst, __ubuf__ uint64_t* src)
+__simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src)
+{
+    asc_loadalign_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     asc_loadalign_impl(dst, src);
 }
@@ -2077,6 +2082,11 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_bfloat16_t& dst, __ubu
     asc_loadalign_upsample_impl(dst, src);
 }
 
+__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src)
+{
+    asc_loadalign_upsample_impl(dst, src);
+}
+
 __simd_callee__ inline void asc_loadalign_downsample(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     asc_loadalign_downsample_impl(dst, src);
@@ -2133,6 +2143,11 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst, __ubuf__ 
 }
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
+{
+    asc_loadalign_downsample_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src)
 {
     asc_loadalign_downsample_impl(dst, src);
 }
