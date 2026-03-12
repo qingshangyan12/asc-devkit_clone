@@ -50,7 +50,6 @@ struct GetL0DataType {
     using Type = T;
 };
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 template <> struct GetMmDstType<fp8_e4m3fn_t> {
     using Type = float;
 };
@@ -86,7 +85,6 @@ template <> struct GetL0DataType<fp8_e4m3fn_t, true> {
 template <> struct GetL0DataType<fp8_e4m3fn_t, false> {
     using Type = fp8_e4m3fn_t;
 };
-#endif
 
 template <typename SrcT>
 __aicore__ inline constexpr static int32_t AuxGetC0Size()
