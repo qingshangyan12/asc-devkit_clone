@@ -13,7 +13,6 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-/*
 template <typename DTYPE>
 __aicore__ inline void img2colv2_cbuf_to_cb_stub(__cb__ DTYPE* dst, __cbuf__ DTYPE* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k,
                                                 uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w,
@@ -50,13 +49,7 @@ protected:
 #define TEST_CUBE_DATAMOVE_COPY_L12L0B(dtype)  \
                                                                                       \
 TEST_F(TEST_COPY_L1_TO_L0B, TEST_COPY_L1_TO_L0B_##dtype)               \
-{                                                                                     \
-    MOCKER_CPP(img2colv2_cbuf_to_cb, void(__cb__ dtype*, __cbuf__ dtype*, uint16_t, uint16_t, uint16_t,                    \
-                                        uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,                    \
-                                        bool, bool, bool, bool, uint16_t))                    \
-            .times(1)                                                                           \
-            .will(invoke(img2colv2_cbuf_to_cb_stub<dtype>));                               \
-                                                                                                \
+{                                                                                               \
     __cb__ dtype *dst = reinterpret_cast<__cb__ dtype *>(11);                                 \
     __cbuf__ dtype *src = reinterpret_cast<__cbuf__ dtype *>(22);                                   \
                                                                                                 \
@@ -82,13 +75,7 @@ TEST_F(TEST_COPY_L1_TO_L0B, TEST_COPY_L1_TO_L0B_##dtype)               \
 }                                                                                               \
                                                                                                 \
 TEST_F(TEST_COPY_L1_TO_L0B, TEST_COPY_L1_TO_L0B_SYNC_##dtype)                                       \
-{                                                                                              \
-    MOCKER_CPP(img2colv2_cbuf_to_cb, void(__cb__ dtype*, __cbuf__ dtype*, uint16_t, uint16_t, uint16_t,                    \
-                                        uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,                    \
-                                        bool, bool, bool, bool, uint16_t))                    \
-            .times(1)                                                                           \
-            .will(invoke(img2colv2_cbuf_to_cb_stub<dtype>));                               \
-                                                                                                \
+{                                                                                               \
     __cb__ dtype *dst = reinterpret_cast<__cb__ dtype *>(11);                                 \
     __cbuf__ dtype *src = reinterpret_cast<__cbuf__ dtype *>(22);                                   \
                                                                                                 \
@@ -126,4 +113,3 @@ TEST_CUBE_DATAMOVE_COPY_L12L0B(int8_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(uint16_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(uint32_t);
 TEST_CUBE_DATAMOVE_COPY_L12L0B(uint8_t);
-*/
