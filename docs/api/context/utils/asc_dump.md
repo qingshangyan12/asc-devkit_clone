@@ -12,6 +12,12 @@
 
 将对应内存上的数据打印出来，同时支持打印自定义的附加信息（仅支持uint32_t类型的信息），比如打印当前行号等。
 
+## 需要包含的头文件
+使用该接口需要包含"utils/debug/asc_dump.h"头文件。
+```cpp
+#include "utils/debug/asc_dump.h"
+```
+
 ## 函数原型
 
 GM内存上的数据打印：
@@ -57,12 +63,15 @@ Cbuf内存上的数据打印：
 ## 约束说明
 
 <cann-filter npu_type="950">
+
 - Ascend 950PR/Ascend 950DT暂时不支持L1上的内存打印。
+
 </cann-filter>
+
 - 使用该接口时，在每个核上dump的数据总量不能超过1M，请开发者自行控制打印的内容数据量，超出则不会打印。
-- 在计算数据量时，若dump的总长度未对齐，需要考虑padding数据的影响。当进行非对齐dump时，如果实际dump的元素长度不满足32字节对齐，
+- 在计算数据量时，若dump的总长度未对齐，需要考虑padding数据的影响。当进行非对齐dump时，如果实际dump的元素长度不满足32字节对齐。
   系统会自动在其末尾补充一定数量的padding数据，以满足对其要求。
-- 如果要正常使用dump功能，需要在kernel核函数外定义如下宏定义:"#define ASCENDC_DUMP 1"
+- 如果要正常使用dump功能，需要在kernel核函数外定义如下宏定义:"#define ASCENDC_DUMP 1"。
 
 ## 调用示例
 
