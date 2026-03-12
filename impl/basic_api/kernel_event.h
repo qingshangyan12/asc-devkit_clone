@@ -251,7 +251,6 @@ constexpr int32_t PIPE_NUM = 6;
 constexpr pipe_t SUPPORTED_PIPE[PIPE_NUM] = { PIPE_S, PIPE_V, PIPE_M, PIPE_MTE1, PIPE_MTE2, PIPE_MTE3 };
 #endif
 
-#if defined(__NPU_ARCH__)
 template <pipe_t pipe>
 __aicore__ inline constexpr bool IsSplitVectorPipe()
 {
@@ -332,7 +331,6 @@ __aicore__ inline void WaitFlagInternal(event_t evt)
     wait_flag(srcPipe, dstPipe, evt);
 #endif
 }
-#endif
 
 __aicore__ constexpr bool IsSupportedPipe(pipe_t pipe)
 {
@@ -641,7 +639,6 @@ __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdD
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 #ifdef ASCENDC_CPU_DEBUG
 class BufIdTracker {
 public:
@@ -781,11 +778,7 @@ __aicore__ constexpr bool IsUseBufId(Hardware src, Hardware dst)
 {
     return (src == Hardware::UB) || (dst == Hardware::UB);
 }
-#endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                       \
-    (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||                       \
-    (__NPU_ARCH__ == 3113))
 template <MemDsbT arg>
 __aicore__ inline void DataSyncBarrierImpl()
 {
@@ -866,7 +859,6 @@ __aicore__ inline void HWaitFlagImpl(int32_t eventID)
             break;
     }
 }
-#endif
 
 template <HardEvent event>
 __aicore__ inline void SetFlagImpl(int32_t eventID)

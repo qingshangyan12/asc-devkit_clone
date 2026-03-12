@@ -32,7 +32,7 @@
 #include "kernel_bf16.h"
 #endif
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+
 namespace AscendC {
 template <typename T>
 struct NumericLimits {
@@ -226,7 +226,7 @@ public:
     }
 };
 }  // namespace AscendC
-#endif
+
 #endif  // ASCENDC_KERNEL_OPERATOR_LIMITS_INTF_H
 
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIMITS_INTF_H)
