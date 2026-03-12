@@ -650,7 +650,7 @@ __aicore__ inline void FixpipeL0C2L1Impl(
         PipeBarrier<PIPE_FIX>();
         // LOC -> GM
         FixpipeTiling fixpipeTiling;
-        FixpipeL0cToL1<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, intriParams.nSize, cacheMode);
+        FixpipeL0cToL1<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, intriParams.nSize);
     } else if (intriParams.preReluMode == ReluMode::VECTOR_RELU) {
         FixpipeTiling fixpipeTiling = GenFixpipeTiling(intriParams.nSize);
         for (uint16_t i = 0; i < fixpipeTiling.nIterNum; ++i) {
@@ -735,7 +735,7 @@ __aicore__ inline void FixpipeL0C2UBImpl(
         PipeBarrier<PIPE_FIX>();
         // LOC -> GM
         FixpipeTiling fixpipeTiling;
-        FixpipeL0cToUB<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, intriParams.nSize, cacheMode);
+        FixpipeL0cToUB<DstT, SrcT, config>(dst, src, intriParams, fixpipeTiling, intriParams.nSize);
     } else if (intriParams.preReluMode == ReluMode::VECTOR_RELU) {
         FixpipeTiling fixpipeTiling = GenFixpipeTiling(intriParams.nSize);
         for (uint16_t i = 0; i < fixpipeTiling.nIterNum; ++i) {
