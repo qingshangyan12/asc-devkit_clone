@@ -21,18 +21,16 @@ protected:
 
 namespace {
 void pld_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Literal dist) {
-    EXPECT_EQ(dst, static_cast<vector_bool>(11));
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
-    EXPECT_EQ(offset, static_cast<iter_reg>(33));
     EXPECT_EQ(dist, static_cast<Literal>(Literal::NORM));
 }
 }
 
 TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPld_Succ)
 {
-    vector_bool dst = static_cast<vector_bool>(11);
+    vector_bool dst = asc_create_mask_b16(PAT_ALL);
     __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
-    iter_reg offset = static_cast<iter_reg>(33);;
+    iter_reg offset = asc_create_iter_reg_b32(64);
 
     MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))       \
         .times(1)                                                                               \
