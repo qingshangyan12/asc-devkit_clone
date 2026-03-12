@@ -11,8 +11,8 @@
  * \file check_format.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_ARCH_UTILS_CHECK_FORMAT_H
-#define IMPL_TENSOR_API_ARCH_ARCH_UTILS_CHECK_FORMAT_H
+#ifndef IMPL_TENSOR_API_ARCH_UTILS_CHECK_FORMAT_H
+#define IMPL_TENSOR_API_ARCH_UTILS_CHECK_FORMAT_H
 
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
@@ -157,4 +157,4 @@ public:
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_ARCH_UTILS_CHECK_FORMAT_H
+#endif // IMPL_TENSOR_API_ARCH_UTILS_CHECK_FORMAT_H
