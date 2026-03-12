@@ -75,7 +75,7 @@ TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_##dtype)               \
 }                                                                                               \
                                                                                                 \
 TEST_F(TEST_COPY_L1_TO_L0A, TEST_COPY_L1_TO_L0A_SYNC_##dtype)                                       \
-{                                                                                              \                                                                                               \
+{                                                                                                  \
     __ca__ dtype *dst = reinterpret_cast<__ca__ dtype *>(11);                                 \
     __cbuf__ dtype *src = reinterpret_cast<__cbuf__ dtype *>(22);                                   \
                                                                                                 \
