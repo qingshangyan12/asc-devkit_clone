@@ -1844,11 +1844,6 @@ __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* s
     asc_loadalign_impl(dst, src);
 }
 
-__simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src)
-{
-    asc_loadalign_impl(dst, src);
-}
-
 __simd_callee__ inline void asc_loadalign_brc(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     asc_loadalign_brc_impl(dst, src);
