@@ -59,6 +59,34 @@ __aicore__ inline int64_t asc_get_ffts_base_addr();
 
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
 
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+__aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
+
+__aicore__ inline void asc_set_l12ub_loop_size(uint64_t config);
+
+__aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);
+
+__aicore__ inline void asc_set_l13d_padding(uint64_t config);
+
+__aicore__ inline void asc_set_l13d_padding(half config);
+
+__aicore__ inline void asc_set_l13d_padding(int16_t config);
+
+__aicore__ inline void asc_set_l13d_padding(uint16_t config);
+
+__aicore__ inline void asc_set_l12l0_padding_val(uint64_t config);
+
+__aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
+
+__aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
+
+__aicore__ inline void asc_set_mad_hif8();
+
+__aicore__ inline void asc_set_mad_tf32();
+
+__aicore__ inline void asc_set_mad_tf32_round_mode();
+
 #endif
 
 #endif

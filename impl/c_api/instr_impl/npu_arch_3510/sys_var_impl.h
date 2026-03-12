@@ -17,6 +17,14 @@
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_block_num_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_system_cycle_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ctrl_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_ffts_base_addr_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_gm2l1_nz_para_imp.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_quant_post_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_relu_alpha_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l12l0_padding_val_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l12ub_loop_size_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l13d_padding_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_mad_impl.h"
 
 __simd_callee__ inline int64_t asc_get_ar_spr()
 {
@@ -47,4 +55,70 @@ __aicore__ inline int64_t asc_get_ctrl()
 {
     return asc_get_ctrl_impl();
 }
+
+__aicore__ inline void asc_set_ffts_base_addr(uint64_t config)
+{
+    asc_set_ffts_base_addr_impl(config);
+}
+
+__aicore__ inline void asc_set_l12ub_loop_size(uint64_t config)
+{
+    asc_set_l12ub_loop_size_impl(config);
+}
+
+__aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config)
+{
+    asc_set_gm2l1_nz_para_impl(config);
+}
+
+__aicore__ inline void asc_set_l13d_padding(uint64_t config)
+{
+    asc_set_l13d_padding_impl(config);
+}
+
+__aicore__ inline void asc_set_l13d_padding(half config)
+{
+    asc_set_l13d_padding_impl(config);
+}
+
+__aicore__ inline void asc_set_l13d_padding(int16_t config)
+{
+    asc_set_l13d_padding_impl(config);
+}
+
+__aicore__ inline void asc_set_l13d_padding(uint16_t config)
+{
+    asc_set_l13d_padding_impl(config);
+}
+
+__aicore__ inline void asc_set_l12l0_padding_val(uint64_t config)
+{
+    asc_set_l12l0_padding_val_impl(config);
+}
+
+__aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config)
+{
+    asc_set_l0c2gm_quant_post_impl(config);
+}
+
+__aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config)
+{
+    asc_set_l0c2gm_relu_alpha_impl(config);
+}
+
+__aicore__ inline void asc_set_mad_hif8()
+{
+    asc_set_mad_hif8_impl();
+}
+
+__aicore__ inline void asc_set_mad_tf32()
+{
+    asc_set_mad_tf32_impl();
+}
+
+__aicore__ inline void asc_set_mad_tf32_round_mode()
+{
+    asc_set_mad_tf32_round_mode_impl();
+}
+
 #endif

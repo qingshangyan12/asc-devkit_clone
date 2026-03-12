@@ -206,6 +206,7 @@
 #include "instr_impl/npu_arch_3510/vector_compute_impl/asc_xor_impl.h"
 #include "instr_impl/npu_arch_3510/vector_compute_impl/asc_prelu_impl.h"
 #include "instr_impl/npu_arch_3510/vector_compute_impl/asc_clear_ar_spr_impl.h"
+#include "instr_impl/npu_arch_3510/vector_compute_impl/asc_set_va_reg_impl.h"
 
 // ==========asc_create_iter_reg(b8/b16/b32)=========
 __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset)
@@ -4999,5 +5000,46 @@ __simd_callee__ inline void asc_mull(vector_int32_t& dst0, vector_int32_t& dst1,
 __simd_callee__ inline void asc_clear_ar_spr()
 {
     asc_clear_ar_spr_impl();
+}
+
+// ===================asc_set_va_reg=====================
+__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array)
+{
+    asc_set_va_reg_impl(addr, src_array);
+}
+ 	 
+__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_array)
+{
+    asc_set_va_reg_impl(addr, src_array);
+}
+
+__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t** src_array)
+{
+    asc_set_va_reg_impl(addr, src_array);
+}
+
+__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t** src_array)
+{
+    asc_set_va_reg_impl(addr, src_array);
+}
+
+__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half** src_array)
+{
+    asc_set_va_reg_impl(addr, src_array);
+}
+
+__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t** src_array)
+{
+    asc_set_va_reg_impl(addr, src_array);
+}
+
+__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_array)
+{
+    asc_set_va_reg_impl(addr, src_array);
+}
+
+__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array)
+{
+    asc_set_va_reg_impl(addr, src_array);
 }
 #endif
