@@ -14,5 +14,64 @@
 #include "instr_impl/npu_arch_3510/sync_impl/asc_sync_notify_impl.h"
 #include "instr_impl/npu_arch_3510/sync_impl/asc_sync_wait_impl.h"
 #include "instr_impl/npu_arch_3510/sync_impl/asc_sync_pipe_impl.h"
+#include "instr_impl/npu_arch_3510/sync_impl/asc_sync_intra_wait_impl.h"
+#include "instr_impl/npu_arch_3510/sync_impl/asc_sync_inter_wait_impl.h"
+#include "instr_impl/npu_arch_3510/sync_impl/asc_sync_block_wait_impl.h"
+#include "instr_impl/npu_arch_3510/sync_impl/asc_sync_intra_arrive_impl.h"
+#include "instr_impl/npu_arch_3510/sync_impl/asc_release_buf_impl.h"
 
+// ==========asc_sync_intra_wait==========
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint8_t sync_id)
+{
+    asc_sync_intra_wait_impl(pipe, sync_id);
+}
+
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id)
+{
+    asc_sync_intra_wait_impl(pipe, sync_id);
+}
+
+// ==========asc_sync_intra_arrive==========
+__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint8_t sync_id)
+{
+    asc_sync_intra_arrive_impl(pipe, sync_id);
+}
+
+__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id)
+{
+    asc_sync_intra_arrive_impl(pipe, sync_id);
+}
+
+// ==========asc_sync_block_wait==========
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint8_t flag_id)
+{
+    asc_sync_block_wait_impl(pipe, flag_id);
+}
+
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id)
+{
+    asc_sync_block_wait_impl(pipe, flag_id);
+}
+
+// ==========asc_sync_inter_wait==========
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id)
+{
+    asc_sync_inter_wait_impl(pipe, flag_id);
+}
+
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id)
+{
+    asc_sync_inter_wait_impl(pipe, flag_id);
+}
+
+// ==========asc_release_buf==========
+__aicore__ inline void asc_release_buf(pipe_t pipe, uint8_t buf_id, bool mode)
+{
+    asc_release_buf_impl(pipe, buf_id, mode);
+}
+
+__aicore__ inline void asc_release_buf(pipe_t pipe, uint64_t buf_id, bool mode)
+{
+    asc_release_buf_impl(pipe, buf_id, mode);
+}
 #endif
