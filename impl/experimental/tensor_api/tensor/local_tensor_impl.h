@@ -15,6 +15,7 @@
 #ifndef IMPL_TENSOR_API_TENSOR_LOCAL_TENSOR_IMPL_H
 #define IMPL_TENSOR_API_TENSOR_LOCAL_TENSOR_IMPL_H
 
+#include "impl/experimental/tensor_api/arch/utils/arch_utils.h"
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_impl.h"
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
@@ -121,19 +122,30 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const {
         return operator()(MakeCoord(c0,c1,cs...));
     }
-
-	template <typename Coord, typename Shape>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) {
+	
+ 	template <typename Coord, typename T>
+ 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const T& t) const {
  	    auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeTileLayout(Layout(), shape);
- 	    return MakeTensor(iter, tileLayout);
- 	}
- 	 
- 	template <typename Coord, typename Shape>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) const {
- 	    auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeTileLayout(Layout(), shape);
- 	    return MakeTensor(iter, tileLayout);
+        if constexpr (Std::is_tuple_v<T>) {
+            auto tileLayout = MakeTileLayout(Layout(), t);
+            return MakeTensor(iter, tileLayout);
+        } else {
+            static_assert(Std::tuple_size_v<Coord> == TWO_DIM_DATA);
+            uint32_t rowSize = Std::min(
+                GetEleFromLayout<decltype(t.Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 0>(t.Layout())
+                    * GetEleFromLayout<decltype(t.Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 1>(t.Layout()),
+                GetEleFromLayout<decltype(Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 0>(Layout())
+                        * GetEleFromLayout<decltype(Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 1>(Layout())
+                    - Std::get<0>(coord));
+            uint32_t colSize = Std::min(
+                GetEleFromLayout<decltype(t.Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(t.Layout())
+                    * GetEleFromLayout<decltype(t.Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(t.Layout()),
+                GetEleFromLayout<decltype(Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(Layout())
+                        * GetEleFromLayout<decltype(Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(Layout())
+                    - Std::get<1>(coord));
+            auto tileLayout = MakeTileLayout(Layout(), MakeShape(rowSize, colSize));
+            return MakeTensor(iter, tileLayout);
+        }
  	}
 
     template <typename... Layouts>
