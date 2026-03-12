@@ -65,7 +65,6 @@ struct LayoutDispatcher;
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::NZ, T, typename Std::enable_if_t<!is_b4_type<T>>> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        constexpr auto c0Size = is_b4_type<T> ? C0_SIZE * 2 : C0_SIZE / sizeof(T);
         return LayoutConstructor(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row, FRACTAL_FIXED), Std::Int<c0Size>{},
                                  CeilDivision(column, (c0Size)), Std::Int<c0Size>{}, Std::Int<c0Size * FRACTAL_FIXED>{},
                                  Std::Int<1>{}, c0Size * CeilAlign(row, FRACTAL_FIXED));
