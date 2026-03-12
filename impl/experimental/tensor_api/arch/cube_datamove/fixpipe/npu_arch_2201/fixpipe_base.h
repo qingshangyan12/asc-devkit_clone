@@ -18,13 +18,61 @@
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_utils.h"
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
-#include "impl/experimental/tensor_api/arch/arch_utils.h"
+#include "impl/experimental/tensor_api/arch/utils/arch_utils.h"
+#include "impl/experimental/tensor_api/arch/utils/check_format.h"
+#include "impl/experimental/tensor_api/arch/utils/check_data_type_2201.h"
 #include "impl/experimental/tensor_api/tensor/layout_method.h"
 
 namespace AscendC {
 namespace Te {
 constexpr uint32_t MAIN_LOOP_N_SIZE_2201 = 512;
 constexpr uint32_t CBURST_NUM_2201 = MAIN_LOOP_N_SIZE_2201 / FRACTAL_FIXED;
+
+template <const FixpipeTrait& trait, typename T, typename U, typename S = void>
+__aicore__ inline constexpr QuantMode_t GetFixpipe2201QuantPre()
+{
+    using srcType = typename U::elementType;
+    using dstType = typename T::elementType;
+    constexpr bool isTensor = IsTileTensorV<S>;
+    constexpr bool isScalar = Std::is_same_v<S, uint64_t>;
+    if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V2201) {
+        if constexpr (isTensor) {
+            if constexpr (Std::is_same_v<srcType, __cc__ int32_t> && Std::is_same_v<dstType, __gm__ half>) {
+                return QuantMode_t::VDEQF16;
+            } else if constexpr (
+                Std::is_same_v<srcType, __cc__ float> && Std::is_one_of_v<dstType, __gm__ uint8_t, __gm__ int8_t>) {
+                return QuantMode_t::VQF322B8_PRE;
+            } else if constexpr (
+                Std::is_same_v<srcType, __cc__ int32_t> && Std::is_one_of_v<dstType, __gm__ uint8_t, __gm__ int8_t>) {
+                return QuantMode_t::VREQ8;
+            } else {
+                return QuantMode_t::NoQuant;
+            }
+        } else if constexpr (isScalar) {
+            if constexpr (Std::is_same_v<srcType, __cc__ int32_t> && Std::is_same_v<dstType, __gm__ half>) {
+                return QuantMode_t::DEQF16;
+            } else if constexpr (
+                Std::is_same_v<srcType, __cc__ float> && Std::is_one_of_v<dstType, __gm__ uint8_t, __gm__ int8_t>) {
+                return QuantMode_t::QF322B8_PRE;
+            } else if constexpr (
+                Std::is_same_v<srcType, __cc__ int32_t> && Std::is_one_of_v<dstType, __gm__ uint8_t, __gm__ int8_t>) {
+                return QuantMode_t::REQ8;
+            } else {
+                return QuantMode_t::NoQuant;
+            }
+        } else {
+            if constexpr (Std::is_same_v<srcType, __cc__ float> && Std::is_same_v<dstType, __gm__ half>) {
+                return QuantMode_t::F322F16;
+            } else if constexpr (Std::is_same_v<srcType, __cc__ float> && Std::is_same_v<dstType, __gm__ bfloat16_t>) {
+                return QuantMode_t::F322BF16;
+            } else {
+                return QuantMode_t::NoQuant;
+            }
+        }
+    } else {
+        return QuantMode_t::NoQuant;
+    }
+}
 
 template <typename T, typename U, typename Coord>
 __aicore__ inline void CheckCoord(const T& dst, const U& src, const Coord& coord)
@@ -65,35 +113,13 @@ public:
 
 private:
     template <typename T>
-    __aicore__ inline constexpr void CheckNDTemplate()
-    {
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<1>>,
-            "CopyCbufToFB Layout->Shape->Row->ZeroDim, is not Std::Int<1> type!");
-        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<1>>,
-            "CopyCbufToFB Layout->Shape->Column->ZeroDim, is not Std::Int<1> type!");
-
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
-        static_assert(Std::is_same_v<StrideRow0, Std::Int<0>>,
-            "CopyCbufToFB Layout->Stride->Row->ZeroDim, is not Std::Int<0> type!");
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<0>>,
-            "CopyCbufToFB Layout->Stride->Column->ZeroDim, is not Std::Int<0> type!");
-        static_assert(Std::is_same_v<StrideColumn1, Std::Int<1>>,
-            "CopyCbufToFB Layout->Stride->Column->OneDim, is not Std::Int<1> type!");
-    }
-    template <typename T>
     __aicore__ inline constexpr void CheckTemplate()
     {
         using srcType = typename T::elementType;
-        CheckNDTemplate<T>();
+        CheckFormat::CheckNDTemplate<T>();
+        CheckDataTypeFor2201::CheckFixPipeDataType<srcType>();
         constexpr Hardware srcTPos = GetHardPos<T>();
         static_assert(srcTPos == Hardware::L1, "The hardware of quant must be L1");
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 2201
-        static_assert(Std::is_one_of_v<srcType, __cbuf__ uint64_t>, "The source data type is not supported.");
-#endif
     }
 
     template <typename T>
@@ -139,19 +165,19 @@ private:
 
 class Copy2201MatrixCcToGmBase {
 public:
-    template <const FixpipeTrait& trait, typename T, typename U, typename S>
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename S>
     __aicore__ inline void DataCopy(const T& dst, const U& src, const S& params)
     {
-        DataCopyImpl<trait, T, U, S>(dst, src, params, tuple_sequence<decltype(params)>{});
+        DataCopyImpl<trait, quantPre, T, U, S>(dst, src, params, tuple_sequence<decltype(params)>{});
     }
 
 private:
-    template <const FixpipeTrait& trait, typename T, typename U, typename S, size_t... Is>
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename S, size_t... Is>
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const S& tupleParams, Std::index_sequence<Is...>)
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        CopyMatrixCcToGm<trait.quantPre, dstType, srcType>(
+        CopyMatrixCcToGm<quantPre, dstType, srcType>(
             (__gm__ dstType *)dst.Data().Get(), (__cc__ srcType *)src.Data().Get(), Std::get<Is>(tupleParams)...);
     }
 

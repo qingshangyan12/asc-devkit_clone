@@ -16,6 +16,8 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0A_ZN2NZB8B4_H
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/instruction.h"
+#include "impl/experimental/tensor_api/arch/utils/check_format.h"
+#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
 
 namespace AscendC {
 namespace Te {
@@ -24,65 +26,23 @@ class LoadDataFourDim3510L12L0AZN2NZB8B4 {
 public:
     template <const LoadDataTrait& trait, typename T, typename U>
     __aicore__ inline void Run(const T& dst, const U& src) {
-        LoadDataImpl<trait, T, U>(dst, src);
+        LoadDataImpl<TraitHolder<trait, true>::traitTransposed, T, U>(dst, src);
     }
 
 private:
-    template<typename T>
-    __aicore__ inline constexpr void CheckNZTemplate()
-    {
-        using type = typename T::elementType;
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<FRACTAL_FIXED>>,
-            "LoadDataFourDim3510L12L0A Layout->Shape->Row->ZeroDim is not Std::Int<16> type!");
-        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim3510L12L0A Layout->Shape->Column->ZeroDim is not Std::Int<C0Size/Type> type!");
-
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<StrideRow0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim3510L12L0A Layout->Stride->Row-ZeroDim is not Std::Int<C0Size/Type> type!");
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>,
-            "LoadDataFourDim3510L12L0A Layout->Stride->Column->ZeroDim is not Std::Int<1> type!");
-    }
-    
-    template<typename T>
-    __aicore__ inline constexpr void CheckZNTemplate()
-    {
-        using type = typename T::elementType;
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<FRACTAL_FIXED>>,
-            "LoadDataFourDim3510L12L0A Layout->Shape->Column->ZeroDim is not Std::Int<16> type!");
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim3510L12L0A Layout->Shape->Row->ZeroDim is not Std::Int<C0Size/Type> type!"); 
-
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim3510L12L0A Layout->Stride->Column-ZeroDim is not Std::Int<C0Size/Type> type!");
-        static_assert(Std::is_same_v<StrideRow0, Std::Int<1>>,
-            "LoadDataFourDim3510L12L0A Layout->Stride->Row->ZeroDim is not Std::Int<1> type!");
-    }
+    template<const LoadDataTrait& trait, bool transpose>
+    struct TraitHolder {
+        static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
+    };
 
     template <const LoadDataTrait& trait, typename T, typename U>
     __aicore__ inline constexpr void CheckTemplate()
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-        CheckNZTemplate<T>();
-        CheckZNTemplate<U>();
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
-        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__ca__ half, __cbuf__ half>, 
-            Std::tuple<__ca__ int16_t, __cbuf__ int16_t>, Std::tuple<__ca__ uint16_t, __cbuf__ uint16_t>,
-            Std::tuple<__ca__ bfloat16_t, __cbuf__ bfloat16_t>, Std::tuple<__ca__ uint32_t, __cbuf__ uint32_t>, 
-            Std::tuple<__ca__ int32_t, __cbuf__ int32_t>, Std::tuple<__ca__ float, __cbuf__ float>, 
-            Std::tuple<__ca__ uint8_t, __cbuf__ uint8_t>, Std::tuple<__ca__ int8_t, __cbuf__ int8_t>, 
-            Std::tuple<__ca__ fp8_e4m3fn_t, __cbuf__ fp8_e4m3fn_t>, Std::tuple<__ca__ fp8_e5m2_t, __cbuf__ fp8_e5m2_t>, 
-            Std::tuple<__ca__ fp4x2_e2m1_t, __cbuf__ fp4x2_e2m1_t>, Std::tuple<__ca__ fp4x2_e1m2_t, __cbuf__ fp4x2_e1m2_t>,
-            Std::tuple<__ca__ hifloat8_t, __cbuf__ hifloat8_t>>, "The data type is not supported.");
-#endif
+        CheckFormat::CheckNZTemplate<T>();
+        CheckFormat::CheckZNTemplate<U>();
+        CheckDataTypeFor3510::CheckL12L0ADataType<dstType, srcType>();
     }
 
         template <const LoadDataTrait& trait, typename T, typename U>
@@ -95,17 +55,16 @@ private:
         constexpr int SHIFT_M_STEP_B4 = 2;
         constexpr int M_STEP_MIN_VAL_B4 = 4;
         uint16_t mLoop = mStep >> SHIFT_M_STEP_B4;
-        uint16_t dstAddrStride = mStep * FRACTAL_FIXED * C0_SIZE;
+        uint16_t dstAddrStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
+                GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) * C0_SIZE;
         mStep = M_STEP_MIN_VAL_B4;
-        int x = 0, y = 0;
-        int Row = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
-                  GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
         LoadCbufToCaS4Base loadCbufToCaS4;
+        auto iter = dst.Data();
         for (uint16_t idx = 0; idx < mLoop; ++idx) {
-            auto sliceDst = dst(MakeCoord(x, y));
-            loadCbufToCaS4.template LoadData<trait, true>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
+            auto sliceDst = MakeTensor(iter, dst.Layout());
+            loadCbufToCaS4.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
                                                     mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);
-            y += C0_SIZE * KHALF;
+            iter = iter + dstAddrStride;
             mStartPosition += M_STEP_MIN_VAL_B4;
         }
     }
@@ -119,16 +78,15 @@ private:
         constexpr int SHIFT_M_STEP_B8 = 1;
         constexpr int M_STEP_MIN_VAL_B8 = 2;
         uint16_t mLoop = mStep >> SHIFT_M_STEP_B8;
-        uint16_t dstAddrStride = mStep * FRACTAL_FIXED * C0_SIZE;
+        uint16_t dstAddrStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
+                GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) * C0_SIZE;
         mStep = M_STEP_MIN_VAL_B8;
-        int x = 0, y = 0;
-        int Row = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
-                    GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
         LoadCbufToCaBase loadCbufToCa;
+        auto iter = dst.Data();
         for (uint16_t idx = 0; idx < mLoop; ++idx) {
-            auto sliceDst = dst(MakeCoord(x, y));
-            loadCbufToCa.template LoadData<trait, true>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-            y += C0_SIZE;
+            auto sliceDst = MakeTensor(iter, dst.Layout());
+            loadCbufToCa.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            iter = iter + dstAddrStride;
             mStartPosition += M_STEP_MIN_VAL_B8;
         }
     }
@@ -142,8 +100,10 @@ private:
         auto srcLayout = src.Layout();
         uint16_t mStartPosition = 0;
         uint16_t kStartPosition = 0;
-        auto m1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) *
-                GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) / FRACTAL_FIXED;
+        auto m1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout) *
+                  GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout) -
+                  GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
+                  GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout);
         auto mStep = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout) *
                 GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout) / FRACTAL_FIXED;
         auto kStep = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout) *
@@ -155,17 +115,17 @@ private:
         constexpr bool isFp4Type = std::is_same<T, fp4x2_e2m1_t>::value || std::is_same<T, fp4x2_e1m2_t>::value;
         if constexpr (isFp4Type) {
             constexpr int KHALF = 2;
-            if ((m1 & 1) == 0) {
+            if (m1 >= FRACTAL_FIXED) {
                 LoadCbufToCaS4Base loadCbufToCaS4;
-                loadCbufToCaS4.template LoadData<trait, true>(dst, src, mStartPosition, kStartPosition / KHALF, 
+                loadCbufToCaS4.template LoadData<trait>(dst, src, mStartPosition, kStartPosition / KHALF, 
                                                     mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);
             } else {
                 LoadDataImplB4<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             }
         } else {
-            if ((m1 & 1) == 0) {
+            if (m1 >= FRACTAL_FIXED) {
                 LoadCbufToCaBase loadCbufToCa;
-                loadCbufToCa.template LoadData<trait, true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+                loadCbufToCa.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             } else {
                 LoadDataImplB8<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             }
