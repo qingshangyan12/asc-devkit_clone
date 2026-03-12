@@ -17,16 +17,16 @@
 
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
-#include "impl/experimental/tensor_api/arch/arch_utils.h"
+#include "impl/experimental/tensor_api/arch/utils/arch_utils.h"
 
 namespace AscendC {
 namespace Te {
 class LoadCbufToCaBase {
 public:
-    template <const LoadDataTrait& trait, bool transpose, typename T, typename U, typename... Params>
+    template <const LoadDataTrait& trait, typename T, typename U, typename... Params>
     __aicore__ inline void LoadData(const T& dst, const U& src, const Params& ...params)
     {
-        LoadCbufToCa<transpose>(dst.Data().Get(), src.Data().Get(), params...);
+        LoadCbufToCa<trait.transposed>(dst.Data().Get(), src.Data().Get(), params...);
     }
 
 private:
@@ -45,10 +45,10 @@ private:
 
 class LoadCbufToCaS4Base {
 public:
-    template <const LoadDataTrait& trait, bool transpose, typename T, typename U, typename... Params>
+    template <const LoadDataTrait& trait, typename T, typename U, typename... Params>
     __aicore__ inline void LoadData(const T& dst, const U& src, const Params& ...params)
     {
-        LoadCbufToCa<transpose>(dst.Data().Get(), src.Data().Get(), params...);
+        LoadCbufToCa<trait.transposed>(dst.Data().Get(), src.Data().Get(), params...);
     }
 
 private:
@@ -67,10 +67,10 @@ private:
 
 class LoadCbufToCbBase {
 public:
-    template <const LoadDataTrait& trait, bool transpose, typename T, typename U, typename... Params>
+    template <const LoadDataTrait& trait, typename T, typename U, typename... Params>
     __aicore__ inline void LoadData(const T& dst, const U& src, const Params& ...params)
     {
-        LoadCbufToCb<transpose>(dst.Data().Get(), src.Data().Get(), params...);
+        LoadCbufToCb<trait.transposed>(dst.Data().Get(), src.Data().Get(), params...);
     }
 
 private:
@@ -89,10 +89,10 @@ private:
 
 class LoadCbufToCbS4Base {
 public:
-    template <const LoadDataTrait& trait, bool transpose, typename T, typename U, typename... Params>
+    template <const LoadDataTrait& trait, typename T, typename U, typename... Params>
     __aicore__ inline void LoadData(const T& dst, const U& src, const Params& ...params)
     {
-        LoadCbufToCb<transpose>(dst.Data().Get(), src.Data().Get(), params...);
+        LoadCbufToCb<trait.transposed>(dst.Data().Get(), src.Data().Get(), params...);
     }
 
 private:

@@ -17,32 +17,27 @@
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_utils.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/instruction.h"
+#include "impl/experimental/tensor_api/arch/utils/check_format.h"
+#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
 
 namespace AscendC {
 namespace Te {
 
 class Fixpipe2GmNz2DnBase3510 {
 public:
-    template <const FixpipeTrait& trait, typename T, typename U>
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
     __aicore__ inline void Run(const T& dst, const U& src) {
         SetRegisterImpl<trait, T, U>(dst, src);
-        DataCopyImpl<trait, T, U>(dst, src);
+        DataCopyImpl<trait, quantPre, T, U>(dst, src);
     }
 
 private:
-
-    template <const FixpipeTrait& trait, typename T, typename U>
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
     __aicore__ inline constexpr void CheckTemplate()
     {
-        using srcType = typename U::elementType;
-        using dstType = typename T::elementType;
-        FormatCheckUtils3510 formatCheckInst;
-        formatCheckInst.CheckDNTemplate<T>();
-        formatCheckInst.CheckL0CNZTemplate<U>();
-#if defined(__NPU_ARCH__ ) && __NPU_ARCH__ == 3510
-        static_assert(Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ float, __cc__ float>, 
-            Std::tuple<__gm__ int32_t, __cc__ int32_t>>, "The data type is not supported.");
-#endif
+        CheckFormat::CheckDNTemplate<T>();
+        CheckFormat::CheckL0CNZTemplate<U>();
+        CheckDataTypeFor3510::CheckFixPipeDataType<quantPre, T, U>();
     }
 
     template <const FixpipeTrait& trait, typename T, typename U>
@@ -56,10 +51,10 @@ private:
         setRegisterInst.SetRegister(dnNum, dstDnMatrixStride, srcNzMatrixStride, srcNzC0Stride);
     }
 
-    template <const FixpipeTrait& trait, typename T, typename U>
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
     __aicore__ inline void DataCopyImpl(const T& dst, const U& src)
     {
-        CheckTemplate<trait, T, U>();
+        CheckTemplate<trait, quantPre, T, U>();
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
         uint32_t nSize = Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout)
@@ -81,7 +76,7 @@ private:
         bool nz2ndEn = false;
         bool nz2dnEn = true;
         CopyMatrixCcToGmBase3510 copyInst;
-        copyInst.DataCopy<trait, T, U>(dst, src, nSize, mSize, srcStride, dstStride, cacheMode,
+        copyInst.DataCopy<trait, quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, cacheMode,
             reluEn, unitFlag, isChannelSplit, nz2ndEn, nz2dnEn);
     }
 };
