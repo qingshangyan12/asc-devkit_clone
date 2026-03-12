@@ -24,6 +24,7 @@
 ## 算子描述
 - 算子功能：  
   fill单算子，用于将输出Global Memory上的数据初始化为0。两个输入作为Add计算的输入，Add的结果放入初始化为0后的Global Memory上。
+
 - 算子规格：  
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">fill</td></tr>
@@ -47,8 +48,6 @@
   - Kernel实现
 
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Fill高阶API接口完成fill计算，得到最终结果，再搬出到外部存储上。
-
-    fill算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm、yGm存储在xLocal、yLocal中，并对Global Memory上的数据初始化，Compute任务负责对xLocal、yLocal执行fill计算，计算结果存储在zLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor zGm。
 
   - Tiling实现
 
