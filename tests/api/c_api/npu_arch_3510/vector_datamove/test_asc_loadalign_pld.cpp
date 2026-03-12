@@ -24,6 +24,16 @@ void pld_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Literal
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
     EXPECT_EQ(dist, static_cast<Literal>(Literal::NORM));
 }
+
+void pld_upsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Literal dist) {
+    EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
+    EXPECT_EQ(dist, static_cast<Literal>(Literal::US_B8));
+}
+
+void pld_downsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Literal dist) {
+    EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
+    EXPECT_EQ(dist, static_cast<Literal>(Literal::DS_B8));
+}
 }
 
 TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPld_Succ)
@@ -37,5 +47,33 @@ TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPld_Succ)
         .will(invoke(pld_stub));
 
     asc_loadalign(dst, src, offset);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPldUpsample_Succ)
+{
+    vector_bool dst = asc_create_mask_b16(PAT_ALL);
+    __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
+    iter_reg offset = asc_create_iter_reg_b32(64);
+
+    MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))       \
+        .times(1)                                                                               \
+        .will(invoke(pld_upsample_stub));
+
+    asc_loadalign_upsample(dst, src, offset);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPldDownsample_Succ)
+{
+    vector_bool dst = asc_create_mask_b16(PAT_ALL);
+    __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
+    iter_reg offset = asc_create_iter_reg_b32(64);
+
+    MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))       \
+        .times(1)                                                                               \
+        .will(invoke(pld_downsample_stub));
+
+    asc_loadalign_downsample(dst, src, offset);
     GlobalMockObject::verify();
 }

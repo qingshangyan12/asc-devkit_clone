@@ -2460,9 +2460,9 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst, __ubuf__ float* src
     asc_loadalign_impl(dst, src_align_32b, offset);
 }
 
-__simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src_align_32b, iter_reg offset)
+__simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
 {
-    asc_loadalign_impl(dst, src_align_32b, offset);
+    asc_loadalign_impl(dst, src, offset);
 }
 
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
@@ -2593,6 +2593,11 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst, __ubuf__ ha
     asc_loadalign_upsample_impl(dst, src_align_32b, offset);
 }
 
+__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
+{
+    asc_loadalign_upsample_impl(dst, src, offset);
+}
+
 // =========DS(B8/B16)=========
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
 {
@@ -2647,6 +2652,11 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bfloat16_t& dst, __u
 __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst, __ubuf__ half* src_align_32b, iter_reg offset)
 {
     asc_loadalign_downsample_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
+{
+    asc_loadalign_downsample_impl(dst, src, offset);
 }
 
 // DINTLV(B8/B16/B32)
