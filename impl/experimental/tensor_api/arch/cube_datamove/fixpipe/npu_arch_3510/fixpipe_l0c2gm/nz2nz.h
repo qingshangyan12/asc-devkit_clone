@@ -24,9 +24,9 @@ namespace Te {
 
 class Fixpipe2GmNz2NzBase3510 {
 public:
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline void Run(const T& dst, const U& src) {
-        DataCopyImpl<trait, quantPre, T, U>(dst, src);
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
+    __aicore__ inline void Run(const T& dst, const U& src, const Params& params) {
+        DataCopyImpl<trait, quantPre, T, U, Params>(dst, src, params);
     }
 
 private:
@@ -38,27 +38,23 @@ private:
         CheckDataTypeFor3510::CheckL0C2GmDataType<quantPre, T, U>();
     }
 
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline void DataCopyImpl(const T& dst, const U& src)
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
+    __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const Params& params)
     {
         CheckTemplate<trait, quantPre, T, U>();
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
-        uint32_t nSize = Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout)
-            * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout),
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout));
-        uint32_t mSize = Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout)
-            * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout),
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout));
+        uint32_t nSize = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout)
+            * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+        uint32_t mSize = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout)
+            * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
         uint32_t srcStride = 
             GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
 
         bool reluEn = trait.enableRelu;
-        uint8_t unitFlag = trait.unitFlag;
+        uint8_t unitFlag = params.unitFlag;
         bool isChannelSplit = trait.enableChannelSplit;
         bool nz2ndEn = false;
         bool nz2dnEn = false;
