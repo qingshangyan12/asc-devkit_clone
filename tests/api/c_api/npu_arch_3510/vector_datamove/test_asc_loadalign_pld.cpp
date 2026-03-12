@@ -22,17 +22,17 @@ protected:
 namespace {
 void pld_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Dist dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
-    EXPECT_EQ(dist, static_cast<Literal>(Dist::DIST_NORM));
+    EXPECT_EQ(dist, static_cast<Dist>(Dist::DIST_NORM));
 }
 
 void pld_upsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Dist dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
-    EXPECT_EQ(dist, static_cast<Literal>(Dist::DIST_US));
+    EXPECT_EQ(dist, static_cast<Dist>(Dist::DIST_US));
 }
 
 void pld_downsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Dist dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
-    EXPECT_EQ(dist, static_cast<Literal>(Dist::DIST_DS));
+    EXPECT_EQ(dist, static_cast<Dist>(Dist::DIST_DS));
 }
 }
 
