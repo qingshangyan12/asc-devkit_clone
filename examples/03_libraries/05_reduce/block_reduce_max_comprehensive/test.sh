@@ -1,0 +1,18 @@
+SCENARIO=4
+REPEAT_TIME=2
+TAIL_MASK=12
+SRC_BLK_STRIDE=1
+DST_REP_STRIDE=1
+SRC_REP_STRIDE=8
+SRC_DATA_SIZE=144
+DST_DATA_SIZE=24
+
+python3 scripts/gen_data.py --scenario $SCENARIO --repeatTime $REPEAT_TIME --tailMask $TAIL_MASK --src_size $SRC_DATA_SIZE --dst_size $DST_DATA_SIZE --srcBlkStride $SRC_BLK_STRIDE --dstRepStride $DST_REP_STRIDE --srcRepStride $SRC_REP_STRIDE
+
+cmake -B build -DSCENARIO_NUM=$SCENARIO -DREPEAT_TIME=$REPEAT_TIME -DTAIL_MASK=$TAIL_MASK -DSRC_BLK_STRIDE=$SRC_BLK_STRIDE -DDST_REP_STRIDE=$DST_REP_STRIDE -DSRC_REP_STRIDE=$SRC_REP_STRIDE -DSRC_DATA_SIZE=$SRC_DATA_SIZE -DDST_DATA_SIZE=$DST_DATA_SIZE
+
+cmake --build build --verbose
+
+./build/demo
+
+python3 scripts/verify_result.py -scenarioNum $SCENARIO output/output.bin output/golden.bin
