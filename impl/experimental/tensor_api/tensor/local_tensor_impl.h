@@ -121,19 +121,28 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
     __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const {
         return operator()(MakeCoord(c0,c1,cs...));
     }
+	
+ 	template <typename Coord, typename T>
+ 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const T& t) const {
+ 	    auto iter = Data() + Layout()(coord);
+        if constexpr (Std::is_tuple_v<T>) {
+            auto tileLayout = MakeTileLayout(Layout(), t);
+            return MakeTensor(iter, tileLayout);
+        } else {
+            static_assert(Std::tuple_size_v<Coord> == TWO_DIM_DATA);
 
-	template <typename Coord, typename Shape>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) {
- 	    auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeTileLayout(Layout(), shape);
- 	    return MakeTensor(iter, tileLayout);
- 	}
- 	 
- 	template <typename Coord, typename Shape>
- 	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) const {
- 	    auto iter = Data() + Layout()(coord);
- 	    auto tileLayout = MakeTileLayout(Layout(), shape);
- 	    return MakeTensor(iter, tileLayout);
+            uint32_t dstRow = Std::get<0>(Std::get<0>(t.Shape())) * Std::get<1>(Std::get<0>(t.Shape()));
+            uint32_t srcRow =
+                Std::get<0>(Std::get<0>(Shape())) * Std::get<1>(Std::get<0>(Shape())) - Std::get<0>(coord);
+            uint32_t rowSize = Std::min(dstRow, srcRow);
+
+            uint32_t dstCol = Std::get<0>(Std::get<1>(t.Shape())) * Std::get<1>(Std::get<1>(t.Shape()));
+            uint32_t srcCol =
+                Std::get<0>(Std::get<1>(Shape())) * Std::get<1>(Std::get<1>(Shape())) - Std::get<1>(coord);
+            uint32_t colSize = Std::min(dstCol, srcCol);
+            auto tileLayout = MakeTileLayout(Layout(), MakeShape(rowSize, colSize));
+            return MakeTensor(iter, tileLayout);
+        }
  	}
 
     template <typename... Layouts>
