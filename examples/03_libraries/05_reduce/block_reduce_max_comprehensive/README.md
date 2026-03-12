@@ -26,16 +26,20 @@
 |------|------|-------|
 | 1 | half | Normal |
 | 2 | half | Counter |
-| 3 | float | Normal |
-| 4 | float | Counter |
+| 3 | half | Counter + 性能测试|
+| 4 | float | Normal |
+| 5 | float | Counter |
+| 6 | float | Counter + 性能测试|
 ---------------------
 **样例参数**
 | 场景 | 类型 | repeatTime | tailMask | srcBlkStride | dstRepStride | srcRepStride | 输入数据大小(32位对齐) | 输出数据大小(32位对齐) | 说明 |
 |------|------|-----------|------|--------------|--------------|--------------|-------|------|------|
 | 1 | half | 2 | 85 | 1 | 1 | 8 | 352 | 32 | 2个repeat+非对齐的mask，连续数据 |
 | 2 | half | 1 | 341 | 1 | 1 | 8 | 352 | 32 | 2个repeat+非对齐的mask，连续数据 |
-| 3 | float | 2 | 12 | 1 | 1 | 8 | 144 | 24 | float基础场景, 2个repeat+非对齐的mask，连续数据 |
-| 4 | float | 1 | 140 | 1 | 1 | 8 | 144 | 24 | float基础场景, 2个repeat+非对齐的mask，连续数据 |
+| 3 | half | 1 | 64 * 1024 | 1 | 1 | 8 | 64 * 1024 | 4 * 1024 | 性能测试 |
+| 4 | float | 2 | 12 | 1 | 1 | 8 | 144 | 24 | float基础场景, 2个repeat+非对齐的mask，连续数据 |
+| 5 | float | 1 | 140 | 1 | 1 | 8 | 144 | 24 | float基础场景, 2个repeat+非对齐的mask，连续数据 |
+| 6 | float | 1 | 32 * 1024 | 1 | 1 | 8 | 32 * 1024 | 4 * 1024 | 性能测试 |
 | 1 | half | 2 | 0 | 2 | 1 | 8 | 384 | 16 | block间有gap |
 | 1 | half | 2 | 0 | 1 | 2 | 8 | 256 | 32 | 输出repeat间有gap |
 | 1 | half | 2 | 0 | 1 | 1 | 16 | 384 | 16 | src repeat间有gap | 

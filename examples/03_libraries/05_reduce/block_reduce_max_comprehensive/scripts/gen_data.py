@@ -58,7 +58,7 @@ def block_reduce_max_golden(src, dst, dtype, repeat, tailMask, srcBlkStride, dst
 
 def main():
     parser = argparse.ArgumentParser(description='Generate test data for BlockReduceMax')
-    parser.add_argument('--scenario', type=int, default=1, choices=range(1, 5),
+    parser.add_argument('--scenario', type=int, default=1, choices=range(1, 7),
                        help='Scenario number (1-4)')
     parser.add_argument('--repeatTime', type=int, help='Repeat times')
     parser.add_argument('--tailMask', type=int, help='Tail mask value')
@@ -79,9 +79,9 @@ def main():
     dstRepStride = args.dstRepStride
     srcRepStride = args.srcRepStride
 
-    if scenario == 1 or scenario == 2:
+    if scenario <= 3:
         dtype = np.float16
-    elif scenario == 3 or scenario == 4:
+    else:
         dtype = np.float32
 
     print(f"Scenario {scenario}")
@@ -108,7 +108,7 @@ def main():
 
     block_reduce_max_golden(src_data, golden_data, 
         dtype, repeatTime, tailMask, srcBlkStride, dstRepStride, srcRepStride,
-        enabelCounterMask=(scenario == 2 or scenario == 4)
+        enabelCounterMask=(scenario != 1 and scenario != 4)
     )
     print("-----------------------")
     print(golden_data)
