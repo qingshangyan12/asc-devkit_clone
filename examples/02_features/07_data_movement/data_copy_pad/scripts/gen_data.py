@@ -36,17 +36,39 @@ def gen_golden_data_simple():
 
 
     min_val, max_val = get_range_by_dtype(input_type)
-    input_shape = [block_length]
+    input_shape = [data_copy_pad_len]
     output_shape = [block_length]
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
     golden = np.zeros(output_shape).astype(output_type)
-    for i in range(data_copy_pad_len):
-        golden[i] = input_x[i] + scalar
+    for i in range(block_length):
+        if i < data_copy_pad_len:
+            golden[i] = input_x[i] + scalar
+        else:
+            golden[i] = 1
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     input_x.tofile("./input/input_x.bin")
     golden.tofile("./output/golden.bin")
 
+def gen_golden_data_simple_set_value():
+    input_type = np.float16
+    output_type = input_type
+    #与算子中标量值保持一致
+    set_pad_value = 37
+    n1 = 32
+    n2 = 31
+
+    min_val, max_val = get_range_by_dtype(input_type)
+    input_shape = [n1, n2]
+    output_shape = [n1, n1]
+    input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
+    golden = set_pad_value * np.ones(output_shape).astype(output_type)
+    golden[0:n1, 0:n2] = input_x
+    os.makedirs("input", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
+    input_x.tofile("./input/input_x_2.bin")
+    golden.tofile("./output/golden_2.bin")
 
 if __name__ == "__main__":
     gen_golden_data_simple()
+    gen_golden_data_simple_set_value()
