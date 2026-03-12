@@ -186,6 +186,7 @@ struct FixpipeParamsC310 {
     ReluMode preReluMode = ReluMode::NO_RELU;
     ClipReluMode preClipReluMode = ClipReluMode::NOCLIP_RELU;
     uint64_t reluScalar;
+    uint64_t vectorRelu;
 #endif
     uint16_t nSize = 0;
     uint16_t mSize = 0;  // M-DirectionSize
