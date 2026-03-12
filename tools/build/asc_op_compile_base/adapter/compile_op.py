@@ -240,8 +240,8 @@ the superkernel cannot be integrated with the operator.", \
             AscendCLogLevel.LOG_WARNING)
     if "isSimt" in js and js["isSimt"] == 1:
         CommonUtility.print_compile_log(compile_info.kernel_name, \
-        f"The operator {op_info.op_type} is simt type, current soc version has not been adapted to \
-superkernel. Therefore, the superkernel cannot be integrated with the operator.", AscendCLogLevel.LOG_WARNING)
+        f"The current soc version does not support merging simt type operator:{op_info.op_type} \
+into superkernel", AscendCLogLevel.LOG_WARNING)
 
     if CommonUtility.is_c310() and "isSimt" not in js:
         if tiling_info.local_memory_size > 0 or _get_simt_type_in_staic(tiling_info, compile_info, obj_path):
