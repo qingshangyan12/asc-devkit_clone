@@ -1,6 +1,6 @@
 # Copy样例
 ## 概述
-本样例基于Copy实现数据搬运，适用于VECIN，VECCALC，VECOUT之间的数据搬运，支持mask操作和DataBlock间隔操作。
+本样例基于Copy实现数据搬运，适用于VECIN，VECOUT之间的数据搬运，支持mask操作和DataBlock间隔操作。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -21,7 +21,7 @@
 ## 算子描述
 - 算子功能：  
 
-  copy算子是VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间隔操作。
+  本算子是展示使用Copy进行VECIN，VECOUT之间的数据搬运，支持mask操作和DataBlock间隔操作。Copy的具体参数介绍可以参考[Copy](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0106.html)。
 - 算子规格：  
 
   <table>
