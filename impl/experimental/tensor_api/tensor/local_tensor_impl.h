@@ -15,6 +15,7 @@
 #ifndef IMPL_TENSOR_API_TENSOR_LOCAL_TENSOR_IMPL_H
 #define IMPL_TENSOR_API_TENSOR_LOCAL_TENSOR_IMPL_H
 
+#include "impl/experimental/tensor_api/arch/utils/arch_utils.h"
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_impl.h"
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
@@ -195,6 +196,26 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
     static_assert(!(HasDereference<Args>::value && ...), "Expected layout args... in MakeLocalTensor(iter, args...)");
     return MakeLocalTensor<Iterator>{}(iter, args...);
 }
+
+template <typename T, typename U, typename Coord>
+__aicore__ inline constexpr auto GetValidSliceTensor(const T& dst, const U& src, const Coord& coord)
+{
+    static_assert(IsTileTensorV<T> && IsTileTensorV<U>, "T and U should be TileTensor type in GetValidSliceTensor");
+    static_assert(Std::tuple_size_v<Coord> == TWO_DIM_DATA, "Coord should be a tuple of two elements in GetValidSliceTensor");
+
+    uint32_t rowSize =
+        Std::min(GetEleFromLayout<decltype(dst.Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dst.Layout())
+                     * GetEleFromLayout<decltype(dst.Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dst.Layout()),
+                 GetEleFromLayout<decltype(src.Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 0>(src.Layout())
+                         * GetEleFromLayout<decltype(src.Layout()), AttrInfo::SHAPE, AttrInfo::ROW, 1>(src.Layout())
+                     - Std::get<0>(coord));
+    uint32_t colSize =
+        Std::min(GetEleFromLayout<decltype(dst.Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dst.Layout())
+                     * GetEleFromLayout<decltype(dst.Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dst.Layout()),
+                 GetEleFromLayout<decltype(src.Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(src.Layout())
+                         * GetEleFromLayout<decltype(src.Layout()), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(src.Layout())
+                     - Std::get<1>(coord));
+    return src(coord, MakeShape(rowSize, colSize));
 
 } // namespace Te
 } // namespace AscendC
