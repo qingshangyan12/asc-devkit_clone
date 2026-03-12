@@ -1,12 +1,17 @@
 # Brcb样例
+
 ## 概述
+
 本样例基于Brcb实现数据填充，可用于输入一个tensor，每一次取输入张量中的8个数填充到结果张量的8个datablock中。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
 ## 目录结构介绍
+
 ```
 ├── brcb
 │   ├── scripts
@@ -18,8 +23,10 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
-  BrcbCustom算子给定一个输入张量，每一次取输入张量中的8个数填充到结果张量的8个datablock（32Bytes）中去，每个数对应一个datablock。
+  BrcbCustom算子每一次取输入张量中的8个数填充到结果张量的8个datablock（32Bytes）中去，每个数对应一个datablock。
+
 - 算子规格：  
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Brcb</td></tr>
@@ -39,14 +46,11 @@
 
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Brcb基础API接口完成计算，得到最终结果，再搬出到外部存储上。
 
-    BrcbCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责从srcLocal每一次取输入张量中的8个数填充到dstLocal的8个datablock（32Bytes）中去，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
-
-
-
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行  
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。

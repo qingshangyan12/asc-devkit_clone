@@ -1,14 +1,16 @@
 # CreateVecIndex算子直调样例
+
 ## 概述
 本样例基于CreateVecIndex实现创建指定起始值的向量索引的方法。
-本样例通过Ascend C编程语言实现了CreateVecIndex算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
+
 ```
 ├── create_vec_index
 │   ├── scripts
@@ -20,8 +22,9 @@
 ```
 
 ## 算子描述
+
 - 算子功能：  
-  CreateVecIndex算子实现了创建指定起始值的向量索引，并返回计算的功能。
+  CreateVecIndex算子实现了创建指定起始值的向量索引，并返回结果的功能。
 
 - 算子规格：  
   <table>
@@ -33,12 +36,11 @@
   - kernel实现   
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成创建指定起始值的向量索引的操作，得到最终结果，再搬出到外部存储上。   
 
-    CreateVecIndex算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm搬运至Local Memory，存储在xLocal，Compute任务负责对xLocal执行相关操作，计算结果存储在outLocal中，CopyOut任务负责将输出数据从outLocal搬运至Global Memory上的输出Tensor outGm中。
-
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行  
+
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
