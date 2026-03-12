@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于DataCopy实现数据搬运，支持在数据搬运过程中进行scalar量化和Relu激活等操作。
+本样例基于DataCopy实现数据搬运，支持在数据搬运过程中通过scalar量化将int32_t类型转换为half类型，并完成NZ到ND格式转换，同时支持Relu激活等操作。
 
 ## 支持的产品
 
@@ -22,9 +22,8 @@
 ```
 
 ## 算子描述
-
+  <!-- 完整的样例流程如下：执行Mmad指令将int8_t类型的左矩阵与右矩阵做矩阵乘法得到int32_t类型的结果矩阵，调用DataCopy scalar随路量化激活搬运将结果矩阵量化成half类型并搬出 -->
 - 算子功能：  
-
   支持在数据搬运过程中进行量化和Relu激活等操作，同时支持Local Memory到Global Memory通路NZ到ND格式的转换。
 - 算子规格：  
   <table>
@@ -40,7 +39,16 @@
 
 - 算子实现：  
   - Kernel实现   
-    Mmad左矩阵和右矩阵的数据类型为int8_t，结果矩阵的数据类型为int32_t。量化模式DEQF16，scalar量化参数为0.5，将Mmad计算出的结果由int32_t量化成half并搬出。
+    通过Mmad接口将int8_t类型的左矩阵和右矩阵做矩阵乘法，得到int32_t类型的结果矩阵。配置DataCopyCO12DstParams参数用于DataCopy随路量化激活搬运，设置量化模式DEQF16，并通过SetFixpipePreQuant接口设置scalar量化参数（本样例为0.5），将Mmad计算出的结果由int32_t量化成half并搬出。
+    
+    scalar量化支持的量化模式如下表所示：
+    | 量化模式 | 描述 |
+    | :--- | :--- |
+    | F322F16 | float量化成half。 |
+    | F322BF16 | float量化成bfloat16_t。 |
+    | DEQF16 | int32_t量化成half。 |
+    | QF322B8_PRE | float量化成int8_t/uint8_t。 |
+    | REQ8 | int32_t量化成int8_t/uint8_t。 |
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

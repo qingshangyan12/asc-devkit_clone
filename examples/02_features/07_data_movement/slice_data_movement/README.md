@@ -38,7 +38,7 @@
   - Kernel实现   
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先按切片参数搬运进片上存储，得到最终结果，再搬出到外部存储上。   
 
-    slice_data_movement算子的实现流程分为3个基本任务：CopyIn，CopyOut。CopyIn任务负责将Global Memory上的输入xGm，按切片参数搬运至Local Memory。CopyOut任务负责将输出数据从outLocal搬运至Global Memory上的输出Tensor outGm中。
+    slice_data_movement算子的实现流程分为2个基本任务：CopyIn，CopyOut。CopyIn任务负责将Global Memory上的输入xGm，按切片参数搬运至Local Memory上的outLocal。CopyOut任务负责将输出数据从outLocal搬运至Global Memory上的输出Tensor outGm中。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
