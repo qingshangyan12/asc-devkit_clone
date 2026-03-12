@@ -32,7 +32,7 @@ void movvpu32_stub(vector_bool &dst, vector_uint32_t src, int16_t part) {
 TEST_F(TestVectorComputeCopyMovvp, Copyu16_Succ)
 {
     vector_bool dst = asc_create_mask_b16(PAT_ALL);
-    vector_uint16_t src = static_cast<vector_uint16_t>(11);
+    vector_uint16_t src;
     int16_t part = static_cast<int16_t>(22);
 
     MOCKER_CPP(movvp, void(vector_bool &, vector_uint16_t, int16_t))
@@ -46,7 +46,7 @@ TEST_F(TestVectorComputeCopyMovvp, Copyu16_Succ)
 TEST_F(TestVectorComputeCopyMovvp, Copyu32_Succ)
 {
     vector_bool dst = asc_create_mask_b16(PAT_ALL);
-    vector_uint32_t src = static_cast<vector_uint32_t>(11);
+    vector_uint32_t src;
     int16_t part = static_cast<int16_t>(22);
 
     MOCKER_CPP(movvp, void(vector_bool &, vector_uint32_t, int16_t))
