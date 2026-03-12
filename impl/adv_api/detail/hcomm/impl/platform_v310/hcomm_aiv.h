@@ -67,22 +67,22 @@ __aicore__ inline void Ub2Gm(const AscendC::GlobalTensor<T>& dstGlobal, const As
 
 __aicore__ inline HcommImpl<COMM_ENGINE::AIV, COMM_PROTOCOL::ROCE>::HcommImpl()
 {
-    pipe_.InitBuffer(wqeInBuf, 32);
+    pipe_.InitBuffer(wqeInBuf, DEFAULT_WQE_ITEM_SIZE);
     wqeItem_ = wqeInBuf.Get<uint8_t>();
 
-    pipe_.InitBuffer(cqeInBuf, 32);
+    pipe_.InitBuffer(cqeInBuf, HCOMM_MEM_BLOCK_SIZE);
     cqeItem_ = cqeInBuf.Get<uint32_t>();
 
-    pipe_.InitBuffer(sqPIInBuf, 32);
+    pipe_.InitBuffer(sqPIInBuf, HCOMM_MEM_BLOCK_SIZE);
     sqPI_ = sqPIInBuf.Get<uint32_t>();
 
-    pipe_.InitBuffer(sqCIInBuf, 32);
+    pipe_.InitBuffer(sqCIInBuf, HCOMM_MEM_BLOCK_SIZE);
     sqCI_ = sqCIInBuf.Get<uint32_t>();
 
-    pipe_.InitBuffer(cqCIInBuf, 32);
+    pipe_.InitBuffer(cqCIInBuf, HCOMM_MEM_BLOCK_SIZE);
     cqCI_ = cqCIInBuf.Get<uint32_t>();
 
-    pipe_.InitBuffer(dbInBuf, 32);
+    pipe_.InitBuffer(dbInBuf, HCOMM_MEM_BLOCK_SIZE);
     doorBell_ = dbInBuf.Get<uint64_t>();
 }
 
