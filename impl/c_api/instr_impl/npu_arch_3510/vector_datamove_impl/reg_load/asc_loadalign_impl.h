@@ -153,7 +153,7 @@ __simd_callee__ inline void asc_loadalign_impl(vector_uint64_t& dst, __ubuf__ ui
 __simd_callee__ inline void asc_loadalign_impl(vector_bool& dst, __ubuf__ uint32_t* src)
 {
     if ASC_IS_AIV {
-        plds(dst, src, 0, NORM);
+        plds(dst, src, 0, DIST_NORM);
     }
 }
 
@@ -361,7 +361,7 @@ __simd_callee__ inline void asc_loadalign_upsample_impl(vector_bfloat16_t& dst, 
 __simd_callee__ inline void asc_loadalign_upsample_impl(vector_bool& dst, __ubuf__ uint32_t* src)
 {
     if ASC_IS_AIV {
-        plds(dst, src, 0, US_B8);
+        plds(dst, src, 0, DIST_US);
     }
 }
 
@@ -458,7 +458,7 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(vector_bfloat16_t& dst
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_bool& dst, __ubuf__ uint32_t* src)
 {
     if ASC_IS_AIV {
-        plds(dst, src, 0, DS_B8);
+        plds(dst, src, 0, DIST_DS);
     }
 }
 
