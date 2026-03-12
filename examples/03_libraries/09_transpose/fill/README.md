@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Kernel直调算子工程，介绍了调用Fill高阶API实现fill单算子，主要演示Fill高阶API在Kernel直调工程中的调用。
+本样例基于Kernel直调算子工程，介绍了调用Fill实现将Global Memory上的数据初始化为0。
 
 ## 支持的产品
 
@@ -23,32 +23,31 @@
 
 ## 算子描述
 - 算子功能：  
-  fill单算子，用于将输出Global Memory上的数据初始化为0。两个输入作为Add计算的输入，Add的结果放入初始化为0后的Global Memory上。
+  fill单算子，用于将输出Global Memory上的数据初始化为0。Add的结果放入初始化为0后的Global Memory上。
+
 - 算子规格：  
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">fill</td></tr>
 
   <tr><td rowspan="4" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input_x</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">input_y</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_x</td><td align="center">[1,256]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_y</td><td align="center">[1,256]</td><td align="center">float</td><td align="center">ND</td></tr>
 
 
   <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">output_z</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">output_z</td><td align="center">[1,256]</td><td align="center">float</td><td align="center">ND</td></tr>
 
 
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">fill_custom</td></tr>
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape为输入input_x[256]，input_y[256]，输出output_z[256]的fill算子。
+  本样例中实现的是固定shape为输入input_x[1,256]，input_y[1,256]，输出output_z[1,256]的fill算子,所用api详细介绍请参考[Fill](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0891.html)。
 
   - Kernel实现
 
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Fill高阶API接口完成fill计算，得到最终结果，再搬出到外部存储上。
-
-    fill算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm、yGm存储在xLocal、yLocal中，并对Global Memory上的数据初始化，Compute任务负责对xLocal、yLocal执行fill计算，计算结果存储在zLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor zGm。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Fill高阶API接口完成初始化为0的计算，得到最终结果，再搬出到外部存储上。
 
   - Tiling实现
 
