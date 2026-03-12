@@ -52,7 +52,7 @@ TEST_F(TestVectorDatamoveLoadAlignPlds, LoadAlignPlds_Succ)
     GlobalMockObject::verify();
 }
 
-TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPldUpsample_Succ)
+TEST_F(TestVectorDatamoveLoadAlignPlds, LoadAlignPldsUpsample_Succ)
 {
     vector_bool dst = asc_create_mask_b16(PAT_ALL);
     __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
@@ -65,7 +65,7 @@ TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPldUpsample_Succ)
     GlobalMockObject::verify();
 }
 
-TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPldDownsample_Succ)
+TEST_F(TestVectorDatamoveLoadAlignPlds, LoadAlignPldsDownsample_Succ)
 {
     vector_bool dst = asc_create_mask_b16(PAT_ALL);
     __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
