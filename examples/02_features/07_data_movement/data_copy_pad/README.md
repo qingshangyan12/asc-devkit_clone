@@ -1,6 +1,6 @@
 # DataCopyPad样例
 ## 概述
-本样例基于DataCopyPad实现数据非对齐搬运，其中从Global Memory搬运数据至Local Memory时，可以根据开发者的需要自行填充数据。
+本样例基于DataCopyPad实现数据非32字节对齐搬运并进行数据填充。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -21,7 +21,7 @@
 ## 算子描述
 - 算子功能：  
 
-  该接口提供数据非对齐搬运的功能，其中从Global Memory搬运数据至Local Memory时，可以根据开发者的需要自行填充数据。
+  本样例展示了使用DataCopyPad讲非32字节对齐的数据从Global Memory搬入VECIN并进行数据填充的使用方法,DataCopyPad的具体参数介绍可以参考[DataCopyPad](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0265.html)。
 - 算子规格：  
 
   <table>
@@ -29,9 +29,9 @@
   
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">32</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">[1,20]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">z</td><td align="center">32</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">z</td><td align="center">[1,32]</td><td align="center">half</td><td align="center">ND</td></tr>
   
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">data_copy_pad_custom</td></tr>
   </table>
@@ -41,7 +41,21 @@
   - kernel实现   
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用DataCopyPad基础API接口将输入srcLocal的数值搬运到dstLocal中，再搬出到外部存储上。
 
-    DataCopyPadCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务调用DataCopyPad负责将Global Memory上的输入Tensor src0Gm、src1Gm连续非对齐搬入src0Local和src1Local中，Compute任务负责对src0Local和src1Local求和，并将结果存储到dstLocal中，DataCopyPadOut任务负责将输出数据从dstLocal连续非对齐搬运至Global Memory上的输出Tensor dstGm。
+    DataCopyPadCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。  
+    - CopyIn任务  
+      调用DataCopyPad负责将Global Memory上的输入Tensor srcGlobal连续非对齐搬入srcLocal中。  
+      本算子中使用DataCopyExtParams结构体自定义搬入时数据块个数为1，数据量为20个half，源操作数和目的操作数的数据块间隔为0。  
+      使用DataCopyPadExtParams结构体，true选择需要填充用户自定义数据，连续搬运数据块左侧需要补充的数据范围为0，连续搬运数据块右侧需要补充的数据范围为2，填充值为0。  
+      ```
+      AscendC::DataCopyExtParams copyParams{1, 20 * sizeof(half), 0, 0, 0}; 
+      AscendC::DataCopyPadExtParams<half> padParams{true, 0, 2, 0};
+      // 从GM->VECIN搬运40字节
+      AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams); 
+      ```
+    - Compute任务
+      负责使用Adds对srcLocal和scalar求和，并将结果存储到dstLocal中。  
+    - DataCopyPadOut任务
+      负责将输出数据从dstLocal连续非对齐搬运至Global Memory上的输出Tensor dstGlobal。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
