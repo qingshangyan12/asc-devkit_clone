@@ -25,6 +25,7 @@
 #include "mstx_local_tensor_info.h"
 
 #include "kernel_check.h"
+#include "kernel_npu_debug.h"
 
 #include "kernel_operator_data_copy_base_impl.h"
 
@@ -51,6 +52,9 @@ __aicore__ inline void __inout_pipe__(MTE2) DataCopy(const LocalTensor<T>& dst, 
 #endif
     using PrimType = PrimT<T>;
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from GlobalTensor to LocalTensor with DataCopyParams");
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopy(dst, src, repeatParams, "DataCopy from GlobalTensor to LocalTensor")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopy from GlobalTensor to LocalTensor", KernelFuncType::NONE_MODE);
@@ -254,6 +258,9 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst,
 #endif
     using PrimType = PrimT<T>;
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from LocalTensor to GlobalTensor with DataCopyParams");
+#endif
 #ifdef ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopy(dst, src, repeatParams, "DataCopy from LocalTensor to GlobalTensor")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopy from LocalTensor to GlobalTensor", KernelFuncType::NONE_MODE);
@@ -324,6 +331,9 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> 
     MstxTensor::GetMstxDataCopyInfo(dst, src, repeatParams, "DataCopy");
 #endif
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from LocalTensor to LocalTensor with DataCopyParams");
+#endif
 
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
@@ -400,6 +410,9 @@ __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<U> 
 #endif
     using PrimDstType = PrimT<T>;
     using PrimSrcType = PrimT<U>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckDataCopyTensor(dst, src, repeatParams, "DataCopy from LocalTensor to LocalTensor with T / U");
+#endif
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
 
@@ -722,6 +735,9 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
     const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckDataCopyCountCommon<T>(count, "DataCopy from GlobalTensor to LocalTensor");
+#endif
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
     struct DataCopyParams repeatParams;
     DataCopyCheck<T>(count, repeatParams);
@@ -739,6 +755,9 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src,
     const uint32_t count)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckDataCopyCountCommon<T>(count, "DataCopy from LocalTensor to GlobalTensor");
+#endif
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, count)));
     struct DataCopyParams repeatParams;
     DataCopyCheck<T>(count, repeatParams);
@@ -756,6 +775,9 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckDataCopyCountCommon<T>(count, "DataCopy from LocalTensor to LocalTensor");
+#endif
     ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to "
         "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
         "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
