@@ -155,14 +155,10 @@ private:
     __aicore__ inline void CopyIn(LocalTensor<SrcAT>& a1, LocalTensor<SrcBT>& b1, LocalTensor<ScaleT>& scaleA1, LocalTensor<ScaleT>& scaleB1, 
         int32_t& padCount)
     {
-        a1 = MATMUL_MODULE(CopyCubeInA)->LoadData(MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(KLoop)->GetInnerStartIdx(),
-            MATMUL_MODULE(MLoop)->GetTileShape(), MATMUL_MODULE(KLoop)->GetTileShapeA());
-        b1 = MATMUL_MODULE(CopyCubeInB)->LoadData(MATMUL_MODULE(KLoop)->GetInnerStartIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-            MATMUL_MODULE(KLoop)->GetTileShapeB(), MATMUL_MODULE(NLoop)->GetTileShape());
-        scaleA1 = MATMUL_MODULE(CopyCubeInScaleA)->LoadData(MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(KLoop)->GetInnerStartIdx(),
-            MATMUL_MODULE(MLoop)->GetTileShapeScaleM(), MATMUL_MODULE(KLoop)->GetTileShapeScaleKa());
-        scaleB1 = MATMUL_MODULE(CopyCubeInScaleB)->LoadData(MATMUL_MODULE(KLoop)->GetInnerStartIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
-            MATMUL_MODULE(KLoop)->GetTileShapeScaleKb(), MATMUL_MODULE(NLoop)->GetTileShapeScaleN());
+        a1 = MATMUL_MODULE(CopyCubeInA)->LoadData(MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(KLoop)->GetInnerStartIdx(), MATMUL_MODULE(MLoop)->GetTileShape(), MATMUL_MODULE(KLoop)->GetTileShapeA());
+        b1 = MATMUL_MODULE(CopyCubeInB)->LoadData(MATMUL_MODULE(KLoop)->GetInnerStartIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(KLoop)->GetTileShapeB(), MATMUL_MODULE(NLoop)->GetTileShape());
+        scaleA1 = MATMUL_MODULE(CopyCubeInScaleA)->LoadData(MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(KLoop)->GetInnerStartIdx(), MATMUL_MODULE(MLoop)->GetTileShapeScaleM(), MATMUL_MODULE(KLoop)->GetTileShapeScaleKa());
+        scaleB1 = MATMUL_MODULE(CopyCubeInScaleB)->LoadData(MATMUL_MODULE(KLoop)->GetInnerStartIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(KLoop)->GetTileShapeScaleKb(), MATMUL_MODULE(NLoop)->GetTileShapeScaleN());
         if constexpr (MatmulFeatureTrait<MM_CFG>::IsSupportUBToL1Singleshape()) {
             if (padCount == 0) {
                 BASE_MODULE::PadZeroForABL1(a1, b1);
@@ -389,8 +385,7 @@ private:
     }
         
     __aicore__ inline void Compute(const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<ScaleT>& scaleA1, LocalTensor<ScaleT>& scaleB1,
-        LocalTensor<BiasT>& bias, const bool enPartialSum, const bool isATranspose, const bool isBTranspose,
-        MxSplitParams& aL0Params, MxSplitParams& bL0Params)
+        LocalTensor<BiasT>& bias, const bool enPartialSum, const bool isATranspose, const bool isBTranspose, MxSplitParams& aL0Params, MxSplitParams& bL0Params)
     {
         bool sL0CInit = false;
         bool sL0CLast = false;
