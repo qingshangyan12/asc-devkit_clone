@@ -34,6 +34,7 @@ void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* bas
 
 inline void pld(vector_bool& dst, __ubuf__ uint32_t* src, vector_address offset, Dist dist) {}
 inline void plds(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset, Dist dist) {}
+inline void plds(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset, Dist dist, Post post) {}
 
 #if defined(__DAV_CUBE__)
     inline int32_t g_coreType = 1;
