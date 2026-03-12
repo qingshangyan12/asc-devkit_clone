@@ -1,0 +1,14 @@
+scenario,scenario_desc,m,n,k,duration(us)
+8,L1->LOA_transpose,8,8,8,0.016
+8,L1->LOA_transpose,16,16,16,0.016
+8,L1->LOA_transpose,24,24,24,0.021
+8,L1->LOA_transpose,32,32,32,0.021
+8,L1->LOA_transpose,48,48,48,0.03
+8,L1->LOA_transpose,64,64,64,0.038
+8,L1->LOA_transpose,80,80,80,0.046
+8,L1->LOA_transpose,96,96,96,0.057
+8,L1->LOA_transpose,112,112,112,0.071
+8,L1->LOA_transpose,128,128,128,0.088
+8,L1->LOA_transpose,144,144,144,0.107
+8,L1->LOA_transpose,160,160,160,0.128
+8,L1->LOA_transpose,176,176,176,0.151

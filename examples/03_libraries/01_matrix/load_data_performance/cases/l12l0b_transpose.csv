@@ -1,0 +1,15 @@
+scenario,scenario_desc,m,n,k,duration(us)
+10,L1->LOB_transpose,8,8,8,0.017
+10,L1->LOB_transpose,16,16,16,0.017
+10,L1->LOB_transpose,24,24,24,0.026
+10,L1->LOB_transpose,32,32,32,0.026
+10,L1->LOB_transpose,48,48,48,0.038
+10,L1->LOB_transpose,64,64,64,0.052
+10,L1->LOB_transpose,80,80,80,0.071
+10,L1->LOB_transpose,96,96,96,0.096
+10,L1->LOB_transpose,112,112,112,0.124
+10,L1->LOB_transpose,128,128,128,0.157
+10,L1->LOB_transpose,144,144,144,0.195
+10,L1->LOB_transpose,160,160,160,0.236
+10,L1->LOB_transpose,176,176,176,0.282
+10,L1->LOB_transpose,192,192,192,
