@@ -59,11 +59,11 @@ __aicore__ inline decltype(auto) LayoutConstructor(T0&& t0, T1&& t1, T2&& t2, T3
 }
 
 // layout_dispatch.h
-template <LayoutFormat format, typename T>
+template <LayoutFormat format, typename T, typename Enable = void>
 struct LayoutDispatcher;
 
 template <typename T>
-struct LayoutDispatcher<LayoutFormat::NZ, T> {
+struct LayoutDispatcher<LayoutFormat::NZ, T, typename Std::enable_if_t<!is_b4_type<T>>> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
         constexpr auto c0Size = is_b4_type<T> ? C0_SIZE * 2 : C0_SIZE / sizeof(T);
         return LayoutConstructor(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row, FRACTAL_FIXED), Std::Int<c0Size>{},
@@ -83,17 +83,7 @@ struct LayoutDispatcher<LayoutFormat::NZ, Std::ignore_t> {
 };
 
 template <>
-struct LayoutDispatcher<LayoutFormat::NZ, fp4x2_e1m2_t> {
-    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<FRACTAL_FIXED>{},  CeilDivision(row, FRACTAL_FIXED), 
-                                Std::Int<C0_SIZE * 2>{},  CeilDivision(column, (C0_SIZE * 2)), 
-                                Std::Int<C0_SIZE * 2>{},  Std::Int<C0_SIZE * FRACTAL_FIXED * 2>{},
-                                Std::Int<1>{},  2 * C0_SIZE * CeilAlign(row, FRACTAL_FIXED)); 
-    }
-};
-
-template <>
-struct LayoutDispatcher<LayoutFormat::NZ, fp4x2_e2m1_t> {
+struct LayoutDispatcher<LayoutFormat::NZ, T, typename Std::enable_if_t<is_b4_type<T>>> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
         return LayoutConstructor(Std::Int<FRACTAL_FIXED>{},  CeilDivision(row, FRACTAL_FIXED), 
                                 Std::Int<C0_SIZE * 2>{},  CeilDivision(column, (C0_SIZE * 2)), 

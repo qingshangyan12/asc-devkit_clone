@@ -65,6 +65,18 @@ inline constexpr bool is_one_of_attr_v = Std::is_one_of_v<ElementType, __gm__ Da
 template <typename DataType>
 inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t> || is_one_of_attr_v<DataType, fp4x2_e2m1_t>;
 
+template <typename T>
+struct IsFP4x2Type : Std::false_type {};
+
+template <typename T>
+struct IsFP4x2Type<fp4x2_e1m2_t> : Std::true_type {};
+
+template <typename T>
+struct IsFP4x2Type<fp4x2_e2m1_t> : Std::true_type {};
+
+template <typename T>
+inline constexpr bool is_fp4_v = IsFP4x2Type<T>::value;
+
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define SCALAR_QUANT_MODE QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8,\
     QuantMode_t::QS322BF16_PRE, QuantMode_t::QF322F16_PRE, QuantMode_t::QF322BF16_PRE, QuantMode_t::QF322FP8_PRE,\
