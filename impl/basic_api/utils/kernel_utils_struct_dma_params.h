@@ -71,8 +71,8 @@ struct Nz2NdParams {
     uint16_t srcNdStride = 0;
     uint16_t dstNdStride = 0;
     uint16_t originalNSize = 0;
-};
 #endif
+};
 
 struct Nz2DnParams {
     __aicore__ Nz2DnParams() {}
