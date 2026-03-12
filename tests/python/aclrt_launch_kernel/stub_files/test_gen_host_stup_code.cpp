@@ -136,7 +136,7 @@ uint32_t launch_and_profiling_add_custom(uint64_t func_key, uint32_t numBlocks, 
 extern "C" uint32_t aclrtlaunch_add_custom(uint32_t numBlocks, void* stream, bool bool_1, bool bool_2, uint32_t uint32_1, A* tmpStruct, uint16_t uint16_1, void* x, void* y, void* z, AddCustomTilingData* tiling)
 {
     struct {
-    #if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON
+    #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined ASCENDC_TIME_STAMP_ON
             void* __ascendc_dump;
     #endif
         alignas(((alignof(bool) + 3) >> 2) << 2) bool bool_1;
@@ -152,7 +152,7 @@ extern "C" uint32_t aclrtlaunch_add_custom(uint32_t numBlocks, void* stream, boo
     } __ascendc_args;
 
     uint32_t __ascendc_ret;
-#if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined ASCENDC_TIME_STAMP_ON
     constexpr uint32_t __ascendc_one_core_dump_size = 1048576;
     AllocAscendMemDevice(&(__ascendc_args.__ascendc_dump), __ascendc_one_core_dump_size * 75);
 #endif
@@ -171,7 +171,7 @@ extern "C" uint32_t aclrtlaunch_add_custom(uint32_t numBlocks, void* stream, boo
     const char *__ascendc_name = "add_custom";
     __ascendc_ret = launch_and_profiling_add_custom(0, numBlocks, stream, (void **)&__ascendc_args, sizeof(__ascendc_args));
     KernelHandleGradUnregister::GetInstance();
-#if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined ASCENDC_TIME_STAMP_ON
     Adx::AdumpPrintWorkSpace(__ascendc_args.__ascendc_dump, __ascendc_one_core_dump_size * 75, stream, __ascendc_name);
     FreeAscendMemDevice(__ascendc_args.__ascendc_dump);
 #endif
