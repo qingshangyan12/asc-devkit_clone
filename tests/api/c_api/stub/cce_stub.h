@@ -32,6 +32,11 @@ void vsts(vector_f8e8m0 src0, vector_f8e8m0 src1, __ubuf__ fp8_e8m0_t* base, int
 void vsts(vector_f4e2m1x2 src0, vector_f4e2m1x2 src1, __ubuf__ fp4x2_e2m1_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 
+inline void set_mad_hif8() {}
+inline void set_mad_tf32() {}
+inline void set_mad_tf32_round_mode() {}
+inline void set_loop_size_l1toout(uint64_t config) {}
+
 #if defined(__DAV_CUBE__)
     inline int32_t g_coreType = 1;
 #else
