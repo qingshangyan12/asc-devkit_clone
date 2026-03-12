@@ -1,0 +1,79 @@
+/**
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+#include <gtest/gtest.h>
+#include <mockcpp/mockcpp.hpp>
+#include "tests/api/c_api/stub/cce_stub.h"
+#include "include/c_api/asc_simd.h"
+
+class TestVectorDatamoveLoadAlignPlds : public testing::Test {
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
+
+namespace {
+void plds_stub(vector_bool &dst, __ubuf__ uint32_t *src, int32_t offset, Literal dist) {
+    EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
+    EXPECT_EQ(offset, static_cast<int32_t>(0));
+    EXPECT_EQ(dist, static_cast<Literal>(Literal::NORM));
+}
+
+void plds_upsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, int32_t offset, Literal dist) {
+    EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
+    EXPECT_EQ(offset, static_cast<int32_t>(0));
+    EXPECT_EQ(dist, static_cast<Literal>(Literal::US_B8));
+}
+
+void plds_downsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, int32_t offset, Literal dist) {
+    EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
+    EXPECT_EQ(offset, static_cast<int32_t>(0));
+    EXPECT_EQ(dist, static_cast<Literal>(Literal::DS_B8));
+}
+}
+
+TEST_F(TestVectorDatamoveLoadAlignPlds, LoadAlignPlds_Succ)
+{
+    vector_bool dst = asc_create_mask_b16(PAT_ALL);
+    __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
+    
+    MOCKER_CPP(plds, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))       \
+        .times(1)                                                                               \
+        .will(invoke(plds_stub));
+
+    asc_loadalign(dst, src);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPldUpsample_Succ)
+{
+    vector_bool dst = asc_create_mask_b16(PAT_ALL);
+    __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
+    
+    MOCKER_CPP(plds, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))       \
+        .times(1)                                                                               \
+        .will(invoke(plds_upsample_stub));
+
+    asc_loadalign_upsample(dst, src);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPldDownsample_Succ)
+{
+    vector_bool dst = asc_create_mask_b16(PAT_ALL);
+    __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
+    
+    MOCKER_CPP(plds, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))       \
+        .times(1)                                                                               \
+        .will(invoke(plds_downsample_stub));
+
+    asc_loadalign_downsample(dst, src);
+    GlobalMockObject::verify();
+}
