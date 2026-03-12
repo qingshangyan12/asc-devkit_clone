@@ -35,7 +35,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_MICRO_CASE_SRC_FILES
 
 # mc62cm12aa micro test cases
 file(GLOB ASCENDC_TEST_mc62cm12aa_MICRO_CASE_SRC_FILES
-    ascendc_case_mc62cm12aa_micro/*.cpp
+    ascendc_case_mc62cm12aa_reg_compute/*.cpp
 )
 
 foreach(product_type ${MICRO_PRODUCT_TYPE_LIST})
