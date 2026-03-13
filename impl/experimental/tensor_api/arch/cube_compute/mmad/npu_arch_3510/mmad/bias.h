@@ -16,9 +16,7 @@
 #define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_BIAS_H
 
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/instruction.h"
-
-#include "impl/experimental/tensor_api/arch/utils/check_format.h"
-#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
+#include "impl/experimental/tensor_api/arch/utils/utils.h"
 
 namespace AscendC {
 namespace Te {
@@ -35,18 +33,11 @@ private:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
     __aicore__ inline constexpr void CheckTemplate()
     {
-        using dstDataType = typename T::elementType;
-        using fmDataType = typename U::elementType;
-        using filterDataType = typename S::elementType;
-        using biasDataType = typename V::elementType;
-        constexpr auto biasPos = GetHardPos<V>();
-
         CheckFormat::CheckL0CNZTemplate<T>();
         CheckFormat::CheckNZTemplate<U>();
         CheckFormat::CheckZNTemplate<S>();
         CheckFormat::CheckNDTemplate<V>();        
-        CheckDataTypeFor3510::CheckMmadDataType<biasPos, dstDataType, fmDataType, filterDataType, biasDataType>();
-
+        CheckDataTypeFor3510::CheckMmadBiasDataType<T, U, S, V>();
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
@@ -57,17 +48,14 @@ private:
         constexpr auto biasPos = GetHardPos<V>();
         auto fmLayout = fm.Layout();
         auto dstLayout = dst.Layout();
-
-        uint16_t m = GetEleFromLayout<decltype(fmLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(fmLayout) * FRACTAL_FIXED;
-        uint16_t k = GetEleFromLayout<decltype(fmLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(fmLayout) * C0_SIZE / sizeof(fmType);
-        uint16_t n = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) * FRACTAL_FIXED;
+ 
         bool cmatrixSource = false;
         if (biasPos == Hardware::BIAS) {
             cmatrixSource = true;
         }
         MmadBiasInstr mmadBiasInstr;
-        mmadBiasInstr.Mmad(dst, fm, filter, bias, m, k, n, params.unitFlag, trait.disableGemv, cmatrixSource, 
-            params.cmatrixInitVal);
+        mmadBiasInstr.Mmad(dst, fm, filter, bias, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, cmatrixSource, 
+            false);
     }
 };
 
