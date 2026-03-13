@@ -23,14 +23,14 @@ namespace Te {
 class MmadMx {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>    
-    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
+    __aicore__ inline static void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
     {   
         MmadImpl<trait, T, U, S>(dst, fm, filter, params);
     }
 
 private:
     template <const MmadTrait& trait, typename T, typename U, typename S>
-    __aicore__ inline constexpr void CheckTemplate()
+    __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckFormat::CheckL0CNZTemplate<T>();
         CheckFormat::CheckNZTemplate<U>();
@@ -39,12 +39,9 @@ private:
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
+    __aicore__ inline static void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
     {
         CheckTemplate<trait, T, U, S>();
-        using fmType = typename U::elementType;
-        auto fmLayout = fm.Layout();
-        auto dstLayout = dst.Layout();
 
         MmadMxInstr mmadMxInstr;
         mmadMxInstr.Mmad(dst, fm, filter, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, trait.cmatrixSource, 

@@ -23,13 +23,13 @@ namespace Te {
 class CopyL12FBBase {
 public:
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline void Run(const T& dst, const U& src) {
+    __aicore__ inline static void Run(const T& dst, const U& src) {
         DataCopyImpl<trait, T, U>(dst, src);
     }
 
 private:
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline constexpr void CheckTemplate()
+    __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckDataTypeFor3510::CheckL12FbDataType<T, U>();
 
@@ -41,7 +41,7 @@ private:
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline auto DataCopyImpl(const T& dst, const U& src)
+    __aicore__ inline static auto DataCopyImpl(const T& dst, const U& src)
     {
         constexpr uint32_t C2PIPE2GM_UNIT = C0_SIZE * 2;
         CheckTemplate<trait, T, U>();

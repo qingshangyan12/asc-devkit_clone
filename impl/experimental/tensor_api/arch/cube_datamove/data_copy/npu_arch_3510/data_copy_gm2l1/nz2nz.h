@@ -23,13 +23,13 @@ namespace Te {
 class CopyGmToCbufAlignV2NZBase {
 public:
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline void Run(const T& dst, const U& src) {
+    __aicore__ inline static void Run(const T& dst, const U& src) {
         DataCopyImpl<trait, T, U>(dst, src);
     }
 
 private:
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline constexpr void CheckTemplate()
+    __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckFormat::CheckNZTemplate<T>();
         CheckFormat::CheckNZTemplate<U>();
@@ -37,7 +37,7 @@ private:
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline void DataCopyImpl(const T& dst, const U& src)
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
     {
         CheckTemplate<trait, T, U>();
 

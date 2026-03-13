@@ -9,51 +9,48 @@
 */
 
 /*!
- * \file mx_bias.h
+ * \file bias.h
  * \brief
  */
-#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_MX_BIAS_H
-#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_MX_BIAS_H
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_BIAS_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_BIAS_H
 
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/instruction.h"
 
 namespace AscendC {
 namespace Te {
 
-class MmadMxBias {
+class MmadBias {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>    
-    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) 
+    __aicore__ inline static void Run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) 
     {
         MmadImpl<trait, T, U, S, V>(dst, fm, filter, bias, params);
     }
 
 private:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
-    __aicore__ inline constexpr void CheckTemplate()
+    __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckFormat::CheckL0CNZTemplate<T>();
         CheckFormat::CheckNZTemplate<U>();
         CheckFormat::CheckZNTemplate<S>();
-        CheckFormat::CheckNDTemplate<V>();        
-        CheckDataTypeFor3510::CheckMxMmadBiasDataType<T, U, S, V>();
+        CheckFormat::CheckNDTemplate<V>();
+        CheckDataTypeFor3510::CheckMmadBiasDataType<T, U, S, V>();
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
+    __aicore__ inline static void MmadImpl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
     {
         CheckTemplate<trait, T, U, S, V>();
-        using fmType = typename U::elementType;
         constexpr auto biasPos = GetHardPos<V>();
-        auto fmLayout = fm.Layout();
-        auto dstLayout = dst.Layout();
-
+ 
         bool cmatrixSource = false;
         if (biasPos == Hardware::BIAS) {
             cmatrixSource = true;
         }
-        MmadMxBiasInstr mmadMxBiasInstr;
-        mmadMxBiasInstr.Mmad(dst, fm, filter, bias, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, cmatrixSource, 
+        MmadBiasInstr mmadBiasInstr;
+        mmadBiasInstr.Mmad(dst, fm, filter, bias, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, cmatrixSource, 
             false);
     }
 };
