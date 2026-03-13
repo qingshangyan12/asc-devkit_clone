@@ -21,17 +21,17 @@
 namespace AscendC {
 namespace Te {
 
-class Mmad3510{
+class Mmad3510 {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
+    template <const MmadTrait& trait, typename T, typename U, typename S>
+    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const MmadParams& params) 
     {   
         Execute<trait, T, U, S>(dst, fm, filter, params);
     }
 
 private:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const Params& params) {
+    template <const MmadTrait& trait, typename T, typename U, typename S>
+    __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const MmadParams& params) {
   
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             if constexpr (trait.mmadType == MmadTrait::MmadType::NORMAL) {

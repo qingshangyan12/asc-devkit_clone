@@ -23,8 +23,8 @@ namespace Te {
 
 class MmadBias {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>    
-    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) 
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename V>    
+    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params) 
     {
         MmadImpl<trait, T, U, S, V>(dst, fm, filter, bias, params);
     }
@@ -40,8 +40,8 @@ private:
         CheckDataTypeFor3510::CheckMmadBiasDataType<T, U, S, V>();
     }
 
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
+    __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params)
     {
         CheckTemplate<trait, T, U, S, V>();
         using fmType = typename U::elementType;

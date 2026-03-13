@@ -23,8 +23,8 @@ namespace Te {
 
 class MmadNormal {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>    
-    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
+    template <const MmadTrait& trait, typename T, typename U, typename S>    
+    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const MmadParams& params) 
     {   
         MmadImpl<trait, T, U, S>(dst, fm, filter, params);
     }
@@ -39,8 +39,8 @@ private:
         CheckDataTypeFor3510::CheckMmadDataType<T, U, S>();
     }
 
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
+    template <const MmadTrait& trait, typename T, typename U, typename S>
+    __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const MmadParams& params)
     {
         CheckTemplate<trait, T, U, S>();
         using fmType = typename U::elementType;

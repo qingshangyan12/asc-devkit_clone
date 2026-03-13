@@ -24,8 +24,8 @@ namespace Te {
 class MmadGenParams2201
 {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const Params& params)
+    template <const MmadTrait& trait, typename T, typename U, typename S>
+    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const MmadParams& params)
     {
         return GenParamsImpl<trait, T, U, S, Params>(dst, fm, filter, params);
     }
@@ -39,8 +39,8 @@ private:
         CheckDataTypeFor2201::CheckMmadDataType<T, U, S>();
     }
 
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter, const Params& params)
+    template <const MmadTrait& trait, typename T, typename U, typename S>
+    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter, const MmadParams& params)
     {
         CheckTemplate<trait, T, U, S>();
         using fmType = typename U::elementType;

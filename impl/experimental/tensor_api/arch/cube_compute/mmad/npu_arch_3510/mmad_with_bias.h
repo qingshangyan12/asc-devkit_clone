@@ -23,15 +23,15 @@ namespace Te {
 
 class MmadWithBias3510{
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) 
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
+    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params) 
     {   
         Execute<trait, T, U, S, V, Params>(dst, fm, filter, bias, params);
     }
 
 private:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) {
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
+    __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params) {
 
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
             if constexpr (trait.mmadType == MmadTrait::MmadType::NORMAL) {

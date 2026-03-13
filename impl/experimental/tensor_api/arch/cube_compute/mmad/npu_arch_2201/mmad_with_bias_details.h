@@ -24,8 +24,8 @@ namespace Te {
 class MmadWithBiasGenParams2201
 {
 public:
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
+    __aicore__ inline auto GenParams(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params)
     {
         return GenParamsImpl<trait, T, U, S, V, Params>(dst, fm, filter, bias, params);
     }
@@ -40,8 +40,8 @@ private:
         CheckDataTypeFor2201::CheckMmadBiasDataType<T, U, S, V>();
     }
 
-    template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
-    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
+    __aicore__ inline auto GenParamsImpl(const T& dst, const U& fm, const S& filter, const V& bias, const MmadParams& params)
     {
         CheckTemplate<trait, T, U, S, V>();
         using fmType = typename U::elementType;
