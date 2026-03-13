@@ -19,15 +19,8 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint8_t sync_id)
-{
-    set_intra_block(pipe, sync_id);
-}
+#define asc_sync_intra_arrive_impl(pipe, sync_id) set_intra_block(pipe, sync_id)
 
-__aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint64_t sync_id)
-{
-    set_intra_block(pipe, sync_id);
-}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

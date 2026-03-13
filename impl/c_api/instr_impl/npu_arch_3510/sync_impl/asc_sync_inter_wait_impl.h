@@ -19,15 +19,8 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, uint8_t flag_id)
-{
-    wait_flag_dev(pipe, flag_id);
-}
+#define asc_sync_inter_wait_impl(pipe, flag_id) wait_flag_dev(pipe, flag_id)
 
-__aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, int64_t flag_id)
-{
-    wait_flag_dev(pipe, flag_id);
-}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

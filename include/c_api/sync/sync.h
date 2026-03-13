@@ -47,6 +47,30 @@ __aicore__ inline void asc_sync_block_wait(int64_t flagID);
 
 __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flagID);
+
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flagID);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint8_t sync_id);
+
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id);
+
+__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint8_t sync_id);
+
+__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id);
+
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint8_t flag_id)
+
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id);
+
+__aicore__ inline void asc_release_buf(pipe_t pipe, uint8_t buf_id, bool mode);
+
+__aicore__ inline void asc_release_buf(pipe_t pipe, uint64_t buf_id, bool mode);
+
+#endif
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  

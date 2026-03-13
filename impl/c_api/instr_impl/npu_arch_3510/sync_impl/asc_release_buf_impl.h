@@ -20,15 +20,8 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_release_buf_impl(pipe_t pipe, uint8_t buf_id, bool mode)
-{
-    rls_buf(pipe, buf_id, mode);
-}
+#define asc_release_buf_impl(pipe, buf_id, mode) rls_buf(pipe, buf_id, mode)
 
-__aicore__ inline void asc_release_buf_impl(pipe_t pipe, uint64_t buf_id, bool mode)
-{
-    rls_buf(pipe, buf_id, mode);
-}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)  

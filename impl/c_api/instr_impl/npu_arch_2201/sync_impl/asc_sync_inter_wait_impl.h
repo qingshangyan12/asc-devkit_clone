@@ -20,10 +20,7 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h" 
 
-__aicore__ inline void asc_sync_inter_wait_impl(int64_t flagID)
-{
-    wait_flag_dev(flagID);
-}
+#define asc_sync_inter_wait_impl(flagID) wait_flag_dev(flagID)
 
 #endif
 
