@@ -21,7 +21,7 @@
 namespace AscendC {
 namespace Te {
 
-class Mmad3510{
+class Mmad3510 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
     __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
@@ -32,17 +32,13 @@ public:
 private:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
     __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const Params& params) {
-  
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            if constexpr (trait.mmadType == MmadTrait::MmadType::NORMAL) {
-                MmadNormal normalStrategy;
-                normalStrategy.Run<trait, T, U, S, Params>(dst, fm, filter, params);
-            } else if constexpr (trait.mmadType == MmadTrait::MmadType::MX) {
-                MmadMx mxStrategy;
-                mxStrategy.Run<trait, T, U, S, Params>(dst, fm, filter, params);
-            }
+        if constexpr (trait.mmadType == MmadTrait::MmadType::NORMAL) {
+            MmadNormal normalStrategy;
+            normalStrategy.Run<trait, T, U, S>(dst, fm, filter, params);
+        } else if constexpr (trait.mmadType == MmadTrait::MmadType::MX) {
+            MmadMx mxStrategy;
+            mxStrategy.Run<trait, T, U, S>(dst, fm, filter, params);
         }
-
     }
 };
 
