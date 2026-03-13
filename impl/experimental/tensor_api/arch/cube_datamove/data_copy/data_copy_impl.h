@@ -38,7 +38,7 @@ DataCopy(const T& dst, const U& src)
     constexpr Hardware dstTPos = GetHardPos<T>();
     constexpr Hardware srcTPos = GetHardPos<U>();
     using Tensor2Tensor = typename
-        DataCopyTensor2Tensor<dstTPos, srcTPos, CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
+        DataCopyTensor2Tensor<dstTPos, srcTPos, CURRENT_ARCH_VERSION>::type;
     Tensor2Tensor{}.template Run<trait, T, U>(dst, src);
 }
 
@@ -49,7 +49,7 @@ DataCopy(const T& dst, const U& src, const Coord& coord)
     constexpr Hardware dstTPos = GetHardPos<T>();
     constexpr Hardware srcTPos = GetHardPos<U>();
     using Tensor2Tensor = typename
-        DataCopyTensor2Tensor<dstTPos, srcTPos, CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
+        DataCopyTensor2Tensor<dstTPos, srcTPos, CURRENT_ARCH_VERSION>::type;
     Tensor2Tensor{}.template Run<trait, T, U, Coord>(dst, src, coord);
 }
 

@@ -44,10 +44,7 @@ private:
     __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
     {
         CheckTemplate<trait, T, U, S, V>();
-        using fmType = typename U::elementType;
         constexpr auto biasPos = GetHardPos<V>();
-        auto fmLayout = fm.Layout();
-        auto dstLayout = dst.Layout();
  
         bool cmatrixSource = false;
         if (biasPos == Hardware::BIAS) {

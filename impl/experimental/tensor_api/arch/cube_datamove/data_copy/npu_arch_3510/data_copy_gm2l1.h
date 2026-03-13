@@ -28,7 +28,7 @@
 namespace AscendC {
 namespace Te {
 
-class DataCopyFourDim3510GM2L1 {
+class DataCopy3510GM2L1 {
 public:
     template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline void Run(const T& dst, const U& src) {
