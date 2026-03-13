@@ -26,7 +26,10 @@
 #include "kernel_tensor.h"
 #include "utils/kernel_utils_constants.h"
 #include "utils/kernel_utils_macros.h"
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "kernel_operator_mm_bitmode_intf.h"
+#endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
