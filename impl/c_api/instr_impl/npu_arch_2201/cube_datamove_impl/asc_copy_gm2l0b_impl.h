@@ -9,15 +9,15 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_copy_gm2l0b_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#warning "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_gm2l0b_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_DATAMOVE_IMPL_ASC_COPY_GM2L0B_IMPL_H
-#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_DATAMOVE_IMPL_ASC_COPY_GM2L0B_IMPL_H
+#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_COPY_GM2L0B_IMPL_H
+#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_CUBE_DATAMOVE_IMPL_ASC_COPY_GM2L0B_IMPL_H
 
-#include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
+#include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride)
 {
@@ -66,19 +66,6 @@ __aicore__ inline void asc_copy_gm2l0b_impl(__cb__ int32_t* dst, __gm__ int32_t*
 }
 
 __aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride)
-{
-    asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
-    asc_sync_post_process();
-}
-
-__aicore__ inline void asc_copy_gm2l0b_impl(__cb__ int64_t* dst, __gm__ int64_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_stride, 0, addr_cal_mode_t::inc);
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l0b_sync_impl(__cb__ int64_t* dst, __gm__ int64_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride)
 {
     asc_copy_gm2l0b_impl(dst, src, base_idx, repeat, src_stride, dst_stride);
     asc_sync_post_process();
