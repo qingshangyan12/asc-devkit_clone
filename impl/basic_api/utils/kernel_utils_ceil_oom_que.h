@@ -366,7 +366,7 @@ template <typename T, int U, int... Args> __aicore__ constexpr bool SupportBytes
     }
     return sizeof(T) == U;
 }
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
 template <auto T, auto U, auto... Args> __aicore__ constexpr bool SupportEnum()
 {
     if constexpr (sizeof...(Args) > 0) {
