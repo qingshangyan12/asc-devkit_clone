@@ -1329,6 +1329,97 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  fp4x2_e1m2_t*&
     asc_storeunalign_postupdate_impl(dst, src0, src1, count);
 }
 
+// ==========asc_storeunalign_postupdate(u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int8_t*& dst, vector_store_align& src0,
+    vector_int8_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  uint8_t*& dst, vector_store_align& src0,
+    vector_uint8_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int16_t*& dst, vector_store_align& src0,
+    vector_int16_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  uint16_t*& dst, vector_store_align& src0,
+    vector_uint16_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int32_t*& dst, vector_store_align& src0,
+    vector_int32_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  uint32_t*& dst, vector_store_align& src0,
+    vector_uint32_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+    
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int64_t*& dst, vector_store_align& src0,
+    vector_int64_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  half*& dst, vector_store_align& src0,
+    vector_half src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  float*& dst, vector_store_align& src0,
+    vector_float src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  bfloat16_t*& dst, vector_store_align& src0,
+    vector_bfloat16_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  fp8_e4m3fn_t*& dst, vector_store_align& src0,
+    vector_fp8_e4m3fn_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  fp8_e5m2_t*& dst, vector_store_align& src0,
+    vector_fp8_e5m2_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  fp8_e8m0_t*& dst, vector_store_align& src0,
+    vector_fp8_e8m0_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  fp4x2_e2m1_t*& dst, vector_store_align& src0,
+    vector_fp4x2_e2m1_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  fp4x2_e1m2_t*& dst, vector_store_align& src0,
+    vector_fp4x2_e1m2_t src1)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, src1);
+}
+
 // ==========通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址=========
 // ==========asc_storeunalign_postupdate(u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int8_t* dst, vector_store_align& src0,
@@ -4795,6 +4886,82 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__  float* dst, vector_s
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__  int64_t* dst, vector_store_align src, int32_t offset)
 {
     asc_storeunalign_post_impl(dst, src, offset);
+}
+
+//===========asc_storeunalign_post(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float/int64)===========
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  int8_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  uint8_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  fp4x2_e2m1_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  fp4x2_e1m2_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  fp8_e8m0_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  fp8_e5m2_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  fp8_e4m3fn_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  int16_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  uint16_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  half* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  bfloat16_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  int32_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  uint32_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  float* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storeunalign_post(__ubuf__  int64_t* dst, vector_store_align src)
+{
+    asc_storeunalign_post_impl(dst, src);
 }
 
 
