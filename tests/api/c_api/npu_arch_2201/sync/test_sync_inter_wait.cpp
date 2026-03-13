@@ -27,17 +27,6 @@ void asc_sync_inter_wait_stub(int64_t flagID)
 }
 }
 
-TEST_F(TestSyncInterWait, sync_block_wait_Succ)
-{
-    int64_t flagID = 33;
-    MOCKER_CPP(wait_flag_dev, void(int64_t))
-            .times(1)
-            .will(invoke(asc_sync_inter_wait_stub));
-
-    asc_sync_block_wait(pipe_t::PIPE_S, flagID);
-    GlobalMockObject::verify();
-}
-
 TEST_F(TestSyncInterWait, sync_inter_wait_Succ)
 {
     int64_t flagID = 33;

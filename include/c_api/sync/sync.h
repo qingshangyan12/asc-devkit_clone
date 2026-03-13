@@ -47,7 +47,7 @@ __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
-__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flagID);
+#define asc_sync_block_wait(pipe, flagID) wait_flag_dev(flagID)
 
 #define asc_sync_inter_wait(pipe, flagID) wait_flag_dev(flagID)
 
