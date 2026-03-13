@@ -2,7 +2,7 @@
 
 ## 环境安装
 
-### 使用显卡和Docker的场景
+### 使用Docker的场景
 
 Docker安装环境以Atlas A2产品为例。
 
