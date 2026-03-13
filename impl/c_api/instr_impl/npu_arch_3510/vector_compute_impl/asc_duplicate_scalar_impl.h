@@ -96,4 +96,12 @@ __simd_callee__ inline void asc_duplicate_scalar_impl(vector_float& dst, float v
         vdup(dst, value, mask, MODE_ZEROING);
     }
 }
+
+__simd_callee__ inline void asc_duplicate_scalar_impl(vector_float& dst, float src)
+{
+    if ASC_IS_AIV {
+        vbr(dst, src);
+    }
+}
+
 #endif

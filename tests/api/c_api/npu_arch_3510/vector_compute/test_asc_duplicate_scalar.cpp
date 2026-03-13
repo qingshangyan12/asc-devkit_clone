@@ -51,3 +51,26 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, bf
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, uint32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, float);
+
+class TestVectorComputeVbrCApi : public testing::Test {
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
+
+namespace {
+void vbr_float_Stub(vector_float& dst, float src) {}
+}
+
+TEST_F(TestVectorComputeVbrCApi, asc_duplicate_scalar_vbr_Succ)
+{
+    vector_float dst;
+    float src;
+
+    MOCKER_CPP(vbr, void(vector_float&, float))
+        .times(1)
+        .will(invoke(vbr_float_Stub));
+
+    asc_duplicate_scalar(dst, src);
+    GlobalMockObject::verify();
+}

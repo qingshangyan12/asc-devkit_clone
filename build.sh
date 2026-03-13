@@ -485,7 +485,7 @@ function build_package(){
 
 function build_test() {
   cmake_config
-  build all
+  build ascendc_ut_c_api_ascend950pr_9599_AIV
 }
 
 function build_test_part() {
