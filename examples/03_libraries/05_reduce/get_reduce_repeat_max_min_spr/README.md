@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍基础api GetReduceRepeatMaxMinSpr的调用，GetReduceRepeatMaxMinSpr的功能是获取ReduceMax、ReduceMin连续场景下的最大/最小值以及相应的索引值。
+本样例介绍基础api [GetReduceRepeatMaxMinSpr](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0226.html)的调用，GetReduceRepeatMaxMinSpr的功能是获取ReduceMax、ReduceMin连续场景下的最大/最小值以及相应的索引值。
 
 ## 支持的产品
 
@@ -26,19 +26,16 @@
 - 算子规格：  
   <table> 
   <tr><td rowspan="2" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">[256]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">[256]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">kernel_get_reduce_repeat_max_min_spr</td></tr>  
   </table>
 
-- 算子实现：  
-  本样例中实现的是GetReduceRepeatMaxMinSpr算子。
+- Kernel实现  
+  GetReduceRepeatMaxMinSpr样例主要使用WholeReduceMax/WholeReduceMin获取准确的索引值，然后调用GetReduceRepeatMaxMinSpr获取最大/最小值，以及其对应的索引值，并将结果搬运至Global Memory上的输出Tensor dstGm。
 
-  - Kernel实现  
-    GetReduceRepeatMaxMinSpr算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责WholeReduceMax/WholeReduceMin获取准确的索引值，然后立即调用GetReduceRepeatMaxMinSpr获取最大/最小值，以及其对应的索引值，并存储到dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
-
-  - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+- 调用实现  
+  使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
