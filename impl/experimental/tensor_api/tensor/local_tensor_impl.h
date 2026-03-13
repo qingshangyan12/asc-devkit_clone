@@ -124,22 +124,14 @@ struct LocalTensor<TensorAttribute<EngineType, LayoutType>> {
 
 	template <typename Coord, typename Shape>
  	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) {
-        if constexpr (is_b4_type<elementType>) {
-            auto iter = Data() + (Layout()(coord) >> 1);
-        } else {
- 	        auto iter = Data() + Layout()(coord);
-        }
+ 	    auto iter = Data() + Layout()(coord);
  	    auto tileLayout = MakeTileLayout(Layout(), shape);
  	    return MakeTensor(iter, tileLayout);
  	}
  	 
  	template <typename Coord, typename Shape>
  	__aicore__ inline constexpr decltype(auto) operator()(const Coord& coord, const Shape& shape) const {
-        if constexpr (is_b4_type<elementType>) {
-            auto iter = Data() + (Layout()(coord) >> 1);
-        } else {
- 	        auto iter = Data() + Layout()(coord);
-        }
+ 	    auto iter = Data() + Layout()(coord);
  	    auto tileLayout = MakeTileLayout(Layout(), shape);
  	    return MakeTensor(iter, tileLayout);
  	}
