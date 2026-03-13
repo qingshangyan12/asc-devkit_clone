@@ -1,6 +1,6 @@
 # DataCopy随路转换NZ2ND搬运样例
 ## 概述
-本样例基于DataCopy实现数据搬运，可用于在数据搬运时进行NZ到ND格式的转换。
+本样例基于[DataCopy](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_00128.html)实现数据搬运，可用于在数据搬运时进行NZ到ND格式的转换。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -36,7 +36,7 @@
 
 - 算子实现：  
   - kernel实现   
-    CopyCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务调用了负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，在数据搬运时进行NZ到ND格式的转换。Compute任务负责将srcLocal搬运到dstLocal中。CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    CopyCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务调用DataCopy接口将Global Memory上的输入Tensor srcGm连续非对齐搬入srcLocal中，在数据搬运时进行NZ到ND格式的转换。Compute任务负责将srcLocal搬运到dstLocal中。CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

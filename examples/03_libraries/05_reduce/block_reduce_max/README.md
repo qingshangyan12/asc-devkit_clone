@@ -1,6 +1,6 @@
 # BlockReduceMax样例
 ## 概述
-本样例基于BlockReduceMax实现最大值归约，可用于对每个datablock内所有元素求最大值。
+本样例基于[BlockReduceMax](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0082.html)实现最大值归约，可用于对每个datablock内所有元素求最大值。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -17,9 +17,9 @@
 │   └── block_reduce_max.asc      // Ascend C算子实现 & 调用样例
 ```
 
-## 算子描述
-- 算子功能：  
-  BlockReduceMaxCustom算子对每个datablock内所有元素求最大值。
+## 样例描述
+- 样例功能：  
+  该样例是对每个datablock内所有元素求最大值。请参考[归约指令](https://www.hiascend.com/document/detail/zh/canncommercial/850/opdevg/Ascendcopdevg/atlas_ascendc_10_0023.html)的总体介绍。
 - 算子规格：  
   <table>
   <tr>
@@ -27,19 +27,19 @@
   <td colspan="4" align="center">BlockReduceMax</td></tr>
   <tr><td rowspan="3" align="center">算子输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">128</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">[128]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">算子输出</td></tr>
-  <tr><td align="center">y</td><td align="center">64</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[64]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">block_reduce_max_custom</td></tr>
   </table>
-- 算子实现：  
-  本样例中实现的是固定shape为输入x[128]，输出y[64]的BlockReduceMaxCustom算子。
+- 样例实现：  
+  本样例中实现的是固定shape为输入x[128]，输出y[64]。
 
   - Kernel实现
 
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用BlockReduceMax接口完成计算，得到最终结果，再搬出到外部存储上。
 
-    BlockReduceMaxCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal每个datablock内所有元素求最大值，并将结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    该样例的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm存储在srcLocal中，Compute任务负责对srcLocal每个datablock内所有元素求最大值，并将结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
 
 
