@@ -36,6 +36,8 @@ inline void pld(vector_bool& dst, __ubuf__ uint32_t* src, vector_address offset,
 inline void plds(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset, Dist dist) {} 
 inline void plds(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset, Dist dist, Post post) {}
 
+inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
+
 // ==========vstar===========
 inline void vstar(vector_align data, __ubuf__ fp8_e4m3fn_t* base) {}
 inline void vstar(vector_align data, __ubuf__ fp8_e5m2_t* base) {}
