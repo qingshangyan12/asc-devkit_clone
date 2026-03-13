@@ -23,20 +23,20 @@ namespace Te {
 class CopyGmToCbufMultiDn2ZnBase {
 public:
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline void Run(const T& dst, const U& src) {
+    __aicore__ inline static void Run(const T& dst, const U& src) {
         DataCopyImpl<trait>(dst, src);
     }
 
 private:
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline constexpr void CheckTemplate() {
+    __aicore__ inline static constexpr void CheckTemplate() {
         CheckFormat::CheckDNTemplate<U>();
         CheckFormat::CheckZNTemplate<T>();
         CheckDataTypeFor3510::CheckGm2L1Fp4DataType<T, U>();
     }
 
     template <const DataCopyTrait& trait, typename T, typename U>
-    __aicore__ inline void DataCopyImpl(const T& dst, const U& src) {
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src) {
         CheckTemplate<trait, T, U>();
 
         using type = typename U::elementType;

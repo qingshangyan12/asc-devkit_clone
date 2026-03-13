@@ -9,45 +9,41 @@
 */
 
 /*!
- * \file mx.h
+ * \file normal_impl.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_MX_H
-#define IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_MX_H
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_NORMAL_IMPL_H
+#define IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_NORMAL_IMPL_H
 
 #include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/instruction.h"
 
 namespace AscendC {
 namespace Te {
 
-class MmadMx {
+class MmadNormal {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>    
-    __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
-    {   
+    __aicore__ inline static void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
+    {
         MmadImpl<trait, T, U, S>(dst, fm, filter, params);
     }
 
 private:
     template <const MmadTrait& trait, typename T, typename U, typename S>
-    __aicore__ inline constexpr void CheckTemplate()
+    __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckFormat::CheckL0CNZTemplate<T>();
         CheckFormat::CheckNZTemplate<U>();
         CheckFormat::CheckZNTemplate<S>();
-        CheckDataTypeFor3510::CheckMxMmadDataType<T, U, S>();
+        CheckDataTypeFor3510::CheckMmadDataType<T, U, S>();
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
-    __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
+    __aicore__ inline static void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
     {
         CheckTemplate<trait, T, U, S>();
-        using fmType = typename U::elementType;
-        auto fmLayout = fm.Layout();
-        auto dstLayout = dst.Layout();
-
-        MmadMxInstr mmadMxInstr;
-        mmadMxInstr.Mmad(dst, fm, filter, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, trait.cmatrixSource, 
+        MmadInstr mmadInstr;
+        mmadInstr.Mmad(dst, fm, filter, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, trait.cmatrixSource, 
             params.cmatrixInitVal);
     }
 };
