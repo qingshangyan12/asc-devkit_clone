@@ -18,6 +18,15 @@
 using namespace AscendC::Te;
 using namespace AscendC;
 
+// set_loop1_stride_outtol1(uint64_t config);
+// set_loop2_stride_outtol1(uint64_t config);
+// set_loop_size_outtol1(uint64_t config);
+// set_pad_val_outtol1(uint64_t config);
+// copy_gm_to_cbuf_align_v2(half* dst, half* src, uint8_t sid, uint32_t burst_num, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+// copy_gm_to_cbuf_multi_nd2nz(half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
+// copy_gm_to_cbuf_multi_dn2nz(half* dst, half* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
+// set_mte2_nz_para(uint64_t para);
+
 struct CopyGm2L1AlignV2Capture {
     void* dst = nullptr;
     void* src = nullptr;
@@ -118,8 +127,23 @@ void PrintTensor(const T& src)
     uint32_t N0 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout);
     uint32_t M1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
     uint32_t N1 = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
-    if constexpr (IsNDFormat<T>::value) {
-        std::cout << "ND Layout Result (2D) (" << M1 << ", " << N1 << "): " << std::endl;
+    if constexpr (IsScaleANDFormat<T>::value) {
+        std::cout << "ScaleAND";
+    } else if constexpr (IsNDFormat<T>::value) {
+        std::cout << "ND";
+    } else if constexpr (IsDNFormat<T>::value) {
+        std::cout << "DN";
+    } else if constexpr (IsNZFormat<T>::value) {
+        std::cout << "NZ";
+    } else if constexpr (IsZNFormat<T>::value) {
+        std::cout << "ZN";
+    } else if constexpr (IsZZFormat<T>::value) {
+        std::cout << "ZZ";
+    } else {
+        std::cout << "UnknownLayout";
+    }
+    if (M0 == 1 && N0 == 1) { // for 2D layout, print in 2D format
+        std::cout << " Layout Result (2D) (" << M1 << ", " << N1 << "): " << std::endl;
         for (int i = 0; i < M1; i++) {
             std::cout << i << ":\t";
             for (int j = 0; j < N1; j++) {
@@ -132,8 +156,8 @@ void PrintTensor(const T& src)
             }
             std::cout << std::endl;
         }
-    } else if constexpr (IsNZFormat<T>::value) {
-        std::cout << "NZ Layout Result (4D) (" << M1 << ", " << N1 << ", " << M0 << ", " << N0 << "): " << std::endl;
+    } else { // for NZ, ZN, ZZ, print in 4D format
+        std::cout << " Layout Result (4D) (" << M1 << ", " << N1 << ", " << M0 << ", " << N0 << "): " << std::endl;
         for (int i0 = 0; i0 < M1; i0++) {
             for (int i1 = 0; i1 < M0; i1++) {
                 for (int j0 = 0; j0 < N1; j0++) {
@@ -210,6 +234,167 @@ void SimND2Nz(const T& dst, const U& src, const Coord& coord)
     SimND2Nz(dst, sliceTensor);
 }
 
+template <typename T, typename U>
+void SimDN2Zn(const T& dst, const U& src)
+{
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto dstLayout = dst.Layout();
+    auto srcLayout = src.Layout();
+    auto M = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+    auto N = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    auto srcColStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    uint32_t c0Elements = C0_SIZE / sizeof(srcType);
+    uint32_t M0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout);
+    uint32_t N0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout);
+    uint32_t M1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+    uint32_t N1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+    if constexpr (is_b4_type<srcType>) {
+        // move fp4 as b8, need to be divided by 2
+        M = M >> 1;
+        srcColStride = srcColStride >> 1;
+        M0 = M0 >> 1;
+    }
+    for (uint32_t m1 = 0; m1 < M1; m1++) {
+        for (uint32_t n1 = 0; n1 < N1; n1++) {
+            for (uint32_t n0 = 0; n0 < N0; n0++) {
+                for (uint32_t m0 = 0; m0 < M0; m0++) {
+                    uint32_t srcRow = m1 * M0 + m0;
+                    uint32_t srcCol = n1 * N0 + n0;
+                    uint32_t dstIndex = ((m1 * N1 + n1) * N0 + n0) * M0 + m0;
+                    uint32_t srcRowNAlignC0 = ((M + c0Elements - 1) / c0Elements) * c0Elements;
+                    if (srcCol < N && srcRow < M) {
+                        dst.Data()[dstIndex] = src.Data()[srcCol * srcColStride + srcRow];
+                    } else if (srcCol < N && srcRow >= M && srcRow < srcRowNAlignC0) {
+                        // bottom padding and right not padding, bottom pad to the next C0 boundary
+                        dst.Data()[dstIndex] = static_cast<srcType>(0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+template <typename T, typename U>
+void SimDN2Nz(const T& dst, const U& src)
+{
+    using srcType = typename U::elementType;
+    static_assert(!is_b4_type<srcType>, "DN2NZ does not support b4 type");
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto dstLayout = dst.Layout();
+    auto srcLayout = src.Layout();
+    auto M = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+    auto N = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    auto srcColStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    uint32_t c0Elements = C0_SIZE / sizeof(srcType);
+    uint32_t M0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout);
+    uint32_t N0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout);
+    uint32_t M1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+    uint32_t N1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+    for (uint32_t n1 = 0; n1 < N1; n1++) {
+        for (uint32_t m1 = 0; m1 < M1; m1++) {
+            for (uint32_t m0 = 0; m0 < M0; m0++) {
+                for (uint32_t n0 = 0; n0 < N0; n0++) {
+                    uint32_t srcRow = m1 * M0 + m0;
+                    uint32_t srcCol = n1 * N0 + n0;
+                    uint32_t dstIndex = ((n1 * M1 + m1) * M0 + m0) * N0 + n0;
+                    uint32_t srcColNAlignC0 = ((N + c0Elements - 1) / c0Elements) * c0Elements;
+                    if (srcRow < M && srcCol < N) {
+                        dst.Data()[dstIndex] = src.Data()[srcRow + srcCol * srcColStride];
+                    } else if (srcRow < M && srcCol >= N && srcCol < srcColNAlignC0) {
+                        // right padding and bottom not padding, right pad to the next C0 boundary
+                        dst.Data()[dstIndex] = static_cast<srcType>(0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+template <typename T, typename U>
+void SimScaleAND2Zz(const T& dst, const U& src)
+{
+    static_assert(IsScaleANDFormat<U>::value && IsZZFormat<T>::value);
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto dstLayout = dst.Layout();
+    auto srcLayout = src.Layout();
+    auto M = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+    auto N = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    auto srcRowStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
+
+    uint32_t c0Elements = C0_SIZE / sizeof(srcType);
+    uint32_t M0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout);
+    uint32_t N0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout);
+    uint32_t M1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+    uint32_t N1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+    for (uint32_t m1 = 0; m1 < M1; m1++) {
+        for (uint32_t n1 = 0; n1 < N1; n1++) {
+            for (uint32_t m0 = 0; m0 < M0; m0++) {
+                for (uint32_t n0 = 0; n0 < N0; n0++) {
+                    uint32_t srcRow = m1 * M0 + m0;
+                    uint32_t srcCol = n1 * N0 + n0;
+                    uint32_t dstIndex = ((m1 * N1 + n1) * M0 + m0) * N0 + n0;
+                    uint32_t srcRowNAlignC0 = ((M + c0Elements - 1) / c0Elements) * c0Elements;
+                    if (srcRow < M && srcCol < N) {
+                        dst.Data()[dstIndex] = src.Data()[srcRow * srcRowStride + srcCol];
+                    } else if (srcCol < N && srcRow >= M && srcRow < srcRowNAlignC0) {
+                        // bottom padding and right not padding, bottom pad to the next C0 boundary
+                        // use dn2nz way to pad, which means padding in the raw row direction, actual col direction
+                        dst.Data()[dstIndex] = static_cast<srcType>(0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+template <typename T, typename U>
+void SimScaleADN2Zz(const T& dst, const U& src)
+{
+    static_assert(IsScaleADNFormat<U>::value && IsZZFormat<T>::value);
+    using srcType = typename U::elementType;
+    static_assert(std::is_same_v<srcType, typename T::elementType>, "src and dst element types must be the same");
+    auto dstLayout = dst.Layout();
+    auto srcLayout = src.Layout();
+    auto M = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+    auto SN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout);
+    auto BN = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+    auto N = SN * BN;
+
+    auto srcBColStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout);
+
+    uint32_t c0Elements = C0_SIZE / sizeof(srcType);
+    uint32_t M0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout);
+    uint32_t N0 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout);
+    uint32_t M1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
+    uint32_t N1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+    for (uint32_t m1 = 0; m1 < M1; m1++) {
+        for (uint32_t n1 = 0; n1 < N1; n1++) {
+            for (uint32_t m0 = 0; m0 < M0; m0++) {
+                for (uint32_t n0 = 0; n0 < N0; n0++) {
+                    uint32_t srcRow = m1 * M0 + m0;
+                    uint32_t srcCol = n1 * N0 + n0;
+                    uint32_t dstIndex = ((m1 * N1 + n1) * M0 + m0) * N0 + n0;
+                    uint32_t srcRowNAlignC0 = ((M + c0Elements - 1) / c0Elements) * c0Elements;
+                    if (srcRow < M && srcCol < N) {
+                        dst.Data()[dstIndex] = src.Data()[n1 * srcBColStride + srcRow * 2 + n0];
+                    } else if (srcCol < N && srcRow >= M && srcRow < srcRowNAlignC0) {
+                        // bottom padding and right not padding, bottom pad to the next C0 boundary
+                        // use dn2nz way to pad, which means padding in the raw row direction, actual col direction
+                        dst.Data()[dstIndex] = static_cast<srcType>(0);
+                    }
+                }
+            }
+        }
+    }
+}
+
 template <typename T>
 void SimulateNd2nzDataCopy(T* dst, T* src, uint16_t ndNum, uint64_t loop1SrcStride, uint16_t nValue, uint32_t dValue,
                            uint64_t loop4SrcStride, uint16_t loop2DstStride, uint16_t loop3DstStride,
@@ -254,6 +439,61 @@ void SimulateNd2nzDataCopy(T* dst, T* src, uint16_t ndNum, uint64_t loop1SrcStri
                         uint8_t* dstEleAddr = dstNAddr + k * typeSize;
                         if (srcEleIndex < dValue) {
                             const uint8_t* srcEleAddr = srcNAddr + k * typeSize;
+                            std::copy(srcEleAddr, srcEleAddr + typeSize, dstEleAddr);
+                        } else {
+                            std::fill(dstEleAddr, dstEleAddr + typeSize, 0); // Padding with zeros
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+template <typename T>
+void SimulateDn2nzDataCopy(T* dst, T* src, uint16_t dnNum, uint64_t loop1SrcStride, uint16_t nValue, uint32_t dValue,
+                           uint64_t loop4SrcStride, uint16_t loop2DstStride, uint16_t loop3DstStride,
+                           uint16_t loop4DstStride, bool enableSmallC0)
+{
+    constexpr uint32_t typeSize = sizeof(T);
+    uint32_t c0Elements = C0_SIZE / typeSize; // Number of elements in one C0 block
+    if (enableSmallC0) {
+        for (int h = 0; h < dnNum; h++) {
+            const uint8_t* srcDnAddr = reinterpret_cast<const uint8_t*>(src) + h * loop4SrcStride;
+            uint8_t* dstDnAddr = reinterpret_cast<uint8_t*>(dst) + h * loop4DstStride * C0_SIZE;
+
+            uint16_t nCeil = (nValue + 3) / 4;
+            for (int j = 0; j < nCeil; j++) {
+                const uint8_t* srcNAddr = (j < nValue) ? (srcDnAddr + j * typeSize) : nullptr;
+                uint8_t* dstNAddr = dstDnAddr + j * 4 * typeSize;
+                for (int k = 0; k < 4; k++) {
+                    uint8_t* dstEleAddr = dstNAddr + k * typeSize;
+                    if ((k < dValue) && (srcNAddr != nullptr)) {
+                        const uint8_t* srcEleAddr = srcNAddr + k * loop1SrcStride;
+                        std::copy(srcEleAddr, srcEleAddr + typeSize, dstEleAddr);
+                    } else {
+                        std::fill(dstEleAddr, dstEleAddr + typeSize, 0); // Padding with zeros
+                    }
+                }
+            }
+        }
+    } else {
+        uint32_t blockNum = (dValue + c0Elements - 1) / c0Elements;
+        for (int h = 0; h < dnNum; h++) {
+            const uint8_t* srcDnAddr = reinterpret_cast<const uint8_t*>(src) + h * loop4SrcStride;
+            uint8_t* dstDnAddr = reinterpret_cast<uint8_t*>(dst) + h * loop4DstStride * C0_SIZE;
+            for (int i = 0; i < blockNum; i++) {
+                const uint8_t* srcBlockAddr = srcDnAddr + i * loop1SrcStride * c0Elements;
+                uint8_t* dstBlockAddr = dstDnAddr + i * loop3DstStride * C0_SIZE;
+
+                for (int j = 0; j < nValue; j++) {
+                    const uint8_t* srcNAddr = srcBlockAddr + j * typeSize;
+                    uint8_t* dstNAddr = dstBlockAddr + j * loop2DstStride * C0_SIZE;
+                    for (int k = 0; k < c0Elements; k++) {
+                        uint32_t srcEleIndex = i * c0Elements + k;
+                        uint8_t* dstEleAddr = dstNAddr + k * typeSize;
+                        if (srcEleIndex < dValue) {
+                            const uint8_t* srcEleAddr = srcNAddr + k * loop1SrcStride;
                             std::copy(srcEleAddr, srcEleAddr + typeSize, dstEleAddr);
                         } else {
                             std::fill(dstEleAddr, dstEleAddr + typeSize, 0); // Padding with zeros
@@ -318,11 +558,21 @@ void SimulateNd2nzDataCopy(T* dst, T* src, uint16_t ndNum, uint64_t loop1SrcStri
         capture.loop4SrcStride = loop4_src_stride;                                                                     \
         capture.enableSmallC0 = smallc0_en;                                                                            \
         gGm2L1Dn2NzCaptures.push_back(capture);                                                                        \
+        if (!gGm2L1NzParaCaptures.empty()) {                                                                           \
+            uint16_t ndNum = gGm2L1NzParaCaptures.back().ndNum;                                                        \
+            uint16_t loop2DstStride = gGm2L1NzParaCaptures.back().loop2DstStride;                                      \
+            uint16_t loop3DstStride = gGm2L1NzParaCaptures.back().loop3DstStride;                                      \
+            uint16_t loop4DstStride = gGm2L1NzParaCaptures.back().loop4DstStride;                                      \
+            SimulateDn2nzDataCopy(dst, src, ndNum, loop1_src_stride, n_value, d_value, loop4_src_stride,               \
+                                  loop2DstStride, loop3DstStride, loop4DstStride, smallc0_en);                         \
+        }                                                                                                              \
     }
 
 CAPTURE_GM_TO_L1(uint8_t);
 CAPTURE_GM_TO_L1(half);
+CAPTURE_GM_TO_L1(uint16_t);
 CAPTURE_GM_TO_L1(float);
+CAPTURE_GM_TO_L1(uint32_t);
 
 void CaptureSetMTE2NzPara(uint64_t para)
 {
@@ -355,7 +605,9 @@ protected:
         ResetCapture();
         MOCKER_GM_TO_L1(uint8_t);
         MOCKER_GM_TO_L1(half);
+        MOCKER_GM_TO_L1(uint16_t);
         MOCKER_GM_TO_L1(float);
+        MOCKER_GM_TO_L1(uint32_t);
         MOCKER(set_mte2_nz_para, void (*)(uint64_t)).stubs().will(invoke(CaptureSetMTE2NzPara));
     }
 
@@ -369,17 +621,16 @@ private:
     void InitializeData()
     {
         using CastT = Std::conditional_t<sizeof(T) == 1, uint8_t, T>;
-        std::iota(reinterpret_cast<CastT*>(src0Gm), reinterpret_cast<CastT*>(src0Gm + L1Size),
-                    static_cast<CastT>(1));
-        std::fill(reinterpret_cast<CastT*>(l1ABuf), reinterpret_cast<CastT*>(l1ABuf + L1Size),
-                    static_cast<CastT>(1));
+        std::iota(reinterpret_cast<CastT*>(src0Gm), reinterpret_cast<CastT*>(src0Gm + GmSize), static_cast<CastT>(1));
+        std::fill(reinterpret_cast<CastT*>(l1ABuf), reinterpret_cast<CastT*>(l1ABuf + L1Size), static_cast<CastT>(1));
         std::fill(reinterpret_cast<CastT*>(l1ABufGolden), reinterpret_cast<CastT*>(l1ABufGolden + L1Size),
-                    static_cast<CastT>(1));
+                  static_cast<CastT>(1));
     }
 
 private:
-    constexpr static uint32_t L1Size = 512 * 1024; // 512KB L1 buffer size
-    __gm__ uint8_t src0Gm[L1Size] = {0};
+    constexpr static uint32_t GmSize = 2 * 1024 * 1024; // 2MB GM buffer size
+    constexpr static uint32_t L1Size = 512 * 1024;      // 512KB L1 buffer size
+    __gm__ uint8_t src0Gm[GmSize] = {0};
     __cbuf__ uint8_t l1ABuf[L1Size] = {0};
     __cbuf__ uint8_t l1ABufGolden[L1Size] = {0};
 };
@@ -399,6 +650,29 @@ TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationND2ND)
     auto l1ATensor = MakeTensor(MakeL1memPtr(l1ABuf), l1ALayout);
 
     auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+    atomCopy.Call(l1ATensor, gmA);
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationND2ND1Dim)
+{
+    using T = float;
+
+    constexpr uint32_t singleM = 1;
+    constexpr uint32_t singleK = 17;
+
+    constexpr uint32_t baseM = 1;
+    constexpr uint32_t baseK = 19;
+
+    auto gmALayout = MakeNDLayout<T>(singleM, singleK);
+    auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+    auto l1ALayout = MakeNDLayout<T>(baseM, baseK);
+    auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+    auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+    auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+    InitializeData<T>();
     atomCopy.Call(l1ATensor, gmA);
 }
 
@@ -474,7 +748,6 @@ TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationND2NzFp4)
         EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
     }
 }
-
 
 TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationND2NzB8)
 {
@@ -572,6 +845,31 @@ TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationDN2Nz)
     atomCopy.Call(l1ATensor, gmA);
 }
 
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationDN2NzB32)
+{
+    using T = float;
+
+    constexpr uint32_t singleM = 17;
+    constexpr uint32_t singleK = 18;
+
+    constexpr uint32_t baseM = 18;
+    constexpr uint32_t baseK = 19;
+
+    auto gmALayout = MakeDNLayout<T>(singleM, singleK);
+    auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+    auto l1ALayout = MakeNzLayout<T>(baseM, baseK);
+    auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+    auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+    auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+    InitializeData<T>();
+    atomCopy.Call(l1ATensor, gmA);
+    SimDN2Nz(l1ATensorGolden, gmA);
+    EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+}
+
 TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationDN2Zn)
 {
     constexpr uint32_t M = 16;
@@ -590,6 +888,79 @@ TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationDN2Zn)
     atomCopy.Call(l1ATensor, gmA);
 }
 
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationDN2ZnB32)
+{
+    using T = float;
+
+    constexpr uint32_t singleM = 18;
+    constexpr uint32_t singleK = 9;
+
+    constexpr uint32_t baseM = 19;
+    constexpr uint32_t baseK = 10;
+
+    auto gmALayout = MakeDNLayout<T>(singleM, singleK);
+    auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+    auto l1ALayout = MakeZnLayout<T>(baseM, baseK);
+    auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+    auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+    auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+    InitializeData<T>();
+    atomCopy.Call(l1ATensor, gmA);
+    SimDN2Zn(l1ATensorGolden, gmA);
+    EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationDN2ZnFp4)
+{
+    using T = fp4x2_e2m1_t;
+
+    {
+        constexpr uint32_t singleM = 18;
+        constexpr uint32_t singleK = 18;
+
+        constexpr uint32_t baseM = 19;
+        constexpr uint32_t baseK = 20;
+
+        auto gmALayout = MakeDNLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimDN2Zn(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 68;
+        constexpr uint32_t singleK = 68;
+
+        constexpr uint32_t baseM = 69;
+        constexpr uint32_t baseK = 70;
+
+        auto gmALayout = MakeDNLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZnLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimDN2Zn(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
 TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationNz2Nz)
 {
     constexpr uint32_t M = 16;
@@ -606,4 +977,98 @@ TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationNz2Nz)
 
     auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
     atomCopy.Call(l1ATensor, gmA);
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleAND2Zz)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 18;
+        constexpr uint32_t singleK = 34;
+
+        constexpr uint32_t baseM = 19;
+        constexpr uint32_t baseK = 36;
+
+        auto gmALayout = MakeScaleANDLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleAND2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeScaleANDLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleAND2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+}
+
+TEST_F(Tensor_Api_Gm2L1, CopyGm2L1OperationScaleADN2Zz)
+{
+    using T = fp8_e8m0_t;
+    {
+        constexpr uint32_t singleM = 18;
+        constexpr uint32_t singleK = 34;
+
+        constexpr uint32_t baseM = 19;
+        constexpr uint32_t baseK = 36;
+
+        auto gmALayout = MakeScaleADNLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleADN2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
+    {
+        constexpr uint32_t singleM = 32;
+        constexpr uint32_t singleK = 32;
+
+        constexpr uint32_t baseM = 32;
+        constexpr uint32_t baseK = 32;
+
+        auto gmALayout = MakeScaleADNLayout<T>(singleM, singleK);
+        auto gmA = MakeTensor(MakeGMmemPtr(reinterpret_cast<T*>(src0Gm)), gmALayout);
+
+        auto l1ALayout = MakeZzLayout<T>(baseM, baseK);
+        auto l1ATensor = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABuf)), l1ALayout);
+        auto l1ATensorGolden = MakeTensor(MakeL1memPtr(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout);
+
+        auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+
+        InitializeData<T>();
+        atomCopy.Call(l1ATensor, gmA);
+        SimScaleADN2Zz(l1ATensorGolden, gmA);
+        EXPECT_TRUE(std::equal(l1ABuf, l1ABuf + L1Size, l1ABufGolden));
+    }
 }

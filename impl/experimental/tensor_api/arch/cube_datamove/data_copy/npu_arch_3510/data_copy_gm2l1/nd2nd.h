@@ -20,7 +20,7 @@
 namespace AscendC {
 namespace Te {
 
-class CopyGmToCbufAlignV2NDBase {
+class CopyGmToCbufAlignV2ND {
 public:
     template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src) {
@@ -43,27 +43,28 @@ private:
 
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
- 
-        auto dstShapeRows = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
-        auto dstShapeColumns = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
+
+        auto srcShapeRows = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+        auto srcShapeColumns = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
         auto dstStrideRows = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         auto srcStrideRows = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(srcLayout);
- 
+
         uint8_t leftPaddingCnt = 0;
         uint8_t rightPaddingCnt = 0;
         uint8_t cacheMode = GetCacheModeFromTensor(src.Data().Get());
- 
+
         using type = typename U::elementType;
- 
-        auto blockCount = dstShapeRows;
-        auto blockLen = dstShapeColumns * sizeof(type);
+
+        // small to big, use src shape for block count and block length calculation
+        auto blockCount = srcShapeRows;
+        auto blockLen = srcShapeColumns * sizeof(type);
         auto srcStride = srcStrideRows * sizeof(type);
         auto dstStride = dstStrideRows * sizeof(type);
 
-        CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, cacheMode, srcStride, dstStride);
+        CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, cacheMode,
+                                          srcStride, dstStride);
     }
 };
-
 }
 }
 
