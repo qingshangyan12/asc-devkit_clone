@@ -6,27 +6,22 @@
 | :-----------| :------: |
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
-| Ascend 950PR/Ascend 950DT | √ |
 
 ## 功能说明
 
 和[asc_sync_block_arrive](asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。
-FFTS块/子块同步指令，每个flagID均分配有计数器，若该flagID被FFTS设置，计数器将递增；若执行了相同标志位的asc_sync_block_wait指令，计数器将递减。当计数器为0时，所有指令将被阻塞，直到计数器变为非0。
-FFTS收集到AIC0的set flag0后立即将flag0广播给block下属的AIV0和AIV1。
 
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint8_t flag_id)
-__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id)
+    __aicore__ inline void asc_sync_block_wait(int64_t flagID)
 ```
 
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 需要执行同步指令的管道。|
-| flagID | 输入 | 事件标号，取值范围[0,15]。|
+| flagID | 输入 | 事件标号，取值范围[0,10]。|
 
 ## 返回值说明
 
@@ -38,14 +33,20 @@ PIPE_S
 
 ## 约束说明
 
-- flagID的取值范围为0至15，每个flagID的计数器范围为0至15
-- 必须保证每个flagID的四位计数器不溢出，否则将引发异常
-- 必须保证相同的ID在同一时间仅被一条管道等待
+- 使用该同步接口时，需要按照如下规则设置Kernel类型：	 
+  - 在纯Vector/Cube场景下，需设置Kernel类型为KERNEL_TYPE_MIX_AIV_1_0或KERNEL_TYPE_MIX_AIC_1_0。	 
+  - 对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型。	 
+- asc_sync_block_wait必须与[asc_sync_block_arrive](asc_sync_block_arrive.md)接口配合使用，避免计算核一直处于阻塞阶段。 
+- 如果执行asc_sync_block_wait时该flagID的计数器的值为0，则asc_sync_block_wait之后的所有指令都将被阻塞，直到该flagID的计数器的值不为0。同一个flagID的计数器最多设置15次。
 
 ## 调用示例
 
 ```cpp
-int64_t flagID = 1;
-asc_sync_block_arrive(PIPE_S, flagID);
+// Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr 
+uint64_t config = *(__gm__ uint64_t*)ffts_addr; 
+asc_set_ffts_base_addr(config); 
+uint8_t mode = 0; 
+int64_t flagID = 1;	 
+asc_sync_block_arrive(PIPE_S, mode, flagID);	 
 asc_sync_block_wait(flagID);  
 ```
