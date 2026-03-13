@@ -1,6 +1,6 @@
 # DataCopyPad样例
 ## 概述
-本样例基于DataCopyPad实现数据非对齐搬运，其中从Global Memory搬运数据至Local Memory时，可以根据开发者的需要自行填充数据。
+本样例基于[DataCopyPad](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0265.html)实现数据非对齐搬运，支持Global Memory与Local Memory之间的数据搬运，可以根据开发者的需要自行填充数据。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -21,7 +21,7 @@
 ## 算子描述
 - 算子功能：  
 
-  该接口提供数据非对齐搬运的功能，其中从Global Memory搬运数据至Local Memory时，可以根据开发者的需要自行填充数据。
+  根据用户自行填充的非对齐数据，完成与标量求和。
 - 算子规格：  
 
   <table>
@@ -39,9 +39,9 @@
 
 - 算子实现：
   - kernel实现   
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用DataCopyPad基础API接口将输入srcLocal的数值搬运到dstLocal中，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，首先通过DataCopyPad将自行填充的输入数据搬运进片上存储，完成与标量求和后，使用DataCopyPad将数据搬出到外部存储上。
 
-    DataCopyPadCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务调用DataCopyPad负责将Global Memory上的输入Tensor src0Gm、src1Gm连续非对齐搬入src0Local和src1Local中，Compute任务负责对src0Local和src1Local求和，并将结果存储到dstLocal中，DataCopyPadOut任务负责将输出数据从dstLocal连续非对齐搬运至Global Memory上的输出Tensor dstGm。
+    DataCopyPadCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责调用DataCopyPad将Global Memory上的输入Tensor src0Gm连续非对齐搬入src0Local中，Compute任务负责对src0Local和标量scalar求和，并将结果存储到dstLocal中，CopyOut任务负责调用DataCopyPad将输出数据从dstLocal连续非对齐搬运至Global Memory上的输出Tensor dstGm。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

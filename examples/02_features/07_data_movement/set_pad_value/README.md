@@ -1,6 +1,6 @@
 # SetPadValue样例
 ## 概述
-本样例基于SetPadValue为非对齐搬运DataCopyPad接口设置需要填充的数值。
+本样例基于[SetPadValue](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0266.html)为非对齐搬运接口DataCopyPad设置需要填充的数值。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -38,7 +38,9 @@
 - 算子实现：  
   本样例中实现的是固定shape为32的set_pad_value算子。
   - kernel实现   
-    SetPadValueCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm连续非对齐搬入srcLocal，并且调用SetPadValue接口设置填充的数值为37。Compute任务暂不做任何处理。CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
+    SetPadValueCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。
+    CopyIn任务负责调用SetPadValue接口设置填充的数值为37，并配合[DataCopyPad](https://www.hiascend.com/document/detail/zh/canncommercial/850/API/ascendcopapi/atlasascendc_api_07_0265.html)将Global Memory上的输入Tensor srcGm连续非对齐搬入srcLocal。
+    Compute任务暂不做任何处理。CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
