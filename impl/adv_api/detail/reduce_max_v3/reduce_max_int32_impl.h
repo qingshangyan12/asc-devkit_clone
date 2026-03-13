@@ -122,14 +122,131 @@ __aicore__ inline void BinaryReduceHalf(const LocalTensor<T>& dst,
 }
 
 // ============================================================================
+// BrcbReduceToSingle - Reduce elements to single value using Brcb + vmax
+// ============================================================================
+// Core idea: Use Brcb to expand each element to a datablock (32 bytes),
+//           then use vmax for block-wise reduction.
+//
+// Why this works:
+// 1. vmax minimum granularity is one datablock (32 bytes = 8 int32_t elements)
+// 2. When count < 8, vmax cannot work directly
+// 3. Brcb expands each element to a full datablock, enabling vmax operations
+//
+// Advantages: Handles ANY count (including < 8 and non-power-of-2)
+// Memory requirement: tmpBuffer >= 288 bytes (32 bytes prep + 256 bytes Brcb output)
+//
+// Process for count=6:
+//   Input: [a, b, c, d, e, f]
+//   Step 1: Pad to 8 elements: [a, b, c, d, e, f, MIN, MIN]
+//   Step 2: Brcb expand to 8 datablocks:
+//     Block 0: [a,a,a,a,a,a,a,a], Block 1: [b,b,b,b,b,b,b,b], ...
+//   Step 3: vmax block-wise reduction to find max
+//   Result: max(a, b, c, d, e, f)
+template <typename T>
+__aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
+                                           const LocalTensor<T>& src,
+                                           const LocalTensor<T>& tmpBuffer,
+                                           uint32_t count)
+{
+    BinaryRepeatParams defaultParam;
+    UnaryRepeatParams defaultUnaryParam;
+    
+    // Handle edge cases
+    if (count == 0) {
+        return;  // Empty input
+    }
+    
+    if (count == 1) {
+        // Single element: copy directly
+        SetMaskCount();
+        SetVectorMask<T, MaskMode::COUNTER>(0, 1);
+        Adds<T, false>(dst, src, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
+        PipeBarrier<PIPE_V>();
+        return;
+    }
+    
+    // Step 1: Prepare 8 elements (pad with MIN_VAL if count < 8)
+    // tmpBuffer layout: [0:8] = prepare buffer, [8:72] = Brcb output
+    LocalTensor<T> prepareBuffer = tmpBuffer;  // First 32 bytes (8 elements)
+    
+    SetMaskCount();
+    
+    if (count < 8) {
+        // Fill entire 8-element region with MIN_VAL first
+        // Note: SetValue may not be available, use Duplicate to fill
+        // For int32_t, MIN_VAL = -2147483648
+        // We use a workaround: fill by copying from a pre-filled location
+        
+        // Alternative approach: Fill prepare buffer with MIN_VAL using Duplicate
+        T minVal = static_cast<T>(-2147483647 - 1);  // INT32_MIN for int32_t, safe for other types
+        
+        // Use Duplicate to fill 8 elements with MIN_VAL
+        SetVectorMask<T, MaskMode::COUNTER>(0, 8);
+        Duplicate<T>(prepareBuffer, minVal, 8);
+        PipeBarrier<PIPE_V>();
+        
+        // Copy valid data (overwrites the MIN_VAL padding)
+        SetVectorMask<T, MaskMode::COUNTER>(0, count);
+        Adds<T, false>(prepareBuffer, src, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
+        PipeBarrier<PIPE_V>();
+    } else {
+        // count >= 8: copy first 8 elements directly
+        SetVectorMask<T, MaskMode::COUNTER>(0, 8);
+        Adds<T, false>(prepareBuffer, src, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
+        PipeBarrier<PIPE_V>();
+    }
+    
+    // Step 2: Use Brcb to expand 8 elements to 8 datablocks
+    // For int32_t: each element -> 8 copies in one datablock (32 bytes)
+    // Output: 8 datablocks = 64 elements = 256 bytes
+    LocalTensor<T> brcbDst = tmpBuffer[8];  // Starting at element 8 (offset 32 bytes)
+    
+    BrcbRepeatParams brcbParams;
+    brcbParams.dstBlkStride = 1;   // Consecutive datablocks
+    brcbParams.dstRepStride = 8;   // 8 datablocks between repeats
+    
+    Brcb<T>(brcbDst, prepareBuffer, 1, brcbParams);
+    PipeBarrier<PIPE_V>();
+    
+    // Step 3: vmax block-wise reduction to find maximum
+    // Each datablock contains 8 identical values
+    // We need to find max across all 8 datablocks
+    
+    // Round 1: Compare Block 0-3 with Block 4-7 -> Result in Block 0-3
+    uint32_t halfElems = 4 * INT32_ELEM_PER_BLK;  // 32 elements (4 datablocks)
+    SetVectorMask<T, MaskMode::COUNTER>(0, halfElems);
+    VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, defaultParam);
+    PipeBarrier<PIPE_V>();
+    
+    // Round 2: Compare Block 0-1 with Block 2-3 -> Result in Block 0-1
+    halfElems = 2 * INT32_ELEM_PER_BLK;  // 16 elements
+    SetVectorMask<T, MaskMode::COUNTER>(0, halfElems);
+    VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, defaultParam);
+    PipeBarrier<PIPE_V>();
+    
+    // Round 3: Compare Block 0 with Block 1 -> Result in Block 0
+    halfElems = INT32_ELEM_PER_BLK;  // 8 elements
+    SetVectorMask<T, MaskMode::COUNTER>(0, halfElems);
+    VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, defaultParam);
+    PipeBarrier<PIPE_V>();
+    
+    // Step 4: Extract result (brcbDst[0] now contains the maximum)
+    SetVectorMask<T, MaskMode::COUNTER>(0, 1);
+    Adds<T, false>(dst, brcbDst, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
+    PipeBarrier<PIPE_V>();
+}
+
+// ============================================================================
 // BinaryReduceToSingle - Repeatedly apply binary reduction until single value
 // ============================================================================
-// Input:  src with `count` elements (must be power of 2)
+// Input:  src with `count` elements (any count, including non-power-of-2)
 // Output: dst[0] contains the maximum value
 // Uses tmpBuffer for intermediate results
-// Note: count must be multiple of 8 (32-byte aligned for int32_t)
 // IMPORTANT: This function does NOT use recursion (Ascend C does not support it)
 // Reference: BinaryReduceByFirstAxis in reduce_common_util_v220_impl.h
+//
+// Modification: For count <= 8, uses BrcbReduceToSingle for correctness
+// (handles non-power-of-2 counts correctly)
 template <typename T>
 __aicore__ inline void BinaryReduceToSingle(const LocalTensor<T>& dst,
                                              const LocalTensor<T>& src,
@@ -151,33 +268,16 @@ __aicore__ inline void BinaryReduceToSingle(const LocalTensor<T>& dst,
         return;
     }
     
-    // Set mask to count mode for all operations
-    SetMaskCount();
-    
-    // Special case: exactly 8 elements - reduce directly
-    if (count == 8) {
-        // Reduce 8 elements to 1 using binary reduction
-        // Step 1: Compare elements 0-3 with 4-7, result in tmpBuffer[0-3]
-        SetVectorMask<T, MaskMode::COUNTER>(0, 4);
-        VMaxImpl<T>(tmpBuffer, src, src[4], MASK_PLACEHOLDER, 1, defaultParam);
-        PipeBarrier<PIPE_V>();
-        
-        // Step 2: Compare elements 0-1 with 2-3, result in tmpBuffer[0-1]
-        SetVectorMask<T, MaskMode::COUNTER>(0, 2);
-        VMaxImpl<T>(tmpBuffer, tmpBuffer, tmpBuffer[2], MASK_PLACEHOLDER, 1, defaultParam);
-        PipeBarrier<PIPE_V>();
-        
-        // Step 3: Compare element 0 with 1, result in tmpBuffer[0]
-        SetVectorMask<T, MaskMode::COUNTER>(0, 1);
-        VMaxImpl<T>(tmpBuffer, tmpBuffer, tmpBuffer[1], MASK_PLACEHOLDER, 1, defaultParam);
-        PipeBarrier<PIPE_V>();
-        
-        // Copy result to dst using Adds for mask consistency
-        SetVectorMask<T, MaskMode::COUNTER>(0, 1);
-        Adds<T, false>(dst, tmpBuffer, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
-        PipeBarrier<PIPE_V>();
+    // ========== Use BrcbReduceToSingle for count <= 8 ==========
+    // This handles non-power-of-2 counts correctly (e.g., 3, 5, 6, 7)
+    if (count <= 8) {
+        BrcbReduceToSingle<T>(dst, src, tmpBuffer, count);
         return;
     }
+    // ============================================================
+    
+    // Set mask to count mode for all operations
+    SetMaskCount();
     
     // Multi-stage binary reduction for larger counts
     // Use iterative approach (NO recursion allowed in Ascend C)
@@ -218,39 +318,11 @@ __aicore__ inline void BinaryReduceToSingle(const LocalTensor<T>& dst,
     }
     
     // Final step: reduce remaining elements (<=8) to 1
-    // Do NOT call BinaryReduceToSingle recursively - handle directly
-    if (currentCount == 1) {
-        // Already single element - copy to dst using Adds
-        LocalTensor<T> resultSrc = useTmpDst ? tmpBuffer : dst;
-        SetVectorMask<T, MaskMode::COUNTER>(0, 1);
-        Adds<T, false>(dst, resultSrc, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
-        PipeBarrier<PIPE_V>();
-    } else {
-        // currentCount is 2, 4, or 8 - reduce to 1
-        LocalTensor<T> finalSrc = useTmpDst ? tmpBuffer : dst;
-        LocalTensor<T> finalTmp = useTmpDst ? dst : tmpBuffer;
-        
-        // Perform binary reduction for final elements
-        while (currentCount > 1) {
-            uint32_t halfCount = currentCount / 2;
-            
-            SetVectorMask<T, MaskMode::COUNTER>(0, halfCount);
-            VMaxImpl<T>(finalTmp, finalSrc, finalSrc[halfCount], MASK_PLACEHOLDER, 1, defaultParam);
-            PipeBarrier<PIPE_V>();
-            
-            // Swap for next iteration
-            LocalTensor<T> temp = finalSrc;
-            finalSrc = finalTmp;
-            finalTmp = temp;
-            
-            currentCount = halfCount;
-        }
-        
-        // Copy result to dst using Adds
-        SetVectorMask<T, MaskMode::COUNTER>(0, 1);
-        Adds<T, false>(dst, finalSrc, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
-        PipeBarrier<PIPE_V>();
-    }
+    // Use BrcbReduceToSingle for correctness (handles any count)
+    LocalTensor<T> finalSrc = useTmpDst ? tmpBuffer : dst;
+    LocalTensor<T> finalTmp = useTmpDst ? dst : tmpBuffer;
+    
+    BrcbReduceToSingle<T>(dst, finalSrc, finalTmp, currentCount);
 }
 
 // ============================================================================
@@ -551,6 +623,8 @@ inline void GetReduceMaxInt32TmpSize(const uint32_t srcShape[2],
     const uint32_t last = srcShape[1];
     constexpr uint32_t elePerBlk = ONE_BLK_SIZE / INT32_BYTES;  // 8 elements
     constexpr uint32_t elePerRep = ONE_REPEAT_BYTE_SIZE / INT32_BYTES;  // 64 elements
+    // Brcb reduction requires: 32 bytes prep buffer + 256 bytes Brcb output
+    constexpr uint32_t BRCB_TMP_SIZE = 288;
     
     if (isReuseSource) {
         maxValue = minValue = 0U;
@@ -561,17 +635,17 @@ inline void GetReduceMaxInt32TmpSize(const uint32_t srcShape[2],
         // AR mode: reduce along last axis [M, N] -> [M]
         // Need tmp buffer for each row's intermediate reduction
         if (last <= elePerBlk) {
-            // Small row: <= 8 elements, need minimal tmp space for binary reduction
-            // Max 8 elements for intermediate results
-            maxValue = minValue = elePerBlk * INT32_BYTES;  // 32 bytes
+            // Small row: <= 8 elements, need Brcb reduction space
+            // 32 bytes prep buffer + 256 bytes Brcb output = 288 bytes
+            maxValue = minValue = BRCB_TMP_SIZE;
         } else if (last <= elePerRep) {
             // Medium row: 9-64 elements
-            // Need first * 8 elements for block accumulation
-            maxValue = minValue = first * elePerBlk * INT32_BYTES;
+            // Need first * 8 elements for block accumulation + 256 bytes for final Brcb
+            maxValue = minValue = first * elePerBlk * INT32_BYTES + 256;
         } else {
             // Large row: > 64 elements
-            // Need first * 64 elements for block accumulation
-            maxValue = minValue = first * elePerRep * INT32_BYTES;
+            // Need first * 64 elements for block accumulation + 256 bytes for final Brcb
+            maxValue = minValue = first * elePerRep * INT32_BYTES + 256;
         }
     } else {
         // RA mode: reduce along first axis [M, N] -> [N]
@@ -594,7 +668,8 @@ inline void GetReduceMaxInt32TmpSize(const uint32_t srcShape[2],
         
         // Calculate padded last axis
         uint32_t padLast = (last + elePerBlk - 1) / elePerBlk * elePerBlk;
-        maxValue = minValue = k * padLast * INT32_BYTES;
+        // Add 256 bytes for final Brcb reduction
+        maxValue = minValue = k * padLast * INT32_BYTES + 256;
     }
 }
 
