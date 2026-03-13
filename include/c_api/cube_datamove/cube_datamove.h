@@ -780,7 +780,7 @@ __aicore__ inline void asc_copy_l12l0c_sync(__cc__ bfloat16_t* dst, __cbuf__ bfl
                                         uint16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_l12l0c(__cc__ half* dst, __cbuf__ half* src, uint16_t n_burst, uint16_t len_burst, 
-                                        uint16_t src_stride, uint16_t dst_stride)
+                                        uint16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_l12l0c_sync(__cc__ half* dst, __cbuf__ half* src, uint16_t n_burst, uint16_t len_burst, 
                                             uint16_t src_stride, uint16_t dst_stride);
