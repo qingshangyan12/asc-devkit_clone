@@ -46,6 +46,22 @@ inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {}
 inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {} 
 inline void rls_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
 
+inline void vmrgsort4(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t regionProposalLi0,
+                      uint16_t regionProposalLi1, uint16_t regionProposalLi2, uint16_t regionProposalLi3, bool isAllStored,
+                      uint8_t maskSignal) {}
+
+inline void vmrgsort4(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t regionProposalLi0,
+                      uint16_t regionProposalLi1, uint16_t regionProposalLi2, uint16_t regionProposalLi3, bool isAllStored,
+                      uint8_t maskSignal) {}
+
+inline void vbs(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, uint8_t repeat,
+                uint8_t dstBlockStride, uint8_t src0BlockStride, uint8_t src1BlockStride, uint8_t dstRepeatStride,
+                uint8_t src0RepeatStride, uint8_t src1RepeatStride, bool repeatStrideMode, bool strideSizeMode) {}
+
+inline void vbs(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, uint8_t repeat,
+                uint8_t dstBlockStride, uint8_t src0BlockStride, uint8_t src1BlockStride, uint8_t dstRepeatStride,
+                uint8_t src0RepeatStride, uint8_t src1RepeatStride, bool repeatStrideMode, bool strideSizeMode) {}
+
 #if defined(__DAV_CUBE__)
     inline int32_t g_coreType = 1;
 #else
