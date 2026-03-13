@@ -25,7 +25,7 @@ void set_ffts_base_addr_Stub(uint64_t config) {
 }
 }
 
-TEST_F(TestSysVarSETCTR, c_api_set_ffts_base_addr_Succ)
+TEST_F(TestSysVarSetFftsBaseAddr, c_api_set_ffts_base_addr_Succ)
 {
     int64_t input = 1;
     MOCKER_CPP(set_ffts_base_addr, void(uint64_t)) 

@@ -15,17 +15,15 @@
 
 #define TEST_SYS_VAR_SET_PADDING(c_api_name, cce_name)\
 \
-class TestSysVarSetMad : public testing::Test {\
+class TestSysVarSetMad##cce_name : public testing::Test {\
 protected:\
     void SetUp() {}\
     void TearDown() {}\
 };\
 \
-namespace {\
 void cce_name##_Stub(data_type config) {}\
-}\
 \
-TEST_F(TestSysVarSetMad, c_api_name##_Succ)\
+TEST_F(TestSysVarSetMad##cce_name, c_api_name##_Succ)\
 {\
     MOCKER_CPP(cce_name, void(void))\
             .times(1)\

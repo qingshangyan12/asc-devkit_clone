@@ -31,7 +31,7 @@ TEST_F(TestSysVarSetL12L0PaddingVal, c_api_set_l12l0_padding_val_Succ)
     MOCKER_CPP(set_padding_b, void(uint64_t)) 
             .times(1)
             .will(invoke(set_l12l0_padding_val_Stub));
-    asc_set_ffts_base_addr(input);
+    asc_set_l12l0_padding_val(input);
     asc_init();
     GlobalMockObject::verify();
 }

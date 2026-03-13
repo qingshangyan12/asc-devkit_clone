@@ -25,13 +25,13 @@ void set_set_gm2l1_nz_para_Stub(uint64_t config) {
 }
 }
 
-TEST_F(TestSysVarSetGm2l1NzPara, c_api_set_set_gm2l1_nz_para_Succ)
+TEST_F(TestSysVarSetGm2l1NzPara, c_api_set_gm2l1_nz_para_Succ)
 {
     int64_t input = 1;
     MOCKER_CPP(set_mte2_nz_para, void(uint64_t)) 
             .times(1)
             .will(invoke(set_set_gm2l1_nz_para_Stub));
-    asc_set_l12ub_loop_size(input);
+    asc_set_gm2l1_nz_para(input);
     asc_init();
     GlobalMockObject::verify();
 }

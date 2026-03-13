@@ -18,7 +18,7 @@
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_system_cycle_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ctrl_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_ffts_base_addr_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_gm2l1_nz_para_imp.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_gm2l1_nz_para_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_quant_post_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_relu_alpha_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l12l0_padding_val_impl.h"
