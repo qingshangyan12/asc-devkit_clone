@@ -1921,6 +1921,34 @@ __simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint32_t *dst, vec
     }
 }
 
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint16_t *dst, vector_bool src, iter_reg offset)
+{
+    if ASC_IS_AIV {
+        pst(src, reinterpret_cast<uint32_t *>(dst), offset, NORM_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint16_t *dst, vector_bool src, iter_reg offset)
+{
+    if ASC_IS_AIV {
+        pst(src, reinterpret_cast<uint32_t *>(dst), offset, PK_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint8_t *dst, vector_bool src, iter_reg offset)
+{
+    if ASC_IS_AIV {
+        pst(src, reinterpret_cast<uint32_t *>(dst), offset, NORM_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t *dst, vector_bool src, iter_reg offset)
+{
+    if ASC_IS_AIV {
+        pst(src, reinterpret_cast<uint32_t *>(dst), offset, PK_B32);
+    }
+}
+
 // 使用 psts, 偏移固定传入0， 由用户自行更新dst地址
 __simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t *dst, vector_bool src)
 {
@@ -1933,6 +1961,34 @@ __simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint32_t *dst, vec
 {
     if ASC_IS_AIV {
         psts(src, dst, 0, PK_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint16_t *dst, vector_bool src)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), 0, NORM_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint16_t *dst, vector_bool src)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), 0, PK_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint8_t *dst, vector_bool src)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), 0, NORM_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t *dst, vector_bool src)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), 0, PK_B32);
     }
 }
 
@@ -1951,6 +2007,34 @@ __simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint32_t *dst, vec
     }
 }
 
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint16_t *dst,  vector_bool src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), offset, NORM_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint16_t *dst, vector_bool src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), offset, PK_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint8_t *dst,  vector_bool src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), offset, NORM_B32);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t *dst, vector_bool src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), offset, PK_B32);
+    }
+}
+
 // 使用 psts, 通过int32_t 传入偏移，同时增加PostMode可以设置成硬件自动Post Update
 __simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset)
 {
@@ -1963,6 +2047,34 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint32_
 {
     if ASC_IS_AIV {
         psts(src, dst, offset, PK_B32, POST_UPDATE);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint16_t *dst, vector_bool src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), offset, NORM_B32, POST_UPDATE);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint16_t *dst, vector_bool src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), offset, PK_B32, POST_UPDATE);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint8_t *dst, vector_bool src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), offset, NORM_B32, POST_UPDATE);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint8_t *dst, vector_bool src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        psts(src, reinterpret_cast<uint32_t *>(dst), offset, PK_B32, POST_UPDATE);
     }
 }
 
