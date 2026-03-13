@@ -20,7 +20,7 @@
 namespace AscendC {
 namespace Te {
 
-class CopyGmToCbufMultiDn2nzBase {
+class CopyGmToCbufMultiDN2Nz {
 public:
     template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src) {
@@ -45,13 +45,17 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
+        uint16_t srcRowShape = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
+        uint32_t srcColShape = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+        uint16_t dstBColStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout);
+
         uint16_t dnNum = 1;
-        uint16_t nValue = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
-        uint32_t dValue = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
+        uint16_t nValue = srcRowShape;
+        uint32_t dValue = srcColShape;
         uint64_t srcDnMatrixStride = 0;
         uint64_t srcDValue = nValue;
-        uint16_t dstNzC0Stride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout)
-            * sizeof(type) / C0_SIZE<>;
+
+        uint16_t dstNzC0Stride = dstBColStride * sizeof(type) / C0_SIZE<>;
         uint16_t dstNzNStride = 1;
         uint32_t dstNzMatrixStride = 0;
 
