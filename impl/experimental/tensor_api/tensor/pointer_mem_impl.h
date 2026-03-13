@@ -49,6 +49,18 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
     }
 }
 
+template <Hardware hPos, typename Pointer, typename Index, Std::enable_if_t<is_b4_type<IterVal<iterator>::type>>
+__aicore__ inline constexpr HardwareMemPtr<hPos, Pointer> operator+(const HardwareMemPtr<hPos, Pointer>& p, Index index) {
+    auto newPtr = p.Get() + index;
+    return HardwareMemPtr<hPos, Pointer>{newPtr};
+}
+
+template <typename Pointer, typename Index, Std::enable_if_t<is_b4_type<IterVal<iterator>::type>>
+__aicore__ inline constexpr IterRef<iterator>::type operator[](const HardwareMemPtr<hPos, Pointer>& p, Index index) {
+    auto ptr = p.Get();
+    return ptr[(index >> 1)];
+}
+
 } // namespace Te
 } // namespace AscendC
 
