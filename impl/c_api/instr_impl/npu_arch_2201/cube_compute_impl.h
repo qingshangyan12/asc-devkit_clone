@@ -26,6 +26,7 @@
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_set_mmad_direction_n_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_enable_hf32_impl.h"
 #include "instr_impl/npu_arch_2201/cube_compute_impl/asc_enable_hf32_trans_impl.h"
+#include "instr_impl/npu_arch_2201/cube_compute_impl/asc_get_l0c2gm_config_impl.h"
 
 __aicore__ inline void asc_enable_hf32()
 {
@@ -243,6 +244,62 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
 {
     asc_set_l0c2gm_config_impl(relu_pre, quant_pre, enable_unit_flag);
+}
+
+// asc_mmad(tf322f32)
+__aicore__ inline void asc_mmad2(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t m,
+                                 uint16_t k, uint16_t n, uint8_t unit_flag, bool k_direction_align, bool cmatrix_source,
+                                 bool cmatrix_init_val)
+{
+    asc_mmad_impl2(c_matrix, a_matrix, b_matrix, m, k, n, unit_flag, k_direction_align, cmatrix_source,
+                   cmatrix_init_val);
+}
+
+__aicore__ inline void asc_mmad_sync2(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix,
+                                      uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool k_direction_align,
+                                      bool cmatrix_source, bool cmatrix_init_val)
+{
+    asc_mmad_sync_impl2(c_matrix, a_matrix, b_matrix, m, k, n, unit_flag, k_direction_align, cmatrix_source,
+                        cmatrix_init_val);
+}
+
+__aicore__ inline void asc_mmad2(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t m,
+                                 uint16_t k, uint16_t n, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag,
+                                 bool k_direction_align, bool is_weight_offset, bool cmatrix_source,
+                                 bool cmatrix_init_val)
+{
+    asc_mmad_impl2(c_matrix, a_matrix, b_matrix, m, k, n, feat_offset, smask_offset, unit_flag, k_direction_align,
+                   is_weight_offset, cmatrix_source, cmatrix_init_val);
+}
+
+__aicore__ inline void asc_mmad_sync2(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix,
+                                      uint16_t m, uint16_t k, uint16_t n, uint8_t feat_offset, uint8_t smask_offset,
+                                      uint8_t unit_flag, bool k_direction_align, bool is_weight_offset,
+                                      bool cmatrix_source, bool cmatrix_init_val)
+{
+    asc_mmad_sync_impl2(c_matrix, a_matrix, b_matrix, m, k, n, feat_offset, smask_offset, unit_flag, k_direction_align,
+                        is_weight_offset, cmatrix_source, cmatrix_init_val);
+}
+
+// asc_get_l0c2gm_config
+__aicore__ inline uint64_t asc_get_l0c2gm_relu()
+{
+    return asc_get_l0c2gm_relu_impl();
+}
+
+__aicore__ inline uint64_t asc_get_l0c2gm_quant()
+{
+    return asc_get_l0c2gm_quant_impl();
+}
+
+__aicore__ inline uint64_t asc_get_l0c2gm_unitflag()
+{
+    return asc_get_l0c2gm_unitflag_impl();
+}
+
+__aicore__ inline uint64_t asc_get_l0c2gm_prequant()
+{
+    return asc_get_l0c2gm_prequant_impl();
 }
 
 #endif

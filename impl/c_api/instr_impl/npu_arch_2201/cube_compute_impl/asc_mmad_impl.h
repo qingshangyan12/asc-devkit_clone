@@ -231,6 +231,47 @@ __aicore__ inline void asc_mmad_s4_sync_impl(__cc__ int32_t* c_matrix, __ca__ in
     asc_sync_post_process();
 }
 
+// mmad(tf322f32)
+__aicore__ inline void asc_mmad_impl2(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix,
+                                      uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool k_direction_align,
+                                      bool cmatrix_source, bool cmatrix_init_val)
+{
+    if ASC_IS_AIC {
+        mad_tf322f32(c_matrix, a_matrix, b_matrix, m, k, n, unit_flag, k_direction_align, cmatrix_source,
+                     cmatrix_init_val);
+    }
+}
+
+__aicore__ inline void asc_mmad_sync_impl2(__cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix,
+                                           uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
+                                           bool k_direction_align, bool cmatrix_source, bool cmatrix_init_val)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, m, k, n, unit_flag, k_direction_align, cmatrix_source,
+                  cmatrix_init_val);
+    asc_sync_post_process();
+}
+
+__aicore__ inline void asc_mmad_impl2(__cc__ float* dst, __ca__ float* src0, __cb__ float* src1, uint16_t m, uint16_t k,
+                                      uint16_t n, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag,
+                                      bool k_direction_align, bool is_weight_offset, bool cmatrix_source,
+                                      bool cmatrix_init_val)
+{
+    if ASC_IS_AIC {
+        mad_tf322f32(dst, src0, src1, m, k, n, feat_offset, smask_offset, unit_flag, k_direction_align,
+                     is_weight_offset, cmatrix_source, cmatrix_init_val);
+    }
+}
+
+__aicore__ inline void asc_mmad_sync_impl2(__cc__ float* dst, __ca__ float* src0, __cb__ float* src1, uint16_t m,
+                                           uint16_t k, uint16_t n, uint8_t feat_offset, uint8_t smask_offset,
+                                           uint8_t unit_flag, bool k_direction_align, bool is_weight_offset,
+                                           bool cmatrix_source, bool cmatrix_init_val)
+{
+    asc_mmad_impl(dst, src0, src1, m, k, n, feat_offset, smask_offset, unit_flag, k_direction_align, is_weight_offset,
+                  cmatrix_source, cmatrix_init_val);
+    asc_sync_post_process();
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

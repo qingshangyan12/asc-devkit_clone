@@ -93,3 +93,43 @@ TEST_F(TestMmadCAPI, mmad_sync_Succ)
     asc_mmad_sync(c, a, b, m, k, n, unitFlag, kDirectionAlign, cmatrixSource, cmatrixInitVal);
     GlobalMockObject::verify();
 }
+
+TEST_F(TestMmadCAPI, madtf322f32_offset_Succ)
+{
+    __cc__ float* c =  reinterpret_cast<__cc__ float*>(1);
+    __ca__ float* a =  reinterpret_cast<__ca__ float*>(2);
+    __cb__ float* b =  reinterpret_cast<__cb__ float*>(3);
+    uint16_t m = 4;
+    uint16_t k = 5;
+    uint16_t n = 6;
+    uint8_t featOffset = 7;
+    uint8_t smaskOffset = 8;
+    uint8_t unitFlag = 1;
+    bool kDirectionAlign = true;
+    bool isWeightOffset = true;
+    bool cmatrixSource = false;
+    bool cmatrixInitVal = true;
+
+    asc_mmad2(c, a, b, m, k, n, featOffset, smaskOffset, unitFlag, kDirectionAlign, isWeightOffset, cmatrixSource,
+             cmatrixInitVal);
+}
+
+TEST_F(TestMmadCAPI, madtf322f32_offset_sync_Succ)
+{
+    __cc__ float* c =  reinterpret_cast<__cc__ float*>(1);
+    __ca__ float* a =  reinterpret_cast<__ca__ float*>(2);
+    __cb__ float* b =  reinterpret_cast<__cb__ float*>(3);
+    uint16_t m = 4;
+    uint16_t k = 5;
+    uint16_t n = 6;
+    uint8_t featOffset = 7;
+    uint8_t smaskOffset = 8;
+    uint8_t unitFlag = 1;
+    bool kDirectionAlign = true;
+    bool isWeightOffset = true;
+    bool cmatrixSource = false;
+    bool cmatrixInitVal = true;
+
+    asc_mmad_sync2(c, a, b, m, k, n, featOffset, smaskOffset, unitFlag, kDirectionAlign, isWeightOffset, cmatrixSource,
+                  cmatrixInitVal);
+}
