@@ -41,6 +41,9 @@
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_scatter_impl.h"
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_gm2ub_align_impl.h"
 #include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_ub2gm_align_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_ub2l1_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_ub2ub_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_ndim_copy_dci_impl.h"
 
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
 // ==========asc_storealign(u8/s8/half/u16/s16/float/u32/s32/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
@@ -5473,4 +5476,166 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e4m3fn_t* dst, __ubuf__ f
 {
     asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
+//=============asc_ndim_copy_dci===============
+__aicore__ inline void asc_ndim_copy_dci() {
+    asc_ndim_copy_dci_impl();
+}
+
+//=============asc_copy_ub2l1===============
+// 连续搬运
+__aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size) {
+    asc_copy_ub2l1_impl(dst, src, size);
+}
+
+// 高维切分
+__aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src,
+            uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap) {
+    asc_copy_ub2l1_impl(dst, src, burst_num, burst_len, src_gap, dst_gap);
+}
+
+// 同步
+__aicore__ inline void asc_copy_ub2l1_sync(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size) {
+    asc_copy_ub2l1_sync_impl(dst, src, size);
+}
+//=============asc_copy_ub2ub===============
+// 连续搬运
+__aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size) {
+    asc_copy_ub2ub_impl(dst, src, size);
+}
+
+// 高维切分
+__aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
+                                      uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap) {
+    asc_copy_ub2ub_impl(dst, src, burst_num, burst_len, src_gap, dst_gap);
+}
+
+// 同步
+__aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size) {
+    asc_copy_ub2ub_sync_impl(dst, src, size);
+}
+
+// 使用 pst, 通过地址寄存器传入偏移,  用户可以选择更新偏移或者更新dst地址
+__simd_callee__ inline void asc_storealign(__ubuf__ uint32_t *dst, vector_bool src, iter_reg offset)
+{
+    asc_storealign_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t *dst, vector_bool src, iter_reg offset)
+{
+    asc_storealign_pack_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign(__ubuf__ uint16_t *dst, vector_bool src, iter_reg offset)
+{
+    asc_storealign_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t *dst, vector_bool src, iter_reg offset)
+{
+    asc_storealign_pack_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign(__ubuf__ uint8_t *dst, vector_bool src, iter_reg offset)
+{
+    asc_storealign_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t     *dst, vector_bool src, iter_reg offset)
+{
+    asc_storealign_pack_impl(dst, src, offset);
+}
+
+// 使用 psts, 偏移固定传入0， 由用户自行更新dst地址
+__simd_callee__ inline void asc_storealign(__ubuf__ uint32_t *dst, vector_bool src)
+{
+    asc_storealign_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t *dst, vector_bool src)
+{
+    asc_storealign_pack_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storealign(__ubuf__ uint16_t *dst, vector_bool src)
+{
+    asc_storealign_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t *dst, vector_bool src)
+{
+        asc_storealign_pack_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storealign(__ubuf__ uint8_t *dst, vector_bool src)
+{
+    asc_storealign_impl(dst, src);
+}
+
+__simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t *dst, vector_bool src)
+{
+    asc_storealign_pack_impl(dst, src);
+}
+
+// 使用 psts, 通过int32_t 传入偏移,  用户可以选择更新偏移或者更新dst地址
+__simd_callee__ inline void asc_storealign(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset)
+{
+    asc_storealign_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset)
+{
+    asc_storealign_pack_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign(__ubuf__ uint16_t *dst, vector_bool src, int32_t offset)
+{
+    asc_storealign_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t *dst, vector_bool src, int32_t offset)
+{
+    asc_storealign_pack_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign(__ubuf__ uint8_t *dst, vector_bool src, int32_t offset)
+{
+    asc_storealign_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t *dst, vector_bool src, int32_t offset)
+{
+    asc_storealign_pack_impl(dst, src, offset);
+}
+
+// 使用 psts, 通过int32_t 传入偏移，同时增加PostMode可以设置成硬件自动Post Update
+__simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset)
+{
+    asc_storealign_postupdate_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t *dst, vector_bool src, int32_t  offset)
+{
+    asc_storealign_pack_postupdate_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint16_t *dst, vector_bool src, int32_t offset)
+{
+    asc_storealign_postupdate_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint16_t *dst, vector_bool src, int32_t  offset)
+{
+    asc_storealign_pack_postupdate_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t *dst, vector_bool src, int32_t offset)
+{
+    asc_storealign_postupdate_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t *dst, vector_bool src, int32_t  offset)
+{
+    asc_storealign_pack_postupdate_impl(dst, src, offset);
+}
+
 #endif
