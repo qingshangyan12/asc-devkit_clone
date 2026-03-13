@@ -211,6 +211,8 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_int32_t& dst, int32_t va
 
 __simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value, vector_bool mask);
 
+__simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float src);
+
 // ==========asc_duplicate(uint8_t/int8_t/uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_duplicate(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
