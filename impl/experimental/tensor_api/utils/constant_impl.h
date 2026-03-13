@@ -77,6 +77,46 @@ struct IsFP4x2Type<fp4x2_e2m1_t> : Std::true_type {};
 template <typename T>
 inline constexpr bool is_fp4_v = IsFP4x2Type<T>::value;
 
+template <typename T>
+using is_gm_attr = __gm__ T;
+
+template <typename T>
+using is_ubuf_attr = __ubuf__ T;
+
+template <typename T>
+using is_L1_attr = __cbuf__ T;
+
+template <typename T>
+using is_L0A_attr = __ca__ T;
+
+template <typename T>
+using is_L0B_attr = __cb__ T;
+
+template <typename T>
+using is_L0C_attr = __cc__ T;
+
+template <typename T>
+using is_Bias_attr = __biasbuf__ T;
+
+template <typename T>
+using is_Fixbuf_attr = __fbuf__ T;
+
+template <typename Iterator, template <typename> class Attr>
+inline constexpr bool is_attr_v =
+    Std::is_one_of_v<
+        Std::remove_cvref_t<Iterator>,
+        Attr<fp4x2_e1m2_t>*,
+        Attr<fp4x2_e2m1_t>*,
+        Attr<fp8_e8m0_t>*,
+        Attr<float>*,
+        Attr<half>*,
+        Attr<int32_t>*,
+        Attr<uint32_t>*,
+        Attr<float>*,
+        Attr<uint8_t>*,
+        Attr<uint32_t>*
+    >;
+
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define SCALAR_QUANT_MODE QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8,\
     QuantMode_t::QS322BF16_PRE, QuantMode_t::QF322F16_PRE, QuantMode_t::QF322BF16_PRE, QuantMode_t::QF322FP8_PRE,\

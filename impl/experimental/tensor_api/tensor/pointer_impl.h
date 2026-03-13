@@ -24,41 +24,49 @@ namespace Te {
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeGMmemPtr(Iterator iter) {
+    static_assert(is_attr_v<Iterator, is_gm_attr>, "MakeGMmemPtr only support __gm__ ptr");
     return MakeMemPtr<Hardware::GM, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeUBmemPtr(Iterator iter) {
+    static_assert(is_attr_v<Iterator, is_ubuf_attr>, "MakeGMmemPtr only support __ubuf__ ptr");
     return MakeMemPtr<Hardware::UB, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeL1memPtr(Iterator iter) {
+    static_assert(is_attr_v<Iterator, is_L1_attr>, "MakeGMmemPtr only support __cbuf__ ptr");
     return MakeMemPtr<Hardware::L1, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeL0AmemPtr(Iterator iter) {
+    static_assert(is_attr_v<Iterator, is_L0A_attr>, "MakeGMmemPtr only support __ca__ ptr");
     return MakeMemPtr<Hardware::L0A, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeL0BmemPtr(Iterator iter) {
+    static_assert(is_attr_v<Iterator, is_L0B_attr>, "MakeGMmemPtr only support __cb__ ptr");
     return MakeMemPtr<Hardware::L0B, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeL0CmemPtr(Iterator iter) {
+    static_assert(is_attr_v<Iterator, is_L0C_attr>, "MakeGMmemPtr only support __cc__ ptr");
     return MakeMemPtr<Hardware::L0C, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeBiasmemPtr(Iterator iter) {
+    static_assert(is_attr_v<Iterator, is_Bias_attr>, "MakeGMmemPtr only support __biasbuf__ ptr");
     return MakeMemPtr<Hardware::BIAS, Iterator>(iter);
 }
 
 template <typename Iterator>
 __aicore__ inline constexpr auto MakeFixbufmemPtr(Iterator iter) {
+    static_assert(is_attr_v<Iterator, is_Fixbuf_attr>, "MakeGMmemPtr only support __fbuf__ ptr");
     return MakeMemPtr<Hardware::FIXBUF, Iterator>(iter);
 }
 
