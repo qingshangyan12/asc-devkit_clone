@@ -32,15 +32,12 @@ public:
 private:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>
     __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const V& bias, const Params& params) {
-
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            if constexpr (trait.mmadType == MmadTrait::MmadType::NORMAL) {
-                MmadBias biasStrategy;
-                biasStrategy.Run<trait, T, U, S, V>(dst, fm, filter, bias, params);
-            } else if constexpr (trait.mmadType == MmadTrait::MmadType::MX) {
-                MmadMxBias mxBiasStrategy;
-                mxBiasStrategy.Run<trait, T, U, S, V>(dst, fm, filter, bias, params);
-            }
+        if constexpr (trait.mmadType == MmadTrait::MmadType::NORMAL) {
+            MmadBias biasStrategy;
+            biasStrategy.Run<trait, T, U, S, V>(dst, fm, filter, bias, params);
+        } else if constexpr (trait.mmadType == MmadTrait::MmadType::MX) {
+            MmadMxBias mxBiasStrategy;
+            mxBiasStrategy.Run<trait, T, U, S, V>(dst, fm, filter, bias, params);
         }
     }
 };
