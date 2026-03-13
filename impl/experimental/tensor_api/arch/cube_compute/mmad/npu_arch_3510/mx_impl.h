@@ -42,9 +42,6 @@ private:
     __aicore__ inline void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
     {
         CheckTemplate<trait, T, U, S>();
-        using fmType = typename U::elementType;
-        auto fmLayout = fm.Layout();
-        auto dstLayout = dst.Layout();
 
         MmadMxInstr mmadMxInstr;
         mmadMxInstr.Mmad(dst, fm, filter, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, trait.cmatrixSource, 
