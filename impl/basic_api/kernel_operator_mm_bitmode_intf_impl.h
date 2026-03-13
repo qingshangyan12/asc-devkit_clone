@@ -21,7 +21,6 @@
 #define ASCENDC_MODULE_OPERATOR_MM_BITMODE_INTF_IMPL_H
 
 namespace AscendC {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 __aicore__ inline Load2DBitModeParam::Load2DBitModeParam()
 {
     config0 = 0;
@@ -245,9 +244,7 @@ __aicore__ inline void SetFMatrixBitModeParams::SetPadList(const uint8_t padList
 {
     config0BitMode.SetPadList(padList_);
 };
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline MmadBitModeParams::MmadBitModeParams()
 {
     config0 = 0;
@@ -314,9 +311,7 @@ __aicore__ inline bool MmadBitModeParams::GetCmatrixInitVal() const
 {
     return config0BitMode.GetCmatrixInitVal();
 };
-#endif
 }  // namespace AscendC
-
 #endif  // ASCENDC_MODULE_OPERATOR_MM_BITMODE_INTF_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BITMODE_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
