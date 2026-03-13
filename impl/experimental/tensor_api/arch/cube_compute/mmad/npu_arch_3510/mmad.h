@@ -15,13 +15,45 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_H
 #define IMPL_TENSOR_API_ARCH_CUBE_COMPUTE_MMAD_NPU_ARCH_3510_MMAD_H
 
-#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad/normal.h"
-#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/mmad/mx.h"
+#include "impl/experimental/tensor_api/arch/cube_compute/mmad/npu_arch_3510/instruction.h"
 
 namespace AscendC {
 namespace Te {
 
-class Mmad3510{
+class MmadNoBiasDetails {
+public:
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>    
+    __aicore__ inline static void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
+    {   
+        MmadImpl<trait, T, U, S>(dst, fm, filter, params);
+    }
+
+private:
+    template <const MmadTrait& trait, typename T, typename U, typename S>
+    __aicore__ inline static constexpr void CheckTemplate()
+    {
+        CheckFormat::CheckL0CNZTemplate<T>();
+        CheckFormat::CheckNZTemplate<U>();
+        CheckFormat::CheckZNTemplate<S>();
+        CheckDataTypeFor3510::CheckMxMmadDataType<T, U, S>();
+    }
+
+    template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
+    __aicore__ inline static void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
+    {
+        CheckTemplate<trait, T, U, S>();
+        
+        if constexpr (trait.mmadType == MmadType::NORMAL) {
+            MmadInstr::Mmad(dst, fm, filter, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, trait.cmatrixSource, 
+                            params.cmatrixInitVal);
+        } else if constexpr (trait.mmadType == MmadType::MX) {
+            MmadMxInstr::Mmad(dst, fm, filter, params.m, params.k, params.n, params.unitFlag, trait.disableGemv, trait.cmatrixSource, 
+                              params.cmatrixInitVal);
+        }
+    }
+};
+
+class Mmad3510 {
 public:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
     __aicore__ inline void Run(const T& dst, const U& fm, const S& filter, const Params& params) 
@@ -32,17 +64,7 @@ public:
 private:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
     __aicore__ inline void Execute(const T& dst, const U& fm, const S& filter, const Params& params) {
-  
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            if constexpr (trait.mmadType == MmadTrait::MmadType::NORMAL) {
-                MmadNormal normalStrategy;
-                normalStrategy.Run<trait, T, U, S, Params>(dst, fm, filter, params);
-            } else if constexpr (trait.mmadType == MmadTrait::MmadType::MX) {
-                MmadMx mxStrategy;
-                mxStrategy.Run<trait, T, U, S, Params>(dst, fm, filter, params);
-            }
-        }
-
+        MmadNoBiasDetails::Run<trait, T, U, S>(dst, fm, filter, params);
     }
 };
 
