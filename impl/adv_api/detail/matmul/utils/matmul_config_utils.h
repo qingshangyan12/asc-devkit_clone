@@ -13,6 +13,12 @@
 * \brief
 */
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/matmul/utils/matmul_config_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MATMUL_CONFIG_UTILS_H__
+#endif
+
 #ifndef IMPL_MATMUL_UTILS_MATMUL_CONFIG_UTILS_H
 #define IMPL_MATMUL_UTILS_MATMUL_CONFIG_UTILS_H
 
@@ -65,7 +71,7 @@ constexpr static int L0CSize_ = 128 * 1024;
 constexpr static int L1Size_ = 512 * 1024;
 constexpr static int UBSize_ = 120 * 1024;
 constexpr static int L0CSize_ = 64 * 1024;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 constexpr static int L1Size_ = 512 * 1024;
 constexpr static int L0CSize_ = 256 * 1024;
 
@@ -106,7 +112,7 @@ constexpr int32_t MX_EVEN_FACTOR = 2;
             equal: TOTAL_UB_SIZE * MAX_AIV_NUM
 */
 constexpr int64_t GM_OFFSET = 128 * 2 * 64 * 50 + 128 * 8 * 50 + 192 * 1024 * 50;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 constexpr FixpipeConfig CFG_ROW_MAJOR_UB = {CO2Layout::ROW_MAJOR, true};
 constexpr FixpipeConfig CFG_NZ_UB = {CO2Layout::NZ, true};
 #else
@@ -484,3 +490,8 @@ __aicore__ constexpr DecompressionMode DecompMode(const MatmulApiStaticTiling &m
 
 } // namespace AscendC
 #endif // _MATMUL_CONFIG_UTILS_H_
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MATMUL_CONFIG_UTILS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MATMUL_CONFIG_UTILS_H__
+#endif

@@ -12,6 +12,11 @@
  * \file kernel_operator_swap_mem_intf.h
  * \brief Interface for memory swap and workspace management
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SWAP_MEM_INTF_H__
+#endif
+
 
 #ifndef ASCENDC_MODULE_SWAP_MEM_INTF_H
 #define ASCENDC_MODULE_SWAP_MEM_INTF_H
@@ -36,7 +41,7 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetSysWorkSpacePtr()
 {
     // kernel launch
 #if defined(__NPU_DEVICE__) && defined(__NPU_ARCH__)
-    if constexpr (__NPU_ARCH__ ==  2201 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3510) {
+    if constexpr (__NPU_ARCH__ ==  2201 || __NPU_ARCH__ == 3510) {
         return __get_kfc_workspace_addr();
     } else {
         return g_sysWorkspaceReserved;
@@ -63,3 +68,8 @@ __aicore__ inline void SetSysWorkSpacePtr(__gm__ uint8_t* workspace)
 }
 #endif
 #endif // ASCENDC_KERNEL_SWAP_MEM_INTF_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SWAP_MEM_INTF_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SWAP_MEM_INTF_H__
+#endif

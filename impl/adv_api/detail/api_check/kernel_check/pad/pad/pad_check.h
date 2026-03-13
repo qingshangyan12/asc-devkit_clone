@@ -12,13 +12,19 @@
  * \file pad_check.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/api_check/kernel_check/pad/pad/pad_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/pad/pad.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_CHECK_H__
+#endif
+
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_PAD_PAD_PAD_CHECK_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_PAD_PAD_PAD_CHECK_H_
 
 #include "kernel_tiling/kernel_tiling.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "pad_check_common.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "pad_check_310.h"
 #else
 #include "pad_check_aicore.h"
@@ -39,3 +45,8 @@ __aicore__ inline void CheckFuncPad(__gm__ const char *apiName, const LocalTenso
 }
 }
 #endif // IMPL_API_CHECK_KERNEL_CHECK_PAD_PAD_PAD_CHECK_H_
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_CHECK_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_CHECK_H__
+#endif

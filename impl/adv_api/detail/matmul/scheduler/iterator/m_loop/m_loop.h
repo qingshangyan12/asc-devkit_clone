@@ -13,6 +13,12 @@
 * \brief
 */
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/matmul/scheduler/iterator/m_loop/m_loop.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_ITERATOR_M_LOOP_M_LOOP_H__
+#endif
+
 #ifndef IMPL_MATMUL_SCHEDULER_ITERATOR_M_LOOP_M_LOOP_H
 #define IMPL_MATMUL_SCHEDULER_ITERATOR_M_LOOP_M_LOOP_H
 
@@ -24,7 +30,12 @@
 #include "m_loop_basic.h"
 #include "m_loop_intrablock.h"
 #include "m_loop_norm_outer_product.h"
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #include "m_loop_mdl_mx.h"
 #endif
 #endif // IMPL_MATMUL_SCHEDULER_ITERATOR_M_LOOP_M_LOOP_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_ITERATOR_M_LOOP_M_LOOP_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_ITERATOR_M_LOOP_M_LOOP_H__
+#endif

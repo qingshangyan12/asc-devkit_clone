@@ -12,6 +12,11 @@
  * \file kernel_macros.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_macros.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_MACROS_H__
+#endif
 #ifndef ASCENDC_KERNEL_MACROS_H
 #define ASCENDC_KERNEL_MACROS_H
 
@@ -89,22 +94,9 @@
 #define ASCENDC_MATMUL_AICORE
 #endif
 
-#if (defined(__NPU_ARCH__) &&                                               \
-     ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) ||                   \
-      (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                   \
-      (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)))
-#ifndef ASCENDC_DUMP
-#define ASCENDC_DUMP 1
-#endif
-#endif
-
-#if defined(ASCENDC_DUMP) && (ASCENDC_DUMP == 0)
-    #undef ASCENDC_DUMP
-#endif
-
 namespace AscendC {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||           \
-    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) ||           \
+    (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) ||           \
     (__NPU_ARCH__ == 5102)) // Available for V200 and V210
 constexpr int32_t QUE_MAX_EVENT = 8;
 #else
@@ -128,10 +120,13 @@ extern int32_t g_matmulCount;
 #define ASCEND_IS_AICORE constexpr(false)
 #endif
 
-// Make the MicroAPI namespace to all versions visible so that user code can be onetrack.
 namespace AscendC {
-namespace MicroAPI {
-
-} // namespace MicroAPI
+namespace Reg {
+} // namespace Reg
+namespace MicroAPI = Reg;
 } // namespace AscendC
 #endif // ASCENDC_KERNEL_MACROS_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_MACROS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_MACROS_H__
+#endif

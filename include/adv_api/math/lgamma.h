@@ -12,15 +12,21 @@
  * \file lgamma.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LGAMMA_H__
+#endif
+
 #ifndef LIB_MATH_LGAMMA_H
 #define LIB_MATH_LGAMMA_H
 #include "kernel_tensor.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/lgamma/lgamma_c310_impl.h"
 #else
 #include "../../../impl/adv_api/detail/math/lgamma/lgamma_common_impl.h"
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -68,3 +74,8 @@ __aicore__ inline void Lgamma(const LocalTensor<T>& dstTensor, const LocalTensor
 }  // namespace AscendC
 #endif
 #endif  // LIB_MATH_LGAMMA_INTERFACE_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LGAMMA_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LGAMMA_H__
+#endif

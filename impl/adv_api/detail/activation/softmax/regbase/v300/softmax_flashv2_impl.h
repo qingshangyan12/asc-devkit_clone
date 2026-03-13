@@ -12,6 +12,13 @@
  * \file softmax_flashv2_impl.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/activation/softmax/regbase/v300/softmax_flashv2_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/activation/softmaxflashv2.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_FLASHV2_IMPL_H__
+#endif
+
 #ifndef IMPL_ACTIVATION_SOFTMAX_V300_SOFTMAX_FLASHV2_IMPL_H
 #define IMPL_ACTIVATION_SOFTMAX_V300_SOFTMAX_FLASHV2_IMPL_H
 
@@ -31,7 +38,7 @@ __aicore__ inline void SoftmaxFlashV2NoUpdate(const LocalTensor<T1>& dst, const 
     const LocalTensor<T1>& maxTensor, const LocalTensor<T1>& src, const LocalTensor<float>& workLocal,
     const LastAxisShapeND& originalSrcShape, const SoftMaxTiling& tiling)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     if (originalSrcShape.k % FLOAT_REPEAT_SIZE) {
         SoftMaxGenericNDWithTailImpl<T1, T1, isBasicBlock, true>(dst, expSumTensor, maxTensor, src, workLocal, originalSrcShape, tiling);
     } else {
@@ -124,7 +131,7 @@ __aicore__ inline void SoftmaxFlashV2UpdateImpl(const LocalTensor<float>& dst, c
     Add(expSumTensor[offset2], expSumTensor[offset2], tmpBuffer0, reduceSize);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 __aicore__ inline void SoftmaxFlashV2UpdateNDImpl(const LocalTensor<half>& dst, const LocalTensor<half>& expSumTensor,
     const LocalTensor<half>& maxTensor, const LocalTensor<half>& src, const LocalTensor<half>& expMaxTensor,
     const LocalTensor<half>& inExpSumTensor, const LocalTensor<half>& inMaxTensor, const LocalTensor<float>& workLocal,
@@ -209,7 +216,7 @@ __aicore__ inline void SoftmaxFlashV2Update(const LocalTensor<T1>& dst, const Lo
     const LocalTensor<T2>& inExpSumTensor, const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal,
     const LastAxisShapeND& originalSrcShape, const SoftMaxTiling& tiling)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     SoftmaxFlashV2UpdateNDImpl(dst, expSumTensor, maxTensor, src, expMaxTensor, inExpSumTensor, inMaxTensor,
                 workLocal, originalSrcShape, tiling);
 #else
@@ -290,3 +297,7 @@ __aicore__ inline void SoftmaxFlashV2M1PostProcess(const LocalTensor<T1>& dstTen
 }
 }
 #endif // IMPL_ACTIVATION_SOFTMAX_V300_SOFTMAX_FLASHV2_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_FLASHV2_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_FLASHV2_IMPL_H__
+#endif

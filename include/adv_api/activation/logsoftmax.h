@@ -12,11 +12,17 @@
  * \file logsoftmax.h
  * \brief LogSoftMax api of AscendC
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGSOFTMAX_H__
+#endif
+
 #ifndef LIB_SOFTMAX_LOGSOFTMAX_H
 #define LIB_SOFTMAX_LOGSOFTMAX_H
 
 #include "kernel_tensor.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/activation/softmax/softmax_common.h"
 #include "../../../impl/adv_api/detail/activation/softmax/logsoftmax_base_impl.h"
 #pragma begin_pipe(V)
@@ -56,3 +62,8 @@ __aicore__ inline void LogSoftMax(const LocalTensor<T>& dst, const LocalTensor<T
 #pragma end_pipe
 #endif
 #endif // LIB_SOFTMAX_LOGSOFTMAX_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGSOFTMAX_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGSOFTMAX_H__
+#endif

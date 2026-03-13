@@ -12,6 +12,11 @@
  * \file kernel_type_conversion_utils.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_type_conversion_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_scalar_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TYPE_CONVERSION_UTILS_H__
+#endif
 #ifndef ASCENDC_TYPE_CONVERSION_UTILS_H
 #define ASCENDC_TYPE_CONVERSION_UTILS_H
 #include "utils/kernel_utils_macros.h"
@@ -26,7 +31,7 @@
 namespace AscendC {
 #if defined(__NPU_ARCH__) &&                                        \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||            \
-     (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) ||            \
+     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||            \
      (__NPU_ARCH__ == 3003))
 constexpr uint32_t BF16_TO_FP32_MAN_LEN = 16;
 constexpr uint32_t FP32_EXP_PART_MASK = 0x7F800000u;
@@ -55,7 +60,7 @@ __aicore__ inline constexpr bool IsBf16NeedRound(uint64_t man)
     return (truncHighBit && (truncLeft || lastBit));
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 namespace FPTranslation {
 // HiFloat8 -> Fp32
 #define HIF8_SIGN_INDEX (7)
@@ -426,3 +431,7 @@ __aicore__ inline float Bf16ToFp32(const bfloat16_t& bVal)
 #endif
 } // namespace AscendC
 #endif // ASCENDC_TYPE_CONVERSION_UTILS_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TYPE_CONVERSION_UTILS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TYPE_CONVERSION_UTILS_H__
+#endif

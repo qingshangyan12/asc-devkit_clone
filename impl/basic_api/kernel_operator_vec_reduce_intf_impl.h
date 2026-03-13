@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_reduce_intf_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_operator_vec_reduce_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_reduce_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_REDUCE_INTF_IMPL_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
@@ -27,7 +32,7 @@
 #include "dav_m300/kernel_operator_vec_reduce_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_reduce_impl.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "dav_c310/kernel_operator_vec_reduce_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_reduce_impl.h"
@@ -270,7 +275,7 @@ __aicore__ inline void PairReduceSum(const LocalTensor<T>& dst, const LocalTenso
         mask, dstRepStride, srcBlkStride, srcRepStride);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <typename T, bool isSetMask, typename U>
 __aicore__ inline void RepeatReduceSum(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const int32_t repeatTime, const int32_t mask, const int32_t dstBlkStride, const int32_t srcBlkStride,
@@ -329,7 +334,7 @@ __aicore__ inline void RepeatReduceSum(const LocalTensor<T>& dst, const LocalTen
  * @param [in] srcBlkStride src block stride
  * @param [in] srcRepStride src repeat stride
  */
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <typename T, bool isSetMask, typename U>
 __aicore__ inline void WholeReduceSum(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
@@ -396,7 +401,7 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
     MstxTensor::GetMstxVecReduceInfo(dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMax");
 #endif
     using PrimType = PrimT<T>;
-#if !((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
         "WholeReduceMax, current api support dtype combination is src and dst both: half / float");});
 #endif
@@ -406,7 +411,7 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
     (__NPU_ARCH__ == 5102) ||                        \
     (__NPU_ARCH__ == 3003) ||                        \
     (__NPU_ARCH__ == 3113) ||                        \
-    (__NPU_ARCH__ == 3101))
+    (__NPU_ARCH__ == 3510))
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMax");
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMax");
@@ -446,7 +451,7 @@ __aicore__ inline void WholeReduceMinCommon(const LocalTensor<T>& dst, const Loc
     const int32_t srcRepStride, ReduceOrder order)
 {
     using PrimType = PrimT<T>;
-#if !((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
         "WholeReduceMin, current api support dtype combination is src and dst both: half / float");});
 #endif
@@ -456,7 +461,7 @@ __aicore__ inline void WholeReduceMinCommon(const LocalTensor<T>& dst, const Loc
     (__NPU_ARCH__ == 5102) ||                        \
     (__NPU_ARCH__ == 3003) ||                        \
     (__NPU_ARCH__ == 3113) ||                        \
-    (__NPU_ARCH__ == 3101))
+    (__NPU_ARCH__ == 3510))
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 3, "order", "WholeReduceMin");
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     ASCENDC_CHECK_VALUE_RANGE(static_cast<int>(order), 0, 1, "order", "WholeReduceMin");
@@ -490,7 +495,7 @@ __aicore__ inline void WholeReduceMin(const LocalTensor<T>& dst, const LocalTens
     WholeReduceMinCommon<T, isSetMask>(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, order);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <typename T, bool isSetMask, typename U>
 __aicore__ inline void WholeReduceSum(const LocalTensor<U>& dst, const LocalTensor<T>& src,
     const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride,
@@ -546,7 +551,7 @@ __aicore__ inline void WholeReduceMax(const LocalTensor<T>& dst, const LocalTens
     MstxTensor::GetMstxVecReduceInfo(dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMax");
 #endif
     using PrimType = PrimT<T>;
-#if !((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     ASCENDC_ASSERT((SupportType<PrimType, half, float>()), { KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
         "WholeReduceMax, current api support dtype combination is src and dst both: half / float");});
 #endif
@@ -618,7 +623,7 @@ __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("ReduceMax", KernelFuncType::MASK_COUNT_MODE);
     }
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     ReduceMaxImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride, calIndex);
 #else
@@ -659,7 +664,7 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("ReduceMin", KernelFuncType::MASK_COUNT_MODE);
     }
 #endif
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     ReduceMinImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride, calIndex);
 #else
@@ -698,7 +703,7 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("ReduceSum", KernelFuncType::MASK_COUNT_MODE);
     }
 #endif
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     ReduceSumImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride);
 #else
@@ -728,7 +733,7 @@ __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("ReduceMax", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     ReduceMaxImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride, calIndex);
 #else
@@ -758,7 +763,7 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("ReduceMin", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     ReduceMinImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride, calIndex);
 #else
@@ -787,7 +792,7 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
         ASCENDC_REPORT_CHECK_ERROR("ReduceSum", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     ReduceSumImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), mask, repeatTime, srcRepStride);
 #else
@@ -820,7 +825,7 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>
     MstxTensor::GetMstxVecReduceComplexInfo(dst, src, sharedTmpBuffer, count, "ReduceMin");
 #endif
     using PrimType = PrimT<T>;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #if ASCENDC_CPU_DEBUG
     int32_t oneRepSize = ONE_REPEAT_BYTE_SIZE / sizeof(PrimType);
     int32_t repeats = count < oneRepSize ? 1 : (count / oneRepSize);
@@ -880,7 +885,7 @@ __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>
     MstxTensor::GetMstxVecReduceComplexInfo(dst, src, sharedTmpBuffer, count, "ReduceMax");
 #endif
     using PrimType = PrimT<T>;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #if ASCENDC_CPU_DEBUG
     int32_t oneRepSize = ONE_REPEAT_BYTE_SIZE / sizeof(PrimType);
     int32_t repeats = count < oneRepSize ? 1 : (count / oneRepSize);
@@ -953,7 +958,7 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
         return;
     }
     ReduceSumImpl<PrimType, isSetMask>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-#elif (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 #if ASCENDC_CPU_DEBUG
     int32_t oneRepSize = ONE_REPEAT_BYTE_SIZE / sizeof(PrimType);
     int32_t repeats = count < oneRepSize ? 1 : (count / oneRepSize);
@@ -1152,3 +1157,7 @@ __aicore__ inline __inout_pipe__(S) T GetAccVal()
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_REDUCE_INTF_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_REDUCE_INTF_IMPL_H__
+#endif

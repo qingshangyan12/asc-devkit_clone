@@ -12,6 +12,11 @@
  * \file kernel_operator_dump_tensor_intf.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_H__
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_H
 
@@ -51,7 +56,7 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
 
 // assert define
 #undef assert
-#ifdef ASCENDC_DUMP
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
 #if defined(__NPU_DEVICE__) || defined(__NPU_HOST__) || defined(__ASCC_DEVICE__) || defined(__ASCC_HOST__)
 #define assert(expr) ASCENDC_NPU_DEBUG_ASSERT_IMPL(expr)
 #else
@@ -66,3 +71,8 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
 
 #include "../../impl/basic_api/kernel_operator_dump_tensor_intf_impl.h"
 #endif  // END OF ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_H__
+#endif
