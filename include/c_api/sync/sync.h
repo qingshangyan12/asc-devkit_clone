@@ -53,15 +53,15 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flagID);
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-#define asc_sync_intra_arrive_impl(pipe, sync_id) set_intra_block(pipe, sync_id)
+#define asc_sync_intra_arrive(pipe, sync_id) set_intra_block(pipe, sync_id)
 
-#define asc_sync_intra_wait_impl(pipe, sync_id) wait_intra_block(pipe, sync_id)
+#define asc_sync_intra_wait(pipe, sync_id) wait_intra_block(pipe, sync_id)
 
-#define asc_sync_inter_wait_impl(pipe, flag_id) wait_flag_dev(pipe, flag_id)
+#define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev(pipe, flag_id)
 
-#define asc_sync_block_wait_impl(pipe, flag_id) wait_flag_dev(pipe, flag_id)
+#define asc_sync_block_wait(pipe, flag_id) wait_flag_dev(pipe, flag_id)
 
-#define asc_release_buf_impl(pipe, buf_id, mode) rls_buf(pipe, buf_id, mode)
+#define asc_release_buf(pipe, buf_id, mode) rls_buf(pipe, buf_id, mode)
 
 #endif
 
