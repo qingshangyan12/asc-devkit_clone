@@ -384,7 +384,11 @@ __aicore__ inline void DumpTensorGM2GMEntityImpl(const GlobalTensor<T>& src, uin
     LocalTensor<T> tmp;
     uint64_t gmBackAddr = dumpWorkspaceStart + DUMP_UINTSIZE * (GetDumpBlockIdx() + 1) - ONE_DUMP_BACKUP_SIZE;
 
+<<<<<<< HEAD
     // 1、alloc 1k UB 2、 backup static GM addr 3、loop copy 4、recover
+=======
+    // 1��alloc 1k UB 2�� backup static GM addr 3��loop copy 4��recover
+>>>>>>> a390152e (fix print switch to fifo others)
     PipeBarrier<PIPE_ALL>();
     // BACKUP
     InitTmpTensor(tmp, static_cast<uint8_t>(TPosition::A1));
@@ -583,7 +587,7 @@ __aicore__ inline void UpdateBlockInfo(uint32_t tlvSize)
 template <class... Args>
 __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-#ifdef ASCENDC_DUMP
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     uint8_t blockIdx = GetDumpBlockIdx();
     if (blockIdx >= DUMP_CORE_COUNT) {
         return;
@@ -654,7 +658,7 @@ __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 {
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     g_dumpWorkspaceReserved = GetSysWorkSpacePtr();
     InitDumpImpl(mixFlag, gmLen);
 #else
@@ -663,7 +667,7 @@ __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
 }
 __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen)
 {
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     g_dumpWorkspaceReserved = dumpStartAddr + DUMP_WORKSPACE_SIZE;
     InitDumpImpl(mixFlag, gmLen);
 #else
