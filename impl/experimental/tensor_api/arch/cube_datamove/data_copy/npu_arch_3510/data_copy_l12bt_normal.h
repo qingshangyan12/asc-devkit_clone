@@ -15,33 +15,28 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12BT_NORMAL_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_DATA_COPY_NPU_ARCH_3510_DATA_COPY_L12BT_NORMAL_H
 
-#include "impl/experimental/tensor_api/arch/utils/arch_utils.h"
-#include "impl/experimental/tensor_api/arch/utils/check_format.h"
-#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
-#include "impl/experimental/tensor_api/tensor/pointer_impl.h"
-#include "impl/experimental/tensor_api/tensor/layout_impl.h"
-#include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/data_copy_l12bt/base.h"
 
 namespace AscendC {
 namespace Te {
 
-class DataCopyFourDim3510L12BT : public CopyL12BTBase {
+class DataCopyFourDim3510L12BT {
 public:
     template <const DataCopyTrait& trait, typename T, typename U>
     __aicore__ inline void Run(const T& dst, const U& src) {
-        Execute<trait>(dst, src, ZeroCoord2DType{});
+        Execute<trait>(dst, src);
     }
     template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
     __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
-        Execute<trait>(dst, src, coord);
+        auto dstTensor = dst(coord, dst.Layout().Shape());
+        Execute<trait>(dstTensor, src);
     }
 
 private:
-    template <const DataCopyTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Execute(const T& dst, const U& src, const Coord& coord) {
+    template <const DataCopyTrait& trait, typename T, typename U>
+    __aicore__ inline void Execute(const T& dst, const U& src) {
         CopyL12BTBase btStrategy;
-        btStrategy.Run<trait, T, U, Coord>(dst, src, coord);
+        btStrategy.Run<trait, T, U>(dst, src);
     }
 };
 

@@ -17,8 +17,6 @@
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 #include "impl/experimental/tensor_api/arch/utils/arch_utils.h"
-#include "impl/experimental/tensor_api/arch/utils/check_format.h"
-#include "impl/experimental/tensor_api/arch/utils/check_data_type_2201.h"
 
 namespace AscendC {
 namespace Te {
@@ -35,17 +33,11 @@ private:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V>
     __aicore__ inline constexpr void CheckTemplate()
     {
-        using dstDataType = typename T::elementType;
-        using fmDataType = typename U::elementType;
-        using filterDataType = typename S::elementType;
-        using biasDataType = typename V::elementType;
-        constexpr auto biasPos = GetHardPos<V>();
-
         CheckFormat::CheckL0CNZTemplate<T>();
         CheckFormat::CheckZZTemplate<U>();
         CheckFormat::CheckZNTemplate<S>();
         CheckFormat::CheckNDTemplate<V>();
-        CheckDataTypeFor2201::CheckMmadDataType<biasPos, dstDataType, fmDataType, filterDataType, biasDataType>(false);
+        CheckDataTypeFor2201::CheckMmadBiasDataType<T, U, S, V>();
     }
 
     template <const MmadTrait& trait, typename T, typename U, typename S, typename V, typename Params>

@@ -35,11 +35,35 @@ constexpr size_t ENABLE_COORD = 1;
 constexpr size_t SHIFT_LEFT_16 = 0x00010000;
 constexpr size_t L2_CACHE_OFFSET = 60;
 constexpr size_t MX_SCALE_K0 = 2;
+constexpr uint32_t BLOCK_CUBE = 16;
+
+struct ArchVersion {
+    static constexpr uint32_t V3510 = 3510;
+    static constexpr uint32_t V2201 = 2201;
+};
+
+struct GetArchVersion {
+    __aicore__ inline constexpr uint32_t operator()() const {
+#ifdef __NPU_ARCH__
+        return __NPU_ARCH__;
+#else
+        return 0;
+#endif
+    }
+};
+
+constexpr uint32_t CURRENT_ARCH_VERSION = GetArchVersion{}();
 
 enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
 
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
+
+template<typename T>
+__aicore__ inline constexpr auto GetHardPos()
+{
+   return T::iterator::hardPos;
+}
 
 template <typename T, typename U>
 __aicore__ inline constexpr auto max(const T src0, const U src1)
@@ -47,16 +71,6 @@ __aicore__ inline constexpr auto max(const T src0, const U src1)
     static_assert(Std::is_same_v<T, U> || Std::is_integral_v<T>, "Only support compare with same type");
     return (src0 > src1) ? src0 : src1;
 }
-
-template <QuantMode_t Value, QuantMode_t... Args>
-struct is_one_of_value : Std::false_type {};
-
-template <QuantMode_t Value, QuantMode_t Head, QuantMode_t... Tail>
-struct is_one_of_value<Value, Head, Tail...>
-    : Std::bool_constant<(Value == Head) || is_one_of_value<Value, Tail...>::value> {};
-
-template <QuantMode_t Value, QuantMode_t... Args>
-inline constexpr bool is_one_of_value_v = is_one_of_value<Value, Args...>::value;
 
 template <typename ElementType, typename DataType>
 inline constexpr bool is_one_of_attr_v = Std::is_one_of_v<ElementType, __gm__ DataType, __cbuf__ DataType, __ca__ DataType, 
@@ -192,7 +206,6 @@ struct IsIntegralConstant<Std::Int<Value>> : Std::true_type {};
 template <typename T>
 constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
 
-constexpr uint32_t BLOCK_CUBE = 16;
 } // namespace Te
 } // namespace AscendC
 

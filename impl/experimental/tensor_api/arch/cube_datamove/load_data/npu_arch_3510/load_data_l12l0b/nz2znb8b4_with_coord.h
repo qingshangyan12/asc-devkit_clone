@@ -16,8 +16,6 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0B_NZ2ZNB8B4_WITH_COORD_H
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/instruction.h"
-#include "impl/experimental/tensor_api/arch/utils/check_format.h"
-#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
 
 namespace AscendC {
 namespace Te {
@@ -34,15 +32,13 @@ private:
     struct TraitHolder {
         static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
     };
-    
+
     template <const LoadDataTrait& trait, typename T, typename U>
     __aicore__ inline constexpr void CheckTemplate()
     {
-        using srcType = typename U::elementType;
-        using dstType = typename T::elementType;
         CheckFormat::CheckZNTemplate<T>();
         CheckFormat::CheckNZTemplate<U>();
-        CheckDataTypeFor3510::CheckL12L0BDataType<dstType, srcType>();
+        CheckDataTypeFor3510::CheckL12L0BDataType<T, U>();
     }
 
     template <const LoadDataTrait& trait, typename T, typename U>
@@ -64,10 +60,8 @@ private:
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
             auto sliceDst = dst(MakeCoord(x, y));
             loadCbufToCbS4.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
-                                                    mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);
-            y += kStep * FRACTAL_FIXED;
-            x += (y / Col) * (C0_SIZE * KHALF / sizeof(DstType));
-            y %= Col;
+                                                    mStep, kStep / KHALF, srcStride, dstStride);
+            x += C0_SIZE * KHALF;
             mStartPosition += M_STEP_MIN_VAL_B4;
         }
     }
@@ -90,9 +84,7 @@ private:
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
             auto sliceDst = dst(MakeCoord(x, y));
             loadCbufToCb.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-            y += kStep * FRACTAL_FIXED;
-            x += (y / Col) * (C0_SIZE / sizeof(DstType));
-            y %= Col;
+            x += C0_SIZE;
             mStartPosition += M_STEP_MIN_VAL_B8;
         }
     }
@@ -106,19 +98,35 @@ private:
         auto srcLayout = src.Layout();
         auto mStartPosition = Std::get<0>(coord) / FRACTAL_FIXED;
         auto kStartPosition = Std::get<1>(coord) * sizeof(DstType) / C0_SIZE;
+        auto n1 = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
+                GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) / FRACTAL_FIXED;
         auto mStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
                 GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) / FRACTAL_FIXED;
         auto kStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) *
                 GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) * sizeof(DstType) / C0_SIZE;
         // Nz -> Zn
-        uint32_t STRIDE_UNIT = FRACTAL_FIXED * (C0_SIZE / sizeof(DstType));
+        constexpr bool isFp4Type = Std::is_one_of_v<
+                Std::tuple<typename T::elementType, typename U::elementType>,
+                Std::tuple<__cb__ fp4x2_e2m1_t, __cbuf__ fp4x2_e2m1_t>,
+                Std::tuple<__cb__ fp4x2_e1m2_t, __cbuf__ fp4x2_e1m2_t>>;
+        constexpr int KHALF = 2;
+        uint32_t STRIDE_UNIT = isFp4Type ? FRACTAL_FIXED * (C0_SIZE / sizeof(DstType) * KHALF) : FRACTAL_FIXED * (C0_SIZE / sizeof(DstType));
         auto srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout) / STRIDE_UNIT;
-        constexpr bool isFp4Type = std::is_same<T, fp4x2_e2m1_t>::value || std::is_same<T, fp4x2_e1m2_t>::value;
         if constexpr (isFp4Type) {
-            LoadDataImplB4<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            if ((n1 & 1) == 0) {
+                LoadCbufToCbS4Base loadCbufToCbS4;
+                loadCbufToCbS4.template LoadData<trait>(dst, src, mStartPosition, kStartPosition / KHALF, mStep, kStep / KHALF, srcStride, dstStride);
+            } else {
+                LoadDataImplB4<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            }
         } else {
-            LoadDataImplB8<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            if ((n1 & 1) == 0) {
+                LoadCbufToCbBase loadCbufToCb;
+                loadCbufToCb.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            } else {
+                LoadDataImplB8<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            }
         }
     }
 };
