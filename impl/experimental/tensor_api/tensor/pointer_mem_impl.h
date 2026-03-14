@@ -51,7 +51,7 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
 
 template <Hardware hPos, typename Pointer, typename Index, Std::enable_if_t<is_b4_type<IterVal<iterator>::type>>
 __aicore__ inline constexpr HardwareMemPtr<hPos, Pointer> operator+(const HardwareMemPtr<hPos, Pointer>& p, Index index) {
-    auto newPtr = p.Get() + index;
+    auto newPtr = p.Get() + (index >> 1);
     return HardwareMemPtr<hPos, Pointer>{newPtr};
 }
 
