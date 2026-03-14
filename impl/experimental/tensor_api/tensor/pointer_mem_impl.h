@@ -16,6 +16,7 @@
 #define IMPL_TENSOR_API_TENSOR_POINTER_MEM_IMPL_H
 
 #include "impl/experimental/tensor_api/tensor/pointer_adaptor_impl.h"
+#include "impl/experimental/tensor_api/utils/constant_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -24,6 +25,14 @@ template <Hardware hPos, typename Pointer>
 struct HardwareMemPtr : IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>> {
     using IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>>::IterAdaptor;
     static constexpr const Hardware hardPos = hPos;
+
+    // b4 专用成员 operator+：遮蔽基类后 ubPtr+2 才会走 (index>>1)，否则会走基类 ptr+i
+    template <typename Index,
+              Std::enable_if_t<is_b4_type<typename IterVal<Pointer>::type>, int> = 0>
+    __aicore__ inline constexpr HardwareMemPtr<hPos, Pointer> operator+(const Index& index) const
+    {
+        return HardwareMemPtr<hPos, Pointer>{this->Get() + (static_cast<size_t>(index) >> 1)};
+    }
 };
 
 // is hardware mem
@@ -47,12 +56,6 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iter)
     } else {
         return HardwareMemPtr<hardPos, Iterator>{iter};
     }
-}
-
-template <Hardware hPos, typename Pointer, typename Index, Std::enable_if_t<is_b4_type<IterVal<iterator>::type>>>
-__aicore__ inline constexpr HardwareMemPtr<hPos, Pointer> operator+(const HardwareMemPtr<hPos, Pointer>& p, Index index) {
-    auto newPtr = p.Get() + (index >> 1);
-    return HardwareMemPtr<hPos, Pointer>{newPtr};
 }
 
 } // namespace Te
