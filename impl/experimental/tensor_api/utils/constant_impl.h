@@ -68,10 +68,10 @@ inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t> || i
 template <typename T>
 struct IsFP4x2Type : Std::false_type {};
 
-template <typename T>
+template <>
 struct IsFP4x2Type<fp4x2_e1m2_t> : Std::true_type {};
 
-template <typename T>
+template <>
 struct IsFP4x2Type<fp4x2_e2m1_t> : Std::true_type {};
 
 template <typename T>
