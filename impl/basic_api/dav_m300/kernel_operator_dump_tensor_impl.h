@@ -384,7 +384,7 @@ __aicore__ inline void DumpTensorGM2GMEntityImpl(const GlobalTensor<T>& src, uin
     LocalTensor<T> tmp;
     uint64_t gmBackAddr = dumpWorkspaceStart + DUMP_UINTSIZE * (GetDumpBlockIdx() + 1) - ONE_DUMP_BACKUP_SIZE;
 
-    // 1��alloc 1k UB 2�� backup static GM addr 3��loop copy 4��recover
+    // 1.alloc 1k UB 2.backup static GM addr 3.loop copy 4.recover
     PipeBarrier<PIPE_ALL>();
     // BACKUP
     InitTmpTensor(tmp, static_cast<uint8_t>(TPosition::A1));
@@ -647,7 +647,7 @@ __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
 
 __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
 {
-#ifdef ASCENDC_TIME_STAMP_ON  // 打点开关宏
+#ifdef ASCENDC_TIME_STAMP_ON
     DumpTimeStampImpl(descId);
 #endif
 }
