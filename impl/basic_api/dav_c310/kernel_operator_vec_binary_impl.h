@@ -53,6 +53,20 @@ __aicore__ inline void DivImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *sr
 {
     static_assert((SupportType<T, uint16_t, int16_t, uint32_t, int32_t, half, float>()),
         "current data type is not supported on current device!");
+    
+    #if FTZ_CONTROL
+    static_assert((SupportType<T, half, float>()),
+        "current data type is not supported on current device when enable subnormal calculate!");
+    if constexpr (SupportType<T, float>()) {
+        static constexpr AscendC::MicroAPI::DivSpecificMode mode = {MicroAPI::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_0ULP_FTZ_FALSE};
+        constexpr auto func = MicroAPI::Div<T, &mode, MicroAPI::RegTensor<T>>;
+        Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
+    } else {
+        static constexpr AscendC::MicroAPI::DivSpecificMode mode = {MicroAPI::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_1ULP_FTZ_FALSE};
+        constexpr auto func = MicroAPI::Div<T, &mode, MicroAPI::RegTensor<T>>;
+        Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
+    }
+    #else   
     if constexpr (config.algo == DivAlgo::INTRINSIC || config.algo == DivAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Div<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
@@ -69,6 +83,7 @@ __aicore__ inline void DivImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *sr
         constexpr auto func = MicroAPI::Div<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, true>(dst, src0, src1, mask, 0, repeatTime, repeatParams);
     }
+    #endif  
 }
 
 template <typename T, bool isSetMask = true>
@@ -147,6 +162,20 @@ __aicore__ inline void DivImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *sr
 {
     static_assert((SupportType<T, uint16_t, int16_t, uint32_t, int32_t, half, float>()),
         "current data type is not supported on current device!");
+
+    #if FTZ_CONTROL
+    static_assert((SupportType<T, half, float>()),
+        "current data type is not supported on current device when enable subnormal calculate!");
+    if constexpr (SupportType<T, float>()) {
+        static constexpr AscendC::MicroAPI::DivSpecificMode mode = {MicroAPI::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_0ULP_FTZ_FALSE};
+        constexpr auto func = MicroAPI::Div<T, &mode, MicroAPI::RegTensor<T>>;
+        Internal::VecBinaryImplTemplate<func, isSetMask, false>(dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
+    } else {
+        static constexpr AscendC::MicroAPI::DivSpecificMode mode = {MicroAPI::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_1ULP_FTZ_FALSE};
+        constexpr auto func = MicroAPI::Div<T, &mode, MicroAPI::RegTensor<T>>;
+        Internal::VecBinaryImplTemplate<func, isSetMask, false>(dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
+    } 
+    #else 
     if constexpr (config.algo == DivAlgo::INTRINSIC || config.algo == DivAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Div<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, false>(dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
@@ -162,7 +191,8 @@ __aicore__ inline void DivImpl(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *sr
         static constexpr AscendC::MicroAPI::DivSpecificMode mode = {MicroAPI::MaskMergeMode::ZEROING, false, DivAlgo::PRECISION_1ULP_FTZ_FALSE};
         constexpr auto func = MicroAPI::Div<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecBinaryImplTemplate<func, isSetMask, false>(dst, src0, src1, nullptr, mask, repeatTime, repeatParams);
-    }
+    } 
+    #endif
 }
 
 template <typename T, bool isSetMask = true>

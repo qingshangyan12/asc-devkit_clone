@@ -1388,19 +1388,34 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
                 (dstReg, srcReg0, srcReg1, mask);
         }
     } else if constexpr (SupportType<ActualT, half>()) {
+        #if FTZ_CONTROL
+        DivIEEE754HalfImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
+        #else
         if constexpr (sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
             DivIEEE754HalfImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
         } else {
             vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
         }
+        #endif
     } else if constexpr (SupportType<ActualT, float>()) {
         if constexpr (sprMode.precisionMode) {
+            #if FTZ_CONTROL
+            DivIEEE754FloatImpl<T, mode, U, true>(dstReg, srcReg0, srcReg1, mask);
+            #else 
             if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
                 DivIEEE754FloatImpl<T, mode, U, true>(dstReg, srcReg0, srcReg1, mask);
             } else {
                 DivPrecisionImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
-            }
+            } 
+            #endif
         } else {
+            #if FTZ_CONTROL
+            if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
+                DivIEEE754FloatImpl<T, mode, U, true>(dstReg, srcReg0, srcReg1, mask);
+            } else {
+                DivIEEE754FloatImpl<T, mode, U, false>(dstReg, srcReg0, srcReg1, mask);
+            }
+            #else 
             if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
                 DivIEEE754FloatImpl<T, mode, U, true>(dstReg, srcReg0, srcReg1, mask);
             } else if constexpr (sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
@@ -1409,7 +1424,8 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
                 DivPrecisionImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
             } else {
                 vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
-            }
+            } 
+            #endif
         }
     } else {
         vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);

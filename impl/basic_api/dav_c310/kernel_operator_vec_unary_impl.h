@@ -263,6 +263,11 @@ __aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t 
     const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    static constexpr MicroAPI::ExpSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, ExpAlgo::PRECISION_1ULP_FTZ_FALSE };
+    constexpr auto func = MicroAPI::Exp<T, &mode, MicroAPI::RegTensor<T>>;
+    Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
+    #else 
     if constexpr (config.algo == ExpAlgo::INTRINSIC || config.algo == ExpAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Exp<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
@@ -271,6 +276,7 @@ __aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t 
         constexpr auto func = MicroAPI::Exp<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
     }
+    #endif 
 }
 
 template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_EXP_CONFIG>
@@ -278,6 +284,11 @@ __aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t 
     const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    static constexpr MicroAPI::ExpSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, ExpAlgo::PRECISION_1ULP_FTZ_FALSE };
+    constexpr auto func = MicroAPI::Exp<T, &mode, MicroAPI::RegTensor<T>>;
+    Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
+    #else  
     if constexpr (config.algo == ExpAlgo::INTRINSIC || config.algo == ExpAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Exp<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
@@ -286,6 +297,7 @@ __aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t 
         constexpr auto func = MicroAPI::Exp<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
     }
+    #endif
 }
 
 template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN_CONFIG>
@@ -293,6 +305,11 @@ __aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t m
     const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    static constexpr MicroAPI::LnSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, LnAlgo::PRECISION_1ULP_FTZ_FALSE };
+    constexpr auto func = MicroAPI::Ln<T, &mode, MicroAPI::RegTensor<T>>;
+    Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
+    #else  
     if constexpr (config.algo == LnAlgo::INTRINSIC || config.algo == LnAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Ln<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
@@ -301,6 +318,7 @@ __aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t m
         constexpr auto func = MicroAPI::Ln<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
     }
+    #endif
 }
 
 template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN_CONFIG>
@@ -308,6 +326,11 @@ __aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t m
     const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    static constexpr MicroAPI::LnSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, LnAlgo::PRECISION_1ULP_FTZ_FALSE };
+    constexpr auto func = MicroAPI::Ln<T, &mode, MicroAPI::RegTensor<T>>;
+    Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
+    #else 
     if constexpr (config.algo == LnAlgo::INTRINSIC || config.algo == LnAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Ln<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
@@ -315,7 +338,8 @@ __aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t m
         static constexpr MicroAPI::LnSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, LnAlgo::PRECISION_1ULP_FTZ_FALSE };
         constexpr auto func = MicroAPI::Ln<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
-    }
+    } 
+    #endif
 }
 
 template <typename T, bool isSetMask = true>
@@ -357,13 +381,18 @@ __aicore__ inline void ReciprocalImpl(__ubuf__ T *dst, __ubuf__ T *src, const ui
     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    constexpr auto func = MicroAPIReciprocal::Reciprocal<T, MicroAPI::RegTensor<T>, true>;
+    Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
+    #else 
     if constexpr (config.algo == ReciprocalAlgo::INTRINSIC || config.algo == ReciprocalAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPIReciprocal::Reciprocal<T, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
     } else if constexpr (config.algo == ReciprocalAlgo::PRECISION_1ULP_FTZ_FALSE) {
         constexpr auto func = MicroAPIReciprocal::Reciprocal<T, MicroAPI::RegTensor<T>, true>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
-    }
+    } 
+    #endif
 }
 
 template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
@@ -371,6 +400,10 @@ __aicore__ inline void ReciprocalImpl(__ubuf__ T *dst, __ubuf__ T *src, const ui
     const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    constexpr auto func = MicroAPIReciprocal::Reciprocal<T, MicroAPI::RegTensor<T>, true>;
+    Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
+    #else   
     if constexpr (config.algo == ReciprocalAlgo::INTRINSIC || config.algo == ReciprocalAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPIReciprocal::Reciprocal<T, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
@@ -378,6 +411,7 @@ __aicore__ inline void ReciprocalImpl(__ubuf__ T *dst, __ubuf__ T *src, const ui
         constexpr auto func = MicroAPIReciprocal::Reciprocal<T, MicroAPI::RegTensor<T>, true>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
     }
+    #endif  
 }
 
 template <typename T, bool isSetMask = true, const SqrtConfig& config = DEFAULT_SQRT_CONFIG>
@@ -385,6 +419,23 @@ __aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t
     const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    if constexpr (SupportType<T, float>()){
+        if constexpr (config.algo == SqrtAlgo::FAST_INVERSE) {
+            static constexpr MicroAPI::SqrtSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, true, SqrtAlgo::FAST_INVERSE };
+            constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
+            Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
+        } else {
+            static constexpr MicroAPI::SqrtSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, false, SqrtAlgo::PRECISION_0ULP_FTZ_FALSE };
+            constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
+            Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
+        }
+    } else {
+        static constexpr MicroAPI::SqrtSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, false, SqrtAlgo::PRECISION_1ULP_FTZ_FALSE };
+        constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
+        Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
+    }
+    #else
     if constexpr (config.algo == SqrtAlgo::INTRINSIC || config.algo == SqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Sqrt<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
@@ -401,6 +452,7 @@ __aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t
         constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
     }
+    #endif
 }
 
 template <typename T, bool isSetMask = true, const SqrtConfig& config = DEFAULT_SQRT_CONFIG>
@@ -408,6 +460,23 @@ __aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t
     const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    if constexpr (SupportType<T, float>()) {
+        if constexpr (config.algo == SqrtAlgo::FAST_INVERSE) {
+            static constexpr MicroAPI::SqrtSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, true, SqrtAlgo::FAST_INVERSE };
+            constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
+            Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
+        } else {
+            static constexpr MicroAPI::SqrtSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, false, SqrtAlgo::PRECISION_0ULP_FTZ_FALSE };
+            constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
+            Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
+        } 
+    } else {
+        static constexpr MicroAPI::SqrtSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, false, SqrtAlgo::PRECISION_1ULP_FTZ_FALSE };
+        constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
+        Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
+    }
+    #else
     if constexpr (config.algo == SqrtAlgo::INTRINSIC || config.algo == SqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Sqrt<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
@@ -424,6 +493,7 @@ __aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t
         constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
     }
+    #endif
 }
 
 namespace MicroAPIRsqrt {
@@ -462,6 +532,11 @@ __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_
     const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    
+    #if FTZ_CONTROL
+    constexpr auto func = MicroAPIRsqrt::Rsqrt<T, MicroAPI::RegTensor<T>, true>;
+    Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
+    #else 
     if constexpr (config.algo == RsqrtAlgo::INTRINSIC || config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPIRsqrt::Rsqrt<T, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
@@ -469,7 +544,8 @@ __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_
                         config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
         constexpr auto func = MicroAPIRsqrt::Rsqrt<T, MicroAPI::RegTensor<T>, true>;
         Internal::VecUnaryLevel0Template<func, isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
-    }
+    }  
+    #endif
 }
 
 template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
@@ -477,6 +553,10 @@ __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_
     const UnaryRepeatParams &repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    constexpr auto func = MicroAPIRsqrt::Rsqrt<T, MicroAPI::RegTensor<T>, true>;
+    Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
+    #else 
     if constexpr (config.algo == RsqrtAlgo::INTRINSIC || config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPIRsqrt::Rsqrt<T, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
@@ -484,7 +564,8 @@ __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_
                         config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
         constexpr auto func = MicroAPIRsqrt::Rsqrt<T, MicroAPI::RegTensor<T>, true>;
         Internal::VecUnaryLevel0Template<func, isSetMask, false>(dst, src, nullptr, mask, repeatTime, repeatParams);
-    }
+    } 
+    #endif
 }
 
 template <typename T, bool isSetMask = true>
@@ -529,6 +610,11 @@ template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    static constexpr MicroAPI::ExpSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, ExpAlgo::PRECISION_1ULP_FTZ_FALSE };
+    constexpr auto func = MicroAPI::Exp<T, &mode, MicroAPI::RegTensor<T>>;
+    Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
+    #else 
     if constexpr (config.algo == ExpAlgo::INTRINSIC || config.algo == ExpAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Exp<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
@@ -536,13 +622,19 @@ __aicore__ inline void ExpImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t 
         static constexpr MicroAPI::ExpSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, ExpAlgo::PRECISION_1ULP_FTZ_FALSE };
         constexpr auto func = MicroAPI::Exp<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
-    }
+    } 
+    #endif
 }
 
 template <typename T, const LnConfig& config = DEFAULT_LN_CONFIG>
 __aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    static constexpr MicroAPI::LnSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, LnAlgo::PRECISION_1ULP_FTZ_FALSE };
+    constexpr auto func = MicroAPI::Ln<T, &mode, MicroAPI::RegTensor<T>>;
+    Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
+    #else  
     if constexpr (config.algo == LnAlgo::INTRINSIC || config.algo == LnAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Ln<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
@@ -551,6 +643,7 @@ __aicore__ inline void LnImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t c
         constexpr auto func = MicroAPI::Ln<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
     }
+    #endif
 }
 
 template <typename T> __aicore__ inline void AbsImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
@@ -596,6 +689,10 @@ __aicore__ inline void ReciprocalImpl(__ubuf__ T *dst, __ubuf__ T *src, const ui
         "current data type is not supported on current device!");
 
     if constexpr (SupportType<T, half, float>()) {
+        #if FTZ_CONTROL
+        constexpr auto func = MicroAPIReciprocal::Reciprocal<T, MicroAPI::RegTensor<T>, true>;
+        Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
+        #else  
         if constexpr (config.algo == ReciprocalAlgo::INTRINSIC || config.algo == ReciprocalAlgo::PRECISION_1ULP_FTZ_TRUE) {
             constexpr auto func = MicroAPIReciprocal::Reciprocal<T, MicroAPI::RegTensor<T>>;
             Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
@@ -603,6 +700,7 @@ __aicore__ inline void ReciprocalImpl(__ubuf__ T *dst, __ubuf__ T *src, const ui
             constexpr auto func = MicroAPIReciprocal::Reciprocal<T, MicroAPI::RegTensor<T>, true>;
             Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
         }
+        #endif  
     } else {
         Internal::VecUnaryLevel2ImplB64<T>(dst, src, count);
     }
@@ -612,6 +710,23 @@ template <typename T, const SqrtConfig& config = DEFAULT_SQRT_CONFIG>
 __aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL
+    if constexpr (SupportType<T, float>()) {
+        if constexpr (config.algo == SqrtAlgo::FAST_INVERSE) {
+            static constexpr MicroAPI::SqrtSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, true, SqrtAlgo::FAST_INVERSE };
+            constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
+            Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
+        } else {
+            static constexpr MicroAPI::SqrtSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, false, SqrtAlgo::PRECISION_0ULP_FTZ_FALSE };
+            constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
+            Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
+        }
+    } else {
+        static constexpr MicroAPI::SqrtSpecificMode mode = { MicroAPI::MaskMergeMode::ZEROING, false, SqrtAlgo::PRECISION_1ULP_FTZ_FALSE };
+        constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
+        Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
+    }
+    #else
     if constexpr (config.algo == SqrtAlgo::INTRINSIC || config.algo == SqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPI::Sqrt<T, MicroAPI::MaskMergeMode::ZEROING, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
@@ -628,6 +743,7 @@ __aicore__ inline void SqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t
         constexpr auto func = MicroAPI::Sqrt<T, &mode, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
     }
+    #endif
 }
 
 template <typename T>
@@ -645,12 +761,16 @@ template <typename T, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
 __aicore__ inline void RsqrtImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    #if FTZ_CONTROL  
+    RsqrtPrecisionModeImpl(dst, src, count);
+    #else 
     if constexpr (config.algo == RsqrtAlgo::INTRINSIC || config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE) {
         constexpr auto func = MicroAPIRsqrt::Rsqrt<T, MicroAPI::RegTensor<T>>;
         Internal::VecUnaryLevel2ImplTemplate<func, T>(dst, src, count);
     } else {
         RsqrtPrecisionModeImpl(dst, src, count);
-    }
+    } 
+    #endif
 }
 
 template <typename T> __aicore__ inline void NotImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint32_t count)
