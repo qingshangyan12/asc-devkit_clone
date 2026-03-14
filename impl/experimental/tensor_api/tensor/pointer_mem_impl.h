@@ -55,12 +55,6 @@ __aicore__ inline constexpr HardwareMemPtr<hPos, Pointer> operator+(const Hardwa
     return HardwareMemPtr<hPos, Pointer>{newPtr};
 }
 
-template <Hardware hPos, typename Pointer, typename Index, Std::enable_if_t<is_b4_type<IterVal<iterator>::type>>>
-__aicore__ inline constexpr IterRef<iterator>::type operator[](const HardwareMemPtr<hPos, Pointer>& p, Index index) {
-    auto ptr = p.Get();
-    return ptr[(index >> 1)];
-}
-
 } // namespace Te
 } // namespace AscendC
 

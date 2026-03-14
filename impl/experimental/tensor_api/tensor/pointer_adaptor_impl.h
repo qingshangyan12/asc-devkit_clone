@@ -35,8 +35,21 @@ struct IterAdaptor
     }
 
     template <typename Index>
-    __aicore__ inline constexpr reference operator[](const Index& i) const {
-        return ptr[i];
+    __aicore__ inline constexpr reference operator[](const Index& i) const
+    {
+        auto value = ptr[i];
+        if constexpr (is_fp4_v<elementType>) {
+            // fp4x2: 1 字节存 2 个 4-bit 元素，逻辑下标 i 对应字节 ptr[i>>1]
+            size_t idx = static_cast<size_t>(i);
+            uint8_t byteVal = static_cast<uint8_t>(value);
+            if (idx % 2 == 0) {
+                return static_cast<decltype(value)>(byteVal & 0xF0u);
+            } else {
+                return static_cast<decltype(value)>((byteVal & 0x0Fu) << 4);
+            }
+        } else {
+            return ptr[i];
+        }
     }
 
     template <typename Index>
