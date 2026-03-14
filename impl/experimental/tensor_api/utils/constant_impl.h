@@ -80,16 +80,7 @@ template <typename DataType>
 inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t> || is_one_of_attr_v<DataType, fp4x2_e2m1_t>;
 
 template <typename T>
-struct IsFP4x2Type : Std::false_type {};
-
-template <>
-struct IsFP4x2Type<fp4x2_e1m2_t> : Std::true_type {};
-
-template <>
-struct IsFP4x2Type<fp4x2_e2m1_t> : Std::true_type {};
-
-template <typename T>
-inline constexpr bool is_fp4_v = IsFP4x2Type<T>::value;
+inline constexpr bool is_fp4_v = Std::is_same_v<T, fp4x2_e1m2_t> || Std::is_same_v<T, fp4x2_e2m1_t>;
 
 template <typename T>
 using is_gm_attr = __gm__ T;
@@ -130,45 +121,6 @@ inline constexpr bool is_attr_v =
         Attr<uint8_t>*,
         Attr<uint32_t>*
     >;
-
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#define SCALAR_QUANT_MODE QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8,\
-    QuantMode_t::QS322BF16_PRE, QuantMode_t::QF322F16_PRE, QuantMode_t::QF322BF16_PRE, QuantMode_t::QF322FP8_PRE,\
-    QuantMode_t::QF322HIF8_PRE, QuantMode_t::QF322HIF8_PRE_HYBRID, QuantMode_t::QF322F32_PRE
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-#define SCALAR_QUANT_MODE QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8
-#else
-#define SCALAR_QUANT_MODE QuantMode_t::NoQuant
-#endif
-
-template <QuantMode_t quantPre>
-using IsScalarQuantMode = is_one_of_value<quantPre, SCALAR_QUANT_MODE>;
-
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#define TILE_OP_INTERNAL_TENSOR_QUANT_MODE QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8,\
-    QuantMode_t::VQS322BF16_PRE, QuantMode_t::VQF322F16_PRE, QuantMode_t::VQF322BF16_PRE, QuantMode_t::VQF322FP8_PRE,\
-    QuantMode_t::VQF322HIF8_PRE, QuantMode_t::VQF322HIF8_PRE_HYBRID, QuantMode_t::VQF322F32_PRE
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-#define TILE_OP_INTERNAL_TENSOR_QUANT_MODE QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8
-#else
-#define TILE_OP_INTERNAL_TENSOR_QUANT_MODE QuantMode_t::NoQuant
-#endif
-
-template <QuantMode_t quantPre>
-using IsVectorQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_TENSOR_QUANT_MODE>;
-
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#define TILE_OP_INTERNAL_DIRECT_QUANT_MODE QuantMode_t::F322F16, QuantMode_t::F322BF16
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-#define TILE_OP_INTERNAL_DIRECT_QUANT_MODE QuantMode_t::F322F16, QuantMode_t::F322BF16
-#else
-#define TILE_OP_INTERNAL_DIRECT_QUANT_MODE QuantMode_t::NoQuant
-#endif
-
-template <QuantMode_t quantPre>
-using IsDirectQuantMode = is_one_of_value<quantPre, TILE_OP_INTERNAL_DIRECT_QUANT_MODE>;
-
-using ZeroCoord2DType = AscendC::Std::tuple<Std::Int<0>, Std::Int<0>>;
 
 template <size_t N, typename = Std::make_index_sequence<N>>
 struct EmptyGenerator;
