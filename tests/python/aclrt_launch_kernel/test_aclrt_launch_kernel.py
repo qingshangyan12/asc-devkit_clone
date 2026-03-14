@@ -42,7 +42,6 @@ class TestAclrtLaunchKernel(unittest.TestCase):
     def setUp(self):
         # operator before each testcase
         print(f"-------------------SetUp----------------")
-        self.maxDiff = None
 
     def tearDown(self):
         # operator after each testcase
