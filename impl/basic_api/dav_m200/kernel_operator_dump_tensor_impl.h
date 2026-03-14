@@ -782,7 +782,6 @@ __aicore__ inline void PrintCommonHead(DumpType printType)
     uint64_t __ascendc_version = 0;
     __gm__ char* __ascendc_versionStr = nullptr;
     GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
-    if (__ascendc_tStamp == 0) {
     __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
 }
 
