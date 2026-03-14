@@ -15,20 +15,18 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_QUANT_L0C2GM_NZ2ND_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_QUANT_L0C2GM_NZ2ND_H
 
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_utils.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/instruction.h"
-#include "impl/experimental/tensor_api/arch/utils/check_format.h"
 
 namespace AscendC {
 namespace Te {
 
 class Fixpipe2GmNZ2NDSimpleQuant3510 {
 public:
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
-    __aicore__ inline void Run(const T& dst, const U& src, const V& quant)
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V, typename Params>
+    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Params& params)
     {
         SetRegisterImpl<trait, T, U, V>(dst, src, quant);
-        DataCopyImpl<trait, quantPre, T, U>(dst, src);
+        DataCopyImpl<trait, quantPre, T, U, Params>(dst, src, params);
     }
 
 private:
@@ -50,27 +48,28 @@ private:
         setRegisterInst.SetRegister<V>(quant, ndNum, dstNDStride, srcNDStride);
     }
 
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline void DataCopyImpl(const T& dst, const U& src)
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
+    __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const Params& params)
     {
         CheckTemplate<trait, T, U>();
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
+        uint32_t mSize = Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout) *
+            GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout),
+            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
+            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout));
         uint32_t nSize = Std::min(
             GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout) *
             GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout),
             GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
             GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout));
-        uint32_t mSize = Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout) *
-            GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout),
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout));
+        
         uint32_t srcStride =
             GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
         bool reluEn = trait.enableRelu;
-        uint8_t unitFlag = trait.unitFlag;
+        uint8_t unitFlag = params.unitFlag;
         bool isChannelSplit = trait.enableChannelSplit;
         bool nz2ndEn = true;
         bool nz2dnEn = false;
@@ -89,8 +88,8 @@ public:
     }
 
 private:
-    template <const FixpipeTrait& trait, typename T, typename U, bool isTail>
-    __aicore__ inline auto GenParams(const T& dst, const U& src)
+    template <const FixpipeTrait& trait, typename T, typename U, bool isTail, typename Params>
+    __aicore__ inline auto GenParams(const T& dst, const U& src, const Params& params)
     {
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
@@ -110,20 +109,20 @@ private:
         uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
         bool reluEn = trait.enableRelu;
-        uint8_t unitFlag = trait.unitFlag;
+        uint8_t unitFlag = params.unitFlag;
         bool isChannelSplit = trait.enableChannelSplit;
         bool nz2ndEn = true;
         bool nz2dnEn = false;
-        auto params = Std::make_tuple(
+        auto fixpipeParams = Std::make_tuple(
             nSize, mSize, srcStride, dstStride, cacheMode, reluEn, unitFlag, isChannelSplit, nz2ndEn, nz2dnEn);
-        return params;
+        return fixpipeParams;
     }
 
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
     __aicore__ inline void FixpipeNZ2NDVectorCompute(const T& dst, const U& src, const V& quant, uint32_t nIterNum,
-        uint32_t calNSize, uint32_t tailNSize)
+        uint32_t calNSize, uint32_t tailNSize, const FixpipeParams& params)
     {
-        auto mainLoopParam = GenParams<trait, T, U, false>(dst, src);
+        auto mainLoopParam = GenParams<trait, T, U, false, FixpipeParams>(dst, src, params);
         CopyMatrixCcToGmBase3510 copyInst;
         CopyDeqTensorToFbuf3510 copyDeqTensorInst;
         for (uint16_t i = 0; i < nIterNum; ++i) {
@@ -135,7 +134,7 @@ private:
                 mainLoopParam, tuple_sequence<decltype(mainLoopParam)>{});
         }
         if (tailNSize) {
-            auto tailParam = GenParams<trait, T, U, true>(dst, src);
+            auto tailParam = GenParams<trait, T, U, true, FixpipeParams>(dst, src, params);
             copyDeqTensorInst.CopyDeqTensorToFbufImpl(quant, tailNSize, nIterNum);
             InsertSync();
             auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * CBURST_NUM_3510));
@@ -156,11 +155,11 @@ private:
 
 class Fixpipe2GmNZ2NDVectorQuant3510 : public Fixpipe2GmNZ2NDVectorBase3510 {
 public:
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
-    __aicore__ inline void Run(const T& dst, const U& src, const V& quant)
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V, typename Params>
+    __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Params& params)
     {
         SetRegisterImpl<trait, T, U>(dst, src);
-        DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant);
+        DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant, params);
     }
 
 private:
@@ -171,8 +170,8 @@ private:
         CheckFormat::CheckL0CNZTemplate<U>();
     }
 
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
-    __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& quant)
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V, typename Params>
+    __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const V& quant, const Params& params)
     {
         CheckTemplate<trait, T, U>();
         auto dstLayout = dst.Layout();
@@ -194,7 +193,7 @@ private:
             tailNSize = nSize % MAIN_LOOP_N_SIZE_3510;
             calNSize = MAIN_LOOP_N_SIZE_3510;
         }
-        FixpipeNZ2NDVectorEntrance<trait, quantPre, T, U, V>(dst, src, quant, nIterNum, calNSize, tailNSize);
+        FixpipeNZ2NDVectorEntrance<trait, quantPre, T, U, V>(dst, src, quant, nIterNum, calNSize, tailNSize, params);
     }
 
     template <const FixpipeTrait& trait, typename T, typename U>

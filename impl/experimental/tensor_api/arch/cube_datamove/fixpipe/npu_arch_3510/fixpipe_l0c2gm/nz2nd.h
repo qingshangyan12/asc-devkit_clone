@@ -15,20 +15,17 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_L0C2GM_NZ2ND_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_L0C2GM_NZ2ND_H
 
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_utils.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/instruction.h"
-#include "impl/experimental/tensor_api/arch/utils/check_format.h"
-#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
 
 namespace AscendC {
 namespace Te {
 
 class Fixpipe2GmNz2NdBase3510 {
 public:
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline void Run(const T& dst, const U& src) {
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
+    __aicore__ inline void Run(const T& dst, const U& src, const Params& params) {
         SetRegisterImpl<trait, T, U>(dst, src);
-        DataCopyImpl<trait, quantPre, T, U>(dst, src);
+        DataCopyImpl<trait, quantPre, T, U, Params>(dst, src, params);
     }
 
 private:
@@ -37,7 +34,7 @@ private:
     {
         CheckFormat::CheckNDTemplate<T>();
         CheckFormat::CheckL0CNZTemplate<U>();
-        CheckDataTypeFor3510::CheckFixPipeDataType<quantPre, T, U>();
+        CheckDataTypeFor3510::CheckL0C2GmDataType<quantPre, T, U>();
     }
 
     template <const FixpipeTrait& trait, typename T, typename U>
@@ -50,8 +47,8 @@ private:
         setRegisterInst.SetRegister(ndNum, dstNdStride, srcNdStride);
     }
 
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline void DataCopyImpl(const T& dst, const U& src)
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
+    __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const Params& params)
     {
         CheckTemplate<trait, quantPre, T, U>();
         auto dstLayout = dst.Layout();
@@ -70,7 +67,7 @@ private:
         uint8_t cacheMode = GetCacheModeFromTensor(dst.Data().Get());
 
         bool reluEn = trait.enableRelu;
-        uint8_t unitFlag = trait.unitFlag;
+        uint8_t unitFlag = params.unitFlag;
         bool isChannelSplit = trait.enableChannelSplit;
         bool nz2ndEn = true;
         bool nz2dnEn = false;

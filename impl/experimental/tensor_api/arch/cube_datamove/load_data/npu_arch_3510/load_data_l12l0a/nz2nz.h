@@ -16,8 +16,6 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_LOAD_DATA_NPU_ARCH_3510_LOAD_DATA_L12L0A_NZ2NZ_H
 
 #include "impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/instruction.h"
-#include "impl/experimental/tensor_api/arch/utils/check_format.h"
-#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
 
 namespace AscendC {
 namespace Te {
@@ -30,42 +28,18 @@ public:
         LoadDataImpl<TraitHolder<trait, false>::traitTransposed, T, U>(dst, src);
     }
 
-private:
+private:    
     template<const LoadDataTrait& trait, bool transpose>
     struct TraitHolder {
         static constexpr LoadDataTrait traitTransposed = LoadDataTrait(trait, transpose);
     };
-    
-    template<typename T>
-    __aicore__ inline constexpr void CheckNZTemplate()
-    {
-        using type = typename T::elementType;
-        using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-        using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<ShapeRow0, Std::Int<FRACTAL_FIXED>>,
-            "LoadDataFourDim3510L12L0A Layout->Shape->Row->ZeroDim is not Std::Int<16> type!");
-        static_assert(Std::is_same_v<ShapeColumn0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim3510L12L0A Layout->Shape->Column->ZeroDim is not Std::Int<C0Size/Type> type!"); 
-
-        using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-        using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
-        using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-        static_assert(Std::is_same_v<StrideRow0, Std::Int<C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim3510L12L0A Layout->Stride->Row-ZeroDim is not Std::Int<C0Size/Type> type!");
-        static_assert(Std::is_same_v<StrideRow1, Std::Int<FRACTAL_FIXED * C0_SIZE / sizeof(type)>>,
-            "LoadDataFourDim3510L12L0A Layout->Stride->Row-ZeroDim is not Std::Int<16*C0Size/Type> type!");
-        static_assert(Std::is_same_v<StrideColumn0, Std::Int<1>>,
-            "LoadDataFourDim3510L12L0A Layout->Stride->Column->ZeroDim is not Std::Int<1> type!");
-    }
 
     template <const LoadDataTrait& trait, typename T, typename U>
     __aicore__ inline constexpr void CheckTemplate()
     {
-        using srcType = typename U::elementType;
-        using dstType = typename T::elementType;
         CheckFormat::CheckNZTemplate<T>();
         CheckFormat::CheckNZTemplate<U>();
-        CheckDataTypeFor3510::CheckL12L0ADataType<dstType, srcType>();
+        CheckDataTypeFor3510::CheckL12L0ADataType<T, U>();
     }
 
     template <const LoadDataTrait& trait, typename T, typename U>
@@ -80,15 +54,17 @@ private:
         auto mStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
         auto kStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
         // Nz -> Nz
-        uint32_t STRIDE_UNIT = FRACTAL_FIXED * (C0_SIZE / sizeof(DstType));
+        constexpr bool isFp4Type = Std::is_one_of_v<
+                Std::tuple<typename T::elementType, typename U::elementType>,
+                Std::tuple<__ca__ fp4x2_e2m1_t, __cbuf__ fp4x2_e2m1_t>,
+                Std::tuple<__ca__ fp4x2_e1m2_t, __cbuf__ fp4x2_e1m2_t>>;
+        constexpr int KHALF = 2;
+        uint32_t STRIDE_UNIT = isFp4Type ? FRACTAL_FIXED * (C0_SIZE / sizeof(DstType) * KHALF) : FRACTAL_FIXED * (C0_SIZE / sizeof(DstType));
         auto srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) / STRIDE_UNIT;
-        constexpr bool isFp4Type = std::is_same<T, fp4x2_e2m1_t>::value || std::is_same<T, fp4x2_e1m2_t>::value;
         if constexpr (isFp4Type) {
-            constexpr int KHALF = 2;
             LoadCbufToCaS4Base loadCbufToCaS4;
-            loadCbufToCaS4.template LoadData<trait>(dst, src, mStartPosition, kStartPosition / KHALF, 
-                                                    mStep, kStep / KHALF, srcStride * KHALF, dstStride * KHALF);    
+            loadCbufToCaS4.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);    
         } else {
             LoadCbufToCaBase loadCbufToCa;
             loadCbufToCa.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);

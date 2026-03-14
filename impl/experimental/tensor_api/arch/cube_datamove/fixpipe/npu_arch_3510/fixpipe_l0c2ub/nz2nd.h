@@ -15,20 +15,17 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_L0C2UB_NZ2ND_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_3510_FIXPIPE_L0C2UB_NZ2ND_H
 
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_utils.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/instruction.h"
-#include "impl/experimental/tensor_api/arch/utils/check_format.h"
-#include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"
 
 namespace AscendC {
 namespace Te {
 
 class Fixpipe2UbNz2NdBase3510 {
 public:
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
+    __aicore__ inline void Run(const T& dst, const U& src, const Params& params) {
         SetRegisterImpl<trait, T, U>(dst, src);
-        DataCopyImpl<trait, quantPre, T, U, Coord>(dst, src, coord);
+        DataCopyImpl<trait, quantPre, T, U, Params>(dst, src, params);
     }
 
 private:
@@ -37,7 +34,7 @@ private:
     {
         CheckFormat::CheckNDTemplate<T>();
         CheckFormat::CheckL0CNZTemplate<U>();
-        CheckDataTypeFor3510::CheckFixPipeDataType<quantPre, T, U>();
+        CheckDataTypeFor3510::CheckL0C2UbDataType<quantPre, T, U>();
 
     }
 
@@ -51,8 +48,8 @@ private:
         setRegisterInst.SetRegister(ndNum, dstNdStride, srcNdStride);
     }
     
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Coord>
-    __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const Coord& coord)
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
+    __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const Params& params)
     {
         CheckTemplate<trait, quantPre, T, U>();
         auto dstLayout = dst.Layout();
@@ -60,24 +57,23 @@ private:
         uint32_t nSize = Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout)
             * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout),
             GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout) - Std::get<1>(coord));
+            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout));
         uint32_t mSize = Std::min(GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout)
             * GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout),
             GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) *
-            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) - Std::get<0>(coord));
+            GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout));
         uint32_t srcStride =
             GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
         uint8_t dualDstCtl = trait.dualDstCtl;
 
         bool reluEn = trait.enableRelu;
-        uint8_t unitFlag = trait.unitFlag;
+        uint8_t unitFlag = params.unitFlag;
         bool subBlockId = false;
         bool nz2ndEn = true;
         bool nz2dnEn = false;
-        auto dstDNTensor = dst(coord, dst.Layout().Shape());
         CopyMatrixCcToUbBase3510 copyInst;
-        copyInst.DataCopy<trait, quantPre, T, U>(dstDNTensor, src, nSize, mSize, srcStride, dstStride, dualDstCtl,
+        copyInst.DataCopy<trait, quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, dualDstCtl,
             reluEn, unitFlag, subBlockId, nz2ndEn, nz2dnEn);
     }
 };
