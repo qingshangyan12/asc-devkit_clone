@@ -34,14 +34,33 @@ struct IterAdaptor
         return *ptr;
     }
 
+    // b4/fp4：逻辑下标对应 ptr[index>>1]，解包写回字节后返回该字节引用，保证返回类型为 reference (T&)
     template <typename Index>
-    __aicore__ inline constexpr reference operator[](const Index& i) const {
-        return ptr[i];
+    __aicore__ inline constexpr reference operator[](const Index& index) const
+    {
+        if constexpr (is_b4_type<valueType>) {
+            reference ref = ptr[(static_cast<size_t>(index) >> 1)];
+            if constexpr (is_fp4_v<elementType>) {
+                uint8_t byteVal = static_cast<uint8_t>(ref);
+                if (index % 2 == 0) {
+                    ref = static_cast<elementType>(byteVal & 0xF0u);
+                } else {
+                    ref = static_cast<elementType>((byteVal & 0x0Fu) << 4);
+                }
+            }
+            return ref;
+        } else {
+            return ptr[index];
+        }
     }
 
     template <typename Index>
     __aicore__ inline constexpr DerivedType operator+(const Index& i) const {
-        return {ptr + i};
+        if constexpr (is_b4_type<valueType>) {
+            return {ptr + (i >> 1)};
+        } else {
+            return {ptr + i};
+        }
     }
 
     __aicore__ inline constexpr iterator Get() const {
