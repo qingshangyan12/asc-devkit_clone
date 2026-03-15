@@ -8,7 +8,6 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-
 cmake_minimum_required(VERSION 3.16)
 
 find_package(ASC REQUIRED)
@@ -27,10 +26,12 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
-message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+message(STATUS "[INFO] INPUT_TYPE is ${INPUT_TYPE}")
+message(STATUS "[INFO] INPUT_SIZE is ${INPUT_SIZE}")
 
 target_compile_definitions(demo PRIVATE
-    SCENARIO_NUM=${SCENARIO_NUM}
+    INPUT_TYPE=${INPUT_TYPE}
+    INPUT_SIZE=${INPUT_SIZE}
 )
 
 target_compile_options(demo PRIVATE
