@@ -16,8 +16,7 @@ Mul属于双目矢量类计算API，其他诸如Add、Sub、Div、Max、Min、Bi
 ```
 ├── vec_binary_performance
 │   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
+│   │   └── gen_data.py         // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── mul.asc                 // Ascend C算子实现 & 调用样例
@@ -56,7 +55,7 @@ MulCustom算子，将两个输入tensor按元素求积。
 
 对应的数学表达式为：
 $$
-z_i = x_i \times y_i
+dst_i = src0_i * src1_i
 $$
 
 ### 算子规格
@@ -87,12 +86,7 @@ Mul接口用于对两个输入tensor按元素执行乘法运算。
 
 ```cpp
 template <typename T>
-__aicore__ inline void Mul(
-    const LocalTensor<T>& dst,
-    const LocalTensor<T>& src0,
-    const LocalTensor<T>& src1,
-    const int32_t& count
-);
+__aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count)
 ```
 
 ### API参数说明
@@ -100,18 +94,18 @@ __aicore__ inline void Mul(
 | 参数名 | 类型 | 输入/输出 | 说明 |
 |--------|------|-----------|------|
 | dst | LocalTensor<T> | 输出 | 目标操作数。用于存放计算结果 |
-| src0 | LocalTensor<T> | 输入 | 源操作数0。第一个输入tensor |
-| src1 | LocalTensor<T> | 输入 | 源操作数1。第二个输入tensor |
+| src0 | LocalTensor<T> | 输入 | 第一个源操作数。 |
+| src1 | LocalTensor<T> | 输入 | 第二个源操作数。 |
 | count | int32_t | 输入 | 参与计算的元素个数 |
 
 ### 使用示例
 
 ```cpp
 // 基本用法
-AscendC::Mul(zLocal, xLocal, yLocal, TOTAL_LENGTH);
+AscendC::Mul(dstLocal, src0Local, src1Local, 512);
 ```
 
-**更多详细说明和使用示例，请参考[Mul接口文档](https://www.hiascend.com/document/detail/zh/ascend-c/latest/api/kernel-augmt/augmnt_18_0039.html)**
+**更多详细说明和使用示例，请参考[Mul接口文档] TODO**
 
 ## 算子实现
 
@@ -191,12 +185,12 @@ Mul接口的理论并行度参照下表：
 
 | 数据类型 | 理论并行度（element / cycle） |
 |----------|---------------------------|
-| half (fp16) | 64 |
-| float (fp32) | 32 |
-| int16 | 64 |
-| int32 | 32 |
+| half (fp16) | 128 |
+| int16 | 128 |
+| int32 | 64 |
+| float (fp32) | 64 |
 
-假设输入tensor的长度为32 * 1024，数据类型为half。对照上表，Mul接口在该场景下的理论并行度为64。则单次Mul接口所需执行时间（cycles）= 数据长度 / 理论并行度 = (32 * 1024) / 64 = 512。该数值为理想并行度条件下，Mul接口的理论性能。
+假设输入tensor的长度为32 * 1024，数据类型为half。对照上表，Mul接口在该场景下的理论并行度为128。则单次Mul接口所需执行时间（cycles）= 数据长度 / 理论并行度 = (32 * 1024) / 128 = 256。该数值为理想并行度条件下，Mul接口的理论性能。
 
 ### 测试方式一：代码打点
 
@@ -252,9 +246,9 @@ python3 ../scripts/gen_data.py -inputType=$INPUT_TYPE -inputSize=$INPUT_SIZE
 #### 日志结果
 
 ```
-[LOG] systemCycleBefore: 14106388455589
-[LOG] systemCycleAfter: 14106388484922
-[LOG] Mul instruction has excuted 1000 times, cost total cycles: 29333
+[LOG] systemCycleBefore: 56467366469232
+[LOG] systemCycleAfter: 56467366477510
+[LOG] Mul instruction has excuted 1000 times, cost total cycles: 8278
 ```
 
 #### 实测性能计算说明
@@ -270,17 +264,17 @@ python3 ../scripts/gen_data.py -inputType=$INPUT_TYPE -inputSize=$INPUT_SIZE
 
 假设日志输出如下：
 ```
-[LOG] systemCycleBefore: 14106388455589
-[LOG] systemCycleAfter: 14106388484922
-[LOG] Mul instruction has excuted 1000 times, cost total cycles: 29333
+[LOG] systemCycleBefore: 56467366469232
+[LOG] systemCycleAfter: 56467366477510
+[LOG] Mul instruction has excuted 1000 times, cost total cycles: 8278
 ```
 
-1. 接口执行1000次总耗时（50MHz）：T_total = 29333(cycles)
-2. 接口平均单次执行耗时（50MHz）：T_avg = 29333 / 1000 = 29.33(cycles)
-3. 换算到AI处理器频率的等效单次执行耗时（1800MHz）：T_ai = 29.33 / 50 * 1800 = 1055.88(cycles)
-4. 换算到AI处理器频率的等效并行度：Throughput = (32 * 1024) / 1055.88 = 31.03(element/cycle)
+1. 接口执行1000次总耗时（50MHz）：T_total = 8278(cycles)
+2. 接口平均单次执行耗时（50MHz）：T_avg = 8278 / 1000 = 8.28(cycles)
+3. 换算到AI处理器频率的等效单次执行耗时（1800MHz）：T_ai = 8.28 / 50 * 1800 = 298.08(cycles)
+4. 换算到AI处理器频率的等效并行度：Throughput = (32 * 1024) / 298.08 = 109.93(element/cycle)
 
-与理论并行度64有一定差距，这是因为数据搬运等开销的存在。
+与理论并行度128接近。
 
 ### 测试方式二：msProf工具性能采集
 
@@ -328,7 +322,7 @@ OPPPROF_202xxxxx_XXXXXX
 
 | aiv_vec_time |
 |--------------|
-| 584.460022 |
+| 163.351105 |
 
 #### 实测性能计算说明
 
@@ -340,13 +334,13 @@ OPPPROF_202xxxxx_XXXXXX
 
 **具体计算示例**：
 
-假设PipeUtilization.csv中aiv_vec_time字段值为584.460022，重复执行次数为1000：
+假设PipeUtilization.csv中aiv_vec_time字段值为163.351105，重复执行次数为1000：
 
-1. 单次指令平均耗时（单位：us）：T_us = 584.460022 / 1000 = 0.5845
-2. 单次指令平均耗时（单位：cycles）：T_cycles = 0.5845 * 1800 = 1052.1
-3. 换算到AI处理器频率的等效并行度：Throughput = (32 * 1024) / 1052.1 = 31.14(element/cycle)
+1. 单次指令平均耗时（单位：us）：T_us = 163.351105 / 1000 = 0.1634
+2. 单次指令平均耗时（单位：cycles）：T_cycles = 0.1634 * 1800 = 294.12
+3. 换算到AI处理器频率的等效并行度：Throughput = (32 * 1024) / 294.12 = 111.41(element/cycle)
 
-与理论并行度64有差距，可通过优化数据搬运等方式提升性能。
+与理论并行度128接近。
 
 #### 补充说明
 
@@ -360,12 +354,19 @@ OPPPROF_202xxxxx_XXXXXX
 
 | 数据类型 | 数据规模（元素个数） | 理论并行度 | 实测并行度 | 达标率 |
 |----------|-------------------|-----------|-----------|--------|
-| half (fp16) | 32 * 1024 | 64 | 50.12 | 78% |
-| half (fp16) | 64 * 1024 | 64 | 56.89 | 89% |
-| float (fp32) | 16 * 1024 | 32 | 25.60 | 80% |
-| float (fp32) | 32 * 1024 | 32 | 28.45 | 89% |
-| int16 | 32 * 1024 | 64 | 48.32 | 75% |
-| int32 | 16 * 1024 | 32 | 24.18 | 76% |
+| half (fp16) | 4 * 1024 | 128 | 68.25 | 53.32% |
+| half (fp16) | 16 * 1024 | 128 | 101.14 | 79.01% |
+| half (fp16) | 32 * 1024 | 128 | 109.96 | 85.90% |
+| float (fp32) | 4 * 1024 | 64 | 43.56 | 68.08% |
+| float (fp32) | 8 * 1024 | 64 | 50.57 | 79.01% |
+| float (fp32) | 16 * 1024 | 64 | 54.98 | 85.90% |
+| int16_t | 4 * 1024 | 128 | 69.42 | 54.23% |
+| int16_t | 16 * 1024 | 128 | 101.14 | 79.01% |
+| int16_t | 32 * 1024 | 128 | 109.59 | 85.61% |
+| int32_t | 4 * 1024 | 64 | 44.03 | 68.80% |
+| int32_t | 8 * 1024 | 64 | 50.57 | 79.01% |
+| int32_t | 16 * 1024 | 64 | 54.79 | 85.61% |
+
 
 **说明**：
 - 理论并行度：理想条件下的理论性能值
@@ -376,14 +377,15 @@ OPPPROF_202xxxxx_XXXXXX
 
 | 场景描述 | 数据类型 | 单核数据规模 | 性能特点 | 适用建议 |
 |----------|----------|----------|----------|----------|
-| 小规模计算 | half | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
-| 中等规模计算 | half | 4K - 32K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
-| 大规模计算 | half | 32K - 128K | 计算占主导地位 | 适合大规模训练场景 |
-| 小规模计算 | float | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
-| 中等规模计算 | float | 4K - 16K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
+| 小规模计算 | half/inf16_t | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
+| 中等规模计算 | half/inf16_t | 4K - 16K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
+| 大规模计算 | half/inf16_t | 16K - 32K | 计算占主导地位 | 适合大规模训练场景 |
+| 小规模计算 | float/inf32_t | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
+| 中等规模计算 | float/inf32_t | 4K - 8K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
+| 大规模计算 | float/inf32_t | 8K - 16K | 计算占主导地位 | 适合大规模训练场景 |
 
 ## 扩展阅读
 
-- [Mul接口文档](https://www.hiascend.com/document/detail/zh/ascend-c/latest/api/kernel-augmt/augmnt_18_0039.html)
-- [Ascend C性能优化指南](../../04_best_practices/12_high_performance_vf/README.md)
-- [矢量计算API最佳实践](../../04_best_practices/12_high_performance_vf/optimize_vf_fusion/README.md)
+- [Mul接口文档] TODO
+- [Ascend C性能优化指南] TODO
+- [矢量计算API最佳实践] TODO
