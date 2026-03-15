@@ -25,17 +25,6 @@ template <Hardware hPos, typename Pointer>
 struct HardwareMemPtr : IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>> {
     using IterAdaptor<Pointer, HardwareMemPtr<hPos, Pointer>>::IterAdaptor;
     static constexpr const Hardware hardPos = hPos;
-
-    // operator+：b4 时逻辑偏移用 (index>>1)，非 b4 用普通 ptr+i（避免 enable_if 在类实例化时报错）
-    template <typename Index>
-    __aicore__ inline constexpr HardwareMemPtr<hPos, Pointer> operator+(const Index& index) const
-    {
-        if constexpr (is_b4_type<typename IterVal<Pointer>::type>) {
-            return HardwareMemPtr<hPos, Pointer>{this->Get() + (static_cast<size_t>(index) >> 1)};
-        } else {
-            return HardwareMemPtr<hPos, Pointer>{this->Get() + static_cast<size_t>(index)};
-        }
-    }
 };
 
 // is hardware mem
