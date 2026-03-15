@@ -1,8 +1,9 @@
-# Exp性能样例
+# Exp算子性能样例
 
 ## 概述
 
-本样例基于Ascend C矢量计算Exp接口，实现输入tensor按元素取指数运算。样例侧重Exp接口的性能验证，帮助开发者了解该接口的性能特性和优化方向。
+本样例基于Ascend C单目矢量计算Exp接口，实现输入tensor按元素取指数运算。样例侧重Exp接口的性能验证，帮助开发者了解该接口的性能特性和优化方向。  
+Exp属于单目矢量类计算API，其他诸如Ln、Abs、Reciprocal、Sqrt、Rsqrt、Relu等API都属于该类别，对应算子性能验证方式可参考本样例。
 
 ## 支持的产品
 
@@ -14,8 +15,7 @@
 ```
 ├── vec_unary_performance
 │   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
+│   │   └── gen_data.py         // 输入数据和真值数
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── exp.asc                 // Ascend C算子实现 & 调用样例
@@ -51,9 +51,9 @@
 ExpCustom算子，将输入的tensor按元素取指数运算。
 
 对应的数学表达式为：
-```
-y = e^x
-```
+$$
+dst_i = e^{src_i}
+$$
 
 ### 算子规格
 
@@ -82,29 +82,26 @@ Exp接口用于对输入tensor按元素执行指数运算。
 ### API原型
 
 ```cpp
-__aicore__ inline void Exp(
-    const LocalTensor<T>& dstLocal,
-    const LocalTensor<T>& srcLocal,
-    uint32_t totalSize
-);
+template <typename T>
+__aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 ```
 
 ### API参数说明
 
 | 参数名 | 类型 | 输入/输出 | 说明 |
 |--------|------|-----------|------|
-| dstLocal | LocalTensor<T> | 输出 | 目标操作数，用于存放计算结果 |
-| srcLocal | LocalTensor<T> | 输入 | 源操作数，输入tensor |
-| totalSize | uint32_t | 输入 | 输入tensor的元素个数 |
+| dst | LocalTensor<T> | 输出 | 目标操作数。用于存放计算结果 |
+| src | LocalTensor<T> | 输入 | 源操作数。输入tensor |
+| count | int32_t | 输入 | 参与计算的元素个数 |
 
 ### 使用示例
 
 ```cpp
 // 基本用法
-AscendC::Exp(dstLocal, srcLocal, TOTAL_LENGTH);
+AscendC::Exp(dstLocal, srcLocal, 512);
 ```
 
-**更多详细说明和使用示例，请参考[Exp接口文档](https://www.hiascend.com/document/detail/zh/ascend-c/latest/)**
+**更多详细说明和使用示例，请参考[Exp接口文档] TODO**
 
 ## 算子实现
 
@@ -154,7 +151,6 @@ mkdir -p build && cd build; # 创建并进入build目录
 cmake .. -DINPUT_TYPE=$INPUT_TYPE -DINPUT_SIZE=$INPUT_SIZE;make -j; # 编译工程
 python3 ../scripts/gen_data.py -inputType=$INPUT_TYPE -inputSize=$INPUT_SIZE # 生成测试输入数据
 ./demo # 执行编译生成的可执行程序，执行样例
-python3 ../scripts/verify_result.py output/output.bin output/golden.bin # 验证输出结果是否正确，确认算法逻辑正确
 ```
 
 执行结果如下，说明精度对比成功。
@@ -170,8 +166,8 @@ test pass!
 
 | 测试方法 | 适用场景 | 优点 | 缺点 |
 |----------|----------|------|------|
-| 代码打点 | 快速验证、开发调试 | 实现简单、无需额外工具、快速获取cycle数 | 精度相对较低、只能获取cycle数 |
-| msProf工具 | 上板调优、性能分析 | 精度高、提供详细的性能分析报告、支持可视化 | 需要安装msProf工具、分析过程相对复杂 |
+| 代码打点 | 快速验证、开发调试 | 实现简单、无需额外工具、快速获取cycle数 | 只能获取单个指令cycle数 |
+| msProf工具 | 上板调优、性能分析 | 提供算子各阶段详细的性能分析报告、支持可视化 | 需要安装msProf工具、分析过程相对复杂 |
 
 **选择建议**：
 - **开发调试阶段**：建议使用代码打点方法，可以快速验证代码逻辑和获取初步性能数据
@@ -201,7 +197,7 @@ Exp接口的理论并行度参照下表：
 #### 代码实现
 
 ```cpp
-constexpr uint32_t INPUT_TENSOR_SIZE = INPUT_SIZE; // 输入数据长度
+constexpr uint32_t TOTAL_LENGTH = INPUT_SIZE; // 输入数据长度
 constexpr uint32_t INPUT_TENSOR_TYPE = INPUT_TYPE; // 输入数据类型
 constexpr uint32_t REPEAT_TIMES_FOR_INSTR_EXCUTE = 1000; // 指令重复执行次数（用于性能测试）
 
@@ -351,10 +347,12 @@ OPPPROF_202xxxxx_XXXXXX
 
 | 数据类型 | 数据规模（元素个数） | 理论并行度 | 实测并行度 | 达标率 |
 |----------|-------------------|-----------|-----------|--------|
-| half (fp16) | 32 * 1024 | 32 | 31.03 | 97% |
-| half (fp16) | 64 * 1024 | 32 | 31.56 | 99% |
-| float (fp32) | 16 * 1024 | 32 | 30.12 | 94% |
-| float (fp32) | 32 * 1024 | 32 | 30.45 | 95% |
+| half (fp16) | 4 * 1024 | 32 | 25.60 | 79.99% |
+| half (fp16) | 16 * 1024 | 32 | 30.12 | 94.12% |
+| half (fp16) | 48 * 1024 | 32 | 31.36 | 97.96% |
+| float (fp32) | 2 * 1024 | 32 | 21.33 | 66.66% |
+| float (fp32) | 8 * 1024 | 32 | 28.44 | 88.89% |
+| float (fp32) | 24 * 1024 | 32 | 30.72 | 96.00% |
 
 **说明**：
 - 理论并行度：理想条件下的理论性能值
@@ -363,40 +361,17 @@ OPPPROF_202xxxxx_XXXXXX
 
 ### 典型场景下的性能分析
 
-| 场景描述 | 数据类型 | 数据规模 | 性能特点 | 适用建议 |
+| 场景描述 | 数据类型 | 单核数据规模 | 性能特点 | 适用建议 |
 |----------|----------|----------|----------|----------|
-| 小规模计算 | half | 1K - 8K | 数据搬运占比较高 | 适合小批量推理场景 |
-| 中等规模计算 | half | 8K - 64K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
-| 大规模计算 | half | 64K - 512K | 计算占主导地位 | 适合大规模训练场景 |
-
-## 性能调优建议
-
-### 数据对齐优化
-
-- 确保输入tensor的数据地址按照32字节对齐，可以提高数据搬移效率
-- 使用TPipe接口的InitBuffer方法时，缓冲区大小建议按32字节对齐
-
-### 计算流水优化
-
-- 使用双缓冲技术（Double Buffer），在计算的同时预取下一批数据，减少等待时间
-- 合理设置repeatTimes和stride参数，充分利用矢量计算的并行能力
-
-### 内存访问优化
-
-- 尽量使用连续内存访问模式，避免跨步访问
-- 对于大规模数据，考虑分块处理，每块数据大小设置为32KB或64KB可以获得最佳内存带宽利用率
+| 小规模计算 | half | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
+| 中等规模计算 | half | 4K - 16K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
+| 大规模计算 | half | 16K - 48K | 计算占主导地位 | 适合大规模训练场景 |
+| 小规模计算 | float | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
+| 中等规模计算 | float | 4K - 8K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
+| 大规模计算 | float | 8K - 24K | 计算占主导地位 | 适合大规模训练场景 |
 
 ## 扩展阅读
 
-- [Exp接口文档](https://www.hiascend.com/document/detail/zh/ascend-c/latest/api/kernel-augmt/augmnt_18_0039.html)
-- [Ascend C性能优化指南](../../04_best_practices/12_high_performance_vf/README.md)
-- [矢量计算API最佳实践](../../04_best_practices/12_high_performance_vf/optimize_vf_fusion/README.md)
-
----
-
-**备注**：
-1. 本样例的定位是指导用户进行开发，而非测试用例，因此重点关注API的使用方法和性能特性分析
-2. 不涉及built-in接口的详细描述，外部用户只需关注基础API接口的使用
-3. 测试场景说明合并了参数说明，避免重复，降低维护成本
-4. 提供两种性能测试方法是为了满足不同阶段的需求：开发调试阶段使用代码打点，性能优化阶段使用msProf工具
-5. 性能数据仅供参考，实际性能可能因硬件环境、数据分布等因素有所差异
+- [Exp接口文档] TODO
+- [Ascend C性能优化指南] TODO
+- [矢量计算API最佳实践] TODO
