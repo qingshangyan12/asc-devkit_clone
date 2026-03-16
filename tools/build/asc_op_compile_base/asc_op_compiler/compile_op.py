@@ -410,15 +410,15 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
             for param in func_params:
                 source += f"    {param} = param_base[args_offset++];\n"
         else:
-            called_func_params = "param"
+            called_func_params = "param, sargs"
             called_func_params_type = "__gm__ uint64_t *param"
-            source += "__gm__ uint64_t *param) {\n"
+            source += "__gm__ uint64_t *param, __gm__ sk::SkSystemArgs *sargs) {\n"
             source += " uint32_t __asc_index = 0;\n"
             for param in func_params:
                 source += f"    {param} = (GM_ADDR)param[__asc_index++];\n"
 
     else:
-        source += ", ".join(func_params) + ") {\n"
+        source += ", ".join(func_params + ["__gm__ sk::SkSystemArgs *sargs"]) + ") {\n"
         called_func_params_type = ", ".join(func_params)
         called_func_params = called_func_params_type.replace("GM_ADDR ", "")
     return source, workspace_idx, called_func_params, called_func_params_type
@@ -589,6 +589,17 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
     source += "#define __global__ __attribute__((cce_kernel))\n"
     source += "#endif\n\n"
 
+    source += """
+namespace sk {
+struct SkSystemArgs {
+    uint16_t skBlockIdx;    // sub-kernel block idx
+    uint16_t skBlockNum;    // sub-kernel block num
+    uint16_t skTaskSyncCfg; // sync type for "early-start"
+    uint8_t reserve[10];
+};
+}
+"""
+
     if global_var_storage.get_variable("ascendc_tiling_no_register"):
         source += gen_tiling_struct_size_for_group_key_no_size(compile_info)
 
@@ -625,6 +636,8 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
     source_declare_pub, workspace_idx, called_func_params, called_func_params_type = \
         _gen_kernel_func_declare_head(is_mix, is_single_and_using_hard_sync, \
         opinfo, tiling_info)
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        called_func_params_type += ", __gm__ sk::SkSystemArgs *sargs"
     source += kernel_func_dec_pub
     source += source_declare_pub
     source_declare_pub_fun = f"ascendc_{auto_gen_kernel_func}(" + called_func_params + ");"
