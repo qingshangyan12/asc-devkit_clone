@@ -41,7 +41,11 @@ struct IterAdaptor
 
     template <typename Index>
     __aicore__ inline constexpr DerivedType operator+(const Index& i) const {
-        return {ptr + i};
+        if constexpr (is_b4_type<valueType>) {
+            return {ptr + (i >> 1)};
+        } else {
+            return {ptr + i};
+        }
     }
 
     __aicore__ inline constexpr iterator Get() const {
