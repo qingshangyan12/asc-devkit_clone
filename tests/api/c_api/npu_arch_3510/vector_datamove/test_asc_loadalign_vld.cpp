@@ -77,6 +77,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldNorm, asc_loadalign, vld, vecto
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldNorm, asc_loadalign, vld, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldNorm, asc_loadalign, vld, vector_int8_t, int8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldNorm, asc_loadalign, vld, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldNorm, asc_loadalign, vld, vector_hifloat8_t, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldNorm, asc_loadalign, vld, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldNorm, asc_loadalign, vld, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldNorm, asc_loadalign, vld, vector_uint16_t, uint16_t);
@@ -94,6 +95,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcB8, asc_loadalign_brc, vld, 
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcB8, asc_loadalign_brc, vld, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcB8, asc_loadalign_brc, vld, vector_int8_t, int8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcB8, asc_loadalign_brc, vld, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcB8, asc_loadalign_brc, vld, vector_hifloat8_t, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcB8, asc_loadalign_brc, vld, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcB8, asc_loadalign_brc, vld, vector_fp8_e8m0_t, fp8_e8m0_t);
 
@@ -113,6 +115,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUpSample, asc_loadalign_upsampl
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUpSample, asc_loadalign_upsample, vld, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUpSample, asc_loadalign_upsample, vld, vector_int8_t, int8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUpSample, asc_loadalign_upsample, vld, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUpSample, asc_loadalign_upsample, vld, vector_hifloat8_t, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUpSample, asc_loadalign_upsample, vld, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUpSample, asc_loadalign_upsample, vld, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUpSample, asc_loadalign_upsample, vld, vector_uint16_t, uint16_t);
@@ -126,6 +129,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldDownSample, asc_loadalign_downs
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldDownSample, asc_loadalign_downsample, vld, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldDownSample, asc_loadalign_downsample, vld, vector_int8_t, int8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldDownSample, asc_loadalign_downsample, vld, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldDownSample, asc_loadalign_downsample, vld, vector_hifloat8_t, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldDownSample, asc_loadalign_downsample, vld, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldDownSample, asc_loadalign_downsample, vld, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldDownSample, asc_loadalign_downsample, vld, vector_uint16_t, uint16_t);
@@ -139,6 +143,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignVldDintlv, asc_loadalign_d
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignVldDintlv, asc_loadalign_deintlv, vld, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignVldDintlv, asc_loadalign_deintlv, vld, vector_int8_t, int8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignVldDintlv, asc_loadalign_deintlv, vld, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignVldDintlv, asc_loadalign_deintlv, vld, vector_hifloat8_t, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignVldDintlv, asc_loadalign_deintlv, vld, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignVldDintlv, asc_loadalign_deintlv, vld, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_INSTR(LoadAlignVldDintlv, asc_loadalign_deintlv, vld, vector_uint16_t, uint16_t);
@@ -155,6 +160,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpack, asc_loadalign_unpack, v
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpack, asc_loadalign_unpack, vld, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpack, asc_loadalign_unpack, vld, vector_int8_t, int8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpack, asc_loadalign_unpack, vld, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpack, asc_loadalign_unpack, vld, vector_hifloat8_t, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpack, asc_loadalign_unpack, vld, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpack, asc_loadalign_unpack, vld, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpack, asc_loadalign_unpack, vld, vector_uint16_t, uint16_t);
@@ -171,6 +177,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpackV2, asc_loadalign_unpack_
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpackV2, asc_loadalign_unpack_v2, vld, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpackV2, asc_loadalign_unpack_v2, vld, vector_int8_t, int8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpackV2, asc_loadalign_unpack_v2, vld, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpackV2, asc_loadalign_unpack_v2, vld, vector_hifloat8_t, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpackV2, asc_loadalign_unpack_v2, vld, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldUnpackV2, asc_loadalign_unpack_v2, vld, vector_fp8_e8m0_t, fp8_e8m0_t);
 
@@ -180,6 +187,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vl
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_int8_t, int8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_hifloat8_t, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_INSTR(LoadAlignVldBrcV2, asc_loadalign_brc_v2, vld, vector_uint16_t, uint16_t);

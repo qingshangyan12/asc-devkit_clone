@@ -50,6 +50,7 @@ TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, hal
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, float);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, bfloat16_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, hifloat8_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, fp4x2_e2m1_t);
@@ -93,6 +94,7 @@ TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, h
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, float);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, bfloat16_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, hifloat8_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, fp4x2_e2m1_t);

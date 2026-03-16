@@ -54,6 +54,7 @@ TEST_VECTOR_DATAMOVE_LOAD_INSTR(Vldasandvldus, asc_load, vldus, vldas, half);
 TEST_VECTOR_DATAMOVE_LOAD_INSTR(Vldasandvldus, asc_load, vldus, vldas, float);
 TEST_VECTOR_DATAMOVE_LOAD_INSTR(Vldasandvldus, asc_load, vldus, vldas, bfloat16_t);
 TEST_VECTOR_DATAMOVE_LOAD_INSTR(Vldasandvldus, asc_load, vldus, vldas, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOAD_INSTR(Vldasandvldus, asc_load, vldus, vldas, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOAD_INSTR(Vldasandvldus, asc_load, vldus, vldas, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOAD_INSTR(Vldasandvldus, asc_load, vldus, vldas, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOAD_INSTR(Vldasandvldus, asc_load, vldus, vldas, fp4x2_e2m1_t);
