@@ -45,6 +45,7 @@ TEST_VECTOR_COMPUTE_SELECT_INSTR(Psel, asc_select, psel, vector_bool);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_uint8_t);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_int8_t);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_fp8_e4m3fn_t);
+TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_hifloat8_t);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_fp8_e5m2_t);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_uint16_t);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_int16_t);

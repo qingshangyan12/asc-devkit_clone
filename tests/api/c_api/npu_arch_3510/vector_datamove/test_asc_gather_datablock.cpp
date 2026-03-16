@@ -79,6 +79,7 @@ TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_0(Vgatherb, asc_gather_datablock, vg
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_0(Vgatherb, asc_gather_datablock, vgatherb, float);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_0(Vgatherb, asc_gather_datablock, vgatherb, bfloat16_t);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_0(Vgatherb, asc_gather_datablock, vgatherb, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_0(Vgatherb, asc_gather_datablock, vgatherb, hifloat8_t);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_0(Vgatherb, asc_gather_datablock, vgatherb, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_0(Vgatherb, asc_gather_datablock, vgatherb, fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_0(Vgatherb, asc_gather_datablock, vgatherb, fp4x2_e1m2_t);
@@ -94,6 +95,7 @@ TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_1(Vgatherb_1, asc_gather_datablock, 
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_1(Vgatherb_1, asc_gather_datablock, vgatherb, float);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_1(Vgatherb_1, asc_gather_datablock, vgatherb, bfloat16_t);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_1(Vgatherb_1, asc_gather_datablock, vgatherb, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_1(Vgatherb_1, asc_gather_datablock, vgatherb, hifloat8_t);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_1(Vgatherb_1, asc_gather_datablock, vgatherb, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_1(Vgatherb_1, asc_gather_datablock, vgatherb, fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_GATHER_DATABLOCK_INSTR_1(Vgatherb_1, asc_gather_datablock, vgatherb, fp4x2_e1m2_t);
