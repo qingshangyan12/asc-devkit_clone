@@ -15,6 +15,7 @@
 #ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_IMPL_H
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_IMPL_H
 
+#include "impl/utils/std/cmath/ceil_div.h"
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_method.h"
 #include "impl/experimental/tensor_api/tensor/coord_index.h"
@@ -45,13 +46,13 @@ __aicore__ inline decltype(auto) MakeTileLayout(const LayoutType& layout, const 
 
         if constexpr (IsIntegralConstantV<InnerRowType> && IsIntegralConstantV<InnerColType>) {
             return MakeLayout(
-                MakeShape(MakeShape(Std::Int<InnerRowType::value>{}, CeilDivision(rows, InnerRowType::value)),
-                          MakeShape(Std::Int<InnerColType::value>{}, CeilDivision(cols, InnerColType::value))),
+                MakeShape(MakeShape(Std::Int<InnerRowType::value>{}, Std::CeilDivision(rows, InnerRowType::value)),
+                          MakeShape(Std::Int<InnerColType::value>{}, Std::CeilDivision(cols, InnerColType::value))),
                 layout.Stride());
         } else {
             return MakeLayout(
-                MakeShape(MakeShape(innerRow, CeilDivision(rows, innerRow)),
-                                        MakeShape(innerCol, CeilDivision(cols, innerCol))),
+                MakeShape(MakeShape(innerRow, Std::CeilDivision(rows, innerRow)),
+                                        MakeShape(innerCol, Std::CeilDivision(cols, innerCol))),
                 layout.Stride());
         }
     }
