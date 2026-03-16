@@ -37,8 +37,12 @@ Exp属于单目矢量类计算API，其他诸如Ln、Abs、Reciprocal、Sqrt、R
 
 | 场景编号 | INPUT_TYPE | 数据类型 | INPUT_SIZE | 数据规模 | 说明 |
 |----------|------------|----------|------------|----------|------|
-| 1 | 1 | half | 32768 | 32K | half类型，32K元素 |
-| 2 | 2 | float | 16384 | 16K | float类型，16K元素 |
+| 1 | 1 | half | 4096 | 4K | half类型，4K元素 |
+| 2 | 1 | half | 16384 | 16K | half类型，16K元素 |
+| 3 | 1 | half | 49152 | 48K | half类型，48K元素 |
+| 4 | 2 | float | 2048 | 2K | float类型，2K元素 |
+| 5 | 2 | float | 8192 | 8K | float类型，8K元素 |
+| 6 | 2 | float | 24576 | 24K | float类型，24K元素 |
 
 **参数说明**：
 - `INPUT_TYPE`：输入数据类型，1表示half，2表示float
@@ -58,20 +62,16 @@ $$
 ### 算子规格
 
 算子整体规格如下表所示：
-
-| 算子类型(OpType) | Exp |
-|------------------|-----|
-| **算子输入** | |
-| name | x |
-| shape | INPUT_SIZE |
-| data type | half或float |
-| format | ND |
-| **算子输出** | |
-| name | y |
-| shape | INPUT_SIZE |
-| data type | half或float |
-| format | ND |
-| **核函数名** | exp_custom |
+<table>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">exp</td></tr>
+  <tr><td rowspan="3" align="center">算子输入</td></tr>
+    <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+    <tr><td align="center">x</td><td align="center">INPUT_SIZE</td><td align="center">half或float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">算子输出</td></tr>
+    <tr><td align="center">y</td><td align="center">INPUT_SIZE</td><td align="center">half或float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4"
+  align="center">exp_custom</td></tr>
+</table>
 
 ## 关键API说明
 
@@ -101,7 +101,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 AscendC::Exp(dstLocal, srcLocal, 512);
 ```
 
-**更多详细说明和使用示例，请参考[Exp接口文档] TODO**
+**更多详细说明和使用示例，请参考[AscendC API列表中的Exp接口文档](https://hiascend.com/document/redirect/CannCommunityAscendCApi)**。
 
 ## 算子实现
 
@@ -337,7 +337,7 @@ OPPPROF_202xxxxx_XXXXXX
 
 #### 补充说明
 
-更多性能指标的详细说明及调优方案，请参考《算子开发工具手册》。
+更多性能指标的详细说明及调优方案，请参考[算子开发工具-算子调优（msProf）](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/devaids/optool/atlasopdev_16_0082.html)。
 
 ## 典型性能数据
 
@@ -361,17 +361,18 @@ OPPPROF_202xxxxx_XXXXXX
 
 ### 典型场景下的性能分析
 
+TODO
+
 | 场景描述 | 数据类型 | 单核数据规模 | 性能特点 | 适用建议 |
 |----------|----------|----------|----------|----------|
 | 小规模计算 | half | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
 | 中等规模计算 | half | 4K - 16K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
 | 大规模计算 | half | 16K - 48K | 计算占主导地位 | 适合大规模训练场景 |
 | 小规模计算 | float | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
-| 中等规模计算 | float | 4K - 8K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
+| 中等规模计算 | float | 2K - 8K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
 | 大规模计算 | float | 8K - 24K | 计算占主导地位 | 适合大规模训练场景 |
 
 ## 扩展阅读
 
-- [Exp接口文档] TODO
-- [Ascend C性能优化指南] TODO
-- [矢量计算API最佳实践] TODO
+- [AscendC API列表中的Exp接口文档](https://hiascend.com/document/redirect/CannCommunityAscendCApi)
+- [算子实践参考-SIMD算子性能优化](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/opdevg/Ascendcopdevg/atlas_ascendc_best_practices_10_0001.html)
