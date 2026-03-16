@@ -55,7 +55,7 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
         } else {
             return MakeLayout(
                 MakeShape(MakeShape(innerRow, CeilDivision(rows, innerRow)),
-                                        MakeShape(innerCol, CeilDivision(cols, innerCol))),
+                          MakeShape(innerCol, CeilDivision(cols, innerCol))),
                 layout.Stride());
         }
     }
