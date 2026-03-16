@@ -12,10 +12,10 @@
  * \file scheduler_mdl_base.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/matmul/scheduler/base/scheduler_mdl_base.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_MDL_BASE_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_MDL_BASE_H__
 #endif
 
 #ifndef IMPL_MATMUL_SCHEDULER_BASE_SCHEDULER_MDL_BASE_H
@@ -220,18 +220,15 @@ protected:
     {
         if constexpr (DoMatmulSpecialMDL(MM_CFG) || MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB()) {
             LocalTensor<TransAT> a2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, TransAT>();
-            MATMUL_MODULE(LoadToA2)->Load(a2, a1, aL0Params.axisL1Len, aL0Params.kAxisL1Len, aL0Params.axisL0Len,
-                MATMUL_MODULE(KLoop)->GetBaseShape(), aL0Params.axisL1Offset, aL0Params.kAxisL1Offset, isATranspose);
+            MATMUL_MODULE(LoadToA2)->Load(a2, a1, aL0Params.axisL1Len, aL0Params.kAxisL1Len, aL0Params.axisL0Len, MATMUL_MODULE(KLoop)->GetBaseShape(), aL0Params.axisL1Offset, aL0Params.kAxisL1Offset, isATranspose);
             return a2;
         } else {
-            auto posA = MATMUL_MODULE(MLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() +
-                MATMUL_MODULE(KLoop)->GetInnerIdx();
+            auto posA = MATMUL_MODULE(MLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() + MATMUL_MODULE(KLoop)->GetInnerIdx();
             int32_t kL0Len = MATMUL_MODULE(KLoop)->GetBaseShape();
             // Split
             if (!(MATMUL_MODULE(TBufPoolL0)->template Hit<TPosition::A2>(posA))) {
                 LocalTensor<TransAT> a2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, TransAT>();
-                MATMUL_MODULE(LoadToA2)->Load(a2, a1, aL0Params.axisL1Len, aL0Params.kAxisL1Len,
-                    aL0Params.axisL0Len, kL0Len, aL0Params.axisL1Offset, aL0Params.kAxisL1Offset, isATranspose);
+                MATMUL_MODULE(LoadToA2)->Load(a2, a1, aL0Params.axisL1Len, aL0Params.kAxisL1Len, aL0Params.axisL0Len, kL0Len, aL0Params.axisL1Offset, aL0Params.kAxisL1Offset, isATranspose);
                 return a2;
             } else {
                 return MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, TransAT>();
@@ -250,8 +247,7 @@ protected:
                 bL0Params.kAxisL1Offset, isBTranspose);
             return b2;
         } else {
-            auto posB = MATMUL_MODULE(NLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() +
-                MATMUL_MODULE(KLoop)->GetInnerIdx();
+            auto posB = MATMUL_MODULE(NLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() + MATMUL_MODULE(KLoop)->GetInnerIdx();
             int32_t kL0Len = MATMUL_MODULE(KLoop)->GetBaseShape();
             if constexpr (HasSparseIndex<B_TYPE>()) {
                 if (!(MATMUL_MODULE(TBufPoolL0)->template Hit<TPosition::B2>(posB))) {
@@ -282,17 +278,14 @@ protected:
         const bool isATranspose, const bool isBTranspose, const bool sL0CInit, const bool sL0CLast)
     {
         int32_t kInnerStartIdx = IsMDLKFullLoad() ? 0 : MATMUL_MODULE(KLoop)->GetInnerStartIdx();
-        auto unitFlag = MATMUL_MODULE(MatmulUnitFlag)->GetUnitFlag(sL0CLast && (MATMUL_MODULE(KLoop)->GetInnerIdx() ==
-            kInnerStartIdx + MATMUL_MODULE(KLoop)->GetInnerIter() - 1));
+        auto unitFlag = MATMUL_MODULE(MatmulUnitFlag)->GetUnitFlag(sL0CLast && (MATMUL_MODULE(KLoop)->GetInnerIdx() == kInnerStartIdx + MATMUL_MODULE(KLoop)->GetInnerIter() - 1));
         bool cmatrixSource;
         bool cmatrixInitVal;
         UpdateMmadComputeParams(kInnerStartIdx, sL0CInit, cmatrixSource, cmatrixInitVal);
         if constexpr (HasSparseIndex<B_TYPE>()) {
-            MATMUL_MODULE(MmadCompute)->template Compute<true>(cMatrix,
-                a2, b2, madM, madK, madN, isATranspose, isBTranspose, unitFlag, cmatrixSource, cmatrixInitVal);
+            MATMUL_MODULE(MmadCompute)->template Compute<true>(cMatrix, a2, b2, madM, madK, madN, isATranspose, isBTranspose, unitFlag, cmatrixSource, cmatrixInitVal);
         } else {
-            MATMUL_MODULE(MmadCompute)->Compute(cMatrix, a2, b2,
-                madM, madK, madN, isATranspose, isBTranspose, unitFlag, cmatrixSource, cmatrixInitVal);
+            MATMUL_MODULE(MmadCompute)->Compute(cMatrix, a2, b2, madM, madK, madN, isATranspose, isBTranspose, unitFlag, cmatrixSource, cmatrixInitVal);
         }
     }
 
@@ -325,8 +318,7 @@ protected:
     {
         if constexpr (IsStaticTilingEnable(MM_CFG)) {
             const auto& tiling = MATMUL_MODULE(MatmulShapeTiling)->GetTiling();
-            return (tiling.GetStepKa() < tiling.GetStepKb() ? tiling.GetStepKa() : tiling.GetStepKb()) *
-                tiling.GetBaseK() >= tiling.GetSingleCoreK();
+            return (tiling.GetStepKa() < tiling.GetStepKb() ? tiling.GetStepKa() : tiling.GetStepKb()) * tiling.GetBaseK() >= tiling.GetSingleCoreK();
         }
         return false;
     }
@@ -579,7 +571,7 @@ protected:
 }  // namespace AscendC
 #endif
 
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_MDL_BASE_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_MDL_BASE_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_MDL_BASE_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_MDL_BASE_H__
 #endif

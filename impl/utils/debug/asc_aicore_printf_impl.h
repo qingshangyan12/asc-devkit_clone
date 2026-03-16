@@ -191,6 +191,7 @@ __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 }
 } // namespace __asc_aicore
 #else
+#include <cstdio>
 namespace __asc_aicore {
 enum class DumpType : uint8_t {
     DUMP_DEFAULT = 0,
@@ -198,7 +199,10 @@ enum class DumpType : uint8_t {
 };
 
 template <class... Args>
-__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args) {}
+__aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
+{
+    std::printf(fmt, args...);
+}
 
 template <class... Args>
 __aicore__ inline void scalar_printf_impl(DumpType debugType, __gm__ const char* fmt, Args&&... args) {}
@@ -206,6 +210,8 @@ __aicore__ inline void scalar_printf_impl(DumpType debugType, __gm__ const char*
 __aicore__ inline void enable_asc_diagnostics() {}
 
 } // namespace __asc_aicore
+
+using namespace __asc_aicore;
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_PRINTF_IMPL__)
