@@ -56,19 +56,11 @@ __aicore__ inline void asc_sync()
     asc_sync_impl();
 }
 
-__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint8_t mode, int64_t flagID)
-{
-    asc_sync_block_arrive_impl(pipe, mode, flagID);
-}
+#define asc_sync_block_arrive(pipe, flag_id) asc_sync_block_arrive_impl(pipe, flag_id)
 
 __aicore__ inline void asc_sync_block_wait(int64_t flagID)
 {
     asc_sync_block_wait_impl(flagID);
-}
-
-__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg)
-{
-    asc_sync_data_barrier_impl(arg);
 }
 
 #endif
