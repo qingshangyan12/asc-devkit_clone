@@ -32,6 +32,12 @@ void vsts(vector_f8e8m0 src0, vector_f8e8m0 src1, __ubuf__ fp8_e8m0_t* base, int
 void vsts(vector_f4e2m1x2 src0, vector_f4e2m1x2 src1, __ubuf__ fp4x2_e2m1_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 
+inline void create_ca_matrix_h(__ca__ bfloat16_t* dst, int64_t repeat, half value) {}
+inline void create_ca_matrix_ui(__ca__ bfloat16_t* dst, int64_t repeat, uint32_t value) {}
+
+inline void create_cb_matrix_h(__cb__ bfloat16_t* dst, int64_t repeat, half value) {}
+inline void create_cb_matrix_ui(__cb__ bfloat16_t* dst, int64_t repeat, uint32_t value) {}
+
 #if defined(__DAV_CUBE__)
     inline int32_t g_coreType = 1;
 #else
