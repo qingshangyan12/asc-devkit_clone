@@ -21,7 +21,7 @@ protected:\
     void TearDown() {}\
 };\
 \
-void cce_name##_Stub(data_type config) {}\
+void cce_name##_Stub() {}\
 \
 TEST_F(TestSysVarSetMad##cce_name, c_api_name##_Succ)\
 {\
