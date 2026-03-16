@@ -177,15 +177,18 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
         // Note: SetValue may not be available, use Duplicate to fill
         // For int32_t, MIN_VAL = -2147483648
         // We use a workaround: fill by copying from a pre-filled location
-        
+
         // Alternative approach: Fill prepare buffer with MIN_VAL using Duplicate
         T minVal = static_cast<T>(-2147483647 - 1);  // INT32_MIN for int32_t, safe for other types
-        
+
         // Use Duplicate to fill 8 elements with MIN_VAL
         SetVectorMask<T, MaskMode::COUNTER>(0, 8);
         Duplicate<T>(prepareBuffer, minVal, 8);
         PipeBarrier<PIPE_V>();
-        
+
+        // CRITICAL: Duplicate() internally calls SetMaskNorm(), must re-enable Count mode
+        SetMaskCount();
+
         // Copy valid data (overwrites the MIN_VAL padding)
         SetVectorMask<T, MaskMode::COUNTER>(0, count);
         Adds<T, false>(prepareBuffer, src, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
