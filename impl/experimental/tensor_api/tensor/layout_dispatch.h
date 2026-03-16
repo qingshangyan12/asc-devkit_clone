@@ -56,13 +56,6 @@ __aicore__ inline decltype(auto) GetTuple(Ts&&... ts) {
     return Make2Params2Tuple(MakeTupleCons{}, ts...);
 }
 
-template <typename T0, typename T1, typename T2, typename T3, typename... Ts>
-__aicore__ inline decltype(auto) LayoutConstructor(T0&& t0, T1&& t1, T2&& t2, T3&& t3, Ts&&... ts) {
-    auto shape = GetTuple(t0, t1, t2, t3);
-    auto stride = GetTuple(ts...);
-    return Layout(shape, stride);
-}
-
 // tuple_dispatch.h
 template <LayoutFormat format, TupleFormat tupleFormat, typename T>
 struct TupleDispatcher;
@@ -274,7 +267,7 @@ struct TupleDispatcher<LayoutFormat::ND, TupleFormat::Coord, fp8_e8m0_t> {
 template <typename T>
 struct TupleDispatcher<LayoutFormat::ZZ, TupleFormat::Coord, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return Make2Params2Tuple(Std::Int<0>{}, CeilDivision(row, FRACTAL_FIXED),
+        return GetTuple(Std::Int<0>{}, CeilDivision(row, FRACTAL_FIXED),
                                     Std::Int<0>{}, CeilDivision(column, (C0_SIZE / sizeof(T))));
     }
 };
