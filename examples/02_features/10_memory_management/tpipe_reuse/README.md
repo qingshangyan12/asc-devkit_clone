@@ -1,6 +1,6 @@
-# Init样例
+# TPipe复用样例
 ## 概述
-本样例基于Init实现内存和同步流水事件EventID的初始化。
+本样例基于TPipe::Init和TPipe::Destory，实现TPipe重复申请与使用。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -9,19 +9,19 @@
 
 ## 目录结构介绍
 ```
-├── init
+├── tpipe_reuse
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── init.asc      // Ascend C算子实现 & 调用样例
+│   └── tpipe_reuse.asc      // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
 - 算子功能：  
 
-  用于内存和同步流水事件EventID的初始化。
+  本样例在用同一个核函数重，创建了两个独立的TPipe对象（pipeIn和pipeCast），并分别执行“初始化->绑定->使用->销毁”的完整生命周期，从而描述TPipe的复用机制。
 - 算子规格：  
 
   <table>
@@ -48,7 +48,7 @@
     </tr>
     <tr>
       <td align="center">核函数名</td>
-      <td colspan="4" align="center">init_custom</td>
+      <td colspan="4" align="center">tpipe_reuse_custom</td>
     </tr>
   </table>
 
