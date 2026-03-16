@@ -16,7 +16,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    tpipe_init_buf_pool.asc
+    tbufpool_buf_pool_subdivision.asc
 )
 
 target_link_libraries(demo PRIVATE
