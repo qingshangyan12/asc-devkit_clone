@@ -28,5 +28,7 @@ template <typename T> __aicore__ inline T abs(const T src);
 
 #include "impl/utils/std/cmath/sqrt.h"
 #include "impl/utils/std/cmath/abs.h"
+#include "impl/utils/std/cmath/ceil_division.h"
+#include "impl/utils/std/cmath/divide.h"
 
 #endif  // AICORE_UTILS_STD_CMATH_H

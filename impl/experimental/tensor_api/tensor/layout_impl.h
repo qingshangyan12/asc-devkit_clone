@@ -15,6 +15,7 @@
 #ifndef IMPL_TENSOR_API_TENSOR_LAYOUT_IMPL_H
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_IMPL_H
 
+#include "impl/utils/std/cmath/ceil_division.h"
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_method.h"
 #include "impl/experimental/tensor_api/tensor/coord_index.h"
@@ -51,8 +52,8 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
     auto realRow = Min(srcRow, dstRow);
     auto realCol = Min(srcCol, dstCol);
 
-    auto row = MakeShape(innerRow, CeilDivision(realRow, innerRow));
-    auto col = MakeShape(innerCol, CeilDivision(realCol, innerCol));
+    auto row = MakeShape(innerRow, Std::ceil_division(realRow, innerRow));
+    auto col = MakeShape(innerCol, Std::ceil_division(realCol, innerCol));
 
     return MakeTileLayout(coord, layout, MakeShape(row, col));
 }
