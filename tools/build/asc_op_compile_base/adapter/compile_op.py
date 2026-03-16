@@ -431,9 +431,9 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
             for param in func_params:
                 source += f"    {param} = param_base[args_offset++];\n"
         else:
-            called_func_params = "param"
-            called_func_params_type = "__gm__ uint64_t *param"
-            source += "__gm__ uint64_t *param) {\n"
+            called_func_params = "param, sargs"
+            called_func_params_type = "__gm__ uint64_t *param, sk::SkSystemArgs *sargs"
+            source += "__gm__ uint64_t *param, sk::SkSystemArgs *sargs) {\n"
             source += " uint32_t __asc_index = 0;\n"
             for param in func_params:
                 source += f"    {param} = (GM_ADDR)param[__asc_index++];\n"
@@ -594,6 +594,9 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
     source += "#define __global__ inline\n"
     source += f"#include \"{src_file}\"\n"
     source += "#include \"kernel_utils.h\"\n"
+
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        source += "#include \"kernel_operator_sys_var_intf_impl.h\"\n"
 
     ascendc_dump_on = "-DASCENDC_DUMP=0" not in compile_options
     dump_info = compile_info.dump_info["dump_type"] != "" and ascendc_dump_on

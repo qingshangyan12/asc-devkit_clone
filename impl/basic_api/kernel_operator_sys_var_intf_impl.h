@@ -49,6 +49,18 @@ __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_dynamic_block_num;
 #endif
 #endif
 
+#if __NPU_ARCH__ == 2201
+namespace sk {
+// transmit block local variable information in SK "sub-kernel"
+struct SkSystemArgs {
+    uint16_t skBlockIdx;    // sub-kernel block idx
+    uint16_t skBlockNum;    // sub-kernel block num
+    uint16_t skTaskSyncCfg; // sync type for "early-start"
+    uint8_t reserve[10];
+};
+}
+#endif
+
 namespace AscendC {
 
 __aicore__ inline int64_t GetBlockIdx()
