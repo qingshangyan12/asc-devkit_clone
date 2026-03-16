@@ -337,7 +337,7 @@ OPPPROF_202xxxxx_XXXXXX
 
 #### 补充说明
 
-更多性能指标的详细说明及调优方案，请参考[算子开发工具-算子调优（msProf）](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/devaids/optool/atlasopdev_16_0082.html)。
+更多性能指标的详细说明及调优方案，请参考[算子开发工具-算子调优（msProf）](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)。
 
 ## 典型性能数据
 
