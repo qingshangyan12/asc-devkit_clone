@@ -22,10 +22,10 @@ namespace Te {
 
 class Fixpipe2UbNz2DnBase3510 {
 public:
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
-    __aicore__ inline void Run(const T& dst, const U& src, const Params& params) {
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename... Params>
+    __aicore__ inline void Run(const T& dst, const U& src, const Params&... params) {
         SetRegisterImpl<trait, T, U>(dst, src);
-        DataCopyImpl<trait, quantPre, T, U, Params>(dst, src, params);
+        DataCopyImpl<trait, quantPre, T, U>(dst, src, params...);
     }
 
 private:
@@ -46,8 +46,7 @@ private:
         uint32_t srcNzMatrixStride = 0;
         uint32_t dstDnMatrixStride = 0;
         uint32_t srcNzC0Stride = 1;
-        SetRegisterBase3510 setRegisterInst;
-        setRegisterInst.SetRegister(dnNum, dstDnMatrixStride, srcNzMatrixStride, srcNzC0Stride);
+        SetRegisterBase3510::SetRegister(dnNum, dstDnMatrixStride, srcNzMatrixStride, srcNzC0Stride);
     }
 
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
@@ -74,8 +73,7 @@ private:
         bool subBlockId = false;
         bool nz2ndEn = false;
         bool nz2dnEn = true;
-        CopyMatrixCcToUbBase3510 copyInst;
-        copyInst.DataCopy<trait, quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, dualDstCtl,
+        CopyMatrixCcToUbBase3510::DataCopy<trait, quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, dualDstCtl,
             reluEn, unitFlag, subBlockId, nz2ndEn, nz2dnEn);
     }
 };
