@@ -34,6 +34,7 @@ from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manage
 
 
 def compile_pre_process(op_info: OpInfo, compile_options: list):
+    compile_options.append("-DASCENDC_DUMP=0")
     cce_runtime.TBE_WORKSPACE_SIZE_LIST.local_list = []
     cce_runtime.TBE_WORKSPACE_IND_LIST.local_list = []
     cce_runtime.MULTI_CORE_SYNC_WORKSPACE_SIZE_LIST.local_list = []
