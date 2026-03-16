@@ -88,6 +88,13 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate_impl(__ubuf__ bfloa
     }
 }
 
+__simd_callee__ inline void asc_storeunalign_post_postupdate_impl(__ubuf__ hifloat8_t*& dst, vector_store_align src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        vstas(src, dst, offset, POST_UPDATE);
+    }
+}
+
 __simd_callee__ inline void asc_storeunalign_post_postupdate_impl(__ubuf__ fp8_e4m3fn_t*& dst, vector_store_align src, int32_t offset)
 {
     if ASC_IS_AIV {
