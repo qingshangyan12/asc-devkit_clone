@@ -53,7 +53,14 @@
 
 - 算子规格：  
   <table>
-  <tr><th align="center">算子类型(OpType)</th><th colspan="5" align="center">WholeReduceSum</th></tr> <tr><td rowspan="2" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">default</td></tr> <tr><td align="center">x</td><td align="center">1024</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr> <tr><td rowspan="1" align="center">算子输出</td><td align="center">out</td><td align="center">16</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr> <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">whole_reduce_sum</td></tr> 
+  <tr><th align="center">算子类型(OpType)</th><th colspan="5" align="center">WholeReduceSum</th></tr>
+  <tr><td rowspan="2" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td>
+  <td align="center">data type</td><td align="center">format</td><td align="center">default</td></tr>
+  <tr><td align="center">x</td><td align="center">1024</td><td align="center">float16</td>
+  <td align="center">ND</td><td align="center">\</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">out</td>
+  <td align="center">16</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">whole_reduce_sum</td></tr> 
   </table>
 
 - 算子实现：  
@@ -61,7 +68,7 @@
   - kernel实现   
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成对每个repeat内所有数据求和，得到最终结果，再搬出到外部存储上。   
 
-    WholeReduceSum算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm搬运至Local Memory，存储在xLocal，Compute任务负责对xLocal执行相关操作，计算结果存储在outLocal中，CopyOut任务负责将输出数据从outLocal搬运至Global Memory上的输出Tensor outGm中。
+    WholeReduceSum算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor srcGm搬运至Local Memory，存储在srcLocal，Compute任务负责对srcLocal执行相关操作，计算结果存储在dstLocal中，CopyOut任务负责将输出数据从dstLocal搬运至Global Memory上的输出Tensor dstGm中。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
