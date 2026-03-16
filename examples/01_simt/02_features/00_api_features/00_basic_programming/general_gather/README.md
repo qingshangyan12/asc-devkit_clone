@@ -1,14 +1,14 @@
 # 纯SIMT编程模式实现Gather算子样例
 
 ## 概述
-样例基于Ascend C纯SIMT编程方式实现Gather算子，从输入张量中采集指定的m行数据，展示离散内存访问类算子的开发方法。
+样例基于Ascend C SIMT编程方式实现Gather算子，从输入张量中采集指定的m行数据，展示泛化场景离散内存访问类算子的开发方法。
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 
 ## 目录结构
 ```
-├── pure_simt_gather
+├── general_gather
 │   ├── gather.asc             # SIMT实现gather调用样例
 |   └── README.md
 ```

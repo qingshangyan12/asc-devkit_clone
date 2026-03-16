@@ -11,9 +11,9 @@
 ## 目录结构
 
 ```
-├── 04_clock
+├── 06_clock
 │   ├── CMakeLists.txt         # cmake编译文件
-│   ├── gather.asc             # Ascend C算子实现gather调用样例
+│   ├── clock.asc             # Ascend C算子实现gather调用样例
 |   └── README.md
 ```
 
