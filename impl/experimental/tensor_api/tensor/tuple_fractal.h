@@ -321,4 +321,4 @@ __aicore__ inline decltype(auto) MakeScaleBDNCoord(U row, S column) { // 转置(
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_TENSOR_LAYOUT_FRACTAL_H
+#endif // IMPL_TENSOR_API_TENSOR_TUPLE_FRACTAL_H
