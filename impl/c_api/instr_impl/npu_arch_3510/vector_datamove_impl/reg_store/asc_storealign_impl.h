@@ -108,6 +108,14 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__  fp8_e4m3fn_t* dst_alig
     }
 }
 
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src,
+    vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b_tmp, 0, NORM_B8, mask);
+    }
+}
+
 __simd_callee__ inline void asc_storealign_impl(__ubuf__  fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src,
     vector_bool mask)
 {
@@ -222,6 +230,14 @@ __simd_callee__ inline void asc_storealign_1st_impl(__ubuf__  fp8_e4m3fn_t* dst_
     if ASC_IS_AIV {
         vector_bool mask;
         __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        vsts(src, dst_align32b_tmp, 0, ONEPT_B8, mask);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_1st_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src)
+{
+    if ASC_IS_AIV {
+        vector_bool mask;
         vsts(src, dst_align32b_tmp, 0, ONEPT_B8, mask);
     }
 }
@@ -443,6 +459,15 @@ __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__  fp8_e4m3fn_t* ds
     }
 }
 
+__simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src0,
+    vector_hifloat8_t src1)
+{
+    if ASC_IS_AIV {
+        vector_bool mask;
+        vsts(src0, src1, dst_align32b_tmp, 0, INTLV_B8, mask);
+    }
+}
+
 __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__  fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src0,
     vector_fp8_e5m2_t src1)
 {
@@ -565,6 +590,14 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__ fp8_e4m3fn_t* dst_align
     }
 }
 
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src, int32_t offset,
+    vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b_tmp, offset, NORM_B8, mask);
+    }
+}
+
 __simd_callee__ inline void asc_storealign_impl(__ubuf__ fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src, int32_t offset,
     vector_bool mask)
 {
@@ -679,6 +712,14 @@ __simd_callee__ inline void asc_storealign_1st_impl(__ubuf__ fp8_e4m3fn_t* dst_a
     if ASC_IS_AIV {
         vector_bool mask;
         __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        vsts(src, dst_align32b_tmp, offset, ONEPT_B8, mask);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_1st_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src, int32_t offset)
+{
+    if ASC_IS_AIV {
+        vector_bool mask;
         vsts(src, dst_align32b_tmp, offset, ONEPT_B8, mask);
     }
 }
@@ -887,6 +928,15 @@ __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__ bfloat16_t* dst_a
     if ASC_IS_AIV {
         vector_bool mask;
         vsts(src0, src1, dst_align32b, offset, INTLV_B16, mask);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src0,
+    vector_hifloat8_t src1, int32_t offset)
+{
+    if ASC_IS_AIV {
+        vector_bool mask;
+        vsts(src0, src1, dst_align32b, offset, INTLV_B8, mask);
     }
 }
 
@@ -1258,6 +1308,14 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__  bfloat16_t* dst_align3
     }
 }
 
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src, iter_reg offset,
+    vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vst(src, dst_align32b, offset, NORM_B8, mask);
+    }
+}
+
 __simd_callee__ inline void asc_storealign_impl(__ubuf__  fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src, iter_reg offset,
     vector_bool mask)
 {
@@ -1373,6 +1431,14 @@ __simd_callee__ inline void asc_storealign_1st_impl(__ubuf__  bfloat16_t* dst_al
     if ASC_IS_AIV {
         vector_bool mask;
         vst(src, dst_align32b, offset, ONEPT_B16, mask);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_1st_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src, iter_reg offset)
+{
+    if ASC_IS_AIV {
+        vector_bool mask;
+        vst(src, dst_align32b, offset, ONEPT_B8, mask);
     }
 }
 
@@ -1592,6 +1658,15 @@ __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__  bfloat16_t* dst_
     }
 }
 
+__simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__  hifloat8_t* dst_align32b, vector_hifloat8_t src0,
+    vector_bfloat16_t src1, iter_reg offset)
+{
+    if ASC_IS_AIV {
+        vector_bool mask;
+        vst(src0, src1, dst_align32b, offset, INTLV_B8, mask);
+    }
+}
+
 __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__  fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src0,
     vector_fp8_e4m3fn_t src1, iter_reg offset)
 {
@@ -1712,6 +1787,16 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t* dst_align32b,
 }
 
 __simd_callee__ inline void asc_storealign_impl(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        asc_store_align_config config;
+        config.block_stride = block_stride;
+        config.repeat_stride = repeat_stride;
+        vsstb(src, dst_align32b, config.config, mask);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
     if ASC_IS_AIV {
         asc_store_align_config config;
@@ -1844,6 +1929,16 @@ __simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint32_t* ds
 }
 
 __simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        asc_store_align_config_post config;
+        config.block_stride = block_stride;
+        config.repeat_stride = repeat_stride;
+        vsstb(src, dst_align32b, config.config, mask, POST_UPDATE);
+    }
+}
+
+__simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ hifloat8_t* dst_align32b, vector_hifloat8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
     if ASC_IS_AIV {
         asc_store_align_config_post config;
