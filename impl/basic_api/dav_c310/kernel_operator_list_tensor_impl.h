@@ -12,6 +12,11 @@
  * \file kernel_operator_list_tensor_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kernel_operator_list_tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIST_TENSOR_IMPL_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_LIST_TENSOR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_LIST_TENSOR_IMPL_H
 
@@ -179,7 +184,7 @@ __aicore__ inline void ListTensorDescImpl<Sequential>::GetDesc(TensorDescImpl<T>
     // check the whole struct has been loaded in cache
     if (curloadOffset + descStructSize_ * sizeof(uint64_t) > preloadOffset_ + PRELOAD_OFFSET) {
 #ifndef ASCENDC_CPU_DEBUG
-        bisheng::cce::dc_preload(shapeStart_, curloadOffset);  // Preload 256Bytes from the cache miss offset.
+        dc_preload(shapeStart_, curloadOffset);  // Preload 256Bytes from the cache miss offset.
 #endif
         preloadOffset_ = curloadOffset;
     }
@@ -212,3 +217,7 @@ __aicore__ inline uint32_t ListTensorDescImpl<Sequential>::GetSize()
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_OPERATOR_LIST_TENSOR_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIST_TENSOR_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIST_TENSOR_IMPL_H__
+#endif

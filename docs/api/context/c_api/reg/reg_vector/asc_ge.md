@@ -4,11 +4,11 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
-ge（greater than or equal to），对源操作数执行逐元素比较。对于src0 >= src1，若条件成立则目的操作数对应结果位为1，否则为0，每个元素的比较结果占一个bit。
+ge（greater than or equal to），对源操作数执行逐元素比较。对于src0_i >= src1_i，若条件成立则目的操作数对应结果位为1，否则为0，每个元素的比较结果占一个bit。
 
 计算公式如下：
 
@@ -59,7 +59,7 @@ PIPE_V
 vector_bool dst;
 vector_half src0;
 vector_half src1;
-vector_bool mask = asc_create_mask_b16(Pat::ALL);
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址。
 asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
 asc_ge(dst, src0, src1, mask);

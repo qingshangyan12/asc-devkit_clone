@@ -12,6 +12,10 @@
  * \file kernel_struct_mm.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_MM_H__
+#endif
 #ifndef ASCENDC_MODULE_STRUCT_MM_H
 #define ASCENDC_MODULE_STRUCT_MM_H
 
@@ -113,7 +117,7 @@ struct Nd2NzParamsV2 {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct LoadData2DMxParams {
     __aicore__ LoadData2DMxParams() {}
 
@@ -137,7 +141,7 @@ struct LoadData2DMxParams {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename TYPE>
 struct LoadData3DParamsV1 {
     using T = typename GetPadValueType<TYPE>::Type;
@@ -203,7 +207,7 @@ struct LoadData3DParamsV1 {
     int16_t leftTopH = 0;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename TYPE>
 struct LoadData3DParamsV2 {
     using T = typename GetPadValueType<TYPE>::Type;
@@ -423,7 +427,7 @@ struct MmadParams {
     bool cmatrixSource = false;
     // Indicates the initial matrix, 1: the number in C matrix is 0, 0：use the real number in C matrix
     bool cmatrixInitVal = true;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     bool disableGemv = false;
 #endif
 };
@@ -456,7 +460,7 @@ enum class FmatrixMode : uint8_t {
     FMATRIX_RIGHT = 1,
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct LoadDataRepeatParam {
     __aicore__ LoadDataRepeatParam() {}
 
@@ -553,20 +557,8 @@ struct CheckLocalMemoryIAParam {
 };
 } // namespace AscendC
 
-/* **************************************************************************************************
- * LoadData(Layout) API Level2                                                                      *
- * **************************************************************************************************/
-namespace AscendC {
-
-struct LoadDataTrait {
-    __aicore__ constexpr LoadDataTrait() {}
-
-    __aicore__ constexpr LoadDataTrait(const bool transposedIn) : transposed(transposedIn) {}
-
-    bool transposed = false;
-};
-constexpr LoadDataTrait DEFAULT_LOAD_DATA_TRAIT{};
-
-}
-
 #endif // ASCENDC_MODULE_STRUCT_MM_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_MM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_MM_H__
+#endif

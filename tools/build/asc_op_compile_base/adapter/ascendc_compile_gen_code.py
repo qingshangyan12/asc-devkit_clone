@@ -35,31 +35,33 @@ def add_time_stamp_codes(desc_id, space_len: int = 1):
 
 def gen_init_dump_code(is_mix: bool, dump_size: int):
     source = ""
-    source += "    #if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON\n"
-    source += "    workspace += " + str(global_var_storage.get_variable("ascendc_required_dump_workspace_size")) + ";\n"
-    source += "    #endif\n"
+    if CommonUtility.is_c310():
+        source += "    #if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON\n"
+        source += "    workspace += " + str(global_var_storage.get_variable("ascendc_required_dump_workspace_size")) + ";\n"
+        source += "    #endif\n"
     if global_var_storage.get_variable("ascendc_enable_dump_workspace") is True or \
         (not CommonUtility.is_support_workspace_offset()):
         source += "    AscendC::SetSysWorkspaceForce(workspace);\n"
     else:
         source += "    // actually SetSysWorkspaceForce is empty function here\n"
         source += "    AscendC::SetSysWorkspaceForce(workspace);\n"
-    source += "    #if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON\n"
-    source += "    constexpr uint32_t ASCENDC_DUMP_SIZE = 123;\n"
-    if global_var_storage.get_variable("ascendc_dump_assert_only") is True:
-        if is_mix:
-            source += "    AscendC::StoreArgsOfInitDump(true);\n"
+    if CommonUtility.is_c310():
+        source += "    #if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON\n"
+        source += "    constexpr uint32_t ASCENDC_DUMP_SIZE = 123;\n"
+        if global_var_storage.get_variable("ascendc_dump_assert_only") is True:
+            if is_mix:
+                source += "    AscendC::StoreArgsOfInitDump(true);\n"
+            else:
+                source += "    AscendC::StoreArgsOfInitDump(false);\n"
         else:
-            source += "    AscendC::StoreArgsOfInitDump(false);\n"
-    else:
-        if is_mix:
-            source += "    AscendC::InitDump(true, ASCENDC_DUMP_SIZE);\n"
-        else:
-            source += "    AscendC::InitDump(false, ASCENDC_DUMP_SIZE);\n"
-    if global_var_storage.get_variable("ascendc_recognize_simtvf") is True:
-        source += "    AscendC::Simt::SetSimtDumpWorkspace(workspace);\n"
-    source += add_time_stamp_codes('TIME_STAMP_WRAP_INIT_DUMP')
-    source += "    #endif\n"
+            if is_mix:
+                source += "    AscendC::InitDump(true, ASCENDC_DUMP_SIZE);\n"
+            else:
+                source += "    AscendC::InitDump(false, ASCENDC_DUMP_SIZE);\n"
+        if global_var_storage.get_variable("ascendc_recognize_simtvf") is True:
+            source += "    AscendC::Simt::SetSimtDumpWorkspace(workspace);\n"
+        source += add_time_stamp_codes('TIME_STAMP_WRAP_INIT_DUMP')
+        source += "    #endif\n"
     return source
 
 
@@ -141,16 +143,16 @@ def gen_global_isolation_macro(compile_info: CompileInfo, tiling_info: TilingInf
                 macro_branch_statment = f"#if {TILING_KEY_MACRO} == {tiling_key}UL && defined(__DAV_M200_VEC__)\n"
     elif (CommonUtility.is_c310()):
         macro_branch_statment = \
-            f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_VEC__) && __NPU_ARCH__ == 3101)\n"
+            f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_VEC__) && __NPU_ARCH__ == 3510)\n"
         # judge operator is aic only
         if compile_info.no_set_kernel_type is False:
             kernel_type = compile_info.tiling_key_kernel_type[str(tiling_key)]
             if kernel_type.value in [1, 3, 5, 6, 7]:
                 macro_branch_statment = \
-                    f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_CUBE__) && __NPU_ARCH__ == 3101)\n"
+                    f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_CUBE__) && __NPU_ARCH__ == 3510)\n"
         elif compile_info.code_channel == CORE_TYPE_CUBE:
             macro_branch_statment = \
-                f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_CUBE__) && __NPU_ARCH__ == 3101)\n"
+                f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_CUBE__) && __NPU_ARCH__ == 3510)\n"
     else:
         macro_branch_statment = f"#if {TILING_KEY_MACRO} == {tiling_key}UL\n"
     return macro_branch_statment
@@ -237,7 +239,7 @@ data_type_map = {
     'DT_UINT32': 4,
     'DT_INT64': 8,
     'DT_UINT64': 8,
-    'DI_HIFLOAT8': 1,
+    'DT_HIFLOAT8': 1,
     'DT_DOUBLE': 8,
     'DT_BOOL': 1,
     'DT_COMPLEX64': 8,

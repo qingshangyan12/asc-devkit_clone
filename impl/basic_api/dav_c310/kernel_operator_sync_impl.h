@@ -12,6 +12,11 @@
  * \file kernel_operator_sync_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kernel_operator_sync_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYNC_IMPL_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_SYNC_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_SYNC_IMPL_H
 
@@ -26,7 +31,7 @@ __aicore__ inline void ClcSyncCount(__gm__ int32_t* localSyncGM, __ubuf__ int32_
         *(reinterpret_cast<__ubuf__ int32_t*>(ubWorkspaceAddr)) = 1;
         set_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
         wait_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
-        bisheng::cce::copy_ubuf_to_gm_align_v2(static_cast<__gm__ int32_t *>(localSyncGM),
+        copy_ubuf_to_gm_align_v2(static_cast<__gm__ int32_t *>(localSyncGM),
             static_cast<__ubuf__ int32_t *>(ubWorkspaceAddr),
             0,
             1,
@@ -61,7 +66,7 @@ __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__
     int32_t blockIdx = isAIVOnly ? get_block_idx() : GetBlockIdxImpl();
 
     __gm__ int32_t* localSyncGM = gmWorkspaceAddr + (blockIdx * DEFAULT_BLK_NUM);
-    bisheng::cce::copy_gm_to_ubuf_align_v2(static_cast<__ubuf__ int32_t *>(ubWorkspaceAddr),
+    copy_gm_to_ubuf_align_v2(static_cast<__ubuf__ int32_t *>(ubWorkspaceAddr),
         static_cast<__gm__ int32_t *>(localSyncGM),
         0,
         1,
@@ -79,7 +84,7 @@ __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__
     *(reinterpret_cast<__ubuf__ int32_t *>(ubWorkspaceAddr)) = curValue;
     set_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_S, PIPE_MTE3, EVENT_ID0);
-    bisheng::cce::copy_ubuf_to_gm_align_v2(static_cast<__gm__ int32_t *>(localSyncGM),
+    copy_ubuf_to_gm_align_v2(static_cast<__gm__ int32_t *>(localSyncGM),
         static_cast<__ubuf__ int32_t *>(ubWorkspaceAddr),
         0,
         1,
@@ -92,7 +97,7 @@ __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__
     int32_t totalBlockCount = ONE_BLK_FLOAT_NUM * totalBlocks;
     uint16_t blockLen = totalBlockCount / AscendCUtils::GetC0Count(sizeof(int32_t));
     while (true) {
-        bisheng::cce::copy_gm_to_ubuf_align_v2(static_cast<__ubuf__ int32_t *>(ubWorkspaceAddr),
+        copy_gm_to_ubuf_align_v2(static_cast<__ubuf__ int32_t *>(ubWorkspaceAddr),
             static_cast<__gm__ int32_t *>(gmWorkspaceAddr),
             0,
             1,
@@ -146,8 +151,8 @@ __aicore__ inline void SyncAllImpl()
                 (static_cast<uint64_t>(g_superKernelAutoSyncAllSyncIdx) << SK_AUTO_SYNC_ALL_SYNC_IDX_CONFIG_BIT_OFFSET) |
                 (static_cast<uint64_t>(isAIVOnly) << SK_AUTO_SYNC_ALL_SYNC_TYPE_CONFIG_BIT_OFFSET) |
                 static_cast<uint64_t>(SK_AUTO_SYNC_ALL_VALID_MAGIC_NUM);
-            bisheng::cce::dcci(reinterpret_cast<__gm__ uint64_t *>(g_superKernelAutoSyncAllConfigGmAddr),
-                        bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+            dcci(reinterpret_cast<__gm__ uint64_t *>(g_superKernelAutoSyncAllConfigGmAddr),
+                        cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
         }
     }
 #endif
@@ -655,8 +660,8 @@ template <bool isAIVOnly = true> __aicore__ inline void SuperKernelAutoSyncAllEn
                 (static_cast<uint64_t>(g_superKernelAutoSyncAllSyncIdx) << SK_AUTO_SYNC_ALL_SYNC_IDX_CONFIG_BIT_OFFSET) |
                 (static_cast<uint64_t>(1) << SK_AUTO_SYNC_ALL_IS_END_CONFIG_BIT_OFFSET) |
                 static_cast<uint64_t>(SK_AUTO_SYNC_ALL_VALID_MAGIC_NUM);
-            bisheng::cce::dcci(reinterpret_cast<__gm__ uint64_t *>(g_superKernelAutoSyncAllConfigGmAddr),
-                        bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+            dcci(reinterpret_cast<__gm__ uint64_t *>(g_superKernelAutoSyncAllConfigGmAddr),
+                        cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
         }
     }
 }
@@ -668,8 +673,8 @@ __aicore__ inline void SuperKernelAutoSyncAllComplementImpl()
     }
     while (1) {
         SuperKernelAutoSyncAllDcciBarrier();
-        bisheng::cce::dcci(reinterpret_cast<__gm__ uint64_t *>(g_superKernelAutoSyncAllConfigGmAddr),
-            bisheng::cce::cache_line_t::SINGLE_CACHE_LINE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+        dcci(reinterpret_cast<__gm__ uint64_t *>(g_superKernelAutoSyncAllConfigGmAddr),
+            cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
         SuperKernelAutoSyncAllDcciBarrier();
 
         uint64_t tmpAutoSyncAllConfig = *reinterpret_cast<__gm__ uint64_t *>(g_superKernelAutoSyncAllConfigGmAddr);
@@ -678,7 +683,7 @@ __aicore__ inline void SuperKernelAutoSyncAllComplementImpl()
         uint8_t isSyncEnd = static_cast<uint8_t>((tmpAutoSyncAllConfig & 0xff00) >> SK_AUTO_SYNC_ALL_IS_END_CONFIG_BIT_OFFSET);
         uint8_t validNum = static_cast<uint8_t>(tmpAutoSyncAllConfig & 0xff);
         if (validNum != SK_AUTO_SYNC_ALL_VALID_MAGIC_NUM) {
-            bisheng::cce::trap();
+            trap();
         }
 
         if (isSyncEnd == 1) {
@@ -768,3 +773,7 @@ __aicore__ inline void SetSyncBaseAddr(uint64_t config)
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_SYNC_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYNC_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYNC_IMPL_H__
+#endif

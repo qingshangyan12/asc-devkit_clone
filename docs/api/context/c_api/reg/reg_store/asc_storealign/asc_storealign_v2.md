@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。接口通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址。
+reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址。
 
 - NORM搬出模式：正常模式，搬运VL数据，支持数据类型为b8、b16、b32。
 - FIRST搬出模式：忽略mask，向dst_align32b中搬运src第一个元素，支持数据类型为b8、b16、b32。
@@ -112,7 +112,7 @@ PIPE_V
 
 ```cpp
 __ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
-vector_bool mask = asc_create_mask_b16(Pat::ALL);
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
 uint32_t offset = 128;
 iter_reg addr_reg = asc_create_iter_reg_b16(offset);
 asc_storealign(dst, src, addr_reg, mask)

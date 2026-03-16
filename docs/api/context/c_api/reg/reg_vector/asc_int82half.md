@@ -4,7 +4,7 @@
 
 |产品|是否支持|
 | :------------ | :------------: |
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
@@ -48,7 +48,7 @@ PIPE_V
 ```cpp
 vector_int8_t src;
 vector_half dst;
-vector_bool mask = asc_create_mask_b8(Pat::ALL);
+vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_int82half(dst, src, mask);
 ```

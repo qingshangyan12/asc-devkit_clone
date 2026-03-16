@@ -4,11 +4,11 @@
 
 |产品|是否支持|
 | :------------ | :------------: |
-| Ascend 950PR/Ascend 950DT | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
-按元素判断src0 != src1是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。
+按元素判断src0_i != src1_i是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。
 
 ## 函数原型
 
@@ -54,7 +54,7 @@ PIPE_V
 vector_bool dst;
 vector_uint8_t src0;
 vector_uint8_t src1;
-vector_bool mask = asc_create_mask_b8(Pat::ALL);
+vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址
 asc_loadalign(src1, src1_addr); //arc1_addr是外部输入的UB内存空间地址。
 asc_ne(dst, src0, src1, mask);

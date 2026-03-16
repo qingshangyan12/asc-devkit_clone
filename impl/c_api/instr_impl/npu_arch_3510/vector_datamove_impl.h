@@ -11,34 +11,36 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_H
 
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_get_mask_spr_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadalign_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadalign_v2_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadalign_postupdate_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadunalign_pre_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storealign_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_postupdate_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_gather_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_gather_datablock_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ub2gm_loop_size_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ub2gm_loop1_stride_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ub2gm_loop2_stride_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadunalign_postupdate_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadunalign_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_load_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_gm2ub_loop_size_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_gm2ub_loop1_stride_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_gm2ub_loop2_stride_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_gm2ub_pad_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ndim_loop_stride_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_post_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_post_postupdate_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_ndim_copy_gm2ub_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ndim_pad_count_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ndim_pad_value_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_store_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/asc_scatter_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_get_mask_spr_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadalign_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadalign_v2_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadalign_postupdate_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadunalign_pre_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storealign_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_postupdate_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_gather_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_gather_datablock_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ub2gm_loop_size_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ub2gm_loop1_stride_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ub2gm_loop2_stride_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadunalign_postupdate_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_loadunalign_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_load_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_gm2ub_loop_size_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_gm2ub_loop1_stride_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_gm2ub_loop2_stride_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_gm2ub_pad_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ndim_loop_stride_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_post_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_storeunalign_post_postupdate_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_ndim_copy_gm2ub_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ndim_pad_count_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_set_ndim_pad_value_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/reg_store/asc_store_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_scatter_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_gm2ub_align_impl.h"
+#include "instr_impl/npu_arch_3510/vector_datamove_impl/asc_copy_ub2gm_align_impl.h"
 
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
 // ==========asc_storealign(u8/s8/half/u16/s16/float/u32/s32/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
@@ -2382,12 +2384,38 @@ __simd_callee__ inline void asc_loadalign(vector_uint64_t& dst, __ubuf__ uint64_
     asc_loadalign_impl(dst, src, offset);
 }
 
+// =========asc_loadalign(iter_reg)(begin)============
+__simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_impl(dst, src_align_32b, offset);
+}
+
 __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_impl(dst, src_align_32b, offset);
 }
 
 __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_impl(dst, src_align_32b, offset);
 }
@@ -2432,12 +2460,37 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst, __ubuf__ float* src
     asc_loadalign_impl(dst, src_align_32b, offset);
 }
 
+__simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_impl(dst, src_align_32b, offset);
+}
+
 __simd_callee__ inline void asc_loadalign_brc(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_brc_impl(dst, src_align_32b, offset);
 }
 
 __simd_callee__ inline void asc_loadalign_brc(vector_int8_t& dst, __ubuf__ int8_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_brc(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_brc(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_brc(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_brc_impl(dst, src_align_32b, offset);
 }
@@ -2479,12 +2532,38 @@ __simd_callee__ inline void asc_loadalign_brc(vector_float& dst, __ubuf__ float*
     asc_loadalign_brc_impl(dst, src_align_32b, offset);
 }
 
+// =========US(B8/B16)=========
+__simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_upsample_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_upsample_impl(dst, src_align_32b, offset);
+}
+
 __simd_callee__ inline void asc_loadalign_upsample(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_upsample_impl(dst, src_align_32b, offset);
 }
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_int8_t& dst, __ubuf__ int8_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_upsample_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_upsample_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_upsample_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_upsample_impl(dst, src_align_32b, offset);
 }
@@ -2509,12 +2588,38 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst, __ubuf__ ha
     asc_loadalign_upsample_impl(dst, src_align_32b, offset);
 }
 
+// =========DS(B8/B16)=========
+__simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_downsample_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_downsample_impl(dst, src_align_32b, offset);
+}
+
 __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_downsample_impl(dst, src_align_32b, offset);
 }
 
 __simd_callee__ inline void asc_loadalign_downsample(vector_int8_t& dst, __ubuf__ int8_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_downsample_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_downsample_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_downsample_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_downsample_impl(dst, src_align_32b, offset);
 }
@@ -2539,12 +2644,38 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst, __ubuf__ 
     asc_loadalign_downsample_impl(dst, src_align_32b, offset);
 }
 
+// DINTLV(B8/B16/B32)
+__simd_callee__ inline void asc_loadalign_deintlv(vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_deintlv_impl(dst0, dst1, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_deintlv(vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_deintlv_impl(dst0, dst1, src_align_32b, offset);
+}
+
 __simd_callee__ inline void asc_loadalign_deintlv(vector_uint8_t& dst0, vector_uint8_t& dst1, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_deintlv_impl(dst0, dst1, src_align_32b, offset);
 }
 
 __simd_callee__ inline void asc_loadalign_deintlv(vector_int8_t& dst0, vector_int8_t& dst1, __ubuf__ int8_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_deintlv_impl(dst0, dst1, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_deintlv_impl(dst0, dst1, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_deintlv_impl(dst0, dst1, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_deintlv_impl(dst0, dst1, src_align_32b, offset);
 }
@@ -2584,12 +2715,38 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_flo
     asc_loadalign_deintlv_impl(dst0, dst1, src_align_32b, offset);
 }
 
+// unpack(B8/B16/B32)
+__simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_impl(dst, src_align_32b, offset);
+}
+
 __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_unpack_impl(dst, src_align_32b, offset);
 }
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_int8_t& dst, __ubuf__ int8_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_unpack_impl(dst, src_align_32b, offset);
 }
@@ -2629,6 +2786,17 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ flo
     asc_loadalign_unpack_impl(dst, src_align_32b, offset);
 }
 
+// unpack v2
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_v2_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_v2_impl(dst, src_align_32b, offset);
+}
+
 __simd_callee__ inline void asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_unpack_v2_impl(dst, src_align_32b, offset);
@@ -2639,12 +2807,53 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_int8_t& dst, __ubuf__
     asc_loadalign_unpack_v2_impl(dst, src_align_32b, offset);
 }
 
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_v2_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_v2_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_unpack_v2_impl(dst, src_align_32b, offset);
+}
+
+// brc_v2
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_v2_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_v2_impl(dst, src_align_32b, offset);
+}
+
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_brc_v2_impl(dst, src_align_32b, offset);
 }
 
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_v2_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_v2_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align_32b, iter_reg offset)
+{
+    asc_loadalign_brc_v2_impl(dst, src_align_32b, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src_align_32b, iter_reg offset)
 {
     asc_loadalign_brc_v2_impl(dst, src_align_32b, offset);
 }
@@ -5117,5 +5326,151 @@ __simd_callee__ inline void asc_scatter(vector_half& dst, __ubuf__ half* src, ve
 __simd_callee__ inline void asc_scatter(vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask)
 {
     asc_scatter_impl(dst, src, index, mask);
+}
+
+// ==========asc_copy_gm2ub_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ half* dst, __gm__ half* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ float* dst, __gm__ float* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2ub_align(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2ub_align_impl(dst, src, n_burst, len_burst, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride);
+}
+
+// ==========asc_copy_ub2gm_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ int8_t* dst, __ubuf__ int8_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ int16_t* dst, __ubuf__ int16_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ int32_t* dst, __ubuf__ int32_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ half* dst, __ubuf__ half* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ float* dst, __ubuf__ float* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ hifloat8_t* dst, __ubuf__ hifloat8_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e5m2_t* dst, __ubuf__ fp8_e5m2_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
+}
+
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint16_t n_burst, uint32_t len_burst,
+            uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+{
+    asc_copy_ub2gm_align_impl(dst, src, n_burst, len_burst, l2_cache_mode, dst_stride, src_stride);
 }
 #endif

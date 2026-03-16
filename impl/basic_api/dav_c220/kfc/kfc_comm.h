@@ -12,6 +12,11 @@
  * \file kfc_comm.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c220/kfc/kfc_comm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_H__
+#endif
 #ifndef __KERNEL_KFC_COMM_H__
 #define __KERNEL_KFC_COMM_H__
 
@@ -101,6 +106,15 @@ constexpr int32_t QUIT_CNT = 4;
 constexpr int32_t MAX_SYNC_COUNT = 100000000;
 constexpr int32_t MMCNT_L1_RESERVERD_SIZE = 64; // Reserved L1 64B for MMCNT Query
 constexpr uint16_t KFC_SYNC_ID = 15;
+
+#ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
+// the max cnt of matmul object in superkernel mode
+constexpr int MAX_MATMUL_OBJ_CNT = 4;
+struct SuperKernelWaitEventCnt {
+    uint32_t eventId[MAX_MATMUL_OBJ_CNT] = {0};
+    int32_t eventCnt[MAX_MATMUL_OBJ_CNT] = {0};
+};
+#endif
 
 struct TilingInfo {
     GM_ADDR tilingAddr;  // the GM address of the tiling.
@@ -255,7 +269,7 @@ struct Conv3DForwardConfigParams {
     uint32_t diStartPos;
     uint32_t mStartPos;
     uint32_t ciStartPos;
-    uint32_t res[10]; // Reservedï¼Œfor 120Byte ailgn
+    uint32_t res[10]; // Reserved£¬for 120Byte ailgn
 };
 
 struct MatmulUserDefInfo {
@@ -531,3 +545,7 @@ __aicore__ inline void RollBackMsgImpl(__gm__ KfcMsg *&msgRcvHead, uint8_t &msgR
 
 }  // namespace AscendC
 #endif  // __KERNEL_KFC_COMM_H__
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_H__
+#endif

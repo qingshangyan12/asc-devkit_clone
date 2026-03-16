@@ -84,14 +84,13 @@ TEST_P(FloatComputeTestsuite1, FloatComputeTestCase1)
     op.Process((__gm__ float*)dstGm, (__gm__ float*)src0Gm, (__gm__ float*)src1Gm, (__gm__ float*)src2Gm, mode);
 }
 
-// TEST_F(FloatComputeTestsuite1, FloatComputeTestCase_absfloat)
-// {
-//     float x = 123.0;
-//     float y = -123.0;
-//     EXPECT_EQ(static_cast<float>(123.0), fabsf(x));
-//     EXPECT_EQ(static_cast<float>(123.0), fabsf(y));
-// }
-
+TEST_F(FloatComputeTestsuite1, FloatComputeTestCase_absfloat)
+{
+    float x = 123.0;
+    float y = -123.0;
+    EXPECT_EQ(static_cast<float>(123.0), fabsf(x));
+    EXPECT_EQ(static_cast<float>(123.0), fabsf(y));
+}
 
 TEST_F(FloatComputeTestsuite1, FloatComputeTestCase_abshalf)
 {
@@ -151,6 +150,53 @@ TEST_F(FloatComputeTestsuite1, FloatComputeTestCase_minbfloat16t)
     bfloat16_t x = 1.0;
     bfloat16_t y = 2.0;
     EXPECT_EQ(static_cast<bfloat16_t>(1.0), __hmin(x, y));
+}
+
+TEST_F(FloatComputeTestsuite1, MathIntegerTest)
+{
+    float src = 0.0f;
+    src = 1.0f;
+
+    long long int src_lln_x = -1;
+    long long int src_lln_y = 1;
+    long long int dst_lln = llmax(src_lln_x, src_lln_y);
+    EXPECT_EQ(dst_lln, 1);
+
+    long int x_ln = -1;
+    long int dst_ln = labs(x_ln);
+    EXPECT_EQ(dst_ln, 1);
+
+    dst_lln = llabs(src_lln_x);
+    EXPECT_EQ(dst_lln, 1);
+
+    unsigned long long int src_ulln_x = 2;
+    unsigned long long int src_ulln_y = 1;
+    unsigned long long int dst_ulln = ullmax(src_ulln_x, src_ulln_y);
+    EXPECT_EQ(dst_ulln, 2);
+
+    unsigned int src_ui_x = 2;
+    unsigned int src_ui_y = 1;
+    unsigned int dst_ui = umax(src_ui_x, src_ui_y);
+    EXPECT_EQ(dst_ui, 2);
+
+    src_lln_x = -1;
+    src_lln_y = 1;
+    dst_lln = llmin(src_lln_x, src_lln_y);
+    EXPECT_EQ(dst_lln, -1);
+
+    src_ulln_x = 0;
+    src_ulln_y = 1;
+    dst_ulln = ullmin(src_ulln_x, src_ulln_y);
+    EXPECT_EQ(dst_ulln, 0);
+
+    src_ui_x = 0;
+    src_ui_y = 1;
+    dst_ui = umin(src_ui_x, src_ui_y);
+    EXPECT_EQ(dst_ui, 0);
+    float x_f = 1.0f;
+    float y_f = 2.0f;
+    float res_div = fdividef(x_f, y_f);
+    EXPECT_EQ(res_div, 0.5f);
 }
 
 void VerifyFloatNumberMath(float x, float xExpected, float epsilon = 1e-5)

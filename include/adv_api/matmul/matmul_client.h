@@ -12,6 +12,12 @@
  * \file matmul_client.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATMUL_CLIENT_H__
+#endif
+
 #ifndef LIB_MATMUL_MATMUL_CLIENT_H
 #define LIB_MATMUL_MATMUL_CLIENT_H
 
@@ -1123,6 +1129,8 @@ public:
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "GetTensorC not support when enableMixDualMaster is enabled.");
+        static_assert(ToMatmulConfig(MM_CFG).enableGetTensorC,
+            "GetTensorC is not support when enableGetTensorC is disabled");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_GM);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         if (!isSyncGetC) { // Asynchronous
@@ -1167,6 +1175,8 @@ public:
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "GetTensorC not support when enableMixDualMaster is enabled.");
+        static_assert(ToMatmulConfig(MM_CFG).enableGetTensorC,
+            "GetTensorC is not support when enableGetTensorC is disabled");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_UB);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         uint64_t singleSize;
@@ -1226,6 +1236,8 @@ public:
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
             "GetTensorC not support when enableMixDualMaster is enabled");
+        static_assert(ToMatmulConfig(MM_CFG).enableGetTensorC,
+            "GetTensorC is not support when enableGetTensorC is disabled");
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
             ASSERT(false && "GetTensorC not support when sameab is enabled");
             return;
@@ -1255,6 +1267,8 @@ public:
     {
         ASSERT(!ToMatmulConfig(MM_CFG).enableMixDualMaster &&
             "GetTensorC not support when enableMixDualMaster is enabled");
+        static_assert(ToMatmulConfig(MM_CFG).enableGetTensorC,
+            "GetTensorC is not support when enableGetTensorC is disabled");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_UB);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         if (!isSyncGetC) { // Asynchronous
@@ -1312,6 +1326,8 @@ public:
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "GetTensorC not support when enableMixDualMaster is enabled.");
+        static_assert(ToMatmulConfig(MM_CFG).enableGetTensorC,
+            "GetTensorC is not support when enableGetTensorC is disabled");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_GM);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         ASSERT(isSyncGetC); // must synchronization mode
@@ -1340,6 +1356,8 @@ public:
     {
         static_assert(!ToMatmulConfig(MM_CFG).enableMixDualMaster,
             "GetTensorC not support when enableMixDualMaster is enabled.");
+        static_assert(ToMatmulConfig(MM_CFG).enableGetTensorC,
+            "GetTensorC is not support when enableGetTensorC is disabled");
         TRACE_START(TraceId::KFC_CLIENT_REV_MSG_GM);
         ASSERT(kfcMsg_.body.isFirstIter == 0);
         ASSERT(!isSyncGetC); // Asynchronous only
@@ -2968,4 +2986,9 @@ public:
 #include "../../../impl/adv_api/detail/matmul/kfc/matmul_client_impl_aicore.h"
 #endif
 } // namespace matmul
+#endif
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATMUL_CLIENT_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATMUL_CLIENT_H__
 #endif

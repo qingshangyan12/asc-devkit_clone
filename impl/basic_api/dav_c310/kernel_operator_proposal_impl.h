@@ -12,6 +12,11 @@
  * \file kernel_operator_proposal_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kernel_operator_proposal_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PROPOSAL_IMPL_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_PROPOSAL_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_PROPOSAL_IMPL_H
 
@@ -121,7 +126,7 @@ __aicore__ inline void GetMrgSortResultImpl(
     uint16_t &mrgSortList1, uint16_t &mrgSortList2, uint16_t &mrgSortList3, uint16_t &mrgSortList4)
 {
     if ASCEND_IS_AIV {
-        int64_t mrgSortResult = bisheng::cce::get_vms4_sr();
+        int64_t mrgSortResult = get_vms4_sr();
         constexpr uint64_t resMask = 0xFFFF;
         // VMS4_SR[15:0], number of finished region proposals in list0
         mrgSortList1 = static_cast<uint64_t>(mrgSortResult) & resMask;
@@ -253,3 +258,7 @@ __aicore__ inline void DoFullSort(const LocalTensor<T> &dstLocal, const LocalTen
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_PROPOSAL_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PROPOSAL_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PROPOSAL_IMPL_H__
+#endif

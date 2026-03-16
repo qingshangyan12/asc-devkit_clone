@@ -19,14 +19,14 @@ add_dependencies(tikcfw_headers hostapi_headers)
 target_include_directories(tikcfw_headers INTERFACE
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/basic_api/>
-  $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/micro_api/>
+  $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/basic_api/reg_compute/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/simt_api/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/c_api/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/basic_api/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/simt_api/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/simt_api/cpp/>
-  $<BUILD_INTERFACE:${ASCENDC_DIR}/include/micro_api/>
+  $<BUILD_INTERFACE:${ASCENDC_DIR}/include/basic_api/reg_compute/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/c_api/>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>
@@ -37,12 +37,12 @@ target_include_directories(tikcfw_headers INTERFACE
   $<INSTALL_INTERFACE:include/asc/include/basic_api>
   $<INSTALL_INTERFACE:include/asc/include/simt_api>
   $<INSTALL_INTERFACE:include/asc/include/simt_api/cpp>
-  $<INSTALL_INTERFACE:include/asc/include/micro_api>
+  $<INSTALL_INTERFACE:include/asc/include/basic_api/reg_compute>
   $<INSTALL_INTERFACE:include/asc/include/c_api>
   $<INSTALL_INTERFACE:include/asc/impl>
   $<INSTALL_INTERFACE:include/asc/impl/basic_api>
   $<INSTALL_INTERFACE:include/asc/impl/simt_api>
-  $<INSTALL_INTERFACE:include/asc/impl/micro_api>
+  $<INSTALL_INTERFACE:include/asc/impl/basic_api/reg_compute>
   $<INSTALL_INTERFACE:include/asc/impl/c_api>
 )
 
@@ -63,16 +63,10 @@ install(DIRECTORY ${ASCENDC_IMPL_DIR}/basic_api
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
 )
 
-install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/micro_api
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include OPTIONAL
-)
 install(DIRECTORY ${ASCENDC_INCLUDE_DIR}/simt_api
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include OPTIONAL
 )
 
-install(DIRECTORY ${ASCENDC_IMPL_DIR}/micro_api
-  DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
-)
 install(DIRECTORY ${ASCENDC_IMPL_DIR}/simt_api
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl OPTIONAL
 )
@@ -82,11 +76,15 @@ file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/incl
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw")
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface")
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/base")
 
 # 1 asc/include/interface
-install(CODE "file(CREATE_LINK ../micro_api ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/micro_api SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../basic_api/reg_compute ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/reg_compute SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../simt_api ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/simt_api SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../utils/debug ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/debug SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../utils/common_types.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/common_types.h SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../../utils/base/sys_constants.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/base/sys_constants.h SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../../utils/base/sys_macros.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/utils/base/sys_macros.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/core_mng ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/core_mng SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/kernel_common.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_common.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../basic_api/kernel_operator_atomic_intf.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_operator_atomic_intf.h SYMBOLIC)")
@@ -154,9 +152,8 @@ endif()
 install(CODE "file(CREATE_LINK ../../../asc/include/interface ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/interface SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../asc/include/kernel_operator.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/kernel_operator.h SYMBOLIC)")
 
-install(CODE "file(CREATE_LINK ../../../../asc/impl/micro_api ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/micro_api SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/reg_compute ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/reg_compute SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/simt_api ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/simt_api SYMBOLIC)")
-install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/tile_api ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/tile_api SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/common_types.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/common_types.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_c100 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_c100 SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_c220 ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_c220 SYMBOLIC)")
@@ -236,6 +233,9 @@ install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_type_conver
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_utils.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/kernel_utils.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/kernel_utils_base.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/kernel_utils_base.h SYMBOLIC)")
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/utils ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/utils SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../../../asc/impl/utils/sys_macros.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/utils/sys_macros.h SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../../../asc/impl/utils/sys_constants.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/utils/sys_constants.h SYMBOLIC)")
+install(CODE "file(CREATE_LINK ../../../../asc/impl/utils/common_types.h ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/utils/common_types.h SYMBOLIC)")
 
 # 3 tikcpp/tikcfw
 install(CODE "file(CREATE_LINK ../../ascendc/include/basic_api/impl ${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/tikcpp/tikcfw/impl SYMBOLIC)")
@@ -249,16 +249,12 @@ if(NOT BUILD_OPEN_PROJECT)
         TARGETS tikcfw_headers
         DIRECTORY ${ASCENDC_DIR}/impl/basic_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
-        DIRECTORY ${ASCENDC_DIR}/impl/micro_api
-        DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
         DIRECTORY ${ASCENDC_DIR}/impl/simt_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
         DIRECTORY ${ASCENDC_DIR}/impl/c_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
 
         DIRECTORY ${ASCENDC_DIR}/include/basic_api
-        DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include
-        DIRECTORY ${ASCENDC_DIR}/include/micro_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include
         DIRECTORY ${ASCENDC_DIR}/include/simt_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include

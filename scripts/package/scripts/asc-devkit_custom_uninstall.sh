@@ -77,6 +77,10 @@ log() {
 whl_uninstall_package() {
     local _module="$1"
     local _module_path="$2"
+    if ! command -v pip3 >/dev/null 2>&1; then
+        log "ERROR" "uninstall ${_module} failed, pip3 is not installed."
+        exit 1
+    fi
     if [ ! -d "$WHL_INSTALL_DIR_PATH/${_module}" ]; then
         pip3 show "${_module}" > /dev/null 2>&1
         if [ $? -ne 0 ]; then
@@ -93,6 +97,7 @@ whl_uninstall_package() {
         fi
     else
         export PYTHONPATH="${_module_path}"
+        export PIP_BREAK_SYSTEM_PACKAGES=1  # 强制卸载系统包
         pip3 uninstall -y "${_module}" > /dev/null 2>&1
         local ret=$?
         if [ $ret -ne 0 ]; then

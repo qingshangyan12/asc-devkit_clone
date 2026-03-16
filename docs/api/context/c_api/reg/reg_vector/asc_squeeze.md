@@ -4,11 +4,11 @@
 
 |产品|是否支持|
 | :------------ | :------------: |
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
-将src中被mask选择的有效元素依次复制到dst，有效元素从低到高连续排列。dst中剩余位置元素置为0。
+将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。
 
 ## 函数原型
 
@@ -69,12 +69,12 @@ PIPE_V
 
 ```cpp
 vector_int8_t src;
-vector_bool mask = asc_create_mask_b8(Pat::ALL);
+vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 // 不存入AR特殊寄存器
 vector_int8_t dst;
 asc_squeeze(dst, src, mask);
 // 存入AR特殊寄存器
-vector_store_unalign dst_v2;
+vector_int8_t dst_v2;
 asc_squeeze_v2(dst_v2, src, mask);
 ```

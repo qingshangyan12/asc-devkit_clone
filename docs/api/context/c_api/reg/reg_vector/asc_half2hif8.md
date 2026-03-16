@@ -62,13 +62,14 @@ PIPE_V
   - 输入数据超过输出类型最值时，返回输出类型的对应最值。
   - 输入数据为+/-inf时, 返回输出类型的对应最值。
   - 输入数据为nan时，返回0。
+- 使能饱和模式和非饱和模式生效时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
 
 ## 调用示例
 
 ```cpp
 vector_half src;
 vector_hifloat8_t dst;
-vector_bool mask = asc_create_mask_b16(Pat::ALL);
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_half2hif8_rna(dst, src, mask);
 ```

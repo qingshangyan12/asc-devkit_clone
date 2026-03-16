@@ -13,6 +13,12 @@
  * \brief
  */
 
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/matmul/stage/split/load_to_l0b/load_to_l0b_load2dV2.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0B_LOAD_TO_L0B_LOAD2DV2_H__
+#endif
+
 #ifndef IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0B_LOAD2DV2_H
 #define IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0B_LOAD2DV2_H
 
@@ -142,7 +148,7 @@ private:
      uint16_t bL1N, uint16_t madN, uint16_t madK, uint16_t bL1NOffset, uint16_t bL1KOffset,
      const LocalTensor<AuxDtype> &l1BAuxMatrix, uint16_t bAuxL1K, uint16_t bAuxL1KOffset, uint16_t bAuxL1NOffset) const
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         uint8_t mStep = CeilDiv(madN, HW_M0);
         uint8_t kStep = CeilDiv(madK, c0Size_);
 
@@ -178,7 +184,7 @@ private:
      uint16_t bL1K, uint16_t madN, uint16_t madK, uint16_t bL1NOffset, uint16_t bL1KOffset,
      const LocalTensor<AuxDtype> &l1BAuxMatrix, uint16_t bAuxL1K, uint16_t bAuxL1KOffset, uint16_t bAuxL1NOffset) const
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         uint8_t mStep = CeilDiv(madN, HW_M0);
         uint8_t kStep = CeilDiv(madK, c0Size_);
 
@@ -216,4 +222,8 @@ private:
 }  // namespace Detail
 }  // namespace Impl
 }  // namespace AscendC
+#endif
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0B_LOAD_TO_L0B_LOAD2DV2_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0B_LOAD_TO_L0B_LOAD2DV2_H__
 #endif // IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0B_LOAD2DV2_H

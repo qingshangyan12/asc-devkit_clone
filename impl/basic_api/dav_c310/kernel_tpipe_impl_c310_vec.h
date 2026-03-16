@@ -12,6 +12,11 @@
  * \file kernel_tpipe_impl_c310_vec.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kernel_tpipe_impl_c310_vec.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_C310_VEC_H__
+#endif
 #ifndef ASCENDC_MODULE_TPIPE_IMPL_C310_VEC_H
 #define ASCENDC_MODULE_TPIPE_IMPL_C310_VEC_H
 
@@ -978,8 +983,8 @@ __aicore__ inline void TQueBind<src, dst, depth, mask>::InitBufHandle(T* bufPool
     uint8_t bufId = MAX_TBUFID + 1;
     uint32_t foundId = 0;
     while (foundId <= index) {
-        bufId = bisheng::cce::sff1(bufPool->tBufPoolImpl.availableIdMask_);
-        bufPool->tBufPoolImpl.availableIdMask_ = bisheng::cce::sbitset0(bufPool->tBufPoolImpl.availableIdMask_, bufId);
+        bufId = sff1(bufPool->tBufPoolImpl.availableIdMask_);
+        bufPool->tBufPoolImpl.availableIdMask_ = sbitset0(bufPool->tBufPoolImpl.availableIdMask_, bufId);
         foundId++;
     }
     bufPool->tBufPoolImpl.availableIdMask_ = bufPool->tBufPoolImpl.bufIdPool_;
@@ -1292,13 +1297,13 @@ __aicore__ inline bool TBufPoolExtImpl<pos, bufIDSize>::InitBuffer(T &que, uint8
         ptr->state = TBufState::FREE;
         ptr->freeBufEvt = T::freeBufEvt;
         if constexpr (enableBufId) {
-            uint8_t bufId = bisheng::cce::sff1(this->tBufPoolImpl.availableIdMask_);
+            uint8_t bufId = sff1(this->tBufPoolImpl.availableIdMask_);
             ASCENDC_ASSERT((bufId <= MAX_TBUFID), {
                 KERNEL_LOG(KERNEL_ERROR, "current id is %u, max buffer ID allocated is %u", static_cast<uint32_t>(bufId),
                            static_cast<uint32_t>(MAX_TBUFID));
             });
             ptr->bufId = bufId;
-            this->tBufPoolImpl.availableIdMask_ = bisheng::cce::sbitset0(this->tBufPoolImpl.availableIdMask_, bufId);
+            this->tBufPoolImpl.availableIdMask_ = sbitset0(this->tBufPoolImpl.availableIdMask_, bufId);
             ptr->bufIdAlt = INVALID_TBUFID;
         } else {
             ptr->enQueEvtID = INVALID_TEVENTID;
@@ -1489,3 +1494,7 @@ __aicore__ inline uint64_t TransUBAddr(uint64_t addr)
 }
 }
 #endif // ASCENDC_MODULE_TPIPE_IMPL_C310_VEC_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_C310_VEC_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_C310_VEC_H__
+#endif

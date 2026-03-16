@@ -12,6 +12,11 @@
  * \file kernel_common.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_COMMON_H__
+#endif
+
 #ifndef ASCENDC_KERNEL_COMMON_H
 #define ASCENDC_KERNEL_COMMON_H
 
@@ -40,7 +45,7 @@ template <typename T>
 class GlobalTensor;
 } // namespace AscendC
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V1) || defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
 #endif
@@ -56,7 +61,7 @@ __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 #endif
 
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
 __BLOCK_LOCAL__ __inline__ uint64_t g_maskCount;
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
@@ -74,7 +79,7 @@ __aicore__ AscendC::TPipe* GetTPipePtr();
 #else
 __aicore__ inline AscendC::TPipe* GetTPipePtr()
 {
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3101
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
 #ifdef SPLIT_CORE_CUBE
     return g_cubeTPipePtr;
 #elif defined(SPLIT_CORE_VEC)
@@ -117,7 +122,7 @@ __aicore__ inline void ResetMask()
     ResetMaskImpl();
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 using MutexID = uint8_t;
 
 class Mutex {
@@ -191,7 +196,7 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetHcclContext(void)
 
 #if defined(__NPU_ARCH__) &&                                                            \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) ||      \
-     (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename T, typename U>
 __aicore__ inline void SetAippFunctions(const GlobalTensor<T>& src0, AippInputFormat format, AippParams<U> config)
 {
@@ -220,4 +225,9 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetDumpWorkSpacePtr()
 {
     return g_dumpWorkspaceReserved;
 }
+#endif
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_COMMON_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_COMMON_H__
 #endif

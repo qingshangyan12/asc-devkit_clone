@@ -7,6 +7,11 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kernel_operator_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__
+#endif
 
 #ifndef ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
@@ -57,12 +62,12 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 
 __aicore__ inline int64_t GetStoreAtomicConfigImpl()
 {
-    return bisheng::cce::get_st_atomic_cfg();
+    return get_st_atomic_cfg();
 }
 
 __aicore__ inline void GetStoreAtomicConfigImpl(uint16_t &atomicType, uint16_t &atomicOp)
 {
-    int64_t stAtomic = bisheng::cce::get_st_atomic_cfg();
+    int64_t stAtomic = get_st_atomic_cfg();
     constexpr uint64_t typeMask = 0x7;
     constexpr uint64_t opBit = 4;
     constexpr uint64_t opMask = 0x3;
@@ -91,21 +96,21 @@ __aicore__ static inline void SetCtrlSprImpl(int64_t value)
                                               startBit == 59 || startBit == 60)),
                   "Invalid startBit/endBit on current device!");
     if (endBit - startBit == 63) {
-        bisheng::cce::set_ctrl(value);
+        set_ctrl(value);
         return;
     }
     uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
     mask = ~mask;
-    int64_t setValue = bisheng::cce::get_ctrl() & mask;
+    int64_t setValue = get_ctrl() & mask;
     setValue |= (value << startBit);
-    bisheng::cce::set_ctrl(setValue);
+    set_ctrl(setValue);
 }
 
 template <int8_t startBit, int8_t endBit>
 __aicore__ static inline int64_t GetCtrlSprImpl()
 {
     static_assert((startBit <= endBit && startBit >= 0 && endBit < 64), "Invalid bit range on current device!");
-    int64_t value = bisheng::cce::get_ctrl();
+    int64_t value = get_ctrl();
     if (endBit - startBit == 63) {
         return value;
     }
@@ -124,15 +129,19 @@ __aicore__ static inline void ResetCtrlSprImpl()
                   "Invalid startBit/endBit on current device!");
     int64_t defaultCtrl = 0x1000000000000008; // default value of ctrl
     if (endBit - startBit == 63) {
-        bisheng::cce::set_ctrl(defaultCtrl);
+        set_ctrl(defaultCtrl);
         return;
     }
     uint64_t mask = ((uint64_t(1) << (endBit - startBit + 1)) - 1) << startBit;
     defaultCtrl = defaultCtrl & mask;
     mask = ~mask;
-    int64_t value = bisheng::cce::get_ctrl() & mask;
+    int64_t value = get_ctrl() & mask;
     value = value | defaultCtrl;
-    bisheng::cce::set_ctrl(value);
+    set_ctrl(value);
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__
+#endif

@@ -12,6 +12,12 @@
  * \file init_global_memory.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_INIT_GLOBAL_MEMORY_H__
+#endif
+
 #ifndef LIB_UTILS_INIT_GLOBAL_MEMORY_H
 #define LIB_UTILS_INIT_GLOBAL_MEMORY_H
 
@@ -19,7 +25,7 @@
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v200_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v220_impl.h"
-#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || \
+#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v310_impl.h"
 #endif
@@ -60,7 +66,7 @@ __aicore__ inline __in_pipe__(V)
  * \param [in] size, size of space to be initialized
  * \param [in] value, value to be initialized in global memory
  */
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <typename T>
 __aicore__ inline __in_pipe__(V)
@@ -71,3 +77,8 @@ __aicore__ inline __in_pipe__(V)
 #endif
 } // namespace AscendC
 #endif // LIB_UTILS_INIT_GLOBAL_MEMORY_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_INIT_GLOBAL_MEMORY_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_INIT_GLOBAL_MEMORY_H__
+#endif

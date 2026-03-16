@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_binary_scalar_intf_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_operator_vec_binary_scalar_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_binary_scalar_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_INTF_IMPL_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
@@ -29,7 +34,7 @@
 #include "dav_m300/kernel_operator_vec_binary_scalar_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_binary_scalar_impl.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "dav_c310/kernel_operator_vec_binary_scalar_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_binary_scalar_impl.h"
@@ -943,7 +948,7 @@ __aicore__ inline void LeakyRelu(const LocalTensor<T>& dst, const LocalTensor<T>
         (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, count);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 /* **************************************************************************************************
  * Adds                                             *
  * ************************************************************************************************* */
@@ -951,7 +956,7 @@ template <bool isSetMask, const BinaryConfig &config, typename U, typename S, ty
 __aicore__ inline void AddsCommon(const U& dst, const S& src0, const V& src1, MaskType mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "One of src0 and src1 should be Tensor");
+    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Adds API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
     static_assert(SupportType<typename U::PrimType, uint8_t, int8_t, half, bfloat16_t, int16_t, float, int32_t,
         int64_t, uint64_t>());
@@ -1040,7 +1045,7 @@ template <bool isSetMask, const BinaryConfig &config, typename U, typename S, ty
 __aicore__ inline void MulsCommon(const U& dst, const S& src0, const V& src1, MaskType mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "One of src0 and src1 should be Tensor");
+    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Muls API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
     static_assert(SupportType<typename U::PrimType, half, bfloat16_t, int16_t, float, int32_t, int64_t, uint64_t>());
     using ActualT = typename U::PrimType;
@@ -1128,7 +1133,7 @@ template <bool isSetMask, const BinaryConfig &config, typename U, typename S, ty
 __aicore__ inline void MaxsCommon(const U& dst, const S& src0, const V& src1, MaskType mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "One of src0 and src1 should be Tensor");
+    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Maxs API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
     static_assert(SupportType<typename U::PrimType, uint8_t, int8_t, half, bfloat16_t, int16_t, float, int32_t,
         int64_t, uint64_t>());
@@ -1216,7 +1221,7 @@ template <bool isSetMask, const BinaryConfig &config, typename U, typename S, ty
 __aicore__ inline void MinsCommon(const U& dst, const S& src0, const V& src1, MaskType mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "One of src0 and src1 should be Tensor");
+    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Mins API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
     static_assert(SupportType<typename U::PrimType, uint8_t, int8_t, half, bfloat16_t, int16_t, float, int32_t,
         int64_t, uint64_t>());
@@ -1305,7 +1310,7 @@ template <bool isSetMask, const BinaryConfig &config, typename U, typename S, ty
 __aicore__ inline void AndsCommon(const U& dst, const S& src0, const V& src1, MaskType mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "One of src0 and src1 should be Tensor");
+    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Ands API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
     static_assert(SupportType<typename U::PrimType, uint16_t, int16_t, int64_t, uint64_t>());
     using ActualT = typename U::PrimType;
@@ -1392,7 +1397,7 @@ template <bool isSetMask, const BinaryConfig &config, typename U, typename S, ty
 __aicore__ inline void OrsCommon(const U& dst, const S& src0, const V& src1, MaskType mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "One of src0 and src1 should be Tensor");
+    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Ors API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
     static_assert(SupportType<typename U::PrimType, uint16_t, int16_t, int64_t, uint64_t>());
     using ActualT = typename U::PrimType;
@@ -1479,7 +1484,7 @@ template <bool isSetMask, const BinaryConfig &config, typename U, typename S, ty
 __aicore__ inline void SubsCommon(const U& dst, const S& src0, const V& src1, MaskType mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "One of src0 and src1 should be Tensor");
+    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Subs API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
     static_assert(SupportType<typename U::PrimType, half, bfloat16_t, int16_t, float, int32_t, int64_t, uint64_t>());
     using ActualT = typename U::PrimType;
@@ -1567,7 +1572,7 @@ template <bool isSetMask, const BinaryConfig &config, typename U, typename S, ty
 __aicore__ inline void DivsCommon(const U& dst, const S& src0, const V& src1, MaskType mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "One of src0 and src1 should be Tensor");
+    static_assert(!TypeUtils::IsInnerDefaultType<S, V>(), "Divs API: One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<U>());
     static_assert(SupportType<typename U::PrimType, half, float, int64_t, uint64_t>());
     using ActualT = typename U::PrimType;
@@ -1663,7 +1668,7 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
 {
     using ActualT = typename T2::PrimType;
     CheckTensorPos<ActualT>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "MulsCast"); 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<T2>());
     static_assert(SupportType<typename T2::PrimType, half>());
@@ -1721,7 +1726,7 @@ __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &sr
 {
     using ActualT = typename T2::PrimType;
     CheckTensorPos<ActualT>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "FusedMulsCast"); 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<T2>());
     static_assert(SupportType<typename T2::PrimType, half>());
@@ -1776,3 +1781,7 @@ __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &sr
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_INTERFACE_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_INTF_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_INTF_IMPL_H__
+#endif

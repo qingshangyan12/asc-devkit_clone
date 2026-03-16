@@ -39,6 +39,7 @@ def gen_compile_options(compile_options_file: str, op_type: str, \
     opc_kernel_config = []
     opc_tiling_keys = ""
     input_param_file = ""
+    opc_template_kernel_str = ""
     for opts in compile_options:
         if "oom" in opts:
             if opts == "--oom":
@@ -59,6 +60,13 @@ def gen_compile_options(compile_options_file: str, op_type: str, \
             keys = opts.strip().split('=')[1].split(',')
             keys_str = ";".join([key for key in keys])
             opc_tiling_keys = keys_str
+        elif "--kernel-template-input" in opts:
+            if "=" not in opts:
+                raise RuntimeError('Invalid --kernel-template-input option format!')
+            input_value = opts.split("=", 1)
+            if not input_value[1]:
+                raise RuntimeError('No value given for --kernel-template-input option!')
+            opc_template_kernel_str = input_value[1]
         else:
             compile_opt.append(opts)
     if len(compile_opt) > 0:
@@ -71,6 +79,10 @@ def gen_compile_options(compile_options_file: str, op_type: str, \
         if opc_config_str != "":
             opc_config_str += "@"
         opc_config_str += "--tiling_key=" + opc_tiling_keys
+    if len(opc_template_kernel_str) > 0:
+        if opc_config_str != "":
+            opc_config_str += "@"
+        opc_config_str += "--kernel-template-input=" + opc_template_kernel_str
     if opc_kernel_config:
         if opc_config_str != "":
             opc_config_str += "@"
@@ -90,6 +102,10 @@ if __name__ == '__main__':
     comp_options = []
     for i in range(len(sys.argv) - 3):
         if sys.argv[i + 3].upper().startswith("ASCEND"):
+            compute_soc += sys.argv[i + 3] + ";"
+        elif sys.argv[i + 3].upper().startswith("KIRIN"):
+            compute_soc += sys.argv[i + 3] + ";"
+        elif sys.argv[i + 3].upper().startswith("MC62"):
             compute_soc += sys.argv[i + 3] + ";"
         else:
             comp_options.append(sys.argv[i + 3])

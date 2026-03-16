@@ -7,16 +7,22 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kernel_operator_set_atomic_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SET_ATOMIC_IMPL_H__
+#endif
+
 #ifndef ASCENDC_MODULE_OPERATOR_SET_ATOMIC_ADD_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_SET_ATOMIC_ADD_IMPL_H
 
 namespace AscendC {
-// bisheng::cce::set_atomic_none
+// set_atomic_none
 __aicore__ inline void SetAtomicNoneImpl()
 {
-    bisheng::cce::set_atomic_none();
+    set_atomic_none();
 }
-// bisheng::cce::set_atomic_add
+// set_atomic_add
 template <typename T>
 __aicore__ inline void SetAtomicAddImpl()
 {
@@ -26,45 +32,45 @@ __aicore__ inline void SetAtomicAddImpl()
 
 template <> __aicore__ inline void SetAtomicAddImpl<float>()
 {
-    bisheng::cce::set_atomic_f32();
-    bisheng::cce::set_atomic_add();
+    set_atomic_f32();
+    set_atomic_add();
 }
 
 template <>
 __aicore__ inline void SetAtomicAddImpl<half>()
 {
-    bisheng::cce::set_atomic_f16();
-    bisheng::cce::set_atomic_add();
+    set_atomic_f16();
+    set_atomic_add();
 }
 
 template <>
 __aicore__ inline void SetAtomicAddImpl<int16_t>()
 {
-    bisheng::cce::set_atomic_s16();
-    bisheng::cce::set_atomic_add();
+    set_atomic_s16();
+    set_atomic_add();
 }
 
 template <>
 __aicore__ inline void SetAtomicAddImpl<int32_t>()
 {
-    bisheng::cce::set_atomic_s32();
-    bisheng::cce::set_atomic_add();
+    set_atomic_s32();
+    set_atomic_add();
 }
 
 template <>
 __aicore__ inline void SetAtomicAddImpl<int8_t>()
 {
-    bisheng::cce::set_atomic_s8();
-    bisheng::cce::set_atomic_add();
+    set_atomic_s8();
+    set_atomic_add();
 }
 
 template <>
 __aicore__ inline void SetAtomicAddImpl<bfloat16_t>()
 {
-    bisheng::cce::set_atomic_bf16();
-    bisheng::cce::set_atomic_add();
+    set_atomic_bf16();
+    set_atomic_add();
 }
-// bisheng::cce::set_atomic_max
+// set_atomic_max
 template <typename T>
 __aicore__ inline void SetAtomicMaxImpl()
 {
@@ -75,46 +81,46 @@ __aicore__ inline void SetAtomicMaxImpl()
 template <>
 __aicore__ inline void SetAtomicMaxImpl<float>()
 {
-    bisheng::cce::set_atomic_max();
-    bisheng::cce::set_atomic_f32();
+    set_atomic_max();
+    set_atomic_f32();
 }
 
 template <>
 __aicore__ inline void SetAtomicMaxImpl<half>()
 {
-    bisheng::cce::set_atomic_max();
-    bisheng::cce::set_atomic_f16();
+    set_atomic_max();
+    set_atomic_f16();
 }
 
 template <>
 __aicore__ inline void SetAtomicMaxImpl<int16_t>()
 {
-    bisheng::cce::set_atomic_max();
-    bisheng::cce::set_atomic_s16();
+    set_atomic_max();
+    set_atomic_s16();
 }
 
 template <>
 __aicore__ inline void SetAtomicMaxImpl<int32_t>()
 {
-    bisheng::cce::set_atomic_max();
-    bisheng::cce::set_atomic_s32();
+    set_atomic_max();
+    set_atomic_s32();
 }
 
 template <>
 __aicore__ inline void SetAtomicMaxImpl<int8_t>()
 {
-    bisheng::cce::set_atomic_max();
-    bisheng::cce::set_atomic_s8();
+    set_atomic_max();
+    set_atomic_s8();
 }
 
 template <>
 __aicore__ inline void SetAtomicMaxImpl<bfloat16_t>()
 {
-    bisheng::cce::set_atomic_max();
-    bisheng::cce::set_atomic_bf16();
+    set_atomic_max();
+    set_atomic_bf16();
 }
 
-// bisheng::cce::set_atomic_min
+// set_atomic_min
 template <typename T>
 __aicore__ inline void SetAtomicMinImpl()
 {
@@ -125,43 +131,43 @@ __aicore__ inline void SetAtomicMinImpl()
 template <>
 __aicore__ inline void SetAtomicMinImpl<float>()
 {
-    bisheng::cce::set_atomic_min();
-    bisheng::cce::set_atomic_f32();
+    set_atomic_min();
+    set_atomic_f32();
 }
 
 template <>
 __aicore__ inline void SetAtomicMinImpl<half>()
 {
-    bisheng::cce::set_atomic_min();
-    bisheng::cce::set_atomic_f16();
+    set_atomic_min();
+    set_atomic_f16();
 }
 
 template <>
 __aicore__ inline void SetAtomicMinImpl<int16_t>()
 {
-    bisheng::cce::set_atomic_min();
-    bisheng::cce::set_atomic_s16();
+    set_atomic_min();
+    set_atomic_s16();
 }
 
 template <>
 __aicore__ inline void SetAtomicMinImpl<int32_t>()
 {
-    bisheng::cce::set_atomic_min();
-    bisheng::cce::set_atomic_s32();
+    set_atomic_min();
+    set_atomic_s32();
 }
 
 template <>
 __aicore__ inline void SetAtomicMinImpl<int8_t>()
 {
-    bisheng::cce::set_atomic_min();
-    bisheng::cce::set_atomic_s8();
+    set_atomic_min();
+    set_atomic_s8();
 }
 
 template <>
 __aicore__ inline void SetAtomicMinImpl<bfloat16_t>()
 {
-    bisheng::cce::set_atomic_min();
-    bisheng::cce::set_atomic_bf16();
+    set_atomic_min();
+    set_atomic_bf16();
 }
 
 template <typename T> __aicore__ inline void SetAtomicTypeImpl()
@@ -172,32 +178,36 @@ template <typename T> __aicore__ inline void SetAtomicTypeImpl()
 
 template <> __aicore__ inline void SetAtomicTypeImpl<float>()
 {
-    bisheng::cce::set_atomic_f32();
+    set_atomic_f32();
 }
 
 template <> __aicore__ inline void SetAtomicTypeImpl<half>()
 {
-    bisheng::cce::set_atomic_f16();
+    set_atomic_f16();
 }
 
 template <> __aicore__ inline void SetAtomicTypeImpl<int16_t>()
 {
-    bisheng::cce::set_atomic_s16();
+    set_atomic_s16();
 }
 
 template <> __aicore__ inline void SetAtomicTypeImpl<int32_t>()
 {
-    bisheng::cce::set_atomic_s32();
+    set_atomic_s32();
 }
 
 template <> __aicore__ inline void SetAtomicTypeImpl<int8_t>()
 {
-    bisheng::cce::set_atomic_s8();
+    set_atomic_s8();
 }
 
 template <> __aicore__ inline void SetAtomicTypeImpl<bfloat16_t>()
 {
-    bisheng::cce::set_atomic_bf16();
+    set_atomic_bf16();
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_SET_ATOMIC_ADD_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SET_ATOMIC_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SET_ATOMIC_IMPL_H__
+#endif

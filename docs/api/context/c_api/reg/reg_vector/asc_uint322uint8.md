@@ -4,7 +4,7 @@
 
 |产品|是否支持|
 | :------------ | :------------: |
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
@@ -64,14 +64,14 @@ PIPE_V
 
 ## 约束说明
 
-无
+- 使能饱和模式和非饱和模式生效时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
 
 ## 调用示例
 
 ```cpp
 vector_uint32_t src;
 vector_uint8_t dst;
-vector_bool mask = asc_create_mask_b32(Pat::ALL);
+vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_uint322uint8(dst, src, mask);
 ```

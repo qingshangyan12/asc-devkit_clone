@@ -92,14 +92,15 @@ struct HcclCombineOpParam {
     uint32_t rankId;                            // id of this rank
     uint32_t rankNum;                           // num of ranks in this comm group
     uint64_t winSize;                           // size of each windows memory
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     uint64_t windowsIn[HCCL_MAX_RANK_NUM_V310];
     uint64_t windowsOut[HCCL_MAX_RANK_NUM_V310];
     GM_ADDR xnOffset;
     GM_ADDR ckeOffset;
     uint8_t res[16];
-    uint8_t algorithmType;
-    uint8_t res2[7783];
+    uint32_t opType[MAX_CC_TILING_NUM];
+    uint8_t algorithmType[MAX_CC_TILING_NUM];
+    uint8_t res2[7744];
 #else
     uint64_t windowsIn[HCCL_MAX_RANK_NUM];
     uint64_t windowsOut[HCCL_MAX_RANK_NUM];

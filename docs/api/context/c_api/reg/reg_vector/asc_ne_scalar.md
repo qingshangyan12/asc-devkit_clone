@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-src中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst对应比特位为1，否则为0。
+src中的每个元素逐个与标量value比较大小，如果src_i != value，则输出结果dst对应比特位为1，否则为0。
 
 ## 函数原型
 
@@ -52,7 +52,7 @@ PIPE_V
 vector_bool dst;
 vector_uint8_t src;
 uint8_t value;
-vector_bool mask = asc_create_mask_b8(Pat::ALL);
+vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_ne_scalar(dst, src, value, mask);
 ```

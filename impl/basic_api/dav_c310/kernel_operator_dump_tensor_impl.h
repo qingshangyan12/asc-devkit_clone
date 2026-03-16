@@ -12,6 +12,11 @@
  * \file kernel_operator_dump_tensor_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kernel_operator_dump_tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 
@@ -20,6 +25,8 @@
 #include "kernel_operator_data_copy_impl.h"
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_operator_print_impl.h"
+#include "impl/utils/debug/asc_aicore_dump_impl.h"
+#include "impl/utils/debug/asc_aicore_time_impl.h"
 
 namespace AscendC {
 template <typename T>
@@ -90,7 +97,7 @@ __aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
     *((__gm__ uint32_t*)blockInfoStart + BLOCK_INFO_MAGIC_POS) = BLOCK_INFO_MAGIC_NUM;
     *((__gm__ uint32_t*)blockInfoStart + BLOCK_INFO_RSV_POS) = 0;
     *((__gm__ uint64_t*)((__gm__ uint32_t*)blockInfoStart + BLOCK_INFO_DUMP_ADDR)) = blockInfoStart + blkInfoLen;
-    bisheng::cce::dcci((__gm__ uint64_t*)blockInfoStart, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)blockInfoStart, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 
     // add DUMP_META info
     blockInfoStart = blockInfoStart + sizeof(BlockInfo);
@@ -104,7 +111,7 @@ __aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
     *(__gm__ uint8_t*)((__gm__ uint8_t*)blockInfoStart + DUMP_META_TASK_RATION) =
         static_cast<uint8_t>(mixFlag);
     *((__gm__ uint32_t*)blockInfoStart + DUMP_META_RSV_POS) = 0;
-    bisheng::cce::dcci((__gm__ uint64_t*)blockInfoStart, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)blockInfoStart, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 }
 __aicore__ inline DataCopyParams GetDataCopyParamImpl(uint32_t offset)
 {
@@ -139,7 +146,7 @@ __aicore__ inline void UpdateBlockInfo(__gm__ BlockInfo* ptr, uint32_t offset)
 {
     ptr->dumpOffset -= offset;
     ptr->dumpAddr += offset;
-    bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 }
 
 __aicore__ inline void WriteDumpShapeInfo(const ShapeInfo &shapeInfo)
@@ -157,7 +164,7 @@ __aicore__ inline void WriteDumpShapeInfo(const ShapeInfo &shapeInfo)
         KERNEL_LOG(KERNEL_ERROR, "remained space is %d, which is not enough for write data %u", ptr->dumpOffset,
             tlvSize); });
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
-        bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+        dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
         return;
     }
     *((__gm__ uint32_t*)ptr->dumpAddr + DUMP_SHAPE_MESSAGE_HEAD_TYPE_POS) = static_cast<uint32_t>(DumpType::DUMP_SHAPE);
@@ -175,7 +182,7 @@ __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo);
 
 __aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
 {
-    bisheng::cce::dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         WriteRingBufShapeInfo(shapeInfo);
     } else {
@@ -239,7 +246,7 @@ __aicore__ inline void DumpTensorL12GMImpl(const LocalTensor<T>& tensor, uint32_
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved);
     uint8_t core = GetDumpBlockIdx();
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
-    bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     uint32_t needCopyLen = offset;
     uint32_t copyCount = GetLoopCount(offset, L1_DUMP_UB_SIZE);
     for (uint32_t idx = 0; idx < copyCount; idx++) {
@@ -278,7 +285,7 @@ __aicore__ inline void DumpTensorL0C2GMImpl(const LocalTensor<T>& tensor, __gm__
     uint16_t n = countBlks * BLOCK_CUBE;
     uint16_t m = (burstLen * ONE_BLK_SIZE / B32_BYTE_SIZE) / BLOCK_CUBE;
     bool nz2dnEn = true;
-    bisheng::cce::copy_matrix_cc_to_gm((__gm__ float *)(ptr->dumpAddr), (__cc__ float *)(tensor.GetPhyAddr()),
+    copy_matrix_cc_to_gm((__gm__ float *)(ptr->dumpAddr), (__cc__ float *)(tensor.GetPhyAddr()),
         0, n, m, m * BLOCK_CUBE, m, 0,
         0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant),
         static_cast<uint8_t>(false), false, false,
@@ -293,7 +300,7 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved);
     uint8_t core = GetDumpBlockIdx();
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
-    bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     uint32_t position = CheckValidPosition(tensor);
     // set the head struct value
     if (position == 0) {
@@ -326,7 +333,7 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor
         KERNEL_LOG(KERNEL_ERROR, "remained space is %d, which is not enough for write data %u", ptr->dumpOffset,
             (padOffset + sizeof(DumpMessageHead))); });
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
-        bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+        dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
         return;
     }
     *((__gm__ uint32_t*)ptr->dumpAddr + DUMP_MESSAGE_HEAD_TYPE_POS) = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
@@ -341,7 +348,7 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor
     // update block info
     UpdateBlockInfo(ptr, sizeof(DumpMessageHead));
     PipeBarrier<PIPE_ALL>();
-    bisheng::cce::dcci((__gm__ uint64_t*)ptr->dumpAddr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)ptr->dumpAddr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (srcHWPos == Hardware::UB) {
         DataCopyParams repeatParams = GetDataCopyParamImpl(padOffset);
         DataCopyUB2GMImpl((__gm__ PrimType*)(ptr->dumpAddr), (__ubuf__ PrimType*)tensor.GetPhyAddr(), repeatParams); // UB to GM
@@ -360,18 +367,29 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor
     }
 }
 
-template <template <typename> class Tensor, typename T>
-__aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize);
-
 template <typename T>
 __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc,
                                                                 uint32_t dumpSize)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
-    bisheng::cce::dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize);
+        const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
+        if (position == Hardware::UB) {
+            __asc_aicore::asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize);
+        } else if (position == Hardware::L1) {
+            return; // L1 to GM dump not support
+        } else if (position == Hardware::L0C) {
+            if ASCEND_IS_NOT_AIC {
+                return;
+            }
+            __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize);
+        } else {
+            ASCENDC_ASSERT((false),
+                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+            return;
+        }
     } else {
         DumpTensorLocal2GMEntityImpl(src, desc, dumpSize);
     }
@@ -405,7 +423,7 @@ __aicore__ inline bool CheckDumpValid(uint32_t padOffset)
         KERNEL_LOG(KERNEL_ERROR, "remained space is %d, which is not enough for write data %lu",
             ptr->dumpOffset, (padOffset + sizeof(DumpMessageHead) + ONE_DUMP_BACKUP_SIZE));
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
-        bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+        dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
         return false;
     }
 
@@ -465,7 +483,7 @@ __aicore__ inline void DumpTensorGM2GMEntityImpl(const GlobalTensor<T>& tensor, 
     DumpBlockInfoImpl(tensor, desc, dumpSize, padOffset);
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved);
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * GetDumpBlockIdx());
-    bisheng::cce::dcci((__gm__ uint64_t*)ptr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     uint64_t gmAddr = ptr->dumpAddr;
     if (g_coreType == AIV) {
         DataCopyParams backupParams = GetDataCopyParamImpl(ONE_DUMP_BACKUP_SIZE); // 1K unit
@@ -478,7 +496,7 @@ __aicore__ inline void DumpTensorGM2GMEntityImpl(const GlobalTensor<T>& tensor, 
         InitTmpTensor(tmpLocal, static_cast<uint8_t>(TPosition::VECIN));
         DataCopyUB2GMImpl((__gm__ PrimType*)(gmBackAddr), (__ubuf__ PrimType*)tmpLocal.GetPhyAddr(), backupParams);
         PipeBarrier<PIPE_ALL>();
-        bisheng::cce::dcci((__gm__ uint64_t*)gmBackAddr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+        dcci((__gm__ uint64_t*)gmBackAddr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
         uint32_t alignSize = padOffset % ONE_DUMP_BACKUP_SIZE;
         uint64_t tmpAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tensor.GetPhyAddr()));
         // Loop copy data
@@ -500,7 +518,7 @@ __aicore__ inline void DumpTensorGM2GMEntityImpl(const GlobalTensor<T>& tensor, 
         for (uint32_t i = 0; i < dumpSize; i++) {
             *((__gm__ PrimType*)gmAddr + i) = *((__gm__ PrimType*)tensor.GetPhyAddr(i));
         }
-        bisheng::cce::dcci((__gm__ uint64_t*)gmAddr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+        dcci((__gm__ uint64_t*)gmAddr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     }
     PipeBarrier<PIPE_ALL>();
     UpdateBlockInfo(ptr, padOffset);
@@ -511,9 +529,9 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
-    bisheng::cce::dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize);
+        __asc_aicore::asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize);
     } else {
         DumpTensorGM2GMEntityImpl(src, desc, dumpSize);
     }
@@ -531,21 +549,19 @@ __aicore__ inline void WriteTimeStampInfo(uint32_t descId)
     // write value
     *((__gm__ uint32_t *)dumpAddr + DUMP_TIME_STAMP_ID_POS) = descId;
     *((__gm__ uint64_t *)((__gm__ uint32_t *)dumpAddr + DUMP_TIME_STAMP_CYCLE_POS)) = static_cast<uint64_t>(GetSystemCycle());
-    *((__gm__ uint64_t *)((__gm__ uint32_t *)dumpAddr + DUMP_TIME_STAMP_PTR_POS)) = static_cast<uint64_t>(bisheng::cce::get_pc());
+    *((__gm__ uint64_t *)((__gm__ uint32_t *)dumpAddr + DUMP_TIME_STAMP_PTR_POS)) = static_cast<uint64_t>(get_pc());
     // update block addr
     *((__gm__ uint64_t *)((__gm__ uint32_t *)blockInfo + BLOCK_INFO_DUMP_ADDR)) = dumpAddr + DUMP_TIME_STAMP_TOTAL_LEN;
     *((__gm__ uint32_t*)blockInfo + BLOCK_INFO_DUMPOFFSET_POS) = blockInfo->dumpOffset - DUMP_TIME_STAMP_TOTAL_LEN;
-    bisheng::cce::dcci((__gm__ uint64_t*)blockInfo, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)blockInfo, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 #endif
 }
 
-__aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId);
-
 __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
 {
-    bisheng::cce::dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        WriteRingBufTimeStampInfo(descId);
+        __asc_aicore::asc_time_stamp(descId);
     } else {
         WriteTimeStampInfo(descId);
     }
@@ -615,8 +631,8 @@ __aicore__ inline void DumpL1TensorTransferByUB()
         if (GetDumpCtrlMsg()->sig == ConstantsInternal::L1_2_UB_DUMP_CTRL_SIGNAL_DUMP) {
             // 等待AIC搬运完成
             wait_intra_block(PIPE_MTE3, ConstantsInternal::DUMP_INTRA_BLOCK_ID);
-            // 刷bisheng::cce::dcci, 更新最新gm内容
-            bisheng::cce::dcci((__gm__ uint64_t*)gmAddr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+            // 刷dcci, 更新最新gm内容
+            dcci((__gm__ uint64_t*)gmAddr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
             // 重新获取len信息 避免信息老化
             uint32_t copyLen = GetDumpCtrlMsg()->len;
             DataCopyParams repeatParams = GetDataCopyParamImpl(copyLen);
@@ -631,8 +647,8 @@ __aicore__ inline void DumpL1TensorTransferByUB()
             // update block info
             PipeBarrier<PIPE_ALL>();
             UpdateBlockInfo(gmAddr, copyLen);
-            bisheng::cce::dcci((__gm__ uint64_t*)(gmAddr->dumpAddr), bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
-            bisheng::cce::dcci((__gm__ uint64_t*)(gmAddr), bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+            dcci((__gm__ uint64_t*)(gmAddr->dumpAddr), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+            dcci((__gm__ uint64_t*)(gmAddr), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
             // 清除dump标志位，避免aiv误进入下一次循环，卡在wait_intra_block
             SendL12UBDumpCtrlMessage(0, 0);
             PipeBarrier<PIPE_ALL>();
@@ -644,16 +660,6 @@ __aicore__ inline void DumpL1TensorTransferByUB()
 __aicore__ inline void FinalizeL1TensorDump()
 {
     DisableL1Dump();
-}
-
-template <typename T>
-__aicore__ inline Hardware CheckDumpTensorPosition(const LocalTensor<T>& src)
-{
-    Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
-    if (position != Hardware::UB && position != Hardware::L1 && position != Hardware::L0C) {
-        return Hardware::MAX;
-    }
-    return position;
 }
 
 template <typename T>
@@ -700,142 +706,6 @@ __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType()
     }
 }
 
-
-template <template<typename> class Tensor, typename T>
-__aicore__ inline void WriteRingBufTlvHead(const Tensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv,
-    const uint32_t& alignDumpDataLen, const uint32_t& desc, const uint32_t& dumpSize)
-{
-    Hardware position;
-    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
-        position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
-    } else if (IsSameType<Tensor<T>, GlobalTensor<T>>::value) {
-        position = Hardware::GM;
-    }
-    dumpTensorTlv->type = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
-    dumpTensorTlv->length = sizeof(DumpTensorTlvInfoHead) - sizeof(uint32_t[2]) + alignDumpDataLen;
-    dumpTensorTlv->tensorAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr()));
-    dumpTensorTlv->dataType = static_cast<uint32_t>(GetTensorDataType<T>());
-    dumpTensorTlv->desc = desc;
-    dumpTensorTlv->bufferId = static_cast<uint32_t>(0U);
-    dumpTensorTlv->position = static_cast<uint16_t>(position);
-    dumpTensorTlv->blockIdx = static_cast<uint16_t>(GetBlockIdxImpl());
-    dumpTensorTlv->dim = static_cast<uint32_t>(0U);
-    for (uint32_t i = 0; i < K_MAX_SHAPE_DIM; ++i) {
-        dumpTensorTlv->shape[i] = static_cast<uint32_t>(0U);
-    }
-    dumpTensorTlv->resv1 = static_cast<uint32_t>(0U);
-    dumpTensorTlv->dumpSize = dumpSize * sizeof(T);
-    bisheng::cce::dcci((__gm__ uint64_t*)dumpTensorTlv, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
-}
-
-template <typename T>
-__aicore__ inline void SetDumpDataL0C2GM(__gm__ uint8_t* dst, const LocalTensor<T>& src, uint32_t dumpSize)
-{
-    if ASCEND_IS_NOT_AIC {
-        return;
-    }
-    // L0C to GM
-    uint16_t align = (dumpSize % DEFAULT_BLOCK_SIZE == 0) ? 0 : 1;
-    uint16_t countBlks = align + dumpSize / DEFAULT_BLOCK_SIZE;
-
-    uint16_t burstLen = static_cast<uint16_t>(SRC_BURST_LEN_SIZE_ELE * SRC_BURST_LEN_SIZE_ELE
-        * sizeof(float) / ONE_BLK_SIZE);
-    uint16_t n = countBlks * BLOCK_CUBE;
-    uint16_t m = (burstLen * ONE_BLK_SIZE / B32_BYTE_SIZE) / BLOCK_CUBE;
-    bisheng::cce::copy_matrix_cc_to_gm((__gm__ float *)(dst), (__cc__ float *)(src.GetPhyAddr()),
-        0, n, m, m * BLOCK_CUBE, m, 0,
-        0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant),
-        static_cast<uint8_t>(false), false, false,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true,
-        false, false, false);
-}
-
-template <typename T>
-__aicore__ inline void WriteRingBufTlvData(const LocalTensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv,
-    const uint32_t& alignDumpDataLen, const uint32_t& dumpSize)
-{
-    __gm__ T* dumpDataAddr = reinterpret_cast<__gm__ T*>(dumpTensorTlv + 1);
-    DataCopyParams copyParams = {1, static_cast<uint16_t>(alignDumpDataLen / ONE_BLK_SIZE), 0, 0};
-
-    PipeBarrier<PIPE_ALL>();
-
-    if (dumpTensorTlv->position == static_cast<uint16_t>(Hardware::UB)) {
-        DataCopyUB2GMImpl(dumpDataAddr, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()), copyParams); // UB to GM
-    } else if (dumpTensorTlv->position == static_cast<uint16_t>(Hardware::L0C)) {
-        SetDumpDataL0C2GM(reinterpret_cast<__gm__ uint8_t*>(dumpDataAddr), src, dumpSize); // L0C to GM
-    }
-
-    PipeBarrier<PIPE_ALL>();
-
-    bisheng::cce::dcci((__gm__ uint64_t*)dumpDataAddr, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
-}
-
-template <typename T>
-__aicore__ inline void WriteRingBufTlvData(
-    const GlobalTensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv, const uint32_t& dumpSize)
-{
-    PipeBarrier<PIPE_ALL>();
-    __gm__ uint8_t* dst = reinterpret_cast<__gm__ uint8_t*>(dumpTensorTlv + 1);
-    MemCopyGm2Gm(dst, reinterpret_cast<__gm__ const uint8_t*>(src.GetPhyAddr()), dumpSize * sizeof(T));
-}
-
-template <template <typename> class Tensor, typename T>
-__aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize)
-{
-#ifdef ASCENDC_DUMP
-    EnablePrintf();
-    if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
-        ASCENDC_ASSERT((false),
-                   { KERNEL_LOG(KERNEL_ERROR, "dump tensor not support this data type"); });
-        return;
-    }
-
-    if (dumpSize == 0) {
-        return;
-    }
-
-    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
-        Hardware position = CheckDumpTensorPosition(src);
-        // set the head struct value
-        if (position == Hardware::MAX) {
-            ASCENDC_ASSERT((false),
-                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
-            return;
-        } else if (position == Hardware::L0C) {
-            if ASCEND_IS_NOT_AIC {
-                return;
-            }
-        } else if (position == Hardware::L1) {
-            return; // L1 to GM dump not support
-        }
-    }
-
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    uint32_t alignDumpDataLen = AlignUp(dumpSize * sizeof(T), ONE_BLK_SIZE);
-    uint32_t tlvLen = sizeof(DumpTensorTlvInfoHead) + alignDumpDataLen;
-    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
-        return;
-    }
-
-    __gm__ DumpTensorTlvInfoHead* dumpTensorTlv =
-        reinterpret_cast<__gm__ DumpTensorTlvInfoHead*>(GetRingBufTlv(blockRingBufInfo));
-
-    WriteRingBufTlvHead(src, dumpTensorTlv, alignDumpDataLen, desc, dumpSize);
-    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
-        WriteRingBufTlvData(src, dumpTensorTlv, alignDumpDataLen, dumpSize);
-    } else if (IsSameType<Tensor<T>, GlobalTensor<T>>::value) {
-        WriteRingBufTlvData(src, dumpTensorTlv, dumpSize);
-    }
-
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-
-    UpdateWriteInfo(writeInfo, tlvLen);
-#endif // ASCENDC_DUMP
-}
-
 __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
 {
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
@@ -856,46 +726,16 @@ __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
     }
     shapeTlv->resv = static_cast<uint32_t>(0U);
 
-    bisheng::cce::dcci((__gm__ uint64_t*)shapeTlv, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
+    dcci((__gm__ uint64_t*)shapeTlv, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 
     __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
 
     UpdateWriteInfo(writeInfo, tlvLen);
-}
-
-__aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId)
-{
-#if defined(ASCENDC_TIME_STAMP_ON) && !defined(ASCENDC_CPU_DEBUG)
-    EnablePrintf();
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    uint32_t tlvLen = sizeof(TimeStampTlvInfo);
-    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
-        return;
-    }
-
-    __gm__ TimeStampTlvInfo* timeStampTlv =
-        reinterpret_cast<__gm__ TimeStampTlvInfo*>(GetRingBufTlv(blockRingBufInfo));
-    timeStampTlv->type = static_cast<uint32_t>(DumpType::DUMP_TIME_STAMP);
-    timeStampTlv->length = tlvLen - sizeof(uint32_t[2]);
-    timeStampTlv->descId = descId;
-    timeStampTlv->blockIdx = static_cast<uint16_t>(GetBlockIdxImpl());
-    timeStampTlv->resv = static_cast<uint16_t>(0U);
-    timeStampTlv->cycle = static_cast<uint64_t>(GetSystemCycle());
-    timeStampTlv->pc = static_cast<uint64_t>(get_pc());
-    timeStampTlv->entry = static_cast<uint64_t>(__get_entry_sys_cnt());
-    timeStampTlv->resvMem[0] = static_cast<uint32_t>(0U);
-    timeStampTlv->resvMem[1] = static_cast<uint32_t>(0U);
-
-    bisheng::cce::dcci((__gm__ uint64_t*)timeStampTlv, bisheng::cce::cache_line_t::ENTIRE_DATA_CACHE, bisheng::cce::dcci_dst_t::CACHELINE_OUT);
-
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-
-    UpdateWriteInfo(writeInfo, tlvLen);
-#endif // ASCENDC_TIME_STAMP_ON
 }
 
 }  // namespace AscendC
+#endif
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__
 #endif

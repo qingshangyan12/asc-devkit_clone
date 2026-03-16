@@ -12,6 +12,13 @@
  * \file broadcast_v220_impl.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/pad/broadcast/broadcast_v220_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/pad/broadcast.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_V220_IMPL_H__
+#endif
+
 #ifndef IMPL_PAD_BROADCAST_BROADCAST_V220_IMPL_H
 #define IMPL_PAD_BROADCAST_BROADCAST_V220_IMPL_H
 
@@ -91,10 +98,10 @@ __aicore__ inline void TwoDimBroadCastLastDimNotAlign220(const LocalTensor<T> &d
 {
     constexpr uint32_t oneBlockElementNum = ONE_BLK_SIZE / sizeof(T);
     BrcbToOneBlock(srcLocal, firstDim, oneBlockElementNum, tmpBuffer);
-    const uint32_t blockDimAlignBlockNum = (numBlocks + oneBlockElementNum - 1) / oneBlockElementNum;
-    const uint32_t numBlocksAlign = blockDimAlignBlockNum * oneBlockElementNum;
+    const uint32_t dstRepeatSize = (numBlocks + oneBlockElementNum - 1) / oneBlockElementNum;
+    const uint32_t numBlocksAlign = dstRepeatSize * oneBlockElementNum;
     SetVectorMask<T, MaskMode::COUNTER>(numBlocksAlign);
-    const CopyRepeatParams copyRepeatParams = {1, 0, (uint16_t)blockDimAlignBlockNum, 1};
+    const CopyRepeatParams copyRepeatParams = {1, 0, (uint16_t)dstRepeatSize, 1};
     uint32_t CopyCounts = firstDim / MAX_REPEAT_TIMES;
     uint32_t dstOffset = 0;
     uint32_t brcbOneBlockTempBufferOffset = 0;
@@ -118,7 +125,7 @@ __aicore__ inline void TwoDimBroadCastLastDimNotAlign220(const LocalTensor<T> &d
     }
     PipeBarrier<PIPE_V>();
     const GatherMaskParams gatherMaskParams = {
-        1, (uint16_t)firstDim, (uint16_t)blockDimAlignBlockNum, 0};  // uint32 cast to uint16
+        1, (uint16_t)firstDim, (uint16_t)dstRepeatSize, 0};  // uint32 cast to uint16
     uint64_t rsvdCnt = 0;
     GatherMask(dstLocal, copyTempBuffer, GATHER_MASK_PATTERN, true, numBlocks, gatherMaskParams, rsvdCnt);
     SetMaskCount();
@@ -149,8 +156,8 @@ __aicore__ inline void GetNotAlignLoopNumbers(const uint32_t firstDim, const uin
 {
     constexpr uint32_t oneBlockElementNum = ONE_BLK_SIZE / sizeof(T);
     constexpr uint32_t minBrcbTempBufferSize = oneBlockElementNum * oneBlockElementNum;
-    const uint32_t blockDimAlignBlockNum = (numBlocks + oneBlockElementNum - 1) / oneBlockElementNum;
-    const uint32_t numBlocksAlign = blockDimAlignBlockNum * oneBlockElementNum;
+    const uint32_t dstRepeatSize = (numBlocks + oneBlockElementNum - 1) / oneBlockElementNum;
+    const uint32_t numBlocksAlign = dstRepeatSize * oneBlockElementNum;
     const uint32_t minCopyTempBufferSize = oneBlockElementNum * numBlocksAlign;
     const uint32_t minTmpBufferSize = minBrcbTempBufferSize + minCopyTempBufferSize;
     ASCENDC_ASSERT((tmpBufferSize >= minTmpBufferSize), {
@@ -213,4 +220,9 @@ __aicore__ inline void NoBroad(const LocalTensor<T> &dstLocal, const LocalTensor
 }
 
 }  // namespace AscendC
+#endif
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_V220_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_BROADCAST_BROADCAST_V220_IMPL_H__
 #endif

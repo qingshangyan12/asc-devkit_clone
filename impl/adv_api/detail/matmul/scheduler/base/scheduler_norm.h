@@ -12,6 +12,12 @@
  * \file scheduler_norm.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/matmul/scheduler/base/scheduler_norm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_NORM_H__
+#endif
+
 #ifndef IMPL_MATMUL_SCHEDULER_BASE_SCHEDULER_NORM_H
 #define IMPL_MATMUL_SCHEDULER_BASE_SCHEDULER_NORM_H
 
@@ -61,7 +67,7 @@ public:
     using BASE_MODULE =
         AscendC::Impl::Detail::MatmulNormSchedulerBase<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, POLICY_TYPE>;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2201)
     __aicore__ inline void CheckBasicBlock()
     {
         ASCENDC_ASSERT((MM_CFG.basicM == MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM()), { 
@@ -92,7 +98,7 @@ public:
 
     __aicore__ inline bool ScheduleOnce(bool enPartialSum)
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2201)
         if constexpr (DoMatmulBasicBlock(MM_CFG)) {
             CheckBasicBlock();
         }
@@ -262,4 +268,9 @@ private:
 }  // namespace Impl
 }  // namespace AscendC
 
+#endif
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_NORM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_BASE_SCHEDULER_NORM_H__
 #endif

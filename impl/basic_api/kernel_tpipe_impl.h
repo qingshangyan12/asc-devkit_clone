@@ -12,9 +12,15 @@
  * \file kernel_tpipe_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_tpipe_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_H__
+#endif
+
 #ifndef ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "dav_c310/kernel_tpipe_impl_c310.h"
 #include "dav_c310/kernel_tpipe_impl_c310_vec.h"
 #include "kernel_tquesync_impl.h"
@@ -603,7 +609,7 @@ __aicore__ inline void TPipe::InitSpmBuffer(const GlobalTensor<T>& workspace, co
 
 __aicore__ inline void TPipe::InitSpmBuffer(const int32_t bufferSize)
 {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3101)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510)
     (void)(bufferSize);
     ASCENDC_DEBUG_ASSERT((false),
                    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "not supported on current device"));
@@ -997,3 +1003,8 @@ __aicore__ inline uint64_t TransUBAddr(uint64_t addr)
 }
 #endif
 #endif // ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_H__
+#endif

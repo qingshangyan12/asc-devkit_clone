@@ -6,6 +6,7 @@
 
 ## 支持的产品
 
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -45,7 +46,7 @@ z = x + y
 <tr><td align="center">y</td><td align="center">72 * 4096</td><td align="center">float</td><td align="center">ND</td></tr>
 </tr>
 </tr>
-<tr><td rowspan="1" align="center">算子输出</td><td align="center">y</td><td align="center">72 * 4096</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">72 * 4096</td><td align="center">float</td><td align="center">ND</td></tr>
 </tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom_v2</td></tr>
 </table>

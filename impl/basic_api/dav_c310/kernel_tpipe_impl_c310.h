@@ -12,6 +12,11 @@
  * \file kernel_tpipe_impl_c310.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kernel_tpipe_impl_c310.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_C310_H__
+#endif
 #ifndef ASCENDC_MODULE_TPIPE_IMPL_C310_H
 #define ASCENDC_MODULE_TPIPE_IMPL_C310_H
 
@@ -427,12 +432,12 @@ template <HardEvent evt> __aicore__ inline TEventID TPipe::AllocEventID()
     ASCENDC_ASSERT((evt < HardEvent::MAX),
                    { KERNEL_LOG(KERNEL_ERROR, "illegal event %d", static_cast<int32_t>(evt)); });
     auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);
-    auto lastId = bisheng::cce::sff0(ptr->eventOccupy);
+    auto lastId = sff0(ptr->eventOccupy);
     ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), {
         KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT);
     });
-    ptr->eventOccupy = bisheng::cce::sbitset1(ptr->eventOccupy, lastId);
+    ptr->eventOccupy = sbitset1(ptr->eventOccupy, lastId);
     return lastId;
 }
 
@@ -444,14 +449,14 @@ template <HardEvent evt> __aicore__ inline void TPipe::ReleaseEventID(TEventID i
     });
     ASCENDC_ASSERT((evt != HardEvent::MAX), { KERNEL_LOG(KERNEL_ERROR, "evt cannot be HardEvent::MAX"); });
     auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);
-    ptr->eventOccupy = bisheng::cce::sbitset0(ptr->eventOccupy, id);
+    ptr->eventOccupy = sbitset0(ptr->eventOccupy, id);
     return;
 }
 
 __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 {
     auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);
-    auto lastId = bisheng::cce::sff0(ptr->eventOccupy);
+    auto lastId = sff0(ptr->eventOccupy);
     ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), {
         KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT);
@@ -462,7 +467,7 @@ __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
 {
     auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);
-    auto lastId = bisheng::cce::sff0(ptr->eventOccupy);
+    auto lastId = sff0(ptr->eventOccupy);
     ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), {
         KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT);
@@ -527,7 +532,7 @@ __aicore__ inline void InitShareBufStart(TPipe* tpipe, uint32_t mode, uint32_t* 
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0B)].maxAddr = 0;
     // v100 Shouldn't Use Bias Table
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::BIAS)].maxAddr = 0;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     Internal::g_sharedEvtId = Internal::g_bufId;
 #endif
     return;
@@ -545,7 +550,7 @@ __aicore__ inline void InitShareBufEnd(TPipe* tpipe)
         tpipe->g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::UB)];
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     Internal::g_bufId = Internal::g_sharedEvtId;
 #endif
     return;
@@ -979,3 +984,7 @@ template <class T> __aicore__ inline bool TPipe::TscmInitBuffer(T& que, uint8_t 
 }
 }
 #endif // ASCENDC_MODULE_TPIPE_IMPL_C310_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_C310_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_IMPL_C310_H__
+#endif

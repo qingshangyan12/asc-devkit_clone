@@ -879,6 +879,9 @@ def is_static_shape(inputs: list, outputs: list, value_depends: dict = None, par
     Returns:
         res (Boolean): True means static_shape, False means dynamic shape
     """
+    if not inputs and not outputs:
+        mode = op_context.get_op_mode()
+        return False if mode == "dynamic" else True
     for idx, input_ele in enumerate(inputs):
         if input_ele is None:
             continue
@@ -1113,7 +1116,7 @@ def get_tiling_data_func():
     class_body = "{\n"
     class_body += "    constexpr uint64_t all_bytes = sizeof(T);\n"
     class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201) || (defined \
-    (__DAV_CUBE__) && __NPU_ARCH__ == 3101) || defined(__GET_CODE_CHANNEL__)\n"
+    (__DAV_CUBE__) && __NPU_ARCH__ == 3510) || defined(__GET_CODE_CHANNEL__)\n"
     class_body += "#if defined(__DAV_C100__) || defined(ASCENDC_CPU_DEBUG)\n"
     class_body += get_dynamic_assign_tiling_data_by_size("all_bytes", "const __gm__", "(const __gm__ uint8_t *)\
 p_tilingdata")
@@ -1121,12 +1124,12 @@ p_tilingdata")
     class_body += "    copy_data_align64((uint8_t*)tilingdata, (__gm__ uint8_t *)p_tilingdata, all_bytes);\n"
     class_body += "#endif\n"
     class_body += "#else\n"
-    class_body += "#if __NPU_ARCH__ == 3101 && defined(__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__) \n"
+    class_body += "#if __NPU_ARCH__ == 3510 && defined(__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__) \n"
     class_body += _gen_tiling_copy_through_reserved_ub()
     class_body += "#else \n"
     class_body += "    __ubuf__ uint8_t *tilingdata_in_ub = (__ubuf__ uint8_t *)get_imm(0);\n"
     class_body += "    constexpr uint32_t len_burst = (all_bytes + 31) / 32;\n"
-    class_body += "#if __NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102\n"
+    class_body += "#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102\n"
     class_body += "    copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t *)tilingdata_in_ub, \
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, 0, 0, 0);\n"
     class_body += get_tilingdata_preload()
@@ -1324,7 +1327,7 @@ def get_tiling_info_v2(op_info: OpInfo, tiling_key_list: list, default_tiling_st
         tiling_info.static_workspace_size = total_workspace_size
         run_info["tiling_data"] = tiling_info.tiling_data.hex()
         tiling_info.raw_run_info = run_info
-        if total_workspace_size >= 0:
+        if total_workspace_size > 0:
             if len(run_info["workspaces"]) > 1:
                 msg = "the num of workspace can not large than 1"
                 raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, msg)

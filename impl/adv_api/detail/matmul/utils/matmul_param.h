@@ -12,6 +12,12 @@
  * \file matmul_param.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/matmul/utils/matmul_param.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MATMUL_PARAM_H__
+#endif
+
 #ifndef IMPL_MATMUL_UTILS_MATMUL_PARAM_H
 #define IMPL_MATMUL_UTILS_MATMUL_PARAM_H
 
@@ -146,14 +152,12 @@ struct MatmulParamsMDLSparse : public MatmulParamsBase<A_TYPE, B_TYPE, C_TYPE, B
 
     int baseMN_;
 };
-
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101) || defined(__ASC_NPU_HOST__)
 template<class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto &MM_CFG>
 struct MatmulParamsMxNorm : public MatmulParamsBase<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG> {
     using L0cT = typename GetMmDstType<typename A_TYPE::T>::Type;
     __aicore__ inline MatmulParamsMxNorm() {};
-    using SrcT = typename A_TYPE::T;
     using SrcBT = typename B_TYPE::T;
+    using SrcT = typename A_TYPE::T;
     using DstT = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
 
@@ -171,8 +175,8 @@ struct MatmulParamsMxMDL : public MatmulParamsBase<A_TYPE, B_TYPE, C_TYPE, BIAS_
     __aicore__ inline MatmulParamsMxMDL() {};
     using SrcT = typename A_TYPE::T;
     using SrcBT = typename B_TYPE::T;
-    using DstT = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
+    using DstT = typename C_TYPE::T;
 
     TPipe* tpipe_;
 
@@ -181,7 +185,6 @@ struct MatmulParamsMxMDL : public MatmulParamsBase<A_TYPE, B_TYPE, C_TYPE, BIAS_
 
     int baseMN_;
 };
-#endif
 
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
 struct MatmulParamsBasicBlock : public MatmulParamsNorm<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG> {
@@ -243,7 +246,6 @@ struct MatmulParams<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, GetMatmulMode(CFG
     using PARAMS = MatmulParamsMDLSparse<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
 };
 
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101) || defined(__ASC_NPU_HOST__)
 // MX_CFG_NORM
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
 struct MatmulParams<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, GetMatmulMode(CFG_NORM),
@@ -259,7 +261,6 @@ struct MatmulParams<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, GetMatmulMode(CFG
     __aicore__ inline MatmulParams(){};
     using PARAMS = MatmulParamsMxMDL<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
 };
-#endif
 
 // MM_CFG_BB
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
@@ -279,3 +280,8 @@ struct MatmulParams<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, GetMatmulMode(CFG
 }  // namespace Impl
 }  // namespace AscendC
 #endif // _MATMUL_PARAM_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MATMUL_PARAM_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_UTILS_MATMUL_PARAM_H__
+#endif
