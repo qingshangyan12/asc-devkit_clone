@@ -431,9 +431,9 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
             for param in func_params:
                 source += f"    {param} = param_base[args_offset++];\n"
         else:
-            called_func_params = "param"
-            called_func_params_type = "__gm__ uint64_t *param"
-            source += "__gm__ uint64_t *param) {\n"
+            called_func_params = "param, sargs"
+            called_func_params_type = "__gm__ uint64_t *param, __gm__ sk::SkSystemArgs *sargs"
+            source += "__gm__ uint64_t *param, __gm__ sk::SkSystemArgs *sargs) {\n"
             source += " uint32_t __asc_index = 0;\n"
             for param in func_params:
                 source += f"    {param} = (GM_ADDR)param[__asc_index++];\n"
@@ -609,6 +609,17 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
     source += "#else\n"
     source += "#define __global__ __attribute__((cce_kernel))\n"
     source += "#endif\n\n"
+
+    source += """
+namespace sk {
+struct SkSystemArgs {
+    uint16_t skBlockIdx;    // sub-kernel block idx
+    uint16_t skBlockNum;    // sub-kernel block num
+    uint16_t skTaskSyncCfg; // sync type for "early-start"
+    uint8_t reserve[10];
+};
+}
+"""
 
     if global_var_storage.get_variable("ascendc_tiling_no_register"):
         source += gen_tiling_struct_size_for_group_key_no_size(compile_info)
