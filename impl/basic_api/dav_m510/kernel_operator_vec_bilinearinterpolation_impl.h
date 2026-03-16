@@ -93,9 +93,9 @@ __aicore__ inline void VecBilinearInterpolationLevel0Template(__ubuf__ T* dst, _
     bool repeatMode, uint16_t dstBlkStride, uint16_t vROffset)
 {
     if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+        ASCENDC_ASSERT(maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
     } else {
-        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+        ASCENDC_ASSERT(maskArray == nullptr, { KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false."); });
     }
 
     if constexpr (isMaskBitMode) {

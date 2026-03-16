@@ -86,13 +86,13 @@ __aicore__ inline void SyncAllImpl()
 template <uint8_t modeId, pipe_t pipe>
 __aicore__ inline void NotifyEventImpl(uint16_t flagId)
 {
-    ASCENDC_ASSERT((false), "CrossCoreSetFlag is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "CrossCoreSetFlag is not supported on current device"); });
 }
 
 template <uint8_t modeId, pipe_t pipe>
 __aicore__ inline void WaitEventImpl(uint16_t flagId)
 {
-    ASCENDC_ASSERT((false), "CrossCoreWaitFlag is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "CrossCoreWaitFlag is not supported on current device"); });
 }
 
 template <atomic_type_t type, atomic_op_t op>

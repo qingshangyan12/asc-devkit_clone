@@ -257,23 +257,23 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 template <atomic_type_t type, atomic_op_t op>
 __aicore__ inline void SetStoreAtomicConfigImpl()
 {
-    ASCENDC_ASSERT((false), "SetStoreAtomicConfig is not supported!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "SetStoreAtomicConfig is not supported!"); });
 }
 
 __aicore__ inline int64_t GetStoreAtomicConfigImpl()
 {
-    ASCENDC_ASSERT((false), "GetStoreAtomicConfig is not supported!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "GetStoreAtomicConfig is not supported!"); });
     return 0;
 }
 
 __aicore__ inline void GetStoreAtomicConfigImpl(uint16_t &atomicType, uint16_t &atomicOp)
 {
-    ASCENDC_ASSERT((false), "GetStoreAtomicConfig is not supported!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "GetStoreAtomicConfig is not supported!"); });
 }
 
 __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam& checkParams)
 {
-    ASCENDC_ASSERT((false), "enableBit is not supported!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "enableBit is not supported!"); });
 }
 
 // api

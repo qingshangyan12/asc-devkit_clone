@@ -63,7 +63,7 @@ __aicore__ inline void WaitEventImpl(uint16_t flagId)
 
 __aicore__ inline void SetSyncBaseAddrImpl(uint64_t config)
 {
-    ASCENDC_ASSERT((false), "SetSyncBaseAddr is not supported on this device!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "SetSyncBaseAddr is not supported on this device!"); });
 }
 
 __aicore__ inline void SetSyncBaseAddr(uint64_t config)

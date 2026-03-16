@@ -398,7 +398,7 @@ __aicore__ inline void CopyImpl(__ubuf__ float* dst, __ubuf__ float* src, const 
 template <typename T, bool isSetMask = true>
 __aicore__ inline void CopyImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], uint8_t repeatTime,
     const CopyRepeatParams& repeatParams) {
-    ASCENDC_ASSERT(false, "current data type is not supported on current device.");
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported on current device."); });
 }
 
 // Copy::Level 0 - mask count mode
@@ -714,7 +714,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void CopyImpl(__ubuf__ T *dst, __ubuf__ T *src, const uint64_t mask, const uint8_t repeatTime,
     const CopyRepeatParams &repeatParams)
 {
-    ASCENDC_ASSERT(false, "current data type is not supported on current device.");
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported on current device."); });
 }
 
 /* **************************************************************************************************

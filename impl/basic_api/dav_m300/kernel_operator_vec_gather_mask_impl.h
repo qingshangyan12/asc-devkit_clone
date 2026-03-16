@@ -39,7 +39,7 @@ __aicore__ inline void GatherMaskCal(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__
 
 __aicore__ inline int64_t GetGatherMaskRemainCountImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetGatherMaskRemainCount on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetGatherMaskRemainCount on current device"); });
     return 0;
 }
 

@@ -125,9 +125,9 @@ __aicore__ inline void VecAxpyImplTemplate(__ubuf__ T *dst, __ubuf__ U *src, U s
     constexpr bool TUCompare = sizeof(T) > sizeof(U);
     using TT = typename Conditional<TUCompare, T, U>::type;
     if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+        ASCENDC_ASSERT(maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
     } else {
-        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+        ASCENDC_ASSERT(maskArray == nullptr, { KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false."); });
     }
     __ubuf__ uint64_t *maskBuf = nullptr;
 

@@ -547,7 +547,7 @@ REGISTER_CAST_ROUND_GROUP1(S322HALF, int32_t, half, 32, 16, SatMode::SAT, Mode::
     __aicore__ inline void CastIntrinsicsImpl##rndStr(__ubuf__ U* dst, __ubuf__ T* src,     \
         const uint32_t calCount)                                                                        \
     {                                                                                                   \
-        ASCENDC_ASSERT((false), "current convert is not supported");                                    \
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "current convert is not supported"); });                                    \
     }
 
 REGISTER_DATA_TYPE_NOT_SUPPORT(CastRint);
@@ -1048,21 +1048,21 @@ template <typename U, typename T, bool isVecDeq, bool halfBlock>
 __aicore__ inline void CastDeqImpl(__ubuf__ U* dst, __ubuf__ T* src,
     const uint32_t count)
 {
-    ASCENDC_ASSERT((false), "CastDeq is not supported");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "CastDeq is not supported"); });
 }
 
 template <typename U, typename T, bool isSetMask = true, bool isVecDeq, bool halfBlock>
 __aicore__ inline void CastDeqImpl(__ubuf__ U* dst, __ubuf__ T* src,
     const uint64_t mask[2], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((false), "CastDeq is not supported");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "CastDeq is not supported"); });
 }
 
 template <typename U, typename T, bool isSetMask = true, bool isVecDeq, bool halfBlock>
 __aicore__ inline void CastDeqImpl(__ubuf__ U* dst, __ubuf__ T* src,
     const int32_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((false), "CastDeq is not supported");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "CastDeq is not supported"); });
 }
 
 // AddReluCast::Level 0 - mask count mode
@@ -1070,7 +1070,7 @@ template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void AddReluCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1,
     const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((false), "AddReluCast is not supported");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "AddReluCast is not supported"); });
 }
 
 // AddReluCast::Level 0 - mask bit mode
@@ -1078,7 +1078,7 @@ template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void AddReluCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1,
     const uint64_t mask[2], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((false), "AddReluCast is not supported");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "AddReluCast is not supported"); });
 }
 
 // AddReluCast::Level 2
@@ -1086,7 +1086,7 @@ template <typename T, typename U>
 __aicore__ inline void AddReluCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1,
     const uint32_t count)
 {
-    ASCENDC_ASSERT((false), "AddReluCast is not supported");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "AddReluCast is not supported"); });
 }
 
 // SubReluCast::Level 0 - mask count mode
@@ -1094,7 +1094,7 @@ template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void SubReluCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1,
     const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((false), "SubReluCast is not supported");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "SubReluCast is not supported"); });
 }
 
 // SubReluCast::Level 0 - mask bit mode
@@ -1102,7 +1102,7 @@ template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void SubReluCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1,
     const uint64_t mask[2], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((false), "SubReluCast is not supported");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "SubReluCast is not supported"); });
 }
 
 // SubReluCast::Level 2
@@ -1110,7 +1110,7 @@ template <typename T, typename U>
 __aicore__ inline void SubReluCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1,
     const uint32_t count)
 {
-    ASCENDC_ASSERT((false), "SubReluCast is not supported");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "SubReluCast is not supported"); });
 }
 
 //  castDequanValue bit arrange

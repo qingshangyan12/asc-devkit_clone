@@ -62,7 +62,7 @@ __aicore__ inline void VextractCal(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal, c
 __aicore__ inline void GetMrgSortResultImpl(
     uint16_t &mrgSortList1, uint16_t &mrgSortList2, uint16_t &mrgSortList3, uint16_t &mrgSortList4)
 {
-    ASCENDC_ASSERT((false), "GetMrgSortResult is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "GetMrgSortResult is not supported on current device"); });
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_PROPOSAL_IMPL_H

@@ -39,7 +39,7 @@ __aicore__ inline int64_t GetBlockIdxImpl()
 
 __aicore__ inline void GetArchVersionImpl(uint32_t& coreVersion)
 {
-    ASCENDC_ASSERT((false), "unsupported GetArchVersion!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetArchVersion!"); });
 }
 
 __aicore__ inline int64_t GetSubBlockNumImpl()
@@ -49,43 +49,43 @@ __aicore__ inline int64_t GetSubBlockNumImpl()
 
 __aicore__ inline int64_t GetPhyCoreIDImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetPhyCoreID!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetPhyCoreID!"); });
     return 0;
 }
 
 __aicore__ inline int64_t GetDataMainBaseImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetDataMainBase!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetDataMainBase!"); });
     return 0;
 }
 
 __aicore__ inline int64_t GetDataSizeImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetDataSize!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetDataSize!"); });
     return 0;
 }
 
 __aicore__ inline int64_t GetDataLocalBaseImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetDataLocalBase!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetDataLocalBase!"); });
     return 0;
 }
 
 __aicore__ inline int64_t GetL2VirtualAddressImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetL2VirtualAddress!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetL2VirtualAddress!"); });
     return 0;
 }
 
 __aicore__ inline int64_t GetParameterBaseAddrImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetParameterBaseAddr!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetParameterBaseAddr!"); });
     return 0;
 }
 
 __aicore__ inline int64_t GetProgramCounterImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetProgramCounter!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetProgramCounter!"); });
     return 0;
 }
 
@@ -133,18 +133,18 @@ __aicore__ inline void ClearSprImpl()
 
 __aicore__ inline int64_t GetSystemVirtualBaseImpl()
 {
-    ASCENDC_ASSERT((false), "unsupported GetSystemVirtualBase!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetSystemVirtualBase!"); });
     return 0;
 }
 
 __aicore__ inline void SetPcieRDCtrlImpl(bool isSetPcie, uint8_t maxBurstLen)
 {
-    ASCENDC_ASSERT((false), "unsupported SetPcieRDCtrl!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported SetPcieRDCtrl!"); });
 }
 
 __aicore__ inline void SetPcieWRCtrlImpl(bool isSetPcie, uint8_t maxBurstLen)
 {
-    ASCENDC_ASSERT((false), "unsupported SetPcieWRCtrl!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported SetPcieWRCtrl!"); });
 }
 
 __aicore__ inline void TrapImpl()

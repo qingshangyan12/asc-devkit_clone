@@ -26,21 +26,21 @@ template <typename T, bool isSetMask>
 __aicore__ inline void VectorPaddingImpl(__ubuf__ T* dst, __ubuf__ T* src, uint8_t padMode, bool padSide,
     const uint64_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((false), "VectorPadding is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "VectorPadding is not supported on current device"); });
 }
 
 template <typename T, bool isSetMask>
 __aicore__ inline void VectorPaddingImpl(__ubuf__ T* dst, __ubuf__ T* src, uint8_t padMode, bool padSide,
     const uint64_t mask[2], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    ASCENDC_ASSERT((false), "VectorPadding is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "VectorPadding is not supported on current device"); });
 }
 
 template <typename T>
 __aicore__ inline void VectorPaddingImpl(__ubuf__ T* dst, __ubuf__ T* src, uint8_t padMode, bool padSide,
     const uint32_t calCount)
 {
-    ASCENDC_ASSERT((false), "VectorPadding is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "VectorPadding is not supported on current device"); });
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VPADDING_IMPL_H

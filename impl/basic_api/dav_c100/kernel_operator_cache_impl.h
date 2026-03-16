@@ -40,7 +40,7 @@ __aicore__ inline int64_t GetICachePreloadStatusImpl()
 
 __aicore__ inline void PreLoad(const int64_t preFetchLen)
 {
-    ASCENDC_ASSERT((false), "ICachePreLoad is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "ICachePreLoad is not supported on current device"); });
 }
 
 } // namespace AscendC

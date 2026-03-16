@@ -87,9 +87,9 @@ __aicore__ inline void VecBinaryScalarLevel0Template(__ubuf__ T *dst, __ubuf__ T
     const UnaryRepeatParams &repeatParams)
 {
     if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+        ASCENDC_ASSERT(maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
     } else {
-        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+        ASCENDC_ASSERT(maskArray == nullptr, { KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false."); });
     }
     __ubuf__ uint64_t *maskBuf = nullptr;
 
@@ -105,7 +105,7 @@ __aicore__ inline void VecBinaryScalarLevel0Template(__ubuf__ T *dst, __ubuf__ T
     } else {
         if constexpr (isMaskBitMode) {
             if constexpr (SupportBytes<T, 1>()) {
-                ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
+                ASCENDC_ASSERT(isSetMask, { KERNEL_LOG(KERNEL_ERROR, "mask must be set when sizeof(T) is 1."); });
                 auto eventIDV2S = GetTPipePtr()->FetchEventID(HardEvent::V_S);
                 SetFlag<HardEvent::V_S>(eventIDV2S);
                 WaitFlag<HardEvent::V_S>(eventIDV2S);
@@ -174,9 +174,9 @@ __aicore__ inline void VecBinaryScalarLevel0Template(__ubuf__ T *dst, __ubuf__ T
     const UnaryRepeatParams &repeatParams)
 {
     if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+        ASCENDC_ASSERT(maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
     } else {
-        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+        ASCENDC_ASSERT(maskArray == nullptr, { KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false."); });
     }
     __ubuf__ uint64_t *maskBuf = nullptr;
 
