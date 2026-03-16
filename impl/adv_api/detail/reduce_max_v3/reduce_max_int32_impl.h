@@ -233,9 +233,12 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
     
     // Step 4: Extract result (brcbDst[0] now contains the maximum)
     // Use GetValue/SetValue to handle non-32B-aligned dst
+    // V_S sync: ensure vector vmax results are visible to scalar GetValue
+    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
+    SetFlag<HardEvent::V_S>(eventIdVToS);
+    WaitFlag<HardEvent::V_S>(eventIdVToS);
     T result = brcbDst.GetValue(0);
     dst.SetValue(0, result);
-    PipeBarrier<PIPE_V>();
 }
 
 // ============================================================================
