@@ -40,77 +40,85 @@ def get_special_names(data_type):
     return names
 
 
-def verify_single_api(output_type, output, golden, input_x):
+def verify_single_api(output_type, input_x):
     np_type = get_type_from_id(output_type)
-    output = np.fromfile(output, dtype=np_type).reshape(-1)
-    golden = np.fromfile(golden, dtype=np_type).reshape(-1)
+    type_name = np_type.__name__
+    
+    output_non_sat = np.fromfile("./output/output_non_sat.bin", dtype=np_type).reshape(-1)
+    output_sat = np.fromfile("./output/output_sat.bin", dtype=np_type).reshape(-1)
+    golden = np.fromfile("./output/golden.bin", dtype=np_type).reshape(-1)
     input_x = np.fromfile(input_x, dtype=np_type).reshape(-1)
     
     special_names = get_special_names(np_type)
     
-    print(f"\n{'='*80}")
-    print(f"Single API (exp) Verification Results - Non-Saturation Mode")
-    print(f"{'='*80}")
-    print(f"{'Input':<20} | {'Golden':<20} | {'Actual':<20} | {'Match':<6}")
-    print(f"{'-'*75}")
+    print(f"\n{'='*105}")
+    print(f"API: exp | Verification Results")
+    print(f"{'='*105}")
+    print(f"{'src/dst type':<12} | {'src':<20} | {'dst (Non-Sat)':<22} | {'dst (Saturation)':<22}")
+    print(f"{'-'*105}")
     
     valid_count = 0
     for i in range(len(golden)):
         inp_val = input_x[i]
+        actual_non_sat = output_non_sat[i]
+        actual_sat = output_sat[i]
         golden_val = golden[i]
-        actual_val = output[i]
         
         if np.isnan(golden_val):
-            is_match = np.isnan(actual_val)
+            is_match = np.isnan(actual_non_sat)
         elif np.isinf(golden_val):
-            is_match = np.isinf(actual_val) and np.sign(actual_val) == np.sign(golden_val)
+            is_match = np.isinf(actual_non_sat) and np.sign(actual_non_sat) == np.sign(golden_val)
         else:
-            is_match = np.isclose(actual_val, golden_val, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL)
+            is_match = np.isclose(actual_non_sat, golden_val, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL)
         
         if is_match:
             valid_count += 1
         
         if i < len(special_names):
             name = special_names[i]
-            print(f"[{name:<5}] {str(inp_val):<12} | {str(golden_val):<18} | {str(actual_val):<18} | {'YES' if is_match else 'NO'}")
+            print(f"{type_name:<12} | [{name:<5}]{str(inp_val):<12} | {str(actual_non_sat):<22} | {str(actual_sat):<22}")
     
     error_ratio = 1.0 - (valid_count / len(golden))
-    print(f"{'-'*75}")
+    print(f"{'-'*105}")
     print(f"Total: {len(golden)}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
-    print(f"{'='*80}\n")
+    print(f"{'='*105}\n")
     
     return error_ratio <= ERROR_TOL
 
 
-def verify_binary_api(output_type, output, golden, input_x, input_y):
+def verify_binary_api(output_type, input_x, input_y):
     np_type = get_type_from_id(output_type)
-    output = np.fromfile(output, dtype=np_type).reshape(-1)
-    golden = np.fromfile(golden, dtype=np_type).reshape(-1)
+    type_name = np_type.__name__
+    
+    output_non_sat = np.fromfile("./output/output_non_sat.bin", dtype=np_type).reshape(-1)
+    output_sat = np.fromfile("./output/output_sat.bin", dtype=np_type).reshape(-1)
+    golden = np.fromfile("./output/golden.bin", dtype=np_type).reshape(-1)
     input_x = np.fromfile(input_x, dtype=np_type).reshape(-1)
     input_y = np.fromfile(input_y, dtype=np_type).reshape(-1)
     
     special_names = get_special_names(np_type)
     num_special = len(special_names)
     
-    print(f"\n{'='*100}")
-    print(f"Binary API (mul) Verification Results - Non-Saturation Mode")
-    print(f"{'='*100}")
-    print(f"{'Input A':<15} | {'Input B':<15} | {'Golden':<20} | {'Actual':<20} | {'Match':<6}")
-    print(f"{'-'*95}")
+    print(f"\n{'='*125}")
+    print(f"API: mul | Verification Results")
+    print(f"{'='*125}")
+    print(f"{'src/dst type':<12} | {'src0':<15} | {'src1':<15} | {'dst (Non-Sat)':<22} | {'dst (Saturation)':<22}")
+    print(f"{'-'*125}")
     
     valid_count = 0
     for idx in range(len(golden)):
         inp_a = input_x[idx]
         inp_b = input_y[idx]
+        actual_non_sat = output_non_sat[idx]
+        actual_sat = output_sat[idx]
         golden_val = golden[idx]
-        actual_val = output[idx]
         
         if np.isnan(golden_val):
-            is_match = np.isnan(actual_val)
+            is_match = np.isnan(actual_non_sat)
         elif np.isinf(golden_val):
-            is_match = np.isinf(actual_val) and np.sign(actual_val) == np.sign(golden_val)
+            is_match = np.isinf(actual_non_sat) and np.sign(actual_non_sat) == np.sign(golden_val)
         else:
-            is_match = np.isclose(actual_val, golden_val, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL)
+            is_match = np.isclose(actual_non_sat, golden_val, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL)
         
         if is_match:
             valid_count += 1
@@ -120,28 +128,28 @@ def verify_binary_api(output_type, output, golden, input_x, input_y):
             j = idx % num_special
             name_a = special_names[i]
             name_b = special_names[j]
-            print(f"[{name_a:<4}] {str(inp_a):<8} | [{name_b:<4}] {str(inp_b):<8} | {str(golden_val):<18} | {str(actual_val):<18} | {'YES' if is_match else 'NO'}")
+            print(f"{type_name:<12} | [{name_a:<4}]{str(inp_a):<8} | [{name_b:<4}]{str(inp_b):<8} | {str(actual_non_sat):<22} | {str(actual_sat):<22}")
     
     error_ratio = 1.0 - (valid_count / len(golden))
-    print(f"{'-'*95}")
+    print(f"{'-'*125}")
     print(f"Total: {len(golden)}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
-    print(f"{'='*100}\n")
+    print(f"{'='*125}\n")
     
     return error_ratio <= ERROR_TOL
 
 
-def verify_result(output_type, output, golden, api_id, input_x=None, input_y=None):
+def verify_result(output_type, api_id, input_x=None, input_y=None):
     try:
         if api_id == API_ID_EXP:
             if input_x is None:
                 input_x = "./input/input_x.bin"
-            res = verify_single_api(output_type, output, golden, input_x)
+            res = verify_single_api(output_type, input_x)
         elif api_id == API_ID_MUL:
             if input_x is None:
                 input_x = "./input/input_x.bin"
             if input_y is None:
                 input_y = "./input/input_y.bin"
-            res = verify_binary_api(output_type, output, golden, input_x, input_y)
+            res = verify_binary_api(output_type, input_x, input_y)
         else:
             print(f"Unsupported API ID: {api_id}")
             return False
@@ -158,15 +166,13 @@ def verify_result(output_type, output, golden, api_id, input_x=None, input_y=Non
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-output_type', type=int, default=1, choices=[1, 2, 3, 4])
-    parser.add_argument('-output', type=str, default="./output/output.bin")
-    parser.add_argument('-golden', type=str, default="./output/golden.bin")
     parser.add_argument('-api_id', type=int, default=1, choices=[1, 2],
                         help="API ID: 1=exp, 2=mul")
     parser.add_argument('-input_x', type=str, default="./input/input_x.bin")
     parser.add_argument('-input_y', type=str, required=False, default="./input/input_y.bin")
     args = parser.parse_args()
     
-    res = verify_result(args.output_type, args.output, args.golden, args.api_id, args.input_x, args.input_y)
+    output_type = 1
+    res = verify_result(output_type, args.api_id, args.input_x, args.input_y)
     if not res:
         sys.exit(1)

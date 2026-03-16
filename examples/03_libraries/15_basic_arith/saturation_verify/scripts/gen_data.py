@@ -92,29 +92,30 @@ def save_bin(data, path):
 
 
 def print_single_api_table(api_name, type_name, special_names, inputs, golden):
-    print(f"\n{'='*80}")
-    print(f"API: {api_name} | Data Type: {type_name} | Single Input Special Values")
-    print(f"{'='*80}")
-    print(f"{'Input Value':<25} | {'API Output (Non-Sat)':<25}")
-    print(f"{'-'*60}")
+    print(f"\n{'='*100}")
+    print(f"API: {api_name} | Data Type: {type_name}")
+    print(f"{'='*100}")
+    print(f"{'src/dst type':<12} | {'src':<20} | {'dst (Non-Sat)':<22}")
+    print(f"{'-'*100}")
     for i, name in enumerate(special_names):
         inp_val = inputs[i]
         out_val = golden[i]
-        print(f"[{name:<5}] {str(inp_val):<20} | {str(out_val):<25}")
-    print(f"{'='*80}\n")
+        print(f"{type_name:<12} | [{name:<5}]{str(inp_val):<12} | {str(out_val):<22}")
+    print(f"{'='*100}\n")
 
 
 def print_binary_api_table(api_name, type_name, special_names, inputs_a, inputs_b, golden):
-    print(f"\n{'='*80}")
-    print(f"API: {api_name} | Data Type: {type_name} | Binary Input Combinations (Non-Sat Mode)")
-    print(f"{'='*80}")
-    print(f"{'Input A':<20} | {'Input B':<20} | {'A op B (Non-Sat)':<25}")
-    print(f"{'-'*75}")
+    print(f"\n{'='*120}")
+    print(f"API: {api_name} | Data Type: {type_name}")
+    print(f"{'='*120}")
+    print(f"{'src/dst type':<12} | {'src0':<15} | {'src1':<15} | {'dst (Non-Sat)':<22}")
+    print(f"{'-'*120}")
     for i, name_a in enumerate(special_names):
         for j, name_b in enumerate(special_names):
             idx = i * len(special_names) + j
-            print(f"[{name_a:<5}] {str(inputs_a[idx]):<12} | [{name_b:<5}] {str(inputs_b[idx]):<12} | {str(golden[idx]):<25}")
-    print(f"{'='*80}\n")
+            out_val = golden[idx]
+            print(f"{type_name:<12} | [{name_a:<4}]{str(inputs_a[idx]):<8} | [{name_b:<4}]{str(inputs_b[idx]):<8} | {str(out_val):<22}")
+    print(f"{'='*120}\n")
 
 
 def gen_exp_data(input_type, input_size):
@@ -155,8 +156,6 @@ def gen_mul_data(input_type, input_size):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate golden data for saturation verify.")
-    parser.add_argument('-inputType', type=int, default=1, choices=[1, 2, 3, 4],
-                        help="Input data type: 1=float16, 2=float32, 3=int16, 4=int32")
     parser.add_argument('-inputSize', type=int, required=True,
                         help="Total number of elements in the tensor")
     parser.add_argument('-apiId', type=int, default=1, choices=[1, 2],
@@ -164,13 +163,14 @@ def main():
     args = parser.parse_args()
 
     api_name = API_NAME_MAP.get(args.apiId, "unknown")
-    type_name = str(TYPE_MAP[args.inputType].__name__)
+    input_type = 1
+    type_name = str(TYPE_MAP[input_type].__name__)
     print(f"\nGenerating test data for: API={api_name}, Type={type_name}, Size={args.inputSize}")
 
     if args.apiId == API_ID_EXP:
-        gen_exp_data(args.inputType, args.inputSize)
+        gen_exp_data(input_type, args.inputSize)
     elif args.apiId == API_ID_MUL:
-        gen_mul_data(args.inputType, args.inputSize)
+        gen_mul_data(input_type, args.inputSize)
     else:
         raise ValueError(f"Unsupported API ID: {args.apiId}")
 

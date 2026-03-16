@@ -26,14 +26,14 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
-message(STATUS "[INFO] INPUT_TYPE is ${INPUT_TYPE}")
 message(STATUS "[INFO] INPUT_SIZE is ${INPUT_SIZE}")
 message(STATUS "[INFO] INPUT_API_ID is ${INPUT_API_ID}")
+message(STATUS "[INFO] INPUT_API_TYPE is ${INPUT_API_TYPE}")
 
 target_compile_definitions(demo PRIVATE
-    INPUT_TYPE=${INPUT_TYPE}
     INPUT_SIZE=${INPUT_SIZE}
     INPUT_API_ID=${INPUT_API_ID}
+    INPUT_API_TYPE=${INPUT_API_TYPE}
 )
 
 target_compile_options(demo PRIVATE
