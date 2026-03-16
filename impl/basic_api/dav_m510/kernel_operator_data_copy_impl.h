@@ -851,7 +851,7 @@ __aicore__ inline void DataCopySliceUB2GMImpl(__gm__ T *dst, __ubuf__ T *src, co
  * ************************************************************************************************* */
 __aicore__ inline void CheckSrcGmDataCopyExtParamsRange(const DataCopyExtParams &intriParams)
 {
-    ASCENDC_ASSERT((intriParams.srcStride <= static_cast<int64_t>(1ul << 40 - 1)), {
+    ASCENDC_ASSERT((intriParams.srcStride <= static_cast<int64_t>((1ul << 40) - 1)), {
         KERNEL_LOG(KERNEL_ERROR, "srcStride is %d, which should be no more than 2^40-1", intriParams.srcStride);
     });
     ASCENDC_ASSERT((intriParams.srcStride >= (-static_cast<int64_t>(intriParams.blockLen))), {
@@ -960,7 +960,7 @@ template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T *dst, __ubuf__ T *src, const DataCopyExtParams &intriParams,
     const uint8_t cacheMode = 0)
 {
-    ASCENDC_ASSERT((intriParams.dstStride <= static_cast<int64_t>(1ul << 40 - 1)),
+    ASCENDC_ASSERT((intriParams.dstStride <= static_cast<int64_t>((1ul << 40) - 1)),
         { KERNEL_LOG(KERNEL_ERROR, "dstStride is %d, which should be no more than 2^40-1", intriParams.dstStride); });
     ASCENDC_ASSERT((intriParams.dstStride >= static_cast<int64_t>(0)),
         { KERNEL_LOG(KERNEL_ERROR, "dstStride is %d, which should be no less than 0", intriParams.dstStride); });
