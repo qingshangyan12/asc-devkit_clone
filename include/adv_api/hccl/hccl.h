@@ -30,7 +30,7 @@ static constexpr HcclServerConfig DEFAULT_CFG = {CoreType::DEFAULT, 0};
 /*!
  * @class Hccl
  * @brief This class mainly provides a series of collection communication primitive interfaces (hence Prepare),
- *        benchmarking against Huawei's collection communication C++ interface, including AllReduce、AllGather�?
+ *        benchmarking against Huawei's collection communication C++ interface, including AllReduce,AllGather,
  *        ReduceScatter and so on.
  *        The typical usage of this class is as follows:
  *          1) Create Hccl object and initialize it.

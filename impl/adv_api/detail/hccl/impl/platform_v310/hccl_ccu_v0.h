@@ -486,7 +486,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     while(true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
         if (waitCke != 0) {
-            if (workingFlag_) { // 0�?
+            if (workingFlag_) {
                 finishNumTemp_++;
 
                 WriteHBMData(finishCntGM_, finishNumTemp_);
@@ -494,7 +494,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
             }
             break;
         }
-        if (!workingFlag_) { // �?�?
+        if (!workingFlag_) {
             uint64_t finshCnt = ReadHBMData(finishCntGM_);
             if (finshCnt > finishNum_) {
                 break;
@@ -510,10 +510,10 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     globalCurWaitId_ %= CCU_MAX_MSG_NUM;
 
     // 补发消息
-    // 场景1�?同一个handleId需要补发消�?
+    // 场景1:同一个handleId需要补发
     if (handleCommitCnt_[handleId] < handleNeedCommitCnt_[handleId]) {
         CommitMsg(handleId);
-    } else { // 场景2�?下一个handleId需要补发消�?
+    } else { // 场景2:下一个handleId需要补发
         uint32_t nextHandleId = handleId + 1;
         if (nextHandleId < curHandleId_ && (handleCommitCnt_[nextHandleId] < handleNeedCommitCnt_[nextHandleId])) {
             CommitMsg(nextHandleId);
