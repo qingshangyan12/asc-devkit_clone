@@ -38,10 +38,18 @@ Mul属于双目矢量类计算API，其他诸如Add、Sub、Div、Max、Min、Bi
 
 | 场景编号 | INPUT_TYPE | 数据类型 | INPUT_SIZE | 数据规模 | 说明 |
 |----------|------------|----------|------------|----------|------|
-| 1 | 1 | half | 32768 | 32K | half类型，32K元素 |
-| 2 | 2 | float | 16384 | 16K | float类型，16K元素 |
-| 3 | 3 | int16 | 32768 | 32K | int16类型，32K元素 |
-| 4 | 4 | int32 | 16384 | 16K | int32类型，16K元素 |
+| 1 | 1 | half | 4096 | 4K | half类型，4K元素 |
+| 2 | 1 | half | 16384 | 16K | half类型，16K元素 |
+| 3 | 1 | half | 32768 | 32K | half类型，32K元素 |
+| 4 | 2 | float | 4096 | 4K | float类型，4K元素 |
+| 5 | 2 | float | 8192 | 8K | float类型，8K元素 |
+| 6 | 2 | float | 16384 | 16K | float类型，16K元素 |
+| 7 | 3 | int16 | 4096 | 4K | int16类型，4K元素 |
+| 8 | 3 | int16 | 16384 | 16K | int16类型，16K元素 |
+| 9 | 3 | int16 | 32768 | 32K | int16类型，32K元素 |
+| 10 | 4 | int32 | 4096 | 4K | int32类型，4K元素 |
+| 11 | 4 | int32 | 8192 | 8K | int32类型，8K元素 |
+| 12 | 4 | int32 | 16384 | 16K | int32类型，16K元素 |
 
 **参数说明**：
 - `INPUT_TYPE`：输入数据类型，1表示half，2表示float，3表示int16，4表示int32
@@ -61,20 +69,19 @@ $$
 ### 算子规格
 
 算子整体规格如下表所示：
+<table>
+<tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Mul</td></tr>
 
-| 算子类型(OpType) | Mul |
-|------------------|-----|
-| **算子输入** | |
-| name | x, y |
-| shape | INPUT_SIZE |
-| data type | half/float/int16/int32 |
-| format | ND |
-| **算子输出** | |
-| name | z |
-| shape | INPUT_SIZE |
-| data type | half/float/int16/int32 |
-| format | ND |
-| **核函数名** | mul_custom |
+<tr><td rowspan="4" align="center">算子输入</td></tr>
+<tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">x</td><td align="center">INPUT_SIZE</td><td align="center">half/float/int16/int32</td><td align="center">ND</td></tr>
+<tr><td align="center">y</td><td align="center">INPUT_SIZE</td><td align="center">half/float/int16/int32</td><td align="center">ND</td></tr>
+
+<tr><td rowspan="2" align="center">算子输出</td></tr>
+<tr><td align="center">z</td><td align="center">INPUT_SIZE</td><td align="center">half/float/int16/int32</td><td align="center">ND</td></tr>
+
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mul_custom</td></tr>
+</table>
 
 ## 关键API说明
 
@@ -105,7 +112,7 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
 AscendC::Mul(dstLocal, src0Local, src1Local, 512);
 ```
 
-**更多详细说明和使用示例，请参考[Mul接口文档] TODO**
+**更多详细说明和使用示例，请参考[AscendC API列表中的Mul接口文档](https://hiascend.com/document/redirect/CannCommunityAscendCApi)**。
 
 ## 算子实现
 
@@ -344,7 +351,7 @@ OPPPROF_202xxxxx_XXXXXX
 
 #### 补充说明
 
-更多性能指标的详细说明及调优方案，请参考《算子开发工具手册》。
+更多性能指标的详细说明及调优方案，请参考[算子开发工具-算子调优（msProf）](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)。
 
 ## 典型性能数据
 
@@ -377,15 +384,14 @@ OPPPROF_202xxxxx_XXXXXX
 
 | 场景描述 | 数据类型 | 单核数据规模 | 性能特点 | 适用建议 |
 |----------|----------|----------|----------|----------|
-| 小规模计算 | half/inf16_t | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
-| 中等规模计算 | half/inf16_t | 4K - 16K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
-| 大规模计算 | half/inf16_t | 16K - 32K | 计算占主导地位 | 适合大规模训练场景 |
-| 小规模计算 | float/inf32_t | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
-| 中等规模计算 | float/inf32_t | 4K - 8K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
-| 大规模计算 | float/inf32_t | 8K - 16K | 计算占主导地位 | 适合大规模训练场景 |
+| 小规模计算 | half/int16_t | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
+| 中等规模计算 | half/int16_t | 4K - 16K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
+| 大规模计算 | half/int16_t | 16K - 32K | 计算占主导地位 | 适合大规模训练场景 |
+| 小规模计算 | float/int32_t | 1K - 4K | 数据搬运占比较高 | 适合小批量推理场景 |
+| 中等规模计算 | float/int32_t | 4K - 8K | 计算和搬运较为均衡 | 适合中等规模推理和训练场景 |
+| 大规模计算 | float/int32_t | 8K - 16K | 计算占主导地位 | 适合大规模训练场景 |
 
 ## 扩展阅读
 
-- [Mul接口文档] TODO
-- [Ascend C性能优化指南] TODO
-- [矢量计算API最佳实践] TODO
+- [AscendC API列表中的Mul接口文档](https://hiascend.com/document/redirect/CannCommunityAscendCApi)
+- [算子实践参考-SIMD算子性能优化](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/opdevg/Ascendcopdevg/atlas_ascendc_best_practices_10_0001.html)
