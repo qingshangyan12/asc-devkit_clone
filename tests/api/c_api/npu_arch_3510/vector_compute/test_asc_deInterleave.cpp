@@ -52,6 +52,7 @@ TEST_VECTOR_COMPUTE_VDINTLV(vector_f8e8m0);
 TEST_VECTOR_COMPUTE_VDINTLV(vector_bfloat16_t);
 TEST_VECTOR_COMPUTE_VDINTLV(vector_float);
 TEST_VECTOR_COMPUTE_VDINTLV(vector_half);
+TEST_VECTOR_COMPUTE_VDINTLV(vector_hifloat8_t);
 
 class TestVectorComputePdintlv : public testing::Test { 
 protected:
