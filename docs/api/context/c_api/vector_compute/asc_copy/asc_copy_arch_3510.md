@@ -9,7 +9,7 @@
 
 ### 功能说明
 
-将数据从Unified Buffer搬运到Unified Buffer。
+将数据从RegTensor搬运到MaskReg。
 
 ### 函数原型
 
@@ -25,7 +25,7 @@
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| part | 输入 | 。 |
+| part | 输入 | 数据搬运阶段的偏移量。 |
 
 ### 返回值说明
 
@@ -37,15 +37,13 @@ PIPE_V
 
 ### 约束说明
 
-- dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
+无
 
 ### 调用示例
 
 ```cpp
-//total_length 指参与计算的数据长度
-constexpr uint32_t total_length = 128;
-__ubuf__ half src[total_length];
-__ubuf__ half dst[total_length];
-asc_copy(dst, src, part);
+int16_t part = 128;
+vector_uint16_t src;
+vector_bool dst;
+asc_copy(dst, src, total_length);
 ```
