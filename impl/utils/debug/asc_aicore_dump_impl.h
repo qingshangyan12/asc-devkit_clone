@@ -149,22 +149,22 @@ __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t
 namespace __asc_aicore {
 template<typename T>
 __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dumpSize) {
-    ASCENDC_ASSERT((false), "asc_dump_gm is not supported in cpu mode.");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "asc_dump_gm is not supported in cpu mode."); });
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dumpSize) {
-    ASCENDC_ASSERT((false), "asc_dump_ubuf is not supported in cpu mode.");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "asc_dump_ubuf is not supported in cpu mode."); });
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dumpSize) {
-    ASCENDC_ASSERT((false), "asc_dump_cbuf is not supported in cpu mode.");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "asc_dump_cbuf is not supported in cpu mode."); });
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dumpSize) {
-    ASCENDC_ASSERT((false), "asc_dump_l1buf is not supported in cpu mode.");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "asc_dump_l1buf is not supported in cpu mode."); });
 }
 } // namespace __asc_aicore
 

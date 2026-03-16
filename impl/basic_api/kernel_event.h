@@ -810,20 +810,20 @@ __aicore__ inline void HSetFlagImpl(int32_t eventID)
     switch (event) {
         case HardEvent::MTE1_M:
             ASCENDC_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
-                           "memT only support L0A, L0B, BIAS in MTE1_M.");
+                           { KERNEL_LOG(KERNEL_ERROR, "memT only support L0A, L0B, BIAS in MTE1_M."); });
             hset_flag(PIPE_MTE1, PIPE_M, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::M_MTE1:
             ASCENDC_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
-                           "memT only support L0A, L0B, BIAS in M_MTE1.");
+                           { KERNEL_LOG(KERNEL_ERROR, "memT only support L0A, L0B, BIAS in M_MTE1."); });
             hset_flag(PIPE_M, PIPE_MTE1, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::M_FIX:
-            ASCENDC_ASSERT((memT == MemoryT::L0C), "memT only support L0C in M_FIX.");
+            ASCENDC_ASSERT((memT == MemoryT::L0C), { KERNEL_LOG(KERNEL_ERROR, "memT only support L0C in M_FIX."); });
             hset_flag(PIPE_M, PIPE_FIX, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::FIX_M:
-            ASCENDC_ASSERT((memT == MemoryT::L0C), "memT only support L0C in FIX_M.");
+            ASCENDC_ASSERT((memT == MemoryT::L0C), { KERNEL_LOG(KERNEL_ERROR, "memT only support L0C in FIX_M."); });
             hset_flag(PIPE_FIX, PIPE_M, e, (mem_t)memT, isVirtual);
             break;
         default:
@@ -845,20 +845,20 @@ __aicore__ inline void HWaitFlagImpl(int32_t eventID)
     switch (event) {
         case HardEvent::MTE1_M:
             ASCENDC_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
-                           "memT only support L0A, L0B, BIAS in MTE1_M.");
+                           { KERNEL_LOG(KERNEL_ERROR, "memT only support L0A, L0B, BIAS in MTE1_M."); });
             hwait_flag(PIPE_MTE1, PIPE_M, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::M_MTE1:
             ASCENDC_ASSERT((memT != MemoryT::L1 && memT != MemoryT::L0C),
-                           "memT only support L0A, L0B, BIAS in M_MTE1.");
+                           { KERNEL_LOG(KERNEL_ERROR, "memT only support L0A, L0B, BIAS in M_MTE1."); });
             hwait_flag(PIPE_M, PIPE_MTE1, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::M_FIX:
-            ASCENDC_ASSERT((memT == MemoryT::L0C), "memT only support L0C in M_FIX.");
+            ASCENDC_ASSERT((memT == MemoryT::L0C), { KERNEL_LOG(KERNEL_ERROR, "memT only support L0C in M_FIX."); });
             hwait_flag(PIPE_M, PIPE_FIX, e, (mem_t)memT, isVirtual);
             break;
         case HardEvent::FIX_M:
-            ASCENDC_ASSERT((memT == MemoryT::L0C), "memT only support L0C in FIX_M.");
+            ASCENDC_ASSERT((memT == MemoryT::L0C), { KERNEL_LOG(KERNEL_ERROR, "memT only support L0C in FIX_M."); });
             hwait_flag(PIPE_FIX, PIPE_M, e, (mem_t)memT, isVirtual);
             break;
         default:

@@ -30,18 +30,18 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline void DataCachePreloadImpl(const GlobalTensor<uint64_t> &src, const T cacheOffset)
 {
-    ASCENDC_ASSERT((false), "DataCachePreload is not supported on this device!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCachePreload is not supported on this device!"); });
 }
 
 __aicore__ inline int64_t GetICachePreloadStatusImpl()
 {
-    ASCENDC_ASSERT((false), "GetICachePreloadStatus is not supported on this device!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "GetICachePreloadStatus is not supported on this device!"); });
     return 0;
 }
 
 __aicore__ inline void PreLoad(const int64_t preFetchLen)
 {
-    ASCENDC_ASSERT((false), "ICachePreLoad is not supported on this device!");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "ICachePreLoad is not supported on this device!"); });
 }
 
 } // namespace AscendC

@@ -1139,19 +1139,19 @@ __aicore__ inline void ReduceMinImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal,
 template <typename T>
 __aicore__ inline void GetReduceMaxMinCountImpl(uint32_t &maxMinValue, uint32_t &maxMinIndex)
 {
-    ASCENDC_ASSERT((false), "GetReduceMaxMinCount is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "GetReduceMaxMinCount is not supported on current device"); });
 }
 
 template <typename T>
 __aicore__ inline void GetReduceMaxMinCountImpl(uint32_t &maxMinValue)
 {
-    ASCENDC_ASSERT((false), "GetReduceMaxMinCount is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "GetReduceMaxMinCount is not supported on current device"); });
 }
 
 template <typename T>
 __aicore__ inline T GetAccValImpl()
 {
-    ASCENDC_ASSERT((false), "GetAccVal is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "GetAccVal is not supported on current device"); });
     return 0;
 }
 }  // namespace AscendC

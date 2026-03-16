@@ -1052,19 +1052,19 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ half* dst, __ubuf__ float* src0,
 
 __aicore__ inline void SetDeqScaleImpl(float scale, int16_t offset, bool signMode)
 {
-    ASCENDC_ASSERT((false), "SetDeqScale is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "SetDeqScale is not supported on current device"); });
 }
 
 template <typename T>
 __aicore__ inline void SetDeqScaleImpl(const LocalTensor<T>& vdeq, const VdeqInfo& vdeqInfo)
 {
-    ASCENDC_ASSERT((false), "SetDeqScale is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "SetDeqScale is not supported on current device"); });
 }
 
 template<typename T>
 __aicore__ inline void SetDeqScaleImpl(T config)
 {
-    ASCENDC_ASSERT((false), "SetDeqScale is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "SetDeqScale is not supported on current device"); });
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_IMPL_H

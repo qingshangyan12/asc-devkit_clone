@@ -202,7 +202,7 @@ __aicore__ inline U CastImpl(T valueIn)
         return 0;
     }
 #else
-    ASCENDC_ASSERT((false), "Cast is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Cast is not supported on current device"); });
     return 0;
 #endif
 }
@@ -217,7 +217,7 @@ __aicore__ inline U ScalarCastImpl(T valueIn)
     (__NPU_ARCH__ == 3510))
     return CastImpl<T, U, roundMode>(valueIn);
 #else
-    ASCENDC_ASSERT((false), "ScalarCast is not supported on current device");
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "ScalarCast is not supported on current device"); });
     return 0;
 #endif
 }

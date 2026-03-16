@@ -72,10 +72,10 @@ __aicore__ inline void VecCreateVecIndexLevel0Template(__ubuf__ T *dst, const T 
 {
     BasicAPIMaskStruct maskArrayStruct;
     if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+        ASCENDC_ASSERT(maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
         maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
     } else {
-        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+        ASCENDC_ASSERT(maskArray == nullptr, { KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false."); });
     }
 
     if (Internal::IsCounterMode()) {
