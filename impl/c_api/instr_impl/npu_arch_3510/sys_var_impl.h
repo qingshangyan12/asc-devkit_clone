@@ -17,6 +17,8 @@
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_block_num_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_system_cycle_impl.h"
 #include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ctrl_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_arch_ver_impl.h"
+#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_core_id_impl.h"
 
 __simd_callee__ inline int64_t asc_get_ar_spr()
 {
@@ -46,5 +48,15 @@ __aicore__ inline void asc_set_ctrl(uint64_t config)
 __aicore__ inline int64_t asc_get_ctrl()
 {
     return asc_get_ctrl_impl();
+}
+
+__aicore__ inline void asc_get_arch_ver(uint32_t& core_version)
+{
+    asc_get_arch_ver_impl(core_version);
+}
+
+__aicore__ inline int64_t asc_get_core_id()
+{
+    return asc_get_core_id_impl();
 }
 #endif
