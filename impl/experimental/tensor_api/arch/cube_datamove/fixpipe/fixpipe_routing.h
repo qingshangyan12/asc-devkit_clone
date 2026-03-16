@@ -38,33 +38,33 @@ struct FixpipeTensor2Tensor {
 };
 
 template <>
-struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::MAX, ArchVersion::V2201, FOUR_DIM_DATA> {
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::MAX, ArchVersion::V2201> {
     using type = FixpipeFourDim2201L0C2GM;
 };
 
 template <>
-struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::L1, ArchVersion::V2201, FOUR_DIM_DATA> {
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::L1, ArchVersion::V2201> {
     using type = FixpipeQuantFourDim2201L0C2GM;
 };
 
 template <>
-struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::MAX, ArchVersion::V3510, FOUR_DIM_DATA> {
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::MAX, ArchVersion::V3510> {
     using type = FixpipeFourDimL0C2GM3510;
 };
 
 template <>
-struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA> {
+struct FixpipeTensor2Tensor<Hardware::GM, Hardware::L0C, Hardware::L1, ArchVersion::V3510> {
     using type = FixpipeQuantFourDimL0C2GM3510;
 };
 
 // L0C to UB routing for V3510
 template <>
-struct FixpipeTensor2Tensor<Hardware::UB, Hardware::L0C, Hardware::MAX, ArchVersion::V3510, FOUR_DIM_DATA> {
+struct FixpipeTensor2Tensor<Hardware::UB, Hardware::L0C, Hardware::MAX, ArchVersion::V3510> {
     using type = FixpipeFourDimL0C2UB3510;
 };
 
 template <>
-struct FixpipeTensor2Tensor<Hardware::UB, Hardware::L0C, Hardware::L1, ArchVersion::V3510, FOUR_DIM_DATA> {
+struct FixpipeTensor2Tensor<Hardware::UB, Hardware::L0C, Hardware::L1, ArchVersion::V3510> {
     using type = FixpipeQuantFourDimL0C2UB3510;
 };
 

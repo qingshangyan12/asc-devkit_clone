@@ -79,7 +79,7 @@ struct FixpipeTrait {
     RoundMode roundMode = RoundMode::DEFAULT;
     bool enableRelu = false;
     bool enableChannelSplit = false;
-    uint8_t dualDstCtl = false;
+    uint8_t dualDstCtl = 0;
 };
 
 struct FixpipeParams {

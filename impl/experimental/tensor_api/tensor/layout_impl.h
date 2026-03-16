@@ -26,8 +26,8 @@ namespace Te {
 template <typename T>
 struct LocalTensor;
 
-template <typename Coord, typename LayoutType, typename TileShape>
-__aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const TileShape& tileShape) 
+template <typename LayoutType, typename TileShape>
+__aicore__ inline decltype(auto) MakeTileLayout(const LayoutType& layout, const TileShape& tileShape) 
 {
     static_assert(Std::is_tuple_v<TileShape>);
 
@@ -81,7 +81,7 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
     auto row = MakeShape(innerRow, CeilDivision(realRow, innerRow));
     auto col = MakeShape(innerCol, CeilDivision(realCol, innerCol));
 
-    return MakeTileLayout(coord, layout, MakeShape(row, col));
+    return MakeTileLayout(layout, MakeShape(row, col));
 }
 
 } // namespace Te
