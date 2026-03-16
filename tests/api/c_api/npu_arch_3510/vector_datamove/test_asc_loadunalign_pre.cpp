@@ -47,6 +47,7 @@ TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas,
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, int16_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, half);
@@ -92,6 +93,7 @@ TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalig
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, int16_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, half);
