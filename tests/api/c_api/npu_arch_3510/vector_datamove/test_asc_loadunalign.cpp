@@ -50,6 +50,7 @@ TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(Vldus0, asc_loadunalign, vldus, half);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(Vldus0, asc_loadunalign, vldus, float);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(Vldus0, asc_loadunalign, vldus, bfloat16_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(Vldus0, asc_loadunalign, vldus, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(Vldus0, asc_loadunalign, vldus, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(Vldus0, asc_loadunalign, vldus, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(Vldus0, asc_loadunalign, vldus, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(Vldus0, asc_loadunalign, vldus, fp4x2_e2m1_t);
