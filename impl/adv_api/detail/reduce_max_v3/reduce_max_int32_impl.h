@@ -157,9 +157,10 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
     }
     
     if (count == 1) {
-        // Single element: copy directly
+        // Single element: use Add with mask to handle non-32B-aligned dst
         SetMaskCount();
         SetVectorMask<T, MaskMode::COUNTER>(0, 1);
+        // Add 0 is equivalent to copy, works with any alignment
         Adds<T, false>(dst, src, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
         PipeBarrier<PIPE_V>();
         return;
@@ -231,8 +232,11 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
     PipeBarrier<PIPE_V>();
     
     // Step 4: Extract result (brcbDst[0] now contains the maximum)
+    // Use Add with mask to handle non-32B-aligned dst
     SetVectorMask<T, MaskMode::COUNTER>(0, 1);
+    // Add 0 is equivalent to copy, works with any alignment
     Adds<T, false>(dst, brcbDst, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
+    PipeBarrier<PIPE_V>();
     PipeBarrier<PIPE_V>();
 }
 
