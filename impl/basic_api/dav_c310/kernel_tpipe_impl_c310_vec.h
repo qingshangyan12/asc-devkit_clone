@@ -1024,7 +1024,7 @@ __aicore__ inline __sync_noalias__ LocalTensor<T> TBuf<pos>::Get(uint32_t len)
     ASCENDC_ASSERT((len * sizeof(PrimType) % 32 == 0),
                    { KERNEL_LOG(KERNEL_ERROR, "buffer length is %u, which should be times of 32 Bytes", len); });
     ASCENDC_ASSERT(((len * sizeof(PrimType)) <= bufLen),
-                   { KERNEL_LOG(KERNEL_ERROR, "len is %lu, max buffer len is %u", len * sizeof(PrimType), bufLen); });
+                   { KERNEL_LOG(KERNEL_ERROR, "len is %zu, max buffer len is %u", len * sizeof(PrimType), bufLen); });
 #endif
     auto ptr = this->bufStart;
     ptr->dataLen = len * sizeof(PrimType);

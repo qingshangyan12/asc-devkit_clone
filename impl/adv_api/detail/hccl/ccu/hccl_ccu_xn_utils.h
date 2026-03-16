@@ -56,7 +56,7 @@ __aicore__ inline uint64_t GetOpId(__gm__ CommonPrepareParamCcu *commParam)
 
     uint64_t reduceType = isReduceType ? static_cast<uint64_t>(commParam->op) : 0U;
 
-    KERNEL_LOG(KERNEL_INFO, "ApiClient GetOpId algoType:%d outDataType:%d, reduceType:%d, dataType:%d, commType:%d",
+    KERNEL_LOG(KERNEL_INFO, "ApiClient GetOpId algoType:%lu outDataType:%lu, reduceType:%lu, dataType:%lu, commType:%lu",
                algoType, outDataType, reduceType, dataType, commType);
 
     return ((algoType & ALGO_TYPE_MASK) << ALGO_TYPE_SHIFT) |
@@ -76,7 +76,7 @@ __aicore__ inline void AssembleHcclMsgExtForCCU(CcuPrepareParam &ccuParam,
 
 
     KERNEL_LOG(KERNEL_INFO, "ApiClient AssembleHcclMsgExtForCCU ccuParam.ccuMsgExt:0x%llx, ccuMsgExt:0x%llx",
-               reinterpret_cast<uint64_t>(ccuParam.ccuMsgExt), reinterpret_cast<uint64_t>(ccuMsgExt));
+               reinterpret_cast<unsigned long long>(ccuParam.ccuMsgExt), reinterpret_cast<unsigned long long>(ccuMsgExt));
 
     for (uint32_t i = 0U; i < ccuParam.rankNum; ++i) {
         ccuMsgExt[i].sendSize = allToAllVParam->sendCounts[i] * dataSize;
@@ -85,7 +85,7 @@ __aicore__ inline void AssembleHcclMsgExtForCCU(CcuPrepareParam &ccuParam,
             allToAllVParam->sdispls[i] * dataSize + ccuMsgExt[i].sendSize * ccuParam.repeatIndex;
         ccuMsgExt[i].recvOffset =
         allToAllVParam->rdispls[i] * dataSize + ccuMsgExt[i].recvSize * ccuParam.repeatIndex;
-        KERNEL_LOG(KERNEL_INFO, "ApiClient ccuMsgExt rankIndex:%u, sendSize:%d, recvSize:%d, sendOffset:%d, recvOffset:%d",
+        KERNEL_LOG(KERNEL_INFO, "ApiClient ccuMsgExt rankIndex:%u, sendSize:%lu, recvSize:%lu, sendOffset:%lu, recvOffset:%lu",
                    i, ccuMsgExt[i].sendSize, ccuMsgExt[i].recvSize, ccuMsgExt[i].sendOffset, ccuMsgExt[i].recvOffset);
     }
  
@@ -134,7 +134,7 @@ __aicore__ inline void CalcGoSize(uint64_t sliceSize, uint64_t loopCount, uint64
     uint64_t m = sliceSize / loopSize;
     uint64_t n = (sliceSize - m * loopSize) / ccuMemsliceSize;
     uint64_t p = sliceSize - m * loopSize - n * ccuMemsliceSize;
-    KERNEL_LOG(KERNEL_INFO, "ApiClient CalcGoSize loopSize:%d, m:%d, n:%d, p:%d", loopSize, m, n, p);
+    KERNEL_LOG(KERNEL_INFO, "ApiClient CalcGoSize loopSize:%lu, m:%lu, n:%lu, p:%lu", loopSize, m, n, p);
 
     goSize[0] = loopSize * m;
     goSize[1] = m;

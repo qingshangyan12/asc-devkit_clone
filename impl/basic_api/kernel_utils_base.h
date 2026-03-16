@@ -228,7 +228,7 @@ public:
                        { KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset); });
         ASCENDC_ASSERT(
             (bufferOffset + bufferSize * sizeof(T) <= ConstDefiner::Instance().bufferInitLen.at(Hardware::UB)), {
-                KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of ub %d",
+                KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of ub %u",
                     bufferOffset, bufferSize, ConstDefiner::Instance().bufferInitLen.at(Hardware::UB));
             });
         const int32_t maxTempSize = 0x100000;
@@ -261,7 +261,7 @@ public:
                        { KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, which must be 32B aligned", bufferOffset); });
         ASCENDC_ASSERT(
             (bufferOffset + bufferSize * sizeof(T) <= ConstDefiner::Instance().bufferInitLen.at(Hardware::FIXBUF)), {
-                KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of fixbuf %d",
+                KERNEL_LOG(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, which exceed the limit of fixbuf %u",
                     bufferOffset, bufferSize, ConstDefiner::Instance().bufferInitLen.at(Hardware::FIXBUF));
             });
         T* addr =

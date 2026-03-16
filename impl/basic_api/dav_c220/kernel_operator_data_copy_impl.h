@@ -34,7 +34,7 @@ __aicore__ inline void CheckDataCopyPadParams(uint16_t blockCount, uint32_t bloc
     ASCENDC_CHECK_VALUE_RANGE(blockLen, 0, dataCopyPadBlkLenLimit, "blockLen", "DataCopyPad");
     if (isGMtoUB) {
         ASCENDC_ASSERT((blockLen % sizeof(T) == 0), { KERNEL_LOG(KERNEL_ERROR, "Failed to check blockLen value in "
-            "DataCopyPad from GM to VECIN / VECOUT, it must be divisible by %zu, current value is %lu.", sizeof(T),
+            "DataCopyPad from GM to VECIN / VECOUT, it must be divisible by %zu, current value is %u.", sizeof(T),
             blockLen); });
     }
 #endif

@@ -146,7 +146,7 @@ public:
             ASCENDC_DEBUG_ASSERT((bufferOffset + bufferSize * INT4_BIT_NUM / ONE_BYTE_BIT_SIZE <=
             ConstDefiner::Instance().bufferInitLen.at(positionHardMap.at(
                 AscendC::TPosition(this->address_.logicPos)))),
-                            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, buffer overflow",
+                            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %u, bufferSize is %u, buffer overflow",
                                 bufferOffset, bufferSize));
 
             this->address_.absAddr = ConstDefiner::Instance().hardwareCpuBufferMap.at(
@@ -158,7 +158,7 @@ public:
             ASCENDC_DEBUG_ASSERT((bufferOffset + bufferSize * INT2_BIT_NUM / ONE_BYTE_BIT_SIZE <=
             ConstDefiner::Instance().bufferInitLen.at(positionHardMap.at(
                 AscendC::TPosition(this->address_.logicPos)))),
-                            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, buffer overflow",
+                            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %u, bufferSize is %u, buffer overflow",
                                 bufferOffset, bufferSize));
 
             this->address_.absAddr = ConstDefiner::Instance().hardwareCpuBufferMap.at(
@@ -169,7 +169,7 @@ public:
             ASCENDC_DEBUG_ASSERT((bufferOffset + bufferSize * INT1_BIT_NUM / ONE_BYTE_BIT_SIZE <=
             ConstDefiner::Instance().bufferInitLen.at(positionHardMap.at(
                 AscendC::TPosition(this->address_.logicPos)))),
-                            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %d, bufferSize is %d, buffer overflow",
+                            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufferOffset is %u, bufferSize is %u, buffer overflow",
                                 bufferOffset, bufferSize));
 
             this->address_.absAddr = ConstDefiner::Instance().hardwareCpuBufferMap.at(

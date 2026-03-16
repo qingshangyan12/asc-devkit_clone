@@ -192,7 +192,7 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
     uint32_t tlvSize = valueSize + DUMP_SHAPE_MESSAGE_TL_LEN;
     if (ptr->dumpOffset < tlvSize) {
         ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "dumpOffset is %d, which must less than remained space %d", ptr->dumpOffset,
+        KERNEL_LOG(KERNEL_ERROR, "dumpOffset is %u, which must less than remained space %u", ptr->dumpOffset,
             valueSize); });
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
@@ -234,7 +234,7 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& src, u
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     if (ptr->dumpOffset < (padOffset + sizeof(DumpMessageHead))) {
         ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "dumpOffset is %d, which must less than remained space %d", ptr->dumpOffset,
+        KERNEL_LOG(KERNEL_ERROR, "dumpOffset is %u, which must less than remained space %zu", ptr->dumpOffset,
             (padOffset + sizeof(DumpMessageHead))); });
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
@@ -325,7 +325,7 @@ __aicore__ inline bool CheckDumpValid(uint32_t offset)
     }
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     if (ptr->dumpOffset < (offset + sizeof(DumpMessageHead) + ONE_DUMP_BACKUP_SIZE)) {
-        KERNEL_LOG(KERNEL_ERROR, "dumpOffset is %d, which must less than remained space %ld", ptr->dumpOffset,
+        KERNEL_LOG(KERNEL_ERROR, "dumpOffset is %u, which must less than remained space %zu", ptr->dumpOffset,
             (offset + sizeof(DumpMessageHead) + ONE_DUMP_BACKUP_SIZE));
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);

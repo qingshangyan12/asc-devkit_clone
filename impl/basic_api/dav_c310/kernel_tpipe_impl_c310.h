@@ -297,7 +297,7 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
                            this->g_tpipeImpl.tscmBufferPtr_),
             {
                 KERNEL_LOG(KERNEL_ERROR,
-                    "tscm addr is %d, limits is %d",
+                    "tscm addr is %u, limits is %u",
                     this->g_tpipeImpl.tscmBufferPtr_,
                     this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr);
             });
@@ -384,7 +384,7 @@ __aicore__ inline bool TPipe::InitBufPool(T &bufPool, uint32_t len)
     ASCENDC_ASSERT(
         (this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr <= this->g_tpipeImpl.tscmBufferPtr_), {
             KERNEL_LOG(KERNEL_ERROR,
-                "tscm addr is %d, limits is %d",
+                "tscm addr is %u, limits is %u",
                 this->g_tpipeImpl.tscmBufferPtr_,
                 this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr);
         });
@@ -972,7 +972,7 @@ template <class T> __aicore__ inline bool TPipe::TscmInitBuffer(T& que, uint8_t 
     }
     ASCENDC_ASSERT(
         (this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr <= this->g_tpipeImpl.tscmBufferPtr_), {
-            KERNEL_LOG(KERNEL_ERROR, "tscm addr %d overlapped with maxAddr %d", this->g_tpipeImpl.tscmBufferPtr_,
+            KERNEL_LOG(KERNEL_ERROR, "tscm addr %u overlapped with maxAddr %u", this->g_tpipeImpl.tscmBufferPtr_,
                 this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr);
         });
     this->g_tpipeImpl.curBufSize_ += num;

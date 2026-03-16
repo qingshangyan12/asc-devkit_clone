@@ -264,7 +264,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SetCcTiling(__gm__ voi
     const uint32_t opType = (static_cast<__gm__ Mc2CcTilingInner *>(ccOpTilingData))->opType;
     ASCENDC_HCCL_API_ASSERT(opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL),
                             { return HCCL_FAILED; }, "Call SetCcTiling failed, ensure cmdType is valid");
-    KERNEL_LOG(KERNEL_INFO, "CmdType = %d, ccOpTilingData = %lu ", opType, reinterpret_cast<uint64_t>(ccOpTilingData));
+    KERNEL_LOG(KERNEL_INFO, "CmdType = %u, ccOpTilingData = %lu ", opType, reinterpret_cast<uint64_t>(ccOpTilingData));
     ccOpTilingDataTable_[opType] = reinterpret_cast<uint64_t>(ccOpTilingData);
     return HCCL_SUCCESS;
 }

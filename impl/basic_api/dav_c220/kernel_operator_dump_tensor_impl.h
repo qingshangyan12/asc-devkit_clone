@@ -236,7 +236,7 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& src, u
     if (ptr->dumpOffset < (padOffset + sizeof(DumpMessageHead))) {
         ASCENDC_ASSERT((false), {
             KERNEL_LOG(KERNEL_ERROR,
-                "Space not enough! need %u Bytes, current remained dump space is %u Bytes",
+                "Space not enough! need %zu Bytes, current remained dump space is %u Bytes",
                 (padOffset + sizeof(DumpMessageHead)),
                 ptr->dumpOffset);
         });
@@ -351,7 +351,7 @@ __aicore__ inline bool CheckDumpValid(uint32_t padOffset)
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     if (ptr->dumpOffset < (padOffset + sizeof(DumpMessageHead) + ONE_DUMP_BACKUP_SIZE)) {
         KERNEL_LOG(KERNEL_ERROR,
-            "Space not enough! need %u Bytes, current remained dump space is %lu Bytes",
+            "Space not enough! need %zu Bytes, current remained dump space is %u Bytes",
             (padOffset + sizeof(DumpMessageHead) + ONE_DUMP_BACKUP_SIZE),
             ptr->dumpOffset);
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;

@@ -38,7 +38,7 @@ void GetReduceXorSumMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t type
          inputSize);
     std::vector<int64_t> shapeDims = srcShape.GetDims();
     ASCENDC_HOST_ASSERT(shapeDims.size() > 0UL, return,
-        "[ReduceXorSum][GetReduceXorSumMaxMinTmpSize] The parameter srcShape dimension number is %lu, expected is greater than 0!",
+        "[ReduceXorSum][GetReduceXorSumMaxMinTmpSize] The parameter srcShape dimension number is %zu, expected is greater than 0!",
          shapeDims.size());
     ASCENDC_HOST_ASSERT(typeSize == 2U, return,
         "[ReduceXorSum][GetReduceXorSumMaxMinTmpSize] The parameter typeSize is %u, expected is 2!", typeSize);

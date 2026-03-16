@@ -51,7 +51,7 @@ private:
             KERNEL_LOG(KERNEL_ERROR, "[CumSum] The cumSumInfo.inner parameter is %u, should be larger than 0.",
                 cumSumInfo.outter); });
         ASCENDC_ASSERT(((cumSumInfo.inner * sizeof(T) % ONE_BLK_SIZE == 0) || HighLevelAPIParametersPrint), {
-            KERNEL_LOG(KERNEL_ERROR, "[CumSum] The result of cumSumInfo.inner * sizeof(T) is %lu, "
+            KERNEL_LOG(KERNEL_ERROR, "[CumSum] The result of cumSumInfo.inner * sizeof(T) is %zu, "
                 "should be an integer multiple of 32.", cumSumInfo.inner * sizeof(T));
         });
         ASCENDC_ASSERT((srcTensor.GetSize() >= (cumSumInfo.inner * cumSumInfo.outter) || HighLevelAPIParametersPrint), {

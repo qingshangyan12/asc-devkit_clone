@@ -165,7 +165,7 @@ __aicore__ inline void Transpose(const LocalTensor<T> &dst, const LocalTensor<T>
             ASCENDC_CHECK_VALUE_RANGE(imageSize, 0, UINT12_MAX, "hSize * wSize", "Transpose");
             ASCENDC_ASSERT(((imageSize * sizeof(PrimT<T>)) % ONE_BLK_SIZE == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check "
                 "hSize, wSize value in Transpose when transposeType is TRANSPOSE_NCHW2NHWC / TRANSPOSE_NHWC2NCHW, "
-                "hSize * wSize * sizeof(T) should be 32B aligned, current value is %lu.", imageSize * sizeof(PrimT<T>));});
+                "hSize * wSize * sizeof(T) should be 32B aligned, current value is %zu.", imageSize * sizeof(PrimT<T>));});
 #endif
             Transpose4DImpl(dst, src, sharedTmpBuffer, transposeParams);
         }

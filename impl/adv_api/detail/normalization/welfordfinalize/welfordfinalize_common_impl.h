@@ -435,7 +435,7 @@ __aicore__ inline void GetWelfordFinalizeTensorInfo(const LocalTensor<float>& st
     // 0x2 indicates reserving two buffers for the storage of mean and variance
     const uint32_t minTmpOutSize = B32_LEN * 0x2;
     ASCENDC_ASSERT((stackBuffer.GetSize() >= (minTmpSize + minTmpOutSize)),
-                { KERNEL_LOG(KERNEL_ERROR, "sharedTmpBuffer size must >= %ld Bytes!", (minTmpSize + minTmpOutSize) * sizeof(float)); });
+                { KERNEL_LOG(KERNEL_ERROR, "sharedTmpBuffer size must >= %zu Bytes!", (minTmpSize + minTmpOutSize) * sizeof(float)); });
 
     const uint32_t expFactor = (stackBuffer.GetSize() - minTmpOutSize) / minTmpSize;
     tiling.computeLength = expFactor * B32_LEN;

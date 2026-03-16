@@ -153,7 +153,7 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo& shapeInfo)
     if (ptr->dumpOffset < tlvSize) {
         ASCENDC_ASSERT((false), {
             KERNEL_LOG(
-                KERNEL_ERROR, "dumpOffset is %d, which must less than remained space %d", ptr->dumpOffset, valueSize);
+                KERNEL_ERROR, "dumpOffset is %u, which must less than remained space %u", ptr->dumpOffset, valueSize);
         });
         *((__gm__ uint32_t *)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t *)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
@@ -201,7 +201,7 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
     if (ptr->dumpOffset < (offset + sizeof(DumpMessageHead))) {
         ASCENDC_ASSERT((false), {
             KERNEL_LOG(KERNEL_ERROR,
-                "dumpOffset is %d, which must less than remained space %d",
+                "dumpOffset is %u, which must less than remained space %zu",
                 ptr->dumpOffset,
                 (offset + sizeof(DumpMessageHead)));
         });
@@ -281,7 +281,7 @@ __aicore__ inline void InitTmpTensor(LocalTensor<T>& tmp, uint8_t quePos)
 __aicore__ inline bool CheckDumpValid(uint32_t offset)
 {
     if (offset % ONE_BLK_SIZE != 0) {
-        KERNEL_LOG(KERNEL_ERROR, "dump size is %d, which must be 32B aligned", offset);
+        KERNEL_LOG(KERNEL_ERROR, "dump size is %u, which must be 32B aligned", offset);
         return false;
     }
     uint8_t core = GetDumpBlockIdx();
@@ -290,13 +290,13 @@ __aicore__ inline bool CheckDumpValid(uint32_t offset)
     }
     uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) - DUMP_WORKSPACE_SIZE;
     if (reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) < DUMP_WORKSPACE_SIZE) {
-        KERNEL_LOG(KERNEL_ERROR, "DumpWorkSpace addr is %d, which must be larger than 75M", offset);
+        KERNEL_LOG(KERNEL_ERROR, "DumpWorkSpace addr is %u, which must be larger than 75M", offset);
         return false;
     }
     __gm__ BlockInfo *ptr = (__gm__ BlockInfo *)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     if (ptr->dumpOffset < (offset + sizeof(DumpMessageHead) + ONE_DUMP_BACKUP_SIZE)) {
         KERNEL_LOG(KERNEL_ERROR,
-            "dumpOffset is %d, which must less than remained space %ld",
+            "dumpOffset is %u, which must less than remained space %zu",
             ptr->dumpOffset,
             (offset + sizeof(DumpMessageHead) + ONE_DUMP_BACKUP_SIZE));
         *((__gm__ uint32_t *)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;

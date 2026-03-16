@@ -35,7 +35,7 @@ public:
         CheckFuncClassReduce<T, pattern>::VerifyingParameters(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad, padLast);
 
         ASCENDC_ASSERT((srcShape[1] * sizeof(T) % ONE_BLK_SIZE == 0 || HighLevelAPIParametersPrint), {
-            KERNEL_LOG(KERNEL_ERROR, "[ReduceMean] The result of srcShape[1] * sizeof(T) cannot be %u, "
+            KERNEL_LOG(KERNEL_ERROR, "[ReduceMean] The result of srcShape[1] * sizeof(T) cannot be %zu, "
             "should be an integer multiple of 32.", srcShape[1] * sizeof(T)); });
     };
 };
