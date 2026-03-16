@@ -410,9 +410,9 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
             for param in func_params:
                 source += f"    {param} = param_base[args_offset++];\n"
         else:
-            called_func_params = "param"
-            called_func_params_type = "__gm__ uint64_t *param"
-            source += "__gm__ uint64_t *param) {\n"
+            called_func_params = "param, sargs"
+            called_func_params_type = "__gm__ uint64_t *param, sk::SkSystemArgs *sargs"
+            source += "__gm__ uint64_t *param, sk::SkSystemArgs *sargs) {\n"
             source += " uint32_t __asc_index = 0;\n"
             for param in func_params:
                 source += f"    {param} = (GM_ADDR)param[__asc_index++];\n"
