@@ -117,7 +117,7 @@ struct TupleDispatcher<LayoutFormat::ND, TupleFormat::Shape, fp8_e8m0_t> {
 template <typename T>
 struct TupleDispatcher<LayoutFormat::ZZ, TupleFormat::Shape, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return Make2Params2Tuple(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row, FRACTAL_FIXED),
+        return GetTuple(Std::Int<FRACTAL_FIXED>{}, CeilDivision(row, FRACTAL_FIXED),
                                     Std::Int<C0_SIZE / sizeof(T)>{}, CeilDivision(column, (C0_SIZE / sizeof(T))));
     }
 };
