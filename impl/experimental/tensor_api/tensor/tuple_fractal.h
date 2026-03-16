@@ -221,11 +221,101 @@ __aicore__ inline decltype(auto) MakeScaleBDNStride(U row, S column) { // 转置
 }
 
 template <typename T, typename U, typename S>
-__aicore__ inline decltype(auto) MakeFractalCoord(U row, S column) {
+__aicore__ inline decltype(auto) MakeNzCoord(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
-        return CoordFormat<T, row, column>{};
+        return NZCoordFormat<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
-        return TupleDispatcher<LayoutFormat::IGNORE, TupleFormat::Coord, Std::ignore_t>::apply(row, column); // (scaleK, n)
+        return TupleDispatcher<LayoutFormat::NZ, TupleFormat::Coord, T>::apply(row, column);
+    }
+}
+
+template <typename U, typename S>
+__aicore__ inline decltype(auto) MakeL0CCoord(U row, S column) {
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return NZCoordFormat<uint16_t, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::NZ, TupleFormat::Coord, uint16_t>::apply(row, column);
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeNDCoord(U row, S column) {
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return NDCoordFormat<T, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::ND, TupleFormat::Coord, T>::apply(row, column);
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeDNCoord(U row, S column) {
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return DNCoordormat<T, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::DN, TupleFormat::Coord, T>::apply(row, column);
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeZnCoord(U row, S column) {
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return ZNCoordFormat<T, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::ZN, TupleFormat::Coord, T>::apply(row, column);
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeZzCoord(U row, S column) {
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return ZZCoordFormat<T, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::ZZ, TupleFormat::Coord, T>::apply(row, column);
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeNnCoord(U row, S column) {
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return ScaleNNCoordFormat<T, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::NN, TupleFormat::Coord, T>::apply(row, column);
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleANDCoord(U row, S column) { // 不转置(m, scaleK)
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return NDCoordFormat<T, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::ND, TupleFormat::Coord, Std::ignore_t>::apply(row, column); // (m, scaleK)
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleADNCoord(U row, S column) { // 转置(m, scaleK)
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return ScaleDNCoordFormat<T, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::DN, TupleFormat::Coord, T>::apply(row, column); // 转置(m, scaleK)
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleBNDCoord(U row, S column) { // 不转置(scaleK, n)
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return ScaleNDCoordFormat<T, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::ND, TupleFormat::Coord, T>::apply(row, column); // (scaleK, n)
+    }
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline decltype(auto) MakeScaleBDNCoord(U row, S column) { // 转置(scaleK, n)
+    if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
+        return DNCoordFormat<T, row, column>{};
+    } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
+        return TupleDispatcher<LayoutFormat::DN, TupleFormat::Coord, Std::ignore_t>::apply(row, column); // (scaleK, n)
     }
 }
 } // namespace Te

@@ -36,7 +36,7 @@ constexpr size_t SHIFT_LEFT_16 = 0x00010000;
 constexpr size_t L2_CACHE_OFFSET = 60;
 constexpr size_t MX_SCALE_K0 = 2;
 
-enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN, IGNORE};
+enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
 
 enum class TupleFormat : uint8_t { Shape, Stride, Coord};
 
