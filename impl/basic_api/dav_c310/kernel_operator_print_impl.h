@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_operator_print_impl.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/dav_c310/kernel_operator_print_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PRINT_IMPL_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PRINT_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_PRINT_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_PRINT_IMPL_H
@@ -31,10 +31,12 @@ __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
 
 __aicore__ inline void EnablePrintf()
 {
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_TIME_STAMP_ON)
+#if defined(__ENABLE_ASCENDC_PRINTF__)
+#if defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct BinaryMetaAscFeature __asc_feature_print__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
+#endif // __ENABLE_ASCENDC_PRINTF__
 }
 
 __aicore__ inline uint32_t GetArgsNum()
@@ -239,32 +241,6 @@ __aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char* f
     UpdateBlockInfo(tlvSize);
 }
 
-__aicore__ __gm__ inline BlockRingBufInfo* GetBlockRingBufInfo();
-__aicore__ __gm__ inline RingBufWriteInfo* GetRingBufWriteInfo(__gm__ BlockRingBufInfo* blockRingBufInfo);
-
-template <class... Args>
-__aicore__ inline void PrintCommonHead(DumpType printType)
-{
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-    if (writeInfo == nullptr || writeInfo->packIdx != 0) {
-        return;
-    }
-
-    uint64_t __ascendc_tStamp = 0;
-    uint64_t __ascendc_version = 0;
-    __gm__ char* __ascendc_versionStr = nullptr;
-    GetCannVersion(__ascendc_versionStr, __ascendc_version, __ascendc_tStamp);
-    if (__ascendc_tStamp == 0) {
-        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "[WARNING]: CANN TimeStamp is invalid, CANN TimeStamp is %u\n", __ascendc_tStamp);
-    } else {
-        __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, "CANN Version: %s, TimeStamp: %u\n", (__gm__ const char*)(__ascendc_versionStr), __ascendc_tStamp);
-    }
-}
-
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
@@ -274,11 +250,6 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
         dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         __asc_aicore::enable_asc_diagnostics();
-#if !defined(__NPU_DEVICE__)
-        if (printType != DumpType::DUMP_ASSERT) {
-            PrintCommonHead(printType);
-        }
-#endif
         __asc_aicore::scalar_printf_impl(__asc_aicore::DumpType::DUMP_SCALAR, fmt, args...);
     } else {
         PrintfEntityImpl(printType, fmt, args...);
@@ -507,7 +478,7 @@ __aicore__ inline void WriteRingBufTlvData(__gm__ PrintTlvInfoHead* printTlv, __
 
 }  // namespace AscendC
 #endif
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PRINT_IMPL_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PRINT_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PRINT_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_PRINT_IMPL_H__
 #endif

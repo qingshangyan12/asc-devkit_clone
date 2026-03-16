@@ -130,7 +130,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitInner(GM_ADDR contex
     }
     KERNEL_LOG(KERNEL_INFO, "ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx", msgAddr, hcclContext_->workSpaceSize);
 
-#ifndef __CCE_KT_TEST__
+#ifndef ASCENDC_CPU_DEBUG
     ASCENDC_ASSERT((reinterpret_cast<uintptr_t>(hcclContext_->xnOffset) % ALIGN_64_BYTE == 0),
         { KERNEL_LOG(KERNEL_ERROR, "xnAddr is not 64-byte aligned!"); });
 #endif
@@ -488,11 +488,11 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     reqId %= CCU_MAX_MSG_NUM;
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
 
-#ifndef __CCE_KT_TEST__ 
+#ifndef ASCENDC_CPU_DEBUG 
     while(true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
         if (waitCke != 0) {
-            if (workingFlag_) { // 0核
+            if (workingFlag_) { // 0�?
                 finishNumTemp_++;
 
                 WriteHBMData(finishCntGM_, finishNumTemp_);
@@ -500,7 +500,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
             }
             break;
         }
-        if (!workingFlag_) { // 非0核
+        if (!workingFlag_) { // �?�?
             uint64_t finshCnt = ReadHBMData(finishCntGM_);
             if (finshCnt > finishNum_) {
                 break;
@@ -516,10 +516,10 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     globalCurWaitId_ %= CCU_MAX_MSG_NUM;
 
     // 补发消息
-    // 场景1： 同一个handleId需要补发消息
+    // 场景1�?同一个handleId需要补发消�?
     if (handleCommitCnt_[handleId] < handleNeedCommitCnt_[handleId]) {
         CommitMsg(handleId);
-    } else { // 场景2： 下一个handleId需要补发消息
+    } else { // 场景2�?下一个handleId需要补发消�?
         uint32_t nextHandleId = handleId + 1;
         if (nextHandleId < curHandleId_ && (handleCommitCnt_[nextHandleId] < handleNeedCommitCnt_[nextHandleId])) {
             CommitMsg(nextHandleId);

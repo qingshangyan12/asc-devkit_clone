@@ -1,4 +1,4 @@
-ï»¿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -12,10 +12,10 @@
  * \file kernel_utils_macros.h
  * \brief
  */
-#if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/utils/kernel_utils_macros.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
-#define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#define UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H__
 #endif
 #ifndef ASCENDC_MODULE_UTILS_MACROS_H
 #define ASCENDC_MODULE_UTILS_MACROS_H
@@ -71,7 +71,7 @@ enum QuantCfgBit {
     PRERELU_SCALE_SCALAR_CFGBIT,
     POSTREELU_SCALE_SCALAR_CFGBIT,
     ELTWISEANTIQ_SCALE_SCALAR_CFGBIT,
-    SCALE_PERGROUP_CFGBIT = 32, // pergroupæŒ‡ç¤º
+    SCALE_PERGROUP_CFGBIT = 32, // pergroupÖ¸Ê¾
 };
 
 enum SidOutSMMU {
@@ -109,12 +109,12 @@ enum KernelType {
     K_TYPE_AIV = 3,                 // v220-vec
     K_TYPE_MIX_AIC_MAIN = 4,        // v220 mix cube/vector 1:2
     K_TYPE_MIX_AIV_MAIN = 5,        // v220 mix vector/cube 1:2
-    K_TYPE_AIC_ROLLBACK = 6,        // v220-cubeï¼Œaic rollback
-    K_TYPE_AIV_ROLLBACK = 7,        // v220-vecï¼Œaiv rollback
+    K_TYPE_AIC_ROLLBACK = 6,        // v220-cube£¬aic rollback
+    K_TYPE_AIV_ROLLBACK = 7,        // v220-vec£¬aiv rollback
     K_TYPE_MAX
 };
 
-enum BinaryMetaType { // å‡½æ•°çº§TLVç±»å‹
+enum BinaryMetaType { // º¯Êı¼¶TLVÀàĞÍ
     B_TYPE_BIN_VERSION_INFO = 0,
     B_TYPE_DEBUG_INFO = 1,
     B_TYPE_DYNAMIC_PARAM = 2,
@@ -122,32 +122,32 @@ enum BinaryMetaType { // å‡½æ•°çº§TLVç±»å‹
     B_TYPE_SK_INFO = 5
 };
 
-struct BaseTlv {  // TLVå¤´éƒ¨å®šä¹‰
+struct BaseTlv {  // TLVÍ·²¿¶¨Òå
     unsigned short type;
     unsigned short len;
 };
 
 struct BinaryMetaVersion {
     BaseTlv head;     // B_TYPE_BIN_VERSION = 0
-    uint32_t version;  // ç‰ˆæœ¬ä¿¡æ¯'
+    uint32_t version;  // °æ±¾ĞÅÏ¢'
 };
 
 struct BinaryMetaDebug {
     BaseTlv head;     // B_TYPE_DEBUG_INFO = 1
-    uint32_t debugBufSize;  // è°ƒè¯•éœ€è¦çš„å†…å­˜ç©ºé—´
-    uint32_t debugOptions; // è°ƒè¯•å¼€å…³å¼€å¯
+    uint32_t debugBufSize;  // µ÷ÊÔĞèÒªµÄÄÚ´æ¿Õ¼ä
+    uint32_t debugOptions; // µ÷ÊÔ¿ª¹Ø¿ªÆô
 };
 
 struct BinaryMetaDynamicParam {
     BaseTlv head;
     uint16_t reserve;
-    uint16_t dynamicParamMode;  // åŠ¨æ€å‚æ•°ï¼Œæ”¯æŒäºŒçº§æŒ‡é’ˆæ–¹å¼ä¼ å‚ç»™kernel
+    uint16_t dynamicParamMode;  // ¶¯Ì¬²ÎÊı£¬Ö§³Ö¶ş¼¶Ö¸Õë·½Ê½´«²Î¸økernel
 };
 
 struct BinaryMetaOptionalParam {
     BaseTlv head;
-    uint16_t optionalInputMode; // å¯¹äºå¯é€‰è¾“å…¥éœ€è¦å ä½å‘å¸ƒ
-    uint16_t optionalOutputMode; // å¯¹äºå¯é€‰è¾“å…¥éœ€è¦å ä½å‘å¸ƒ
+    uint16_t optionalInputMode; // ¶ÔÓÚ¿ÉÑ¡ÊäÈëĞèÒªÕ¼Î»·¢²¼
+    uint16_t optionalOutputMode; // ¶ÔÓÚ¿ÉÑ¡ÊäÈëĞèÒªÕ¼Î»·¢²¼
 };
 
 struct BinaryMetaAscFeature {
@@ -155,7 +155,7 @@ struct BinaryMetaAscFeature {
     uint32_t feature; // PRINT = 1, FFTS = 2, L2CACHE = 3
 };
 
-enum FuncMetaType { // å‡½æ•°çº§TLVç±»å‹
+enum FuncMetaType { // º¯Êı¼¶TLVÀàĞÍ
     F_TYPE_KTYPE = 1, // kernel type tlv
     F_TYPE_CROSS_CORE_SYNC = 2, // cross core sync
     F_TYPE_MIX_TASK_RATION = 3, // MIX CORE TYPE
@@ -170,7 +170,7 @@ enum FuncMetaType { // å‡½æ•°çº§TLVç±»å‹
 
 struct FuncMetaDeterministic {
     BaseTlv head;
-    uint32_t deterministic; // ç¡®å®šæ€§è®¡ç®—
+    uint32_t deterministic; // È·¶¨ĞÔ¼ÆËã
 };
 
 struct FuncMetaFunctionEntry {
@@ -184,7 +184,7 @@ struct FuncMetaNumBlocks {
     uint32_t numBlocks; // numBlocks
 };
 
-enum CrossCoreSyncType { // å‡½æ•°çº§TLVç±»å‹
+enum CrossCoreSyncType { // º¯Êı¼¶TLVÀàĞÍ
     C_TYPE_USE_SYNC = 1, // use cross core sync
     C_TYPE_MAX
 };
@@ -346,7 +346,7 @@ struct FuncMetaSknlMap {
     SknlMapInfo sknlMeta;
 };
 
-template <auto GF, uint64_t cap, auto SK0 = 0xffffffffffffffff, auto SK1 = 0xffffffffffffffff, auto SK2 = 0xffffffffffffffff, auto SK3 = 0xffffffffffffffff>
+template <auto GF, uint64_t cap, auto SK0, auto SK1 = SK0, auto SK2 = SK0, auto SK3 = SK0>
 struct SknlKernelMap {
     static constexpr SknlMapInfo value = {cap, (void*)GF, {(void*)SK0, (void*)SK1, (void*)SK2, (void*)SK3}};
 };
@@ -527,7 +527,7 @@ constexpr bool g_gm_overflow_check = false;
 #endif
 
 #endif // ASCENDC_MODULE_UTILS_MACROS_H
-#if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H)
-#undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
-#undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_MACROS_H__
 #endif

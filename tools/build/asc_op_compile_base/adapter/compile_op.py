@@ -142,6 +142,8 @@ def _json_except_info(compile_info: CompileInfo):
             sub_dfx_info["func_name"] = sub_operater_infos["kernelName"]
             sub_dfx_info["split_mode"] = sub_operater_infos.get("split_mode")
             sub_dfx_info["blockNum"] = sub_operater_infos["blockDim"]
+            sub_dfx_info["sub_operator_op_type"] = \
+                sub_operater_infos.get('sub_operator_op_type', '')
             sub_dfx_info["sub_operator_kernel_type"] = sub_operater_infos["sub_operator_kernel_type"]
             sub_dfx_info["sub_operator_early_start_set_flag"] = \
             sub_operater_infos['sub_operator_early_start_set_flag']
@@ -239,12 +241,17 @@ def _json_post_process(compile_info: CompileInfo, op_info: OpInfo, tiling_info: 
             f"The operator {op_info.op_type} has not been adapted to superkernel. Therefore, \
 the superkernel cannot be integrated with the operator.", \
             AscendCLogLevel.LOG_WARNING)
-    if CommonUtility.is_c310():
+    if "isSimt" in js and js["isSimt"] == 1:
+        CommonUtility.print_compile_log(compile_info.kernel_name, \
+        f"The current soc version does not support merging simt type operator:{op_info.op_type} \
+into superkernel", AscendCLogLevel.LOG_WARNING)
+
+    if CommonUtility.is_c310() and "isSimt" not in js:
         if tiling_info.local_memory_size > 0 or _get_simt_type_in_staic(tiling_info, compile_info, obj_path):
             js["supportSuperKernel"] = 0
-            CommonUtility.print_compile_log(compile_info.kernel_name, \
-            f"The operator {op_info.op_type} is simt type, current soc version has not been adapted to \
-superkernel. Therefore, the superkernel cannot be integrated with the operator.", AscendCLogLevel.LOG_WARNING)
+            js["isSimt"] = 1
+        else:
+            js["isSimt"] = 0
 
     aicore_num = get_context().get_addition("_op_aicore_num")
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
@@ -1364,7 +1371,6 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
                                                 distinct_tag, kernel_meta_dir)
         handle_compile_options(compile_info_origin, compile_option_tuple_origin, tiling_info, workspace_idx)
         compile_kernel_and_meta(compile_info_origin, op_info, compile_option_tuple_origin, tiling_info)
-        link_kernel_obj(compile_info_origin, op_info, tiling_info)
 
         # compile_sk_bind
         sk_bind_dst_file = compile_sk_bind(compile_info, compile_info_origin, compile_option_tuple, kernel_meta_dir)
@@ -1508,6 +1514,18 @@ def handle_dump_options(compile_info: CompileInfo, compile_option_tuple):
     if compile_info.dump_info["dump_type"] == "assert":
         compile_option_tuple.compile_options.append('-DASCENDC_DUMP_ASSERT_ONLY')
         global_var_storage.set_variable("ascendc_dump_assert_only", True)
+
+    # handle dump macro
+    if CommonUtility.is_c310():
+        if "assert" not in compile_info.dump_info["dump_type"] and "printf" not in compile_info.dump_info["dump_type"]:
+            compile_option_tuple.compile_options.append('-DASCENDC_DUMP=0')
+            length_before = len(compile_option_tuple.compile_options)
+            CommonUtility.remove_options(compile_option_tuple.compile_options, ['-DASCENDC_DUMP', '-DASCENDC_DUMP=1'])
+            length_after = len(compile_option_tuple.compile_options)
+            if length_before != length_after:
+                CommonUtility.print_compile_log(compile_info.kernel_name, \
+                    "-DASCENDC_DUMP=1 is deleted because the feature is not used internally in src file", \
+                    AscendCLogLevel.LOG_WARNING)
 
     # dump or acc or timestamp or recognize_simtvf will need extra workspace
     ascendc_enable_dump_workspace = ("-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options) or \
