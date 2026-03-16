@@ -82,6 +82,7 @@ TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, v
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, int64_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp8_e8m0_t);
@@ -95,6 +96,7 @@ TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_post
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, uint32_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, int64_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, hifloat8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, fp4x2_e1m2_t);
