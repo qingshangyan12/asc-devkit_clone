@@ -22,9 +22,9 @@
 #ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_UNARY_IMPL_H
 #define ASCENDC_MODULE_REG_COMPUTE_VEC_UNARY_IMPL_H
 
+#include "kernel_reg_compute_common_impl.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_struct_intf.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"
-#include "kernel_reg_compute_common_impl.h"
 #include "../../../../include/utils/std/type_traits.h"
 
 namespace AscendC {

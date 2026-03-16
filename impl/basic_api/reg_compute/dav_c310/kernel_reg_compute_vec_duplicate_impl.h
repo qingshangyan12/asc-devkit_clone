@@ -22,8 +22,8 @@
 #ifndef ASCENDC_MODULE_REG_COMPUTE_VEC_DUPLICATE_IMPL_H
 #define ASCENDC_MODULE_REG_COMPUTE_VEC_DUPLICATE_IMPL_H
 
-#include "../../../../include/basic_api/reg_compute/kernel_reg_compute_utils.h"
 #include "kernel_reg_compute_common_impl.h"
+#include "../../../../include/basic_api/reg_compute/kernel_reg_compute_utils.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_struct_intf.h"
 #include "../../../../include/utils/std/type_traits.h"
 
