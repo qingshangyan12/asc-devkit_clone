@@ -213,6 +213,9 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
     // Each datablock contains 8 identical values
     // We need to find max across all 8 datablocks
     
+    // CRITICAL: Duplicate() internally calls SetMaskNorm(), so we must re-enable Count mode
+    SetMaskCount();
+    
     // Round 1: Compare Block 0-3 with Block 4-7 -> Result in Block 0-3
     uint32_t halfElems = 4 * INT32_ELEM_PER_BLK;  // 32 elements (4 datablocks)
     SetVectorMask<T, MaskMode::COUNTER>(0, halfElems);
