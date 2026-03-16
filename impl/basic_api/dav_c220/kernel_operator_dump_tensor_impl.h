@@ -42,7 +42,6 @@ __aicore__ inline void EnablePrintf()
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
 }
 
-
 template <typename T>
 __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType();
 
