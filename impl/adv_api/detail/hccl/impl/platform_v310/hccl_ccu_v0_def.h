@@ -128,7 +128,6 @@ private:
     uint64_t finishNum_;
     uint64_t finishNumTemp_;
 
-    CCUConfig ccuConfig_;
     CCUMsg ccuMsg_;
 
     uint64_t ccOpTilingDataTable_[static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)] = {0UL};
