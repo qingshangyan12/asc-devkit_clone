@@ -1,0 +1,36 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/*!
+ * \file divide.h
+ * \brief
+ */
+#ifndef IMPL_STD_DIVIDE_H
+#define IMPL_STD_DIVIDE_H
+
+#ifdef ASCENDC_CPU_DEBUG
+#include <cmath>
+#endif
+
+namespace AscendC {
+namespace Std {
+
+__aicore__ inline constexpr int32_t divide(int32_t num1, int32_t num2)
+{
+    if (num2 == 0) {
+        static_assert("The divisor cannot be 0!");
+    } else {
+        return num1 / num2;
+    }
+}
+
+}
+}
+#endif
