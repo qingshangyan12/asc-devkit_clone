@@ -169,12 +169,6 @@ struct CCUMsg {
     GM_ADDR waitCKEAddr;   // The wait address corresponding to each Msg
 };
 
-struct ReduceDataTypeAbility {
-    HcclReduceOp op;
-    HcclDataType dstDataType;
-    HcclDataType srcDataType;
-};
-
 struct CCUMsgExt { // AllToAllv HcclMsgExt trans for ccu
     uint64_t sendSize;
     uint64_t sendOffset;
