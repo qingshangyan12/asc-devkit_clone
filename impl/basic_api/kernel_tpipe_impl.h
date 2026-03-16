@@ -282,7 +282,7 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
     }
 #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
     ASCENDC_DEBUG_ASSERT((curPoolAddr <= bufferInitLen.at(pool)),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "curPoolAddr is %d, limits is %d", curPoolAddr, bufferInitLen.at(pool)));
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "curPoolAddr is %u, limits is %u", curPoolAddr, bufferInitLen.at(pool)));
 #endif
     this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr = curPoolAddr;
     this->g_tpipeImpl.curBufSize_ += num;
@@ -292,7 +292,7 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
         this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN));
     ASCENDC_DEBUG_ASSERT(
         (this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr <= this->g_tpipeImpl.tscmBufferPtr_),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tscm addr is %d, limits is %d",
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tscm addr is %u, limits is %u",
                 this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr,
                 this->g_tpipeImpl.tscmBufferPtr_));
 #ifdef ASCENDC_TIME_STAMP_ON
@@ -347,7 +347,7 @@ template <TPosition pos> __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf
     }
 #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
     ASCENDC_DEBUG_ASSERT((curPoolAddr <= bufferInitLen.at(pool)),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "curPoolAddr is %d, exceeds the limit %d", curPoolAddr, bufferInitLen.at(pool)));
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "curPoolAddr is %u, exceeds the limit %u", curPoolAddr, bufferInitLen.at(pool)));
 #endif
     this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr = curPoolAddr;
     this->g_tpipeImpl.curBufSize_ += bufHandleSize;
@@ -395,13 +395,13 @@ __aicore__ inline bool TPipe::InitBufPool(T &bufPool, uint32_t len)
     curPoolAddr += len;
 #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
     ASCENDC_DEBUG_ASSERT((curPoolAddr <= bufferInitLen.at(pool)),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "curPoolAddr is %d, limits is %d", curPoolAddr, bufferInitLen.at(pool)));
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "curPoolAddr is %u, limits is %u", curPoolAddr, bufferInitLen.at(pool)));
 #endif
     this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr = curPoolAddr;
     ASCENDC_DEBUG_ASSERT(
         (this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr <= this->g_tpipeImpl.tscmBufferPtr_),
             KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-                "tscm addr is %d, limits is %d",
+                "tscm addr is %u, limits is %u",
                 this->g_tpipeImpl.tscmBufferPtr_,
                 this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr));
     return true;
@@ -981,7 +981,7 @@ template <class T> __aicore__ inline bool TPipe::TscmInitBuffer(T& que, uint8_t 
 
     ASCENDC_DEBUG_ASSERT(
         (this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr <= this->g_tpipeImpl.tscmBufferPtr_),
-            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tscm addr %d overlapped with maxAddr %d", this->g_tpipeImpl.tscmBufferPtr_,
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR, "tscm addr %u overlapped with maxAddr %u", this->g_tpipeImpl.tscmBufferPtr_,
                 this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr));
     this->g_tpipeImpl.curBufSize_ += num;
     // total buffer num created by InitBuffer must be <= 64

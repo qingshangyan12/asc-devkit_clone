@@ -420,7 +420,7 @@ __aicore__ inline CubeResGroupHandle<T> CreateCubeResGroup(
     KfcWorkspace &desc, uint8_t blockStart, uint8_t blockSize, uint8_t msgQueueSize, GM_ADDR tiling)
 {
     ASCENDC_DEBUG_ASSERT(
-        (sizeof(T) % 64 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CubeMsgType Size is %u must be aligned to 64B.", sizeof(T)));
+        (sizeof(T) % 64 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "CubeMsgType Size is %zu must be aligned to 64B.", sizeof(T)));
     CubeResGroupHandle handle =
         CubeResGroupHandle<T>(desc.GetKfcWorkspace(), blockStart, blockSize, msgQueueSize, GetEventId(desc));
     desc.UpdateKfcWorkspace(__GetMsgAreaLen(handle, sizeof(T)));

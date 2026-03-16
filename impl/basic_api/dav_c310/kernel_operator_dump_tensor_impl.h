@@ -161,7 +161,7 @@ __aicore__ inline void WriteDumpShapeInfo(const ShapeInfo &shapeInfo)
     uint32_t tlvSize = valueSize + DUMP_SHAPE_MESSAGE_TL_LEN;
     if (ptr->dumpOffset < tlvSize) {
         ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "remained space is %d, which is not enough for write data %u", ptr->dumpOffset,
+        KERNEL_LOG(KERNEL_ERROR, "remained space is %u, which is not enough for write data %u", ptr->dumpOffset,
             tlvSize); });
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
@@ -330,7 +330,7 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor
 
     if (ptr->dumpOffset < (padOffset + sizeof(DumpMessageHead))) {
         ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "remained space is %d, which is not enough for write data %u", ptr->dumpOffset,
+        KERNEL_LOG(KERNEL_ERROR, "remained space is %u, which is not enough for write data %zu", ptr->dumpOffset,
             (padOffset + sizeof(DumpMessageHead))); });
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
@@ -420,7 +420,7 @@ __aicore__ inline bool CheckDumpValid(uint32_t padOffset)
 
     __gm__ BlockInfo* ptr = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
     if (ptr->dumpOffset < (padOffset + sizeof(DumpMessageHead) + ONE_DUMP_BACKUP_SIZE)) {
-        KERNEL_LOG(KERNEL_ERROR, "remained space is %d, which is not enough for write data %lu",
+        KERNEL_LOG(KERNEL_ERROR, "remained space is %u, which is not enough for write data %zu",
             ptr->dumpOffset, (padOffset + sizeof(DumpMessageHead) + ONE_DUMP_BACKUP_SIZE));
         *((__gm__ uint32_t*)ptr + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
         dcci((__gm__ uint64_t*)ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
