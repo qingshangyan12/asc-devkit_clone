@@ -6,6 +6,7 @@
 
 ## 支持的产品
 
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -51,6 +52,7 @@ DumpTensor介绍：
     ```
     z = x + y
     ```
+
 - 算子规格：  
   - Cube场景Mmad算子：  
 
@@ -98,7 +100,7 @@ DumpTensor介绍：
 
       使用内核调用符<<<>>>调用核函数。
 
-  - Vector场景Add算子： 
+  - Vector场景Add算子：  
 
     本样例中实现的是固定shape为8*2048的Add算子，同时添加DumpTensor用于Dump指定Tensor的内容。
     - Kernel实现  
@@ -106,6 +108,7 @@ DumpTensor介绍：
       ```
       z = x + y
       ```
+
       计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。
 
       Add算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm和yGm搬运到Local Memory，分别存储在xLocal、yLocal，Compute任务负责对xLocal、yLocal执行加法操作，计算结果存储在zLocal中，CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
@@ -117,45 +120,58 @@ DumpTensor介绍：
 ## 编译运行  
 
 在本样例根目录下执行如下步骤，编译并执行算子。
+
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
+
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
   - 默认路径，非root用户安装CANN软件包
+
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
   - 指定路径install_path，安装CANN软件包
+
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
+
 - 样例执行
+
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
   ```
+
   执行cube.asc样例的命令如下所示：
+
   ```bash
   python3 ../scripts/gen_data_cube.py   # 生成测试输入数据
   ./cube               # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result_cube.py output_cube/output.bin output_cube/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
+
   执行结果如下，说明精度对比成功。
+
   ```bash
   cube test pass!
   ```
+
   执行vector.asc样例的命令如下所示：
+
   ```bash
   python3 ../scripts/gen_data_vector.py      # 生成测试输入数据
   ./vector                # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result_vector.py output_vector/output_z.bin output_vector/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
+
   执行结果如下，说明精度对比成功。
+
   ```bash
   vector test pass!
   ```

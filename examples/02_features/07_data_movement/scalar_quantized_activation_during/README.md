@@ -6,6 +6,7 @@
 
 ## 支持的产品
 
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -37,35 +38,39 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">KernelFixpipeCustom</td></tr>
   </table>
 
-
 - 算子实现：  
-  - Kernel实现   
+  - Kernel实现  
     Mmad左矩阵和右矩阵的数据类型为int8_t，结果矩阵的数据类型为int32_t。量化模式DEQF16，scalar量化参数为0.5，将Mmad计算出的结果由int32_t量化成half并搬出。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行 
- 
+## 编译运行  
+
 在本样例根目录下执行如下步骤，编译并执行算子。
+
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
+
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
   - 默认路径，非root用户安装CANN软件包
+
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
   - 指定路径install_path，安装CANN软件包
+
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
-    
+
 - 样例执行
+
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
@@ -73,7 +78,9 @@
   ./demo                        # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden_data.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
+
   执行结果如下，说明精度对比成功。
+
   ```bash
   test pass!
   ```
