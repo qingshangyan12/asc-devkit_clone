@@ -35,6 +35,7 @@ void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* bas
 inline void set_mad_hif8() {}
 inline void set_mad_tf32() {}
 inline void set_mad_tf32_round_mode() {}
+inline void set_loop_size_l1toout(uint64_t config) {}
 
 #if defined(__DAV_CUBE__)
     inline int32_t g_coreType = 1;
