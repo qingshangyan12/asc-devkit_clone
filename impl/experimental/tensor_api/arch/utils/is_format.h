@@ -75,71 +75,67 @@ struct GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1> {
     using type = Std::remove_cvref_t<typename GetTypeFromFourDimTrait<T>::StrideColumnsOneDim>;
 };
 
-template <typename ValType, typename CheckType>
-struct Pair {
-    using ValueType = ValType;
-    using TargetType = CheckType;
-};
-
 template <typename T>
-struct FormatChecker {
-protected:
+struct CheckArrangement {
     using type = typename T::elementType;
-    static constexpr auto c0Size = is_b4_type<type> ? C0_SIZE * 2 : C0_SIZE / sizeof(type);
-    using ShapeRow0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
-    using ShapeColumn0 = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
-    using StrideRow0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
-    using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
-    using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
-    using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
-public:
-    template <typename ValType, typename CheckType>
-    __aicore__ inline static constexpr bool CheckSingle() {
-        return ValType::value == CheckType{};
-    }
-
-    template <typename... Pairs, size_t... Is>
-    __aicore__ inline static constexpr bool CheckAllPairsImpl(Std::index_sequence<Is...>) {
-        return (CheckSingle<
-                typename std::tuple_element_t<Is, std::tuple<Pairs...>>::ValueType,
-                typename std::tuple_element_t<Is, std::tuple<Pairs...>>::TargetType
-                >() && ...);
-    }
-
-    template <typename... Pairs>
-    __aicore__ inline static constexpr bool CheckAllPairs() {
-        using Indices = Std::make_index_sequence<sizeof...(Pairs)>;
-        return CheckAllPairsImpl<Pairs...>(Indices{});
-    }
+    using ShapeRow0Type = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::ROW, 0>::type;
+    using ShapeColumn0Type = typename GetFourDimType<T, AttrInfo::SHAPE, AttrInfo::COLUMN, 0>::type;
+    using StrideRow0Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 0>::type;
+    using StrideRow1Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
+    using StrideColumn0Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
+    using StrideColumn1Type = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
 
     __aicore__ inline static constexpr bool IsScaleType() {
  	    return is_one_of_attr_v<type, fp8_e8m0_t>;
  	}
+
+    static constexpr ShapeRow0Type ShapeRow0{};
+    static constexpr ShapeColumn0Type ShapeColumn0{};
+    static constexpr StrideRow0Type StrideRow0{};
+    static constexpr StrideRow1Type StrideRow1{};
+    static constexpr StrideColumn0Type StrideColumn0{};
+    static constexpr StrideColumn1Type StrideColumn1{};
+    static constexpr auto c0Size = is_b4_type<type> ? C0_SIZE * 2 : C0_SIZE / sizeof(type);
 };
 
+__aicore__ inline constexpr bool CheckPairs() {
+    return true;
+}
+
+template <typename T, typename U, typename... Args>
+__aicore__ inline constexpr bool CheckPairs(const T& left, const U& right, Args ...args) {
+    return (left == right) && CheckPairs(args...);
+}
+
+template <typename... Args>
+__aicore__ inline constexpr bool CheckEvenPairs(Args... args) {
+    static_assert((sizeof...(args) % 2) == 0, "parameters number must be an number.");
+    return CheckPairs(args...);
+}
+
 template <typename T>
-struct IsZZFormat : FormatChecker<T> {
+struct IsZZFormat {
 private:
+    static constexpr CheckArrangement<T> arg{};
+
     __aicore__ inline static constexpr bool IsFractalZZFormatNormal() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeRow0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<FRACTAL_FIXED>{}, arg.ShapeRow0, 
+                                      Std::Int<arg.c0Size>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<arg.c0Size>{}, arg.StrideRow0,
+                                      Std::Int<1>{}, arg.StrideColumn0);
+        return (isShapeRight && isStrideRight);
     }
 
     __aicore__ inline static constexpr bool IsFractalScaleZZFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeRow0>,
-               Pair<Std::Int<MX_SCALE_K0>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<MX_SCALE_K0>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<FRACTAL_FIXED>{}, arg.ShapeRow0,
+                                      Std::Int<MX_SCALE_K0>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<MX_SCALE_K0>{}, arg.StrideRow0,
+                                      Std::Int<1>{}, arg.StrideColumn0);
+        return (isShapeRight && isStrideRight);
     }
 
     __aicore__ inline static constexpr bool IsFractalZZFormat() {
-        using ResultType = Std::conditional_t<FormatChecker<T>::IsScaleType(),
+        using ResultType = Std::conditional_t<arg.IsScaleType(),
                            Std::bool_constant<IsFractalScaleZZFormat()>,
                            Std::bool_constant<IsFractalZZFormatNormal()>>;
         return ResultType::value;
@@ -149,90 +145,93 @@ public:
 };
 
 template <typename T>
-struct IsNNFormat : FormatChecker<T> {
+struct IsNNFormat {
 private:
+    static constexpr CheckArrangement<T> arg{};
+
     __aicore__ inline static constexpr bool IsFractalNNFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<MX_SCALE_K0>, typename Base::ShapeRow0>,
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<1>, typename Base::StrideRow0>,
-               Pair<Std::Int<MX_SCALE_K0>, typename Base::StrideColumn0>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<MX_SCALE_K0>{}, arg.ShapeRow0,
+               Std::Int<FRACTAL_FIXED>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<1>{}, arg.StrideRow0,
+               Std::Int<MX_SCALE_K0>{}, arg.StrideColumn0);
+
+        return (isShapeRight && isStrideRight);
     }
 public:
     static constexpr bool value = IsFractalNNFormat();
 };
 
 template <typename T>
-struct IsZNFormat : FormatChecker<T> {
+struct IsZNFormat {
 private:
+    static constexpr CheckArrangement<T> arg{};
+
     __aicore__ inline static constexpr bool IsFractalZNFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<Base::c0Size>, typename Base::ShapeRow0>,
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<1>, typename Base::StrideRow0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::StrideColumn0>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<arg.c0Size>{}, arg.ShapeRow0,
+               Std::Int<FRACTAL_FIXED>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<1>{}, arg.StrideRow0,
+               Std::Int<arg.c0Size>{}, arg.StrideColumn0);
+        return (isShapeRight && isStrideRight);
     }
 public:
     static constexpr bool value = IsFractalZNFormat();
 };
 
 template <typename T>
-struct IsNZFormat : FormatChecker<T> {
+struct IsNZFormat {
 private:
+    static constexpr CheckArrangement<T> arg{};
+
     __aicore__ inline static constexpr bool IsFractalNZFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeRow0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<FRACTAL_FIXED>{}, arg.ShapeRow0,
+               Std::Int<arg.c0Size>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<arg.c0Size>{}, arg.StrideRow0,
+               Std::Int<1>{}, arg.StrideColumn0);
+        return (isShapeRight && isStrideRight);
     }
 public:
     static constexpr bool value = IsFractalNZFormat();
 };
 
 template <typename T>
-struct IsL0cNZFormat : FormatChecker<T> {
+struct IsL0cNZFormat {
 private:
+    static constexpr CheckArrangement<T> arg{};
+
     __aicore__ inline static constexpr bool IsFractalL0cNZFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeRow0>,
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<FRACTAL_FIXED>{}, arg.ShapeRow0,
+               Std::Int<FRACTAL_FIXED>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<FRACTAL_FIXED>{}, arg.StrideRow0,
+               Std::Int<1>{}, arg.StrideColumn0);
+        return (isShapeRight && isStrideRight);
     }
 public:
     static constexpr bool value = IsFractalL0cNZFormat();
 };
 
 template <typename T>
-struct IsNDFormat : FormatChecker<T>{
+struct IsNDFormat {
 private:
+    static constexpr CheckArrangement<T> arg{};
+
     __aicore__ inline static constexpr bool IsFractalNDFormatNormal() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<1>, typename Base::ShapeRow0>,
-               Pair<Std::Int<1>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<0>, typename Base::StrideRow0>,
-               Pair<Std::Int<0>, typename Base::StrideColumn0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn1>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<1>{}, arg.ShapeRow0,
+               Std::Int<1>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<0>{}, arg.StrideRow0,
+               Std::Int<0>{}, arg.StrideColumn0, Std::Int<1>{}, arg.StrideColumn1);
+        return (isShapeRight && isStrideRight);
     }
 
     __aicore__ inline static constexpr bool IsFractalScaleNDFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<2>, typename Base::ShapeRow0>,
-               Pair<Std::Int<1>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<1>, typename Base::StrideRow0>,
-               Pair<Std::Int<0>, typename Base::StrideColumn0>,
-               Pair<Std::Int<2>, typename Base::StrideColumn1>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<2>{}, arg.ShapeRow0,
+               Std::Int<1>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<1>{}, arg.StrideRow0,
+               Std::Int<0>{}, arg.StrideColumn0, Std::Int<2>{}, arg.StrideColumn1);
+        return (isShapeRight && isStrideRight);
     }
 
     __aicore__ inline static constexpr bool IsFractalNDFormat() {
-        using ResultType = Std::conditional_t<FormatChecker<T>::IsScaleType(),
+        using ResultType = Std::conditional_t<arg.IsScaleType(),
                            Std::bool_constant<IsFractalScaleNDFormat()>,
                            Std::bool_constant<IsFractalNDFormatNormal()>>;
         return ResultType::value;
@@ -242,30 +241,28 @@ public:
 };
 
 template <typename T>
-struct IsDNFormat : FormatChecker<T> {
+struct IsDNFormat {
 private:
+    static constexpr CheckArrangement<T> arg{};
+
     __aicore__ inline static constexpr bool IsFractalDNFormatNormal() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<1>, typename Base::ShapeRow0>,
-               Pair<Std::Int<1>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<0>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideRow1>,
-               Pair<Std::Int<0>, typename Base::StrideColumn0>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<1>{}, arg.ShapeRow0,
+               Std::Int<1>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<0>{}, arg.StrideRow0,
+               Std::Int<1>{}, arg.StrideRow1, Std::Int<0>{}, arg.StrideColumn0);
+        return (isShapeRight && isStrideRight);
     }
 
     __aicore__ inline static constexpr bool IsFractalScaleDNFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<1>, typename Base::ShapeRow0>,
-               Pair<Std::Int<2>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<0>, typename Base::StrideRow0>,
-               Pair<Std::Int<2>, typename Base::StrideRow1>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<1>{}, arg.ShapeRow0,
+               Std::Int<2>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<0>{}, arg.StrideRow0,
+               Std::Int<2>{}, arg.StrideRow1, Std::Int<1>{}, arg.StrideColumn0);
+        return (isShapeRight && isStrideRight);
     }
 
     __aicore__ inline static constexpr bool IsFractalDNFormat() {
-        using ResultType = Std::conditional_t<FormatChecker<T>::IsScaleType(),
+        using ResultType = Std::conditional_t<arg.IsScaleType(),
                            Std::bool_constant<IsFractalScaleDNFormat()>,
                            Std::bool_constant<IsFractalDNFormatNormal()>>;
         return ResultType::value;
