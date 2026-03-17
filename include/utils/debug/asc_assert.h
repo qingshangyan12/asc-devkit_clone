@@ -36,16 +36,19 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 #endif
 #endif
 
-#if defined(__NPU_DEVICE__)
+#define COUNT_ARGS_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
+#define COUNT_ARGS(...) COUNT_ARGS_IMPL(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 1)
+#define GET_ARG_COUNT(...) COUNT_ARGS(__VA_ARGS__)
+#define ASSERT_IMPL(N, ...) ASSERT_FUNC(N, __VA_ARGS__)
+#define ASSERT_FUNC(N, ...) ASSERT_##N(__VA_ARGS__)
+#define ASSERT_1(expr) assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
+#define ASSERT_2(expr, ...) ASSERT_1(expr)
+
 #ifdef assert
 #undef assert
 #endif
-#define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
-#else
-#ifndef assert
-#define assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
-#endif
-#endif
+#define assert(...) ASSERT_IMPL(GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ascendc_assert(...) assert(...)
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
