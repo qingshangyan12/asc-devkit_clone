@@ -27,6 +27,9 @@
 #endif
 
 namespace __asc_aicore {
+using ::__asc_aicore::asc_entire_dcci;
+using ::__asc_aicore::get_cstring_len;
+
 template <typename T>
 __aicore__ inline void set_scalar_param(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
 {
