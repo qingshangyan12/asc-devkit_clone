@@ -98,7 +98,7 @@ __aicore__ inline auto MakeTensorWithCoord(const T& oldTensor, const Coord& coor
     return newTensor;
 } 
 
-class Copy2201DeqTensorToFbuf {
+class CopyDeqTensorToFbuf2201 {
 public:
     template <typename T>
     __aicore__ inline void CopyDeqTensorToFbufImpl(const T& src, uint16_t calNSize, uint16_t nIterIndex)
@@ -160,7 +160,7 @@ private:
     }
 };
 
-class Copy2201MatrixCcToGmBase {
+class CopyMatrixCcToGm2201 {
 public:
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename S>
     __aicore__ inline void DataCopy(const T& dst, const U& src, const S& params)
@@ -197,7 +197,7 @@ private:
     }
 };
 
-class SetRegister2201Base {
+class SetRegister2201 {
 public:
     template <typename T, typename U>
     __aicore__ inline void SetRegister(const T& quant, const U& params)
