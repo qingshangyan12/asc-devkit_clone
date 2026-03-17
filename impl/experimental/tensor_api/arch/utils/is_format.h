@@ -92,6 +92,7 @@ protected:
     using StrideRow1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::ROW, 1>::type;
     using StrideColumn0 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 0>::type;
     using StrideColumn1 = typename GetFourDimType<T, AttrInfo::STRIDE, AttrInfo::COLUMN, 1>::type;
+
 public:
     template <typename ValType, typename CheckType>
     __aicore__ inline static constexpr bool CheckSingle() {
@@ -115,27 +116,50 @@ public:
     __aicore__ inline static constexpr bool IsScaleType() {
  	    return is_one_of_attr_v<type, fp8_e8m0_t>;
  	}
+
+    using ShapeRow0Type = ShapeRow0;
+    using ShapeColumn0Type = ShapeColumn0;
+    using StrideRow0Type = StrideRow0;
+    using StrideRow1Type = StrideRow1;
+    using StrideColumn0Type = StrideColumn0;
+    using StrideColumn1Type = StrideColumn1;
 };
 
 template <typename T>
-struct IsZZFormat : FormatChecker<T> {
+__aicore__ inline static constexpr bool Check() {
+    return true;
+}
+
+template <typename T, typename ValType, typename CheckType, typename... Rest>
+__aicore__ inline static constexpr bool Check(ValType, CheckType, Rest... rest) {
+    return FormatChecker<T>::template CheckAllPairs<Pair<ValType, CheckType>>()
+           && Check<T>(rest...);
+}
+
+template <typename T> using ShapeRow0_t = typename FormatChecker<T>::ShapeRow0Type;
+template <typename T> using ShapeColumn0_t = typename FormatChecker<T>::ShapeColumn0Type;
+template <typename T> using StrideRow0_t = typename FormatChecker<T>::StrideRow0Type;
+template <typename T> using StrideRow1_t = typename FormatChecker<T>::StrideRow1Type;
+template <typename T> using StrideColumn0_t = typename FormatChecker<T>::StrideColumn0Type;
+template <typename T> using StrideColumn1_t = typename FormatChecker<T>::StrideColumn1Type;
+
+template <typename T>
+struct IsZZFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalZZFormatNormal() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeRow0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        return Check<T>(
+               Std::Int<FRACTAL_FIXED>{}, ShapeRow0_t<T>{},
+               Std::Int<FormatChecker<T>::c0Size>{}, ShapeColumn0_t<T>{},
+               Std::Int<FormatChecker<T>::c0Size>{}, StrideRow0_t<T>{},
+               Std::Int<1>{}, StrideColumn0_t<T>{});
     }
 
     __aicore__ inline static constexpr bool IsFractalScaleZZFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeRow0>,
-               Pair<Std::Int<MX_SCALE_K0>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<MX_SCALE_K0>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        return Check<T>(
+               Std::Int<FRACTAL_FIXED>{}, ShapeRow0_t<T>{},
+               Std::Int<MX_SCALE_K0>{}, ShapeColumn0_t<T>{},
+               Std::Int<MX_SCALE_K0>{}, StrideRow0_t<T>{},
+               Std::Int<1>{}, StrideColumn0_t<T>{});
     }
 
     __aicore__ inline static constexpr bool IsFractalZZFormat() {
@@ -149,86 +173,80 @@ public:
 };
 
 template <typename T>
-struct IsNNFormat : FormatChecker<T> {
+struct IsNNFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalNNFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<MX_SCALE_K0>, typename Base::ShapeRow0>,
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<1>, typename Base::StrideRow0>,
-               Pair<Std::Int<MX_SCALE_K0>, typename Base::StrideColumn0>>();
+        return Check<T>(
+               Std::Int<MX_SCALE_K0>{}, ShapeRow0_t<T>{},
+               Std::Int<FRACTAL_FIXED>{}, ShapeColumn0_t<T>{},
+               Std::Int<1>{}, StrideRow0_t<T>{},
+               Std::Int<MX_SCALE_K0>{}, StrideColumn0_t<T>{});
     }
 public:
     static constexpr bool value = IsFractalNNFormat();
 };
 
 template <typename T>
-struct IsZNFormat : FormatChecker<T> {
+struct IsZNFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalZNFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<Base::c0Size>, typename Base::ShapeRow0>,
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<1>, typename Base::StrideRow0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::StrideColumn0>>();
+        return Check<T>(
+               Std::Int<FormatChecker<T>::c0Size>{}, ShapeRow0_t<T>{},
+               Std::Int<FRACTAL_FIXED>{}, ShapeColumn0_t<T>{},
+               Std::Int<1>{}, StrideRow0_t<T>{},
+               Std::Int<FormatChecker<T>::c0Size>{}, StrideColumn0_t<T>{});
     }
 public:
     static constexpr bool value = IsFractalZNFormat();
 };
 
 template <typename T>
-struct IsNZFormat : FormatChecker<T> {
+struct IsNZFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalNZFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeRow0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<Base::c0Size>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        return Check<T>(
+               Std::Int<FRACTAL_FIXED>{}, ShapeRow0_t<T>{},
+               Std::Int<FormatChecker<T>::c0Size>{}, ShapeColumn0_t<T>{},
+               Std::Int<FormatChecker<T>::c0Size>{}, StrideRow0_t<T>{},
+               Std::Int<1>{}, StrideColumn0_t<T>{});
     }
 public:
     static constexpr bool value = IsFractalNZFormat();
 };
 
 template <typename T>
-struct IsL0cNZFormat : FormatChecker<T> {
+struct IsL0cNZFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalL0cNZFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeRow0>,
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<FRACTAL_FIXED>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        return Check<T>(
+               Std::Int<FRACTAL_FIXED>{}, ShapeRow0_t<T>{},
+               Std::Int<FRACTAL_FIXED>{}, ShapeColumn0_t<T>{},
+               Std::Int<FRACTAL_FIXED>{}, StrideRow0_t<T>{},
+               Std::Int<1>{}, StrideColumn0_t<T>{});
     }
 public:
     static constexpr bool value = IsFractalL0cNZFormat();
 };
 
 template <typename T>
-struct IsNDFormat : FormatChecker<T>{
+struct IsNDFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalNDFormatNormal() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<1>, typename Base::ShapeRow0>,
-               Pair<Std::Int<1>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<0>, typename Base::StrideRow0>,
-               Pair<Std::Int<0>, typename Base::StrideColumn0>,
-               Pair<Std::Int<1>, typename Base::StrideColumn1>>();
+        return Check<T>(
+               Std::Int<1>{}, ShapeRow0_t<T>{},
+               Std::Int<1>{}, ShapeColumn0_t<T>{},
+               Std::Int<0>{}, StrideRow0_t<T>{},
+               Std::Int<0>{}, StrideColumn0_t<T>{},
+               Std::Int<1>{}, StrideColumn1_t<T>{});
     }
 
     __aicore__ inline static constexpr bool IsFractalScaleNDFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<2>, typename Base::ShapeRow0>,
-               Pair<Std::Int<1>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<1>, typename Base::StrideRow0>,
-               Pair<Std::Int<0>, typename Base::StrideColumn0>,
-               Pair<Std::Int<2>, typename Base::StrideColumn1>>();
+        return Check<T>(
+               Std::Int<2>{}, ShapeRow0_t<T>{},
+               Std::Int<1>{}, ShapeColumn0_t<T>{},
+               Std::Int<1>{}, StrideRow0_t<T>{},
+               Std::Int<0>{}, StrideColumn0_t<T>{},
+               Std::Int<2>{}, StrideColumn1_t<T>{});
     }
 
     __aicore__ inline static constexpr bool IsFractalNDFormat() {
@@ -242,26 +260,24 @@ public:
 };
 
 template <typename T>
-struct IsDNFormat : FormatChecker<T> {
+struct IsDNFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalDNFormatNormal() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<1>, typename Base::ShapeRow0>,
-               Pair<Std::Int<1>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<0>, typename Base::StrideRow0>,
-               Pair<Std::Int<1>, typename Base::StrideRow1>,
-               Pair<Std::Int<0>, typename Base::StrideColumn0>>();
+        return Check<T>(
+               Std::Int<1>{}, ShapeRow0_t<T>{},
+               Std::Int<1>{}, ShapeColumn0_t<T>{},
+               Std::Int<0>{}, StrideRow0_t<T>{},
+               Std::Int<1>{}, StrideRow1_t<T>{},
+               Std::Int<0>{}, StrideColumn0_t<T>{});
     }
 
     __aicore__ inline static constexpr bool IsFractalScaleDNFormat() {
-        using Base = FormatChecker<T>;
-        return Base::template CheckAllPairs<
-               Pair<Std::Int<1>, typename Base::ShapeRow0>,
-               Pair<Std::Int<2>, typename Base::ShapeColumn0>,
-               Pair<Std::Int<0>, typename Base::StrideRow0>,
-               Pair<Std::Int<2>, typename Base::StrideRow1>,
-               Pair<Std::Int<1>, typename Base::StrideColumn0>>();
+        return Check<T>(
+               Std::Int<1>{}, ShapeRow0_t<T>{},
+               Std::Int<2>{}, ShapeColumn0_t<T>{},
+               Std::Int<0>{}, StrideRow0_t<T>{},
+               Std::Int<2>{}, StrideRow1_t<T>{},
+               Std::Int<1>{}, StrideColumn0_t<T>{});
     }
 
     __aicore__ inline static constexpr bool IsFractalDNFormat() {
