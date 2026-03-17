@@ -18,6 +18,11 @@ import numpy as np
 API_ID_EXP = 1
 API_ID_MUL = 2
 
+API_NAME_MAP = {
+    1: "exp",
+    2: "mul",
+}
+
 RELATIVE_TOL = 1e-6
 ABSOLUTE_TOL = 1e-9
 ERROR_TOL = 1e-4
@@ -86,7 +91,7 @@ def verify_single_api(output_type, input_x):
     return error_ratio <= ERROR_TOL
 
 
-def verify_binary_api(output_type, input_x, input_y):
+def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
     np_type = get_type_from_id(output_type)
     type_name = np_type.__name__
     
@@ -100,12 +105,13 @@ def verify_binary_api(output_type, input_x, input_y):
     num_special = len(special_names)
     
     print(f"\n{'='*125}")
-    print(f"API: mul | Verification Results")
+    print(f"API: {api_name} | Verification Results")
     print(f"{'='*125}")
     print(f"{'src/dst type':<12} | {'src0':<15} | {'src1':<15} | {'dst (Non-Sat)':<22} | {'dst (Saturation)':<22}")
     print(f"{'-'*125}")
     
     valid_count = 0
+    printed_count = 0
     for idx in range(len(golden)):
         inp_a = input_x[idx]
         inp_b = input_y[idx]
@@ -116,7 +122,8 @@ def verify_binary_api(output_type, input_x, input_y):
         if np.isnan(golden_val):
             is_match = np.isnan(actual_non_sat)
         elif np.isinf(golden_val):
-            is_match = np.isinf(actual_non_sat) and np.sign(actual_non_sat) == np.sign(golden_val)
+            is_match = (np.isinf(actual_non_sat) and np.sign(actual_non_sat) == np.sign(golden_val)) or \
+                       (actual_non_sat == 0 and golden_val == np.inf)
         else:
             is_match = np.isclose(actual_non_sat, golden_val, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL)
         
@@ -124,21 +131,25 @@ def verify_binary_api(output_type, input_x, input_y):
             valid_count += 1
         
         if idx < num_special * num_special:
+            # 去重显示
             i = idx // num_special
             j = idx % num_special
-            name_a = special_names[i]
-            name_b = special_names[j]
-            print(f"{type_name:<12} | [{name_a:<4}]{str(inp_a):<8} | [{name_b:<4}]{str(inp_b):<8} | {str(actual_non_sat):<22} | {str(actual_sat):<22}")
+            if i <= j:
+                name_a = special_names[i]
+                name_b = special_names[j]
+                print(f"{type_name:<12} | [{name_a:<4}]{str(inp_a):<8} | [{name_b:<4}]{str(inp_b):<8} | {str(actual_non_sat):<22} | {str(actual_sat):<22}")
+                printed_count += 1
     
     error_ratio = 1.0 - (valid_count / len(golden))
     print(f"{'-'*125}")
-    print(f"Total: {len(golden)}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
+    print(f"Total: {len(golden)}, Unique: {printed_count}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
     print(f"{'='*125}\n")
     
     return error_ratio <= ERROR_TOL
 
 
 def verify_result(output_type, api_id, input_x=None, input_y=None):
+    api_name = API_NAME_MAP.get(api_id, "unknown")
     try:
         if api_id == API_ID_EXP:
             if input_x is None:
@@ -149,7 +160,7 @@ def verify_result(output_type, api_id, input_x=None, input_y=None):
                 input_x = "./input/input_x.bin"
             if input_y is None:
                 input_y = "./input/input_y.bin"
-            res = verify_binary_api(output_type, input_x, input_y)
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
         else:
             print(f"Unsupported API ID: {api_id}")
             return False

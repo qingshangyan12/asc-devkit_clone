@@ -1,8 +1,21 @@
 #!/bin/bash
 
-INPUT_SIZE=128
+INPUT_SIZE=${INPUT_SIZE:-128}
 INPUT_API_ID=${INPUT_API_ID:-1}
 INPUT_API_TYPE=${INPUT_API_TYPE:-1}
+
+case $INPUT_API_ID in
+    1|3|4|5) EXPECTED_TYPE=1 ;;
+    2|6|7|8) EXPECTED_TYPE=2 ;;
+    *) echo "Error: Unknown API_ID=$INPUT_API_ID"; exit 1 ;;
+esac
+
+if [ "$INPUT_API_TYPE" != "$EXPECTED_TYPE" ]; then
+    echo "Error: API_ID=$INPUT_API_ID expects API_TYPE=$EXPECTED_TYPE, but got API_TYPE=$INPUT_API_TYPE"
+    echo "  Exp/Sqrt/Ln/Abs (API_ID 1/3/4/5) should use API_TYPE=1 (Unary)"
+    echo "  Mul/Add/Sub/Div (API_ID 2/6/7/8) should use API_TYPE=2 (Binary)"
+    exit 1
+fi
 
 echo "========================================="
 echo "INPUT_SIZE:     $INPUT_SIZE"
