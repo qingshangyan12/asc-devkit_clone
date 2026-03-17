@@ -47,6 +47,7 @@ target_link_libraries(vector PRIVATE
 # ======================================================================================
 target_compile_options(cube PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
+    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
 )
 
 # ======================================================================================
@@ -57,4 +58,5 @@ target_compile_options(cube PRIVATE
 # ======================================================================================
 target_compile_options(vector PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
+    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
 )
