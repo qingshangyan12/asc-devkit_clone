@@ -26,6 +26,10 @@ target_link_libraries(demo PRIVATE
     m
     dl
 )
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
 
 # ======================================================================================
 # NPU 编译选项配置

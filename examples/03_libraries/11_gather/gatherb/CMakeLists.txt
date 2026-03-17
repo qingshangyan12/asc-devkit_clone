@@ -16,7 +16,7 @@ find_package(ASC REQUIRED HINTS $ENV{ASCEND_INSTALL_PATH}/compiler/tikcpp/ascend
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    gatherb.asc
+    gatherb_static.asc
 )
 
 target_link_libraries(demo PRIVATE
@@ -27,12 +27,19 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+ 	 
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
+
 # ======================================================================================
 # NPU 编译选项配置
 #
 # 说明：
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
+
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
     # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>

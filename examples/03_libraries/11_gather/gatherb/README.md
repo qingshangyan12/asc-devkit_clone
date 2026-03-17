@@ -2,6 +2,43 @@
 ## 概述
 本样例基于Gatherb实现对于给定的输入张量和一个地址偏移量，根据偏移地址按照DataBlock的粒度将输入张量按元素收集到结果张量中。
 
+本样例通过Ascend C编程语言实现了Gather算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。
+
+下面主要记录了5种不同的测试场景（scenario），用于评估某种计算系统或处理器在不同条件下的性能表现。
+
+<table>
+    <tr>
+        <td>scenarioNum</td>
+        <td>数据类型</td>
+        <td>描述</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>half</td>
+        <td>【基础半精度功能测试】目的操作数连续写出模式</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>half</td>
+        <td>【基础半精度功能测试】目的操作数非连续写出模式</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>half</td>
+        <td>【半精度无业务性能测试】目的操作数连续写出模式</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>half</td>
+        <td>【半精度无业务性能测试】bank conflict的场景</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>float</td>
+        <td>【单精度无业务性能测试】目的操作数连续写出模式</td>
+    </tr>
+</table>
+
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -15,25 +52,15 @@
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── gatherb.asc                 // Ascend C算子实现 & 调用样例
+│   ├── gatherb.asc             // Ascend C算子实现 & 调用样例（动态内存版本）
+│   └── gatherb_static.asc      // Ascend C算子实现 & 调用样例（静态内存版本）
 ```
 
 ## 算子描述
 - 算子功能：  
   Gatherb算子实现了根据偏移地址按照DataBlock的粒度将输入张量按元素收集到结果张量中，并返回计算结果的功能。
 
-- 算子规格：  
-  <table>  
-  <tr><th align="center">算子类型(OpType)</th><th colspan="5" align="center">Gatherb</th></tr>  
-  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">default</td></tr>  
-  <tr><td align="center">x</td><td align="center">128</td><td align="center">uint16</td><td align="center">ND</td><td align="center">\</td></tr>  
-  <tr><td align="center">offset</td><td align="center">8</td><td align="center">uint32</td><td align="center">ND</td><td align="center">\</td></tr>   
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">out</td><td align="center">128</td><td align="center">uint16</td><td align="center">ND</td><td align="center">\</td></tr>  
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">vgatherb_core</td></tr>  
-  </table>
-
 - 算子实现：  
-  本样例中实现的是固定shape为128的Gatherb算子。
   - kernel实现   
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成根据偏移地址按照DataBlock的粒度将输入张量按元素收集到结果张量中的操作，得到最终结果，再搬出到外部存储上。   
 
@@ -63,11 +90,12 @@
     
 - 样例执行
   ```bash
+  SCENARIO=1
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  cmake .. -DSCENARIO_NUM=$SCENARIO;make -j;             # 编译工程
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO  # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash
