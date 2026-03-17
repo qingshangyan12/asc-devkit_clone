@@ -19,15 +19,13 @@ protected:
     void TearDown() {}
 };
 
-namespace {
 void set_l12ub_loop_size_Stub(uint64_t config) {
-    EXPECT_EQ(config, static_cast<uint64_t>(1));
-}
+    EXPECT_EQ(config, static_cast<uint64_t>(22));
 }
 
 TEST_F(TestSysVarSetL12UbLoopSize, c_api_set_l12ub_loop_size_Succ)
 {
-    int64_t input = 1;
+    int64_t input = 22;
     MOCKER_CPP(set_loop_size_l1toout, void(uint64_t)) 
             .times(1)
             .will(invoke(set_l12ub_loop_size_Stub));

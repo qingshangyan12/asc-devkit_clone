@@ -21,20 +21,22 @@ protected:\
     void TearDown() {}\
 };\
 \
-namespace {\
 void set_l12ub_loop_size_Stub##data_type(data_type config) {\
-    EXPECT_EQ(config, static_cast<data_type>(1));\
-}\
+    EXPECT_EQ(config, static_cast<data_type>(33));\
 }\
 \
 TEST_F(TestSysVarSetL13dPadding, c_api_set_l12ub_loop_size##data_type)\
 {\
-    data_type input = 1;\
-    MOCKER_CPP(set_loop_size_l1toout, void(data_type))\
+    data_type input = 33;\
+    MOCKER_CPP(set_padding, void(data_type))\
             .times(1)\
             .will(invoke(set_l12ub_loop_size_Stub##data_type));\
-    asc_set_l12ub_loop_size(input);\
+    asc_set_l13d_padding(input);\
     asc_init();\
     GlobalMockObject::verify();\
 }
 
+TEST_SYS_VAR_SET_PADDING(uint64_t);
+TEST_SYS_VAR_SET_PADDING(half);
+TEST_SYS_VAR_SET_PADDING(int16_t);
+TEST_SYS_VAR_SET_PADDING(uint16_t);

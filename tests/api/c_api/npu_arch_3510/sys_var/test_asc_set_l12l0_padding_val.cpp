@@ -19,15 +19,13 @@ protected:
     void TearDown() {}
 };
 
-namespace {
 void set_l12l0_padding_val_Stub(uint64_t config) {
-    EXPECT_EQ(config, static_cast<uint64_t>(1));
-}
+    EXPECT_EQ(config, static_cast<uint64_t>(11));
 }
 
 TEST_F(TestSysVarSetL12L0PaddingVal, c_api_set_l12l0_padding_val_Succ)
 {
-    int64_t input = 1;
+    int64_t input = 11;
     MOCKER_CPP(set_padding_b, void(uint64_t)) 
             .times(1)
             .will(invoke(set_l12l0_padding_val_Stub));
