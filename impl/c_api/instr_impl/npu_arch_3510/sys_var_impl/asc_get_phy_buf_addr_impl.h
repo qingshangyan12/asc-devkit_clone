@@ -25,21 +25,6 @@ __aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset)
     return get_imm(offset);
 }
 
-__aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset0, uint64_t offset1)
-{
-    return get_imm(offset0, offset1);
-}
-
-__aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset0, uint64_t offset1, uint64_t offset2)
-{
-    return get_imm(offset0, offset1, offset2);
-}
-
-__aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset0, uint64_t offset1, uint64_t offset2, uint64_t offset3)
-{
-    return get_imm(offset0, offset1, offset2, offset3);
-}
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)  

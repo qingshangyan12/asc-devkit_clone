@@ -25,21 +25,9 @@ uint64_t get_imm_stub(uint64_t offset)
 {
     return 0;
 }
-uint64_t get_imm_stub1(uint64_t offset0, uint64_t offset1)
-{
-    return 1;
-}
-uint64_t get_imm_stub2(uint64_t offset0, uint64_t offset1, uint64_t offset2)
-{
-    return 2;
-}
-uint64_t get_imm_stub3(uint64_t offset0, uint64_t offset1, uint64_t offset2, uint64_t offset3)
-{
-    return 3;
-}
 }
 
-TEST_F(TestGetPhyBufAddr, asc_get_phy_buf_addr_one_param_Succ)
+TEST_F(TestGetPhyBufAddr, asc_get_phy_buf_addr_Succ)
 {
     MOCKER_CPP(get_imm, uint64_t(uint64_t))
             .times(1)
@@ -47,38 +35,5 @@ TEST_F(TestGetPhyBufAddr, asc_get_phy_buf_addr_one_param_Succ)
 
     int64_t val = asc_get_phy_buf_addr(0);
     EXPECT_EQ(0, val);
-    GlobalMockObject::verify();
-}
-
-TEST_F(TestGetPhyBufAddr, asc_get_phy_buf_addr_two_param_Succ)
-{
-    MOCKER_CPP(get_imm, uint64_t(uint64_t, uint64_t))
-        .times(1)
-        .will(invoke(get_imm_stub1));
-
-    int64_t val = asc_get_phy_buf_addr(0, 1);
-    EXPECT_EQ(1, val);
-    GlobalMockObject::verify();
-}
-
-TEST_F(TestGetPhyBufAddr, asc_get_phy_buf_addr_three_param_Succ)
-{
-    MOCKER_CPP(get_imm, uint64_t(uint64_t, uint64_t, uint64_t))
-        .times(1)
-        .will(invoke(get_imm_stub2));
-
-    int64_t val = asc_get_phy_buf_addr(0, 1, 2);
-    EXPECT_EQ(2, val);
-    GlobalMockObject::verify();
-}
-
-TEST_F(TestGetPhyBufAddr, asc_get_phy_buf_addr_four_param_Succ)
-{
-    MOCKER_CPP(get_imm, uint64_t(uint64_t, uint64_t, uint64_t, uint64_t))
-        .times(1)
-        .will(invoke(get_imm_stub3));
-
-    int64_t val = asc_get_phy_buf_addr(0, 1, 2, 3);
-    EXPECT_EQ(3, val);
     GlobalMockObject::verify();
 }
