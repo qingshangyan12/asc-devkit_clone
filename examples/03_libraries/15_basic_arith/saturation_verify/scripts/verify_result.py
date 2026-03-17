@@ -45,7 +45,7 @@ def get_special_names(data_type):
     return names
 
 
-def verify_single_api(output_type, input_x):
+def verify_single_api(output_type, input_x, api_name="exp"):
     np_type = get_type_from_id(output_type)
     type_name = np_type.__name__
     
@@ -57,7 +57,7 @@ def verify_single_api(output_type, input_x):
     special_names = get_special_names(np_type)
     
     print(f"\n{'='*105}")
-    print(f"API: exp | Verification Results")
+    print(f"API: {api_name} | Verification Results")
     print(f"{'='*105}")
     print(f"{'src/dst type':<12} | {'src':<20} | {'dst (Non-Sat)':<22} | {'dst (Saturation)':<22}")
     print(f"{'-'*105}")

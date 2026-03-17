@@ -5,8 +5,8 @@ INPUT_API_ID=${INPUT_API_ID:-1}
 INPUT_API_TYPE=${INPUT_API_TYPE:-1}
 
 case $INPUT_API_ID in
-    1|3|4|5) EXPECTED_TYPE=1 ;;
-    2|6|7|8) EXPECTED_TYPE=2 ;;
+    1) EXPECTED_TYPE=1 ;;
+    2) EXPECTED_TYPE=2 ;;
     *) echo "Error: Unknown API_ID=$INPUT_API_ID"; exit 1 ;;
 esac
 

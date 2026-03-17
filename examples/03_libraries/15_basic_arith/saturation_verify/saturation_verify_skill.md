@@ -85,6 +85,7 @@ INPUT_API_ID=xxx INPUT_API_TYPE=1 bash test.sh
 # 双目 API  
 INPUT_API_ID=xxx INPUT_API_TYPE=2 bash test.sh
 ```
+将执行结果的表格数据呈现出来，供用户复制。
 
 ## 文件结构
 
@@ -101,3 +102,211 @@ saturation_verify/
 ├── test.sh                   # 测试脚本
 └── README.md                 # 使用文档
 ```
+
+---
+
+## 补充说明：Step 3 代码适配详细示例
+
+以用户新增 `Reciprocal` API 为例，说明手动修改代码的具体步骤。假设 `Reciprocal` 是单目 API，支持 half/float 类型。
+
+### 3.1 修改 saturation_verify.asc
+
+**步骤1：添加 API ID 定义**
+
+在文件开头找到 `#define API_ID_EXP  1` 和 `#define API_ID_MUL  2`，添加：
+
+```cpp
+#define API_ID_EXP   1
+#define API_ID_MUL   2
+#define API_ID_RECIPROCAL   3    // 新增
+```
+
+**步骤2：修改 CopyIn() 函数**
+
+在 CopyIn() 函数的 if-else 链中新增单目 API 的输入处理：
+
+```cpp
+__aicore__ inline void CopyIn()
+{
+    if constexpr (INPUT_API_ID_VAL == API_ID_EXP) {
+        AscendC::LocalTensor<T> srcLocal = inQueueSrc.AllocTensor<T>();
+        AscendC::DataCopy(srcLocal, srcGlobal, INPUT_TENSOR_SIZE);
+        inQueueSrc.EnQue(srcLocal);
+    } else if constexpr (INPUT_API_ID_VAL == API_ID_MUL) {
+        // 双目 API 有两个输入
+        AscendC::LocalTensor<T> src1Local = inQueueSrc1.AllocTensor<T>();
+        AscendC::LocalTensor<T> src2Local = inQueueSrc2.AllocTensor<T>();
+        AscendC::DataCopy(src1Local, src1Global, INPUT_TENSOR_SIZE);
+        AscendC::DataCopy(src2Local, src2Global, INPUT_TENSOR_SIZE);
+        inQueueSrc1.EnQue(src1Local);
+        inQueueSrc2.EnQue(src2Local);
+    } else if constexpr (INPUT_API_ID_VAL == API_ID_RECIPROCAL) {   // 新增
+        AscendC::LocalTensor<T> srcLocal = inQueueSrc.AllocTensor<T>();
+        AscendC::DataCopy(srcLocal, srcGlobal, INPUT_TENSOR_SIZE);
+        inQueueSrc.EnQue(srcLocal);
+    }
+}
+```
+
+**步骤3：修改 Compute() 函数**
+
+在 Compute() 函数的 if-else 链中新增 API 调用：
+
+```cpp
+__aicore__ inline void Compute()
+{
+    if constexpr (INPUT_API_ID_VAL == API_ID_EXP) {
+        AscendC::LocalTensor<T> srcLocal = inQueueSrc.DeQue<T>();
+        AscendC::LocalTensor<T> dstLocal = outQueueDst.AllocTensor<T>();
+        AscendC::Exp(dstLocal, srcLocal, INPUT_TENSOR_SIZE);
+        outQueueDst.EnQue<T>(dstLocal);
+        inQueueSrc.FreeTensor(srcLocal);
+    } else if constexpr (INPUT_API_ID_VAL == API_ID_MUL) {
+        AscendC::LocalTensor<T> src1Local = inQueueSrc1.DeQue<T>();
+        AscendC::LocalTensor<T> src2Local = inQueueSrc2.DeQue<T>();
+        AscendC::LocalTensor<T> dstLocal = outQueueDst.AllocTensor<T>();
+        AscendC::Mul(dstLocal, src1Local, src2Local, INPUT_TENSOR_SIZE);
+        outQueueDst.EnQue<T>(dstLocal);
+        inQueueSrc1.FreeTensor(src1Local);
+        inQueueSrc2.FreeTensor(src2Local);
+    } else if constexpr (INPUT_API_ID_VAL == API_ID_RECIPROCAL) {   // 新增
+        AscendC::LocalTensor<T> srcLocal = inQueueSrc.DeQue<T>();
+        AscendC::LocalTensor<T> dstLocal = outQueueDst.AllocTensor<T>();
+        AscendC::Reciprocal(dstLocal, srcLocal, INPUT_TENSOR_SIZE);  // 调用 API
+        outQueueDst.EnQue<T>(dstLocal);
+        inQueueSrc.FreeTensor(srcLocal);
+    }
+}
+```
+
+### 3.2 创建 scripts/gen_data_reciprocal.py
+
+新建文件，参考现有的 gen_data_exp.py：
+
+```python
+#!/usr/bin python3
+import numpy as np
+from gen_data_utils import DATA_TYPE_MAP, construct_special_values, save_bin, get_special_names, print_unary_api_table
+
+def compute_reciprocal_golden(input_array):
+    with np.errstate(over='ignore', under='ignore', invalid='ignore'):
+        result = np.where(input_array == 0, np.inf, np.reciprocal(input_array))
+    return result.astype(input_array.dtype)
+
+def gen_reciprocal_data(input_type, input_size):
+    data_type = DATA_TYPE_MAP[input_type]
+    type_name = np.dtype(data_type).name
+    
+    special_vals = construct_special_values(data_type)
+    inputs = np.array(special_vals, dtype=data_type)
+    golden = compute_reciprocal_golden(inputs)
+    
+    save_bin(inputs, f"./input/input_x.bin")
+    save_bin(golden, f"./output/golden.bin")
+    
+    special_names = get_special_names(data_type)
+    print_unary_api_table("reciprocal", type_name, special_names, inputs, golden)
+```
+
+### 3.3 修改 scripts/gen_data.py
+
+**步骤1：添加导入**
+
+```python
+from gen_data_exp import compute_exp_golden, gen_exp_data
+from gen_data_mul import compute_mul_golden, gen_mul_data
+from gen_data_reciprocal import compute_reciprocal_golden, gen_reciprocal_data  # 新增
+```
+
+**步骤2：添加 API ID 和名称映射**
+
+```python
+API_ID_EXP = 1
+API_ID_MUL = 2
+API_ID_RECIPROCAL = 3  # 新增
+
+API_NAME_MAP = {
+    1: "exp",
+    2: "mul",
+    3: "reciprocal",  # 新增
+}
+```
+
+**步骤3：修改 argparse 的 choices**
+
+```python
+parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3],
+                    help="API ID: 1=exp, 2=mul, 3=reciprocal")
+```
+
+**步骤4：添加分支逻辑**
+
+```python
+if args.apiId == API_ID_EXP:
+    gen_exp_data(input_type, args.inputSize)
+elif args.apiId == API_ID_MUL:
+    gen_mul_data(input_type, args.inputSize)
+elif args.apiId == API_ID_RECIPROCAL:  # 新增
+    gen_reciprocal_data(input_type, args.inputSize)
+```
+
+### 3.4 修改 scripts/verify_result.py
+
+**步骤1：添加 API ID 和名称映射**
+
+```python
+API_ID_EXP = 1
+API_ID_MUL = 2
+API_ID_RECIPROCAL = 3  # 新增
+
+API_NAME_MAP = {
+    1: "exp",
+    2: "mul",
+    3: "reciprocal",  # 新增
+}
+```
+
+**步骤2：修改 verify_result 函数中的调用**
+
+```python
+if api_id == API_ID_EXP:
+    res = verify_single_api(output_type, input_x, "exp")
+elif api_id == API_ID_RECIPROCAL:  # 新增
+    res = verify_single_api(output_type, input_x, "reciprocal")
+elif api_id == API_ID_MUL:
+    res = verify_binary_api(output_type, input_x, input_y, api_name)
+```
+
+**步骤3：修改 argparse 的 choices**
+
+```python
+parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3],
+                    help="API ID: 1=exp, 2=mul, 3=reciprocal")
+```
+
+### 3.5 修改 test.sh
+
+**步骤1：修改 case 映射**
+
+```bash
+case $INPUT_API_ID in
+    1|3) EXPECTED_TYPE=1 ;;   # 单目 API: exp(1), reciprocal(3)
+    2) EXPECTED_TYPE=2 ;;     # 双目 API: mul(2)
+    *) echo "Error: Unknown API_ID=$INPUT_API_ID"; exit 1 ;;
+esac
+```
+
+**步骤2：更新 echo 提示**
+
+```bash
+echo "INPUT_API_ID:   $INPUT_API_ID (1: exp, 2: mul, 3: reciprocal)"
+```
+
+### 3.6 执行验证
+
+```bash
+# 单目 API
+INPUT_API_ID=3 INPUT_API_TYPE=1 bash test.sh
+```
+
+执行完成后会输出饱和/非饱和模式对比表格。
