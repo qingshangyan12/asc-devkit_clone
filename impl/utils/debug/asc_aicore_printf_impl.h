@@ -26,10 +26,7 @@
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_printf_utils.h"
 #endif
 
-using ::__asc_aicore::asc_entire_dcci;
-using ::__asc_aicore::get_cstring_len;
 namespace __asc_aicore {
-
 template <typename T>
 __aicore__ inline void set_scalar_param(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
 {

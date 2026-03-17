@@ -41,7 +41,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 #define GET_ARG_COUNT(...) COUNT_ARGS(__VA_ARGS__)
 #define ASSERT_IMPL(N, ...) ASSERT_FUNC(N, __VA_ARGS__)
 #define ASSERT_FUNC(N, ...) ASSERT_##N(__VA_ARGS__)
-#define ASSERT_1(expr) assert(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
+#define ASSERT_1(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
 #define ASSERT_2(expr, ...) ASSERT_1(expr)
 
 #ifdef assert
