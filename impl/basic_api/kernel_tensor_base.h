@@ -12,6 +12,11 @@
  * \file kernel_tensor_base.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_tensor_base.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_BASE_H__
+#endif
 #ifndef ASCENDC_MODULE_TENSOR_BASE_H
 #define ASCENDC_MODULE_TENSOR_BASE_H
 #include <cstdint>
@@ -77,7 +82,7 @@ enum class TBufState : uint8_t {
 struct TBufType {
     TBufState state;
     HardEvent freeBufEvt;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     union {
         struct {
             TEventID enQueEvtID;
@@ -280,3 +285,7 @@ __aicore__ inline void BaseTensorTraitTensor<TensorTrait<T, pos, LayoutType>>::S
 
 }
 #endif // ASCENDC_MODULE_TPIPE_BASE_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_BASE_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_BASE_H__
+#endif

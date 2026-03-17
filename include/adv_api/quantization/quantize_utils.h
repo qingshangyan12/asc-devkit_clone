@@ -12,6 +12,12 @@
  * \file quantize_utils.h
  * \brief
  */
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZE_UTILS_H__
+#endif
+
 #ifndef LIB_QUANTIZATION_QUANTIZE_UTILS_H
 #define LIB_QUANTIZATION_QUANTIZE_UTILS_H
 
@@ -19,7 +25,7 @@
 #include "kernel_basic_intf.h"
 
 namespace AscendC {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 enum class QuantizePolicy : int32_t {
     PER_TENSOR,
     PER_CHANNEL,
@@ -39,6 +45,11 @@ struct QuantizeParams {
   uint32_t n;
   uint32_t groupSize = 0;
 };
-#endif // defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101
+#endif // defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 }; // namespace AscendC
 #endif // LIB_QUANTIZATION_QUANTIZE_UTILS_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZE_UTILS_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZE_UTILS_H__
+#endif

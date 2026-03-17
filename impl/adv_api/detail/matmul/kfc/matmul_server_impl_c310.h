@@ -12,6 +12,12 @@
  * \file matmul_server_impl_c310.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/adv_api/detail/matmul/kfc/matmul_server_impl_c310.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul_client.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_KFC_MATMUL_SERVER_IMPL_C310_H__
+#endif
+
 #ifndef IMPL_MATMUL_KFC_MATMUL_SERVER_IMPL_C310_H
 #define IMPL_MATMUL_KFC_MATMUL_SERVER_IMPL_C310_H
 
@@ -169,7 +175,7 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         }
     }
 
-    // Now release UB, actual is gmï¼Œ gm->l1
+    // Now release UB, actual is gmï¿?gm->l1
     if constexpr ((ToMatmulConfig(MM_CFG).iterateMode & IterateMode::ITERATE_MODE_ALL) != 0) {
         if (sync || body.waitIterateAll) {
             ASSERT(funID == KFC_Enum::MMFUN_ITERATE_ALL);
@@ -520,5 +526,19 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
     }
     return true;
 }
+
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG, class MM_CB,
+    MATMUL_POLICY_TEMPLATE_OF(MATMUL_POLICY)>
+__aicore__ inline void MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::SuperKernelEventCount(uint16_t eventID)
+{
+    (void)eventID;
+}
+#endif
 } // namespace AscendC
 #endif // IMPL_MATMUL_KFC_MATMUL_SERVER_IMPL_C310_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_KFC_MATMUL_SERVER_IMPL_C310_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_KFC_MATMUL_SERVER_IMPL_C310_H__
+#endif

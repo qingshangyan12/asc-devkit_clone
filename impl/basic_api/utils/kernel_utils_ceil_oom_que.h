@@ -12,6 +12,11 @@
  * \file kernel_utils_ceil_oom_que.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/utils/kernel_utils_ceil_oom_que.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H__
+#endif
 #ifndef ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
 #define ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
 #include "utils/kernel_utils_macros.h"
@@ -50,7 +55,7 @@ __aicore__ inline uint32_t Ceil(uint32_t a, uint32_t b)
     return (a + b - 1) / b;
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
 __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {
@@ -276,7 +281,7 @@ __aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig* conf)
     };
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 __aicore__ constexpr bool UseAltBufId(TPosition queDstPos, TPosition dstConsumerPos, uint32_t consumerSize)
 {
     if (consumerSize <= 1) {
@@ -318,7 +323,7 @@ __aicore__ constexpr bool SupportType()
     return IsSameType<T, U>::value;
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 template <typename T> struct GetComplexElementType {
     using Type = T;
 };
@@ -380,13 +385,13 @@ template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&
 #endif
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
 template <auto funcPtr, typename... Args> __aicore__ inline void asc_vf_call(Args &&... args)
 {
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3101) 
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) 
         funcPtr(args...);
 #endif
 }
@@ -447,3 +452,7 @@ template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&
 #endif
 
 #endif // ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_CEIL_OOM_QUE_H__
+#endif

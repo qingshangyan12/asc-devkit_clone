@@ -12,6 +12,11 @@
  * \file kernel_utils_struct_confusion_pad.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/utils/kernel_utils_struct_confusion_pad.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_STRUCT_CONFUSION_PAD_H__
+#endif
 #ifndef ASCENDC_MODULE_UTILS_STRUCT_CONFUSION_PAD_H
 #define ASCENDC_MODULE_UTILS_STRUCT_CONFUSION_PAD_H
 #include "utils/kernel_utils_mode.h"
@@ -297,7 +302,7 @@ struct ConfusionTranspose0213Tiling {
     uint32_t mainOffset = 0;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 struct ConfusionTranspose021Tiling {
     __aicore__ ConfusionTranspose021Tiling()
     {
@@ -409,7 +414,7 @@ struct UnPadParams {
 #if defined(__NPU_ARCH__) &&                                                   \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) ||                       \
      (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) ||                       \
-     (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102))
+     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 // aipp config offset
 constexpr int32_t AIPP_OFFSET_CSC_ENABLE = 63;
 constexpr int32_t AIPP_OFFSET_CH1 = 16;
@@ -439,3 +444,7 @@ constexpr int32_t AIPP_OUTPUT_PADDING_MODE0_CHANNEL_NUM = 4;
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_UTILS_STRUCT_CONFUSION_PAD_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_STRUCT_CONFUSION_PAD_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_STRUCT_CONFUSION_PAD_H__
+#endif

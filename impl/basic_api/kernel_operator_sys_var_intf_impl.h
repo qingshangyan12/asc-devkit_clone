@@ -12,7 +12,11 @@
  * \file kernel_operator_sys_var_intf_impl.h
  * \brief
  */
-
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/kernel_operator_sys_var_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_sys_var_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYS_VAR_INTF_IMPL_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_IMPL_H
 
@@ -29,7 +33,7 @@
 #include "dav_m300/kernel_operator_sys_var_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_sys_var_impl.h"
-#elif __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "dav_c310/kernel_operator_sys_var_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_sys_var_impl.h"
@@ -39,7 +43,7 @@
 #include "dav_l311/kernel_operator_sys_var_impl.h"
 #endif
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #ifdef __SUPER_KERNEL_DYNAMIC_BLOCK_NUM__
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_dynamic_block_num;
 #endif
@@ -103,7 +107,7 @@ __aicore__ inline int64_t GetSystemCycle()
     return GetSystemCycleImpl();
 }
 
-#if (__NPU_ARCH__ == 3101) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr(){
     return GetSprImpl<spr>();
@@ -116,3 +120,7 @@ __aicore__ inline void ClearSpr(){
 #endif
 }  // namespace AscendC
 #endif  // ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_IMPL_H
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYS_VAR_INTF_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYS_VAR_INTF_IMPL_H__
+#endif

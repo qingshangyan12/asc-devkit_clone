@@ -21,7 +21,7 @@
 
 #include "instr_impl/npu_arch_2201/sys_var_impl.h"
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 #include "instr_impl/npu_arch_3510/sys_var_impl.h"
 
@@ -53,7 +53,7 @@ __aicore__ inline int64_t asc_get_program_counter();
 
 __aicore__ inline void asc_get_arch_ver(uint32_t& coreVersion);
 
-__simd_callee__ inline int64_t asc_get_ar_spr();
+__aicore__ inline int64_t asc_get_ar_spr();
 
 __aicore__ inline int64_t asc_get_ffts_base_addr();
 

@@ -20,7 +20,7 @@
 
 #include "instr_impl/npu_arch_2201/atomic_impl.h"
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 #include "instr_impl/npu_arch_3510/atomic_impl.h"
 
@@ -70,13 +70,11 @@ __aicore__ inline void asc_set_atomic_min_int8();
 
 __aicore__ inline void asc_set_atomic_min_int16();
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3101)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-// ==========asc_set_atomic_add_float16==========
-__simd_callee__ inline void asc_set_atomic_add_float16();
+__aicore__ inline void asc_set_atomic_add_float16();
 
-// ==========asc_set_atomic_max_float==========
-__simd_callee__ inline void asc_set_atomic_max_float();
+__aicore__ inline void asc_set_atomic_max_float();
 
 __aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
 

@@ -15,12 +15,7 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_DUMP_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_DUMP_IMPL_H
 
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_DUMP_IMPL__
-#warning "asc_aicore_dump_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future."
-#endif
-
+#ifndef ASCENDC_CPU_DEBUG
 #include "impl/utils/sys_macros.h"
 #include "impl/utils/common_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
@@ -28,7 +23,7 @@
 
 #if __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_dump_utils.h"
-#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3101
+#elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
 #endif
 
@@ -71,7 +66,7 @@ __aicore__ inline void set_dump_tlv_data(U src, __gm__ DumpTensorTlv* dumpTlv, u
         dumpLen = alignDumpLen / ASC_ONE_DATABLOCK_SIZE;
         mem_copy_ub_to_gm_impl(dumpDstAddr, src, static_cast<uint16_t>(dumpLen));
     } else if constexpr (hardware == Hardware::L1) {
-        mem_copy_l1buf_to_gm_impl(dumpDstAddr, (__cbuf__ U*)src, alignDumpLen);
+        mem_copy_l1buf_to_gm_impl(dumpDstAddr, src, alignDumpLen);
     } else if constexpr (hardware == Hardware::L0C) {
         mem_copy_cbuf_to_gm_impl(dumpDstAddr, src, alignDumpLen);
     }
@@ -81,7 +76,6 @@ __aicore__ inline void set_dump_tlv_data(U src, __gm__ DumpTensorTlv* dumpTlv, u
 template <Hardware hardware, typename T, typename U>
 __aicore__ inline void asc_dump_impl(U src, uint32_t desc, uint32_t dumpSize)
 {
-    static_assert((get_dump_datatype<T>() != DumpTensorDataType::ACL_MAX), "dump tensor is not supported this data type\n");
     __gm__ DebugBlockHeadInfo* blockInfo = get_block_info();
     if (dumpSize <= 0 || blockInfo == nullptr) {
         return;
@@ -148,8 +142,34 @@ __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t
     }
     set_ctrl(ctrlValue);
 }
+} // namespace __asc_aicore
+#else
+#include "kernel_log.h"
 
+namespace __asc_aicore {
+template<typename T>
+__aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dumpSize) {
+    ASCENDC_ASSERT((false), "asc_dump_gm is not supported in cpu mode.");
 }
+
+template<typename T>
+__aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dumpSize) {
+    ASCENDC_ASSERT((false), "asc_dump_ubuf is not supported in cpu mode.");
+}
+
+template<typename T>
+__aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dumpSize) {
+    ASCENDC_ASSERT((false), "asc_dump_cbuf is not supported in cpu mode.");
+}
+
+template<typename T>
+__aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dumpSize) {
+    ASCENDC_ASSERT((false), "asc_dump_l1buf is not supported in cpu mode.");
+}
+} // namespace __asc_aicore
+
+using namespace __asc_aicore;
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_DUMP_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
