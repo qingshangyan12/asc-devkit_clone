@@ -1906,7 +1906,6 @@ __simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ float* dst_a
     }
 }
 
-// 使用 pst, 通过地址寄存器传入偏移,  用户可以选择更新偏移或者更新dst地址
 __simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t *dst, vector_bool src, iter_reg offset)
 {
     if ASC_IS_AIV {
@@ -1949,7 +1948,6 @@ __simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t *dst, vect
     }
 }
 
-// 使用 psts, 偏移固定传入0， 由用户自行更新dst地址
 __simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t *dst, vector_bool src)
 {
     if ASC_IS_AIV {
@@ -1992,7 +1990,6 @@ __simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t *dst, vect
     }
 }
 
-// 使用 psts, 通过int32_t 传入偏移,  用户可以选择更新偏移或者更新dst地址
 __simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t *dst,  vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -2035,7 +2032,6 @@ __simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t *dst, vect
     }
 }
 
-// 使用 psts, 通过int32_t 传入偏移，同时增加PostMode可以设置成硬件自动Post Update
 __simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {

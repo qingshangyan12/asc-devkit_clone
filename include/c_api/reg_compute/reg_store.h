@@ -895,7 +895,6 @@ __simd_callee__ inline void asc_store(__ubuf__  fp4x2_e2m1_t* dst, vector_fp4x2_
 
 __simd_callee__ inline void asc_store(__ubuf__  fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src, uint32_t count);
 
-// 使用 pst, 通过地址寄存器传入偏移,  用户可以选择更新偏移或者更新dst地址
 __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t *dst, vector_bool src, iter_reg  offset);
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t *dst,  vector_bool src,  iter_reg  offset);
 __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t *dst, vector_bool src, iter_reg  offset);
@@ -903,7 +902,6 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t *dst,  vector_
 __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t *dst, vector_bool src, iter_reg  offset);
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t *dst,  vector_bool src,  iter_reg  offset);
 
-// 使用 psts, 偏移固定传入0， 由用户自行更新dst地址
 __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t *dst, vector_bool src);
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t *dst, vector_bool src);
 __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t *dst, vector_bool src);
@@ -911,7 +909,6 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t *dst, vector_b
 __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t *dst, vector_bool src);
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t *dst, vector_bool src);
 
-// 使用 psts, 通过int32_t 传入偏移,  用户可以选择更新偏移或者更新dst地址
 __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t *dst,  vector_bool src, int32_t  offset);
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset);
 __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t *dst,  vector_bool src, int32_t  offset);
@@ -919,7 +916,6 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t *dst, vector_b
 __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t *dst,  vector_bool src, int32_t  offset);
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t *dst, vector_bool src, int32_t offset);
 
-// 使用 psts, 通过int32_t 传入偏移，同时增加PostMode可以设置成硬件自动Post Update
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset);
 __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset);
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint16_t *dst, vector_bool src, int32_t offset);
