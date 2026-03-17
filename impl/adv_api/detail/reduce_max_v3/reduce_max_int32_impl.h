@@ -246,20 +246,20 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
     VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, smallDataParam);
     PipeBarrier<PIPE_V>();
     
-    // Step 4: Extract result (brcbDst[0] now contains the maximum)
-    // Use GetValue/SetValue with proper event synchronization for scalar operations
-    // Note: Maximum value is in brcbDst[0], which is tmpBuffer[8]
-    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
-    SetFlag<HardEvent::V_S>(eventIdVToS);
-    WaitFlag<HardEvent::V_S>(eventIdVToS);
+    // Step 4: Extract result using GatherMask (supports non-aligned dst)
+    // Maximum value is in brcbDst[0], extract it to dst[0]
+    // Reuse prepareBuffer (tmpBuffer[0:8]) as pattern tensor
+    LocalTensor<uint32_t> patternTensor = prepareBuffer.template ReinterpretCast<uint32_t>();
+    SetMaskCount();
+    SetVectorMask<uint32_t, MaskMode::COUNTER>(0, 8);
+    Duplicate<uint32_t>(patternTensor, 1u, 8);
+    PipeBarrier<PIPE_V>();
 
-    T result = brcbDst.GetValue(0);
-
-    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
-    SetFlag<HardEvent::S_V>(eventIdSToV);
-    WaitFlag<HardEvent::S_V>(eventIdSToV);
-
-    dst.SetValue(0, result);
+    // Extract first element from brcbDst to dst using GatherMask
+    // GatherMaskParams: {repeat, lastAxis, countstride, startIndex}
+    GatherMaskParams gatherMaskParam = {1, 1, 1, 0};
+    uint64_t rsvdCnt;
+    GatherMask<T, uint32_t>(dst, brcbDst, patternTensor, true, INT32_ELEM_PER_BLK, gatherMaskParam, rsvdCnt);
 }
 
 // ============================================================================
