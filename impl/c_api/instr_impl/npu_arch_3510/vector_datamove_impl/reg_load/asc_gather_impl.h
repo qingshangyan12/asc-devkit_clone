@@ -75,6 +75,14 @@ __simd_callee__ inline void asc_gather_impl(vector_half& dst, __ubuf__  half* sr
     }
 }
 
+__simd_callee__ inline void asc_gather_impl(vector_half& dst, __ubuf__ float* src, vector_uint32_t index,
+                                            vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2_bc(dst, src, index, mask);
+    }
+}
+
 __simd_callee__ inline void asc_gather_impl(vector_float& dst, __ubuf__  float* src,
     vector_uint32_t index, vector_bool mask)
 {
