@@ -79,6 +79,7 @@ TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, bfloat16_t, 
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, uint16_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, fp8_e5m2_t, vector_fp8_e5m2_t, uint16_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2, asc_gather, vgather2, fp8_e8m0_t, vector_fp8_e8m0_t, uint16_t);
+TEST_VECTOR_DATAMOVE_GATHER_INSTR_0(Vgather2_BC, asc_gather, vgather2_bc, float, vector_half, uint32_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_1(Vselr, asc_gather, vselr, int8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_1(Vselr, asc_gather, vselr, uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_1(Vselr, asc_gather, vselr, int16_t, uint16_t);
