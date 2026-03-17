@@ -47,7 +47,7 @@ TEST_F(TestCubeDatamove##class_name##c_api_name##cce_name##data_type, c_api_name
     uint16_t src_stride = static_cast<uint16_t>(55);\
     uint16_t dst_stride = static_cast<uint16_t>(66);\
 \
-    MOCKER_CPP(cce_name, void(__ca__ data_type*, __gm__ data_type*, uint16_t, uint8_t, uint16_t, 
+    MOCKER_CPP(cce_name, void(__ca__ data_type*, __gm__ data_type*, uint16_t, uint8_t, uint16_t,\
         uint8_t, uint16_t, addr_cal_mode_t))\
         .times(1)\
         .will(invoke(mock##class_name##c_api_name##data_type##Stub));\
