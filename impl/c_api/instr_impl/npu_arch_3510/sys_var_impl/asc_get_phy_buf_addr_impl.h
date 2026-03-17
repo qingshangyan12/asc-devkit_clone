@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -23,21 +23,6 @@
 __aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset)
 {
     return get_imm(offset);
-}
-
-__aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset0, uint64_t offset1)
-{
-    return get_imm(offset0, offset1);
-}
-
-__aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset0, uint64_t offset1, uint64_t offset2)
-{
-    return get_imm(offset0, offset1, offset2);
-}
-
-__aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset0, uint64_t offset1, uint64_t offset2, uint64_t offset3)
-{
-    return get_imm(offset0, offset1, offset2, offset3);
 }
 
 #endif
