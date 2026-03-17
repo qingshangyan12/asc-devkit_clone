@@ -28,7 +28,6 @@ __aicore__ inline void asc_copy_ub2l1_impl(__cbuf__ void* dst, __ubuf__ void* sr
                uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
 {
     if ASC_IS_AIV {
-        // sid set to 0
         copy_ubuf_to_cbuf(dst, src, 0, n_burst, burst_len, src_gap, dst_gap);
     }
 }
