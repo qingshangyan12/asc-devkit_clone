@@ -21,12 +21,16 @@
 namespace AscendC {
 namespace Te {
 
-class CopyMatrixCcToGmBase3510 {
+class CopyMatrixCcToOutInstr3510 {
 public:
-    template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename... Params>
+    template <const FixpipeTrait& trait, QuantMode_t quantPre, L0C2OutType outType, typename T, typename U, typename... Params>
     __aicore__ inline void DataCopy(const T& dst, const U& src, const Params& ...params)
     {
-        CopyMatrixCcToGm<quantPre>(dst.Data().Get(), src.Data().Get(), params...);
+        if constexpr (outType == L0C2OutType::GM) {
+            CopyMatrixCcToGm<quantPre>(dst.Data().Get(), src.Data().Get(), params...);
+        } else {
+            CopyMatrixCcToUb<quantPre>(dst.Data().Get(), src.Data().Get(), params...);
+        }
     }
 
 private:
@@ -44,16 +48,6 @@ private:
                 nz2dnEn); 
         }
     }
-};
-class CopyMatrixCcToUbBase3510 {
-public:
-template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename... Params>
-    __aicore__ inline void DataCopy(const T& dst, const U& src, const Params& ...params)
-    {
-        CopyMatrixCcToUb<quantPre>(dst.Data().Get(), src.Data().Get(), params...);
-    }
-
-private:
 
     template <QuantMode_t quantPre, typename T, typename U>
     __aicore__ inline void CopyMatrixCcToUb(__ubuf__ T *dst, __cc__ U *src, uint32_t nSize, uint32_t mSize,
