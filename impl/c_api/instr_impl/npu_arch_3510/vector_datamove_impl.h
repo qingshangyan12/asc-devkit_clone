@@ -1465,8 +1465,26 @@ __simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__  half* src,
     asc_gather_impl(dst, src, index, mask);
 }
 
-__simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__  float* src,
-    vector_uint32_t index, vector_bool mask)
+__simd_callee__ inline void asc_gather(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index,
+    vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index,
+    vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__ half* src, vector_uint32_t index,
+    vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index,
+    vector_bool mask)
 {
     asc_gather_impl(dst, src, index, mask);
 }
