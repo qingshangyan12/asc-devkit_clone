@@ -15,7 +15,7 @@
 
 #define TEST_SYS_VAR_SET_PADDING(data_type)\
 \
-class TestSysVarSetL13dPadding : public testing::Test {\
+class TestSysVarSetL13dPadding##data_type : public testing::Test {\
 protected:\
     void SetUp() {}\
     void TearDown() {}\
@@ -25,7 +25,7 @@ void set_l12ub_loop_size_Stub##data_type(data_type config) {\
     EXPECT_EQ(config, static_cast<data_type>(33));\
 }\
 \
-TEST_F(TestSysVarSetL13dPadding, c_api_set_l12ub_loop_size##data_type)\
+TEST_F(TestSysVarSetL13dPadding##data_type, c_api_set_l12ub_loop_size##data_type)\
 {\
     data_type input = 33;\
     MOCKER_CPP(set_padding, void(data_type))\
