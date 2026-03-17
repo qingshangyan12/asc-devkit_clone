@@ -48,6 +48,10 @@ asc-devkit:
       - impl/basic_api/dav_c220/kernel_operator_dump_tensor_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl/printf_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_get_buf_impl.h
+      - impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_sync_data_barrier_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_data_barrier_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sync_impl.h
   llt:
     ut_check: true
     st_check: false
