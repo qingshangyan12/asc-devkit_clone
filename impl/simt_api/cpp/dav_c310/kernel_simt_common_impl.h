@@ -25,13 +25,13 @@ typedef bfloat16_t bhalf;
 
 constexpr int32_t THREAD_GROUP_SIZE = 32;
 
-__aicore__ inline int32_t GetWarpSizeImpl()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetWarpSizeImpl()
 {
     return THREAD_GROUP_SIZE;
 }
 
 template <int32_t dim = 0>
-__aicore__ inline int32_t GetThreadNumImpl()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetThreadNumImpl()
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     if constexpr (dim == 0) {
@@ -58,7 +58,7 @@ __aicore__ inline int32_t GetThreadNumImpl()
 }
 
 template <int32_t dim = 0>
-__aicore__ inline int32_t GetThreadIdxImpl()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetThreadIdxImpl()
 {
     static_assert((dim >= 0 && dim <= 2), "dim is out of range [0, 2]");
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -85,7 +85,7 @@ __aicore__ inline int32_t GetThreadIdxImpl()
     return 0;
 }
 
-__aicore__ inline int32_t GetBlockIdxImpl()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetBlockIdxImpl()
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return block_idx;
@@ -94,7 +94,7 @@ __aicore__ inline int32_t GetBlockIdxImpl()
 #endif
 }
 
-__aicore__ inline int32_t GetBlockNumImpl()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t GetBlockNumImpl()
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return block_num;
