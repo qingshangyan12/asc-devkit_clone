@@ -30,6 +30,7 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_bfloat16_t& dst, bfloat1
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint32_t& dst, uint32_t value, vector_bool mask)
 __simd_callee__ inline void asc_duplicate_scalar(vector_int32_t& dst, int32_t value, vector_bool mask)
 __simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value, vector_bool mask)
+__simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value)
 ```
 
 ## 参数说明
