@@ -19,11 +19,11 @@
 
 namespace AscendC {
 namespace Te {
-class LoadDataFourDim3510L12L0BNZ2ZNB8B4WithCoord {
+class LoadDataL12L0BNZ2ZNB8B4WithCoord3510 {
 
 public:
     template <const LoadDataTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void Run(const T& dst, const U& src, const Coord& coord) {
+    __aicore__ inline static void Run(const T& dst, const U& src, const Coord& coord) {
         LoadDataImpl<TraitHolder<trait, true>::traitTransposed, T, U, Coord>(dst, src, coord);
     }
 
@@ -34,7 +34,7 @@ private:
     };
 
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline constexpr void CheckTemplate()
+    __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckFormat::CheckZNTemplate<T>();
         CheckFormat::CheckNZTemplate<U>();
@@ -42,7 +42,7 @@ private:
     }
 
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline void LoadDataImplB4(const T& dst, const U& src, uint16_t mStartPosition,
+    __aicore__ inline static void LoadDataImplB4(const T& dst, const U& src, uint16_t mStartPosition,
         uint16_t kStartPosition, uint8_t mStep, uint8_t kStep, int16_t srcStride, uint16_t dstStride)
     {
         using DstType = typename T::elementType;
@@ -56,10 +56,9 @@ private:
         int x = 0, y = 0;
         int Col = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
                     GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
-        LoadCbufToCbS4Base loadCbufToCbS4;
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
             auto sliceDst = dst(MakeCoord(x, y));
-            loadCbufToCbS4.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
+            LoadCbufToCbS43510::template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
                                                     mStep, kStep / KHALF, srcStride, dstStride);
             x += C0_SIZE * KHALF;
             mStartPosition += M_STEP_MIN_VAL_B4;
@@ -67,7 +66,7 @@ private:
     }
 
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline void LoadDataImplB8(const T& dst, const U& src, uint16_t mStartPosition,
+    __aicore__ inline static void LoadDataImplB8(const T& dst, const U& src, uint16_t mStartPosition,
         uint16_t kStartPosition, uint8_t mStep, uint8_t kStep, int16_t srcStride, uint16_t dstStride)
     {
         using DstType = typename T::elementType;
@@ -80,17 +79,16 @@ private:
         int x = 0, y = 0;
         int Col = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(dstLayout) *
                     GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
-        LoadCbufToCbBase loadCbufToCb;
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
             auto sliceDst = dst(MakeCoord(x, y));
-            loadCbufToCb.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            LoadCbufToCb3510::template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             x += C0_SIZE;
             mStartPosition += M_STEP_MIN_VAL_B8;
         }
     }
 
     template <const LoadDataTrait& trait, typename T, typename U, typename Coord>
-    __aicore__ inline void LoadDataImpl(const T& dst, const U& src, const Coord& coord)
+    __aicore__ inline static void LoadDataImpl(const T& dst, const U& src, const Coord& coord)
     {
         CheckTemplate<trait, T, U>();
         using DstType = typename T::elementType;
@@ -115,15 +113,13 @@ private:
         auto dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout) / STRIDE_UNIT;
         if constexpr (isFp4Type) {
             if ((n1 & 1) == 0) {
-                LoadCbufToCbS4Base loadCbufToCbS4;
-                loadCbufToCbS4.template LoadData<trait>(dst, src, mStartPosition, kStartPosition / KHALF, mStep, kStep / KHALF, srcStride, dstStride);
+                LoadCbufToCbS43510::template LoadData<trait>(dst, src, mStartPosition, kStartPosition / KHALF, mStep, kStep / KHALF, srcStride, dstStride);
             } else {
                 LoadDataImplB4<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             }
         } else {
             if ((n1 & 1) == 0) {
-                LoadCbufToCbBase loadCbufToCb;
-                loadCbufToCb.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+                LoadCbufToCb3510::template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             } else {
                 LoadDataImplB8<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             }

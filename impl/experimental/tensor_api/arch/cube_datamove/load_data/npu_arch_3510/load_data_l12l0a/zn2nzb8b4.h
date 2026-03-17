@@ -19,11 +19,11 @@
 
 namespace AscendC {
 namespace Te {
-class LoadDataFourDim3510L12L0AZN2NZB8B4 {
+class LoadDataL12L0AZN2NZB8B43510 {
 
 public:
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline void Run(const T& dst, const U& src) {
+    __aicore__ inline static void Run(const T& dst, const U& src) {
         LoadDataImpl<TraitHolder<trait, true>::traitTransposed, T, U>(dst, src);
     }
 
@@ -34,7 +34,7 @@ private:
     };
 
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline constexpr void CheckTemplate()
+    __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckFormat::CheckNZTemplate<T>();
         CheckFormat::CheckZNTemplate<U>();
@@ -42,7 +42,7 @@ private:
     }
 
         template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline void LoadDataImplB4(const T& dst, const U& src, uint16_t mStartPosition,
+    __aicore__ inline static void LoadDataImplB4(const T& dst, const U& src, uint16_t mStartPosition,
         uint16_t kStartPosition, uint8_t mStep, uint8_t kStep, int16_t srcStride, uint16_t dstStride)
     {
         using DstType = typename T::elementType;
@@ -54,11 +54,10 @@ private:
         uint16_t dstAddrStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
                 GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) * C0_SIZE;
         mStep = M_STEP_MIN_VAL_B4;
-        LoadCbufToCaS4Base loadCbufToCaS4;
         auto iter = dst.Data();
         for (uint16_t idx = 0; idx < mLoop; ++idx) {
             auto sliceDst = MakeTensor(iter, dst.Layout());
-            loadCbufToCaS4.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
+            LoadCbufToCaS43510::template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition / KHALF, 
                                                     mStep, kStep / KHALF, srcStride, dstStride);
             iter = iter + dstAddrStride;
             mStartPosition += M_STEP_MIN_VAL_B4;
@@ -66,7 +65,7 @@ private:
     }
 
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline void LoadDataImplB8(const T& dst, const U& src, uint16_t mStartPosition,
+    __aicore__ inline static void LoadDataImplB8(const T& dst, const U& src, uint16_t mStartPosition,
         uint16_t kStartPosition, uint8_t mStep, uint8_t kStep, int16_t srcStride, uint16_t dstStride)
     {
         using DstType = typename T::elementType;
@@ -77,18 +76,17 @@ private:
         uint16_t dstAddrStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout) *
                 GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(dstLayout) * C0_SIZE;
         mStep = M_STEP_MIN_VAL_B8;
-        LoadCbufToCaBase loadCbufToCa;
         auto iter = dst.Data();
         for (uint16_t idx = 0; idx < mLoop; ++idx) {
             auto sliceDst = MakeTensor(iter, dst.Layout());
-            loadCbufToCa.template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            LoadCbufToCa3510::template LoadData<trait>(sliceDst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             iter = iter + dstAddrStride;
             mStartPosition += M_STEP_MIN_VAL_B8;
         }
     }
 
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline void LoadDataImpl(const T& dst, const U& src)
+    __aicore__ inline static void LoadDataImpl(const T& dst, const U& src)
     {
         CheckTemplate<trait, T, U>();
         using DstType = typename T::elementType;
@@ -115,15 +113,13 @@ private:
         auto dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) / STRIDE_UNIT;
         if constexpr (isFp4Type) {
             if (m1 < FRACTAL_FIXED) {
-                LoadCbufToCaS4Base loadCbufToCaS4;
-                loadCbufToCaS4.template LoadData<trait>(dst, src, mStartPosition, kStartPosition / KHALF, mStep, kStep / KHALF, srcStride, dstStride);
+                LoadCbufToCaS43510::template LoadData<trait>(dst, src, mStartPosition, kStartPosition / KHALF, mStep, kStep / KHALF, srcStride, dstStride);
             } else {
                 LoadDataImplB4<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             }
         } else {
             if (m1 < FRACTAL_FIXED) {
-                LoadCbufToCaBase loadCbufToCa;
-                loadCbufToCa.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+                LoadCbufToCa3510::template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             } else {
                 LoadDataImplB8<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
             }
