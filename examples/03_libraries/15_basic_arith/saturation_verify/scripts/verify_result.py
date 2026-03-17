@@ -56,11 +56,11 @@ def verify_single_api(output_type, input_x, api_name="exp"):
     
     special_names = get_special_names(np_type)
     
-    print(f"\n{'='*105}")
-    print(f"API: {api_name} | Verification Results")
-    print(f"{'='*105}")
-    print(f"{'src/dst type':<12} | {'src':<20} | {'dst (Non-Sat)':<22} | {'dst (Saturation)':<22}")
-    print(f"{'-'*105}")
+    print(f"\n{'='*116}")
+    print(f"API: {api_name} | Data Type: {np_type} | Verification Results")
+    print(f"{'='*116}")
+    print(f"{'type':<8} | {'src':<26} | {'dst (API Output, Non-Sat)':<26} | {'dst (API Output, Saturation)':<26}")
+    print(f"{'-'*116}")
     
     valid_count = 0
     for i in range(len(golden)):
@@ -81,12 +81,12 @@ def verify_single_api(output_type, input_x, api_name="exp"):
         
         if i < len(special_names):
             name = special_names[i]
-            print(f"{type_name:<12} | [{name:<5}]{str(inp_val):<12} | {str(actual_non_sat):<22} | {str(actual_sat):<22}")
+            print(f"{type_name:<8} | {name:<6}{str(inp_val):<20} | {str(actual_non_sat):<26} | {str(actual_sat):<26}")
     
     error_ratio = 1.0 - (valid_count / len(golden))
-    print(f"{'-'*105}")
+    print(f"{'-'*116}")
     print(f"Total: {len(golden)}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
-    print(f"{'='*105}\n")
+    print(f"{'='*116}\n")
     
     return error_ratio <= ERROR_TOL
 
@@ -104,11 +104,11 @@ def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
     special_names = get_special_names(np_type)
     num_special = len(special_names)
     
-    print(f"\n{'='*125}")
-    print(f"API: {api_name} | Verification Results")
-    print(f"{'='*125}")
-    print(f"{'src/dst type':<12} | {'src0':<15} | {'src1':<15} | {'dst (Non-Sat)':<22} | {'dst (Saturation)':<22}")
-    print(f"{'-'*125}")
+    print(f"\n{'='*124}")
+    print(f"API: {api_name} | Data Type: {np_type} | Verification Results")
+    print(f"{'='*124}")
+    print(f"{'type':<8} | {'src0':<26} | {'src1':<26} | {'dst (API Output, Non-Sat)':<26} | {'dst (API Output, Saturation)':<26}")
+    print(f"{'-'*124}")
     
     valid_count = 0
     printed_count = 0
@@ -131,19 +131,17 @@ def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
             valid_count += 1
         
         if idx < num_special * num_special:
-            # 去重显示
             i = idx // num_special
             j = idx % num_special
-            if i <= j:
-                name_a = special_names[i]
-                name_b = special_names[j]
-                print(f"{type_name:<12} | [{name_a:<4}]{str(inp_a):<8} | [{name_b:<4}]{str(inp_b):<8} | {str(actual_non_sat):<22} | {str(actual_sat):<22}")
-                printed_count += 1
+            name_a = special_names[i]
+            name_b = special_names[j]
+            print(f"{type_name:<8} | {name_a:<6}{str(inp_a):<20} | {name_b:<6}{str(inp_b):<20} | {str(actual_non_sat):<26} | {str(actual_sat):<26}")
+            printed_count += 1
     
     error_ratio = 1.0 - (valid_count / len(golden))
-    print(f"{'-'*125}")
+    print(f"{'-'*124}")
     print(f"Total: {len(golden)}, Unique: {printed_count}, Matched: {valid_count}, Error Ratio: {error_ratio:.4f}")
-    print(f"{'='*125}\n")
+    print(f"{'='*124}\n")
     
     return error_ratio <= ERROR_TOL
 
@@ -179,11 +177,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-api_id', type=int, default=1, choices=[1, 2],
                         help="API ID: 1=exp, 2=mul")
+    parser.add_argument('-output_type', type=int, default=1, choices=[1, 2, 3, 4],
+                        help="Output type: 1=float16, 2=float32, 3=int16, 4=int32")
     parser.add_argument('-input_x', type=str, default="./input/input_x.bin")
     parser.add_argument('-input_y', type=str, required=False, default="./input/input_y.bin")
     args = parser.parse_args()
     
-    output_type = 1
-    res = verify_result(output_type, args.api_id, args.input_x, args.input_y)
+    res = verify_result(args.output_type, args.api_id, args.input_x, args.input_y)
     if not res:
         sys.exit(1)

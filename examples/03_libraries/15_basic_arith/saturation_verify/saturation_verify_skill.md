@@ -85,7 +85,7 @@ INPUT_API_ID=xxx INPUT_API_TYPE=1 bash test.sh
 # 双目 API  
 INPUT_API_ID=xxx INPUT_API_TYPE=2 bash test.sh
 ```
-将执行结果的表格数据呈现出来，供用户复制。
+将执行结果的表格数据呈现出来，以及执行命令，供用户复制。
 
 ## 文件结构
 

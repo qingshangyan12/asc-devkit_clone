@@ -42,10 +42,12 @@ def main():
                         help="Total number of elements in the tensor")
     parser.add_argument('-apiId', type=int, default=1, choices=[1, 2],
                         help="API ID: 1=exp, 2=mul")
+    parser.add_argument('-inputType', type=int, default=1, choices=[1, 2, 3, 4],
+                        help="Input type: 1=float16, 2=float32, 3=int16, 4=int32")
     args = parser.parse_args()
 
     api_name = API_NAME_MAP.get(args.apiId, "unknown")
-    input_type = 1
+    input_type = args.inputType
     type_name = str(TYPE_MAP[input_type].__name__)
     print(f"\nGenerating test data for: API={api_name}, Type={type_name}, Size={args.inputSize}")
 

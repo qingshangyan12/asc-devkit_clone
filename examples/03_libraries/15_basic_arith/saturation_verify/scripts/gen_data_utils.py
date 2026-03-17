@@ -79,27 +79,27 @@ def get_special_names(data_type):
 
 
 def print_unary_api_table(api_name, type_name, special_names, inputs, golden):
-    print(f"\n{'='*100}")
-    print(f"API: {api_name} | Data Type: {type_name}")
-    print(f"{'='*100}")
-    print(f"{'src/dst type':<12} | {'src':<20} | {'dst (Non-Sat)':<22}")
-    print(f"{'-'*100}")
+    print(f"\n{'='*116}")
+    print(f"API: {api_name} | Data Type: {type_name} | Gen Golden")
+    print(f"{'='*116}")
+    print(f"{'type':<8} | {'src':<26} | {'dst (Numpy-Golden)':<26}")
+    print(f"{'-'*116}")
     for i, name in enumerate(special_names):
         inp_val = inputs[i]
         out_val = golden[i]
-        print(f"{type_name:<12} | [{name:<5}]{str(inp_val):<12} | {str(out_val):<22}")
-    print(f"{'='*100}\n")
+        print(f"{type_name:<8} | {name:<6}{str(inp_val):<20} | {str(out_val):<26}")
+    print(f"{'='*116}\n")
 
 
 def print_binary_api_table(api_name, type_name, special_names, inputs_a, inputs_b, golden):
-    print(f"\n{'='*120}")
-    print(f"API: {api_name} | Data Type: {type_name}")
-    print(f"{'='*120}")
-    print(f"{'src/dst type':<12} | {'src0':<15} | {'src1':<15} | {'dst (Non-Sat)':<22}")
-    print(f"{'-'*120}")
+    print(f"\n{'='*124}")
+    print(f"API: {api_name} | Data Type: {type_name} | Gen Golden")
+    print(f"{'='*124}")
+    print(f"{'type':<8} | {'src0':<26} | {'src1':<26} | {'dst (Numpy-Golden)':<26}")
+    print(f"{'-'*124}")
     for i, name_a in enumerate(special_names):
         for j, name_b in enumerate(special_names):
             idx = i * len(special_names) + j
             out_val = golden[idx]
-            print(f"{type_name:<12} | [{name_a:<4}]{str(inputs_a[idx]):<8} | [{name_b:<4}]{str(inputs_b[idx]):<8} | {str(out_val):<22}")
-    print(f"{'='*120}\n")
+            print(f"{type_name:<8} | {name_a:<6}{str(inputs_a[idx]):<20} | {name_b:<6}{str(inputs_b[idx]):<20} | {str(out_val):<26}")
+    print(f"{'='*124}\n")
