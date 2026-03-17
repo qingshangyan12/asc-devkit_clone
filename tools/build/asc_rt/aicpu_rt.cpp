@@ -69,7 +69,10 @@ void AicpuDumpPrintBuffer(const void *dumpBuffer, const size_t bufSize)
         return;
     }
     memset_s(bufHost, bufSize, 0, bufSize);
+    aclmdlRICaptureMode mode = ACL_MODEL_RI_CAPTURE_MODE_RELAXED; // support CAPTURE MODE GLOBAL on host, when using device printf
+    aclmdlRICaptureThreadExchangeMode(&mode);
     CHECK_ACL(aclrtMemcpy(bufHost, bufSize, dumpBuffer, bufSize, ACL_MEMCPY_DEVICE_TO_HOST));
+    aclmdlRICaptureThreadExchangeMode(&mode);
     static thread_local size_t lastOffSet = 8;
     size_t curOffSet = *reinterpret_cast<size_t*>(bufHost);
     if (curOffSet > lastOffSet) {
@@ -82,6 +85,7 @@ void AicpuDumpPrintBuffer(const void *dumpBuffer, const size_t bufSize)
 AicpuDumpThreadRes::AicpuDumpThreadRes(const void* dumpAddr, const size_t dumpSize, const int32_t deviceId)
     : thread_([dumpAddr, dumpSize, deviceId, args = &mutex_]()
     {
+        ASCENDLOGI("Aicpu dump thread started, deviceId: %d.", deviceId);
         CHECK_ACL(aclrtSetDevice(deviceId));
         while (!args->stop.load(std::memory_order_relaxed)) {
             AicpuDumpPrintBuffer(dumpAddr, dumpSize);
@@ -112,10 +116,13 @@ int AicpuGetDumpConfig(void **addr, size_t *size)
         std::lock_guard<std::mutex> lock(dumpMutex);
         if (dumpAddr[deviceId] == nullptr) {
             void *device = nullptr;
-            CHECK_ACL_ERR(aclrtMalloc(reinterpret_cast<void**>(&device), 1048576, ACL_MEM_MALLOC_HUGE_FIRST));
+            CHECK_ACL_ERR(aclrtMalloc(reinterpret_cast<void**>(&device), DUMP_SIZE, ACL_MEM_MALLOC_HUGE_FIRST));
             dumpAddr[deviceId] = device;
             uint64_t bufferOffSet = 8;
+            aclmdlRICaptureMode mode = ACL_MODEL_RI_CAPTURE_MODE_RELAXED; // support CAPTURE MODE GLOBAL on host, when using device printf
+            aclmdlRICaptureThreadExchangeMode(&mode);
             CHECK_ACL_ERR(aclrtMemcpy(device, 8, &bufferOffSet, 8, ACL_MEMCPY_HOST_TO_DEVICE));
+            aclmdlRICaptureThreadExchangeMode(&mode);
             *addr = dumpAddr[deviceId];
             *size = DUMP_SIZE;
             static AicpuDumpThreadRes dumpThread(*addr, *size, deviceId);
@@ -133,9 +140,6 @@ size_t* AicpuSetDumpConfig(const unsigned long *aicpuFileBuf, size_t fileSize) {
         ASCENDLOGE("Invalid fileSize: %zu", fileSize);
         return nullptr;
     }
-    void *dumpAddr = nullptr;
-    size_t dumpSize = 0;
-    AicpuGetDumpConfig(&dumpAddr, &dumpSize);
     size_t *kernelBuf = reinterpret_cast<size_t*>(malloc(fileSize));
     if (kernelBuf == nullptr) {
         ASCENDLOGE("Failed to allocate memory for kernel buffer, size: %zu", fileSize);
@@ -153,11 +157,14 @@ size_t* AicpuSetDumpConfig(const unsigned long *aicpuFileBuf, size_t fileSize) {
         } else if (ret == 2) {  // 2 means no symbol: g_aicpuDumpConfig
             ASCENDLOGI("dump switch is off.");
         }
-    } else {
-        startIndex /= sizeof(size_t);
-        kernelBuf[startIndex] = static_cast<size_t>(reinterpret_cast<uintptr_t>(dumpAddr));
-        kernelBuf[startIndex + 1] = dumpSize;
+        return kernelBuf;
     }
+    void *dumpAddr = nullptr;
+    size_t dumpSize = 0;
+    AicpuGetDumpConfig(&dumpAddr, &dumpSize);
+    startIndex /= sizeof(size_t);
+    kernelBuf[startIndex] = static_cast<size_t>(reinterpret_cast<uintptr_t>(dumpAddr));
+    kernelBuf[startIndex + 1] = dumpSize;
     return kernelBuf;
 }
 }
