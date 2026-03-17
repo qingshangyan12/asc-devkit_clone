@@ -24,7 +24,6 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-//asc_squeeze
 __aicore__ inline void asc_squeeze_impl(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0, __ubuf__ uint16_t *src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {

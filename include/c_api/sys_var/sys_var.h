@@ -65,12 +65,6 @@ __aicore__ inline int64_t asc_get_vf_len();
 
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
 
-__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset0, uint64_t offset1);
-
-__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset0, uint64_t offset1, uint64_t offset2);
-
-__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset0, uint64_t offset1, uint64_t offset2, uint64_t offset3);
-
 #endif
 
 #endif

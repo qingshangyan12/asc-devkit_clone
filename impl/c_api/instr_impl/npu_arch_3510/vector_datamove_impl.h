@@ -5482,34 +5482,28 @@ __aicore__ inline void asc_ndim_copy_dci() {
 }
 
 //=============asc_copy_ub2l1===============
-// 连续搬运
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size) {
     asc_copy_ub2l1_impl(dst, src, size);
 }
 
-// 高维切分
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src,
             uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap) {
     asc_copy_ub2l1_impl(dst, src, burst_num, burst_len, src_gap, dst_gap);
 }
 
-// 同步
 __aicore__ inline void asc_copy_ub2l1_sync(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size) {
     asc_copy_ub2l1_sync_impl(dst, src, size);
 }
 //=============asc_copy_ub2ub===============
-// 连续搬运
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size) {
     asc_copy_ub2ub_impl(dst, src, size);
 }
 
-// 高维切分
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
                                       uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap) {
     asc_copy_ub2ub_impl(dst, src, burst_num, burst_len, src_gap, dst_gap);
 }
 
-// 同步
 __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size) {
     asc_copy_ub2ub_sync_impl(dst, src, size);
 }
