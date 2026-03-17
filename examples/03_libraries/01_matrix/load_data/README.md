@@ -57,9 +57,9 @@
   #endif
   #endif
       AscendC::LoadData(featureMapA2, featureMapA1, load3dParams);
-  // 使用Load2D将右矩阵从B1搬运至B2
-  AscendC::LoadData2DParams load2dParams(0, weRepeat, 1, 0, 0, false, 0);
-  AscendC::LoadData(weightB2, weightB1, load2dParams);
+      // 使用Load2D将右矩阵从B1搬运至B2
+      AscendC::LoadData2DParams load2dParams(0, weRepeat, 1, 0, 0, false, 0);
+      AscendC::LoadData(weightB2, weightB1, load2dParams);
   ```
 
   - 调用实现  

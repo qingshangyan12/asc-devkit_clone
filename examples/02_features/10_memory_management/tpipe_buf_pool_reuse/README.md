@@ -1,4 +1,4 @@
-# TPipe::InitBufPool样例
+# TPipe bufPool复用样例
 ## 概述
 本样例基于TPipe::InitBufPool初始化TBufPool内存资源池，适用于内存资源有限时，希望手动指定UB/L1内存资源复用的场景。本接口初始化后在整体内存资源中划分出一块子资源池。
 
@@ -8,13 +8,13 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── tpipe_init_buf_pool
+├── tpipe_buf_pool_reuse
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── tpipe_init_buf_pool.asc      // Ascend C算子实现 & 调用样例
+│   └── tpipe_buf_pool_reuse.asc      // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
@@ -53,7 +53,7 @@
     </tr>
     <tr>
       <td align="center">核函数名</td>
-      <td colspan="4" align="center">tpipe_init_buf_pool_custom</td>
+      <td colspan="4" align="center">tpipe_buf_pool_reuse_custom</td>
     </tr>
   </table>
 
