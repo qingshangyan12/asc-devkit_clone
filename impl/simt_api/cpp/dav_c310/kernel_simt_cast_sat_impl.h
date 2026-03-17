@@ -22,7 +22,7 @@ namespace Simt {
 
 #if !defined(ASCENDC_CPU_DEBUG)
 template <typename T, typename U>
-__aicore__ inline T CastRintSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastRintSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, int32_t>::value) {
@@ -44,7 +44,7 @@ __aicore__ inline T CastRintSat(U x)
 }
 
 template <typename T, typename U>
-__aicore__ inline T CastFloorSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastFloorSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, int32_t>::value) {
@@ -66,7 +66,7 @@ __aicore__ inline T CastFloorSat(U x)
 }
 
 template <typename T, typename U>
-__aicore__ inline T CastCeilSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastCeilSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, int32_t>::value) {
@@ -88,7 +88,7 @@ __aicore__ inline T CastCeilSat(U x)
 }
 
 template <typename T, typename U>
-__aicore__ inline T CastRoundSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastRoundSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, int32_t>::value) {
@@ -110,7 +110,7 @@ __aicore__ inline T CastRoundSat(U x)
 }
 
 template <typename T, typename U>
-__aicore__ inline T CastTruncSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastTruncSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, int32_t>::value) {
@@ -132,7 +132,7 @@ __aicore__ inline T CastTruncSat(U x)
 }
 
 template <typename T, typename U>
-__aicore__ inline T CastRintNoSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastRintNoSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, half>::value) {
@@ -146,7 +146,7 @@ __aicore__ inline T CastRintNoSat(U x)
 }
 
 template <typename T, typename U>
-__aicore__ inline T CastFloorNoSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastFloorNoSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, half>::value) {
@@ -160,7 +160,7 @@ __aicore__ inline T CastFloorNoSat(U x)
 }
 
 template <typename T, typename U>
-__aicore__ inline T CastCeilNoSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastCeilNoSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, half>::value) {
@@ -174,7 +174,7 @@ __aicore__ inline T CastCeilNoSat(U x)
 }
 
 template <typename T, typename U>
-__aicore__ inline T CastRoundNoSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastRoundNoSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, half>::value) {
@@ -188,7 +188,7 @@ __aicore__ inline T CastRoundNoSat(U x)
 }
 
 template <typename T, typename U>
-__aicore__ inline T CastTruncNoSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastTruncNoSat(U x)
 {
     T y;
     if constexpr (std::is_same<T, half>::value) {
@@ -202,7 +202,7 @@ __aicore__ inline T CastTruncNoSat(U x)
 }
 
 template <typename T, typename U, RoundMode roundMode>
-__aicore__ inline T CastSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastSat(U x)
 {
     T y;
     switch (roundMode) {
@@ -233,7 +233,7 @@ __aicore__ inline T CastSat(U x)
 }
 
 template <typename T, typename U, RoundMode roundMode>
-__aicore__ inline T CastNoSat(U x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastNoSat(U x)
 {
     T y;
     switch (roundMode) {
