@@ -96,33 +96,33 @@ def gen_compile_options(compile_options_file: str, op_type: str, \
 
 
 def parse_options(args):
-        result = []
-        current = ''
-        in_quotes = False
-        quote_char = None
-    
-        for arg in args:
-            for ch in arg:
-                if ch in ['"', "'"]:
-                    if in_quotes and ch == quote_char:
-                        in_quotes = False
-                        quote_char = None
-                    else:
-                        in_quotes = True
-                        quote_char = ch
-                if ch == ';' and not in_quotes:
-                    result.append(current)
-                    current = ''
+    result = []
+    current = ''
+    in_quotes = False
+    quote_char = None
+
+    for arg in args:
+        for ch in arg:
+            if ch in ['"', "'"]:
+                if in_quotes and ch == quote_char:
+                    in_quotes = False
+                    quote_char = None
                 else:
-                    current += ch
-            if not in_quotes:
+                    in_quotes = True
+                    quote_char = ch
+            if ch == ';' and not in_quotes:
                 result.append(current)
                 current = ''
             else:
-                pass
-        if current:
+                current += ch
+        if not in_quotes:
             result.append(current)
-        return result
+            current = ''
+        else:
+            pass
+    if current:
+        result.append(current)
+    return result
     
 if __name__ == '__main__':
     if len(sys.argv) < 4:
