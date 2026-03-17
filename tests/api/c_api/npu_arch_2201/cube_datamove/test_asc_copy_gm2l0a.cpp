@@ -39,8 +39,8 @@ void mock##class_name##c_api_name##data_type##Stub(__ca__ data_type* dst, __gm__
 \
 TEST_F(TestCubeDatamove##class_name##c_api_name##cce_name##data_type, c_api_name##data_type##_config_succ)\
 {\
-    __ca__ data_type* dst = reinterpret_cast<data_type>(11);\
-    __cbuf__ data_type* src = reinterpret_cast<data_type>(22);\
+    __ca__ data_type* dst = reinterpret_cast<data_type*>(11);\
+    __cbuf__ data_type* src = reinterpret_cast<data_type*>(22);\
 \
     uint16_t base_idx = static_cast<uint16_t>(33);\
     uint8_t repeat = static_cast<uint8_t>(44);\
