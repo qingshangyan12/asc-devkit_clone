@@ -23,6 +23,8 @@ namespace Te{
 constexpr uint32_t MAIN_LOOP_N_SIZE_3510 = 512;
 constexpr uint32_t CBURST_NUM_3510 = MAIN_LOOP_N_SIZE_3510 / BLOCK_CUBE;
 
+enum class L0C2OutType : uint8_t { GM, UB };
+
 template <typename T>
 __aicore__ inline auto AllocTempBuf(const T& calNSize)
 {
