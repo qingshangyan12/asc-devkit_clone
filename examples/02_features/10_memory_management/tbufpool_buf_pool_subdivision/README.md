@@ -1,4 +1,4 @@
-# TBufPool::InitBufPool样例
+# TBufPool继续细分小块资源样例
 ## 概述
 本样例基于TBufPool::InitBufPool进行TBufPool资源划分，适用于将Tpipe::InitBufPool接口划分的整块资源，继续划分成小块资源的场景。
 ## 支持的产品
@@ -7,13 +7,13 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
 ```
-├── tpipe_init_buf_pool
+├── tbufpool_buf_pool_subdivision
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── tpipe_init_buf_pool.asc      // Ascend C算子实现 & 调用样例
+│   └── tbufpool_buf_pool_subdivision.asc      // Ascend C算子实现 & 调用样例
 ```
 
 ## 算子描述
@@ -52,7 +52,7 @@
     </tr>
     <tr>
       <td align="center">核函数名</td>
-      <td colspan="4" align="center">tpipe_init_buf_pool_custom</td>
+      <td colspan="4" align="center">tbufpool_buf_pool_subdivision_custom</td>
     </tr>
   </table>
 
