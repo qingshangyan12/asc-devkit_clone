@@ -32,6 +32,17 @@ void vsts(vector_f8e8m0 src0, vector_f8e8m0 src1, __ubuf__ fp8_e8m0_t* base, int
 void vsts(vector_f4e2m1x2 src0, vector_f4e2m1x2 src1, __ubuf__ fp4x2_e2m1_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 
+inline void load_cbuf_to_cb_transpose(float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
+    uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride, uint16_t src_frac_stride) {}
+inline void load_cbuf_to_cb_transpose(float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
+    uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride, uint16_t src_frac_stride) {}
+inline void load_cbuf_to_cb_transpose(hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
+    uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride, uint16_t src_frac_stride) {}
+inline void load_cbuf_to_cb_transpose_s4(float4_e1m2x2_t* dst, __cbuf__ float4_e1m2x2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
+    uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride, uint16_t src_frac_stride) {}
+inline void load_cbuf_to_cb_transpose_s4(float4_e2m1x2_t* dst, __cbuf__ float4_e2m1x2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
+    uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride, uint16_t src_frac_stride) {}
+
 #if defined(__DAV_CUBE__)
     inline int32_t g_coreType = 1;
 #else
