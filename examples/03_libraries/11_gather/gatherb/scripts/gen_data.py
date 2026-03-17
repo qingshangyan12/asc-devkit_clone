@@ -26,10 +26,8 @@ def get_range_by_dtype(input_type):
         print(f"Unsupported data type:{input_type}")
 
 def gen_golden_data_simple(scenarioNum):
-    if scenarioNum >= 1 and scenarioNum <= 4:
+    if scenarioNum >= 1 and scenarioNum <= 5:
         input_type = np.dtype("uint16")
-    elif scenarioNum == 5:
-        input_type = np.dtype("uint32")
     output_type = input_type
     min_val, max_val = get_range_by_dtype(input_type)
     one_data_block_size = 32 # 一个datablock能处理32B数据
@@ -55,13 +53,13 @@ def gen_golden_data_simple(scenarioNum):
         dst_rep_stride = 32
     elif scenarioNum == 5:
         repeat_time = 128
-        block_length = 8 * 1024
+        block_length = 16 * 1024
         dst_blk_stride = 1
         dst_rep_stride = 8
 
     offset_size = block_length // dst_blk_stride * input_type.itemsize // one_data_block_size
-    input_y = np.arange(0, offset_size * one_data_block_size // input_type.itemsize, one_data_block_size // input_type.itemsize, np.uint32)
-    input_shape = [block_length // dst_blk_stride * 2]
+    input_y = np.arange(0, offset_size * one_data_block_size, one_data_block_size, np.uint32)
+    input_shape = [block_length // dst_blk_stride]
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
     output_shape = [block_length]
     golden = np.zeros(output_shape).astype(output_type)
