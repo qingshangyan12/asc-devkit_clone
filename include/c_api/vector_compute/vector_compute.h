@@ -16,7 +16,15 @@
 #ifndef INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
 #define INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+
 #include "instr_impl/npu_arch_2201/vector_compute_impl.h"
+
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+#include "instr_impl/npu_arch_3510/vector_compute_impl.h"
+
+#endif
 
 #define asc_transto5hd_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half)
 
@@ -2271,13 +2279,9 @@ __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, 
 
 __aicore__ inline void asc_copy_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t count);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part);
 
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part);
-
-#endif
 
 #endif
 

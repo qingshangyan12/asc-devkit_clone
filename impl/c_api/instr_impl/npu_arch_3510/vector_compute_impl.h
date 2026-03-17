@@ -4758,6 +4758,7 @@ __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int1
 {
     asc_copy_impl(dst, src, part);
 }
+
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part)
 {
     asc_copy_impl(dst, src, part);
