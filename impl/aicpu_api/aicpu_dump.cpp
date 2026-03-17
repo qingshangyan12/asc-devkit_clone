@@ -25,31 +25,33 @@ struct DumpConfig {
     size_t dumpOffset;
 };
 
+constexpr size_t DUMP_BUFFER_HEADER_SIZE = sizeof(uint64_t);
+
 std::mutex dump_mutex;
 extern "C" {
-DumpConfig g_aicpuDumpConfig = {reinterpret_cast<void*>(0x8), 0x100000, 0x0};
+DumpConfig g_aicpuDumpConfig = {nullptr, 0x100000, 0};
 }
 
 namespace AscendC {
 void printf(const char *fmt, ...)
 {
     std::lock_guard<std::mutex> lock(dump_mutex);
-    void *aicpuDumpBuffer = g_aicpuDumpConfig.dumpBufAddr;
-    size_t aicpuDumpBufSize = g_aicpuDumpConfig.dumpBufSize;
-    size_t aicpuDumpOffSet = 0;
-    if (aicpuDumpBuffer) {
-        aicpuDumpOffSet = *reinterpret_cast<size_t*>(aicpuDumpBuffer);
-    } else {
+    if (g_aicpuDumpConfig.dumpBufAddr == nullptr) {
         return;
     }
-    if (aicpuDumpOffSet >= aicpuDumpBufSize) {
+    size_t dataOffset = g_aicpuDumpConfig.dumpOffset;
+    size_t dataSize = g_aicpuDumpConfig.dumpBufSize - DUMP_BUFFER_HEADER_SIZE;
+    if (dataOffset >= dataSize) {
         return;
     }
     va_list otherArgs;
     va_start(otherArgs, fmt);
-    aicpuDumpOffSet += vsnprintf_s(reinterpret_cast<char *>(aicpuDumpBuffer) + aicpuDumpOffSet,
-        aicpuDumpBufSize - aicpuDumpOffSet, aicpuDumpBufSize - aicpuDumpOffSet, fmt, otherArgs);
-    *reinterpret_cast<size_t*>(g_aicpuDumpConfig.dumpBufAddr) = aicpuDumpOffSet;
+    dataOffset += vsnprintf_s(
+        reinterpret_cast<char*>(g_aicpuDumpConfig.dumpBufAddr) + DUMP_BUFFER_HEADER_SIZE + dataOffset,
+        dataSize - dataOffset,
+        dataSize - dataOffset, fmt, otherArgs);
+    g_aicpuDumpConfig.dumpOffset = dataOffset;
+    *reinterpret_cast<size_t*>(g_aicpuDumpConfig.dumpBufAddr) = dataOffset;
     va_end(otherArgs);
 }
 }

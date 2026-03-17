@@ -53,6 +53,8 @@
     } while (0)
 
 constexpr size_t DUMP_SIZE = 1048576;
+constexpr size_t MAX_DEVICE_NUM = 16;
+constexpr size_t DUMP_BUFFER_HEADER_SIZE = sizeof(uint64_t);
 
 extern "C" {
 int32_t ElfGetSymbolOffset(uint8_t* elf, size_t elfSize, const char* symbolName, size_t* offset, size_t* size);
@@ -70,10 +72,10 @@ void AicpuDumpPrintBuffer(const void *dumpBuffer, const size_t bufSize)
     }
     memset_s(bufHost, bufSize, 0, bufSize);
     CHECK_ACL(aclrtMemcpy(bufHost, bufSize, dumpBuffer, bufSize, ACL_MEMCPY_DEVICE_TO_HOST));
-    static thread_local size_t lastOffSet = 8;
+    static thread_local size_t lastOffSet = 0;
     size_t curOffSet = *reinterpret_cast<size_t*>(bufHost);
     if (curOffSet > lastOffSet) {
-        printf("%s", reinterpret_cast<char*>(bufHost) + lastOffSet);
+        printf("%s", reinterpret_cast<char*>(bufHost) + DUMP_BUFFER_HEADER_SIZE + lastOffSet);
         lastOffSet = curOffSet;
     }
     free(bufHost);
@@ -82,6 +84,7 @@ void AicpuDumpPrintBuffer(const void *dumpBuffer, const size_t bufSize)
 AicpuDumpThreadRes::AicpuDumpThreadRes(const void* dumpAddr, const size_t dumpSize, const int32_t deviceId)
     : thread_([dumpAddr, dumpSize, deviceId, args = &mutex_]()
     {
+        ASCENDLOGI("Aicpu dump thread started, deviceId: %d.", deviceId);
         CHECK_ACL(aclrtSetDevice(deviceId));
         while (!args->stop.load(std::memory_order_relaxed)) {
             AicpuDumpPrintBuffer(dumpAddr, dumpSize);
@@ -98,7 +101,7 @@ AicpuDumpThreadRes::~AicpuDumpThreadRes()
 
 int AicpuGetDumpConfig(void **addr, size_t *size)
 {
-    static void *dumpAddr[16] = {nullptr};
+    static void *dumpAddr[MAX_DEVICE_NUM] = {nullptr};
     static std::mutex dumpMutex;
     int32_t deviceId = -1;
     CHECK_ACL_ERR(aclrtGetDevice(&deviceId));
@@ -112,10 +115,10 @@ int AicpuGetDumpConfig(void **addr, size_t *size)
         std::lock_guard<std::mutex> lock(dumpMutex);
         if (dumpAddr[deviceId] == nullptr) {
             void *device = nullptr;
-            CHECK_ACL_ERR(aclrtMalloc(reinterpret_cast<void**>(&device), 1048576, ACL_MEM_MALLOC_HUGE_FIRST));
+            CHECK_ACL_ERR(aclrtMalloc(reinterpret_cast<void**>(&device), DUMP_SIZE, ACL_MEM_MALLOC_HUGE_FIRST));
             dumpAddr[deviceId] = device;
-            uint64_t bufferOffSet = 8;
-            CHECK_ACL_ERR(aclrtMemcpy(device, 8, &bufferOffSet, 8, ACL_MEMCPY_HOST_TO_DEVICE));
+            uint64_t initOffset = 0;
+            CHECK_ACL_ERR(aclrtMemcpy(device, DUMP_BUFFER_HEADER_SIZE, &initOffset, DUMP_BUFFER_HEADER_SIZE, ACL_MEMCPY_HOST_TO_DEVICE));
             *addr = dumpAddr[deviceId];
             *size = DUMP_SIZE;
             static AicpuDumpThreadRes dumpThread(*addr, *size, deviceId);
@@ -133,9 +136,6 @@ size_t* AicpuSetDumpConfig(const unsigned long *aicpuFileBuf, size_t fileSize) {
         ASCENDLOGE("Invalid fileSize: %zu", fileSize);
         return nullptr;
     }
-    void *dumpAddr = nullptr;
-    size_t dumpSize = 0;
-    AicpuGetDumpConfig(&dumpAddr, &dumpSize);
     size_t *kernelBuf = reinterpret_cast<size_t*>(malloc(fileSize));
     if (kernelBuf == nullptr) {
         ASCENDLOGE("Failed to allocate memory for kernel buffer, size: %zu", fileSize);
@@ -153,11 +153,14 @@ size_t* AicpuSetDumpConfig(const unsigned long *aicpuFileBuf, size_t fileSize) {
         } else if (ret == 2) {  // 2 means no symbol: g_aicpuDumpConfig
             ASCENDLOGI("dump switch is off.");
         }
-    } else {
-        startIndex /= sizeof(size_t);
-        kernelBuf[startIndex] = static_cast<size_t>(reinterpret_cast<uintptr_t>(dumpAddr));
-        kernelBuf[startIndex + 1] = dumpSize;
+        return kernelBuf;
     }
+    void *dumpAddr = nullptr;
+    size_t dumpSize = 0;
+    AicpuGetDumpConfig(&dumpAddr, &dumpSize);
+    startIndex /= sizeof(size_t);
+    kernelBuf[startIndex] = static_cast<size_t>(reinterpret_cast<uintptr_t>(dumpAddr));
+    kernelBuf[startIndex + 1] = dumpSize;
     return kernelBuf;
 }
 }
