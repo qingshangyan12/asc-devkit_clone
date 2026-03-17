@@ -20,16 +20,16 @@
 namespace AscendC {
 namespace Te {
 
-class Fixpipe2GmNz2NzBase3510 {
+class Fixpipe2GmNz2Nz3510 {
 public:
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
-    __aicore__ inline void Run(const T& dst, const U& src, const Params& params) {
+    __aicore__ inline static void Run(const T& dst, const U& src, const Params& params) {
         DataCopyImpl<trait, quantPre, T, U, Params>(dst, src, params);
     }
 
 private:
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline constexpr void CheckTemplate()
+    __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckFormat::CheckNZTemplate<T>();
         CheckFormat::CheckL0CNZTemplate<U>();
@@ -37,7 +37,7 @@ private:
     }
 
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename Params>
-    __aicore__ inline void DataCopyImpl(const T& dst, const U& src, const Params& params)
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const Params& params)
     {
         CheckTemplate<trait, quantPre, T, U>();
         auto dstLayout = dst.Layout();
@@ -60,8 +60,7 @@ private:
         bool isChannelSplit = trait.enableChannelSplit;
         bool nz2ndEn = false;
         bool nz2dnEn = false;
-        CopyMatrixCcToGmBase3510 copyInst;
-        copyInst.DataCopy<trait, quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride,
+        CopyMatrixCcToGmBase3510::DataCopy<trait, quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride,
             cacheMode, reluEn, unitFlag, isChannelSplit, nz2ndEn, nz2dnEn);
     }
 };

@@ -89,7 +89,7 @@ struct Format2201Registor<Format2201::ND, Format2201::NZ, QuantMode2201::Vector>
     using type = FixpipeNZ2ND2201VectorQuant;
 };
 
-class FixpipeQuantFourDim2201L0C2GM {
+class FixpipeQuant2201L0C2GM {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename S, typename Params>
     __aicore__ inline void Run(const T& dst, const U& src, const S& quant, const Params& params)

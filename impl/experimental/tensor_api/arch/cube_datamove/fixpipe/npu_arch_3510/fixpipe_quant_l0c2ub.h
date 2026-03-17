@@ -74,7 +74,7 @@ struct FormatRegistorFixpipe2Ub3510<Format3510::DN, Format3510::NZ, QuantMode351
 };
 
 
-class FixpipeQuantFourDimL0C2UB3510 {
+class FixpipeQuantL0C2UB3510 {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename V, typename Params>
     __aicore__ inline void Run(const T& dst, const U& src, const V& quant, const Params& params) {

@@ -35,7 +35,7 @@ LoadData(const T& dst, const U& src)
     constexpr Hardware dstPos = GetHardPos<T>();
     constexpr Hardware srcPos = GetHardPos<U>();
     using Tensor2Tensor = typename LoadDataTensor2TensorNoCoord<dstPos, srcPos, 
-        CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
+        CURRENT_ARCH_VERSION>::type;
     Tensor2Tensor{}.template Run<trait, T, U>(dst, src);
 }
 
@@ -46,7 +46,7 @@ LoadData(const T& dst, const U& src, const Coord& coord)
     constexpr Hardware dstPos = GetHardPos<T>();
     constexpr Hardware srcPos = GetHardPos<U>();
     using Tensor2Tensor = typename LoadDataTensor2Tensor<dstPos, srcPos, 
-        CURRENT_ARCH_VERSION, FOUR_DIM_DATA>::type;
+        CURRENT_ARCH_VERSION>::type;
     Tensor2Tensor{}.template Run<trait, T, U, Coord>(dst, src, coord);
 }
 } // namespace Te

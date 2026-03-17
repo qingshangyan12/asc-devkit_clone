@@ -113,7 +113,7 @@ private:
     }
 };
 
-class FixpipeFourDim2201L0C2GM : public FixpipetNz2Nz2201Base, public FixpipetNz2Nd2201Base {
+class Fixpipe2201L0C2GM : public FixpipetNz2Nz2201Base, public FixpipetNz2Nd2201Base {
 public:
     template <const FixpipeTrait& trait, typename T, typename U, typename Params>
     __aicore__ inline void Run(const T& dst, const U& src, const Params& params) {

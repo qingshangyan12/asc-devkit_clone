@@ -27,7 +27,7 @@
 namespace AscendC {
 namespace Te {
 constexpr size_t TWO_DIM_DATA = 2;
-constexpr size_t FOUR_DIM_DATA = 4;
+// constexpr size_t FOUR_DIM_DATA = 4;
 constexpr size_t C0_SIZE = 32;
 constexpr size_t FRACTAL_FIXED = 16;
 constexpr size_t DISABLE_COORD = 0;
