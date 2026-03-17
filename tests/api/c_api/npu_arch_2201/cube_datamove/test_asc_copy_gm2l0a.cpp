@@ -26,7 +26,7 @@ protected:\
 };\
 \
 void mock##class_name##c_api_name##data_type##Stub(__ca__ data_type* dst, __gm__ data_type* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,\
-    uint8_t dst_stride, uint16_t sid, addr_cal_mode_t addr_cal_mode)\
+    uint16_t dst_stride, uint8_t sid, addr_cal_mode_t addr_cal_mode)\
 {\
     EXPECT_EQ(dst, reinterpret_cast<__ca__ data_type*>(11));\
     EXPECT_EQ(src, reinterpret_cast<__gm__ data_type*>(22));\
@@ -48,7 +48,7 @@ TEST_F(TestCubeDatamove##class_name##c_api_name##cce_name##data_type, c_api_name
     uint16_t dst_stride = static_cast<uint16_t>(66);\
 \
     MOCKER_CPP(cce_name, void(__ca__ data_type*, __gm__ data_type*, uint16_t, uint8_t, uint16_t,\
-        uint8_t, uint16_t, addr_cal_mode_t))\
+        uint16_t, uint8_t, addr_cal_mode_t))\
         .times(1)\
         .will(invoke(mock##class_name##c_api_name##data_type##Stub));\
 \
