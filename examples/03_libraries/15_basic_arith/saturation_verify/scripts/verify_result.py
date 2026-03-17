@@ -38,6 +38,12 @@ def get_type_from_id(output_type):
     return type_map.get(output_type, np.float16)
 
 
+def format_value(val, np_type):
+    if np_type == np.float16:
+        return f"{float(val):.6f}"
+    return str(val)
+
+
 def get_special_names(data_type):
     names = ['min', 'max', '+0', '-0']
     if np.issubdtype(data_type, np.floating):
@@ -81,7 +87,10 @@ def verify_single_api(output_type, input_x, api_name="exp"):
         
         if i < len(special_names):
             name = special_names[i]
-            print(f"{type_name:<8} | {name:<6}{str(inp_val):<20} | {str(actual_non_sat):<26} | {str(actual_sat):<26}")
+            inp_str = format_value(inp_val, np_type)
+            non_sat_str = format_value(actual_non_sat, np_type)
+            sat_str = format_value(actual_sat, np_type)
+            print(f"{type_name:<8} | {name:<6}{inp_str:<20} | {non_sat_str:<26} | {sat_str:<26}")
     
     error_ratio = 1.0 - (valid_count / len(golden))
     print(f"{'-'*116}")
@@ -135,7 +144,11 @@ def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
             j = idx % num_special
             name_a = special_names[i]
             name_b = special_names[j]
-            print(f"{type_name:<8} | {name_a:<6}{str(inp_a):<20} | {name_b:<6}{str(inp_b):<20} | {str(actual_non_sat):<26} | {str(actual_sat):<26}")
+            inp_a_str = format_value(inp_a, np_type)
+            inp_b_str = format_value(inp_b, np_type)
+            non_sat_str = format_value(actual_non_sat, np_type)
+            sat_str = format_value(actual_sat, np_type)
+            print(f"{type_name:<8} | {name_a:<6}{inp_a_str:<20} | {name_b:<6}{inp_b_str:<20} | {non_sat_str:<26} | {sat_str:<26}")
             printed_count += 1
     
     error_ratio = 1.0 - (valid_count / len(golden))
