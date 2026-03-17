@@ -247,11 +247,19 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
     PipeBarrier<PIPE_V>();
     
     // Step 4: Extract result (brcbDst[0] now contains the maximum)
-    // Use Adds with mask to copy single element, handles non-32B-aligned dst
-    SetMaskCount();
-    SetVectorMask<T, MaskMode::COUNTER>(0, 1);
-    Adds<T, false>(dst, brcbDst, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
-    PipeBarrier<PIPE_V>();
+    // Use GetValue/SetValue with proper event synchronization for scalar operations
+    // Note: Maximum value is in brcbDst[0], which is tmpBuffer[8]
+    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
+    SetFlag<HardEvent::V_S>(eventIdVToS);
+    WaitFlag<HardEvent::V_S>(eventIdVToS);
+
+    T result = brcbDst.GetValue(0);
+
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+    SetFlag<HardEvent::S_V>(eventIdSToV);
+    WaitFlag<HardEvent::S_V>(eventIdSToV);
+
+    dst.SetValue(0, result);
 }
 
 // ============================================================================
@@ -402,9 +410,9 @@ __aicore__ inline void BlockLevelReduce(const LocalTensor<T>& dst,
     PipeBarrier<PIPE_V>();
     
     // Now first element of tmpBuffer contains the maximum value
-    // Use GetValue/SetValue for single element extraction (scalar operation, no alignment requirement)
-    T result = tmpBuffer.GetValue(0);
-    dst.SetValue(0, result);
+    // Use Adds for single element extraction
+    SetVectorMask<T, MaskMode::COUNTER>(0, 1);
+    Adds<T, false>(dst, tmpBuffer, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
     PipeBarrier<PIPE_V>();
 }
 
