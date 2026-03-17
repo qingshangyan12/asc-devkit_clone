@@ -11,9 +11,9 @@
 ## 目录结构
 
 ```
-├── 04_clock
+├── 06_clock
 │   ├── CMakeLists.txt         # cmake编译文件
-│   ├── gather.asc             # Ascend C算子实现gather调用样例
+│   ├── clock.asc             # Ascend C算子实现gather调用样例
 |   └── README.md
 ```
 
@@ -47,7 +47,7 @@
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
