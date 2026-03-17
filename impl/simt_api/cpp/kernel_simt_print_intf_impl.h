@@ -54,7 +54,7 @@ inline auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)..
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 
 template <class... Args>
-__aicore__ inline void PRINTF(const __gm__ char* fmt, Args&&... args)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void PRINTF(const __gm__ char* fmt, Args&&... args)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #ifdef ASCENDC_DUMP
@@ -68,7 +68,7 @@ __aicore__ inline void PRINTF(const __gm__ char* fmt, Args&&... args)
 }
 
 template <class... Args>
-__aicore__ inline void printf(const __gm__ char* fmt, Args&&... args)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void printf(const __gm__ char* fmt, Args&&... args)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #ifdef ASCENDC_DUMP
