@@ -148,7 +148,16 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
                                            const LocalTensor<T>& tmpBuffer,
                                            uint32_t count)
 {
-    BinaryRepeatParams defaultParam;
+    // Use repStride = 1 for small data to avoid NPU address check error
+    // NPU hardware checks repStride address range even when repeatTime = 1
+    BinaryRepeatParams smallDataParam;
+    smallDataParam.dstBlkStride = 1;
+    smallDataParam.src0BlkStride = 1;
+    smallDataParam.src1BlkStride = 1;
+    smallDataParam.dstRepStride = 1;   // Changed from DEFAULT_REPEAT_STRIDE (8)
+    smallDataParam.src0RepStride = 1;
+    smallDataParam.src1RepStride = 1;
+    
     UnaryRepeatParams defaultUnaryParam;
     
     // Handle edge cases
@@ -157,7 +166,7 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
     }
     
     if (count == 1) {
-        // Single element: use Add with mask to handle non-32B-aligned dst
+        // Single element: use Adds with mask to handle non-32B-aligned dst
         SetMaskCount();
         SetVectorMask<T, MaskMode::COUNTER>(0, 1);
         // Add 0 is equivalent to copy, works with any alignment
@@ -212,39 +221,37 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
     Brcb<T>(brcbDst, prepareBuffer, 1, brcbParams);
     PipeBarrier<PIPE_V>();
     
-    // Step 3: vmax block-wise reduction to find maximum
+    // Step 3: VMax block-wise reduction to find maximum
     // Each datablock contains 8 identical values
     // We need to find max across all 8 datablocks
+    // CRITICAL: Use smallDataParam with repStride=1 to avoid NPU address check error
     
-    // CRITICAL: Duplicate() internally calls SetMaskNorm(), so we must re-enable Count mode
     SetMaskCount();
     
     // Round 1: Compare Block 0-3 with Block 4-7 -> Result in Block 0-3
     uint32_t halfElems = 4 * INT32_ELEM_PER_BLK;  // 32 elements (4 datablocks)
     SetVectorMask<T, MaskMode::COUNTER>(0, halfElems);
-    VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, defaultParam);
+    VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, smallDataParam);
     PipeBarrier<PIPE_V>();
     
     // Round 2: Compare Block 0-1 with Block 2-3 -> Result in Block 0-1
     halfElems = 2 * INT32_ELEM_PER_BLK;  // 16 elements
     SetVectorMask<T, MaskMode::COUNTER>(0, halfElems);
-    VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, defaultParam);
+    VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, smallDataParam);
     PipeBarrier<PIPE_V>();
     
     // Round 3: Compare Block 0 with Block 1 -> Result in Block 0
     halfElems = INT32_ELEM_PER_BLK;  // 8 elements
     SetVectorMask<T, MaskMode::COUNTER>(0, halfElems);
-    VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, defaultParam);
+    VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, smallDataParam);
     PipeBarrier<PIPE_V>();
     
     // Step 4: Extract result (brcbDst[0] now contains the maximum)
-    // Use GetValue/SetValue to handle non-32B-aligned dst
-    // V_S sync: ensure vector vmax results are visible to scalar GetValue
-    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
-    SetFlag<HardEvent::V_S>(eventIdVToS);
-    WaitFlag<HardEvent::V_S>(eventIdVToS);
-    T result = brcbDst.GetValue(0);
-    dst.SetValue(0, result);
+    // Use Adds with mask to copy single element, handles non-32B-aligned dst
+    SetMaskCount();
+    SetVectorMask<T, MaskMode::COUNTER>(0, 1);
+    Adds<T, false>(dst, brcbDst, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
+    PipeBarrier<PIPE_V>();
 }
 
 // ============================================================================
