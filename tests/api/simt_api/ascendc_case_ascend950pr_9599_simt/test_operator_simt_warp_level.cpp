@@ -244,3 +244,19 @@ TEST_P(WarpLevelComputeTestsuite, WarpLevelComputeTestCase)
         ASSERT_EQ(static_cast<uint8_t>((expectValues[i] >> 24) & 0xFF), dstGM[i*typeSize+3]);
     }
 }
+
+TEST_F(WarpLevelComputeTestsuite, WarpApiCover)
+{
+    EXPECT_EQ(0, WarpAllSync(0));
+    EXPECT_EQ(0, WarpAnySync(0));
+    EXPECT_EQ(0, WarpBallotSync(0));
+    EXPECT_EQ(0, WarpActiveMask(0));
+    EXPECT_EQ(0, WarpShflSync(0, 1, 32));
+    EXPECT_EQ(0, WarpShflUpSync(0, 1, 32));
+    EXPECT_EQ(0, WarpShflDownSync(0, 1, 32));
+    EXPECT_EQ(0, WarpShflXorSync(0, 1, 32));
+    EXPECT_EQ(0, WarpReduceAddSync(0));
+    EXPECT_EQ(0, WarpReduceMaxSync(0));
+    EXPECT_EQ(0, WarpReduceMinSync(0));
+    ThreadBarrier();
+}
