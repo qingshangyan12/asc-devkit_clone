@@ -19,15 +19,13 @@ protected:
     void TearDown() {}
 };
 
-namespace {
 void set_l0c2gm_quant_post_Stub(uint64_t config) {
-    EXPECT_EQ(config, static_cast<uint64_t>(1));
-}
+    EXPECT_EQ(config, static_cast<uint64_t>(10));
 }
 
 TEST_F(TestSysVarSetL0c2gmQuantPost, c_api_set_l0c2gm_quant_post_Succ)
 {
-    int64_t input = 1;
+    int64_t input = 10;
     MOCKER_CPP(set_quant_post, void(uint64_t)) 
             .times(1)
             .will(invoke(set_l0c2gm_quant_post_Stub));
