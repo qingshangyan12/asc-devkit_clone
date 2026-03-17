@@ -58,5 +58,5 @@
 | [trunc](./trunc)                     | 本样例演示了基于Trunc高阶API的算子实现。样例按元素做浮点数截断，即向零取整操作 |
 | [where](./where)                     | 本样例演示了基于Where高阶API的算子实现。样例根据指定的条件，从两个源操作数中选择元素，生成目标操作数。两个源操作数均可以是LocalTensor或标量 |
 | [xor](./xor)                         | 本样例演示了基于Xor高阶API的算子实现。样例按元素执行Xor运算 |
-| [vec_binary](./vec_binary)                         | 本样例演示了基于Mul基础API（双目矢量类计算API）的算子实现。样例将输入的两个tensor按元素做求积运算。其他双目矢量类计算API的算子实现可参考本样例 |
-| [vec_unary](./vec_unary)                         | 本样例演示了基于Exp基础API（单目矢量类计算API）的算子实现。样例将输入的tensor按元素取自然对数运算。其他单目矢量类API计算的算子实现可参考本样例 |
+| [vec_binary_performance](./vec_binary_performance)                         | 本样例为性能验证样例，演示了基于Mul基础API（双目矢量类计算API）的算子实现。样例将输入的两个tensor按元素做求积运算。其他双目矢量类计算API的算子实现可参考本样例 |
+| [vec_unary_performance](./vec_unary_performance)                         | 本样例为性能验证样例，演示了基于Exp基础API（单目矢量类计算API）的算子实现。样例将输入的tensor按元素取自然对数运算。其他单目矢量类API计算的算子实现可参考本样例 |
