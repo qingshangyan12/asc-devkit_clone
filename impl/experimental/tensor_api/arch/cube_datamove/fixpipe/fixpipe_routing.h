@@ -18,10 +18,8 @@
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_l0c2gm.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_2201/fixpipe_quant_l0c2gm.h"
 
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_l0c2gm.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_l0c2ub.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2gm.h"
-#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2ub.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_l0c2out.h"
+#include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/fixpipe_quant_l0c2out.h"
 
 namespace AscendC {
 namespace Te {
