@@ -54,6 +54,8 @@ template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
 #endif
 
+}  // namespace AscendC
+
 // assert define
 #undef assert
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -71,7 +73,6 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
 #define ascendc_assert(...)
 #endif
 #endif
-}  // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_dump_tensor_intf_impl.h"
 #endif  // END OF ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_H
