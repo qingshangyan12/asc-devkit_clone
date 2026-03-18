@@ -65,11 +65,11 @@ PIPE_MTE2
 ## 调用示例
 
 ```cpp
-//base_idx 指搬运起始分块
+//base_idx指搬运起始分块
 constexpr uint16_t base_idx = 1;
-//repeat 指搬运的迭代次数
+//repeat指搬运的迭代次数
 constexpr uint8_t repeat = 2; 
-//stride 指搬运步长，单位为512字节
+//stride指搬运步长，单位为512字节
 constexpr uint16_t src_stride = 0;
 constexpr uint16_t dst_stride = 1;
 __gm__ half src[256];
