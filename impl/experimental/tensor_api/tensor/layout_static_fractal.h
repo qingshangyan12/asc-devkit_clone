@@ -141,25 +141,25 @@ using ScaleZZStrideFormat = Stride<Stride<Std::Int<MX_SCALE_K0>, Std::Int<FRACTA
                                     Stride<Std::Int<1>, Std::Int<C0_SIZE>>>;
 
 template <typename T, size_t row, size_t column>
-using NDFormatLayout = Layout<NDShapeFormat<T, row, column>, NDStrideFormat<T, row, column>>;
+using NDFormatLayout = Layout<NDShapeFormat<T, row, column>, NDStrideFormat<T, row, column>, LayoutFormat::ND>;
 
 template <typename T, size_t row, size_t column>
-using DNFormatLayout = Layout<DNShapeFormat<T, row, column>, DNStrideFormat<T, row, column>>;
+using DNFormatLayout = Layout<DNShapeFormat<T, row, column>, DNStrideFormat<T, row, column>, LayoutFormat::DN>;
 
 template <typename T, size_t row, size_t column>
-using ZNFormatLayout = Layout<ZNShapeFormat<T, row, column>, ZNStrideFormat<T, row, column>>;
+using ZNFormatLayout = Layout<ZNShapeFormat<T, row, column>, ZNStrideFormat<T, row, column>, LayoutFormat::ZN>;
 
 template <typename T, size_t row, size_t column, typename Enable = void>
 struct NZLayoutFormatImpl;
 
 template <typename T, size_t row, size_t column>
 struct NZLayoutFormatImpl<T, row, column, typename Std::enable_if<!Std::is_same_v<T, Std::ignore_t>>::type> {
-    using type = Layout<NZShapeFormat<T, row, column>, NZStrideFormat<T, row, column>>;
+    using type = Layout<NZShapeFormat<T, row, column>, NZStrideFormat<T, row, column>, LayoutFormat::NZ>;
 };
 
 template <typename T, size_t row, size_t column>
 struct NZLayoutFormatImpl<T, row, column, typename Std::enable_if<Std::is_same_v<T, Std::ignore_t>>::type> {
-    using type = Layout<NZShapeFormat<uint16_t, row, column>, NZStrideFormat<uint16_t, row, column>>;
+    using type = Layout<NZShapeFormat<uint16_t, row, column>, NZStrideFormat<uint16_t, row, column>, LayoutFormat::L0C>;
 };
 
 template <typename T, size_t row, size_t column>
@@ -170,12 +170,12 @@ using L0CFormatLayout = NZFormatLayout<Std::ignore_t, row, column>;
 
 template <typename T, size_t row, size_t column>
 struct ZZLayoutFormatImpl {
-    using type = Layout<ScaleZZShapeFormat<T, row, column>, ScaleZZStrideFormat<T, row, column>>;
+    using type = Layout<ScaleZZShapeFormat<T, row, column>, ScaleZZStrideFormat<T, row, column>, LayoutFormat::ZZ>;
 };
 
 template <size_t row, size_t column>
 struct ZZLayoutFormatImpl<fp8_e8m0_t, row, column> {
-    using type = Layout<ScaleZZShapeFormat<fp8_e8m0_t, row, column>, ScaleZZStrideFormat<fp8_e8m0_t, row, column>>;
+    using type = Layout<ScaleZZShapeFormat<fp8_e8m0_t, row, column>, ScaleZZStrideFormat<fp8_e8m0_t, row, column>, LayoutFormat::ZZ>;
 };
 
 template <typename T, size_t row, size_t column>
@@ -183,23 +183,23 @@ using ZZFormatLayout = typename ZZLayoutFormatImpl<T, row, column>::type;
 
 // NN
 template <typename T, size_t row, size_t column>
-using NNFormatLayout = Layout<ScaleNNShapeFormat<T, row, column>, ScaleNNStrideFormat<T, row, column>>;
+using NNFormatLayout = Layout<ScaleNNShapeFormat<T, row, column>, ScaleNNStrideFormat<T, row, column>, LayoutFormat::NN>;
 
 // scaleAND
 template <typename T, size_t row, size_t column>
-using ScaleANDFormatLayout = Layout<NDShapeFormat<T, row, column>, NDStrideFormat<T, row, column>>;
+using ScaleANDFormatLayout = Layout<NDShapeFormat<T, row, column>, NDStrideFormat<T, row, column>, LayoutFormat::ScaleAND>;
 
 // scaleADN
 template <typename T, size_t row, size_t column>
-using ScaleADNFormatLayout = Layout<ScaleDNShapeFormat<T, row, column>, ScaleDNStrideFormat<T, row, column>>;
+using ScaleADNFormatLayout = Layout<ScaleDNShapeFormat<T, row, column>, ScaleDNStrideFormat<T, row, column>, LayoutFormat::ScaleADN>;
 
 // scaleBND
 template <typename T, size_t row, size_t column>
-using ScaleBNDFormatLayout = Layout<ScaleNDShapeFormat<T, row, column>, ScaleNDStrideFormat<T, row, column>>;
+using ScaleBNDFormatLayout = Layout<ScaleNDShapeFormat<T, row, column>, ScaleNDStrideFormat<T, row, column>, LayoutFormat::ScaleBND>;
 
 // scaleBDN
 template <typename T, size_t row, size_t column>
-using ScaleBDNFormatLayout = Layout<DNShapeFormat<T, row, column>, DNStrideFormat<T, row, column>>;
+using ScaleBDNFormatLayout = Layout<DNShapeFormat<T, row, column>, DNStrideFormat<T, row, column>, LayoutFormat::ScaleBDN>;
 
 } // namespace Te
 } // namespace AscendC

@@ -54,7 +54,20 @@ struct GetArchVersion {
 
 constexpr uint32_t CURRENT_ARCH_VERSION = GetArchVersion{}();
 
-enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
+enum class LayoutFormat : uint8_t {
+    IGNORE,
+    NZ,
+    ZN,
+    ZZ,
+    DN,
+    ND,
+    NN,
+    L0C,
+    ScaleAND,
+    ScaleADN,
+    ScaleBND,
+    ScaleBDN
+};
 
 enum class TupleFormat : uint8_t { Shape, Stride, Coord};
 

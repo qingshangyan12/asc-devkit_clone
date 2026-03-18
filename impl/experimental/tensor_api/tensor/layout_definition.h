@@ -38,12 +38,14 @@ using Tile = Std::tuple<Layouts...>;
 template <typename... Coords>
 using Coord = Std::tuple<Coords...>;
 
-template <typename T, typename U>
+template <typename T, typename U, typename ValueType = void, LayoutFormat Fmt = LayoutFormat::Unknown>
 struct Layout : private Std::tuple<T, U>
 {
     static constexpr auto size = StaticLayoutSize<T, U>::size;
     static constexpr auto depth = nesting_depth_v<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
+    static constexpr LayoutFormat format = Fmt;
+    using ValueTypeT = ValueType;
 
     __aicore__ inline constexpr Layout(const T& shape  = {}, const U& stride = {})
         : Std::tuple<T, U>(shape, stride)
@@ -113,8 +115,8 @@ struct Layout : private Std::tuple<T, U>
 template <typename T>
 struct is_layout : Std::false_type {};
 
-template <typename T, typename U>
-struct is_layout<Layout<T, U>> : Std::true_type {};
+template <typename T, typename U, typename ValueType, LayoutFormat Fmt>
+struct is_layout<Layout<T, U, ValueType, Fmt>> : Std::true_type {};
 
 template <typename T>
 constexpr bool is_layout_v = is_layout<T>::value;

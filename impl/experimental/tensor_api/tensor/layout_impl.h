@@ -65,7 +65,8 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
 template <typename Coord, typename LayoutType, typename TensorType>
 __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const LocalTensor<TensorType>& tileTensor) 
 {
-    static_assert(tileTensor.rank == LayoutType::rank, "tensor rank is not equal layout");
+    using TensorLayoutType = typename LocalTensor<TensorType>::LayoutType;
+    static_assert(TensorLayoutType::rank == LayoutType::rank, "Rank of Tensor is not equal to Rank of Layout");
 
     auto innerRow = Std::get<0>(Std::get<0>(layout.Shape()));
     auto innerCol = Std::get<0>(Std::get<1>(layout.Shape()));
@@ -82,7 +83,9 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
     auto row = MakeShape(innerRow, Std::ceil_division(realRow, innerRow));
     auto col = MakeShape(innerCol, Std::ceil_division(realCol, innerCol));
 
-    return MakeTileLayout(coord, layout, MakeShape(row, col));
+    LayoutFormat format = LayoutType::format;
+    using T = LocalTensor<TensorType>::ValueType;
+    return LayoutDispatcher<format, T>::apply(row, col);
 }
 
 } // namespace Te
