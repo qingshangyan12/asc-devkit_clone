@@ -9,6 +9,9 @@
 
 | 目录名称                                                                   |  功能描述                                           |
 |------------------------------------------------------------------------| ------------------------------------------------- |
+| [cross_core_set_flag_aiv](./cross_core_set_flag_aiv)                                                     | 本样例详细说明：在仅包含 Vector 计算的应用场景下，如何使用 CrossCoreSetFlag和CrossCoreWaitFlag的模式 0、模式 1 实现 AIV 间的同步。 |
+| [cross_core_set_flag_mix](./cross_core_set_flag_mix)                                                     | 本样例详细说明：在包含Cube和Vector融合计算应用场景下，如何使用 CrossCoreSetFlag和CrossCoreWaitFlag的模式 0、模式 2 实现多个AI Core 中所有AIC间的同步和单个 AI Core 中AIC与AIV间的同步。 |
+| [data_sync_barrier](./data_sync_barrier)                                                     | 本样例介绍DataSyncBarrier的调用，该接口功能：阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，适用于核内标量单元流水（PIPE_S）的同步。 |
 | [ib_set](./ib_set)                                                     | 本样例基于IBSet实现核间同步，适用于以下场景：当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。 |
 | [init_determine_compute_workspace](./init_determine_compute_workspace) | 本样例模拟8个核进行数据处理，使用确定性计算接口保证核间运行顺序，进行原子累加。 |
 | [mutex](./mutex)                                                       | 本样例基于Mutex::Lock和Mutex::Unlock实现核内异步流水之间的同步，通过锁定指定流水再释放流水来实现流水的同步依赖。|
