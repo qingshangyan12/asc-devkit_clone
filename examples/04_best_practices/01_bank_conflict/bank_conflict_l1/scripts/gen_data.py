@@ -18,9 +18,9 @@ np.random.seed(9)
 
 def gen_golden_data():
     M = 128
-    K = 8192
+    K = 4096
     N = 256
-    kRound = 64
+    kRound = 32
     input_type = np.dtype("float16")
     x1_gm = np.random.uniform(1, 10, [M, K]).astype(input_type)
     x2_gm = np.random.uniform(1, 10, [K, N]).astype(input_type)
