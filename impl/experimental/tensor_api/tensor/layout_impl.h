@@ -76,8 +76,8 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
     auto dstRow = Std::get<0>(Std::get<0>(tileTensor.Shape())) * Std::get<1>(Std::get<0>(tileTensor.Shape()));
     auto dstCol = Std::get<0>(Std::get<1>(tileTensor.Shape())) * Std::get<1>(Std::get<1>(tileTensor.Shape()));
 
-    auto realRow = Min(srcRow, dstRow);
-    auto realCol = Min(srcCol, dstCol);
+    auto realRow = Std::(srcRow, dstRow);
+    auto realCol = Std::(srcCol, dstCol);
 
     auto row = MakeShape(innerRow, Std::ceil_division(realRow, innerRow));
     auto col = MakeShape(innerCol, Std::ceil_division(realCol, innerCol));
