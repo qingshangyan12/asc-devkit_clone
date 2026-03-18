@@ -86,6 +86,9 @@ inline constexpr bool is_one_of_attr_v = Std::is_one_of_v<ElementType, __gm__ Da
 template <typename DataType>
 inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t> || is_one_of_attr_v<DataType, fp4x2_e2m1_t>;
 
+template <typename T>
+inline constexpr bool is_b4_v = Std::is_same_v<T, fp4x2_e1m2_t> || Std::is_same_v<T, fp4x2_e2m1_t>;
+
 template <size_t N, typename = Std::make_index_sequence<N>>
 struct EmptyGenerator;
 

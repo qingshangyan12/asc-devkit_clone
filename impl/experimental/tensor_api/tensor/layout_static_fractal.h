@@ -114,13 +114,36 @@ template <typename T, size_t row, size_t column>
 using DNStrideFormat = Stride<Stride<Std::Int<0>, Std::Int<1>>, Stride<Std::Int<0>, Std::Int<row>>>;
 
 // ZN
-template <typename T, size_t  row, size_t  column>
-using ZNShapeFormat = Shape<Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<row / (C0_SIZE / sizeof(T))>>,
-    Shape<Std::Int<FRACTAL_FIXED>, Std::Int<column / FRACTAL_FIXED>>>;
+template <typename T, size_t row, size_t column, typename Enable = void>
+struct ZNShapeFormatImpl {
+    using type = Shape<Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<Std::ceil_division(row, (C0_SIZE / sizeof(T)))>>,
+        Shape<Std::Int<FRACTAL_FIXED>, Std::Int<Std::ceil_division(column, FRACTAL_FIXED)>>>; 
+};
 
-template <typename T, size_t  row, size_t  column>
-using ZNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * column>>,
-    Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
+template <typename T, size_t row, size_t column>
+struct ZNShapeFormatImpl<T, row, column, Std::enable_if_t<is_b4_v<T>>> {
+    using type = Shape<Shape<Std::Int<2 * C0_SIZE>, Std::Int<Std::ceil_division(row, 2 * C0_SIZE)>>,
+        Shape<Std::Int<FRACTAL_FIXED>, Std::Int<Std::ceil_division(column, FRACTAL_FIXED)>>>;
+};
+
+template <typename T, size_t row, size_t column>
+using ZNShapeFormat = typename ZNShapeFormatImpl<T, row, column>::type;
+
+// ZN Stride
+template <typename T, size_t row, size_t column, typename Enable = void>
+struct ZNStrideFormatImpl {
+    using type = Stride<Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * Std::ceil_align(column, FRACTAL_FIXED)>>,
+        Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
+};
+
+template <typename T, size_t row, size_t column>
+struct ZNStrideFormatImpl<T, row, column, Std::enable_if_t<is_b4_v<T>>> {
+    using type = Stride<Stride<Std::Int<1>, Std::Int<2 * C0_SIZE * Std::ceil_align(column, FRACTAL_FIXED)>>,
+        Stride<Std::Int<2 * C0_SIZE>, Std::Int<2 * C0_SIZE * FRACTAL_FIXED>>>;
+};
+
+template <typename T, size_t row, size_t column>
+using ZNStrideFormat = typename ZNStrideFormatImpl<T, row, column>::type;
 
 // ZZ
 template <typename T, size_t row, size_t column>
