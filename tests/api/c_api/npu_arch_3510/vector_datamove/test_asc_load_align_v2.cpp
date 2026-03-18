@@ -13,7 +13,11 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
+<<<<<<< HEAD
 #define TEST_VECTOR_COMPUTE_LOADALIGNV2(dst_type, src_type)            \
+=======
+#define TEST_VECTOR_COMPUTE_LOADALIGNV2(dst_type, src_type, cce_dst_type, cce_src_type)            \
+>>>>>>> upstream/master
                                                                                                 \
 class TestVectorDataMoveLoadAlignV2##dst_type##CApi : public testing::Test {                 \
 protected:                                                                                      \
@@ -22,7 +26,11 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
+<<<<<<< HEAD
 void vsldb##_##dst_type##_Stub(dst_type& dst, __ubuf__ src_type* src, int32_t offset, vector_bool mask) {} \
+=======
+void vsldb##_##dst_type##_Stub(cce_dst_type& dst, __ubuf__ cce_src_type* src, int32_t offset, vector_bool mask) {} \
+>>>>>>> upstream/master
 }                                                                                               \
                                                                                                 \
 TEST_F(TestVectorDataMoveLoadAlignV2##dst_type##CApi, c_api_asc_loadalign_v2_##dst_type##_Succ)       \
@@ -31,7 +39,11 @@ TEST_F(TestVectorDataMoveLoadAlignV2##dst_type##CApi, c_api_asc_loadalign_v2_##d
     __ubuf__ src_type *src = reinterpret_cast<__ubuf__ src_type *>(11);       \
     vector_bool mask;                                                                           \
                                                                                                 \
+<<<<<<< HEAD
     MOCKER_CPP(vsldb, void(dst_type&, __ubuf__ src_type*, int32_t, vector_bool))                     \
+=======
+    MOCKER_CPP(vsldb, void(cce_dst_type&, __ubuf__ cce_src_type*, int32_t, vector_bool))                     \
+>>>>>>> upstream/master
         .times(1)                                                                               \
         .will(invoke(vsldb##_##dst_type##_Stub));                                           \
                                                                                                 \
@@ -39,6 +51,7 @@ TEST_F(TestVectorDataMoveLoadAlignV2##dst_type##CApi, c_api_asc_loadalign_v2_##d
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
+<<<<<<< HEAD
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int8_t, int8_t);
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_uint8_t, uint8_t);
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int16_t, int16_t);
@@ -57,6 +70,27 @@ TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_float, float);
 
 
 #define TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(dst_type, src_type)            \
+=======
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int8_t, int8_t, vector_int8_t, int8_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int16_t, int16_t, vector_int16_t, int16_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_uint16_t, uint16_t, vector_uint16_t, uint16_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int32_t, int32_t, vector_int32_t, int32_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_uint32_t, uint32_t, vector_uint32_t, uint32_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int64_t, int64_t, vector_int64_t, int64_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_hifloat8_t, hifloat8_t, vector_uint8_t, uint8_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t, fp8_e5m2_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t, fp8_e8m0_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_half, half, vector_half, half);
+TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_float, float, vector_float, float);
+
+
+#define TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(dst_type, src_type, cce_dst_type, cce_src_type)            \
+>>>>>>> upstream/master
                                                                                                 \
 class TestVectorDataMoveLoadAlignPostUpdateV2##dst_type##CApi : public testing::Test {                 \
 protected:                                                                                      \
@@ -65,7 +99,11 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
+<<<<<<< HEAD
 void vsldb_post##_##dst_type##_Stub(dst_type& dst, __ubuf__ src_type*& src, int32_t offset, vector_bool mask, Literal mode) {} \
+=======
+void vsldb_post##_##dst_type##_Stub(cce_dst_type& dst, __ubuf__ cce_src_type*& src, int32_t offset, vector_bool mask, Literal mode) {} \
+>>>>>>> upstream/master
 }                                                                                               \
                                                                                                 \
 TEST_F(TestVectorDataMoveLoadAlignPostUpdateV2##dst_type##CApi, c_api_asc_loadalign_v2_##dst_type##_Succ)       \
@@ -74,7 +112,11 @@ TEST_F(TestVectorDataMoveLoadAlignPostUpdateV2##dst_type##CApi, c_api_asc_loadal
     __ubuf__ src_type *src = reinterpret_cast<__ubuf__ src_type *>(11);       \
     vector_bool mask;                                                                           \
                                                                                                 \
+<<<<<<< HEAD
     MOCKER_CPP(vsldb, void(dst_type&, __ubuf__ src_type*&, int32_t, vector_bool, Literal))                     \
+=======
+    MOCKER_CPP(vsldb, void(cce_dst_type&, __ubuf__ cce_src_type*&, int32_t, vector_bool, Literal))                     \
+>>>>>>> upstream/master
         .times(1)                                                                               \
         .will(invoke(vsldb_post##_##dst_type##_Stub));                                           \
                                                                                                 \
@@ -82,6 +124,7 @@ TEST_F(TestVectorDataMoveLoadAlignPostUpdateV2##dst_type##CApi, c_api_asc_loadal
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
+<<<<<<< HEAD
 TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_int8_t, int8_t);
 TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_uint8_t, uint8_t);
 TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_int16_t, int16_t);
@@ -97,3 +140,21 @@ TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
 TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
 TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_half, half);
 TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_float, float);
+=======
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_int8_t, int8_t, vector_int8_t, int8_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_int16_t, int16_t, vector_int16_t, int16_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_uint16_t, uint16_t, vector_uint16_t, uint16_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_int32_t, int32_t, vector_int32_t, int32_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_uint32_t, uint32_t, vector_uint32_t, uint32_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_int64_t, int64_t, vector_int64_t, int64_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_hifloat8_t, hifloat8_t, vector_uint8_t, uint8_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t, fp8_e5m2_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t, fp8_e8m0_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_half, half, vector_half, half);
+TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(vector_float, float, vector_float, float);
+>>>>>>> upstream/master

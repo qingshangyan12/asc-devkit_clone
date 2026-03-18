@@ -132,6 +132,7 @@ __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 template<typename T>
 __simd_vf__ inline void MulDstAddVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, __ubuf__ T* src2Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
+<<<<<<< HEAD
     AscendC::MicroAPI::RegTensor<T> srcReg0;
     AscendC::MicroAPI::RegTensor<T> srcReg1;
     AscendC::MicroAPI::RegTensor<T> dstReg;
@@ -143,6 +144,19 @@ __simd_vf__ inline void MulDstAddVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, _
         AscendC::MicroAPI::LoadAlign(dstReg, src2Addr + i * oneRepeatSize);
         AscendC::MicroAPI::MulDstAdd(dstReg, srcReg0, srcReg1, mask);
         AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+=======
+    AscendC::Reg::RegTensor<T> srcReg0;
+    AscendC::Reg::RegTensor<T> srcReg1;
+    AscendC::Reg::RegTensor<T> dstReg;
+    AscendC::Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTimes; i++) {
+        mask = AscendC::Reg::UpdateMask<T>(count);
+        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
+        AscendC::Reg::LoadAlign(dstReg, src2Addr + i * oneRepeatSize);
+        AscendC::Reg::MulDstAdd(dstReg, srcReg0, srcReg1, mask);
+        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+>>>>>>> upstream/master
     }
 }
 ```

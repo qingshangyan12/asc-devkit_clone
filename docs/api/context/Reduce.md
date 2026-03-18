@@ -146,6 +146,7 @@ __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
     __simd_vf__ inline void ReduceVF(__ubuf__ T* dstAddr, __ubuf__ U* srcAddr, uint32_t count, 
      uint32_t srcRepeatSize, uint32_t dstRepeatSize, uint16_t repeatTimes)
     {
+<<<<<<< HEAD
         AscendC::MicroAPI::RegTensor<U> srcReg;
         AscendC::MicroAPI::RegTensor<T> dsrReg;
         AscendC::MicroAPI::MaskReg mask;
@@ -154,6 +155,16 @@ __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
             mask = AscendC::MicroAPI::UpdateMask<U>(count);
             AscendC::MicroAPI::Reduce<AscendC::MicroAPI::ReduceType::SUM>(dsrReg, srcReg, mask);
             AscendC::MicroAPI::StoreAlign(dstAddr + i * dstRepeatSize, dsrReg, mask);
+=======
+        AscendC::Reg::RegTensor<U> srcReg;
+        AscendC::Reg::RegTensor<T> dsrReg;
+        AscendC::Reg::MaskReg mask;
+        for (uint16_t i = 0; i < repeatTimes; i++) {
+            AscendC::Reg::LoadAlign(srcReg, srcAddr + i * srcRepeatSize);
+            mask = AscendC::Reg::UpdateMask<U>(count);
+            AscendC::Reg::Reduce<AscendC::Reg::ReduceType::SUM>(dsrReg, srcReg, mask);
+            AscendC::Reg::StoreAlign(dstAddr + i * dstRepeatSize, dsrReg, mask);
+>>>>>>> upstream/master
         }
     }
     ```
@@ -164,6 +175,7 @@ __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
     template<typename T>
     __aicore__ inline void ReduceVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
     {
+<<<<<<< HEAD
         AscendC::MicroAPI::RegTensor<T> srcReg;
         AscendC::MicroAPI::RegTensor<T> dstReg;
         AscendC::MicroAPI::MaskReg mask;
@@ -175,6 +187,19 @@ __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
             // type = ReduceType::MIN
             // AscendC::MicroAPI::Reduce<AscendC::MicroAPI::ReduceType::MIN>(dstReg, srcReg, mask);
             AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, maskReg);
+=======
+        AscendC::Reg::RegTensor<T> srcReg;
+        AscendC::Reg::RegTensor<T> dstReg;
+        AscendC::Reg::MaskReg mask;
+        for (uint16_t i = 0; i < repeatTimes; i++) {
+            AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+            mask = AscendC::Reg::UpdateMask<T>(count);
+            // type = ReduceType::MAX
+            AscendC::Reg::Reduce<AscendC::Reg::ReduceType::MAX>(dstReg, srcReg, mask);
+            // type = ReduceType::MIN
+            // AscendC::Reg::Reduce<AscendC::Reg::ReduceType::MIN>(dstReg, srcReg, mask);
+            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, maskReg);
+>>>>>>> upstream/master
         }
     }
     ```

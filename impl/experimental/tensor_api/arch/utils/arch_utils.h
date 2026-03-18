@@ -8,11 +8,39 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 /*!
+<<<<<<< HEAD:impl/experimental/tensor_api/arch/utils/arch_utils.h
  * \file arch_utils.h
  * \brief
  */
 #ifndef IMPL_TENSOR_API_ARCH_UTILS_ARCH_UTILS_H
 #define IMPL_TENSOR_API_ARCH_UTILS_ARCH_UTILS_H
+=======
+* \file tensor_tile_constant.h
+* \brief
+*/
+#ifndef IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_CONSTANT_H
+#define IMPL_EXPERIMENTAL_TENSOR_API_UTILS_TENSOR_TILE_CONSTANT_H
+
+#include <cstdint>
+#include <utility>
+#include <type_traits>
+#include "impl/experimental/tensor_api/utils/tensor_tile_macro.h"
+#include "impl/utils/common_types.h"
+#include "include/utils/std/tuple.h"
+#include "include/utils/std/type_traits.h"
+#include "include/utils/std/utility.h"
+#include "include/utils/std/algorithm.h"
+
+namespace AscendC{
+
+namespace TileInternal{
+constexpr size_t TWO_DIM_DATA = 2;
+constexpr size_t FOUR_DIM_DATA = 4;
+constexpr size_t C0_SIZE = 32;
+constexpr size_t FRACTAL_FIXED = 16;
+constexpr size_t DISABLE_COORD = 0;
+constexpr size_t ENABLE_COORD = 1;
+>>>>>>> upstream/master:impl/experimental/tensor_api/utils/tensor_tile_constant.h
 
 #include "impl/experimental/tensor_api/arch/utils/check_data_type_2201.h"
 #include "impl/experimental/tensor_api/arch/utils/check_data_type_3510.h"

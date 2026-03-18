@@ -106,6 +106,7 @@ __simd_callee__ inline void MaskDeInterleave(MaskReg& dst0, MaskReg& dst1, MaskR
 template <typename T>
 __simd_vf__ inline void MaskInterleaveDeInterleaveVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
+<<<<<<< HEAD
     AscendC::MicroAPI::RegTensor<T> srcReg;
     AscendC::MicroAPI::MaskReg maskFull = AscendC::MicroAPI::CreateMask<T, AscendC::MicroAPI::MaskPattern::ALL>();
     AscendC::MicroAPI::MaskReg maskM3 = AscendC::MicroAPI::CreateMask<T, AscendC::MicroAPI::MaskPattern::M3>();
@@ -119,6 +120,21 @@ __simd_vf__ inline void MaskInterleaveDeInterleaveVF(__ubuf__ T* dstAddr, __ubuf
         AscendC::MicroAPI::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
         AscendC::MicroAPI::Adds(srcReg, srcReg, 0, newMask0);
         AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+=======
+    AscendC::Reg::RegTensor<T> srcReg;
+    AscendC::Reg::MaskReg maskFull = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    AscendC::Reg::MaskReg maskM3 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::M3>();
+    AscendC::Reg::MaskReg newMask0;
+    AscendC::Reg::MaskReg newMask1;
+    AscendC::Reg::MaskInterleave<T>(newMask0, newMask1, maskFull, maskM3);
+    AscendC::Reg::MaskDeInterleave<T>(newMask0, newMask1, newMask0, newMask1);
+    AscendC::Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        mask = AscendC::Reg::UpdateMask<T>(count);
+        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+        AscendC::Reg::Adds(srcReg, srcReg, 0, newMask0);
+        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+>>>>>>> upstream/master
     }
 }
 ```

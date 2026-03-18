@@ -11,9 +11,9 @@
 
 set -e
 
-SUPPORTED_SHORT_OPTS=("h" "j" "t" "p")
+SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type" "extra-cmake-args"
+    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -24,9 +24,6 @@ USER_ID=$(id -u)
 CPU_NUM=$(($(cat /proc/cpuinfo | grep "^processor" | wc -l)))
 THREAD_NUM=32
 BUILD_TYPE="Release"
-ENABLE_BUILD_DEVICE=ON
-USE_CXX11_ABI=0
-CMAKE_TOOLCHAIN_FILE_VAL=""
 
 dotted_line="----------------------------------------------------------------"
 
@@ -105,6 +102,52 @@ usage() {
   echo "    --make_clean         Clean build artifacts"
   echo "    --build-type=<TYPE>"
   echo "                         Specify build type (TYPE options: Release/Debug), Default:Release"
+  echo "    -f, --changed_file   Set the changed files for CI mode, eg: -f change_file.txt"
+}
+
+parse_cmake_extra_args() {
+    echo "Parse cmake extra args."
+    # para check
+    local args_str="$1"
+    if [[ -z "$args_str" ]]; then
+        echo "The parsed parameter string is empty."
+        return 0
+    fi
+
+    IFS=',' read -ra kv_pairs <<< "$args_str"
+
+    for kv_pair in "${kv_pairs[@]}"; do
+        if [[ -z "$kv_pair" ]]; then
+            continue
+        fi
+
+        local key="${kv_pair%%=*}"
+        local value="${kv_pair#*=}"
+
+        case "$key" in
+            "ENABLE_BUILD_DEVICE")
+                ENABLE_BUILD_DEVICE="$value"
+                echo "Set ENABLE_BUILD_DEVICE to ${ENABLE_BUILD_DEVICE}."
+                ;;
+            "USE_CXX11_ABI")
+                USE_CXX11_ABI="$value"
+                echo "Set USE_CXX11_ABI to ${USE_CXX11_ABI}."
+                ;;
+            "CMAKE_TOOLCHAIN_FILE")
+                CMAKE_TOOLCHAIN_FILE_VAL=$(realpath -s "$value")
+                echo "Set CMAKE_TOOLCHAIN_FILE_VAL to ${CMAKE_TOOLCHAIN_FILE_VAL}."
+                ;;
+            *)
+                echo "invalid parameter key: $key"
+                ;;
+        esac
+    done
+
+    if [[ "X$(echo "$USE_CXX11_ABI" | tr '[:upper:]' '[:lower:]')" == "xon" || "$USE_CXX11_ABI" == "1" ]]; then
+      USE_CXX11_ABI=1
+    elif [[ "X$(echo "$USE_CXX11_ABI" | tr '[:upper:]' '[:lower:]')" == "xoff" || "$USE_CXX11_ABI" == "0" ]]; then
+      USE_CXX11_ABI=0
+    fi
 }
 
 parse_cmake_extra_args() {
@@ -405,6 +448,16 @@ set_options() {
       check_param_j
       shift 2
       ;;
+    -f)
+      CHANGED_FILES="$2"
+      CI_MODE=TRUE
+      shift 2
+      ;;
+    --changed_file=*)
+      CHANGED_FILES="${1#*=}"
+      CI_MODE=TRUE
+      shift
+      ;;
     --build-type=*)
       BUILD_TYPE="${1#*=}"
       check_param_test_build_type
@@ -516,6 +569,32 @@ function build_test_part() {
   return 0
 }
 
+set_ci_mode() {
+  if [[ "$CHANGED_FILES" != /* ]]; then
+    CHANGED_FILES=${CURRENT_DIR}/$CHANGED_FILES
+  fi
+  log "[INFO] CI mode: changed file path is $CHANGED_FILES"
+  log "[INFO] CI mode: context in changed file: "
+  cat $CHANGED_FILES
+
+  if [[ -n "$CHANGED_FILES" ]]; then
+    log "[INFO] CI mode: processing changed files for CI mode."
+    # 调用 parse_changed_files.py 解析修改的文件
+    local parse_script="${CURRENT_DIR}/scripts/util/parse_changed_files.py"
+    if [[ ! -f "$parse_script" ]]; then
+      log "[ERROR] CI mode: parse_changed_files.py not found at $parse_script"
+      exit 1
+    fi
+
+    SKIP_COMPILE_AND_TEST=$(python3 "$parse_script" "$CHANGED_FILES")
+    if [[ "${SKIP_COMPILE_AND_TEST}" == "TRUE" ]]; then
+      log "[INFO] CI mode: No need to compile and test."
+      exit 200
+    fi
+    log "[INFO] CI mode: need compile and test for CI mode."
+  fi
+}
+
 main() {
   check_param_with_help "$@"
   set_options "$@"
@@ -556,6 +635,10 @@ main() {
   fi
 
   cd ${BUILD_DIR}
+
+  if [[ "${CI_MODE}" == "TRUE" ]]; then
+    set_ci_mode
+  fi
 
   if [ -n "${TEST}" ]; then
     build_test

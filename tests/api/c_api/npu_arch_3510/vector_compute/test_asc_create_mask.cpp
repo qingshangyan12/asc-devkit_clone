@@ -22,7 +22,11 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
+<<<<<<< HEAD
 vector_bool cce_name##_Stub(Literal mode) {}                                                          \
+=======
+vector_bool cce_name##_Stub(Literal mode) { return vector_bool{}; }                             \
+>>>>>>> upstream/master
 }                                                                                               \
                                                                                                 \
 TEST_F(TestVectorCompute##class_name##_CApi, c_api_name##_Succ)       \

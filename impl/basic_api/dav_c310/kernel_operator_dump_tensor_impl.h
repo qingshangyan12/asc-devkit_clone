@@ -12,6 +12,11 @@
  * \file kernel_operator_dump_tensor_impl.h
  * \brief
  */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#pragma message("impl/basic_api/dav_c310/kernel_operator_dump_tensor_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__
+#endif
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 
@@ -20,6 +25,8 @@
 #include "kernel_operator_data_copy_impl.h"
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_operator_print_impl.h"
+#include "impl/utils/debug/asc_aicore_dump_impl.h"
+#include "impl/utils/debug/asc_aicore_time_impl.h"
 
 namespace AscendC {
 template <typename T>
@@ -360,9 +367,6 @@ __aicore__ inline void DumpTensorLocal2GMEntityImpl(const LocalTensor<T>& tensor
     }
 }
 
-template <template <typename> class Tensor, typename T>
-__aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize);
-
 template <typename T>
 __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc,
                                                                 uint32_t dumpSize)
@@ -371,7 +375,21 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize);
+        const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
+        if (position == Hardware::UB) {
+            __asc_aicore::asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize);
+        } else if (position == Hardware::L1) {
+            return; // L1 to GM dump not support
+        } else if (position == Hardware::L0C) {
+            if ASCEND_IS_NOT_AIC {
+                return;
+            }
+            __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize);
+        } else {
+            ASCENDC_ASSERT((false),
+                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+            return;
+        }
     } else {
         DumpTensorLocal2GMEntityImpl(src, desc, dumpSize);
     }
@@ -513,7 +531,7 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize);
+        __asc_aicore::asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize);
     } else {
         DumpTensorGM2GMEntityImpl(src, desc, dumpSize);
     }
@@ -539,13 +557,11 @@ __aicore__ inline void WriteTimeStampInfo(uint32_t descId)
 #endif
 }
 
-__aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId);
-
 __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
 {
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        WriteRingBufTimeStampInfo(descId);
+        __asc_aicore::asc_time_stamp(descId);
     } else {
         WriteTimeStampInfo(descId);
     }
@@ -647,16 +663,6 @@ __aicore__ inline void FinalizeL1TensorDump()
 }
 
 template <typename T>
-__aicore__ inline Hardware CheckDumpTensorPosition(const LocalTensor<T>& src)
-{
-    Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
-    if (position != Hardware::UB && position != Hardware::L1 && position != Hardware::L0C) {
-        return Hardware::MAX;
-    }
-    return position;
-}
-
-template <typename T>
 __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType()
 {
     if constexpr (IsSameType<T, bool>::value) {
@@ -700,6 +706,7 @@ __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType()
     }
 }
 
+<<<<<<< HEAD
 
 template <template<typename> class Tensor, typename T>
 __aicore__ inline void WriteRingBufTlvHead(const Tensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv,
@@ -836,6 +843,8 @@ __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc
 #endif // ASCENDC_DUMP
 }
 
+=======
+>>>>>>> upstream/master
 __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
 {
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
@@ -857,6 +866,7 @@ __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo)
     shapeTlv->resv = static_cast<uint32_t>(0U);
 
     dcci((__gm__ uint64_t*)shapeTlv, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+<<<<<<< HEAD
 
     __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
 
@@ -890,12 +900,17 @@ __aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId)
     timeStampTlv->resvMem[1] = static_cast<uint32_t>(0U);
 
     dcci((__gm__ uint64_t*)timeStampTlv, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+=======
+>>>>>>> upstream/master
 
     __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
 
     UpdateWriteInfo(writeInfo, tlvLen);
-#endif // ASCENDC_TIME_STAMP_ON
 }
 
 }  // namespace AscendC
+#endif
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_IMPL_H__
 #endif

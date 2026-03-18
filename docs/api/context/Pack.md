@@ -94,6 +94,7 @@ __simd_callee__ inline void Pack(MaskReg& dst, MaskReg& src)
 template <typename T>
 __simd_vf__ inline void PackVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
+<<<<<<< HEAD
     AscendC::MicroAPI::RegTensor<T> srcReg;
     AscendC::MicroAPI::MaskReg maskFull = AscendC::MicroAPI::CreateMask<T, AscendC::MicroAPI::MaskPattern::ALL>();
     AscendC::MicroAPI::MaskReg mask0;
@@ -104,6 +105,18 @@ __simd_vf__ inline void PackVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_
         AscendC::MicroAPI::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
         AscendC::MicroAPI::Adds(srcReg, srcReg, 0, mask0);
         AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask1);
+=======
+    AscendC::Reg::RegTensor<T> srcReg;
+    AscendC::Reg::MaskReg maskFull = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    AscendC::Reg::MaskReg mask0;
+    AscendC::Reg::MaskReg mask1;
+    AscendC::Reg::Pack<AscendC::Reg::HighLowPart::LOWEST>(mask0, maskFull);
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        mask1 = AscendC::Reg::UpdateMask<T>(count);
+        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+        AscendC::Reg::Adds(srcReg, srcReg, 0, mask0);
+        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask1);
+>>>>>>> upstream/master
     }
 }
 ```

@@ -18,8 +18,18 @@ add_executable(demo
     floor_mod.asc
 )
 
+<<<<<<< HEAD
 target_compile_options(demo PRIVATE
     # 该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
+=======
+# ======================================================================================
+# NPU 编译选项配置
+#
+# 说明：
+#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+# ======================================================================================
+target_compile_options(demo PRIVATE
+>>>>>>> upstream/master
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
     $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:-g -O0>>
 )

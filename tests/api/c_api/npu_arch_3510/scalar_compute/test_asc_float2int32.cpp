@@ -22,7 +22,11 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
+<<<<<<< HEAD
 int64_t cce_name##_Stub(float value) {}                                                         \
+=======
+int64_t cce_name##_Stub(float value) { return 0; }                                              \
+>>>>>>> upstream/master
 }                                                                                               \
                                                                                                 \
 TEST_F(TestScalarCompute##class_name####data_type##CApi, c_api_name##_Succ)                     \

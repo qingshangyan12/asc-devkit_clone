@@ -19,7 +19,73 @@
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
 
 namespace AscendC {
+<<<<<<< HEAD:impl/experimental/tensor_api/arch/utils/is_format.h
 namespace Te {
+=======
+template <typename T, typename U>
+constexpr bool VerifyingDataCopyTemplate =
+    ((IsTileTensorV<U> && IsTileTensorV<T>) ||
+    (IsTileTensorV<U> && IsTileTensorV<T>));
+
+template <typename T, typename U, typename Coord>
+constexpr bool VerifyingDataCopyTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingDataCopyTemplate<T, U>;
+
+template <typename T, typename U>
+constexpr bool VerifyingLoadDataTemplate = IsTileTensorV<U> && IsTileTensorV<T>;
+
+template <typename T, typename U, typename Coord>
+constexpr bool VerifyingLoadDataTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingLoadDataTemplate<T, U>;
+
+
+template <typename T, typename U, typename S>
+static constexpr bool VerifyingMmadTemplate = (IsTileTensorV<T> && IsTileTensorV<U> 
+    && IsTileTensorV<S>);
+
+template <typename T, typename U, typename S, typename V>
+static constexpr bool VerifyingMmadWithBiasTemplate = (IsTileTensorV<T> && IsTileTensorV<U> 
+    && IsTileTensorV<S> && IsTileTensorV<V>);
+
+template <typename T, typename U>
+static constexpr bool VerifyingFixpipeTemplate = (IsTileTensorV<T> && IsTileTensorV<U>);
+
+template <typename T, typename U, typename V>
+static constexpr bool VerifyingFixpipeQuantTemplate = (IsTileTensorV<T> && IsTileTensorV<U>
+    && (IsTileTensorV<V> || Std::is_same_v<V, uint64_t>)); 
+
+template <typename T, typename U, typename Coord>
+constexpr bool VerifyingFixpipeTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingFixpipeTemplate<T, U>;
+
+template <typename T, typename U, typename V, typename Coord>
+constexpr bool VerifyingFixpipeQuantTemplateWithCoord = Std::is_tuple_v<Coord> && VerifyingFixpipeQuantTemplate<T, U, V>;
+
+namespace TileInternal {
+struct ArchVersion {
+    static constexpr uint32_t V3101 = 3510;
+    static constexpr uint32_t V2201 = 2201;
+};
+
+struct GetArchVersion {
+    __aicore__ inline constexpr uint32_t operator()() const {
+#ifdef __NPU_ARCH__
+        return __NPU_ARCH__;
+#else
+        return 0;
+#endif
+    }
+};
+
+constexpr uint32_t CURRENT_ARCH_VERSION = GetArchVersion{}();
+
+// IsIntegralConstant
+template <typename T>
+struct IsIntegralConstant : Std::false_type {};
+
+template <size_t Value>
+struct IsIntegralConstant<Std::Int<Value>> : Std::true_type {};
+
+template <typename T>
+constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
+>>>>>>> upstream/master:impl/experimental/tensor_api/utils/tensor_tile_format.h
 
 template <typename T>
 struct GetTypeFromFourDimTrait;

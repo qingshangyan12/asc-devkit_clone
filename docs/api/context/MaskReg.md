@@ -94,6 +94,7 @@ Ascend 950PR/Ascend 950DT
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```
+<<<<<<< HEAD
 AscendC::MicroAPI::RegTensor<uint32_t> srcReg;
 AscendC::MicroAPI::MaskReg mask0 = AscendC::MicroAPI::CreateMask<uint32_t,AscendC::MicroAPI:: MaskPattern::ALL >();
 AscendC::MicroAPI::MaskReg mask1;
@@ -104,6 +105,18 @@ for (uint16_t i = 0; i < 2; i++) {
     AscendC::MicroAPI::Adds(srcReg, srcReg, 1, mask0);
     AscendC::MicroAPI::StoreAlign<T, AscendC::MicroAPI::PostLiteral::POST_MODE_UPDATE>(dst0Addr, srcReg, 0, mask0);
     AscendC::MicroAPI::StoreAlign<T, AscendC::MicroAPI::PostLiteral::POST_MODE_UPDATE>(dst1Addr, srcReg, 0, mask1);
+=======
+AscendC::Reg::RegTensor<uint32_t> srcReg;
+AscendC::Reg::MaskReg mask0 = AscendC::Reg::CreateMask<uint32_t,AscendC::Reg:: MaskPattern::ALL >();
+AscendC::Reg::MaskReg mask1;
+uint32_t scalarValue = 127;
+for (uint16_t i = 0; i < 2; i++) {
+    mask1 = AscendC::Reg::UpdateMask<uint32_t>(scalarValue);
+    AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(srcReg, srcAddr, 0);
+    AscendC::Reg::Adds(srcReg, srcReg, 1, mask0);
+    AscendC::Reg::StoreAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(dst0Addr, srcReg, 0, mask0);
+    AscendC::Reg::StoreAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(dst1Addr, srcReg, 0, mask1);
+>>>>>>> upstream/master
 }
 ```
 

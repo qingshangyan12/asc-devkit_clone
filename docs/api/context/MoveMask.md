@@ -72,6 +72,7 @@ __simd_callee__ inline MaskReg MoveMask()
 template <typename T>
 __simd_vf__ inline void MoveMaskVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
+<<<<<<< HEAD
     AscendC::MicroAPI::RegTensor<T> srcReg;
     AscendC::MicroAPI::MaskReg addMask = AscendC::MicroAPI::MoveMask<T>();
     AscendC::MicroAPI::MaskReg mask;
@@ -80,6 +81,16 @@ __simd_vf__ inline void MoveMaskVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uin
         AscendC::MicroAPI::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
         AscendC::MicroAPI::Adds(srcReg, srcReg, 0, addMask);
         AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+=======
+    AscendC::Reg::RegTensor<T> srcReg;
+    AscendC::Reg::MaskReg addMask = AscendC::Reg::MoveMask<T>();
+    AscendC::Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        mask = AscendC::Reg::UpdateMask<T>(count);
+        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+        AscendC::Reg::Adds(srcReg, srcReg, 0, addMask);
+        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+>>>>>>> upstream/master
     }
 }
 ```

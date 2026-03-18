@@ -44,6 +44,11 @@ PIPE_V
 ```c++
 vector_half dst;
 vector_half src;
+<<<<<<< HEAD
 vector_bool mask;
+=======
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
+asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+>>>>>>> upstream/master
 asc_pair_reduce_sum(dst, src, mask);
 ```
