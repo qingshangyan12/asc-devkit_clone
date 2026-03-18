@@ -47,7 +47,7 @@ endif()
 # CMAKE_ASC_COMPILER: bisheng
 if(NOT CMAKE_ASC_COMPILE_OBJECT)
     set(CMAKE_ASC_COMPILE_OBJECT "<CMAKE_ASC_COMPILER> <DEFINES> <INCLUDES> -fPIC ${debug_compile_options} \
-<FLAGS> -o <OBJECT> -c -x asc <SOURCE>")
+<CMAKE_ASC_COMPILE_FLAGS> <FLAGS> -o <OBJECT> -c -x asc <SOURCE>")
 endif()
 
 # Create a static archive incrementally for large object file counts.
@@ -103,4 +103,61 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "sim")
     else()
         message(FATAL_ERROR "Unsupported ASC architecture for simulator: ${CMAKE_ASC_ARCHITECTURES}")
     endif()
+endif()
+
+if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
+    # CPU模式架构映射表
+    # set(_ARCH_TO_DIR_MAP
+    #     "dav-2002" "2002" => Ascend310P
+    #     "dav-2201" "2201" => Ascend910B1
+    #     "dav-3510" "3510" => Ascend950PR_9599
+    # )
+    # list(FIND _ARCH_TO_DIR_MAP "${CMAKE_ASC_ARCHITECTURES}" _index)
+    # if(_index GREATER -1)
+        # math(EXPR _val_index "${_index} + 1")
+        # list(GET _ARCH_TO_DIR_MAP ${_val_index} _ASC_INTERNAL_DIR)
+        
+        # system include
+        set(ASC_CPU_SYSTEM_INCLUDE_OPTIONS "-isystem$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/include -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/include \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw/lib \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw/lib/matmul -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw/impl \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw/interface -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/adv_api \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/basic_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/c_api \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/micro_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/simt_api \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/utils -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/adv_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/adv_api/matmul \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/aicpu_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/basic_api \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/c_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/interface \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/micro_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/simt_api \
+-isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/tiling -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/utils")
+        
+        # 添加编译选项
+        string(APPEND CMAKE_ASC_COMPILE_FLAGS "-g -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -DASCENDC_DEBUG=1 -D__NPU_ARCH__=2201 --run-mode=cpu ${ASC_CPU_SYSTEM_INCLUDE_OPTIONS}")
+        
+        # 配置链接选项：rpath和库搜索路径
+        string(APPEND CMAKE_ASC_LINK_FLAGS "--run-mode=cpu \
+-Wl,-rpath,$ENV{ASCEND_HOME_PATH}/lib64} -Wl,-L$ENV{ASCEND_HOME_PATH}/lib64 \
+-Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib \
+-Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/Ascend910B1 -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/Ascend910B1 \
+-Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/simulator/Ascend910B1/lib -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/simulator/Ascend910B1/lib \
+-Wl,--disable-new-dtags")
+                
+        # 配置链接库
+        link_libraries(
+            -Wl,-Bdynamic,--no-as-needed
+            ascendc_acl_stub
+            pem_davinci
+            # pvmodel # if 2001
+            cpudebug_cceprint
+            cpudebug_npuchk
+            cpudebug_stubreg
+            cpudebug
+            c_sec
+            stdc++
+            # -pthread # if 3501
+        )
+        
+    # else()
+    #     message(FATAL_ERROR "Unsupported ASC architecture for CPU mode: ${CMAKE_ASC_ARCHITECTURES}")
+    # endif()
 endif()
