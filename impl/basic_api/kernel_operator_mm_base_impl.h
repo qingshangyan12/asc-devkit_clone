@@ -438,6 +438,9 @@ template <typename T, typename U, typename S>
 __aicore__ inline void MmadImpl(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const MmadParams& mmadParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckMmadTensorCommon(dst, fm, filter, mmadParams, "Mmad");
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckMmadParams(dst, fm, filter, mmadParams, "Mmad")) {
         ASCENDC_REPORT_CHECK_ERROR("Mmad", KernelFuncType::NONE_MODE);
@@ -452,6 +455,9 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadImpl(const LocalTensor<T>& dst, const LocalTensor<U>& fm,
     const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadParams& mmadParams)
 {
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckMmadTensorCommon(dst, fm, filter, bias, mmadParams, "Mmad with bias");
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckMmadParams(dst, fm, filter, bias, mmadParams, "Mmad with bias")) {
         ASCENDC_REPORT_CHECK_ERROR("Mmad with bias", KernelFuncType::NONE_MODE);

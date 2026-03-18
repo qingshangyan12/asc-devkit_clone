@@ -204,13 +204,13 @@ template <typename T> struct FixpipeInfoParams {
 template <typename T>
 __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ T *dst, __cc__ T *src, FixpipeInfoParams<T> &fixpipeInfo)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "Fixpipe from CO1 to A1 / B1 with src and dst both float / int32_t");
+    ReportNotSupport(false, "Fixpipe from CO1 to A1 / B1 with src and dst both float / int32_t");
 }
 
 template <typename T, typename U>
 __aicore__ inline void FixpipeL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, FixpipeInfoParams<U>& fixpipeInfo)
 {
-    ASCENDC_REPORT_NOT_SUPPORT((!fixpipeInfo.nz2ndEn), "Fixpipe from CO1 to A1 / B1 with nz2ndEn = true");
+    ReportNotSupport((!fixpipeInfo.nz2ndEn), "Fixpipe from CO1 to A1 / B1 with nz2ndEn = true");
     /*
     make code for vector quant mode:
     1. generate tiling
