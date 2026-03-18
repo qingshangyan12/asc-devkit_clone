@@ -36,7 +36,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 #endif
 #endif
 
-#define COUNT_ARGS_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, N, ...) N
+#define COUNT_ARGS_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...) N
 #define COUNT_ARGS(...) COUNT_ARGS_IMPL(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1)
 #define GET_ARG_COUNT(...) COUNT_ARGS(__VA_ARGS__)
 #define ASSERT_IMPL(N, ...) ASSERT_FUNC(N, __VA_ARGS__)
