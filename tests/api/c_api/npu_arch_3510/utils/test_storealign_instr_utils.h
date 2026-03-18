@@ -591,17 +591,17 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
-void Stub_TestVectorDataMoveStorealignInstrPst_Norm_##data_type(vector_bool src, __ubuf__ uint32_t *base, vector_address offset, Literal dist) {} \
-void Stub_TestVectorDataMoveStorealignInstrPst_Pack_##data_type(vector_bool src, __ubuf__ uint32_t *base, vector_address offset, Literal dist) {} \
+void Stub_TestVectorDataMoveStorealignInstrPst_Norm_##data_type(vector_bool src, __ubuf__ uint32_t* base, vector_address offset, Literal dist) {} \
+void Stub_TestVectorDataMoveStorealignInstrPst_Pack_##data_type(vector_bool src, __ubuf__ uint32_t* base, vector_address offset, Literal dist) {} \
 }                                                                                                \
                                                                                                  \
 TEST_F(TestVectorDataMoveStorealignInstrPst##_##data_type, test_normal)                          \
 {                                                                                                \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(0);                         \
+    __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type* >(0);                         \
     vector_bool src;                                                                             \
     vector_address offset;                                                                       \
                                                                                                  \
-    MOCKER_CPP(pst, void(vector_bool src, __ubuf__ uint32_t *base, vector_address offset, Literal dist))  \
+    MOCKER_CPP(pst, void(vector_bool src, __ubuf__ uint32_t* base, vector_address offset, Literal dist))  \
         .times(1)                                                                                \
         .will(invoke(Stub_TestVectorDataMoveStorealignInstrPst_Norm_##data_type));               \
                                                                                                  \
@@ -610,11 +610,11 @@ TEST_F(TestVectorDataMoveStorealignInstrPst##_##data_type, test_normal)         
 }                                                                                                \
 TEST_F(TestVectorDataMoveStorealignInstrPst##_##data_type, test_pack)                            \
 {                                                                                                \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(0);                         \
+    __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type* >(0);                         \
     vector_bool src;                                                                             \
     vector_address offset;                                                                       \
                                                                                                  \
-    MOCKER_CPP(pst, void(vector_bool src, __ubuf__ uint32_t *base, vector_address offset, Literal dist))  \
+    MOCKER_CPP(pst, void(vector_bool src, __ubuf__ uint32_t* base, vector_address offset, Literal dist))  \
         .times(1)                                                                                \
         .will(invoke(Stub_TestVectorDataMoveStorealignInstrPst_Pack_##data_type));               \
                                                                                                  \
@@ -631,16 +631,16 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
-void Stub_TestVectorDataMoveStorealignInstrPsts_1_Norm_##data_type(vector_bool src, __ubuf__ uint32_t *base, int32_t offset, Literal dist) {} \
-void Stub_TestVectorDataMoveStorealignInstrPsts_1_Pack_##data_type(vector_bool src, __ubuf__ uint32_t *base, int32_t offset, Literal dist) {} \
+void Stub_TestVectorDataMoveStorealignInstrPsts_1_Norm_##data_type(vector_bool src, __ubuf__ uint32_t* base, int32_t offset, Literal dist) {} \
+void Stub_TestVectorDataMoveStorealignInstrPsts_1_Pack_##data_type(vector_bool src, __ubuf__ uint32_t* base, int32_t offset, Literal dist) {} \
 }                                                                                                \
                                                                                                  \
 TEST_F(TestVectorDataMoveStorealignInstrPsts1##_##data_type, test_normal)                          \
 {                                                                                                \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(0);                         \
+    __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type* >(0);                         \
     vector_bool src;                                                                             \
                                                                                                  \
-    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t *base, int32_t offset, Literal dist))  \
+    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t* base, int32_t offset, Literal dist))  \
         .times(1)                                                                                \
         .will(invoke(Stub_TestVectorDataMoveStorealignInstrPsts_1_Norm_##data_type));               \
                                                                                                  \
@@ -649,11 +649,11 @@ TEST_F(TestVectorDataMoveStorealignInstrPsts1##_##data_type, test_normal)       
 }                                                                                                \
 TEST_F(TestVectorDataMoveStorealignInstrPsts1##_##data_type, test_pack)                            \
 {                                                                                                \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(0);                         \
+    __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type* >(0);                         \
     vector_bool src;                                                                             \
                                                                            \
                                                                                                  \
-    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t *base, int32_t offset, Literal dist))  \
+    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t* base, int32_t offset, Literal dist))  \
         .times(1)                                                                                \
         .will(invoke(Stub_TestVectorDataMoveStorealignInstrPsts_1_Pack_##data_type));               \
                                                                                                  \
@@ -670,16 +670,16 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
-void Stub_TestVectorDataMoveStorealignInstrPsts_2_Norm_##data_type(vector_bool src, __ubuf__ uint32_t *base, int32_t offset, Literal dist) {} \
-void Stub_TestVectorDataMoveStorealignInstrPsts_2_Pack_##data_type(vector_bool src, __ubuf__ uint32_t *base, int32_t offset, Literal dist) {} \
+void Stub_TestVectorDataMoveStorealignInstrPsts_2_Norm_##data_type(vector_bool src, __ubuf__ uint32_t* base, int32_t offset, Literal dist) {} \
+void Stub_TestVectorDataMoveStorealignInstrPsts_2_Pack_##data_type(vector_bool src, __ubuf__ uint32_t* base, int32_t offset, Literal dist) {} \
 }                                                                                                \
                                                                                                  \
 TEST_F(TestVectorDataMoveStorealignInstrPsts2##_##data_type, test_normal)                          \
 {                                                                                                \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(0);                         \
+    __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type* >(0);                         \
     vector_bool src;                                                                             \
                                                                                                  \
-    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t *base, int32_t offset, Literal dist))  \
+    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t* base, int32_t offset, Literal dist))  \
         .times(1)                                                                                \
         .will(invoke(Stub_TestVectorDataMoveStorealignInstrPsts_2_Norm_##data_type));               \
                                                                                                  \
@@ -688,11 +688,11 @@ TEST_F(TestVectorDataMoveStorealignInstrPsts2##_##data_type, test_normal)       
 }                                                                                                \
 TEST_F(TestVectorDataMoveStorealignInstrPsts2##_##data_type, test_pack)                            \
 {                                                                                                \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(0);                         \
+    __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type* >(0);                         \
     vector_bool src;                                                                             \
                                                                            \
                                                                                                  \
-    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t *base, int32_t offset, Literal dist))  \
+    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t* base, int32_t offset, Literal dist))  \
         .times(1)                                                                                \
         .will(invoke(Stub_TestVectorDataMoveStorealignInstrPsts_2_Pack_##data_type));               \
                                                                                                  \
@@ -709,16 +709,16 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
-void Stub_TestVectorDataMoveStorealignInstrPsts_3_Norm_##data_type(vector_bool src, __ubuf__ uint32_t *&base, int32_t offset, Literal dist, Literal post) {} \
-void Stub_TestVectorDataMoveStorealignInstrPsts_3_Pack_##data_type(vector_bool src, __ubuf__ uint32_t *&base, int32_t offset, Literal dist, Literal post) {} \
+void Stub_TestVectorDataMoveStorealignInstrPsts_3_Norm_##data_type(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {} \
+void Stub_TestVectorDataMoveStorealignInstrPsts_3_Pack_##data_type(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {} \
 }                                                                                                \
                                                                                                  \
 TEST_F(TestVectorDataMoveStorealignInstrPsts3##_##data_type, test_normal)                          \
 {                                                                                                \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(0);                         \
+    __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type* >(0);                         \
     vector_bool src;                                                                             \
                                                                                                  \
-    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t *&base, int32_t offset, Literal dist, Literal post))  \
+    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post))  \
         .times(1)                                                                                \
         .will(invoke(Stub_TestVectorDataMoveStorealignInstrPsts_3_Norm_##data_type));               \
                                                                                                  \
@@ -727,10 +727,10 @@ TEST_F(TestVectorDataMoveStorealignInstrPsts3##_##data_type, test_normal)       
 }                                                                                                \
 TEST_F(TestVectorDataMoveStorealignInstrPsts3##_##data_type, test_pack)                            \
 {                                                                                                \
-    __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(0);                         \
+    __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type* >(0);                         \
     vector_bool src;                                                                             \
                                                                                                  \
-    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t *&base, int32_t offset, Literal dist, Literal post))  \
+    MOCKER_CPP(psts, void(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post))  \
         .times(1)                                                                                \
         .will(invoke(Stub_TestVectorDataMoveStorealignInstrPsts_3_Pack_##data_type));               \
                                                                                                  \
