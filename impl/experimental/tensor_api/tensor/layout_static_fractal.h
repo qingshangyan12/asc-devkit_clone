@@ -66,12 +66,12 @@ using ScaleZZCoordFormat = Shape<Shape<Std::Int<0>, Std::Int<row/FRACTAL_FIXED>>
 
 // NZ
 template <typename T, size_t row, size_t column>
-using NZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row / FRACTAL_FIXED>>,
-    Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<column / (C0_SIZE / sizeof(T))>>>;
+using NZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<Std::ceil_division(row, FRACTAL_FIXED)>>,
+    Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<Std::ceil_division(column, C0_SIZE / sizeof(T))>>>; 
 
 template <typename T, size_t row, size_t column>
 using NZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>,
-    Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * row>>>;
+    Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * Std::ceil_align(row, FRACTAL_FIXED)>>>;
 
 //  ScaleND
 template <typename T, size_t row, size_t column>
@@ -148,16 +148,16 @@ using ZNStrideFormat = typename ZNStrideFormatImpl<T, row, column>::type;
 
 // ZZ
 template <typename T, size_t row, size_t column>
-using ZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row / FRACTAL_FIXED>>,
-    Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<column / (C0_SIZE / sizeof(T))>>>;
+using ZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<Std::ceil_division(row, FRACTAL_FIXED)>>,
+    Shape<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<Std::ceil_division(column, C0_SIZE / sizeof(T))>>>;
 
 template <typename T, size_t row, size_t column>
-using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRACTAL_FIXED * column>>,
+using ZZStrideFormat = Stride<Stride<Std::Int<C0_SIZE / sizeof(T)>, Std::Int<FRACTAL_FIXED * Std::ceil_division(column, C0_SIZE / sizeof(T))>>,
     Stride<Std::Int<1>, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>>>;
 
 // scaleZZ
 template <typename T, size_t row, size_t column>
-using ScaleZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<row/FRACTAL_FIXED>>, 
+using ScaleZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<Std::ceil_division(row, FRACTAL_FIXED)>>,  
                                     Shape<Std::Int<MX_SCALE_K0>, Std::Int<column/MX_SCALE_K0>>>;
 
 template <typename T, size_t row, size_t column>
