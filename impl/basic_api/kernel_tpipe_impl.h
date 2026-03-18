@@ -497,7 +497,7 @@ template <TPosition pos> __aicore__ inline uint64_t TPipe::GetQueueEndAddress()
     return this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(hardType)].maxAddr;
 }
 
-__aicore__ inline void TPipe::Destroy()
+__aicore__ inline void TPipe::DestroyWithoutPipeAll()
 {
     g_tpipeImpl.isDestroy = true;
     auto ptr = this->g_tpipeImpl.buf_;
@@ -526,6 +526,11 @@ __aicore__ inline void TPipe::Destroy()
     WaitFlag<HardEvent::M_MTE1>(2);
     ReleaseEventID<HardEvent::M_MTE1>(2);
 #endif
+}
+
+__aicore__ inline void TPipe::Destroy()
+{
+    DestroyWithoutPipeAll();
 #ifndef __ASCENDC_ENABLE_SUPER_KERNEL__
     pipe_barrier(PIPE_ALL);
 #endif
