@@ -128,6 +128,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_copy_gm2l1_align(A5)](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_align_arch_3510.md)                     | 将GM中的数据padding后搬运到L1中。 |
 | [asc_copy_gm2l1(A5)](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_3510.md)                     | 将GM中的数据搬运到L1中。 |
 | [asc_copy_gm2l1_dn2nz(A5)](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_dn2nz_arch_3510.md)                     | 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。 |
+| [asc_copy_l12gm(A2/A3)](cube_datamove/asc_copy_l12gm/asc_copy_l12gm_arch_2201.md)                     | 将数据从L1搬运到GM。 |
 | [asc_copy_gm2l1_nd2nz(A5)](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_nd2nz_arch_3510.md)                     | 将GM中的数据搬运到L1中，在此过程中执行ND->NZ/NHWC->NC1HWC0/NHWC->C1HWNC0操作。 |
 | [asc_copy_l0c2gm](cube_datamove/asc_copy_l0c2gm.md)                     | 将L0C中的数据搬运到GM中。 |
 | [asc_copy_l0c2l1(A2/A3)](cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_2201.md)                        | 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到L1 Buffer中。 |

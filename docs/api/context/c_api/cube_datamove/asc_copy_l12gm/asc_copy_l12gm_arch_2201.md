@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-将数据从Level 1 cache (L1)搬运到Global Memory (GM)。
+将数据从L1 Buffer搬运到Global Memory。
 
 ## 函数原型
 
@@ -31,9 +31,9 @@
 | dst | 输出    | 目的操作数的起始地址。|
 | src | 输入    | 源操作数的起始地址。|
 | n_burst | 输入    | 待搬运的连续传输数据块个数。取值范围：[1, 4095] |
-| len_burst | 输入    | 待搬运的每个连续传输数据块的长度，单位为DataBlock。取值范围：[1, 65535] |
-| src_stride | 输入    | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位为32B |
-| dst_stride | 输入    | 相邻迭代间，目标操作数前一个分形起始地址与后一个分形起始地址的间隔，单位为32B  |
+| len_burst | 输入    | 待搬运的每个连续传输数据块的长度，单位为32个字节。取值范围：[1, 65535]。 |
+| src_stride | 输入    | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位为32个字节。 |
+| dst_stride | 输入    | 相邻迭代间，目标操作数前一个分形起始地址与后一个分形起始地址的间隔，单位为32个字节。 |
 
 ## 返回值说明
 
@@ -52,7 +52,15 @@ PIPE_MTE1
 ## 调用示例
 
 ```cpp
+//待搬运的连续传输数据块为1
+constexpr uint16_t n_burst = 1;
+//待搬运的每个连续传输数据块的长度为32个字节
+constexpr uint16_t len_burst = 1;
+//相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为0
+constexpr uint16_t src_stride = 0;
+//相邻迭代间，目标操作数前一个分形与后一个分形起始地址的间隔为32个字节
+constexpr uint16_t dst_stride = 1;
 __cbuf__ half src[256];
 __gm__ half dst[256];
-asc_copy_l12gm(dst, src, 1, 1, 1, 0);
+asc_copy_l12gm(dst, src, n_burst, len_burst, src_stride, dst_stride);
 ```
