@@ -497,7 +497,8 @@ template <TPosition pos> __aicore__ inline uint64_t TPipe::GetQueueEndAddress()
     return this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(hardType)].maxAddr;
 }
 
-__aicore__ inline void TPipe::Destroy()
+#if __NPU_ARCH__ == 2201
+__aicore__ inline void TPipe::DestroyWithoutPipeAll()
 {
     g_tpipeImpl.isDestroy = true;
     auto ptr = this->g_tpipeImpl.buf_;
@@ -508,7 +509,6 @@ __aicore__ inline void TPipe::Destroy()
         }
     }
     // for matmul macro, release M_MTE1 0 1 event id.
-#if __NPU_ARCH__ == 2201
     if ASCEND_IS_AIC {
         WaitFlag<HardEvent::M_MTE1>(0);
         ReleaseEventID<HardEvent::M_MTE1>(0);
@@ -518,7 +518,24 @@ __aicore__ inline void TPipe::Destroy()
         WaitFlag<HardEvent::M_MTE1>(2);
         ReleaseEventID<HardEvent::M_MTE1>(2);
     }
-#elif __NPU_ARCH__ == 3002 || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+}
+#endif
+
+__aicore__ inline void TPipe::Destroy()
+{
+#if __NPU_ARCH__ == 2201
+    DestroyWithoutPipeAll();
+#else
+    g_tpipeImpl.isDestroy = true;
+    auto ptr = this->g_tpipeImpl.buf_;
+    for (uint8_t i = 0; i < this->g_tpipeImpl.curBufSize_; i++, ptr++) {
+        if (ptr->freeBufEvtID != INVALID_TEVENTID && ptr->state == TBufState::FREE) {
+            WaitFlagImpl(ptr->freeBufEvt, ptr->freeBufEvtID);
+            ptr->freeBufEvtID = INVALID_TEVENTID;
+        }
+    }
+#endif
+#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
     WaitFlag<HardEvent::M_MTE1>(0);
     ReleaseEventID<HardEvent::M_MTE1>(0);
     WaitFlag<HardEvent::M_MTE1>(1);
