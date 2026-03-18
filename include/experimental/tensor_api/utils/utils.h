@@ -17,5 +17,7 @@
 
 #include "include/experimental/tensor_api/arch/trait_struct.h"
 #include "include/utils/common_types.h"
+#include "include/utils/std/algorithm.h"
+#include "include/utils/std/cmath.h"
 
 #endif // INCLUDE_TENSOR_API_UTILS_UTILS_H
