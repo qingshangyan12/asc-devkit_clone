@@ -35,7 +35,7 @@ __aicore__ inline decltype(auto) MakeL0CLayout(U row, S column) {
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return L0CFormatLayout<row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
-        return LayoutDispatcher<LayoutFormat::NZ, uint16_t>::apply(row, column);
+        return LayoutDispatcher<LayoutFormat::L0C, uint16_t>::apply(row, column);
     }
 }
 
@@ -89,7 +89,7 @@ __aicore__ inline decltype(auto) MakeScaleANDLayout(U row, S column) { // 不转
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleANDFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
-        return LayoutDispatcher<LayoutFormat::ND, Std::ignore_t>::apply(row, column); // (m, scaleK)
+        return LayoutDispatcher<LayoutFormat::ScaleAND, Std::ignore_t>::apply(row, column); // (m, scaleK)
     }
 }
 
@@ -98,7 +98,7 @@ __aicore__ inline decltype(auto) MakeScaleADNLayout(U row, S column) { // 转置
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleADNFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
-        return LayoutDispatcher<LayoutFormat::DN, T>::apply(row, column); // 转置(m, scaleK)
+        return LayoutDispatcher<LayoutFormat::ScaleADN, T>::apply(row, column); // 转置(m, scaleK)
     }
 }
 
@@ -107,7 +107,7 @@ __aicore__ inline decltype(auto) MakeScaleBNDLayout(U row, S column) { // 不转
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleBNDFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
-        return LayoutDispatcher<LayoutFormat::ND, T>::apply(row, column); // (scaleK, n)
+        return LayoutDispatcher<LayoutFormat::ScaleBND, T>::apply(row, column); // (scaleK, n)
     }
 }
 
@@ -116,7 +116,7 @@ __aicore__ inline decltype(auto) MakeScaleBDNLayout(U row, S column) { // 转置
     if constexpr(IsIntegralConstantV<U> && IsIntegralConstantV<S>) {
         return ScaleBDNFormatLayout<T, row, column>{};
     } else if(Std::is_integral_v<U> && Std::is_integral_v<S>){
-        return LayoutDispatcher<LayoutFormat::DN, Std::ignore_t>::apply(row, column); // (scaleK, n)
+        return LayoutDispatcher<LayoutFormat::ScaleBDN, Std::ignore_t>::apply(row, column); // (scaleK, n)
     }
 }
 

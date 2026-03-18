@@ -57,12 +57,19 @@ __aicore__ inline decltype(auto) GetTuple(Ts&&... ts) {
     return Make2Params2Tuple(MakeTupleCons{}, ts...);
 }
 
- template <typename T0, typename T1, typename T2, typename T3, typename... Ts> 
- __aicore__ inline decltype(auto) LayoutConstructor(T0&& t0, T1&& t1, T2&& t2, T3&& t3, Ts&&... ts) { 
-     auto shape = GetTuple(t0, t1, t2, t3); 
-     auto stride = GetTuple(ts...); 
-     return Layout(shape, stride); 
- }
+template <LayoutFormat Fmt, typename ValueType, typename T0, typename T1, typename T2, typename T3, typename... Ts>
+__aicore__ inline decltype(auto) LayoutConstructor(T0&& t0, T1&& t1, T2&& t2, T3&& t3, Ts&&... ts) {
+    auto shape = GetTuple(Std::forward<T0>(t0), Std::forward<T1>(t1), Std::forward<T2>(t2), Std::forward<T3>(t3));
+    auto stride = GetTuple(Std::forward<Ts>(ts)...);
+    return Layout<decltype(shape), decltype(stride), ValueType, Fmt>(shape, stride);
+}
+
+template <typename ValueType, typename T0, typename T1, typename T2, typename T3, typename... Ts>
+__aicore__ inline decltype(auto) LayoutConstructor(T0&& t0, T1&& t1, T2&& t2, T3&& t3, Ts&&... ts) {
+    return LayoutConstructor<LayoutFormat::IGNORE, ValueType>(Std::forward<T0>(t0), Std::forward<T1>(t1),
+                                                               Std::forward<T2>(t2), Std::forward<T3>(t3),
+                                                               Std::forward<Ts>(ts)...);
+}
 
 // tuple_dispatch.h
 template <LayoutFormat format, TupleFormat tupleFormat, typename T>
@@ -297,99 +304,169 @@ struct TupleDispatcher<LayoutFormat::NN, TupleFormat::Coord, fp8_e8m0_t> {
 };
 
 // layout_dispatch.h
+// layout_dispatch.h
 template <LayoutFormat format, typename T>
 struct LayoutDispatcher;
 
+// NZ
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::NZ, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
         constexpr auto c0Size = is_b4_type<T> ? C0_SIZE * 2 : C0_SIZE / sizeof(T);
-        return LayoutConstructor(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED), Std::Int<c0Size>{},
-                                 Std::ceil_division(column, (c0Size)), Std::Int<c0Size>{}, Std::Int<c0Size * FRACTAL_FIXED>{},
-                                 Std::Int<1>{}, c0Size * CeilAlign(row, FRACTAL_FIXED));
+        return LayoutConstructor<LayoutFormat::NZ, T>(
+            Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED), Std::Int<c0Size>{},
+            Std::ceil_division(column, c0Size),
+            Std::Int<c0Size>{}, Std::Int<c0Size * FRACTAL_FIXED>{},
+            Std::Int<1>{}, c0Size * CeilAlign(row, FRACTAL_FIXED));
     }
 };
 
 template <>
 struct LayoutDispatcher<LayoutFormat::NZ, Std::ignore_t> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<FRACTAL_FIXED>{},  Std::ceil_division(row, FRACTAL_FIXED), 
-                                Std::Int<C0_SIZE / sizeof(uint16_t)>{},  Std::ceil_division(column, (C0_SIZE / sizeof(uint16_t))), 
-                                Std::Int<C0_SIZE / sizeof(uint16_t)>{},  Std::Int<C0_SIZE / sizeof(uint16_t) * FRACTAL_FIXED>{},
-                                Std::Int<1>{},  C0_SIZE / sizeof(uint16_t) * CeilAlign(row, FRACTAL_FIXED)); 
+        return LayoutConstructor<LayoutFormat::NZ, Std::ignore_t>(
+            Std::Int<FRACTAL_FIXED>{},  Std::ceil_division(row, FRACTAL_FIXED),
+            Std::Int<C0_SIZE / sizeof(uint16_t)>{},  Std::ceil_division(column, (C0_SIZE / sizeof(uint16_t))),
+            Std::Int<C0_SIZE / sizeof(uint16_t)>{},  Std::Int<C0_SIZE / sizeof(uint16_t) * FRACTAL_FIXED>{},
+            Std::Int<1>{},  C0_SIZE / sizeof(uint16_t) * CeilAlign(row, FRACTAL_FIXED));
     }
 };
 
+// ZN
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::ZN, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
         constexpr auto c0Size = is_b4_type<T> ? C0_SIZE * 2 : C0_SIZE / sizeof(T);
-        return LayoutConstructor(Std::Int<c0Size>{},  Std::ceil_division(row, (c0Size)),
-                                Std::Int<FRACTAL_FIXED>{},  Std::ceil_division(column, FRACTAL_FIXED),
-                                Std::Int<1>{},  c0Size * CeilAlign(column, FRACTAL_FIXED),
-                                Std::Int<c0Size>{},  Std::Int<c0Size * FRACTAL_FIXED>{});
+        return LayoutConstructor<LayoutFormat::ZN, T>(
+            Std::Int<c0Size>{},  Std::ceil_division(row, c0Size),
+            Std::Int<FRACTAL_FIXED>{},  Std::ceil_division(column, FRACTAL_FIXED),
+            Std::Int<1>{},  c0Size * CeilAlign(column, FRACTAL_FIXED),
+            Std::Int<c0Size>{},  Std::Int<c0Size * FRACTAL_FIXED>{});
     }
 };
 
+// DN
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::DN, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<1>{}, row, Std::Int<1>{}, column,
-                                    Std::Int<0>{}, Std::Int<1>{}, Std::Int<0>{}, row);
+        return LayoutConstructor<LayoutFormat::DN, T>(
+            Std::Int<1>{}, row, Std::Int<1>{}, column,
+            Std::Int<0>{}, Std::Int<1>{}, Std::Int<0>{}, row);
     }
 };
 
 template <>
 struct LayoutDispatcher<LayoutFormat::DN, fp8_e8m0_t> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<1>{}, row, Std::Int<2>{}, column / MX_SCALE_K0,
-                                    Std::Int<0>{}, Std::Int<MX_SCALE_K0>{}, Std::Int<1>{}, MX_SCALE_K0 * row);
+        return LayoutConstructor<LayoutFormat::DN, fp8_e8m0_t>(
+            Std::Int<1>{}, row, Std::Int<2>{}, column / MX_SCALE_K0,
+            Std::Int<0>{}, Std::Int<MX_SCALE_K0>{}, Std::Int<1>{}, MX_SCALE_K0 * row);
     }
 };
 
+// ND
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::ND, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<1>{}, row, Std::Int<1>{}, column,
-                                    Std::Int<0>{}, column, Std::Int<0>{}, Std::Int<1>{});
+        return LayoutConstructor<LayoutFormat::ND, T>(
+            Std::Int<1>{}, row, Std::Int<1>{}, column,
+            Std::Int<0>{}, column, Std::Int<0>{}, Std::Int<1>{});
     }
 };
 
 template <>
 struct LayoutDispatcher<LayoutFormat::ND, fp8_e8m0_t> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<2>{}, row / MX_SCALE_K0, Std::Int<1>{}, column,
-                                    Std::Int<1>{}, MX_SCALE_K0 * column, Std::Int<0>{}, Std::Int<MX_SCALE_K0>{});
+        return LayoutConstructor<LayoutFormat::ND, fp8_e8m0_t>(
+            Std::Int<2>{}, row / MX_SCALE_K0, Std::Int<1>{}, column,
+            Std::Int<1>{}, MX_SCALE_K0 * column, Std::Int<0>{}, Std::Int<MX_SCALE_K0>{});
     }
 };
 
+// ZZ
 template <typename T>
 struct LayoutDispatcher<LayoutFormat::ZZ, T> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED),
-                                    Std::Int<C0_SIZE / sizeof(T)>{}, Std::ceil_division(column, (C0_SIZE / sizeof(T))),
-                                    Std::Int<C0_SIZE / sizeof(T)>{}, FRACTAL_FIXED * CeilAlign(column, (C0_SIZE / sizeof(T))),
-                                    Std::Int<1>{}, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{});
+        return LayoutConstructor<LayoutFormat::ZZ, T>(
+            Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED),
+            Std::Int<C0_SIZE / sizeof(T)>{}, Std::ceil_division(column, (C0_SIZE / sizeof(T))),
+            Std::Int<C0_SIZE / sizeof(T)>{}, FRACTAL_FIXED * CeilAlign(column, (C0_SIZE / sizeof(T))),
+            Std::Int<1>{}, Std::Int<C0_SIZE / sizeof(T) * FRACTAL_FIXED>{});
     }
 };
 
 template <>
 struct LayoutDispatcher<LayoutFormat::ZZ, fp8_e8m0_t> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
-        return LayoutConstructor(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED),
-                                    Std::Int<MX_SCALE_K0>{}, column / MX_SCALE_K0,
-                                    Std::Int<MX_SCALE_K0>{}, column * FRACTAL_FIXED,
-                                    Std::Int<1>{}, Std::Int<C0_SIZE>{});
+        return LayoutConstructor<LayoutFormat::ZZ, fp8_e8m0_t>(
+            Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(row, FRACTAL_FIXED),
+            Std::Int<MX_SCALE_K0>{}, column / MX_SCALE_K0,
+            Std::Int<MX_SCALE_K0>{}, column * FRACTAL_FIXED,
+            Std::Int<1>{}, Std::Int<C0_SIZE>{});
     }
 };
 
+// NN (只在 fp8 上有)
 template <>
 struct LayoutDispatcher<LayoutFormat::NN, fp8_e8m0_t> {
     __aicore__ inline static decltype(auto) apply(size_t row, size_t column) { // (scaleK, n)
-        return LayoutConstructor(Std::Int<MX_SCALE_K0>{}, row / MX_SCALE_K0,
-                                    Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED),
-                                    Std::Int<1>{}, Std::Int<C0_SIZE>{},
-                                    Std::Int<MX_SCALE_K0>{}, row * FRACTAL_FIXED);
+        return LayoutConstructor<LayoutFormat::NN, fp8_e8m0_t>(
+            Std::Int<MX_SCALE_K0>{}, row / MX_SCALE_K0,
+            Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED),
+            Std::Int<1>{}, Std::Int<C0_SIZE>{},
+            Std::Int<MX_SCALE_K0>{}, row * FRACTAL_FIXED);
+    }
+};
+
+// L0C（配合 MakeL0CLayout，T 为 uint16_t）
+template <>
+struct LayoutDispatcher<LayoutFormat::L0C, uint16_t> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return LayoutConstructor<LayoutFormat::L0C, uint16_t>(
+            Std::Int<FRACTAL_FIXED>{},  Std::ceil_division(row, FRACTAL_FIXED),
+            Std::Int<C0_SIZE / sizeof(uint16_t)>{},  Std::ceil_division(column, (C0_SIZE / sizeof(uint16_t))),
+            Std::Int<C0_SIZE / sizeof(uint16_t)>{},  Std::Int<C0_SIZE / sizeof(uint16_t) * FRACTAL_FIXED>{},
+            Std::Int<1>{},  C0_SIZE / sizeof(uint16_t) * CeilAlign(row, FRACTAL_FIXED));
+    }
+};
+
+// ScaleAND（MakeScaleANDLayout 中 runtime 分支用 Std::ignore_t）
+template <typename T>
+struct LayoutDispatcher<LayoutFormat::ScaleAND, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return LayoutConstructor<LayoutFormat::ScaleAND, T>(
+            Std::Int<1>{}, row, Std::Int<1>{}, column,
+            Std::Int<0>{}, column, Std::Int<0>{}, Std::Int<1>{});
+    }
+};
+
+// ScaleADN（MakeScaleADNLayout runtime 用 T）
+template <typename T>
+struct LayoutDispatcher<LayoutFormat::ScaleADN, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return LayoutConstructor<LayoutFormat::ScaleADN, T>(
+            Std::Int<1>{}, row, Std::Int<1>{}, column,
+            Std::Int<0>{}, Std::Int<1>{}, Std::Int<0>{}, row);
+    }
+};
+
+// ScaleBND（MakeScaleBNDLayout runtime 用 T）
+template <typename T>
+struct LayoutDispatcher<LayoutFormat::ScaleBND, T> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return LayoutConstructor<LayoutFormat::ScaleBND, T>(
+            Std::Int<1>{}, row, Std::Int<1>{}, column,
+            Std::Int<0>{}, column, Std::Int<0>{}, Std::Int<1>{});
+    }
+};
+
+// ScaleBDN（MakeScaleBDNLayout runtime 用 Std::ignore_t）
+template <>
+struct LayoutDispatcher<LayoutFormat::ScaleBDN, Std::ignore_t> {
+    __aicore__ inline static decltype(auto) apply(size_t row, size_t column) {
+        return LayoutConstructor<LayoutFormat::ScaleBDN, Std::ignore_t>(
+            Std::Int<1>{}, row, Std::Int<2>{}, column / MX_SCALE_K0,
+            Std::Int<0>{}, Std::Int<MX_SCALE_K0>{}, Std::Int<1>{}, MX_SCALE_K0 * row);
     }
 };
 
