@@ -10,10 +10,6 @@
 3. 执行饱和/非饱和模式验证
 4. 输出对比结果表格
 
-[注] 手动执行指南：  
-步骤1、提示词：执行saturation_verify_skill.md  
-步骤2、步骤1完成后会自动完成代码适配，再执行命令：INPUT_API_ID=xx INPUT_API_TYPE=yy bash test.sh
-
 ---
 
 ## Step 1：提问用户是否完成user_input.md的信息输入填写，YES or NO
