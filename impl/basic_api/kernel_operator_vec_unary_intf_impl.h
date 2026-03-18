@@ -70,7 +70,7 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Relu", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Relu", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Relu");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -92,7 +92,7 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Relu", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Relu", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Relu");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -121,7 +121,7 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Relu", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Relu", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Relu")) {
@@ -191,7 +191,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Exp", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Exp", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Exp");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -213,7 +213,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Exp", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Exp", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Exp");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -259,7 +259,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Exp", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Exp", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Exp")) {
@@ -328,7 +328,7 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Ln", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Ln", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Ln");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -349,7 +349,7 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Ln", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Ln", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Ln");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -394,7 +394,7 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Ln", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Ln", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Ln")) {
@@ -427,7 +427,7 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Abs", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Abs", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Abs");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -449,7 +449,7 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Abs", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Abs", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Abs");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -478,7 +478,7 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Abs", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Abs", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Abs")) {
@@ -571,7 +571,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Reciprocal", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Reciprocal", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Reciprocal");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -593,7 +593,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Reciprocal", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Reciprocal", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Reciprocal");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -641,7 +641,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Reciprocal", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Reciprocal", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Reciprocal")) {
@@ -712,7 +712,7 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Rsqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Rsqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Rsqrt");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -734,7 +734,7 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Rsqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Rsqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Rsqrt");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -780,7 +780,7 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Rsqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Rsqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Rsqrt")) {
@@ -851,7 +851,7 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Sqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Sqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Sqrt");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -873,7 +873,7 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Sqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Sqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Sqrt");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -919,7 +919,7 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Sqrt", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Sqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Sqrt")) {
@@ -952,7 +952,7 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Not", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Not", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Not");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -974,7 +974,7 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Not", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Not", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Not");
 #endif
 #if ASCENDC_CPU_DEBUG
@@ -1003,7 +1003,7 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 {
     using PrimType = PrimT<T>;
 #ifdef ASCENDC_DEBUG
-    CheckVectorTensor("Not", NamedTensor("dst", dst), NamedTensor("src", src));
+    CheckVectorTensor("Not", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Not")) {
