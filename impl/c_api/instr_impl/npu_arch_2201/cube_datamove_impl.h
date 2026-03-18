@@ -1733,7 +1733,7 @@ __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config)
     asc_set_l13d_fmatrix_impl(config);
 }
 
-// ==========asc_l0c2l1_l0c2l1  bfloat16_t/half/float/int32_t/uint8_t/int8_t/uint32_t/===========
+// ==========asc_copy_gm2l0a  bfloat16_t/half/float/int32_t/uint8_t/int8_t/uint32_t/===========
 __aicore__ inline void asc_copy_gm2l0a(__ca__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat,
     uint16_t src_stride, uint16_t dst_stride)
 {
