@@ -18,6 +18,7 @@
 
 ## 🚀概述
 
+
 Ascend C是[CANN](https://hiascend.com/software/cann) （Compute Architecture for Neural Networks）推出的昇腾AI处理器专用的算子程序开发语言，原生支持C和C++标准规范。Ascend C主要由类库和语言扩展层构成，提供多层级API，满足多维场景算子开发诉求；总体逻辑架构图如下所示：
 
 <img src="docs/figures/architecture.png" alt="架构图"  width="850px" height="580px">
