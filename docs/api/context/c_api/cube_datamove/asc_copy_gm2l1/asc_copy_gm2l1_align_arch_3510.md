@@ -72,18 +72,18 @@ PIPE_MTE2
 ## 调用示例
 
 ```cpp
-//burst_num指待搬运的连续传输数据块个数
+//待搬运的连续传输数据块个数为2
 constexpr uint32_t burst_num = 2;
-//burst_len指待搬运的每个连续传输数据块的长度
+//待搬运的每个连续传输数据块的长度为64个字节
 constexpr uint32_t burst_len = 2;
-//left_padding_count与right_padding_count指数据左右侧的padding元素数
+//数据左右侧padding的元素数为0
 constexpr uint8_t left_padding_count = 0;
 constexpr uint8_t right_padding_count = 0;
-//data_select_bit为false指padding值取数据块的第一个元素
+//padding值取数据块的第一个元素
 constexpr bool data_select_bit = false;
-//l2_cache_ctl为0指l2 cache采用DISABLE模式
+//l2 cache采用DISABLE模式
 constexpr uint8_t l2_cache_ctl = 0;
-//burst_src_stride与burst_dst_stride指输入输出数据中两个相邻连续数据块之间的距离
+//输入输出数据中两个相邻连续数据块之间的距离为0
 constexpr uint64_t burst_src_stride = 0;
 constexpr uint32_t burst_dst_stride = 0;
 __gm__ half src[256];
