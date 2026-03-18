@@ -1451,42 +1451,6 @@ __aicore__ inline void CastImpl(
     }
 }
 
-template <typename DST_TYPE, typename SRC_TYPE, const Reg::CastTrait& castTrait>
-__simd_callee__ inline void CastIntrinsicsB64Common(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src,
-    uint8_t repeatTime, const UnaryRepeatParams repeatParams, Reg::RegTensor<SRC_TYPE> srcVreg,
-    Reg::RegTensor<DST_TYPE> dstVreg, Reg::RegTensor<uint32_t> tmpVreg,
-    Reg::RegTensor<uint32_t> zeroVreg, Reg::MaskReg b32Preg,
-    Reg::MaskReg b64Preg, uint16_t i, const uint8_t elePerBlk)
-{
-    if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {
-        // b32->b64
-        Reg::LoadAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY>((Reg::RegTensor<uint32_t> &)srcVreg,
-            (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b32Preg);
-        Reg::Interleave(
-            (Reg::RegTensor<uint32_t> &)srcVreg, tmpVreg, (Reg::RegTensor<uint32_t> &)srcVreg, zeroVreg);
-    } else {
-        // b64->b32
-        Reg::LoadAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY>((Reg::RegTensor<uint32_t>&)srcVreg,
-            (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b64Preg);
-    }
-    Reg::Cast<DST_TYPE, SRC_TYPE, castTrait>(dstVreg, srcVreg, b64Preg);
-    if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {
-        // b32->b64
-        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_STORE>();
-        Reg::StoreAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk,
-            (Reg::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b64Preg);
-    } else {
-        // b64->b32
-        Reg::DeInterleave(
-            (Reg::RegTensor<uint32_t> &)dstVreg, tmpVreg, (Reg::RegTensor<uint32_t> &)dstVreg, zeroVreg);
-        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_STORE>();
-        Reg::StoreAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk,
-            (Reg::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b32Preg);
-    }
-}
-
 template <typename DST_TYPE, typename SRC_TYPE, RoundMode roundMode>
 __simd_vf__ inline void CastIntrinsicsB64ImplVF2(__ubuf__ DST_TYPE *dst, __ubuf__ SRC_TYPE *src, const BasicAPIMaskStruct maskArrayStruct,
     uint8_t repeatTime, const UnaryRepeatParams repeatParams)
@@ -1503,8 +1467,33 @@ __simd_vf__ inline void CastIntrinsicsB64ImplVF2(__ubuf__ DST_TYPE *dst, __ubuf_
     Reg::MaskInterleave<uint32_t>(b64Preg, tmpPreg, b32Preg, b32Preg);
     Reg::Duplicate(zeroVreg, 0, fullPreg);
     for (uint16_t i = 0; i < repeatTime; ++i) {
-        CastIntrinsicsB64Common<DST_TYPE, SRC_TYPE, castTrait>(dst, src, repeatTime, repeatParams, srcVreg, dstVreg,
-            tmpVreg, zeroVreg, b32Preg, b64Preg, i, elePerBlk);
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {	 
+            // b32->b64	 
+            MicroAPI::LoadAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t> &)srcVreg, 
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b32Preg); 
+            MicroAPI::Interleave( 
+                (MicroAPI::RegTensor<uint32_t> &)srcVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)srcVreg, zeroVreg); 
+        } else { 
+            // b64->b32 
+            MicroAPI::LoadAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t>&)srcVreg, 
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b64Preg); 
+        } 
+        MicroAPI::Cast<DST_TYPE, SRC_TYPE, castTrait>(dstVreg, srcVreg, b64Preg); 
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) { 
+            // b32->b64 
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>(); 
+            MicroAPI::StoreAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>( 
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk, 
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b64Preg); 
+        } else { 
+            // b64->b32 
+            MicroAPI::DeInterleave( 
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)dstVreg, zeroVreg); 
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>(); 
+            MicroAPI::StoreAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>( 
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk, 
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b32Preg); 
+        }
     }
 }
 
@@ -1655,8 +1644,35 @@ __simd_vf__ inline void CastIntrinsicsB64ImplCounterVF(__ubuf__ DST_TYPE *dst, _
     Reg::MaskReg fullPreg = Reg::CreateMask<uint32_t, Reg::MaskPattern::ALL>();
     Reg::Duplicate(zeroVreg, 0, fullPreg);
     for (uint16_t i = 0; i < newRepeatTimes; ++i) {
-        CastIntrinsicsB64Common<DST_TYPE, SRC_TYPE, castTrait>(dst, src, repeatTime, repeatParams, srcVreg, dstVreg,
-            tmpVreg, zeroVreg, b32Preg, b64Preg, i, elePerBlk);
+        b32Preg = MicroAPI::UpdateMask<uint32_t>(countSreg);	 
+        MicroAPI::MaskInterleave<uint32_t>(b64Preg, tmpPreg, b32Preg, b32Preg);	 
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) { 
+            // b32->b64 
+            MicroAPI::LoadAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t> &)srcVreg, 
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b32Preg); 
+            MicroAPI::Interleave( 
+                (MicroAPI::RegTensor<uint32_t> &)srcVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)srcVreg, zeroVreg); 
+        } else { 
+            // b64->b32 
+            MicroAPI::LoadAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>((MicroAPI::RegTensor<uint32_t>&)srcVreg, 
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b64Preg); 
+        } 
+        MicroAPI::Cast<DST_TYPE, SRC_TYPE, castTrait>(dstVreg, srcVreg, b64Preg); 
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) { 
+            // b32->b64 
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>(); 
+            MicroAPI::StoreAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>( 
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk, 
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b64Preg); 
+        } else { 
+            // b64->b32 
+            MicroAPI::DeInterleave( 
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, tmpVreg, (MicroAPI::RegTensor<uint32_t> &)dstVreg, zeroVreg); 
+            MicroAPI::LocalMemBar<MicroAPI::MemType::VEC_STORE, MicroAPI::MemType::VEC_STORE>(); 
+            MicroAPI::StoreAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY>( 
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk, 
+                (MicroAPI::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b32Preg); 
+        }       
     }
 }
 
