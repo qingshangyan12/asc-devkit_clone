@@ -2015,179 +2015,175 @@ __simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ float* dst_a
     }
 }
 
-__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t *dst, vector_bool src, iter_reg offset)
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t* dst, vector_bool src, iter_reg offset)
 {
     if ASC_IS_AIV {
         pst(src, dst, offset, NORM_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint32_t *dst, vector_bool src, iter_reg offset)
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint32_t* dst, vector_bool src, iter_reg offset)
 {
     if ASC_IS_AIV {
         pst(src, dst, offset, PK_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint16_t *dst, vector_bool src, iter_reg offset)
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint16_t* dst, vector_bool src, iter_reg offset)
 {
     if ASC_IS_AIV {
-        pst(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), offset, NORM_B32);
+        pst(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), offset, NORM_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint16_t *dst, vector_bool src, iter_reg offset)
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint16_t* dst, vector_bool src, iter_reg offset)
 {
     if ASC_IS_AIV {
-        pst(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), offset, PK_B32);
+        pst(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), offset, PK_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint8_t *dst, vector_bool src, iter_reg offset)
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint8_t* dst, vector_bool src, iter_reg offset)
 {
     if ASC_IS_AIV {
-        pst(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), offset, NORM_B32);
+        pst(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), offset, NORM_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t *dst, vector_bool src, iter_reg offset)
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t* dst, vector_bool src, iter_reg offset)
 {
     if ASC_IS_AIV {
-        pst(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), offset, PK_B32);
+        pst(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), offset, PK_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t *dst, vector_bool src)
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t* dst, vector_bool src)
 {
     if ASC_IS_AIV {
         psts(src, dst, 0, NORM_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint32_t *dst, vector_bool src)
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint32_t* dst, vector_bool src)
 {
     if ASC_IS_AIV {
         psts(src, dst, 0, PK_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint16_t *dst, vector_bool src)
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint16_t* dst, vector_bool src)
 {
     if ASC_IS_AIV {
-        psts(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), 0, NORM_B32);
+        psts(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), 0, NORM_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint16_t *dst, vector_bool src)
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint16_t* dst, vector_bool src)
 {
     if ASC_IS_AIV {
-        psts(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), 0, PK_B32);
+        psts(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), 0, PK_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint8_t *dst, vector_bool src)
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint8_t* dst, vector_bool src)
 {
     if ASC_IS_AIV {
-        psts(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), 0, NORM_B32);
+        psts(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), 0, NORM_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t *dst, vector_bool src)
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t* dst, vector_bool src)
 {
     if ASC_IS_AIV {
-        psts(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), 0, PK_B32);
+        psts(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), 0, PK_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t *dst,  vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint32_t* dst,  vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
         psts(src, dst, offset, NORM_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint32_t* dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
         psts(src, dst, offset, PK_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint16_t *dst,  vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint16_t* dst,  vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
-        psts(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), offset, NORM_B32);
+        psts(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), offset, NORM_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint16_t *dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint16_t* dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
-        psts(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), offset, PK_B32);
+        psts(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), offset, PK_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint8_t *dst,  vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_impl(__ubuf__ uint8_t* dst,  vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
-        psts(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), offset, NORM_B32);
+        psts(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), offset, NORM_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t *dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ uint8_t* dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
-        psts(src, reinterpret_cast<__ubuf__ uint32_t *>(dst), offset, PK_B32);
+        psts(src, reinterpret_cast<__ubuf__ uint32_t*>(dst), offset, PK_B32);
     }
 }
 
-__simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint32_t *&dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint32_t*& dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
         psts(src, dst, offset, NORM_B32, POST_UPDATE);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint32_t *&dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint32_t*& dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
         psts(src, dst, offset, PK_B32, POST_UPDATE);
     }
 }
 
-__simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint16_t *&dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint16_t*& dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
-        __ubuf__ uint32_t *tempDst = reinterpret_cast<__ubuf__ uint32_t *>(dst);
-        psts(src, tempDst, offset, NORM_B32, POST_UPDATE);
-        dst = reinterpret_cast<__ubuf__ uint16_t *>(tempDst);
+        __ubuf__ uint32_t*& temp_dst = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
+        psts(src, temp_dst, offset, NORM_B32, POST_UPDATE);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint16_t *&dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint16_t*& dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
-        __ubuf__ uint32_t *tempDst = reinterpret_cast<__ubuf__ uint32_t *>(dst);
-        psts(src, tempDst, offset, PK_B32, POST_UPDATE);
-        dst = reinterpret_cast<__ubuf__ uint16_t *>(tempDst);
+        __ubuf__ uint32_t*& temp_dst = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
+        psts(src, temp_dst, offset, PK_B32, POST_UPDATE);
     }
 }
 
-__simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint8_t *&dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ uint8_t*& dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
-        __ubuf__ uint32_t *tempDst = reinterpret_cast<__ubuf__ uint32_t *>(dst);
-        psts(src, tempDst, offset, NORM_B32, POST_UPDATE);
-        dst = reinterpret_cast<__ubuf__ uint8_t *>(tempDst);
+        __ubuf__ uint32_t*& temp_dst = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
+        psts(src, temp_dst, offset, NORM_B32, POST_UPDATE);
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint8_t *&dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint8_t*& dst, vector_bool src, int32_t offset)
 {
     if ASC_IS_AIV {
-        __ubuf__ uint32_t *tempDst = reinterpret_cast<__ubuf__ uint32_t *>(dst);
-        psts(src, tempDst, offset, PK_B32, POST_UPDATE);
-        dst = reinterpret_cast<__ubuf__ uint8_t *>(tempDst);
+        __ubuf__ uint32_t*& temp_dst = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
+        psts(src, temp_dst, offset, PK_B32, POST_UPDATE);
     }
 }
 
