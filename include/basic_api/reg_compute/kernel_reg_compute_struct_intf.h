@@ -8,42 +8,44 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+
 /* !
- * \file kernel_reg_compute_struct_intf.h
- * \brief
- */
+* \file kernel_reg_compute_struct_intf.h
+* \brief
+*/
+
 
 #if !defined(_ASCENDC_INCLUDE_INTERNAL_HEADERS_)
 #define _ASCENDC_INCLUDE_INTERNAL_HEADERS_
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_STRUCT_INTF_H__
 #endif
 
+
 #ifndef ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
 #define ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
 
+
 #if (__NPU_ARCH__ == 3510) || defined(__ASC_NPU_HOST__)
 #include "../../impl/basic_api/reg_compute/dav_c310/kernel_reg_compute_datatype_impl.h"
-#elif __NPU_ARCH__ == 5102
-#include "../../impl/basic_api/reg_compute/dav_m510/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 2103
 #include "../../impl/basic_api/reg_compute/dav_l210/kernel_reg_compute_datatype_impl.h"
-#elif __NPU_ARCH__ == 3003
-#include "../../impl/basic_api/reg_compute/dav_l300/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 3103
 #include "../../impl/basic_api/reg_compute/dav_l310/kernel_reg_compute_datatype_impl.h"
-#elif __NPU_ARCH__ == 3113
-#include "../../impl/basic_api/reg_compute/dav_l311/kernel_reg_compute_datatype_impl.h"
 #endif
+
 
 namespace AscendC {
 namespace Reg {
+
 
 struct RegTrait {
     int REG_NUM = 1;
 };
 
+
 constexpr RegTrait RegTraitNumOne = {1};
 constexpr RegTrait RegTraitNumTwo = {2};
+
 
 template <typename T, const RegTrait& regTrait = RegTraitNumOne>
 struct RegTensor {
@@ -54,6 +56,7 @@ struct RegTensor {
     using RegType = typename TypeGet<T>::T;
     RegType reg[trait.REG_NUM];
 
+
     __simd_callee__ inline operator RegType& ()
     {
         // only process one reg, two registers require explicit call
@@ -62,14 +65,16 @@ struct RegTensor {
     __simd_callee__ void Print() const;
 };
 
+
 } // namespace Reg
 } // namespace AscendC
 
+
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_struct_intf_impl.h"
 #endif // ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
+
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_STRUCT_INTF_H__)
 #undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_STRUCT_INTF_H__
 #endif
-
