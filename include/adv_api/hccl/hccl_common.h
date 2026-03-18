@@ -12,12 +12,6 @@
  * \file hccl_common.h
  * \brief
  */
-
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_COMMON_H__
-#endif
-
 #ifndef LIB_HCCL_HCCL_COMMON_H
 #define LIB_HCCL_HCCL_COMMON_H
 
@@ -117,8 +111,3 @@ enum class ScopeType: uint8_t {
 }  // namespace AscendC
 
 #endif  // LIB_HCCL_HCCL_COMMON_H
-
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_COMMON_H__)
-#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_COMMON_H__
-#endif
