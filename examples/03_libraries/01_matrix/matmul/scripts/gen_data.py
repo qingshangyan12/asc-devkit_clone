@@ -14,24 +14,26 @@
 
 import os
 import numpy as np
-
+import ml_dtypes
+bfloat16 = ml_dtypes.bfloat16
 
 def gen_golden_data():
-    m, n, k, is_bias = 128, 2048, 1024, True
+    m, n, k, is_bias = 8192, 8192, 8192, False
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
-    x1_gm = np.random.uniform(-1, 1, [m, k]).astype(np.float16)
-    x2_gm = np.random.uniform(-1, 1, [k, n]).astype(np.float16)
+    x1_gm = np.random.uniform(-1, 1, [m, k]).astype(bfloat16)
+    x2_gm = np.random.uniform(-1, 1, [k, n]).astype(bfloat16)
     if is_bias:
-        bias_gm = np.random.uniform(-10, 10, [n]).reshape([n]).astype(np.float32)
+        bias_gm = np.random.uniform(-10, 10, [n]).reshape([n]).astype(bfloat16)
         golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float32) + bias_gm
         bias_gm.tofile("./input/bias_gm.bin")
     else:
         golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(np.float32)
-
+    golden = golden.astype(bfloat16)
     x1_gm.tofile("./input/x1_gm.bin")
+    x2_gm=x2_gm.transpose()
     x2_gm.tofile("./input/x2_gm.bin")
     golden.tofile("./output/golden.bin")
 
