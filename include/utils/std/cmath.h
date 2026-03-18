@@ -14,6 +14,7 @@
  */
 #ifndef AICORE_UTILS_STD_CMATH_H
 #define AICORE_UTILS_STD_CMATH_H
+#include <type_traits>
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include "stub_def.h"
@@ -23,10 +24,16 @@ namespace AscendC {
 namespace Std {
 template <typename T> __aicore__ inline T sqrt(const T src);
 template <typename T> __aicore__ inline T abs(const T src);
+template <typename T, typename U>
+ASCENDC_HOST_AICORE inline constexpr ::std::common_type_t<T, U> ceil_division(T num1, U num2);
+template <typename T, typename U>
+ASCENDC_HOST_AICORE inline constexpr ::std::common_type_t<T, U> divide(T num1, U num2);
 }
 }
 
 #include "impl/utils/std/cmath/sqrt.h"
 #include "impl/utils/std/cmath/abs.h"
+#include "impl/utils/std/cmath/ceil_division.h"
+#include "impl/utils/std/cmath/divide.h"
 
 #endif  // AICORE_UTILS_STD_CMATH_H

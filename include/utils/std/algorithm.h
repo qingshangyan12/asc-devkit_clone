@@ -14,6 +14,7 @@
  */
 #ifndef AICORE_UTILS_STD_ALGORITHM_H
 #define AICORE_UTILS_STD_ALGORITHM_H
+#include <type_traits>
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include "stub_def.h"
@@ -21,8 +22,8 @@
 
 namespace AscendC {
 namespace Std {
-template <typename T, typename U> ASCENDC_HOST_AICORE inline T min(const T src0, const U src1);
-template <typename T, typename U> ASCENDC_HOST_AICORE inline T max(const T src0, const U src1);
+template <typename T, typename U> ASCENDC_HOST_AICORE inline ::std::common_type_t<T, U> min(const T src0, const U src1);
+template <typename T, typename U> ASCENDC_HOST_AICORE inline ::std::common_type_t<T, U> max(const T src0, const U src1);
 }
 }
 
