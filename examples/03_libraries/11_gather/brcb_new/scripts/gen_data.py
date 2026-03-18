@@ -28,48 +28,56 @@ def get_range_by_dtype(input_type):
         print(f"Unsupported data type:{input_type}")
 
 
-def gen_golden_data_simple(scenarioNum):
-    """生成测试数据和真值"""
+def gen_golden_data_simple(scenarioNum, size=None, repeatTime=None, 
+                          dstBlkStride=None, dstRepStride=None):
+    """生成测试数据和真值，支持外部参数配置"""
     # Brcb: 从src取8个数据，每个数据广播成一个32B块
     one_block_size = 32  # 32B = 一个block
 
+    # 根据场景设置默认参数
     if scenarioNum == 1:
         # half 基础测试
         input_type = np.dtype("float16")
-        src_size = 64
-        dst_blk_stride = 1
-        dst_rep_stride = 8
-        repeat_time = 8
+        default_src_size = 64
+        default_dst_blk_stride = 1
+        default_dst_rep_stride = 8
+        default_repeat_time = 8
     elif scenarioNum == 2:
         # half 大步长测试
         input_type = np.dtype("float16")
-        src_size = 64
-        dst_blk_stride = 2
-        dst_rep_stride = 16
-        repeat_time = 8
+        default_src_size = 64
+        default_dst_blk_stride = 2
+        default_dst_rep_stride = 16
+        default_repeat_time = 8
     elif scenarioNum == 3:
         # half 大数据量测试
         input_type = np.dtype("float16")
-        src_size = 1024
-        dst_blk_stride = 1
-        dst_rep_stride = 8
-        repeat_time = 128
+        default_src_size = 1024
+        default_dst_blk_stride = 1
+        default_dst_rep_stride = 8
+        default_repeat_time = 128
     elif scenarioNum == 4:
         # float 基础测试
         input_type = np.dtype("float32")
-        src_size = 64
-        dst_blk_stride = 1
-        dst_rep_stride = 8
-        repeat_time = 8
+        default_src_size = 64
+        default_dst_blk_stride = 1
+        default_dst_rep_stride = 8
+        default_repeat_time = 8
     elif scenarioNum == 5:
         # float 大数据量测试
         input_type = np.dtype("float32")
-        src_size = 1024
-        dst_blk_stride = 1
-        dst_rep_stride = 8
-        repeat_time = 128
+        default_src_size = 1024
+        default_dst_blk_stride = 1
+        default_dst_rep_stride = 8
+        default_repeat_time = 128
     else:
         raise ValueError(f"Unsupported scenario: {scenarioNum}")
+
+    # 应用外部配置（优先使用外部参数）
+    src_size = size if size is not None else default_src_size
+    repeat_time = repeatTime if repeatTime is not None else default_repeat_time
+    dst_blk_stride = dstBlkStride if dstBlkStride is not None else default_dst_blk_stride
+    dst_rep_stride = dstRepStride if dstRepStride is not None else default_dst_rep_stride
 
     min_val, max_val = get_range_by_dtype(input_type)
     output_type = input_type
@@ -110,5 +118,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 6),
                         help='Scenario number: 1-3=half tests, 4-5=float tests')
+    parser.add_argument('-size', type=int, default=None,
+                        help='Source data size (overrides scenario default)')
+    parser.add_argument('-repeatTime', type=int, default=None,
+                        help='Repeat time (overrides scenario default)')
+    parser.add_argument('-dstBlkStride', type=int, default=None,
+                        help='Destination block stride (overrides scenario default)')
+    parser.add_argument('-dstRepStride', type=int, default=None,
+                        help='Destination repeat stride (overrides scenario default)')
     args = parser.parse_args()
-    gen_golden_data_simple(args.scenarioNum)
+    gen_golden_data_simple(args.scenarioNum, args.size, args.repeatTime, 
+                          args.dstBlkStride, args.dstRepStride)

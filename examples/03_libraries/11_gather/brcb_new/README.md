@@ -62,17 +62,26 @@ struct BrcbRepeatParams {
 - **函数式风格**：使用模板函数而非类封装
 - **编译时参数**：使用 constexpr 函数获取场景参数
 
-### 场景参数定义
+### 外部配置参数
 
-```cpp
-struct BrcbScenarioParams {
-    uint32_t srcSize;        // 输入数据大小
-    uint32_t dstSize;        // 输出数据大小
-    uint8_t repeatTime;      // 重复次数
-    uint16_t dstBlkStride;   // 目的数据块步长
-    uint16_t dstRepStride;   // 目的重复步长
-};
-```
+本样例支持通过 CMake 参数和 Python 脚本参数进行外部配置：
+
+| 参数名 | 类型 | 说明 |
+|-------|------|------|
+| SIZE | uint32_t | 输入数据大小 |
+| REPEAT_TIME | uint8_t | 重复次数 |
+| DST_BLK_STRIDE | uint16_t | 目的数据块步长 |
+| DST_REP_STRIDE | uint16_t | 目的重复步长 |
+
+各场景默认参数：
+
+| 场景 | SIZE | REPEAT_TIME | DST_BLK_STRIDE | DST_REP_STRIDE |
+|-----|------|-------------|----------------|----------------|
+| 1 | 64 | 8 | 1 | 8 |
+| 2 | 64 | 8 | 2 | 16 |
+| 3 | 1024 | 128 | 1 | 8 |
+| 4 | 64 | 8 | 1 | 8 |
+| 5 | 1024 | 128 | 1 | 8 |
 
 ## 编译运行
 
@@ -88,9 +97,21 @@ source /usr/local/Ascend/cann/set_env.sh
 
 ```bash
 mkdir -p build && cd build
-cmake -DSCENARIO_NUM=1 -DSIZE=16384 ..
+# 使用默认参数编译
+cmake -DSCENARIO_NUM=1 -DSIZE=64 -DREPEAT_TIME=8 -DDST_BLK_STRIDE=1 -DDST_REP_STRIDE=8 ..
 make -j
 python3 ../scripts/gen_data.py -scenarioNum 1
+./demo
+python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/golden.bin
+```
+
+或使用自定义参数：
+
+```bash
+# 自定义参数编译
+cmake -DSCENARIO_NUM=1 -DSIZE=128 -DREPEAT_TIME=16 -DDST_BLK_STRIDE=2 -DDST_REP_STRIDE=16 ..
+make -j
+python3 ../scripts/gen_data.py -scenarioNum 1 -size 128 -repeatTime 16 -dstBlkStride 2 -dstRepStride 16
 ./demo
 python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/golden.bin
 ```

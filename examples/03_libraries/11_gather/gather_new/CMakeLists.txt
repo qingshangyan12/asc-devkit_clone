@@ -21,10 +21,12 @@ add_executable(demo
 
 message(STATUS "[INFO] SIZE is ${SIZE}")
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+message(STATUS "[INFO] CALC_SIZE is ${CALC_SIZE}")
 
 target_compile_definitions(demo PRIVATE
     SIZE=${SIZE}
     SCENARIO_NUM=${SCENARIO_NUM}
+    CALC_SIZE=${CALC_SIZE}
 )
 
 target_compile_options(demo PRIVATE

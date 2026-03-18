@@ -28,47 +28,54 @@ def get_range_by_dtype(input_type):
         print(f"Unsupported data type:{input_type}")
 
 
-def gen_golden_data_simple(scenarioNum):
-    """生成测试数据和真值"""
+def gen_golden_data_simple(scenarioNum, size=None, repeatTime=None, 
+                          dstBlkStride=None, dstRepStride=None):
+    """生成测试数据和真值，支持外部参数配置"""
     one_data_block_size = 32  # 一个datablock能处理32B数据
 
-    # 根据场景设置参数
+    # 根据场景设置默认参数
     if scenarioNum == 1:
         input_type = np.dtype("uint16")
         output_type = input_type
         min_val, max_val = get_range_by_dtype(input_type)
-        repeat_time = 2
-        block_length = 256
-        dst_blk_stride = 1
-        dst_rep_stride = 8
+        default_repeat_time = 2
+        default_block_length = 256
+        default_dst_blk_stride = 1
+        default_dst_rep_stride = 8
     elif scenarioNum == 2:
         input_type = np.dtype("uint16")
         output_type = input_type
         min_val, max_val = get_range_by_dtype(input_type)
-        repeat_time = 2
-        block_length = 512
-        dst_blk_stride = 2
-        dst_rep_stride = 16
+        default_repeat_time = 2
+        default_block_length = 512
+        default_dst_blk_stride = 2
+        default_dst_rep_stride = 16
     elif scenarioNum == 3:
         # 大数据量测试 uint16_t
         input_type = np.dtype("uint16")
         output_type = input_type
         min_val, max_val = get_range_by_dtype(input_type)
-        repeat_time = 128
-        block_length = 16 * 1024
-        dst_blk_stride = 1
-        dst_rep_stride = 8
+        default_repeat_time = 128
+        default_block_length = 16 * 1024
+        default_dst_blk_stride = 1
+        default_dst_rep_stride = 8
     elif scenarioNum == 4:
         # 大数据量测试 uint32_t
         input_type = np.dtype("uint32")
         output_type = input_type
         min_val, max_val = get_range_by_dtype(input_type)
-        repeat_time = 128
-        block_length = 16 * 1024
-        dst_blk_stride = 1
-        dst_rep_stride = 8
+        default_repeat_time = 128
+        default_block_length = 16 * 1024
+        default_dst_blk_stride = 1
+        default_dst_rep_stride = 8
     else:
         raise ValueError(f"Unsupported scenario: {scenarioNum}")
+
+    # 应用外部配置（优先使用外部参数）
+    repeat_time = repeatTime if repeatTime is not None else default_repeat_time
+    block_length = size if size is not None else default_block_length
+    dst_blk_stride = dstBlkStride if dstBlkStride is not None else default_dst_blk_stride
+    dst_rep_stride = dstRepStride if dstRepStride is not None else default_dst_rep_stride
 
     offset_size = block_length // dst_blk_stride * input_type.itemsize // one_data_block_size
     input_y = np.arange(0, offset_size * one_data_block_size, one_data_block_size, np.uint32)
@@ -103,5 +110,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 5),
                         help='Scenario number: 1-2=uint16 modes, 3=Large data uint16_t, 4=Large data uint32_t')
+    parser.add_argument('-size', type=int, default=None,
+                        help='Block length (overrides scenario default)')
+    parser.add_argument('-repeatTime', type=int, default=None,
+                        help='Repeat time (overrides scenario default)')
+    parser.add_argument('-dstBlkStride', type=int, default=None,
+                        help='Destination block stride (overrides scenario default)')
+    parser.add_argument('-dstRepStride', type=int, default=None,
+                        help='Destination repeat stride (overrides scenario default)')
     args = parser.parse_args()
-    gen_golden_data_simple(args.scenarioNum)
+    gen_golden_data_simple(args.scenarioNum, args.size, args.repeatTime,
+                          args.dstBlkStride, args.dstRepStride)

@@ -63,18 +63,29 @@ struct GatherRepeatParams {
 - **函数式风格**：使用模板函数而非类封装
 - **编译时参数**：使用 constexpr 函数获取场景参数
 
-### 场景参数定义
+### 外部配置参数
 
-```cpp
-struct GatherbScenarioParams {
-    uint32_t inSize;        // 输入数据大小
-    uint32_t offsetSize;    // 偏移量大小
-    uint32_t outSize;       // 输出数据大小
-    uint32_t repeatTime;    // 重复次数
-    uint8_t dstBlkStride;   // 目的数据块步长
-    uint8_t dstRepStride;   // 目的重复步长
-};
-```
+本样例支持通过 CMake 参数和 Python 脚本参数进行外部配置：
+
+| 参数名 | 类型 | 说明 |
+|-------|------|------|
+| SIZE | uint32_t | 输出数据大小 (outSize) |
+| REPEAT_TIME | uint32_t | 重复次数 |
+| DST_BLK_STRIDE | uint8_t | 目的数据块步长 |
+| DST_REP_STRIDE | uint8_t | 目的重复步长 |
+
+各场景默认参数：
+
+| 场景 | SIZE | REPEAT_TIME | DST_BLK_STRIDE | DST_REP_STRIDE |
+|-----|------|-------------|----------------|----------------|
+| 1 | 256 | 2 | 1 | 8 |
+| 2 | 512 | 2 | 2 | 16 |
+| 3 | 16384 | 128 | 1 | 8 |
+| 4 | 16384 | 128 | 1 | 8 |
+
+计算参数：
+- `offsetSize = REPEAT_TIME * 8`
+- `inSize = SIZE / DST_BLK_STRIDE`
 
 ## 编译运行
 
@@ -90,9 +101,21 @@ source /usr/local/Ascend/cann/set_env.sh
 
 ```bash
 mkdir -p build && cd build
-cmake -DSCENARIO_NUM=1 ..
+# 使用默认参数编译
+cmake -DSCENARIO_NUM=1 -DSIZE=256 -DREPEAT_TIME=2 -DDST_BLK_STRIDE=1 -DDST_REP_STRIDE=8 ..
 make -j
 python3 ../scripts/gen_data.py -scenarioNum 1
+./demo
+python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/golden.bin
+```
+
+或使用自定义参数：
+
+```bash
+# 自定义参数编译
+cmake -DSCENARIO_NUM=1 -DSIZE=512 -DREPEAT_TIME=4 -DDST_BLK_STRIDE=2 -DDST_REP_STRIDE=16 ..
+make -j
+python3 ../scripts/gen_data.py -scenarioNum 1 -size 512 -repeatTime 4 -dstBlkStride 2 -dstRepStride 16
 ./demo
 python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/golden.bin
 ```

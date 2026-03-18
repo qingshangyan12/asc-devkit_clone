@@ -65,12 +65,29 @@ __aicore__ inline void Gather(LocalTensor<T>& dst, LocalTensor<T>& src,
 - **事件同步**：使用 `SetFlag/WaitFlag` 进行同步
 - **函数式风格**：使用模板函数而非类封装
 
+### 外部配置参数
+
+本样例支持通过 CMake 参数和 Python 脚本参数进行外部配置：
+
+| 参数名 | 类型 | 说明 |
+|-------|------|------|
+| SIZE | uint32_t | 缓冲区大小（用于静态内存分配） |
+| CALC_SIZE | uint32_t | 计算数据大小 |
+
+各场景默认参数：
+
+| 场景 | SIZE | CALC_SIZE |
+|-----|------|-----------|
+| 1-3 | 16384 | 128 |
+| 4 | 16384 | 16384 |
+| 5 | 16384 | 16384 |
+
 ### 地址分配策略
 
 ```cpp
 constexpr uint32_t srcAddr = 0;
-constexpr uint32_t offsetAddr = srcAddr + size * sizeof(T) * 2 + 256;  // 256字节对齐
-constexpr uint32_t dstAddr = offsetAddr + size * sizeof(U) + 256;
+constexpr uint32_t offsetAddr = srcAddr + SIZE * sizeof(T) * 2 + 256;  // 256字节对齐
+constexpr uint32_t dstAddr = offsetAddr + SIZE * sizeof(U) + 256;
 ```
 
 ## 编译运行
@@ -87,9 +104,21 @@ source /usr/local/Ascend/cann/set_env.sh
 
 ```bash
 mkdir -p build && cd build
-cmake -DSCENARIO_NUM=1 -DSIZE=16384 ..
+# 使用默认参数编译
+cmake -DSCENARIO_NUM=1 -DSIZE=16384 -DCALC_SIZE=128 ..
 make -j
 python3 ../scripts/gen_data.py -scenarioNum 1
+./demo
+python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/golden.bin
+```
+
+或使用自定义参数：
+
+```bash
+# 自定义参数编译
+cmake -DSCENARIO_NUM=1 -DSIZE=32768 -DCALC_SIZE=256 ..
+make -j
+python3 ../scripts/gen_data.py -scenarioNum 1 -calcSize 256
 ./demo
 python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/golden.bin
 ```

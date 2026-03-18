@@ -28,50 +28,42 @@ def get_range_by_dtype(input_type):
         print(f"Unsupported data type:{input_type}")
 
 
-def gen_golden_data_simple(scenarioNum):
-    """生成测试数据和真值"""
+def gen_golden_data_simple(scenarioNum, calcSize=None):
+    """生成测试数据和真值，支持外部参数配置"""
+    # 根据场景设置默认参数
     if scenarioNum >= 1 and scenarioNum <= 3:
         # half类型的Count/Mask模式测试
-        count = 128
+        default_count = 128
         input_type = np.dtype("float16")
         min_val, max_val = get_range_by_dtype(input_type)
         output_type = input_type
         src_base_addr = 32 * input_type.itemsize
-        input_y = np.arange(0, count * input_type.itemsize, input_type.itemsize, np.uint32)
-        input_shape = [(count * input_type.itemsize + src_base_addr) // input_type.itemsize]
-        input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
-        output_shape = [count]
-        golden = np.zeros(output_shape).astype(output_type)
-        for i in range(count):
-            golden[i] = input_x[(src_base_addr + input_y[i]) // input_type.itemsize]
     elif scenarioNum == 4:
         # 大数据量测试 half 类型
-        count = 1024 * 16
+        default_count = 1024 * 16
         input_type = np.dtype("float16")
         min_val, max_val = get_range_by_dtype(input_type)
         output_type = input_type
         src_base_addr = 0 * input_type.itemsize
-        input_y = np.arange(0, count * input_type.itemsize, input_type.itemsize, np.uint32)
-        input_shape = [(count * input_type.itemsize + src_base_addr) // input_type.itemsize]
-        input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
-        output_shape = [count]
-        golden = np.zeros(output_shape).astype(output_type)
-        for i in range(count):
-            golden[i] = input_x[(src_base_addr + input_y[i]) // input_type.itemsize]
     elif scenarioNum == 5:
         # 大数据量测试 float 类型
-        count = 1024 * 16
+        default_count = 1024 * 16
         input_type = np.dtype("float32")
         min_val, max_val = get_range_by_dtype(input_type)
         output_type = input_type
         src_base_addr = 0 * input_type.itemsize
-        input_y = np.arange(0, count * input_type.itemsize, input_type.itemsize, np.uint32)
-        input_shape = [(count * input_type.itemsize + src_base_addr) // input_type.itemsize]
-        input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
-        output_shape = [count]
-        golden = np.zeros(output_shape).astype(output_type)
-        for i in range(count):
-            golden[i] = input_x[(src_base_addr + input_y[i]) // input_type.itemsize]
+    
+    # 应用外部配置（优先使用外部参数）
+    count = calcSize if calcSize is not None else default_count
+    
+    # 生成数据
+    input_y = np.arange(0, count * input_type.itemsize, input_type.itemsize, np.uint32)
+    input_shape = [(count * input_type.itemsize + src_base_addr) // input_type.itemsize]
+    input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
+    output_shape = [count]
+    golden = np.zeros(output_shape).astype(output_type)
+    for i in range(count):
+        golden[i] = input_x[(src_base_addr + input_y[i]) // input_type.itemsize]
 
     print(f"Scenario {scenarioNum}:")
     print(f"  Input X shape: {input_x.shape}")
@@ -89,5 +81,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 6),
                         help='Scenario number: 1-3=half Count/Mask modes, 4=Large data half, 5=Large data float')
+    parser.add_argument('-calcSize', type=int, default=None,
+                        help='Calculation size (overrides scenario default)')
     args = parser.parse_args()
-    gen_golden_data_simple(args.scenarioNum)
+    gen_golden_data_simple(args.scenarioNum, args.calcSize)
