@@ -10,8 +10,9 @@
 
 /*!
  * \file kernel_check.h
- * \brief
+ * \brief test
  */
+
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/kernel_check.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_list_tensor_intf.h\"\" and use public functions or variables defined in interface headers files.")
