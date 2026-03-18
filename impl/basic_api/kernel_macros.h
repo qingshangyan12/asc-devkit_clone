@@ -94,14 +94,7 @@
 #define ASCENDC_MATMUL_AICORE
 #endif
 
-<<<<<<< HEAD
-#if (defined(__NPU_ARCH__) &&                                               \
-     ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) ||                   \
-      (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                   \
-      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)))
-=======
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
->>>>>>> upstream/master
 #ifndef ASCENDC_DUMP
 #define ASCENDC_DUMP 1
 #endif
@@ -137,18 +130,10 @@ extern int32_t g_matmulCount;
 #define ASCEND_IS_AICORE constexpr(false)
 #endif
 
-<<<<<<< HEAD
-// Make the MicroAPI namespace to all versions visible so that user code can be onetrack.
-namespace AscendC {
-namespace MicroAPI {
-
-} // namespace MicroAPI
-=======
 namespace AscendC {
 namespace Reg {
 } // namespace Reg
 namespace MicroAPI = Reg;
->>>>>>> upstream/master
 } // namespace AscendC
 #endif // ASCENDC_KERNEL_MACROS_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_MACROS_H__)

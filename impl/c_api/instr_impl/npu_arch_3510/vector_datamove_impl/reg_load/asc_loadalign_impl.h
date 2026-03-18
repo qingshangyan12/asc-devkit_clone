@@ -80,8 +80,6 @@ __simd_callee__ inline void asc_loadalign_impl(vector_fp8_e4m3fn_t& dst, __ubuf_
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -89,7 +87,6 @@ __simd_callee__ inline void asc_loadalign_impl(vector_hifloat8_t& dst, __ubuf__ 
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_impl(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -208,8 +205,6 @@ __simd_callee__ inline void asc_loadalign_brc_impl(vector_fp8_e4m3fn_t& dst, __u
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_brc_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -217,7 +212,6 @@ __simd_callee__ inline void asc_loadalign_brc_impl(vector_hifloat8_t& dst, __ubu
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_brc_impl(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -322,8 +316,6 @@ __simd_callee__ inline void asc_loadalign_upsample_impl(vector_fp8_e4m3fn_t& dst
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_upsample_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -331,7 +323,6 @@ __simd_callee__ inline void asc_loadalign_upsample_impl(vector_hifloat8_t& dst, 
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_upsample_impl(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -415,8 +406,6 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(vector_fp8_e4m3fn_t& d
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -424,7 +413,6 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(vector_hifloat8_t& dst
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -508,8 +496,6 @@ __simd_callee__ inline void asc_loadalign_unpack_impl(vector_fp8_e4m3fn_t& dst, 
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_unpack_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -517,7 +503,6 @@ __simd_callee__ inline void asc_loadalign_unpack_impl(vector_hifloat8_t& dst, __
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_unpack_impl(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -622,8 +607,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e4m3fn_t& ds
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -631,7 +614,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_hifloat8_t& dst,
     }
 }
 
->>>>>>> upstream/master
 // offset = 0, brc_v2
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
@@ -687,8 +669,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e4m3fn_t& dst, 
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -696,7 +676,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_hifloat8_t& dst, __
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -851,8 +830,6 @@ __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_fp8_e4m3fn_t& dst0
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -861,7 +838,6 @@ __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_hifloat8_t& dst0, 
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -966,8 +942,6 @@ __simd_callee__ inline void asc_loadalign_impl(vector_fp8_e4m3fn_t& dst, __ubuf_
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -975,7 +949,6 @@ __simd_callee__ inline void asc_loadalign_impl(vector_hifloat8_t& dst, __ubuf__ 
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_impl(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1094,8 +1067,6 @@ __simd_callee__ inline void asc_loadalign_brc_impl(vector_fp8_e4m3fn_t& dst, __u
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_brc_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1103,7 +1074,6 @@ __simd_callee__ inline void asc_loadalign_brc_impl(vector_hifloat8_t& dst, __ubu
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_brc_impl(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1208,8 +1178,6 @@ __simd_callee__ inline void asc_loadalign_upsample_impl(vector_fp8_e4m3fn_t& dst
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_upsample_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1217,7 +1185,6 @@ __simd_callee__ inline void asc_loadalign_upsample_impl(vector_hifloat8_t& dst, 
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_upsample_impl(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1301,8 +1268,6 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(vector_fp8_e4m3fn_t& d
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1310,7 +1275,6 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(vector_hifloat8_t& dst
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1394,8 +1358,6 @@ __simd_callee__ inline void asc_loadalign_unpack_impl(vector_fp8_e4m3fn_t& dst, 
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_unpack_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1403,7 +1365,6 @@ __simd_callee__ inline void asc_loadalign_unpack_impl(vector_hifloat8_t& dst, __
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_unpack_impl(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1508,8 +1469,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e4m3fn_t& ds
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1517,7 +1476,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_hifloat8_t& dst,
     }
 }
 
->>>>>>> upstream/master
 // int32_t offset, brc_v2
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
@@ -1573,8 +1531,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e4m3fn_t& dst, 
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1582,7 +1538,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_hifloat8_t& dst, __
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1737,8 +1692,6 @@ __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_fp8_e4m3fn_t& dst0
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1747,7 +1700,6 @@ __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_hifloat8_t& dst0, 
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_deintlv_impl(vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1861,8 +1813,6 @@ __simd_callee__ inline void asc_loadalign_impl(vector_fp8_e4m3fn_t& dst, __ubuf_
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_loadalign_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1870,7 +1820,6 @@ __simd_callee__ inline void asc_loadalign_impl(vector_hifloat8_t& dst, __ubuf__ 
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_loadalign_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src_align32b, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
     if ASC_IS_AIV {

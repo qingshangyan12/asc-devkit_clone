@@ -1287,22 +1287,6 @@ __aicore__ inline void GenVecCastDeqParam(uint64_t deqScaleAddr, Reg::RegTensor<
     Reg::And((Reg::RegTensor<int32_t> &)scaleReg, (Reg::RegTensor<int32_t> &)scaleReg, tmpReg, fullMask);
 
     // Pack lowest 16bit of mrg2ChnIndexReg, because in API "Gather", the sizeof(offsetReg) should be the same as sizeof(mrg2ChnIndexReg)
-<<<<<<< HEAD
-    fullMask = MicroAPI::CreateMask<uint16_t, MicroAPI::MaskPattern::ALL>();
-    MicroAPI::Arange(offsetIndexReg, zero);
-    MicroAPI::Duplicate((MicroAPI::RegTensor<int16_t> &)tmpReg, gatherConstant);
-    MicroAPI::Div((MicroAPI::RegTensor<int16_t> &)tmpReg, offsetIndexReg, (MicroAPI::RegTensor<int16_t> &)tmpReg, fullMask);
-    MicroAPI::Muls((MicroAPI::RegTensor<int16_t> &)tmpReg, (MicroAPI::RegTensor<int16_t> &)tmpReg, gatherConstant, fullMask);
-    MicroAPI::Sub(offsetIndexReg, offsetIndexReg, (MicroAPI::RegTensor<int16_t> &)tmpReg, fullMask);
-    MicroAPI::Gather((MicroAPI::RegTensor<uint16_t> &)offsetReg, (MicroAPI::RegTensor<uint16_t> &)offsetReg, (MicroAPI::RegTensor<uint16_t> &)offsetIndexReg);
-
-    MicroAPI::Gather((MicroAPI::RegTensor<uint16_t> &)signModeReg, (MicroAPI::RegTensor<uint16_t> &)signModeReg, (MicroAPI::RegTensor<uint16_t> &)offsetIndexReg);
-    // Gen mask for elements which cast to sign and cast to unsign
-    MicroAPI::Duplicate((MicroAPI::RegTensor<int16_t> &)tmpReg, one);
-    MicroAPI::Compare(signMask, signModeReg, (MicroAPI::RegTensor<int16_t> &)tmpReg, fullMask);
-    MicroAPI::Duplicate((MicroAPI::RegTensor<int16_t> &)tmpReg, zero);
-    MicroAPI::Compare(unSignMask, signModeReg, (MicroAPI::RegTensor<int16_t> &)tmpReg, fullMask);
-=======
     fullMask = Reg::CreateMask<uint16_t, Reg::MaskPattern::ALL>();
     Reg::Arange(offsetIndexReg, zero);
     Reg::Duplicate((Reg::RegTensor<int16_t> &)tmpReg, gatherConstant);
@@ -1317,7 +1301,6 @@ __aicore__ inline void GenVecCastDeqParam(uint64_t deqScaleAddr, Reg::RegTensor<
     Reg::Compare(signMask, signModeReg, (Reg::RegTensor<int16_t> &)tmpReg, fullMask);
     Reg::Duplicate((Reg::RegTensor<int16_t> &)tmpReg, zero);
     Reg::Compare(unSignMask, signModeReg, (Reg::RegTensor<int16_t> &)tmpReg, fullMask);
->>>>>>> upstream/master
 }
 
 template <bool halfBlock>

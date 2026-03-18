@@ -186,18 +186,6 @@
     template <typename T>
     __simd_vf__ inline void XorVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
     {
-<<<<<<< HEAD
-        AscendC::MicroAPI::RegTensor<T> srcReg0;
-        AscendC::MicroAPI::RegTensor<T> srcReg1;
-        AscendC::MicroAPI::RegTensor<T> dstReg;
-        AscendC::MicroAPI::MaskReg mask;
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            mask = AscendC::MicroAPI::UpdateMask<T>(count);
-            AscendC::MicroAPI::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-            AscendC::MicroAPI::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);       
-            AscendC::MicroAPI::Xor(dstReg, srcReg0, srcReg1, mask);
-            AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-=======
         AscendC::Reg::RegTensor<T> srcReg0;
         AscendC::Reg::RegTensor<T> srcReg1;
         AscendC::Reg::RegTensor<T> dstReg;
@@ -208,7 +196,6 @@
             AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);       
             AscendC::Reg::Xor(dstReg, srcReg0, srcReg1, mask);
             AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
->>>>>>> upstream/master
         }
     }
     ```
@@ -219,19 +206,6 @@
     template <typename T>
     __simd_vf__ inline void XorVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
     {
-<<<<<<< HEAD
-        AscendC::MicroAPI::RegTensor<T> srcReg;
-        AscendC::MicroAPI::MaskReg src0 = AscendC::MicroAPI::CreateMask<T, AscendC::MicroAPI::MaskPattern::ALLF>();
-        AscendC::MicroAPI::MaskReg src1 = AscendC::MicroAPI::CreateMask<T, AscendC::MicroAPI::MaskPattern::ALL>();
-        AscendC::MicroAPI::MaskReg dst;
-        AscendC::MicroAPI::MaskReg mask;
-        for (uint16_t i = 0; i < (uint16_t)repeatTimes; ++i) {
-            mask = AscendC::MicroAPI::UpdateMask<T>(count);
-            AscendC::MicroAPI::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-            AscendC::MicroAPI::Xor(dst, src0, src1, mask);
-            AscendC::MicroAPI::Adds(srcReg, srcReg, 0, dst);
-            AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
-=======
         AscendC::Reg::RegTensor<T> srcReg;
         AscendC::Reg::MaskReg src0 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
         AscendC::Reg::MaskReg src1 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
@@ -243,7 +217,6 @@
             AscendC::Reg::Xor(dst, src0, src1, mask);
             AscendC::Reg::Adds(srcReg, srcReg, 0, dst);
             AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
->>>>>>> upstream/master
         }
     }
     ```

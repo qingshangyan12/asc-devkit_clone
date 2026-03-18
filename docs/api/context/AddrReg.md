@@ -94,21 +94,12 @@ Ascend 950PR/Ascend 950DT
 ```
 __simd_vf__ inline void CreateAddrRegVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
-<<<<<<< HEAD
-    AscendC::MicroAPI::MaskReg mask = AscendC::MicroAPI::CreateMask<T>();
-    AscendC::MicroAPI::AddrReg aReg;
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        aReg = AscendC::MicroAPI::CreateAddrReg<T>(i, oneRepeatSize);
-        AscendC::MicroAPI::LoadAlign(mask, srcAddr, aReg);
-        AscendC::MicroAPI::StoreAlign(dstAddr, mask, aReg);
-=======
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
     AscendC::Reg::AddrReg aReg;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         aReg = AscendC::Reg::CreateAddrReg<T>(i, oneRepeatSize);
         AscendC::Reg::LoadAlign(mask, srcAddr, aReg);
         AscendC::Reg::StoreAlign(dstAddr, mask, aReg);
->>>>>>> upstream/master
     }
 }
 ```

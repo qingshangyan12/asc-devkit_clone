@@ -147,10 +147,7 @@ class SingleOpCompile:
                      str(kwargs), str(opt_input_mode), str(opt_output_mode), str(dyn_param_mode),
                      str(sub_kernel_option), str(output_path))
         tiling_key_list = self.__opc_compile_args.get(OpcOptions.TILING_KEY)
-<<<<<<< HEAD
-=======
         extra_settings = self.__op_info.get(CompileParam.EXTRA_SETTINGS, None)
->>>>>>> upstream/master
         kernel_template_input = self.__opc_compile_args.get(OpcOptions.KERNEL_TEMPLATE_INPUT)
         if self.__op_info.get(OpcOptions.IS_DYNAMIC) or \
             self.__opc_compile_args.get(OpcOptions.OP_MODE) == OpModeType.DYNAMIC:

@@ -76,13 +76,8 @@ __simd_callee__ inline void FMaf(Reg::RegTensor<float>& dstReg, Reg::RegTensor<f
     Reg::RegTensor<float>& srcReg2, float scalarValue, Reg::MaskReg& mask)
 {
     // dst = src1 * src2 + scalarValue
-<<<<<<< HEAD
-    MicroAPI::RegTensor<float> tmpReg;
-    MicroAPI::Duplicate(tmpReg, scalarValue, mask);
-=======
     Reg::RegTensor<float> tmpReg;
     Reg::Duplicate(tmpReg, scalarValue, mask);
->>>>>>> upstream/master
     FMaf(dstReg, srcReg1, srcReg2, tmpReg, mask);
 }
 
@@ -391,13 +386,8 @@ __simd_callee__ inline void CosfPoly(Reg::RegTensor<float> &dstReg, Reg::RegTens
     FMaf(dstReg, srcRegS, COS_POLY_COEFF4, mask);
 }
 
-<<<<<<< HEAD
-__simd_callee__ inline void TrigRedFPreprocessForHalf(MicroAPI::RegTensor<float> &regR, MicroAPI::RegTensor<int32_t> &regI,
-    MicroAPI::RegTensor<float> &srcRegA, MicroAPI::MaskReg& mask)
-=======
 __simd_callee__ inline void TrigRedFPreprocessForHalf(Reg::RegTensor<float> &regR, Reg::RegTensor<int32_t> &regI,
     Reg::RegTensor<float> &srcRegA, Reg::MaskReg& mask)
->>>>>>> upstream/master
 {
     constexpr float J_MUL_COEFF = 0.636619747f;
     constexpr float J_ADD_COEFF = 12582912.0f;
@@ -553,15 +543,9 @@ __simd_vf__ inline void TrigRedFPreProcessImpl(__ubuf__ float *tmpBufferR, __ubu
     Reg::RegTensor<float> castReg, regR;
 
     for (uint16_t i = 0; i < repeatTimes; i++) {
-<<<<<<< HEAD
-        MicroAPI::MaskReg mask = MicroAPI::UpdateMask<float>(calCount);
-        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_UNPACK_B16>(srcReg, src + i * B32_DATA_NUM_PER_REPEAT);
-        MicroAPI::Cast<float, T, SinCosImpl::castTraitF16F32>(castReg, srcReg, mask);
-=======
         Reg::MaskReg mask = Reg::UpdateMask<float>(calCount);
         Reg::LoadAlign<T, Reg::LoadDist::DIST_UNPACK_B16>(srcReg, src + i * B32_DATA_NUM_PER_REPEAT);
         Reg::Cast<float, T, SinCosImpl::castTraitF16F32>(castReg, srcReg, mask);
->>>>>>> upstream/master
         TrigRedFPreprocessForHalf(regR, regI, castReg, mask);
 
         Reg::StoreAlign(tmpBufferR + i * B32_DATA_NUM_PER_REPEAT, regR, mask);
@@ -585,17 +569,10 @@ __simd_vf__ inline void TrigRedFComputePImpl(__ubuf__ uint32_t *tmpBufferRegPHig
         Reg::MaskReg mask = Reg::UpdateMask<float>(calCount);
         Reg::LoadAlign(castReg, src + i * B32_DATA_NUM_PER_REPEAT);
         // a = a * 0.0f + a
-<<<<<<< HEAD
-        MicroAPI::Duplicate(tmpF32Reg, 0.0f, mask);
-        MicroAPI::FusedMulDstAdd(castReg, tmpF32Reg, castReg, mask);
-        // initialize q and r: *q = 0; r = a;
-        MicroAPI::Duplicate(regI, 0, mask);
-=======
         Reg::Duplicate(tmpF32Reg, 0.0f, mask);
         Reg::FusedMulDstAdd(castReg, tmpF32Reg, castReg, mask);
         // initialize q and r: *q = 0; r = a;
         Reg::Duplicate(regI, 0, mask);
->>>>>>> upstream/master
         regR = castReg;
         // store the origin q and r in ub
         Reg::StoreAlign((__ubuf__ float *)tmpBufferRegPHigh + i * B32_DATA_NUM_PER_REPEAT, regR, mask);

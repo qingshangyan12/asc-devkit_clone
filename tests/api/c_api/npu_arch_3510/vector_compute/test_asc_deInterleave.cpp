@@ -40,8 +40,6 @@ TEST_F(TestVectorComputeVDIntlv##data_type##CApi, c_api_asc_vdintlv_##data_type#
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_COMPUTE_VDINTLV_HIF8(data_type)            \
                                                                                                 \
 class TestVectorComputeVDIntlv##data_type##CApi : public testing::Test {                 \
@@ -69,7 +67,6 @@ TEST_F(TestVectorComputeVDIntlv##data_type##CApi, c_api_asc_vdintlv_##data_type#
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
->>>>>>> upstream/master
 TEST_VECTOR_COMPUTE_VDINTLV(vector_int32_t);
 TEST_VECTOR_COMPUTE_VDINTLV(vector_uint32_t);
 TEST_VECTOR_COMPUTE_VDINTLV(vector_int16_t);
@@ -82,10 +79,7 @@ TEST_VECTOR_COMPUTE_VDINTLV(vector_f8e8m0);
 TEST_VECTOR_COMPUTE_VDINTLV(vector_bfloat16_t);
 TEST_VECTOR_COMPUTE_VDINTLV(vector_float);
 TEST_VECTOR_COMPUTE_VDINTLV(vector_half);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_COMPUTE_VDINTLV_HIF8(vector_hifloat8_t);
->>>>>>> upstream/master
 
 class TestVectorComputePdintlv : public testing::Test { 
 protected:

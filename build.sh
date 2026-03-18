@@ -13,7 +13,7 @@ set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type"
+    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "basic_test_one" "basic_test_two" "basic_test_three" "build-type" "extra-cmake-args" "changed_file"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -24,6 +24,11 @@ USER_ID=$(id -u)
 CPU_NUM=$(($(cat /proc/cpuinfo | grep "^processor" | wc -l)))
 THREAD_NUM=32
 BUILD_TYPE="Release"
+ENABLE_BUILD_DEVICE=ON
+USE_CXX11_ABI=0
+CMAKE_TOOLCHAIN_FILE_VAL=""
+CHANGED_FILES=""
+CI_MODE=FALSE
 
 dotted_line="----------------------------------------------------------------"
 
@@ -103,51 +108,6 @@ usage() {
   echo "    --build-type=<TYPE>"
   echo "                         Specify build type (TYPE options: Release/Debug), Default:Release"
   echo "    -f, --changed_file   Set the changed files for CI mode, eg: -f change_file.txt"
-}
-
-parse_cmake_extra_args() {
-    echo "Parse cmake extra args."
-    # para check
-    local args_str="$1"
-    if [[ -z "$args_str" ]]; then
-        echo "The parsed parameter string is empty."
-        return 0
-    fi
-
-    IFS=',' read -ra kv_pairs <<< "$args_str"
-
-    for kv_pair in "${kv_pairs[@]}"; do
-        if [[ -z "$kv_pair" ]]; then
-            continue
-        fi
-
-        local key="${kv_pair%%=*}"
-        local value="${kv_pair#*=}"
-
-        case "$key" in
-            "ENABLE_BUILD_DEVICE")
-                ENABLE_BUILD_DEVICE="$value"
-                echo "Set ENABLE_BUILD_DEVICE to ${ENABLE_BUILD_DEVICE}."
-                ;;
-            "USE_CXX11_ABI")
-                USE_CXX11_ABI="$value"
-                echo "Set USE_CXX11_ABI to ${USE_CXX11_ABI}."
-                ;;
-            "CMAKE_TOOLCHAIN_FILE")
-                CMAKE_TOOLCHAIN_FILE_VAL=$(realpath -s "$value")
-                echo "Set CMAKE_TOOLCHAIN_FILE_VAL to ${CMAKE_TOOLCHAIN_FILE_VAL}."
-                ;;
-            *)
-                echo "invalid parameter key: $key"
-                ;;
-        esac
-    done
-
-    if [[ "X$(echo "$USE_CXX11_ABI" | tr '[:upper:]' '[:lower:]')" == "xon" || "$USE_CXX11_ABI" == "1" ]]; then
-      USE_CXX11_ABI=1
-    elif [[ "X$(echo "$USE_CXX11_ABI" | tr '[:upper:]' '[:lower:]')" == "xoff" || "$USE_CXX11_ABI" == "0" ]]; then
-      USE_CXX11_ABI=0
-    fi
 }
 
 parse_cmake_extra_args() {

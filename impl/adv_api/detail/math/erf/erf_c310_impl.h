@@ -147,21 +147,12 @@ __simd_callee__ inline void ErfSpecialCaseCompute(Reg::RegTensor<float>& dstReg,
     Reg::Duplicate(tmpU32Reg, ERF_R0, mask);
     Reg::Compare<float, CMPMODE::LT>(cmpMask, tmpF5Reg, (Reg::RegTensor<float> &)tmpU32Reg, mask);
 
-<<<<<<< HEAD
-    MicroAPI::Duplicate(tmpF32Reg, LOG2_VALUE, mask);
-    MicroAPI::Log(tmpF32Reg, tmpF32Reg, mask);
-    MicroAPI::Mul(tmpF32Reg, tmpReg, tmpF32Reg, mask);
-    MicroAPI::Exp(tmpF32Reg, tmpF32Reg, mask);  // tmpF32Reg: f23
-    MicroAPI::Duplicate(tmpU32Reg, ERF_R1, mask);
-    MicroAPI::Sub(tmpF32Reg1, (MicroAPI::RegTensor<float> &)tmpU32Reg, tmpF32Reg, mask); //tmpF32Reg1: f25
-=======
     Reg::Duplicate(tmpF32Reg, LOG2_VALUE, mask);
     Reg::Log(tmpF32Reg, tmpF32Reg, mask);
     Reg::Mul(tmpF32Reg, tmpReg, tmpF32Reg, mask);
     Reg::Exp(tmpF32Reg, tmpF32Reg, mask);  // tmpF32Reg: f23
     Reg::Duplicate(tmpU32Reg, ERF_R1, mask);
     Reg::Sub(tmpF32Reg1, (Reg::RegTensor<float> &)tmpU32Reg, tmpF32Reg, mask); //tmpF32Reg1: f25
->>>>>>> upstream/master
 
     Reg::Duplicate(tmpU32Reg, ERF_R2, mask);
     Reg::And(tmpU32Reg, (Reg::RegTensor<uint32_t> &)srcReg, tmpU32Reg, mask);

@@ -39,8 +39,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5_HIF8(class_name, c_api_name, cce_name, data_type)  \
                                                                                                 \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {              \
@@ -67,7 +65,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdate, vstas, int8_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdate, vstas, uint8_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdate, vstas, int16_t);
@@ -79,10 +76,7 @@ TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdat
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdate, vstas, float);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdate, vstas, bfloat16_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdate, vstas, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5_HIF8(Vstas, asc_storeunalign_post_postupdate, vstas, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdate, vstas, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdate, vstas, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_5(Vstas, asc_storeunalign_post_postupdate, vstas, fp4x2_e2m1_t);

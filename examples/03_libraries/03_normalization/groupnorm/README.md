@@ -45,11 +45,7 @@
   </table>
 
 - 算子实现：  
-<<<<<<< HEAD
-  本样例中实现的是固定shape(inputX[2, 16, 16, 8]，gamma[16], beta[16]，groupNum=4)的groupnorm算子。
-=======
   本样例中实现的是固定shape(inputX[2, 16, 16, 8]，gamma[16]，beta[16]，groupNum=4)的groupnorm算子。
->>>>>>> upstream/master
 
   - Kernel实现
 

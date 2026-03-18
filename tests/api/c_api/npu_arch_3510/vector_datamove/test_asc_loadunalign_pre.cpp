@@ -40,8 +40,6 @@ TEST_F(TestVectorDatamove##class_name##data_type##CApi, c_api_name##_Succ)      
     GlobalMockObject::verify();                                                                 \
 }
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_HIF8(class_name, c_api_name, cce_name, data_type)       \
                                                                                                 \
 class TestVectorDatamove##class_name##data_type##CApi : public testing::Test {                  \
@@ -69,7 +67,6 @@ TEST_F(TestVectorDatamove##class_name##data_type##CApi, c_api_name##_Succ)      
     GlobalMockObject::verify();                                                                 \
 }
 
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, int8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, fp4x2_e2m1_t);
@@ -77,10 +74,7 @@ TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas,
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_HIF8(LoadUnalignPre, asc_loadunalign_pre, vldas, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, int16_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE(LoadUnalignPre, asc_loadunalign_pre, vldas, half);
@@ -119,8 +113,6 @@ TEST_F(TestVectorDatamove##class_name##data_type##CApi, c_api_name##_Succ)      
     GlobalMockObject::verify();                                                                 \
 }
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET_HIF8(class_name, c_api_name, cce_name, data_type)\
                                                                                                 \
 class TestVectorDatamove##class_name##data_type##CApi : public testing::Test {                  \
@@ -150,7 +142,6 @@ TEST_F(TestVectorDatamove##class_name##data_type##CApi, c_api_name##_Succ)      
     GlobalMockObject::verify();                                                                 \
 }
 
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, int8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, fp4x2_e2m1_t);
@@ -158,10 +149,7 @@ TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalig
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET_HIF8(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, int16_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_PRE_OFFSET(LoadUnalignPreOffset, asc_loadunalign_pre, vlda, half);
