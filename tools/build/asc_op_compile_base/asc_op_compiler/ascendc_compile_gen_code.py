@@ -272,7 +272,7 @@ def set_workspace_param(opinfo: OpInfo, tiling_info: TilingInfo):
             # each output needs 9 uint64 elements
             output_shape_len = (9 * 8 * len(opinfo.output_shape_depend_on_compute) + 32 - 1) // 32 * 32
             source += "    AscendC::OOMCheckAddrRange(__ascendc_output_shape, {});\n".format(output_shape_len)
-        source += "#ifdef ASCENDC_DUMP\n"
+        source += "#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)\n"
         source += "    AscendC::OOMCheckAddrRange(workspace - " + str(
             global_var_storage.get_variable("ascendc_required_dump_workspace_size")) + \
                 ", {});\n".format(tiling_info.static_workspace_size)
@@ -285,7 +285,7 @@ def set_workspace_param(opinfo: OpInfo, tiling_info: TilingInfo):
             source += "    AscendC::OOMCheckAddrRange(__ascendc_output_shape, {});\n".format(output_shape_len)
             source += "    tmpTilingSizeForOOM += 8;\n"
         workspace_len = "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
-        source += "#ifdef ASCENDC_DUMP\n"
+        source += "#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)\n"
         source += "    AscendC::OOMCheckAddrRange(workspace - " + str(global_var_storage.get_variable(
             "ascendc_required_dump_workspace_size")) + ", {});\n".format(workspace_len)
         source += "#else\n"

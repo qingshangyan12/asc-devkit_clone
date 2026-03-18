@@ -480,7 +480,7 @@ def _gen_set_workspace_codes(is_mix: bool, is_single_and_using_hard_sync: bool, 
         source += "    }\n"
         source += "#endif\n"
     if "printf" in compile_info.dump_info["dump_type"]:
-        source += "#ifdef ASCENDC_DUMP\n"
+        source += "#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)\n"
         source += "    uint64_t __ascendc_tStamp = 0;\n"
         source += "    uint64_t __ascendc_version = 0;\n"
         source += "     __gm__ char* __ascendc_versionStr = nullptr;\n"
@@ -652,7 +652,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
 
 
     if (CommonUtility.is_c310()) and dump_info:
-        source += "#if defined(ASCENDC_DUMP) && defined(RAW_AIC_ONLY_DUMP_TENSOR)\n"
+        source += "#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && defined(RAW_AIC_ONLY_DUMP_TENSOR)\n"
         source += "    if ASCEND_IS_AIV {\n"
         source += "        AscendC::EnableL1Dump();\n"
         source += "        workspace += " + \
@@ -758,7 +758,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
         source += "    AscendC::WriteBackOverflow(overflowStatus);\n"
 
     if (CommonUtility.is_c310()) and dump_info:
-        source += "#if defined(ASCENDC_DUMP) && defined(RAW_AIC_ONLY_DUMP_TENSOR)\n"
+        source += "#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && defined(RAW_AIC_ONLY_DUMP_TENSOR)\n"
         source += "    if ASCEND_IS_AIC {\n"
         source += "        pipe_barrier(PIPE_ALL);\n"
         source += "        AscendC::FinalizeL1TensorDump();\n"
@@ -1516,7 +1516,7 @@ def handle_dump_options(compile_info: CompileInfo, compile_option_tuple):
         global_var_storage.set_variable("ascendc_dump_assert_only", True)
 
     # dump or acc or timestamp or recognize_simtvf will need extra workspace
-    ascendc_enable_dump_workspace = ("-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options) or \
+    ascendc_enable_dump_workspace = False or \
         ("assert" == compile_info.dump_info["dump_type"]) or \
         (global_var_storage.get_variable("ascendc_time_stamp_compile_options") is True) or \
         "-DASCENDC_ACC_DUMP" in compile_option_tuple.compile_options or \
