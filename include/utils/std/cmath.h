@@ -9,11 +9,12 @@
 */
 
 /*!
- * \file cmath.h
+ * \file algorithm.h
  * \brief
  */
-#ifndef AICORE_UTILS_STD_CMATH_H
-#define AICORE_UTILS_STD_CMATH_H
+#ifndef AICORE_UTILS_STD_ALGORITHM_H
+#define AICORE_UTILS_STD_ALGORITHM_H
+#include <type_traits>
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include "stub_def.h"
@@ -21,12 +22,12 @@
 
 namespace AscendC {
 namespace Std {
-template <typename T> __aicore__ inline T sqrt(const T src);
-template <typename T> __aicore__ inline T abs(const T src);
+template <typename T, typename U> ASCENDC_HOST_AICORE inline std::common_type_t<T, U> min(const T src0, const U src1);
+template <typename T, typename U> ASCENDC_HOST_AICORE inline std::common_type_t<T, U> max(const T src0, const U src1);
 }
 }
 
-#include "impl/utils/std/cmath/sqrt.h"
-#include "impl/utils/std/cmath/abs.h"
+#include "impl/utils/std/algorithm/max.h"
+#include "impl/utils/std/algorithm/min.h"
 
-#endif  // AICORE_UTILS_STD_CMATH_H
+#endif  // AICORE_UTILS_STD_ALGORITHM_H

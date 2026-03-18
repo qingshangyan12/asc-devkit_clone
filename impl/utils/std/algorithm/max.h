@@ -15,13 +15,13 @@
 #ifndef IMPL_STD_MAX_H
 #define IMPL_STD_MAX_H
 #include "../type_traits/is_same.h"
+#include <type_traits>
 
 namespace AscendC {
 namespace Std {
 template <typename T, typename U>
-ASCENDC_HOST_AICORE inline T max(const T src0, const U src1)
+ASCENDC_HOST_AICORE inline std::common_type_t<T, U> max(const T src0, const U src1)
 {
-    static_assert(Std::is_same<T, U>::value, "Only support compare with same type!");
     return (src0 > src1) ? src0 : src1;
 }
 
