@@ -44,9 +44,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 #define ASSERT_1(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, ""))
 #define ASSERT_2(expr, ...) ASSERT_1(expr)
 
-#ifdef assert
 #undef assert
-#endif
+#undef ascendc_assert
 #define assert(...) ASSERT_IMPL(GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ascendc_assert(...) assert(...)
 
