@@ -4,6 +4,7 @@
 
 | AI处理器类型 | 是否支持  |
 | :----------------------- | :------: |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
 
 ## 功能说明
@@ -28,7 +29,7 @@
     __aicore__ inline void asc_copy_l12l0c(__cc__ bfloat16_t* dst, __cbuf__ float* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride)
     __aicore__ inline void asc_copy_l12l0c(__cc__ float* dst, __cbuf__ float* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride)
     __aicore__ inline void asc_copy_l12l0c(__cc__ int32_t* dst, __cbuf__ int32_t* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride)
-    __aicore__ inline void asc_copy_l12l0c(__cc__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t n_burst, uint16_t len_burst, Uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c(__cc__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride)
     ```
 - 同步搬运
 
@@ -49,10 +50,10 @@
 | :--- |:------|:----------------------------------------------------------------|
 | dst | 输出    | 目的操作数的起始地址。|
 | src | 输入    | 源操作数的起始地址。|
-| n_burst | 输入    | 待搬运的连续传输数据块个数。取值范围：[1, 4095] |
-| len_burst | 输入    | 待搬运的每个连续传输数据块的长度，单位为DataBlock。取值范围：[1, 65535] |
-| src_stride | 输入    | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位为32B |
-| dst_stride | 输入    | 相邻迭代间，目标操作数前一个分形起始地址与后一个分形起始地址的间隔，单位为32B  |
+| n_burst | 输入    | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
+| len_burst | 输入    | 待搬运的每个连续传输数据块的长度，单位为32个字节。取值范围：[1, 65535]。 |
+| src_stride | 输入    | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位为32个字节。 |
+| dst_stride | 输入    | 相邻迭代间，目标操作数前一个分形起始地址与后一个分形起始地址的间隔，单位为32个字节。 |
 
 ## 返回值说明
 
@@ -71,7 +72,15 @@ PIPE_MTE1
 ## 调用示例
 
 ```cpp
+//待搬运的连续传输数据块为1个
+constexpr uint16_t n_burst = 1;
+//待搬运的每个连续传输数据块的长度为32个字节
+constexpr uint16_t len_burst = 1;
+//相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为32个字节
+constexpr uint16_t src_stride = 1;
+//相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为0个字节
+constexpr uint16_t dst_stride = 0;
 __cbuf__ half src[256];
 __cc__ half dst[256];
-asc_copy_l12l0c(dst, src, 1, 1, 1, 0);
+asc_copy_l12l0c(dst, src, n_burst, len_burst, src_stride, dst_stride);
 ```

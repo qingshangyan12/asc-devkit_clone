@@ -143,7 +143,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_copy_l12fb](cube_datamove/asc_copy_l12fb.md)                       | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
 | [asc_copy_l12l0a(A2/A3)](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
 | [asc_copy_l12l0a(A5)](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_3510.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
-| [asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到l0b Buffer里。 |
+| [asc_copy_l12l0b(A2/A3)](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到l0b Buffer里。 |
+| [asc_copy_l12l0a(A5)](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_3510.md)                     | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |
+| [asc_copy_l12l0c(A2/A3)](cube_datamove/asc_copy_l12l0c/asc_copy_l12l0c_arch_2201.md)                     | 将矩阵由L1 Buffer搬运到L0C Buffer中。 |
 | [asc_copy_l12l0b_sparse](cube_datamove/asc_copy_l12l0b_sparse.md)       | 用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。 |
 | [asc_copy_l12l0b_trans](cube_datamove/asc_copy_l12l0b_trans.md)         | 该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。 |
 | [asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)     | DataCopy（CO1->GM、CO1->A1）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。 |
