@@ -51,7 +51,7 @@ private:
  
         uint8_t leftPaddingCnt = 0;
         uint8_t rightPaddingCnt = 0;
-        uint8_t cacheMode = GetCacheModeFromTensor(src.Data().Get());
+        uint8_t cacheMode = GetCacheModeFromTensor(src);
  
         using type = typename U::elementType;
  

@@ -53,7 +53,7 @@ private:
             dValue = dValue >> 1;
             srcRowStride = srcRowStride >> 1;
         }
-        constexpr auto c0Size = is_b4_type<type> ? C0_SIZE * 2 : C0_SIZE;
+        constexpr auto c0Size = GetC0Size<type>();
         
         uint64_t srcNdMatrixStride = 0;
         uint64_t srcDValue = srcRowStride;
@@ -69,7 +69,7 @@ private:
         // loop4_dst_stride : dst_nz_matrix_stride * size_of_dst_type / C0_SIZE
         uint16_t loop4DstStride = static_cast<uint16_t>(dstNzMatrixStride * sizeof(type) / c0Size);
 
-        uint8_t cacheMode = GetCacheModeFromTensor(src.Data().Get());
+        uint8_t cacheMode = GetCacheModeFromTensor(src);
 
         CopyGmToCbufMultiNd2nzInstr::DataCopy(dst, src, ndNum, loop2DstStride, loop3DstStride, loop4DstStride,
                                          loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, false);
