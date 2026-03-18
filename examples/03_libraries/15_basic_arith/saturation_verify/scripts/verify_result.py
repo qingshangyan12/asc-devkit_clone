@@ -17,10 +17,26 @@ import numpy as np
 
 API_ID_EXP = 1
 API_ID_MUL = 2
+API_ID_SQRT = 3
+API_ID_RSQRT = 4
+API_ID_RELU = 5
+API_ID_ADD = 6
+API_ID_SUB = 7
+API_ID_DIV = 8
+API_ID_MAX = 9
+API_ID_MIN = 10
 
 API_NAME_MAP = {
     1: "exp",
     2: "mul",
+    3: "sqrt",
+    4: "rsqrt",
+    5: "relu",
+    6: "add",
+    7: "sub",
+    8: "div",
+    9: "max",
+    10: "min",
 }
 
 RELATIVE_TOL = 1e-6
@@ -166,6 +182,48 @@ def verify_result(output_type, api_id, input_x=None, input_y=None):
             if input_x is None:
                 input_x = "./input/input_x.bin"
             res = verify_single_api(output_type, input_x)
+        elif api_id == API_ID_SQRT:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            res = verify_single_api(output_type, input_x, "sqrt")
+        elif api_id == API_ID_RSQRT:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            res = verify_single_api(output_type, input_x, "rsqrt")
+        elif api_id == API_ID_RELU:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            res = verify_single_api(output_type, input_x, "relu")
+        elif api_id == API_ID_ADD:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_SUB:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_DIV:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_MAX:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_MIN:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
         elif api_id == API_ID_MUL:
             if input_x is None:
                 input_x = "./input/input_x.bin"
@@ -188,8 +246,8 @@ def verify_result(output_type, api_id, input_x=None, input_y=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2],
-                        help="API ID: 1=exp, 2=mul")
+    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                        help="API ID: 1=exp, 2=mul, 3=sqrt, 4=rsqrt, 5=relu, 6=add, 7=sub, 8=div, 9=max, 10=min")
     parser.add_argument('-output_type', type=int, default=1, choices=[1, 2, 3, 4],
                         help="Output type: 1=float16, 2=float32, 3=int16, 4=int32")
     parser.add_argument('-input_x', type=str, default="./input/input_x.bin")
