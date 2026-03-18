@@ -5892,32 +5892,32 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t *dst, vector_bo
     asc_storealign_pack_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint32_t *dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint32_t *&dst, vector_bool src, int32_t offset)
 {
     asc_storealign_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t *dst, vector_bool src, int32_t  offset)
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t *&dst, vector_bool src, int32_t  offset)
 {
     asc_storealign_pack_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint16_t *dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint16_t *&dst, vector_bool src, int32_t offset)
 {
     asc_storealign_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint16_t *dst, vector_bool src, int32_t  offset)
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint16_t *&dst, vector_bool src, int32_t  offset)
 {
     asc_storealign_pack_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t *dst, vector_bool src, int32_t offset)
+__simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t *&dst, vector_bool src, int32_t offset)
 {
     asc_storealign_postupdate_impl(dst, src, offset);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t *dst, vector_bool src, int32_t  offset)
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t *&dst, vector_bool src, int32_t  offset)
 {
     asc_storealign_pack_postupdate_impl(dst, src, offset);
 }
