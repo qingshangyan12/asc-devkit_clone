@@ -17,6 +17,7 @@
 
 #include "impl/experimental/tensor_api/utils/utils_impl.h"
 #include "impl/experimental/tensor_api/tensor/layout_definition.h"
+#include "impl/utils/std/cmath/ceil_division.h"
 
 namespace AscendC {
 namespace Te {
