@@ -25,7 +25,7 @@
 #include "mstx_local_tensor_info.h"
 
 #include "kernel_check.h"
-#include "kernel_npu_debug.h"
+#include "kernel_operator_data_copy_check.h"
 
 #include "kernel_operator_data_copy_base_impl.h"
 
@@ -1408,9 +1408,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T> &ds
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxDataCopyPadInfo(dst, src, dataCopyParams, padParams, "DataCopyPad");
 #endif
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT");
-#endif
+
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to VECIN/VECOUT")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to VECIN / VECOUT", KernelFuncType::NONE_MODE);
@@ -1516,10 +1514,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T> &d
     MstxTensor::GetMstxDataCopyPadInfo(dst, src, dataCopyParams, "DataCopyPad");
 #endif
     using PrimType = PrimT<T>;
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckDataCopyPadTensor(dst, src, dataCopyParams,
-        "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams");
-#endif
 #if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
