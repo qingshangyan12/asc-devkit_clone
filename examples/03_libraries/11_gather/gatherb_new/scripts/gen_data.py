@@ -64,8 +64,8 @@ def gen_golden_data_simple(scenarioNum, size=None, repeatTime=None,
         input_type = np.dtype("uint32")
         output_type = input_type
         min_val, max_val = get_range_by_dtype(input_type)
-        default_repeat_time = 128
-        default_block_length = 16 * 1024
+        default_repeat_time = 160
+        default_block_length = 10 * 1024
         default_dst_blk_stride = 1
         default_dst_rep_stride = 8
     else:

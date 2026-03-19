@@ -81,11 +81,7 @@ struct GatherRepeatParams {
 | 1 | 256 | 2 | 1 | 8 |
 | 2 | 512 | 2 | 2 | 16 |
 | 3 | 16384 | 128 | 1 | 8 |
-| 4 | 16384 | 128 | 1 | 8 |
-
-计算参数：
-- `offsetSize = REPEAT_TIME * 8`
-- `inSize = SIZE / DST_BLK_STRIDE`
+| 4 | 10240 | 160 | 1 | 8 |
 
 ## 编译运行
 
