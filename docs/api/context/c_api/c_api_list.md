@@ -123,13 +123,11 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 | API名称                                                                   |   说明   |
 |-------------------------------------------------------------------------|-----------|
-| [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)                     | 将GM中的数据搬运到L0B中。 |
-<cann-filter npu_type = "950"> 
-| [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)                     | 将GM中的数据padding后搬运到L1中。 |
-| [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1.md)                     | 将GM中的数据搬运到L1中。 |
-| [asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。|
-| [asc_copy_gm2l1_nd2nz](cube_datamove/asc_copy_gm2l1_nd2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行ND->NZ/NHWC->NC1HWC0/NHWC->C1HWNC0操作。 |
-</cann-filter>
+| [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)                     | 将GM中的数据搬运到L0B中。 | 
+| <cann-filter npu_type = "950"> [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)                     | 将GM中的数据padding后搬运到L1中。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1.md)                     | 将GM中的数据搬运到L1中。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。 </cann-filter> |
+| <cann-filter npu_type = "950"> [asc_copy_gm2l1_nd2nz](cube_datamove/asc_copy_gm2l1_nd2nz.md)                     | 将GM中的数据搬运到L1中，在此过程中执行ND->NZ/NHWC->NC1HWC0/NHWC->C1HWNC0操作。</cann-filter> |
 | [asc_copy_l12gm](cube_datamove/asc_copy_l12gm.md)                     | 将数据从L1搬运到GM。 |
 | [asc_copy_l0c2gm](cube_datamove/asc_copy_l0c2gm.md)                     | 将L0C中的数据搬运到GM中。 |
 | [asc_copy_l0c2l1](cube_datamove/asc_copy_l0c2l1)                        | 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到GM中。 |
@@ -201,9 +199,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 |   API名称   |   说明   |
 |----------|-----------|
-<cann-filter npu_type = "950">
-| [asc_release_buf](sync/asc_release_buf.md)| 释放缓存。 |
-</cann-filter>
+| <cann-filter npu_type = "950"> [asc_release_buf](sync/asc_release_buf.md)| 释放缓存。</cann-filter> |
 | [asc_sync_notify](sync/asc_sync_notify.md)| 设置同步标志。 |
 | [asc_sync_wait](sync/asc_sync_wait.md)| 等待同步标志。 |
 | [asc_sync_pipe](sync/asc_sync_pipe.md)| 等待指定流水线操作完成。 |
@@ -214,10 +210,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sync_data_barrier](sync/asc_sync_data_barrier.md) | 用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。 |
 | [asc_sync_block_arrive](sync/asc_sync_block_arrive.md) | 该指令用于发送同步信息数据到核间同步寄存器，设置同步点。 |
 | [asc_sync_block_wait](sync/asc_sync_block_wait.md) | 和[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。 |
-<cann-filter npu_type = "950">
-| [asc_sync_intra_wait](sync/asc_sync_intra_wait.md)| 等待FFTS块/子块同步标志。 |
-| [asc_sync_intra_arrive](sync/asc_sync_intra_wait.md)| 向FFTS块/子块同步寄存器发送同步信号。 |
-</cann-filter>
+| <cann-filter npu_type = "950"> [asc_sync_intra_wait](sync/asc_sync_intra_wait.md)| 等待FFTS块/子块同步标志。 </cann-filter> |
+| <cann-filter npu_type = "950"> [asc_sync_intra_arrive](sync/asc_sync_intra_wait.md)| 向FFTS块/子块同步寄存器发送同步信号。 </cann-filter> |
 
 ## 系统变量
 
