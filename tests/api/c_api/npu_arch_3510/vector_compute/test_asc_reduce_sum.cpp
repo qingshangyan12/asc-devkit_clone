@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef TESTS_API_C_API_NPU_ARCH_3510_UTILS_TEST_UNARY_INSTR_UTILS_H
-#define TESTS_API_C_API_NPU_ARCH_3510_UTILS_TEST_UNARY_INSTR_UTILS_H
+#ifndef TESTS_API_C_API_NPU_ARCH_3510_UTILS_TEST_REDUCE_SUM_H
+#define TESTS_API_C_API_NPU_ARCH_3510_UTILS_TEST_REDUCE_SUM_H
 
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
@@ -39,9 +39,13 @@ TEST_F(TestVectorCompute##class_name##_##dst_type##_##src_type##_CApi, c_api_nam
         .times(1)                                                                               \
         .will(invoke(cce_name##_##dst_type##_##src_type##_Stub));                                           \
                                                                                                 \
-    asc_reduce_add(dst, src, mask);                                                                \
+    asc_reduce_sum(dst, src, mask);                                                                \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
-TEST_VECTOR_COMPUTE_VCADD_INSTR(Vcadd, asc_reduce_add, vcadd, vector_int32_t, vector_int16_t);
-
+TEST_VECTOR_COMPUTE_VCADD_INSTR(Vcadd, asc_reduce_sum, vcadd, vector_int32_t, vector_int16_t);
+TEST_VECTOR_COMPUTE_VCADD_INSTR(Vcadd, asc_reduce_sum, vcadd, vector_int32_t, vector_int32_t);
+TEST_VECTOR_COMPUTE_VCADD_INSTR(Vcadd, asc_reduce_sum, vcadd, vector_uint32_t, vector_uint16_t);
+TEST_VECTOR_COMPUTE_VCADD_INSTR(Vcadd, asc_reduce_sum, vcadd, vector_uint32_t, vector_uint32_t);
+TEST_VECTOR_COMPUTE_VCADD_INSTR(Vcadd, asc_reduce_sum, vcadd, vector_half, vector_half);
+TEST_VECTOR_COMPUTE_VCADD_INSTR(Vcadd, asc_reduce_sum, vcadd, vector_float, vector_float);
 #endif
