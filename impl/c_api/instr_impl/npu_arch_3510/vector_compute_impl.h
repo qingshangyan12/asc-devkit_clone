@@ -4754,6 +4754,16 @@ __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src)
     asc_copy_impl(dst, src); 
 }
 
+__simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part)
+{
+    asc_copy_impl(dst, src, part);
+}
+
+__simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part)
+{
+    asc_copy_impl(dst, src, part);
+}
+
 // ==========asc_float2e4m3_rn=========
 __simd_callee__ inline void asc_float2e4m3_rn_sat(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
 {
