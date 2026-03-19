@@ -936,6 +936,8 @@ __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src,
                                         uint64_t src_stride, uint32_t dst_stride)
 {
     asc_copy_gm2l1_sync_impl(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
+}
+
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)
 {
     asc_set_l13d_fmatrix_b_impl(config);
