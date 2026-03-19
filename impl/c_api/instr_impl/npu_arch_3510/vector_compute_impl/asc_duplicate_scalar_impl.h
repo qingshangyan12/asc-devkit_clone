@@ -166,6 +166,7 @@ __simd_callee__ inline void asc_duplicate_scalar_impl(vector_bfloat16_t& dst, bf
 __simd_callee__ inline void asc_duplicate_scalar_impl(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value)
 {
     if ASC_IS_AIV {
+        fp8_e4m3fn_t* value_tmp = reinterpret_cast<fp8_e4m3fn_t*>(&value);
         vbr(dst, value);
     }
 }
@@ -173,6 +174,7 @@ __simd_callee__ inline void asc_duplicate_scalar_impl(vector_fp8_e4m3fn_t& dst, 
 __simd_callee__ inline void asc_duplicate_scalar_impl(vector_fp8_e5m2_t& dst, fp8_e5m2_t value)
 {
     if ASC_IS_AIV {
+        fp8_e5m2_t* value_tmp = reinterpret_cast<fp8_e5m2_t*>(&value);
         vbr(dst, value);
     }
 }
@@ -180,6 +182,7 @@ __simd_callee__ inline void asc_duplicate_scalar_impl(vector_fp8_e5m2_t& dst, fp
 __simd_callee__ inline void asc_duplicate_scalar_impl(vector_fp8_e8m0_t& dst, fp8_e8m0_t value)
 {
     if ASC_IS_AIV {
+        fp8_e8m0_t* value_tmp = reinterpret_cast<fp8_e8m0_t*>(&value);
         vbr(dst, value);
     }
 }
