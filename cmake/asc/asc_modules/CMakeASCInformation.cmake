@@ -120,18 +120,25 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
         list(GET _ARCH_TO_SOC_DIR_MAP ${_soc_dir_index} _SOC_DIR)
         
         # system include
-        set(ASC_CPU_SYSTEM_INCLUDE_OPTIONS "-isystem$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/include -isystem$ENV{ASCEND_HOME_PATH}/include \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw -isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/lib \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/lib/matmul -isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/impl \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/interface -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/adv_api \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/basic_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/c_api \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/micro_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/simt_api \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/utils -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/adv_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/adv_api/matmul \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/aicpu_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/basic_api \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/c_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/interface \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/micro_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/simt_api \
--isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/tiling -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/utils")
+        set(ASC_CPU_SYSTEM_INCLUDE_OPTIONS "-isystem$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/include"
+            "-isystem$ENV{ASCEND_HOME_PATH}/include"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/adv_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/basic_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/c_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/micro_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/simt_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/utils"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/adv_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/adv_api/matmul"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/aicpu_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/basic_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/c_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/interface"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/micro_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/simt_api"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/tiling"
+            "-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/utils")
         
         # 添加编译选项
         string(APPEND CMAKE_ASC_FLAGS "-g -D_GLIBCXX_USE_CXX11_ABI=0 -DASCENDC_DEBUG=1 -D__NPU_ARCH__=${_SHORT_NPU_ARCH} --run-mode=cpu ${ASC_CPU_SYSTEM_INCLUDE_OPTIONS}")
