@@ -46,7 +46,7 @@ namespace __asc_aicore {
 template <class... Args>
 __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args);
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void printf(__gm__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);
 }

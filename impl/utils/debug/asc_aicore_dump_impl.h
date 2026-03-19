@@ -96,7 +96,7 @@ __aicore__ inline void asc_dump_impl(U src, uint32_t desc, uint32_t dumpSize)
 }
 
 template<typename T>
-__aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dumpSize)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
@@ -108,7 +108,7 @@ __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dump
 }
 
 template<typename T>
-__aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dumpSize)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
@@ -120,7 +120,7 @@ __aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t 
 }
 
 template<typename T>
-__aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dumpSize)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
@@ -132,7 +132,7 @@ __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t du
 }
 
 template<typename T>
-__aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dumpSize)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
@@ -148,7 +148,7 @@ __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t
 
 namespace __asc_aicore {
 template<typename T>
-__aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dumpSize) {
+static __attribute__((noinline)) __aicore__ void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dumpSize) {
     ASCENDC_ASSERT((false), "asc_dump_gm is not supported in cpu mode.");
 }
 

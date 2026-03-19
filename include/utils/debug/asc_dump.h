@@ -26,16 +26,16 @@
 
 namespace __asc_aicore {
 template<typename T>
-__aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dumpSize);
+static __attribute__((noinline)) __aicore__ void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dumpSize);
 
 template<typename T>
-__aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dumpSize);
+static __attribute__((noinline)) __aicore__ void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dumpSize);
 
 template<typename T>
-__aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dumpSize);
+static __attribute__((noinline)) __aicore__ void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dumpSize);
 
 template<typename T>
-__aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dumpSize);
+static __attribute__((noinline)) __aicore__ void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dumpSize);
 }
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_DUMP_H__)
