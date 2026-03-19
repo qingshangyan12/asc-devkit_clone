@@ -497,15 +497,9 @@ __simd_vf__ inline void ConfusionTransposeND2NZWithInlvVFImpl(__ubuf__ T* dstAdd
 
             AscendC::Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg0, (__ubuf__ T*&)rowStrideAddr, 1, 0, mask);
-<<<<<<< HEAD
-            AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
-                vSrcReg1, (__ubuf__ T*&)neighborStrideAddr, 1, 0, mask);
-            AscendC::MicroAPI::Interleave<T>(vDstReg0, vDstReg1, vSrcReg0, vSrcReg1);
-=======
             AscendC::Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg1, (__ubuf__ T*&)neighborStrideAddr, 1, 0, mask);
             AscendC::Reg::Interleave<T>(vDstReg0, vDstReg1, vSrcReg0, vSrcReg1);
->>>>>>> upstream/master
 
             uint64_t dstRowStrideAddr = uint64_t(dstAddr + dstOffset + j * c0Size);
             AscendC::Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_NORMAL>(
@@ -533,15 +527,9 @@ __simd_vf__ inline void ConfusionTransposeND2NZWithInlvVFImpl(__ubuf__ T* dstAdd
             AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(mask_size);
             AscendC::Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg0, (__ubuf__ T*&)rowStrideAddr, 1, 0, mask);
-<<<<<<< HEAD
-            AscendC::MicroAPI::LoadAlign<T, MicroAPI::DataCopyMode::DATA_BLOCK_COPY, MicroAPI::PostLiteral::POST_MODE_NORMAL>(
-                vSrcReg1, (__ubuf__ T*&)neighborStrideAddr, 1, 0, mask);
-            AscendC::MicroAPI::Interleave<T>(vDstReg0, vDstReg1, vSrcReg0, vSrcReg1);
-=======
             AscendC::Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg1, (__ubuf__ T*&)neighborStrideAddr, 1, 0, mask);
             AscendC::Reg::Interleave<T>(vDstReg0, vDstReg1, vSrcReg0, vSrcReg1);
->>>>>>> upstream/master
 
             uint64_t dstRowStrideAddr = uint64_t(dstAddr + dstOffset + j * c0Size);
             AscendC::Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_NORMAL>(

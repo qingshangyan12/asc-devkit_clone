@@ -172,19 +172,6 @@ __simd_callee__ inline void CalcHSingleBlockOutPut(__ubuf__ T* output, Reg::RegT
         // Calc x - mean in first block.
         Reg::Sub(resultH, gxReg, meanReg, hFloatMask);
         // Calc (x - mean) / sdReg in first block.
-<<<<<<< HEAD
-        MicroAPI::Div(resultH, resultH, sdReg, hFloatMask);
-        MicroAPI::RegTensor<T> oriGammaH;
-        MicroAPI::RegTensor<float> gammaReg;
-        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_US_B16>(oriGammaH, gamma);
-        MicroAPI::Cast<float, T, layoutZMrgZ>(gammaReg, oriGammaH, hFloatMask);
-        // Calc (x - mean) / sdReg * gamma in first block.
-        MicroAPI::Mul(resultH, resultH, gammaReg, hFloatMask);
-        MicroAPI::RegTensor<T> oriBetaH;
-        MicroAPI::RegTensor<float> betaReg;
-        MicroAPI::LoadAlign<T, MicroAPI::LoadDist::DIST_US_B16>(oriBetaH, beta);
-        MicroAPI::Cast<float, T, layoutZMrgZ>(betaReg, oriBetaH, hFloatMask);
-=======
         Reg::Div(resultH, resultH, sdReg, hFloatMask);
         Reg::RegTensor<T> oriGammaH;
         Reg::RegTensor<float> gammaReg;
@@ -196,7 +183,6 @@ __simd_callee__ inline void CalcHSingleBlockOutPut(__ubuf__ T* output, Reg::RegT
         Reg::RegTensor<float> betaReg;
         Reg::LoadAlign<T, Reg::LoadDist::DIST_US_B16>(oriBetaH, beta);
         Reg::Cast<float, T, layoutZMrgZ>(betaReg, oriBetaH, hFloatMask);
->>>>>>> upstream/master
         // Calc (x - mean) * sdReg * gamma + in first block.
         Reg::Add(resultH, resultH, betaReg, hFloatMask);
         Reg::RegTensor<T> oriOutputH;

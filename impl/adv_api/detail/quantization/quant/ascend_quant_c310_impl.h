@@ -1021,13 +1021,8 @@ __simd_callee__ inline void TransRegForFp4(
 
 template <typename scaleT, const AscendQuantConfig& config>
 __simd_callee__ inline void LoadContinuousScaleAndOffset(__ubuf__ scaleT* scaleAddr, __ubuf__ scaleT* offsetAddr,
-<<<<<<< HEAD
-                                                   MicroAPI::RegTensor<scaleT>& scaleVreg,
-                                                   MicroAPI::RegTensor<scaleT>& offsetVreg)
-=======
                                                    Reg::RegTensor<scaleT>& scaleVreg,
                                                    Reg::RegTensor<scaleT>& offsetVreg)
->>>>>>> upstream/master
 {
     Reg::LoadAlign<scaleT, Reg::LoadDist::DIST_NORM>(scaleVreg, scaleAddr);
     if constexpr (config.hasOffset) {

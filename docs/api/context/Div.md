@@ -201,8 +201,6 @@ struct DivConfig {
 
 -   针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t/complex32/complex64数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
 
--   针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t/complex32/complex64数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
-
 ## 调用示例<a name="section642mcpsimp"></a>
 
 更多样例可参考[LINK](更多样例-9.md)。

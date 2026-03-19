@@ -108,8 +108,6 @@ __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__  fp8_e4m3f
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ hifloat8_t*& dst, vector_store_align& src0,
     vector_hifloat8_t src1, uint32_t count)
 {
@@ -118,7 +116,6 @@ __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ hifloat8_t
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__  fp8_e5m2_t*& dst, vector_store_align& src0,
     vector_fp8_e5m2_t src1, uint32_t count)
 {
@@ -236,8 +233,6 @@ __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__  bfloat16_
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ hifloat8_t* dst, vector_store_align& src0,
     vector_hifloat8_t src1, iter_reg& count)
 {
@@ -246,7 +241,6 @@ __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ hifloat8_t
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__  fp8_e4m3fn_t* dst, vector_store_align& src0,
     vector_fp8_e4m3fn_t src1, iter_reg& count)
 {

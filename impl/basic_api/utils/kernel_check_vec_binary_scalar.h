@@ -12,14 +12,11 @@
  * \file kernel_check_vec_binary_scalar.h
  * \brief
  */
-<<<<<<< HEAD
-=======
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic_api/utils/kernel_check_vec_binary_scalar.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_VEC_BINARY_SCALAR_H__
 #endif
->>>>>>> upstream/master
 #ifndef ASCENDC_MODULE_CHECK_VEC_BINARY_SCALAR_H
 #define ASCENDC_MODULE_CHECK_VEC_BINARY_SCALAR_H
 

@@ -27,10 +27,6 @@ target_link_libraries(demo PRIVATE
     dl
 )
 
-<<<<<<< HEAD
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-=======
 # ======================================================================================
 # NPU 编译选项配置
 #
@@ -40,5 +36,4 @@ target_compile_options(demo PRIVATE
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
     # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
->>>>>>> upstream/master
 )

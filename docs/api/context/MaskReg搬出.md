@@ -262,21 +262,12 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 template <typename T>
 __simd_vf__ inline void StoreAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
-<<<<<<< HEAD
-    AscendC::MicroAPI::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        mask = AscendC::MicroAPI::UpdateMask<T>(count);        
-        AscendC::MicroAPI::AddrReg offset = AscendC::MicroAPI::CreateAddrReg<T>(i, oneRepeatSize);
-        AscendC::MicroAPI::LoadAlign(mask, srcAddr, offset);
-        AscendC::MicroAPI::StoreAlign(dstAddr, mask, offset);
-=======
     AscendC::Reg::MaskReg mask;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = AscendC::Reg::UpdateMask<T>(count);        
         AscendC::Reg::AddrReg offset = AscendC::Reg::CreateAddrReg<T>(i, oneRepeatSize);
         AscendC::Reg::LoadAlign(mask, srcAddr, offset);
         AscendC::Reg::StoreAlign(dstAddr, mask, offset);
->>>>>>> upstream/master
     }
 }
 ```

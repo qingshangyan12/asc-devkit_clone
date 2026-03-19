@@ -1179,21 +1179,6 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask)
 __simd_vf__ inline void CastVF(__ubuf__ int16_t* dstAddr, __ubuf__ float* srcAddr, uint32_t count, uint32_t srcRepeatSize, uint32_t dstRepeatSize, uint16_t repeatTimes)
 {
     // castTrait 类变量时需要加static
-<<<<<<< HEAD
-    static constexpr AscendC::MicroAPI::CastTrait castTrait = 
-    {AscendC::MicroAPI::RegLayout::ZERO, AscendC::MicroAPI::SatMode::NO_SAT,AscendC::MicroAPI::MaskMergeMode::ZEROING,AscendC::RoundMode::CAST_RINT};
-   
-   
-    
-    AscendC::MicroAPI::RegTensor<float> srcReg;
-    AscendC::MicroAPI::RegTensor<int16_t> dstReg;
-    AscendC::MicroAPI::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        AscendC::MicroAPI::LoadAlign(srcReg, srcAddr + i * srcRepeatSize);
-        mask = AscendC::MicroAPI::UpdateMask<float>(count);
-        AscendC::MicroAPI::Cast<int16_t, float, castTrait>(dstReg, srcReg, mask);
-        AscendC::MicroAPI::StoreAlign(dstAddr + i * dstRepeatSize, dstReg, mask);
-=======
     static constexpr AscendC::Reg::CastTrait castTrait = 
     {AscendC::Reg::RegLayout::ZERO, AscendC::Reg::SatMode::NO_SAT,AscendC::Reg::MaskMergeMode::ZEROING,AscendC::RoundMode::CAST_RINT};
    
@@ -1207,7 +1192,6 @@ __simd_vf__ inline void CastVF(__ubuf__ int16_t* dstAddr, __ubuf__ float* srcAdd
         mask = AscendC::Reg::UpdateMask<float>(count);
         AscendC::Reg::Cast<int16_t, float, castTrait>(dstReg, srcReg, mask);
         AscendC::Reg::StoreAlign(dstAddr + i * dstRepeatSize, dstReg, mask);
->>>>>>> upstream/master
     }
 }
 ```

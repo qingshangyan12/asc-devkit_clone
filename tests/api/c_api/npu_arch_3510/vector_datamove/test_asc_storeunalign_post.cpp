@@ -39,8 +39,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3_HIF8(class_name, c_api_name, cce_name, data_type)  \
                                                                                                 \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {              \
@@ -67,7 +65,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, int8_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, uint8_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, int16_t);
@@ -79,10 +76,7 @@ TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, hal
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, float);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, bfloat16_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3_HIF8(Vsta, asc_storeunalign_post, vsta, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_3(Vsta, asc_storeunalign_post, vsta, fp4x2_e2m1_t);
@@ -115,8 +109,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4_HIF8(class_name, c_api_name, cce_name, data_type)  \
                                                                                                 \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {              \
@@ -143,7 +135,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, int8_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, uint8_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, int16_t);
@@ -155,10 +146,7 @@ TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, h
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, float);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, bfloat16_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4_HIF8(Vstas, asc_storeunalign_post, vstas, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_4(Vstas, asc_storeunalign_post, vstas, fp4x2_e2m1_t);
