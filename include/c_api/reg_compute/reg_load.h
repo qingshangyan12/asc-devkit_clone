@@ -1422,6 +1422,14 @@ __simd_callee__ inline void asc_scatter(vector_half& dst, __ubuf__ half* src, ve
 
 __simd_callee__ inline void asc_scatter(vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask);
 
+__simd_callee__ inline void asc_scatter(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint16_t index, vector_bool mask);
+
+__simd_callee__ inline void asc_scatter(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask);
+
+__simd_callee__ inline void asc_scatter(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask);
+
+__simd_callee__ inline void asc_scatter(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask);
+
 __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src);
 
 __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset);
