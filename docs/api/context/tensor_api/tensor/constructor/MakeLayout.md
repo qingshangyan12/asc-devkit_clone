@@ -71,7 +71,7 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape, const Stride
 
 ## 调用示例
 
-```
+```cpp
 // 初始化Layout数据结构，获取对应数值
 AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
 AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
