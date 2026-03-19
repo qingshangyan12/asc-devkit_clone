@@ -27,6 +27,7 @@ def get_dtype_limits(data_type):
     if np.issubdtype(data_type, np.floating):
         finfo = np.finfo(data_type)
         return {
+            # 用于边界值/特殊值测试
             'min': finfo.min,
             'max': finfo.max,
             'pos_zero': np.array(+0.0, dtype=data_type),
@@ -34,14 +35,30 @@ def get_dtype_limits(data_type):
             'nan': np.array(np.nan, dtype=data_type),
             'pos_inf': np.array(np.inf, dtype=data_type),
             'neg_inf': np.array(-np.inf, dtype=data_type),
+
+            # 用于正常值测试（验证API基本功能）
+            # 'min': 1.234,
+            # 'max': -0.399,
+            # 'pos_zero': 9.99,
+            # 'neg_zero': -1.88,
+            # 'nan': -6.68,
+            # 'pos_inf': 0.111,
+            # 'neg_inf': 7.777,
         }
     elif np.issubdtype(data_type, np.integer):
         iinfo = np.iinfo(data_type)
         return {
+            # 用于边界值/特殊值测试
             'min': np.array(iinfo.min, dtype=data_type),
             'max': np.array(iinfo.max, dtype=data_type),
             'pos_zero': np.array(+0, dtype=data_type),
             'neg_zero': np.array(-0, dtype=data_type),
+
+            # 用于正常值测试（验证API基本功能）
+            # 'min': 99,
+            # 'max': -88,
+            # 'pos_zero': 6,
+            # 'neg_zero': -3,
         }
     else:
         raise ValueError(f"Unsupported data type: {data_type}")

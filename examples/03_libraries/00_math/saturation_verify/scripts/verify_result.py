@@ -17,10 +17,12 @@ import numpy as np
 
 API_ID_EXP = 1
 API_ID_MUL = 2
+API_ID_ADDS = 3
 
 API_NAME_MAP = {
     1: "exp",
     2: "mul",
+    3: "adds",
 }
 
 RELATIVE_TOL = 1e-6
@@ -159,7 +161,7 @@ def verify_binary_api(output_type, input_x, input_y, api_name="mul"):
     return error_ratio <= ERROR_TOL
 
 
-def verify_result(output_type, api_id, input_x=None, input_y=None):
+def verify_result(output_type, api_id, api_type=1, input_x=None, input_y=None):
     api_name = API_NAME_MAP.get(api_id, "unknown")
     try:
         if api_id == API_ID_EXP:
@@ -167,6 +169,12 @@ def verify_result(output_type, api_id, input_x=None, input_y=None):
                 input_x = "./input/input_x.bin"
             res = verify_single_api(output_type, input_x)
         elif api_id == API_ID_MUL:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_ADDS:
             if input_x is None:
                 input_x = "./input/input_x.bin"
             if input_y is None:
@@ -188,14 +196,16 @@ def verify_result(output_type, api_id, input_x=None, input_y=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2],
-                        help="API ID: 1=exp, 2=mul")
+    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3],
+                        help="API ID: 1=exp, 2=mul, 3=adds")
+    parser.add_argument('-api_type', type=int, default=1, choices=[1, 2, 3],
+                        help="API type: 1=Unary, 2=Binary, 3=BinaryScalar")
     parser.add_argument('-output_type', type=int, default=1, choices=[1, 2, 3, 4],
                         help="Output type: 1=float16, 2=float32, 3=int16, 4=int32")
     parser.add_argument('-input_x', type=str, default="./input/input_x.bin")
     parser.add_argument('-input_y', type=str, required=False, default="./input/input_y.bin")
     args = parser.parse_args()
     
-    res = verify_result(args.output_type, args.api_id, args.input_x, args.input_y)
+    res = verify_result(args.output_type, args.api_id, args.api_type, args.input_x, args.input_y)
     if not res:
         sys.exit(1)
