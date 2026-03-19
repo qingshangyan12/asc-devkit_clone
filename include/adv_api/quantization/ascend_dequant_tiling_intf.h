@@ -7,12 +7,6 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASCEND_DEQUANT_TILING_INTF_H__
-#endif
-
 #ifndef LIB_QUANTIZATION_ASCEND_DEQUANT_TILING_INTF_H
 #define LIB_QUANTIZATION_ASCEND_DEQUANT_TILING_INTF_H
 #include "ascend_dequant_tiling.h"
@@ -22,8 +16,3 @@ typedef void AscendDequantTilingDeprecatedHeader;
 using LibAscendDequantTilingInterface = AscendDequantTilingDeprecatedHeader;
 } // namespace AscendC
 #endif // LIB_QUANTIZATION_ASCEND_DEQUANT_TILING_INTF_H
-
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASCEND_DEQUANT_TILING_INTF_H__)
-#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASCEND_DEQUANT_TILING_INTF_H__
-#endif
