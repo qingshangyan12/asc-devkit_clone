@@ -33,82 +33,49 @@ LoadData3DV2指令以下简称load3dv2，该指令对于二维矩阵的转置能
     目的地址位于L0B上，默认启用转置功能（enTranspose=false时，依然会启用转置功能）。
 
 由于本样例暂不支持输入数据类型为int4b_t，因此本样例展示了以下五种load3dv2在矩阵乘法的使用：
-    <title>Load3Dv2接口场景对照表</title>
-    <style>
-        /* 基础表格样式，保证美观且易读 */
-        table {
-            border-collapse: collapse; /* 合并边框 */
-            width: 80%; /* 表格宽度，可根据需要调整 */
-            margin: 20px auto; /* 居中显示 */
-            font-family: Arial, sans-serif; /* 通用字体 */
-        }
-        th, td {
-            border: 1px solid #333; /* 边框样式 */
-            padding: 12px; /* 单元格内边距 */
-            text-align: center; /* 文字居中 */
-        }
-        th {
-            background-color: #f0f0f0; /* 表头背景色 */
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9; /* 偶数行背景色，提升可读性 */
-        }
-    </style>
-</head>
-<body>
-    <h3>Load3Dv2接口场景对照表</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>scenarioNum</th>
-                <th>输入数据类型</th>
-                <th>A矩阵转置</th>
-                <th>B矩阵转置</th>
-                <th>备注</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>half</td>
-                <td>不转置</td>
-                <td>不转置</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>half</td>
-                <td>转置</td>
-                <td>不转置</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>float</td>
-                <td>不转置</td>
-                <td>不转置</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>float</td>
-                <td>转置</td>
-                <td>不转置</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>int8_t</td>
-                <td>不转置</td>
-                <td>转置</td>
-                <td>-</td>
-            </tr>
-        </tbody>
-    </table>
-    <p style="text-align: center; color: #666; font-size: 14px;">
-        注：输入数据类型为b8时且目的地址位于L0B时，不支持load3dv2指令，因此当scenarioNum=5时，SplitB中调用的是load2d指令。
-    </p>
+<table align="center" style="text-align:center; border-collapse:collapse;">
+    <caption>表1：Load3Dv2接口场景对照表</caption>
+    <thead>
+        <tr>
+            <th style="border:1px solid #000; padding:6px 12px;">scenarioNum</th>
+            <th style="border:1px solid #000; padding:6px 12px;">输入数据类型</th>
+            <th style="border:1px solid #000; padding:6px 12px;">A矩阵转置</th>
+            <th style="border:1px solid #000; padding:6px 12px;">B矩阵转置</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="border:1px solid #000; padding:6px 12px;">1</td>
+            <td style="border:1px solid #000; padding:6px 12px;">half</td>
+            <td style="border:1px solid #000; padding:6px 12px;">不转置</td>
+            <td style="border:1px solid #000; padding:6px 12px;">不转置</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #000; padding:6px 12px;">2</td>
+            <td style="border:1px solid #000; padding:6px 12px;">half</td>
+            <td style="border:1px solid #000; padding:6px 12px;">转置</td>
+            <td style="border:1px solid #000; padding:6px 12px;">不转置</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #000; padding:6px 12px;">3</td>
+            <td style="border:1px solid #000; padding:6px 12px;">float</td>
+            <td style="border:1px solid #000; padding:6px 12px;">不转置</td>
+            <td style="border:1px solid #000; padding:6px 12px;">不转置</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #000; padding:6px 12px;">4</td>
+            <td style="border:1px solid #000; padding:6px 12px;">float</td>
+            <td style="border:1px solid #000; padding:6px 12px;">转置</td>
+            <td style="border:1px solid #000; padding:6px 12px;">不转置</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #000; padding:6px 12px;">5</td>
+            <td style="border:1px solid #000; padding:6px 12px;">int8_t</td>
+            <td style="border:1px solid #000; padding:6px 12px;">不转置</td>
+            <td style="border:1px solid #000; padding:6px 12px;">转置</td>
+        </tr>
+    </tbody>
+</table>
 
   本样例中scenarioNum=3和4分别与样例[mmad_s8_f16_f32_with_A_B_transpose_option](./mmad_s8_f16_f32_with_A_B_transpose_option/README.md)中scenarioNum=10和12场景一致，因此load3dv2指令具体的参数配置和示意图可以参考该样例readme的2.3.1和3.3.1两个小节。
 
