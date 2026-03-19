@@ -137,7 +137,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_fill_l0a](cube_datamove/asc_fill_l0a.md)                           | 将L0A Buffer的Local Memory初始化为某一具体数值。 |
 | [asc_fill_l0b](cube_datamove/asc_fill_l0b.md)                           | 将L0B Buffer的Local Memory初始化为某一具体数值。 |
 | [asc_fill_l1](cube_datamove/asc_fill_l1.md)                             | 将L1 Buffer的Local Memory初始化为某一具体数值。 |
-| [asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)                 | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。 |
+| [asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)                 | 设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b.md)的3D格式搬运接口在L1 Buffer的边界值。 |
 | [asc_load_image_to_cbuf](cube_datamove/asc_load_image_to_cbuf.md)       | 将图像数据从Global Memory搬运到L1 Buffer。 |
 | [asc_copy_l12bt](cube_datamove/asc_copy_l12bt.md)                       | 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。 |
 | [asc_copy_l12fb](cube_datamove/asc_copy_l12fb.md)                       | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
