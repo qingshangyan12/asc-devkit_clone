@@ -51,7 +51,7 @@
 
 namespace AscendC {
 template <typename T>
-__aicore__ inline void DumpTensor(const LocalTensor<T> &input, uint32_t desc, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void DumpTensor(const LocalTensor<T> &input, uint32_t desc, uint32_t dumpSize)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
@@ -63,7 +63,7 @@ __aicore__ inline void DumpTensor(const LocalTensor<T> &input, uint32_t desc, ui
     return;
 }
 template <typename T>
-__aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
@@ -75,7 +75,7 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
     return;
 }
 template <typename T>
-__aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+static __attribute__((noinline)) __aicore__ void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
@@ -88,7 +88,7 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
     return;
 }
 template <typename T>
-__aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+static __attribute__((noinline)) __aicore__ void DumpTensor(const LocalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
@@ -102,7 +102,7 @@ __aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, ui
 }
 
 template <typename T>
-__aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
@@ -121,7 +121,7 @@ __aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t ind
     return;
 }
 template <typename T>
-__aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
@@ -142,14 +142,14 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
 
 #if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
 template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
 #endif
 }
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
@@ -162,7 +162,7 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 using ::printf;
 
 template<typename... Args>
-inline auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)...))
+static __attribute__((noinline)) auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)...))
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     return printf(std::forward<Args>(args)...);
@@ -173,7 +173,7 @@ inline auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)..
 
 #if defined(__NPU_HOST__) || defined(__ASCC_HOST__)
 template <class... Args>
-inline void PRINTF(const char* fmt, Args&&... args)
+static __attribute__((noinline)) void PRINTF(const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
@@ -183,7 +183,7 @@ inline void PRINTF(const char* fmt, Args&&... args)
 
 #else
 template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
@@ -191,7 +191,7 @@ __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 }
 
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void printf(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
@@ -211,7 +211,7 @@ __aicore__ inline void StoreArgsOfInitDump(bool mixFlag, __gm__ uint8_t* dumpAdd
 #endif
 
 template <class... Args>
-__aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void AssertImpl(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
 #ifdef ASCENDC_DUMP_ASSERT_ONLY
