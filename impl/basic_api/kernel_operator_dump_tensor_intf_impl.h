@@ -51,101 +51,63 @@
 
 namespace AscendC {
 template <typename T>
-__aicore__ inline void DumpTensor(const LocalTensor<T> &input, uint32_t desc, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void DumpTensor(const LocalTensor<T> &input, uint32_t desc, uint32_t dumpSize)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    DumpTensorLocal2GMImpl(input, desc, dumpSize);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     DumpTensorLocal2GMImpl(input, desc, dumpSize);
-#endif
 #endif
     return;
 }
 template <typename T>
-__aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    DumpTensorGM2GMImpl(input, desc, dumpSize);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     DumpTensorGM2GMImpl(input, desc, dumpSize);
-#endif
 #endif
     return;
 }
 template <typename T>
-__aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+static __attribute__((noinline)) __aicore__ void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    DumpShapeImpl(shapeInfo);
-    DumpTensorGM2GMImpl(input, desc, dumpSize);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     DumpShapeImpl(shapeInfo);
     DumpTensorGM2GMImpl(input, desc, dumpSize);
-#endif
 #endif
     return;
 }
 template <typename T>
-__aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+static __attribute__((noinline)) __aicore__ void DumpTensor(const LocalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    DumpShapeImpl(shapeInfo);
-    DumpTensorLocal2GMImpl(input, desc, dumpSize);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     DumpShapeImpl(shapeInfo);
     DumpTensorLocal2GMImpl(input, desc, dumpSize);
-#endif
 #endif
     return;
 }
 
 template <typename T>
-__aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
-    if (countOff > input.GetSize()) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
-                        countOff, input.GetSize()); });
-        return;
-    }
-    LocalTensor<T> tmp = input[countOff];
-    DumpTensorLocal2GMImpl(tmp, index, dumpSize);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
     if (countOff > input.GetSize()) {
         ASCENDC_ASSERT((false),
@@ -155,29 +117,16 @@ __aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t ind
     }
     LocalTensor<T> tmp = input[countOff];
     DumpTensorLocal2GMImpl(tmp, index, dumpSize);
-#endif
 #endif
     return;
 }
 template <typename T>
-__aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+static __attribute__((noinline)) __aicore__ void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#if defined(ASCENDC_DUMP) || defined(ASCENDC_ACC_DUMP)
-    if (countOff > input.GetSize()) {
-        ASCENDC_ASSERT((false),
-            { KERNEL_LOG(KERNEL_ERROR, "tensor offset [%d] exceeds limit [%d]",
-                        countOff, input.GetSize()); });
-        return;
-    }
-    GlobalTensor<T> tmp = input[countOff];
-    DumpTensorGM2GMImpl(tmp, index, dumpSize);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
     if (countOff > input.GetSize()) {
         ASCENDC_ASSERT((false),
@@ -187,36 +136,23 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
     }
     GlobalTensor<T> tmp = input[countOff];
     DumpTensorGM2GMImpl(tmp, index, dumpSize);
-#endif
 #endif
     return;
 }
 
 #if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
 template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
 #endif
 }
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void printf(__gm__ const char* fmt, Args&&... args)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
 #endif
 }
 
@@ -226,65 +162,39 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 using ::printf;
 
 template<typename... Args>
-inline auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)...))
+static __attribute__((noinline)) auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)...))
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    return printf(std::forward<Args>(args)...);
-#else
-    return 0;
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     return printf(std::forward<Args>(args)...);
 #else
     return 0;
-#endif
 #endif
 }
 
 #if defined(__NPU_HOST__) || defined(__ASCC_HOST__)
 template <class... Args>
-inline void PRINTF(const char* fmt, Args&&... args)
+static __attribute__((noinline)) void PRINTF(const char* fmt, Args&&... args)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
 #endif
 }
 #endif // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
 
 #else
 template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
 #endif
 }
 
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void printf(__gm__ const char* fmt, Args&&... args)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
 #endif
 }
 #endif // ASCENDC_CPU_DEBUG
@@ -301,22 +211,8 @@ __aicore__ inline void StoreArgsOfInitDump(bool mixFlag, __gm__ uint8_t* dumpAdd
 #endif
 
 template <class... Args>
-__aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
+static __attribute__((noinline)) __aicore__ void AssertImpl(__gm__ const char* fmt, Args&&... args)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#ifdef ASCENDC_DUMP
-#ifdef ASCENDC_DUMP_ASSERT_ONLY
-    if (g_dumpAddrAssertOnlyReserved == nullptr) {
-        InitDump(g_mixFlagAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
-    } else {
-        InitDump(g_mixFlagAssertOnlyReserved, g_dumpAddrAssertOnlyReserved, ONE_CORE_DUMP_SIZE);
-    }
-#endif
-    PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
-#else
-    return;
-#endif
-#else
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
 #ifdef ASCENDC_DUMP_ASSERT_ONLY
     if (g_dumpAddrAssertOnlyReserved == nullptr) {
@@ -328,7 +224,6 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
     PrintfImpl(DumpType::DUMP_ASSERT, fmt, args...);
 #else
     return;
-#endif
 #endif
 }
 
