@@ -16,6 +16,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_ATOMIC_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_ATOMIC_IMPL_H
 
+
 namespace AscendC {
 // atomic_add
 template <typename T>
