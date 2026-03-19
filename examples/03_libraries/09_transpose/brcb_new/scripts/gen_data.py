@@ -85,7 +85,7 @@ def gen_golden_data_simple(scenarioNum, size=None, repeatTime=None,
     # 计算输出大小
     # Brcb: 一次repeat处理8个元素，每个元素广播到32B块
     elements_per_block = one_block_size // input_type.itemsize
-    dst_size = repeat_time * 8 * dst_rep_stride * elements_per_block // dst_rep_stride
+    dst_size = repeat_time * dst_rep_stride * elements_per_block
 
     # 生成输入数据
     input_x = np.random.uniform(min_val, max_val, [src_size]).astype(input_type)

@@ -78,17 +78,9 @@ __aicore__ inline void Gather(LocalTensor<T>& dst, LocalTensor<T>& src,
 
 | 场景 | SIZE | CALC_SIZE |
 |-----|------|-----------|
-| 1-3 | 16384 | 128 |
+| 1-3 | 160 | 128 |
 | 4 | 16384 | 16384 |
-| 5 | 16384 | 16384 |
-
-### 地址分配策略
-
-```cpp
-constexpr uint32_t srcAddr = 0;
-constexpr uint32_t offsetAddr = srcAddr + SIZE * sizeof(T) * 2 + 256;  // 256字节对齐
-constexpr uint32_t dstAddr = offsetAddr + SIZE * sizeof(U) + 256;
-```
+| 5 | 10240 | 10240 |
 
 ## 编译运行
 
@@ -105,7 +97,7 @@ source /usr/local/Ascend/cann/set_env.sh
 ```bash
 mkdir -p build && cd build
 # 使用默认参数编译
-cmake -DSCENARIO_NUM=1 -DSIZE=16384 -DCALC_SIZE=128 ..
+cmake -DSCENARIO_NUM=1 -DSIZE=160 -DCALC_SIZE=128 ..
 make -j
 python3 ../scripts/gen_data.py -scenarioNum 1
 ./demo
@@ -116,7 +108,7 @@ python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/gold
 
 ```bash
 # 自定义参数编译
-cmake -DSCENARIO_NUM=1 -DSIZE=32768 -DCALC_SIZE=256 ..
+cmake -DSCENARIO_NUM=1 -DSIZE=288 -DCALC_SIZE=256 ..
 make -j
 python3 ../scripts/gen_data.py -scenarioNum 1 -calcSize 256
 ./demo
@@ -129,11 +121,3 @@ python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/gold
 test pass!
 ```
 
-## 与动态内存版本对比
-
-| 特性 | 动态内存版本 | 静态内存版本 (本样例) |
-|------|-------------|---------------------|
-| 内存管理 | TPipe + TQue | 静态 LocalTensor |
-| 编程风格 | 类封装 | 函数式模板 |
-| 地址分配 | 运行时动态 | 编译时静态 |
-| 同步机制 | 队列自动同步 | SetFlag/WaitFlag |

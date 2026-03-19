@@ -126,12 +126,3 @@ python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/gold
 test pass!
 ```
 
-## 与动态内存版本对比
-
-| 特性 | 动态内存版本 | 静态内存版本 (本样例) |
-|------|-------------|---------------------|
-| 内存管理 | TPipe + TQue | 静态 LocalTensor |
-| 编程风格 | 类封装 | 函数式模板 |
-| 地址分配 | 运行时动态 | 编译时静态 |
-| 同步机制 | 队列自动同步 | SetFlag/WaitFlag |
-| 场景参数 | 运行时获取 | constexpr 编译时计算 |

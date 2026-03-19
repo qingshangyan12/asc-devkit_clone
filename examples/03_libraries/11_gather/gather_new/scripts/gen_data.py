@@ -47,7 +47,7 @@ def gen_golden_data_simple(scenarioNum, calcSize=None):
         src_base_addr = 0 * input_type.itemsize
     elif scenarioNum == 5:
         # 大数据量测试 float 类型
-        default_count = 1024 * 16
+        default_count = 1024 * 10
         input_type = np.dtype("float32")
         min_val, max_val = get_range_by_dtype(input_type)
         output_type = input_type
