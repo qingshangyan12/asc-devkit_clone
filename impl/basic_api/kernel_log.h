@@ -275,7 +275,7 @@ inline std::string GenBlockStr()
 
 namespace AscendC {
 template <class... Args>
-__aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args);
+static __attribute__((noinline)) __aicore__ void AssertImpl(__gm__ const char* fmt, Args&&... args);
 }
 
 namespace AscendC {
