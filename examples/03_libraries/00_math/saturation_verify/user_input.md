@@ -1,4 +1,4 @@
-1、API 名称（如`Exp`, `Sqrt`, `Mul`）
+1、API 名称（如`Exp`, `Mul`, `Adds`）
 
 用户填写：Reciprocal
 
@@ -13,7 +13,7 @@ template <typename T>
 __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 
 
-3、单目API还是双目API
+3、是单目API？双目API？双目标量API？
 
 用户填写：单目
 
@@ -21,6 +21,6 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 
 用户填写：half/float
 
-5、功能说明（数学含义，如Exp：）
+5、功能说明（数学含义，如Exp）
 
-用户填写：按元素取倒数
+用户填写：将输入的tensor按元素取自然指数
