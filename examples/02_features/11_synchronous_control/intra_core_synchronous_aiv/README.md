@@ -153,36 +153,6 @@ Atlas A2/A3系列产品的硬件架构如下图1所示。由于AIV核内部的�
 
 ### 所有插入的同步汇总
 由图 1、图 2 可分析得到各接口间存在的数据依赖关系（详见代码注释），并依据表 3 在不同接口之间插入相应的多流水同步或单流水同步指令。表 4 和表 5 汇总了本样例中所插入的全部同步指令及其说明，从两表中可以看出，本样例使用了表 2 中除标量单流水同步之外的所有 AIV 核内同步方式。
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* 简单样式，可根据需求修改 */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #000;
-        }
-        th, td {
-            border: 1px solid #000;
-            padding: 8px 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #f5f5f5;
-            font-weight: bold;
-        }
-        /* 方案1：固定宽度（推荐，数值可修改） */
-        .col-hardevent { width: 90px; } /* HardEvent列宽度 */
-        .col-explain { width: calc(100% - 120px); } /* 说明列自适应剩余宽度 */
-        /* 方案2：比例宽度（注释掉方案1，解开下面注释即可使用） */
-        /* .col-hardevent { width: 30%; } */
-        /* .col-explain { width: 70%; } */
-    </style>
-</head>
-<body>
     <table>
     <caption style="font-size: 14px; font-weight: bold; padding-bottom: 8px;">表4：样例中所有多流水同步</caption>
         <thead>
@@ -220,19 +190,7 @@ Atlas A2/A3系列产品的硬件架构如下图1所示。由于AIV核内部的�
             <tr><td class="col-hardevent">PipeBarrier&lt;PIPE_MTE3&gt;()</td><td class="col-explain"> 两次DataCopy（MTE3）搬出到GM的地址都会产生重叠，插入同步能保证dst1Global不会覆盖dst0Global。</td></tr>
         </tbody>
     </table>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
+    
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
