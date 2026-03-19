@@ -8,14 +8,14 @@
 
 ## 功能说明
 
-block内同步指令，与[asc_sync_intra_wait](../asc_sync_intra_wait/asc_sync_intra_wait_arch_3510.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应Vector Core与Cube Core中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他Core对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+block内同步指令，与[asc_sync_intra_wait](asc_sync_intra_wait.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应Vector Core与Cube Core中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他Core对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint8_t sync_id)
-__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id)
-```
+    ```cpp
+    __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint8_t sync_id)
+    __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id)
+    ```
 
 ## 参数说明
 
