@@ -49,3 +49,7 @@ TEST_VECTOR_DATAMOVE_SCATTER_INSTR_0(Vscatter, asc_scatter, vscatter, uint32_t, 
 TEST_VECTOR_DATAMOVE_SCATTER_INSTR_0(Vscatter, asc_scatter, vscatter, bfloat16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_SCATTER_INSTR_0(Vscatter, asc_scatter, vscatter, half, uint16_t);
 TEST_VECTOR_DATAMOVE_SCATTER_INSTR_0(Vscatter, asc_scatter, vscatter, float, uint32_t);
+TEST_VECTOR_DATAMOVE_SCATTER_INSTR_0(Vscatter, asc_scatter, vscatter, fp8_e4m3fn_t, uint16_t);
+TEST_VECTOR_DATAMOVE_SCATTER_INSTR_0(Vscatter, asc_scatter, vscatter, fp8_e5m2_t, uint16_t);
+TEST_VECTOR_DATAMOVE_SCATTER_INSTR_0(Vscatter, asc_scatter, vscatter, fp8_e8m0_t, uint16_t);
+TEST_VECTOR_DATAMOVE_SCATTER_INSTR_0(Vscatter, asc_scatter, vscatter, hifloat8_t, uint16_t);
