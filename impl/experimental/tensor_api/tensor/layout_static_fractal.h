@@ -24,11 +24,11 @@ namespace Te {
 // NZ
 template <typename T, size_t row, size_t column>
 using NZCoordFormat = Shape<Shape<Std::Int<0>, Std::Int<Std::ceil_division(row, FRACTAL_FIXED)>>,
-    Shape<Std::Int<0>, Std::Int<Std::ceil_division(column, C0_ELEMENT<T>)>>;
+    Shape<Std::Int<0>, Std::Int<Std::ceil_division(column, C0_ELEMENT<T>)>>>;
 
 // ZN
 template <typename T, size_t  row, size_t  column>
-using ZNCoordFormat = Shape<Shape<Std::Int<0>, Std::Int<Std::ceil_division(row, C0_ELEMENT<T>)>,
+using ZNCoordFormat = Shape<Shape<Std::Int<0>, Std::Int<Std::ceil_division(row, C0_ELEMENT<T>)>>,
     Shape<Std::Int<0>, Std::Int<Std::ceil_division(column, FRACTAL_FIXED)>>>;
 
 //  ScaleND
@@ -56,7 +56,7 @@ using DNCoordFormat = Shape<Shape<Std::Int<0>, Std::Int<row>>, Shape<Std::Int<0>
 // ZZ
 template <typename T, size_t row, size_t column>
 using ZZCoordFormat = Shape<Shape<Std::Int<0>, Std::Int<Std::ceil_division(row, FRACTAL_FIXED)>>, 
-    Shape<Std::Int<0>, Std::Int<Std::ceil_division(column, C0_ELEMENT<T>)>>; 
+    Shape<Std::Int<0>, Std::Int<Std::ceil_division(column, C0_ELEMENT<T>)>>>; 
 
 // scaleZZ
 template <typename T, size_t row, size_t column>
@@ -115,7 +115,7 @@ using DNStrideFormat = Stride<Stride<Std::Int<0>, Std::Int<1>>, Stride<Std::Int<
 
 // ZN
 template <typename T, size_t  row, size_t  column>
-using ZNShapeFormat = Shape<Shape<Std::Int<C0_ELEMENT<T>>, Std::Int<Std::ceil_division(row, C0_ELEMENT<T>)>,
+using ZNShapeFormat = Shape<Shape<Std::Int<C0_ELEMENT<T>>, Std::Int<Std::ceil_division(row, C0_ELEMENT<T>)>>,
     Shape<Std::Int<FRACTAL_FIXED>, Std::Int<Std::ceil_division(column, FRACTAL_FIXED)>>>; 
 
 template <typename T, size_t  row, size_t  column>
@@ -125,7 +125,7 @@ using ZNStrideFormat = Stride<Stride<Std::Int<1>, Std::Int<C0_ELEMENT<T> * Std::
 // ZZ
 template <typename T, size_t row, size_t column>
 using ZZShapeFormat = Shape<Shape<Std::Int<FRACTAL_FIXED>, Std::Int<Std::ceil_division(row, FRACTAL_FIXED)>>,
-    Shape<Std::Int<C0_ELEMENT<T>>, Std::Int<Std::ceil_division(column, C0_ELEMENT<T>)>>;
+    Shape<Std::Int<C0_ELEMENT<T>>, Std::Int<Std::ceil_division(column, C0_ELEMENT<T>)>>>;
 
 template <typename T, size_t row, size_t column>
 using ZZStrideFormat = Stride<Stride<Std::Int<C0_ELEMENT<T>>, Std::Int<FRACTAL_FIXED * Std::ceil_align(column, C0_ELEMENT<T>)>>,
