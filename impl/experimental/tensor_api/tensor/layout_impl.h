@@ -56,7 +56,8 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
 template <typename Coord, typename LayoutType, typename TensorType>
  __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const LocalTensor<TensorType>& tileTensor) 
 {
-    static_assert(tileTensor.rank == LayoutType::rank, "tensor rank is not equal layout");
+    using TensorLayoutType = typename LocalTensor<TensorType>::layoutType;
+    static_assert(TensorLayoutType::rank == LayoutType::rank, "Tensor Rank must be equal to Layout rank");
 
     auto innerRow = Std::get<0>(Std::get<0>(layout.Shape()));
     auto innerCol = Std::get<0>(Std::get<1>(layout.Shape()));
