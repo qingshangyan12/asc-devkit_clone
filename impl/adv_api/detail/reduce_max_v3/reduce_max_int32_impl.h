@@ -413,6 +413,7 @@ __aicore__ inline void BlockLevelReduce(const LocalTensor<T>& dst,
 // ============================================================================
 // Pattern AR: [M, N] -> [M, 1], reduce along the last axis (N)
 // Each row is reduced to a single maximum value
+// Reference: reduce_prod_v220_impl.h ReduceProdByLastAxis
 template <bool isReuseSource = false>
 __aicore__ inline void ReduceMaxInt32AR(const LocalTensor<int32_t>& dstTensor,
                                          const LocalTensor<int32_t>& srcTensor,
@@ -425,18 +426,28 @@ __aicore__ inline void ReduceMaxInt32AR(const LocalTensor<int32_t>& dstTensor,
     BinaryRepeatParams defaultParam;
     UnaryRepeatParams defaultUnaryParam;
     
-    // Allocate aligned buffer for intermediate row results
-    // Each row result is stored at rowResults[row * elePerBlk] for 32B alignment
-    // Reference: reduce_prod_v220_impl.h uses similar pattern
+    // Allocate buffers based on isReuseSource
+    // Reference: reduce_prod_v220_impl.h line 83
     LocalTensor<int32_t> rowResults = tmpTensor;
-    LocalTensor<int32_t> workBuffer = tmpTensor[firstAxis * elePerBlk];
+    LocalTensor<int32_t> workBuffer = isReuseSource ? tmpTensor : tmpTensor[firstAxis * elePerBlk];
+    
+    // finalResStored: source tensor for GatherMask extraction
+    // isReuseSource = true: results stored in srcTensor (spaced by padLast)
+    // isReuseSource = false: results stored in rowResults (compact)
+    LocalTensor<int32_t> finalResStored = isReuseSource ? srcTensor : rowResults;
+    
+    // countstride for GatherMask: controls source address stride
+    // isReuseSource = true: results at src[row * padLast], stride = padLast / elePerBlk
+    // isReuseSource = false: results at rowResults[row * elePerBlk], stride = 1
+    uint16_t countStride = isReuseSource ? static_cast<uint16_t>(padLast / elePerBlk) : 1;
     
     // Process each row independently
     for (uint32_t row = 0; row < firstAxis; row++) {
         LocalTensor<int32_t> rowSrc = srcTensor[row * padLast];
-        // Key change: use aligned rowResults instead of dstTensor[row]
-        // This ensures 32B alignment for Adds in BrcbReduceToSingle
-        LocalTensor<int32_t> rowDst = rowResults[row * elePerBlk];  // 32B aligned!
+        // rowDst: destination for this row's result
+        // isReuseSource = true: store in srcTensor[row * padLast] (reuse source space)
+        // isReuseSource = false: store in rowResults[row * elePerBlk] (32B aligned)
+        LocalTensor<int32_t> rowDst = isReuseSource ? rowSrc : rowResults[row * elePerBlk];
         
         // Reduce this row to a single value
         if (lastAxis <= elePerBlk) {
@@ -500,9 +511,9 @@ __aicore__ inline void ReduceMaxInt32AR(const LocalTensor<int32_t>& dstTensor,
     Duplicate<uint32_t>(patternTensor, 1u, elePerBlk);
     PipeBarrier<PIPE_V>();
     
-    GatherMaskParams gatherMaskParam = {1, static_cast<uint16_t>(firstAxis), 1, 0};
+    GatherMaskParams gatherMaskParam = {1, static_cast<uint16_t>(firstAxis), countStride, 0};
     uint64_t rsvdCnt;
-    GatherMask<int32_t, uint32_t>(dstTensor, rowResults, patternTensor, 
+    GatherMask<int32_t, uint32_t>(dstTensor, finalResStored, patternTensor, 
                                    true, elePerBlk, gatherMaskParam, rsvdCnt);
 }
 
@@ -523,80 +534,72 @@ __aicore__ inline void ReduceMaxInt32RA(const LocalTensor<int32_t>& dstTensor,
     BinaryRepeatParams defaultParam;
     UnaryRepeatParams defaultUnaryParam;
     
-    // Binary reduction along the first axis
-    // Each iteration halves the number of rows
+    // Reference: BinaryReduceByFirstAxis line 475
+    // isReuseSource = true: work directly on srcTensor
+    // isReuseSource = false: use tmpTensor as work buffer
+    LocalTensor<int32_t> currBuff = isReuseSource ? srcTensor : tmpTensor;
     
-    uint32_t currentRows = firstAxis;
-    uint32_t halfRows = currentRows / 2;
+    // Find closest power of 2 for binary reduction
+    uint32_t k = FindClosestPowerOfTwo(firstAxis);
+    uint32_t splitK = 1 << k;
+    uint32_t remain = firstAxis - splitK;
     
-    // Use ping-pong buffers for intermediate results
-    LocalTensor<int32_t> currentSrc = srcTensor;
-    LocalTensor<int32_t> currentDst = tmpTensor;
-    bool useTmpDst = true;
-    
-    // Set mask to count mode for all operations
     SetMaskCount();
     
-    // Handle odd number of rows: combine the last row with the result
-    // First, we'll process pairs of rows
-    
-    while (currentRows > 1) {
-        halfRows = currentRows / 2;
-        
-        // Compare each pair of rows: row[i] and row[i + halfRows]
-        // Result stored in currentDst[0:halfRows * padLast]
-        for (uint32_t row = 0; row < halfRows; row++) {
-            LocalTensor<int32_t> src0 = currentSrc[row * padLast];
-            LocalTensor<int32_t> src1 = currentSrc[(row + halfRows) * padLast];
-            LocalTensor<int32_t> dstRow = currentDst[row * padLast];
-            
-            // Compare full row (use lastAxis for actual data, not padLast)
-            SetVectorMask<int32_t, MaskMode::COUNTER>(0, lastAxis);
-            VMaxImpl<int32_t>(dstRow, src0, src1, MASK_PLACEHOLDER, 1, defaultParam);
+    if constexpr (isReuseSource) {
+        // isReuseSource = true: reduce directly on srcTensor
+        // Handle remaining rows (non-power-of-2 case)
+        if (remain != 0) {
+            // Combine remaining rows with the main block
+            SetVectorMask<int32_t, MaskMode::COUNTER>(0, padLast * remain);
+            VMaxImpl<int32_t>(srcTensor, srcTensor, srcTensor[splitK * padLast], 
+                              MASK_PLACEHOLDER, 1, defaultParam);
+            PipeBarrier<PIPE_V>();
         }
-        
-        // Handle odd row if exists
-        if (currentRows % 2 == 1) {
-            // Copy the last row to dstBuffer
-            LocalTensor<int32_t> lastSrcRow = currentSrc[(currentRows - 1) * padLast];
-            LocalTensor<int32_t> lastDstRow = currentDst[halfRows * padLast];
-            
-            // Copy last row using Adds with 0 as a copy operation
-            SetVectorMask<int32_t, MaskMode::COUNTER>(0, lastAxis);
-            Adds<int32_t, false>(lastDstRow, lastSrcRow, static_cast<int32_t>(0), 
-                                 MASK_PLACEHOLDER, 1, defaultUnaryParam);
-            halfRows++;  // Include the odd row in the count
-        }
-        
-        PipeBarrier<PIPE_V>();
-        
-        // Update for next iteration
-        currentRows = halfRows;
-        
-        // Swap buffers
-        if (useTmpDst) {
-            currentSrc = tmpTensor;
-            currentDst = srcTensor;  // Reuse source as intermediate buffer
-        } else {
-            currentSrc = srcTensor;
-            currentDst = tmpTensor;
-        }
-        useTmpDst = !useTmpDst;
-    }
-    
-    // Final result is in currentSrc[0:padLast]
-    // Copy to dstTensor using Adds with 0 as a copy operation
-    SetVectorMask<int32_t, MaskMode::COUNTER>(0, lastAxis);
-    if (!useTmpDst) {
-        // Result is in tmpTensor, copy to dstTensor
-        Adds<int32_t, false>(dstTensor, tmpTensor, static_cast<int32_t>(0), 
-                             MASK_PLACEHOLDER, 1, defaultUnaryParam);
     } else {
-        // Result is in srcTensor (was used as intermediate buffer)
-        Adds<int32_t, false>(dstTensor, srcTensor, static_cast<int32_t>(0), 
-                             MASK_PLACEHOLDER, 1, defaultUnaryParam);
+        // isReuseSource = false: use tmpTensor as work buffer
+        // Handle remaining rows (non-power-of-2 case)
+        if (remain != 0) {
+            // First copy main block to tmpTensor
+            SetVectorMask<int32_t, MaskMode::COUNTER>(0, splitK * padLast);
+            Adds<int32_t, false>(tmpTensor, srcTensor, static_cast<int32_t>(0), 
+                                 MASK_PLACEHOLDER, 1, defaultUnaryParam);
+            PipeBarrier<PIPE_V>();
+            // Combine remaining rows
+            SetVectorMask<int32_t, MaskMode::COUNTER>(0, padLast * remain);
+            VMaxImpl<int32_t>(tmpTensor, tmpTensor, srcTensor[splitK * padLast], 
+                              MASK_PLACEHOLDER, 1, defaultParam);
+            PipeBarrier<PIPE_V>();
+        } else if (splitK > 1) {
+            // Binary reduce from srcTensor to tmpTensor
+            splitK >>= 1;
+            SetVectorMask<int32_t, MaskMode::COUNTER>(0, padLast * splitK);
+            VMaxImpl<int32_t>(tmpTensor, srcTensor, srcTensor[splitK * padLast], 
+                              MASK_PLACEHOLDER, 1, defaultParam);
+            PipeBarrier<PIPE_V>();
+        } else {
+            // Single row, copy directly to dstTensor
+            SetVectorMask<int32_t, MaskMode::COUNTER>(0, lastAxis);
+            Adds<int32_t, false>(dstTensor, srcTensor, static_cast<int32_t>(0), 
+                                 MASK_PLACEHOLDER, 1, defaultUnaryParam);
+            PipeBarrier<PIPE_V>();
+            return;
+        }
     }
     
+    // Binary reduce the remaining 2^k rows
+    while (splitK > 1) {
+        splitK >>= 1;
+        SetVectorMask<int32_t, MaskMode::COUNTER>(0, padLast * splitK);
+        VMaxImpl<int32_t>(currBuff, currBuff, currBuff[splitK * padLast], 
+                          MASK_PLACEHOLDER, 1, defaultParam);
+        PipeBarrier<PIPE_V>();
+    }
+    
+    // Copy final result to dstTensor
+    SetVectorMask<int32_t, MaskMode::COUNTER>(0, lastAxis);
+    Adds<int32_t, false>(dstTensor, currBuff, static_cast<int32_t>(0), 
+                         MASK_PLACEHOLDER, 1, defaultUnaryParam);
     PipeBarrier<PIPE_V>();
 }
 
@@ -665,7 +668,14 @@ inline void GetReduceMaxInt32TmpSize(const uint32_t srcShape[2],
     constexpr uint32_t BRCB_TMP_SIZE = 288;
     
     if (isReuseSource) {
-        maxValue = minValue = 0U;
+        // isReuseSource = true: reuse srcTensor for intermediate results
+        // AR mode: still needs Brcb work buffer (288 bytes)
+        // RA mode: no tmp buffer needed (binary reduction on srcTensor directly)
+        if (pattern == ReducePattern::AR) {
+            maxValue = minValue = BRCB_TMP_SIZE;  // 288 bytes for Brcb work buffer
+        } else {
+            maxValue = minValue = 0U;  // RA mode: no tmp buffer needed
+        }
         return;
     }
     
