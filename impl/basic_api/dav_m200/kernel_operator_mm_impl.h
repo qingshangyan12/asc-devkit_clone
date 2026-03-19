@@ -53,7 +53,7 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
                 loadDataParam.dstGap, loadDataParam.sid, 0, inc);
         }
     }
-    
+
 #endif
 }
 
@@ -76,7 +76,7 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
                 loadDataParam.dstGap, loadDataParam.sid, 0, inc);
         }
     }
-    
+
 #endif
 }
 
@@ -252,7 +252,7 @@ __aicore__ inline void LoadData3DV2L12L0ACal(__ca__ T* dst, __cbuf__ T* src,
             loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
             loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
             loadDataParams.enTranspose, loadDataParams.channelSize);
-    }   
+    }
 #endif
 }
 
@@ -273,7 +273,7 @@ __aicore__ inline void LoadData3DV2L12L0BCal(__cb__ T* dst, __cbuf__ T* src,
                 loadDataParams.mStartPt, loadDataParams.strideW, loadDataParams.strideH, loadDataParams.filterW,
                 loadDataParams.filterH, loadDataParams.dilationFilterW, loadDataParams.dilationFilterH,
                 loadDataParams.enTranspose, loadDataParams.channelSize);
-    }    
+    }
 #endif
 }
 
@@ -387,12 +387,12 @@ __aicore__ inline void MmadCal(__cc__ T* c, __ca__ U* a, __cb__ S* b, const Mmad
         "Dst: half, src0: half, src1: half; Dst: float, src0: half, src1: half"
         "Dst: int32_t, src0: int4b_t, src1: int4b_t");});
     if constexpr ((IsSameType<U, int4b_t>::value) && (IsSameType<S, int4b_t>::value)) {
-        ASCENDC_ASSERT(mmadParams.k % 2 == 0, 
+        ASCENDC_ASSERT(mmadParams.k % 2 == 0,
                         {KERNEL_LOG(KERNEL_ERROR, "When src0 and src1 are int4b_t, k must be even number.");});
         mad_s4(c, a, b, mmadParams.m,mmadParams.k, mmadParams.n, cmatrixInitVal);
     } else {
         mad(c, a, b, mmadParams.m, mmadParams.k, mmadParams.n, cmatrixInitVal);
-    } 
+    }
 #endif
 }
 
@@ -417,7 +417,7 @@ __aicore__ inline void LoadDataWithSparseCal(const LocalTensor<T> &dst, const Lo
     ASCENDC_REPORT_NOT_SUPPORT(false, "LoadDataWithSparse");
 }
 
-template <typename T = int8_t, typename std::enable_if<IsSameType<PrimT<T>, int8_t>::value, bool>::type = true> 
+template <typename T = int8_t, typename std::enable_if<IsSameType<PrimT<T>, int8_t>::value, bool>::type = true>
 __aicore__ inline void LoadUnzipIndexCal(const GlobalTensor<T> &src, uint32_t numOfIndexTabEntry)
 {
 #if ASCENDC_CPU_DEBUG
@@ -619,3 +619,5 @@ __aicore__ inline void LoadDataUnzipToL0ACal(__ca__ T *dst, __gm__ T *src)
 #undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_
 #undef UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H
 #endif
+
+
