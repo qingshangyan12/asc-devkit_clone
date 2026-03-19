@@ -5003,42 +5003,42 @@ __simd_callee__ inline void asc_clear_ar_spr()
 }
 
 // ===================asc_set_va_reg=====================
-__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array)
 {
     asc_set_va_reg_impl(addr, src_array);
 }
  	 
-__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_array)
 {
     asc_set_va_reg_impl(addr, src_array);
 }
 
-__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t** src_array)
 {
     asc_set_va_reg_impl(addr, src_array);
 }
 
-__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t** src_array)
 {
     asc_set_va_reg_impl(addr, src_array);
 }
 
-__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half** src_array)
 {
     asc_set_va_reg_impl(addr, src_array);
 }
 
-__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t** src_array)
 {
     asc_set_va_reg_impl(addr, src_array);
 }
 
-__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_array)
 {
     asc_set_va_reg_impl(addr, src_array);
 }
 
-__simd_callee__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array)
+__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array)
 {
     asc_set_va_reg_impl(addr, src_array);
 }
