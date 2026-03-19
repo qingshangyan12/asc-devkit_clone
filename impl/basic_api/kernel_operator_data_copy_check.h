@@ -301,8 +301,8 @@ __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const Glob
 
     CheckNd2NzParamsCommon(intriParams, apiName);
     ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::L1 || dstHwPos == Hardware::UB),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor route in %s, supported routes are GM -> UB / "
-        "L1, current dst TPosition is %s.\n", apiName, GetTPositionName(dstPos)));
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor position in %s, supported positions are "
+        "A1 / B1 / VECIN, current position is %s.\n", apiName, GetTPositionName(dstPos)));
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
     ASCENDC_DEBUG_ASSERT((dstRequiredBytes <= dstTensorSizeBytes), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
         "check dstLocal size in %s, tensor size needs to be at least %llu bytes, while current tensor size is only "
@@ -325,10 +325,10 @@ __aicore__ inline void CheckDataCopyTensor(const LocalTensor<T>& dst, const Loca
 
     CheckNd2NzParamsCommon(intriParams, apiName);
     ASCENDC_DEBUG_ASSERT((srcHwPos == Hardware::UB), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check src tensor "
-        "route in %s, supported route is UB -> L1, current src TPosition is %s.\n", apiName,
+        "position in %s, supported positions are VECIN / VECCALC / VECOUT, current position is %s.\n", apiName,
         GetTPositionName(srcPos)));
     ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::L1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dst tensor "
-        "route in %s, supported route is UB -> L1, current dst TPosition is %s.\n", apiName,
+        "position in %s, supported positions are TSCM, current position is %s.\n", apiName,
         GetTPositionName(dstPos)));
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);

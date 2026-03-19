@@ -18,11 +18,10 @@
 #include "kernel_log.h"
 #include "utils/kernel_utils_ceil_oom_que.h"
 #include "utils/kernel_utils_constants.h"
-#include "kernel_struct_fixpipe.h"
 #include "kernel_tensor.h"
-#include "kernel_struct_mm.h"
 
 namespace AscendC {
+
 template <typename T>
 struct NamedTensor {
     __aicore__ NamedTensor(const LocalTensor<T>& tensorIn, const __gm__ char* tensorNameIn)
@@ -102,8 +101,8 @@ __aicore__ inline void CheckTensorAlignment(const LocalTensor<T>& inputTensor, u
     tensorAddr = tensorAddr -
         reinterpret_cast<uint64_t>(ConstDefiner::Instance().hardwareCpuBufferMap.at(positionHardMap.at(tensorPos)));
 #endif
-    ASCENDC_DEBUG_ASSERT((tensorAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s start "
-        "address alignment in %s, its start address must align with %u bytes, current start address is %llu.\n",
+    ASCENDC_DEBUG_ASSERT((tensorAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s tensor "
+        "start address alignment in %s, its start address must align with %u bytes, current start address is %llu.\n",
         tensorName, apiName, alignBytes, static_cast<unsigned long long>(tensorAddr)));
 }
 
@@ -117,47 +116,70 @@ __aicore__ inline void CheckValueRange(T value, T valueLow, T valueHigh, const _
         int64_t castHigh = static_cast<int64_t>(valueHigh);
         ASCENDC_DEBUG_ASSERT((value <= valueHigh && value >= valueLow), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
             "check %s value in %s, its valid range is [%lld, %lld], current value is %lld.\n", paramName, apiName,
-            castLow, castHigh, castValue));
+            static_cast<long long>(castLow), static_cast<long long>(castHigh), static_cast<long long>(castValue)));
     } else if constexpr (SupportType<T, uint8_t, uint16_t, uint32_t, uint64_t>()) {
         uint64_t castValue = static_cast<uint64_t>(value);
         uint64_t castLow = static_cast<uint64_t>(valueLow);
         uint64_t castHigh = static_cast<uint64_t>(valueHigh);
         ASCENDC_DEBUG_ASSERT((value <= valueHigh && value >= valueLow), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
             "check %s value in %s, its valid range is [%llu, %llu], current value is %llu.\n", paramName, apiName,
-            castLow, castHigh, castValue));
+            static_cast<unsigned long long>(castLow), static_cast<unsigned long long>(castHigh),
+            static_cast<unsigned long long>(castValue)));
     } else {
         ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Current dtype is not supported for check "
             "function CheckValueRange.\n"));
     }
 }
 
-template <typename T>
+__aicore__ inline bool IsMaskNorm()
+{
+    int64_t ctrlValue = get_ctrl();
+    int64_t modeValue = (ctrlValue >> 56) & 1ULL;
+    return (modeValue == 0);    // 0: norm, 1: counter
+}
+
+// mask check:
+// m200: when norm mode, not support both mask 0. When calculation are executed, it will trigger error
+// m200 + c220: when counter mode, mask should be in range [0, UINT32_MAX]
+template <typename T, bool isSetMask = true>
 __aicore__ inline void CheckMaskArray(const uint64_t mask[], const __gm__ char* apiName)
 {
-    ASCENDC_DEBUG_ASSERT((mask != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask[] in %s, "
-        "it is nullptr.\n", apiName));
-    if constexpr (sizeof(T) == 2) {
-        ASCENDC_DEBUG_ASSERT(!(mask[0] == 0 && mask[1] == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
-            "mask[] value in %s, when sizeof(T) == 2, mask[0] and mask[1] cannot be both 0.\n", apiName));
-    } else if constexpr (sizeof(T) == 4) {
-        ASCENDC_DEBUG_ASSERT((mask[0] != 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask[] value in %s, "
-            "when sizeof(T) == 4, mask[0] cannot be 0.\n", apiName));
-    } else if constexpr (sizeof(T) == 8) {
-        ASCENDC_DEBUG_ASSERT((mask[0] != 0 && mask[0] <= UINT32_MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
-            "check mask[] value in %s, when sizeof(T) == 8, mask[0] should be in range (0, UINT32_MAX], current value "
-            "is %llu.\n", apiName, mask[0]));
+    ASCENDC_DEBUG_ASSERT((mask != nullptr), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask[] in %s, it is "
+        "nullptr.\n", apiName));
+    if constexpr(!isSetMask) {
+        return;   // when isSetMask = false, use previous mask. Thus no need for check.
+    }
+#if __NPU_ARCH__ == 2002
+    ASCENDC_DEBUG_ASSERT(!(IsMaskNorm() && mask[0] ==0 && mask[1] == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to "
+        "check mask[] value in %s, when in norm mode, mask cannot be both 0 on current platform.\n", apiName));
+#endif
+    if constexpr (sizeof(T) == 8) {
+        // norm and counter both need mask[0] in range [0, UINT32_MAX]
+        ASCENDC_DEBUG_ASSERT((mask[0] <= UINT32_MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask[] value "
+            "in %s, when sizeof(T) == 8, mask[0] should be in range [0, UINT32_MAX], current value is %llu.\n", apiName,
+            mask[0]));
     }
 }
 
-template <typename T>
+template <typename T, bool isSetMask = true>
 __aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* apiName)
 {
+    if constexpr(!isSetMask) {
+        return;   // when isSetMask = false, use previous mask. Thus no need for check.
+    }
+
+    if (!IsMaskNorm()) {
+        ASCENDC_DEBUG_ASSERT((mask <= UINT32_MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value when "
+            "counter mode in %s, mask should be in range [0, UINT32_MAX], current value is %llu.\n", apiName, mask));
+        return;
+    }
+
     if constexpr (sizeof(T) == 2) {
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 2" , apiName);
+        CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 2" , apiName);
     } else if constexpr (sizeof(T) == 4) {
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 4" , apiName);
+        CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 4" , apiName);
     } else if constexpr (sizeof(T) == 8) {
-        CheckValueRange<uint64_t>(mask, 1, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 8" , apiName);
+        CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 8" , apiName);
     }
 }
 
