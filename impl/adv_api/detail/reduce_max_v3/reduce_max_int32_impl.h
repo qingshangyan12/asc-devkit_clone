@@ -246,20 +246,12 @@ __aicore__ inline void BrcbReduceToSingle(const LocalTensor<T>& dst,
     VMaxImpl<T>(brcbDst, brcbDst, brcbDst[halfElems], MASK_PLACEHOLDER, 1, smallDataParam);
     PipeBarrier<PIPE_V>();
     
-    // Step 4: Extract result using GatherMask (supports non-aligned dst)
-    // Maximum value is in brcbDst[0], extract it to dst[0]
-    // Reuse prepareBuffer (tmpBuffer[0:8]) as pattern tensor
-    LocalTensor<uint32_t> patternTensor = prepareBuffer.template ReinterpretCast<uint32_t>();
+    // Step 4: Write result to dst using Adds (dst is guaranteed 32B aligned by caller)
+    // Result is in brcbDst[0], copy to dst[0]
     SetMaskCount();
-    SetVectorMask<uint32_t, MaskMode::COUNTER>(0, 8);
-    Duplicate<uint32_t>(patternTensor, 1u, 8);
+    SetVectorMask<T, MaskMode::COUNTER>(0, 1);
+    Adds<T, false>(dst, brcbDst, static_cast<T>(0), MASK_PLACEHOLDER, 1, defaultUnaryParam);
     PipeBarrier<PIPE_V>();
-
-    // Extract first element from brcbDst to dst using GatherMask
-    // GatherMaskParams: {repeat, lastAxis, countstride, startIndex}
-    GatherMaskParams gatherMaskParam = {1, 1, 1, 0};
-    uint64_t rsvdCnt;
-    GatherMask<T, uint32_t>(dst, brcbDst, patternTensor, true, INT32_ELEM_PER_BLK, gatherMaskParam, rsvdCnt);
 }
 
 // ============================================================================
@@ -433,11 +425,18 @@ __aicore__ inline void ReduceMaxInt32AR(const LocalTensor<int32_t>& dstTensor,
     BinaryRepeatParams defaultParam;
     UnaryRepeatParams defaultUnaryParam;
     
+    // Allocate aligned buffer for intermediate row results
+    // Each row result is stored at rowResults[row * elePerBlk] for 32B alignment
+    // Reference: reduce_prod_v220_impl.h uses similar pattern
+    LocalTensor<int32_t> rowResults = tmpTensor;
+    LocalTensor<int32_t> workBuffer = tmpTensor[firstAxis * elePerBlk];
+    
     // Process each row independently
     for (uint32_t row = 0; row < firstAxis; row++) {
         LocalTensor<int32_t> rowSrc = srcTensor[row * padLast];
-        LocalTensor<int32_t> rowDst = dstTensor[row];
-        LocalTensor<int32_t> rowTmp = tmpTensor;
+        // Key change: use aligned rowResults instead of dstTensor[row]
+        // This ensures 32B alignment for Adds in BrcbReduceToSingle
+        LocalTensor<int32_t> rowDst = rowResults[row * elePerBlk];  // 32B aligned!
         
         // Reduce this row to a single value
         if (lastAxis <= elePerBlk) {
@@ -450,7 +449,7 @@ __aicore__ inline void ReduceMaxInt32AR(const LocalTensor<int32_t>& dstTensor,
                                      MASK_PLACEHOLDER, 1, defaultUnaryParam);
                 PipeBarrier<PIPE_V>();
             } else {
-                BinaryReduceToSingle<int32_t>(rowDst, rowSrc, rowTmp, lastAxis);
+                BinaryReduceToSingle<int32_t>(rowDst, rowSrc, workBuffer, lastAxis);
             }
         } else {
             // Large row: > 8 elements
@@ -458,8 +457,8 @@ __aicore__ inline void ReduceMaxInt32AR(const LocalTensor<int32_t>& dstTensor,
             uint32_t blkCount = lastAxis / elePerBlk;
             uint32_t blkTail = lastAxis % elePerBlk;
             
-            // First, copy first block to tmpTensor using Adds
-            LocalTensor<int32_t> accumBuffer = rowTmp;
+            // First, copy first block to workBuffer using Adds
+            LocalTensor<int32_t> accumBuffer = workBuffer;
             
             SetMaskCount();
             SetVectorMask<int32_t, MaskMode::COUNTER>(0, elePerBlk);
@@ -487,11 +486,24 @@ __aicore__ inline void ReduceMaxInt32AR(const LocalTensor<int32_t>& dstTensor,
             }
             
             // Step 2: Reduce accumBuffer (8 elements) to single value
-            BinaryReduceToSingle<int32_t>(rowDst, accumBuffer, rowTmp[elePerBlk], elePerBlk);
+            BinaryReduceToSingle<int32_t>(rowDst, accumBuffer, workBuffer[elePerBlk], elePerBlk);
         }
         
         PipeBarrier<PIPE_V>();
     }
+    
+    // Finally, extract all row results to dstTensor using GatherMask
+    // Reference: reduce_prod_v220_impl.h lines 126-131
+    LocalTensor<uint32_t> patternTensor = workBuffer.template ReinterpretCast<uint32_t>();
+    SetMaskCount();
+    SetVectorMask<uint32_t, MaskMode::COUNTER>(0, elePerBlk);
+    Duplicate<uint32_t>(patternTensor, 1u, elePerBlk);
+    PipeBarrier<PIPE_V>();
+    
+    GatherMaskParams gatherMaskParam = {1, static_cast<uint16_t>(firstAxis), 1, 0};
+    uint64_t rsvdCnt;
+    GatherMask<int32_t, uint32_t>(dstTensor, rowResults, patternTensor, 
+                                   true, elePerBlk, gatherMaskParam, rsvdCnt);
 }
 
 // ============================================================================
@@ -659,19 +671,25 @@ inline void GetReduceMaxInt32TmpSize(const uint32_t srcShape[2],
     
     if (pattern == ReducePattern::AR) {
         // AR mode: reduce along last axis [M, N] -> [M]
-        // Need tmp buffer for each row's intermediate reduction
+        // Buffer layout: rowResults (first * elePerBlk) + workBuffer
+        // - rowResults: aligned buffer for storing each row's result (first * 8 elements)
+        // - workBuffer: temporary space for binary reduction
+        
+        // Row results buffer size: first * 8 * 4 = first * 32 bytes
+        uint32_t rowResultsSize = first * elePerBlk * INT32_BYTES;
+        
         if (last <= elePerBlk) {
             // Small row: <= 8 elements, need Brcb reduction space
-            // 32 bytes prep buffer + 256 bytes Brcb output = 288 bytes
-            maxValue = minValue = BRCB_TMP_SIZE;
+            // rowResults + 288 bytes Brcb space
+            maxValue = minValue = rowResultsSize + BRCB_TMP_SIZE;
         } else if (last <= elePerRep) {
             // Medium row: 9-64 elements
-            // Need first * 8 elements for block accumulation + 256 bytes for final Brcb
-            maxValue = minValue = first * elePerBlk * INT32_BYTES + 256;
+            // rowResults + 256 bytes for final Brcb reduction
+            maxValue = minValue = rowResultsSize + 256;
         } else {
             // Large row: > 64 elements
-            // Need first * 64 elements for block accumulation + 256 bytes for final Brcb
-            maxValue = minValue = first * elePerRep * INT32_BYTES + 256;
+            // rowResults + 256 bytes for final Brcb reduction
+            maxValue = minValue = rowResultsSize + 256;
         }
     } else {
         // RA mode: reduce along first axis [M, N] -> [N]
