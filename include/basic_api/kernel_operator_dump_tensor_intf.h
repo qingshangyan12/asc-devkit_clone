@@ -39,7 +39,7 @@ template <typename T>
 static __attribute__((noinline)) __aicore__ void DumpTensor(const LocalTensor<T>& tensor, uint32_t desc,
     uint32_t dumpSize, const ShapeInfo& shapeInfo);
 template <typename T>
-static __attribute__((noinline)) _aicore__ void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc,
+static __attribute__((noinline)) __aicore__ void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc,
     uint32_t dumpSize, const ShapeInfo& shapeInfo);
 template <typename T>
 static __attribute__((noinline)) __aicore__ void DumpAccChkPoint(const LocalTensor<T> &tensor,
