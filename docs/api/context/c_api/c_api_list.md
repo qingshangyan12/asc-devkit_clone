@@ -203,6 +203,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 |   API名称   |   说明   |
 |----------|-----------|
+| [asc_release_buf(A5)](sync/asc_release_buf/asc_release_buf_arch_3510.md)| 释放缓存。 |
+| [asc_sync_intra_wait](sync/asc_sync_intra_wait/asc_sync_intra_wait_arch_3510.md)| 等待FFTS块/子块同步标志。 |
+| [asc_sync_intra_arrive](sync/asc_sync_intra_wait/asc_sync_intra_wait_arch_3510.md)| 向FFTS块/子块同步寄存器发送同步信号。 |
 | [asc_sync_notify](sync/asc_sync_notify.md)| 设置同步标志。 |
 | [asc_sync_wait](sync/asc_sync_wait.md)| 等待同步标志。 |
 | [asc_sync_pipe](sync/asc_sync_pipe.md)| 等待指定流水线操作完成。 |

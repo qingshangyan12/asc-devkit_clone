@@ -10,9 +10,7 @@
 
 ## 功能说明
 
-和[asc_sync_block_arrive](asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。
-FFTS块/子块同步指令，每个flagID均分配有计数器，若该flagID被FFTS设置，计数器将递增；若执行了相同标志位的asc_sync_block_wait指令，计数器将递减。当计数器为0时，所有指令将被阻塞，直到计数器变为非0。
-FFTS收集到AIC0的set flag0后立即将flag0广播给block下属的AIV0和AIV1。
+和[asc_sync_block_arrive](asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。如果flagID所对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
 ## 函数原型
 
@@ -38,14 +36,14 @@ PIPE_S
 
 ## 约束说明
 
-- flagID的取值范围为0至15，每个flagID的计数器范围为0至15
-- 必须保证每个flagID的四位计数器不溢出，否则将引发异常
-- 必须保证相同的ID在同一时间仅被一条管道等待
+- flagID的取值范围为0至15，每个flagID的计数器范围为0至15。
+- 必须保证每个flagID的四位计数器不溢出，否则将引发异常。
+- 必须保证相同的ID在同一时间仅被一条流水线使用。
 
 ## 调用示例
 
 ```cpp
 int64_t flagID = 1;
 asc_sync_block_arrive(PIPE_S, flagID);
-asc_sync_block_wait(flagID);  
+asc_sync_block_wait(PIPE_S, flagID);  
 ```

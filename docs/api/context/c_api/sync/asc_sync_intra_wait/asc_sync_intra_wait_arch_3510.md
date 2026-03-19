@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-block内同步指令，与[asc_sync_intra_arrive](../asc_sync_intra_arrive/asc_sync_intra_arrive_arch_3510.md)配合使用，是混合模式的block中不同内核的流水线同步指令。对于一个混合模式的block，指令将分发至一个CUBECORE与一个VECCORE，CUBECORE拥有32个ID，VECCORE拥有16个ID。asc_sync_intra_arrive将使其他CORE对应的计数器加一，且不阻塞同一流水线的后续指令。asc_sync_intra_wait会在ID计数器为0时阻塞流水线，直至ID被其他核心设置，若计数器非0，则减少计数器的数值。
+block内同步指令，与[asc_sync_intra_arrive](../asc_sync_intra_arrive/asc_sync_intra_arrive_arch_3510.md)配合使用，是block内不同内核的流水线同步指令，用于向每个内核的同步寄存器发送同步信号。每个sync_id对应VECCORE与CUBECORE中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他CORE对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
 
 ## 函数原型
 
@@ -46,6 +46,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
+//设置同步指令事件标号为1
 int64_t sync_id = 1;
 asc_sync_intra_arrive(PIPE_S, sync_id);
 asc_sync_intra_wait(sync_id);  

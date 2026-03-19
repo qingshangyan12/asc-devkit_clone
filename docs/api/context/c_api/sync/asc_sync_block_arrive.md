@@ -50,5 +50,5 @@ asc_set_ffts_base_addr(config);
 uint8_t mode = 0;
 int64_t flagID = 1;
 asc_sync_block_arrive(PIPE_S, mode, flagID);
-asc_sync_block_wait(flagID);  
+asc_sync_block_wait(PIPE_S, flagID);  
 ```
