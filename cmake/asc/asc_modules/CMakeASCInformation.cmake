@@ -108,7 +108,7 @@ endif()
 if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
     # CPU模式架构映射表
     set(_ARCH_TO_SOC_DIR_MAP
-        "dav-2002" "2002" "Ascend310P"
+        "dav-2002" "2002" "Ascend310P1"
         "dav-2201" "2201" "Ascend910B1"
         "dav-3510" "3510" "Ascend950PR_9599"
     )
@@ -121,18 +121,18 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
         list(GET _ARCH_TO_SOC_DIR_MAP ${_soc_dir_index} _SOC_DIR)
         
         # system include
-        set(ASC_CPU_SYSTEM_INCLUDE_OPTIONS "-isystem$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/include -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/include \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw/lib \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw/lib/matmul -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw/impl \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/tikcpp/tikcfw/interface -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/adv_api \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/basic_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/c_api \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/micro_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/simt_api \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/impl/utils -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/adv_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/adv_api/matmul \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/aicpu_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/basic_api \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/c_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/interface \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/micro_api -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/simt_api \
--isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/tiling -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/utils")
+        set(ASC_CPU_SYSTEM_INCLUDE_OPTIONS "-isystem$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/include -isystem$ENV{ASCEND_HOME_PATH}/include \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw -isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/lib \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/lib/matmul -isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/impl \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/tikcpp/tikcfw/interface -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/adv_api \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/basic_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/c_api \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/micro_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/simt_api \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/impl/utils -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/adv_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/adv_api/matmul \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/aicpu_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/basic_api \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/c_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/interface \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/micro_api -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/simt_api \
+-isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/tiling -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/utils")
         
         # 添加编译选项
         string(APPEND CMAKE_ASC_FLAGS "-g -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -DASCENDC_DEBUG=1 -D__NPU_ARCH__=${_SHORT_NPU_ARCH} --run-mode=cpu ${ASC_CPU_SYSTEM_INCLUDE_OPTIONS}")
@@ -152,7 +152,7 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
             -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/simulator/${_SOC_DIR}/lib
             -Wl,-Bdynamic,--no-as-needed
             ascendc_acl_stub
-            $<$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-2002>:pvmodel>
+            $<$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-2002>:_pvmodel>
             $<$<OR:$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-2201>,$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-3510>>:pem_davinci>
             $<$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-3510>:-pthread>
             cpudebug_cceprint
@@ -161,6 +161,15 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
             cpudebug
             c_sec
             stdc++
+            runtime
+            register
+            error_manager
+            profapi
+            ge_common_base
+            unified_dlog
+            mmpa
+            dl
+            ascend_dump
         )
         
     else()
