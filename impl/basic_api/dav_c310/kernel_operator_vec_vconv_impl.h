@@ -1934,8 +1934,33 @@ __simd_vf__ inline void CastIntrinsicsB64ImplVF1(__ubuf__ DST_TYPE *dst, __ubuf_
     Reg::MaskReg fullPreg = Reg::CreateMask<uint32_t, Reg::MaskPattern::ALL>();
     Reg::Duplicate(zeroVreg, 0, fullPreg);
     for (uint16_t i = 0; i < repeatTime; ++i) {
-        CastIntrinsicsB64Common<DST_TYPE, SRC_TYPE, castTrait>(dst, src, repeatTime, repeatParams, srcVreg, dstVreg,
-            tmpVreg, zeroVreg, b32Preg, b64Preg, i, elePerBlk);
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) {	 
+            // b32 -> b64	 
+            Reg::LoadAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY>((Reg::RegTensor<uint32_t> &)srcVreg, 
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b32Preg); 
+            Reg::Interleave( 
+                (Reg::RegTensor<uint32_t> &)srcVreg, tmpVreg, (Reg::RegTensor<uint32_t> &)srcVreg, zeroVreg); 
+        } else { 
+            // b64 -> b32 
+            Reg::LoadAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY>((Reg::RegTensor<uint32_t>&)srcVreg, 
+                (__ubuf__ uint32_t *&)src + i * repeatParams.srcRepStride * elePerBlk, repeatParams.srcBlkStride, b64Preg); 
+        } 
+        Reg::Cast<DST_TYPE, SRC_TYPE, castTrait>(dstVreg, srcVreg, b64Preg); 
+        if constexpr (sizeof(DST_TYPE) == sizeof(int64_t)) { 
+            // b32 -> b64 
+            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_STORE>(); 
+            Reg::StoreAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY>( 
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk, 
+                (Reg::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b64Preg); 
+        } else { 
+            // b64 -> b32 
+            Reg::DeInterleave( 
+                (Reg::RegTensor<uint32_t> &)dstVreg, tmpVreg, (Reg::RegTensor<uint32_t> &)dstVreg, zeroVreg); 
+            Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_STORE>(); 
+            Reg::StoreAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY>( 
+                (__ubuf__ uint32_t *&)dst + i * repeatParams.dstRepStride * elePerBlk, 
+                (Reg::RegTensor<uint32_t> &)dstVreg, repeatParams.dstBlkStride, b32Preg); 
+        }
     }
 }
 
