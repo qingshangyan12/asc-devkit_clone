@@ -2,64 +2,33 @@
 
 ## 产品支持情况
 
-
-<table><thead align="left"><tr id="row20831180131817"><th class="cellrowborder" valign="top" width="57.99999999999999%" id="mcps1.1.3.1.1"><p id="p1883113061818"><span id="ph20833205312295">产品</span></p>
-</th>
-<th class="cellrowborder" align="center" valign="top" width="42%" id="mcps1.1.3.1.2"><p id="p783113012187">是否支持</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row220181016240"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p48327011813"><span id="ph583230201815"><term id="zh-cn_topic_0000001312391781_term1253731311225">Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115">Atlas A3 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p7948163910184">√</p>
-</td>
-</tr>
-<tr id="row173226882415"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181815"><span id="ph1483216010188"><term id="zh-cn_topic_0000001312391781_term11962195213215">Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811">Atlas A2 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911820">√</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 产品     | 是否支持 |
+| ----------- |:----:|
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √    |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √    |
 
 ## 功能说明
 
-将传入的Shape和Stride数据打包成Layout数据结构。
+构造Layout对象，用于定义张量的布局。支持两种形式：带步长的布局和默认步长的布局。
 
 ## 函数原型
 
-```
-template <typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto MakeLayout(const ShapeType& shape, const StrideType& stride)
+```cpp
+// 带步长的Layout
+template <typename T, typename U>
+__aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride)
+
+// 默认步长的Layout
+template <typename T>
+__aicore__ inline constexpr auto MakeLayout(const T& shape)
 ```
 
 ## 参数说明
 
-
-<table><thead align="left"><tr id="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_row6223476444"><th class="cellrowborder" valign="top" width="17.22%" id="mcps1.1.4.1.1"><p id="p1085176175119">参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="15.340000000000002%" id="mcps1.1.4.1.2"><p id="p1851763519">输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="67.44%" id="mcps1.1.4.1.3"><p id="p148519610515">描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_row152234713443"><td class="cellrowborder" valign="top" width="17.22%" headers="mcps1.1.4.1.1 "><p id="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_p8563195616313">shape</p>
-</td>
-<td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.1.4.1.2 "><p id="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_p15663137127">输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="p823866165711"><span id="ph715020184014"><a href="容器函数.md">Std::tuple结构类型，用于定义数据的逻辑形状，例如二维矩阵的行数和列数或多维张量的各维度大小。</span></p>
-</td>
-</tr>
-<tr id="row1392614743211"><td class="cellrowborder" valign="top" width="17.22%" headers="mcps1.1.4.1.1 "><p id="p139261676324">stride</p>
-</td>
-<td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.1.4.1.2 "><p id="p19272713213">输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="p64517398452"><span id="ph1582113012"><a href="容器函数.md">Std::tuple结构类型，用于定义各维度在内存中的步长，即同维度相邻元素在内存中的间隔，间隔的单位为元素，与Shape的维度信息一一对应。</span></p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+|--------|-----------|------|
+| shape | 输入 | 张量的形状，Shape类型 |
+| stride | 输入 | 张量的步长，Stride类型（可选） |
 
 ## 返回值说明
 
@@ -67,24 +36,24 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape, const Stride
 
 ## 约束说明
 
-构造Layout对象时传入的Shape和Stride结构，需是[Std::tuple](../../utils/容器函数.md)结构类型，且满足Std::tuple结构类型的使用约束。
+- Shape和Stride的维度数量必须一致
+- Layout支持最多4个维度的数据配置
+- Shape、Stride等数值数据，仅支持size_t类型和int类型
+- 当不提供stride时，会自动计算默认步长（行主序）
 
 ## 调用示例
 
+```cpp
+// 方式1：带步长的Layout
+auto shape = AscendC::MakeShape(10, 20, 30);
+auto stride = AscendC::MakeStride(1, 100, 200);
+auto layout = AscendC::MakeLayout(shape, stride);
+
+// 方式2：默认步长的Layout
+auto shape = AscendC::MakeShape(10, 20, 30);
+auto layout = AscendC::MakeLayout(shape); // 自动计算步长
+
+// 获取Shape和Stride
+auto layoutShape = layout.shape;
+auto layoutStride = layout.stride;
 ```
-// 初始化Layout数据结构，获取对应数值
-AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
-AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
-
-auto layoutMake = AscendC::MakeLayout(shape, stride);
-AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> layoutInit(shape, stride);
-
-int value = AscendC::Std::get<0>(layoutMake.GetShape()); // value = 10
-value = AscendC::Std::get<1>(layoutMake.GetShape()); // value = 20
-value = AscendC::Std::get<2>(layoutMake.GetShape()); // value = 30
-
-value = AscendC::Std::get<0>(layoutInit.GetStride()); // value = 1
-value = AscendC::Std::get<1>(layoutInit.GetStride()); // value = 100
-value = AscendC::Std::get<2>(layoutInit.GetStride()); // value = 200
-```
-
