@@ -115,8 +115,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sub_relu](vector_compute/asc_sub_relu.md) | 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
 | [asc_transto5hd](vector_compute/asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
 | [asc_pair_reduce_sum](vector_compute/asc_pair_reduce_sum.md) | 对输入数据做归约操作，得到数据总和。 |
-| [asc_copy](vector_compute/asc_copy/asc_copy_arch_2201.md) | 将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。 |
-| <cann-filter npu_type = "950"> [asc_copy](vector_compute/asc_copy/asc_copy_arch_3510.md) | 将数据从RegTensor搬运到MaskReg。</cann-filter>|
+| [asc_copy](vector_compute/asc_copy.md) | 将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。 |
+| <cann-filter npu_type = "950"> [asc_copy](reg/reg_vector/asc_copy_v2.md) | 将数据从RegTensor搬运到MaskReg。</cann-filter>|
 
 ## 数据搬运
 
