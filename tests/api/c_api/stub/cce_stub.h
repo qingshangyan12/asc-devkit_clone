@@ -41,10 +41,6 @@ inline void vbr(vector_f8e4m3& dst, fp8_e4m3fn_t value) {}
 inline void vbr(vector_f8e5m2& dst, fp8_e5m2_t value) {}
 inline void vbr(vector_f8e8m0& dst, fp8_e8m0_t value) {}
 
-inline void pld(vector_bool& dst, __ubuf__ uint32_t* src, vector_address offset, Dist dist) {} 
-inline void plds(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset, Dist dist) {} 
-inline void plds(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset, Dist dist, Post post) {}
-
 inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
 
 // ==========vstar===========
