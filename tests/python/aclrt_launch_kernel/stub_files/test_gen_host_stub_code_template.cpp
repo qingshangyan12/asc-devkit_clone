@@ -136,10 +136,6 @@ uint32_t aclrtlaunch_hello_world<35>(uint32_t numBlocks, void* stream)
     constexpr uint32_t __ascendc_overflow_status_size = 8;
     AllocAscendMemDevice(&(__ascendc_args.__ascendc_overflow), __ascendc_overflow_status_size);
 
-<<<<<<< HEAD
-    const char *__ascendc_name = "hello_world";
-=======
->>>>>>> upstream/master
     __ascendc_ret = launch_and_profiling_hello_world(0, numBlocks, stream, (void **)&__ascendc_args, sizeof(__ascendc_args));
     KernelHandleGradUnregister::GetInstance();
     FreeAscendMemDevice(__ascendc_args.__ascendc_overflow);
@@ -157,10 +153,6 @@ uint32_t aclrtlaunch_hello_world<45>(uint32_t numBlocks, void* stream)
     constexpr uint32_t __ascendc_overflow_status_size = 8;
     AllocAscendMemDevice(&(__ascendc_args.__ascendc_overflow), __ascendc_overflow_status_size);
 
-<<<<<<< HEAD
-    const char *__ascendc_name = "hello_world";
-=======
->>>>>>> upstream/master
     __ascendc_ret = launch_and_profiling_hello_world(1000000, numBlocks, stream, (void **)&__ascendc_args, sizeof(__ascendc_args));
     KernelHandleGradUnregister::GetInstance();
     FreeAscendMemDevice(__ascendc_args.__ascendc_overflow);

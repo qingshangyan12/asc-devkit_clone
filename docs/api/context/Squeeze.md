@@ -123,18 +123,6 @@ StoreUnAlign(dstAddr, dstVreg, ureg);
 template<typename T>
 __simd_vf__ inline void SqueezeVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
-<<<<<<< HEAD
-    AscendC::MicroAPI::RegTensor<T> srcReg0;
-    AscendC::MicroAPI::RegTensor<T> srcReg1;
-    AscendC::MicroAPI::UnalignRegForStore ureg;
-    AscendC::MicroAPI::MaskReg sqzMask = AscendC::MicroAPI::CreateMask<T, AscendC::MicroAPI::MaskPattern::H>();
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        AscendC::MicroAPI::LoadAlign<T, AscendC::MicroAPI::PostLiteral::POST_MODE_UPDATE>(srcReg0, srcAddr, oneRepeatSize);
-        AscendC::MicroAPI::Squeeze<T, AscendC::MicroAPI::GatherMaskMode::STORE_REG>(srcReg1, srcReg0, sqzMask);
-        AscendC::MicroAPI::StoreUnAlign<T, AscendC::MicroAPI::PostLiteral::POST_MODE_UPDATE>(dstAddr, srcReg1, ureg);
-     }
-     AscendC::MicroAPI::StoreUnAlignPost(dstAddr, ureg);
-=======
     AscendC::Reg::RegTensor<T> srcReg0;
     AscendC::Reg::RegTensor<T> srcReg1;
     AscendC::Reg::UnalignRegForStore ureg;
@@ -145,7 +133,6 @@ __simd_vf__ inline void SqueezeVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint
         AscendC::Reg::StoreUnAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(dstAddr, srcReg1, ureg);
      }
      AscendC::Reg::StoreUnAlignPost(dstAddr, ureg);
->>>>>>> upstream/master
 }
 ```
 

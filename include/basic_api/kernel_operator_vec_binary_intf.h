@@ -25,11 +25,7 @@
 #include "kernel_struct_binary.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-<<<<<<< HEAD
-#include "micro_api/kernel_micro_utils.h"
-=======
 #include "reg_compute/kernel_reg_compute_utils.h"
->>>>>>> upstream/master
 #endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1

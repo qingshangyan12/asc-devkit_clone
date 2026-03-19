@@ -14,11 +14,7 @@
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-<<<<<<< HEAD:examples/02_features/10_memory_management/tpipe_init_buf_pool/README.md
-│   └── tpipe_init_buf_pool.asc      // Ascend C算子实现 & 调用样例
-=======
 │   └── tpipe_buf_pool_reuse.asc      // Ascend C算子实现 & 调用样例
->>>>>>> upstream/master:examples/02_features/10_memory_management/tpipe_buf_pool_reuse/README.md
 ```
 
 ## 算子描述

@@ -669,10 +669,6 @@ __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
 
 __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride);
 
-<<<<<<< HEAD
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-=======
 // ==========asc_copy_gm2l0b==========
 __aicore__ inline void asc_copy_gm2l0b(__cb__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
 
@@ -708,7 +704,6 @@ __aicore__ inline void asc_copy_gm2l0b_sync(__cb__ int4b_t* dst, __gm__ int4b_t*
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
->>>>>>> upstream/master
 // ==========asc_l0c2l1_l0c2l1===========
 // half  float
 __aicore__ inline void asc_copy_l0c2l1(__cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
@@ -717,36 +712,6 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ half* dst, __cc__ float* src, ui
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
                                             bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
                                             bool c0_pad_en);
-<<<<<<< HEAD
-
-// int8_t  float
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
-                                            uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
-                                            uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
-                                            bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
-                                            bool c0_pad_en);
-
-
-// uint8_t  float
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
-                                            uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
-                                            uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
-                                            bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
-                                            bool c0_pad_en);
-
-// float  float
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
-                                            uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
-                                            uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
-                                            bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
-                                            bool c0_pad_en);
-
-// half int32_t
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
-=======
 
 // int8_t  float
 __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
@@ -783,40 +748,20 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ half* dst, __cc__ int32_t* src, 
 
 // int8_t int32_t
 __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
->>>>>>> upstream/master
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
                                             bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
                                             bool c0_pad_en);
 
-<<<<<<< HEAD
-// int8_t int32_t
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
-=======
 // uint8_t int32_t
 __aicore__ inline void asc_copy_l0c2l1(__cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
->>>>>>> upstream/master
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
                                             bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
                                             bool c0_pad_en);
 
-<<<<<<< HEAD
-// uint8_t int32_t
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
-=======
-// int32_t int32_t
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
->>>>>>> upstream/master
-                                            uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
-                                            uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
-                                            bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
-                                            bool c0_pad_en);
-
-<<<<<<< HEAD
 // int32_t int32_t
 __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
@@ -825,19 +770,6 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int32_t* dst, __cc__ int32_t* sr
                                             bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
                                             bool c0_pad_en);
 
-// ==========asc_copy_l12l0a_mx==========
-__aicore__ inline void asc_copy_l12l0a_mx(uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos,
-    uint16_t y_start_pos, uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride);
-
-__aicore__ inline void asc_set_gm2l1_loop_size(uint64_t loop1_size, uint64_t loop2_size);
-
-__aicore__ inline void asc_set_gm2l1_loop1_stride(uint64_t loop1_src_stride, uint64_t loop1_dst_stride);
-
-__aicore__ inline void asc_set_gm2l1_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride);
-
-__aicore__ inline void asc_set_gm2l1_pad(uint32_t pad_val);
-
-=======
 __aicore__ inline void asc_copy_l0c2l1(__cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, 
                                         uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre,
                                         uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd_en);
@@ -1323,7 +1255,6 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint
 
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
                                         uint64_t src_stride, uint32_t dst_stride);
->>>>>>> upstream/master
 #endif
 
 #endif

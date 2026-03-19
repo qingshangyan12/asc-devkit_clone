@@ -45,8 +45,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                          \
 }                                                                                                        \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_STOREALIGN_REPEAT_INSTR_HIF8(class_name, c_api_name, cce_name, data_type, index) \
                                                                                                          \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {                       \
@@ -76,7 +74,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                          \
 }                                                                                                        \
 
->>>>>>> upstream/master
 #define TEST_VECTOR_DATAMOVE_STOREALIGN_REPEAT_POST_INSTR(class_name, c_api_name, cce_name, data_type, index) \
                                                                                                          \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {                       \
@@ -106,8 +103,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                          \
 }                                                                                                        \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_STOREALIGN_REPEAT_POST_INSTR_HIF8(class_name, c_api_name, cce_name, data_type, index) \
                                                                                                          \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {                       \
@@ -137,5 +132,4 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                          \
 }                                                                                                        \
 
->>>>>>> upstream/master
 #endif

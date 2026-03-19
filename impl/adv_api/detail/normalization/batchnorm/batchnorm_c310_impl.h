@@ -251,21 +251,12 @@ __simd_callee__ inline void ComputeY(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal,
     uint32_t featureLength, const float epsilon)
 {
     constexpr float rsqrtExponent = -0.5;
-<<<<<<< HEAD
-    MicroAPI::RegTensor<float> srcReg;
-    MicroAPI::RegTensor<float> meanReg;
-    MicroAPI::RegTensor<float> varReg;
-    MicroAPI::RegTensor<float> gammaReg;
-    MicroAPI::RegTensor<float> betaReg;
-    MicroAPI::RegTensor<float> diffReg;
-=======
     Reg::RegTensor<float> srcReg;
     Reg::RegTensor<float> meanReg;
     Reg::RegTensor<float> varReg;
     Reg::RegTensor<float> gammaReg;
     Reg::RegTensor<float> betaReg;
     Reg::RegTensor<float> diffReg;
->>>>>>> upstream/master
     uint16_t mainRepeatTime = static_cast<uint16_t>(featureLength / oneRepSize);
     uint32_t tailCount = featureLength % oneRepSize;
     uint16_t tailRepeatTime = static_cast<uint16_t>(CeilDivision(tailCount, oneRepSize));
@@ -290,13 +281,8 @@ __simd_callee__ inline void ComputeY(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal,
             Reg::Sub(diffReg, srcReg, meanReg, maskFull);
             Reg::Mul(varReg, varReg, diffReg, maskFull);
             // res * gamm + beta
-<<<<<<< HEAD
-            MicroAPI::Mul(varReg, varReg, gammaReg, maskFull);
-            MicroAPI::Add(varReg, varReg, betaReg, maskFull);
-=======
             Reg::Mul(varReg, varReg, gammaReg, maskFull);
             Reg::Add(varReg, varReg, betaReg, maskFull);
->>>>>>> upstream/master
             SaveDataWithT(dstLocal, varReg, maskFull, bIdx * featureLength + i * oneRepSize);
         }
     }
@@ -317,13 +303,8 @@ __simd_callee__ inline void ComputeY(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal,
             Reg::Sub(diffReg, srcReg, meanReg, maskReg);
             Reg::Mul(varReg, varReg, diffReg, maskReg);
             // res * gamm + beta
-<<<<<<< HEAD
-            MicroAPI::Mul(varReg, varReg, gammaReg, maskReg);
-            MicroAPI::Add(varReg, varReg, betaReg, maskReg);
-=======
             Reg::Mul(varReg, varReg, gammaReg, maskReg);
             Reg::Add(varReg, varReg, betaReg, maskReg);
->>>>>>> upstream/master
             SaveDataWithT(dstLocal, varReg, maskReg, bIdx * featureLength + mainRepeatTime * oneRepSize);
         }
     }

@@ -34,15 +34,9 @@ __simd_callee__ inline void MulAdds(Reg::RegTensor<float>& dstReg, Reg::RegTenso
     Reg::RegTensor<float>& srcReg2, const float scalarValue, Reg::MaskReg& mask)
 {
     // dst = src1 * src2 + scalarValue
-<<<<<<< HEAD
-    MicroAPI::RegTensor<float> tmpReg;
-    MicroAPI::Mul(tmpReg, srcReg1, srcReg2, mask);
-    MicroAPI::Adds(dstReg, tmpReg, scalarValue, mask);
-=======
     Reg::RegTensor<float> tmpReg;
     Reg::Mul(tmpReg, srcReg1, srcReg2, mask);
     Reg::Adds(dstReg, tmpReg, scalarValue, mask);
->>>>>>> upstream/master
 }
     
 // compute Erfc with xa = |x| + fp32_min

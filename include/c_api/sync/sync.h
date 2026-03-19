@@ -43,12 +43,6 @@ __aicore__ inline void asc_sync();
 
 __aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint8_t mode, int64_t flagID);
 
-<<<<<<< HEAD
-__aicore__ inline void asc_sync_block_wait(int64_t flagID);
-
-__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
-
-=======
 __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
@@ -71,7 +65,6 @@ __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
 #endif
 
->>>>>>> upstream/master
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  

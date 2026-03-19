@@ -123,8 +123,6 @@ __simd_callee__ inline void asc_gather_datablock_impl(vector_fp8_e4m3fn_t& dst, 
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_gather_datablock_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src,
     vector_uint32_t index, vector_bool mask)
 {
@@ -134,7 +132,6 @@ __simd_callee__ inline void asc_gather_datablock_impl(vector_hifloat8_t& dst, __
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_gather_datablock_impl(vector_fp8_e5m2_t& dst, __ubuf__  fp8_e5m2_t* src,
     vector_uint32_t index, vector_bool mask)
 {
@@ -260,8 +257,6 @@ __simd_callee__ inline void asc_gather_datablock_impl(vector_fp8_e4m3fn_t& dst, 
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_gather_datablock_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src,
     vector_uint32_t index)
 {
@@ -270,7 +265,6 @@ __simd_callee__ inline void asc_gather_datablock_impl(vector_hifloat8_t& dst, __
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_gather_datablock_impl(vector_fp8_e5m2_t& dst, __ubuf__  fp8_e5m2_t* src,
     vector_uint32_t index)
 {

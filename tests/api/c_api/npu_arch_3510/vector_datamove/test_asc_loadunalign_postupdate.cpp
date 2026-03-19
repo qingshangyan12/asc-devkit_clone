@@ -41,8 +41,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR_HIF8(class_name, c_api_name, cce_name, data_type)     \
                                                                                                 \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {              \
@@ -71,7 +69,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
->>>>>>> upstream/master
 #define TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(class_name, c_api_name, cce_name, data_type)\
                                                                                                 \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {              \
@@ -101,8 +98,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR_HIF8(class_name, c_api_name, cce_name, data_type)\
                                                                                                 \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {              \
@@ -132,7 +127,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
->>>>>>> upstream/master
 // ==========asc_loadunalign_postupdate(u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e2m1/e1m2)=========
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, int8_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, uint8_t);
@@ -145,10 +139,7 @@ TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, v
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, int64_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR_HIF8(LOADUALIGN, asc_loadunalign_postupdate, vldus, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(LOADUALIGN, asc_loadunalign_postupdate, vldus, fp8_e8m0_t);
@@ -162,10 +153,7 @@ TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_post
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, uint32_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, int64_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR_HIF8(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADUNALIGN_VLDU_INSTR(LOADUALIGNVLDU, asc_loadunalign_postupdate, vldu, fp4x2_e1m2_t);

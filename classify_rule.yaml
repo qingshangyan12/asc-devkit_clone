@@ -54,6 +54,8 @@ asc-devkit:
       - impl/basic_api/dav_c220/kernel_operator_dump_tensor_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl/printf_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl.h
+      - impl/adv_api/detail/**
+      - impl/basic_api/**
       - impl/experimental/tensor_api/arch/cube_datamove/data_copy/npu_arch_3510/**
       - impl/experimental/tensor_api/arch/cube_datamove/fixpipe/npu_arch_3510/**
       - impl/experimental/tensor_api/arch/cube_datamove/load_data/npu_arch_3510/**

@@ -35,10 +35,5 @@ target_link_libraries(demo PRIVATE
 # ======================================================================================
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-<<<<<<< HEAD:examples/02_features/10_memory_management/init/CMakeLists.txt
-
-    # 该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
-=======
->>>>>>> upstream/master:examples/02_features/10_memory_management/tbufpool_buf_pool_subdivision/CMakeLists.txt
     # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
 )

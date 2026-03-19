@@ -1,15 +1,6 @@
 set(BOOST_NAME "boost")
 set(BOOST_DOWNLOAD_PATH ${CANN_3RD_LIB_PATH}/boost)
-<<<<<<< HEAD
-
-if (EXISTS "${CANN_3RD_LIB_PATH}/boost/boost/config.hpp")
-    set(BOOST_SRC_PATH ${CANN_3RD_LIB_PATH}/boost)
-else()
-    set(BOOST_SRC_PATH ${CANN_3RD_LIB_PATH}/boost-1.87.0)
-endif()
-=======
 set(BOOST_LOCAL_TAR "${CANN_3RD_LIB_PATH}/boost_1_87_0.tar.gz")  # 本地 tar.gz 包路径
->>>>>>> upstream/master
 
 # 判断本地已解压的源码路径
 if (EXISTS "${CANN_3RD_LIB_PATH}/boost/boost/config.hpp")

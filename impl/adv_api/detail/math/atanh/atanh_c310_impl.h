@@ -53,19 +53,11 @@ __simd_vf__ inline void AtanhImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t c
         } else {
             Reg::LoadAlign(srcVreg, src + i * oneRepElm);
         }
-<<<<<<< HEAD
-        MicroAPI::Adds(tmpReg1, (MicroAPI::RegTensor<float>&)srcVreg, ATANH_ONE, mask);
-        MicroAPI::Sub(tmpReg2, dupReg, (MicroAPI::RegTensor<float>&)srcVreg, mask);
-        MicroAPI::Div(tmpReg1, tmpReg1, tmpReg2, mask);
-        MicroAPI::Ln(tmpReg1, tmpReg1, mask);
-        MicroAPI::Muls((MicroAPI::RegTensor<float>&)dstVreg, tmpReg1, ATANH_MULS_CONSTANT, mask);
-=======
         Reg::Adds(tmpReg1, (Reg::RegTensor<float>&)srcVreg, ATANH_ONE, mask);
         Reg::Sub(tmpReg2, dupReg, (Reg::RegTensor<float>&)srcVreg, mask);
         Reg::Div(tmpReg1, tmpReg1, tmpReg2, mask);
         Reg::Ln(tmpReg1, tmpReg1, mask);
         Reg::Muls((Reg::RegTensor<float>&)dstVreg, tmpReg1, ATANH_MULS_CONSTANT, mask);
->>>>>>> upstream/master
         if constexpr (sizeof(T) == sizeof(half)) {
             Reg::Cast<half, float, castTraitB32ToB16>(
                 dstVreg, (Reg::RegTensor<float>&)dstVreg, mask);
