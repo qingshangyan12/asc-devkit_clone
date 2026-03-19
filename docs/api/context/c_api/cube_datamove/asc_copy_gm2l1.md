@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-将矩阵数据从Global Memory搬运到L1 Buffer中，包含padding操作。
+将矩阵数据从Global Memory搬运到L1 Buffer中，搬运过程中可以对数据进行填充。
 
 ## 函数原型
 
