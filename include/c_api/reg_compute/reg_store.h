@@ -675,7 +675,6 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  fp4x2_e2m1_t*&
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  fp4x2_e1m2_t*& dst, vector_store_align& src0,
     vector_fp4x2_e1m2_t src1, uint32_t count);
 
-// ==========asc_storeunalign_postupdate no count (u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int8_t*& dst, vector_store_align& src0, vector_int8_t src1);
 
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  uint8_t*& dst, vector_store_align& src0, vector_uint8_t src1);

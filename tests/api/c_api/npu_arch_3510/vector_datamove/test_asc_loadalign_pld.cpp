@@ -20,19 +20,19 @@ protected:
 };
 
 namespace {
-void pld_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Dist dist) {
+void pld_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Literal dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
-    EXPECT_EQ(dist, static_cast<Dist>(Dist::DIST_NORM));
+    EXPECT_EQ(dist, static_cast<Literal>(Literal::NORM));
 }
 
-void pld_upsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Dist dist) {
+void pld_upsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Literal dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
-    EXPECT_EQ(dist, static_cast<Dist>(Dist::DIST_US));
+    EXPECT_EQ(dist, static_cast<Literal>(Literal::US));
 }
 
-void pld_downsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Dist dist) {
+void pld_downsample_stub(vector_bool &dst, __ubuf__ uint32_t *src, iter_reg offset, Literal dist) {
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ uint32_t *>(22));
-    EXPECT_EQ(dist, static_cast<Dist>(Dist::DIST_DS));
+    EXPECT_EQ(dist, static_cast<Literal>(Literal::DS));
 }
 }
 
@@ -42,7 +42,7 @@ TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPld_Succ)
     __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
     iter_reg offset = asc_create_iter_reg_b32(64);
 
-    MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Dist))
+    MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))
         .times(1)
         .will(invoke(pld_stub));
 
@@ -56,7 +56,7 @@ TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPldUpsample_Succ)
     __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
     iter_reg offset = asc_create_iter_reg_b32(64);
 
-    MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Dist))
+    MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))
         .times(1)
         .will(invoke(pld_upsample_stub));
 
@@ -70,7 +70,7 @@ TEST_F(TestVectorDatamoveLoadAlignPld, LoadAlignPldDownsample_Succ)
     __ubuf__ uint32_t *src = reinterpret_cast<__ubuf__ uint32_t *>(22);
     iter_reg offset = asc_create_iter_reg_b32(64);
 
-    MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Dist))
+    MOCKER_CPP(pld, void(vector_bool &, __ubuf__ uint32_t *, iter_reg, Literal))
         .times(1)
         .will(invoke(pld_downsample_stub));
 
