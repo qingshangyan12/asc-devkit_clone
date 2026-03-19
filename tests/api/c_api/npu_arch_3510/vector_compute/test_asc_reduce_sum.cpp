@@ -39,9 +39,9 @@ TEST_F(TestVectorCompute##class_name##_##dst_type##_##src_type##_CApi, c_api_nam
         .times(1)                                                                               \
         .will(invoke(cce_name##_##dst_type##_##src_type##_Stub));                                           \
                                                                                                 \
-    asc_reduce_add(dst, src, mask);                                                                \
+    asc_reduce_sum(dst, src, mask);                                                                \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
-TEST_VECTOR_COMPUTE_VCADD_INSTR(Vcadd, asc_reduce_add, vcadd, vector_int32_t, vector_int16_t);
+TEST_VECTOR_COMPUTE_VCADD_INSTR(Vcadd, asc_reduce_sum, vcadd, vector_int32_t, vector_int16_t);
 
 #endif
