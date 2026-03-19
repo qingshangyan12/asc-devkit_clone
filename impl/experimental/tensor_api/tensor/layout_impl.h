@@ -44,10 +44,12 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
         auto srcRow = innerRow * Std::get<1>(GetShape<0>(layout));
         auto srcCol = innerCol * Std::get<1>(GetShape<1>(layout));
         
-        using type = decltype(Std::get<0>(tileShape));
-        auto originShape = TupleSize(MakeShape(srcRow, srcCol)) > TupleSize(tileShape) ? tileShape : MakeShape(static_cast<type>(srcRow), static_cast<type>(srcCol));
-        auto shape = MakeFractalShape(originShape, MakeShape(innerRow, innerCol));
-        return MakeLayout(shape, layout.Stride());
+        auto srcShape = MakeShape(srcRow, srcCol);
+        if (TupleSize(srcShape) > TupleSize(tileShape)) {
+            return MakeLayout(MakeFractalShape(tileShape, MakeShape(innerRow, innerCol)), layout.Stride()); 
+        } else {
+            return MakeLayout(MakeFractalShape(srcShape, MakeShape(innerRow, innerCol)), layout.Stride());
+        }
     } 
 }
 
@@ -68,12 +70,11 @@ template <typename Coord, typename LayoutType, typename TensorType>
     auto srcShape = MakeShape(srcRow, srcCol);
     auto dstShape = MakeShape(dstRow, dstCol);
 
-    auto realRow = Min(srcRow, dstRow);	 
-    auto realCol = Min(srcCol, dstCol);
-
-    auto shape = MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol));
-
-    return MakeLayout(shape, layout.Stride());
+    if (TupleSize(srcShape) > TupleSize(dstShape)) {
+        return MakeLayout(MakeFractalShape(dstShape, MakeShape(innerRow, innerCol)), layout.Stride()); 
+    } else {
+        return MakeLayout(MakeFractalShape(srcShape, MakeShape(innerRow, innerCol)), layout.Stride());
+    }
 }
 
 } // namespace Te
