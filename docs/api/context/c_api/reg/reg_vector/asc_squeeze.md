@@ -8,7 +8,11 @@
 
 ## 功能说明
 
+<<<<<<< HEAD
 将src中被mask选择的有效元素依次复制到dst，有效元素从低到高连续排列。dst中剩余位置元素置为0。
+=======
+将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。
+>>>>>>> upstream/master
 
 ## 函数原型
 
@@ -75,6 +79,10 @@ asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址�
 vector_int8_t dst;
 asc_squeeze(dst, src, mask);
 // 存入AR特殊寄存器
+<<<<<<< HEAD
 vector_store_unalign dst_v2;
+=======
+vector_int8_t dst_v2;
+>>>>>>> upstream/master
 asc_squeeze_v2(dst_v2, src, mask);
 ```

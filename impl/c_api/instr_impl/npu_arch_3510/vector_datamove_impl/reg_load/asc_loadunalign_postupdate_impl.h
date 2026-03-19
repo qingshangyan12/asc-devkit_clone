@@ -103,6 +103,17 @@ __simd_callee__ inline void asc_loadunalign_postupdate_impl(vector_fp8_e4m3fn_t&
     }
 }
 
+<<<<<<< HEAD
+=======
+__simd_callee__ inline void asc_loadunalign_postupdate_impl(vector_hifloat8_t& dst, vector_load_align& src0, __ubuf__ hifloat8_t *src1, uint32_t count)
+{
+    if ASC_IS_AIV {
+        __ubuf__ uint8_t* src1_tmp = reinterpret_cast<__ubuf__ uint8_t*>(src1);
+        vldus(reinterpret_cast<vector_uint8_t&>(dst), src0, src1_tmp, count, POST_UPDATE);
+    }
+}
+
+>>>>>>> upstream/master
 __simd_callee__ inline void asc_loadunalign_postupdate_impl(vector_fp8_e5m2_t& dst, vector_load_align& src0, __ubuf__ fp8_e5m2_t *src1, uint32_t count)
 {
     if ASC_IS_AIV {
@@ -214,6 +225,17 @@ __simd_callee__ inline void asc_loadunalign_postupdate_impl(vector_fp8_e4m3fn_t&
     }
 }
 
+<<<<<<< HEAD
+=======
+__simd_callee__ inline void asc_loadunalign_postupdate_impl(vector_hifloat8_t& dst, vector_load_align& src0, __ubuf__ hifloat8_t *src1, iter_reg offset, uint32_t count)
+{
+    if ASC_IS_AIV {
+        __ubuf__ uint8_t* src1_tmp = reinterpret_cast<__ubuf__ uint8_t*>(src1);
+        vldu(reinterpret_cast<vector_uint8_t&>(dst), src0, offset, src1_tmp, count);
+    }
+}
+
+>>>>>>> upstream/master
 __simd_callee__ inline void asc_loadunalign_postupdate_impl(vector_fp8_e5m2_t& dst, vector_load_align& src0, __ubuf__ fp8_e5m2_t *src1, iter_reg offset, uint32_t count)
 {
     if ASC_IS_AIV {

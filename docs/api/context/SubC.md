@@ -190,6 +190,7 @@ __simd_callee__ inline void SubC(MaskReg& carry, U& dstReg, U& srcReg0, U& srcRe
 template <typename T>
 __simd_vf__ inline void SubC(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t repeatTimes, uint32_t oneRepeatSize){
     
+<<<<<<< HEAD
     AscendC::MicroAPI::RegTensor<T> srcReg0;
     AscendC::MicroAPI::RegTensor<T> srcReg1;
     AscendC::MicroAPI::RegTensor<T> dstReg0;
@@ -205,6 +206,23 @@ __simd_vf__ inline void SubC(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf_
         // 8*4B=32B align
         AscendC::MicroAPI::StoreAlign<uint32_t, AscendC::MicroAPI::MaskDist::DIST_NORM>((__ubuf__ uint32_t*)dst1Addr + i * 8, carry);
         AscendC::MicroAPI::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
+=======
+    AscendC::Reg::RegTensor<T> srcReg0;
+    AscendC::Reg::RegTensor<T> srcReg1;
+    AscendC::Reg::RegTensor<T> dstReg0;
+    AscendC::Reg::RegTensor<T> dstReg1;
+    AscendC::Reg::MaskReg mask; 
+    AscendC::Reg::MaskReg maskZero = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
+    AscendC::Reg::MaskReg carry = AscendC::Reg::CreateMask<uint8_t>();
+    for (uint16_t i = 0; i < repeatTimes; i++) {
+        mask = AscendC::Reg::UpdateMask<T>(count);
+        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
+        AscendC::Reg::SubC(carry, dstReg0, srcReg0, srcReg1, maskZero, mask);
+        // 8*4B=32B align
+        AscendC::Reg::StoreAlign<uint32_t, AscendC::Reg::MaskDist::DIST_NORM>((__ubuf__ uint32_t*)dst1Addr + i * 8, carry);
+        AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
+>>>>>>> upstream/master
     }
 }
 ```

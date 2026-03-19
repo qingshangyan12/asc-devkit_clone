@@ -158,6 +158,7 @@ src为half类型时，Vector计算单元一次计算只处理最多VL/sizeof\(fl
 template<typename T, typename U>
 static __simd_vf__ inline void ExpSubVF(__ubuf__ T* dstAddr, __ubuf__ U* src0Addr, __ubuf__ U* src1Addr, uint32_t count, uint32_t srcRepeatSize, uint32_t dstRepeatSize, uint16_t repeatTimes)
 {
+<<<<<<< HEAD
     AscendC::MicroAPI::RegTensor<U> srcReg0;
     AscendC::MicroAPI::RegTensor<U> srcReg1;
     AscendC::MicroAPI::RegTensor<T> dstReg;
@@ -168,6 +169,18 @@ static __simd_vf__ inline void ExpSubVF(__ubuf__ T* dstAddr, __ubuf__ U* src0Add
         AscendC::MicroAPI::LoadAlign(srcReg1, src1Addr + i * srcRepeatSize);
         AscendC::MicroAPI::ExpSub<T, U, AscendC::MicroAPI::RegLayout::ZERO, AscendC::MicroAPI::MaskMergeMode::ZEROING>(dstReg, srcReg0, srcReg1, mask);
         AscendC::MicroAPI::StoreAlign(dstAddr + i * dstRepeatSize, dstReg, mask);
+=======
+    AscendC::Reg::RegTensor<U> srcReg0;
+    AscendC::Reg::RegTensor<U> srcReg1;
+    AscendC::Reg::RegTensor<T> dstReg;
+    AscendC::Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTimes; i++) {
+        mask = AscendC::Reg::UpdateMask<U>(count);
+        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * srcRepeatSize);
+        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * srcRepeatSize);
+        AscendC::Reg::ExpSub<T, U, AscendC::Reg::RegLayout::ZERO, AscendC::Reg::MaskMergeMode::ZEROING>(dstReg, srcReg0, srcReg1, mask);
+        AscendC::Reg::StoreAlign(dstAddr + i * dstRepeatSize, dstReg, mask);
+>>>>>>> upstream/master
     }
 }
 ```

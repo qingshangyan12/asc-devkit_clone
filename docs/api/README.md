@@ -2198,6 +2198,7 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 </td>
 </tr>
 <tr id="row15910115416337"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p139106548332"><a name="p139106548332"></a><a name="p139106548332"></a><a href="context\exp10f.md">exp10f</a></p>
+<<<<<<< HEAD
 </td>
 <td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1910165423315"><a name="p1910165423315"></a><a name="p1910165423315"></a>指定输入x，获取10的x次方。</p>
 </td>
@@ -4124,6 +4125,1933 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 </td>
 </tr>
 <tr id="row586654192019"><td class="cellrowborder" valign="top" width="37.44%" headers="mcps1.2.3.1.1 "><p id="p419110458198"><a name="p419110458198"></a><a name="p419110458198"></a><a href="context\ASCENDC_TPL_SEL_PARAM.md">ASCENDC_TPL_SEL_PARAM</a></p>
+=======
+>>>>>>> upstream/master
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1910165423315"><a name="p1910165423315"></a><a name="p1910165423315"></a>指定输入x，获取10的x次方。</p>
+</td>
+</tr>
+<tr id="row11402831381"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p940217311820"><a name="p940217311820"></a><a name="p940217311820"></a><a href="context\hexp10.md">hexp10</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p164021231786"><a name="p164021231786"></a><a name="p164021231786"></a>指定输入x，获取10的x次方。</p>
+</td>
+</tr>
+<tr id="row19569132111514"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p0569152118154"><a name="p0569152118154"></a><a name="p0569152118154"></a><a href="context\h2exp10.md">h2exp10</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p356912219157"><a name="p356912219157"></a><a name="p356912219157"></a>指定输入x，对x的各元素，获取10的该元素次方。</p>
+</td>
+</tr>
+<tr id="row991095413335"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p291012547334"><a name="p291012547334"></a><a name="p291012547334"></a><a href="context\expm1f.md">expm1f</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1191005413310"><a name="p1191005413310"></a><a name="p1191005413310"></a>指定输入x，获取e的x次方减1。</p>
+</td>
+</tr>
+<tr id="row191019548335"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p991035418339"><a name="p991035418339"></a><a name="p991035418339"></a><a href="context\logf.md">logf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p11910205418339"><a name="p11910205418339"></a><a name="p11910205418339"></a>获取以e为底，输入数据的对数。</p>
+</td>
+</tr>
+<tr id="row138171718819"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p73911717819"><a name="p73911717819"></a><a name="p73911717819"></a><a href="context\hlog.md">hlog</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p6394174814"><a name="p6394174814"></a><a name="p6394174814"></a>获取以e为底，输入数据的对数。</p>
+</td>
+</tr>
+<tr id="row82661656111513"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p626615631511"><a name="p626615631511"></a><a name="p626615631511"></a><a href="context\h2log.md">h2log</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p18266185621513"><a name="p18266185621513"></a><a name="p18266185621513"></a>获取以e为底，输入数据各元素的对数。</p>
+</td>
+</tr>
+<tr id="row109109545337"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1291095410333"><a name="p1291095410333"></a><a name="p1291095410333"></a><a href="context\log2f.md">log2f</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p179101547334"><a name="p179101547334"></a><a name="p179101547334"></a>获取以2为底，输入数据的对数。</p>
+</td>
+</tr>
+<tr id="row15716025186"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p171619255814"><a name="p171619255814"></a><a name="p171619255814"></a><a href="context\hlog2.md">hlog2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p117162259814"><a name="p117162259814"></a><a name="p117162259814"></a>获取以2为底，输入数据的对数。</p>
+</td>
+</tr>
+<tr id="row5476192010166"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p34761920131611"><a name="p34761920131611"></a><a name="p34761920131611"></a><a href="context\h2log2.md">h2log2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p194762206163"><a name="p194762206163"></a><a name="p194762206163"></a>获取以2为底，输入数据各元素的对数。</p>
+</td>
+</tr>
+<tr id="row1791035443313"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1091015411331"><a name="p1091015411331"></a><a name="p1091015411331"></a><a href="context\log10f.md">log10f</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p17910145463312"><a name="p17910145463312"></a><a name="p17910145463312"></a>获取以10为底，输入数据的对数。</p>
+</td>
+</tr>
+<tr id="row101890358817"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1819014355815"><a name="p1819014355815"></a><a name="p1819014355815"></a><a href="context\hlog10.md">hlog10</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p9748104713819"><a name="p9748104713819"></a><a name="p9748104713819"></a>获取以10为底，输入数据的对数。</p>
+</td>
+</tr>
+<tr id="row13859105101618"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p118592517166"><a name="p118592517166"></a><a name="p118592517166"></a><a href="context\h2log10.md">h2log10</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p485945171614"><a name="p485945171614"></a><a name="p485945171614"></a>获取以10为底，输入数据各元素的对数。</p>
+</td>
+</tr>
+<tr id="row1391045415335"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1911185411339"><a name="p1911185411339"></a><a name="p1911185411339"></a><a href="context\log1pf.md">log1pf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p291195411335"><a name="p291195411335"></a><a name="p291195411335"></a>获取以e为底，输入数据加1的对数。</p>
+</td>
+</tr>
+<tr id="row4911105423314"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1991185473313"><a name="p1991185473313"></a><a name="p1991185473313"></a><a href="context\logbf.md">logbf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p129111454183318"><a name="p129111454183318"></a><a name="p129111454183318"></a>计算以2为底，输入数据的对数，并对结果向下取整，返回浮点数。</p>
+</td>
+</tr>
+<tr id="row1491135415337"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p12911145419333"><a name="p12911145419333"></a><a name="p12911145419333"></a><a href="context\ilogbf.md">ilogbf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p39111654113314"><a name="p39111654113314"></a><a name="p39111654113314"></a>计算以2为底，输入数据的对数，并对结果向下取整，返回整数。</p>
+</td>
+</tr>
+<tr id="row29111754153318"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p891175410338"><a name="p891175410338"></a><a name="p891175410338"></a><a href="context\cosf.md">cosf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p791135473319"><a name="p791135473319"></a><a name="p791135473319"></a>获取输入数据的三角函数余弦值。</p>
+</td>
+</tr>
+<tr id="row67461455384"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p374614555819"><a name="p374614555819"></a><a name="p374614555819"></a><a href="context\hcos.md">hcos</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1174615551686"><a name="p1174615551686"></a><a name="p1174615551686"></a>获取输入数据的三角函数余弦值。</p>
+</td>
+</tr>
+<tr id="row1854724181710"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p12854122421717"><a name="p12854122421717"></a><a name="p12854122421717"></a><a href="context\h2cos.md">h2cos</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p285442471714"><a name="p285442471714"></a><a name="p285442471714"></a>获取输入数据各元素的三角函数余弦值。</p>
+</td>
+</tr>
+<tr id="row13911554133318"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p10911115463319"><a name="p10911115463319"></a><a name="p10911115463319"></a><a href="context\coshf.md">coshf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p119111545339"><a name="p119111545339"></a><a name="p119111545339"></a>获取输入数据的双曲余弦值。</p>
+</td>
+</tr>
+<tr id="row1991165416336"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p99113543339"><a name="p99113543339"></a><a name="p99113543339"></a><a href="context\cospif.md">cospif</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p591115420332"><a name="p591115420332"></a><a name="p591115420332"></a>获取输入数据与π相乘的余弦值。</p>
+</td>
+</tr>
+<tr id="row17911115412338"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p29118548332"><a name="p29118548332"></a><a name="p29118548332"></a><a href="context\acosf.md">acosf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1391185433312"><a name="p1391185433312"></a><a name="p1391185433312"></a>获取输入数据的反余弦值。</p>
+</td>
+</tr>
+<tr id="row1591115540333"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1091185423313"><a name="p1091185423313"></a><a name="p1091185423313"></a><a href="context\acoshf.md">acoshf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1391115543333"><a name="p1391115543333"></a><a name="p1391115543333"></a>获取输入数据的双曲反余弦值。</p>
+</td>
+</tr>
+<tr id="row7911185413313"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p991117540339"><a name="p991117540339"></a><a name="p991117540339"></a><a href="context\sinf.md">sinf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p491145483319"><a name="p491145483319"></a><a name="p491145483319"></a>获取输入数据的三角函数正弦值。</p>
+</td>
+</tr>
+<tr id="row177714819916"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p12772081498"><a name="p12772081498"></a><a name="p12772081498"></a><a href="context\hsin.md">hsin</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p025914298"><a name="p025914298"></a><a name="p025914298"></a>获取输入数据的三角函数正弦值。</p>
+</td>
+</tr>
+<tr id="row157924881716"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p757913480179"><a name="p757913480179"></a><a name="p757913480179"></a><a href="context\h2sin.md">h2sin</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p115807481174"><a name="p115807481174"></a><a name="p115807481174"></a>获取输入数据各元素的三角函数正弦值。</p>
+</td>
+</tr>
+<tr id="row1291116544339"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p39111854153318"><a name="p39111854153318"></a><a name="p39111854153318"></a><a href="context\sinhf.md">sinhf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p10911854183317"><a name="p10911854183317"></a><a name="p10911854183317"></a>获取输入数据的双曲正弦值。</p>
+</td>
+</tr>
+<tr id="row2911155443313"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p59115544339"><a name="p59115544339"></a><a name="p59115544339"></a><a href="context\sinpif.md">sinpif</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1991275410335"><a name="p1991275410335"></a><a name="p1991275410335"></a>获取输入数据与π相乘的正弦值。</p>
+</td>
+</tr>
+<tr id="row17912145413335"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p169121654143312"><a name="p169121654143312"></a><a name="p169121654143312"></a><a href="context\asinf.md">asinf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p15912135433312"><a name="p15912135433312"></a><a name="p15912135433312"></a>获取输入数据的反正弦值。</p>
+</td>
+</tr>
+<tr id="row391275418334"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p169121054133310"><a name="p169121054133310"></a><a name="p169121054133310"></a><a href="context\asinhf.md">asinhf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1091215453318"><a name="p1091215453318"></a><a name="p1091215453318"></a>获取输入数据的双曲反正弦值。</p>
+</td>
+</tr>
+<tr id="row2912454113313"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p169124541336"><a name="p169124541336"></a><a name="p169124541336"></a><a href="context\sincosf.md">sincosf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p591275412338"><a name="p591275412338"></a><a name="p591275412338"></a>获取输入数据的三角函数正弦值和余弦值。</p>
+</td>
+</tr>
+<tr id="row1191219541337"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p09121354123318"><a name="p09121354123318"></a><a name="p09121354123318"></a><a href="context\sincospif.md">sincospif</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p14912135416337"><a name="p14912135416337"></a><a name="p14912135416337"></a>获取输入数据与π相乘的三角函数正弦值和余弦值。</p>
+</td>
+</tr>
+<tr id="row4912054123311"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p991225416331"><a name="p991225416331"></a><a name="p991225416331"></a><a href="context\frexpf.md">frexpf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p59121254153318"><a name="p59121254153318"></a><a name="p59121254153318"></a>将x转换为归一化[1/2, 1)的有符号数乘以2的积分幂。</p>
+</td>
+</tr>
+<tr id="row591225420337"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p491215414331"><a name="p491215414331"></a><a name="p491215414331"></a><a href="context\ldexpf.md">ldexpf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1291275463317"><a name="p1291275463317"></a><a name="p1291275463317"></a>获取输入x乘以2的exp次幂的结果。</p>
+</td>
+</tr>
+<tr id="row189127545339"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p591275473312"><a name="p591275473312"></a><a name="p591275473312"></a><a href="context\sqrtf.md">sqrtf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p15912125473316"><a name="p15912125473316"></a><a name="p15912125473316"></a>获取输入数据x的平方根。</p>
+</td>
+</tr>
+<tr id="row2013118509914"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1813116501295"><a name="p1813116501295"></a><a name="p1813116501295"></a><a href="context\hsqrt.md">hsqrt</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1913110508910"><a name="p1913110508910"></a><a name="p1913110508910"></a>获取输入数据x的平方根。</p>
+</td>
+</tr>
+<tr id="row15698935161815"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p2698935171814"><a name="p2698935171814"></a><a name="p2698935171814"></a><a href="context\h2sqrt.md">h2sqrt</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p12698183541814"><a name="p12698183541814"></a><a name="p12698183541814"></a>获取输入数据x各元素的平方根。</p>
+</td>
+</tr>
+<tr id="row15912354193311"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p59121054113311"><a name="p59121054113311"></a><a name="p59121054113311"></a><a href="context\rsqrtf.md">rsqrtf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p2091210546339"><a name="p2091210546339"></a><a name="p2091210546339"></a>获取输入数据x的平方根的倒数。</p>
+</td>
+</tr>
+<tr id="row155815911920"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p85584592099"><a name="p85584592099"></a><a name="p85584592099"></a><a href="context\hrsqrt.md">hrsqrt</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p165581593917"><a name="p165581593917"></a><a name="p165581593917"></a>获取输入数据x的平方根的倒数。</p>
+</td>
+</tr>
+<tr id="row1166825612188"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p56681056131817"><a name="p56681056131817"></a><a name="p56681056131817"></a><a href="context\h2rsqrt.md">h2rsqrt</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p466818566188"><a name="p466818566188"></a><a name="p466818566188"></a>获取输入数据x各元素的平方根的倒数。</p>
+</td>
+</tr>
+<tr id="row161542011141014"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1715461131015"><a name="p1715461131015"></a><a name="p1715461131015"></a><a href="context\hrcp.md">hrcp</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p278471781014"><a name="p278471781014"></a><a name="p278471781014"></a>获取输入数据x的倒数。</p>
+</td>
+</tr>
+<tr id="row15749172251912"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1274952271918"><a name="p1274952271918"></a><a name="p1274952271918"></a><a href="context\h2rcp.md">h2rcp</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p4749122251920"><a name="p4749122251920"></a><a name="p4749122251920"></a>获取输入数据x各元素的倒数。</p>
+</td>
+</tr>
+<tr id="row39129540339"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p17912195414335"><a name="p17912195414335"></a><a name="p17912195414335"></a><a href="context\hypotf.md">hypotf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p69122549339"><a name="p69122549339"></a><a name="p69122549339"></a>获取输入数据x、y的平方和x^2 + y^2的平方根。</p>
+</td>
+</tr>
+<tr id="row179123547336"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p291215414337"><a name="p291215414337"></a><a name="p291215414337"></a><a href="context\rhypotf.md">rhypotf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p13912175411334"><a name="p13912175411334"></a><a name="p13912175411334"></a>获取输入数据x、y的平方和x^2 + y^2的平方根的倒数。</p>
+</td>
+</tr>
+<tr id="row209131354203318"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p189135546330"><a name="p189135546330"></a><a name="p189135546330"></a><a href="context\powf.md">powf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p89131548338"><a name="p89131548338"></a><a name="p89131548338"></a>获取输入数据x的y次幂。</p>
+</td>
+</tr>
+<tr id="row1691385403315"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1991316546338"><a name="p1991316546338"></a><a name="p1991316546338"></a><a href="context\norm3df.md">norm3df</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p6913165483312"><a name="p6913165483312"></a><a name="p6913165483312"></a>获取输入数据a、b、c的平方和a^2 + b^2 + c^2的平方根。</p>
+</td>
+</tr>
+<tr id="row189134549332"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p149135547337"><a name="p149135547337"></a><a name="p149135547337"></a><a href="context\rnorm3df.md">rnorm3df</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1591315547332"><a name="p1591315547332"></a><a name="p1591315547332"></a>获取输入数据a、b、c的平方和a^2 + b^2 + c^2的平方根的倒数。</p>
+</td>
+</tr>
+<tr id="row6913754103312"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p79133542332"><a name="p79133542332"></a><a name="p79133542332"></a><a href="context\norm4df.md">norm4df</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p159133545335"><a name="p159133545335"></a><a name="p159133545335"></a>获取输入数据a、b、c、d的平方和a^2 + b^2+ c^2+ d^2的平方根。</p>
+</td>
+</tr>
+<tr id="row2913155414331"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p109137543339"><a name="p109137543339"></a><a name="p109137543339"></a><a href="context\rnorm4df.md">rnorm4df</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p2091305415337"><a name="p2091305415337"></a><a name="p2091305415337"></a>获取输入数据a、b、c、d的平方和a^2 + b^2 + c^2 + d^2的平方根的倒数。</p>
+</td>
+</tr>
+<tr id="row49134540337"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p791335412331"><a name="p791335412331"></a><a name="p791335412331"></a><a href="context\normf.md">normf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p89131754173312"><a name="p89131754173312"></a><a name="p89131754173312"></a>获取输入数据a中前n个元素的平方和a[0]^2 + a[1]^2 +...+ a[n-1]^2的平方根。</p>
+</td>
+</tr>
+<tr id="row9913195423314"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p791375413314"><a name="p791375413314"></a><a name="p791375413314"></a><a href="context\rnormf.md">rnormf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p20913154183315"><a name="p20913154183315"></a><a name="p20913154183315"></a>获取输入数据a中前n个元素的平方和a[0]^2 + a[1]^2 + ...+ a[n-1]^2的平方根的倒数。</p>
+</td>
+</tr>
+<tr id="row19131154153316"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p149136545335"><a name="p149136545335"></a><a name="p149136545335"></a><a href="context\cbrtf.md">cbrtf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p69134548337"><a name="p69134548337"></a><a name="p69134548337"></a>获取输入数据x的立方根。</p>
+</td>
+</tr>
+<tr id="row69144542337"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p79141854143319"><a name="p79141854143319"></a><a name="p79141854143319"></a><a href="context\rcbrtf.md">rcbrtf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p5914195423310"><a name="p5914195423310"></a><a name="p5914195423310"></a>获取输入数据x的立方根的倒数。</p>
+</td>
+</tr>
+<tr id="row1191415547334"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p0914185463320"><a name="p0914185463320"></a><a name="p0914185463320"></a><a href="context\erff.md">erff</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p791420542339"><a name="p791420542339"></a><a name="p791420542339"></a>获取输入数据的误差函数值。</p>
+</td>
+</tr>
+<tr id="row16914185493319"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p12914125411339"><a name="p12914125411339"></a><a name="p12914125411339"></a><a href="context\erfcf.md">erfcf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1091465419339"><a name="p1091465419339"></a><a name="p1091465419339"></a>获取输入数据的互补误差函数值。</p>
+</td>
+</tr>
+<tr id="row1491419541338"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p2091415414331"><a name="p2091415414331"></a><a name="p2091415414331"></a><a href="context\erfinvf.md">erfinvf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p10914115423319"><a name="p10914115423319"></a><a name="p10914115423319"></a>获取输入数据的逆误差函数值。</p>
+</td>
+</tr>
+<tr id="row491495463319"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1691419544339"><a name="p1691419544339"></a><a name="p1691419544339"></a><a href="context\erfcinvf.md">erfcinvf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p9914155411339"><a name="p9914155411339"></a><a name="p9914155411339"></a>获取输入数据的逆互补误差函数值。</p>
+</td>
+</tr>
+<tr id="row12914115414339"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p7914145493311"><a name="p7914145493311"></a><a name="p7914145493311"></a><a href="context\erfcxf.md">erfcxf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p191413543333"><a name="p191413543333"></a><a name="p191413543333"></a>获取输入数据的缩放互补误差函数值。</p>
+</td>
+</tr>
+<tr id="row199147542338"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1691414548339"><a name="p1691414548339"></a><a name="p1691414548339"></a><a href="context\tgammaf.md">tgammaf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1091413548331"><a name="p1091413548331"></a><a name="p1091413548331"></a>获取输入数据x的伽马函数值。</p>
+</td>
+</tr>
+<tr id="row3914254133318"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p7915135493311"><a name="p7915135493311"></a><a name="p7915135493311"></a><a href="context\lgammaf.md">lgammaf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p3915754143313"><a name="p3915754143313"></a><a name="p3915754143313"></a>获取输入数据x伽马值的绝对值并求自然对数。</p>
+</td>
+</tr>
+<tr id="row591520548334"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1891595412338"><a name="p1891595412338"></a><a name="p1891595412338"></a><a href="context\cyl_bessel_i0f.md">cyl_bessel_i0f</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p20915054133314"><a name="p20915054133314"></a><a name="p20915054133314"></a>获取输入数据x的0阶常规修正圆柱贝塞尔函数的值。</p>
+</td>
+</tr>
+<tr id="row59153548339"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p091514544334"><a name="p091514544334"></a><a name="p091514544334"></a><a href="context\cyl_bessel_i1f.md">cyl_bessel_i1f</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1915145410334"><a name="p1915145410334"></a><a name="p1915145410334"></a>获取输入数据x的1阶常规修正圆柱贝塞尔函数的值。</p>
+</td>
+</tr>
+<tr id="row691512548334"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p0915125413319"><a name="p0915125413319"></a><a name="p0915125413319"></a><a href="context\normcdff.md">normcdff</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p119151454103312"><a name="p119151454103312"></a><a name="p119151454103312"></a>获取输入数据x的标准正态分布的累积分布函数值。</p>
+</td>
+</tr>
+<tr id="row20349141123420"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p10301542341"><a name="p10301542341"></a><a name="p10301542341"></a><a href="context\normcdfinvf.md">normcdfinvf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p15301346347"><a name="p15301346347"></a><a name="p15301346347"></a>获取输入数据x的标准正态累积分布的逆函数</p>
+</td>
+</tr>
+<tr id="row16915105413334"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p159151549334"><a name="p159151549334"></a><a name="p159151549334"></a><a href="context\j0f.md">j0f</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p891555443311"><a name="p891555443311"></a><a name="p891555443311"></a>获取输入数据x的0阶第一类贝塞尔函数j0的值。</p>
+</td>
+</tr>
+<tr id="row1191545463312"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p19151554153310"><a name="p19151554153310"></a><a name="p19151554153310"></a><a href="context\j1f.md">j1f</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1891595418336"><a name="p1891595418336"></a><a name="p1891595418336"></a>获取输入数据x的1阶第一类贝塞尔函数j1的值。</p>
+</td>
+</tr>
+<tr id="row99153549332"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p2091595483312"><a name="p2091595483312"></a><a name="p2091595483312"></a><a href="context\jnf.md">jnf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p12915454173316"><a name="p12915454173316"></a><a name="p12915454173316"></a>获取输入数据x的n阶第一类贝塞尔函数jn的值。</p>
+</td>
+</tr>
+<tr id="row1191565416337"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p10915185414338"><a name="p10915185414338"></a><a name="p10915185414338"></a><a href="context\y0f.md">y0f</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p991514545332"><a name="p991514545332"></a><a name="p991514545332"></a>获取输入数据x的0阶第二类贝塞尔函数y0的值。</p>
+</td>
+</tr>
+<tr id="row8915185420338"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p29151854203311"><a name="p29151854203311"></a><a name="p29151854203311"></a><a href="context\y1f.md">y1f</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p13915155483317"><a name="p13915155483317"></a><a name="p13915155483317"></a>获取输入数据x的1阶第二类贝塞尔函数y1的值。</p>
+</td>
+</tr>
+<tr id="row491595483318"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p19915165418337"><a name="p19915165418337"></a><a name="p19915165418337"></a><a href="context\ynf.md">ynf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p189151754133313"><a name="p189151754133313"></a><a name="p189151754133313"></a>获取输入数据x的n阶第二类贝塞尔函数yn的值。</p>
+</td>
+</tr>
+<tr id="row5915354113314"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p14916175416338"><a name="p14916175416338"></a><a name="p14916175416338"></a><a href="context\fabsf.md">fabsf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p119161754193319"><a name="p119161754193319"></a><a name="p119161754193319"></a>获取输入数据的绝对值。</p>
+</td>
+</tr>
+<tr id="row1345410171828"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1454617720"><a name="p1454617720"></a><a name="p1454617720"></a><a href="context\__habs.md">__habs</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p134549171823"><a name="p134549171823"></a><a name="p134549171823"></a>获取输入数据的绝对值。</p>
+</td>
+</tr>
+<tr id="row189161954123314"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p991615546339"><a name="p991615546339"></a><a name="p991615546339"></a><a href="context\fmaf.md">fmaf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p3916105413333"><a name="p3916105413333"></a><a name="p3916105413333"></a>对输入数据x、y、z，计算x与y相乘加上z的结果。</p>
+</td>
+</tr>
+<tr id="row189014232040"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p99017231749"><a name="p99017231749"></a><a name="p99017231749"></a><a href="context\__hfma.md">__hfma</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p390152312411"><a name="p390152312411"></a><a name="p390152312411"></a>对输入数据x、y、z，计算x与y相乘加上z的结果。</p>
+</td>
+</tr>
+<tr id="row1891611541336"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p2916115413339"><a name="p2916115413339"></a><a name="p2916115413339"></a><a href="context\fmaxf.md">fmaxf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p091616545335"><a name="p091616545335"></a><a name="p091616545335"></a>获取两个输入数据中的最大值。</p>
+</td>
+</tr>
+<tr id="row311020351658"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p81110351658"><a name="p81110351658"></a><a name="p81110351658"></a><a href="context\__hmax.md">__hmax</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p16734242758"><a name="p16734242758"></a><a name="p16734242758"></a>获取两个输入数据中的最大值。</p>
+</td>
+</tr>
+<tr id="row139161854153314"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p291645411338"><a name="p291645411338"></a><a name="p291645411338"></a><a href="context\fminf.md">fminf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p891675463312"><a name="p891675463312"></a><a name="p891675463312"></a>获取两个输入数据中的最小值。</p>
+</td>
+</tr>
+<tr id="row1458293819518"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1658211381353"><a name="p1658211381353"></a><a name="p1658211381353"></a><a href="context\__hmin.md">__hmin</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p7582438957"><a name="p7582438957"></a><a name="p7582438957"></a>获取两个输入数据中的最小值。</p>
+</td>
+</tr>
+<tr id="row15916454203311"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p4916115411332"><a name="p4916115411332"></a><a name="p4916115411332"></a><a href="context\fdimf.md">fdimf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p13916125433311"><a name="p13916125433311"></a><a name="p13916125433311"></a>获取输入数据的差值，差值小于0时，返回0。</p>
+</td>
+</tr>
+<tr id="row119165548334"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p12916195415332"><a name="p12916195415332"></a><a name="p12916195415332"></a><a href="context\remquof.md">remquof</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1791695411333"><a name="p1791695411333"></a><a name="p1791695411333"></a>获取输入数据x除以y的余数。求余数时，商取最接近x除以y浮点数结果的整数，当x除以y的浮点数结果与左右最接近的整数距离相等时，商取偶数，同时将商赋值给指针变量quo。</p>
+</td>
+</tr>
+<tr id="row13916254203313"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p14916254133316"><a name="p14916254133316"></a><a name="p14916254133316"></a><a href="context\fmodf.md">fmodf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p491615453316"><a name="p491615453316"></a><a name="p491615453316"></a>获取输入数据x除以y的余数。求余数时，商取x除以y浮点数结果的整数部分。</p>
+</td>
+</tr>
+<tr id="row1791614546337"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p139161541336"><a name="p139161541336"></a><a name="p139161541336"></a><a href="context\remainderf.md">remainderf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p5916185418337"><a name="p5916185418337"></a><a name="p5916185418337"></a>获取输入数据x除以y的余数。求余数时，商取最接近x除以y浮点数结果的整数，当x除以y的浮点数结果与左右最接近的整数距离相等时，商取偶数。</p>
+</td>
+</tr>
+<tr id="row091635423313"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p39166542332"><a name="p39166542332"></a><a name="p39166542332"></a><a href="context\copysignf.md">copysignf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p209161154133315"><a name="p209161154133315"></a><a name="p209161154133315"></a>获取由第一个输入x的数值部分和第二个输入y的符号部分拼接得到的浮点数。</p>
+</td>
+</tr>
+<tr id="row12916105473310"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1091665433317"><a name="p1091665433317"></a><a name="p1091665433317"></a><a href="context\nearbyintf.md">nearbyIntf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p16917354163318"><a name="p16917354163318"></a><a name="p16917354163318"></a>获取与输入浮点数最接近的整数，输入浮点数与左右整数的距离相等时，返回偶数。</p>
+</td>
+</tr>
+<tr id="row129171654113313"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p191775483318"><a name="p191775483318"></a><a name="p191775483318"></a><a href="context\nextafterf.md">nextafterf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p18917185418334"><a name="p18917185418334"></a><a name="p18917185418334"></a>如果y大于x，返回比x大的下一个可表示的浮点值，即浮点数二进制最低位加1。</p>
+<p id="p8917354133310"><a name="p8917354133310"></a><a name="p8917354133310"></a>如果y小于x，返回比x小的下一个可表示的浮点值，即浮点数二进制最低位减1。</p>
+<p id="p1991745433314"><a name="p1991745433314"></a><a name="p1991745433314"></a>如果y等于x，返回x。</p>
+</td>
+</tr>
+<tr id="row149171154153319"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p169175549335"><a name="p169175549335"></a><a name="p169175549335"></a><a href="context\scalbnf.md">scalbnf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p5917135413314"><a name="p5917135413314"></a><a name="p5917135413314"></a>获取输入数据x与2的n次方的乘积。</p>
+</td>
+</tr>
+<tr id="row3917125453319"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p4917125413310"><a name="p4917125413310"></a><a name="p4917125413310"></a><a href="context\scalblnf.md">scalblnf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p119172054133314"><a name="p119172054133314"></a><a name="p119172054133314"></a>获取输入数据x与2的n次方的乘积。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 30**  精度转换
+
+<a name="table14459746154815"></a>
+<table><thead align="left"><tr id="row134598462487"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p24591346124818"><a name="p24591346124818"></a><a name="p24591346124818"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="60%" id="mcps1.2.3.1.2"><p id="p1545918468481"><a name="p1545918468481"></a><a name="p1545918468481"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row345924604816"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1245915462484"><a name="p1245915462484"></a><a name="p1245915462484"></a><a href="context\rintf.md">rintf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p19459124613489"><a name="p19459124613489"></a><a name="p19459124613489"></a>获取与输入数据最接近的整数，若存在两个同样接近的整数，则获取其中的偶数。</p>
+</td>
+</tr>
+<tr id="row729089477"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p5291690717"><a name="p5291690717"></a><a name="p5291690717"></a><a href="context\hrint.md">hrint</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p182918911719"><a name="p182918911719"></a><a name="p182918911719"></a>获取与输入数据最接近的整数，若存在两个同样接近的整数，则获取其中的偶数。</p>
+</td>
+</tr>
+<tr id="row12019499204"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p130849102011"><a name="p130849102011"></a><a name="p130849102011"></a><a href="context\h2rint.md">h2rint</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1901749162013"><a name="p1901749162013"></a><a name="p1901749162013"></a>获取与输入数据各元素最接近的整数，若存在两个同样接近的整数，则获取其中的偶数。</p>
+</td>
+</tr>
+<tr id="row16459184654815"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p18459204617484"><a name="p18459204617484"></a><a name="p18459204617484"></a><a href="context\lrintf.md">lrintf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p20459104684810"><a name="p20459104684810"></a><a name="p20459104684810"></a>获取与输入数据最接近的整数，若存在两个同样接近的整数，则获取其中的偶数。</p>
+</td>
+</tr>
+<tr id="row124591546124816"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1745974634812"><a name="p1745974634812"></a><a name="p1745974634812"></a><a href="context\llrintf.md">llrintf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p245954654812"><a name="p245954654812"></a><a name="p245954654812"></a>获取与输入数据最接近的整数，若存在两个同样接近的整数，则获取其中的偶数。</p>
+</td>
+</tr>
+<tr id="row14459124615487"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1545934694812"><a name="p1545934694812"></a><a name="p1545934694812"></a><a href="context\roundf.md">roundf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p445916469481"><a name="p445916469481"></a><a name="p445916469481"></a>获取对输入数据四舍五入后的整数。</p>
+</td>
+</tr>
+<tr id="row4459154613487"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1045944624815"><a name="p1045944624815"></a><a name="p1045944624815"></a><a href="context\lroundf.md">lroundf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p3459046164817"><a name="p3459046164817"></a><a name="p3459046164817"></a>获取对输入数据四舍五入后的整数。</p>
+</td>
+</tr>
+<tr id="row44591746144816"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p194590469486"><a name="p194590469486"></a><a name="p194590469486"></a><a href="context\llroundf.md">llroundf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p445924614485"><a name="p445924614485"></a><a name="p445924614485"></a>获取对输入数据四舍五入后的整数。</p>
+</td>
+</tr>
+<tr id="row154598465484"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p16459246174813"><a name="p16459246174813"></a><a name="p16459246174813"></a><a href="context\floorf.md">floorf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p445924616480"><a name="p445924616480"></a><a name="p445924616480"></a>获取小于或等于输入数据的最大整数值。</p>
+</td>
+</tr>
+<tr id="row1095217147715"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p16953714579"><a name="p16953714579"></a><a name="p16953714579"></a><a href="context\hfloor.md">hfloor</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1395331416711"><a name="p1395331416711"></a><a name="p1395331416711"></a>获取小于或等于输入数据的最大整数值。</p>
+</td>
+</tr>
+<tr id="row11971115314208"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p5972175362012"><a name="p5972175362012"></a><a name="p5972175362012"></a><a href="context\h2floor.md">h2floor</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p997245312209"><a name="p997245312209"></a><a name="p997245312209"></a>获取小于或等于输入数据各元素的最大整数值。</p>
+</td>
+</tr>
+<tr id="row12811735115110"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p42781135185115"><a name="p42781135185115"></a><a name="p42781135185115"></a><a href="context\ceilf.md">ceilf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p8278103517513"><a name="p8278103517513"></a><a name="p8278103517513"></a>获取大于或等于输入数据的最小整数值。</p>
+</td>
+</tr>
+<tr id="row187657177712"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1276516171876"><a name="p1276516171876"></a><a name="p1276516171876"></a><a href="context\hceil.md">hceil</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p4766181718717"><a name="p4766181718717"></a><a name="p4766181718717"></a>获取大于或等于输入数据的最小整数值。</p>
+</td>
+</tr>
+<tr id="row55640577203"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p17564125762010"><a name="p17564125762010"></a><a name="p17564125762010"></a><a href="context\h2ceil.md">h2ceil</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p125644579203"><a name="p125644579203"></a><a name="p125644579203"></a>获取大于或等于输入数据各元素的最小整数值。</p>
+</td>
+</tr>
+<tr id="row3281335195118"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p427916352511"><a name="p427916352511"></a><a name="p427916352511"></a><a href="context\truncf.md">truncf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p12279133555111"><a name="p12279133555111"></a><a name="p12279133555111"></a>获取对输入数据的浮点数截断后的整数。</p>
+</td>
+</tr>
+<tr id="row5414182018710"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p114141420374"><a name="p114141420374"></a><a name="p114141420374"></a><a href="context\htrunc.md">htrunc</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p141412012710"><a name="p141412012710"></a><a name="p141412012710"></a>获取对输入数据的浮点数截断后的整数。</p>
+</td>
+</tr>
+<tr id="row1524850182111"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p182481506212"><a name="p182481506212"></a><a name="p182481506212"></a><a href="context\h2trunc.md">h2trunc</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p62485015213"><a name="p62485015213"></a><a name="p62485015213"></a>获取对输入数据各元素的浮点数截断后的整数。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 31**  比较函数
+
+<a name="table13951184259"></a>
+<table><thead align="left"><tr id="row20395131832515"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p339517183253"><a name="p339517183253"></a><a name="p339517183253"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="60%" id="mcps1.2.3.1.2"><p id="p6395131819252"><a name="p6395131819252"></a><a name="p6395131819252"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row93963189258"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p439610186253"><a name="p439610186253"></a><a name="p439610186253"></a><a href="context\isfinite-1.md">isfinite</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1396181813253"><a name="p1396181813253"></a><a name="p1396181813253"></a>判断浮点数是否为有限数（非inf、非nan）。</p>
+</td>
+</tr>
+<tr id="row739661817254"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p2396218192518"><a name="p2396218192518"></a><a name="p2396218192518"></a><a href="context\isnan-1.md">isnan</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p2039631814253"><a name="p2039631814253"></a><a name="p2039631814253"></a>判断浮点数是否为nan。</p>
+</td>
+</tr>
+<tr id="row16744631793"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p874412316911"><a name="p874412316911"></a><a name="p874412316911"></a><a href="context\__hisnan.md">__hisnan</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p15744113114918"><a name="p15744113114918"></a><a name="p15744113114918"></a>判断浮点数是否为nan。</p>
+</td>
+</tr>
+<tr id="row5396191822512"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p93961918152514"><a name="p93961918152514"></a><a name="p93961918152514"></a><a href="context\isinf-1.md">isinf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p18215105443017"><a name="p18215105443017"></a><a name="p18215105443017"></a>判断浮点数是否为无穷。</p>
+</td>
+</tr>
+<tr id="row3972933196"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p199724331919"><a name="p199724331919"></a><a name="p199724331919"></a><a href="context\__hisinf.md">__hisinf</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p19728332911"><a name="p19728332911"></a><a name="p19728332911"></a>判断浮点数是否为无穷。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 32**  Atomic函数
+
+<a name="table17209165495117"></a>
+<table><thead align="left"><tr id="row720915541514"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p16210954205119"><a name="p16210954205119"></a><a name="p16210954205119"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="60%" id="mcps1.2.3.1.2"><p id="p122101254105114"><a name="p122101254105114"></a><a name="p122101254105114"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row221025405119"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p18210165415117"><a name="p18210165415117"></a><a name="p18210165415117"></a><a href="context\asc_atomic_add.md">asc_atomic_add</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p14210105415119"><a name="p14210105415119"></a><a name="p14210105415119"></a>对<span id="ph10536132505718"><a name="ph10536132505718"></a><a name="ph10536132505718"></a>Unified Buffer</span>或<span id="ph1753616252577"><a name="ph1753616252577"></a><a name="ph1753616252577"></a>Global Memory</span>上的数据与指定数据执行原子加操作，即将指定数据累加到<span id="ph15143152082811"><a name="ph15143152082811"></a><a name="ph15143152082811"></a>Unified Buffer</span>或<span id="ph214322082812"><a name="ph214322082812"></a><a name="ph214322082812"></a>Global Memory</span>的数据中。</p>
+</td>
+</tr>
+<tr id="row102101054135111"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p10210654105113"><a name="p10210654105113"></a><a name="p10210654105113"></a><a href="context\asc_atomic_sub.md">asc_atomic_sub</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1021019548518"><a name="p1021019548518"></a><a name="p1021019548518"></a>对<span id="ph5434440195718"><a name="ph5434440195718"></a><a name="ph5434440195718"></a>Unified Buffer</span>或<span id="ph1343414075710"><a name="ph1343414075710"></a><a name="ph1343414075710"></a>Global Memory</span>上的数据与指定数据执行原子减操作，即在<span id="ph93051920194612"><a name="ph93051920194612"></a><a name="ph93051920194612"></a>Unified Buffer</span>或<span id="ph1330532015466"><a name="ph1330532015466"></a><a name="ph1330532015466"></a>Global Memory</span>的数据上减去指定数据。</p>
+</td>
+</tr>
+<tr id="row14210155416511"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p12101954125120"><a name="p12101954125120"></a><a name="p12101954125120"></a><a href="context\asc_atomic_exch.md">asc_atomic_exch</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p921017541514"><a name="p921017541514"></a><a name="p921017541514"></a>对<span id="ph19824155135715"><a name="ph19824155135715"></a><a name="ph19824155135715"></a>Unified Buffer</span>或<span id="ph2824251175717"><a name="ph2824251175717"></a><a name="ph2824251175717"></a>Global Memory</span>地址做原子赋值操作，即将指定数据赋值到<span id="ph38242515577"><a name="ph38242515577"></a><a name="ph38242515577"></a>Unified Buffer</span>或<span id="ph1782418514572"><a name="ph1782418514572"></a><a name="ph1782418514572"></a>Global Memory</span>地址中。</p>
+</td>
+</tr>
+<tr id="row9210125445116"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p16210654145112"><a name="p16210654145112"></a><a name="p16210654145112"></a><a href="context\asc_atomic_max.md">asc_atomic_max</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p182101754115113"><a name="p182101754115113"></a><a name="p182101754115113"></a>对<span id="ph82259014584"><a name="ph82259014584"></a><a name="ph82259014584"></a>Unified Buffer</span>或<span id="ph722514018587"><a name="ph722514018587"></a><a name="ph722514018587"></a>Global Memory</span>数据做原子求最大值操作，即将<span id="ph72255035818"><a name="ph72255035818"></a><a name="ph72255035818"></a>Unified Buffer</span>或<span id="ph3225180185819"><a name="ph3225180185819"></a><a name="ph3225180185819"></a>Global Memory</span>的数据与指定数据中的最大值赋值到<span id="ph16444335125614"><a name="ph16444335125614"></a><a name="ph16444335125614"></a>Unified Buffer</span>或<span id="ph2444133513562"><a name="ph2444133513562"></a><a name="ph2444133513562"></a>Global Memory</span>地址中。</p>
+</td>
+</tr>
+<tr id="row5210165425115"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p321035415115"><a name="p321035415115"></a><a name="p321035415115"></a><a href="context\asc_atomic_min.md">asc_atomic_min</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p16210155445111"><a name="p16210155445111"></a><a name="p16210155445111"></a>对<span id="ph236151245817"><a name="ph236151245817"></a><a name="ph236151245817"></a>Unified Buffer</span>或<span id="ph17361012165811"><a name="ph17361012165811"></a><a name="ph17361012165811"></a>Global Memory</span>数据做原子求最小值操作，即将<span id="ph103671216583"><a name="ph103671216583"></a><a name="ph103671216583"></a>Unified Buffer</span>或<span id="ph43616124587"><a name="ph43616124587"></a><a name="ph43616124587"></a>Global Memory</span>的数据与指定数据中的最小值赋值到<span id="ph1336191245816"><a name="ph1336191245816"></a><a name="ph1336191245816"></a>Unified Buffer</span>或<span id="ph1236121265812"><a name="ph1236121265812"></a><a name="ph1236121265812"></a>Global Memory</span>地址中。</p>
+</td>
+</tr>
+<tr id="row162101254175110"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p421011547518"><a name="p421011547518"></a><a name="p421011547518"></a><a href="context\asc_atomic_inc.md">asc_atomic_inc</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p0210115417511"><a name="p0210115417511"></a><a name="p0210115417511"></a>对<span id="ph4991141914580"><a name="ph4991141914580"></a><a name="ph4991141914580"></a>Unified Buffer</span>或<span id="ph18991719175819"><a name="ph18991719175819"></a><a name="ph18991719175819"></a>Global Memory</span>上address的数值进行原子加1操作，如果address上的数值大于等于指定数值val，则对address赋值为0，否则将address上数值加1。</p>
+</td>
+</tr>
+<tr id="row19210145435112"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p2210115455112"><a name="p2210115455112"></a><a name="p2210115455112"></a><a href="context\asc_atomic_dec.md">asc_atomic_dec</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1021025445117"><a name="p1021025445117"></a><a name="p1021025445117"></a>对<span id="ph1959983155818"><a name="ph1959983155818"></a><a name="ph1959983155818"></a>Unified Buffer</span>或<span id="ph05991831195817"><a name="ph05991831195817"></a><a name="ph05991831195817"></a>Global Memory</span>上address的数值进行原子减1操作，如果address上的数值等于0或大于指定数值val，则对address赋值为val，否则将address上数值减1。</p>
+</td>
+</tr>
+<tr id="row13198193011527"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p48379327525"><a name="p48379327525"></a><a name="p48379327525"></a><a href="context\asc_atomic_cas.md">asc_atomic_cas</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p101941330125214"><a name="p101941330125214"></a><a name="p101941330125214"></a>对<span id="ph8959114015812"><a name="ph8959114015812"></a><a name="ph8959114015812"></a>Unified Buffer</span>或<span id="ph0959144013587"><a name="ph0959144013587"></a><a name="ph0959144013587"></a>Global Memory</span>上address的数值进行原子比较赋值操作，如果address上的数值等于指定数值compare，则对address赋值为指定数值val，否则address的数值不变。</p>
+</td>
+</tr>
+<tr id="row1819812308522"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p18837203213524"><a name="p18837203213524"></a><a name="p18837203213524"></a><a href="context\asc_atomic_and.md">asc_atomic_and</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p919417304529"><a name="p919417304529"></a><a name="p919417304529"></a>对<span id="ph18404486584"><a name="ph18404486584"></a><a name="ph18404486584"></a>Unified Buffer</span>或<span id="ph138406481583"><a name="ph138406481583"></a><a name="ph138406481583"></a>Global Memory</span>上address的数值与指定数值val进行原子与（&amp;）操作，即将address数值与（&amp;）val的结果赋值到<span id="ph7927849219"><a name="ph7927849219"></a><a name="ph7927849219"></a>Unified Buffer</span>或<span id="ph4927742218"><a name="ph4927742218"></a><a name="ph4927742218"></a>Global Memory</span>上。</p>
+</td>
+</tr>
+<tr id="row11982030105210"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1837163211522"><a name="p1837163211522"></a><a name="p1837163211522"></a><a href="context\asc_atomic_or.md">asc_atomic_or</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p15194130125218"><a name="p15194130125218"></a><a name="p15194130125218"></a>对<span id="ph652716542215"><a name="ph652716542215"></a><a name="ph652716542215"></a>Unified Buffer</span>或<span id="ph1652785412220"><a name="ph1652785412220"></a><a name="ph1652785412220"></a>Global Memory</span>上address的数值与指定数值val进行原子或（|）操作，即将address数值或（|）val的结果赋值到<span id="ph1333582155916"><a name="ph1333582155916"></a><a name="ph1333582155916"></a>Unified Buffer</span>或<span id="ph13335112125912"><a name="ph13335112125912"></a><a name="ph13335112125912"></a>Global Memory</span>上。</p>
+</td>
+</tr>
+<tr id="row819816309523"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p108358323529"><a name="p108358323529"></a><a name="p108358323529"></a><a href="context\asc_atomic_xor.md">asc_atomic_xor</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p8194203065216"><a name="p8194203065216"></a><a name="p8194203065216"></a>对<span id="ph12461111115918"><a name="ph12461111115918"></a><a name="ph12461111115918"></a>Unified Buffer</span>或<span id="ph19461181110597"><a name="ph19461181110597"></a><a name="ph19461181110597"></a>Global Memory</span>上address的数值与指定数值val进行原子异或（^）操作，即将address数值异或（^）val的结果赋值到<span id="ph746121145910"><a name="ph746121145910"></a><a name="ph746121145910"></a>Unified Buffer</span>或<span id="ph1946111113591"><a name="ph1946111113591"></a><a name="ph1946111113591"></a>Global Memory</span>上。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 33**  Warp函数
+
+<a name="table13746514532"></a>
+<table><thead align="left"><tr id="row53744575316"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p133744575314"><a name="p133744575314"></a><a name="p133744575314"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="60%" id="mcps1.2.3.1.2"><p id="p1137419545315"><a name="p1137419545315"></a><a name="p1137419545315"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row63742535318"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p137411525310"><a name="p137411525310"></a><a name="p137411525310"></a><a href="context\asc_all.md">asc_all</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p118785325243"><a name="p118785325243"></a><a name="p118785325243"></a>判断是否所有活跃线程的输入均不为0。</p>
+</td>
+</tr>
+<tr id="row1374145125316"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p3374165145317"><a name="p3374165145317"></a><a name="p3374165145317"></a><a href="context\asc_any.md">asc_any</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p361320505593"><a name="p361320505593"></a><a name="p361320505593"></a>判断是否有活跃线程的输入不为0。</p>
+</td>
+</tr>
+<tr id="row937495135320"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1237412595310"><a name="p1237412595310"></a><a name="p1237412595310"></a><a href="context\asc_ballot.md">asc_ballot</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p178511254143017"><a name="p178511254143017"></a><a name="p178511254143017"></a>判断Warp内每个活跃线程的输入是否不为0。</p>
+</td>
+</tr>
+<tr id="row937475185312"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p18374152538"><a name="p18374152538"></a><a name="p18374152538"></a><a href="context\asc_activemask.md">asc_activemask</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p13965195011409"><a name="p13965195011409"></a><a name="p13965195011409"></a>查看Warp内所有线程是否为活跃状态。</p>
+</td>
+</tr>
+<tr id="row16374452533"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p737413565311"><a name="p737413565311"></a><a name="p737413565311"></a><a href="context\asc_shfl.md">asc_shfl</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p8374185115315"><a name="p8374185115315"></a><a name="p8374185115315"></a>获取Warp内指定线程srcLane输入的用于交换的var值。</p>
+</td>
+</tr>
+<tr id="row13747585320"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p337419535319"><a name="p337419535319"></a><a name="p337419535319"></a><a href="context\asc_shfl_up.md">asc_shfl_up</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1337411519534"><a name="p1337411519534"></a><a name="p1337411519534"></a>获取Warp内当前线程向前偏移delta（当前线程LaneId-delta）的线程输入的用于交换的var值。</p>
+</td>
+</tr>
+<tr id="row193742515530"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p637420511533"><a name="p637420511533"></a><a name="p637420511533"></a><a href="context\asc_shfl_down.md">asc_shfl_down</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p537455125315"><a name="p537455125315"></a><a name="p537455125315"></a>获取Warp内当前线程向后偏移delta（当前线程LaneId+delta）的线程输入的用于交换的var值。</p>
+</td>
+</tr>
+<tr id="row103591959165310"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p19356125955319"><a name="p19356125955319"></a><a name="p19356125955319"></a><a href="context\asc_shfl_xor.md">asc_shfl_xor</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p14356125916533"><a name="p14356125916533"></a><a name="p14356125916533"></a>获取Warp内当前线程LaneId与输入laneMask做异或操作（LaneId^laneMask）得到的dstLaneId对应线程输入的用于交换的var值。</p>
+</td>
+</tr>
+<tr id="row335915918538"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p163562059105319"><a name="p163562059105319"></a><a name="p163562059105319"></a><a href="context\asc_reduce_add.md">asc_reduce_add</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p6356195985310"><a name="p6356195985310"></a><a name="p6356195985310"></a>对Warp内所有活跃线程输入的val求和。</p>
+</td>
+</tr>
+<tr id="row18358459195316"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p183561590539"><a name="p183561590539"></a><a name="p183561590539"></a><a href="context\asc_reduce_max.md">asc_reduce_max</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p3356759135312"><a name="p3356759135312"></a><a name="p3356759135312"></a>对Warp内所有活跃线程输入的val求最大值。</p>
+</td>
+</tr>
+<tr id="row6358459175313"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p83567590530"><a name="p83567590530"></a><a name="p83567590530"></a><a href="context\asc_reduce_min.md">asc_reduce_min</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1235655945315"><a name="p1235655945315"></a><a name="p1235655945315"></a>对Warp内所有活跃线程输入val求最小值。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 34**  类型转换
+
+<a name="table113998363475"></a>
+<table><thead align="left"><tr id="row143991736144719"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p199910538472"><a name="p199910538472"></a><a name="p199910538472"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p7100105313479"><a name="p7100105313479"></a><a name="p7100105313479"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row23991536104710"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p7545194413475"><a name="p7545194413475"></a><a name="p7545194413475"></a><a href="context\__float2half.md">__float2half</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p67160345551"><a name="p67160345551"></a><a name="p67160345551"></a>将浮点数转换为半精度浮点数，并四舍五入到最接近的偶数，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row6399173694716"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p10545844174711"><a name="p10545844174711"></a><a name="p10545844174711"></a><a href="context\__float2half_rn.md">__float2half_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p164361426604"><a name="p164361426604"></a><a name="p164361426604"></a>将浮点数转换为半精度浮点数，并四舍五入到最接近的偶数，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row1239912369471"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p17545154414473"><a name="p17545154414473"></a><a name="p17545154414473"></a><a href="context\__float2half_rz.md">__float2half_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p220920202916"><a name="p220920202916"></a><a name="p220920202916"></a>将浮点数转换为半精度浮点数，并向零的方向舍入，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row8399236134717"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p15546164413471"><a name="p15546164413471"></a><a name="p15546164413471"></a><a href="context\__float2half_rd.md">__float2half_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p20533447152814"><a name="p20533447152814"></a><a name="p20533447152814"></a>将浮点数转换为半精度浮点数，并在转换过程中向下取整，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row3399736164710"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p5546124415471"><a name="p5546124415471"></a><a name="p5546124415471"></a><a href="context\__float2half_ru.md">__float2half_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p8332154901"><a name="p8332154901"></a><a name="p8332154901"></a>将浮点数转换为半精度浮点数，并在转换过程中向上取整，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row1242312012415"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p174237032416"><a name="p174237032416"></a><a name="p174237032416"></a><a href="context\__float2half_rna.md">__float2half_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p042330122418"><a name="p042330122418"></a><a name="p042330122418"></a>将浮点数转换为半精度浮点数，并向远离零的方向舍入，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row1251930240"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p2025143152418"><a name="p2025143152418"></a><a name="p2025143152418"></a><a href="context\__float2half_ro.md">__float2half_ro</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1251193192415"><a name="p1251193192415"></a><a name="p1251193192415"></a>将浮点数转换为半精度浮点数，并四舍五入到最接近的奇数，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row143991336194711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1354664444719"><a name="p1354664444719"></a><a name="p1354664444719"></a><a href="context\__float2bfloat16.md">__float2bfloat16</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p13160165155714"><a name="p13160165155714"></a><a name="p13160165155714"></a>将浮点数转换为bfloat16精度，并四舍五入到最接近的偶数，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row1640063654713"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p75463441475"><a name="p75463441475"></a><a name="p75463441475"></a><a href="context\__float2bfloat16_rn.md">__float2bfloat16_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p54391374585"><a name="p54391374585"></a><a name="p54391374585"></a>将浮点数转换为bfloat16精度，并四舍五入到最接近的偶数，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row34004367474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p12547194414712"><a name="p12547194414712"></a><a name="p12547194414712"></a><a href="context\__float2bfloat16_rz.md">__float2bfloat16_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1081512231916"><a name="p1081512231916"></a><a name="p1081512231916"></a>将浮点数转换为bfloat16精度，并向零的方向舍入，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row8400103613470"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p3547154410476"><a name="p3547154410476"></a><a name="p3547154410476"></a><a href="context\__float2bfloat16_rd.md">__float2bfloat16_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p171811233813"><a name="p171811233813"></a><a name="p171811233813"></a>将浮点数转换为bfloat16精度，在转换过程中将结果向下舍入，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row3400153614475"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1654784404718"><a name="p1654784404718"></a><a name="p1654784404718"></a><a href="context\__float2bfloat16_ru.md">__float2bfloat16_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p12717143411552"><a name="p12717143411552"></a><a name="p12717143411552"></a>将浮点数转换为bfloat16精度，在转换过程中将结果向上取整，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row3872927162415"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p5873192717244"><a name="p5873192717244"></a><a name="p5873192717244"></a><a href="context\__float2bfloat16_rna.md">__float2bfloat16_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1687382752418"><a name="p1687382752418"></a><a name="p1687382752418"></a>将浮点数转换为bfloat16精度，并向远离零的方向舍入，返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row17400193634715"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p654810448473"><a name="p654810448473"></a><a name="p654810448473"></a><a href="context\__float2uint_rn.md">__float2uint_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1571753495516"><a name="p1571753495516"></a><a name="p1571753495516"></a>将浮点数转换为四舍五入至最接近的偶数的无符号整数。</p>
+</td>
+</tr>
+<tr id="row140013369471"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p154815446477"><a name="p154815446477"></a><a name="p154815446477"></a><a href="context\__float2uint_rz.md">__float2uint_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p871711343558"><a name="p871711343558"></a><a name="p871711343558"></a><span>将浮点数转换为向零舍入的无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row104006369477"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p74001636134710"><a name="p74001636134710"></a><a name="p74001636134710"></a><a href="context\__float2uint_rd.md">__float2uint_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p068816420211"><a name="p068816420211"></a><a name="p068816420211"></a><span>将浮点数转换为向下取整的无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row3400163684717"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14400143684711"><a name="p14400143684711"></a><a name="p14400143684711"></a><a href="context\__float2uint_ru.md">__float2uint_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1241111211217"><a name="p1241111211217"></a><a name="p1241111211217"></a><span>将浮点数转换为向上取整的无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row15135232162410"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p4136163242415"><a name="p4136163242415"></a><a name="p4136163242415"></a><a href="context\__float2uint_rna.md">__float2uint_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p713673292411"><a name="p713673292411"></a><a name="p713673292411"></a><span>将浮点数转换为向远离零舍入的无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row1840043619473"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p20400113634718"><a name="p20400113634718"></a><a name="p20400113634718"></a><a href="context\__float2int_rn.md">__float2int_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p371763410551"><a name="p371763410551"></a><a name="p371763410551"></a><span>将浮点数转换为有符号整数，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row540017368474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p184004360478"><a name="p184004360478"></a><a name="p184004360478"></a><a href="context\__float2int_rz.md">__float2int_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p53909251622"><a name="p53909251622"></a><a name="p53909251622"></a><span>将浮点数转换为向零舍入的有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row15400103624711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p3400936114712"><a name="p3400936114712"></a><a name="p3400936114712"></a><a href="context\__float2int_rd.md">__float2int_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p41610341227"><a name="p41610341227"></a><a name="p41610341227"></a><span>将浮点数转换为向下取整的有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row140023614717"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p9401136114720"><a name="p9401136114720"></a><a name="p9401136114720"></a><a href="context\__float2int_ru.md">__float2int_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p171712341559"><a name="p171712341559"></a><a name="p171712341559"></a><span>将浮点数转换为向上取整的有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row792233742414"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p18923143719248"><a name="p18923143719248"></a><a name="p18923143719248"></a><a href="context\__float2int_rna.md">__float2int_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p149231937112419"><a name="p149231937112419"></a><a name="p149231937112419"></a><span>将浮点数转换为向远离零舍入的有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row144011136124717"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p134015361474"><a name="p134015361474"></a><a name="p134015361474"></a><a href="context\__float2ull_rn.md">__float2ull_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p11502195014220"><a name="p11502195014220"></a><a name="p11502195014220"></a><span>将浮点数转换为四舍五入到最接近偶数的64位无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row184011636114710"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p54011336104715"><a name="p54011336104715"></a><a name="p54011336104715"></a><a href="context\__float2ull_rz.md">__float2ull_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1564219586217"><a name="p1564219586217"></a><a name="p1564219586217"></a><span>将浮点数转换为向零舍入的64位无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row18401183624714"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p15401163624710"><a name="p15401163624710"></a><a name="p15401163624710"></a><a href="context\__float2ull_rd.md">__float2ull_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p13581991138"><a name="p13581991138"></a><a name="p13581991138"></a><span>将浮点数转换为向下取整的64位无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row74011836164719"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p440123604719"><a name="p440123604719"></a><a name="p440123604719"></a><a href="context\__float2ull_ru.md">__float2ull_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p16717163465516"><a name="p16717163465516"></a><a name="p16717163465516"></a><span>将浮点数转换为向上取整的64位无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row21671443142411"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1616824392417"><a name="p1616824392417"></a><a name="p1616824392417"></a><a href="context\__float2ull_rna.md">__float2ull_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p14168643162411"><a name="p14168643162411"></a><a name="p14168643162411"></a><span>将浮点数转换为向远离零舍入的64位无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row204016361478"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p12401103614471"><a name="p12401103614471"></a><a name="p12401103614471"></a><a href="context\__float2ll_rn.md">__float2ll_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p16717113465513"><a name="p16717113465513"></a><a name="p16717113465513"></a><span>将浮点数转换为有符号64位整数，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row1340115369475"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1940143654717"><a name="p1940143654717"></a><a name="p1940143654717"></a><a href="context\__float2ll_rz.md">__float2ll_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1871783417551"><a name="p1871783417551"></a><a name="p1871783417551"></a><span>将浮点数转换为向零舍入的64位有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row10401536134711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p194014360474"><a name="p194014360474"></a><a name="p194014360474"></a><a href="context\__float2ll_rd.md">__float2ll_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p2608200144"><a name="p2608200144"></a><a name="p2608200144"></a><span>将浮点数转换为向下取整的64位有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row4401736144711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p15401133664711"><a name="p15401133664711"></a><a name="p15401133664711"></a><a href="context\__float2ll_ru.md">__float2ll_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p116347817420"><a name="p116347817420"></a><a name="p116347817420"></a><span>将浮点数转换为向上取整的64位有符号整数。</span></p>
+</td>
+</tr>
+<tr id="row1371134802413"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p123711848132412"><a name="p123711848132412"></a><a name="p123711848132412"></a><a href="context\__float2ll_rna.md">__float2ll_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p83711348192417"><a name="p83711348192417"></a><a name="p83711348192417"></a><span>将浮点数转换为向远离零舍入的64位有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row1140113634719"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p84021236104720"><a name="p84021236104720"></a><a name="p84021236104720"></a><a href="context\__half2float.md">__half2float</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p83569314412"><a name="p83569314412"></a><a name="p83569314412"></a>将half转换为浮点数。</p>
+</td>
+</tr>
+<tr id="row154021136174719"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p164027364476"><a name="p164027364476"></a><a name="p164027364476"></a><a href="context\__half2bfloat16_rn.md">__half2bfloat16_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p16180134412418"><a name="p16180134412418"></a><a name="p16180134412418"></a><span>将half转换为bfloat16，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row12402336184711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p240293634717"><a name="p240293634717"></a><a name="p240293634717"></a><a href="context\__half2bfloat16_rz.md">__half2bfloat16_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p15718103495514"><a name="p15718103495514"></a><a name="p15718103495514"></a><span>将half 转换为向零舍入的bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row13402123617477"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1040217367478"><a name="p1040217367478"></a><a name="p1040217367478"></a><a href="context\__half2bfloat16_rd.md">__half2bfloat16_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p971814344550"><a name="p971814344550"></a><a name="p971814344550"></a><span>将half转换为向下取整的bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row4402193619479"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p164028361472"><a name="p164028361472"></a><a name="p164028361472"></a><a href="context\__half2bfloat16_ru.md">__half2bfloat16_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1171817342554"><a name="p1171817342554"></a><a name="p1171817342554"></a><span>将half转换为bfloat16（向上取整）。</span></p>
+</td>
+</tr>
+<tr id="row336017524249"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1636015521246"><a name="p1636015521246"></a><a name="p1636015521246"></a><a href="context\__half2bfloat16_rna.md">__half2bfloat16_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p536119526242"><a name="p536119526242"></a><a name="p536119526242"></a><span>将half类型数据转换为向远离零舍入的bfloat16类型数据</span>。</p>
+</td>
+</tr>
+<tr id="row1840223664715"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p940253618477"><a name="p940253618477"></a><a name="p940253618477"></a><a href="context\__half2uint_rn.md">__half2uint_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p7171025654"><a name="p7171025654"></a><a name="p7171025654"></a><span>将half转换为无符号整数，并四舍五入到最接近的偶数。</span></p>
+</td>
+</tr>
+<tr id="row12402736114712"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p087218441464"><a name="p087218441464"></a><a name="p087218441464"></a><a href="context\__half2uint_rz.md">__half2uint_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p187180342555"><a name="p187180342555"></a><a name="p187180342555"></a><span>将half转换为向零舍入的无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row114024363478"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1040253613476"><a name="p1040253613476"></a><a name="p1040253613476"></a><a href="context\__half2uint_rd.md">__half2uint_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p967713382518"><a name="p967713382518"></a><a name="p967713382518"></a><span>将half转换为向下取整的无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row44022036154710"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p164026367478"><a name="p164026367478"></a><a name="p164026367478"></a><a href="context\__half2uint_ru.md">__half2uint_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1219512451458"><a name="p1219512451458"></a><a name="p1219512451458"></a><span>将half转换为向上取整的无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row1467145542417"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p18671145510249"><a name="p18671145510249"></a><a name="p18671145510249"></a><a href="context\__half2uint_rna.md">__half2uint_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1067165562413"><a name="p1067165562413"></a><a name="p1067165562413"></a><span>将half类型数据转换为向远离零舍入的无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row20403133654711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p54035364478"><a name="p54035364478"></a><a name="p54035364478"></a><a href="context\__half2int_rn.md">__half2int_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1844185219512"><a name="p1844185219512"></a><a name="p1844185219512"></a><span>将half转换为有符号整数，并四舍五入到最接近的偶数。</span></p>
+</td>
+</tr>
+<tr id="row2040373674710"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p15403153684711"><a name="p15403153684711"></a><a name="p15403153684711"></a><a href="context\__half2int_rz.md">__half2int_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1871943415554"><a name="p1871943415554"></a><a name="p1871943415554"></a><span>将half 转换为向零舍入的有符号整数。</span></p>
+</td>
+</tr>
+<tr id="row340313361479"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p13403163615474"><a name="p13403163615474"></a><a name="p13403163615474"></a><a href="context\__half2int_rd.md">__half2int_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p3863861614"><a name="p3863861614"></a><a name="p3863861614"></a><span>将half转换为向下取整的有符号整数。</span></p>
+</td>
+</tr>
+<tr id="row34031436134711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p340393612478"><a name="p340393612478"></a><a name="p340393612478"></a><a href="context\__half2int_ru.md">__half2int_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p971923425519"><a name="p971923425519"></a><a name="p971923425519"></a><span>将half转换为有符号整数（向上取整）。</span></p>
+</td>
+</tr>
+<tr id="row13707758172410"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p170715817249"><a name="p170715817249"></a><a name="p170715817249"></a><a href="context\__half2int_rna.md">__half2int_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1470795813242"><a name="p1470795813242"></a><a name="p1470795813242"></a><span>将half类型数据转换为向远离零舍入的有符号整数。</span></p>
+</td>
+</tr>
+<tr id="row14403193613479"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14403193624713"><a name="p14403193624713"></a><a name="p14403193624713"></a><a href="context\__half2ull_rn.md">__half2ull_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p10203102316617"><a name="p10203102316617"></a><a name="p10203102316617"></a><span>将half转换为无符号64位整数，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row5403153615472"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p18403183611479"><a name="p18403183611479"></a><a name="p18403183611479"></a><a href="context\__half2ull_rz.md">__half2ull_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p2072013347559"><a name="p2072013347559"></a><a name="p2072013347559"></a><span>将half转换为向零舍入的64位无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row174034361476"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p184033366476"><a name="p184033366476"></a><a name="p184033366476"></a><a href="context\__half2ull_rd.md">__half2ull_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p147203340553"><a name="p147203340553"></a><a name="p147203340553"></a><span>将half转换为向下取整的64位无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row940316361477"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1740312366473"><a name="p1740312366473"></a><a name="p1740312366473"></a><a href="context\__half2ull_ru.md">__half2ull_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p157201434125515"><a name="p157201434125515"></a><a name="p157201434125515"></a><span>将half 转换为向上取整的64位无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row19426152152519"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p842616213251"><a name="p842616213251"></a><a name="p842616213251"></a><a href="context\__half2ull_rna.md">__half2ull_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p184261124259"><a name="p184261124259"></a><a name="p184261124259"></a><span>将half类型数据转换为向远离零舍入的64位无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row10403103615478"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p4403123617475"><a name="p4403123617475"></a><a name="p4403123617475"></a><a href="context\__half2ll_rn.md">__half2ll_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p447114529614"><a name="p447114529614"></a><a name="p447114529614"></a><span>将half转换为有符号64位整数，并四舍五入到最接近的偶数位。</span></p>
+</td>
+</tr>
+<tr id="row154031036154717"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p6403736174713"><a name="p6403736174713"></a><a name="p6403736174713"></a><a href="context\__half2ll_rz.md">__half2ll_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p13720103455512"><a name="p13720103455512"></a><a name="p13720103455512"></a><span>将half转换为向零舍入的64位有符号整数。</span></p>
+</td>
+</tr>
+<tr id="row1740343654718"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p15403153684713"><a name="p15403153684713"></a><a name="p15403153684713"></a><a href="context\__half2ll_rd.md">__half2ll_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1439876272"><a name="p1439876272"></a><a name="p1439876272"></a><span>将half转换为向下取整的64位有符号整数。</span></p>
+</td>
+</tr>
+<tr id="row1740415365473"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p340433634711"><a name="p340433634711"></a><a name="p340433634711"></a><a href="context\__half2ll_ru.md">__half2ll_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p69073111576"><a name="p69073111576"></a><a name="p69073111576"></a><span>将half 转换为向上取整的64位有符号整数。</span></p>
+</td>
+</tr>
+<tr id="row6350196192514"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p16350136102510"><a name="p16350136102510"></a><a name="p16350136102510"></a><a href="context\__half2ll_rna.md">__half2ll_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p635010614253"><a name="p635010614253"></a><a name="p635010614253"></a><span>将half类型数据转换为向远离零舍入的64位有符号整数。</span></p>
+</td>
+</tr>
+<tr id="row16404736164717"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1404036184712"><a name="p1404036184712"></a><a name="p1404036184712"></a><a href="context\__bfloat162half_rn.md">__bfloat162half_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p77202346555"><a name="p77202346555"></a><a name="p77202346555"></a>将bfloat16转换为half，并四舍五入到最接近的偶数，然后返回转换后的值。</p>
+</td>
+</tr>
+<tr id="row14404836184715"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p6404163619470"><a name="p6404163619470"></a><a name="p6404163619470"></a><a href="context\__bfloat162half_rz.md">__bfloat162half_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p187201634205518"><a name="p187201634205518"></a><a name="p187201634205518"></a>将bfloat16转换为<span>向零舍入</span>的half。</p>
+</td>
+</tr>
+<tr id="row2404183624716"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1940433611475"><a name="p1940433611475"></a><a name="p1940433611475"></a><a href="context\__bfloat162half_rd.md">__bfloat162half_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1764015335716"><a name="p1764015335716"></a><a name="p1764015335716"></a>将bfloat16转换为<span>向下取整</span>的half。</p>
+</td>
+</tr>
+<tr id="row8404123614711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p10404153619471"><a name="p10404153619471"></a><a name="p10404153619471"></a><a href="context\__bfloat162half_ru.md">__bfloat162half_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p572023415514"><a name="p572023415514"></a><a name="p572023415514"></a>将bfloat16转换为<span>向上取整</span>的half。</p>
+</td>
+</tr>
+<tr id="row327416911257"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1274189122515"><a name="p1274189122515"></a><a name="p1274189122515"></a><a href="context\__bfloat162half_rna.md">__bfloat162half_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p227439152518"><a name="p227439152518"></a><a name="p227439152518"></a>将bfloat16类型数据转换为<span>向远离零舍入</span>的half类型数据。</p>
+</td>
+</tr>
+<tr id="row2404193617476"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1540433674714"><a name="p1540433674714"></a><a name="p1540433674714"></a><a href="context\__bfloat162float.md">__bfloat162float</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p9550347072"><a name="p9550347072"></a><a name="p9550347072"></a>将bfloat16转换为浮点数。</p>
+</td>
+</tr>
+<tr id="row1404436154713"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p18404133615473"><a name="p18404133615473"></a><a name="p18404133615473"></a><a href="context\__bfloat162uint_rn.md">__bfloat162uint_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p2134855074"><a name="p2134855074"></a><a name="p2134855074"></a><span>将bfloat16转换为四舍五入到最接近偶数的无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row64040360473"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p8404123612476"><a name="p8404123612476"></a><a name="p8404123612476"></a><a href="context\__bfloat162uint_rz.md">__bfloat162uint_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p041010211817"><a name="p041010211817"></a><a name="p041010211817"></a><span>将bfloat16转换为向零舍入的无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row04047365474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p8404936144720"><a name="p8404936144720"></a><a name="p8404936144720"></a><a href="context\__bfloat162uint_rd.md">__bfloat162uint_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p8705981887"><a name="p8705981887"></a><a name="p8705981887"></a><span>将bfloat16转换为向下取整的无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row1340414361476"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p5404143619476"><a name="p5404143619476"></a><a name="p5404143619476"></a><a href="context\__bfloat162uint_ru.md">__bfloat162uint_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p127205345551"><a name="p127205345551"></a><a name="p127205345551"></a><span>将bfloat16转换为向上取整的无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row136491712112513"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p12649191222519"><a name="p12649191222519"></a><a name="p12649191222519"></a><a href="context\__bfloat162uint_rna.md">__bfloat162uint_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1364931219251"><a name="p1364931219251"></a><a name="p1364931219251"></a><span>将bfloat16类型数据转换为向远离零舍入的无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row1404113619471"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1340411363471"><a name="p1340411363471"></a><a name="p1340411363471"></a><a href="context\__bfloat162int_rn.md">__bfloat162int_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1230712251812"><a name="p1230712251812"></a><a name="p1230712251812"></a><span>将bfloat16转换为四舍五入到最接近偶数的有符号整数</span></p>
+</td>
+</tr>
+<tr id="row2040563694719"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p440519365470"><a name="p440519365470"></a><a name="p440519365470"></a><a href="context\__bfloat162int_rz.md">__bfloat162int_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p12882144116812"><a name="p12882144116812"></a><a name="p12882144116812"></a><span>将bfloat16转换为向零舍入的有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row4405636204713"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p7405143611478"><a name="p7405143611478"></a><a name="p7405143611478"></a><a href="context\__bfloat162int_rd.md">__bfloat162int_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1209105017819"><a name="p1209105017819"></a><a name="p1209105017819"></a><span>将bfloat16转换为向下取整的有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row5405636194718"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p440513369470"><a name="p440513369470"></a><a name="p440513369470"></a><a href="context\__bfloat162int_ru.md">__bfloat162int_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p208632581689"><a name="p208632581689"></a><a name="p208632581689"></a><span>将bfloat16转换为向上取整的有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row1352901552517"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p35290154251"><a name="p35290154251"></a><a name="p35290154251"></a><a href="context\__bfloat162int_rna.md">__bfloat162int_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p452911158259"><a name="p452911158259"></a><a name="p452911158259"></a><span>将bfloat16类型数据转换为向远离零舍入的有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row040593613475"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p154051736204717"><a name="p154051736204717"></a><a name="p154051736204717"></a><a href="context\__bfloat162ull_rn.md">__bfloat162ull_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p77215343551"><a name="p77215343551"></a><a name="p77215343551"></a><span>将bfloat16转换为四舍五入到最接近偶数的64位无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row9405153610479"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p840514362473"><a name="p840514362473"></a><a name="p840514362473"></a><a href="context\__bfloat162ull_rz.md">__bfloat162ull_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p5673514697"><a name="p5673514697"></a><a name="p5673514697"></a><span>将bfloat16 转换为向零舍入的64位无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row5405113619474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p6405123644718"><a name="p6405123644718"></a><a name="p6405123644718"></a><a href="context\__bfloat162ull_rd.md">__bfloat162ull_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p117215349551"><a name="p117215349551"></a><a name="p117215349551"></a><span>将 bfloat16转换为向下取整的64位无符号整数。</span></p>
+</td>
+</tr>
+<tr id="row174050363475"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p4405183694712"><a name="p4405183694712"></a><a name="p4405183694712"></a><a href="context\__bfloat162ull_ru.md">__bfloat162ull_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1721153475514"><a name="p1721153475514"></a><a name="p1721153475514"></a><span>将bfloat16转换为向上取整的64位无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row531311186250"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p33131618152518"><a name="p33131618152518"></a><a name="p33131618152518"></a><a href="context\__bfloat162ull_rna.md">__bfloat162ull_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p731371814254"><a name="p731371814254"></a><a name="p731371814254"></a><span>将bfloat16类型数据转换为向远离零舍入的64位无符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row1540510369474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1240615365476"><a name="p1240615365476"></a><a name="p1240615365476"></a><a href="context\__bfloat162ll_rn.md">__bfloat162ll_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p4721334195517"><a name="p4721334195517"></a><a name="p4721334195517"></a><span>将 bfloat16转换为四舍五入到最接近偶数的64位有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row840643614711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1540653618478"><a name="p1540653618478"></a><a name="p1540653618478"></a><a href="context\__bfloat162ll_rz.md">__bfloat162ll_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p105015571020"><a name="p105015571020"></a><a name="p105015571020"></a><span>将bfloat16转换为向零舍入的64位有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row540616367473"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p0406103664710"><a name="p0406103664710"></a><a name="p0406103664710"></a><a href="context\__bfloat162ll_rd.md">__bfloat162ll_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1172123435519"><a name="p1172123435519"></a><a name="p1172123435519"></a><span>将bfloat16转换为向下取整的64位有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row11406193614716"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p540653644713"><a name="p540653644713"></a><a name="p540653644713"></a><a href="context\__bfloat162ll_ru.md">__bfloat162ll_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p572193495513"><a name="p572193495513"></a><a name="p572193495513"></a><span>将 bfloat16转换为向上取整的64位有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row98496238252"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p884919238256"><a name="p884919238256"></a><a name="p884919238256"></a><a href="context\__bfloat162ll_rna.md">__bfloat162ll_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p0849323152519"><a name="p0849323152519"></a><a name="p0849323152519"></a><span>将bfloat16类型数据转换为向远离零舍入的64位有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row54062036114718"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p16406036194719"><a name="p16406036194719"></a><a name="p16406036194719"></a><a href="context\__uint2float_rn.md">__uint2float_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p993662615105"><a name="p993662615105"></a><a name="p993662615105"></a><span>将uint32转换为浮点数，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row1406173610472"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p13406153694711"><a name="p13406153694711"></a><a name="p13406153694711"></a><a href="context\__uint2float_rz.md">__uint2float_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p672123412559"><a name="p672123412559"></a><a name="p672123412559"></a><span>将uint32转换为向零舍入的浮点数。</span></p>
+</td>
+</tr>
+<tr id="row34062036134713"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p114069361472"><a name="p114069361472"></a><a name="p114069361472"></a><a href="context\__uint2float_rd.md">__uint2float_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p167211343556"><a name="p167211343556"></a><a name="p167211343556"></a><span>将uint32向下取整转换为浮点数。</span></p>
+</td>
+</tr>
+<tr id="row14406133684714"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p440615369477"><a name="p440615369477"></a><a name="p440615369477"></a><a href="context\__uint2float_ru.md">__uint2float_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p87065482107"><a name="p87065482107"></a><a name="p87065482107"></a><span>将uint32转换为向上取整的浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row759202718258"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1759027152517"><a name="p1759027152517"></a><a name="p1759027152517"></a><a href="context\__uint2float_rna.md">__uint2float_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p0595272254"><a name="p0595272254"></a><a name="p0595272254"></a><span>将uint32类型数据转换为向远离零舍入的浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row19406103611476"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p5406123618479"><a name="p5406123618479"></a><a name="p5406123618479"></a><a href="context\__uint2half_rn.md">__uint2half_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p187211034185517"><a name="p187211034185517"></a><a name="p187211034185517"></a><span>将uint32转换为half（四舍五入到最接近的偶数）</span>。</p>
+</td>
+</tr>
+<tr id="row14406173616474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p12406153614471"><a name="p12406153614471"></a><a name="p12406153614471"></a><a href="context\__uint2half_rz.md">__uint2half_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1272163419553"><a name="p1272163419553"></a><a name="p1272163419553"></a><span>将uint32转换为向零舍入的half。</span></p>
+</td>
+</tr>
+<tr id="row6406036144718"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1640763614720"><a name="p1640763614720"></a><a name="p1640763614720"></a><a href="context\__uint2half_rd.md">__uint2half_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p18482911131119"><a name="p18482911131119"></a><a name="p18482911131119"></a><span>将uint32向下取整为half</span>。</p>
+</td>
+</tr>
+<tr id="row94072036104718"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p104077362478"><a name="p104077362478"></a><a name="p104077362478"></a><a href="context\__uint2half_ru.md">__uint2half_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p185701217121113"><a name="p185701217121113"></a><a name="p185701217121113"></a><span>将uint32向上取整转换为half</span>。</p>
+</td>
+</tr>
+<tr id="row124561830142510"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p7456630202512"><a name="p7456630202512"></a><a name="p7456630202512"></a><a href="context\__uint2half_rna.md">__uint2half_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p15456113052510"><a name="p15456113052510"></a><a name="p15456113052510"></a><span>将uint32类型数据转换为向远离零舍入的half类型数据</span>。</p>
+</td>
+</tr>
+<tr id="row640719366478"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p64071736184710"><a name="p64071736184710"></a><a name="p64071736184710"></a><a href="context\__uint2bfloat16_rn.md">__uint2bfloat16_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p172183435518"><a name="p172183435518"></a><a name="p172183435518"></a><span>将uint32转换为bfloat16，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row18407183619472"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p17407123615473"><a name="p17407123615473"></a><a name="p17407123615473"></a><a href="context\__uint2bfloat16_rz.md">__uint2bfloat16_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p162891035121120"><a name="p162891035121120"></a><a name="p162891035121120"></a><span>将uint32转换为向零舍入的bfloat16。</span></p>
+</td>
+</tr>
+<tr id="row640783684717"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1407133612471"><a name="p1407133612471"></a><a name="p1407133612471"></a><a href="context\__uint2bfloat16_rd.md">__uint2bfloat16_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p2092954331115"><a name="p2092954331115"></a><a name="p2092954331115"></a><span>将uint32向下取整转换为bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row1340715368473"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1440717367474"><a name="p1440717367474"></a><a name="p1440717367474"></a><a href="context\__uint2bfloat16_ru.md">__uint2bfloat16_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p26171250201111"><a name="p26171250201111"></a><a name="p26171250201111"></a><span>将uint32向上取整转换为bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row2185733142517"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p3185433142516"><a name="p3185433142516"></a><a name="p3185433142516"></a><a href="context\__uint2bfloat16_rna.md">__uint2bfloat16_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p11185203314258"><a name="p11185203314258"></a><a name="p11185203314258"></a><span>将uint32类型数据转换为向远离零舍入的bfloat16类型数据</span>。</p>
+</td>
+</tr>
+<tr id="row104071136194718"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p15407036144715"><a name="p15407036144715"></a><a name="p15407036144715"></a><a href="context\__int2float_rn.md">__int2float_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1814358131111"><a name="p1814358131111"></a><a name="p1814358131111"></a><span>将int32转换为浮点数，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row5408183644719"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1040815363470"><a name="p1040815363470"></a><a name="p1040815363470"></a><a href="context\__int2float_rz.md">__int2float_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p2721153415558"><a name="p2721153415558"></a><a name="p2721153415558"></a><span>将int32转换为向零舍入的浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row19408143619479"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1540883614474"><a name="p1540883614474"></a><a name="p1540883614474"></a><a href="context\__int2float_rd.md">__int2float_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p112301814171210"><a name="p112301814171210"></a><a name="p112301814171210"></a><span>将int32向下取整转换为浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row240843612473"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p15408436184719"><a name="p15408436184719"></a><a name="p15408436184719"></a><a href="context\__int2float_ru.md">__int2float_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p18722334185518"><a name="p18722334185518"></a><a name="p18722334185518"></a><span>将int32转换为向上取整的浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row7842735152519"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p384233512512"><a name="p384233512512"></a><a name="p384233512512"></a><a href="context\__int2float_rna.md">__int2float_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p5842193513251"><a name="p5842193513251"></a><a name="p5842193513251"></a><span>将int32类型数据转换为向远离零舍入的浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row104081236154716"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p17408143674715"><a name="p17408143674715"></a><a name="p17408143674715"></a><a href="context\__int2half_rn.md">__int2half_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p19263529181212"><a name="p19263529181212"></a><a name="p19263529181212"></a><span>将int32转换为half（四舍五入到最接近的偶数）</span>。</p>
+</td>
+</tr>
+<tr id="row540863644714"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1340873674712"><a name="p1340873674712"></a><a name="p1340873674712"></a><a href="context\__int2half_rz.md">__int2half_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p47221034165515"><a name="p47221034165515"></a><a name="p47221034165515"></a><span>将int32转换为向零舍入的half</span>。</p>
+</td>
+</tr>
+<tr id="row1540811360472"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p194081236174713"><a name="p194081236174713"></a><a name="p194081236174713"></a><a href="context\__int2half_rd.md">__int2half_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p5739104318125"><a name="p5739104318125"></a><a name="p5739104318125"></a><span>将int32向下取整为half</span>。</p>
+</td>
+</tr>
+<tr id="row2408103634714"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p164081636124717"><a name="p164081636124717"></a><a name="p164081636124717"></a><a href="context\__int2half_ru.md">__int2half_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p76114525124"><a name="p76114525124"></a><a name="p76114525124"></a><span>将int32向上取整转换为half</span>。</p>
+</td>
+</tr>
+<tr id="row16940538112519"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1394013386252"><a name="p1394013386252"></a><a name="p1394013386252"></a><a href="context\__int2half_rna.md">__int2half_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p14940138122513"><a name="p14940138122513"></a><a name="p14940138122513"></a><span>将int32类型数据转换为向远离零舍入的half</span><span>类型数据</span>。</p>
+</td>
+</tr>
+<tr id="row164081836184711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p17408936184711"><a name="p17408936184711"></a><a name="p17408936184711"></a><a href="context\__int2bfloat16_rn.md">__int2bfloat16_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p17722203417557"><a name="p17722203417557"></a><a name="p17722203417557"></a><span>将int32转换为bfloat16，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row174081936124717"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p3409153684712"><a name="p3409153684712"></a><a name="p3409153684712"></a><a href="context\__int2bfloat16_rz.md">__int2bfloat16_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p572293417553"><a name="p572293417553"></a><a name="p572293417553"></a><span>将int32转换为向零舍入的bfloat16。</span></p>
+</td>
+</tr>
+<tr id="row040933613479"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p204098366478"><a name="p204098366478"></a><a name="p204098366478"></a><a href="context\__int2bfloat16_rd.md">__int2bfloat16_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p2642141419136"><a name="p2642141419136"></a><a name="p2642141419136"></a><span>将int32向下取整转换为bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row1940923604715"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1740943604716"><a name="p1740943604716"></a><a name="p1740943604716"></a><a href="context\__int2bfloat16_ru.md">__int2bfloat16_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1759312411314"><a name="p1759312411314"></a><a name="p1759312411314"></a><span>将int32向上取整转换为bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row12863141142515"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p12864441192512"><a name="p12864441192512"></a><a name="p12864441192512"></a><a href="context\__int2bfloat16_rna.md">__int2bfloat16_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p168641415255"><a name="p168641415255"></a><a name="p168641415255"></a><span>将int32类型数据转换为向远离零舍入的bfloat16类型数据。</span></p>
+</td>
+</tr>
+<tr id="row8409133612478"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p7409436164710"><a name="p7409436164710"></a><a name="p7409436164710"></a><a href="context\__ull2float_rn.md">__ull2float_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p7722183418559"><a name="p7722183418559"></a><a name="p7722183418559"></a><span>将uint64转换为浮点数，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row15409173615474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p6409123694715"><a name="p6409123694715"></a><a name="p6409123694715"></a><a href="context\__ull2float_rz.md">__ull2float_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1454923814139"><a name="p1454923814139"></a><a name="p1454923814139"></a><span>将uint64转换为向零舍入的浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row2409103614713"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p840953620478"><a name="p840953620478"></a><a name="p840953620478"></a><a href="context\__ull2float_rd.md">__ull2float_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1685174561314"><a name="p1685174561314"></a><a name="p1685174561314"></a><span>将uint64向下取整转换为浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row174091036164712"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1440913365478"><a name="p1440913365478"></a><a name="p1440913365478"></a><a href="context\__ull2float_ru.md">__ull2float_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p2722103415512"><a name="p2722103415512"></a><a name="p2722103415512"></a><span>将uint64向上取整转换为浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row1133774515251"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p433714532516"><a name="p433714532516"></a><a name="p433714532516"></a><a href="context\__ull2float_rna.md">__ull2float_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1433724572515"><a name="p1433724572515"></a><a name="p1433724572515"></a><span>将uint64类型数据转换为向远离零舍入的浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row3409173654713"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p13409936104712"><a name="p13409936104712"></a><a name="p13409936104712"></a><a href="context\__ull2half_rn.md">__ull2half_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p41941026202016"><a name="p41941026202016"></a><a name="p41941026202016"></a><span>将uint64转换为half，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row20409123616474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p34094362477"><a name="p34094362477"></a><a name="p34094362477"></a><a href="context\__ull2half_rz.md">__ull2half_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p18542972149"><a name="p18542972149"></a><a name="p18542972149"></a><span>将uint64转换为向零舍入的half</span>。</p>
+</td>
+</tr>
+<tr id="row04091236104716"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p194101336164717"><a name="p194101336164717"></a><a name="p194101336164717"></a><a href="context\__ull2half_rd.md">__ull2half_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p13722153445518"><a name="p13722153445518"></a><a name="p13722153445518"></a><span>将uint64向下取整转换为half</span>。</p>
+</td>
+</tr>
+<tr id="row641083615477"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p17410123617479"><a name="p17410123617479"></a><a name="p17410123617479"></a><a href="context\__ull2half_ru.md">__ull2half_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p177221534165512"><a name="p177221534165512"></a><a name="p177221534165512"></a><span>将uint64向上取整转换为浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row9546104812253"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p85461548102519"><a name="p85461548102519"></a><a name="p85461548102519"></a><a href="context\__ull2half_rna.md">__ull2half_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1554674810259"><a name="p1554674810259"></a><a name="p1554674810259"></a><span>将uint64类型数据转换为向远离零舍入的half</span><span>类型数据</span>。</p>
+</td>
+</tr>
+<tr id="row241019362470"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1141013613476"><a name="p1141013613476"></a><a name="p1141013613476"></a><a href="context\__ull2bfloat16_rn.md">__ull2bfloat16_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p14484204917229"><a name="p14484204917229"></a><a name="p14484204917229"></a><span>将uint64转换为bfloat16，并四舍五入到最接近的偶数</span>。</p>
+</td>
+</tr>
+<tr id="row3410143612478"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p0410936124718"><a name="p0410936124718"></a><a name="p0410936124718"></a><a href="context\__ull2bfloat16_rz.md">__ull2bfloat16_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p0573123741412"><a name="p0573123741412"></a><a name="p0573123741412"></a><span>将uint64转换为向零舍入的bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row14100360474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1341003644714"><a name="p1341003644714"></a><a name="p1341003644714"></a><a href="context\__ull2bfloat16_rd.md">__ull2bfloat16_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p755194513148"><a name="p755194513148"></a><a name="p755194513148"></a><span>将uint64向下取整转换为bfloat</span>16。</p>
+</td>
+</tr>
+<tr id="row20410113617479"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p12410113614717"><a name="p12410113614717"></a><a name="p12410113614717"></a><a href="context\__ull2bfloat16_ru.md">__ull2bfloat16_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p10722163455515"><a name="p10722163455515"></a><a name="p10722163455515"></a><span>将uint64向上取整转换为bfloat</span>16。</p>
+</td>
+</tr>
+<tr id="row7791552172511"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p879125210252"><a name="p879125210252"></a><a name="p879125210252"></a><a href="context\__ull2bfloat16_rna.md">__ull2bfloat16_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p07919521254"><a name="p07919521254"></a><a name="p07919521254"></a><span>将uint64类型数据转换为向远离零舍入的bfloat16</span><span>类型数据</span>。</p>
+</td>
+</tr>
+<tr id="row841023684719"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p04109367478"><a name="p04109367478"></a><a name="p04109367478"></a><a href="context\__ll2float_rn.md">__ll2float_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p137229345558"><a name="p137229345558"></a><a name="p137229345558"></a><span>将int64转换为四舍五入到最接近偶数的浮点数。</span></p>
+</td>
+</tr>
+<tr id="row2410103616479"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p19410183684711"><a name="p19410183684711"></a><a name="p19410183684711"></a><a href="context\__ll2float_rz.md">__ll2float_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p147221134115515"><a name="p147221134115515"></a><a name="p147221134115515"></a><span>将int64转换为向零舍入的浮点数。</span></p>
+</td>
+</tr>
+<tr id="row1941013620473"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p4410336174713"><a name="p4410336174713"></a><a name="p4410336174713"></a><a href="context\__ll2float_rd.md">__ll2float_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p17722113405519"><a name="p17722113405519"></a><a name="p17722113405519"></a><span>将int64向下取整转换为浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row4410183644711"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1841020365478"><a name="p1841020365478"></a><a name="p1841020365478"></a><a href="context\__ll2float_ru.md">__ll2float_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1431032531516"><a name="p1431032531516"></a><a name="p1431032531516"></a><span>将int转换为向上取整的浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row1743115552510"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p874335510253"><a name="p874335510253"></a><a name="p874335510253"></a><a href="context\__ll2float_rna.md">__ll2float_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p13743155152519"><a name="p13743155152519"></a><a name="p13743155152519"></a><span>将int64类型数据转换为向远离零舍入的浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row14411143624716"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p15411173619473"><a name="p15411173619473"></a><a name="p15411173619473"></a><a href="context\__ll2half_rn.md">__ll2half_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p14723234205514"><a name="p14723234205514"></a><a name="p14723234205514"></a><span>将int64转换为四舍五入到最接近偶数的half。</span></p>
+</td>
+</tr>
+<tr id="row114117366478"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1941118362474"><a name="p1941118362474"></a><a name="p1941118362474"></a><a href="context\__ll2half_rz.md">__ll2half_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p141931639101512"><a name="p141931639101512"></a><a name="p141931639101512"></a><span>将int64转换为向零舍入的half。</span></p>
+</td>
+</tr>
+<tr id="row2041193619478"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1411203610475"><a name="p1411203610475"></a><a name="p1411203610475"></a><a href="context\__ll2half_rd.md">__ll2half_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p172319346556"><a name="p172319346556"></a><a name="p172319346556"></a><span>将int64向下取整转换为half</span>。</p>
+</td>
+</tr>
+<tr id="row10411836204714"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1411103614473"><a name="p1411103614473"></a><a name="p1411103614473"></a><a href="context\__ll2half_ru.md">__ll2half_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p128211254151511"><a name="p128211254151511"></a><a name="p128211254151511"></a><span>将int64转换为向上取整的half</span>。</p>
+</td>
+</tr>
+<tr id="row463935882510"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p163965814259"><a name="p163965814259"></a><a name="p163965814259"></a><a href="context\__ll2half_rna.md">__ll2half_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p14640135882511"><a name="p14640135882511"></a><a name="p14640135882511"></a><span>将int64类型数据转换为向远离零舍入的half类型数据</span>。</p>
+</td>
+</tr>
+<tr id="row114111836174714"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1241183654713"><a name="p1241183654713"></a><a name="p1241183654713"></a><a href="context\__ll2bfloat16_rn.md">__ll2bfloat16_rn</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p192102114163"><a name="p192102114163"></a><a name="p192102114163"></a><span>将int64转换为四舍五入到最接近偶数的bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row34111136124714"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p2411193619479"><a name="p2411193619479"></a><a name="p2411193619479"></a><a href="context\__ll2bfloat16_rz.md">__ll2bfloat16_rz</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p107391107164"><a name="p107391107164"></a><a name="p107391107164"></a><span>将int64转换为向零舍入的bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row194115368474"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p17411536174710"><a name="p17411536174710"></a><a name="p17411536174710"></a><a href="context\__ll2bfloat16_rd.md">__ll2bfloat16_rd</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p14723203445512"><a name="p14723203445512"></a><a name="p14723203445512"></a><span>将int64向下取整转换为bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row541123617472"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1141112367474"><a name="p1141112367474"></a><a name="p1141112367474"></a><a href="context\__ll2bfloat16_ru.md">__ll2bfloat16_ru</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p169241026171617"><a name="p169241026171617"></a><a name="p169241026171617"></a><span>将int转换为向上取整的bfloat16</span>。</p>
+</td>
+</tr>
+<tr id="row9837181142617"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1583731142610"><a name="p1583731142610"></a><a name="p1583731142610"></a><a href="context\__ll2bfloat16_rna.md">__ll2bfloat16_rna</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p6837191182611"><a name="p6837191182611"></a><a name="p6837191182611"></a><span>将int64类型数据转换为向远离零舍入的bfloat16类型数据</span>。</p>
+</td>
+</tr>
+<tr id="row641383612477"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p184130363474"><a name="p184130363474"></a><a name="p184130363474"></a><a href="context\__int_as_float.md">__int_as_float</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1289973313162"><a name="p1289973313162"></a><a name="p1289973313162"></a><span>将整数中的位重新解释为浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row14413436124712"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p3413103684714"><a name="p3413103684714"></a><a name="p3413103684714"></a><a href="context\__uint_as_float.md">__uint_as_float</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p167113412169"><a name="p167113412169"></a><a name="p167113412169"></a><span>将无符号整数中的位重新解释为浮点数</span>。</p>
+</td>
+</tr>
+<tr id="row1998818470557"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1198816478553"><a name="p1198816478553"></a><a name="p1198816478553"></a><a href="context\__float_as_int.md">__float_as_int</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p13988194765514"><a name="p13988194765514"></a><a name="p13988194765514"></a><span>将浮点数中的位重新解释为有符号整数</span>。</p>
+</td>
+</tr>
+<tr id="row1841319365476"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p1413163611474"><a name="p1413163611474"></a><a name="p1413163611474"></a><a href="context\__float_as_uint.md">__float_as_uint</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p127231834105512"><a name="p127231834105512"></a><a name="p127231834105512"></a><span>将浮点数中的位重新解释为无符号整数</span>。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 35**  向量类型构造函数
+
+<a name="table3436715145018"></a>
+<table><thead align="left"><tr id="row19436111511507"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p943615158508"><a name="p943615158508"></a><a name="p943615158508"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="60%" id="mcps1.2.3.1.2"><p id="p11436515105015"><a name="p11436515105015"></a><a name="p11436515105015"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row5436131513501"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p10436151512506"><a name="p10436151512506"></a><a name="p10436151512506"></a><a href="context\make_int2.md">make_int2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p17436715145016"><a name="p17436715145016"></a><a name="p17436715145016"></a>从两个int类型数据创建int2类型的向量。</p>
+</td>
+</tr>
+<tr id="row471121118511"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p171171145115"><a name="p171171145115"></a><a name="p171171145115"></a><a href="context\make_int3.md">make_int3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p071131195113"><a name="p071131195113"></a><a name="p071131195113"></a>从三个int类型数据创建int3类型的向量。</p>
+</td>
+</tr>
+<tr id="row5166195105213"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1216611519526"><a name="p1216611519526"></a><a name="p1216611519526"></a><a href="context\make_int4.md">make_int4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p171667585211"><a name="p171667585211"></a><a name="p171667585211"></a>从四个int类型数据创建int4类型的向量。</p>
+</td>
+</tr>
+<tr id="row13344124135117"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p19344102414516"><a name="p19344102414516"></a><a name="p19344102414516"></a><a href="context\make_uint2.md">make_uint2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p7344202405118"><a name="p7344202405118"></a><a name="p7344202405118"></a>从两个unsigned int类型数据创建uint2类型的向量。</p>
+</td>
+</tr>
+<tr id="row61047309518"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p19104113085118"><a name="p19104113085118"></a><a name="p19104113085118"></a><a href="context\make_uint3.md">make_uint3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p8104113015111"><a name="p8104113015111"></a><a name="p8104113015111"></a>从三个unsigned int类型数据创建uint3类型的向量。</p>
+</td>
+</tr>
+<tr id="row1391812612523"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1891818625217"><a name="p1891818625217"></a><a name="p1891818625217"></a><a href="context\make_uint4.md">make_uint4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p291896165212"><a name="p291896165212"></a><a name="p291896165212"></a>从四个unsigned int类型数据创建uint4类型的向量。</p>
+</td>
+</tr>
+<tr id="row15545141175217"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p254581165216"><a name="p254581165216"></a><a name="p254581165216"></a><a href="context\make_ulonglong2.md">make_ulonglong2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p46955638"><a name="p46955638"></a><a name="p46955638"></a>从两个unsigned long long int类型数据创建ulonglong2类型的向量。</p>
+</td>
+</tr>
+<tr id="row166217509511"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p362145045113"><a name="p362145045113"></a><a name="p362145045113"></a><a href="context\make_ulonglong3.md">make_ulonglong3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1862115018516"><a name="p1862115018516"></a><a name="p1862115018516"></a>从三个unsigned long long int类型数据创建ulonglong3类型的向量。</p>
+</td>
+</tr>
+<tr id="row1566110525518"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1966165210514"><a name="p1966165210514"></a><a name="p1966165210514"></a><a href="context\make_ulonglong4.md">make_ulonglong4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1266165265110"><a name="p1266165265110"></a><a name="p1266165265110"></a>从四个unsigned long long int类型数据创建ulonglong4类型的向量。</p>
+</td>
+</tr>
+<tr id="row332116913524"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p10321109175210"><a name="p10321109175210"></a><a name="p10321109175210"></a><a href="context\make_longlong2.md">make_longlong2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p163211795526"><a name="p163211795526"></a><a name="p163211795526"></a>从两个long long int类型数据创建longlong2类型的向量。</p>
+</td>
+</tr>
+<tr id="row886905455115"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p0869145418514"><a name="p0869145418514"></a><a name="p0869145418514"></a><a href="context\make_longlong3.md">make_longlong3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p2869175416510"><a name="p2869175416510"></a><a name="p2869175416510"></a>从三个long long int类型数据创建longlong3类型的向量。</p>
+</td>
+</tr>
+<tr id="row63747465512"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p203741046195110"><a name="p203741046195110"></a><a name="p203741046195110"></a><a href="context\make_longlong4.md">make_longlong4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p12374246175113"><a name="p12374246175113"></a><a name="p12374246175113"></a>从四个long long int类型数据创建longlong4类型的向量。</p>
+</td>
+</tr>
+<tr id="row206401548175114"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p176401548135115"><a name="p176401548135115"></a><a name="p176401548135115"></a><a href="context\make_ulong2.md">make_ulong2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p13640114895111"><a name="p13640114895111"></a><a name="p13640114895111"></a>从两个unsigned long int类型数据创建ulong2类型的向量。</p>
+</td>
+</tr>
+<tr id="row1546113444515"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p124619442511"><a name="p124619442511"></a><a name="p124619442511"></a><a href="context\make_ulong3.md">make_ulong3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p12461174418516"><a name="p12461174418516"></a><a name="p12461174418516"></a>从三个unsigned long int类型数据创建ulong3类型的向量。</p>
+</td>
+</tr>
+<tr id="row1720394225114"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p8203442175111"><a name="p8203442175111"></a><a name="p8203442175111"></a><a href="context\make_ulong4.md">make_ulong4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p114819561638"><a name="p114819561638"></a><a name="p114819561638"></a>从四个unsigned long int类型数据创建ulong4类型的向量。</p>
+</td>
+</tr>
+<tr id="row98461139185117"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p18467398515"><a name="p18467398515"></a><a name="p18467398515"></a><a href="context\make_long2.md">make_long2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p36897217412"><a name="p36897217412"></a><a name="p36897217412"></a>从两个long int类型数据创建long2类型的向量。</p>
+</td>
+</tr>
+<tr id="row1772153719511"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p187721637115114"><a name="p187721637115114"></a><a name="p187721637115114"></a><a href="context\make_long3.md">make_long3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p377293785116"><a name="p377293785116"></a><a name="p377293785116"></a>从三个long int类型数据创建long3类型的向量。</p>
+</td>
+</tr>
+<tr id="row7469193515110"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p14469335135113"><a name="p14469335135113"></a><a name="p14469335135113"></a><a href="context\make_long4.md">make_long4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p124701035125115"><a name="p124701035125115"></a><a name="p124701035125115"></a>从四个long int类型数据创建long4类型的向量。</p>
+</td>
+</tr>
+<tr id="row3494352205820"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1349475210586"><a name="p1349475210586"></a><a name="p1349475210586"></a><a href="context\make_float2.md">make_float2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p19087201843"><a name="p19087201843"></a><a name="p19087201843"></a>从两个float类型数据创建float2类型的向量。</p>
+</td>
+</tr>
+<tr id="row1065075485813"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p18650115414587"><a name="p18650115414587"></a><a name="p18650115414587"></a><a href="context\make_float3.md">make_float3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p17517172713410"><a name="p17517172713410"></a><a name="p17517172713410"></a>从三个float类型数据创建float3类型的向量。</p>
+</td>
+</tr>
+<tr id="row19114201565110"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p3114131514512"><a name="p3114131514512"></a><a name="p3114131514512"></a><a href="context\make_float4.md">make_float4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p611401545111"><a name="p611401545111"></a><a name="p611401545111"></a>从四个float类型数据创建float4类型的向量。</p>
+</td>
+</tr>
+<tr id="row1234817505587"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1234835045811"><a name="p1234835045811"></a><a name="p1234835045811"></a><a href="context\make_short2.md">make_short2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p4348145065814"><a name="p4348145065814"></a><a name="p4348145065814"></a>从两个short类型数据创建short2类型的向量。</p>
+</td>
+</tr>
+<tr id="row13693945165816"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p8693204510583"><a name="p8693204510583"></a><a name="p8693204510583"></a><a href="context\make_short3.md">make_short3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p7693245115812"><a name="p7693245115812"></a><a name="p7693245115812"></a>从三个short类型数据创建short3类型的向量。</p>
+</td>
+</tr>
+<tr id="row1232211421586"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p5322194295812"><a name="p5322194295812"></a><a name="p5322194295812"></a><a href="context\make_short4.md">make_short4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1732274265815"><a name="p1732274265815"></a><a name="p1732274265815"></a>从四个short类型数据创建short4类型的向量。</p>
+</td>
+</tr>
+<tr id="row5926134715581"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1792654725810"><a name="p1792654725810"></a><a name="p1792654725810"></a><a href="context\make_ushort2.md">make_ushort2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p203031851"><a name="p203031851"></a><a name="p203031851"></a>从两个unsigned short类型数据创建ushort2类型的向量。</p>
+</td>
+</tr>
+<tr id="row51141515165113"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1411411516519"><a name="p1411411516519"></a><a name="p1411411516519"></a><a href="context\make_ushort3.md">make_ushort3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p61141115135110"><a name="p61141115135110"></a><a name="p61141115135110"></a>从三个unsigned short类型数据创建ushort3类型的向量。</p>
+</td>
+</tr>
+<tr id="row181941338705"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1119412381013"><a name="p1119412381013"></a><a name="p1119412381013"></a><a href="context\make_ushort4.md">make_ushort4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1719463816011"><a name="p1719463816011"></a><a name="p1719463816011"></a>从四个unsigned short类型数据创建ushort4类型的向量。</p>
+</td>
+</tr>
+<tr id="row199058480015"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p19906348608"><a name="p19906348608"></a><a name="p19906348608"></a><a href="context\make_uchar2.md">make_uchar2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p6319121712510"><a name="p6319121712510"></a><a name="p6319121712510"></a>从两个unsigned char类型数据创建uchar2类型的向量。</p>
+</td>
+</tr>
+<tr id="row1569912431201"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p136991843601"><a name="p136991843601"></a><a name="p136991843601"></a><a href="context\make_uchar3.md">make_uchar3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p26991643609"><a name="p26991643609"></a><a name="p26991643609"></a>从三个unsigned char类型数据创建uchar3类型的向量。</p>
+</td>
+</tr>
+<tr id="row1862216461104"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p16622144620018"><a name="p16622144620018"></a><a name="p16622144620018"></a><a href="context\make_uchar4.md">make_uchar4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p2301729454"><a name="p2301729454"></a><a name="p2301729454"></a>从四个unsigned char类型数据创建uchar4类型的向量。</p>
+</td>
+</tr>
+<tr id="row206531940901"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p465464012019"><a name="p465464012019"></a><a name="p465464012019"></a><a href="context\make_char2.md">make_char2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1765474013012"><a name="p1765474013012"></a><a name="p1765474013012"></a>从两个signed char类型数据创建char2类型的向量。</p>
+</td>
+</tr>
+<tr id="row1998510301405"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p4985163016014"><a name="p4985163016014"></a><a name="p4985163016014"></a><a href="context\make_char3.md">make_char3</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p898543017019"><a name="p898543017019"></a><a name="p898543017019"></a>从三个signed char类型数据创建char3类型的向量。</p>
+</td>
+</tr>
+<tr id="row27831346010"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p878316341305"><a name="p878316341305"></a><a name="p878316341305"></a><a href="context\make_char4.md">make_char4</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p69292465518"><a name="p69292465518"></a><a name="p69292465518"></a>从四个signed char类型数据创建char4类型的向量。</p>
+</td>
+</tr>
+<tr id="row127719411315"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p027718415112"><a name="p027718415112"></a><a name="p027718415112"></a><a href="context\make_half2.md">make_half2</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p827784119114"><a name="p827784119114"></a><a name="p827784119114"></a>从两个half类型数据创建half2类型的向量。</p>
+</td>
+</tr>
+<tr id="row335394413111"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p03533441115"><a name="p03533441115"></a><a name="p03533441115"></a><a href="context\make_bfloat162.md">make_bfloat162</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1135344418116"><a name="p1135344418116"></a><a name="p1135344418116"></a>从两个bfloat16_t类型数据创建bfloat16x2_t类型的向量。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 36**  使能Cache Hints的Load/Store函数
+
+<a name="table17209142275014"></a>
+<table><thead align="left"><tr id="row120922211507"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p1220962210501"><a name="p1220962210501"></a><a name="p1220962210501"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="60%" id="mcps1.2.3.1.2"><p id="p620912295018"><a name="p620912295018"></a><a name="p620912295018"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row180373015523"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p68031330105213"><a name="p68031330105213"></a><a name="p68031330105213"></a><a href="context\asc_ldcg.md">asc_ldcg</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p2094931913815"><a name="p2094931913815"></a><a name="p2094931913815"></a>从L2 Cache加载缓存的数据，如果缓存命中，则直接返回数据。若未命中，则从<span id="ph4433133645514"><a name="ph4433133645514"></a><a name="ph4433133645514"></a>Global Memory</span>地址预加载数据缓存至L2 Cache，并返回数据。</p>
+</td>
+</tr>
+<tr id="row185241328175218"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p1352432816526"><a name="p1352432816526"></a><a name="p1352432816526"></a><a href="context\asc_ldca.md">asc_ldca</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p95231912151116"><a name="p95231912151116"></a><a name="p95231912151116"></a>首先从Data Cache加载缓存数据，若未命中，则尝试从L2 Cache加载。如果Data Cache和L2 Cache中均未找到所需数据，则从Global Memory中读取数据，然后将其缓存到L2 Cache和Data Cache中。</p>
+</td>
+</tr>
+<tr id="row83103233528"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p13310182315219"><a name="p13310182315219"></a><a name="p13310182315219"></a><a href="context\asc_stcg.md">asc_stcg</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p10735143121114"><a name="p10735143121114"></a><a name="p10735143121114"></a>将指定数据存储到Global Memory的地址address中，并缓存到L2 Cache，但不缓存至Data Cache。</p>
+</td>
+</tr>
+<tr id="row142096228500"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p2209172255013"><a name="p2209172255013"></a><a name="p2209172255013"></a><a href="context\asc_stwt.md">asc_stwt</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p19524191351212"><a name="p19524191351212"></a><a name="p19524191351212"></a>将指定数据存储到Global Memory的地址address中，并缓存至Data Cache和L2 Cache。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+## Utils API<a name="section15221943104512"></a>
+
+**表 37**  C++标准库API列表
+
+<a name="table99801554584"></a>
+<table><thead align="left"><tr id="row179811554088"><th class="cellrowborder" valign="top" width="37.71%" id="mcps1.2.3.1.1"><p id="p298155413815"><a name="p298155413815"></a><a name="p298155413815"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="62.29%" id="mcps1.2.3.1.2"><p id="p129815541982"><a name="p129815541982"></a><a name="p129815541982"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row99811354881"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p29811545811"><a name="p29811545811"></a><a name="p29811545811"></a><a href="context\max-1.md">max</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p138701595101"><a name="p138701595101"></a><a name="p138701595101"></a>比较相同数据类型的两个数中的最大值。</p>
+</td>
+</tr>
+<tr id="row99818543818"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p179811546812"><a name="p179811546812"></a><a name="p179811546812"></a><a href="context\min-1.md">min</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p986935911109"><a name="p986935911109"></a><a name="p986935911109"></a>比较相同数据类型的两个数中的最小值。</p>
+</td>
+</tr>
+<tr id="row9612616122612"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p690582982619"><a name="p690582982619"></a><a name="p690582982619"></a><a href="context\abs-1.md">abs</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1161313165264"><a name="p1161313165264"></a><a name="p1161313165264"></a>获取输入数据的绝对值。</p>
+</td>
+</tr>
+<tr id="row1711751919267"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p14905729172617"><a name="p14905729172617"></a><a name="p14905729172617"></a><a href="context\sqrt-1.md">sqrt</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p5117419162612"><a name="p5117419162612"></a><a name="p5117419162612"></a>计算输入数据的平方根。</p>
+</td>
+</tr>
+<tr id="row17982175418816"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p298213542810"><a name="p298213542810"></a><a name="p298213542810"></a><a href="context\integer_sequence.md">integer_sequence</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p8869259101018"><a name="p8869259101018"></a><a name="p8869259101018"></a>用于生成一个整数序列。</p>
+</td>
+</tr>
+<tr id="row139821454384"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p1598219543820"><a name="p1598219543820"></a><a name="p1598219543820"></a><a href="context\tuple.md">tuple</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p88681259101020"><a name="p88681259101020"></a><a name="p88681259101020"></a>允许存储多个不同类型元素的容器。</p>
+</td>
+</tr>
+<tr id="row19821854887"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p1829135316100"><a name="p1829135316100"></a><a name="p1829135316100"></a><a href="context\get-1.md">get</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p42902537103"><a name="p42902537103"></a><a name="p42902537103"></a>从tuple容器中提取指定位置的元素。</p>
+</td>
+</tr>
+<tr id="row19821254681"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p9290175311107"><a name="p9290175311107"></a><a name="p9290175311107"></a><a href="context\make_tuple.md">make_tuple</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p028955381015"><a name="p028955381015"></a><a name="p028955381015"></a>用于便捷地创建tuple对象。</p>
+</td>
+</tr>
+<tr id="row169828546818"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p6289453151012"><a name="p6289453151012"></a><a name="p6289453151012"></a><a href="context\is_convertible.md">is_convertible</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1028845351011"><a name="p1028845351011"></a><a name="p1028845351011"></a>在程序编译时判断两个类型之间是否可以进行隐式转换。</p>
+</td>
+</tr>
+<tr id="row498311545815"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p42881453151010"><a name="p42881453151010"></a><a name="p42881453151010"></a><a href="context\is_base_of.md">is_base_of</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p11287105315108"><a name="p11287105315108"></a><a name="p11287105315108"></a>在程序编译时判断一个类型是否为另一个类型的基类。</p>
+</td>
+</tr>
+<tr id="row1598312541817"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p172878539107"><a name="p172878539107"></a><a name="p172878539107"></a><a href="context\is_same.md">is_same</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1128711539108"><a name="p1128711539108"></a><a name="p1128711539108"></a>在程序编译时判断两个类型是否完全相同。</p>
+</td>
+</tr>
+<tr id="row1633720117221"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p93381111122210"><a name="p93381111122210"></a><a name="p93381111122210"></a><a href="context\is_void.md">is_void</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1533831115228"><a name="p1533831115228"></a><a name="p1533831115228"></a>在程序编译时，检测一个类型是否为void类型。</p>
+</td>
+</tr>
+<tr id="row52421326162217"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p12242172662210"><a name="p12242172662210"></a><a name="p12242172662210"></a><a href="context\is_integral.md">is_integral</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1624252612219"><a name="p1624252612219"></a><a name="p1624252612219"></a>在程序编译时，检测一个类型是否为整数类型。</p>
+</td>
+</tr>
+<tr id="row11734172662219"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p1973415265225"><a name="p1973415265225"></a><a name="p1973415265225"></a><a href="context\is_floating_point.md">is_floating_point</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p57343265222"><a name="p57343265222"></a><a name="p57343265222"></a>在程序编译时，检测一个类型是否为浮点类型。</p>
+</td>
+</tr>
+<tr id="row222019272222"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p6220182752214"><a name="p6220182752214"></a><a name="p6220182752214"></a><a href="context\is_array.md">is_array</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p422182716228"><a name="p422182716228"></a><a name="p422182716228"></a>在程序编译时，检测一个类型是否为数组类型。</p>
+</td>
+</tr>
+<tr id="row7633162752214"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p163352792217"><a name="p163352792217"></a><a name="p163352792217"></a><a href="context\is_pointer.md">is_pointer</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p663302713222"><a name="p663302713222"></a><a name="p663302713222"></a>在程序编译时，判断一个类型是否为指针类型。</p>
+</td>
+</tr>
+<tr id="row238102862215"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p13381828182211"><a name="p13381828182211"></a><a name="p13381828182211"></a><a href="context\is_reference.md">is_reference</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p939162872220"><a name="p939162872220"></a><a name="p939162872220"></a>在程序编译时，检测一个类型是否为引用类型。</p>
+</td>
+</tr>
+<tr id="row204651428192213"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p8465152814228"><a name="p8465152814228"></a><a name="p8465152814228"></a><a href="context\is_const.md">is_const</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1046562819221"><a name="p1046562819221"></a><a name="p1046562819221"></a>在程序编译时，检测一个类型是否为const限定的类型。</p>
+</td>
+</tr>
+<tr id="row7909628112210"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p1090919288227"><a name="p1090919288227"></a><a name="p1090919288227"></a><a href="context\remove_const.md">remove_const</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p129091628182219"><a name="p129091628182219"></a><a name="p129091628182219"></a>在程序编译时，对传入的模板参数类型移除const限定符。</p>
+</td>
+</tr>
+<tr id="row20307202992210"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p130722972215"><a name="p130722972215"></a><a name="p130722972215"></a><a href="context\remove_volatile.md">remove_volatile</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p830772915225"><a name="p830772915225"></a><a name="p830772915225"></a>在程序编译时，对传入的模板参数类型移除volatile限定符。</p>
+</td>
+</tr>
+<tr id="row158421829152216"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p484217299222"><a name="p484217299222"></a><a name="p484217299222"></a><a href="context\remove_cv.md">remove_cv</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p284232922210"><a name="p284232922210"></a><a name="p284232922210"></a>在程序编译时，对传入的模板参数类型移除const限定符或volatile限定符，或同时移除这两种限定符。</p>
+</td>
+</tr>
+<tr id="row16326103092214"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p332613052215"><a name="p332613052215"></a><a name="p332613052215"></a><a href="context\remove_reference.md">remove_reference</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1532653082214"><a name="p1532653082214"></a><a name="p1532653082214"></a>在程序编译时，从给定类型中移除引用限定符。</p>
+</td>
+</tr>
+<tr id="row19738173016229"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p1373818309226"><a name="p1373818309226"></a><a name="p1373818309226"></a><a href="context\remove_pointer.md">remove_pointer</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p873883092210"><a name="p873883092210"></a><a name="p873883092210"></a>在程序编译时，从给定类型中移除指针限定符。</p>
+</td>
+</tr>
+<tr id="row2169173192219"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p1816912311226"><a name="p1816912311226"></a><a name="p1816912311226"></a><a href="context\add_const.md">add_const</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p01692316228"><a name="p01692316228"></a><a name="p01692316228"></a>在程序编译时，为指定类型添加const限定符。</p>
+</td>
+</tr>
+<tr id="row6604193111220"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p7604103110226"><a name="p7604103110226"></a><a name="p7604103110226"></a><a href="context\add_volatile.md">add_volatile</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p860419319222"><a name="p860419319222"></a><a name="p860419319222"></a>在程序编译时，为指定类型添加volatile限定符。</p>
+</td>
+</tr>
+<tr id="row1151173214224"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p12521432172212"><a name="p12521432172212"></a><a name="p12521432172212"></a><a href="context\add_cv.md">add_cv</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p65293272214"><a name="p65293272214"></a><a name="p65293272214"></a>在程序编译时，为指定类型添加const和volatile限定符。</p>
+</td>
+</tr>
+<tr id="row8490932192211"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p1849183212225"><a name="p1849183212225"></a><a name="p1849183212225"></a><a href="context\add_pointer.md">add_pointer</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p14491532112214"><a name="p14491532112214"></a><a name="p14491532112214"></a>在程序编译时，为指定类型添加指针限定符。</p>
+</td>
+</tr>
+<tr id="row99214327228"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p5921163211227"><a name="p5921163211227"></a><a name="p5921163211227"></a><a href="context\add_lvalue_reference.md">add_lvalue_reference</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p492143211222"><a name="p492143211222"></a><a name="p492143211222"></a>在程序编译时，为指定类型添加左值引用限定符。</p>
+</td>
+</tr>
+<tr id="row4302033132213"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p3302163352214"><a name="p3302163352214"></a><a name="p3302163352214"></a><a href="context\add_rvalue_reference.md">add_rvalue_reference</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p630218339222"><a name="p630218339222"></a><a name="p630218339222"></a>在程序编译时，为指定类型添加右值引用限定符。</p>
+</td>
+</tr>
+<tr id="row498311541816"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p4286105318107"><a name="p4286105318107"></a><a name="p4286105318107"></a><a href="context\enable_if.md">enable_if</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1328665317104"><a name="p1328665317104"></a><a name="p1328665317104"></a>在程序编译时根据某个条件启用或禁用特定的函数模板、类模板或模板特化。</p>
+</td>
+</tr>
+<tr id="row49836541682"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p18285105321019"><a name="p18285105321019"></a><a name="p18285105321019"></a><a href="context\conditional.md">conditional</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p1928525319102"><a name="p1928525319102"></a><a name="p1928525319102"></a>在程序编译时根据一个布尔条件从两个类型中选择一个类型。</p>
+</td>
+</tr>
+<tr id="row15509255143618"><td class="cellrowborder" valign="top" width="37.71%" headers="mcps1.2.3.1.1 "><p id="p968185918363"><a name="p968185918363"></a><a name="p968185918363"></a><a href="context\integral_constant.md">integral_constant</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.29%" headers="mcps1.2.3.1.2 "><p id="p15098558367"><a name="p15098558367"></a><a name="p15098558367"></a>用于封装一个编译时常量整数值，是标准库中许多类型特性和编译时计算的基础组件。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 38**  平台信息获取API列表
+
+<a name="table32991747162610"></a>
+<table><thead align="left"><tr id="row13299184712616"><th class="cellrowborder" valign="top" width="37.6%" id="mcps1.2.3.1.1"><p id="p15299104762613"><a name="p15299104762613"></a><a name="p15299104762613"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="62.4%" id="mcps1.2.3.1.2"><p id="p123001847142611"><a name="p123001847142611"></a><a name="p123001847142611"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row63002047192611"><td class="cellrowborder" valign="top" width="37.6%" headers="mcps1.2.3.1.1 "><p id="p530034762613"><a name="p530034762613"></a><a name="p530034762613"></a><a href="context\PlatformAscendC.md">PlatformAscendC</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.4%" headers="mcps1.2.3.1.2 "><p id="p43001947152612"><a name="p43001947152612"></a><a name="p43001947152612"></a>在实现Host侧的Tiling函数时，可能需要获取一些硬件平台的信息，来支撑Tiling的计算，比如获取硬件平台的核数等信息。PlatformAscendC类提供获取这些平台信息的功能。</p>
+</td>
+</tr>
+<tr id="row6300134719269"><td class="cellrowborder" valign="top" width="37.6%" headers="mcps1.2.3.1.1 "><p id="p14300184720265"><a name="p14300184720265"></a><a name="p14300184720265"></a><a href="context\PlatformAscendCManager.md">PlatformAscendCManager</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.4%" headers="mcps1.2.3.1.2 "><p id="p1330019473269"><a name="p1330019473269"></a><a name="p1330019473269"></a>基于Kernel Launch算子工程，通过基础调用（Kernel Launch）方式调用算子的场景下，可能需要获取硬件平台相关信息，比如获取硬件平台的核数。PlatformAscendCManager类提供获取平台信息的功能。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表 39**  Tiling调测API列表
+
+<a name="table2675125415261"></a>
+<table><thead align="left"><tr id="row1967612545262"><th class="cellrowborder" valign="top" width="37.419999999999995%" id="mcps1.2.3.1.1"><p id="p367695412260"><a name="p367695412260"></a><a name="p367695412260"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="62.580000000000005%" id="mcps1.2.3.1.2"><p id="p0676145422615"><a name="p0676145422615"></a><a name="p0676145422615"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row1010110512216"><td class="cellrowborder" valign="top" width="37.419999999999995%" headers="mcps1.2.3.1.1 "><p id="p2010212532219"><a name="p2010212532219"></a><a name="p2010212532219"></a><a href="context\OpTilingRegistry.md">OpTilingRegistry</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.580000000000005%" headers="mcps1.2.3.1.2 "><p id="p710211522210"><a name="p710211522210"></a><a name="p710211522210"></a><span id="ph134802046173619"><a name="ph134802046173619"></a><a name="ph134802046173619"></a>OpTilingRegistry类属于context_ascendc命名空间，主要用于加载Tiling实现的动态库，并获取算子的Tiling函数指针以进行调试和验证。</span></p>
+</td>
+</tr>
+<tr id="row1867785432614"><td class="cellrowborder" valign="top" width="37.419999999999995%" headers="mcps1.2.3.1.1 "><p id="p967795492618"><a name="p967795492618"></a><a name="p967795492618"></a><a href="context\ContextBuilder.md">ContextBuilder</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.580000000000005%" headers="mcps1.2.3.1.2 "><p id="p56781254122619"><a name="p56781254122619"></a><a name="p56781254122619"></a>ContextBuilder类提供一系列的API接口，支持手动构造类来验证Tiling函数以及KernelContext类用于TilingParse函数的验证。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+<<<<<<< HEAD
+**表 41**  Tiling下沉API列表
+=======
+**表 40**  Tiling模板编程API列表
+>>>>>>> upstream/master
+
+<a name="table2864441102011"></a>
+<table><thead align="left"><tr id="row4832193752110"><th class="cellrowborder" valign="top" width="37.44%" id="mcps1.2.3.1.1"><p id="p157001846132117"><a name="p157001846132117"></a><a name="p157001846132117"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="62.56%" id="mcps1.2.3.1.2"><p id="p1570016468218"><a name="p1570016468218"></a><a name="p1570016468218"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row1486515413204"><td class="cellrowborder" valign="top" width="37.44%" headers="mcps1.2.3.1.1 "><p id="p111901452192"><a name="p111901452192"></a><a name="p111901452192"></a><a href="context\模板参数定义.md">模板参数定义</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.56%" headers="mcps1.2.3.1.2 "><p id="p5191124551911"><a name="p5191124551911"></a><a name="p5191124551911"></a>通过该类接口进行模板参数ASCENDC_TPL_ARGS_DECL和模板参数组合ASCENDC_TPL_ARGS_SEL（即可使用的模板）的定义。</p>
+</td>
+</tr>
+<tr id="row198667417207"><td class="cellrowborder" valign="top" width="37.44%" headers="mcps1.2.3.1.1 "><p id="p17191145131910"><a name="p17191145131910"></a><a name="p17191145131910"></a><a href="context\GET_TPL_TILING_KEY.md">GET_TPL_TILING_KEY</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="62.56%" headers="mcps1.2.3.1.2 "><p id="p1619174520193"><a name="p1619174520193"></a><a name="p1619174520193"></a>Tiling模板编程时，开发者通过调用此接口自动生成TilingKey。该接口将传入的模板参数通过定义的位宽，转成二进制，按照顺序组合后转成uint64数值，即TilingKey。</p>
+</td>
+</tr>
+<tr id="row586654192019"><td class="cellrowborder" valign="top" width="37.44%" headers="mcps1.2.3.1.1 "><p id="p419110458198"><a name="p419110458198"></a><a name="p419110458198"></a><a href="context\ASCENDC_TPL_SEL_PARAM.md">ASCENDC_TPL_SEL_PARAM</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="62.56%" headers="mcps1.2.3.1.2 "><p id="p819119458193"><a name="p819119458193"></a><a name="p819119458193"></a><span id="ph1519110455190"><a name="ph1519110455190"></a><a name="ph1519110455190"></a>Tiling模板编程时，开发者通过调用此接口自动生成并配置TilingKey。</span></p>
 </td>
@@ -4131,24 +6059,12 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 </tbody>
 </table>
 
-**表 41**  Tiling下沉API列表
-
-<a name="table2173036112514"></a>
-<table><thead align="left"><tr id="row161714011250"><th class="cellrowborder" valign="top" width="37.3%" id="mcps1.2.3.1.1"><p id="p96601406261"><a name="p96601406261"></a><a name="p96601406261"></a>接口名</p>
-</th>
-<th class="cellrowborder" valign="top" width="62.7%" id="mcps1.2.3.1.2"><p id="p26609019267"><a name="p26609019267"></a><a name="p26609019267"></a>功能描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row917323610256"><td class="cellrowborder" valign="top" width="37.3%" headers="mcps1.2.3.1.1 "><p id="p1419164561913"><a name="p1419164561913"></a><a name="p1419164561913"></a><a href="context\zh-cn_topic_0000002269484441.md">DEVICE_IMPL_OP_OPTILING</a></p>
-</td>
-<td class="cellrowborder" valign="top" width="62.7%" headers="mcps1.2.3.1.2 "><p id="p9191945151920"><a name="p9191945151920"></a><a name="p9191945151920"></a><span id="ph419114452199"><a name="ph419114452199"></a><a name="ph419114452199"></a>在<a href="context\zh-cn_topic_0000002130625528.md">Tiling下沉</a>场景中，该宏定义用于生成Tiling下沉的注册类，再通过调用注册类的成员函数来注册需要下沉的Tiling函数。</span></p>
-</td>
-</tr>
-</tbody>
-</table>
-
+<<<<<<< HEAD
 **表 42**  RTC API列表
+=======
+
+**表 41**  RTC API列表
+>>>>>>> upstream/master
 
 <a name="table59039568269"></a>
 <table><thead align="left"><tr id="row99046568261"><th class="cellrowborder" valign="top" width="37.419999999999995%" id="mcps1.2.3.1.1"><p id="p1490425632618"><a name="p1490425632618"></a><a name="p1490425632618"></a>接口名</p>
@@ -4195,7 +6111,11 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 </tbody>
 </table>
 
+<<<<<<< HEAD
 **表 43**  log API列表
+=======
+**表 42**  log API列表
+>>>>>>> upstream/master
 
 <a name="table1514223372716"></a>
 <table><thead align="left"><tr id="row3142033112715"><th class="cellrowborder" valign="top" width="37.79%" id="mcps1.2.3.1.1"><p id="p181421633182714"><a name="p181421633182714"></a><a name="p181421633182714"></a>接口名</p>
@@ -4212,7 +6132,11 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 </tbody>
 </table>
 
+<<<<<<< HEAD
 **表 44**  调测接口列表
+=======
+**表 43**  调测接口列表
+>>>>>>> upstream/master
 
 <a name="table17826192512135"></a>
 <table><thead align="left"><tr id="row10826162551319"><th class="cellrowborder" valign="top" width="37.79%" id="mcps1.2.3.1.1"><p id="p782622512134"><a name="p782622512134"></a><a name="p782622512134"></a>接口名</p>
@@ -4241,7 +6165,11 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 
 ## AI CPU API<a name="section06362251213"></a>
 
+<<<<<<< HEAD
 **表 45**  AI CPU API列表
+=======
+**表 44**  AI CPU API列表
+>>>>>>> upstream/master
 
 <a name="table340354212211"></a>
 <table><thead align="left"><tr id="row1440344222113"><th class="cellrowborder" valign="top" width="37.419999999999995%" id="mcps1.2.3.1.1"><p id="p140384218217"><a name="p140384218217"></a><a name="p140384218217"></a>接口名</p>

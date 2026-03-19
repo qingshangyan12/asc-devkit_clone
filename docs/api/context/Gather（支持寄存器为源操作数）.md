@@ -128,6 +128,7 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 template<typename T, typename U>
 __simd_vf__ inline void GatherVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ U* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
+<<<<<<< HEAD
     AscendC::MicroAPI::RegTensor<T> srcReg0, dstReg;
     AscendC::MicroAPI::RegTensor<U> srcReg1;
     AscendC::MicroAPI::MaskReg mask;
@@ -137,6 +138,17 @@ __simd_vf__ inline void GatherVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ub
         AscendC::MicroAPI::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
         AscendC::MicroAPI::Gather(dstReg, srcReg0, srcReg1);
         AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+=======
+    AscendC::Reg::RegTensor<T> srcReg0, dstReg;
+    AscendC::Reg::RegTensor<U> srcReg1;
+    AscendC::Reg::MaskReg mask;
+    AscendC::Reg::LoadAlign(srcReg1, src1Addr);
+    for (uint16_t i = 0; i < repeatTimes; i++) {
+        mask = AscendC::Reg::UpdateMask<T>(count);
+        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+        AscendC::Reg::Gather(dstReg, srcReg0, srcReg1);
+        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+>>>>>>> upstream/master
     }
 }
 ```

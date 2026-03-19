@@ -68,6 +68,7 @@ template <typename T>
 __aicore__ inline void AddCustomImpl(__local_mem__ T *dst, __local_mem__ T *src0, __local_mem__ T *src1,
     uint32_t calCount)
 {
+<<<<<<< HEAD
     AscendC::MicroAPI::RegTensor<T> reg0;
     AscendC::MicroAPI::RegTensor<T> reg1;
     AscendC::MicroAPI::RegTensor<T> reg2;
@@ -80,6 +81,20 @@ __aicore__ inline void AddCustomImpl(__local_mem__ T *dst, __local_mem__ T *src0
         AscendC::MicroAPI::LoadAlign(reg1, src1 + i * repeatElm);
         AscendC::MicroAPI::Add(reg2, reg0, reg1, mask);
         AscendC::MicroAPI::StoreAlign(dst + i * repeatElm, reg2, mask);
+=======
+    AscendC::Reg::RegTensor<T> reg0;
+    AscendC::Reg::RegTensor<T> reg1;
+    AscendC::Reg::RegTensor<T> reg2;
+    AscendC::Reg::MaskReg mask;
+    constexpr uint32_t repeatElm = AscendC::GetVecLen() / sizeof(T);
+    uint16_t repeatTime = AscendC::CeilDivision(calCount, repeatElm);
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        mask = AscendC::Reg::UpdateMask<T>(calCount);
+        AscendC::Reg::LoadAlign(reg0, src0 + i * repeatElm);
+        AscendC::Reg::LoadAlign(reg1, src1 + i * repeatElm);
+        AscendC::Reg::Add(reg2, reg0, reg1, mask);
+        AscendC::Reg::StoreAlign(dst + i * repeatElm, reg2, mask);
+>>>>>>> upstream/master
     }
 }
 template <typename T>

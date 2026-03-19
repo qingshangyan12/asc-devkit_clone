@@ -149,6 +149,7 @@ __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask)
 
 ```
 template <typename T, typename U>
+<<<<<<< HEAD
 __simd_vf__ inline void HistogramsVF(__ubuf__ U* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes, AscendC::MicroAPI::HistogramsBinType mode, AscendC::MicroAPI::HistogramsType type)
 {
     AscendC::MicroAPI::RegTensor<T> srcReg;
@@ -159,6 +160,18 @@ __simd_vf__ inline void HistogramsVF(__ubuf__ U* dstAddr, __ubuf__ T* srcAddr, u
         AscendC::MicroAPI::LoadAlign(srcReg, srcAddr + oneRepeatSize * i);
         AscendC::MicroAPI::Histograms<T, U, mode, type>(dstReg, srcReg, mask0);
         AscendC::MicroAPI::StoreAlign(dstAddr, dstReg, mask1);
+=======
+__simd_vf__ inline void HistogramsVF(__ubuf__ U* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes, AscendC::Reg::HistogramsBinType mode, AscendC::Reg::HistogramsType type)
+{
+    AscendC::Reg::RegTensor<T> srcReg;
+    AscendC::Reg::RegTensor<U> dstReg;
+    AscendC::Reg::MaskReg mask0 = AscendC::Reg::CreateMask<T>();
+    AscendC::Reg::MaskReg mask1 = AscendC::Reg::CreateMask<T>();
+    for (uint16_t i = 0; i < repeatTimes; ++i){
+        AscendC::Reg::LoadAlign(srcReg, srcAddr + oneRepeatSize * i);
+        AscendC::Reg::Histograms<T, U, mode, type>(dstReg, srcReg, mask0);
+        AscendC::Reg::StoreAlign(dstAddr, dstReg, mask1);
+>>>>>>> upstream/master
     }
 }
 ```

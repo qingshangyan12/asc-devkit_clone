@@ -34,6 +34,10 @@ TEST_F(TestSyncBlkWait, sync_block_wait_Succ)
             .times(1)
             .will(invoke(asc_sync_block_wait_stub));
 
+<<<<<<< HEAD
     asc_sync_block_wait(flagID);
+=======
+    asc_sync_block_wait(pipe_t::PIPE_S, flagID);
+>>>>>>> upstream/master
     GlobalMockObject::verify();
 }

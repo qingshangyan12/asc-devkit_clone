@@ -268,11 +268,19 @@
     template<typename T>
     __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t oneRepeatSize, uint16_t repeatTimes)
     {
+<<<<<<< HEAD
         AscendC::MicroAPI::RegTensor<T> dstReg;
         AscendC::MicroAPI::MaskReg mask = AscendC::MicroAPI::CreateMask<T>();    
         for (uint16_t i = 0; i < repeatTimes; i++) {
             AscendC::MicroAPI::Duplicate(dstReg, scalarValue);
             AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+=======
+        AscendC::Reg::RegTensor<T> dstReg;
+        AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();    
+        for (uint16_t i = 0; i < repeatTimes; i++) {
+            AscendC::Reg::Duplicate(dstReg, scalarValue);
+            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+>>>>>>> upstream/master
         }
     }
     ```
@@ -283,6 +291,7 @@
     template<typename T>
     __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
     {
+<<<<<<< HEAD
         AscendC::MicroAPI::RegTensor<T> dstReg;
         AscendC::MicroAPI::MaskReg mask;    
         for (uint16_t i = 0; i < repeatTimes; i++) {
@@ -290,6 +299,15 @@
             AscendC::MicroAPI::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);
             AscendC::MicroAPI::Duplicate(dstReg, scalarValue, mask);
             AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+=======
+        AscendC::Reg::RegTensor<T> dstReg;
+        AscendC::Reg::MaskReg mask;    
+        for (uint16_t i = 0; i < repeatTimes; i++) {
+            mask = AscendC::Reg::UpdateMask<T>(count);
+            AscendC::Reg::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);
+            AscendC::Reg::Duplicate(dstReg, scalarValue, mask);
+            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+>>>>>>> upstream/master
         }
     }
     ```
@@ -300,6 +318,7 @@
     template<typename T>
     __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
     {
+<<<<<<< HEAD
         AscendC::MicroAPI::RegTensor<T> srcReg;
         AscendC::MicroAPI::RegTensor<T> dstReg;
         AscendC::MicroAPI::MaskReg mask;
@@ -308,6 +327,16 @@
             AscendC::MicroAPI::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);
             AscendC::MicroAPI::Duplicate(dstReg, srcReg, mask);
             AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+=======
+        AscendC::Reg::RegTensor<T> srcReg;
+        AscendC::Reg::RegTensor<T> dstReg;
+        AscendC::Reg::MaskReg mask;
+        for (uint16_t i = 0; i < repeatTimes; i++) {
+            mask = AscendC::Reg::UpdateMask<T>(count);
+            AscendC::Reg::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);
+            AscendC::Reg::Duplicate(dstReg, srcReg, mask);
+            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+>>>>>>> upstream/master
         }
     }
     ```

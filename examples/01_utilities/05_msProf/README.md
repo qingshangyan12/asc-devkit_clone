@@ -42,6 +42,7 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
 
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
+<<<<<<< HEAD
       ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比，建议优化算子逻辑，减少冗余计算指令
       ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
       ├──Memory.csv                 # UB，L1和主存储器读写带宽速率，单位GB/s
@@ -50,6 +51,17 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
       ├──OpBasicInfo.csv            # 算子基础信息
       ├──PipeUtilization.csv        # pipe类指令耗时和占比，建议优化数据搬运逻辑，提高带宽利用率
       └──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比， 建议减少/避免对于同一个bank读写冲突或bank group的读读冲突
+=======
+      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+      ├──OpBasicInfo.csv            # 算子基础信息
+      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+      ├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
+      └──visualize_data.bin         # MindStudio Insight呈现文件
+>>>>>>> upstream/master
       ```
 - 性能流水仿真
     
@@ -67,10 +79,17 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
       ```bash
       ├──dump                    # 原始的性能数据，用户无需关注
       └──simulator               # 算子基础信息
+<<<<<<< HEAD
         ├──core0.cubecore0.      # 按照core*.veccore*或core*.cubecore*目录存放各核的仿真指令流水图文件
         ├──core0.veccore0
         ├──core0.veccore1
         ├──trace.json           # Edge/Chrome Trace Viewer/Perfetto呈现文件
+=======
+        ├──core0.cubecore0      # 按照core*.veccore*或core*.cubecore*目录存放各核的仿真指令流水图文件
+        ├──core0.veccore0
+        ├──core0.veccore1
+        ├──trace.json           # 仿真流水图和仿真热点函数等信息可视化呈现文件
+>>>>>>> upstream/master
         └──visualize_data.bin   # MindStudio Insight呈现文件
 
       ```
