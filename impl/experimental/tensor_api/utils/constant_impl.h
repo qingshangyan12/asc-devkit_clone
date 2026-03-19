@@ -66,18 +66,6 @@ __aicore__ inline constexpr auto GetHardPos()
    return T::iterator::hardPos;
 }
 
-template <typename T, typename U>
-__aicore__ inline constexpr auto max(const T& src0, const U& src1)
-{
-    return (src0 > src1) ? src0 : src1;
-}
-
-template <typename T, typename U>
-__aicore__ inline constexpr auto Min(const T& src0, const U& src1)
-{
-    return (src0 < src1) ? src0 : src1;
-}
-
 template <typename ElementType, typename DataType>
 inline constexpr bool is_one_of_attr_v = Std::is_one_of_v<ElementType, __gm__ DataType, __cbuf__ DataType, __ca__ DataType, 
                                                         __cb__ DataType, __cc__ DataType, __ubuf__ DataType, DataType>;
