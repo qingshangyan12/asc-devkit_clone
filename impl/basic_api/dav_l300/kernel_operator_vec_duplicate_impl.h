@@ -226,19 +226,11 @@ __simd_vf__ inline void InterleaveImplNormal(__ubuf__ T *dst0Local, __ubuf__ T *
         Reg::UnalignReg ureg;
         for (uint16_t i = 0; i < repeatTime; ++i) {
             // unalign process, copy element is sregLower
-<<<<<<< HEAD
-            MicroAPI::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower);
-            MicroAPI::DataCopyUnAlign(src0Reg, ureg, src0Local + halfCount + i * sregLower);
-            MicroAPI::DataCopyUnAlignPre(ureg, src1Local + halfCount + i * sregLower);
-            MicroAPI::DataCopyUnAlign(src1Reg, ureg, src1Local + halfCount + i * sregLower);
-            MicroAPI::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
-=======
             Reg::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower);
             Reg::DataCopyUnAlign(src0Reg, ureg, src0Local + halfCount + i * sregLower);
             Reg::DataCopyUnAlignPre(ureg, src1Local + halfCount + i * sregLower);
             Reg::DataCopyUnAlign(src1Reg, ureg, src1Local + halfCount + i * sregLower);
             Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
->>>>>>> upstream/master
             // two dst reg all need update mask
             preg = Reg::UpdateMask<T>(sreg);
             Reg::DataCopy(dst1Local + i * 2 * sregLower, dst0Reg, preg);
@@ -286,17 +278,10 @@ __simd_vf__ inline void InterleaveImplB64(__ubuf__ T *dst0Local, __ubuf__ T *dst
         Reg::RegTensor<T> src0RegTmp0, src0RegTmp1, src1RegTmp0, src1RegTmp1;
         for (uint16_t i = 0; i < repeatTime; ++i) {
             // unalign process, copy element is sregLower
-<<<<<<< HEAD
-            MicroAPI::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower);
-            MicroAPI::DataCopyUnAlign(src0RegTmp0, ureg, src0Local + halfCount + i * sregLower);
-            MicroAPI::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
-            MicroAPI::DataCopyUnAlign(src0RegTmp1, ureg,
-=======
             Reg::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower);
             Reg::DataCopyUnAlign(src0RegTmp0, ureg, src0Local + halfCount + i * sregLower);
             Reg::DataCopyUnAlignPre(ureg, src0Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
             Reg::DataCopyUnAlign(src0RegTmp1, ureg,
->>>>>>> upstream/master
                 src0Local + halfCount + i * sregLower + VECTOR_REG_WIDTH / sizeof(T));
             Reg::DataCopyUnAlignPre(ureg, src1Local + halfCount + i * sregLower);
             Reg::DataCopyUnAlign(src1RegTmp0, ureg, src1Local + halfCount + i * sregLower);
@@ -378,11 +363,7 @@ __simd_vf__ inline void DeInterleaveImplNormal(__ubuf__ T *dst0Local, __ubuf__ T
             Reg::DataCopy(dst1Local + halfCount + i * sregLower, dst1Reg, preg);
         }
     } else {
-<<<<<<< HEAD
-        MicroAPI::UnalignReg ureg;
-=======
         Reg::UnalignReg ureg;
->>>>>>> upstream/master
         // split main and tail, because dst copy element is different with main block
         for (uint16_t i = 0; i < repeatTime - 1; ++i) {
             Reg::DataCopy(src0Reg, src1Local + i * 2 * sregLower);
@@ -391,17 +372,10 @@ __simd_vf__ inline void DeInterleaveImplNormal(__ubuf__ T *dst0Local, __ubuf__ T
             __ubuf__ T *dst0LocalTmp = dst0Local + halfCount + i * sregLower;
             __ubuf__ T *dst1LocalTmp = dst1Local + halfCount + i * sregLower;
             // unalign process, copy element is sregLower
-<<<<<<< HEAD
-            MicroAPI::DataCopyUnAlign(dst0LocalTmp, dst0Reg, ureg, sregLower);
-            MicroAPI::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-            MicroAPI::DataCopyUnAlign(dst1LocalTmp, dst1Reg, ureg, sregLower);
-            MicroAPI::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
-=======
             Reg::DataCopyUnAlign(dst0LocalTmp, dst0Reg, ureg, sregLower);
             Reg::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
             Reg::DataCopyUnAlign(dst1LocalTmp, dst1Reg, ureg, sregLower);
             Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
->>>>>>> upstream/master
         }
         Reg::DataCopy(src0Reg, src1Local + (repeatTime - 1) * 2 * sregLower);
         Reg::DataCopy(src1Reg, src1Local + (repeatTime - 1) * 2 * sregLower + sregLower);
@@ -464,23 +438,6 @@ __simd_vf__ inline void DeInterleaveImplB64(__ubuf__ T *dst0Local, __ubuf__ T *d
             __ubuf__ T *dst0LocalTmp = dst0Local + halfCount + i * sregLower;
             __ubuf__ T *dst1LocalTmp = dst1Local + halfCount + i * sregLower;
             // simulate dual intlv to combine two regs
-<<<<<<< HEAD
-            MicroAPI::Interleave((MicroAPI::RegTensor<uint32_t> &)dst0RegTmp0,
-                (MicroAPI::RegTensor<uint32_t> &)dst0RegTmp1, (MicroAPI::RegTensor<uint32_t> &)dst0Reg.reg[0],
-                (MicroAPI::RegTensor<uint32_t> &)dst0Reg.reg[1]);
-            MicroAPI::Interleave((MicroAPI::RegTensor<uint32_t> &)dst1RegTmp0,
-                (MicroAPI::RegTensor<uint32_t> &)dst1RegTmp1, (MicroAPI::RegTensor<uint32_t> &)dst1Reg.reg[0],
-                (MicroAPI::RegTensor<uint32_t> &)dst1Reg.reg[1]);
-            // unalign process, copy element is sregLower / 2
-            MicroAPI::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp0, ureg, sregLower / 2);
-            MicroAPI::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-            MicroAPI::DataCopyUnAlign(dst0LocalTmp, dst0RegTmp1, ureg, sregLower / 2);
-            MicroAPI::DataCopyUnAlignPost(dst0LocalTmp, ureg, 0);
-            MicroAPI::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp0, ureg, sregLower / 2);
-            MicroAPI::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
-            MicroAPI::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, sregLower / 2);
-            MicroAPI::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
-=======
             Reg::Interleave((Reg::RegTensor<uint32_t> &)dst0RegTmp0,
                 (Reg::RegTensor<uint32_t> &)dst0RegTmp1, (Reg::RegTensor<uint32_t> &)dst0Reg.reg[0],
                 (Reg::RegTensor<uint32_t> &)dst0Reg.reg[1]);
@@ -496,7 +453,6 @@ __simd_vf__ inline void DeInterleaveImplB64(__ubuf__ T *dst0Local, __ubuf__ T *d
             Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
             Reg::DataCopyUnAlign(dst1LocalTmp, dst1RegTmp1, ureg, sregLower / 2);
             Reg::DataCopyUnAlignPost(dst1LocalTmp, ureg, 0);
->>>>>>> upstream/master
         }
         // tail block process, because dst copy element is different with main block
         // vld dual src

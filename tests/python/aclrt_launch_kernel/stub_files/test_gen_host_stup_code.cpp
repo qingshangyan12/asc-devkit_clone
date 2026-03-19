@@ -161,10 +161,6 @@ extern "C" uint32_t aclrtlaunch_add_custom(uint32_t numBlocks, void* stream, boo
     __ascendc_args.z = z;
     (void) memcpy_s(&__ascendc_args.tiling, sizeof(__ascendc_args.tiling), tiling, sizeof(__ascendc_args.tiling));
 
-<<<<<<< HEAD
-    const char *__ascendc_name = "add_custom";
-=======
->>>>>>> upstream/master
     __ascendc_ret = launch_and_profiling_add_custom(0, numBlocks, stream, (void **)&__ascendc_args, sizeof(__ascendc_args));
     KernelHandleGradUnregister::GetInstance();
     FreeAscendMemDevice(__ascendc_args.__ascendc_overflow);

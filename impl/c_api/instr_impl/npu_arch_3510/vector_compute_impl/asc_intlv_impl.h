@@ -109,8 +109,6 @@ __simd_callee__ inline void asc_intlv_impl(vector_fp8_e4m3fn_t& dst0, vector_fp8
     }
 }
 
-<<<<<<< HEAD
-=======
 __simd_callee__ inline void asc_intlv_impl(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, vector_hifloat8_t src0, vector_hifloat8_t src1)
 {
     if ASC_IS_AIV {
@@ -119,7 +117,6 @@ __simd_callee__ inline void asc_intlv_impl(vector_hifloat8_t& dst0, vector_hiflo
     }
 }
 
->>>>>>> upstream/master
 __simd_callee__ inline void asc_intlv_impl(vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1)
 {
     if ASC_IS_AIV {

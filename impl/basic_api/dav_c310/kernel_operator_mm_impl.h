@@ -1427,19 +1427,11 @@ __aicore__ inline void LoadImageToLocalCal(__cbuf__ T *dst, const LoadImageToLoc
         auto actual_tmp = reinterpret_cast<__gm__ PrimT<T>*>(tmp + GetBlockIdx()*256*1024);
 
         LoadImageToLocalCalLoop0<T>(actual_tmp, src0, src1, dstSize, format, config, loadDataParams);
-<<<<<<< HEAD
 
         LoadImageToLocalCalLoop1<T>(actual_tmp, dstSize, format, config, loadDataParams);
 
         dcci(reinterpret_cast<__gm__ uint64_t*>(actual_tmp), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 
-=======
-
-        LoadImageToLocalCalLoop1<T>(actual_tmp, dstSize, format, config, loadDataParams);
-
-        dcci(reinterpret_cast<__gm__ uint64_t*>(actual_tmp), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-
->>>>>>> upstream/master
         struct DataCopyParams repeatParams;
         repeatParams.blockLen = dstSize / AscendCUtils::GetC0Count(sizeof(PrimT<T>));
         DataCopyGM2L1Impl(dst, actual_tmp, repeatParams);

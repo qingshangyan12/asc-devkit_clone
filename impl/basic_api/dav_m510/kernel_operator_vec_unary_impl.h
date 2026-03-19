@@ -114,29 +114,6 @@ __simd_vf__ inline void VecUnaryLevel2ImplFloat(__ubuf__ T *dst, __ubuf__ T *src
     Reg::Duplicate(posInfReg, notNum0.f, maskFull);
     Reg::Duplicate(negInfReg, notNum1.f, maskFull);
     for (uint16_t i = 0; i < repeatTime; i++) {
-<<<<<<< HEAD
-        mask = MicroAPI::UpdateMask<T>(sreg);
-        MicroAPI::LoadAlign(srcReg, src + i * sregLower);
-
-        MicroAPI::Duplicate(regOne, 1.0f, maskFull);
-        MicroAPI::Duplicate(regOneHalf, oneHalf, maskFull);
-
-        MicroAPI::CompareScalar<T, CMPMODE::LT>(cmpMask, srcReg, subnormalBound, mask);
-        MicroAPI::Muls(tmpReg, srcReg, multiplyFactor0, mask);
-        MicroAPI::Select(srcReg, tmpReg, srcReg, cmpMask);
-
-        MicroAPI::Div(divReg, regOne, srcReg, mask);           // r = errdiv(1.0, x);
-        MicroAPI::Sqrt(resReg, divReg, mask);                  // y = errsqrt(r);
-        MicroAPI::Muls(tmpReg, srcReg, negHalfFactor, mask);   // -0.5x
-        MicroAPI::Mul(mulReg, tmpReg, resReg, mask);           // -0.5xy
-        MicroAPI::MulAddDst(regOneHalf, mulReg, resReg, mask); // 1.5 - 0.5xy*y
-        MicroAPI::Mul(resReg, regOneHalf, resReg, mask);       // y = y * (1.5 + (-0.5*x*y) * y)
-
-        MicroAPI::Muls(tmpReg, srcReg, negOne, mask);      // -x
-        MicroAPI::MulAddDst(regOne, tmpReg, divReg, mask); // s = 1 - x*r
-        MicroAPI::Muls(tmpReg, resReg, negOne, mask);      // -y
-        MicroAPI::MulAddDst(divReg, tmpReg, resReg, mask); // t = r + (-y) * y
-=======
         mask = Reg::UpdateMask<T>(sreg);
         Reg::LoadAlign(srcReg, src + i * sregLower);
 
@@ -158,7 +135,6 @@ __simd_vf__ inline void VecUnaryLevel2ImplFloat(__ubuf__ T *dst, __ubuf__ T *src
         Reg::MulAddDst(regOne, tmpReg, divReg, mask); // s = 1 - x*r
         Reg::Muls(tmpReg, resReg, negOne, mask);      // -y
         Reg::MulAddDst(divReg, tmpReg, resReg, mask); // t = r + (-y) * y
->>>>>>> upstream/master
         // e = s + x * t => s = s + x * t
         Reg::MulAddDst(regOne, srcReg, divReg, mask);
         // y = y + y * e * 0.5

@@ -142,13 +142,8 @@ __aicore__ inline void CopySignF(Reg::RegTensor<float>& dstReg, Reg::RegTensor<f
 __simd_callee__ inline void GetLogFExtStepOne(Reg::RegTensor<float>& tmpIReg, Reg::RegTensor<float>& tmpMReg,
     Reg::RegTensor<float>& tmpRReg, Reg::RegTensor<float>& srcReg, PowerLogParams& params, Reg::MaskReg& mask)
 {
-<<<<<<< HEAD
-    MicroAPI::RegTensor<float> tmpAReg, tmpFloatReg;
-    MicroAPI::RegTensor<int32_t> tmpEReg;
-=======
     Reg::RegTensor<float> tmpAReg, tmpFloatReg;
     Reg::RegTensor<int32_t> tmpEReg;
->>>>>>> upstream/master
     /* init variable a and i:
      *  if (a < 1.175494351e-38f){ // 0x1.0p-126
      *      a = a * 8388608.0f; // 0x1.0p+23
@@ -657,13 +652,8 @@ __aicore__ inline void PowFComputeImpl(__ubuf__ T* dst, const T& scalarValue, __
 }
 
 /*********** PowF Intrinsic Impl **********/
-<<<<<<< HEAD
-__simd_callee__ inline void GetPowFIntrinsicCore(MicroAPI::RegTensor<float>& dstReg, MicroAPI::RegTensor<float>& baseReg,
-    MicroAPI::RegTensor<float>& expReg, MicroAPI::MaskReg& mask)
-=======
 __simd_callee__ inline void GetPowFIntrinsicCore(Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& baseReg,
     Reg::RegTensor<float>& expReg, Reg::MaskReg& mask)
->>>>>>> upstream/master
 {
     // Compute dst = exp(exp * ln(|base|))
     Reg::RegTensor<float> tmpReg;
@@ -1199,12 +1189,9 @@ __aicore__ inline void PowerCommonImpl(const LocalTensor<T>& dstTensor, const Lo
     PowerCommonImpl<T, isReuseSource, config>(dstTensor, src0Tensor, src1Scalar, stackTensor, calCount);
 }
 } //namespace AscendC
-<<<<<<< HEAD
-=======
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_POWER_POWER_C310_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_POWER_POWER_C310_IMPL_H__
->>>>>>> upstream/master
 #endif

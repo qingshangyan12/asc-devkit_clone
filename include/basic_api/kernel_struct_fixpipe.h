@@ -209,13 +209,9 @@ using FixpipeParamsM300 = FixpipeParamsV220;
 using FixpipeParamsM310 = FixpipeParamsV220;
 } // namespace AscendC
 
-<<<<<<< HEAD
-#endif // ASCENDC_MODULE_STRUCT_FIXPIPE_H
-=======
 #endif // ASCENDC_MODULE_STRUCT_FIXPIPE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H__
 #endif
->>>>>>> upstream/master

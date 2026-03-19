@@ -22,11 +22,7 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
-<<<<<<< HEAD
-iter_reg cce_name##_Stub(uint32_t offset) {}                                                          \
-=======
 iter_reg cce_name##_Stub(uint32_t offset) { return vector_address{}; }                          \
->>>>>>> upstream/master
 }                                                                                               \
                                                                                                 \
 TEST_F(TestVectorCompute##class_name##_CApi, c_api_name##_Succ)       \

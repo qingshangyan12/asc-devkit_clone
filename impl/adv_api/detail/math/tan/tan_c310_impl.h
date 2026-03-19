@@ -147,11 +147,7 @@ __simd_callee__ inline void TanPolynomialApproximation(Reg::RegTensor<float> &ds
     // x^2 = mul(input_x, input_x)
     Reg::Mul(roundReg, resReg, resReg, mask);
     // res_up = muls(x^2, 0.0698520831551998762793)
-<<<<<<< HEAD
-    MicroAPI::Muls(tmpReg, roundReg, TAN_RES_MULTI_SCA, mask);
-=======
     Reg::Muls(tmpReg, roundReg, TAN_RES_MULTI_SCA, mask);
->>>>>>> upstream/master
     // res_up = adds(res_up, -6.8711573651634203789)
     Reg::Adds(tmpReg, tmpReg, TAN_RES_ADDICT_UP, mask);
     // res_up = mul(res_up, x^2)

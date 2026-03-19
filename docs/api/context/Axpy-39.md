@@ -138,17 +138,6 @@ dstReg和srcReg可以为同一个RegTensor。
 template<typename T, typename U>
 static __simd_vf__ inline void AxpyVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, U scalarValue, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
-<<<<<<< HEAD
-    AscendC::MicroAPI::RegTensor<T> srcReg;
-    AscendC::MicroAPI::RegTensor<T> dstReg;
-    AscendC::MicroAPI::MaskReg mask;    
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::MicroAPI::UpdateMask<T>(count);
-        AscendC::MicroAPI::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::MicroAPI::LoadAlign(dstReg, dstAddr + i * oneRepeatSize);
-        AscendC::MicroAPI::Axpy(dstReg, srcReg, scalarValue, mask);
-        AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-=======
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::RegTensor<T> dstReg;
     AscendC::Reg::MaskReg mask;    
@@ -158,7 +147,6 @@ static __simd_vf__ inline void AxpyVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, 
         AscendC::Reg::LoadAlign(dstReg, dstAddr + i * oneRepeatSize);
         AscendC::Reg::Axpy(dstReg, srcReg, scalarValue, mask);
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
->>>>>>> upstream/master
     }
 }
 ```

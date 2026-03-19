@@ -18,10 +18,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateNorm, asc_loa
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateNorm, asc_loadalign_postupdate, vlds, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateNorm, asc_loadalign_postupdate, vlds, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateNorm, asc_loadalign_postupdate, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR_HIF8(LoadAlignPostupdateNorm, asc_loadalign_postupdate, vlds, vector_hifloat8_t, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateNorm, asc_loadalign_postupdate, vlds, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateNorm, asc_loadalign_postupdate, vlds, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateNorm, asc_loadalign_postupdate, vlds, vector_half, half);
@@ -40,10 +37,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrc, asc_load
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrc, asc_loadalign_brc_postupdate, vlds, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrc, asc_loadalign_brc_postupdate, vlds, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrc, asc_loadalign_brc_postupdate, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR_HIF8(LoadAlignPostupdateBrc, asc_loadalign_brc_postupdate, vlds, vector_hifloat8_t, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrc, asc_loadalign_brc_postupdate, vlds, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrc, asc_loadalign_brc_postupdate, vlds, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrc, asc_loadalign_brc_postupdate, vlds, vector_half, half);
@@ -60,10 +54,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUpsample, asc
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUpsample, asc_loadalign_upsample_postupdate, vlds, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUpsample, asc_loadalign_upsample_postupdate, vlds, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUpsample, asc_loadalign_upsample_postupdate, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR_HIF8(LoadAlignPostupdateUpsample, asc_loadalign_upsample_postupdate, vlds, vector_hifloat8_t, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUpsample, asc_loadalign_upsample_postupdate, vlds, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUpsample, asc_loadalign_upsample_postupdate, vlds, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUpsample, asc_loadalign_upsample_postupdate, vlds, vector_half, half);
@@ -77,10 +68,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateDownsample, a
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateDownsample, asc_loadalign_downsample_postupdate, vlds, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateDownsample, asc_loadalign_downsample_postupdate, vlds, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateDownsample, asc_loadalign_downsample_postupdate, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR_HIF8(LoadAlignPostupdateDownsample, asc_loadalign_downsample_postupdate, vlds, vector_hifloat8_t, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateDownsample, asc_loadalign_downsample_postupdate, vlds, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateDownsample, asc_loadalign_downsample_postupdate, vlds, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateDownsample, asc_loadalign_downsample_postupdate, vlds, vector_half, half);
@@ -94,10 +82,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpack, asc_l
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpack, asc_loadalign_unpack_postupdate, vlds, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpack, asc_loadalign_unpack_postupdate, vlds, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpack, asc_loadalign_unpack_postupdate, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR_HIF8(LoadAlignPostupdateUnpack, asc_loadalign_unpack_postupdate, vlds, vector_hifloat8_t, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpack, asc_loadalign_unpack_postupdate, vlds, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpack, asc_loadalign_unpack_postupdate, vlds, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpack, asc_loadalign_unpack_postupdate, vlds, vector_half, half);
@@ -114,10 +99,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpackV2, asc
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpackV2, asc_loadalign_unpack_postupdate_v2, vlds, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpackV2, asc_loadalign_unpack_postupdate_v2, vlds, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateUnpackV2, asc_loadalign_unpack_postupdate_v2, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR_HIF8(LoadAlignPostupdateUnpackV2, asc_loadalign_unpack_postupdate_v2, vlds, vector_hifloat8_t, hifloat8_t);
->>>>>>> upstream/master
 
 // vlds, brc_v2
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrcV2, asc_loadalign_brc_postupdate_v2, vlds, vector_int8_t, int8_t);
@@ -127,10 +109,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrcV2, asc_lo
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrcV2, asc_loadalign_brc_postupdate_v2, vlds, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrcV2, asc_loadalign_brc_postupdate_v2, vlds, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrcV2, asc_loadalign_brc_postupdate_v2, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR_HIF8(LoadAlignPostupdateBrcV2, asc_loadalign_brc_postupdate_v2, vlds, vector_hifloat8_t, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrcV2, asc_loadalign_brc_postupdate_v2, vlds, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrcV2, asc_loadalign_brc_postupdate_v2, vlds, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_INSTR(LoadAlignPostupdateBrcV2, asc_loadalign_brc_postupdate_v2, vlds, vector_half, half);
@@ -156,10 +135,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR(LoadAlignPostupdateDeint
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR(LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR(LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR(LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR_HIF8(LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_hifloat8_t, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR(LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR(LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_POSTUPDATE_DEINTLV_INSTR(LoadAlignPostupdateDeintlv, asc_loadalign_deintlv_postupdate, vlds, vector_half, half);

@@ -105,13 +105,8 @@ __simd_callee__ inline void CosPolynomialApproximation(Reg::RegTensor<float>& ds
     Reg::Adds(dstReg, dstReg, SCALAR_ONE, mask);
 
     // res_up = mul(x^2, 2.604926501e-6)
-<<<<<<< HEAD
-    MicroAPI::Muls(round, kpi, COS_RES_MULTI_SCA, mask);
-    MicroAPI::Adds(round, round, COS_RES_ADDICT_UP, mask);
-=======
     Reg::Muls(round, kpi, COS_RES_MULTI_SCA, mask);
     Reg::Adds(round, round, COS_RES_ADDICT_UP, mask);
->>>>>>> upstream/master
     // res_up = mul(res_up, x^2)
     Reg::Mul(round, round, kpi, mask);
     Reg::Adds(round, round, COS_2ADDS, mask);

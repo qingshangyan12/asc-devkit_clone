@@ -79,10 +79,7 @@ TEST_VECTOR_COMPUTE_INTLV(vector_fp8_e4m3fn_t);
 TEST_VECTOR_COMPUTE_INTLV(vector_fp8_e5m2_t);
 TEST_VECTOR_COMPUTE_INTLV(vector_fp8_e8m0_t);
 TEST_VECTOR_COMPUTE_INTLV(vector_bfloat16_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_COMPUTE_INTLV_HIF8(vector_hifloat8_t);
->>>>>>> upstream/master
 
 class TestVectorComputePintlv : public testing::Test { 
 protected:

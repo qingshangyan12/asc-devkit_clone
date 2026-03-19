@@ -37,9 +37,5 @@ target_link_libraries(demo PRIVATE
 # ======================================================================================
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
-<<<<<<< HEAD:examples/03_libraries/05_reduce/reducesum/CMakeLists.txt
-    # # 该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
-=======
->>>>>>> upstream/master:examples/03_libraries/05_reduce/reducesum_lowlevel/CMakeLists.txt
     # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
 )
