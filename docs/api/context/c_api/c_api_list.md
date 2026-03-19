@@ -115,8 +115,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sub_relu](vector_compute/asc_sub_relu.md) | 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
 | [asc_transto5hd](vector_compute/asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
 | [asc_pair_reduce_sum](vector_compute/asc_pair_reduce_sum.md) | 对输入数据做归约操作，得到数据总和。 |
-| [asc_copy(A2/A3)](vector_compute/asc_copy/asc_copy_arch_2201.md) | 将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。 |
-| [asc_copy(A5)](vector_compute/asc_copy/asc_copy_arch_3510.md) | 将数据从RegTensor搬运到MaskReg。|
+| [asc_copy](vector_compute/asc_copy/asc_copy_arch_2201.md) | 将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。 |
+| <cann-filter npu_type = "950"> [asc_copy](vector_compute/asc_copy/asc_copy_arch_3510.md) | 将数据从RegTensor搬运到MaskReg。</cann-filter>|
 
 ## 数据搬运
 
@@ -290,8 +290,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_loadalign](reg/reg_load/asc_loadalign/) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式。 |
-| [asc_loadalign(A5)](vector_datamove/asc_loadalign/asc_loadalign_arch_3510.md) | 将数据从UB搬入MaskReg。 |
-| [asc_loadalign_postupdate(A5)](vector_datamove/asc_loadalign/asc_loadalign_postupdate_arch_3510.md) | 将数据从UB搬入MaskReg，使能post mode。 |
+| <cann-filter npu_type = "950"> [asc_loadalign](reg/reg_load/asc_loadalign/asc_loadalign_arch_3510.md) | 将数据从UB搬入MaskReg。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_loadalign_postupdate](reg/reg_load/asc_loadalign_postupdate.md) | 将数据从UB搬入MaskReg，使能post mode。</cann-filter> |
 | [asc_storealign](reg/reg_store/asc_storealign/) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
 | [asc_gather](reg/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |
 | [asc_gather_datablock](reg/reg_load/asc_gather_datablock.md) | 给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。 |

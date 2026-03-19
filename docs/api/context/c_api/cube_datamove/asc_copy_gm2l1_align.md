@@ -52,10 +52,10 @@
 | burst_len | 输入 | 待搬运的每个连续传输数据块的长度，单位为32个字节。对位宽为16的数据类型，该参数取值应为2的倍数，对位宽为32的数据类型，该参数取值应为4的倍数。 |
 | left_padding_count | 输入 | 数据左侧的padding元素数。对位宽为8的数据类型，该参数的最大值为32，对位宽为16的数据类型，该参数的最大值为16，对位宽为32的数据类型，该参数的最大值为8。 |
 | right_padding_count | 输入 | 数据右侧的padding元素数。对位宽为8的数据类型，该参数的最大值为32，对位宽为16的数据类型，该参数的最大值为16，对位宽为32的数据类型，该参数的最大值为8。 |
-| data_select_bit | 输入 | padding数据选择位，若为false，则padding值为数据块的第一个元素；若为true，则根据set_pad_val_outtol1设置的的常量来padding。 |
+| data_select_bit | 输入 | padding数据选择位，当前只支持设置为false，将padding值设置为数据块的第一个元素。 |
 | l2_cache_ctl | 输入 | 配置数据在L2 Cache中的管理策略。该参数取值说明如下：  <br>&bull; 0：DISABLE模式，适用于仅需访问一次的数据。 <br>&bull; 1：NORMAL模式，适用于重用模式未知或不极端的数据。 <br>&bull; 2：LAST模式，适用于高频重复访问的数据。 <br>&bull; 4：PERSISTENT模式，适用于需要长期驻留在缓存中的数据。 |
-| burst_src_stride |输入| 输入数据中两个相邻连续数据块之间的距离。 |
-| burst_dst_stride | 输入 | 输出数据中两个相邻连续数据块之间的距离。 |
+| burst_src_stride |输入| 输入数据中两个相邻的burst所对应的连续数据块头与头之间的距离。 |
+| burst_dst_stride | 输入 | 输出数据中两个相邻的burst所对应的连续数据块头与头之间的距离。 |
 
 ## 返回值说明
 
