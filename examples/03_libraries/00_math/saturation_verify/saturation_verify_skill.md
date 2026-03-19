@@ -21,7 +21,7 @@
 
 | 信息 | 说明 | 示例 |
 |------|------|------|
-| **API 名称** | 函数名称 | `Exp`, `Mul`, `Adds` |
+| **API 名称** | 函数名称 | `Exp`, `Mul`, `Adds`, `LeakyRelu` |
 | **函数原型** | Ascend C API 签名 | `AscendC::Exp(dst, src, count)` |
 | **API类型** | 单目/双目/双目标量 | `Unary` 单目, `Binary` 双目, `BinaryScalar` 双目标量 |
 | **支持的数据类型** | half/float/int16/int32 | `half, float` |
@@ -33,7 +33,7 @@
 |---------|---------|---------|----------|
 | `Unary` (1) | 函数签名为 `API(dst, src, count)` | 1个tensor输入 | Exp, Sqrt, Ln, Abs, Reciprocal等 |
 | `Binary` (2) | 函数签名为 `API(dst, src0, src1, count)` | 2个tensor输入 | Mul, Sub, Div等 |
-| `BinaryScalar` (3) | 函数签名为 `API(dst, src, scalar, count)` | 1个tensor输入 + 1个scalar | Adds, Muls等 |
+| `BinaryScalar` (3) | 函数签名为 `API(dst, src, scalar, count)` | 1个tensor输入 + 1个scalar | Adds, Muls, LeakyRelu等 |
 ---
 
 ## Step 3: 代码自动适配
@@ -131,8 +131,9 @@ saturation_verify/
 │   ├── gen_data_exp.py       # Exp 专用（单目）
 │   ├── gen_data_mul.py       # Mul 专用（双目）
 │   ├── gen_data_adds.py      # Adds 专用（双目标量）
+│   ├── gen_data_leakyrelu.py # LeakyRelu 专用（双目标量）
 │   └── verify_result.py      # 验证脚本
-├── saturation_verify.asc      # 算子实现
+├── saturation_verify.asc     # 算子实现
 ├── CMakeLists.txt            # 编译配置
 ├── test.sh                   # 测试脚本
 └── README.md                 # 使用文档
@@ -144,18 +145,20 @@ saturation_verify/
 
 ### 示例一：新增单目 API（以 Reciprocal 为例）
 
-假设 `Reciprocal` 是单目 API，支持 half/float 类型。
+假设 `Reciprocal` 是单目 API，支持 half/float 类型。当前已有 Exp(1), Mul(2), Adds(3), LeakyRelu(4)，新增编号为 5。
 
 #### 3.1.1 修改 saturation_verify.asc
 
 **步骤1：添加 API ID 定义**
 
-在文件开头找到 `#define API_ID_EXP  1` 和 `#define API_ID_MUL  2`，添加：
+在文件开头找到现有的 API ID 定义，添加：
 
 ```cpp
 #define API_ID_EXP   1
 #define API_ID_MUL   2
-#define API_ID_RECIPROCAL   3    // 新增
+#define API_ID_ADDS  3
+#define API_ID_LEAKYRELU  4
+#define API_ID_RECIPROCAL   5    // 新增
 ```
 
 **步骤2：修改 CopyIn() 函数**
@@ -170,7 +173,20 @@ __aicore__ inline void CopyIn()
         AscendC::DataCopy(srcLocal, srcGlobal, INPUT_TENSOR_SIZE);
         inQueueSrc.EnQue(srcLocal);
     } else if constexpr (INPUT_API_ID_VAL == API_ID_MUL) {
-        // 双目 API 有两个输入
+        AscendC::LocalTensor<T> src1Local = inQueueSrc1.AllocTensor<T>();
+        AscendC::LocalTensor<T> src2Local = inQueueSrc2.AllocTensor<T>();
+        AscendC::DataCopy(src1Local, src1Global, INPUT_TENSOR_SIZE);
+        AscendC::DataCopy(src2Local, src2Global, INPUT_TENSOR_SIZE);
+        inQueueSrc1.EnQue(src1Local);
+        inQueueSrc2.EnQue(src2Local);
+    } else if constexpr (INPUT_API_ID_VAL == API_ID_ADDS) {
+        AscendC::LocalTensor<T> src1Local = inQueueSrc1.AllocTensor<T>();
+        AscendC::LocalTensor<T> src2Local = inQueueSrc2.AllocTensor<T>();
+        AscendC::DataCopy(src1Local, src1Global, INPUT_TENSOR_SIZE);
+        AscendC::DataCopy(src2Local, src2Global, INPUT_TENSOR_SIZE);
+        inQueueSrc1.EnQue(src1Local);
+        inQueueSrc2.EnQue(src2Local);
+    } else if constexpr (INPUT_API_ID_VAL == API_ID_LEAKYRELU) {
         AscendC::LocalTensor<T> src1Local = inQueueSrc1.AllocTensor<T>();
         AscendC::LocalTensor<T> src2Local = inQueueSrc2.AllocTensor<T>();
         AscendC::DataCopy(src1Local, src1Global, INPUT_TENSOR_SIZE);
@@ -206,10 +222,46 @@ __aicore__ inline void Compute()
         outQueueDst.EnQue<T>(dstLocal);
         inQueueSrc1.FreeTensor(src1Local);
         inQueueSrc2.FreeTensor(src2Local);
+    } else if constexpr (INPUT_API_ID_VAL == API_ID_ADDS) {
+        // Adds 实现（BinaryScalar）
+        AscendC::LocalTensor<T> src1Local = inQueueSrc1.DeQue<T>();
+        AscendC::LocalTensor<T> src2Local = inQueueSrc2.DeQue<T>();
+        AscendC::LocalTensor<T> dstLocal = outQueueDst.AllocTensor<T>();
+        AscendC::LocalTensor<T> dstLocalTmp = outQueueDst.AllocTensor<T>();
+        int32_t specialValueCnt = (INPUT_DATA_TYPE_VAL <= 2) ? 7 : 4;
+        for (int i = 0; i < specialValueCnt; ++i) {
+            AscendC::Duplicate(dstLocalTmp, T(0), INPUT_TENSOR_SIZE);
+            for (int j = 0; j < specialValueCnt; ++j) {
+                T scalar = src2Local.GetValue(j);
+                AscendC::Adds(dstLocalTmp, src1Local, scalar, INPUT_TENSOR_SIZE);
+                dstLocal.SetValue(j + i * specialValueCnt, dstLocalTmp.GetValue(i * specialValueCnt));
+            }
+        }
+        outQueueDst.EnQue<T>(dstLocal);
+        inQueueSrc1.FreeTensor(src1Local);
+        inQueueSrc2.FreeTensor(src2Local);
+    } else if constexpr (INPUT_API_ID_VAL == API_ID_LEAKYRELU) {
+        // LeakyRelu 实现（BinaryScalar）
+        AscendC::LocalTensor<T> src1Local = inQueueSrc1.DeQue<T>();
+        AscendC::LocalTensor<T> src2Local = inQueueSrc2.DeQue<T>();
+        AscendC::LocalTensor<T> dstLocal = outQueueDst.AllocTensor<T>();
+        AscendC::LocalTensor<T> dstLocalTmp = outQueueDst.AllocTensor<T>();
+        int32_t specialValueCnt = 7;
+        for (int i = 0; i < specialValueCnt; ++i) {
+            AscendC::Duplicate(dstLocalTmp, T(0), INPUT_TENSOR_SIZE);
+            for (int j = 0; j < specialValueCnt; ++j) {
+                T scalar = src2Local.GetValue(j);
+                AscendC::LeakyRelu(dstLocalTmp, src1Local, scalar, INPUT_TENSOR_SIZE);
+                dstLocal.SetValue(j + i * specialValueCnt, dstLocalTmp.GetValue(i * specialValueCnt));
+            }
+        }
+        outQueueDst.EnQue<T>(dstLocal);
+        inQueueSrc1.FreeTensor(src1Local);
+        inQueueSrc2.FreeTensor(src2Local);
     } else if constexpr (INPUT_API_ID_VAL == API_ID_RECIPROCAL) {   // 新增
         AscendC::LocalTensor<T> srcLocal = inQueueSrc.DeQue<T>();
         AscendC::LocalTensor<T> dstLocal = outQueueDst.AllocTensor<T>();
-        AscendC::Reciprocal(dstLocal, srcLocal, INPUT_TENSOR_SIZE);  // 调用 API
+        AscendC::Reciprocal(dstLocal, srcLocal, INPUT_TENSOR_SIZE);
         outQueueDst.EnQue<T>(dstLocal);
         inQueueSrc.FreeTensor(srcLocal);
     }
@@ -252,6 +304,8 @@ def gen_reciprocal_data(input_type, input_size):
 ```python
 from gen_data_exp import compute_exp_golden, gen_exp_data
 from gen_data_mul import compute_mul_golden, gen_mul_data
+from gen_data_adds import compute_adds_golden, gen_adds_data
+from gen_data_leakyrelu import compute_leakyrelu_golden, gen_leakyrelu_data
 from gen_data_reciprocal import compute_reciprocal_golden, gen_reciprocal_data  # 新增
 ```
 
@@ -260,20 +314,24 @@ from gen_data_reciprocal import compute_reciprocal_golden, gen_reciprocal_data  
 ```python
 API_ID_EXP = 1
 API_ID_MUL = 2
-API_ID_RECIPROCAL = 3  # 新增
+API_ID_ADDS = 3
+API_ID_LEAKYRELU = 4
+API_ID_RECIPROCAL = 5  # 新增
 
 API_NAME_MAP = {
     1: "exp",
     2: "mul",
-    3: "reciprocal",  # 新增
+    3: "adds",
+    4: "leakyrelu",
+    5: "reciprocal",  # 新增
 }
 ```
 
 **步骤3：修改 argparse 的 choices**
 
 ```python
-parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3],
-                    help="API ID: 1=exp, 2=mul, 3=reciprocal")
+parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3, 4, 5],
+                    help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu, 5=reciprocal")
 ```
 
 **步骤4：添加分支逻辑**
@@ -283,6 +341,10 @@ if args.apiId == API_ID_EXP:
     gen_exp_data(input_type, args.inputSize)
 elif args.apiId == API_ID_MUL:
     gen_mul_data(input_type, args.inputSize)
+elif args.apiId == API_ID_ADDS:
+    gen_adds_data(input_type, args.inputSize)
+elif args.apiId == API_ID_LEAKYRELU:
+    gen_leakyrelu_data(input_type, args.inputSize)
 elif args.apiId == API_ID_RECIPROCAL:  # 新增
     gen_reciprocal_data(input_type, args.inputSize)
 ```
@@ -294,12 +356,16 @@ elif args.apiId == API_ID_RECIPROCAL:  # 新增
 ```python
 API_ID_EXP = 1
 API_ID_MUL = 2
-API_ID_RECIPROCAL = 3  # 新增
+API_ID_ADDS = 3
+API_ID_LEAKYRELU = 4
+API_ID_RECIPROCAL = 5  # 新增
 
 API_NAME_MAP = {
     1: "exp",
     2: "mul",
-    3: "reciprocal",  # 新增
+    3: "adds",
+    4: "leakyrelu",
+    5: "reciprocal",  # 新增
 }
 ```
 
@@ -308,17 +374,21 @@ API_NAME_MAP = {
 ```python
 if api_id == API_ID_EXP:
     res = verify_single_api(output_type, input_x, "exp")
-elif api_id == API_ID_RECIPROCAL:  # 新增
-    res = verify_single_api(output_type, input_x, "reciprocal")
 elif api_id == API_ID_MUL:
     res = verify_binary_api(output_type, input_x, input_y, api_name)
+elif api_id == API_ID_ADDS:
+    res = verify_binary_api(output_type, input_x, input_y, api_name)
+elif api_id == API_ID_LEAKYRELU:
+    res = verify_binary_api(output_type, input_x, input_y, api_name)
+elif api_id == API_ID_RECIPROCAL:  # 新增
+    res = verify_single_api(output_type, input_x, "reciprocal")
 ```
 
 **步骤3：修改 argparse 的 choices**
 
 ```python
-parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3],
-                    help="API ID: 1=exp, 2=mul, 3=reciprocal")
+parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3, 4, 5],
+                    help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu, 5=reciprocal")
 ```
 
 ### 3.5 修改 test.sh
@@ -330,6 +400,8 @@ case $INPUT_API_ID in
     1) EXPECTED_TYPE=1 ;;      # 单目 API: exp(1)
     2) EXPECTED_TYPE=2 ;;      # 双目 API: mul(2)
     3) EXPECTED_TYPE=3 ;;      # 双目标量 API: adds(3)
+    4) EXPECTED_TYPE=3 ;;      # 双目标量 API: leakyrelu(4)
+    5) EXPECTED_TYPE=1 ;;      # 单目 API: reciprocal(5)
     *) echo "Error: Unknown API_ID=$INPUT_API_ID"; exit 1 ;;
 esac
 ```
@@ -337,14 +409,14 @@ esac
 **步骤2：更新 echo 提示**
 
 ```bash
-echo "INPUT_API_ID:   $INPUT_API_ID (1: exp, 2: mul, 3: adds, ...)"
+echo "INPUT_API_ID:   $INPUT_API_ID (1: exp, 2: mul, 3: adds, 4: leakyrelu, 5: reciprocal)"
 ```
 
 ### 3.6 执行验证
 
 ```bash
 # 单目 API
-INPUT_API_ID=4 INPUT_API_TYPE=1 bash test.sh
+INPUT_API_ID=5 INPUT_API_TYPE=1 bash test.sh
 ```
 
 执行完成后会输出饱和/非饱和模式对比表格。
@@ -353,7 +425,7 @@ INPUT_API_ID=4 INPUT_API_TYPE=1 bash test.sh
 
 ### 示例二：新增双目标量 API（以 Adds 为例）
 
-假设 `Adds` 是双目标量 API，支持 half/float/int16/int32 类型。
+假设 `Adds` 是双目标量 API，支持 half/float/int16/int32 类型。当前已有 Exp(1), Mul(2)，新增编号为 3。
 
 #### 3.7 修改 saturation_verify.asc
 
@@ -582,8 +654,27 @@ Test PASSED!
 | `Matched` | 非饱和模式下的API输出结果，与Golden结果匹配的用例数 |
 | `Error Ratio` | 错误率（Match/Total） |
 
-### 双目标量 API（如 Adds, Muls）输出示例
+### 双目标量 API（如 Adds）输出示例
 
+```
+==========================================================================================================================
+API: adds | Data Type: float16 | Verification Results
+==========================================================================================================================
+type     | src0                       | src1                       | dst (API Output, Non-Sat) | dst (API Output, Saturation)
+----------------------------------------------------------------------------------------------------------------------------
+float16  | min   -65504.000000        | min   -65504.000000        | -inf                     | -65504.000000
+float16  | min   -65504.000000        | max   65504.000000         | -0.000000                | -0.000000
+float16  | min   -65504.000000        | +0    0.000000            | -65504.000000            | -65504.000000
+float16  | min   -65504.000000        | -0    -0.000000           | -65504.000000            | -65504.000000
+float16  | min   -65504.000000        | NaN   nan                  | nan                      | nan
+float16  | min   -65504.000000        | +INF  inf                  | inf                      | 65504.000000
+float16  | min   -65504.000000        | -INF  -inf                 | -inf                     | -65504.000000
+...
+----------------------------------------------------------------------------------------------------------------------------
+Total: 49, Unique: 49, Matched: 49, Error Ratio: 0.0000
+==========================================================================================================================
+
+Test PASSED!
 ```
 ===========================================================================================================================
 API: adds | Data Type: float16 | Verification Results

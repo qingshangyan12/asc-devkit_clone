@@ -4,11 +4,12 @@
 
 ## 支持的 API
 
-| API_ID | API 名称 | 类型 | 支持的数据类型 |
-|--------|----------|------|---------------|
-| 1 | Exp | 单目 (Unary) | half, float |
-| 2 | Mul | 双目 (Binary) | half, float, int16, int32 |
-| 3 | Adds | 双目标量 (BinaryScalar) | half, float, int16, int32 |
+| API_ID | API 名称 | 类型 | 支持的数据类型 | 说明 |
+|--------|----------|------|---------------|------|
+| 1 | Exp | 单目 (Unary) | half, float | 计算指数 `dst = e^src` |
+| 2 | Mul | 双目 (Binary) | half, float, int16, int32 | 元素级乘法 `dst = src0 × src1` |
+| 3 | Adds | 双目标量 (BinaryScalar) | half, float, int16, int32 | 元素与标量加法 `dst = src + scalar` |
+| 4 | LeakyRelu | 双目标量 (BinaryScalar) | half, float | Leaky ReLU `dst = x >= 0 ? x : x × alpha` |
 
 新API自动适配和验证请参考[快速开始-方式一](#快速开始)。
 
@@ -34,18 +35,21 @@ INPUT_API_ID=2 INPUT_API_TYPE=2 bash test.sh
 
 # 测试 Adds（双目标量 API）
 INPUT_API_ID=3 INPUT_API_TYPE=3 bash test.sh
+
+# 测试 LeakyRelu（双目标量 API）
+INPUT_API_ID=4 INPUT_API_TYPE=3 bash test.sh
 ```
 
 ## 环境变量说明
 
 | 变量 | 说明 | 默认值 | 可选值 |
 |------|------|--------|--------|
-| `INPUT_API_ID` | API 编号 | 1 | 1=Exp, 2=Mul, 3=Adds |
+| `INPUT_API_ID` | API 编号 | 1 | 1=Exp, 2=Mul, 3=Adds, 4=LeakyRelu |
 | `INPUT_API_TYPE` | API 类型 | 1 | 1=Unary单目, 2=Binary双目, 3=BinaryScalar双目标量 |
 | `INPUT_DATA_TYPE` | 数据类型 | 0（遍历所有） | 1=float16, 2=float32, 3=int16, 4=int32 |
 | `INPUT_SIZE` | 张量大小 | 128 | 当前固定值 |
 
-如果新增了其他API，API编号会依次递增。比如新增验证Rsqrt，INPUT_API_ID=4；再新增Sub，INPUT_API_ID=5等等。
+如果新增了其他API，API编号会依次递增。比如新增验证Rsqrt，INPUT_API_ID=5；再新增Sub，INPUT_API_ID=6等等。
 
 ### API 类型说明
 
@@ -53,7 +57,7 @@ INPUT_API_ID=3 INPUT_API_TYPE=3 bash test.sh
 |---------|------|----------|
 | `Unary` (1) | 单目运算，一个 tensor 输入 | Exp |
 | `Binary` (2) | 双目运算，两个 tensor 输入 | Mul |
-| `BinaryScalar` (3) | 双目运算，一个 tensor 输入 + 一个 scalar 输入 | Adds |
+| `BinaryScalar` (3) | 双目运算，一个 tensor 输入 + 一个 scalar 输入 | Adds, LeakyRelu |
 
 ## 使用示例
 
@@ -126,6 +130,7 @@ saturation_verify/
 │   ├── gen_data_exp.py        # Exp 数据生成（单目）
 │   ├── gen_data_mul.py        # Mul 数据生成（双目）
 │   ├── gen_data_adds.py       # Adds 数据生成（双目标量）
+│   ├── gen_data_leakyrelu.py  # LeakyRelu 数据生成（双目标量）
 │   ├── gen_data_utils.py      # 公共函数
 │   └── verify_result.py       # 结果验证
 ├── input/                     # 输入数据目录
@@ -149,5 +154,6 @@ source ${ASCEND_INSTALL_PATH}/set_env.sh
    - Exp (ID=1) → TYPE=1 (Unary)
    - Mul (ID=2) → TYPE=2 (Binary)
    - Adds (ID=3) → TYPE=3 (BinaryScalar)
-3. 检查数据类型是否在Ascend C API支持范围内（当前test.sh默认遍历执行half/float/int16_t/int32_t）
-4. 对于 BinaryScalar 类型（如Adds），INPUT_SCALAR 从 input_y.bin 的特殊值中逐个提取
+   - LeakyRelu (ID=4) → TYPE=3 (BinaryScalar)
+3. 检查数据类型是否在Ascend C API支持范围内
+4. 对于 BinaryScalar 类型（如Adds、LeakyRelu），INPUT_SCALAR 从 input_y.bin 的特殊值中逐个提取
