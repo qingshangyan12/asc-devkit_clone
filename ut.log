@@ -1,0 +1,1063 @@
+[2026-03-20 16:56:12] Info: cmake config -DCUSTOM_ASCEND_CANN_PACKAGE_PATH=/usr/local/Ascend/cann-9.0.0 -DENABLE_TEST=ON -DCANN_3RD_LIB_PATH=/data/zyj/asc-devkit/build -DTEST_MOD=ascendc_ut_basic_api_ascend910, .
+-- compile project asc-devkit with library
+-- CMAKE_MODULE_PATH: /data/zyj/asc-devkit/cmake/modules
+-- Variables in unified_dlog module:
+-- unified_dlog_INCLUDE_DIR="/usr/local/Ascend/cann-9.0.0/pkg_inc"
+-- unified_dlog_SHARED_LIBRARY="/usr/local/Ascend/cann-9.0.0/lib64/libunified_dlog.so"
+-- 
+ Properties for TARGET unified_dlog:
+   unified_dlog.INTERFACE_COMPILE_DEFINITIONS = "PROCESS_LOG"
+   unified_dlog.INTERFACE_LINK_LIBRARIES = "unified_dlog_headers"
+   unified_dlog.IMPORTED_LOCATION = "/usr/local/Ascend/cann-9.0.0/lib64/libunified_dlog.so"
+
+-- 
+ Properties for TARGET unified_dlog_headers:
+   unified_dlog_headers.INTERFACE_INCLUDE_DIRECTORIES = "/usr/local/Ascend/cann-9.0.0/pkg_inc;/usr/local/Ascend/cann-9.0.0/pkg_inc/base"
+
+-- Variables in mmpa module:
+-- mmpa_INCLUDE_DIR="/usr/local/Ascend/cann-9.0.0/include"
+-- mmpa_SHARED_LIBRARY="/usr/local/Ascend/cann-9.0.0/lib64/libmmpa.so"
+-- mmpa_STATIC_LIBRARY="/usr/local/Ascend/cann-9.0.0/lib64/libmmpa.a"
+-- 
+ Properties for TARGET mmpa:
+   mmpa.INTERFACE_LINK_LIBRARIES = "mmpa_headers"
+   mmpa.IMPORTED_LOCATION = "/usr/local/Ascend/cann-9.0.0/lib64/libmmpa.so"
+
+-- 
+ Properties for TARGET static_mmpa:
+   static_mmpa.INTERFACE_LINK_LIBRARIES = "mmpa_headers"
+   static_mmpa.IMPORTED_LOCATION = "/usr/local/Ascend/cann-9.0.0/lib64/libmmpa.a"
+
+-- 
+ Properties for TARGET mmpa_headers:
+   mmpa_headers.INTERFACE_INCLUDE_DIRECTORIES = "/usr/local/Ascend/cann-9.0.0/include;/usr/local/Ascend/cann-9.0.0/include/mmpa;/usr/local/Ascend/cann-9.0.0/include/mmpa/sub_inc"
+
+-- Found register library:/usr/local/Ascend/cann-9.0.0/aarch64-linux/lib64/libregister.so
+-- Found opp_registry library:/usr/local/Ascend/cann-9.0.0/aarch64-linux/lib64/libopp_registry.so
+-- Found exe_graph library:/usr/local/Ascend/cann-9.0.0/aarch64-linux/lib64/libexe_graph.so
+-- Found error_manager library:/usr/local/Ascend/cann-9.0.0/aarch64-linux/lib64/liberror_manager.so
+-- Found metadef library:/usr/local/Ascend/cann-9.0.0/aarch64-linux/lib64/libmetadef.so
+-- Found graph library:/usr/local/Ascend/cann-9.0.0/aarch64-linux/lib64/libgraph.so
+-- Found graph_base library:/usr/local/Ascend/cann-9.0.0/aarch64-linux/lib64/libgraph_base.so
+-- Found rt2_registry library:/usr/local/Ascend/cann-9.0.0/aarch64-linux/lib64/librt2_registry.a
+-- Variables in platform module:
+-- platform_INCLUDE_DIR="/usr/local/Ascend/cann-9.0.0/include"
+-- platform_SHARED_LIBRARY="/usr/local/Ascend/cann-9.0.0/lib64/libplatform.so"
+-- 
+ Properties for TARGET platform:
+   platform.INTERFACE_LINK_LIBRARIES = "platform_headers"
+   platform.IMPORTED_LOCATION = "/usr/local/Ascend/cann-9.0.0/lib64/libplatform.so"
+
+-- 
+ Properties for TARGET platform_headers:
+   platform_headers.INTERFACE_INCLUDE_DIRECTORIES = "/usr/local/Ascend/cann-9.0.0/include;/usr/local/Ascend/cann-9.0.0/include/platform"
+
+-- Could NOT find pvmodel_ascend910 (missing: ascend910_LIBRARY) 
+-- CMAKE_BINARY_DIR=/data/zyj/asc-devkit/build
+-- CMAKE_CURRENT_SOURCE_DIR=/data/zyj/asc-devkit/tools/build/asc_opc
+-- CMAKE_BINARY_DIR=/data/zyj/asc-devkit/build
+-- CMAKE_CURRENT_SOURCE_DIR=/data/zyj/asc-devkit/tools/build/asc_op_compile_base
+-- Generating version.info....
+-- tikcfw_headers target exists, gathering its include dirs
+-- tikcfw_headers include dirs: $<BUILD_INTERFACE:/data/zyj/asc-devkit/impl>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/impl/basic_api/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/impl/basic_api/reg_compute/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/impl/simt_api/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/impl/c_api/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/include/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/include/basic_api/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/include/simt_api/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/include/simt_api/cpp/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/include/basic_api/reg_compute/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/include/c_api/>;$<BUILD_INTERFACE:/data/zyj/asc-devkit/build/include>;$<INSTALL_INTERFACE:include>;$<INSTALL_INTERFACE:include/ascendc>;$<INSTALL_INTERFACE:include/ascendc/include>;$<INSTALL_INTERFACE:include/ascendc/include/basic_api>;$<INSTALL_INTERFACE:include/asc/include>;$<INSTALL_INTERFACE:include/asc/include/basic_api>;$<INSTALL_INTERFACE:include/asc/include/simt_api>;$<INSTALL_INTERFACE:include/asc/include/simt_api/cpp>;$<INSTALL_INTERFACE:include/asc/include/basic_api/reg_compute>;$<INSTALL_INTERFACE:include/asc/include/c_api>;$<INSTALL_INTERFACE:include/asc/impl>;$<INSTALL_INTERFACE:include/asc/impl/basic_api>;$<INSTALL_INTERFACE:include/asc/impl/simt_api>;$<INSTALL_INTERFACE:include/asc/impl/basic_api/reg_compute>;$<INSTALL_INTERFACE:include/asc/impl/c_api>
+-- tikicpulib found, adding include directories
+-- tikicpulib cmake path: /usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/lib/cmake
+-- tikicpulib include dirs: /usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/lib/include;/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../include;/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/tikcpp/tikcfw;/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/tikcpp/tikcfw/impl;/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/tikcpp/tikcfw/interface;/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/ascendc/include/highlevel_api/lib/;/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/ascendc/include/highlevel_api/impl/;/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/ascendc/include/highlevel_api/lib/matmul;/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../include/base
+-- Total test files to test: 58
+-- INC_FLAGS: -I/data/zyj/asc-devkit;-I/data/zyj/asc-devkit/impl;-I/data/zyj/asc-devkit/impl/basic_api/;-I/data/zyj/asc-devkit/impl/basic_api/reg_compute/;-I/data/zyj/asc-devkit/impl/simt_api/;-I/data/zyj/asc-devkit/impl/c_api/;-I/data/zyj/asc-devkit/include/;-I/data/zyj/asc-devkit/include/basic_api/;-I/data/zyj/asc-devkit/include/simt_api/;-I/data/zyj/asc-devkit/include/simt_api/cpp/;-I/data/zyj/asc-devkit/include/basic_api/reg_compute/;-I/data/zyj/asc-devkit/include/c_api/;-I/data/zyj/asc-devkit/build/include;-I/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/lib/include;-I/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../include;-I/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/tikcpp/tikcfw;-I/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/tikcpp/tikcfw/impl;-I/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/tikcpp/tikcfw/interface;-I/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/ascendc/include/highlevel_api/lib/;-I/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/ascendc/include/highlevel_api/impl/;-I/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../compiler/ascendc/include/highlevel_api/lib/matmul;-I/usr/local/Ascend/cann-9.0.0/toolkit/tools/tikicpulib/../../include/base
+-- Creating CPU targets
+-- Creating CPU_single targets
+-- Creating NPU targets
+-- Creating NPU_single targets
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /data/zyj/asc-devkit/build
+[  0%] Generating kernel tiling configuration header
+[LOG]:   /data/zyj/asc-devkit/include/adv_api /data/zyj/asc-devkit/build/kernel_tiling/kernel_tiling.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/activation/logsoftmax_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/activation/softmax_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/conv/conv3d/conv3d_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/conv_backprop/conv3d_bp_filter_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/conv_backprop/conv3d_bp_input_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/hccl/hccl_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/matmul/matmul_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/normalization/batchnorm_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/normalization/deepnorm_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/normalization/groupnorm_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/normalization/layernorm_grad_beta_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/normalization/layernorm_grad_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/normalization/layernorm_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/normalization/rmsnorm_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/pad/pad_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/sort/topk_tilingdata.h
+generate tiling def header file:  /data/zyj/asc-devkit/include/adv_api/transpose/confusion_transpose_tilingdata.h
+[  0%] Ensuring kernel headers are generated
+[  0%] Built target generate_kernel_headers
+Consolidate compiler generated dependencies of target ascendc_ut_basic_api_ascend910
+[  0%] Linking CXX executable ascendc_ut_basic_api_ascend910
+Run  
+[==========] Running 470 tests from 49 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from TEST_POP_STACK_BUFFER
+[ RUN      ] TEST_POP_STACK_BUFFER.TensorPopStackBuffer
+[       OK ] TEST_POP_STACK_BUFFER.TensorPopStackBuffer (116 ms)
+[----------] 1 test from TEST_POP_STACK_BUFFER (116 ms total)
+
+[----------] 10 tests from TEST_TENSOR
+[ RUN      ] TEST_TENSOR.TensorBracketWithoutInitBuffer
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR.TensorBracketWithoutInitBuffer (0 ms)
+[ RUN      ] TEST_TENSOR.TensorBracketWithInitBuffer
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR.TensorBracketWithInitBuffer (0 ms)
+[ RUN      ] TEST_TENSOR.TensorEqual
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR.TensorEqual (0 ms)
+[ RUN      ] TEST_TENSOR.TensorConpyConstrcutWithInitBuffer
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR.TensorConpyConstrcutWithInitBuffer (0 ms)
+[ RUN      ] TEST_TENSOR.TensorCopyConstrcutWithoutInitBuffer
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR.TensorCopyConstrcutWithoutInitBuffer (0 ms)
+[ RUN      ] TEST_TENSOR.TensorSetUserTagTest
+[       OK ] TEST_TENSOR.TensorSetUserTagTest (0 ms)
+[ RUN      ] TEST_TENSOR.TensorReinterpretCastTest
+[       OK ] TEST_TENSOR.TensorReinterpretCastTest (0 ms)
+[ RUN      ] TEST_TENSOR.LocalTensorSupportInt4Test
+[       OK ] TEST_TENSOR.LocalTensorSupportInt4Test (0 ms)
+[ RUN      ] TEST_TENSOR.GlobalTensorSupportInt4Test
+[       OK ] TEST_TENSOR.GlobalTensorSupportInt4Test (0 ms)
+[ RUN      ] TEST_TENSOR.TestGetSetValue
+[       OK ] TEST_TENSOR.TestGetSetValue (0 ms)
+[----------] 10 tests from TEST_TENSOR (0 ms total)
+
+[----------] 10 tests from TEST_TENSOR_DESC
+[ RUN      ] TEST_TENSOR_DESC.TensorBracketWithoutInitBuffer
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR_DESC.TensorBracketWithoutInitBuffer (0 ms)
+[ RUN      ] TEST_TENSOR_DESC.TensorBracketWithInitBuffer
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR_DESC.TensorBracketWithInitBuffer (0 ms)
+[ RUN      ] TEST_TENSOR_DESC.TensorEqual
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR_DESC.TensorEqual (0 ms)
+[ RUN      ] TEST_TENSOR_DESC.TensorConpyConstrcutWithInitBuffer
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR_DESC.TensorConpyConstrcutWithInitBuffer (0 ms)
+[ RUN      ] TEST_TENSOR_DESC.TensorCopyConstrcutWithoutInitBuffer
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 
+0024 : 24 25 26 27 28 29 30 31 
+[       OK ] TEST_TENSOR_DESC.TensorCopyConstrcutWithoutInitBuffer (0 ms)
+[ RUN      ] TEST_TENSOR_DESC.TensorSetUserTagTest
+[       OK ] TEST_TENSOR_DESC.TensorSetUserTagTest (0 ms)
+[ RUN      ] TEST_TENSOR_DESC.TensorReinterpretCastTest
+[       OK ] TEST_TENSOR_DESC.TensorReinterpretCastTest (0 ms)
+[ RUN      ] TEST_TENSOR_DESC.LocalTensorSupportInt4Test
+[       OK ] TEST_TENSOR_DESC.LocalTensorSupportInt4Test (0 ms)
+[ RUN      ] TEST_TENSOR_DESC.GlobalTensorSupportInt4Test
+[       OK ] TEST_TENSOR_DESC.GlobalTensorSupportInt4Test (0 ms)
+[ RUN      ] TEST_TENSOR_DESC.GlobalTensorSetValueTest
+[       OK ] TEST_TENSOR_DESC.GlobalTensorSetValueTest (0 ms)
+[----------] 10 tests from TEST_TENSOR_DESC (0 ms total)
+
+[----------] 12 tests from TEST_TPIPE
+[ RUN      ] TEST_TPIPE.TPipeConstructionTest
+[       OK ] TEST_TPIPE.TPipeConstructionTest (114 ms)
+[ RUN      ] TEST_TPIPE.TPipeInitBufferWithTBufTest
+[       OK ] TEST_TPIPE.TPipeInitBufferWithTBufTest (114 ms)
+[ RUN      ] TEST_TPIPE.TPipeInitBufferWithTQueTest
+[       OK ] TEST_TPIPE.TPipeInitBufferWithTQueTest (114 ms)
+[ RUN      ] TEST_TPIPE.TPipeReset
+[       OK ] TEST_TPIPE.TPipeReset (227 ms)
+[ RUN      ] TEST_TPIPE.TPipeGetAbsAddrWithTbufTest
+[       OK ] TEST_TPIPE.TPipeGetAbsAddrWithTbufTest (114 ms)
+[ RUN      ] TEST_TPIPE.TPipeGetAbsAddrWithTensorTest
+[       OK ] TEST_TPIPE.TPipeGetAbsAddrWithTensorTest (114 ms)
+[ RUN      ] TEST_TPIPE.TQueMaskTest
+[       OK ] TEST_TPIPE.TQueMaskTest (0 ms)
+[ RUN      ] TEST_TPIPE.TQueBindMaskTest
+[       OK ] TEST_TPIPE.TQueBindMaskTest (0 ms)
+[ RUN      ] TEST_TPIPE.TQueBuf2TensorTest
+[       OK ] TEST_TPIPE.TQueBuf2TensorTest (114 ms)
+[ RUN      ] TEST_TPIPE.testCustomizeInitBuffer
+[       OK ] TEST_TPIPE.testCustomizeInitBuffer (114 ms)
+[ RUN      ] TEST_TPIPE.TQueSetUserTagTest
+[       OK ] TEST_TPIPE.TQueSetUserTagTest (114 ms)
+[ RUN      ] TEST_TPIPE.TQueBindEnQueTest
+[       OK ] TEST_TPIPE.TQueBindEnQueTest (114 ms)
+[----------] 12 tests from TEST_TPIPE (1256 ms total)
+
+[----------] 6 tests from TEST_TBUFPOOL
+[ RUN      ] TEST_TBUFPOOL.TpipeInitBufPool
+[       OK ] TEST_TBUFPOOL.TpipeInitBufPool (114 ms)
+[ RUN      ] TEST_TBUFPOOL.TbufPoolInitBufPool
+[       OK ] TEST_TBUFPOOL.TbufPoolInitBufPool (114 ms)
+[ RUN      ] TEST_TBUFPOOL.TbufPoolInitBuffer
+[       OK ] TEST_TBUFPOOL.TbufPoolInitBuffer (114 ms)
+[ RUN      ] TEST_TBUFPOOL.TbufPoolInitBufPoolUnalign
+[       OK ] TEST_TBUFPOOL.TbufPoolInitBufPoolUnalign (114 ms)
+[ RUN      ] TEST_TBUFPOOL.MyBufPoolInitBufferCase1
+[       OK ] TEST_TBUFPOOL.MyBufPoolInitBufferCase1 (114 ms)
+[ RUN      ] TEST_TBUFPOOL.MyBufPoolInitBufferCase2
+[       OK ] TEST_TBUFPOOL.MyBufPoolInitBufferCase2 (113 ms)
+[----------] 6 tests from TEST_TBUFPOOL (686 ms total)
+
+[----------] 4 tests from TestProcessLock
+[ RUN      ] TestProcessLock.ProcessLockConstruct
+[       OK ] TestProcessLock.ProcessLockConstruct (0 ms)
+[ RUN      ] TestProcessLock.ProcessLockFree
+[       OK ] TestProcessLock.ProcessLockFree (0 ms)
+[ RUN      ] TestProcessLock.ProcessLockUnmapFail
+[kernel_process_lock.cpp:68] block_idx: 0, core_type: mix 2970056 FreeLock:FreeLock Fail : ProcessLock unmap fail. Error Code : 22
+[       OK ] TestProcessLock.ProcessLockUnmapFail (0 ms)
+[ RUN      ] TestProcessLock.ProcessLockMapFail
+[kernel_process_lock.cpp:51] block_idx: 0, core_type: mix 2970056 CreateLock:CreateLock Fail : ProcessLock map fail. Error Code : 22
+[       OK ] TestProcessLock.ProcessLockMapFail (0 ms)
+[----------] 4 tests from TestProcessLock (0 ms total)
+
+[----------] 2 tests from TestAscendCTypeCheck
+[ RUN      ] TestAscendCTypeCheck.testSingleType
+[       OK ] TestAscendCTypeCheck.testSingleType (0 ms)
+[ RUN      ] TestAscendCTypeCheck.testCompositeTypes
+[       OK ] TestAscendCTypeCheck.testCompositeTypes (0 ms)
+[----------] 2 tests from TestAscendCTypeCheck (0 ms total)
+
+[----------] 1 test from DataCopyUB2L1TestSuite
+[ RUN      ] DataCopyUB2L1TestSuite.testCaseDataCopyUB2L1
+[       OK ] DataCopyUB2L1TestSuite.testCaseDataCopyUB2L1 (1 ms)
+[----------] 1 test from DataCopyUB2L1TestSuite (2 ms total)
+
+[----------] 1 test from DataCopyL12BTTestSuite
+[ RUN      ] DataCopyL12BTTestSuite.testCaseDataCopyL12BT
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_data_copy_impl.h:82][DataCopyL12BTImpl][2970056] DataCopy from C1 to C2 is not supported on current device.
+[       OK ] DataCopyL12BTTestSuite.testCaseDataCopyL12BT (0 ms)
+[----------] 1 test from DataCopyL12BTTestSuite (0 ms total)
+
+[----------] 17 tests from TEST_CAST_COMPILE
+[ RUN      ] TEST_CAST_COMPILE.Castint8_t2halfCAST_RINTLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:43][CastIntrinsicsImpl][2970056] Current RoundMode of Cast from int8_t to half is not supported on current device, only RoundMode::CAST_NONE support!
+[       OK ] TEST_CAST_COMPILE.Castint8_t2halfCAST_RINTLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Castuint8_t2halfCAST_RINTLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:57][CastIntrinsicsImpl][2970056] Current RoundMode of Cast from uint8_t to half is not supported on current device, only RoundMode::CAST_NONE support!
+[       OK ] TEST_CAST_COMPILE.Castuint8_t2halfCAST_RINTLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Castint32_t2floatCAST_RINTLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:71][CastIntrinsicsImpl][2970056] Current RoundMode of Cast from int32_t to float is not supported on current device, only RoundMode::CAST_NONE support!
+[       OK ] TEST_CAST_COMPILE.Castint32_t2floatCAST_RINTLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Casthalf2floatCAST_RINTLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:85][CastIntrinsicsImpl][2970056] Current RoundMode of Cast from half to float is not supported on current device, only RoundMode::CAST_NONE support!
+[       OK ] TEST_CAST_COMPILE.Casthalf2floatCAST_RINTLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Casthalf2int32_tCAST_ODDLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:117][CastIntrinsicsImpl][2970056] RoundMode::CAST_ODD of Cast from half to int32_t is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Casthalf2int32_tCAST_ODDLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Casthalf2int32_tCAST_NONELEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:123][CastIntrinsicsImpl][2970056] RoundMode::CAST_NONE of Cast from half to int32_t is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Casthalf2int32_tCAST_NONELEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Casthalf2uint8_tCAST_ODDLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:207][CastIntrinsicsImpl][2970056] RoundMode::CAST_ODD of Cast from half to uint8_t is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Casthalf2uint8_tCAST_ODDLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Castfloat2halfCAST_RINTLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:231][CastIntrinsicsImpl][2970056] RoundMode::CAST_RINT of Cast from float to half is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Castfloat2halfCAST_RINTLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Castfloat2halfCAST_FLOORLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:237][CastIntrinsicsImpl][2970056] RoundMode::CAST_FLOOR of Cast from float to half is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Castfloat2halfCAST_FLOORLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Castfloat2halfCAST_CEILLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:243][CastIntrinsicsImpl][2970056] RoundMode::CAST_CEIL of Cast from float to half is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Castfloat2halfCAST_CEILLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Castfloat2halfCAST_ROUNDLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:249][CastIntrinsicsImpl][2970056] RoundMode::CAST_ROUND of Cast from float to half is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Castfloat2halfCAST_ROUNDLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Castfloat2halfCAST_TRUNCLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:255][CastIntrinsicsImpl][2970056] RoundMode::CAST_TRUNC of Cast from float to half is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Castfloat2halfCAST_TRUNCLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Castfloat2int32_tCAST_ODDLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:291][CastIntrinsicsImpl][2970056] RoundMode::CAST_ODD of Cast from float to int32_t is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Castfloat2int32_tCAST_ODDLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Castfloat2int32_tCAST_NONELEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:297][CastIntrinsicsImpl][2970056] RoundMode::CAST_NONE of Cast from float to int32_t is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Castfloat2int32_tCAST_NONELEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Casthalf2int8_tCAST_ODDLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:159][CastIntrinsicsImpl][2970056] RoundMode::CAST_ODD of Cast from half to int8_t is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Casthalf2int8_tCAST_ODDLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Casthalf2int8_tCAST_RINTLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:165][CastIntrinsicsImpl][2970056] RoundMode::CAST_RINT of Cast from half to int8_t is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Casthalf2int8_tCAST_RINTLEVEL2FailedCase (114 ms)
+[ RUN      ] TEST_CAST_COMPILE.Casthalf2uint8_tCAST_RINTLEVEL2FailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_vec_vconv_impl.h:201][CastIntrinsicsImpl][2970056] RoundMode::CAST_RINT of Cast from half to uint8_t is not supported on current device
+[       OK ] TEST_CAST_COMPILE.Casthalf2uint8_tCAST_RINTLEVEL2FailedCase (114 ms)
+[----------] 17 tests from TEST_CAST_COMPILE (1944 ms total)
+
+[----------] 27 tests from TEST_CAST
+[ RUN      ] TEST_CAST.Casthalf2int32_tCAST_RINTLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int32_tCAST_RINTLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2int32_tCAST_FLOORLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int32_tCAST_FLOORLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2int32_tCAST_CEILLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int32_tCAST_CEILLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2int32_tCAST_ROUNDLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int32_tCAST_ROUNDLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2int32_tCAST_TRUNCLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int32_tCAST_TRUNCLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castfloat2int32_tCAST_RINTLEVEL2Case
+[       OK ] TEST_CAST.Castfloat2int32_tCAST_RINTLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castfloat2int32_tCAST_FLOORLEVEL2Case
+[       OK ] TEST_CAST.Castfloat2int32_tCAST_FLOORLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castfloat2int32_tCAST_CEILLEVEL2Case
+[       OK ] TEST_CAST.Castfloat2int32_tCAST_CEILLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castfloat2int32_tCAST_ROUNDLEVEL2Case
+[       OK ] TEST_CAST.Castfloat2int32_tCAST_ROUNDLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castfloat2int32_tCAST_TRUNCLEVEL2Case
+[       OK ] TEST_CAST.Castfloat2int32_tCAST_TRUNCLEVEL2Case (115 ms)
+[ RUN      ] TEST_CAST.Castint32_t2floatCAST_NONELEVEL2Case
+[       OK ] TEST_CAST.Castint32_t2floatCAST_NONELEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2floatCAST_NONELEVEL2Case
+[       OK ] TEST_CAST.Casthalf2floatCAST_NONELEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castfloat2halfCAST_NONELEVEL2Case
+[       OK ] TEST_CAST.Castfloat2halfCAST_NONELEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castfloat2halfCAST_ODDLEVEL2Case
+[       OK ] TEST_CAST.Castfloat2halfCAST_ODDLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2int8_tCAST_NONELEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int8_tCAST_NONELEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2int8_tCAST_FLOORLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int8_tCAST_FLOORLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2int8_tCAST_CEILLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int8_tCAST_CEILLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2int8_tCAST_ROUNDLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int8_tCAST_ROUNDLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2int8_tCAST_TRUNCLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2int8_tCAST_TRUNCLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2uint8_tCAST_NONELEVEL2Case
+[       OK ] TEST_CAST.Casthalf2uint8_tCAST_NONELEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2uint8_tCAST_FLOORLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2uint8_tCAST_FLOORLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2uint8_tCAST_CEILLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2uint8_tCAST_CEILLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2uint8_tCAST_ROUNDLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2uint8_tCAST_ROUNDLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Casthalf2uint8_tCAST_TRUNCLEVEL2Case
+[       OK ] TEST_CAST.Casthalf2uint8_tCAST_TRUNCLEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castint32_t2halfCAST_NONELEVEL2Case
+[       OK ] TEST_CAST.Castint32_t2halfCAST_NONELEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castuint8_t2halfCAST_NONELEVEL2Case
+[       OK ] TEST_CAST.Castuint8_t2halfCAST_NONELEVEL2Case (114 ms)
+[ RUN      ] TEST_CAST.Castint8_t2halfCAST_NONELEVEL2Case
+[       OK ] TEST_CAST.Castint8_t2halfCAST_NONELEVEL2Case (114 ms)
+[----------] 27 tests from TEST_CAST (3099 ms total)
+
+[----------] 2 tests from TEST_DATA_COPY_CHECK
+[ RUN      ] TEST_DATA_COPY_CHECK.DATACOPYCHEKint8_t2int8_tL12GMFailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_data_copy_impl.h:279][DataCopyL12GMImpl][2970056] DataCopy from A1 / B1 to GM is not supported on current device.
+[       OK ] TEST_DATA_COPY_CHECK.DATACOPYCHEKint8_t2int8_tL12GMFailedCase (0 ms)
+[ RUN      ] TEST_DATA_COPY_CHECK.DATACOPYCHEKint8_t2int8_tL12L0CFailedCase
+[ERROR][Core_0][/data/zyj/asc-devkit/include/basic_api/../../impl/basic_api/dav_c100/kernel_operator_data_copy_impl.h:778][DataCopyL12L0CImpl][2970056] DataCopy from A1 / B1 to CO1 is not supported on current device.
+[       OK ] TEST_DATA_COPY_CHECK.DATACOPYCHEKint8_t2int8_tL12L0CFailedCase (0 ms)
+[----------] 2 tests from TEST_DATA_COPY_CHECK (0 ms total)
+
+[----------] 1 test from TEST_VEC_UNARY_F
+[ RUN      ] TEST_VEC_UNARY_F.VecUnaryCase
+[       OK ] TEST_VEC_UNARY_F.VecUnaryCase (0 ms)
+[----------] 1 test from TEST_VEC_UNARY_F (0 ms total)
+
+[----------] 12 tests from TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/0
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/0 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/1
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/1 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/2
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/2 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/3
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/3 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/4
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/4 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/5
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/5 (116 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/6
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/6 (118 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/7
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/7 (115 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/8
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/8 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/9
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/9 (115 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/10
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/10 (115 ms)
+[ RUN      ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/11
+[       OK ] TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite.DataCopySimpleTestCase/11 (115 ms)
+[----------] 12 tests from TEST_DATA_COPY_SIMPLE/DataCopySimpleTestsuite (1384 ms total)
+
+[----------] 48 tests from TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/0
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/0 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/1
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/1 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/2
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/2 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/3
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/3 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/4
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/4 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/5
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/5 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/6
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/6 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/7
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/7 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/8
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/8 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/9
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/9 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/10
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/10 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/11
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/11 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/12
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/12 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/13
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/13 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/14
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/14 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/15
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/15 (119 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/16
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/16 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/17
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/17 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/18
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/18 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/19
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/19 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/20
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/20 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/21
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/21 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/22
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/22 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/23
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/23 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/24
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/24 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/25
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/25 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/26
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/26 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/27
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/27 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/28
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/28 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/29
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/29 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/30
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/30 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/31
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/31 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/32
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/32 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/33
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/33 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/34
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/34 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/35
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/35 (114 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/36
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/36 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/37
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/37 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/38
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/38 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/39
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/39 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/40
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/40 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/41
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/41 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/42
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/42 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/43
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/43 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/44
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/44 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/45
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/45 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/46
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/46 (115 ms)
+[ RUN      ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/47
+[       OK ] TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite.DataCopyEnhancedTestCase/47 (114 ms)
+[----------] 48 tests from TEST_DATA_COPY_ENHANCED/DataCopyEnhancedTestsuite (5530 ms total)
+
+[----------] 2 tests from TEST_OPEARATION_DATACOPYGM2L1ND2NZ/DataCopyGm2L1Nd2NzTestsuite
+[ RUN      ] TEST_OPEARATION_DATACOPYGM2L1ND2NZ/DataCopyGm2L1Nd2NzTestsuite.DataCopyGm2L1Nd2NzTestsuiteOpTestCase/0
+[       OK ] TEST_OPEARATION_DATACOPYGM2L1ND2NZ/DataCopyGm2L1Nd2NzTestsuite.DataCopyGm2L1Nd2NzTestsuiteOpTestCase/0 (115 ms)
+[ RUN      ] TEST_OPEARATION_DATACOPYGM2L1ND2NZ/DataCopyGm2L1Nd2NzTestsuite.DataCopyGm2L1Nd2NzTestsuiteOpTestCase/1
+[       OK ] TEST_OPEARATION_DATACOPYGM2L1ND2NZ/DataCopyGm2L1Nd2NzTestsuite.DataCopyGm2L1Nd2NzTestsuiteOpTestCase/1 (115 ms)
+[----------] 2 tests from TEST_OPEARATION_DATACOPYGM2L1ND2NZ/DataCopyGm2L1Nd2NzTestsuite (231 ms total)
+
+[----------] 2 tests from TEST_OPEARATION_DATACOPYUb2GmNz2Nd/DataCopyUb2GmNz2NdTestsuite
+[ RUN      ] TEST_OPEARATION_DATACOPYUb2GmNz2Nd/DataCopyUb2GmNz2NdTestsuite.DataCopyUb2GmNz2NdTestsuiteOpTestCase/0
+[       OK ] TEST_OPEARATION_DATACOPYUb2GmNz2Nd/DataCopyUb2GmNz2NdTestsuite.DataCopyUb2GmNz2NdTestsuiteOpTestCase/0 (116 ms)
+[ RUN      ] TEST_OPEARATION_DATACOPYUb2GmNz2Nd/DataCopyUb2GmNz2NdTestsuite.DataCopyUb2GmNz2NdTestsuiteOpTestCase/1
+[       OK ] TEST_OPEARATION_DATACOPYUb2GmNz2Nd/DataCopyUb2GmNz2NdTestsuite.DataCopyUb2GmNz2NdTestsuiteOpTestCase/1 (116 ms)
+[----------] 2 tests from TEST_OPEARATION_DATACOPYUb2GmNz2Nd/DataCopyUb2GmNz2NdTestsuite (232 ms total)
+
+[----------] 12 tests from TEST_DATA_COPY_SLICE/TestDataCopySliceSuite
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/0
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/0 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/1
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/1 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/2
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/2 (115 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/3
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/3 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/4
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/4 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/5
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/5 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/6
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/6 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/7
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/7 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/8
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/8 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/9
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/9 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/10
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/10 (114 ms)
+[ RUN      ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/11
+[       OK ] TEST_DATA_COPY_SLICE/TestDataCopySliceSuite.TestDataCopySliceCases/11 (116 ms)
+[----------] 12 tests from TEST_DATA_COPY_SLICE/TestDataCopySliceSuite (1379 ms total)
+
+[----------] 15 tests from TENSOR_PRINT/TEST_TENSOR_PRINT
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/0
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/0 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/1
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/1 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/2
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/2 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/3
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/3 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/4
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 
+0032 : 32 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/4 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/5
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+0016 : 16 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/5 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/6
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/6 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/7
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/7 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/8
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/8 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/9
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 
+0032 : 32 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/9 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/10
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+0016 : 16 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/10 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/11
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/11 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/12
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 
+0032 : 32 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/12 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/13
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 
+0032 : 32 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/13 (0 ms)
+[ RUN      ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/14
+0000 : 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+0032 : 1 
+[       OK ] TENSOR_PRINT/TEST_TENSOR_PRINT.TensorPrintTest/14 (0 ms)
+[----------] 15 tests from TENSOR_PRINT/TEST_TENSOR_PRINT (0 ms total)
+
+[----------] 15 tests from TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/0
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/0 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/1
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/1 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/2
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/2 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/3
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/3 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/4
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 
+0032 : 32 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/4 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/5
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+0016 : 16 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/5 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/6
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/6 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/7
+0000 : 0 1 2 3 4 5 6 7 
+0008 : 8 9 10 11 12 13 14 15 
+0016 : 16 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/7 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/8
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/8 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/9
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+0016 : 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 
+0032 : 32 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/9 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/10
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+0016 : 16 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/10 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/11
+0000 : 0 1 2 3 4 5 6 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/11 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/12
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 
+0032 : 32 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/12 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/13
+0000 : 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 
+0032 : 32 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/13 (0 ms)
+[ RUN      ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/14
+0000 : 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+0032 : 1 
+[       OK ] TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT.TensorDescPrintTest/14 (0 ms)
+[----------] 15 tests from TENSOR_DESC_PRINT/TEST_TENSOR_DESC_PRINT (0 ms total)
+
+[----------] 15 tests from SET_PHY_TYPE/TEST_GET_PHY_TYPE
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/0
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/0 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/1
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/1 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/2
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/2 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/3
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/3 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/4
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/4 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/5
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/5 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/6
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/6 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/7
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/7 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/8
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/8 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/9
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/9 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/10
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/10 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/11
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/11 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/12
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/12 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/13
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/13 (0 ms)
+[ RUN      ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/14
+[       OK ] SET_PHY_TYPE/TEST_GET_PHY_TYPE.GetPhyTypeTest/14 (0 ms)
+[----------] 15 tests from SET_PHY_TYPE/TEST_GET_PHY_TYPE (0 ms total)
+
+[----------] 24 tests from GET_POSITION_TYPE/TEST_GET_POSITION
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/0
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/0 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/1
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/1 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/2
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/2 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/3
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/3 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/4
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/4 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/5
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/5 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/6
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/6 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/7
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/7 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/8
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/8 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/9
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/9 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/10
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/10 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/11
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/11 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/12
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/12 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/13
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/13 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/14
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/14 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/15
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/15 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/16
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/16 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/17
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/17 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/18
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/18 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/19
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/19 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/20
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/20 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/21
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/21 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/22
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/22 (0 ms)
+[ RUN      ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/23
+[       OK ] GET_POSITION_TYPE/TEST_GET_POSITION.GetPositionTest/23 (0 ms)
+[----------] 24 tests from GET_POSITION_TYPE/TEST_GET_POSITION (0 ms total)
+
+[----------] 24 tests from GET_Q_EVT/TEST_GET_Q_EVT
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/0
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/0 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/1
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/1 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/2
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/2 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/3
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/3 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/4
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/4 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/5
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/5 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/6
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/6 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/7
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/7 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/8
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/8 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/9
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/9 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/10
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/10 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/11
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/11 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/12
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/12 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/13
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/13 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/14
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/14 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/15
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/15 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/16
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/16 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/17
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/17 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/18
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/18 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/19
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/19 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/20
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/20 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/21
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/21 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/22
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/22 (0 ms)
+[ RUN      ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/23
+[       OK ] GET_Q_EVT/TEST_GET_Q_EVT.GetQueEvtTest/23 (0 ms)
+[----------] 24 tests from GET_Q_EVT/TEST_GET_Q_EVT (0 ms total)
+
+[----------] 9 tests from ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER
+[ RUN      ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/0
+[       OK ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/0 (115 ms)
+[ RUN      ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/1
+[       OK ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/1 (115 ms)
+[ RUN      ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/2
+[       OK ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/2 (115 ms)
+[ RUN      ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/3
+[       OK ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/3 (115 ms)
+[ RUN      ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/4
+[       OK ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/4 (115 ms)
+[ RUN      ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/5
+[       OK ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/5 (115 ms)
+[ RUN      ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/6
+[       OK ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/6 (115 ms)
+[ RUN      ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/7
+[       OK ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/7 (115 ms)
+[ RUN      ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/8
+[       OK ] ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER.AllocFreeBufferTest/8 (116 ms)
+[----------] 9 tests from ALLOC_FREE_BUFFER/TEST_ALLOC_FREE_BUFFER (1040 ms total)
+
+[----------] 23 tests from GET_BUFFER_POS/TEST_GET_BUFFER_POS
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/0
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/0 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/1
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/1 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/2
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/2 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/3
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/3 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/4
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/4 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/5
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/5 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/6
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/6 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/7
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/7 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/8
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/8 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/9
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/9 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/10
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/10 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/11
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/11 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/12
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/12 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/13
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/13 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/14
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/14 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/15
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/15 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/16
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/16 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/17
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/17 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/18
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/18 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/19
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/19 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/20
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/20 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/21
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/21 (0 ms)
+[ RUN      ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/22
+[       OK ] GET_BUFFER_POS/TEST_GET_BUFFER_POS.GetBufferPosTest/22 (0 ms)
+[----------] 23 tests from GET_BUFFER_POS/TEST_GET_BUFFER_POS (0 ms total)
+
+[----------] 24 tests from GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/0
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/0 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/1
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/1 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/2
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/2 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/3
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/3 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/4
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/4 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/5
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/5 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/6
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/6 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/7
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/7 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/8
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/8 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/9
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/9 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/10
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/10 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/11
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/11 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/12
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/12 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/13
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/13 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/14
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/14 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/15
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/15 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/16
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/16 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/17
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/17 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/18
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/18 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/19
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/19 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/20
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/20 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/21
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/21 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/22
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/22 (0 ms)
+[ RUN      ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/23
+[       OK ] GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS.GetBufferLogicPosTest/23 (0 ms)
+[----------] 24 tests from GET_BUFFER_LOGIC_POS/TEST_GET_BUFFER_LOGIC_POS (0 ms total)
+
+[----------] 12 tests from TEST_OPEARATION_AXPY/AxpyTestsuite
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/0
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/0 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/1
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/1 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/2
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/2 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/3
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/3 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/4
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/4 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/5
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/5 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/6
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/6 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/7
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/7 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/8
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/8 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/9
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/9 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/10
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/10 (115 ms)
+[ RUN      ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/11
+[       OK ] TEST_OPEARATION_AXPY/AxpyTestsuite.AxpyLevel2TestCase/11 (115 ms)
+[----------] 12 tests from TEST_OPEARATION_AXPY/AxpyTestsuite (1382 ms total)
+
+[----------] 1 test from TEST_OPEARATION_SYNCALL/SyncAllTestsuite
+[ RUN      ] TEST_OPEARATION_SYNCALL/SyncAllTestsuite.SyncAllOpTestCase/0
+[       OK ] TEST_OPEARATION_SYNCALL/SyncAllTestsuite.SyncAllOpTestCase/0 (115 ms)
+[----------] 1 test from TEST_OPEARATION_SYNCALL/SyncAllTestsuite (115 ms total)
+
+[----------] 2 tests from TEST_PACKAGE_Conv2D/Conv2DTestSuite
+Conv2DTestSuite SetUpTestCase
+[ RUN      ] TEST_PACKAGE_Conv2D/Conv2DTestSuite.Conv2DTestCase/0
+[       OK ] TEST_PACKAGE_Conv2D/Conv2DTestSuite.Conv2DTestCase/0 (121 ms)
+[ RUN      ] TEST_PACKAGE_Conv2D/Conv2DTestSuite.Conv2DTestCase/1
+[       OK ] TEST_PACKAGE_Conv2D/Conv2DTestSuite.Conv2DTestCase/1 (116 ms)
+Conv2DTestSuite TearDownTestCase
+[----------] 2 tests from TEST_PACKAGE_Conv2D/Conv2DTestSuite (238 ms total)
+
+[----------] 30 tests from TEST_OPEARATION_DUPLICATE/DuplicateTestsuite
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/0
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/0 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/1
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/1 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/2
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/2 (115 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/3
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/3 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/4
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/4 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/5
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/5 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/6
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/6 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/7
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/7 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/8
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/8 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/9
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/9 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/10
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/10 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/11
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/11 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/12
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/12 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/13
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/13 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/14
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/14 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/15
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/15 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/16
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/16 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/17
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/17 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/18
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/18 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/19
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/19 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/20
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/20 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/21
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/21 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/22
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/22 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/23
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/23 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/24
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/24 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/25
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/25 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/26
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/26 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/27
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/27 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/28
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/28 (114 ms)
+[ RUN      ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/29
+[       OK ] TEST_OPEARATION_DUPLICATE/DuplicateTestsuite.DuplicateLevel2TestCase/29 (114 ms)
+[----------] 30 tests from TEST_OPEARATION_DUPLICATE/DuplicateTestsuite (3443 ms total)
+
+[----------] 9 tests from TEST_PACKAGE_GEMM/GemmTestSuite
+GemmTestSuite SetUpTestCase
+[ RUN      ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/0
+[       OK ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/0 (0 ms)
+[ RUN      ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/1
+[       OK ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/1 (0 ms)
+[ RUN      ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/2
+[       OK ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/2 (0 ms)
+[ RUN      ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/3
+[       OK ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/3 (3 ms)
+[ RUN      ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/4
+[       OK ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/4 (0 ms)
+[ RUN      ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/5
+[       OK ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/5 (0 ms)
+[ RUN      ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/6
+[       OK ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/6 (0 ms)
+[ RUN      ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/7
+[       OK ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/7 (0 ms)
+[ RUN      ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/8
+[       OK ] TEST_PACKAGE_GEMM/GemmTestSuite.GemmTestCase/8 (2 ms)
+GemmTestSuite TearDownTestCase
+[----------] 9 tests from TEST_PACKAGE_GEMM/GemmTestSuite (8 ms total)
+
+[----------] 15 tests from TEST_LOAD_DATA_2D/LoadData2dTestsuite
+[ RUN      ] TEST_LOAD_DATA_2D/LoadData2dTestsuite.LoadData2dTestCase/0
