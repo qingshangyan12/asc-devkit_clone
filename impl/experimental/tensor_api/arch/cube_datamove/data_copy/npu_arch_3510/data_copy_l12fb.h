@@ -44,7 +44,7 @@ private:
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
 
-        constexpr uint32_t C2PIPE2GM_UNIT = C0_SIZE * 2;
+        constexpr uint32_t C2PIPE2GM_UNIT = C0_SIZE<> * 2;
 
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
