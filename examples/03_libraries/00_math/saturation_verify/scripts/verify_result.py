@@ -18,11 +18,13 @@ import numpy as np
 API_ID_EXP = 1
 API_ID_MUL = 2
 API_ID_ADDS = 3
+API_ID_LEAKYRELU = 4
 
 API_NAME_MAP = {
     1: "exp",
     2: "mul",
     3: "adds",
+    4: "leakyrelu",
 }
 
 RELATIVE_TOL = 1e-6
@@ -180,6 +182,12 @@ def verify_result(output_type, api_id, api_type=1, input_x=None, input_y=None):
             if input_y is None:
                 input_y = "./input/input_y.bin"
             res = verify_binary_api(output_type, input_x, input_y, api_name)
+        elif api_id == API_ID_LEAKYRELU:
+            if input_x is None:
+                input_x = "./input/input_x.bin"
+            if input_y is None:
+                input_y = "./input/input_y.bin"
+            res = verify_binary_api(output_type, input_x, input_y, api_name)
         else:
             print(f"Unsupported API ID: {api_id}")
             return False
@@ -196,8 +204,8 @@ def verify_result(output_type, api_id, api_type=1, input_x=None, input_y=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3],
-                        help="API ID: 1=exp, 2=mul, 3=adds")
+    parser.add_argument('-api_id', type=int, default=1, choices=[1, 2, 3, 4],
+                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu")
     parser.add_argument('-api_type', type=int, default=1, choices=[1, 2, 3],
                         help="API type: 1=Unary, 2=Binary, 3=BinaryScalar")
     parser.add_argument('-output_type', type=int, default=1, choices=[1, 2, 3, 4],

@@ -13,7 +13,7 @@ run_test() {
     echo ""
     echo "========================================="
     echo "INPUT_SIZE:     $INPUT_SIZE"
-    echo "INPUT_API_ID:   $INPUT_API_ID (1: exp, 2: mul, 3: adds)"
+    echo "INPUT_API_ID:   $INPUT_API_ID (1: exp, 2: mul, 3: adds, 4: leakyrelu)"
     echo "INPUT_API_TYPE: $INPUT_API_TYPE (${API_TYPE_NAMES[$INPUT_API_TYPE]})"
     echo "INPUT_DATA_TYPE: $data_type (${TYPE_NAMES[$data_type]})"
     echo "========================================="
@@ -40,6 +40,7 @@ case $INPUT_API_ID in
     1) EXPECTED_TYPE=1 ;; # 单目API
     2) EXPECTED_TYPE=2 ;; # 双目API
     3) EXPECTED_TYPE=3 ;; # 双目矢量API
+    4) EXPECTED_TYPE=3 ;; # 双目矢量API
     *) echo "Error: Unknown API_ID=$INPUT_API_ID"; exit 1 ;;
 esac
 
@@ -48,6 +49,7 @@ if [ "$INPUT_API_TYPE" != "$EXPECTED_TYPE" ]; then
     echo "  Exp (API_ID 1) should use API_TYPE=1 (Unary)"
     echo "  Mul (API_ID 2) should use API_TYPE=2 (Binary)"
     echo "  Adds (API_ID 3) should use API_TYPE=3 (BinaryScalar)"
+    echo "  LeakyRelu (API_ID 4) should use API_TYPE=3 (BinaryScalar)"
     exit 1
 fi
 

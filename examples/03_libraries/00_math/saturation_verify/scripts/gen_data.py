@@ -20,10 +20,12 @@ from gen_data_utils import print_unary_api_table, print_binary_api_table
 from gen_data_exp import compute_exp_golden, gen_exp_data
 from gen_data_mul import compute_mul_golden, gen_mul_data
 from gen_data_adds import compute_adds_golden, gen_adds_data
+from gen_data_leakyrelu import compute_leakyrelu_golden, gen_leakyrelu_data
 
 API_ID_EXP = 1
 API_ID_MUL = 2
 API_ID_ADDS = 3
+API_ID_LEAKYRELU = 4
 
 TYPE_MAP = {
     1: np.float16,
@@ -35,7 +37,8 @@ TYPE_MAP = {
 API_NAME_MAP = {
     1: "exp",
     2: "mul",
-    3: "adds"
+    3: "adds",
+    4: "leakyrelu"
 }
 
 
@@ -43,8 +46,8 @@ def main():
     parser = argparse.ArgumentParser(description="Generate golden data for saturation verify.")
     parser.add_argument('-inputSize', type=int, required=True,
                         help="Total number of elements in the tensor")
-    parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3],
-                        help="API ID: 1=exp, 2=mul, 3=adds")
+    parser.add_argument('-apiId', type=int, default=1, choices=[1, 2, 3, 4],
+                        help="API ID: 1=exp, 2=mul, 3=adds, 4=leakyrelu")
     parser.add_argument('-inputType', type=int, default=1, choices=[1, 2, 3, 4],
                         help="Input type: 1=float16, 2=float32, 3=int16, 4=int32")
     parser.add_argument('-apiType', type=int, default=1, choices=[1, 2, 3],
@@ -63,6 +66,8 @@ def main():
         gen_mul_data(input_type, args.inputSize)
     elif args.apiId == API_ID_ADDS:
         gen_adds_data(input_type, args.inputSize)
+    elif args.apiId == API_ID_LEAKYRELU:
+        gen_leakyrelu_data(input_type, args.inputSize)
     else:
         raise ValueError(f"Unsupported API ID: {args.apiId}")
 
