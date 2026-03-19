@@ -62,8 +62,10 @@ template <typename Coord, typename LayoutType, typename TensorType>
     auto srcShape = MakeShape(srcRow, srcCol);
     auto dstShape = MakeShape(dstRow, dstCol);
 
-    auto originShape = TupleSize(srcShape) > TupleSize(dstShape)  ? dstShape : srcShape;
-    auto shape = MakeFractalShape(originShape, MakeShape(innerRow, innerCol));
+    auto realRow = Min(srcRow, dstRow);	 
+    auto realCol = Min(srcCol, dstCol);
+
+    auto shape = MakeFractalShape(MakeShape(realRow, realCol), MakeShape(innerRow, innerCol));
 
     return MakeLayout(shape, layout.Stride());
 }
