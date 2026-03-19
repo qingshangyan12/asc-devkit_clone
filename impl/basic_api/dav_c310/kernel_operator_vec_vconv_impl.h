@@ -1907,7 +1907,7 @@ template <typename ORI_DST_TYPE, typename ORI_SRC_TYPE, bool isSetMask = true>
 __aicore__ inline void CastImpl(__ubuf__ ORI_DST_TYPE *oriDst, __ubuf__ ORI_SRC_TYPE *oriSrc, const RoundMode &roundMode,
     const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    CastImplCommon<ORI_DST_TYPE, ORI_SRC_TYPE, isSetMask>(oriDst, oriSrc, roundMode, mask, repeatTime, repeatParams);
+    CastImplCommon<ORI_DST_TYPE, ORI_SRC_TYPE, isSetMask, MaskType>(oriDst, oriSrc, roundMode, mask, repeatTime, repeatParams);
 }
 
 template <typename DST_TYPE, typename SRC_TYPE, RoundMode roundMode, bool isSetMask>
@@ -2081,7 +2081,7 @@ template <typename ORI_DST_TYPE, typename ORI_SRC_TYPE, bool isSetMask = true>
 __aicore__ inline void CastImpl(__ubuf__ ORI_DST_TYPE *oriDst, __ubuf__ ORI_SRC_TYPE *oriSrc, const RoundMode &roundMode,
     const uint64_t mask, uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
 {
-    CastImplCommon<ORI_DST_TYPE, ORI_SRC_TYPE, isSetMask>(oriDst, oriSrc, roundMode, mask, repeatTime, repeatParams);
+    CastImplCommon<ORI_DST_TYPE, ORI_SRC_TYPE, isSetMask, MaskType>(oriDst, oriSrc, roundMode, mask, repeatTime, repeatParams);
 }
 
 // scale is stored as  1 sign bit, 8 exponent bits and 10 mantissa bits in 1971 hardware
