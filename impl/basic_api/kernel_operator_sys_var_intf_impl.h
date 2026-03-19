@@ -56,6 +56,18 @@ struct SkSystemArgs {
     uint16_t skBlockNum;    // sub-kernel block num
     uint16_t skTaskSyncCfg; // sync type for "early-start"
     uint8_t reserve[10];
+    inline __aicore__ uint16_t SkGetBlockIdx() {
+        return skBlockIdx;
+    }
+    inline __aicore__ uint16_t SkGetBlockNum() {
+        return skBlockNum;
+    }
+    inline __aicore__ uint16_t SkGetTaskSyncCfg() {
+        return skTaskSyncCfg;
+    }
+    inline __aicore__ uint16_t SkSetTaskSyncCfg(uint16_t config) {
+        skTaskSyncCfg = config;
+    }
 };
 }
 
