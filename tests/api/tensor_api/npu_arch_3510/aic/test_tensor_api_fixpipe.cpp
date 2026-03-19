@@ -84,7 +84,7 @@ public:
                 n_size_global = AscendC::Std::ceil_align(n, FRACTAL_FIXED);
                 m_size_global =  AscendC::Std::ceil_align(m, C0_SIZE / sizeof(uint16_t));
             }
-            dst_stride_global = C0_SIZE / sizeof(DstT) * AscengdC::AscendC::Std::ceil_align(m, FRACTAL_FIXED);
+            dst_stride_global = C0_SIZE / sizeof(DstT) * AscendC::Std::ceil_align(m, FRACTAL_FIXED);
             src_stride_global = C0_SIZE / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
             NZ2ND_en_global = false;
             NZ2DN_en_global = false;
