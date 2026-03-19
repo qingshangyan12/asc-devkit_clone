@@ -276,7 +276,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t h2rsqrt(bfloat16x2_t x)
     return x;
 }
 
-#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t hrcp(bfloat16_t x)
 {
     return static_cast<bfloat16_t>(1.0) / x;
@@ -288,7 +287,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t h2rcp(bfloat16x2_t x)
     bfloat16_t tmp2 = static_cast<bfloat16_t>(1.0) / x.y;
     return {tmp1, tmp2};
 }
-#endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t hfloor(bfloat16_t x)
 {
@@ -326,7 +324,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t h2ceil(bfloat16x2_t x)
  	return {tmp1, tmp2};
 }
 
-#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t htrunc(bfloat16_t x)
 {
     if (x > static_cast<bfloat16_t>(0)) {
@@ -353,7 +350,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16x2_t h2trunc(bfloat16x2_t x)
     x = {tmp1, tmp2};
     return x;
 }
-#endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bfloat16_t __float2bfloat16(const float x) {
     return __cvt_bfloat16_t<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
