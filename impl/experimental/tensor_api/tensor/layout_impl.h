@@ -41,12 +41,12 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
     
     using type = decltype(Std::get<0>(tileShape));
     auto originShape = TupleSize(MakeShape(srcRow, srcCol)) > TupleSize(tileShape) ? tileShape : MakeShape(static_cast<type>(srcRow), static_cast<type>(srcCol));
-    auto shape = MakeFractalShape(originShape, GetShape<0>(layout));
+    auto shape = MakeFractalShape(originShape, MakeShape(innerRow, innerCol));
     return MakeLayout(shape, layout.Stride());
 }
 
 template <typename Coord, typename LayoutType, typename TensorType>
-__aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const LocalTensor<TensorType>& tileTensor) 
+ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const LocalTensor<TensorType>& tileTensor) 
 {
     static_assert(tileTensor.rank == LayoutType::rank, "tensor rank is not equal layout");
 
