@@ -248,12 +248,9 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
 }
 
 template <typename T>
-<<<<<<< HEAD
-=======
 __aicore__ constexpr inline DumpTensorDataType get_dump_datatype_impl();
 
 template <typename T>
->>>>>>> upstream/master
 __aicore__ constexpr inline DumpTensorDataType get_dump_datatype()
 {
     return get_dump_datatype_impl<T>();

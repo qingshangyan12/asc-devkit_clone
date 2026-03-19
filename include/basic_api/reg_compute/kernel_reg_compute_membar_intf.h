@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
 * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -8,34 +8,6 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-<<<<<<< HEAD:include/utils/debug/asc_time.h
-/*!
- * \file asc_time.h
- * \brief
- */
-#ifndef INCLUDE_UTILS_DEBUG_ASC_TIME_H
-#define INCLUDE_UTILS_DEBUG_ASC_TIME_H
-
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_TIME_H__
-#endif
-
-#include "simt_api/device_types.h"
-
-namespace __asc_simt_vf {
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t clock(void);
-} // namespace __asc_simt_vf
-
-#include "impl/utils/debug/asc_time_simt_impl.h"
-
-#if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_TIME_H__)
-#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_TIME_H__
-#endif
-
-#endif
-=======
 /* !
  * \file kernel_reg_compute_membar_intf.h
  * \brief
@@ -68,4 +40,3 @@ __simd_callee__ inline void LocalMemBar();
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_MEMBAR_INTF_H__
 #endif
 
->>>>>>> upstream/master:include/basic_api/reg_compute/kernel_reg_compute_membar_intf.h

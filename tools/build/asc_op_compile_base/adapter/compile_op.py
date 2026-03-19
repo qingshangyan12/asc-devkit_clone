@@ -241,14 +241,6 @@ def _json_post_process(compile_info: CompileInfo, op_info: OpInfo, tiling_info: 
             f"The operator {op_info.op_type} has not been adapted to superkernel. Therefore, \
 the superkernel cannot be integrated with the operator.", \
             AscendCLogLevel.LOG_WARNING)
-<<<<<<< HEAD
-    if CommonUtility.is_c310():
-        if tiling_info.local_memory_size > 0 or _get_simt_type_in_staic(tiling_info, compile_info, obj_path):
-            js["supportSuperKernel"] = 0
-            CommonUtility.print_compile_log(compile_info.kernel_name, \
-            f"The operator {op_info.op_type} is simt type, current soc version has not been adapted to \
-superkernel. Therefore, the superkernel cannot be integrated with the operator.", AscendCLogLevel.LOG_WARNING)
-=======
     if "isSimt" in js and js["isSimt"] == 1:
         CommonUtility.print_compile_log(compile_info.kernel_name, \
         f"The current soc version does not support merging simt type operator:{op_info.op_type} \
@@ -260,16 +252,11 @@ into superkernel", AscendCLogLevel.LOG_WARNING)
             js["isSimt"] = 1
         else:
             js["isSimt"] = 0
->>>>>>> upstream/master
 
     aicore_num = get_context().get_addition("_op_aicore_num")
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
     if aicore_num is not None and vectorcore_num is not None:
-<<<<<<< HEAD
-        js["platformInfo"] = {"cubeCoreNum": int(aicore_num), "vectorCoreNum": int(vectorcore_num)}
-=======
         js["platformInfo"] = {"cubeCoreCnt": int(aicore_num), "vectorCoreCnt": int(vectorcore_num)}
->>>>>>> upstream/master
 
     if not global_var_storage.get_variable("ascendc_dump_disable_compile_options") \
         and compile_info.dump_info.get("dump_type", "") != "":
@@ -652,12 +639,8 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
     else:
         gen_func_attributes += " [aicore]"
 
-<<<<<<< HEAD
-    kernel_func_dec = f"extern \"C\" {gen_func_attributes} [aicore] void {auto_gen_kernel_func}("
-=======
     kernel_func_dec = f"extern \"C\" {gen_func_attributes} void {auto_gen_kernel_func}("
     compile_info.global_kernel_attribute = gen_func_attributes
->>>>>>> upstream/master
     kernel_func_dec_pub = f"__aicore__ inline __attribute__((always_inline)) void ascendc_{auto_gen_kernel_func}("
 
     source_declare_pub, workspace_idx, called_func_params, called_func_params_type = \

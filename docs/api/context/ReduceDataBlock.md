@@ -134,21 +134,6 @@ template<typename T>
 __simd_vf__ inline void ReduceDataBlockVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, 
  uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
-<<<<<<< HEAD
-    AscendC::MicroAPI::RegTensor<T> srcReg;
-    AscendC::MicroAPI::RegTensor<T> dstReg;
-    AscendC::MicroAPI::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        AscendC::MicroAPI::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        mask = AscendC::MicroAPI::UpdateMask<T>(count);
-        // type = ReduceType::SUM
-        AscendC::MicroAPI::ReduceDataBlock<AscendC::MicroAPI::ReduceType::SUM>(dstReg, srcReg, mask);
-        // type = ReduceType::MAX
-        // AscendC::MicroAPI::ReduceDataBlock<AscendC::MicroAPI::ReduceType::MAX>(dstReg, srcReg, mask);
-        // type = ReduceType::MIN
-        // AscendC::MicroAPI::ReduceDataBlock<AscendC::MicroAPI::ReduceType::MIN>(dstReg, srcReg, mask);
-        AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask); 
-=======
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::RegTensor<T> dstReg;
     AscendC::Reg::MaskReg mask;
@@ -162,7 +147,6 @@ __simd_vf__ inline void ReduceDataBlockVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAd
         // type = ReduceType::MIN
         // AscendC::Reg::ReduceDataBlock<AscendC::Reg::ReduceType::MIN>(dstReg, srcReg, mask);
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask); 
->>>>>>> upstream/master
     }
 }
 ```

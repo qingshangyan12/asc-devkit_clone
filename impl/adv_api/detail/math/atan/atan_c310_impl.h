@@ -75,23 +75,6 @@ __simd_callee__ inline void TaylorExpand(Reg::RegTensor<float>& dstReg, Reg::Reg
     Reg::Muls(dstReg, dstReg, factorList[expandLevel], preg);
     for (uint16_t i = 0; i < COUNT_SIX; ++i) {
         // dst*x^2+ the previous expand factor
-<<<<<<< HEAD
-        MicroAPI::Adds(dstReg, dstReg, factorList[6], preg);
-        MicroAPI::Mul(dstReg, dstReg, squareReg, preg);
-        MicroAPI::Adds(dstReg, dstReg, factorList[5], preg);
-    }
-    // dst*x^2+ the previous expand factor
-    MicroAPI::Adds(dstReg, dstReg, factorList[4], preg);
-    MicroAPI::Mul(dstReg, dstReg, squareReg, preg);
-    MicroAPI::Adds(dstReg, dstReg, factorList[3], preg);
-    MicroAPI::Mul(dstReg, dstReg, squareReg, preg);
-    MicroAPI::Adds(dstReg, dstReg, factorList[2], preg);
-    MicroAPI::Mul(dstReg, dstReg, squareReg, preg);
-    MicroAPI::Adds(dstReg, dstReg, factorList[1], preg);
-    MicroAPI::Mul(dstReg, dstReg, squareReg, preg);
-    MicroAPI::Adds(dstReg, dstReg, factorList[0], preg);
-    MicroAPI::Mul(dstReg, dstReg, srcReg, preg);
-=======
         Reg::Adds(dstReg, dstReg, factorList[6], preg);
         Reg::Mul(dstReg, dstReg, squareReg, preg);
         Reg::Adds(dstReg, dstReg, factorList[5], preg);
@@ -107,7 +90,6 @@ __simd_callee__ inline void TaylorExpand(Reg::RegTensor<float>& dstReg, Reg::Reg
     Reg::Mul(dstReg, dstReg, squareReg, preg);
     Reg::Adds(dstReg, dstReg, factorList[0], preg);
     Reg::Mul(dstReg, dstReg, srcReg, preg);
->>>>>>> upstream/master
 }
 
 // (x-y)/(1+xy)
@@ -132,19 +114,11 @@ __simd_callee__ inline void AtanCompute(
     constexpr float piByEight = 0.39269908169872415480783042290994;
     constexpr float tanPiByEight = 0.4142135623730950;
 
-<<<<<<< HEAD
-    MicroAPI::RegTensor<float> clipReg;
-    MicroAPI::RegTensor<float> absReg;
-    MicroAPI::RegTensor<float> tmpReg;
-    MicroAPI::RegTensor<float> tmpReg2;
-    MicroAPI::RegTensor<float> squareReg;
-=======
     Reg::RegTensor<float> clipReg;
     Reg::RegTensor<float> absReg;
     Reg::RegTensor<float> tmpReg;
     Reg::RegTensor<float> tmpReg2;
     Reg::RegTensor<float> squareReg;
->>>>>>> upstream/master
     // when x's value is too large the first calculator of TaylorExpand will be overflow. when epsilon is 0.0001,
     // the approximate value of `tan(pi/2 - 0.0001)` is 10000
     // Clip x to [MIN_INPUT_VALUE, MAX_INPUT_VALUE] in float

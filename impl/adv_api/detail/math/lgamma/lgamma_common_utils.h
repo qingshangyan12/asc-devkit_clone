@@ -12,11 +12,6 @@
  * \file lgamma_common_utils.h
  * \brief
  */
-<<<<<<< HEAD
-#ifndef IMPL_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H
-#define IMPL_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H
-=======
->>>>>>> upstream/master
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/adv_api/detail/math/lgamma/lgamma_common_utils.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/lgamma.h\"\" and use public functions or variables defined in interface headers files.")
@@ -303,13 +298,9 @@ __simd_callee__ inline void LgammaLoadData(Reg::RegTensor<float>& dstReg,
 #endif
 }  // namespace AscendC
 #endif
-<<<<<<< HEAD
-#endif  // IMPL_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H
-=======
 #endif  // IMPL_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_LGAMMA_LGAMMA_COMMON_UTILS_H__
 #endif
->>>>>>> upstream/master

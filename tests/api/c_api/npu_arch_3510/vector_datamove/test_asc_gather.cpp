@@ -90,8 +90,6 @@ TEST_VECTOR_DATAMOVE_GATHER_INSTR_1(Vselr, asc_gather, vselr, bfloat16_t, uint16
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_1(Vselr, asc_gather, vselr, fp8_e4m3fn_t, uint8_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_1(Vselr, asc_gather, vselr, fp8_e5m2_t, uint8_t);
 TEST_VECTOR_DATAMOVE_GATHER_INSTR_1(Vselr, asc_gather, vselr, fp8_e8m0_t, uint8_t);
-<<<<<<< HEAD
-=======
 
 class TestCApiVectorDataMoveAscGatherHifloat8 : public testing::Test {
 protected:
@@ -132,4 +130,3 @@ TEST_F(TestCApiVectorDataMoveAscGatherHifloat8, vselr_Succ)
     asc_gather(dst, src, index);
     GlobalMockObject::verify();
 }
->>>>>>> upstream/master

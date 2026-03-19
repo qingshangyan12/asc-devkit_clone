@@ -13,10 +13,6 @@
  * \brief
  */
 
-<<<<<<< HEAD:include/micro_api/kernel_micro_struct_intf.h
-#if (__NPU_ARCH__ == 3510) || defined(__ASC_NPU_HOST__)
-#include "micro_api/dav_c310/kernel_micro_datatype_impl.h"
-=======
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_STRUCT_INTF_H__
@@ -27,7 +23,6 @@
 
 #if (__NPU_ARCH__ == 3510) || defined(__ASC_NPU_HOST__)
 #include "../../impl/basic_api/reg_compute/dav_c310/kernel_reg_compute_datatype_impl.h"
->>>>>>> upstream/master:include/basic_api/reg_compute/kernel_reg_compute_struct_intf.h
 #elif __NPU_ARCH__ == 5102
 #include "../../impl/basic_api/reg_compute/dav_m510/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 2103

@@ -18,12 +18,6 @@
 #include "impl/utils/sys_macros.h"
 #include "impl/utils/debug/asc_debug_utils.h"
 
-<<<<<<< HEAD
-#include "impl/utils/sys_macros.h"
-#include "impl/utils/debug/asc_debug_utils.h"
-
-=======
->>>>>>> upstream/master
 namespace __asc_aicore {
 __aicore__ inline void asc_entire_dcci_impl(__gm__ uint64_t* ptr)
 {

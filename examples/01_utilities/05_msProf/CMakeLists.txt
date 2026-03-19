@@ -47,11 +47,7 @@ set_target_properties(demo_sim PROPERTIES
 
 set(SIM_LIBRARIES
     runtime_camodel
-<<<<<<< HEAD
-    npu_drv
-=======
     npu_drv_camodel
->>>>>>> upstream/master
     ${SHARED_LIBRARIES}
 )
 

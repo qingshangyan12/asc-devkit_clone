@@ -163,8 +163,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync_impl(__cbuf__ uint8_t* dst, __cc__ i
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, uint_flag_mode, quant_pre, relu_pre,
                         enable_channel_split, enable_nd2nz);
-<<<<<<< HEAD
-=======
     asc_sync_post_process();
 }
 
@@ -207,7 +205,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync_impl(__cbuf__ void* dst, __cc__ int3
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, uint_flag_mode, quant_pre, relu_pre,
                         enable_channel_split, enable_nd2nz);
->>>>>>> upstream/master
     asc_sync_post_process();
 }
 

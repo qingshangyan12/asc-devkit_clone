@@ -532,17 +532,10 @@ __simd_vf__ inline void GatherbImpl(__ubuf__ T *dst, __ubuf__ T *src, __ubuf__ u
         if constexpr (sizeof(T) == 8) {
             // pg is the predicate for block index, and regarded as B32 format.
             // For convenience, we use fullPreg format to represent it.
-<<<<<<< HEAD
-            MicroAPI::GatherB(dstReg, src, indexReg, fullPreg);
-            MicroAPI::StoreAlign<uint32_t, MicroAPI::DataCopyMode::DATA_BLOCK_COPY,
-                MicroAPI::PostLiteral::POST_MODE_UPDATE>((__ubuf__ uint32_t *&)dst,
-                (MicroAPI::RegTensor<uint32_t> &)dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride),
-=======
             Reg::GatherB(dstReg, src, indexReg, fullPreg);
             Reg::StoreAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY,
                 Reg::PostLiteral::POST_MODE_UPDATE>((__ubuf__ uint32_t *&)dst,
                 (Reg::RegTensor<uint32_t> &)dstReg, static_cast<uint32_t>(repeatParams.dstBlkStride),
->>>>>>> upstream/master
                 static_cast<uint32_t>(repeatParams.dstRepStride), fullPreg);
         } else {
             Reg::GatherB(dstReg, src, indexReg, fullPreg);
