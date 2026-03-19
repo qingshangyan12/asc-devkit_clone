@@ -76,9 +76,9 @@ __aicore__ inline void CheckMmadTensorCommon(const LocalTensor<T>& dst, const Lo
         IsSameType<PrimT<S>, half>::value) ? VALUE_512 : align1024B;
 
     CheckMmadParamsCommon(mmadParams, apiName);
-    CheckTensorTPosition<TPosition::CO1>(dst, "dst", "CO1", apiName);
-    CheckTensorTPosition<TPosition::A2>(fm, "fm", "A2", apiName);
-    CheckTensorTPosition<TPosition::B2>(filter, "filter", "B2", apiName);
+    CheckTensorPhyPosition<Hardware::L0C>(dst, "dstLocal", "L0C", apiName);
+    CheckTensorPhyPosition<Hardware::L0A>(fm, "fmLocal", "L0A", apiName);
+    CheckTensorPhyPosition<Hardware::L0B>(filter, "filterLocal", "L0B", apiName);
     CheckTensorAlignment(dst, dstAlign, "dst", apiName);
     CheckTensorAlignment(fm, VALUE_512, "fm", apiName);
     CheckTensorAlignment(filter, VALUE_512, "filter", apiName);
@@ -96,7 +96,11 @@ __aicore__ inline void CheckMmadTensorCommon(const LocalTensor<T>& dst, const Lo
 {
     CheckMmadTensorCommon(dst, fm, filter, mmadParams, apiName);
     CheckTensorAlignment(bias, 128, "bias", apiName);
-    CheckTensorTPosition<TPosition::CO1, TPosition::C2>(bias, "bias", "CO1 / C2", apiName);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
+    CheckTensorPhyPosition<Hardware::L0C>(bias, "bias", "L0C", apiName);
+#else
+    CheckTensorPhyPosition<Hardware::L0C, Hardware::BIAS>(bias, "bias", "L0C / BIAS", apiName);
+#endif
 #if __NPU_ARCH__ == 2201
     ASCENDC_DEBUG_ASSERT((SupportType<Tuple<PrimT<T>, PrimT<U>, PrimT<S>, PrimT<V>>,
         Tuple<int32_t, int8_t, int8_t, int32_t>,
@@ -175,36 +179,15 @@ __aicore__ inline void CheckFixpipeParamsV220Common(const FixpipeParamsV220& int
     }
 }
 
-template <typename U>
-__aicore__ inline void CheckFixpipeSrcCommon(const LocalTensor<U>& src, const __gm__ char* apiName)
-{
-    CheckTensorTPosition<TPosition::CO1>(src, "src", "CO1", apiName);
-}
-
-template <typename T>
-__aicore__ inline void CheckFixpipeLocalDstCommon(const LocalTensor<T>& dst, const __gm__ char* apiName)
-{
-    const TPosition dstPos = static_cast<TPosition>(dst.GetPosition());
-    const Hardware dstHwPos = GetPhyType(dstPos);
-    ASCENDC_DEBUG_ASSERT((dstHwPos == Hardware::L1 || dstHwPos == Hardware::UB), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Failed to check dst tensor route in %s, supported dst TPositions are A1 / B1 / C1 / VECIN / VECOUT / "
-        "VECCALC / TSCM, current dst TPosition is %s.\n", apiName, GetTPositionName(dstPos)));
-}
-
-template <typename S>
-__aicore__ inline void CheckFixpipeWorkspaceCommon(const LocalTensor<S>& cbufWorkspace, const __gm__ char* apiName)
-{
-    CheckTensorTPosition<TPosition::C1>(cbufWorkspace, "cbufWorkspace",
-        "C1", apiName);
-}
-
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void CheckFixpipeTensor(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const FixpipeParamsV220& intriParams, const __gm__ char* apiName)
 {
     CheckFixpipeParamsV220Common<T, U, config>(intriParams, apiName);
-    CheckFixpipeSrcCommon(src, apiName);
-    CheckFixpipeLocalDstCommon(dst, apiName);
+    CheckTensorPhyPosition<Hardware::L0C>(src, "src", "L0C", apiName);
+    const uint32_t L0C_SRC_ALIGN = 16 * sizeof(float);
+    CheckTensorAlignment(src, L0C_SRC_ALIGN, "src", apiName);
+    CheckTensorPhyPosition<Hardware::L1, Hardware::UB>(dst, "dst", "L1 / UB", apiName);
 }
 
 template <typename T, typename U, const FixpipeConfig& config, typename S>
@@ -212,7 +195,11 @@ __aicore__ inline void CheckFixpipeTensor(const LocalTensor<T>& dst, const Local
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsV220& intriParams, const __gm__ char* apiName)
 {
     CheckFixpipeTensor<T, U, config>(dst, src, intriParams, apiName);
-    CheckFixpipeWorkspaceCommon(cbufWorkspace, apiName);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
+    CheckTensorPhyPosition<Hardware::UB>(cbufWorkspace, "cbufWorkspace", "UB", apiName);
+#else
+    CheckTensorPhyPosition<Hardware::L1>(cbufWorkspace, "cbufWorkspace", "L1", apiName);
+#endif
     CheckFixpipeQuantPreWithWorkspaceCommon(intriParams.quantPre, apiName);
 }
 
@@ -222,7 +209,7 @@ __aicore__ inline void CheckFixpipeTensor(const GlobalTensor<T>& dst, const Loca
 {
     (void)dst;
     CheckFixpipeParamsV220Common<T, U, config>(intriParams, apiName);
-    CheckFixpipeSrcCommon(src, apiName);
+    CheckTensorPhyPosition<Hardware::L0C>(src, "src", "L0C", apiName);
 }
 
 template <typename T, typename U, const FixpipeConfig& config, typename S>
@@ -230,7 +217,11 @@ __aicore__ inline void CheckFixpipeTensor(const GlobalTensor<T>& dst, const Loca
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsV220& intriParams, const __gm__ char* apiName)
 {
     CheckFixpipeTensor<T, U, config>(dst, src, intriParams, apiName);
-    CheckFixpipeWorkspaceCommon(cbufWorkspace, apiName);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
+    CheckTensorPhyPosition<Hardware::UB>(cbufWorkspace, "cbufWorkspace", "UB", apiName);
+#else
+    CheckTensorPhyPosition<Hardware::L1>(cbufWorkspace, "cbufWorkspace", "L1", apiName);
+#endif
     CheckFixpipeQuantPreWithWorkspaceCommon(intriParams.quantPre, apiName);
 }
 

@@ -28,6 +28,10 @@ namespace AscendC {
 __aicore__ inline void CastIntrinsicsImpl(__ubuf__ half* dst, __ubuf__ int32_t* src, const RoundMode& roundMode,
     uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+    ASCENDC_DEBUG_WARNING((false), {
+        KERNEL_LOG(KERNEL_WARN,
+            "roundMode is ignored when casting from int32_t to half, please use it with SetDeqScale(half scale) interface.\n");
+    });
     vconv_deq(dst, src, repeatTime, repeatParams.dstBlkStride, repeatParams.srcBlkStride, repeatParams.dstRepStride,
         repeatParams.srcRepStride);
 }
@@ -362,13 +366,17 @@ __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int16_t* dst, __ubuf__ half* 
 __aicore__ inline void CastIntrinsicsImpl(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, const RoundMode& roundMode,
     uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    ASCENDC_DEBUG_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Cast from type int16_t to uint8_t\n"); });
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport((false), "Cast from type int16_t to uint8_t\n");
+#endif
 }
 
 __aicore__ inline void CastIntrinsicsImpl(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, const RoundMode& roundMode,
     uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-    ASCENDC_DEBUG_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Cast from type int16_t to int8_t\n"); });
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport((false), "Cast from type int16_t to int8_t\n");
+#endif
 }
 
 __aicore__ inline void CastIntrinsicsImpl(__ubuf__ half* dst, __ubuf__ int16_t* src, const RoundMode& roundMode,
