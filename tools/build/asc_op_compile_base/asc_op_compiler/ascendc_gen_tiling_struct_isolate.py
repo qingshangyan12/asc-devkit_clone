@@ -55,6 +55,7 @@ class IsolateTilingInfo:
             self.run_info["tiling_data"] = bytes.fromhex(self.run_info["tiling_data"])
         self.tiling_key_list = tiling_info_dict["tiling_key_list"]
         self.tiling_key_group_map = tiling_info_dict["tiling_key_group_map"]
+        self.tiling_const_propagation = tiling_info_dict.get("tiling_const_propagation", False)
         self.tiling_info = TilingInfo()
 
     def dump_json(self):
@@ -96,7 +97,8 @@ def generate_tiling_info(isolate_tiling_info):
     else:
         tiling_info.static_shape_flag = False
         generate_dynamic_tiling_struct_file(isolate_tiling_info.op_type, tiling_info, \
-            isolate_tiling_info.tiling_key_list, isolate_tiling_info.tiling_key_group_map)
+            isolate_tiling_info.tiling_key_list, isolate_tiling_info.tiling_key_group_map, \
+            isolate_tiling_info.tiling_const_propagation)
     isolate_tiling_info.tiling_info = tiling_info
 
 
