@@ -1,4 +1,4 @@
-# MakeNZLayout
+# MakeRowMajorLayout
 
 ## 产品支持情况
 
@@ -17,23 +17,23 @@
 
 ## 功能说明
 
-根据输入的行数和列数，生成[层次化表述法](../defenition/Layout和层次化表述法.md)的NZ Layout结构，该结构为连续的NZ Layout结构，即数据紧密排列。
+根据输入的行数和列数，生成[层次化表述法](../defenition/Layout和层次化表述法.md)的RowMajor Layout结构，该结构为连续的RowMajor Layout结构，即数据紧密排列。
 
 ```cpp
 Layout = ((Shape) : (Stride))
-Shape = ((Std::Int<16>{}, row / 16), (Std::Int<32 / sizeof(T)>{}, column / (32 / sizeof(T))))
-Stride = ((Std::Int<32 / sizeof(T)>{}, Std::Int<32 / sizeof(T) * 16>{}), (Std::Int<1>{}, 32 / sizeof(T) * row))
+Shape = ((Std::Int<1>{}, row),(Std::Int<1>{}, column))
+Stride = ((Std::Int<0>{}, column),(Std::Int<0>{},  Std::Int<1>{}))
 ```
 
 ## 函数原型
 
 ```cpp
 // 生成的Layout为静态数据
-template <typename T, size_t row, size_t column> NZLayout
+template <typename T, size_t row, size_t column> RowMajorLayout
 
 // 生成的Layout为动态数据
 template <typename T>
-__aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column)
+__aicore__ inline decltype(auto) MakeRowMajorLayout(size_t row, size_t column)
 ```
 
 ## 参数说明
@@ -51,8 +51,7 @@ __aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column)
 
 ## 约束说明
 
--   基础数据类型的位宽，需大于等于1。
--   输入的row和column，应保证计算公式结果大于零，整除有效无余数。
+- 基础数据类型的位宽，需大于等于1。
 
 ## 调用示例
 
@@ -61,9 +60,9 @@ __aicore__ inline decltype(auto) MakeNZLayout(size_t row, size_t column)
 using SrcT = half;
 size_t mLength = 128;
 size_t kLength = 64;
-auto srcLayout = AscendC::MakeNZLayout<SrcT>(mLength, kLength);
+auto srcLayout = AscendC::MakeRowMajorLayout<SrcT>(mLength, kLength);
 
 // 生成的Layout为静态数据
-NZLayout<SrcT, 128, 64> srcLayout;
+RowMajorLayout<SrcT, 128, 64> srcLayout;
 ```
 
