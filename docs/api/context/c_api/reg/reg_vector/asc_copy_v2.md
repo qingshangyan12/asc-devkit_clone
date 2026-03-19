@@ -9,7 +9,7 @@
 
 ### 功能说明
 
-将数据从RegTensor搬运到MaskReg。
+将数据从RegTensor搬运到MaskReg。与搬运目的地为矢量数据寄存器的同名接口[asc_copy](asc_copy.md)相比，本接口的第三个入参part指数据搬运阶段的偏移量。
 
 ### 函数原型
 
