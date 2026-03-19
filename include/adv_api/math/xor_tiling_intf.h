@@ -12,12 +12,6 @@
  * \file xor_tiling_intf.h
  * \brief
  */
-
-#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_XOR_TILING_INTF_H__
-#endif
-
 #ifndef  LIB_MATH_XOR_TILING_INTF
 #define  LIB_MATH_XOR_TILING_INTF
 
@@ -30,8 +24,3 @@ using LibXorInterface = XorDeprecatedHeader;
 } // namespace AscendC
 
 #endif  // LIB_MATH_XOR_TILING_INTF
-
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_XOR_TILING_INTF_H__)
-#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_XOR_TILING_INTF_H__
-#endif
