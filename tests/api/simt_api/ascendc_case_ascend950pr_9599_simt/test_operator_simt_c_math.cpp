@@ -214,3 +214,10 @@ void VerifyFloatNumberMath(float x, float xExpected, float epsilon = 1e-5)
         EXPECT_NEAR(x, xExpected, epsilon);
     }
 }
+
+TEST_F(FloatComputeTestsuite1, CompareTest)
+{
+    EXPECT_EQ(true, isfinite(1.234f));
+    EXPECT_EQ(false, isnan(1.234f));
+    EXPECT_EQ(false, isinf(1.234f));
+}
