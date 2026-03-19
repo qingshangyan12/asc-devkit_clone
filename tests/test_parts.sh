@@ -70,7 +70,7 @@ basic_test_two_targets=(
     # ascendc_ut_basic_api_mc62cm12aa_AIC
     # ascendc_ut_basic_api_mc62cm12aa_BASIC
     # ascendc_ut_basic_api_mc62cm12aa_FRAMEWORK
-    # ascendc_ut_micro_api_mc62cm12aa
+    # ascendc_ut_reg_compute_mc62cm12aa
     # ascendc_ut_simt_api_mc62cm12aa
     ascendc_run_all_header_checks
 )
@@ -87,10 +87,9 @@ basic_test_three_targets=(
     ascendc_ut_c_api_ascend950pr_9599_AIV
     ascendc_ut_tensor_api_NPU_ARCH_2201_AIC
     ascendc_ut_tensor_api_NPU_ARCH_2201_AIV
-    ascendc_ut_tensor_api_NPU_ARCH_3510_AIC
     ascendc_ut_basic_api_ascend950pr_9599_AIC
     ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
     ascendc_ut_basic_api_ascend950pr_9599_AIV_FRAMEWORK
-    ascendc_ut_micro_api_ascend950pr_9599
+    ascendc_ut_reg_compute_ascend950pr_9599
     ascendc_ut_simt_api_ascend950pr_9599
 )

@@ -21,30 +21,32 @@
 #warning "impl/simt_api/math_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "simt_api/math_functions.h" and use public functions or variables defined in interface header files."
 #endif
 
+#include "impl/simt_api/device_functions_impl.h"
+
 #define ASCRT_FOUR_BYTE_LEN_U       32U
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lroundf(float x)
 {
-    float tmp = __roundf(x);
-    return __cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
+    float tmp = roundf(x);
+    return __float2ll_rna(tmp);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llroundf(float x)
 {
-    float tmp = __roundf(x);
-    return __cvt_int64_t<ROUND::A, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
+    float tmp = roundf(x);
+    return __float2ll_rna(tmp);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lrintf(float x)
 {
-    float tmp = __rintf(x);
-    return __cvt_int64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
+    float tmp = rintf(x);
+    return __float2ll_rn(tmp);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llrintf(float x)
 {
-    float tmp = __rintf(x);
-    return __cvt_int64_t<ROUND::R, RoundingSaturation::RS_ENABLE_VALUE>(tmp);
+    float tmp = rintf(x);
+    return __float2ll_rn(tmp);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float truncf(float x)
@@ -2887,11 +2889,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float y1f(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ynf(int n, float x)
 {
-    if (x == 0) {
-        return -ASCRT_INF_F;
-    }
     if (n < 0 || x < 0 || isnan(x)) {
         return ASCRT_INF_F / ASCRT_INF_F;
+    }
+    if (x == 0) {
+        return -ASCRT_INF_F;
     }
     if (isinf(x)) {
         return 0;

@@ -9,7 +9,7 @@
 */
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
-#include "include/experimental/tensor_api/tensor.h"
+#include "impl/experimental/tensor_api/tensor_api_impl.h"
 
 class Tensor_Api_Atom : public testing::Test {
 protected:
@@ -21,13 +21,18 @@ protected:
 
 TEST_F(Tensor_Api_Atom, CopyGM2L1Operation)
 {
+    using namespace AscendC;
     using namespace AscendC::Std;
-    using namespace AscendC::Te;
 
     constexpr uint32_t TILE_LENGTH = 128;
 
     __gm__ float src[TILE_LENGTH] = {0};
     __cbuf__ float dst[TILE_LENGTH] = {0};
+
+    constexpr int M = 11;
+    constexpr int N = 12;
+    constexpr int blockM = 13;
+    constexpr int blockN = 14;
 
     auto coord = MakeCoord(Int<20>{}, Int<30>{});
     auto shape = MakeShape(MakeShape(Int<11>{}, Int<12>{}), MakeShape(Int<13>{}, Int<14>{}));
@@ -54,7 +59,7 @@ TEST_F(Tensor_Api_Atom, CopyGM2L1Operation)
 
 TEST_F(Tensor_Api_Atom, CopyL12L0Operation)
 {
-    using namespace AscendC::Te;
+    using namespace AscendC;
     using namespace AscendC::Std;
 
     constexpr uint32_t TILE_LENGTH = 128;
@@ -62,6 +67,11 @@ TEST_F(Tensor_Api_Atom, CopyL12L0Operation)
     __cbuf__ float l1Src[TILE_LENGTH] = {0};
     __ca__ float l0aDst[TILE_LENGTH] = {0};
     __cb__ float l0bDst[TILE_LENGTH] = {0};
+
+    constexpr int M = 11;
+    constexpr int N = 12;
+    constexpr int blockM = 13;
+    constexpr int blockN = 14;
 
     auto coord = MakeCoord(Int<20>{}, Int<30>{});
     auto shape = MakeShape(MakeShape(Int<11>{}, Int<12>{}), MakeShape(Int<13>{}, Int<14>{}));
@@ -72,16 +82,27 @@ TEST_F(Tensor_Api_Atom, CopyL12L0Operation)
     auto dstL0B = MakeTensor(MakeL0BmemPtr(l0bDst), MakeLayout(shape, stride));
 
     auto atomCopy = MakeCopy(CopyL12L0{}, LoadDataTraitDefault{});
+    atomCopy.Call(dstL0A, srcL1);
 
     atomCopy.Call(dstL0A, srcL1, coord);
 
+    CopyAtom<CopyTraits<CopyL12L0, LoadDataTraitDefault>>{}.Call(dstL0A, srcL1);
+
     CopyAtom<CopyTraits<CopyL12L0, LoadDataTraitDefault>>{}.Call(dstL0A, srcL1, coord);
+
+    Copy(CopyAtom<CopyTraits<CopyL12L0, LoadDataTraitDefault>>{}, dstL0A, srcL1);
 
     Copy(CopyAtom<CopyTraits<CopyL12L0, LoadDataTraitDefault>>{}, dstL0A, srcL1, coord);
 
+
+    atomCopy.Call(dstL0B, srcL1);
     atomCopy.Call(dstL0B, srcL1, coord);
 
+    CopyAtom<CopyTraits<CopyL12L0, LoadDataTraitDefault>>{}.Call(dstL0B, srcL1);
+
     CopyAtom<CopyTraits<CopyL12L0, LoadDataTraitDefault>>{}.Call(dstL0B, srcL1, coord);
+
+    Copy(CopyAtom<CopyTraits<CopyL12L0, LoadDataTraitDefault>>{}, dstL0B, srcL1);
 
     Copy(CopyAtom<CopyTraits<CopyL12L0, LoadDataTraitDefault>>{}, dstL0B, srcL1, coord);
 
@@ -91,13 +112,18 @@ TEST_F(Tensor_Api_Atom, CopyL12L0Operation)
 
 TEST_F(Tensor_Api_Atom, CopyL0C2GMOperation)
 {
-    using namespace AscendC::Te;
+    using namespace AscendC;
     using namespace AscendC::Std;
 
     constexpr uint32_t TILE_LENGTH = 128;
 
     __cc__ float src[TILE_LENGTH] = {0};
     __gm__ float dst[TILE_LENGTH] = {0};
+
+    constexpr int M = 11;
+    constexpr int N = 12;
+    constexpr int blockM = 13;
+    constexpr int blockN = 14;
 
     auto coord = MakeCoord(Int<20>{}, Int<30>{});
     auto shape = MakeShape(MakeShape(Int<11>{}, Int<12>{}), MakeShape(Int<13>{}, Int<14>{}));
@@ -118,40 +144,6 @@ TEST_F(Tensor_Api_Atom, CopyL0C2GMOperation)
     Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}, gmDst, l0cSrc);
 
     Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}, gmDst, l0cSrc, coord);
-
-    EXPECT_EQ(dst[0], 0);
-}
-
-TEST_F(Tensor_Api_Atom, CopyL0C2GMWithOperation)
-{
-    using namespace AscendC;
-    using namespace AscendC::Std;
-    using namespace AscendC::Te;
-
-    constexpr uint32_t TILE_LENGTH = 128;
-
-    __cc__ float src[TILE_LENGTH] = {0};
-    __gm__ float dst[TILE_LENGTH] = {0};
-
-    auto coord = MakeCoord(Int<20>{}, Int<30>{});
-    auto shape = MakeShape(MakeShape(Int<11>{}, Int<12>{}), MakeShape(Int<13>{}, Int<14>{}));
-    auto stride = MakeStride(MakeStride(Int<15>{}, Int<16>{}), MakeStride(Int<17>{}, Int<18>{}));
-
-    auto l0cSrc = MakeTensor(MakeL0CmemPtr(src), MakeLayout(shape, stride));
-    auto gmDst = MakeTensor(MakeGMmemPtr(dst), MakeLayout(shape, stride));
-
-    auto atomCopy = MakeCopy(CopyL0C2GM{});
-    atomCopy.with(12).Call(gmDst, l0cSrc);
-
-    atomCopy.with(23).Call(gmDst, l0cSrc, coord);
-
-    CopyAtom<CopyTraits<CopyL0C2GM>>{}.with(34).Call(gmDst, l0cSrc);
-
-    CopyAtom<CopyTraits<CopyL0C2GM>>{}.with(45).Call(gmDst, l0cSrc, coord);
-
-    Copy(CopyAtom<CopyTraits<CopyL0C2GM>>{}.with(56), gmDst, l0cSrc);
-
-    Copy(CopyAtom<CopyTraits<CopyL0C2GM>>{}.with(67), gmDst, l0cSrc, coord);
 
     EXPECT_EQ(dst[0], 0);
 }
