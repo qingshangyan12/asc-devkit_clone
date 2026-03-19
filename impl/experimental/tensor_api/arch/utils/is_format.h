@@ -80,8 +80,8 @@ struct IsZZFormat {
 private:
     __aicore__ inline static constexpr bool IsFractalZZFormatNormal() {
         constexpr bool isShapeRight = Std::is_constant<FRACTAL_FIXED, ShapeRow0>::value 
-            && Std::is_constant<C0_SIZE / sizeof(type), ShapeColumn0>::value;
-        constexpr bool isStrideRight = Std::is_constant<C0_SIZE / sizeof(type), StrideRow0>::value 
+            && Std::is_constant<GetC0Size() / sizeof(type), ShapeColumn0>::value;
+        constexpr bool isStrideRight = Std::is_constant<GetC0Size() / sizeof(type), StrideRow0>::value 
             && Std::is_constant<1, StrideColumn0>::value;
         return (isShapeRight && isStrideRight);
     }

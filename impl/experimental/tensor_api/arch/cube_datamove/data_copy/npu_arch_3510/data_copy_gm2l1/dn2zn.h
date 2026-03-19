@@ -53,7 +53,7 @@ private:
             dValue = dValue >> 1;
             srcRowStride = srcRowStride >> 1;
         }
-        constexpr auto c0Size = is_b4_type<type> ? C0_SIZE * 2 : C0_SIZE;
+        constexpr auto c0Size = GetC0Size<type>();
         
         uint64_t srcNdMatrixStride = 0;
         uint64_t srcDValue = srcRowStride;
