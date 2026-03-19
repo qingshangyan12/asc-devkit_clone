@@ -12,8 +12,6 @@
  * \file math_functions_impl.h
  * \brief
  */
-#ifndef IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
-#define IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -21,32 +19,37 @@
 #warning "impl/simt_api/math_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "simt_api/math_functions.h" and use public functions or variables defined in interface header files."
 #endif
 
-#include "impl/simt_api/device_functions_impl.h"
+#ifndef IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
+#define IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
+
+#include "simt_api/device_types.h"
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 
 #define ASCRT_FOUR_BYTE_LEN_U       32U
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lroundf(float x)
 {
     float tmp = roundf(x);
-    return __float2ll_rna(tmp);
+    return __cvt_int64_t<__internal_get_round<__RoundMode::CAST_ROUND>(), RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llroundf(float x)
 {
     float tmp = roundf(x);
-    return __float2ll_rna(tmp);
+    return __cvt_int64_t<__internal_get_round<__RoundMode::CAST_ROUND>(), RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lrintf(float x)
 {
     float tmp = rintf(x);
-    return __float2ll_rn(tmp);
+    return __cvt_int64_t<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long long int llrintf(float x)
 {
     float tmp = rintf(x);
-    return __float2ll_rn(tmp);
+    return __cvt_int64_t<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_ENABLE_VALUE>(tmp);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float truncf(float x)
@@ -2967,9 +2970,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int signbit(float x)
 {
     return signbitf(x);
 }
+
+#endif
+#endif  // IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_FUNCTIONS_IMPL__
 #endif
-
-#endif  // IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
