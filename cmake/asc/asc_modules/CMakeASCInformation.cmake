@@ -47,7 +47,7 @@ endif()
 # CMAKE_ASC_COMPILER: bisheng
 if(NOT CMAKE_ASC_COMPILE_OBJECT)
     set(CMAKE_ASC_COMPILE_OBJECT "<CMAKE_ASC_COMPILER> <DEFINES> <INCLUDES> -fPIC ${debug_compile_options} \
-<CMAKE_ASC_COMPILE_FLAGS> <FLAGS> -o <OBJECT> -c -x asc <SOURCE>")
+<FLAGS> -o <OBJECT> -c -x asc <SOURCE>")
 endif()
 
 # Create a static archive incrementally for large object file counts.
@@ -132,18 +132,21 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
 -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/tiling -isystem${ASCEND_CANN_PACKAGE_LINUX_PATH}/asc/include/utils")
         
         # 添加编译选项
-        string(APPEND CMAKE_ASC_COMPILE_FLAGS "-g -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -DASCENDC_DEBUG=1 -D__NPU_ARCH__=2201 --run-mode=cpu ${ASC_CPU_SYSTEM_INCLUDE_OPTIONS}")
+        string(APPEND CMAKE_ASC_FLAGS "-g -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -DASCENDC_DEBUG=1 -D__NPU_ARCH__=2201 --run-mode=cpu ${ASC_CPU_SYSTEM_INCLUDE_OPTIONS}")
         
         # 配置链接选项：rpath和库搜索路径
-        string(APPEND CMAKE_ASC_LINK_FLAGS "--run-mode=cpu \
--Wl,-rpath,$ENV{ASCEND_HOME_PATH}/lib64} -Wl,-L$ENV{ASCEND_HOME_PATH}/lib64 \
--Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib \
--Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/Ascend910B1 -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/Ascend910B1 \
--Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/simulator/Ascend910B1/lib -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/simulator/Ascend910B1/lib \
--Wl,--disable-new-dtags")
+        string(APPEND CMAKE_ASC_LINK_FLAGS "--run-mode=cpu -Wl,--disable-new-dtags")
                 
         # 配置链接库
         link_libraries(
+            -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/lib64
+            -Wl,-L$ENV{ASCEND_HOME_PATH}/lib64
+            -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib
+            -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib
+            -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/Ascend910B1
+            -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/tikicpulib/lib/Ascend910B1
+            -Wl,-rpath,$ENV{ASCEND_HOME_PATH}/tools/simulator/Ascend910B1/lib
+            -Wl,-L$ENV{ASCEND_HOME_PATH}/tools/simulator/Ascend910B1/lib
             -Wl,-Bdynamic,--no-as-needed
             ascendc_acl_stub
             pem_davinci
