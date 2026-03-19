@@ -28,9 +28,5 @@ target_link_libraries(demo PRIVATE
 )
 
 target_compile_options(demo PRIVATE
-<<<<<<< HEAD:examples/00_introduction/01_add/micro_api_add/CMakeLists.txt
-    # 该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
-=======
->>>>>>> upstream/master:examples/02_features/07_data_movement/multidimensional_data_movement/CMakeLists.txt
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
 )

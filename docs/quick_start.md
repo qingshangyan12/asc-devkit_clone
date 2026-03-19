@@ -1,77 +1,4 @@
-<<<<<<< HEAD
-# 快速入门
-
-## 环境安装
-
-### 使用显卡和Docker的场景
-
-Docker安装环境以Atlas A2产品为例。
-
-#### 前提条件
-
-*   **Docker环境**：宿主机已安装Docker引擎（版本1.11.2及以上）。
-*   **驱动与固件**：宿主机已安装昇腾NPU 24.1.0版本以上的[驱动与固件](https://www.hiascend.com/hardware/firmware-drivers/community?product=1&model=30&cann=8.0.RC3.alpha002&driver=1.0.26.alpha)Ascend HDK。安装指导详见《[CANN 软件安装指南](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850alpha002/softwareinst/instg/instg_0005.html?Mode=PmIns&OS=openEuler&Software=cannToolKit)》。
-    
-    > **注意**：使用`npu-smi info`查看对应的驱动与固件版本。
-
-#### 下载镜像
-
-拉取已预集成CANN软件包的镜像。
-
-具体操作步骤如下：
-
-1.  以root用户登录宿主机。
-2.  执行拉取命令（请根据你的宿主机架构选择）：
-    * ARM架构：
-        ```bash
-        docker pull --platform=arm64 swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops
-        ```
-    * X86架构：
-        ```bash
-        docker pull --platform=amd64 swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops
-        ```
-    > **注意**：正常网速下，镜像下载时间约为5-10分钟。
-
-#### Docker运行
-
-请根据以下命令运行docker：
-
-```bash
-docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_manager --device /dev/devmm_svm --device /dev/hisi_hdc -v /usr/local/dcmi:/usr/local/dcmi -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver/lib64/:/usr/local/Ascend/driver/lib64/ -v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info -v /etc/ascend_install.info:/etc/ascend_install.info -it swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops bash
-```
-以下为用户需关注的参数说明：
-| 参数 | 说明 | 注意事项 |
-| :--- | :--- | :--- |
-| `--name cann_container` | 指定容器名称，便于管理。 | 可自定义。 |
-| `--device /dev/davinci0` | 核心：将宿主机的NPU设备卡映射到容器内，可指定映射多张NPU设备卡。 | 必须根据实际情况调整：`davinci0`对应系统中的第0张NPU卡。请先在宿主机执行 `npu-smi info`命令，根据输出显示的设备号（如`NPU 0`, `NPU 1`）来修改此编号。|
-| `-v /usr/local/Ascend/driver/lib64/:/usr/local/Ascend/driver/lib64/` | 关键挂载：将宿主机的NPU驱动库映射到容器内。 | - |
-
-#### 检查环境
-
-进入容器后，验证环境和驱动是否正常。
-
--   **检查NPU设备**
-
-    执行如下命令，若返回驱动相关信息说明已成功挂载。    
-    ```bash    
-    npu-smi info
-    ```
--   **检查CANN包的安装**
-    
-    执行如下命令查看CANN Toolkit版本信息，是否为8.5.0版本。
-    ```bash
-    cat /usr/local/Ascend/cann/share/info/asc-devkit/version.info
-    ```
-至此，你已经拥有了一个“开箱即用”的开发环境。
-
-### 其他场景
-
-#### 前提条件
-
-1. **安装依赖**
-=======
 # 编译构建
->>>>>>> upstream/master
 
 ## 环境准备
 本项目支持源码编译，在源码编译前，需要确保已经安装驱动、固件和CANN软件（Ascend-cann-toolkit和Ascend-cann-ops）。
@@ -107,19 +34,10 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
 **2.下载CANN镜像**
 
-<<<<<<< HEAD
-#### 环境准备<a name="prepare&install"></a>
-
-本项目支持由源码编译，进行源码编译前，请根据如下步骤完成相关环境准备。
-=======
 - 步骤1：以root用户登录宿主机。确保宿主机已安装Docker引擎（版本1.11.2及以上）。
->>>>>>> upstream/master
 
 - 步骤2：从[昇腾镜像仓库](https://www.hiascend.com/developer/ascendhub/detail/17da20d1c2b6493cb38765adeba85884)拉取已预集成的CANN软件包及所需依赖的镜像。命令如下，根据实际架构选择：
 
-<<<<<<< HEAD
-    根据实际环境，下载对应`Ascend-cann-toolkit_${cann_version}_linux-${arch}.run`包，下载链接为[toolkit x86_64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/x86_64/Ascend-cann-toolkit_9.0.0_linux-x86_64.run)、[toolkit aarch64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/aarch64/Ascend-cann-toolkit_9.0.0_linux-aarch64.run)。
-=======
     ```bash
     # 示例：拉取ARM架构的CANN开发镜像
     docker pull --platform=arm64 swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops
@@ -164,7 +82,6 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
     运行算子时必须安装驱动与固件，若仅编译算子，可跳过本操作，安装指导请参考[CANN软件安装指南](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
    
 2. 安装社区版CANN toolkit包。
->>>>>>> upstream/master
 
     ```bash
     # 确保安装包具有可执行权限
@@ -177,14 +94,6 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 
     运行算子前必须安装本包，若仅编译算子，可跳过本操作。
 
-<<<<<<< HEAD
-    根据产品型号和环境架构，下载对应`Ascend-cann-${soc_name}-ops_9.0.0_linux-${arch}.run`包，下载链接如下：
-
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：[ops x86_64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/x86_64/Ascend-cann-910b-ops_9.0.0_linux-x86_64.run)、[ops aarch64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/aarch64/Ascend-cann-910b-ops_9.0.0_linux-aarch64.run)。
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：[ops x86_64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/x86_64/Ascend-cann-A3-ops_9.0.0_linux-x86_64.run)、[ops aarch64包](https://mirror-centralrepo.devcloud.cn-north-4.huaweicloud.com/artifactory/cann-run-release/software/master/20260211182015/aarch64/Ascend-cann-A3-ops_9.0.0_linux-aarch64.run)。
-
-=======
->>>>>>> upstream/master
     ```bash
     # 确保安装包具有可执行权限
     chmod +x Ascend-cann-${soc_name}-ops_${cann_version}_linux-${arch}.run

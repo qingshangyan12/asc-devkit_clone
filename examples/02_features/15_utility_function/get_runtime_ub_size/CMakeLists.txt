@@ -34,9 +34,5 @@ target_link_libraries(demo PRIVATE
 # ======================================================================================
 target_compile_options(demo PRIVATE
 
-<<<<<<< HEAD
-    # 该NPU架构版本号暂未正式发布，后续可能会有变更，请关注正式版本发布信息
-=======
->>>>>>> upstream/master
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
 )

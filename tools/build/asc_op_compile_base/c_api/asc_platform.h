@@ -64,10 +64,7 @@ enum class DPLATFORM {
   KIRINX90,
   KIRIN9030,
   MC62CM12A,
-<<<<<<< HEAD
-=======
   MC32DM11A,
->>>>>>> upstream/master
   DEFAULT_CURRENT
 };
 

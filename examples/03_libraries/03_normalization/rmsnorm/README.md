@@ -47,11 +47,7 @@
   </table>
 
 - 算子实现：  
-<<<<<<< HEAD
-  本样例中实现的是固定shape(src[1, 1, 16], gamma[16], dst[1, 1, 16])的rmsnorm算子。
-=======
   本样例中实现的是固定shape(src[1, 1, 16]，gamma[16]，dst[1, 1, 16])的rmsnorm算子。
->>>>>>> upstream/master
 
   - Kernel实现
 

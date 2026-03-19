@@ -19,13 +19,6 @@
 #include <type_traits>
 #include "impl/utils/common_types.h"
 
-#include <cstdint>
-#include <type_traits>
-
-namespace __asc_aicore {
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
-}
-
 struct AscTlvHead { // TLV Head include type and length
     uint16_t type;
     uint16_t len;

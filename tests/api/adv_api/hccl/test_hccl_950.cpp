@@ -384,11 +384,7 @@ TEST_F(HcclSuiteAIC, AllReduce_CcuAllReduceMeshMem2Mem1D)
     Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
     hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
     HcclHandle handleId = hccl.AllReduce(reinterpret_cast<__gm__ uint8_t*>(0x11),
-<<<<<<< HEAD
-                                         reinterpret_cast<__gm__ uint8_t*>(0x11), 100,
-=======
                                          reinterpret_cast<__gm__ uint8_t*>(0x11), 64,
->>>>>>> upstream/master
                                          HcclDataType::HCCL_DATA_TYPE_INT8,
                                          HcclReduceOp::HCCL_REDUCE_SUM, 1);
     hccl.Commit(handleId);
@@ -396,8 +392,6 @@ TEST_F(HcclSuiteAIC, AllReduce_CcuAllReduceMeshMem2Mem1D)
     EXPECT_EQ(hccl.Wait(handleId), HCCL_SUCCESS);
 }
 
-<<<<<<< HEAD
-=======
 TEST_F(HcclSuiteAIC, AllReduce_CcuAllReduceMeshMem2Mem1D_Cout_not_dived)
 {
     std::vector<uint8_t> workSpace(workSpaceSize + 1024 * 14);
@@ -437,7 +431,6 @@ TEST_F(HcclSuiteAIC, AllReduce_CcuAllReduceMeshMem2Mem1D_Cout_zero)
     EXPECT_EQ(hccl.Wait(handleId), HCCL_FAILED);
 }
 
->>>>>>> upstream/master
 TEST_F(HcclSuiteAIC, ReduceScatter_CcuReduceScatterMeshMem2Mem1D)
 {
     std::vector<uint8_t> workSpace(workSpaceSize + 1024 * 100 * 1024);

@@ -41,8 +41,6 @@ TEST_F(TestVectorCompute##class_name####data_type##CApi, c_api_name##_##data_typ
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_COMPUTE_SELECT_INSTR_HIF8(class_name, c_api_name, cce_name, data_type)           \
                                                                                                 \
 class TestVectorCompute##class_name####data_type##CApi : public testing::Test {                 \
@@ -71,15 +69,11 @@ TEST_F(TestVectorCompute##class_name####data_type##CApi, c_api_name##_##data_typ
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
->>>>>>> upstream/master
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Psel, asc_select, psel, vector_bool);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_uint8_t);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_int8_t);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_COMPUTE_SELECT_INSTR_HIF8(Vsel, asc_select, vsel, vector_hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_fp8_e5m2_t);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_uint16_t);
 TEST_VECTOR_COMPUTE_SELECT_INSTR(Vsel, asc_select, vsel, vector_int16_t);

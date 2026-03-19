@@ -31,41 +31,10 @@
 #endif
 #endif
 
-<<<<<<< HEAD
-#ifdef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-#define __gm__ 
-#endif
-
-#ifndef __host_aicore__
-#define __host_aicore__ [host, aicore]
-#endif // __host_aicore__
-
-#if (_ASCENDC_HAS_BISHENG_COMPILER)
-#ifndef ASCENDC_HOST
-#define ASCENDC_HOST __host__
-#endif
-#ifndef ASCENDC_AICORE
-#define ASCENDC_AICORE __aicore__
-#endif
-#ifndef ASCENDC_HOST_AICORE
-#define ASCENDC_HOST_AICORE __host_aicore__
-#endif
-#else
-#ifndef ASCENDC_HOST
-#define ASCENDC_HOST
-#endif
-#ifndef ASCENDC_AICORE
-#define ASCENDC_AICORE
-#endif
-#ifndef ASCENDC_HOST_AICORE
-#define ASCENDC_HOST_AICORE
-=======
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #define __simt_gm__ __gm__
 #else
 #define __simt_gm__ 
->>>>>>> upstream/master
-#endif
 #endif
 
 inline __simt_gm__ uint8_t* __simt_gm__ g_sysSimtPrintFifoSpace = nullptr;
@@ -482,11 +451,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl(DumpType print_type,
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 
 template <class... Args>
-<<<<<<< HEAD
-static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(const __gm__ char* fmt, Args&&... args)
-=======
 static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(const __simt_gm__ char* fmt, Args&&... args)
->>>>>>> upstream/master
 {
 #if !defined (ASCENDC_DUMP) || (ASCENDC_DUMP != 0)
     simt_printf_impl(DumpType::DUMP_SIMT_PRINTF, fmt, args...);

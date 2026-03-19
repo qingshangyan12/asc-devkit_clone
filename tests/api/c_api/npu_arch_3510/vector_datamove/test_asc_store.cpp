@@ -44,8 +44,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_STORE_HIF8(class_name, c_api_name, cce_name0, cce_name1, data_type)              \
                                                                                                 \
 class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {                 \
@@ -77,7 +75,6 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
->>>>>>> upstream/master
 
 #define TEST_VECTOR_DATAMOVE_STORE3(class_name, c_api_name, cce_name2, cce_name3, data_type)                 \
                                                                                                 \
@@ -111,8 +108,6 @@ TEST_F(TestVectorDataMove3##class_name##_##data_type##_CApi, c_api_name##_##data
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
-<<<<<<< HEAD
-=======
 #define TEST_VECTOR_DATAMOVE_STORE3_HIF8(class_name, c_api_name, cce_name2, cce_name3, data_type)                 \
                                                                                                 \
 class TestVectorDataMove3##class_name##_##data_type##_CApi : public testing::Test {                 \
@@ -145,7 +140,6 @@ TEST_F(TestVectorDataMove3##class_name##_##data_type##_CApi, c_api_name##_##data
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
 
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, int8_t);
 TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, uint8_t);
 TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, int16_t);
@@ -157,10 +151,7 @@ TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, half);
 TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, float);
 TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, bfloat16_t);
 TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_STORE_HIF8(Vstusandvstas, asc_store, vstus, vstas, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_STORE(Vstusandvstas, asc_store, vstus, vstas, fp4x2_e2m1_t);
@@ -177,10 +168,7 @@ TEST_VECTOR_DATAMOVE_STORE3(Vstusandvstas, asc_store, vstus, vstas, half);
 TEST_VECTOR_DATAMOVE_STORE3(Vstusandvstas, asc_store, vstus, vstas, float);
 TEST_VECTOR_DATAMOVE_STORE3(Vstusandvstas, asc_store, vstus, vstas, bfloat16_t);
 TEST_VECTOR_DATAMOVE_STORE3(Vstusandvstas, asc_store, vstus, vstas, fp8_e4m3fn_t);
-<<<<<<< HEAD
-=======
 TEST_VECTOR_DATAMOVE_STORE3_HIF8(Vstusandvstas, asc_store, vstus, vstas, hifloat8_t);
->>>>>>> upstream/master
 TEST_VECTOR_DATAMOVE_STORE3(Vstusandvstas, asc_store, vstus, vstas, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_STORE3(Vstusandvstas, asc_store, vstus, vstas, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_STORE3(Vstusandvstas, asc_store, vstus, vstas, fp4x2_e2m1_t);

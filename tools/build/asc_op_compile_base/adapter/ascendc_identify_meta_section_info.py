@@ -30,14 +30,6 @@ AIV_TYPE_SIMD_SIMT_MIX_VF = 4
 
 @dataclass
 class BaseTlv:
-<<<<<<< HEAD
-    type: int
-    length: int
-
-    @classmethod
-    def from_bytes(cls, data: bytes) -> 'BaseTlv':
-        type_val, length_val = struct.unpack('<HH', data[:4])
-=======
     """Base TLV (Type-Length-Value) data structure"""
     type: int          # TLV type identifier (uint16)
     length: int        # TLV data length (uint16)
@@ -45,13 +37,10 @@ class BaseTlv:
     @classmethod
     def from_bytes(cls, data: bytes) -> 'BaseTlv':
         type_val, length_val = struct.unpack('<HH', data[:4]) # little-endian
->>>>>>> upstream/master
         return cls(type_val, length_val)
 
 
 def extract_hex_data(hex_dump: str) -> str:
-<<<<<<< HEAD
-=======
     """
     Extract pure hex data from hex dump string
 
@@ -60,7 +49,6 @@ def extract_hex_data(hex_dump: str) -> str:
                  0000 50000000 00000000"
         Output: "5000000000000000"
     """
->>>>>>> upstream/master
     hex_parts = []
     if hex_dump is None:
         return " "
@@ -79,19 +67,14 @@ def extract_hex_data(hex_dump: str) -> str:
                 break
             hex_parts.append(part)
 
-<<<<<<< HEAD
-=======
     '''
     hex_parts:
     eg. ['01000400', '03000000', '04008c00', '00050003', '00000000', '00030002', ...]  
     '''
->>>>>>> upstream/master
     return ''.join(hex_parts)
 
 
 def parse_hexdump_to_tlv(hexdump: str) -> str:
-<<<<<<< HEAD
-=======
     """
     Format hex dump to TLV format
 
@@ -106,7 +89,6 @@ def parse_hexdump_to_tlv(hexdump: str) -> str:
                  0000 50000000 00000000"
         Output: "0000 50000000 00000000"
     """
->>>>>>> upstream/master
     tlv_lines = []
     for line in hexdump.splitlines():
         if not line.strip():
@@ -121,24 +103,11 @@ def parse_hexdump_to_tlv(hexdump: str) -> str:
 
         hex_chars = hex_data.replace(' ', '')
         hex_parts = []
-<<<<<<< HEAD
-        for i in range(0, len(hex_chars), 8):
-=======
         for i in range(0, len(hex_chars), 8): # 8 bytes per group
->>>>>>> upstream/master
             if i + 8 <= len(hex_chars):
                 hex_parts.append(hex_chars[i: i + 8])
         
         formatted_hex = ' '.join(hex_parts)
-<<<<<<< HEAD
-        tlv_lines.append(f"{address} {formatted_hex.ljust(39)} {ascii_part}")
-
-    return '\n'.join(tlv_lines)
-
-
-# .o生成tlv
-def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Optional[str]:
-=======
         tlv_lines.append(f"{address} {formatted_hex.ljust(39)} {ascii_part}") # 39 width for hex data
 
     '''
@@ -163,7 +132,6 @@ def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Op
     Example:
         llvm-objdump -s -j .ascend.meta.kernel_name object_file.o
     """
->>>>>>> upstream/master
     if not os.path.exists(object_file_path):
         raise FileNotFoundError(f"object file {object_file_path} not found, please check it.")
     section_name = ".ascend.meta." + kernel_name
@@ -176,8 +144,6 @@ def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Op
         LogUtil.print_compile_log(kernel_name, f"generate tlv info failed: {e}", AscendCLogLevel.LOG_WARNING)
         return None
 
-<<<<<<< HEAD
-=======
     '''
     tlv_info
     e.g.
@@ -187,7 +153,6 @@ def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Op
     ...
     00e0 0a000400 00000000                   ........
     '''
->>>>>>> upstream/master
     tlv_info = tlv_info.decode('utf-8')
     
     tlv_string = parse_hexdump_to_tlv(tlv_info)
@@ -196,9 +161,6 @@ def generate_tlv_from_object_file(object_file_path: str, kernel_name: str) -> Op
 
 
 def parse_tlv_get_simt_value(tlv_string: str, kernel_name: str):
-<<<<<<< HEAD
-    try:        
-=======
     """
     Parse SIMT type value from TLV string
 
@@ -206,7 +168,6 @@ def parse_tlv_get_simt_value(tlv_string: str, kernel_name: str):
         str: hex string of SIMT type value (e.g., "0x00000003"), None if failed
     """
     try:
->>>>>>> upstream/master
         LogUtil.print_compile_log(kernel_name, f"start parse tlv info ...", AscendCLogLevel.LOG_INFO)
         hex_data = extract_hex_data(tlv_string)
         if not hex_data:
@@ -220,10 +181,6 @@ def parse_tlv_get_simt_value(tlv_string: str, kernel_name: str):
 
 
 def _parse_simt_value_from_bytes(data: bytes) -> str:
-<<<<<<< HEAD
-    offset = 0
-    while offset + 4 <= len(data):
-=======
     """
     Parse SIMT type value from bytes data
 
@@ -232,7 +189,6 @@ def _parse_simt_value_from_bytes(data: bytes) -> str:
     """
     offset = 0
     while offset + 4 <= len(data): # 4 bytes for TLV header
->>>>>>> upstream/master
         tlv_type, length = _parse_tlv_header_and_check(data, offset)
         
         if tlv_type is None:  
@@ -246,9 +202,6 @@ def _parse_simt_value_from_bytes(data: bytes) -> str:
 
 
 def _parse_tlv_header_and_check(data: bytes, offset: int):
-<<<<<<< HEAD
-
-=======
     """
     Parse TLV header and perform boundary check
 
@@ -268,7 +221,6 @@ def _parse_tlv_header_and_check(data: bytes, offset: int):
         -> tlv_type = 0x000c (12)
         -> length = 0x0004 (4)
     """
->>>>>>> upstream/master
     tlv_type = data[offset] | (data[offset + 1] << 8)
     length = data[offset + 2] | (data[offset + 3] << 8)
     
@@ -279,8 +231,6 @@ def _parse_tlv_header_and_check(data: bytes, offset: int):
 
 
 def _extract_tlv_value(data: bytes, offset: int, length: int) -> str:
-<<<<<<< HEAD
-=======
     """
     Extract value field from TLV data
 
@@ -300,7 +250,6 @@ def _extract_tlv_value(data: bytes, offset: int, length: int) -> str:
         data[value_start:value_start+4] = [0x03, 0x00, 0x00, 0x00]
         -> value = 0x00000003
     """
->>>>>>> upstream/master
     value_start = offset + 4
     if length >= 4:
         value = data[value_start] | (data[value_start + 1] << 8) | \
@@ -309,12 +258,6 @@ def _extract_tlv_value(data: bytes, offset: int, length: int) -> str:
         value = 0
         for i in range(min(length, 4)):
             value |= data[value_start + i] << (i * 8)
-<<<<<<< HEAD
-    return f"0x{value:08x}"
-
-
-def check_op_type_is_simt(object_file_path: str, kernel_name: str):
-=======
     return f"0x{value:08x}" # 8 bytes for uint32 zero-padding
 
 
@@ -325,7 +268,6 @@ def check_op_type_is_simt(object_file_path: str, kernel_name: str):
     Returns:
         bool: True if SIMT type, False if not SIMT type or parse failed
     """
->>>>>>> upstream/master
     tlv_string = generate_tlv_from_object_file(object_file_path, kernel_name)
     simt_value = parse_tlv_get_simt_value(tlv_string, kernel_name)
     if not simt_value:

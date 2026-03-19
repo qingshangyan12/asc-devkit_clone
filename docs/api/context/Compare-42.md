@@ -121,20 +121,6 @@ srcReg0和srcReg1可以是同一个RegTensor。
 template<typename T>
 __simd_vf__ inline void CompareVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
-<<<<<<< HEAD
-    AscendC::MicroAPI::RegTensor<T> srcReg0;
-    AscendC::MicroAPI::RegTensor<T> srcReg1;
-    AscendC::MicroAPI::RegTensor<T> dstReg;
-    AscendC::MicroAPI::MaskReg mask;
-    AscendC::MicroAPI::MaskReg cmpMaskReg;
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::MicroAPI::UpdateMask<T>(count);
-        AscendC::MicroAPI::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-        AscendC::MicroAPI::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);        
-        AscendC::MicroAPI::Compare<T, AscendC::CMPMODE::EQ>(cmpMaskReg, srcReg0, srcReg1, mask);
-        AscendC::MicroAPI::Select(dstReg, srcReg0, srcReg1, cmpMaskReg);
-        AscendC::MicroAPI::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-=======
     AscendC::Reg::RegTensor<T> srcReg0;
     AscendC::Reg::RegTensor<T> srcReg1;
     AscendC::Reg::RegTensor<T> dstReg;
@@ -147,7 +133,6 @@ __simd_vf__ inline void CompareVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __u
         AscendC::Reg::Compare<T, AscendC::CMPMODE::EQ>(cmpMaskReg, srcReg0, srcReg1, mask);
         AscendC::Reg::Select(dstReg, srcReg0, srcReg1, cmpMaskReg);
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
->>>>>>> upstream/master
     }
 }
 ```
