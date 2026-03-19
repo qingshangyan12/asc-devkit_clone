@@ -37,11 +37,19 @@ INPUT_API_ID=2 INPUT_API_TYPE=2 bash test.sh
 | 变量 | 说明 | 默认值 | 可选值 |
 |------|------|--------|--------|
 | `INPUT_API_ID` | API 编号 | 1 | 1=Exp, 2=Mul |
-| `INPUT_API_TYPE` | API 类型 | 1 | 1=单目(Unary), 2=双目(Binary) |
+| `INPUT_API_TYPE` | API 类型 | 1 | 1=Unary单目, 2=Binary双目, 3=BinaryScalar双目标量 |
 | `INPUT_DATA_TYPE` | 数据类型 | 0（遍历所有） | 1=float16, 2=float32, 3=int16, 4=int32 |
 | `INPUT_SIZE` | 张量大小 | 128 | 当前固定值 |
 
 如果新增了其他API，API编号会依次递增。比如新增验证Rsqrt，INPUT_API_ID=3；再新增Sub，INPUT_API_ID=4等等。
+
+### API 类型说明
+
+| API 类型 | 说明 | 适用 API |
+|---------|------|----------|
+| `Unary` (1) | 单目运算，一个 tensor 输入 | Exp |
+| `Binary` (2) | 双目运算，两个 tensor 输入 | Mul |
+| `BinaryScalar` (3) | 双目运算，一个 tensor 输入 + 一个 scalar 输入 | Adds |
 
 ## 使用示例
 
