@@ -290,7 +290,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_loadalign](reg/reg_load/asc_loadalign/) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式。 |
-| <cann-filter npu_type = "950"> [asc_loadalign](reg/reg_load/asc_loadalign/asc_loadalign_arch_3510.md) | 将数据从UB搬入MaskReg。</cann-filter> |
+| <cann-filter npu_type = "950"> [asc_loadalign](reg/reg_load/asc_loadalign/asc_loadalign_v6.md) | 将数据从UB搬入MaskReg。</cann-filter> |
 | <cann-filter npu_type = "950"> [asc_loadalign_postupdate](reg/reg_load/asc_loadalign_postupdate.md) | 将数据从UB搬入MaskReg，使能post mode。</cann-filter> |
 | [asc_storealign](reg/reg_store/asc_storealign/) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
 | [asc_gather](reg/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |
