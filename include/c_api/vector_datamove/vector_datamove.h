@@ -199,6 +199,25 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__  uint64_t* dst, __ubuf__ uint
 
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint32_t size);
 
+//===========asc_set_copy_pad_val(int8/uint8/int16/uint16/half/bfloat16/int32/uint32/float)===========
+__aicore__ inline void asc_set_copy_pad_val(int8_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(int16_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(uint16_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(half pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(bfloat16_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(int32_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(float pad_value);
+
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 // ==========asc_copy_gm2ub_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
@@ -384,7 +403,38 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint32_t* dst, __gm__ uint32
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* src,
     uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size,
     uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode);
-    
+
+//===========asc_set_copy_pad_val(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float)===========
+__aicore__ inline void asc_set_copy_pad_val(int8_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(fp4x2_e2m1_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(fp4x2_e1m2_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(fp8_e8m0_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(fp8_e5m2_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(fp8_e4m3fn_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(hifloat8_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(int16_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(uint16_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(half pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(bfloat16_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(int32_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value);
+
+__aicore__ inline void asc_set_copy_pad_val(float pad_value);
+
 #endif
 
 #endif
