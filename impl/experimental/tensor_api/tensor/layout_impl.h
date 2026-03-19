@@ -30,16 +30,17 @@ struct LocalTensor;
 template <typename Coord, typename LayoutType, typename TileShape>
 __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const LayoutType& layout, const TileShape& tileShape) 
 {
-    static_assert(Std::is_tuple_v<TileShape>,"TileShape must be a tuple")
-    static_assert(Std::nesting_depth_v<TileShape> == TWO_DIM_DATA, "Only Support Two Dim Tile Shape");
-    static_assert(Std::nesting_depth_v<LayoutType> == FOUR_DIM_DATA, "Only Support Four Dim Layout");
+    static_assert(Std::is_tuple_v<TileShape>,"TileShape must be a tuple");
+    static_assert(nesting_depth_v<TileShape> == TWO_DIM_DATA, "Only Support Two Dim TileShape");
+    static_assert(nesting_depth_v<Std::remove_cvref_t<decltype(layout.Shape())>> == FOUR_DIM_DATA, "Only Support Four Dim Layout");
 
     auto innerRow = Std::get<0>(GetShape<0>(layout));
     auto innerCol = Std::get<0>(GetShape<1>(layout));
-    auto srcRow = innerRow * Std::get<1>(GetShape<0>(layout));;
+    auto srcRow = innerRow * Std::get<1>(GetShape<0>(layout));
     auto srcCol = innerCol * Std::get<1>(GetShape<1>(layout));
     
-    auto originShape = TupleSize(MakeShape(srcRow, srcCol)) > TupleSize(tileShape) ? tileShape : MakeShape(srcRow, srcCol);
+    using type = decltype(Std::get<0>(tileShape));
+    auto originShape = TupleSize(MakeShape(srcRow, srcCol)) > TupleSize(tileShape) ? tileShape : MakeShape(static_cast<type>(srcRow), static_cast<type>(srcCol));
     auto shape = MakeFractalShape(originShape, GetShape<0>(layout));
     return MakeLayout(shape, layout.Stride());
 }
@@ -58,13 +59,11 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
     auto dstRow = Std::get<0>(Std::get<0>(tileTensor.Shape())) * Std::get<1>(Std::get<0>(tileTensor.Shape()));
     auto dstCol = Std::get<0>(Std::get<1>(tileTensor.Shape())) * Std::get<1>(Std::get<1>(tileTensor.Shape()));
 
-    auto realRow = Min(srcRow, dstRow);
-    auto realCol = Min(srcCol, dstCol);
+    auto srcShape = MakeShape(srcRow, srcCol);
+    auto dstShape = MakeShape(dstRow, dstCol);
 
-    auto row = MakeShape(innerRow, Std::ceil_division(realRow, innerRow));
-    auto col = MakeShape(innerCol, Std::ceil_division(realCol, innerCol));
-
-    auto shape = MakeFractalShape(MakeShape(row, col), GetShape<0>(layout));
+    auto originShape = TupleSize(srcShape) > TupleSize(dstShape)  ? dstShape : srcShape;
+    auto shape = MakeFractalShape(originShape, GetShape<0>(layout));
 
     return MakeLayout(shape, layout.Stride());
 }
