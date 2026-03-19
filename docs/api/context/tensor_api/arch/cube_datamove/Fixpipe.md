@@ -20,7 +20,7 @@ Fixpipe能够在矩阵计算完成后对计算结果进行处理，例如量化�
 
 ## 函数原型<a name="section1790918208125"></a>
 
-```
+```cpp
 template <const FixpipeTrait& trait = DEFAULT_FIXPIPE_TRAIT, typename T, typename U>
 __aicore__ inline typename Std::enable_if<VerifyingFixpipeTemplate<T, U>, void>::type Fixpipe(const T& dst, const U& src)
 
@@ -54,8 +54,14 @@ Fixpipe(const T& dst, const U& src, const V& quant);
 | ------ | --------- | ------------ |
 | dst    | 输出      | 目的操作数。 |
 | src    | 输入      | 源操作数。   |
-| quant  | 输入      | 量化参数     |
+| quant  | 输入      | 量化参数。     |
 
+## API映射关系
+与built-in接口映射关系：
+XXX接口是在built-in接口(更新为编译器提供的接口)的基础上进行抽象封装实现的，其对应的底层built-in接口为：
+```cpp
+// 按照数据类型顺序列出所映射的接口
+```
 
 ## 返回值说明<a name="section44801012174220"></a>
 
@@ -91,10 +97,9 @@ VerifyingFixpipeTemplate表达式为模板参数校验表达式，执行效果�
 | 目的操作数数据对齐要求                       | 无对齐要求。                                                 |
 | 数据排布要求                                 | NZ Layout -> NZ Layout : 源操作数和目的操作数仅支持连续排布和非连续排布。NZ Layout -> RowMajor Layout ：源操作数和目的操作数仅支持连续排布和非连续排布。<br>NZ Layout -> ColumnMajor Layout：源操作数和目的操作数仅支持连续排布和非连续排布。<br/>NZ Layout内层矩阵的Shape大小为16 * 16。 |
 
-
 ## 调用示例<a name="section163951002119"></a>
 
-```
+```cpp
 ...
 // CO1 -> GM
 using SrcT = float;

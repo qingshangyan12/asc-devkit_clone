@@ -20,9 +20,16 @@ DataCopy提供数据搬运功能，该接口支持Local Memory与Global Memory�
 
 ## 函数原型>
 
-```
+```cpp
 template <const DataCopyTrait& trait = DEFAULT_DATA_COPY_TRAIT, typename T, typename U>
 __aicore__ inline typename Std::enable_if<VerifyingDataCopyTemplate<T, U>, void>::type DataCopy(const T& dst, const U& src)
+```
+
+## API映射关系
+与built-in接口映射关系：
+XXX接口是在built-in接口(更新为编译器提供的接口)的基础上进行抽象封装实现的，其对应的底层built-in接口为：
+```cpp
+// 按照数据类型顺序列出所映射的接口
 ```
 
 ## 参数说明>
@@ -111,10 +118,9 @@ VerifyingDataCopyTemplate表达式为模板参数T和U的校验表达式，执�
 |目的操作数数据对齐要求|起始地址和数据长度要求128字节对齐。|
 |数据排布要求|RowMajor Layout -> RowMajor Layout：源操作数和目的操作数均支持连续和非连续排布。非连续时仅支持以行为单位进行跳跃。|
 
-
 ## 调用示例>
 
-```
+```cpp
 ...
 // GM -> A1
 using SrcT = half;

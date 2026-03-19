@@ -28,9 +28,9 @@
 
 ## 函数原型
 
-```
-__aicore__ inline constexpr decltype(auto) layout() {}
-__aicore__ inline constexpr decltype(auto) layout() const {}
+```cpp
+__aicore__ inline constexpr decltype(auto) layout()
+__aicore__ inline constexpr decltype(auto) layout() const
 ```
 
 ## 参数说明
@@ -43,11 +43,11 @@ __aicore__ inline constexpr decltype(auto) layout() const {}
 
 ## 约束说明
 
-构造Layout对象时传入的Shape和Stride结构，需是[Std::tuple](容器函数.md)结构类型，且满足Std::tuple结构类型的使用约束。
+构造Layout对象时传入的Shape和Stride结构，需是[Std::tuple](../../utils/容器函数.md)结构类型，且满足Std::tuple结构类型的使用约束。
 
 ## 调用示例
 
-```
+```cpp
 AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
 AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
 

@@ -20,7 +20,7 @@ LoadData接口支持Local Memory内部的数据搬运，能够完成L1 Buffer -\
 
 ## 函数原型>
 
-```
+```cpp
 template <constLoadDataTrait& trait = DEFAULT_LOAD_DATA_TRAIT, typename T, typename U>
 __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplate<T, U>, void>::type LoadData(const T& dst, const U& src);
 ```
@@ -43,6 +43,12 @@ __aicore__ inline typename Std::enable_if<VerifyingLoadDataTemplate<T, U>, void>
 |dst|输出|目的操作数。|
 |src|输入|源操作数。|
 
+## API映射关系
+与built-in接口映射关系：
+XXX接口是在built-in接口(更新为编译器提供的接口)的基础上进行抽象封装实现的，其对应的底层built-in接口为：
+```cpp
+// 按照数据类型顺序列出所映射的接口
+```
 
 ## 返回值说明>
 
@@ -91,10 +97,9 @@ VerifyingLoadDataTemplate表达式为模板参数校验表达式，执行效果�
 |目的操作数数据对齐要求|起始地址和数据长度要求512字节对齐。|
 |数据排布要求|NZ Layout -> ZN Layout : 源操作数和目的操作数均仅支持连续排布。<br>NZ Layout内层矩阵的Shape大小是16 * (32 / sizeof(T))。ZN Layout内存矩阵的Shape大小是 (32 / sizeof(T)) * 16。|
 
-
 ## 调用示例>
 
-```
+```cpp
 ...
 // A1 -> A2
 using SrcT = float;

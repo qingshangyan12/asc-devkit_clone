@@ -20,7 +20,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline decltype(auto) GetLayout() const
 ```
 
@@ -38,7 +38,7 @@ Layout实例化对象。
 
 ## 调用示例
 
-```
+```cpp
 AscendC::Shape<size_t,size_t,size_t> shape = AscendC::MakeShape(10, 20, 30);
 AscendC::Stride<size_t,size_t,size_t> stride = AscendC::MakeStride(1, 100, 200);
 
