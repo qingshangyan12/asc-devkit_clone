@@ -115,8 +115,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sub_relu](vector_compute/asc_sub_relu.md) | 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。 |
 | [asc_transto5hd](vector_compute/asc_transto5hd.md) | 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。 |
 | [asc_pair_reduce_sum](vector_compute/asc_pair_reduce_sum.md) | 对输入数据做归约操作，得到数据总和。 |
-| [asc_copy](vector_compute/asc_copy.md) | 将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。 |
-
+| [asc_copy(A2/A3)](vector_compute/asc_copy/asc_copy_arch_2201.md) | 将数据从Unified Buffer搬运到Unified Buffer。支持高维切分。 |
+| [asc_copy(A5)](vector_compute/asc_copy/asc_copy_arch_3510.md) | 将数据从RegTensor搬运到MaskReg。|
 
 ## 数据搬运
 
@@ -204,8 +204,6 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_release_buf(A5)](sync/asc_release_buf/asc_release_buf_arch_3510.md)| 释放缓存。 |
-| [asc_sync_intra_wait](sync/asc_sync_intra_wait/asc_sync_intra_wait_arch_3510.md)| 等待FFTS块/子块同步标志。 |
-| [asc_sync_intra_arrive](sync/asc_sync_intra_wait/asc_sync_intra_wait_arch_3510.md)| 向FFTS块/子块同步寄存器发送同步信号。 |
 | [asc_sync_notify](sync/asc_sync_notify.md)| 设置同步标志。 |
 | [asc_sync_wait](sync/asc_sync_wait.md)| 等待同步标志。 |
 | [asc_sync_pipe](sync/asc_sync_pipe.md)| 等待指定流水线操作完成。 |
@@ -216,7 +214,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sync_data_barrier](sync/asc_sync_data_barrier.md) | 用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。 |
 | [asc_sync_block_arrive](sync/asc_sync_block_arrive.md) | 该指令用于发送同步信息数据到核间同步寄存器，设置同步点。 |
 | [asc_sync_block_wait](sync/asc_sync_block_wait.md) | 和[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。 |
-
+| [asc_sync_intra_wait(A5)](sync/asc_sync_intra_wait/asc_sync_intra_wait_arch_3510.md)| 等待FFTS块/子块同步标志。 |
+| [asc_sync_intra_arrive(A5)](sync/asc_sync_intra_wait/asc_sync_intra_arrive_arch_3510.md)| 向FFTS块/子块同步寄存器发送同步信号。 |
 
 ## 系统变量
 
@@ -294,6 +293,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_loadalign](reg/reg_load/asc_loadalign/) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式。 |
+| [asc_loadalign(A5)](vector_datamove/asc_loadalign/asc_loadalign_arch_3510.md) | 将数据从UB搬入MaskReg。 |
+| [asc_loadalign_postupdate(A5)](vector_datamove/asc_loadalign/asc_loadalign_postupdate_arch_3510.md) | 将数据从UB搬入MaskReg，使能post mode。 |
 | [asc_storealign](reg/reg_store/asc_storealign/) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
 | [asc_gather](reg/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |
 | [asc_gather_datablock](reg/reg_load/asc_gather_datablock.md) | 给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。 |

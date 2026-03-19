@@ -37,7 +37,7 @@ Reg矢量计算数据搬运接口，适用于从UB搬入MaskReg。使能post mod
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| offset | 输入 | 实际搬运UB起始地址为srcAddr + offset |
+| offset | 输入 | 数据搬运的偏移量。 |
 
 ### 返回值说明
 
@@ -54,9 +54,11 @@ PIPE_V
 ### 调用示例
 
 ```cpp
+//数据总量为256
 constexpr uint64_t total_length = 256;
 vector_bool dst = asc_create_mask_b16(PAT_ALL);
 __ubuf__ uint32_t src[total_length];
+//数据搬运的偏移量为64
 int32_t offset = 64;
 asc_loadalign_postupdate(dst, src, offset);
 ```

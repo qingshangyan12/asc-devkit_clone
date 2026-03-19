@@ -13,7 +13,6 @@
 
 ### 函数原型
 
-- 
 ```cpp
     __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part)
     __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part)
@@ -42,8 +41,9 @@ PIPE_V
 ### 调用示例
 
 ```cpp
+//数据搬运阶段的偏移量为128
 int16_t part = 128;
 vector_uint16_t src;
 vector_bool dst;
-asc_copy(dst, src, total_length);
+asc_copy(dst, src, part);
 ```
