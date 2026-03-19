@@ -97,6 +97,42 @@ __simd_callee__ inline void asc_scatter_impl(vector_float& dst, __ubuf__ float* 
     }
 }
 
+//asc_scatter float8_e4m3_t
+__simd_callee__ inline void asc_scatter_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV{
+        float8_e4m3_t src_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(src);
+        vscatter(dst, src_tmp, index, mask);
+    }
+}
+
+//asc_scatter float8_e5m2_t
+__simd_callee__ inline void asc_scatter_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV{
+        float8_e5m2_t src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
+        vscatter(dst, src_tmp, index, mask);
+    }
+}
+
+//asc_scatter float8_e8m0_t
+__simd_callee__ inline void asc_scatter_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV{
+        float8_e8m0_t src_tmp = reinterpret_cast<__ubuf__ float8_e8m0_t*>(src);
+        vscatter(dst, src_tmp, index, mask);
+    }
+}
+
+//asc_scatter hifloat8_t
+__simd_callee__ inline void asc_scatter_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV{
+        __ubuf__ uint8_t* src = reinterpret_cast<uint8_t*>(src);
+        vscatter(reinterpret_cast<vector_uint8_t&>(dst), src, index, mask);
+    }
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
