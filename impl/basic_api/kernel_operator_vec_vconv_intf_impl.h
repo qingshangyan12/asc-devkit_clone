@@ -71,7 +71,7 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
     const RoundMode& roundMode, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Cast");
 #endif
@@ -104,7 +104,7 @@ template <typename T, typename U, bool isSetMask>
 __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const RoundMode& roundMode, const uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Cast");
 #endif
@@ -144,7 +144,7 @@ template <typename T, typename U>
 __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const RoundMode& roundMode, const uint32_t count)
 {
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
 #endif
 #ifdef __MSTX_DFX_REPORT__

@@ -163,7 +163,6 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
     const Nd2NzParams& intriParams)
 {
-    CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
     using PrimType = PrimT<T>;
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
@@ -177,10 +176,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, 
     } else if (dstHWPos == Hardware::UB) {
         DataCopyGM2UBND2NZImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(),
             intriParams);
-    } else {
-        ASCENDC_CHECK_TPOSITION(false, "dst", "A1 / B1 / VECIN",
-            "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams",
-            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
     }
 }
 #endif
@@ -237,15 +232,10 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const LocalTensor<T> &src,
     const Nd2NzParams &intriParams)
 {
-    CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckDataCopyTensor(dst, src, intriParams, "DataCopy from LocalTensor to LocalTensor with Nd2NzParams");
 #endif
-    CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN / VECCALC / VECOUT",
-        "DataCopy from LocalTensor to LocalTensor with Nd2NzParams");
-    CheckTensorPos<T>(dst, Hardware::L1, "dst", "TSCM",
-        "DataCopy from LocalTensor to LocalTensor with Nd2NzParams");
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, intriParams));
     DataCopyUB2L1ND2NZImpl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         intriParams);
