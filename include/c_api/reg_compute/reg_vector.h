@@ -213,6 +213,30 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_int32_t& dst, int32_t va
 
 __simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value, vector_bool mask);
 
+__simd_callee__ inline void asc_duplicate_scalar(vector_uint8_t& dst, uint8_t value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst, int8_t value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_uint16_t& dst, uint16_t value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_int16_t& dst, int16_t value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_uint32_t& dst, uint32_t value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_int32_t& dst, int32_t value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_half& dst, half value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_bfloat16_t& dst, bfloat16_t value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e5m2_t& dst, fp8_e5m2_t value);
+
+__simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e8m0_t& dst, fp8_e8m0_t value);
+
 // ==========asc_duplicate(uint8_t/int8_t/uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_duplicate(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
@@ -1204,6 +1228,15 @@ __simd_callee__ inline void asc_prelu(vector_half& dst, vector_half src0, vector
 
 //===================asc_clear_ar_spr=====================
 __simd_callee__ inline void asc_clear_ar_spr();
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+__simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part);
+
+__simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part);
+
+#endif
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  

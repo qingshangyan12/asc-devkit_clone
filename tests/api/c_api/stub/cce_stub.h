@@ -32,6 +32,33 @@ void vsts(vector_f8e8m0 src0, vector_f8e8m0 src1, __ubuf__ fp8_e8m0_t* base, int
 void vsts(vector_f4e2m1x2 src0, vector_f4e2m1x2 src1, __ubuf__ fp4x2_e2m1_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 
+inline void vgather2_bc(vector_s16& dst, __ubuf__ int16_t* src, vector_u32 index, vector_bool mask) {}
+inline void vgather2_bc(vector_u16& dst, __ubuf__ uint16_t* src, vector_u32 index, vector_bool mask) {}
+inline void vgather2_bc(vector_f16& dst, __ubuf__ half* src, vector_u32 index, vector_bool mask) {}
+inline void vgather2_bc(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_u32 index, vector_bool mask) {}
+
+inline void vbr(vector_f8e4m3& dst, fp8_e4m3fn_t value) {}
+inline void vbr(vector_f8e5m2& dst, fp8_e5m2_t value) {}
+inline void vbr(vector_f8e8m0& dst, fp8_e8m0_t value) {}
+
+inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
+
+// ==========vstar===========
+inline void vstar(vector_align data, __ubuf__ fp8_e4m3fn_t* base) {}
+inline void vstar(vector_align data, __ubuf__ fp8_e5m2_t* base) {}
+inline void vstar(vector_align data, __ubuf__ fp8_e8m0_t* base) {}
+inline void vstar(vector_align data, __ubuf__ fp4x2_e2m1_t* base) {}
+inline void vstar(vector_align data, __ubuf__ fp4x2_e1m2_t* base) {}
+
+// ==========vstur===========
+inline void vstur(vector_align& alignData, vector_s64 src, __ubuf__ int64_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f8e4m3 src, __ubuf__ fp8_e4m3fn_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f8e5m2 src, __ubuf__ fp8_e5m2_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f8e8m0 src, __ubuf__ fp8_e8m0_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f4e2m1x2 src, __ubuf__ fp4x2_e2m1_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f4e1m2x2 src, __ubuf__ fp4x2_e1m2_t* base, Literal post) {}
+
+
 #if defined(__DAV_CUBE__)
     inline int32_t g_coreType = 1;
 #else
