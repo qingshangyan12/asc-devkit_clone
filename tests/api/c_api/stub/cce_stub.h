@@ -32,6 +32,30 @@ void vsts(vector_f8e8m0 src0, vector_f8e8m0 src1, __ubuf__ fp8_e8m0_t* base, int
 void vsts(vector_f4e2m1x2 src0, vector_f4e2m1x2 src1, __ubuf__ fp4x2_e2m1_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 
+inline void vmrgsort4(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t regionProposalLi0,
+                      uint16_t regionProposalLi1, uint16_t regionProposalLi2, uint16_t regionProposalLi3, bool isAllStored,
+                      uint8_t maskSignal) {}
+
+inline void vmrgsort4(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t regionProposalLi0,
+                      uint16_t regionProposalLi1, uint16_t regionProposalLi2, uint16_t regionProposalLi3, bool isAllStored,
+                      uint8_t maskSignal) {}
+
+inline void vbs(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, uint8_t repeat,
+                uint8_t dstBlockStride, uint8_t src0BlockStride, uint8_t src1BlockStride, uint8_t dstRepeatStride,
+                uint8_t src0RepeatStride, uint8_t src1RepeatStride, bool repeatStrideMode, bool strideSizeMode) {}
+
+inline void vbs(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, uint8_t repeat,
+                uint8_t dstBlockStride, uint8_t src0BlockStride, uint8_t src1BlockStride, uint8_t dstRepeatStride,
+                uint8_t src0RepeatStride, uint8_t src1RepeatStride, bool repeatStrideMode, bool strideSizeMode) {}
+
+inline void get_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
+
+inline void create_ca_matrix_h(__ca__ bfloat16_t* dst, int64_t repeat, half value) {}
+inline void create_ca_matrix_ui(__ca__ bfloat16_t* dst, int64_t repeat, uint32_t value) {}
+
+inline void create_cb_matrix_h(__cb__ bfloat16_t* dst, int64_t repeat, half value) {}
+inline void create_cb_matrix_ui(__cb__ bfloat16_t* dst, int64_t repeat, uint32_t value) {}
+
 inline void copy_gm_to_cbuf_v2(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride) {} 
 inline void img2colv2_cbuf_to_ca(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,  
                         uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel) {} 
