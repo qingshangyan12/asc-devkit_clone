@@ -671,26 +671,11 @@ inline void GetReduceMaxInt32TmpSize(const uint32_t srcShape[2],
     
     if (pattern == ReducePattern::AR) {
         // AR mode: reduce along last axis [M, N] -> [M]
-        // Buffer layout: rowResults (first * elePerBlk) + workBuffer
+        // Buffer layout: rowResults (first * elePerBlk) + workBuffer (288 bytes for Brcb)
         // - rowResults: aligned buffer for storing each row's result (first * 8 elements)
-        // - workBuffer: temporary space for binary reduction
-        
-        // Row results buffer size: first * 8 * 4 = first * 32 bytes
-        uint32_t rowResultsSize = first * elePerBlk * INT32_BYTES;
-        
-        if (last <= elePerBlk) {
-            // Small row: <= 8 elements, need Brcb reduction space
-            // rowResults + 288 bytes Brcb space
-            maxValue = minValue = rowResultsSize + BRCB_TMP_SIZE;
-        } else if (last <= elePerRep) {
-            // Medium row: 9-64 elements
-            // rowResults + 256 bytes for final Brcb reduction
-            maxValue = minValue = rowResultsSize + 256;
-        } else {
-            // Large row: > 64 elements
-            // rowResults + 256 bytes for final Brcb reduction
-            maxValue = minValue = rowResultsSize + 256;
-        }
+        // - workBuffer: Brcb reduction requires 32 bytes prep + 256 bytes Brcb output = 288 bytes
+        uint32_t rowResultsSize = first * elePerBlk * INT32_BYTES;  // first * 32 bytes
+        maxValue = minValue = rowResultsSize + BRCB_TMP_SIZE;  // 288 bytes for Brcb
     } else {
         // RA mode: reduce along first axis [M, N] -> [N]
         // Need tmp buffer for ping-pong during binary reduction
