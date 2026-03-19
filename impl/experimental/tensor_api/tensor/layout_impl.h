@@ -63,7 +63,7 @@ __aicore__ inline decltype(auto) MakeTileLayout(const Coord& coord, const Layout
     auto dstShape = MakeShape(dstRow, dstCol);
 
     auto originShape = TupleSize(srcShape) > TupleSize(dstShape)  ? dstShape : srcShape;
-    auto shape = MakeFractalShape(originShape, GetShape<0>(layout));
+    auto shape = MakeFractalShape(originShape, MakeShape(innerRow, innerCol));
 
     return MakeLayout(shape, layout.Stride());
 }
