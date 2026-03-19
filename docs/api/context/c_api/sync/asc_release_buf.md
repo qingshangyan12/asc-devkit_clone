@@ -7,14 +7,14 @@
 
 ## 功能说明
 
-用于AICore内部异步通道同步的指令，用于释放由asc_get_buf指令申请的缓存。
+用于AI Core内部异步通道同步的指令，用于释放由asc_get_buf指令申请的缓存。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_release_buf(pipe_t pipe, uint8_t buf_id, bool mode)
-__aicore__ inline void asc_release_buf(pipe_t pipe, uint64_t buf_id, bool mode)
-```
+    ```cpp
+    __aicore__ inline void asc_release_buf(pipe_t pipe, uint8_t buf_id, bool mode)
+    __aicore__ inline void asc_release_buf(pipe_t pipe, uint64_t buf_id, bool mode)
+    ```
 
 ## 参数说明
 

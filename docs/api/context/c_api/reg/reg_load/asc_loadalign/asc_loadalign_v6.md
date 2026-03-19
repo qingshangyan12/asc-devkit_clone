@@ -15,28 +15,27 @@ Reg矢量计算数据搬运接口，适用于从UB搬入MaskReg。
 
 - 普通搬运
 
-```cpp
+    ```cpp
     __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src)
     __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
     __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
-```
+    ```
 
 - 上采样搬运
 
-```cpp
+    ```cpp
     __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src)
     __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
     __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
-```
+    ```
 
 - 下采样搬运
 
-```cpp
+    ```cpp
     __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src)
     __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
     __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
-
-```
+    ```
 
 ### 参数说明
 
@@ -44,7 +43,7 @@ Reg矢量计算数据搬运接口，适用于从UB搬入MaskReg。
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| offset | 输入 | （可选）当输入为reg_iter类型时，用户通过地址寄存器传入偏移；当输入为int32_t类型时，用户直接以数值的方式传入偏移。 |
+| offset | 输入 | 当输入为reg_iter类型时，用户通过地址寄存器传入偏移；当输入为int32_t类型时，用户直接以数值的方式传入偏移。 |
 
 ### 返回值说明
 

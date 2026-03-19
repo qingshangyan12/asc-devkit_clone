@@ -210,8 +210,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sync_data_barrier](sync/asc_sync_data_barrier.md) | 用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。 |
 | [asc_sync_block_arrive](sync/asc_sync_block_arrive.md) | 该指令用于发送同步信息数据到核间同步寄存器，设置同步点。 |
 | [asc_sync_block_wait](sync/asc_sync_block_wait.md) | 和[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)配合使用（通过flagID关联），用于等待所有同步对象到达flagID对应的同步点。 |
-| <cann-filter npu_type = "950"> [asc_sync_intra_wait](sync/asc_sync_intra_wait.md)| 等待FFTS块/子块同步标志。 </cann-filter> |
-| <cann-filter npu_type = "950"> [asc_sync_intra_arrive](sync/asc_sync_intra_wait.md)| 向FFTS块/子块同步寄存器发送同步信号。 </cann-filter> |
+| <cann-filter npu_type = "950"> [asc_sync_intra_wait](sync/asc_sync_intra_wait.md)| 等待核间同步寄存器同步标志。 </cann-filter> |
+| <cann-filter npu_type = "950"> [asc_sync_intra_arrive](sync/asc_sync_intra_wait.md)| 向核间同步寄存器发送同步信号。 </cann-filter> |
+| <cann-filter npu_type = "950"> [asc_sync_inter_wait](sync/asc_sync_inter_wait.md)| 等待block内同步标志。 </cann-filter> |
 
 ## 系统变量
 
@@ -289,7 +290,6 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |   API名称   |   说明   |
 |----------|-----------|
 | [asc_loadalign](reg/reg_load/asc_loadalign/) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式。 |
-| [asc_loadalign](reg/reg_load/asc_loadalign/asc_loadalign_v6.md) | 将数据从UB搬入MaskReg。|
 | [asc_loadalign_postupdate](reg/reg_load/asc_loadalign_postupdate.md) | 将数据从UB搬入MaskReg，使能post mode。|
 | [asc_storealign](reg/reg_store/asc_storealign/) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
 | [asc_gather](reg/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |

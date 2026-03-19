@@ -52,12 +52,12 @@
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| loop1_src_stride | 输入 | 源操作数关于loop1的步长，单位为字节，它等价于源操作数在D轴上的数据规格。 |
+| loop1_src_stride | 输入 | 搬运过程中最内层循环相邻迭代源操作数的数据块间的间隔，单位为字节。 |
 | l2_cache_ctl | 输入 | 配置数据在L2 Cache中的管理策略。取值说明如下：  <br>&bull; 0：DISABLE模式，适用于仅需访问一次的数据。 <br>&bull; 1：NORMAL模式，适用于重用模式未知或不极端的数据。 <br>&bull; 2：LAST模式，适用于高频重复访问的数据。 <br>&bull; 4：PERSISTENT模式，适用于需要长期驻留在缓存中的数据。 |
 | n_value | 输入 | 源操作数中DN排布中的N值。 |
 | d_value | 输入 | 源操作数中DN排布中的D值。 |
-| loop4_src_stride | 输入 | 源操作数关于loop4的步长，单位为字节。 |
-| smallc0_en | 输入 | 小C0使能控制开关取值说明如下：  <br>&bull; true：每一个C0数据块都会被pad至32个字节。 <br>&bull; false：每一个C0数据块都会被pad为4个channel。 |
+| loop4_src_stride | 输入 | 搬运过程中最外层循环相邻迭代源操作数的数据块间的间隔，单位为字节。 |
+| smallc0_en | 输入 | SmallC0模式开关：  <br>&bull; true：C0_SIZE会被pad至32个字节。 <br>&bull; false：C0_SIZE会被pad为4个channel。 |
 
 ## 返回值说明
 
@@ -74,7 +74,7 @@ PIPE_MTE2
 ## 调用示例
 
 ```cpp
-//源操作数关于loop1的步长为4个字节
+//搬运关于最内层循环的步长为4个字节
 constexpr uint64_t loop1_src_stride = 4;
 //L2 Cache采用NORMAL模式
 constexpr uint8_t l2_cache_ctl = 1;
@@ -82,7 +82,7 @@ constexpr uint8_t l2_cache_ctl = 1;
 constexpr uint16_t n_value = 3;
 //D值为3
 constexpr uint32_t d_value = 3;
-//源操作数关于loop4的步长为2个字节
+//搬运关于最外层循环的步长为2个字节
 constexpr uint64_t loop4_src_stride = 2;
 //每一个C0数据块都会被pad至32个字节
 constexpr bool smallc0_en = true;

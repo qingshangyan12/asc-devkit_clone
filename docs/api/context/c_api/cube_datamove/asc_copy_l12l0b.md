@@ -11,7 +11,9 @@
 ## 功能说明
 
 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。包含2D格式搬运、3D格式搬运。
+<cann-filter npu_type="950">
 注意Ascend 950PR/Ascend 950DT环境下只可使用3D格式的高维切分搬运/同步高维切分搬运接口。
+</cann-filter>
 
 ## 函数原型
 
