@@ -32,26 +32,26 @@
 
 namespace AscendC {
 template <typename T>
-__aicore__ inline void DumpTensor(const LocalTensor<T> &tensor, uint32_t desc, uint32_t dumpSize);
+static __attribute__((noinline)) __aicore__ void DumpTensor(const LocalTensor<T> &tensor, uint32_t desc, uint32_t dumpSize);
 template <typename T>
-__aicore__ inline void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize);
+static __attribute__((noinline)) __aicore__ void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize);
 template <typename T>
-__aicore__ inline void DumpTensor(const LocalTensor<T>& tensor, uint32_t desc,
+static __attribute__((noinline)) __aicore__ void DumpTensor(const LocalTensor<T>& tensor, uint32_t desc,
     uint32_t dumpSize, const ShapeInfo& shapeInfo);
 template <typename T>
-__aicore__ inline void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc,
+_static __attribute__((noinline)) _aicore__ void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc,
     uint32_t dumpSize, const ShapeInfo& shapeInfo);
 template <typename T>
-__aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &tensor,
+static __attribute__((noinline)) __aicore__ void DumpAccChkPoint(const LocalTensor<T> &tensor,
     uint32_t index, uint32_t countOff, uint32_t dumpSize);
 template <typename T>
-__aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor,
+static __attribute__((noinline)) __aicore__ void DumpAccChkPoint(const GlobalTensor<T> &tensor,
     uint32_t index, uint32_t countOff, uint32_t dumpSize);
 #ifndef ASCENDC_CPU_DEBUG
 template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args);
+static __attribute__((noinline)) __aicore__ void PRINTF(__gm__ const char* fmt, Args&&... args);
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
+static __attribute__((noinline)) __aicore__ void printf(__gm__ const char* fmt, Args&&... args);
 #endif
 
 // assert define
