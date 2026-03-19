@@ -69,7 +69,7 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Relu", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Relu");
 #endif
@@ -91,7 +91,7 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Relu", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Relu");
 #endif
@@ -120,8 +120,9 @@ template <typename T>
 __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Relu", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Relu");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Relu")) {
@@ -190,7 +191,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Exp", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Exp");
 #endif
@@ -212,7 +213,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Exp", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Exp");
 #endif
@@ -258,8 +259,9 @@ template <typename T>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Exp", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Exp");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Exp")) {
@@ -327,7 +329,7 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Ln", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Ln");
 #endif
@@ -348,7 +350,7 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Ln", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Ln");
 #endif
@@ -393,8 +395,9 @@ template <typename T>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Ln", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Ln");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Ln")) {
@@ -426,7 +429,7 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Abs", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Abs");
 #endif
@@ -448,7 +451,7 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Abs", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Abs");
 #endif
@@ -477,8 +480,9 @@ template <typename T>
 __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Abs", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Abs");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Abs")) {
@@ -570,7 +574,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Reciprocal", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Reciprocal");
 #endif
@@ -592,7 +596,7 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Reciprocal", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Reciprocal");
 #endif
@@ -640,8 +644,9 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
     const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Reciprocal", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Reciprocal");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Reciprocal")) {
@@ -711,7 +716,7 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Rsqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Rsqrt");
 #endif
@@ -733,7 +738,7 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Rsqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Rsqrt");
 #endif
@@ -779,8 +784,9 @@ template <typename T>
 __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Rsqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Rsqrt");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Rsqrt")) {
@@ -850,7 +856,7 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Sqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Sqrt");
 #endif
@@ -872,7 +878,7 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Sqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Sqrt");
 #endif
@@ -918,8 +924,9 @@ template <typename T>
 __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Sqrt", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Sqrt");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Sqrt")) {
@@ -951,7 +958,7 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Not", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskArray<T>(mask, "Not");
 #endif
@@ -973,7 +980,7 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Not", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<T>(mask, "Not");
 #endif
@@ -1002,8 +1009,9 @@ template <typename T>
 __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
 {
     using PrimType = PrimT<T>;
-#ifdef ASCENDC_DEBUG
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Not", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
+    CheckValueRange<int32_t>(count, 0, INT32_MAX, "count", "Not");
 #endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunVecBinaryScalar(dst, src, static_cast<PrimType>(0), count, "Not")) {
