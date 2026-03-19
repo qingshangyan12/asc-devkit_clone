@@ -86,6 +86,15 @@ inline constexpr bool is_one_of_attr_v = Std::is_one_of_v<ElementType, __gm__ Da
 template <typename DataType>
 inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t> || is_one_of_attr_v<DataType, fp4x2_e2m1_t>;
 
+template<typename T = Std::ignore_t>
+__aicore__ inline constexpr size_t GetC0Size() {
+    if constexpr (is_b4_type<T>) {
+        return C0_SIZE * 2;
+    } else {
+        return C0_SIZE;
+    }
+}
+
 template <size_t N, typename = Std::make_index_sequence<N>>
 struct EmptyGenerator;
 
