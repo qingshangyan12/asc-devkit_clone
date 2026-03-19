@@ -90,7 +90,6 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "sim")
         "dav-2002" "dav_2002"
         "dav-2201" "dav_2201"
         "dav-3510" "dav_3510"
-        "dav-3510" "dav_3510"
     )
     list(FIND _ARCH_TO_DIR_MAP "${CMAKE_ASC_ARCHITECTURES}" _index)
     if(_index GREATER -1)
@@ -135,7 +134,7 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
 -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/tiling -isystem$ENV{ASCEND_HOME_PATH}/compiler/asc/include/utils")
         
         # 添加编译选项
-        string(APPEND CMAKE_ASC_FLAGS "-g -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -DASCENDC_DEBUG=1 -D__NPU_ARCH__=${_SHORT_NPU_ARCH} --run-mode=cpu ${ASC_CPU_SYSTEM_INCLUDE_OPTIONS}")
+        string(APPEND CMAKE_ASC_FLAGS "-g -D_GLIBCXX_USE_CXX11_ABI=0 -DASCENDC_DEBUG=1 -D__NPU_ARCH__=${_SHORT_NPU_ARCH} --run-mode=cpu ${ASC_CPU_SYSTEM_INCLUDE_OPTIONS}")
         
         # 配置链接选项：rpath和库搜索路径
         string(APPEND CMAKE_ASC_LINK_FLAGS "--run-mode=cpu -Wl,--disable-new-dtags")
