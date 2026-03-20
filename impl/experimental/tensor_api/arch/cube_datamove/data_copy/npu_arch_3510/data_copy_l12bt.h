@@ -58,7 +58,7 @@ private:
             convControl = true;
         }
         uint16_t blockCount = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
-        uint16_t blockLen = Std::ceil_division(srcCol, C0_ELEMENT<dstType>);
+        uint16_t blockLen = CeilDivision(srcCol, C0_ELEMENT<dstType>);
         uint16_t srcStride = (srcRow - srcCol) / C0_ELEMENT<srcType>;
         uint16_t dstStride = (dstRow - srcCol) / C0_ELEMENT<dstType>;
 
