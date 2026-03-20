@@ -40,16 +40,16 @@
 
     ```bash
     # 示例：拉取ARM架构的CANN开发镜像
-    docker pull --platform=arm64 swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops
+    docker pull --platform=arm64 swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:9.0.0-beta.1-910b-ubuntu22.04-py3.11
     # 示例：拉取X86架构的CANN开发镜像
-    docker pull --platform=amd64 swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops
+    docker pull --platform=amd64 swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:9.0.0-beta.1-910b-ubuntu22.04-py3.11
     ```
 
 **3.运行Docker**
 <br>拉取镜像后，需要以特定参数启动容器，以便容器内能访问宿主的昇腾设备。
 
 ```bash
-docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_manager --device /dev/devmm_svm --device /dev/hisi_hdc -v /usr/local/dcmi:/usr/local/dcmi -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver/lib64/:/usr/local/Ascend/driver/lib64/ -v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info -v /etc/ascend_install.info:/etc/ascend_install.info -it swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops bash
+docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_manager --device /dev/devmm_svm --device /dev/hisi_hdc -v /usr/local/dcmi:/usr/local/dcmi -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver/lib64/:/usr/local/Ascend/driver/lib64/ -v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info -v /etc/ascend_install.info:/etc/ascend_install.info -it swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:9.0.0-beta.1-910b-ubuntu22.04-py3.11 bash
 ```
 | 参数 | 说明 | 注意事项 |
 | :--- | :--- | :--- |
@@ -65,7 +65,7 @@ docker run --name cann_container --device /dev/davinci0 --device /dev/davinci_ma
 | `-v /etc/ascend_install.info:/etc/ascend_install.info` | 挂载CANN软件安装信息文件。 |- |
 | `-v /home/your_dir:/home/your_dir` | 挂载宿主机的一个路径到容器中。 | 可自选使用。 |
 | `-it` | `-i`（交互式）和 `-t`（分配伪终端）的组合参数。 |- |
-| `swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops` | 指定要运行的Docker镜像。 |请确保此镜像名和标签（tag）与你通过`docker pull`拉取的镜像完全一致。 |
+| `swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:9.0.0-beta.1-910b-ubuntu22.04-py3.11` | 指定要运行的Docker镜像。 |请确保此镜像名和标签（tag）与你通过`docker pull`拉取的镜像完全一致。 |
 | `bash` | 容器启动后立即执行的命令。 |- |
 
 ### 场景三：手动安装软件包
