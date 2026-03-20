@@ -56,4 +56,20 @@
     #endif
 #endif
 
+namespace AscendC {
+namespace Std {
+
+template <typename T, typename U>
+ASCENDC_HOST_AICORE inline constexpr decltype(auto) ceil_division(T num1, U num2)
+{
+    return (num1 + num2 - Int<1>{}) / num2;
+}
+
+template <typename T, typename U>
+ASCENDC_HOST_AICORE inline constexpr auto ceil_align(const T& num1, const U& num2)
+{
+    return ceil_division(num1, num2) * num2;
+}
+}
+}
 #endif //IMPL_TENSOR_API_UTILS_MACRO_IMPL_H
