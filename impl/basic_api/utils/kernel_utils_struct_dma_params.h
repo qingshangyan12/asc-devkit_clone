@@ -92,6 +92,7 @@ struct Nz2DnParams {
     uint16_t srcNzC0Stride = 0; // loop0SrcStride
 };
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ != 3510) || (__NPU_ARCH__ != 5102))
 template <typename T = int32_t>
 struct FixpipeParams {
     __aicore__ FixpipeParams()
@@ -123,6 +124,7 @@ struct FixpipeParams {
     Nz2NdParams nz2ndParams;
     uint8_t unitFlag = 0;
 };
+#endif
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_UTILS_STRUCT_DMA_PARAMS_H
