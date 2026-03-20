@@ -15,7 +15,6 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_BASE_H
 #define IMPL_TENSOR_API_ARCH_CUBE_DATAMOVE_FIXPIPE_NPU_ARCH_2201_FIXPIPE_BASE_H
 
-#include "impl/utils/std/cmath/ceil_division.h"
 #include "impl/experimental/tensor_api/arch/cube_datamove/fixpipe/fixpipe_utils.h"
 #include "impl/experimental/tensor_api/tensor/pointer_impl.h"
 #include "impl/experimental/tensor_api/tensor/local_tensor_impl.h"
@@ -99,7 +98,7 @@ __aicore__ inline auto MakeTensorWithCoord(const T& oldTensor, const Coord& coor
     return newTensor;
 } 
 
-class Copy2201DeqTensorToFbuf {
+class CopyDeqTensorToFbuf2201 {
 public:
     template <typename T>
     __aicore__ inline void CopyDeqTensorToFbufImpl(const T& src, uint16_t calNSize, uint16_t nIterIndex)
@@ -131,7 +130,7 @@ private:
         uint16_t rowStride = GetEleFromLayout<decltype(layout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(layout);
         uint16_t blockCount = Std::ceil_division(calNSize, colLength);
         uint16_t blockLen = Std::ceil_division(colLength * sizeof(srcType), fbufBurstLenUnit);
-        uint16_t srcStride = Std::ceil_division(rowStride * sizeof(srcType), C0_SIZE);
+        uint16_t srcStride = Std::ceil_division(rowStride * sizeof(srcType), C0_SIZE<>);
         uint16_t dstStride = blockLen;
         uint32_t deqValueOffset = MAIN_LOOP_N_SIZE_2201 / colLength * rowStride * nIterIndex;
 
@@ -161,7 +160,7 @@ private:
     }
 };
 
-class Copy2201MatrixCcToGmBase {
+class CopyMatrixCcToGm2201 {
 public:
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename S>
     __aicore__ inline void DataCopy(const T& dst, const U& src, const S& params)
@@ -198,7 +197,7 @@ private:
     }
 };
 
-class SetRegister2201Base {
+class SetRegister2201 {
 public:
     template <typename T, typename U>
     __aicore__ inline void SetRegister(const T& quant, const U& params)

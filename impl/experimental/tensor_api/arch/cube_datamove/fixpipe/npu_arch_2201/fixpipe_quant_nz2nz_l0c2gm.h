@@ -21,7 +21,7 @@
 namespace AscendC {
 namespace Te {
 
-class FixpipeNZ2NZ2201SimpleQuant : public Copy2201MatrixCcToGmBase, public SetRegister2201Base {
+class FixpipeNZ2NZSimpleQuant2201 : public CopyMatrixCcToGm2201, public SetRegister2201 {
 public:
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename S, typename Params>
     __aicore__ inline void Run(const T& dst, const U& src, const S& quant, const Params& params)
@@ -60,7 +60,7 @@ private:
         uint32_t mSize = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout) *
                          GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
         uint32_t srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
-        uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) * sizeof(dstType) / C0_SIZE;
+        uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) * sizeof(dstType) / C0_SIZE<>;
 
         bool reluEn = false;
         uint8_t unitFlag = params.unitFlag;
@@ -71,7 +71,7 @@ private:
     }
 };
 
-class FixpipeNZ2NZ2201VectorBase : public Copy2201MatrixCcToGmBase, public Copy2201DeqTensorToFbuf {
+class FixpipeNZ2NZVector2201 : public CopyMatrixCcToGm2201, public CopyDeqTensorToFbuf2201 {
 public:
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename S, typename V>
     __aicore__ inline void FixpipeNZ2NZVectorEntrance(const T& dst, const U& src, const S& quant, const V& params)
@@ -105,7 +105,7 @@ private:
         uint32_t mSize = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 0>(srcLayout) *
                          GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
         uint32_t srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
-        uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) * sizeof(dstType) / C0_SIZE;
+        uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) * sizeof(dstType) / C0_SIZE<>;
 
         bool reluEn = false;
         uint8_t unitFlag = 0;
@@ -142,7 +142,7 @@ private:
     }
 };
 
-class FixpipeNZ2NZ2201VectorQuant : public FixpipeNZ2NZ2201VectorBase {
+class FixpipeNZ2NZVectorQuant2201 : public FixpipeNZ2NZVector2201 {
 public:
     template <const FixpipeTrait& trait, QuantMode_t quantPre, typename T, typename U, typename S, typename Params>
     __aicore__ inline void Run(const T& dst, const U& src, const S& quant, const Params& inParams)
@@ -169,7 +169,7 @@ private:
         uint32_t nSize = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 0>(srcLayout) *
                          GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(srcLayout);
         uint32_t srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / FRACTAL_FIXED;
-        uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) * sizeof(dstType) / C0_SIZE;
+        uint32_t dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) * sizeof(dstType) / C0_SIZE<>;
 
         uint16_t nIterNum = 1;
         uint32_t calNSize = nSize;

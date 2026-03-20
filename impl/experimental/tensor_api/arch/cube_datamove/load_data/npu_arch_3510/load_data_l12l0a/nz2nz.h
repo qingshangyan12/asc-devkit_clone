@@ -20,11 +20,11 @@
 namespace AscendC {
 namespace Te {
 
-class LoadDataFourDim3510L12L0ANZ2NZ {
+class LoadDataL12L0ANZ2NZ3510 {
 
 public:
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline void Run(const T& dst, const U& src) {
+    __aicore__ inline static void Run(const T& dst, const U& src) {
         LoadDataImpl<TraitHolder<trait, false>::traitTransposed, T, U>(dst, src);
     }
 
@@ -35,7 +35,7 @@ private:
     };
 
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline constexpr void CheckTemplate()
+    __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckFormat::CheckNZTemplate<T>();
         CheckFormat::CheckNZTemplate<U>();
@@ -43,7 +43,7 @@ private:
     }
 
     template <const LoadDataTrait& trait, typename T, typename U>
-    __aicore__ inline void LoadDataImpl(const T& dst, const U& src)
+    __aicore__ inline static void LoadDataImpl(const T& dst, const U& src)
     {
         CheckTemplate<trait, T, U>();
         using DstType = typename T::elementType;
@@ -54,20 +54,14 @@ private:
         auto mStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(dstLayout);
         auto kStep = GetEleFromLayout<decltype(dstLayout), AttrInfo::SHAPE, AttrInfo::COLUMN, 1>(dstLayout);
         // Nz -> Nz
-        constexpr bool isFp4Type = Std::is_one_of_v<
-                Std::tuple<typename T::elementType, typename U::elementType>,
-                Std::tuple<__ca__ fp4x2_e2m1_t, __cbuf__ fp4x2_e2m1_t>,
-                Std::tuple<__ca__ fp4x2_e1m2_t, __cbuf__ fp4x2_e1m2_t>>;
-        constexpr int KHALF = 2;
-        uint32_t STRIDE_UNIT = isFp4Type ? FRACTAL_FIXED * (C0_SIZE / sizeof(DstType) * KHALF) : FRACTAL_FIXED * (C0_SIZE / sizeof(DstType));
+        constexpr uint32_t KHALF = 2;
+        constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetEleFromLayout<decltype(srcLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::COLUMN, 1>(dstLayout) / STRIDE_UNIT;
-        if constexpr (isFp4Type) {
-            LoadCbufToCaS4Base loadCbufToCaS4;
-            loadCbufToCaS4.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);    
+        if constexpr (is_b4_type<DstType>) {
+            LoadCbufToCaS43510::LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);    
         } else {
-            LoadCbufToCaBase loadCbufToCa;
-            loadCbufToCa.template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+            LoadCbufToCa3510::template LoadData<trait>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         }
     }
 };
