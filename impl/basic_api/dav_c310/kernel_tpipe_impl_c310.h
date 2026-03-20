@@ -33,6 +33,10 @@
 #include "kernel_tensor_base.h"
 #include "kernel_tensor_impl.h"
 #include "kernel_tpipe.h"
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
+#endif
 #include "kernel_tpipe_base.h"
 #include "kernel_utils.h"
 #include "kernel_utils_base.h"
@@ -738,7 +742,7 @@ template <TPosition pos> __aicore__ inline uint64_t TPipe::GetQueueEndAddress()
     return this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(hardType)].maxAddr;
 }
 
-__aicore__ inline void TPipe::Destroy()
+__aicore__ inline void TPipe::DestroyWithoutPipeAll()
 {
     if ASCEND_IS_AIC {
         g_tpipeImpl.isDestroy = true;
@@ -758,6 +762,11 @@ __aicore__ inline void TPipe::Destroy()
         ReleaseEventID<HardEvent::M_MTE1>(2);
     }
     Internal::g_bufId = 0;
+}
+
+__aicore__ inline void TPipe::Destroy()
+{
+    DestroyWithoutPipeAll();
 }
 
 __aicore__ inline void TPipe::Reset()

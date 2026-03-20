@@ -48,7 +48,6 @@ FRACTAL_Z    -> NCHW            CHNT  -> NCH   [0,1*2,3*4,5]      -> [0,1,2*3]
 FRACTAL_Z_3D -> NCDHW           DCHNT -> NCDH  [0,1,2*3,4*5,6]    -> [0,1,2,3*4]
 FRACTAL_Z    -> ND              HCNT  -> HCN   [0:-4,-4,-3*-2,-1] -> [0:-2,-2,-1]
 */
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
 enum class ClipReluMode{
     NOCLIP_RELU = 0,
     CLIP_RELU = 1
@@ -60,7 +59,6 @@ enum class ReluMode{
     SCALAR_RELU = 2,
     VECTOR_RELU = 3
 };
-#endif
 
 union NotNumUnion {
     __simd_callee__ NotNumUnion() {}
@@ -143,7 +141,6 @@ enum class DeqScale : uint8_t {
     VDEQ16,
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003)) || defined(__ASC_NPU_HOST__)
 enum class BinaryScalarOp : uint8_t {
     ADDS = 0,
     MULS,
@@ -154,7 +151,6 @@ enum class BinaryScalarOp : uint8_t {
     ANDS,
     ORS,
 };
-#endif
 
 enum class ReduceMode : uint8_t {
     REDUCE_MAX = 0,
@@ -198,8 +194,6 @@ enum class DeQuantMode : uint8_t {
     DEQUANT_WITH_MULTI_ROW,         // {1, m * n, n} != {m, n, n}
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
-    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
 enum class SpecialPurposeReg {
     AR = 0,
 };
@@ -210,7 +204,6 @@ struct SyncAllConfig {
 };
 
 constexpr SyncAllConfig DEFAULT_SYNC_ALL_CONFIG = {PIPE_ALL, PIPE_ALL};
-#endif
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_UTILS_MODE_H

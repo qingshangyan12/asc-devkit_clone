@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -158,7 +158,7 @@ __aicore__ inline void SetPcieWRCtrlImpl(bool isSetPcie, uint8_t maxBurstLen)
 
 __aicore__ inline void TrapImpl()
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "Trap");
+    trap();
 }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_SYS_VAR_IMPL_H
