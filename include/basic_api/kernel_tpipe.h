@@ -88,6 +88,7 @@ protected:
     static constexpr HardEvent enQueEvt = GetQueEvt(srcHardType, dstHardType, true, nd2nz, nz2nd);
     static constexpr HardEvent freeBufEvt = GetQueEvt(srcHardType, dstHardType, false, nd2nz, nz2nd);
     static constexpr int32_t queDepth = depth;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     static constexpr bool enableGlobalManageQue = EnableGlobalManageQue<GetBufferPos(src, dst)>(config);
     static constexpr pipe_t srcPipe = GetPipe(srcHardType, dstHardType, true);
     static constexpr pipe_t dstPipe = GetPipe(srcHardType, dstHardType, false);
@@ -95,7 +96,7 @@ protected:
     static constexpr uint8_t shiftBits = CalculatesShiftedBit(config.bufferLen);
     static constexpr uint8_t maxBufferBlock = GlobalManageQueConfig<GetBufferPos(src, dst)>::maxBufferBlock;
     static constexpr uint8_t bufIdOffset = GlobalManageQueConfig<GetBufferPos(src, dst)>::bufIdOffset;
-
+#endif
     union {
         uint64_t value;
         struct {
