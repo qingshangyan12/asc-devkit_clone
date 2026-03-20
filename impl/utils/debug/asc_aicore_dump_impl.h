@@ -54,7 +54,7 @@ __aicore__ inline void set_dump_tlv_data(U src, __gm__ DumpTensorTlv* dumpTlv, u
 {
     __gm__ T* dumpDstAddr = reinterpret_cast<__gm__ T*>(dumpTlv + 1);
     
-    if (dumpDstAddr == nullptr || src == nullptr) {
+    if (dumpDstAddr == nullptr || (src == nullptr && hardware != AscendC::Hardware::L0C)) {
         return;
     }
     sync_all();
