@@ -192,7 +192,7 @@ private:
 
 #include "../../impl/basic_api/kernel_operator_mm_bitmode_intf_impl.h"
 
-#endif
+#endif // __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102
 #endif
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BITMODE_INTF_H)
 #undef _ASCENDC_INCLUDE_INTERNAL_HEADERS_

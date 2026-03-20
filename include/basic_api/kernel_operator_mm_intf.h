@@ -27,7 +27,7 @@
 #include "utils/kernel_utils_constants.h"
 #include "utils/kernel_utils_macros.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #include "kernel_operator_mm_bitmode_intf.h"
 #endif
 
