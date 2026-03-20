@@ -10,51 +10,19 @@
 # ----------------------------------------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.16)
+
 find_package(ASC REQUIRED)
-project(cpudebug)
+
+project(cpudebug LANGUAGES ASC CXX)
 
 add_executable(add ${CMAKE_CURRENT_SOURCE_DIR}/add.asc)
+
+# ======================================================================================
+# NPU 编译选项配置
+#
+# 说明：
+#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+# ======================================================================================
 target_compile_options(add PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-${NPU_ARCH}>
-    $<$<COMPILE_LANGUAGE:ASC>:--run-mode=cpu>
-    -D __CCE_KT_TEST__=1
-    -D ASCENDC_DEBUG=1
-    -D __NPU_ARCH__=${NPU_ARCH}
-    -g -O2 -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -Wall -Werror
-)
-
-target_include_directories(add PRIVATE
-    ${ASCEND_INSTALL_PATH}/tools/tikicpulib/lib/include
-)
-
-target_link_options(add PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--run-mode=cpu>
-    -L${ASCEND_INSTALL_PATH}/tools/tikicpulib/lib
-    -L${ASCEND_INSTALL_PATH}/tools/tikicpulib/lib/${SOC_VERSION}
-    -L${ASCEND_INSTALL_PATH}/tools/simulator/${SOC_VERSION}/lib
-    -L${ASCEND_INSTALL_PATH}/lib64
-    -Wl,-rpath,${ASCEND_INSTALL_PATH}/tools/tikicpulib/lib
-    -Wl,-rpath,${ASCEND_INSTALL_PATH}/tools/tikicpulib/lib/${SOC_VERSION}
-    -Wl,-rpath,${ASCEND_INSTALL_PATH}/tools/simulator/${SOC_VERSION}/lib
-    -Wl,-rpath,${ASCEND_INSTALL_PATH}/lib64
-)
-
-target_link_libraries(add PRIVATE
-    -Wl,-Bdynamic,--no-as-needed
-    m
-    ascendc_acl_stub
-    cpudebug_cceprint
-    cpudebug_npuchk
-    cpudebug_stubreg
-    cpudebug
-    pem_davinci
-    c_sec
-    stdc++
-    -Wl,--as-needed    
-)
-
-install(TARGETS add
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
