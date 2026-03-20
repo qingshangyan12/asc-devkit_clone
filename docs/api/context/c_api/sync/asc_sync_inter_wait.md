@@ -45,5 +45,5 @@ PIPE_S
 ```cpp
 int64_t flagID = 1;
 asc_sync_inter_arrive(PIPE_S, flagID);
-asc_sync_inter_wait(flagID);  
+asc_sync_inter_wait(PIPE_S, flagID);  
 ```

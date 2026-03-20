@@ -49,5 +49,5 @@ PIPE_S
 //设置同步指令事件标号为1
 int64_t sync_id = 1;
 asc_sync_intra_arrive(PIPE_S, sync_id);
-asc_sync_intra_wait(sync_id);  
+asc_sync_intra_wait(PIPE_S, sync_id);  
 ```
