@@ -58,15 +58,15 @@ void MainVecCompareDemo(__gm__ uint8_t* __restrict__ selMaskGm, __gm__ uint8_t* 
     input1Global.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(src1Gm), dataSize);
     selMaskGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint8_t*>(selMaskGm), dataSize);
 
-    TBuf<TPosition::CO2> tbuf;
+    TBuf<TPosition::VECIN> tbuf;
     tpipe.InitBuffer(tbuf, dataSize * sizeof(T));
     LocalTensor<T> input0Local = tbuf.Get<T>();
 
-    TBuf<TPosition::CO2> tbuf1;
+    TBuf<TPosition::VECIN> tbuf1;
     tpipe.InitBuffer(tbuf1, dataSize * sizeof(T));
     LocalTensor<T> input1Local = tbuf1.Get<T>();
 
-    TBuf<TPosition::CO2> tbuf2;
+    TBuf<TPosition::VECIN> tbuf2;
     tpipe.InitBuffer(tbuf2, selMaskSize * sizeof(uint8_t));
     LocalTensor<uint8_t> selMaskLocal = tbuf2.Get<uint8_t>();
 
