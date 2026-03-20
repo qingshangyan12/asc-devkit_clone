@@ -363,8 +363,27 @@ def gen_2_real_stream_sync_code(super_operator, pre_op, cur_op, arch):
     super_kernel_file = ''
     if pre_op is not None:
         super_kernel_file += gen_2_real_stream_send_code(super_operator, pre_op, arch)
+    
+    # pre op send to outside
+    if pre_op is not None:
+        if pre_op.kernel_type in [SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, \
+                SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY,
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0]:
+            if len(pre_op.send_event_list) != 0:
+                super_kernel_file += indent_code_func(pre_op.notify_block[arch])
+
     if cur_op is not None:
         super_kernel_file += gen_2_real_stream_recv_code(cur_op, arch)
+
+    # pre op send to outside
+    if pre_op is not None:
+        if pre_op.kernel_type not in [SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY, \
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0, \
+                SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY,
+                SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0]:
+            if len(pre_op.send_event_list) != 0:
+                super_kernel_file += indent_code_func(pre_op.notify_block[arch])
 
     return super_kernel_file
 
@@ -375,10 +394,6 @@ def gen_sync_and_event_code_for_two_stream(super_operator, pre_sub_operator, sub
         # pre op send inter-core sync, cur op recv inter-core sync
         sync_and_event_code += \
             indent_code_func(gen_2_real_stream_sync_code(super_operator, pre_sub_operator, sub_operator, arch))
-        # pre op send to outside
-        if pre_sub_operator is not None:
-            if len(pre_sub_operator.send_event_list) != 0:
-                sync_and_event_code += indent_code_func(pre_sub_operator.notify_block[arch])
         # current op wait for outside
         if pre_sub_operator is not None:
             if len(sub_operator.wait_block) != 0:
@@ -406,11 +421,6 @@ def gen_sync_and_event_code_for_two_stream(super_operator, pre_sub_operator, sub
         # pre op send inter-core sync, cur op recv inter-core sync
         sync_and_event_code += \
             indent_code_func(gen_2_real_stream_sync_code(super_operator, pre_sub_operator, sub_operator, arch))
-
-        # pre op send to outside 
-        if pre_sub_operator is not None:
-            if len(pre_sub_operator.send_event_list) != 0:
-                sync_and_event_code += indent_code_func(pre_sub_operator.notify_block[arch])
 
     return sync_and_event_code
 
