@@ -343,9 +343,11 @@ const uint64_t LOAD_FILTER_H = 24;
 const uint64_t LOAD_FILTER_W = 16;
 const uint64_t LOAD_STRIDE_H = 8;
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 namespace Internal {
 constexpr int32_t TSCM_CROSS_SYNC_ID_MAX = 11;
 }
+#endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 // param check size
@@ -463,7 +465,6 @@ template <typename T> struct GetPadValueType {
     using Type = T;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 // To support FP8 datacopypad, pad type needs transfer to b8
 template <> struct GetPadValueType<fp8_e5m2_t> {
     using Type = uint8_t;
@@ -489,7 +490,6 @@ template <> struct GetPadValueType<fp4x2_e1m2_t> {
 template <> struct GetPadValueType<fp4x2_e2m1_t> {
     using Type = uint8_t;
 };
-#endif
 
 template <bool condition, class T1, class T2>
 struct Conditional {
