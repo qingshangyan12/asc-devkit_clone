@@ -53,6 +53,8 @@
     } while (0)
 
 constexpr size_t DUMP_SIZE = 1048576;
+// DumpConfig struct contains 2 fields: offset (size_t) and size (size_t)
+constexpr size_t DUMP_CONFIG_FIELD_COUNT = 2;
 
 extern "C" {
 int32_t ElfGetSymbolOffset(uint8_t* elf, size_t elfSize, const char* symbolName, size_t* offset, size_t* size);
@@ -158,7 +160,8 @@ size_t* AicpuSetDumpConfig(const unsigned long *aicpuFileBuf, size_t fileSize) {
         return kernelBuf;
     }
     // validate startIndex and symbolSize to avoid out-of-bounds access
-    if (symbolSize < sizeof(size_t) * 2 || startIndex > fileSize - sizeof(size_t) * 2) {
+    if (symbolSize < sizeof(size_t) * DUMP_CONFIG_FIELD_COUNT ||
+        startIndex + sizeof(size_t) * DUMP_CONFIG_FIELD_COUNT > fileSize) {
         ASCENDLOGE("Invalid symbol offset or size: startIndex=%zu, symbolSize=%zu, fileSize=%zu",
                    startIndex, symbolSize, fileSize);
         return kernelBuf;
