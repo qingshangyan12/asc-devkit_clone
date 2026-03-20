@@ -83,16 +83,11 @@ CPU Debug介绍
     source ${install_path}/cann/set_env.sh
     ```
 
-  ```bash
-  # 选择芯片型号
-  soc_version=${1:-soc_version}
-  ```
-  - soc_version：昇腾AI处理器型号，如果无法确定具体的soc_version，则在安装昇腾AI处理器的服务器执行npu-smi info命令进行查询，在查询到的“Name”前增加Ascend信息，例如“Name”对应取值为xxxyy，实际配置的soc_version值为Ascendxxxyy。
-
 - 样例执行
+  请根据实际测试的 NPU 硬件架构选择对应的 `CMAKE_ASC_ARCHITECTURES` 参数并与 `npu-arch` 参数一致
   ```bash
   mkdir -p build && cd build;
-  cmake .. -Dsoc_version=${soc_version}; make -j
+  cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201; make -j
   python3 ../scripts/gen_data.py
   ./add
   python3 ../scripts/verify_result.py output.bin golden.bin
@@ -106,7 +101,7 @@ CPU Debug介绍
   在上述指令中"./add"前加入"gdb --args"，再次执行指令即可进入gdb模式。
   ```bash
   mkdir -p build && cd build;
-  cmake .. -Dsoc_version=${soc_version}; make -j
+  cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201; make -j
   python3 ../scripts/gen_data.py
   gdb --args ./add
   run                # 让程序在gdb模式正常执行直到结束
