@@ -499,6 +499,7 @@ event_list:{sub_operator.send_event_list}")
                 super_kernel_file += indent_code_func(sub_operator.notify_block[arch])
         pre_sub_operator = sub_operator
     super_kernel_file += f'}}\n\n'
+
     return super_kernel_file
 
 
