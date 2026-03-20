@@ -668,14 +668,12 @@ struct SizeOfBits<uint2b_t> {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <> struct SizeOfBits<fp4x2_e2m1_t> {
     static constexpr uint32_t value = INT4_BIT_NUM;
 };
 template <> struct SizeOfBits<fp4x2_e1m2_t> {
     static constexpr uint32_t value = INT4_BIT_NUM;
 };
-#endif
 
 __aicore__ inline bool CheckCastOverlappingHigh(const uint64_t dstAddr, const uint64_t srcAddr,
     const uint32_t dstTypeSize, const uint32_t srcTypeSize, const uint32_t count)
