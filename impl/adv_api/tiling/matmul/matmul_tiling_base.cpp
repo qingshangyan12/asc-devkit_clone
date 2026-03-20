@@ -473,6 +473,16 @@ int32_t MatmulApiTilingBase::SetBatchNum(int32_t batch)
     return 0;
 }
 
+int32_t MatmulApiTilingBase::SetBatchOutNum(int32_t batch)
+{
+    CHECK_TILING_PARAMETER(batch, " Set BatchOutNum");
+    if (batch <= 0) {
+        TILING_LOG_DEBUG("The Input BatchOutNum size should be greater than 0, currently, batch is %d.", batch);
+    }
+    this->batchOutNum = batch;
+    return 0;
+}
+
 int32_t MatmulApiTilingBase::SetShape(int32_t m, int32_t n, int32_t k)
 {
     TILING_LOG_DEBUG(" Set Single M: %d", m);

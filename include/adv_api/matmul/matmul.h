@@ -210,6 +210,11 @@ public:
      */
     __aicore__ inline void SetBatchNum(int32_t batchA, int32_t batchB) {}
     /**
+     * @brief Reset the batch number of copy out for Batch Matmul without chaging tiling
+     * @param [in] batchOutNum: batch number of copy out
+     */
+    __aicore__ inline void SetBatchOutNum(int32_t batchOutNum) {}
+    /**
      * @brief Clear bias flag, bias will not be involved in the computation
      */
     __aicore__ inline void DisableBias() {}

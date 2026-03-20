@@ -457,7 +457,7 @@ private:
     {
         const auto batchLoop = MATMUL_MODULE(BatchLoop);
         if constexpr (ToMatmulConfig(MM_CFG).bmmOutMode != BatchOutMode::SINGLE_BATCH) {
-            if (batchLoop->IsNeedNBatchOut()) {
+            if (batchLoop->IsNeedBatchOut()) {
                 BASE_MODULE::GetBatchResult(dst, ctx, enAtomic, enSequentialWrite);
             } else {
                 auto co1Local = MATMUL_MODULE(CubeOutBuffer)->GetTensor();
@@ -472,7 +472,7 @@ private:
     {
         if constexpr (ToMatmulConfig(MM_CFG).bmmOutMode != BatchOutMode::SINGLE_BATCH) {
             const auto batchLoop = MATMUL_MODULE(BatchLoop);
-            if (batchLoop->IsNeedNBatchOut()) {
+            if (batchLoop->IsNeedBatchOut()) {
                 batchLoop->SetBatchOutOffsetNum(batchLoop->GetBatchOutOffsetNum() + batchLoop->GetBatchOutCacheNum());
                 batchLoop->SetBatchOutCacheNum(0);
             }
