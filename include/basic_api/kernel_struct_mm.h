@@ -117,6 +117,7 @@ struct Nd2NzParamsV2 {
 };
 #endif
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 struct LoadData2DMxParams {
     __aicore__ LoadData2DMxParams() {}
 
@@ -138,6 +139,7 @@ struct LoadData2DMxParams {
     uint16_t srcStride = 0;
     uint16_t dstStride = 0;
 };
+#endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <typename TYPE>
