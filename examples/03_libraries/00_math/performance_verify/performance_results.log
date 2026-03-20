@@ -1,0 +1,30 @@
+Performance Test Results - Fri 20 Mar 2026 06:04:11 PM CST
+=========================================
+[LOG] Exp instruction executed 1000 times, data length: 4096, cost total cycles: 4445
+
+================================================================================
+Verification Result | API: exp | Type: float16
+================================================================================
+Total elements: 4096, Matched: 4096, Error Ratio: 0.000000
+Test PASSED!
+[LOG] Exp instruction executed 1000 times, data length: 16384, cost total cycles: 15112
+
+================================================================================
+Verification Result | API: exp | Type: float16
+================================================================================
+Total elements: 16384, Matched: 16384, Error Ratio: 0.000000
+Test PASSED!
+[LOG] Exp instruction executed 1000 times, data length: 2048, cost total cycles: 2667
+
+================================================================================
+Verification Result | API: exp | Type: float32
+================================================================================
+Total elements: 2048, Matched: 2048, Error Ratio: 0.000000
+Test PASSED!
+[LOG] Exp instruction executed 1000 times, data length: 8192, cost total cycles: 8000
+
+================================================================================
+Verification Result | API: exp | Type: float32
+================================================================================
+Total elements: 8192, Matched: 8192, Error Ratio: 0.000000
+Test PASSED!
