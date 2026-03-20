@@ -122,3 +122,23 @@ python3 ../scripts/verify_result.py -scenarioNum 1 output/output.bin output/gold
 test pass!
 ```
 
+## 性能数据
+ 	 
+样例采用msprof工具测试性能数据  
+
+```
+基于完整样例编译生成可执行程序，执行以下命令，通过msprof工具获取上板profiling数据。  
+```shell
+cd build
+msprof ./demo
+```
+在执行上述命令后，会在对应目录下生成op_summary_xxx.csv文件，其中aiv_vec_time代表vec类型指令耗时。
+- 单次指令平均耗时(单位: us)： time = aiv_vec_time / REPEAT_TIMES_FOR_PERF_TEST
+- 单词指令平均耗时(单位: cycles)： time * frequence（硬件频率）  
+
+| 数据类型 | SIZE（元素数） | 理论性能（cycles） | 实测性能（cycles） |
+|:------------:|:------------:|:--------------:|:-----------------:|
+| uint16_t     | 16K          | 390            | 419               |
+| uint32_t     | 10K          | 488            | 509               |
+
+> **说明**：性能数据基于典型硬件环境测得，实际结果可能因硬件、驱动版本等因素有所差异。
