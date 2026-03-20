@@ -375,6 +375,6 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_unpack](reg/reg_vector/asc_unpack.md) | 矢量解包操作。 |
 | [asc_unsqueeze](reg/reg_vector/asc_unsqueeze.md) | 根据mask进行解压缩，将生成的数据输出到dst。 |
 | [asc_update_mask](reg/reg_vector/asc_update_mask.md) | 根据value大小生成对应的掩码寄存器中的值。 |
-| [asc_copy](reg/reg_vector/asc_copy_v2.md) | 将数据从RegTensor搬运到MaskReg。|
+| [asc_copy](reg/reg_vector/asc_copy.md) | 完成数据在寄存器内的搬运。|
 
 </cann-filter>
