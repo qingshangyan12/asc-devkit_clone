@@ -55,9 +55,9 @@ private:
         uint16_t dstRow = GetEleFromLayout<decltype(dstLayout), AttrInfo::STRIDE, AttrInfo::ROW, 1>(dstLayout);
 
         uint16_t blockCount = GetEleFromLayout<decltype(srcLayout), AttrInfo::SHAPE, AttrInfo::ROW, 1>(srcLayout);
-        uint16_t blockLen = Std::ceil_division(srcCol * sizeof(srcType), C2PIPE2GM_UNIT);
-        uint16_t srcStride = Std::ceil_division(srcRow * sizeof(srcType), C0_SIZE<>);
-        uint16_t dstStride = Std::ceil_division(dstRow * sizeof(dstType), C2PIPE2GM_UNIT);
+        uint16_t blockLen = CeilDivision(srcCol * sizeof(srcType), C2PIPE2GM_UNIT);
+        uint16_t srcStride = CeilDivision(srcRow * sizeof(srcType), C0_SIZE<>);
+        uint16_t dstStride = CeilDivision(dstRow * sizeof(dstType), C2PIPE2GM_UNIT);
 
         CopyL12FBInstr copyInstr;
         copyInstr.DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
