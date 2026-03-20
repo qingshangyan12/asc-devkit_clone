@@ -95,7 +95,7 @@ struct CheckArrangement {
     static constexpr StrideRow1Type StrideRow1{};
     static constexpr StrideColumn0Type StrideColumn0{};
     static constexpr StrideColumn1Type StrideColumn1{};
-    static constexpr auto c0Size = is_b4_type<type> ? C0_SIZE * 2 : C0_SIZE / sizeof(type);
+    static constexpr auto c0Ele = C0_ELEMENT<type>;
 };
 
 __aicore__ inline constexpr bool CheckPairs() {
@@ -109,7 +109,7 @@ __aicore__ inline constexpr bool CheckPairs(const T& left, const U& right, Args 
 
 template <typename... Args>
 __aicore__ inline constexpr bool CheckEvenPairs(Args... args) {
-    static_assert((sizeof...(args) % 2) == 0, "parameters number must be an number.");
+    static_assert((sizeof...(args) % 2) == 0, "parameters number must be an even number.");
     return CheckPairs(args...);
 }
 
@@ -120,8 +120,8 @@ private:
 
     __aicore__ inline static constexpr bool IsFractalZZFormatNormal() {
         constexpr bool isShapeRight = CheckEvenPairs(Std::Int<FRACTAL_FIXED>{}, arg.ShapeRow0, 
-                                      Std::Int<arg.c0Size>{}, arg.ShapeColumn0);
-        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<arg.c0Size>{}, arg.StrideRow0,
+                                      Std::Int<arg.c0Ele>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<arg.c0Ele>{}, arg.StrideRow0,
                                       Std::Int<1>{}, arg.StrideColumn0);
         return (isShapeRight && isStrideRight);
     }
@@ -167,10 +167,10 @@ private:
     static constexpr CheckArrangement<T> arg{};
 
     __aicore__ inline static constexpr bool IsFractalZNFormat() {
-        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<arg.c0Size>{}, arg.ShapeRow0,
+        constexpr bool isShapeRight = CheckEvenPairs(Std::Int<arg.c0Ele>{}, arg.ShapeRow0,
                Std::Int<FRACTAL_FIXED>{}, arg.ShapeColumn0);
         constexpr bool isStrideRight = CheckEvenPairs(Std::Int<1>{}, arg.StrideRow0,
-               Std::Int<arg.c0Size>{}, arg.StrideColumn0);
+               Std::Int<arg.c0Ele>{}, arg.StrideColumn0);
         return (isShapeRight && isStrideRight);
     }
 public:
@@ -184,8 +184,8 @@ private:
 
     __aicore__ inline static constexpr bool IsFractalNZFormat() {
         constexpr bool isShapeRight = CheckEvenPairs(Std::Int<FRACTAL_FIXED>{}, arg.ShapeRow0,
-               Std::Int<arg.c0Size>{}, arg.ShapeColumn0);
-        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<arg.c0Size>{}, arg.StrideRow0,
+               Std::Int<arg.c0Ele>{}, arg.ShapeColumn0);
+        constexpr bool isStrideRight = CheckEvenPairs(Std::Int<arg.c0Ele>{}, arg.StrideRow0,
                Std::Int<1>{}, arg.StrideColumn0);
         return (isShapeRight && isStrideRight);
     }
@@ -273,7 +273,7 @@ public:
 
 template <typename T>
 struct IsScaleANDFormat { // shape = ((1, row),(1,col)) stride = ((0, col),(0, 1))
-    static constexpr bool value = IsNDFormat<T>::normalValue;
+    static constexpr bool value = IsNDFormat<T>::value;
 };
 
 template <typename T>
@@ -288,7 +288,7 @@ struct IsScaleBNDFormat { // shape = ((2, row/2),(1,col)) stride = ((1, 2*col),(
 
 template <typename T>
 struct IsScaleBDNFormat { // shape = ((1, row),(1,col)) stride = ((0, 1),(0, row))
-    static constexpr bool value = IsDNFormat<T>::normalValue;
+    static constexpr bool value = IsDNFormat<T>::value;
 };
 
 } // namespace Te
