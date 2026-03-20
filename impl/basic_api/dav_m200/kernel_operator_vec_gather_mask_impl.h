@@ -102,28 +102,24 @@ __aicore__ inline void GatherMaskImpl(
     GatherMaskImpl(dst, src0, nullsrc1, patternMode, gatherMaskParams);
 }
 
-template <typename T, GatherMaskMode mode = defaultGatherMaskMode>
-__aicore__ inline void GatherMaskCal(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ uint16_t* src1, const bool reduceMode,
+template <typename T, typename U, GatherMaskMode mode = defaultGatherMaskMode>
+__aicore__ inline void GatherMaskCal(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ U* src1, const bool reduceMode,
     const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
 {
+    static_assert(SupportType<U, uint16_t, uint32_t>(), "Failed to check src1Pattern dtype in GatherMask, current api "
+        "support src1Pattern dtype to be uint16_t / uint32_t.");
     ASCENDC_REPORT_NOT_SUPPORT(mode == GatherMaskMode::VERSION_V1, "GatherMask with mode = GatherMaskMode::V2");
-    ASCENDC_ASSERT((SupportType<T, half, uint16_t, int16_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "GatherMask when src1Pattern is uint16_t tensor, current api support dtype combination is src and dst both: "
-        "half / uint16_t / int16_t.");});
-    GatherMaskImpl(reinterpret_cast<__ubuf__ uint16_t*>(dst), reinterpret_cast<__ubuf__ uint16_t*>(src0), src1, 0,
-        reduceMode, mask, gatherMaskParams, rsvdCnt);
-}
-
-template <typename T, GatherMaskMode mode = defaultGatherMaskMode>
-__aicore__ inline void GatherMaskCal(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ uint32_t* src1, const bool reduceMode,
-    const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
-{
-    ASCENDC_REPORT_NOT_SUPPORT(mode == GatherMaskMode::VERSION_V1, "GatherMask with mode = GatherMaskMode::V2");
-    ASCENDC_ASSERT((SupportType<T, float, uint32_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in "
-        "GatherMask when src1Pattern is uint32_t tensor, current api support dtype combination is src and dst both: "
-        "float / uint32_t / int32_t.");});
-    GatherMaskImpl(reinterpret_cast<__ubuf__ uint32_t*>(dst), reinterpret_cast<__ubuf__ uint32_t*>(src0), src1, 0,
-        reduceMode, mask, gatherMaskParams, rsvdCnt);
+    if constexpr(SupportType<U, uint16_t>()) {
+        ASCENDC_ASSERT((SupportType<T, half, uint16_t, int16_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype "
+            "in GatherMask when src1Pattern is uint16_t tensor, current api support dtype combination is src and dst "
+            "both: half / uint16_t / int16_t.");});
+    } else {
+        ASCENDC_ASSERT((SupportType<T, float, uint32_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype "
+            "in GatherMask when src1Pattern is uint32_t tensor, current api support dtype combination is src and dst "
+            "both: float / uint32_t / int32_t.");});
+    }
+    GatherMaskImpl(reinterpret_cast<__ubuf__ U*>(dst), reinterpret_cast<__ubuf__ U*>(src0), src1, 0, reduceMode, mask,
+        gatherMaskParams, rsvdCnt);
 }
 
 template <typename T, GatherMaskMode mode = defaultGatherMaskMode>
