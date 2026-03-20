@@ -54,6 +54,18 @@ __simd_callee__ inline void asc_gather(vector_fp8_e5m2_t& dst, __ubuf__  fp8_e5m
 __simd_callee__ inline void asc_gather(vector_fp8_e8m0_t& dst, __ubuf__  fp8_e8m0_t* src,
     vector_uint16_t index, vector_bool mask);
 
+__simd_callee__ inline void asc_gather(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index,
+    vector_bool mask);
+
+__simd_callee__ inline void asc_gather(vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index,
+    vector_bool mask);
+
+__simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__ half* src, vector_uint32_t index,
+    vector_bool mask);
+
+__simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index,
+    vector_bool mask);
+
 // ==========源操作数和目的数都为寄存器=========
 // ==========asc_gather(u8/s8/half/u16/s16/u32/s32/bf16/e4m3/e5m2/e8m0)=========
 __simd_callee__ inline void asc_gather(vector_int8_t& dst, vector_int8_t src,
@@ -1409,5 +1421,29 @@ __simd_callee__ inline void asc_scatter(vector_bf16& dst, __ubuf__ bfloat16_t* s
 __simd_callee__ inline void asc_scatter(vector_half& dst, __ubuf__ half* src, vector_uint16_t index, vector_bool mask);
 
 __simd_callee__ inline void asc_scatter(vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask);
+
+__simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src);
+
+__simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset);
+
+__simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset);
+
+__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src);
+
+__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset);
+
+__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset);
+
+__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src);
+
+__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset);
+
+__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset);
+
+__simd_callee__ inline void asc_loadalign_postupdate(vector_bool& dst, __ubuf__ uint32_t* src);
+
+__simd_callee__ inline void asc_loadalign_upsample_postupdate(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset);
+
+__simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset);
 
 #endif

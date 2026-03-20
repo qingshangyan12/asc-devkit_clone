@@ -131,6 +131,12 @@ __simd_callee__ inline void asc_loadalign_impl(vector_float& dst, __ubuf__ float
     }
 }
 
+__simd_callee__ inline void asc_loadalign_impl(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset) {
+    if ASC_IS_AIV {
+        pld(dst, src, offset, NORM);
+    }
+}
+
 // =========BRC_B8(fp4x2_e2m1/fp4x2_e1m2/u8/s8/f8_e4m3/fp8_e5m2/fp8_e8m0)=========
 __simd_callee__ inline void asc_loadalign_brc_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
 {
@@ -334,6 +340,12 @@ __simd_callee__ inline void asc_loadalign_upsample_impl(vector_half& dst, __ubuf
     }
 }
 
+__simd_callee__ inline void asc_loadalign_upsample_impl(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset) {
+    if ASC_IS_AIV {
+        pld(dst, src, offset, US);
+    }
+}
+
 // =========DS(B8/B16)=========
 __simd_callee__ inline void asc_loadalign_downsample_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src_align_32b, iter_reg offset)
 {
@@ -421,6 +433,12 @@ __simd_callee__ inline void asc_loadalign_downsample_impl(vector_half& dst, __ub
 {
     if ASC_IS_AIV {
         vld(dst, src_align_32b, offset, DS_B16);
+    }
+}
+
+__simd_callee__ inline void asc_loadalign_downsample_impl(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset) {
+    if ASC_IS_AIV {
+        pld(dst, src, offset, DS);
     }
 }
 
