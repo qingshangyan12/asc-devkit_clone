@@ -47,13 +47,13 @@ PIPE_MTE2
 ## 约束说明
 
 - 对于插入padding值的场景：
-<br>&bull; burst_len的单位为32个字节的指的是写入L1 Buffer的实际数据数，它必须设置为1，此时一次仅从GM里读取1/2/4/8/16个字节的数据。
-<br>&bull; 每一次burst都是从GM中连续读取，因此不需要设置src_stride。
-<br>&bull; dst_stride以32个字节为单位。
+    - burst_len的单位为32个字节的指的是写入L1 Buffer的实际数据数，它必须设置为1，此时一次仅从GM里读取1/2/4/8/16个字节的数据。
+    - 每一次burst都是从GM中连续读取，因此不需要设置src_stride。
+    - dst_stride以32个字节为单位。
 - 对于移除padding值的场景：
-<br>&bull; 源操作数中一次burst操作的数据为burst_len * 32个字节，目的操作数中一次burst的实际数据为burst_len * 4/8/16个字节。
-<br>&bull; 每一次burst后都连续地往L1 Buffer中写入，因此不需要设置dst_stride。
-<br>&bull; src_stride以32个字节为单位。
+    - 源操作数中一次burst操作的数据为burst_len * 32个字节，目的操作数中一次burst的实际数据为burst_len * 4/8/16个字节。
+    - 每一次burst后都连续地往L1 Buffer中写入，因此不需要设置dst_stride。
+    - src_stride以32个字节为单位。
 
 ## 调用示例
 

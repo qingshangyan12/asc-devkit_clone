@@ -38,10 +38,10 @@ PIPE_S
 - 需要保证相同的ID只会被一个流水线控制。
 - 每个ID对应一个4位计数器，特定CORE的同步ID计数器可通过其他CORE发起的asc_sync_intra_arrive递增；也可通过本身发起的asc_sync_intra_wait递减。 
 - 三个CORE的ID映射规则如下：
-<br> ID为0~15的VECC0RE0的asc_sync_intra_arrive指令会被映射到CUBECORE的0~15的ID。 
-<br> ID为0~15的VECC0RE1的asc_sync_intra_arrive指令会被映射到CUBECORE的16~31的ID。 
-<br> ID为0~15的CUBECORE的asc_sync_intra_arrive指令会被映射到VECC0RE0的0~15的ID。 
-<br> ID为16~31的CUBECORE的asc_sync_intra_arrive指令会被映射到VECC0RE0的0~15的ID。 
+    - ID为0~15的VECC0RE0的asc_sync_intra_arrive指令会被映射到CUBECORE的0~15的ID。 
+    - ID为0~15的VECC0RE1的asc_sync_intra_arrive指令会被映射到CUBECORE的16~31的ID。 
+    - ID为0~15的CUBECORE的asc_sync_intra_arrive指令会被映射到VECC0RE0的0~15的ID。 
+    - ID为16~31的CUBECORE的asc_sync_intra_arrive指令会被映射到VECC0RE0的0~15的ID。 
 
 ## 调用示例
 
