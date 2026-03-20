@@ -27,6 +27,8 @@
 
 namespace AscendC {
 namespace Internal {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+    __NPU_ARCH__ == 3113)
 template <uint32_t size = sizeof(uint8_t)> struct ExtractTypeBySize {
     using T = uint8_t;
 };
@@ -43,6 +45,7 @@ template <> struct ExtractTypeBySize<sizeof(uint64_t)> {
     using T = uint64_t;
 };
 } // namespace Internal
+#endif
 
 namespace Reg {
 namespace Internal {
