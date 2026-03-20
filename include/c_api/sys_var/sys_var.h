@@ -65,6 +65,10 @@ __aicore__ inline int64_t asc_get_vf_len();
 
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
 
+__aicore__ inline void asc_get_arch_ver(uint32_t& coreVersion);
+
+__aicore__ inline int64_t asc_get_core_id();
+
 #endif
 
 #endif
