@@ -243,7 +243,7 @@ public:
     }
 
     __aicore__ static inline void Max(const LocalTensor<T> &dst, uint32_t count)
-    {      
+    {
         Duplicate(dst, Max(), count);
     }
 
