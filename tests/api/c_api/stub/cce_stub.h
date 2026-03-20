@@ -32,19 +32,46 @@ void vsts(vector_f8e8m0 src0, vector_f8e8m0 src1, __ubuf__ fp8_e8m0_t* base, int
 void vsts(vector_f4e2m1x2 src0, vector_f4e2m1x2 src1, __ubuf__ fp4x2_e2m1_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f4e1m2x2 src0, vector_f4e1m2x2 src1, __ubuf__ fp4x2_e1m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 
-inline void copy_gm_to_cbuf_v2(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride) {} 
-inline void img2colv2_cbuf_to_ca(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,  
-                        uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel) {} 
-inline void img2colv2_cbuf_to_ca(__ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,  
-                        uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel) {} 
-inline void img2colv2_cbuf_to_cb(__cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,  
-                        uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel) {} 
-inline void img2colv2_cbuf_to_cb(__cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,  
-                        uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel) {} 
-inline void wait_flag_dev(pipe_t pipe, uint8_t flag_id) {} 
-inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {} 
-inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {} 
+inline void vgather2_bc(vector_s16& dst, __ubuf__ int16_t* src, vector_u32 index, vector_bool mask) {}
+inline void vgather2_bc(vector_u16& dst, __ubuf__ uint16_t* src, vector_u32 index, vector_bool mask) {}
+inline void vgather2_bc(vector_f16& dst, __ubuf__ half* src, vector_u32 index, vector_bool mask) {}
+inline void vgather2_bc(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_u32 index, vector_bool mask) {}
+
+inline void vbr(vector_f8e4m3& dst, fp8_e4m3fn_t value) {}
+inline void vbr(vector_f8e5m2& dst, fp8_e5m2_t value) {}
+inline void vbr(vector_f8e8m0& dst, fp8_e8m0_t value) {}
+
+inline void copy_gm_to_cbuf_v2(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride) {}
+inline void img2colv2_cbuf_to_ca(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,
+                        uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel) {}
+inline void img2colv2_cbuf_to_ca(__ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,
+                        uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel) {}
+inline void img2colv2_cbuf_to_cb(__cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,
+                        uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel) {}
+inline void img2colv2_cbuf_to_cb(__cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,
+                        uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w, bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel) {}
+inline void wait_flag_dev(pipe_t pipe, uint8_t flag_id) {}
+inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {}
+inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {}
 inline void rls_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
+
+inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
+
+// ==========vstar===========
+inline void vstar(vector_align data, __ubuf__ fp8_e4m3fn_t* base) {}
+inline void vstar(vector_align data, __ubuf__ fp8_e5m2_t* base) {}
+inline void vstar(vector_align data, __ubuf__ fp8_e8m0_t* base) {}
+inline void vstar(vector_align data, __ubuf__ fp4x2_e2m1_t* base) {}
+inline void vstar(vector_align data, __ubuf__ fp4x2_e1m2_t* base) {}
+
+// ==========vstur===========
+inline void vstur(vector_align& alignData, vector_s64 src, __ubuf__ int64_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f8e4m3 src, __ubuf__ fp8_e4m3fn_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f8e5m2 src, __ubuf__ fp8_e5m2_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f8e8m0 src, __ubuf__ fp8_e8m0_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f4e2m1x2 src, __ubuf__ fp4x2_e2m1_t* base, Literal post) {}
+inline void vstur(vector_align& alignData, vector_f4e1m2x2 src, __ubuf__ fp4x2_e1m2_t* base, Literal post) {}
+
 
 #if defined(__DAV_CUBE__)
     inline int32_t g_coreType = 1;

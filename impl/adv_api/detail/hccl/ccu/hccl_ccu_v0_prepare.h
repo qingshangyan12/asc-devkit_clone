@@ -64,7 +64,6 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAllVWr
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
  
-    uint64_t tmpCount = commParam->count / ccuParam_.rankNum;
     uint64_t loopCount = CCU_LOOP_COUNT_ATAVW;
  
     xnData_[1] = reinterpret_cast<uint64_t>(commParam->sendBuf); // 1 is index of xnData
