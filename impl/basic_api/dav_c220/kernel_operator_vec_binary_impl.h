@@ -62,9 +62,9 @@ template <typename T>
 __aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in Add, current api support dtype combination is src and dst both: half / float / "
-            "int16_t / int32_t.");});
+            "int16_t / int32_t.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vadd(dst, src0, src1, 1, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE,
@@ -113,9 +113,9 @@ template <typename T>
 __aicore__ inline void SubImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in Sub, current api support dtype combination is src and dst both: half / float / "
-            "int16_t / int32_t.");});
+            "int16_t / int32_t.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vsub(dst, src0, src1, 1, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE,
@@ -163,9 +163,9 @@ template <typename T>
 __aicore__ inline void MulImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in Mul, current api support dtype combination is src and dst both: half / float / "
-            "int16_t / int32_t.");});
+            "int16_t / int32_t.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vmul(dst, src0, src1, 1, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE,
@@ -213,8 +213,8 @@ template <typename T>
 __aicore__ inline void DivImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, float>()), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Div, "
-            "current api support dtype combination is src and dst both: half / float.");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype "
+            "in Div, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vdiv(dst, src0, src1, 1, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE,
@@ -263,9 +263,9 @@ template <typename T>
 __aicore__ inline void MaxImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in Max, current api support dtype combination is src and dst both: half / float / "
-            "int16_t / int32_t.");});
+            "int16_t / int32_t.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vmax(dst, src0, src1, 1, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE,
@@ -314,9 +314,9 @@ template <typename T>
 __aicore__ inline void MinImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((SupportType<T, half, float, int16_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in Min, current api support dtype combination is src and dst both: half / float / "
-            "int16_t / int32_t.");});
+            "int16_t / int32_t.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         vmin(dst, src0, src1, 1, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE,
@@ -365,9 +365,12 @@ template <typename T>
 __aicore__ inline void AndImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, int16_t, uint16_t, uint32_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
+        ASCENDC_DEBUG_ASSERT((SupportType<T, int16_t, uint16_t, uint32_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
             "Failed to check dtype in And, current api support dtype combination is src and dst both: int16_t / "
-            "uint16_t / uint32_t / int32_t.");});
+            "uint16_t / uint32_t / int32_t.\n"));
+        ASCENDC_DEBUG_WARNING((!SupportType<T, uint32_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_WARN,
+            "When dtype is int32_t / uint32_t for And with count, it is not recommended to be used. Please use "
+            "int16_t / uint16_t instead.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         // for compatibility, in older version, all dtype reinterpret_cast to int16_t
@@ -418,9 +421,12 @@ template <typename T>
 __aicore__ inline void OrImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_ASSERT((SupportType<T, int16_t, uint16_t, uint32_t, int32_t>()), {KERNEL_LOG(KERNEL_ERROR,
-            "Failed to check dtype in Or, current api support dtype combination is src and dst both: int16_t / uint16_t"
-            " / uint32_t / int32_t.");});
+        ASCENDC_DEBUG_ASSERT((SupportType<T, int16_t, uint16_t, uint32_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dtype in Or, current api support dtype combination is src and dst both: int16_t / "
+            "uint16_t / uint32_t / int32_t.\n"));
+        ASCENDC_DEBUG_WARNING((!SupportType<T, uint32_t, int32_t>()), KERNEL_LOG_INTERNAL(KERNEL_WARN,
+            "When dtype is int32_t / uint32_t for Or with count, it is not recommended to be used. Please use "
+            "int16_t / uint16_t instead.\n"));
         set_mask_count();
         set_vector_mask(0, count);
         // for compatibility, in older version, all dtype reinterpret_cast to int16_t
