@@ -82,7 +82,7 @@ private:
         if constexpr (IsSameType<PrimT<T>, T>::value) {
             Duplicate(dstLocal, static_cast<PrimT<T>>(0), mDstElementCount);
         }
-        uint64_t maskbit[2] = {0x0, 0xFFFFFFFFFFFFFFFF};
+        uint64_t maskbit[2] = {0x1, 0xFFFFFFFFFFFFFFFF};
         BilinearInterpolation(dstLocal, src0Local, src0OffsetLocal, src1Local, maskbit, mHRepeat, mRepeatMode,
             mDstBlkStride, mVROffset, mVRepeat, tmpLocal);
         BilinearInterpolation(dstLocal, src0Local, src0OffsetLocal, src1Local, mMask, mHRepeat, mRepeatMode,
@@ -166,13 +166,13 @@ INSTANTIATE_TEST_CASE_P(TEST_OPEARATION_BILINEARINTERPOLATION, BilinearInterpola
         bilinearInterpolationParams{128, 2, false, 1, 128, 2, true, 0, 2, testBilinearInterpolation<half>},
         // dtype仅支持为half
         bilinearInterpolationParams{128, 2, false, 1, 128, 2, false, 2, 2, testBilinearInterpolation<int16_t>},
-        bilinearInterpolationParams{128, 2, false, 1, 128, 2, false, 2, 4, testBilinearInterpolation<float>},
+        bilinearInterpolationParams{64, 2, false, 1, 128, 2, false, 2, 4, testBilinearInterpolation<float>},
         // vROffset范围为[128, 65535] + tensorSize overflow
         bilinearInterpolationParams{128, 2, false, 1, 100, 2, false, 9, 2, testBilinearInterpolation<half>},
         // TensorTrait
         bilinearInterpolationParams{128, 2, false, 1, 128, 2, true, 0, 2, testBilinearInterpolation<AscendC::TensorTrait<half>>},
         bilinearInterpolationParams{128, 2, false, 1, 128, 2, false, 2, 2, testBilinearInterpolation<AscendC::TensorTrait<int16_t>>},
-        bilinearInterpolationParams{128, 2, false, 1, 128, 2, false, 2, 4, testBilinearInterpolation<AscendC::TensorTrait<float>>},
+        bilinearInterpolationParams{128, 2, false, 1, 128, 2, false, 5, 4, testBilinearInterpolation<AscendC::TensorTrait<float>>},
         bilinearInterpolationParams{128, 2, false, 1, 100, 2, false, 9, 2, testBilinearInterpolation<AscendC::TensorTrait<half>>}
 ));
 
