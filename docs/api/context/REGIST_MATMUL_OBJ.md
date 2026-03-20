@@ -58,6 +58,9 @@ REGIST_MATMUL_OBJ(tpipe, workspace, ...)
 -   在程序中，最多支持定义4个Matmul对象。
 -   当代码中只有一个Matmul对象时，本接口可以不传入tiling参数，通过[Init](Init-86.md)接口单独传入tiling参数。
 -   当代码中有多个Matmul对象时，必须满足Matmul对象与其tiling参数一一对应，依次传入，具体方式请参考调用示例。
+-   在分离模式中，本接口调用后，AIC核仅会执行下述适配了AIV核发起的接口，其他接口不会在AIC核执行：
+    -    [Matmul Kernel侧接口](Matmul-Kernel侧接口.md)目录下的接口
+    -    [基础数据搬运](基础数据搬运.md)和[随路转换ND2NZ搬运](随路转换ND2NZ搬运.md)接口，仅支持数据通路为GM -> A1、B1（GM -> L1 Buffer）
 
 ## 调用示例<a name="section15468239131714"></a>
 
