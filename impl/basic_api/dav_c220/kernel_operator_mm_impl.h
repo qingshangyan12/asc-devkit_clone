@@ -20,6 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #include "kernel_struct_mm.h"
+#include "kernel_npu_debug.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -69,6 +70,8 @@ template <typename T>
 __aicore__ inline void LoadData2DGM2L0ACal(__ca__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParam)
 {
     if ASCEND_IS_AIC {
+        ASCENDC_DEBUG_ASSERT((!SupportType<T, int4b_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "LoadData with LoadData2DParams, GM -> A2 does not support int4b_t.\n"));
         using U = typename Conditional<SupportType<T, uint16_t, int16_t>(), half, T>::type;
         load_gm_to_ca((__ca__ U*)dst, (__gm__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, (addr_cal_mode_t)0);
@@ -79,6 +82,8 @@ template <typename T>
 __aicore__ inline void LoadData2DGM2L0BCal(__cb__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParam)
 {
     if ASCEND_IS_AIC {
+        ASCENDC_DEBUG_ASSERT((!SupportType<T, int4b_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "LoadData with LoadData2DParams, GM -> B2 does not support int4b_t.\n"));
         using U = typename Conditional<SupportType<T, uint16_t, int16_t>(), half, T>::type;
         load_gm_to_cb((__cb__ U*)dst, (__gm__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
             loadDataParam.srcStride, loadDataParam.dstGap, loadDataParam.sid, (addr_cal_mode_t)0);
@@ -89,6 +94,8 @@ template <typename T>
 __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParam)
 {
     if ASCEND_IS_AIC {
+        ASCENDC_DEBUG_ASSERT((!SupportType<T, int4b_t>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check dtype in "
+            "LoadData with LoadData2DParams, GM -> A1 / B1 does not support int4b_t.\n"));
         using U = typename Conditional<SupportType<T, uint16_t, int16_t>(), half, T>::type;
         if (loadDataParam.addrMode == 0) {
             load_gm_to_cbuf((__cbuf__ U*)dst, (__gm__ U*)src, loadDataParam.startIndex, loadDataParam.repeatTimes,
@@ -103,31 +110,41 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T *dst, __cbuf__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from A1 to A2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from A1 to A2");
+#endif
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T *dst, __cbuf__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from B1 to B2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from B1 to B2");
+#endif
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L0ACal(__ca__ T *dst, __gm__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from GM to A2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from GM to A2");
+#endif
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L0BCal(__cb__ T *dst, __gm__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from GM to B2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from GM to B2");
+#endif
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T *dst, __gm__ T *src, const LoadData2DParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadData with LoadData2DParamsV2 from GM to A1 / B1");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadData with LoadData2DParamsV2 from GM to A1 / B1");
+#endif
 }
 
 template <typename T>
@@ -135,9 +152,6 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(__ca__ T *dst, __cbuf__ T *s
     const LoadData2dTransposeParams &loadDataParam)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadDataWithTranspose when dst position is A2, current "
-            "api support dtype combination is dst: half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t");});
         if constexpr (!IsSameType<T, int4b_t>::value) {
             load_cbuf_to_ca_transpose(dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes,
                 loadDataParam.srcStride, loadDataParam.dstGap, inc, loadDataParam.dstFracGap);
@@ -150,10 +164,6 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *s
     const LoadData2dTransposeParams &loadDataParam)
 {
     if ASCEND_IS_AIC {
-        ASCENDC_ASSERT((SupportType<T, half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t, int4b_t>()),
-            {KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in LoadDataWithTranspose when dst position is B2, current "
-            "api support dtype combination is dst: half, bfloat16_t, float, int32_t, uint32_t, uint8_t, int8_t, "
-            "int4b_t");});
         if constexpr (IsSameType<T, int4b_t>::value) {
             load_cbuf_to_cb_transpose_s4((__cb__ void *)dst, (__cbuf__ void *)src, loadDataParam.startIndex,
                 loadDataParam.repeatTimes, loadDataParam.srcStride, loadDataParam.dstGap, inc,
@@ -169,7 +179,9 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(__cb__ T *dst, __cbuf__ T *src,
     const LoadData2dTransposeParamsV2 &loadDataParam)
 {
-    ASCENDC_REPORT_NOT_SUPPORT(false, "LoadDataWithTranspose with LoadData2dTransposeParamsV2 from B1 to B2");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNotSupport(false, "LoadDataWithTranspose with LoadData2dTransposeParamsV2 from B1 to B2");
+#endif
 }
 
 /* **************************************************************************************************

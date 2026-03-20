@@ -22,11 +22,11 @@ void MainVecBinaryScalarDemo(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t*
     inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(srcGm), dataSize);
     outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(dstGm), dataSize);
 
-    TBuf<TPosition::CO2> tbuf;
+    TBuf<TPosition::VECIN> tbuf;
     tpipe.InitBuffer(tbuf, dataSize * sizeof(T));
     LocalTensor<T> inputLocal = tbuf.Get<T>();
 
-    TBuf<TPosition::CO2> tbuf1;
+    TBuf<TPosition::VECIN> tbuf1;
     tpipe.InitBuffer(tbuf1, dataSize * sizeof(T));
     LocalTensor<T> outputLocal = tbuf1.Get<T>();
 
