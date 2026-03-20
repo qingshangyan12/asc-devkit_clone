@@ -89,6 +89,7 @@ struct gatherParams {
     uint32_t typeSize;
     uint32_t elementCount;
     bool expectRes;
+    uint32_t expectErrorTimes;
     void (*CalFunc)(uint8_t*, uint8_t*, uint8_t*, uint32_t);
 };
 
@@ -105,20 +106,20 @@ protected:
 };
 
 INSTANTIATE_TEST_CASE_P(TEST_OPEARATION_GATHER, GatherTestsuite,
-    ::testing::Values(gatherParams { 2, 128, true, testGather<half>},
-        gatherParams { 4, 128, true, testGather<float>},
-        gatherParams { 2, 192, true, testGather<half>},
-        gatherParams { 4, 192, true, testGather<float>},
-        gatherParams { 2, 256, true, testGather<half>},
-        gatherParams { 4, 256, true, testGather<half>},
+    ::testing::Values(gatherParams { 2, 128, true, 2, testGather<half>},
+        gatherParams { 4, 128, true, 2, testGather<float>},
+        gatherParams { 2, 192, true, 2, testGather<half>},
+        gatherParams { 4, 192, true, 2, testGather<float>},
+        gatherParams { 2, 256, true, 2, testGather<half>},
+        gatherParams { 4, 256, true, 2, testGather<half>},
 
-        gatherParams { 4, 256, false, testGather<int8_t>},
-        gatherParams { 4, 256, false, testGather<uint8_t>},
+        gatherParams { 4, 256, false, 1, testGather<int8_t>},
+        gatherParams { 4, 256, false, 1, testGather<uint8_t>},
         // TensorTrait
-        gatherParams { 2, 128, true, testGather<AscendC::TensorTrait<half>>},
-        gatherParams { 4, 128, true, testGather<AscendC::TensorTrait<float>>},
-        gatherParams { 4, 256, false, testGather<AscendC::TensorTrait<int8_t>>},
-        gatherParams { 4, 256, false, testGather<AscendC::TensorTrait<uint8_t>>}
+        gatherParams { 2, 128, true, 2, testGather<AscendC::TensorTrait<half>>},
+        gatherParams { 4, 128, true, 2, testGather<AscendC::TensorTrait<float>>},
+        gatherParams { 4, 256, false, 1, testGather<AscendC::TensorTrait<int8_t>>},
+        gatherParams { 4, 256, false, 1, testGather<AscendC::TensorTrait<uint8_t>>}
 ));
 
 
@@ -129,7 +130,7 @@ TEST_P(GatherTestsuite, testGather)
     uint8_t srcOffsetGm[param.elementCount * sizeof(uint32_t)] = {0};
     uint8_t dstGm[param.elementCount * param.typeSize] = {0};
     if (!param.expectRes) {
-        MOCKER(raise, int(*)(int)).times(2).will(returnValue(0));
+        MOCKER(raise, int(*)(int)).times(param.expectErrorTimes).will(returnValue(0));
     }
     param.CalFunc(dstGm, srcGm, srcOffsetGm, param.elementCount);
 

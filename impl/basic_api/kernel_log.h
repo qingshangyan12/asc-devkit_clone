@@ -53,6 +53,15 @@ namespace AscendC {
     } while (0)
 #endif
 
+// intend to give warning when cond is false instead of abort
+#define ASCENDC_ASSERT_WARNING(cond, behavior) \
+    do {                                       \
+        if (!(cond)) {                         \
+            behavior;                          \
+        }                                      \
+    } while (0)
+
+
 #else // defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
 
 #ifndef ASCC_ASCENDC_ASSERT
@@ -331,6 +340,14 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
             abort();                                                                                                    \
         }                                                                                                               \
     } while (0)
+#define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                                        \
+    do                                                                                                                   \
+    {                                                                                                                    \
+        if (!(expr))                                                                                                     \
+        {                                                                                                                \
+            fprintf(stderr, "%s[WARNING] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
+        }                                                                                                                \
+    } while (0)
 #else
 #if defined(ASC_DEVKIT_VERSION_STR) && defined(ASC_DEVKIT_TIMESTAMP)
 #define ASSERT_MSG(expr, fmt, ...)  \
@@ -355,6 +372,16 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
             trap();                                                                                        \
         }                                                                                                  \
     } while (0)
+#define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                          \
+    do {                                                                                                   \
+        ENABLE_ASSERT();                                                                                   \
+        ENABLE_ASSERT_DUMP_SIZE();                                                                         \
+        if (!(expr)) {                                                                                     \
+            AscendC::AssertPrint("%s[WARNING] [CANN_VERSION : %s][TimeStamp : %u] %s:%u: Assertion `%s' " fmt, prompt,\
+            (__gm__ const char*)(ASC_DEVKIT_VERSION_STR), static_cast<uint64_t>(ASC_DEVKIT_TIMESTAMP),                 \
+            __FILE__, __LINE__, #expr, ##__VA_ARGS__);                                                     \
+        }                                                                                                  \
+    } while (0)
 #else
 #define ASSERT_MSG(expr, fmt, ...)                                                                                \
     do {                                                                                                          \
@@ -372,6 +399,14 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
         if (!(expr)) {                                                                                            \
             AscendC::AssertPrint("%s[ASSERT] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
             trap();                                                                                               \
+        }                                                                                                         \
+    } while (0)
+#define ASC_WARNING_MSG__(prompt, expr, fmt, ...)                                                                  \
+    do {                                                                                                          \
+        ENABLE_ASSERT();                                                                                          \
+        ENABLE_ASSERT_DUMP_SIZE();                                                                                \
+        if (!(expr)) {                                                                                            \
+            AscendC::AssertPrint("%s[WARNING] %s:%u: Assertion `%s' " fmt, prompt, __FILE__, __LINE__, #expr, ##__VA_ARGS__); \
         }                                                                                                         \
     } while (0)
 #endif
@@ -396,6 +431,19 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
         }                                          \
     } while (0)
 
+#define ASCENDC_DEBUG_WARNING_IMPL(expr, ...)      \
+    do {                                           \
+        __gm__ const char* prompt = "";            \
+        if (!(expr)) {                             \
+            if (VA_ARGS_IS_EMPTY(__VA_ARGS__)) {   \
+                ASC_WARNING_MSG__(prompt, expr, "\n");\
+            } else {                               \
+                ASC_WARNING_MSG__(prompt, expr, __VA_ARGS__);\
+            }                                      \
+        }                                          \
+    } while (0)
+
+
 #ifdef ASCENDC_CPU_DEBUG
 #define ASCENDC_DEBUG_DEPRECATE_ASSERT_IMPL(expr, ...)                        \
     do {                                                                      \
@@ -429,6 +477,7 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
 #endif
 #else
 #define ASCENDC_DEBUG_ASSERT_IMPL(...)
+#define ASCENDC_DEBUG_WARNING_IMPL(...)
 #define ASCENDC_DEBUG_DEPRECATE_ASSERT_IMPL(...)
 #endif
 
@@ -444,6 +493,18 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
                 ASC_ASSERT_MSG__(prompt, expr, "\n");\
             } else {                               \
                 ASC_ASSERT_MSG__(prompt, expr, __VA_ARGS__);\
+            }                                      \
+        }                                          \
+    } while (0)
+
+#define ASCENDC_DEBUG_WARNING_IMPL(expr, ...)       \
+    do {                                           \
+        __gm__ const char* prompt = "";            \
+        if (!(expr)) {                             \
+            if (VA_ARGS_IS_EMPTY(__VA_ARGS__)) {   \
+                ASC_WARNING_MSG__(prompt, expr, "\n");\
+            } else {                               \
+                ASC_WARNING_MSG__(prompt, expr, __VA_ARGS__);\
             }                                      \
         }                                          \
     } while (0)
@@ -481,6 +542,7 @@ __host_aicore__ static __attribute__ ((noinline)) void AssertFail(const __gm__ c
 #endif
 #else
 #define ASCENDC_DEBUG_ASSERT_IMPL(...)
+#define ASCENDC_DEBUG_WARNING_IMPL(...)
 #define ASCENDC_DEBUG_DEPRECATE_ASSERT_IMPL(...)
 #endif
 
@@ -491,13 +553,16 @@ namespace AscendC{
 #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
 #define KERNEL_LOG_INTERNAL(level, format, ...) KERNEL_LOG_##level(format, ##__VA_ARGS__)
 #define ASCENDC_DEBUG_ASSERT(...) ASCENDC_ASSERT(__VA_ARGS__)
+#define ASCENDC_DEBUG_WARNING(...) ASCENDC_ASSERT_WARNING(__VA_ARGS__)
 #else
 #ifdef ASCENDC_DEBUG
 #define KERNEL_LOG_INTERNAL(level, format, ...) format, ##__VA_ARGS__
 #define ASCENDC_DEBUG_ASSERT(...) ASCENDC_DEBUG_ASSERT_IMPL(__VA_ARGS__)
+#define ASCENDC_DEBUG_WARNING(...) ASCENDC_DEBUG_WARNING_IMPL(__VA_ARGS__)
 #else
 #define KERNEL_LOG_INTERNAL(level, format, ...)
 #define ASCENDC_DEBUG_ASSERT(...)
+#define ASCENDC_DEBUG_WARNING(...)
 #endif
 #endif
 }
