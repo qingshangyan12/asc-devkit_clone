@@ -75,6 +75,7 @@ template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
         return;
     }
 #else
+    static_assert(pipe != PIPE_S, "PipeBarrier<PIPE_S> is not supported on current device!");
     if ASCEND_IS_AIC {
         if constexpr (pipe == PIPE_MTE3) {
             return;
@@ -103,6 +104,7 @@ template <pipe_t pipe> __aicore__ inline void PipeBarrierImpl()
     }
 #endif
 #if (__NPU_ARCH__ == 2201)
+    ASCENDC_DEBUG_ASSERT(pipe != PIPE_S, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "PipeBarrier<PIPE_S> is not supported on current device!"));
     if ASCEND_IS_AIC {
         if constexpr (pipe == PIPE_V) {
             return;
