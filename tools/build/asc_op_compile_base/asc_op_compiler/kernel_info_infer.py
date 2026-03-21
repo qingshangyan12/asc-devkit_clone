@@ -139,7 +139,7 @@ AscendCLogLevel.LOG_ERROR)
     @staticmethod
     def get_dump_info_from_i_file(content):
         dump_info = {"dump_type": "", "dump_size": 1048576}
-        if CommonUtility.is_c310():
+        if CommonUtility.is_c310() or CommonUtility.is_v220():
             actual_dump_size = 1048576 * CommonUtility.get_dump_core_num()
 
             match_printf = re.search(r"__enable_feature_for_compile_printf = 1", content)

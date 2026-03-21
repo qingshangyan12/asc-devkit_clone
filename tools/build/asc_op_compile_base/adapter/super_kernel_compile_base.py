@@ -14,9 +14,9 @@ super kernel compile base
 """
 
 
-def gen_super_dump_code(is_mix: bool, dump_size: int, offset: int, is_c310: bool):
+def gen_super_dump_code(is_mix: bool, dump_size: int, offset: int, is_c310_c220: bool):
     source = ""
-    if is_c310:
+    if is_c310_c220:
         source += "    #if defined ASCENDC_DUMP || defined ASCENDC_TIME_STAMP_ON\n"
         source += "    constexpr uint32_t ASCENDC_DUMP_SIZE = 123;\n"
         if is_mix:
