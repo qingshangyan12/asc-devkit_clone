@@ -149,7 +149,7 @@ AscendCLogLevel.LOG_ERROR)
         elif match_assert:
             dump_info["dump_type"] = "assert"
 
-        if dump_info["dump_type"] == "assert"
+        if dump_info["dump_type"] == "assert":
             actual_dump_size = 1048576 * CommonUtility.get_dump_core_num()
 
             match = re.search(r"__enable_feature_for_compile_assertBufSize = \s*([0-9]{1,})", content)
