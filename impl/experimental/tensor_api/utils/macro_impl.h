@@ -61,7 +61,7 @@ namespace AscendC {
 namespace Std {
 
 template <typename T, typename U>
-ASCENDC_HOST_AICORE inline constexpr auto ceil_align(const T& num1, const U& num2)
+ASCENDC_HOST_AICORE inline constexpr decltype(auto) ceil_align(T num1, U num2)
 {
     return ceil_division(num1, num2) * num2;
 }

@@ -15,6 +15,8 @@
 #ifndef IMPL_STD_CEIL_DIVISION_H
 #define IMPL_STD_CEIL_DIVISION_H
 
+#include "../type_traits/integral_constant.h"
+
 namespace AscendC {
 namespace Std {
 
