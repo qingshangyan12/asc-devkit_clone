@@ -206,12 +206,12 @@ public:
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
-            Std::is_one_of_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
-                             Std::tuple<__cbuf__ int8_t, __gm__ int8_t>,
-                             Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ half, __gm__ half>,
-                             Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
-                             Std::tuple<__cbuf__ int32_t, __gm__ int32_t>,
-                             Std::tuple<__cbuf__ uint64_t, __gm__ uint64_t>>,
+            Std::is_one_of_v<
+                Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ uint8_t, __gm__ uint8_t>,
+                Std::tuple<__cbuf__ int8_t, __gm__ int8_t>, Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>,
+                Std::tuple<__cbuf__ half, __gm__ half>, Std::tuple<__cbuf__ uint16_t, __gm__ uint16_t>,
+                Std::tuple<__cbuf__ float, __gm__ float>, Std::tuple<__cbuf__ int32_t, __gm__ int32_t>,
+                Std::tuple<__cbuf__ uint64_t, __gm__ uint64_t>, Std::tuple<__cbuf__ int64_t, __gm__ int64_t>>,
             "The data type is not supported.");
 #endif
     }
